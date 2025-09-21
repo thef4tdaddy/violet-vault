@@ -17,7 +17,7 @@ const useLongPress = (callback, threshold = 500) => {
         callback(event);
       }, threshold);
     },
-    [callback, threshold]
+    [callback, threshold],
   );
 
   const clear = useCallback(() => {
@@ -44,22 +44,30 @@ const useKeyboardNavigation = (isExpanded, setExpanded, containerRef) => {
       if (!isExpanded) return;
 
       switch (e.key) {
-        case 'Escape':
+        case "Escape":
           setExpanded(false);
           break;
-        case 'Tab':
+        case "Tab":
           // Let browser handle tab navigation
           break;
-        case 'ArrowUp':
-        case 'ArrowDown': {
+        case "ArrowUp":
+        case "ArrowDown": {
           e.preventDefault();
           // Focus management for action buttons
-          const actionButtons = containerRef.current?.querySelectorAll('[role="menuitem"]');
+          const actionButtons =
+            containerRef.current?.querySelectorAll('[role="menuitem"]');
           if (actionButtons && actionButtons.length > 0) {
-            const currentIndex = Array.from(actionButtons).findIndex(btn => btn === document.activeElement);
-            const nextIndex = e.key === 'ArrowUp'
-              ? (currentIndex <= 0 ? actionButtons.length - 1 : currentIndex - 1)
-              : (currentIndex >= actionButtons.length - 1 ? 0 : currentIndex + 1);
+            const currentIndex = Array.from(actionButtons).findIndex(
+              (btn) => btn === document.activeElement,
+            );
+            const nextIndex =
+              e.key === "ArrowUp"
+                ? currentIndex <= 0
+                  ? actionButtons.length - 1
+                  : currentIndex - 1
+                : currentIndex >= actionButtons.length - 1
+                  ? 0
+                  : currentIndex + 1;
             actionButtons[nextIndex]?.focus();
           }
           break;
@@ -70,8 +78,8 @@ const useKeyboardNavigation = (isExpanded, setExpanded, containerRef) => {
     };
 
     if (isExpanded) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
     }
   }, [isExpanded, setExpanded, containerRef]);
 };

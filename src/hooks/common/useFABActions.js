@@ -37,7 +37,12 @@ export const useRegisterFABActions = ({
         unregisterPrimaryAction(targetScreenId);
       };
     }
-  }, [primaryAction, targetScreenId, registerPrimaryAction, unregisterPrimaryAction]);
+  }, [
+    primaryAction,
+    targetScreenId,
+    registerPrimaryAction,
+    unregisterPrimaryAction,
+  ]);
 
   // Register secondary actions
   useEffect(() => {

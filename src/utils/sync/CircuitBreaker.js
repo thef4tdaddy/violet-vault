@@ -32,7 +32,10 @@ export class CircuitBreaker {
     }
 
     try {
-      const result = await this._executeWithMonitoring(operation, operationName);
+      const result = await this._executeWithMonitoring(
+        operation,
+        operationName,
+      );
       this._onSuccess(operationName);
       return result;
     } catch (error) {
@@ -70,13 +73,15 @@ export class CircuitBreaker {
    */
   async _handleOpenCircuit(operationName) {
     if (Date.now() >= this.nextAttempt) {
-      logger.debug(`🔍 ${this.name}: Attempting to half-open circuit for ${operationName}`);
+      logger.debug(
+        `🔍 ${this.name}: Attempting to half-open circuit for ${operationName}`,
+      );
       this._transitionToHalfOpen();
       return null; // Allow caller to retry
     }
 
     const error = new Error(
-      `Circuit breaker is OPEN. Next attempt in ${this._getTimeUntilRetry()}ms`
+      `Circuit breaker is OPEN. Next attempt in ${this._getTimeUntilRetry()}ms`,
     );
     error.code = "CIRCUIT_BREAKER_OPEN";
     throw error;
@@ -93,7 +98,9 @@ export class CircuitBreaker {
       return await operation();
     } finally {
       const duration = Date.now() - startTime;
-      logger.debug(`⚡ ${this.name}: ${operationName} executed in ${duration}ms`);
+      logger.debug(
+        `⚡ ${this.name}: ${operationName} executed in ${duration}ms`,
+      );
     }
   }
 
@@ -105,7 +112,9 @@ export class CircuitBreaker {
     this.successCount++;
 
     if (this.state === "HALF_OPEN") {
-      logger.info(`✅ ${this.name}: ${operationName} succeeded, closing circuit`);
+      logger.info(
+        `✅ ${this.name}: ${operationName} succeeded, closing circuit`,
+      );
       this._transitionToClosed();
     } else if (this.failures > 0) {
       // Reset failure count on success in CLOSED state
@@ -126,7 +135,7 @@ export class CircuitBreaker {
       {
         error: error.message,
         state: this.state,
-      }
+      },
     );
 
     if (this.failures >= this.failureThreshold) {
@@ -153,11 +162,14 @@ export class CircuitBreaker {
     this.state = "OPEN";
     this.nextAttempt = Date.now() + this.timeout;
 
-    logger.error(`🔴 ${this.name}: Circuit opened due to ${operationName} failures`, {
-      failures: this.failures,
-      threshold: this.failureThreshold,
-      nextRetryIn: this.timeout,
-    });
+    logger.error(
+      `🔴 ${this.name}: Circuit opened due to ${operationName} failures`,
+      {
+        failures: this.failures,
+        threshold: this.failureThreshold,
+        nextRetryIn: this.timeout,
+      },
+    );
   }
 
   /**

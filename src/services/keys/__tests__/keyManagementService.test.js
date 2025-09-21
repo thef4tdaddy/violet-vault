@@ -19,7 +19,7 @@ vi.mock("../../../utils/security/encryption", () => ({
       Promise.resolve({
         key: new Uint8Array([17, 18, 19, 20, 21, 22, 23, 24]),
         salt: new Uint8Array([25, 26, 27, 28, 29, 30, 31, 32]),
-      })
+      }),
     ),
     encrypt: vi.fn(() => Promise.resolve("encrypted-data")),
     decrypt: vi.fn(() => Promise.resolve('{"key":[1,2,3,4],"salt":[5,6,7,8]}')),
@@ -92,9 +92,9 @@ describe("keyManagementService", () => {
         salt: null,
       });
 
-      await expect(keyManagementService.getCurrentKeyFingerprint()).rejects.toThrow(
-        "No encryption key available"
-      );
+      await expect(
+        keyManagementService.getCurrentKeyFingerprint(),
+      ).rejects.toThrow("No encryption key available");
     });
   });
 
@@ -105,7 +105,7 @@ describe("keyManagementService", () => {
       await keyManagementService.copyKeyToClipboard(5);
 
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining('"type":"unprotected"')
+        expect.stringContaining('"type":"unprotected"'),
       );
 
       // Fast-forward time to test auto-clear
@@ -115,10 +115,12 @@ describe("keyManagementService", () => {
     });
 
     it("should handle clipboard errors gracefully", async () => {
-      navigator.clipboard.writeText.mockRejectedValueOnce(new Error("Clipboard error"));
+      navigator.clipboard.writeText.mockRejectedValueOnce(
+        new Error("Clipboard error"),
+      );
 
       await expect(keyManagementService.copyKeyToClipboard()).rejects.toThrow(
-        "Failed to copy to clipboard"
+        "Failed to copy to clipboard",
       );
     });
   });
@@ -147,7 +149,7 @@ describe("keyManagementService", () => {
       });
 
       await expect(keyManagementService.downloadKeyFile()).rejects.toThrow(
-        "No encryption key or salt available"
+        "No encryption key or salt available",
       );
     });
   });
@@ -169,9 +171,9 @@ describe("keyManagementService", () => {
     });
 
     it("should reject weak passwords", async () => {
-      await expect(keyManagementService.downloadProtectedKeyFile("weak")).rejects.toThrow(
-        "Export password must be at least 8 characters long"
-      );
+      await expect(
+        keyManagementService.downloadProtectedKeyFile("weak"),
+      ).rejects.toThrow("Export password must be at least 8 characters long");
     });
   });
 
@@ -191,7 +193,7 @@ describe("keyManagementService", () => {
       });
 
       await expect(keyManagementService.generateQRCode()).rejects.toThrow(
-        "No encryption key or salt available"
+        "No encryption key or salt available",
       );
     });
   });
@@ -262,11 +264,18 @@ describe("keyManagementService", () => {
         login: mockLogin,
       });
 
-      const result = await keyManagementService.importAndLogin(keyFile, null, "vaultpassword");
+      const result = await keyManagementService.importAndLogin(
+        keyFile,
+        null,
+        "vaultpassword",
+      );
 
       expect(result.success).toBe(true);
       expect(result.user).toBe("imported-user");
-      expect(mockLogin).toHaveBeenCalledWith("vaultpassword", expect.any(Object));
+      expect(mockLogin).toHaveBeenCalledWith(
+        "vaultpassword",
+        expect.any(Object),
+      );
     });
 
     it("should import protected key and login", async () => {
@@ -286,7 +295,7 @@ describe("keyManagementService", () => {
       const result = await keyManagementService.importAndLogin(
         keyFile,
         "exportpassword",
-        "vaultpassword"
+        "vaultpassword",
       );
 
       expect(result.success).toBe(true);
@@ -302,7 +311,7 @@ describe("keyManagementService", () => {
 
       // No import password provided
       await expect(
-        keyManagementService.importAndLogin(keyFile, null, "vaultpassword")
+        keyManagementService.importAndLogin(keyFile, null, "vaultpassword"),
       ).rejects.toThrow("Import password required for protected key file");
     });
   });

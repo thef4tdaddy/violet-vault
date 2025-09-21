@@ -8,16 +8,20 @@ import {
   analyzeUnusedCategories,
 } from "../../utils/analytics/transactionAnalyzer";
 
-export const useTransactionAnalysis = (filteredTransactions, allTransactions, settings) => {
+export const useTransactionAnalysis = (
+  filteredTransactions,
+  allTransactions,
+  settings,
+) => {
   return useMemo(() => {
     const uncategorizedSuggestions = analyzeUncategorizedTransactions(
       filteredTransactions,
-      settings
+      settings,
     );
     const unusedCategorySuggestions = analyzeUnusedCategories(
       allTransactions,
       filteredTransactions,
-      settings
+      settings,
     );
 
     return [...uncategorizedSuggestions, ...unusedCategorySuggestions];

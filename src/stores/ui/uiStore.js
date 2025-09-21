@@ -14,9 +14,12 @@ const migrateOldData = async () => {
 
     // Migrate if old data exists
     if (oldData) {
-      logger.info("Migrating data from old budget-store to violet-vault-store", {
-        source: "migrateOldData",
-      });
+      logger.info(
+        "Migrating data from old budget-store to violet-vault-store",
+        {
+          source: "migrateOldData",
+        },
+      );
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -29,7 +32,8 @@ const migrateOldData = async () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts:
+              parsedOldData.state.supplementalAccounts || [],
             debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
@@ -39,10 +43,16 @@ const migrateOldData = async () => {
           version: 0,
         };
 
-        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-        logger.info("Data migration completed successfully - replaced existing data", {
-          source: "migrateOldData",
-        });
+        localStorage.setItem(
+          "violet-vault-store",
+          JSON.stringify(transformedData),
+        );
+        logger.info(
+          "Data migration completed successfully - replaced existing data",
+          {
+            source: "migrateOldData",
+          },
+        );
 
         // Seed Dexie with migrated data so hooks can access it
         await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
@@ -50,11 +60,15 @@ const migrateOldData = async () => {
         await budgetDb.bulkUpsertTransactions(
           transformedData.state.allTransactions.length > 0
             ? transformedData.state.allTransactions
-            : transformedData.state.transactions
+            : transformedData.state.transactions,
         );
-        await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
+        await budgetDb.bulkUpsertSavingsGoals(
+          transformedData.state.savingsGoals,
+        );
         await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-        await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+        await budgetDb.bulkUpsertPaychecks(
+          transformedData.state.paycheckHistory,
+        );
 
         // Save unassignedCash and actualBalance to Dexie metadata
         await setBudgetMetadata({
@@ -262,9 +276,14 @@ const storeInitializer = (set, _get) => ({
       };
 
       // Store analytics locally (could be enhanced to send to analytics service)
-      const existingAnalytics = JSON.parse(localStorage.getItem("pwa_analytics") || "[]");
+      const existingAnalytics = JSON.parse(
+        localStorage.getItem("pwa_analytics") || "[]",
+      );
       existingAnalytics.push(analytics);
-      localStorage.setItem("pwa_analytics", JSON.stringify(existingAnalytics.slice(-50))); // Keep last 50 events
+      localStorage.setItem(
+        "pwa_analytics",
+        JSON.stringify(existingAnalytics.slice(-50)),
+      ); // Keep last 50 events
 
       logger.info("PWA install choice tracked", analytics);
 
@@ -314,9 +333,14 @@ const storeInitializer = (set, _get) => ({
     };
 
     // Store analytics
-    const existingAnalytics = JSON.parse(localStorage.getItem("pwa_analytics") || "[]");
+    const existingAnalytics = JSON.parse(
+      localStorage.getItem("pwa_analytics") || "[]",
+    );
     existingAnalytics.push(analytics);
-    localStorage.setItem("pwa_analytics", JSON.stringify(existingAnalytics.slice(-50)));
+    localStorage.setItem(
+      "pwa_analytics",
+      JSON.stringify(existingAnalytics.slice(-50)),
+    );
 
     // Store dismissal timestamp for cooldown
     localStorage.setItem("pwa_install_last_dismissed", now.toString());
@@ -356,8 +380,11 @@ const storeInitializer = (set, _get) => ({
     });
 
     try {
-      const { default: patchNotesManager } = await import("../../utils/pwa/patchNotesManager");
-      const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
+      const { default: patchNotesManager } = await import(
+        "../../utils/pwa/patchNotesManager"
+      );
+      const patchNotes =
+        await patchNotesManager.getPatchNotesForVersion(toVersion);
 
       set((state) => {
         state.loadingPatchNotes = false;
@@ -404,7 +431,11 @@ const storeInitializer = (set, _get) => ({
       const { useAuth } = await import("../auth/authStore");
       const authState = useAuth.getState();
 
-      if (!authState.isUnlocked || !authState.budgetId || !authState.encryptionKey) {
+      if (
+        !authState.isUnlocked ||
+        !authState.budgetId ||
+        !authState.encryptionKey
+      ) {
         logger.warn("Cannot start background sync - missing auth data", {
           isUnlocked: authState.isUnlocked,
           hasBudgetId: !!authState.budgetId,
@@ -414,7 +445,9 @@ const storeInitializer = (set, _get) => ({
       }
 
       // Import and start the cloud sync service
-      const { cloudSyncService } = await import("../../services/cloudSyncService");
+      const { cloudSyncService } = await import(
+        "../../services/cloudSyncService"
+      );
 
       const syncConfig = {
         budgetId: authState.budgetId,
@@ -452,10 +485,13 @@ const storeInitializer = (set, _get) => ({
 
   // Legacy compatibility: Debt management moved to TanStack Query hooks
   setDebts() {
-    logger.warn("setDebts called - debts are now managed by TanStack Query/useDebts hook", {
-      source: "budgetStore.setDebts",
-      migration: "Use useDebts() hook instead",
-    });
+    logger.warn(
+      "setDebts called - debts are now managed by TanStack Query/useDebts hook",
+      {
+        source: "budgetStore.setDebts",
+        migration: "Use useDebts() hook instead",
+      },
+    );
   },
 });
 
@@ -487,8 +523,8 @@ if (LOCAL_ONLY_MODE) {
           showPatchNotes: state.showPatchNotes,
         }),
       }),
-      { name: "violet-vault-ui-devtools" }
-    )
+      { name: "violet-vault-ui-devtools" },
+    ),
   );
 }
 

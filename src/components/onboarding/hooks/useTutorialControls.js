@@ -10,9 +10,10 @@ export const useTutorialControls = (
   tutorialSteps,
   currentStep,
   setCurrentStep,
-  setShowTutorial
+  setShowTutorial,
 ) => {
-  const { endTutorialStep, markStepComplete, setPreference } = useOnboardingStore();
+  const { endTutorialStep, markStepComplete, setPreference } =
+    useOnboardingStore();
 
   const closeTutorial = useCallback(() => {
     setShowTutorial(false);
@@ -37,7 +38,13 @@ export const useTutorialControls = (
       markStepComplete("accountSetup");
       closeTutorial();
     }
-  }, [tutorialSteps, currentStep, setCurrentStep, markStepComplete, closeTutorial]);
+  }, [
+    tutorialSteps,
+    currentStep,
+    setCurrentStep,
+    markStepComplete,
+    closeTutorial,
+  ]);
 
   const prevStep = useCallback(() => {
     if (currentStep > 0) {

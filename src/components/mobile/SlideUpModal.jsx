@@ -173,7 +173,10 @@ const SlideUpModal = ({
       >
         {/* Handle for visual indication of draggable area */}
         {showHandle && (
-          <div ref={handleRef} className="flex justify-center pt-3 pb-2 cursor-pointer">
+          <div
+            ref={handleRef}
+            className="flex justify-center pt-3 pb-2 cursor-pointer"
+          >
             <div className="w-12 h-1 bg-gray-300 rounded-full" />
           </div>
         )}

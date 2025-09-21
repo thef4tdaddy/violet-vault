@@ -100,7 +100,7 @@ describe("useDashboardCalculations", () => {
 
   it("should calculate totals correctly", () => {
     const { result } = renderHook(() =>
-      useDashboardCalculations(mockEnvelopes, mockSavingsGoals, 150.0, 1200.0)
+      useDashboardCalculations(mockEnvelopes, mockSavingsGoals, 150.0, 1200.0),
     );
 
     expect(result.current.totalEnvelopeBalance).toBe(300.75);
@@ -113,7 +113,7 @@ describe("useDashboardCalculations", () => {
 
   it("should handle balanced accounts", () => {
     const { result } = renderHook(() =>
-      useDashboardCalculations(mockEnvelopes, mockSavingsGoals, 149.75, 1201.5)
+      useDashboardCalculations(mockEnvelopes, mockSavingsGoals, 149.75, 1201.5),
     );
 
     expect(Math.abs(result.current.difference)).toBeLessThan(0.01);
@@ -126,7 +126,9 @@ describe("useDashboardCalculations", () => {
       { id: 2, currentBalance: null },
     ];
 
-    const { result } = renderHook(() => useDashboardCalculations(invalidEnvelopes, [], NaN, 100));
+    const { result } = renderHook(() =>
+      useDashboardCalculations(invalidEnvelopes, [], NaN, 100),
+    );
 
     expect(result.current.totalEnvelopeBalance).toBe(0);
     expect(result.current.safeUnassignedCash).toBe(0);
@@ -159,7 +161,11 @@ describe("useTransactionReconciliation", () => {
 
   it("should handle successful reconciliation", () => {
     const { result } = renderHook(() =>
-      useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
+      useTransactionReconciliation(
+        mockReconcileTransaction,
+        mockEnvelopes,
+        mockSavingsGoals,
+      ),
     );
 
     const mockTransaction = {
@@ -171,7 +177,10 @@ describe("useTransactionReconciliation", () => {
     const mockOnSuccess = vi.fn();
 
     act(() => {
-      const success = result.current.handleReconcileTransaction(mockTransaction, mockOnSuccess);
+      const success = result.current.handleReconcileTransaction(
+        mockTransaction,
+        mockOnSuccess,
+      );
       expect(success).toBe(true);
     });
 
@@ -180,14 +189,18 @@ describe("useTransactionReconciliation", () => {
         amount: -100,
         description: "Test transaction",
         reconciledAt: expect.any(String),
-      })
+      }),
     );
     expect(mockOnSuccess).toHaveBeenCalled();
   });
 
   it("should handle income transactions correctly", () => {
     const { result } = renderHook(() =>
-      useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
+      useTransactionReconciliation(
+        mockReconcileTransaction,
+        mockEnvelopes,
+        mockSavingsGoals,
+      ),
     );
 
     const mockTransaction = {
@@ -203,14 +216,18 @@ describe("useTransactionReconciliation", () => {
     expect(mockReconcileTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
         amount: 100,
-      })
+      }),
     );
   });
 
   it("should validate required fields", () => {
     const { globalToast } = require("../../../stores/ui/toastStore");
     const { result } = renderHook(() =>
-      useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
+      useTransactionReconciliation(
+        mockReconcileTransaction,
+        mockEnvelopes,
+        mockSavingsGoals,
+      ),
     );
 
     // Test missing amount
@@ -225,7 +242,7 @@ describe("useTransactionReconciliation", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please enter amount and description",
-      "Required Fields"
+      "Required Fields",
     );
 
     // Test missing description
@@ -241,7 +258,11 @@ describe("useTransactionReconciliation", () => {
 
   it("should handle auto-reconcile positive difference", () => {
     const { result } = renderHook(() =>
-      useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
+      useTransactionReconciliation(
+        mockReconcileTransaction,
+        mockEnvelopes,
+        mockSavingsGoals,
+      ),
     );
 
     act(() => {
@@ -254,13 +275,17 @@ describe("useTransactionReconciliation", () => {
         description: "Balance reconciliation - added extra funds",
         type: "income",
         envelopeId: "unassigned",
-      })
+      }),
     );
   });
 
   it("should handle auto-reconcile negative difference", () => {
     const { result } = renderHook(() =>
-      useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
+      useTransactionReconciliation(
+        mockReconcileTransaction,
+        mockEnvelopes,
+        mockSavingsGoals,
+      ),
     );
 
     act(() => {
@@ -273,13 +298,17 @@ describe("useTransactionReconciliation", () => {
         description: "Balance reconciliation - adjusted for discrepancy",
         type: "expense",
         envelopeId: "unassigned",
-      })
+      }),
     );
   });
 
   it("should generate correct envelope options", () => {
     const { result } = renderHook(() =>
-      useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
+      useTransactionReconciliation(
+        mockReconcileTransaction,
+        mockEnvelopes,
+        mockSavingsGoals,
+      ),
     );
 
     const options = result.current.getEnvelopeOptions();
@@ -307,11 +336,15 @@ describe("usePaydayManager", () => {
   });
 
   it("should generate payday prediction with sufficient history", () => {
-    const { predictNextPayday } = require("../../../utils/budgeting/paydayPredictor");
+    const {
+      predictNextPayday,
+    } = require("../../../utils/budgeting/paydayPredictor");
     const mockPrediction = { nextPayday: "2023-02-15", confidence: 0.95 };
     predictNextPayday.mockReturnValue(mockPrediction);
 
-    const { result } = renderHook(() => usePaydayManager(mockPaycheckHistory, mockSetActiveView));
+    const { result } = renderHook(() =>
+      usePaydayManager(mockPaycheckHistory, mockSetActiveView),
+    );
 
     expect(result.current.paydayPrediction).toBe(mockPrediction);
     expect(predictNextPayday).toHaveBeenCalledWith(mockPaycheckHistory);
@@ -319,7 +352,10 @@ describe("usePaydayManager", () => {
 
   it("should not generate prediction with insufficient history", () => {
     const { result } = renderHook(() =>
-      usePaydayManager([{ date: "2023-01-01", amount: 2000 }], mockSetActiveView)
+      usePaydayManager(
+        [{ date: "2023-01-01", amount: 2000 }],
+        mockSetActiveView,
+      ),
     );
 
     expect(result.current.paydayPrediction).toBeNull();
@@ -327,19 +363,25 @@ describe("usePaydayManager", () => {
 
   it("should handle process paycheck navigation", () => {
     const logger = require("../../../utils/common/logger");
-    const { result } = renderHook(() => usePaydayManager(mockPaycheckHistory, mockSetActiveView));
+    const { result } = renderHook(() =>
+      usePaydayManager(mockPaycheckHistory, mockSetActiveView),
+    );
 
     act(() => {
       result.current.handleProcessPaycheck();
     });
 
     expect(mockSetActiveView).toHaveBeenCalledWith("paycheck");
-    expect(logger.default.debug).toHaveBeenCalledWith("Navigating to paycheck processor");
+    expect(logger.default.debug).toHaveBeenCalledWith(
+      "Navigating to paycheck processor",
+    );
   });
 
   it("should handle envelope preparation", () => {
     const { globalToast } = require("../../../stores/ui/toastStore");
-    const { result } = renderHook(() => usePaydayManager(mockPaycheckHistory, mockSetActiveView));
+    const { result } = renderHook(() =>
+      usePaydayManager(mockPaycheckHistory, mockSetActiveView),
+    );
 
     act(() => {
       result.current.handlePrepareEnvelopes();
@@ -347,7 +389,7 @@ describe("usePaydayManager", () => {
 
     expect(globalToast.showInfo).toHaveBeenCalledWith(
       "Navigate to envelope management for funding planning!",
-      "Funding Planning"
+      "Funding Planning",
     );
   });
 });
@@ -406,7 +448,9 @@ describe("useDashboardHelpers", () => {
     const { result } = renderHook(() => useDashboardHelpers());
 
     expect(result.current.getBalanceStatusIcon(true, 0)).toBe("CheckCircle");
-    expect(result.current.getBalanceStatusIcon(false, 15)).toBe("AlertTriangle");
+    expect(result.current.getBalanceStatusIcon(false, 15)).toBe(
+      "AlertTriangle",
+    );
     expect(result.current.getBalanceStatusIcon(false, 5)).toBe("AlertTriangle");
   });
 });

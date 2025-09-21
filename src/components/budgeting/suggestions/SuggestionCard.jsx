@@ -20,7 +20,12 @@ const TYPE_ICONS = {
   decrease_envelope: "TrendingDown",
 };
 
-const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) => {
+const SuggestionCard = ({
+  suggestion,
+  onApply,
+  onDismiss,
+  isCompact = false,
+}) => {
   const priorityIconName = PRIORITY_ICONS[suggestion.priority] || "Zap";
   const typeIconName = TYPE_ICONS[suggestion.type] || "Eye";
   const priorityColor = PRIORITY_COLORS[suggestion.priority] || "text-gray-500";
@@ -62,7 +67,9 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
               })}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">{suggestion.title}</p>
+              <p className="font-medium text-gray-900 text-sm truncate">
+                {suggestion.title}
+              </p>
               <p className="text-xs text-gray-600">
                 ${suggestion.suggestedAmount.toFixed(0)}/month
               </p>
@@ -101,7 +108,9 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
             })}
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900 text-sm">{suggestion.title}</h4>
+            <h4 className="font-semibold text-gray-900 text-sm">
+              {suggestion.title}
+            </h4>
             <div className="flex items-center mt-1">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
@@ -117,7 +126,9 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
                 })}
                 {suggestion.priority} priority
               </span>
-              <span className="ml-2 text-xs text-gray-500">{suggestion.impact}</span>
+              <span className="ml-2 text-xs text-gray-500">
+                {suggestion.impact}
+              </span>
             </div>
           </div>
         </div>
@@ -132,7 +143,9 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
 
       <p className="text-sm text-gray-700 mb-2">{suggestion.description}</p>
 
-      <p className="text-xs text-gray-600 mb-3 italic">{suggestion.reasoning}</p>
+      <p className="text-xs text-gray-600 mb-3 italic">
+        {suggestion.reasoning}
+      </p>
 
       <div className="flex items-center justify-between">
         <div className="text-sm">

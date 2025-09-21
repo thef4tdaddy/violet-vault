@@ -144,7 +144,9 @@ export const initializeCrypto = () => {
   }
 
   if (!isSupported) {
-    logger.warn("Web Crypto API not fully supported - some features may be limited");
+    logger.warn(
+      "Web Crypto API not fully supported - some features may be limited",
+    );
   }
 
   logger.info("Crypto compatibility layer initialized", {

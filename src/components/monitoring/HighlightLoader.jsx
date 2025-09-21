@@ -11,7 +11,9 @@ const HighlightLoader = () => {
     const initializeHighlight = async () => {
       try {
         // Dynamic import of the highlight utility
-        const { initHighlight } = await import("../../utils/common/highlight.js");
+        const { initHighlight } = await import(
+          "../../utils/common/highlight.js"
+        );
 
         // Initialize highlight.run
         initHighlight();

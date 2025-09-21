@@ -20,7 +20,12 @@ const TabContent = ({
   categoryBreakdown,
 }) => {
   if (activeTab === "overview") {
-    return <OverviewTab monthlyTrends={monthlyTrends} envelopeSpending={envelopeSpending} />;
+    return (
+      <OverviewTab
+        monthlyTrends={monthlyTrends}
+        envelopeSpending={envelopeSpending}
+      />
+    );
   }
 
   if (activeTab === "trends") {
@@ -35,7 +40,12 @@ const TabContent = ({
   }
 
   if (activeTab === "health") {
-    return <HealthTab envelopeHealth={envelopeHealth} budgetVsActual={budgetVsActual} />;
+    return (
+      <HealthTab
+        envelopeHealth={envelopeHealth}
+        budgetVsActual={budgetVsActual}
+      />
+    );
   }
 
   if (activeTab === "categories") {

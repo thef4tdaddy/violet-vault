@@ -60,7 +60,7 @@ export const useDashboardCalculations = (
   envelopes = [],
   savingsGoals = [],
   unassignedCash = 0,
-  actualBalance = 0
+  actualBalance = 0,
 ) => {
   const calculations = useMemo(() => {
     // Calculate totals
@@ -104,11 +104,18 @@ export const useDashboardCalculations = (
  * Hook for handling transaction reconciliation process
  * Extracts reconciliation logic and validation
  */
-export const useTransactionReconciliation = (reconcileTransaction, envelopes, savingsGoals) => {
+export const useTransactionReconciliation = (
+  reconcileTransaction,
+  envelopes,
+  savingsGoals,
+) => {
   const handleReconcileTransaction = useCallback(
     (newTransaction, onSuccess) => {
       if (!newTransaction.amount || !newTransaction.description.trim()) {
-        globalToast.showError("Please enter amount and description", "Required Fields");
+        globalToast.showError(
+          "Please enter amount and description",
+          "Required Fields",
+        );
         return false;
       }
 
@@ -116,7 +123,10 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
       const transaction = {
         id: Date.now(),
         ...newTransaction,
-        amount: newTransaction.type === "expense" ? -Math.abs(amount) : Math.abs(amount),
+        amount:
+          newTransaction.type === "expense"
+            ? -Math.abs(amount)
+            : Math.abs(amount),
         reconciledAt: new Date().toISOString(),
       };
 
@@ -124,7 +134,7 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
       onSuccess?.();
       return true;
     },
-    [reconcileTransaction]
+    [reconcileTransaction],
   );
 
   const handleAutoReconcileDifference = useCallback(
@@ -153,7 +163,7 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
         });
       }
     },
-    [reconcileTransaction]
+    [reconcileTransaction],
   );
 
   const getEnvelopeOptions = useCallback(() => {
@@ -194,7 +204,7 @@ export const usePaydayManager = (paycheckHistory, setActiveView) => {
   const handlePrepareEnvelopes = useCallback(() => {
     globalToast.showInfo(
       "Navigate to envelope management for funding planning!",
-      "Funding Planning"
+      "Funding Planning",
     );
     // TODO: Integrate with envelope planning interface
   }, []);

@@ -32,7 +32,10 @@ export const useAuth = create((set, _get) => ({
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
+      setTimeout(
+        () => reject(new Error("Login timeout after 10 seconds")),
+        10000,
+      ),
     );
 
     const loginPromise = (async () => {
@@ -52,10 +55,13 @@ export const useAuth = create((set, _get) => ({
               Array.from(newSalt.slice(0, 8))
                 .map((b) => b.toString(16).padStart(2, "0"))
                 .join("") + "...";
-            logger.auth("Key derived deterministically for cross-browser sync", {
-              saltPreview,
-              keyType: key.constructor?.name || "unknown",
-            });
+            logger.auth(
+              "Key derived deterministically for cross-browser sync",
+              {
+                saltPreview,
+                keyType: key.constructor?.name || "unknown",
+              },
+            );
           }
           logger.auth("Generated/restored key and salt for user.");
 
@@ -65,7 +71,10 @@ export const useAuth = create((set, _get) => ({
           if (!shareCode) {
             throw new Error("Share code missing from user data during login");
           }
-          const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
+          const deterministicBudgetId = await encryptionUtils.generateBudgetId(
+            password,
+            shareCode,
+          );
 
           const finalUserData = {
             ...userData,
@@ -118,19 +127,23 @@ export const useAuth = create((set, _get) => ({
           };
 
           // Encrypt and save the initial budget data to localStorage
-          const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
+          const encrypted = await encryptionUtils.encrypt(
+            initialBudgetData,
+            key,
+          );
           localStorage.setItem(
             "envelopeBudgetData",
             JSON.stringify({
               encryptedData: encrypted.data,
               salt: Array.from(newSalt),
               iv: encrypted.iv,
-            })
+            }),
           );
 
           logger.auth("New budget created and saved with share code system.", {
             budgetId: finalUserData.budgetId,
-            shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
+            shareCodePreview:
+              shareCode.split(" ").slice(0, 2).join(" ") + " ...",
           });
 
           // Start background sync after successful login (new user path)
@@ -143,7 +156,9 @@ export const useAuth = create((set, _get) => ({
           logger.auth("Existing user login path.");
           const savedData = localStorage.getItem("envelopeBudgetData");
           if (!savedData) {
-            logger.warn("No saved data found in localStorage for existing user.");
+            logger.warn(
+              "No saved data found in localStorage for existing user.",
+            );
             return {
               success: false,
               error: "No budget data found for this password.",
@@ -162,16 +177,21 @@ export const useAuth = create((set, _get) => ({
             });
             return {
               success: false,
-              error: "Local data is corrupted. Please clear data and start fresh.",
+              error:
+                "Local data is corrupted. Please clear data and start fresh.",
             };
           }
 
           // SECURITY FIX: Validate password BEFORE setting auth state (Issue #577)
           logger.auth("Validating password before allowing login");
           // Safe external store access (prevents React error #185)
-          const passwordValid = await useAuth.getState().validatePassword(password);
+          const passwordValid = await useAuth
+            .getState()
+            .validatePassword(password);
           if (!passwordValid) {
-            logger.auth("Password validation failed - offering new budget creation");
+            logger.auth(
+              "Password validation failed - offering new budget creation",
+            );
             return {
               success: false,
               error: "This password doesn't match the existing budget.",
@@ -194,11 +214,14 @@ export const useAuth = create((set, _get) => ({
               Array.from(deterministicSalt.slice(0, 8))
                 .map((b) => b.toString(16).padStart(2, "0"))
                 .join("") + "...";
-            logger.auth("Using deterministic key derivation for cross-browser sync", {
-              saltPreview,
-              passwordLength: password?.length || 0,
-              keyType: key.constructor?.name || "unknown",
-            });
+            logger.auth(
+              "Using deterministic key derivation for cross-browser sync",
+              {
+                saltPreview,
+                passwordLength: password?.length || 0,
+                keyType: key.constructor?.name || "unknown",
+              },
+            );
           }
 
           // Debug derived key (safe preview only)
@@ -225,17 +248,25 @@ export const useAuth = create((set, _get) => ({
 
           let decryptedData;
           try {
-            decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
+            decryptedData = await encryptionUtils.decrypt(
+              encryptedData,
+              key,
+              iv,
+            );
             logger.auth("Successfully decrypted local data.");
           } catch (decryptError) {
             // This should not happen since we validated the password above
-            logger.error("Unexpected decryption failure after password validation", {
-              error: decryptError.message,
-              errorType: decryptError.constructor?.name,
-            });
+            logger.error(
+              "Unexpected decryption failure after password validation",
+              {
+                error: decryptError.message,
+                errorType: decryptError.constructor?.name,
+              },
+            );
             return {
               success: false,
-              error: "Unable to decrypt data. Please try again or contact support.",
+              error:
+                "Unable to decrypt data. Please try again or contact support.",
               code: "DECRYPTION_FAILED",
             };
           }
@@ -243,12 +274,18 @@ export const useAuth = create((set, _get) => ({
           let migratedData = decryptedData;
           let currentUserData = decryptedData.currentUser;
 
-          if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
-            logger.auth("Legacy data detected - clearing for fresh start with share code system.");
+          if (
+            !currentUserData ||
+            !currentUserData.budgetId ||
+            !currentUserData.shareCode
+          ) {
+            logger.auth(
+              "Legacy data detected - clearing for fresh start with share code system.",
+            );
             // Clear legacy data - all budgets now require share codes
             localStorage.removeItem("envelopeBudgetData");
             throw new Error(
-              "Legacy data cleared - please create a new budget with share code system"
+              "Legacy data cleared - please create a new budget with share code system",
             );
           }
 
@@ -289,7 +326,10 @@ export const useAuth = create((set, _get) => ({
         }
       } catch (error) {
         logger.error("Login failed.", error);
-        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+        if (
+          error.name === "OperationError" ||
+          error.message.toLowerCase().includes("decrypt")
+        ) {
           return { success: false, error: "Invalid password." };
         }
         return { success: false, error: "Invalid password or corrupted data." };
@@ -308,7 +348,10 @@ export const useAuth = create((set, _get) => ({
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Join timeout after 10 seconds")), 10000)
+      setTimeout(
+        () => reject(new Error("Join timeout after 10 seconds")),
+        10000,
+      ),
     );
 
     const joinPromise = (async () => {
@@ -379,9 +422,11 @@ export const useAuth = create((set, _get) => ({
             encryptedData: encrypted.data,
             salt: Array.from(newSalt),
             iv: encrypted.iv,
-          })
+          }),
         );
-        logger.auth("Saved encrypted shared budget data to localStorage for persistence.");
+        logger.auth(
+          "Saved encrypted shared budget data to localStorage for persistence.",
+        );
 
         // Start background sync after successful join
         // Safe external store access (prevents React error #185)
@@ -421,7 +466,10 @@ export const useAuth = create((set, _get) => ({
     logger.auth("Updating user.", updatedUser);
     set((state) => ({
       currentUser: updatedUser,
-      budgetId: updatedUser.budgetId !== state.budgetId ? updatedUser.budgetId : state.budgetId,
+      budgetId:
+        updatedUser.budgetId !== state.budgetId
+          ? updatedUser.budgetId
+          : state.budgetId,
     }));
   },
 
@@ -434,10 +482,13 @@ export const useAuth = create((set, _get) => ({
       // GitHub Issue #576 Phase 2: Universal race condition prevention for ALL users
       // Same delay for all users to prevent race conditions
       const syncDelay = 2500; // 2.5s for all users to ensure encryption context is ready
-      logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
-        isNewUser,
-        delayMs: syncDelay,
-      });
+      logger.auth(
+        `⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`,
+        {
+          isNewUser,
+          delayMs: syncDelay,
+        },
+      );
       await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
       // Import UI store to access startBackgroundSync
@@ -467,9 +518,14 @@ export const useAuth = create((set, _get) => ({
       const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
       const oldKey = oldKeyData.key;
 
-      const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
+      const decryptedData = await encryptionUtils.decrypt(
+        encryptedData,
+        oldKey,
+        iv,
+      );
 
-      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const { key: newKey, salt: newSalt } =
+        await encryptionUtils.generateKey(newPassword);
       const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
       localStorage.setItem(
@@ -478,7 +534,7 @@ export const useAuth = create((set, _get) => ({
           encryptedData: encrypted.data,
           salt: Array.from(newSalt), // Deterministic salt from new password
           iv: encrypted.iv,
-        })
+        }),
       );
 
       set({ salt: newSalt, encryptionKey: newKey });
@@ -497,7 +553,10 @@ export const useAuth = create((set, _get) => ({
       return { success: true };
     } catch (error) {
       logger.error("Password change failed.", error);
-      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+      if (
+        error.name === "OperationError" ||
+        error.message.toLowerCase().includes("decrypt")
+      ) {
         return { success: false, error: "Invalid current password." };
       }
       return { success: false, error: error.message };
@@ -539,7 +598,11 @@ export const useAuth = create((set, _get) => ({
       const savedData = localStorage.getItem("envelopeBudgetData");
       if (savedData) {
         const { encryptedData, iv } = JSON.parse(savedData);
-        const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+        const decryptedData = await encryptionUtils.decrypt(
+          encryptedData,
+          encryptionKey,
+          iv,
+        );
 
         // Update the currentUser in the encrypted data
         const updatedData = {
@@ -547,14 +610,17 @@ export const useAuth = create((set, _get) => ({
           currentUser: updatedProfile,
         };
 
-        const encrypted = await encryptionUtils.encrypt(updatedData, encryptionKey);
+        const encrypted = await encryptionUtils.encrypt(
+          updatedData,
+          encryptionKey,
+        );
         localStorage.setItem(
           "envelopeBudgetData",
           JSON.stringify({
             encryptedData: encrypted.data,
             salt: Array.from(currentSalt),
             iv: encrypted.iv,
-          })
+          }),
         );
       }
 
@@ -572,7 +638,9 @@ export const useAuth = create((set, _get) => ({
       });
       logger.auth("validatePassword: Starting validation");
 
-      const { encryptionUtils } = await import("../../utils/security/encryption");
+      const { encryptionUtils } = await import(
+        "../../utils/security/encryption"
+      );
       const authState = useAuth.getState();
       const savedData = localStorage.getItem("envelopeBudgetData");
 
@@ -586,7 +654,9 @@ export const useAuth = create((set, _get) => ({
       // SECURITY FIX: Always validate against actual encrypted data when it exists
       // The fallback method was insecure and allowed any password for session unlock
       if (!savedData) {
-        logger.auth("validatePassword: No saved data found - cannot validate password");
+        logger.auth(
+          "validatePassword: No saved data found - cannot validate password",
+        );
         logger.production("Password validation failed", {
           reason: "no_encrypted_data_to_validate_against",
         });
@@ -608,20 +678,26 @@ export const useAuth = create((set, _get) => ({
 
       // Validate that we have all required encryption components
       if (!savedSalt || !encryptedData || !iv) {
-        logger.auth("validatePassword: Missing required encryption components", {
-          hasSavedSalt: !!savedSalt,
-          hasEncryptedData: !!encryptedData,
-          hasIv: !!iv,
-        });
+        logger.auth(
+          "validatePassword: Missing required encryption components",
+          {
+            hasSavedSalt: !!savedSalt,
+            hasEncryptedData: !!encryptedData,
+            hasIv: !!iv,
+          },
+        );
         return false;
       }
 
       const saltArray = new Uint8Array(savedSalt);
-      logger.auth("validatePassword: Using deterministic key derivation for validation", {
-        saltLength: saltArray.length,
-        ivLength: iv.length,
-        hasEncryptedData: !!encryptedData,
-      });
+      logger.auth(
+        "validatePassword: Using deterministic key derivation for validation",
+        {
+          saltLength: saltArray.length,
+          ivLength: iv.length,
+          hasEncryptedData: !!encryptedData,
+        },
+      );
 
       // Use deterministic key derivation to validate password
       const keyData = await encryptionUtils.deriveKey(password);
@@ -632,16 +708,21 @@ export const useAuth = create((set, _get) => ({
       // Try to decrypt actual data to validate password
       try {
         await encryptionUtils.decrypt(encryptedData, testKey, iv);
-        logger.auth("validatePassword: Decryption successful - password is correct");
+        logger.auth(
+          "validatePassword: Decryption successful - password is correct",
+        );
         logger.production("Password validation successful", {
           method: "encrypted_data_validation",
         });
         return true;
       } catch (decryptError) {
-        logger.auth("validatePassword: Decryption failed - password is incorrect", {
-          error: decryptError.message,
-          errorType: decryptError.constructor?.name,
-        });
+        logger.auth(
+          "validatePassword: Decryption failed - password is incorrect",
+          {
+            error: decryptError.message,
+            errorType: decryptError.constructor?.name,
+          },
+        );
         logger.production("Password validation failed", {
           reason: "decryption_failed",
         });
@@ -681,7 +762,13 @@ export const AuthProvider = ({ children }) => {
         resetTimeout();
       };
 
-      const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
+      const events = [
+        "mousedown",
+        "mousemove",
+        "keypress",
+        "scroll",
+        "touchstart",
+      ];
       events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });

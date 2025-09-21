@@ -10,6 +10,7 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 ## 🔍 Stores Identified
 
 ### Active Zustand Stores:
+
 1. **`src/stores/ui/uiStore.js`** - Main UI state and settings
 2. **`src/stores/ui/toastStore.js`** - Toast notifications (recently fixed)
 3. **`src/stores/ui/fabStore.js`** - Floating Action Button state
@@ -17,15 +18,18 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 5. **`src/stores/auth/authStore.jsx`** - Authentication state
 
 ### Non-Store Files (False Positives):
+
 - `src/hooks/common/usePrompt.js` - Uses Zustand for local modal state
 - `src/hooks/common/useConfirm.js` - Uses Zustand for local modal state
 
 ## 🚨 Critical Violations Found
 
 ### 1. **uiStore.js** - 5 VIOLATIONS
+
 **Risk Level**: 🔴 HIGH (Multiple get() calls in actions)
 
 **Violations**:
+
 - **Line 205**: `const state = get();` in `updateApp()` action
 - **Line 243**: `const state = get();` in `showPatchNotes()` action
 - **Line 284**: `const state = get();` in `dismissPatchNotes()` action
@@ -35,9 +39,11 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 **Impact**: Each violation can trigger React error #185
 
 ### 2. **authStore.jsx** - 4 VIOLATIONS
+
 **Risk Level**: 🔴 HIGH (Critical authentication flows)
 
 **Violations**:
+
 - **Line 137**: `const { startBackgroundSyncAfterLogin } = get();` in login flow
 - **Line 170**: `const passwordValid = await get().validatePassword(password);` in auth validation
 - **Line 282**: `const { startBackgroundSyncAfterLogin } = get();` in setup flow
@@ -46,49 +52,57 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 **Impact**: Critical auth flows at risk of infinite render loops
 
 ### 3. **fabStore.js** - 1 VIOLATION
+
 **Risk Level**: 🟡 MEDIUM (Currently not used)
 
 **Violations**:
+
 - **Line 186**: `const state = get();` in debug method
 
 **Impact**: Low immediate risk (FAB disabled), but must be fixed for reimplementation
 
 ### 4. **toastStore.js** - ✅ SAFE
+
 **Status**: Recently fixed, uses store reference pattern
 
 ### 5. **onboardingStore.js** - ✅ SAFE
+
 **Status**: Simplified to eliminate all get() calls
 
 ## 📊 Violation Summary
 
-| Store | Violations | Risk Level | Status |
-|-------|------------|------------|---------|
-| uiStore.js | 5 | 🔴 Critical | Needs immediate refactor |
-| authStore.jsx | 4 | 🔴 Critical | Needs immediate refactor |
-| fabStore.js | 1 | 🟡 Medium | Fix before reimplementation |
-| toastStore.js | 0 | ✅ Safe | Recently fixed |
-| onboardingStore.js | 0 | ✅ Safe | Simplified |
+| Store              | Violations | Risk Level  | Status                      |
+| ------------------ | ---------- | ----------- | --------------------------- |
+| uiStore.js         | 5          | 🔴 Critical | Needs immediate refactor    |
+| authStore.jsx      | 4          | 🔴 Critical | Needs immediate refactor    |
+| fabStore.js        | 1          | 🟡 Medium   | Fix before reimplementation |
+| toastStore.js      | 0          | ✅ Safe     | Recently fixed              |
+| onboardingStore.js | 0          | ✅ Safe     | Simplified                  |
 
 **Total Violations**: 10 critical get() calls in actions
 
 ## 🏗️ Architecture Issues Identified
 
 ### 1. **Mixed Concerns in uiStore**
+
 - **Problem**: Contains both persistent UI settings AND ephemeral state
 - **Examples**: PWA update state, patch notes modals, unassigned cash modal
 - **Solution**: Separate persistent settings from temporary UI state
 
 ### 2. **Complex Authentication Logic**
+
 - **Problem**: authStore has complex flows with get() calls
 - **Examples**: Background sync triggers, password validation chains
 - **Solution**: Extract business logic to custom hooks, keep store minimal
 
 ### 3. **Store Reference Pattern Not Used**
+
 - **Problem**: Direct get() calls instead of store references
 - **Examples**: All violations use `get()` instead of store object references
 - **Solution**: Implement store reference pattern consistently
 
 ### 4. **Middleware Inconsistency**
+
 - **Problem**: Different middleware combinations across stores
 - **Examples**: Some use immer, some don't; inconsistent devtools setup
 - **Solution**: Standardize middleware stack
@@ -96,14 +110,17 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 ## 📋 Refactor Priority Plan
 
 ### Phase 1: Critical Safety Fixes (P0)
+
 1. **uiStore.js** - Replace all 5 get() calls with safe patterns
 2. **authStore.jsx** - Replace all 4 get() calls with safe patterns
 
 ### Phase 2: Architecture Improvements (P1)
+
 3. **uiStore.js** - Separate persistent vs ephemeral state
 4. **authStore.jsx** - Extract complex logic to custom hooks
 
 ### Phase 3: Consistency & Optimization (P2)
+
 5. **fabStore.js** - Fix violation and prepare for safe reimplementation
 6. **All stores** - Standardize middleware configuration
 7. **All stores** - Implement selective subscription patterns
@@ -111,16 +128,19 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 ## 🎯 Success Criteria
 
 ### Safety Metrics:
+
 - ✅ Zero get() calls inside store actions
 - ✅ All stores pass new ESLint rules
 - ✅ No React error #185 occurrences
 
 ### Performance Metrics:
+
 - ✅ Reduced component re-render count
 - ✅ Selective subscriptions implemented
 - ✅ Store size reduced by separating concerns
 
 ### Architecture Metrics:
+
 - ✅ Clear separation of persistent vs ephemeral state
 - ✅ Consistent middleware usage across all stores
 - ✅ Store reference pattern used for async operations
@@ -128,6 +148,7 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 ## 🔧 Implementation Strategy
 
 ### 1. Store Reference Pattern
+
 ```javascript
 // ❌ Current (unsafe)
 const action = async () => {
@@ -143,6 +164,7 @@ const action = async () => {
 ```
 
 ### 2. State Separation
+
 ```javascript
 // ❌ Current (mixed concerns)
 {

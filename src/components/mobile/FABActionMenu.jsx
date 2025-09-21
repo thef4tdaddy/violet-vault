@@ -15,7 +15,7 @@ const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       action.action?.();
       onActionClick();
@@ -34,7 +34,7 @@ const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
     "focus:outline-none",
     "focus:ring-2",
     "focus:ring-white",
-    "focus:ring-opacity-50"
+    "focus:ring-opacity-50",
   ];
 
   if (isLoading) {
@@ -58,11 +58,11 @@ const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
         aria-label={action.label}
         disabled={isLoading}
       >
-        {isLoading ? (
-          React.createElement(getIcon("Loader2"), { className: "h-4 w-4 animate-spin" })
-        ) : (
-          React.createElement(getIcon(action.icon), { className: "h-4 w-4" })
-        )}
+        {isLoading
+          ? React.createElement(getIcon("Loader2"), {
+              className: "h-4 w-4 animate-spin",
+            })
+          : React.createElement(getIcon(action.icon), { className: "h-4 w-4" })}
       </button>
     </div>
   );

@@ -20,12 +20,13 @@ const OnboardingTutorial = ({ children }) => {
   const { tutorialSteps, getCurrentStepElement } = useTutorialSteps();
   const { getTooltipPosition } = useTutorialPositioning();
   const { useHighlightEffect } = useTutorialHighlight();
-  const { closeTutorial, nextStep, prevStep, skipTutorial } = useTutorialControls(
-    tutorialSteps,
-    currentStep,
-    setCurrentStep,
-    setShowTutorial
-  );
+  const { closeTutorial, nextStep, prevStep, skipTutorial } =
+    useTutorialControls(
+      tutorialSteps,
+      currentStep,
+      setCurrentStep,
+      setShowTutorial,
+    );
 
   // Get current step data
   const step = tutorialSteps[currentStep];

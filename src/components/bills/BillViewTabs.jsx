@@ -6,7 +6,13 @@ import StandardFilters from "../ui/StandardFilters";
  * View mode tabs for BillManager using standardized tabs component
  * Pure UI component that preserves exact visual appearance
  */
-const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilterOptions }) => {
+const BillViewTabs = ({
+  viewModes,
+  viewMode,
+  setViewMode,
+  filterOptions,
+  setFilterOptions,
+}) => {
   return (
     <div className="space-y-0">
       {/* View Mode Tabs */}
@@ -22,7 +28,9 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
       {/* Connected Filters */}
       <StandardFilters
         filters={filterOptions}
-        onFilterChange={(key, value) => setFilterOptions((prev) => ({ ...prev, [key]: value }))}
+        onFilterChange={(key, value) =>
+          setFilterOptions((prev) => ({ ...prev, [key]: value }))
+        }
         filterConfigs={[
           {
             key: "urgency",

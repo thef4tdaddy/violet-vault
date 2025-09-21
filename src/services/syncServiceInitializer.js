@@ -30,9 +30,13 @@ class SyncServiceInitializer {
       logger.info("🔄 Lazy loading Firebase sync services...");
 
       // Load Firebase sync services dynamically
-      const [{ default: chunkedSyncService }, { default: firebaseSyncService }] = await Promise.all(
-        [import("./chunkedSyncService.js"), import("./firebaseSyncService.js")]
-      );
+      const [
+        { default: chunkedSyncService },
+        { default: firebaseSyncService },
+      ] = await Promise.all([
+        import("./chunkedSyncService.js"),
+        import("./firebaseSyncService.js"),
+      ]);
 
       // Store references for access
       this.chunkedSyncService = chunkedSyncService;

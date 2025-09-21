@@ -3,7 +3,7 @@ import { useTouchFeedback } from "../../utils/ui/touchFeedback";
 import {
   TransferEnvelopeSelect,
   TransferAmountInput,
-  TransferDescriptionInput
+  TransferDescriptionInput,
 } from "./transfer/TransferFormFields";
 
 /**
@@ -50,7 +50,10 @@ const TransferModalContent = ({
       />
 
       <div className="flex gap-3 pt-2">
-        <button onClick={onClose} className="flex-1 btn btn-secondary border-2 border-black">
+        <button
+          onClick={onClose}
+          className="flex-1 btn btn-secondary border-2 border-black"
+        >
           Cancel
         </button>
         <button

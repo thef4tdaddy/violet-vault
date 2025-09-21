@@ -106,7 +106,7 @@ export const useBudgetHistoryRestore = (restore) => {
         logger.error("Failed to restore from history:", err);
       }
     },
-    [confirm, prompt, restore]
+    [confirm, prompt, restore],
   );
 
   return {

@@ -11,9 +11,12 @@ export const useFABLoadingStates = () => {
   const { showError } = useToast();
 
   // Check if a specific action is loading
-  const isActionLoading = useCallback((actionId) => {
-    return loadingActions.has(actionId);
-  }, [loadingActions]);
+  const isActionLoading = useCallback(
+    (actionId) => {
+      return loadingActions.has(actionId);
+    },
+    [loadingActions],
+  );
 
   // Check if any action is loading
   const isAnyActionLoading = useCallback(() => {
@@ -22,12 +25,12 @@ export const useFABLoadingStates = () => {
 
   // Start loading for an action
   const startLoading = useCallback((actionId) => {
-    setLoadingActions(prev => new Set(prev).add(actionId));
+    setLoadingActions((prev) => new Set(prev).add(actionId));
   }, []);
 
   // Stop loading for an action
   const stopLoading = useCallback((actionId) => {
-    setLoadingActions(prev => {
+    setLoadingActions((prev) => {
       const newSet = new Set(prev);
       newSet.delete(actionId);
       return newSet;
@@ -35,50 +38,56 @@ export const useFABLoadingStates = () => {
   }, []);
 
   // Wrap an action with loading state and error handling
-  const wrapActionWithLoading = useCallback((actionId, actionFn, actionLabel = "Action") => {
-    return async (...args) => {
-      if (isActionLoading(actionId)) {
-        logger.debug(`FAB: Action ${actionId} already in progress, ignoring`);
-        return;
-      }
+  const wrapActionWithLoading = useCallback(
+    (actionId, actionFn, actionLabel = "Action") => {
+      return async (...args) => {
+        if (isActionLoading(actionId)) {
+          logger.debug(`FAB: Action ${actionId} already in progress, ignoring`);
+          return;
+        }
 
-      try {
-        startLoading(actionId);
-        logger.debug(`FAB: Starting action ${actionId}`, { label: actionLabel });
+        try {
+          startLoading(actionId);
+          logger.debug(`FAB: Starting action ${actionId}`, {
+            label: actionLabel,
+          });
 
-        // Execute the action
-        const result = await Promise.resolve(actionFn(...args));
+          // Execute the action
+          const result = await Promise.resolve(actionFn(...args));
 
-        logger.debug(`FAB: Action ${actionId} completed successfully`);
-        return result;
+          logger.debug(`FAB: Action ${actionId} completed successfully`);
+          return result;
+        } catch (error) {
+          logger.error(`FAB: Action ${actionId} failed`, {
+            error: error.message,
+            label: actionLabel,
+            stack: error.stack,
+          });
 
-      } catch (error) {
-        logger.error(`FAB: Action ${actionId} failed`, {
-          error: error.message,
-          label: actionLabel,
-          stack: error.stack
-        });
+          // Show error toast
+          showError(
+            `${actionLabel} Failed`,
+            error.message || "An unexpected error occurred",
+            5000,
+          );
 
-        // Show error toast
-        showError(
-          `${actionLabel} Failed`,
-          error.message || "An unexpected error occurred",
-          5000
-        );
-
-        // Re-throw for component error boundaries if needed
-        throw error;
-
-      } finally {
-        stopLoading(actionId);
-      }
-    };
-  }, [isActionLoading, startLoading, stopLoading, showError]);
+          // Re-throw for component error boundaries if needed
+          throw error;
+        } finally {
+          stopLoading(actionId);
+        }
+      };
+    },
+    [isActionLoading, startLoading, stopLoading, showError],
+  );
 
   // Create a loading wrapper for FAB actions
-  const createLoadingAction = useCallback((actionId, actionFn, actionLabel) => {
-    return wrapActionWithLoading(actionId, actionFn, actionLabel);
-  }, [wrapActionWithLoading]);
+  const createLoadingAction = useCallback(
+    (actionId, actionFn, actionLabel) => {
+      return wrapActionWithLoading(actionId, actionFn, actionLabel);
+    },
+    [wrapActionWithLoading],
+  );
 
   // Bulk operations
   const clearAllLoading = useCallback(() => {

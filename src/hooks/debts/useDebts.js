@@ -36,7 +36,9 @@ const useDebts = () => {
       // One-time migration: Fix debts with undefined status
       const debtsNeedingStatus = debts.filter((debt) => !debt.status);
       if (debtsNeedingStatus.length > 0) {
-        logger.info(`🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`);
+        logger.info(
+          `🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`,
+        );
         for (const debt of debtsNeedingStatus) {
           await budgetDb.debts.update(debt.id, { status: "active" });
           logger.debug(`✅ Updated debt "${debt.name}" status to active`);
@@ -153,7 +155,10 @@ const useDebts = () => {
       const debt = await budgetDb.debts.get(id);
       if (debt) {
         const history = [...(debt.paymentHistory || []), { ...payment }];
-        const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
+        const newBalance = Math.max(
+          0,
+          (debt.currentBalance || 0) - payment.amount,
+        );
 
         const updatedDebt = {
           ...debt,
@@ -205,7 +210,8 @@ const useDebts = () => {
     getDebtById,
 
     refetch: debtsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.debts }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.debts }),
   };
 };
 

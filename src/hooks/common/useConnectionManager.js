@@ -38,8 +38,19 @@ const useConnectionManager = (entityType, entityId) => {
   }, [entityType, entityId, bills, envelopes, debts]);
 
   // Get connection data using extracted hook
-  const { currentConnections, availableOptions, hasConnections, hasAvailableOptions } =
-    useConnectionData(entityType, entityId, currentEntity, bills, envelopes, debts);
+  const {
+    currentConnections,
+    availableOptions,
+    hasConnections,
+    hasAvailableOptions,
+  } = useConnectionData(
+    entityType,
+    entityId,
+    currentEntity,
+    bills,
+    envelopes,
+    debts,
+  );
 
   // Connection operations with state management
   const connectWithState = async (targetId) => {
@@ -56,7 +67,7 @@ const useConnectionManager = (entityType, entityId) => {
         bills,
         debts,
         updateBill,
-        updateDebt
+        updateDebt,
       );
       if (result.success) setSelectedConnectionId("");
       return result;
@@ -66,7 +77,8 @@ const useConnectionManager = (entityType, entityId) => {
   };
 
   const disconnectWithState = async () => {
-    if (!currentEntity || currentConnections.length === 0) return { success: false };
+    if (!currentEntity || currentConnections.length === 0)
+      return { success: false };
 
     setIsConnecting(true);
     try {
@@ -75,7 +87,7 @@ const useConnectionManager = (entityType, entityId) => {
         entityId,
         currentConnections,
         updateBill,
-        updateDebt
+        updateDebt,
       );
     } finally {
       setIsConnecting(false);
@@ -91,7 +103,7 @@ const useConnectionManager = (entityType, entityId) => {
         targetId,
         bills,
         currentEntity,
-        updateEnvelope
+        updateEnvelope,
       );
     }
   };

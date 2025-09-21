@@ -27,7 +27,9 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
   return (
     <div
       className={`p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300 ${
-        unassignedCash < 0 ? "from-red-50 to-pink-50 border-red-200 hover:border-red-300" : ""
+        unassignedCash < 0
+          ? "from-red-50 to-pink-50 border-red-200 hover:border-red-300"
+          : ""
       }`}
       onClick={handleClick}
     >
@@ -46,7 +48,9 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
         <div className="flex items-center gap-2 ml-4">
           <div
             className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-              unassignedCash < 0 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+              unassignedCash < 0
+                ? "bg-red-100 text-red-700"
+                : "bg-green-100 text-green-700"
             }`}
           >
             {unassignedCash < 0 ? "Overspent" : "Available"}
@@ -65,14 +69,18 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
       {/* Cash Amount Display */}
       <div className="mb-4">
         <div className="text-center py-4">
-          <p className="text-xs text-gray-500 mb-2">Click anywhere to distribute</p>
+          <p className="text-xs text-gray-500 mb-2">
+            Click anywhere to distribute
+          </p>
           <p
             className={`text-3xl font-bold ${
               unassignedCash < 0 ? "text-red-600" : "text-green-600"
             }`}
           >
             ${Math.abs(unassignedCash).toFixed(2)}
-            {unassignedCash < 0 && <span className="text-sm text-red-500 ml-2">deficit</span>}
+            {unassignedCash < 0 && (
+              <span className="text-sm text-red-500 ml-2">deficit</span>
+            )}
           </p>
           <p className="text-xs text-gray-500 mt-2">
             {unassignedCash < 0
@@ -88,7 +96,9 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
           {React.createElement(getIcon("DollarSign"), {
             className: "h-3 w-3 mr-1",
           })}
-          <span>{unassignedCash < 0 ? "Needs attention" : "Ready to allocate"}</span>
+          <span>
+            {unassignedCash < 0 ? "Needs attention" : "Ready to allocate"}
+          </span>
         </div>
       </div>
     </div>

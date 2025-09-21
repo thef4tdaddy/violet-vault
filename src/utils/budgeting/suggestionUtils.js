@@ -92,13 +92,17 @@ export const calculateMonthsOfData = (transactions) => {
  * @param {Object} settings - Analysis settings
  * @returns {Array} Array of suggestions
  */
-export const analyzeUnassignedTransactions = (transactions, monthsOfData, settings) => {
+export const analyzeUnassignedTransactions = (
+  transactions,
+  monthsOfData,
+  settings,
+) => {
   const suggestions = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
   // Get unassigned outgoing transactions
   const unassignedTransactions = transactions.filter(
-    (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === "")
+    (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === ""),
   );
 
   // Group by category
@@ -120,7 +124,10 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
 
   // Generate suggestions for significant categories
   Object.values(unassignedByCategory).forEach((categoryData, index) => {
-    if (categoryData.amount >= minAmount && categoryData.count >= minTransactions) {
+    if (
+      categoryData.amount >= minAmount &&
+      categoryData.count >= minTransactions
+    ) {
       const monthlyAverage = categoryData.amount / monthsOfData;
       const suggestedAmount = Math.ceil(monthlyAverage * bufferPercentage);
 
@@ -155,13 +162,18 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
  * @param {Object} settings - Analysis settings
  * @returns {Array} Array of merchant pattern suggestions
  */
-export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, settings) => {
+export const analyzeMerchantPatterns = (
+  transactions,
+  envelopes,
+  monthsOfData,
+  settings,
+) => {
   const suggestions = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
   // Get unassigned transactions
   const unassignedTransactions = transactions.filter(
-    (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === "")
+    (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === ""),
   );
 
   const merchantSpending = {};
@@ -195,7 +207,7 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
       const existingEnvelope = envelopes.find(
         (e) =>
           e.name.toLowerCase().includes(category.toLowerCase()) ||
-          e.category?.toLowerCase().includes(category.toLowerCase())
+          e.category?.toLowerCase().includes(category.toLowerCase()),
       );
 
       if (!existingEnvelope) {
@@ -232,23 +244,35 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
  * @param {Object} settings - Analysis settings
  * @returns {Array} Array of optimization suggestions
  */
-export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfData, settings) => {
+export const analyzeEnvelopeOptimization = (
+  transactions,
+  envelopes,
+  monthsOfData,
+  settings,
+) => {
   const suggestions = [];
-  const { overspendingThreshold, overfundingThreshold, bufferPercentage } = settings;
+  const { overspendingThreshold, overfundingThreshold, bufferPercentage } =
+    settings;
 
   envelopes.forEach((envelope) => {
     const envelopeTransactions = transactions.filter(
-      (t) => t.amount < 0 && t.envelopeId === envelope.id
+      (t) => t.amount < 0 && t.envelopeId === envelope.id,
     );
 
     if (envelopeTransactions.length === 0) return;
 
-    const totalSpent = envelopeTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const totalSpent = envelopeTransactions.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0,
+    );
     const monthlySpent = totalSpent / monthsOfData;
     const monthlyBudget = envelope.monthlyAmount || 0;
 
     // Overspending detection
-    if (monthlySpent > monthlyBudget * overspendingThreshold && monthlyBudget > 0) {
+    if (
+      monthlySpent > monthlyBudget * overspendingThreshold &&
+      monthlyBudget > 0
+    ) {
       const overage = monthlySpent - monthlyBudget;
       const suggestedAmount = Math.ceil(monthlySpent * bufferPercentage);
 
@@ -317,15 +341,32 @@ export const generateAllSuggestions = (
   settings,
   dateRange,
   dismissedSuggestions = new Set(),
-  showDismissed = false
+  showDismissed = false,
 ) => {
-  const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
+  const filteredTransactions = filterTransactionsByDateRange(
+    transactions,
+    dateRange,
+  );
   const monthsOfData = calculateMonthsOfData(filteredTransactions);
 
   const allSuggestions = [
-    ...analyzeUnassignedTransactions(filteredTransactions, monthsOfData, settings),
-    ...analyzeMerchantPatterns(filteredTransactions, envelopes, monthsOfData, settings),
-    ...analyzeEnvelopeOptimization(filteredTransactions, envelopes, monthsOfData, settings),
+    ...analyzeUnassignedTransactions(
+      filteredTransactions,
+      monthsOfData,
+      settings,
+    ),
+    ...analyzeMerchantPatterns(
+      filteredTransactions,
+      envelopes,
+      monthsOfData,
+      settings,
+    ),
+    ...analyzeEnvelopeOptimization(
+      filteredTransactions,
+      envelopes,
+      monthsOfData,
+      settings,
+    ),
   ];
 
   // Sort by priority and filter dismissed

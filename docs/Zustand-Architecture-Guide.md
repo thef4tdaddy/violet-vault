@@ -12,12 +12,14 @@ Complete architectural guide for Zustand store development in VioletVault. This 
 ### 1. **Clear Separation of Concerns**
 
 #### **What Belongs in Zustand**
+
 - ✅ **Persistent UI Settings**: Theme, preferences, user settings
 - ✅ **Global UI State**: Modal visibility, loading states
 - ✅ **Authentication State**: User info, tokens, session data
 - ✅ **App-Level Configuration**: Feature flags, sync settings
 
 #### **What DOESN'T Belong in Zustand**
+
 - ❌ **Computed/Derived State**: Use TanStack Query instead
 - ❌ **Server Data**: Use TanStack Query + Dexie instead
 - ❌ **Temporary Component State**: Use React useState instead
@@ -26,21 +28,27 @@ Complete architectural guide for Zustand store development in VioletVault. This 
 ### 2. **Store Types & Patterns**
 
 #### **Core State Stores**
+
 For persistent, global application state:
+
 ```javascript
 // Example: uiStore.js, authStore.jsx
-const useCoreStore = create(persist(
-  (set) => ({
-    // Persistent settings only
-    setting: defaultValue,
-    setSetting: (value) => set({ setting: value }),
-  }),
-  { name: 'core-store' }
-));
+const useCoreStore = create(
+  persist(
+    (set) => ({
+      // Persistent settings only
+      setting: defaultValue,
+      setSetting: (value) => set({ setting: value }),
+    }),
+    { name: "core-store" },
+  ),
+);
 ```
 
 #### **Feature State Stores**
+
 For scoped functionality (like FAB, notifications):
+
 ```javascript
 // Example: fabStore.js, toastStore.js
 const useFeatureStore = create((set) => ({
@@ -59,29 +67,32 @@ const useFeatureStore = create((set) => ({
 ### 1. **NEVER Use get() in Actions**
 
 #### ❌ Dangerous Pattern (Causes React Error #185)
+
 ```javascript
 const useStore = create((set, get) => ({
   action: async () => {
     const state = get(); // ❌ FORBIDDEN - Infinite render loops
     await someAsyncCall(state.value);
-  }
+  },
 }));
 ```
 
 #### ✅ Safe Pattern
+
 ```javascript
 const useStore = create((set) => ({
   action: async () => {
     // Safe external store access
     const state = useStore.getState();
     await someAsyncCall(state.value);
-  }
+  },
 }));
 ```
 
 ### 2. **Selective Subscriptions Only**
 
 #### ❌ Performance Problem
+
 ```javascript
 const MyComponent = () => {
   const store = useStore(); // ❌ Subscribes to entire store
@@ -90,9 +101,10 @@ const MyComponent = () => {
 ```
 
 #### ✅ Optimized Pattern
+
 ```javascript
 const MyComponent = () => {
-  const specificValue = useStore(state => state.specificValue); // ✅ Selective
+  const specificValue = useStore((state) => state.specificValue); // ✅ Selective
   return <div>{specificValue}</div>;
 };
 ```
@@ -100,6 +112,7 @@ const MyComponent = () => {
 ### 3. **Store Reference Pattern for Async**
 
 #### ❌ Unsafe Async Pattern
+
 ```javascript
 const useToastStore = create((set, get) => ({
   addToast: (toast) => {
@@ -109,11 +122,12 @@ const useToastStore = create((set, get) => ({
     setTimeout(() => {
       get().removeToast(toast.id);
     }, 3000);
-  }
+  },
 }));
 ```
 
 #### ✅ Safe Async Pattern
+
 ```javascript
 const useToastStore = create((set) => {
   const store = {
@@ -128,9 +142,10 @@ const useToastStore = create((set) => {
       }, 3000);
     },
 
-    removeToast: (id) => set((state) => ({
-      toasts: state.toasts.filter(t => t.id !== id)
-    }))
+    removeToast: (id) =>
+      set((state) => ({
+        toasts: state.toasts.filter((t) => t.id !== id),
+      })),
   };
 
   return store;
@@ -140,6 +155,7 @@ const useToastStore = create((set) => {
 ## 🔄 When to Use Alternatives
 
 ### **TanStack Query** (Recommended for)
+
 - Server data fetching and caching
 - Computed/derived values
 - Complex data transformations
@@ -149,19 +165,21 @@ const useToastStore = create((set) => {
 // Use TanStack Query for computed state
 const useEnvelopeTotal = () => {
   return useQuery({
-    queryKey: ['envelope-total', envelopeId],
+    queryKey: ["envelope-total", envelopeId],
     queryFn: () => calculateEnvelopeTotal(envelopeId),
-    staleTime: 1000 * 60 * 5 // 5 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 ```
 
 ### **React Context** (Use for)
+
 - Feature-scoped state that doesn't need global access
 - Component tree specific data
 - When you need dependency injection patterns
 
 ### **Component State** (Use for)
+
 - Temporary UI state (form inputs, local toggles)
 - Component-specific interactions
 - One-off modal visibility
@@ -172,9 +190,7 @@ const MyComponent = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div>
-      <button onClick={() => setIsExpanded(!isExpanded)}>
-        Toggle
-      </button>
+      <button onClick={() => setIsExpanded(!isExpanded)}>Toggle</button>
       {isExpanded && <div>Content</div>}
     </div>
   );
@@ -184,11 +200,12 @@ const MyComponent = () => {
 ## 📦 Middleware Standards
 
 ### **Recommended Middleware Stack**
+
 ```javascript
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { persist, devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 // Standard middleware configuration
 const useStandardStore = create(
@@ -199,17 +216,18 @@ const useStandardStore = create(
           // Store definition
         })),
         {
-          name: 'store-name',
+          name: "store-name",
           version: 1,
-        }
+        },
       ),
-      { name: 'store-devtools' }
-    )
-  )
+      { name: "store-devtools" },
+    ),
+  ),
 );
 ```
 
 ### **Middleware Guidelines**
+
 - **immer**: Use for complex state updates with nested objects
 - **persist**: Use for data that should survive page refreshes
 - **devtools**: Always include for debugging (strips in production)
@@ -218,27 +236,28 @@ const useStandardStore = create(
 ## 🧪 Testing Patterns
 
 ### **Store Testing Template**
-```javascript
-import { renderHook, act } from '@testing-library/react';
-import { useMyStore } from '../myStore';
 
-describe('MyStore', () => {
+```javascript
+import { renderHook, act } from "@testing-library/react";
+import { useMyStore } from "../myStore";
+
+describe("MyStore", () => {
   beforeEach(() => {
     // Reset store state before each test
     useMyStore.setState(useMyStore.getInitialState());
   });
 
-  it('should update state safely', () => {
+  it("should update state safely", () => {
     const { result } = renderHook(() => useMyStore());
 
     act(() => {
-      result.current.setSomeValue('test');
+      result.current.setSomeValue("test");
     });
 
-    expect(result.current.someValue).toBe('test');
+    expect(result.current.someValue).toBe("test");
   });
 
-  it('should handle async operations safely', async () => {
+  it("should handle async operations safely", async () => {
     const { result } = renderHook(() => useMyStore());
 
     await act(async () => {
@@ -253,50 +272,58 @@ describe('MyStore', () => {
 ## 🚨 Common Pitfalls
 
 ### 1. **Store Pollution**
+
 - **Problem**: Putting everything in one giant store
 - **Solution**: Create focused, single-purpose stores
 
 ### 2. **State Complexity**
+
 - **Problem**: Complex computed values in stores
 - **Solution**: Move to TanStack Query or custom hooks
 
 ### 3. **Subscription Overhead**
+
 - **Problem**: Components re-rendering on unrelated state changes
 - **Solution**: Use selective subscriptions consistently
 
 ### 4. **Memory Leaks**
+
 - **Problem**: Conditional store subscriptions
 - **Solution**: Always subscribe, conditionally use data
 
 ## 📊 Performance Guidelines
 
 ### **Store Size Limits**
+
 - Keep stores focused and small
 - Prefer multiple small stores over one large store
 - Extract complex logic to custom hooks
 
 ### **Subscription Optimization**
+
 ```javascript
 // ✅ Good - Specific subscriptions
-const name = useUserStore(state => state.name);
-const email = useUserStore(state => state.email);
+const name = useUserStore((state) => state.name);
+const email = useUserStore((state) => state.email);
 
 // ❌ Bad - Single subscription for multiple values
-const { name, email } = useUserStore(state => ({
+const { name, email } = useUserStore((state) => ({
   name: state.name,
-  email: state.email
+  email: state.email,
 })); // Creates new object every render
 ```
 
 ### **Action Optimization**
+
 ```javascript
 // ✅ Good - Batch related updates
-const updateUser = (userData) => set((state) => ({
-  ...state,
-  name: userData.name,
-  email: userData.email,
-  lastUpdated: Date.now()
-}));
+const updateUser = (userData) =>
+  set((state) => ({
+    ...state,
+    name: userData.name,
+    email: userData.email,
+    lastUpdated: Date.now(),
+  }));
 
 // ❌ Bad - Multiple separate updates
 const updateUser = (userData) => {
@@ -309,6 +336,7 @@ const updateUser = (userData) => {
 ## 🔗 Integration with VioletVault Architecture
 
 ### **Data Flow Hierarchy**
+
 1. **Firebase** (optional cloud storage)
 2. **Dexie** (local IndexedDB storage)
 3. **TanStack Query** (computed state, server data)
@@ -316,6 +344,7 @@ const updateUser = (userData) => {
 5. **React State** (component-local state)
 
 ### **Store Coordination**
+
 ```javascript
 // Stores should be loosely coupled
 const useAuthStore = create((set) => ({
@@ -326,8 +355,8 @@ const useAuthStore = create((set) => ({
     set({ user });
 
     // Notify other systems without direct coupling
-    window.dispatchEvent(new CustomEvent('auth:login', { detail: user }));
-  }
+    window.dispatchEvent(new CustomEvent("auth:login", { detail: user }));
+  },
 }));
 
 // Other stores listen to events, not direct store coupling
@@ -335,8 +364,8 @@ const useUIStore = create((set) => {
   // Listen for auth events
   useEffect(() => {
     const handleLogin = () => set({ showWelcome: true });
-    window.addEventListener('auth:login', handleLogin);
-    return () => window.removeEventListener('auth:login', handleLogin);
+    window.addEventListener("auth:login", handleLogin);
+    return () => window.removeEventListener("auth:login", handleLogin);
   }, []);
 
   return {

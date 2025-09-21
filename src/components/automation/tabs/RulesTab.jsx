@@ -1,6 +1,9 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
+import {
+  RULE_TYPES,
+  TRIGGER_TYPES,
+} from "../../../utils/budgeting/autofunding";
 
 const RulesTab = ({
   rules,
@@ -108,10 +111,12 @@ const RulesTab = ({
           {React.createElement(getIcon("Settings"), {
             className: "h-12 w-12 text-gray-400 mx-auto mb-4",
           })}
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Auto-Funding Rules</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No Auto-Funding Rules
+          </h3>
           <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-            Create your first rule to automate envelope funding based on your preferences and
-            triggers.
+            Create your first rule to automate envelope funding based on your
+            preferences and triggers.
           </p>
         </div>
       ) : (
@@ -124,7 +129,9 @@ const RulesTab = ({
               <div
                 key={rule.id}
                 className={`p-4 border rounded-lg transition-all ${
-                  rule.enabled ? "border-gray-200 bg-white" : "border-gray-100 bg-gray-50"
+                  rule.enabled
+                    ? "border-gray-200 bg-white"
+                    : "border-gray-100 bg-gray-50"
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -167,7 +174,8 @@ const RulesTab = ({
                         Executed {rule.executionCount || 0} times
                         {rule.lastExecuted && (
                           <span className="ml-2">
-                            Last: {new Date(rule.lastExecuted).toLocaleDateString()}
+                            Last:{" "}
+                            {new Date(rule.lastExecuted).toLocaleDateString()}
                           </span>
                         )}
                       </div>
@@ -180,22 +188,30 @@ const RulesTab = ({
                       title={rule.enabled ? "Disable rule" : "Enable rule"}
                     >
                       {rule.enabled
-                        ? React.createElement(getIcon("Eye"), { className: "h-4 w-4" })
-                        : React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })}
+                        ? React.createElement(getIcon("Eye"), {
+                            className: "h-4 w-4",
+                          })
+                        : React.createElement(getIcon("EyeOff"), {
+                            className: "h-4 w-4",
+                          })}
                     </button>
                     <button
                       onClick={() => onEditRule(rule)}
                       className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
                       title="Edit rule"
                     >
-                      {React.createElement(getIcon("Edit3"), { className: "h-4 w-4" })}
+                      {React.createElement(getIcon("Edit3"), {
+                        className: "h-4 w-4",
+                      })}
                     </button>
                     <button
                       onClick={() => onDeleteRule(rule.id)}
                       className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
                       title="Delete rule"
                     >
-                      {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
+                      {React.createElement(getIcon("Trash2"), {
+                        className: "h-4 w-4",
+                      })}
                     </button>
                   </div>
                 </div>

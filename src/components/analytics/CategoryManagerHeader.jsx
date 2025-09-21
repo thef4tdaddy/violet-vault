@@ -22,7 +22,9 @@ const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }) => {
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-sm text-purple-800 font-medium">{suggestionCount} suggestions</span>
+        <span className="text-sm text-purple-800 font-medium">
+          {suggestionCount} suggestions
+        </span>
         <button
           onClick={onToggleSettings}
           className="p-2 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all"

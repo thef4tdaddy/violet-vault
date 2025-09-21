@@ -38,7 +38,9 @@ describe("useEnvelopeForm", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       expect(result.current.formData.name).toBe("");
-      expect(result.current.formData.envelopeType).toBe(ENVELOPE_TYPES.VARIABLE);
+      expect(result.current.formData.envelopeType).toBe(
+        ENVELOPE_TYPES.VARIABLE,
+      );
       expect(result.current.formData.autoAllocate).toBe(true);
       expect(result.current.errors).toEqual({});
       expect(result.current.isDirty).toBe(false);
@@ -54,7 +56,9 @@ describe("useEnvelopeForm", () => {
         color: "#a855f7",
       };
 
-      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, envelope }));
+      const { result } = renderHook(() =>
+        useEnvelopeForm({ ...defaultProps, envelope }),
+      );
 
       expect(result.current.formData.name).toBe("Test Envelope");
       expect(result.current.formData.monthlyAmount).toBe("100");
@@ -96,10 +100,15 @@ describe("useEnvelopeForm", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       act(() => {
-        result.current.updateFormField("envelopeType", ENVELOPE_TYPES.SINKING_FUND);
+        result.current.updateFormField(
+          "envelopeType",
+          ENVELOPE_TYPES.SINKING_FUND,
+        );
       });
 
-      expect(result.current.formData.envelopeType).toBe(ENVELOPE_TYPES.SINKING_FUND);
+      expect(result.current.formData.envelopeType).toBe(
+        ENVELOPE_TYPES.SINKING_FUND,
+      );
     });
   });
 
@@ -191,7 +200,9 @@ describe("useEnvelopeForm", () => {
   describe("Form submission", () => {
     it("should handle successful submission", async () => {
       const mockOnSave = vi.fn().mockResolvedValue();
-      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }));
+      const { result } = renderHook(() =>
+        useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }),
+      );
 
       // Set valid form data
       act(() => {
@@ -213,7 +224,7 @@ describe("useEnvelopeForm", () => {
           name: "Test Envelope",
           monthlyAmount: 100,
           category: "Food",
-        })
+        }),
       );
       expect(result.current.isDirty).toBe(false);
     });
@@ -234,7 +245,9 @@ describe("useEnvelopeForm", () => {
 
     it("should handle submission errors", async () => {
       const mockOnSave = vi.fn().mockRejectedValue(new Error("Save failed"));
-      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }));
+      const { result } = renderHook(() =>
+        useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }),
+      );
 
       // Set valid form data
       act(() => {
@@ -258,7 +271,7 @@ describe("useEnvelopeForm", () => {
     it("should close without confirmation when not dirty", () => {
       const mockOnClose = vi.fn();
       const { result } = renderHook(() =>
-        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
+        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose }),
       );
 
       act(() => {
@@ -274,7 +287,7 @@ describe("useEnvelopeForm", () => {
 
       const mockOnClose = vi.fn();
       const { result } = renderHook(() =>
-        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
+        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose }),
       );
 
       // Make form dirty
@@ -296,7 +309,7 @@ describe("useEnvelopeForm", () => {
 
       const mockOnClose = vi.fn();
       const { result } = renderHook(() =>
-        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
+        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose }),
       );
 
       // Make form dirty
@@ -345,7 +358,9 @@ describe("useEnvelopeForm", () => {
         category: "Food",
       };
 
-      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, envelope }));
+      const { result } = renderHook(() =>
+        useEnvelopeForm({ ...defaultProps, envelope }),
+      );
 
       // Modify form
       act(() => {
@@ -374,7 +389,10 @@ describe("useEnvelopeForm", () => {
       });
 
       expect(result.current.calculatedAmounts.monthlyAmount).toBe(100);
-      expect(result.current.calculatedAmounts.biweeklyAllocation).toBeCloseTo(46.15, 2);
+      expect(result.current.calculatedAmounts.biweeklyAllocation).toBeCloseTo(
+        46.15,
+        2,
+      );
     });
   });
 

@@ -20,7 +20,8 @@ const OfflinePage = () => {
             <span className="text-white font-black text-3xl">V</span>
           </div>
           <h1 className="font-black text-black text-3xl mb-2">
-            <span className="text-4xl">V</span>IOLET <span className="text-4xl">V</span>AULT
+            <span className="text-4xl">V</span>IOLET{" "}
+            <span className="text-4xl">V</span>AULT
           </h1>
         </div>
 
@@ -33,11 +34,13 @@ const OfflinePage = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-3">
-            <span className="text-2xl">Y</span>OU'RE <span className="text-2xl">O</span>FFLINE
+            <span className="text-2xl">Y</span>OU'RE{" "}
+            <span className="text-2xl">O</span>FFLINE
           </h2>
 
           <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-            This page isn't available offline, but your core budgeting features still work.
+            This page isn't available offline, but your core budgeting features
+            still work.
           </p>
 
           <div className="space-y-3 text-left text-sm">
@@ -45,13 +48,17 @@ const OfflinePage = () => {
               {React.createElement(getIcon("PieChart"), {
                 className: "w-4 h-4 text-green-600 flex-shrink-0",
               })}
-              <span className="text-gray-700">View your budget and envelopes</span>
+              <span className="text-gray-700">
+                View your budget and envelopes
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               {React.createElement(getIcon("CreditCard"), {
                 className: "w-4 h-4 text-green-600 flex-shrink-0",
               })}
-              <span className="text-gray-700">Add transactions (queued for sync)</span>
+              <span className="text-gray-700">
+                Add transactions (queued for sync)
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               {React.createElement(getIcon("List"), {
@@ -69,13 +76,17 @@ const OfflinePage = () => {
               {React.createElement(getIcon("BarChart"), {
                 className: "w-4 h-4 text-green-600 flex-shrink-0",
               })}
-              <span className="text-gray-700">View analytics and spending trends</span>
+              <span className="text-gray-700">
+                View analytics and spending trends
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               {React.createElement(getIcon("Target"), {
                 className: "w-4 h-4 text-green-600 flex-shrink-0",
               })}
-              <span className="text-gray-700">Track savings goals progress</span>
+              <span className="text-gray-700">
+                Track savings goals progress
+              </span>
             </div>
           </div>
         </div>

@@ -11,7 +11,8 @@ vi.mock("../../../hooks/auth/useUserSetup");
 vi.mock("../components/UserSetupHeader", () => ({
   default: ({ step, isReturningUser, userName }) => (
     <div data-testid="header">
-      Header: Step {step}, Returning: {isReturningUser.toString()}, User: {userName}
+      Header: Step {step}, Returning: {isReturningUser.toString()}, User:{" "}
+      {userName}
     </div>
   ),
 }));
@@ -29,7 +30,11 @@ vi.mock("../components/PasswordInput", () => ({
 
 vi.mock("../components/UserNameInput", () => ({
   default: ({ value, onChange }) => (
-    <input data-testid="username-input" value={value} onChange={(e) => onChange(e.target.value)} />
+    <input
+      data-testid="username-input"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
   ),
 }));
 
@@ -58,7 +63,9 @@ vi.mock("../components/StepButtons", () => ({
       Step {step} buttons
       {onContinue && <button onClick={onContinue}>Continue</button>}
       {onBack && <button onClick={onBack}>Back</button>}
-      {onStartTracking && <button onClick={onStartTracking}>Start Tracking</button>}
+      {onStartTracking && (
+        <button onClick={onStartTracking}>Start Tracking</button>
+      )}
     </div>
   ),
 }));
@@ -105,7 +112,9 @@ describe("UserSetup", () => {
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(document.querySelector("form")).toBeInTheDocument();
     expect(
-      screen.getByText("OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY")
+      screen.getByText(
+        "OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -191,14 +200,16 @@ describe("UserSetup", () => {
       "border-2",
       "border-black",
       "bg-purple-100/40",
-      "backdrop-blur-sm"
+      "backdrop-blur-sm",
     );
   });
 
   it("should have background pattern", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
-    const backgroundPattern = document.querySelector('[style*="radial-gradient"]');
+    const backgroundPattern = document.querySelector(
+      '[style*="radial-gradient"]',
+    );
     expect(backgroundPattern).toBeInTheDocument();
   });
 });

@@ -15,13 +15,13 @@ For persistent, global application state like settings and authentication:
 
 ```javascript
 // template-core-store.js
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { persist, devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import logger from '../../utils/common/logger.js';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import logger from "../../utils/common/logger.js";
 
-const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === 'true';
+const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 /**
  * Core State Store Template
@@ -29,33 +29,34 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === 'true';
  * Use for: Persistent settings, global app state, user preferences
  * Characteristics: Persisted, global access, simple state
  */
-const createCoreStoreInitializer = (storeName, initialState, actions) => (set, _get) => {
-  const store = {
-    // Initial state
-    ...initialState,
+const createCoreStoreInitializer =
+  (storeName, initialState, actions) => (set, _get) => {
+    const store = {
+      // Initial state
+      ...initialState,
 
-    // Actions with safe patterns
-    ...Object.entries(actions).reduce((acc, [key, actionFn]) => {
-      acc[key] = (...args) => {
-        try {
-          // Safe external store access pattern
-          const getCurrentState = () => useStore.getState();
+      // Actions with safe patterns
+      ...Object.entries(actions).reduce((acc, [key, actionFn]) => {
+        acc[key] = (...args) => {
+          try {
+            // Safe external store access pattern
+            const getCurrentState = () => useStore.getState();
 
-          return actionFn(set, getCurrentState, ...args);
-        } catch (error) {
-          logger.error(`Action ${key} failed in ${storeName}`, error);
-          throw error;
-        }
-      };
-      return acc;
-    }, {}),
+            return actionFn(set, getCurrentState, ...args);
+          } catch (error) {
+            logger.error(`Action ${key} failed in ${storeName}`, error);
+            throw error;
+          }
+        };
+        return acc;
+      }, {}),
 
-    // Reset utility
-    reset: () => set(() => initialState),
+      // Reset utility
+      reset: () => set(() => initialState),
+    };
+
+    return store;
   };
-
-  return store;
-};
 
 // Usage example:
 const useSettingsStore = create(
@@ -64,35 +65,35 @@ const useSettingsStore = create(
       persist(
         immer(
           createCoreStoreInitializer(
-            'settings-store',
+            "settings-store",
             {
-              theme: 'light',
-              language: 'en',
+              theme: "light",
+              language: "en",
               notifications: true,
             },
             {
               setTheme: (set, _getCurrentState, theme) =>
                 set((state) => {
                   state.theme = theme;
-                  logger.info('Theme updated', { theme });
+                  logger.info("Theme updated", { theme });
                 }),
 
               setLanguage: (set, _getCurrentState, language) =>
                 set((state) => {
                   state.language = language;
-                  logger.info('Language updated', { language });
+                  logger.info("Language updated", { language });
                 }),
-            }
-          )
+            },
+          ),
         ),
         {
-          name: 'violet-vault-settings',
+          name: "violet-vault-settings",
           version: 1,
-        }
+        },
       ),
-      { name: 'settings-devtools' }
-    )
-  )
+      { name: "settings-devtools" },
+    ),
+  ),
 );
 
 export default useSettingsStore;
@@ -104,11 +105,11 @@ For scoped functionality like modals, notifications, and UI features:
 
 ```javascript
 // template-feature-store.js
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import logger from '../../utils/common/logger.js';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import logger from "../../utils/common/logger.js";
 
 /**
  * Feature State Store Template
@@ -145,17 +146,14 @@ const createFeatureStore = (storeName, initialState, actions) => {
 
   return create(
     subscribeWithSelector(
-      devtools(
-        immer(storeInitializer),
-        { name: `${storeName}-devtools` }
-      )
-    )
+      devtools(immer(storeInitializer), { name: `${storeName}-devtools` }),
+    ),
   );
 };
 
 // Usage example:
 const useNotificationStore = createFeatureStore(
-  'notification-store',
+  "notification-store",
   {
     notifications: [],
     isLoading: false,
@@ -181,9 +179,9 @@ const useNotificationStore = createFeatureStore(
 
     removeNotification: (set, _store, id) =>
       set((state) => {
-        state.notifications = state.notifications.filter(n => n.id !== id);
+        state.notifications = state.notifications.filter((n) => n.id !== id);
       }),
-  }
+  },
 );
 
 export default useNotificationStore;
@@ -195,9 +193,9 @@ For temporary, non-persistent state that doesn't need to survive page refreshes:
 
 ```javascript
 // template-ephemeral-store.js
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 /**
  * Ephemeral State Store Template
@@ -215,27 +213,29 @@ const createEphemeralStore = (storeName, initialState) => {
         // Simple setters
         ...Object.keys(initialState).reduce((acc, key) => {
           const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
-          acc[setterName] = (value) => set((state) => {
-            state[key] = value;
-          });
+          acc[setterName] = (value) =>
+            set((state) => {
+              state[key] = value;
+            });
           return acc;
         }, {}),
 
         // Batch update
-        updateState: (updates) => set((state) => {
-          Object.assign(state, updates);
-        }),
+        updateState: (updates) =>
+          set((state) => {
+            Object.assign(state, updates);
+          }),
 
         // Reset
         reset: () => set(() => initialState),
       })),
-      { name: `${storeName}-ephemeral-devtools` }
-    )
+      { name: `${storeName}-ephemeral-devtools` },
+    ),
   );
 };
 
 // Usage example:
-const useFormStore = createEphemeralStore('form-state', {
+const useFormStore = createEphemeralStore("form-state", {
   currentStep: 0,
   isValid: false,
   isDirty: false,
@@ -251,13 +251,13 @@ export default useFormStore;
 
 ```javascript
 // utils/stores/createSafeStore.js
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { persist, devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import logger from '../common/logger.js';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import logger from "../common/logger.js";
 
-const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === 'true';
+const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 /**
  * Creates a safe Zustand store with standard middleware and error handling
@@ -279,23 +279,23 @@ export const createSafeStore = ({
   name,
   initialState,
   actions = {},
-  options = {}
+  options = {},
 }) => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
     immer: enableImmer = true,
     devtools: enableDevtools = true,
-    version = 1
+    version = 1,
   } = options;
 
   // Validate configuration
-  if (!name || typeof name !== 'string') {
-    throw new Error('Store name is required and must be a string');
+  if (!name || typeof name !== "string") {
+    throw new Error("Store name is required and must be a string");
   }
 
-  if (!initialState || typeof initialState !== 'object') {
-    throw new Error('Initial state is required and must be an object');
+  if (!initialState || typeof initialState !== "object") {
+    throw new Error("Initial state is required and must be an object");
   }
 
   // Store initializer with safe patterns
@@ -318,7 +318,7 @@ export const createSafeStore = ({
             logger.debug(`Action ${actionName} executed in ${name}`, {
               actionName,
               storeName: name,
-              args: args.length
+              args: args.length,
             });
 
             return result;
@@ -342,9 +342,9 @@ export const createSafeStore = ({
           storeName: name,
           stateKeys: Object.keys(state),
           timestamp: Date.now(),
-          version
+          version,
         };
-      }
+      },
     };
 
     return store;
@@ -362,7 +362,7 @@ export const createSafeStore = ({
   if (enablePersist && !LOCAL_ONLY_MODE) {
     const persistConfig = {
       name: `violet-vault-${name}`,
-      version
+      version,
     };
 
     // Add partialize if specific keys are requested
@@ -395,7 +395,7 @@ export const createSafeStore = ({
     persist: enablePersist && !LOCAL_ONLY_MODE,
     immer: enableImmer,
     devtools: enableDevtools,
-    actions: Object.keys(actions)
+    actions: Object.keys(actions),
   });
 
   return useStore;
@@ -409,8 +409,8 @@ export const createPersistedStore = (config) => {
     ...config,
     options: {
       ...config.options,
-      persist: true
-    }
+      persist: true,
+    },
   });
 };
 
@@ -422,8 +422,8 @@ export const createEphemeralStore = (config) => {
     ...config,
     options: {
       ...config.options,
-      persist: false
-    }
+      persist: false,
+    },
   });
 };
 ```
@@ -432,7 +432,7 @@ export const createEphemeralStore = (config) => {
 
 ```javascript
 // utils/stores/storeRegistry.js
-import logger from '../common/logger.js';
+import logger from "../common/logger.js";
 
 /**
  * Global store registry for development and debugging
@@ -456,8 +456,8 @@ class StoreRegistry {
       metadata: {
         ...metadata,
         registeredAt: Date.now(),
-        name
-      }
+        name,
+      },
     });
 
     logger.debug(`Registered store: ${name}`, metadata);
@@ -483,11 +483,13 @@ class StoreRegistry {
    * Get all registered stores
    */
   getAll() {
-    return Array.from(this.stores.entries()).map(([name, { store, metadata }]) => ({
-      name,
-      store,
-      metadata
-    }));
+    return Array.from(this.stores.entries()).map(
+      ([name, { store, metadata }]) => ({
+        name,
+        store,
+        metadata,
+      }),
+    );
   }
 
   /**
@@ -503,7 +505,7 @@ class StoreRegistry {
    */
   resetAll() {
     this.stores.forEach(({ store }, name) => {
-      if (store.getState && typeof store.getState().reset === 'function') {
+      if (store.getState && typeof store.getState().reset === "function") {
         store.getState().reset();
         logger.debug(`Reset store: ${name}`);
       }
@@ -522,14 +524,14 @@ class StoreRegistry {
         info[name] = {
           metadata,
           stateKeys: Object.keys(state),
-          hasReset: typeof state.reset === 'function',
-          hasDebugInfo: typeof state.getDebugInfo === 'function',
-          debugInfo: state.getDebugInfo ? state.getDebugInfo() : null
+          hasReset: typeof state.reset === "function",
+          hasDebugInfo: typeof state.getDebugInfo === "function",
+          debugInfo: state.getDebugInfo ? state.getDebugInfo() : null,
         };
       } catch (error) {
         info[name] = {
           metadata,
-          error: error.message
+          error: error.message,
         };
       }
     });
@@ -548,11 +550,11 @@ class StoreRegistry {
       stores: () => this.getDebugInfo(),
       resetAll: () => this.resetAll(),
       getStore: (name) => this.get(name),
-      listStores: () => Array.from(this.stores.keys())
+      listStores: () => Array.from(this.stores.keys()),
     };
 
-    logger.info('Store registry dev helpers initialized', {
-      stores: Array.from(this.stores.keys())
+    logger.info("Store registry dev helpers initialized", {
+      stores: Array.from(this.stores.keys()),
     });
 
     this.initialized = true;
@@ -574,35 +576,35 @@ if (import.meta.env.DEV) {
 
 ```javascript
 // stores/ui/settingsStore.js
-import { createPersistedStore } from '../../utils/stores/createSafeStore.js';
-import { storeRegistry } from '../../utils/stores/storeRegistry.js';
-import logger from '../../utils/common/logger.js';
+import { createPersistedStore } from "../../utils/stores/createSafeStore.js";
+import { storeRegistry } from "../../utils/stores/storeRegistry.js";
+import logger from "../../utils/common/logger.js";
 
 const useSettingsStore = createPersistedStore({
-  name: 'settings',
+  name: "settings",
   initialState: {
-    theme: 'light',
-    language: 'en',
+    theme: "light",
+    language: "en",
     autoSave: true,
     notifications: {
       push: true,
       email: false,
-      sound: true
-    }
+      sound: true,
+    },
   },
   actions: {
     setTheme: (set, _getCurrentState, _store, theme) => {
       set((state) => {
         state.theme = theme;
       });
-      logger.info('Theme updated', { theme });
+      logger.info("Theme updated", { theme });
     },
 
     updateNotificationSettings: (set, _getCurrentState, _store, settings) => {
       set((state) => {
         state.notifications = { ...state.notifications, ...settings };
       });
-      logger.info('Notification settings updated', settings);
+      logger.info("Notification settings updated", settings);
     },
 
     toggleAutoSave: (set, getCurrentState) => {
@@ -610,20 +612,20 @@ const useSettingsStore = createPersistedStore({
       set((state) => {
         state.autoSave = !currentAutoSave;
       });
-      logger.info('Auto-save toggled', { autoSave: !currentAutoSave });
-    }
+      logger.info("Auto-save toggled", { autoSave: !currentAutoSave });
+    },
   },
   options: {
     version: 1,
-    persistedKeys: ['theme', 'language', 'autoSave', 'notifications']
-  }
+    persistedKeys: ["theme", "language", "autoSave", "notifications"],
+  },
 });
 
 // Register for debugging
-storeRegistry.register('settings', useSettingsStore, {
-  type: 'core',
-  description: 'Global application settings',
-  persistent: true
+storeRegistry.register("settings", useSettingsStore, {
+  type: "core",
+  description: "Global application settings",
+  persistent: true,
 });
 
 export default useSettingsStore;
@@ -633,21 +635,24 @@ export default useSettingsStore;
 
 ```javascript
 // stores/ui/modalStore.js
-import { createEphemeralStore } from '../../utils/stores/createSafeStore.js';
-import { storeRegistry } from '../../utils/stores/storeRegistry.js';
+import { createEphemeralStore } from "../../utils/stores/createSafeStore.js";
+import { storeRegistry } from "../../utils/stores/storeRegistry.js";
 
 const useModalStore = createEphemeralStore({
-  name: 'modal',
+  name: "modal",
   initialState: {
     activeModal: null,
     modalProps: {},
     isClosing: false,
-    history: []
+    history: [],
   },
   actions: {
     openModal: (set, _getCurrentState, store, modalName, props = {}) => {
       set((state) => {
-        state.history.push({ modal: state.activeModal, props: state.modalProps });
+        state.history.push({
+          modal: state.activeModal,
+          props: state.modalProps,
+        });
         state.activeModal = modalName;
         state.modalProps = props;
         state.isClosing = false;
@@ -655,7 +660,7 @@ const useModalStore = createEphemeralStore({
 
       // Auto-focus management
       setTimeout(() => {
-        const modal = document.querySelector('[data-modal-focus]');
+        const modal = document.querySelector("[data-modal-focus]");
         if (modal) modal.focus();
       }, 100);
     },
@@ -691,15 +696,15 @@ const useModalStore = createEphemeralStore({
       } else {
         store.closeModal();
       }
-    }
-  }
+    },
+  },
 });
 
 // Register for debugging
-storeRegistry.register('modal', useModalStore, {
-  type: 'feature',
-  description: 'Modal state management',
-  persistent: false
+storeRegistry.register("modal", useModalStore, {
+  type: "feature",
+  description: "Modal state management",
+  persistent: false,
 });
 
 export default useModalStore;
@@ -711,8 +716,8 @@ export default useModalStore;
 
 ```javascript
 // utils/testing/storeTestUtils.js
-import { renderHook, act } from '@testing-library/react';
-import { storeRegistry } from '../stores/storeRegistry.js';
+import { renderHook, act } from "@testing-library/react";
+import { storeRegistry } from "../stores/storeRegistry.js";
 
 /**
  * Utility for testing Zustand stores
@@ -795,75 +800,78 @@ export const resetAllStores = () => {
 
 ```javascript
 // __tests__/stores/settingsStore.test.js
-import { describe, it, expect, beforeEach } from 'vitest';
-import { createStoreTestHelper, resetAllStores } from '../../utils/testing/storeTestUtils.js';
-import useSettingsStore from '../../stores/ui/settingsStore.js';
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  createStoreTestHelper,
+  resetAllStores,
+} from "../../utils/testing/storeTestUtils.js";
+import useSettingsStore from "../../stores/ui/settingsStore.js";
 
-describe('Settings Store', () => {
+describe("Settings Store", () => {
   let storeHelper;
 
   beforeEach(() => {
     resetAllStores();
-    storeHelper = createStoreTestHelper(useSettingsStore, 'settings');
+    storeHelper = createStoreTestHelper(useSettingsStore, "settings");
     storeHelper.setup();
   });
 
-  it('should initialize with default state', () => {
+  it("should initialize with default state", () => {
     storeHelper.assertState({
-      theme: 'light',
-      language: 'en',
-      autoSave: true
+      theme: "light",
+      language: "en",
+      autoSave: true,
     });
   });
 
-  it('should update theme correctly', async () => {
-    await storeHelper.executeAction('setTheme', 'dark');
+  it("should update theme correctly", async () => {
+    await storeHelper.executeAction("setTheme", "dark");
 
     storeHelper.assertState({
-      theme: 'dark'
+      theme: "dark",
     });
   });
 
-  it('should toggle auto-save', async () => {
-    await storeHelper.executeAction('toggleAutoSave');
+  it("should toggle auto-save", async () => {
+    await storeHelper.executeAction("toggleAutoSave");
 
     storeHelper.assertState({
-      autoSave: false
+      autoSave: false,
     });
 
-    await storeHelper.executeAction('toggleAutoSave');
+    await storeHelper.executeAction("toggleAutoSave");
 
     storeHelper.assertState({
-      autoSave: true
+      autoSave: true,
     });
   });
 
-  it('should update notification settings partially', async () => {
-    await storeHelper.executeAction('updateNotificationSettings', {
+  it("should update notification settings partially", async () => {
+    await storeHelper.executeAction("updateNotificationSettings", {
       push: false,
-      sound: false
+      sound: false,
     });
 
     const state = storeHelper.getState();
     expect(state.notifications).toEqual({
       push: false,
       email: false, // unchanged
-      sound: false
+      sound: false,
     });
   });
 
-  it('should reset to initial state', async () => {
+  it("should reset to initial state", async () => {
     // Make changes
-    await storeHelper.executeAction('setTheme', 'dark');
-    await storeHelper.executeAction('toggleAutoSave');
+    await storeHelper.executeAction("setTheme", "dark");
+    await storeHelper.executeAction("toggleAutoSave");
 
     // Reset
     storeHelper.reset();
 
     // Verify reset
     storeHelper.assertState({
-      theme: 'light',
-      autoSave: true
+      theme: "light",
+      autoSave: true,
     });
   });
 });
@@ -874,12 +882,14 @@ describe('Settings Store', () => {
 ### ✅ Store Creation Checklist
 
 **Planning:**
+
 - [ ] Determine store type (Core/Feature/Ephemeral)
 - [ ] Define clear purpose and scope
 - [ ] Identify state that belongs in this store
 - [ ] Plan action signatures and behaviors
 
 **Implementation:**
+
 - [ ] Use appropriate template (Core/Feature/Ephemeral)
 - [ ] Follow safe patterns (no `get()` in actions)
 - [ ] Implement proper error handling
@@ -887,6 +897,7 @@ describe('Settings Store', () => {
 - [ ] Include reset functionality
 
 **Safety:**
+
 - [ ] No `get()` calls in store actions
 - [ ] Use store reference pattern for async operations
 - [ ] Implement external state access with `getState()`
@@ -894,6 +905,7 @@ describe('Settings Store', () => {
 - [ ] Use selective subscriptions in components
 
 **Testing:**
+
 - [ ] Create comprehensive test suite
 - [ ] Test all actions and state changes
 - [ ] Test error scenarios
@@ -901,12 +913,14 @@ describe('Settings Store', () => {
 - [ ] Test persistence (if applicable)
 
 **Integration:**
+
 - [ ] Register in store registry
 - [ ] Add to ESLint exclusions if needed
 - [ ] Update CLAUDE.md if patterns change
 - [ ] Document any special considerations
 
 **Performance:**
+
 - [ ] Verify selective subscriptions work
 - [ ] Test with large state objects
 - [ ] Verify persistence performance

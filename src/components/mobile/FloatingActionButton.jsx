@@ -12,7 +12,12 @@ import FABActionMenu from "./FABActionMenu";
  */
 const FloatingActionButton = () => {
   const { shouldShowFAB, primaryAction, isExpanded } = useFABSelectors();
-  const { containerRef, handlePrimaryClick, handleLongPress, handleBackdropClick } = useFABBehavior();
+  const {
+    containerRef,
+    handlePrimaryClick,
+    handleLongPress,
+    handleBackdropClick,
+  } = useFABBehavior();
   const { adjustedStyle } = useFABSmartPositioning();
   const { isAnyActionLoading } = useFABLoadingStates();
 
@@ -40,9 +45,7 @@ const FloatingActionButton = () => {
         onTouchCancel={handleLongPress.onTouchCancel}
         className={`bg-purple-600 hover:bg-purple-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-105 ${
           isExpanded ? "rotate-45" : "rotate-0"
-        } ${
-          isAnyActionLoading() ? "opacity-75 cursor-wait" : ""
-        }`}
+        } ${isAnyActionLoading() ? "opacity-75 cursor-wait" : ""}`}
         disabled={isAnyActionLoading()}
         title={primaryAction?.label || "Actions"}
         aria-label="Floating action button"
@@ -50,9 +53,12 @@ const FloatingActionButton = () => {
         aria-haspopup="menu"
         style={{ width: "56px", height: "56px" }}
       >
-        {React.createElement(getIcon(isExpanded ? "X" : primaryAction?.icon || "Plus"), {
-          className: "h-6 w-6",
-        })}
+        {React.createElement(
+          getIcon(isExpanded ? "X" : primaryAction?.icon || "Plus"),
+          {
+            className: "h-6 w-6",
+          },
+        )}
       </button>
 
       {/* Backdrop */}

@@ -13,7 +13,9 @@ const HistoryStatistics = ({ statistics }) => {
           })}
           <div>
             <p className="text-sm text-blue-700">Total Changes</p>
-            <p className="text-lg font-semibold text-blue-900">{statistics.totalCommits}</p>
+            <p className="text-lg font-semibold text-blue-900">
+              {statistics.totalCommits}
+            </p>
           </div>
         </div>
       </div>
@@ -55,7 +57,9 @@ const HistoryStatistics = ({ statistics }) => {
           })}
           <div>
             <p className="text-sm text-gray-700">Storage Size</p>
-            <p className="text-xs text-gray-900">{Math.round(statistics.storageSize / 1024)} KB</p>
+            <p className="text-xs text-gray-900">
+              {Math.round(statistics.storageSize / 1024)} KB
+            </p>
           </div>
         </div>
       </div>

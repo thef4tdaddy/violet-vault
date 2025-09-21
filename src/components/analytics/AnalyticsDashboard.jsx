@@ -26,14 +26,19 @@ const AnalyticsDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data
-  const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } =
-    useBudgetStore(state => ({
-      transactions: state.transactions,
-      envelopes: state.envelopes,
-      _savingsGoals: state.savingsGoals,
-      _actualBalance: state.actualBalance,
-      _unassignedCash: state.unassignedCash
-    }));
+  const {
+    transactions,
+    envelopes,
+    _savingsGoals,
+    _actualBalance,
+    _unassignedCash,
+  } = useBudgetStore((state) => ({
+    transactions: state.transactions,
+    envelopes: state.envelopes,
+    _savingsGoals: state.savingsGoals,
+    _actualBalance: state.actualBalance,
+    _unassignedCash: state.unassignedCash,
+  }));
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
@@ -116,15 +121,24 @@ const AnalyticsDashboard = () => {
 
     // Calculate envelope utilization
     const totalBudgeted =
-      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.monthlyBudget || 0), 0) || 0;
+      balance.envelopeAnalysis?.reduce(
+        (sum, env) => sum + (env.monthlyBudget || 0),
+        0,
+      ) || 0;
     const totalSpent =
-      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.spent || 0), 0) || 0;
-    const envelopeUtilization = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
+      balance.envelopeAnalysis?.reduce(
+        (sum, env) => sum + (env.spent || 0),
+        0,
+      ) || 0;
+    const envelopeUtilization =
+      totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
 
     // Calculate savings progress
     const savingsProgress =
-      balance.savingsAnalysis?.reduce((sum, goal) => sum + goal.progressRate, 0) /
-      Math.max(1, balance.savingsAnalysis?.length || 1);
+      balance.savingsAnalysis?.reduce(
+        (sum, goal) => sum + goal.progressRate,
+        0,
+      ) / Math.max(1, balance.savingsAnalysis?.length || 1);
 
     // Determine balance health
     const balanceHealth = balance.balanceSummary?.isBalanced
@@ -166,7 +180,9 @@ const AnalyticsDashboard = () => {
           })}
           <h3 className="text-red-900 font-medium">Analytics Error</h3>
         </div>
-        <p className="text-red-700 mt-2">Failed to load analytics data. Please try again.</p>
+        <p className="text-red-700 mt-2">
+          Failed to load analytics data. Please try again.
+        </p>
       </div>
     );
   }
@@ -177,9 +193,12 @@ const AnalyticsDashboard = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-black text-black text-base">
-            <span className="text-lg">A</span>NALYTICS <span className="text-lg">D</span>ASHBOARD
+            <span className="text-lg">A</span>NALYTICS{" "}
+            <span className="text-lg">D</span>ASHBOARD
           </h1>
-          <p className="text-purple-900 mt-1">Comprehensive financial insights and reporting</p>
+          <p className="text-purple-900 mt-1">
+            Comprehensive financial insights and reporting
+          </p>
         </div>
 
         <div className="flex items-center gap-3 mt-4 lg:mt-0">
@@ -229,7 +248,8 @@ const AnalyticsDashboard = () => {
         {activeTab === "overview" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">F</span>INANCIAL <span className="text-lg">O</span>VERVIEW
+              <span className="text-lg">F</span>INANCIAL{" "}
+              <span className="text-lg">O</span>VERVIEW
             </h2>
             <ChartsAndAnalytics
               transactions={transactions}
@@ -242,7 +262,8 @@ const AnalyticsDashboard = () => {
         {activeTab === "spending" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">S</span>PENDING <span className="text-lg">A</span>NALYSIS
+              <span className="text-lg">S</span>PENDING{" "}
+              <span className="text-lg">A</span>NALYSIS
             </h2>
             <ChartsAndAnalytics
               transactions={transactions}
@@ -256,16 +277,21 @@ const AnalyticsDashboard = () => {
         {activeTab === "trends" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">T</span>RENDS & <span className="text-lg">F</span>ORECASTING
+              <span className="text-lg">T</span>RENDS &{" "}
+              <span className="text-lg">F</span>ORECASTING
             </h2>
-            <TrendAnalysisCharts analyticsData={analyticsQuery.data} timeFilter={timeFilter} />
+            <TrendAnalysisCharts
+              analyticsData={analyticsQuery.data}
+              timeFilter={timeFilter}
+            />
           </div>
         )}
 
         {activeTab === "performance" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">P</span>ERFORMANCE <span className="text-lg">M</span>ONITOR
+              <span className="text-lg">P</span>ERFORMANCE{" "}
+              <span className="text-lg">M</span>ONITOR
             </h2>
             <PerformanceMonitor
               analyticsData={analyticsQuery.data}
@@ -277,7 +303,8 @@ const AnalyticsDashboard = () => {
         {activeTab === "envelopes" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">E</span>NVELOPE <span className="text-lg">A</span>NALYSIS
+              <span className="text-lg">E</span>NVELOPE{" "}
+              <span className="text-lg">A</span>NALYSIS
             </h2>
             <ChartsAndAnalytics
               transactions={transactions}

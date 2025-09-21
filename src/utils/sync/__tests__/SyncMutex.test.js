@@ -67,7 +67,9 @@ describe("SyncMutex", () => {
 
       expect(syncMutex.syncMetrics.operationsCompleted).toBe(2);
       const expectedAvg = syncMutex.syncMetrics.totalLockTime / 2;
-      expect(syncMutex.syncMetrics.averageLockTime).toBe(Math.round(expectedAvg));
+      expect(syncMutex.syncMetrics.averageLockTime).toBe(
+        Math.round(expectedAvg),
+      );
     });
 
     it("should track max lock time correctly", async () => {
@@ -101,7 +103,7 @@ describe("SyncMutex", () => {
         expect.objectContaining({
           operation: "slow-operation",
           metrics: expect.any(Object),
-        })
+        }),
       );
     });
 
@@ -113,7 +115,7 @@ describe("SyncMutex", () => {
       syncMutex.release();
 
       expect(logger.default.warn).not.toHaveBeenCalledWith(
-        expect.stringContaining("Slow sync operation detected")
+        expect.stringContaining("Slow sync operation detected"),
       );
     });
   });
@@ -160,7 +162,7 @@ describe("SyncMutex", () => {
         expect.objectContaining({
           currentOperation: "first-operation",
           metrics: expect.any(Object),
-        })
+        }),
       );
 
       expect(syncMutex.locked).toBe(false);
@@ -192,7 +194,9 @@ describe("SyncMutex", () => {
         throw new Error("test error");
       });
 
-      await expect(syncMutex.execute(mockFn, "error-test")).rejects.toThrow("test error");
+      await expect(syncMutex.execute(mockFn, "error-test")).rejects.toThrow(
+        "test error",
+      );
 
       expect(syncMutex.syncMetrics.operationsCompleted).toBe(1);
       expect(syncMutex.locked).toBe(false);

@@ -86,7 +86,7 @@ const AddBillModal = ({
       autoAcquire: true,
       autoRelease: true,
       showToasts: true,
-    }
+    },
   );
 
   // Lock management is now handled by useEditLock with autoAcquire/autoRelease
@@ -190,7 +190,11 @@ const AddBillModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl">
-        <BillModalHeader editingBill={editingBill} formData={formData} onClose={onClose} />
+        <BillModalHeader
+          editingBill={editingBill}
+          formData={formData}
+          onClose={onClose}
+        />
         <ModalContent />
       </div>
     </div>

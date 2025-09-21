@@ -16,7 +16,9 @@ const ArchivingActionButtons = ({
     <div className="bg-white rounded-xl p-6 border border-gray-200">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Ready to Archive</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Ready to Archive
+          </h3>
           <p className="text-gray-600 text-sm mt-1">
             {confirmArchiving
               ? 'Click "Confirm Archive" to proceed with archiving.'
@@ -39,7 +41,10 @@ const ArchivingActionButtons = ({
           )}
 
           {confirmArchiving && (
-            <button onClick={toggleConfirmArchiving} className="btn btn-secondary">
+            <button
+              onClick={toggleConfirmArchiving}
+              className="btn btn-secondary"
+            >
               Cancel
             </button>
           )}
@@ -50,7 +55,9 @@ const ArchivingActionButtons = ({
             disabled={isArchiving}
           >
             {React.createElement(getIcon("Archive"), { className: "h-4 w-4" })}
-            <span>{confirmArchiving ? "Confirm Archive" : "Start Archiving"}</span>
+            <span>
+              {confirmArchiving ? "Confirm Archive" : "Start Archiving"}
+            </span>
           </button>
         </div>
       </div>

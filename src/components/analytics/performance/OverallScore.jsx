@@ -12,8 +12,12 @@ const OverallScore = ({ score }) => {
         <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-600 text-white mb-4">
           <span className="text-2xl font-bold">{score}</span>
         </div>
-        <h4 className="text-lg font-semibold text-gray-900 mb-2">Overall Financial Health</h4>
-        <p className="text-gray-600 max-w-md mx-auto">{getPerformanceMessage(score)}</p>
+        <h4 className="text-lg font-semibold text-gray-900 mb-2">
+          Overall Financial Health
+        </h4>
+        <p className="text-gray-600 max-w-md mx-auto">
+          {getPerformanceMessage(score)}
+        </p>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import useBudgetData from "../budgeting/useBudgetData";
-import { useUnassignedCash, useActualBalance } from "../budgeting/useBudgetMetadata";
+import {
+  useUnassignedCash,
+  useActualBalance,
+} from "../budgeting/useBudgetMetadata";
 import useBills from "../bills/useBills";
 import {
   calculateEnvelopeData,
@@ -41,14 +44,18 @@ export const useLayoutData = () => {
 
     // Use existing utility with empty arrays for transactions and bills
     // since we're only calculating envelope-based metrics
-    const processedEnvelopeData = calculateEnvelopeData(budgetData.envelopes, [], []);
+    const processedEnvelopeData = calculateEnvelopeData(
+      budgetData.envelopes,
+      [],
+      [],
+    );
     return calculateEnvelopeTotals(processedEnvelopeData);
   }, [budgetData.envelopes]);
 
   // Filter out null/undefined transactions for safe operations
   const safeTransactions = useMemo(() => {
     return (budgetData.transactions || []).filter(
-      (t) => t && typeof t === "object" && typeof t.amount === "number"
+      (t) => t && typeof t === "object" && typeof t.amount === "number",
     );
   }, [budgetData.transactions]);
 

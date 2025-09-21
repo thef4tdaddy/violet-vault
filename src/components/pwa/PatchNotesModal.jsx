@@ -8,7 +8,12 @@ import { markVersionAsSeen } from "../../utils/common/version";
  * Shows what's new after app updates
  */
 const PatchNotesModal = () => {
-  const { showPatchNotes, patchNotesData, loadingPatchNotes, hidePatchNotesModal } = useUiStore();
+  const {
+    showPatchNotes,
+    patchNotesData,
+    loadingPatchNotes,
+    hidePatchNotesModal,
+  } = useUiStore();
 
   if (!showPatchNotes || !patchNotesData) return null;
 
@@ -65,7 +70,9 @@ const PatchNotesModal = () => {
   // Add features first
   if (patchNotesData.features?.length > 0) {
     highlights.push(
-      ...patchNotesData.features.slice(0, 3).map((text) => ({ type: "feature", text }))
+      ...patchNotesData.features
+        .slice(0, 3)
+        .map((text) => ({ type: "feature", text })),
     );
   }
 
@@ -73,7 +80,9 @@ const PatchNotesModal = () => {
   if (highlights.length < 4 && patchNotesData.fixes?.length > 0) {
     const remaining = 4 - highlights.length;
     highlights.push(
-      ...patchNotesData.fixes.slice(0, remaining).map((text) => ({ type: "fix", text }))
+      ...patchNotesData.fixes
+        .slice(0, remaining)
+        .map((text) => ({ type: "fix", text })),
     );
   }
 
@@ -81,7 +90,9 @@ const PatchNotesModal = () => {
   if (highlights.length < 4 && patchNotesData.other?.length > 0) {
     const remaining = 4 - highlights.length;
     highlights.push(
-      ...patchNotesData.other.slice(0, remaining).map((text) => ({ type: "other", text }))
+      ...patchNotesData.other
+        .slice(0, remaining)
+        .map((text) => ({ type: "other", text })),
     );
   }
 
@@ -115,7 +126,8 @@ const PatchNotesModal = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            🎉 <span className="text-2xl">W</span>HAT'S <span className="text-2xl">N</span>EW
+            🎉 <span className="text-2xl">W</span>HAT'S{" "}
+            <span className="text-2xl">N</span>EW
           </h2>
 
           <div className="flex items-center justify-center space-x-2 mb-2">
@@ -126,7 +138,9 @@ const PatchNotesModal = () => {
           </div>
 
           {patchNotesData.summary && (
-            <p className="text-purple-900 text-sm leading-relaxed">{patchNotesData.summary}</p>
+            <p className="text-purple-900 text-sm leading-relaxed">
+              {patchNotesData.summary}
+            </p>
           )}
         </div>
 
@@ -168,8 +182,9 @@ const PatchNotesModal = () => {
                 className: "w-4 h-4 text-blue-600",
               })}
               <span className="text-blue-700">
-                Updated from <span className="font-mono">{patchNotesData.fromVersion}</span> to{" "}
-                <span className="font-mono">{patchNotesData.toVersion}</span>
+                Updated from{" "}
+                <span className="font-mono">{patchNotesData.fromVersion}</span>{" "}
+                to <span className="font-mono">{patchNotesData.toVersion}</span>
               </span>
             </div>
           </div>
@@ -183,8 +198,8 @@ const PatchNotesModal = () => {
                 className: "w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5",
               })}
               <span className="text-yellow-700">
-                Full release notes are being loaded. The information above shows general
-                improvements.
+                Full release notes are being loaded. The information above shows
+                general improvements.
               </span>
             </div>
           </div>
@@ -213,7 +228,8 @@ const PatchNotesModal = () => {
         {/* Footer */}
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-500">
-            Thanks for using VioletVault! We're constantly improving your budgeting experience.
+            Thanks for using VioletVault! We're constantly improving your
+            budgeting experience.
           </p>
         </div>
       </div>

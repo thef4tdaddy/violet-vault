@@ -40,30 +40,36 @@
 ## Zustand Store Standards
 
 ### **Store Types & Use Cases**
+
 - **Core State**: Authentication, global UI settings (authStore, uiStore)
 - **Feature State**: Scoped functionality (fabStore when enabled)
 - **Ephemeral State**: Temporary UI (toasts, modals) - minimal scope
 
 ### **Safe Patterns - ALWAYS USE**
+
 - **NEVER** call `get()` inside store actions (causes React error #185)
 - Use `useStore.getState()` for external store access in async operations
 - Use `set((state) => ...)` instead of `get()` calls for state updates
 - Subscribe selectively: `useStore(state => state.specificValue)` not `useStore()`
 
 ### **Store Architecture Rules**
+
 - **Persistent State**: Core settings that survive page refreshes
 - **Computed State**: Use TanStack Query, not Zustand
 - **Temporary State**: Use React useState, not global stores
 - **Async Operations**: Use store reference pattern, never `get()` in timeouts/promises
 
 ### **Forbidden Patterns**
+
 - ❌ `get()` calls inside store actions (triggers React error #185)
 - ❌ Conditional store subscriptions (violates React hooks rules)
 - ❌ Mixing persistent and ephemeral state in same store
 - ❌ Complex computed values in stores (use TanStack Query)
 
 ### **ESLint Protection**
+
 Custom rules prevent unsafe patterns - configured in `configs/eslint.config.js`:
+
 - Rules validate all new Zustand code
 - Violations blocked at development time
 - See `docs/ESLint-Zustand-Rules.md` for details
@@ -155,6 +161,7 @@ Never create custom implementations when shared components exist.
 **For ALL feature implementation requests, follow this mandatory workflow:**
 
 ### 1. **Issue Analysis & Expansion**
+
 - **ALWAYS** check if GitHub issue exists first
 - If exists: Read thoroughly and expand with detailed technical analysis
 - If missing: Create comprehensive issue with proper labels/milestones
@@ -162,12 +169,14 @@ Never create custom implementations when shared components exist.
 - Use labels: "enhancement" and "roadmap" for new features
 
 ### 2. **Sub-Issue Creation**
+
 - Break down complex features into manageable sub-issues
 - Each sub-issue should be independently completable
 - Link sub-issues to parent epic for tracking
 - Assign appropriate labels (enhancement, mobile, UX, etc.)
 
 ### 3. **Implementation Planning**
+
 - Create detailed technical plan in issue comments
 - Define architecture, components, and integration points
 - Map out phase-by-phase implementation strategy
@@ -175,6 +184,7 @@ Never create custom implementations when shared components exist.
 - Set success criteria and testing requirements
 
 ### 4. **Pre-Implementation Checklist**
+
 - ✅ Issue properly documented and expanded
 - ✅ Sub-issues created if needed
 - ✅ Implementation plan commented on issue
@@ -183,6 +193,7 @@ Never create custom implementations when shared components exist.
 - **ONLY THEN proceed with actual coding**
 
 **Example Pattern:**
+
 - Read/create GitHub issue → Expand with analysis → Create technical plan → Comment plan → Break into sub-issues if complex → Begin development
 
 **This ensures proper planning, documentation, and tracking before diving into code.**

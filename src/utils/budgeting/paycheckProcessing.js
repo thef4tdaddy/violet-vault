@@ -3,8 +3,15 @@
  * Extracted from paycheckMutations.js for better maintainability
  */
 
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
-import { calculatePaycheckBalances, validateBalances } from "../common/balanceCalculator";
+import {
+  budgetDb,
+  getBudgetMetadata,
+  setBudgetMetadata,
+} from "../../db/budgetDb";
+import {
+  calculatePaycheckBalances,
+  validateBalances,
+} from "../common/balanceCalculator";
 import logger from "../common/logger";
 
 /**
@@ -22,13 +29,14 @@ export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
 
   const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
     (sum, env) => sum + (parseFloat(env.currentBalance) || 0),
-    0
+    0,
   );
   const currentTotalSavingsBalance = currentSavings.reduce(
     (sum, saving) => sum + (parseFloat(saving.currentBalance) || 0),
-    0
+    0,
   );
-  const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
+  const currentVirtualBalance =
+    currentTotalEnvelopeBalance + currentTotalSavingsBalance;
 
   logger.info("Current balances before paycheck", {
     currentActualBalance,
@@ -85,7 +93,7 @@ export const createPaycheckRecord = async (
   paycheckData,
   currentBalances,
   newBalances,
-  allocations
+  allocations,
 ) => {
   const paycheckRecord = {
     id: `paycheck_${Date.now()}`,
@@ -114,7 +122,11 @@ export const createPaycheckRecord = async (
 /**
  * Process paycheck with balance calculations and allocations
  */
-export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoalsQuery) => {
+export const processPaycheck = async (
+  paycheckData,
+  envelopesQuery,
+  savingsGoalsQuery,
+) => {
   logger.info("Starting paycheck processing", {
     amount: paycheckData.amount,
     mode: paycheckData.mode,
@@ -123,7 +135,10 @@ export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoals
   });
 
   // Get current balances
-  const currentBalances = await getCurrentBalances(envelopesQuery, savingsGoalsQuery);
+  const currentBalances = await getCurrentBalances(
+    envelopesQuery,
+    savingsGoalsQuery,
+  );
 
   // Prepare allocations for calculator
   const allocations =
@@ -133,7 +148,11 @@ export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoals
     })) || [];
 
   // Use centralized balance calculator to ensure consistency
-  const newBalances = calculatePaycheckBalances(currentBalances, paycheckData, allocations);
+  const newBalances = calculatePaycheckBalances(
+    currentBalances,
+    paycheckData,
+    allocations,
+  );
 
   // Validate the calculation
   const validation = validateBalances(newBalances);
@@ -170,7 +189,7 @@ export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoals
     paycheckData,
     currentBalances,
     newBalances,
-    allocations
+    allocations,
   );
 
   return paycheckRecord;

@@ -12,7 +12,12 @@ import { routeConfig } from "./routeConfig";
  * Handles both marketing (/) and app (/app/*) routes
  * Landing page at root, full app under /app/ prefix
  */
-const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+const AppRoutes = ({
+  budget,
+  currentUser,
+  totalBiweeklyNeed,
+  setActiveView,
+}) => {
   const commonProps = {
     budget,
     currentUser,
@@ -39,7 +44,9 @@ const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) =>
         <Route
           key={path}
           path={path}
-          element={<ViewRendererComponent activeView={activeView} {...commonProps} />}
+          element={
+            <ViewRendererComponent activeView={activeView} {...commonProps} />
+          }
         />
       ))}
 

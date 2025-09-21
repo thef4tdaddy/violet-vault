@@ -28,7 +28,9 @@ const HistoryList = ({
             className: "h-12 w-12 mx-auto mb-3 opacity-50",
           })}
           <p>No history available</p>
-          <p className="text-sm mt-1">History will appear as you make changes to your budget</p>
+          <p className="text-sm mt-1">
+            History will appear as you make changes to your budget
+          </p>
         </div>
       )}
 
@@ -50,7 +52,9 @@ const HistoryList = ({
                     {React.createElement(getIcon("GitCommit"), {
                       className: "h-4 w-4 text-gray-600",
                     })}
-                    <span className="font-mono text-sm text-gray-600">{commit.shortHash}</span>
+                    <span className="font-mono text-sm text-gray-600">
+                      {commit.shortHash}
+                    </span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${getAuthorColor(commit.author)}`}
                     >
@@ -58,7 +62,9 @@ const HistoryList = ({
                     </span>
                   </div>
 
-                  <p className="text-sm font-medium text-gray-900 mb-1">{commit.message}</p>
+                  <p className="text-sm font-medium text-gray-900 mb-1">
+                    {commit.message}
+                  </p>
 
                   <div className="flex items-center text-xs text-gray-500">
                     {React.createElement(getIcon("Calendar"), {

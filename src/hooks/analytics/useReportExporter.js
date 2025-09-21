@@ -54,7 +54,11 @@ export const useReportExporter = () => {
       // Report metadata
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "normal");
-      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, yPosition);
+      pdf.text(
+        `Generated: ${new Date().toLocaleDateString()}`,
+        margin,
+        yPosition,
+      );
       yPosition += 8;
       pdf.text(`Period: ${timeFilter}`, margin, yPosition);
       yPosition += 15;
@@ -77,19 +81,19 @@ export const useReportExporter = () => {
           pdf.text(
             `Total Income: $${(analyticsData.totalIncome || 0).toLocaleString()}`,
             margin,
-            yPosition
+            yPosition,
           );
           yPosition += 8;
           pdf.text(
             `Total Expenses: $${(analyticsData.totalExpenses || 0).toLocaleString()}`,
             margin,
-            yPosition
+            yPosition,
           );
           yPosition += 8;
           pdf.text(
             `Net Amount: $${(analyticsData.netAmount || 0).toLocaleString()}`,
             margin,
-            yPosition
+            yPosition,
           );
           yPosition += 15;
         }
@@ -110,7 +114,13 @@ export const useReportExporter = () => {
         pdf.setFont("helvetica", "normal");
 
         // Table headers
-        const headers = ["Envelope", "Budget", "Spent", "Balance", "Utilization"];
+        const headers = [
+          "Envelope",
+          "Budget",
+          "Spent",
+          "Balance",
+          "Utilization",
+        ];
         const colWidths = [50, 25, 25, 25, 25];
         let xPosition = margin;
 
@@ -180,7 +190,7 @@ export const useReportExporter = () => {
 
       setExportProgress(100);
     },
-    [exportOptions]
+    [exportOptions],
   );
 
   const exportToCSV = useCallback(async (analyticsData) => {
@@ -212,8 +222,12 @@ export const useReportExporter = () => {
     const csvContent = csvData
       .map((row) =>
         row
-          .map((field) => (typeof field === "string" && field.includes(",") ? `"${field}"` : field))
-          .join(",")
+          .map((field) =>
+            typeof field === "string" && field.includes(",")
+              ? `"${field}"`
+              : field,
+          )
+          .join(","),
       )
       .join("\\n");
 
@@ -227,7 +241,7 @@ export const useReportExporter = () => {
       link.setAttribute("href", url);
       link.setAttribute(
         "download",
-        `VioletVault-Data-${new Date().toISOString().split("T")[0]}.csv`
+        `VioletVault-Data-${new Date().toISOString().split("T")[0]}.csv`,
       );
       link.style.visibility = "hidden";
       document.body.appendChild(link);
@@ -246,7 +260,8 @@ export const useReportExporter = () => {
 
     for (let i = 0; i < chartElements.length; i++) {
       const element = chartElements[i];
-      const chartName = element.getAttribute("data-chart-name") || `chart-${i + 1}`;
+      const chartName =
+        element.getAttribute("data-chart-name") || `chart-${i + 1}`;
 
       setExportProgress(20 + (i * 60) / chartElements.length);
 
@@ -307,19 +322,22 @@ export const useReportExporter = () => {
         logger.info("Export completed successfully");
         globalToast.showSuccess(
           `${exportFormat.toUpperCase()} export completed!`,
-          "Export Successful"
+          "Export Successful",
         );
         onExport?.(exportFormat, exportOptions);
         onClose?.();
       } catch (error) {
         logger.error("Export failed", error);
-        globalToast.showError("Export failed. Please try again.", "Export Failed");
+        globalToast.showError(
+          "Export failed. Please try again.",
+          "Export Failed",
+        );
       } finally {
         setIsExporting(false);
         setExportProgress(0);
       }
     },
-    [exportFormat, exportOptions, exportToPDF, exportToCSV, exportChartImages]
+    [exportFormat, exportOptions, exportToPDF, exportToCSV, exportChartImages],
   );
 
   const applyTemplate = useCallback((template) => {

@@ -67,7 +67,7 @@ const MainLayout = ({ firebaseSync }) => {
   } = auth;
 
   // Onboarding state - prevent security warning during tutorial
-  const isOnboarded = useOnboardingStore(state => state.isOnboarded);
+  const _isOnboarded = useOnboardingStore((state) => state.isOnboarded);
 
   // Initialize data from Dexie to Zustand on app startup
   useDataInitialization(); // Return values not currently used
@@ -75,7 +75,8 @@ const MainLayout = ({ firebaseSync }) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
 
-  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
+  const { exportData, importData, resetEncryptionAndStartFresh } =
+    useDataManagement();
 
   const {
     rotationDue,
@@ -93,7 +94,10 @@ const MainLayout = ({ firebaseSync }) => {
   const [syncConflicts, setSyncConflicts] = useState(null);
 
   // Toast notifications from Zustand store
-  const { toasts, removeToast } = useToastStore();
+  const { toasts, removeToast } = useToastStore((state) => ({
+    toasts: state.toasts,
+    removeToast: state.removeToast,
+  }));
 
   // Log auth state changes only (not on every render)
   useEffect(() => {
@@ -118,14 +122,21 @@ const MainLayout = ({ firebaseSync }) => {
   // Navigation effect - redirect to dashboard after successful authentication
   useEffect(() => {
     if (isUnlocked && currentUser && location.pathname === "/") {
-      logger.auth("User logged in but on landing page, redirecting to dashboard");
+      logger.auth(
+        "User logged in but on landing page, redirecting to dashboard",
+      );
       navigate("/app/dashboard");
     }
   }, [isUnlocked, currentUser, location.pathname, navigate]);
 
   // Use centralized auth gateway check
   if (shouldShowAuthGateway()) {
-    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
+    return (
+      <AuthGateway
+        onSetupComplete={handleSetup}
+        onLocalOnlyReady={handleLocalOnlyReady}
+      />
+    );
   }
 
   // Log budget sync state only on significant changes to reduce console spam
@@ -198,19 +209,22 @@ const MainContent = ({
   onUpdateProfile,
   isLocalOnlyMode = false,
   securityManager,
-  openBugReport,
+  _openBugReport,
 }) => {
-  const budget = useBudgetStore();
+  const budget = useBudgetStore((state) => ({
+    resetAllData: state.resetAllData,
+  }));
   // Get current route for view determination
   const location = useLocation();
   const navigate = useNavigate();
 
   // Onboarding state - prevent security warning during tutorial
-  const isOnboarded = useOnboardingStore(state => state.isOnboarded);
+  const _isOnboarded = useOnboardingStore((state) => state.isOnboarded);
 
   // Extract data from shared hooks
   const { securityContext } = auth;
-  const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } = layoutData;
+  const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } =
+    layoutData;
 
   // Helper function to get current view from URL
   const getCurrentViewFromPath = (pathname) => {
@@ -227,7 +241,8 @@ const MainContent = ({
   };
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [settingsInitialSection, setSettingsInitialSection] = useState("general");
+  const [settingsInitialSection, setSettingsInitialSection] =
+    useState("general");
   const [showCorruptionModal, setShowCorruptionModal] = useState(false);
   const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
@@ -244,7 +259,9 @@ const MainContent = ({
   // But don't show during onboarding tutorial to avoid conflicts
   useEffect(() => {
     if (auth.isUnlocked && auth.currentUser && isOnboarded) {
-      const hasAcknowledged = localStorage.getItem("localDataSecurityAcknowledged");
+      const hasAcknowledged = localStorage.getItem(
+        "localDataSecurityAcknowledged",
+      );
       if (!hasAcknowledged) {
         // Small delay to let the UI settle after login
         const timer = setTimeout(() => {
@@ -258,14 +275,20 @@ const MainContent = ({
   // Listen for corruption detection events
   useEffect(() => {
     const handleCorruptionDetected = (event) => {
-      logger.warn("🚨 Corruption modal triggered by sync service", event.detail);
+      logger.warn(
+        "🚨 Corruption modal triggered by sync service",
+        event.detail,
+      );
       setShowCorruptionModal(true);
     };
 
     window.addEventListener("syncCorruptionDetected", handleCorruptionDetected);
 
     return () => {
-      window.removeEventListener("syncCorruptionDetected", handleCorruptionDetected);
+      window.removeEventListener(
+        "syncCorruptionDetected",
+        handleCorruptionDetected,
+      );
     };
   }, []);
 
@@ -274,7 +297,7 @@ const MainContent = ({
     firebaseSync,
     securityContext.encryptionKey,
     securityContext.budgetId,
-    currentUser
+    currentUser,
   );
 
   // Auto-complete onboarding steps based on user actions
@@ -293,7 +316,6 @@ const MainContent = ({
 
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
-
 
   return (
     <OnboardingTutorial setActiveView={setActiveView}>
@@ -342,7 +364,6 @@ const MainContent = ({
           {/* Bug Report Button */}
           <BugReportButton />
 
-
           {/* Bottom Navigation Bar - Mobile Only */}
           <BottomNavigationBar />
 
@@ -358,7 +379,9 @@ const MainContent = ({
               <p className="text-xs text-gray-500 mt-1">
                 Last updated: {getVersionInfo().buildDate}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Built with ❤️ for secure budgeting
+              </p>
             </div>
           </div>
         </div>

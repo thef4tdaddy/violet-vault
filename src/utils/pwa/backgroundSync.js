@@ -83,11 +83,15 @@ class BackgroundSyncManager {
         operation.lastError = error.message;
 
         if (operation.retryCount >= operation.maxRetries) {
-          logger.error("❌ Background Sync: Operation failed permanently", error, {
-            operationType: operation.type,
-            operationId: operation.id,
-            retryCount: operation.retryCount,
-          });
+          logger.error(
+            "❌ Background Sync: Operation failed permanently",
+            error,
+            {
+              operationType: operation.type,
+              operationId: operation.id,
+              retryCount: operation.retryCount,
+            },
+          );
           failedOperations.push(operation);
         } else {
           logger.warn("⚠️ Background Sync: Operation failed, will retry", {
@@ -103,12 +107,12 @@ class BackgroundSyncManager {
 
     // Remove successful operations from queue
     this.pendingOperations = this.pendingOperations.filter(
-      (op) => !successfulOperations.some((success) => success.id === op.id)
+      (op) => !successfulOperations.some((success) => success.id === op.id),
     );
 
     // Remove permanently failed operations
     this.pendingOperations = this.pendingOperations.filter(
-      (op) => !failedOperations.some((failed) => failed.id === op.id)
+      (op) => !failedOperations.some((failed) => failed.id === op.id),
     );
 
     await this.savePendingOperations();
@@ -172,9 +176,15 @@ class BackgroundSyncManager {
    */
   async savePendingOperations() {
     try {
-      localStorage.setItem(this.syncQueue, JSON.stringify(this.pendingOperations));
+      localStorage.setItem(
+        this.syncQueue,
+        JSON.stringify(this.pendingOperations),
+      );
     } catch (error) {
-      logger.error("❌ Background Sync: Failed to save pending operations", error);
+      logger.error(
+        "❌ Background Sync: Failed to save pending operations",
+        error,
+      );
     }
   }
 
@@ -191,7 +201,10 @@ class BackgroundSyncManager {
         });
       }
     } catch (error) {
-      logger.error("❌ Background Sync: Failed to load pending operations", error);
+      logger.error(
+        "❌ Background Sync: Failed to load pending operations",
+        error,
+      );
       this.pendingOperations = [];
     }
   }

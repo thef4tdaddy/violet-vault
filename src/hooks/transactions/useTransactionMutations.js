@@ -1,5 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys, optimisticHelpers } from "../../utils/common/queryClient.js";
+import {
+  queryKeys,
+  optimisticHelpers,
+} from "../../utils/common/queryClient.js";
 import { budgetDb } from "../../db/budgetDb.js";
 import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.js";
 import logger from "../../utils/common/logger.js";
@@ -7,7 +10,9 @@ import logger from "../../utils/common/logger.js";
 // Helper to trigger sync for transaction changes
 const triggerTransactionSync = (changeType) => {
   if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+    window.cloudSyncService.triggerSyncForCriticalChange(
+      `transaction_${changeType}`,
+    );
   }
 };
 
@@ -68,7 +73,10 @@ export const useTransactionMutations = () => {
       };
 
       // Apply optimistic update and save to Dexie
-      await optimisticHelpers.addTransaction(queryClient, reconciledTransaction);
+      await optimisticHelpers.addTransaction(
+        queryClient,
+        reconciledTransaction,
+      );
 
       // Save to Dexie (single source of truth for transactions)
       await budgetDb.transactions.put(reconciledTransaction);
@@ -137,7 +145,11 @@ export const useTransactionMutations = () => {
       };
 
       // Apply optimistic update using helper
-      await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
+      await optimisticHelpers.updateTransaction(
+        queryClient,
+        id,
+        updatedTransaction,
+      );
 
       // Update in Dexie (single source of truth for transactions)
       await budgetDb.transactions.update(id, updatedTransaction);

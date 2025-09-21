@@ -3,7 +3,11 @@
  * Extracted from paycheckMutations.js for better maintainability
  */
 
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
+import {
+  budgetDb,
+  getBudgetMetadata,
+  setBudgetMetadata,
+} from "../../db/budgetDb";
 import logger from "../common/logger";
 
 /**

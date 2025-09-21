@@ -48,7 +48,10 @@ export class BugReportService {
 
       // Step 4: Submit with fallbacks
       const providers = this.getProviders(options.providers);
-      const result = await this.submitWithProperScreenshotHandling(reportData, providers);
+      const result = await this.submitWithProperScreenshotHandling(
+        reportData,
+        providers,
+      );
 
       logger.info("Bug report submitted successfully", {
         submissionId: result.submissionId,
@@ -88,7 +91,9 @@ export class BugReportService {
     try {
       // Collect data in parallel for better performance
       const [screenshot, systemInfo, contextInfo] = await Promise.all([
-        options.includeScreenshot ? this.captureScreenshotSafely() : Promise.resolve(null),
+        options.includeScreenshot
+          ? this.captureScreenshotSafely()
+          : Promise.resolve(null),
         SystemInfoService.collectSystemInfo(),
         ContextAnalysisService.getCurrentPageContext(),
       ]);
@@ -187,11 +192,16 @@ export class BugReportService {
   static async submitWithProperScreenshotHandling(reportData, providers) {
     // If screenshot is too large for JSON payload, handle separately
     if (reportData.screenshot) {
-      const screenshotInfo = ScreenshotService.getScreenshotInfo(reportData.screenshot);
+      const screenshotInfo = ScreenshotService.getScreenshotInfo(
+        reportData.screenshot,
+      );
 
       if (screenshotInfo.sizeKB > 500) {
         // > 500KB
-        logger.info("Large screenshot detected, using alternative upload method", screenshotInfo);
+        logger.info(
+          "Large screenshot detected, using alternative upload method",
+          screenshotInfo,
+        );
 
         // For large screenshots, we'll:
         // 1. Submit the bug report without the screenshot first
@@ -204,7 +214,7 @@ export class BugReportService {
 
         const result = await BugReportAPIService.submitWithFallbacks(
           reportWithoutScreenshot,
-          providers
+          providers,
         );
 
         // TODO: Implement separate screenshot upload if provider supports it
@@ -213,7 +223,8 @@ export class BugReportService {
           captured: true,
           size: screenshotInfo.sizeKB,
           uploaded: false,
-          reason: "Screenshot too large for JSON payload - separate upload needed",
+          reason:
+            "Screenshot too large for JSON payload - separate upload needed",
         };
 
         return result;
@@ -288,7 +299,9 @@ export class BugReportService {
       };
 
       // Save to localStorage as last resort
-      const existingReports = JSON.parse(localStorage.getItem("violet-vault-bug-reports") || "[]");
+      const existingReports = JSON.parse(
+        localStorage.getItem("violet-vault-bug-reports") || "[]",
+      );
       existingReports.push(fallbackData);
 
       // Keep only last 10 reports
@@ -296,7 +309,10 @@ export class BugReportService {
         existingReports.splice(0, existingReports.length - 10);
       }
 
-      localStorage.setItem("violet-vault-bug-reports", JSON.stringify(existingReports));
+      localStorage.setItem(
+        "violet-vault-bug-reports",
+        JSON.stringify(existingReports),
+      );
 
       logger.info("Bug report saved locally as fallback", {
         reportCount: existingReports.length,
@@ -313,7 +329,9 @@ export class BugReportService {
    */
   static getLocalReports() {
     try {
-      return JSON.parse(localStorage.getItem("violet-vault-bug-reports") || "[]");
+      return JSON.parse(
+        localStorage.getItem("violet-vault-bug-reports") || "[]",
+      );
     } catch (error) {
       logger.error("Failed to retrieve local reports", error);
       return [];
@@ -355,14 +373,18 @@ export class BugReportService {
   static async testScreenshot() {
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
-      const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
+      const info = screenshot
+        ? ScreenshotService.getScreenshotInfo(screenshot)
+        : null;
 
       return {
         success: !!screenshot,
         screenshot: !!screenshot,
         info,
         methods: {
-          displayMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia),
+          displayMedia: !!(
+            navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia
+          ),
           html2canvas: true, // Dynamically imported
         },
       };
@@ -437,7 +459,8 @@ export class BugReportService {
         this.testContextAnalysis(),
       ]);
 
-      const overallSuccess = screenshot.success && systemInfo.success && contextAnalysis.success;
+      const overallSuccess =
+        screenshot.success && systemInfo.success && contextAnalysis.success;
 
       return {
         success: overallSuccess,
@@ -459,7 +482,12 @@ export class BugReportService {
 }
 
 // Export individual services for direct use if needed
-export { ScreenshotService, SystemInfoService, BugReportAPIService, ContextAnalysisService };
+export {
+  ScreenshotService,
+  SystemInfoService,
+  BugReportAPIService,
+  ContextAnalysisService,
+};
 
 // Export default as the unified service
 export default BugReportService;

@@ -52,11 +52,18 @@ class BudgetDatabaseService {
 
       if (useCache) {
         const cacheKey = `${this.cachePrefix}envelopes_active`;
-        let envelopes = await this.db.getCachedValue(cacheKey, this.defaultCacheTtl);
+        let envelopes = await this.db.getCachedValue(
+          cacheKey,
+          this.defaultCacheTtl,
+        );
 
         if (!envelopes) {
           envelopes = await this.db.getActiveEnvelopes();
-          await this.db.setCachedValue(cacheKey, envelopes, this.defaultCacheTtl);
+          await this.db.setCachedValue(
+            cacheKey,
+            envelopes,
+            this.defaultCacheTtl,
+          );
         }
 
         return envelopes;
@@ -84,7 +91,14 @@ class BudgetDatabaseService {
    * Transaction operations with date range optimization
    */
   async getTransactions(options = {}) {
-    const { dateRange, envelopeId, category, type, limit = 100, useCache = false } = options;
+    const {
+      dateRange,
+      envelopeId,
+      category,
+      type,
+      limit = 100,
+      useCache = false,
+    } = options;
 
     try {
       if (envelopeId) {
@@ -102,7 +116,7 @@ class BudgetDatabaseService {
       if (dateRange) {
         const transactions = await this.db.getTransactionsByDateRange(
           dateRange.start,
-          dateRange.end
+          dateRange.end,
         );
         return limit ? transactions.slice(0, limit) : transactions;
       }
@@ -115,7 +129,10 @@ class BudgetDatabaseService {
         if (!transactions) {
           const startDate = new Date();
           startDate.setDate(startDate.getDate() - 30); // Last 30 days
-          transactions = await this.db.getTransactionsByDateRange(startDate, new Date());
+          transactions = await this.db.getTransactionsByDateRange(
+            startDate,
+            new Date(),
+          );
           transactions = transactions.slice(0, limit);
           await this.db.setCachedValue(cacheKey, transactions, 60000);
         }
@@ -236,7 +253,10 @@ class BudgetDatabaseService {
       }
 
       if (dateRange) {
-        return await this.db.getPaychecksByDateRange(dateRange.start, dateRange.end);
+        return await this.db.getPaychecksByDateRange(
+          dateRange.start,
+          dateRange.end,
+        );
       }
 
       return await this.db.getPaycheckHistory(limit);
@@ -348,10 +368,17 @@ class BudgetDatabaseService {
         }
       }
 
-      const transactions = await this.db.getAnalyticsData(dateRange, includeTransfers);
+      const transactions = await this.db.getAnalyticsData(
+        dateRange,
+        includeTransfers,
+      );
 
       if (useCache) {
-        await this.db.setCachedValue(cacheKey, transactions, this.defaultCacheTtl);
+        await this.db.setCachedValue(
+          cacheKey,
+          transactions,
+          this.defaultCacheTtl,
+        );
       }
 
       return transactions;
@@ -415,7 +442,7 @@ class BudgetDatabaseService {
             this.db.cache.clear(),
             this.db.auditLog.clear(),
           ]);
-        }
+        },
       );
 
       logger.info("All budget data cleared");

@@ -123,7 +123,9 @@ const EditEnvelopeModal = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Priority
+            </label>
             <select
               value={formData.priority || "medium"}
               onChange={(e) => updateFormField("priority", e.target.value)}
@@ -145,11 +147,16 @@ const EditEnvelopeModal = ({
               type="checkbox"
               id="autoAllocate"
               checked={formData.autoAllocate !== false}
-              onChange={(e) => updateFormField("autoAllocate", e.target.checked)}
+              onChange={(e) =>
+                updateFormField("autoAllocate", e.target.checked)
+              }
               disabled={!canEdit}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:cursor-not-allowed"
             />
-            <label htmlFor="autoAllocate" className="ml-2 block text-sm text-gray-900">
+            <label
+              htmlFor="autoAllocate"
+              className="ml-2 block text-sm text-gray-900"
+            >
               Auto-allocate funds
             </label>
           </div>
@@ -166,7 +173,9 @@ const EditEnvelopeModal = ({
               onClick={handleDeleteClick}
               className="flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition-colors"
             >
-              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 mr-2" })}
+              {React.createElement(getIcon("Trash2"), {
+                className: "h-4 w-4 mr-2",
+              })}
               Delete Envelope
             </button>
           )}
@@ -187,7 +196,9 @@ const EditEnvelopeModal = ({
             disabled={!canSubmit || isLoading}
             className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
-            {React.createElement(getIcon("Save"), { className: "h-4 w-4 mr-2" })}
+            {React.createElement(getIcon("Save"), {
+              className: "h-4 w-4 mr-2",
+            })}
             {isLoading ? "Saving..." : "Save Changes"}
           </button>
         </div>

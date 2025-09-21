@@ -87,8 +87,8 @@ const useOnboardingStore = create(
     {
       name: "violet-vault-onboarding",
       version: 1,
-    }
-  )
+    },
+  ),
 );
 
 export default useOnboardingStore;

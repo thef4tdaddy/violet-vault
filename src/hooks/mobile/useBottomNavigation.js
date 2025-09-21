@@ -92,12 +92,14 @@ export const useBottomNavigation = () => {
         priority: 4, // Show on extra large screens
       },
     ],
-    []
+    [],
   );
 
   // Get current active item based on URL
   const activeItem = useMemo(() => {
-    const currentItem = navigationItems.find((item) => item.path === location.pathname);
+    const currentItem = navigationItems.find(
+      (item) => item.path === location.pathname,
+    );
     return currentItem?.key || "dashboard";
   }, [location.pathname, navigationItems]);
 
@@ -118,7 +120,9 @@ export const useBottomNavigation = () => {
     const availableSlots = maxItems - priority1.length;
     const additionalItems = remaining.slice(0, availableSlots);
 
-    return [...priority1, ...additionalItems].sort((a, b) => a.priority - b.priority);
+    return [...priority1, ...additionalItems].sort(
+      (a, b) => a.priority - b.priority,
+    );
   };
 
   return {

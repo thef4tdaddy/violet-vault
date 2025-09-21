@@ -2,7 +2,10 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { getIconByName } from "../../../utils/common/billIcons";
 import { getFrequencyDisplayText } from "../../../utils/common/frequencyCalculations";
-import { formatBillAmount, getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
+import {
+  formatBillAmount,
+  getBillStatusIcon,
+} from "../../../utils/bills/billDetailUtils";
 import { useBillDetail } from "../../../hooks/bills/useBillDetail";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 
@@ -31,13 +34,24 @@ const BillDetailModal = ({
     handlePaymentAmountChange,
     handleShowPaymentForm,
     handleHidePaymentForm,
-  } = useBillDetail(bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring);
+  } = useBillDetail(
+    bill,
+    onDelete,
+    onMarkPaid,
+    onClose,
+    onEdit,
+    onCreateRecurring,
+  );
 
   if (!isOpen || !bill) return null;
 
   // Get UI components
   const BillIcon = getIconByName(bill.iconName || "Receipt");
-  const statusIconName = getBillStatusIcon(bill.status, statusInfo.isOverdue, statusInfo.isDueSoon);
+  const statusIconName = getBillStatusIcon(
+    bill.status,
+    statusInfo.isOverdue,
+    statusInfo.isDueSoon,
+  );
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -46,16 +60,23 @@ const BillDetailModal = ({
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-xl ${statusInfo.classes.bg}`}>
-              {React.createElement(BillIcon, { className: `h-6 w-6 ${statusInfo.classes.icon}` })}
+              {React.createElement(BillIcon, {
+                className: `h-6 w-6 ${statusInfo.classes.icon}`,
+              })}
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">{bill.name}</h3>
+              <h3 className="text-xl font-semibold text-gray-900">
+                {bill.name}
+              </h3>
               <p className="text-gray-600">
                 {bill.category} • {getFrequencyDisplayText(bill.frequency)}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
@@ -79,12 +100,16 @@ const BillDetailModal = ({
           <div className="bg-purple-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Amount Due</p>
+                <p className="text-sm text-purple-600 font-medium">
+                  Amount Due
+                </p>
                 <p className="text-2xl font-bold text-purple-700">
                   ${formatBillAmount(bill.amount)}
                 </p>
               </div>
-              {React.createElement(getIcon("DollarSign"), { className: "h-8 w-8 text-purple-500" })}
+              {React.createElement(getIcon("DollarSign"), {
+                className: "h-8 w-8 text-purple-500",
+              })}
             </div>
           </div>
 
@@ -93,10 +118,14 @@ const BillDetailModal = ({
               <div>
                 <p className="text-sm text-blue-600 font-medium">Due Date</p>
                 <p className="text-lg font-bold text-blue-700">
-                  {bill.dueDate ? new Date(bill.dueDate).toLocaleDateString() : "Not set"}
+                  {bill.dueDate
+                    ? new Date(bill.dueDate).toLocaleDateString()
+                    : "Not set"}
                 </p>
               </div>
-              {React.createElement(getIcon("Calendar"), { className: "h-8 w-8 text-blue-500" })}
+              {React.createElement(getIcon("Calendar"), {
+                className: "h-8 w-8 text-blue-500",
+              })}
             </div>
           </div>
 
@@ -105,7 +134,10 @@ const BillDetailModal = ({
               <div>
                 <p className="text-sm text-green-600 font-medium">Frequency</p>
                 <p className="text-lg font-bold text-green-700">
-                  {getFrequencyDisplayText(bill.frequency, bill.customFrequency)}
+                  {getFrequencyDisplayText(
+                    bill.frequency,
+                    bill.customFrequency,
+                  )}
                 </p>
               </div>
               {React.createElement(getIcon("Clock"), {
@@ -129,7 +161,9 @@ const BillDetailModal = ({
               <div>
                 <p className="text-amber-600">Days Away</p>
                 <p className="font-semibold text-amber-900">
-                  {daysUntilDue !== null ? `${daysUntilDue} days` : "Not calculated"}
+                  {daysUntilDue !== null
+                    ? `${daysUntilDue} days`
+                    : "Not calculated"}
                 </p>
               </div>
             </div>
@@ -168,9 +202,13 @@ const BillDetailModal = ({
                     className="flex justify-between items-center bg-gray-50 rounded-lg p-3"
                   >
                     <div>
-                      <p className="text-sm font-medium">${payment.amount?.toFixed(2)}</p>
+                      <p className="text-sm font-medium">
+                        ${payment.amount?.toFixed(2)}
+                      </p>
                       <p className="text-xs text-gray-600">
-                        {new Date(payment.paidDate || payment.date).toLocaleDateString()}
+                        {new Date(
+                          payment.paidDate || payment.date,
+                        ).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="text-right">
@@ -195,8 +233,13 @@ const BillDetailModal = ({
                 Mark as Paid
               </button>
             ) : (
-              <form onSubmit={handleMarkPaid} className="bg-green-50 rounded-xl p-4">
-                <h4 className="font-medium text-green-900 mb-3">Mark as Paid</h4>
+              <form
+                onSubmit={handleMarkPaid}
+                className="bg-green-50 rounded-xl p-4"
+              >
+                <h4 className="font-medium text-green-900 mb-3">
+                  Mark as Paid
+                </h4>
                 <div className="flex gap-3">
                   <input
                     type="number"
@@ -241,7 +284,9 @@ const BillDetailModal = ({
               onClick={handleCreateRecurring}
               className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center justify-center"
             >
-              {React.createElement(getIcon("Target"), { className: "h-4 w-4 mr-2" })}
+              {React.createElement(getIcon("Target"), {
+                className: "h-4 w-4 mr-2",
+              })}
               Make Recurring
             </button>
           )}
@@ -250,7 +295,9 @@ const BillDetailModal = ({
             onClick={handleEdit}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
-            {React.createElement(getIcon("Edit"), { className: "h-4 w-4 mr-2" })}
+            {React.createElement(getIcon("Edit"), {
+              className: "h-4 w-4 mr-2",
+            })}
             Edit Bill
           </button>
 
@@ -258,7 +305,9 @@ const BillDetailModal = ({
             onClick={handleDelete}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center justify-center"
           >
-            {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 mr-2" })}
+            {React.createElement(getIcon("Trash2"), {
+              className: "h-4 w-4 mr-2",
+            })}
             Delete
           </button>
         </div>

@@ -10,7 +10,9 @@ const ChangeDetails = ({
 }) => {
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">Change Details</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        Change Details
+      </h3>
 
       {!selectedCommit && (
         <div className="text-center py-8 text-gray-500">
@@ -40,14 +42,17 @@ const ChangeDetails = ({
               </span>
             </div>
 
-            <h4 className="font-medium text-gray-900 mb-1">{commitDetails.commit.message}</h4>
+            <h4 className="font-medium text-gray-900 mb-1">
+              {commitDetails.commit.message}
+            </h4>
 
             <div className="text-sm text-gray-600 space-y-1">
               <p>
                 <strong>Author:</strong> {commitDetails.commit.author}
               </p>
               <p>
-                <strong>Date:</strong> {new Date(commitDetails.commit.timestamp).toLocaleString()}
+                <strong>Date:</strong>{" "}
+                {new Date(commitDetails.commit.timestamp).toLocaleString()}
               </p>
               {commitDetails.commit.parentHash && (
                 <p>
@@ -79,13 +84,15 @@ const ChangeDetails = ({
                     {getChangeIcon(change.type)}
                     <div className="flex-1">
                       <p className="font-medium">
-                        {change.description || `${change.changeType} ${change.entityType}`}
+                        {change.description ||
+                          `${change.changeType} ${change.entityType}`}
                       </p>
                       {change.diff && (
                         <div className="mt-1 text-xs text-gray-600">
                           {Object.keys(change.diff).map((field) => (
                             <div key={field}>
-                              <strong>{field}:</strong> {JSON.stringify(change.diff[field].from)} →{" "}
+                              <strong>{field}:</strong>{" "}
+                              {JSON.stringify(change.diff[field].from)} →{" "}
                               {JSON.stringify(change.diff[field].to)}
                             </div>
                           ))}

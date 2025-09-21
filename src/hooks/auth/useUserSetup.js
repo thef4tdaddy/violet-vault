@@ -64,7 +64,9 @@ export const useUserSetup = (onSetupComplete) => {
               userName: profile.userName,
             });
           } else {
-            logger.debug("📋 Profile found but no budget data - treating as new user");
+            logger.debug(
+              "📋 Profile found but no budget data - treating as new user",
+            );
             setIsReturningUser(false);
           }
         } catch (error) {
@@ -85,7 +87,10 @@ export const useUserSetup = (onSetupComplete) => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        setTimeout(
+          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+          timeoutMs,
+        ),
       ),
     ]);
   };
@@ -136,7 +141,10 @@ export const useUserSetup = (onSetupComplete) => {
     if (isReturningUser) {
       // For returning users, try to login directly
       if (!masterPassword) {
-        globalToast.showError("Please enter your password", "Password Required");
+        globalToast.showError(
+          "Please enter your password",
+          "Password Required",
+        );
         return;
       }
 
@@ -150,25 +158,34 @@ export const useUserSetup = (onSetupComplete) => {
         logger.error("❌ Login failed:", error);
 
         // Check if this is the new password validation error with suggestion
-        if (error?.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET" && error?.canCreateNew) {
+        if (
+          error?.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET" &&
+          error?.canCreateNew
+        ) {
           // Show error with suggestion - let the UI handle the confirmation flow
           globalToast.showError(
             `${error.error}\n\n${error.suggestion}`,
-            "Password Mismatch - Create New Budget?"
+            "Password Mismatch - Create New Budget?",
           );
           return; // Don't show generic error toast
         }
 
         // Check if this is the no data found error with suggestion to start over
-        if (error?.code === "NO_DATA_FOUND_OFFER_NEW_BUDGET" && error?.canCreateNew) {
+        if (
+          error?.code === "NO_DATA_FOUND_OFFER_NEW_BUDGET" &&
+          error?.canCreateNew
+        ) {
           globalToast.showError(
             `${error.error}\n\n${error.suggestion}`,
-            "No Data Found - Start Over?"
+            "No Data Found - Start Over?",
           );
           return; // Don't show generic error toast
         }
 
-        globalToast.showError("Incorrect password. Please try again.", "Login Failed");
+        globalToast.showError(
+          "Incorrect password. Please try again.",
+          "Login Failed",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -193,14 +210,19 @@ export const useUserSetup = (onSetupComplete) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
-      globalToast.showError("Please fill in both password and name", "Required Fields");
+      globalToast.showError(
+        "Please fill in both password and name",
+        "Required Fields",
+      );
       return;
     }
 
     setIsLoading(true);
     try {
       // Generate share code for Step 3 using centralized manager
-      const { shareCodeManager } = await import("../../utils/auth/shareCodeManager");
+      const { shareCodeManager } = await import(
+        "../../utils/auth/shareCodeManager"
+      );
       const generatedShareCode = shareCodeManager.generateShareCode();
 
       setShareCode(generatedShareCode);
@@ -266,7 +288,7 @@ export const useUserSetup = (onSetupComplete) => {
       logger.error("❌ Failed to clear Dexie database:", error);
       globalToast.showError(
         "Failed to clear local data completely. Some data may persist.",
-        "Clear Data Warning"
+        "Clear Data Warning",
       );
     }
 
