@@ -317,9 +317,45 @@ const storeInitializer = (set, _get) => ({
       return { success: false, reason: "not_available" };
     }
 
-    // Use the regular install method - safe external store access
-    const success = await useUiStore.getState().installApp();
-    return { success, reason: success ? "installed" : "declined" };
+    // Perform installation directly (avoid calling other store actions)
+    try {
+      const promptEvent = state.installPromptEvent;
+      const result = await promptEvent.prompt();
+
+      logger.info("Manual PWA install result", { outcome: result.outcome });
+
+      // Track user choice for analytics
+      const userChoice = result.outcome;
+      const analytics = {
+        action: "pwa_manual_install",
+        choice: userChoice,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+      };
+
+      // Store analytics locally
+      const existingAnalytics = JSON.parse(
+        localStorage.getItem("pwa_analytics") || "[]",
+      );
+      existingAnalytics.push(analytics);
+      localStorage.setItem(
+        "pwa_analytics",
+        JSON.stringify(existingAnalytics.slice(-50)),
+      );
+
+      // Clear the install prompt event
+      set((state) => {
+        state.installPromptEvent = null;
+        state.showInstallPrompt = false;
+      });
+
+      const success = result.outcome === "accepted";
+      return { success, reason: success ? "installed" : "declined" };
+    } catch (error) {
+      logger.error("Failed to manually install PWA", error);
+      return { success: false, reason: "error" };
+    }
   },
 
   // Track install prompt dismissal
