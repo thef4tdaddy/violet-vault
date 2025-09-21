@@ -27,11 +27,16 @@ export const detectLocalData = async () => {
     logger.info("📊 Database stats:", stats);
 
     // 3. Calculate total data items
-    const totalItems = stats.envelopes + stats.transactions + stats.bills +
-                      stats.goals + stats.paychecks;
+    const totalItems =
+      stats.envelopes +
+      stats.transactions +
+      stats.bills +
+      stats.goals +
+      stats.paychecks;
 
     // 4. Check for any core budget data (envelopes, transactions, bills)
-    const hasCoreData = stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
+    const hasCoreData =
+      stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
 
     // 5. Sample actual data to verify counts are accurate
     const sampleData = await Promise.all([
@@ -61,23 +66,22 @@ export const detectLocalData = async () => {
           envelopes: actualEnvelopeSample.length > 0,
           transactions: actualTransactionSample.length > 0,
           bills: actualBillSample.length > 0,
-        }
+        },
       },
-      recommendation: hasCoreData ?
-        "✅ Local data found - safe to proceed with operations" :
-        "❌ No core data found - operations should be restricted"
+      recommendation: hasCoreData
+        ? "✅ Local data found - safe to proceed with operations"
+        : "❌ No core data found - operations should be restricted",
     };
 
     logger.info("🎯 Data detection result:", result);
     return result;
-
   } catch (error) {
     logger.error("❌ Data detection failed:", error);
     return {
       hasData: false,
       totalItems: 0,
       details: { error: error.message },
-      recommendation: "❌ Data detection failed - assume no data for safety"
+      recommendation: "❌ Data detection failed - assume no data for safety",
     };
   }
 };

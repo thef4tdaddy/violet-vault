@@ -1,7 +1,12 @@
 import React from "react";
 import { ACCOUNT_TYPES } from "../../../utils/accounts";
 
-const AccountBasicFields = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
+const AccountBasicFields = ({
+  accountForm,
+  setAccountForm,
+  canEdit,
+  editingAccount,
+}) => (
   <>
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-2">

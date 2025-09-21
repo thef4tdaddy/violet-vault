@@ -152,6 +152,90 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
 
                 <button
                   onClick={async () => {
+                    console.log("🔍 TESTING: window.detectLocalDataDebug");
+                    try {
+                      const result = await window.detectLocalDataDebug();
+                      console.log("🔍 SUCCESS:", result);
+                    } catch (error) {
+                      console.error("🔍 ERROR:", error);
+                    }
+                  }}
+                  className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+                >
+                  {React.createElement(getIcon("Search"), {
+                    className: "h-4 w-4 text-purple-600 mr-3",
+                  })}
+                  <div className="text-left">
+                    <p className="font-medium text-purple-900">
+                      🔍 Detect Local Data
+                    </p>
+                    <p className="text-xs text-purple-700">
+                      Comprehensive local data detection with debugging
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={async () => {
+                    console.log("⚡ TESTING: window.hasLocalDataDebug");
+                    try {
+                      const result = await window.hasLocalDataDebug();
+                      console.log("⚡ SUCCESS:", result);
+                    } catch (error) {
+                      console.error("⚡ ERROR:", error);
+                    }
+                  }}
+                  className="w-full flex items-center p-3 border border-indigo-200 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+                >
+                  {React.createElement(getIcon("Zap"), {
+                    className: "h-4 w-4 text-indigo-600 mr-3",
+                  })}
+                  <div className="text-left">
+                    <p className="font-medium text-indigo-900">
+                      ⚡ Quick Data Check
+                    </p>
+                    <p className="text-xs text-indigo-700">
+                      Fast boolean check for local data presence
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={async () => {
+                    console.log("🛡️ TESTING: window.safeCloudDataReset");
+                    const confirmed = await confirm({
+                      title: "Safe Cloud Data Reset",
+                      message:
+                        "🛡️ Run safe cloud data reset? This includes comprehensive local data validation.",
+                      confirmText: "Run Safe Reset",
+                      cancelText: "Cancel",
+                    });
+                    if (confirmed) {
+                      try {
+                        const result = await window.safeCloudDataReset();
+                        console.log("🛡️ SUCCESS:", result);
+                      } catch (error) {
+                        console.error("🛡️ ERROR:", error);
+                      }
+                    }
+                  }}
+                  className="w-full flex items-center p-3 border border-orange-200 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+                >
+                  {React.createElement(getIcon("Shield"), {
+                    className: "h-4 w-4 text-orange-600 mr-3",
+                  })}
+                  <div className="text-left">
+                    <p className="font-medium text-orange-900">
+                      🛡️ Safe Cloud Data Reset
+                    </p>
+                    <p className="text-xs text-orange-700">
+                      Reset with comprehensive local data validation
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={async () => {
                     console.log("🧹 TESTING: window.forceCloudDataReset");
                     const confirmed = await confirm({
                       title: "Reset Cloud Data",
