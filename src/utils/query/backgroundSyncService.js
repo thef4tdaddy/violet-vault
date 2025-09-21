@@ -129,13 +129,13 @@ export const networkManager = {
   },
 };
 
-// Initialize network listeners
+// Initialize network listeners (but don't auto-execute cache restore)
 if (typeof window !== "undefined") {
   window.addEventListener("online", networkManager.onOnline);
   window.addEventListener("offline", networkManager.onOffline);
 
-  // Initial cache restore on page load
-  backgroundSync.restoreFromDexie();
+  // Note: restoreFromDexie() should be called explicitly by app initialization,
+  // not automatically on module load to prevent React error #185
 }
 
 export default backgroundSync;
