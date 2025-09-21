@@ -67,8 +67,7 @@ const MainLayout = ({ firebaseSync }) => {
   } = auth;
 
   // Onboarding state - prevent security warning during tutorial
-  const onboardingStore = useOnboardingStore();
-  const isOnboarded = onboardingStore.isOnboarded;
+  const isOnboarded = useOnboardingStore(state => state.isOnboarded);
 
   // Initialize data from Dexie to Zustand on app startup
   useDataInitialization(); // Return values not currently used
@@ -207,8 +206,7 @@ const MainContent = ({
   const navigate = useNavigate();
 
   // Onboarding state - prevent security warning during tutorial
-  const onboardingStore = useOnboardingStore();
-  const isOnboarded = onboardingStore.isOnboarded;
+  const isOnboarded = useOnboardingStore(state => state.isOnboarded);
 
   // Extract data from shared hooks
   const { securityContext } = auth;
