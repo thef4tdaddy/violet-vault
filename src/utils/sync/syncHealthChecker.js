@@ -6,6 +6,7 @@
 import { budgetDb } from "../../db/budgetDb";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import chunkedSyncService from "../../services/chunkedSyncService";
+import { detectLocalData } from "./dataDetectionHelper";
 import logger from "../common/logger";
 
 export const runImmediateSyncHealthCheck = async () => {
@@ -273,9 +274,28 @@ async function runHealthChecksInternal(results) {
   }
 
   // Print Results
-  const passRate = Math.round(
-    (results.passed / (results.passed + results.failed)) * 100,
-  );
+  // Test 8: Comprehensive Data Detection (for debugging corruption recovery issues)
+  try {
+    logger.info("🧪 Testing comprehensive data detection...");
+
+    const dataDetection = await detectLocalData();
+
+    results.tests.push({
+      name: "Comprehensive Data Detection",
+      status: "✅ PASSED",
+      details: `Data detected: ${dataDetection.hasData}, Total items: ${dataDetection.totalItems}, Core data: ${JSON.stringify(dataDetection.details.samplesFound)}`,
+    });
+    results.passed++;
+  } catch (error) {
+    results.tests.push({
+      name: "Comprehensive Data Detection",
+      status: "❌ FAILED",
+      error: error.message,
+    });
+    results.failed++;
+  }
+
+  const passRate = Math.round((results.passed / results.tests.length) * 100);
 
   logger.info("🔧 SYNC HEALTH CHECK COMPLETE:", {
     total: results.tests.length,
