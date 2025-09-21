@@ -193,6 +193,8 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
+          // Allow larger files to be cached (default is 2MB, increasing to 5MB)
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
           // Define offline navigation fallback
           navigateFallback: "/offline",
           navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
