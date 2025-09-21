@@ -5,10 +5,11 @@
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
  * Enhanced with mobile slide-up functionality for Issue #164
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useBillForm } from "../../hooks/bills/useBillForm";
 import useEditLock from "../../hooks/common/useEditLock";
 import { useConfirm } from "../../hooks/common/useConfirm";
+import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
 // eslint-disable-next-line no-restricted-imports -- Required for edit lock service initialization
 import { initializeEditLocks } from "../../services/editLockService";
@@ -29,18 +30,7 @@ const AddBillModal = ({
   editingBill = null,
   _forceMobileMode = false, // Internal prop for testing
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect screen size
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
+  const isMobile = useMobileDetection();
   // Use the extracted form logic hook
   const {
     // Form State
