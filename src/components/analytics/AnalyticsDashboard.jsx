@@ -27,7 +27,13 @@ const AnalyticsDashboard = () => {
 
   // Get budget data
   const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } =
-    useBudgetStore();
+    useBudgetStore(state => ({
+      transactions: state.transactions,
+      envelopes: state.envelopes,
+      _savingsGoals: state.savingsGoals,
+      _actualBalance: state.actualBalance,
+      _unassignedCash: state.unassignedCash
+    }));
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
