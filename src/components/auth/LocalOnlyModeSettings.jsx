@@ -28,7 +28,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
     if (isOpen) {
       getStats().then(setStats).catch(logger.error);
     }
-  }, [isOpen, getStats]);
+  }, [isOpen]); // getStats is stable in Zustand
 
   // Clear states when closing
   useEffect(() => {

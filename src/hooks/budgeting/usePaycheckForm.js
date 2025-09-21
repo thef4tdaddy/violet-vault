@@ -20,7 +20,7 @@ const useInitializeNewPayerState = (
       setShowAddNewPayer(hasNoPaychecks);
       initialRender.current = false;
     }
-  }, [uniquePayersLength, setShowAddNewPayer, initialRender]);
+  }, [uniquePayersLength, initialRender]); // setShowAddNewPayer is stable in useState
 };
 
 /**

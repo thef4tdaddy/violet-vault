@@ -36,7 +36,7 @@ const useNetworkStatus = () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [setOnlineStatus]); // setOnlineStatus is stable in Zustand
+  }, []); // Empty deps - setOnlineStatus is stable in Zustand
 };
 
 export default useNetworkStatus;

@@ -37,12 +37,7 @@ export const useRegisterFABActions = ({
         unregisterPrimaryAction(targetScreenId);
       };
     }
-  }, [
-    primaryAction,
-    targetScreenId,
-    registerPrimaryAction,
-    unregisterPrimaryAction,
-  ]);
+  }, [primaryAction, targetScreenId]); // FAB actions are stable in Zustand
 
   // Register secondary actions
   useEffect(() => {
@@ -60,12 +55,12 @@ export const useRegisterFABActions = ({
         unregisterSecondaryAction(id);
       });
     };
-  }, [secondaryActions, registerSecondaryAction, unregisterSecondaryAction]);
+  }, [secondaryActions]); // FAB actions are stable in Zustand
 
   // Set visibility
   useEffect(() => {
     setVisibility(visible);
-  }, [visible, setVisibility]);
+  }, [visible]); // setVisibility is stable in Zustand
 };
 
 /**
@@ -81,7 +76,7 @@ export const useSetFABDefaults = (handlers = {}) => {
     Object.entries(handlers).forEach(([actionId, handler]) => {
       setDefaultActionHandler(actionId, handler);
     });
-  }, [handlers, setDefaultActionHandler]);
+  }, [handlers]); // setDefaultActionHandler is stable in Zustand
 };
 
 /**
@@ -97,7 +92,7 @@ export const useSyncFABScreen = (screenId) => {
     if (screenId) {
       setCurrentScreen(screenId);
     }
-  }, [screenId, setCurrentScreen]);
+  }, [screenId]); // setCurrentScreen is stable in Zustand
 };
 
 export default useRegisterFABActions;

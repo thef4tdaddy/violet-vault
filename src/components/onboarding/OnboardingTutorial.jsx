@@ -50,7 +50,7 @@ const OnboardingTutorial = ({ children }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [isOnboarded, preferences, getProgress]);
+  }, [isOnboarded, preferences]); // getProgress is stable in Zustand
 
   // Handle escape key to close tutorial
   useEffect(() => {

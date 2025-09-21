@@ -140,8 +140,8 @@ export default {
                 /^(restore|initialize|start|trigger|execute|run|sync|fetch|load|save)/.test(
                   node.callee.property.name
                 ) &&
-                // Exclude safe operations like addEventListener
-                !/^(addEventListener|removeEventListener)$/.test(node.callee.property.name)
+                // Exclude safe operations like addEventListener and safe initialization functions
+                !/^(addEventListener|removeEventListener|initializeErrorCapture|initializeDevHelpers)$/.test(node.callee.property.name)
               ) {
                 context.report({
                   node,

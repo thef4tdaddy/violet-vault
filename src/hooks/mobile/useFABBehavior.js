@@ -81,7 +81,7 @@ const useKeyboardNavigation = (isExpanded, setExpanded, containerRef) => {
       document.addEventListener("keydown", handleKeyDown);
       return () => document.removeEventListener("keydown", handleKeyDown);
     }
-  }, [isExpanded, setExpanded, containerRef]);
+  }, [isExpanded, containerRef]); // setExpanded is stable in useState
 };
 
 /**

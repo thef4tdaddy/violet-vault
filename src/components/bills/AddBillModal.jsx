@@ -96,7 +96,7 @@ const AddBillModal = ({
     if (isOpen) {
       resetForm();
     }
-  }, [isOpen, resetForm]);
+  }, [isOpen]); // resetForm is stable in Zustand
 
   // Custom delete handler using standardized confirm modal
   const handleDeleteClick = async () => {
