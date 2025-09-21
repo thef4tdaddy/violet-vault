@@ -417,5 +417,150 @@ export default {
         };
       },
     },
+
+    "zustand-no-object-dependencies": {
+      meta: {
+        type: "error",
+        docs: {
+          description: "Prevent object dependencies in useEffect that recreate on every render",
+          category: "Possible Errors",
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          noObjectDependencies:
+            "Dangerous pattern: Object dependency in useEffect creates infinite render loops! " +
+            "Objects recreate on every render causing the effect to run infinitely. " +
+            "Use primitive values or useMemo/useCallback for object dependencies.",
+        },
+      },
+      create(context) {
+        return {
+          CallExpression(node) {
+            // Look for useEffect calls
+            if (node.callee.name === "useEffect" && node.arguments.length >= 2) {
+              const depsArray = node.arguments[1];
+
+              // Check if dependencies array exists
+              if (depsArray && depsArray.type === "ArrayExpression") {
+                depsArray.elements.forEach((dep) => {
+                  if (dep && dep.type === "Identifier") {
+                    // Check for common object dependency patterns that cause infinite renders
+                    const dangerousPatterns = [
+                      /State$/, // uiState, formState, etc.
+                      /Data$/, // userData, formData, etc.
+                      /Config$/, // appConfig, etc.
+                      /Options$/, // modalOptions, etc.
+                      /Props$/, // componentProps, etc.
+                    ];
+
+                    if (dangerousPatterns.some(pattern => pattern.test(dep.name))) {
+                      context.report({
+                        node: dep,
+                        messageId: "noObjectDependencies",
+                      });
+                    }
+                  }
+                });
+              }
+            }
+          },
+        };
+      },
+    },
+
+    "zustand-proper-store-initialization": {
+      meta: {
+        type: "error",
+        docs: {
+          description: "Ensure stores are initialized with proper store instances, not state data",
+          category: "Possible Errors",
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          useStoreInstance:
+            "Dangerous pattern: Initializing service with state data instead of store instance! " +
+            "Pass the store function (useStore) not state data (useStore(...)) to initialization functions. " +
+            "Services need access to store methods, not just current state.",
+        },
+      },
+      create(context) {
+        return {
+          CallExpression(node) {
+            // Look for initialization function calls
+            if (
+              node.callee.type === "MemberExpression" &&
+              node.callee.property.name === "initialize" &&
+              node.arguments.length > 0
+            ) {
+              const arg = node.arguments[0];
+
+              // Check if argument is a store hook call with selector (state data)
+              if (
+                arg.type === "CallExpression" &&
+                arg.callee.name &&
+                arg.callee.name.includes("Store") &&
+                arg.callee.name.startsWith("use") &&
+                arg.arguments.length > 0
+              ) {
+                context.report({
+                  node: arg,
+                  messageId: "useStoreInstance",
+                });
+              }
+            }
+          },
+        };
+      },
+    },
+
+    "zustand-no-recreating-functions": {
+      meta: {
+        type: "error",
+        docs: {
+          description: "Prevent function dependencies that recreate on every render",
+          category: "Possible Errors",
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          useStableFunction:
+            "Dangerous pattern: Function dependency recreates on every render! " +
+            "Wrap the function in useCallback or move it outside the component to prevent infinite renders.",
+        },
+      },
+      create(context) {
+        return {
+          CallExpression(node) {
+            // Look for useEffect calls
+            if (node.callee.name === "useEffect" && node.arguments.length >= 2) {
+              const depsArray = node.arguments[1];
+
+              if (depsArray && depsArray.type === "ArrayExpression") {
+                depsArray.elements.forEach((dep) => {
+                  if (dep && dep.type === "Identifier") {
+                    // Check for function names that might recreate on every render
+                    const functionPatterns = [
+                      /^handle[A-Z]/, // handleClick, handleSubmit, etc.
+                      /^on[A-Z]/, // onClick, onSubmit, etc.
+                      /Callback$/, // submitCallback, etc.
+                      /Handler$/, // clickHandler, etc.
+                    ];
+
+                    if (functionPatterns.some(pattern => pattern.test(dep.name))) {
+                      context.report({
+                        node: dep,
+                        messageId: "useStableFunction",
+                      });
+                    }
+                  }
+                });
+              }
+            }
+          },
+        };
+      },
+    },
   },
 };
