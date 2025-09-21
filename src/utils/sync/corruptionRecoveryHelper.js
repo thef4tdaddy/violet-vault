@@ -24,13 +24,13 @@ export const safeCloudDataReset = async () => {
         success: false,
         error: errorMsg,
         safetyAbort: true,
-        detectionDetails: dataDetection
+        detectionDetails: dataDetection,
       };
     }
 
     logger.info("✅ Local data confirmed:", {
       totalItems: dataDetection.totalItems,
-      samplesFound: dataDetection.details.samplesFound
+      samplesFound: dataDetection.details.samplesFound,
     });
 
     // Step 2: Validate data is actually accessible
@@ -38,27 +38,29 @@ export const safeCloudDataReset = async () => {
     const quickCheck = await hasLocalData();
 
     if (!quickCheck) {
-      const errorMsg = "SAFETY ABORT: Quick data validation failed - data may be corrupted or inaccessible";
+      const errorMsg =
+        "SAFETY ABORT: Quick data validation failed - data may be corrupted or inaccessible";
       logger.error(errorMsg);
       return {
         success: false,
         error: errorMsg,
         safetyAbort: true,
-        detectionDetails: dataDetection
+        detectionDetails: dataDetection,
       };
     }
 
     // Step 3: Proceed with cloud reset (this would be implemented by the calling function)
-    logger.info("✅ Safety checks passed. Local data confirmed present and accessible.");
+    logger.info(
+      "✅ Safety checks passed. Local data confirmed present and accessible.",
+    );
 
     return {
       success: true,
       message: "Safety validation passed - local data confirmed",
       localDataConfirmed: true,
       detectionDetails: dataDetection,
-      readyForCloudReset: true
+      readyForCloudReset: true,
     };
-
   } catch (error) {
     const errorMsg = `SAFETY ABORT: Data detection failed - ${error.message}`;
     logger.error(errorMsg, error);
@@ -66,7 +68,7 @@ export const safeCloudDataReset = async () => {
       success: false,
       error: errorMsg,
       safetyAbort: true,
-      exception: error.message
+      exception: error.message,
     };
   }
 };
@@ -83,7 +85,11 @@ if (typeof window !== "undefined") {
   window.hasLocalDataDebug = hasLocalData;
 
   logger.info("🔧 Enhanced corruption recovery tools exposed to window:", {
-    functions: ['safeCloudDataReset', 'detectLocalDataDebug', 'hasLocalDataDebug']
+    functions: [
+      "safeCloudDataReset",
+      "detectLocalDataDebug",
+      "hasLocalDataDebug",
+    ],
   });
 }
 

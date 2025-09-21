@@ -8,14 +8,13 @@ const AccountModalHeader = ({
   isOwnLock,
   _lock,
   breakLock,
-  lockLoading
+  lockLoading,
 }) => (
   <div className="flex justify-between items-center mb-6">
     <div className="flex items-center gap-3 flex-1">
       <h3 className="font-black text-black text-base">
         <span className="text-lg">{editingAccount ? "E" : "A"}</span>
-        {editingAccount ? "DIT" : "DD"}{" "}
-        <span className="text-lg">A</span>CCOUNT
+        {editingAccount ? "DIT" : "DD"} <span className="text-lg">A</span>CCOUNT
       </h3>
       {lockLoading && (
         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
@@ -34,10 +33,7 @@ const AccountModalHeader = ({
           Break
         </button>
       )}
-      <button
-        onClick={onClose}
-        className="text-gray-400 hover:text-gray-600"
-      >
+      <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
         {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
       </button>
     </div>

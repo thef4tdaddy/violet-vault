@@ -1,7 +1,12 @@
 import React from "react";
 import { ACCOUNT_COLORS } from "../../../utils/accounts";
 
-const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
+const AccountColorAndSettings = ({
+  accountForm,
+  setAccountForm,
+  canEdit,
+  editingAccount,
+}) => (
   <>
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-2">
