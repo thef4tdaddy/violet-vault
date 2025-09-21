@@ -37,6 +37,37 @@
 - Firebase (if enabled) -> Dexie -> TanStack
 - Zustand only is for ui state, and auth settings
 
+## Zustand Store Standards
+
+### **Store Types & Use Cases**
+- **Core State**: Authentication, global UI settings (authStore, uiStore)
+- **Feature State**: Scoped functionality (fabStore when enabled)
+- **Ephemeral State**: Temporary UI (toasts, modals) - minimal scope
+
+### **Safe Patterns - ALWAYS USE**
+- **NEVER** call `get()` inside store actions (causes React error #185)
+- Use `useStore.getState()` for external store access in async operations
+- Use `set((state) => ...)` instead of `get()` calls for state updates
+- Subscribe selectively: `useStore(state => state.specificValue)` not `useStore()`
+
+### **Store Architecture Rules**
+- **Persistent State**: Core settings that survive page refreshes
+- **Computed State**: Use TanStack Query, not Zustand
+- **Temporary State**: Use React useState, not global stores
+- **Async Operations**: Use store reference pattern, never `get()` in timeouts/promises
+
+### **Forbidden Patterns**
+- ❌ `get()` calls inside store actions (triggers React error #185)
+- ❌ Conditional store subscriptions (violates React hooks rules)
+- ❌ Mixing persistent and ephemeral state in same store
+- ❌ Complex computed values in stores (use TanStack Query)
+
+### **ESLint Protection**
+Custom rules prevent unsafe patterns - configured in `configs/eslint.config.js`:
+- Rules validate all new Zustand code
+- Violations blocked at development time
+- See `docs/ESLint-Zustand-Rules.md` for details
+
 ## UI Component Standards
 
 **ALWAYS use standardized shared UI components** - See [docs/Shared-UI-Components.md](docs/Shared-UI-Components.md)
