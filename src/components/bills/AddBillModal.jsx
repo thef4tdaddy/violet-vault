@@ -3,8 +3,9 @@
  *
  * UI-only component using useBillForm hook for all business logic
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
+ * Enhanced with mobile slide-up functionality for Issue #164
  */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useBillForm } from "../../hooks/bills/useBillForm";
 import useEditLock from "../../hooks/common/useEditLock";
 import { useConfirm } from "../../hooks/common/useConfirm";
@@ -15,6 +16,7 @@ import { useAuth } from "../../stores/auth/authStore";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
+import SlideUpModal from "../mobile/SlideUpModal";
 
 // eslint-disable-next-line max-lines-per-function -- Component orchestrates extracted components
 const AddBillModal = ({
@@ -25,7 +27,20 @@ const AddBillModal = ({
   onDeleteBill,
   onError,
   editingBill = null,
+  _forceMobileMode = false, // Internal prop for testing
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
   // Use the extracted form logic hook
   const {
     // Form State
@@ -126,40 +141,67 @@ const AddBillModal = ({
 
   if (!isOpen) return null;
 
+  const modalTitle = editingBill ? "Edit Bill" : "Add Bill";
+
+  // Extract modal content for reuse between mobile and desktop
+  const ModalContent = () => (
+    <>
+      {/* Edit Lock Indicator */}
+      {editingBill && (isLocked || isOwnLock) && (
+        <div className="px-6 py-3 border-b border-gray-200">
+          <EditLockIndicator
+            isLocked={isLocked}
+            isOwnLock={isOwnLock}
+            lock={lock}
+            onBreakLock={breakLock}
+            showDetails={true}
+          />
+        </div>
+      )}
+
+      <BillFormFields
+        formData={formData}
+        updateField={updateField}
+        canEdit={canEdit}
+        editingBill={editingBill}
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        onClose={onClose}
+        suggestedIconName={suggestedIconName}
+        iconSuggestions={iconSuggestions}
+        categories={categories}
+        calculateBiweeklyAmount={calculateBiweeklyAmount}
+        calculateMonthlyAmount={calculateMonthlyAmount}
+        getNextDueDate={getNextDueDate}
+        onDeleteClick={handleDeleteClick}
+      />
+    </>
+  );
+
+  // Mobile slide-up modal
+  if (isMobile || _forceMobileMode) {
+    return (
+      <SlideUpModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={modalTitle}
+        height="auto"
+        showHandle={true}
+        backdrop={true}
+      >
+        <div className="pb-6">
+          <ModalContent />
+        </div>
+      </SlideUpModal>
+    );
+  }
+
+  // Desktop centered modal
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl">
         <BillModalHeader editingBill={editingBill} formData={formData} onClose={onClose} />
-
-        {/* Edit Lock Indicator */}
-        {editingBill && (isLocked || isOwnLock) && (
-          <div className="px-6 py-3 border-b border-gray-200">
-            <EditLockIndicator
-              isLocked={isLocked}
-              isOwnLock={isOwnLock}
-              lock={lock}
-              onBreakLock={breakLock}
-              showDetails={true}
-            />
-          </div>
-        )}
-
-        <BillFormFields
-          formData={formData}
-          updateField={updateField}
-          canEdit={canEdit}
-          editingBill={editingBill}
-          handleSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-          onClose={onClose}
-          suggestedIconName={suggestedIconName}
-          iconSuggestions={iconSuggestions}
-          categories={categories}
-          calculateBiweeklyAmount={calculateBiweeklyAmount}
-          calculateMonthlyAmount={calculateMonthlyAmount}
-          getNextDueDate={getNextDueDate}
-          onDeleteClick={handleDeleteClick}
-        />
+        <ModalContent />
       </div>
     </div>
   );
