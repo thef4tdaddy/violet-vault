@@ -62,7 +62,7 @@ class PWAManager {
         // Check if there's already a waiting service worker
         if (this.registration.waiting) {
           logger.info("⏳ Service Worker already waiting");
-          this.uiStore.setUpdateAvailable(true);
+          this.uiStore.getState().setUpdateAvailable(true);
         }
       } else {
         logger.info("⏳ Waiting for service worker registration...");
@@ -92,7 +92,7 @@ class PWAManager {
         if (navigator.serviceWorker.controller) {
           // New service worker is ready to activate
           logger.info("✅ New service worker installed and ready");
-          this.uiStore.setUpdateAvailable(true);
+          this.uiStore.getState().setUpdateAvailable(true);
         } else {
           // First time install
           logger.info("🎉 Service worker installed for the first time");
@@ -113,7 +113,7 @@ class PWAManager {
       logger.info("📱 PWA install prompt available");
 
       // Store the event for later use
-      this.uiStore.setInstallPromptEvent(event);
+      this.uiStore.getState().setInstallPromptEvent(event);
 
       // Check if user has dismissed install prompt recently
       const lastDismissed = localStorage.getItem("pwa_install_last_dismissed");
@@ -136,8 +136,8 @@ class PWAManager {
 
       setTimeout(() => {
         // Double-check that the prompt is still available
-        if (this.uiStore.installPromptEvent) {
-          this.uiStore.showInstallModal();
+        if (this.uiStore.getState().installPromptEvent) {
+          this.uiStore.getState().showInstallModal();
         }
       }, delay);
     });
@@ -145,7 +145,7 @@ class PWAManager {
     // Listen for app installation
     window.addEventListener("appinstalled", () => {
       logger.info("🎉 PWA was installed successfully");
-      this.uiStore.setInstallPromptEvent(null);
+      this.uiStore.getState().setInstallPromptEvent(null);
       this.uiStore.hideInstallModal();
     });
 
@@ -174,7 +174,7 @@ class PWAManager {
           logger.info(
             "📡 Received update available message from service worker",
           );
-          this.uiStore.setUpdateAvailable(true);
+          this.uiStore.getState().setUpdateAvailable(true);
           break;
         case "UPDATE_INSTALLED":
           logger.info("✅ Update installed, app will refresh");
@@ -240,7 +240,7 @@ class PWAManager {
 
         // Show patch notes after a short delay to allow app to fully load
         setTimeout(() => {
-          this.uiStore.loadPatchNotesForUpdate(
+          this.uiStore.getState().loadPatchNotesForUpdate(
             versionCheck.lastSeenVersion,
             versionCheck.currentVersion,
           );
