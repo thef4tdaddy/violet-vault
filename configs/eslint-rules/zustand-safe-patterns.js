@@ -80,16 +80,27 @@ export default {
         schema: [],
         messages: {
           useStoreReference:
-            "Use store reference pattern for async operations. Create const store = { actions } and reference store.action() in timeouts/promises instead of get().action(). " +
-            "See docs/Zustand-Safe-Patterns.md for examples.",
+            "Dangerous async store pattern detected! Use external store reference instead. " +
+            "Replace get().action() or store.action() with useStoreName.getState().action() in setTimeout/Promise callbacks. " +
+            "This prevents React error #185 infinite render loops. See docs/Zustand-Safe-Patterns.md for examples.",
         },
       },
       create(context) {
         let inAsyncOperation = false;
+        let inZustandStore = false;
 
         return {
-          // Detect async operations and get() calls
+          // Detect Zustand store creation
           CallExpression(node) {
+            // Check for create() calls (Zustand stores)
+            if (
+              node.callee.name === "create" ||
+              (node.callee.type === "MemberExpression" && node.callee.property.name === "create")
+            ) {
+              inZustandStore = true;
+              return;
+            }
+
             // Check for async operations (setTimeout, setInterval, Promise chains)
             if (
               ["setTimeout", "setInterval"].includes(node.callee.name) ||
@@ -100,16 +111,40 @@ export default {
               return;
             }
 
-            // Check for get() calls in async operations
-            if (inAsyncOperation && node.callee.name === "get" && node.arguments.length === 0) {
-              context.report({
-                node,
-                messageId: "useStoreReference",
-              });
+            // Check for dangerous patterns in async operations
+            if (inAsyncOperation) {
+              // 1. Check for get() calls in async operations
+              if (node.callee.name === "get" && node.arguments.length === 0) {
+                context.report({
+                  node,
+                  messageId: "useStoreReference",
+                });
+                return;
+              }
+
+              // 2. Check for store.action() calls in async operations (the toastStore bug!)
+              if (
+                node.callee.type === "MemberExpression" &&
+                node.callee.object.name === "store" &&
+                inZustandStore
+              ) {
+                context.report({
+                  node,
+                  messageId: "useStoreReference",
+                });
+                return;
+              }
             }
           },
 
           "CallExpression:exit"(node) {
+            if (
+              node.callee.name === "create" ||
+              (node.callee.type === "MemberExpression" && node.callee.property.name === "create")
+            ) {
+              inZustandStore = false;
+            }
+
             if (
               ["setTimeout", "setInterval"].includes(node.callee.name) ||
               (node.callee.type === "MemberExpression" &&

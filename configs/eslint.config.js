@@ -150,9 +150,9 @@ export default [
       // Block all console statements - use logger instead
       "no-console": "error",
 
-      // 🏗️ Zustand Store Safety Rules (Issue #658-659) - Start with 'warn' for gradual adoption
+      // 🏗️ Zustand Store Safety Rules (Issue #658-659) - Enhanced after React error #185 fix
       "zustand-safe-patterns/zustand-no-get-in-actions": "warn", // Prevent React error #185
-      "zustand-safe-patterns/zustand-store-reference-pattern": "warn", // Safe async patterns
+      "zustand-safe-patterns/zustand-store-reference-pattern": "error", // CRITICAL: Prevent React error #185
       "zustand-safe-patterns/zustand-selective-subscriptions": "warn", // Performance optimization
       "zustand-safe-patterns/zustand-no-conditional-subscriptions": "warn", // Memory leak prevention
 
