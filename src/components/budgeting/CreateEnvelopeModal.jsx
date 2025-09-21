@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { getIcon } from "../../utils";
 import useEnvelopeForm from "../../hooks/budgeting/useEnvelopeForm";
+import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
 import SlideUpModal from "../mobile/SlideUpModal";
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
@@ -18,18 +19,7 @@ const CreateEnvelopeModal = ({
   currentUser = { userName: "User", userColor: "#a855f7" },
   _forceMobileMode = false, // Internal prop for testing
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect screen size
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
+  const isMobile = useMobileDetection();
 
   const {
     // Form state

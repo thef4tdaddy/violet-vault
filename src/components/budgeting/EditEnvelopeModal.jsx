@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import useEnvelopeEdit from "../../hooks/budgeting/useEnvelopeEdit";
 import logger from "../../utils/common/logger";
+import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
@@ -21,18 +22,7 @@ const EditEnvelopeModal = ({
   _forceMobileMode = false, // Internal prop for testing
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect screen size
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
+  const isMobile = useMobileDetection();
 
   const {
     // Form state
