@@ -7,11 +7,11 @@ import logger from "../../utils/common/logger";
  * Extracts network status logic from Layout component
  */
 const useNetworkStatus = () => {
+  // Get the store action using proper subscription (prevents React error #185)
+  const setOnlineStatus = useBudgetStore((state) => state.setOnlineStatus);
+
   // Set up online/offline status detection
   useEffect(() => {
-    // Get the action from the store
-    const { setOnlineStatus } = useBudgetStore.getState();
-
     // Handler for when the browser goes online
     const handleOnline = () => {
       logger.info("Network status: Online");
@@ -36,7 +36,7 @@ const useNetworkStatus = () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
+  }, [setOnlineStatus]); // setOnlineStatus is stable in Zustand
 };
 
 export default useNetworkStatus;
