@@ -446,12 +446,14 @@ export default {
                 depsArray.elements.forEach((dep) => {
                   if (dep && dep.type === "Identifier") {
                     // Check for common object dependency patterns that cause infinite renders
+                    // Focus on Zustand store subscriptions and computed objects
                     const dangerousPatterns = [
-                      /State$/, // uiState, formState, etc.
-                      /Data$/, // userData, formData, etc.
-                      /Config$/, // appConfig, etc.
-                      /Options$/, // modalOptions, etc.
-                      /Props$/, // componentProps, etc.
+                      /^uiState$/, // Zustand uiState subscription
+                      /^authState$/, // Zustand authState subscription
+                      /^formState$/, // Form state objects
+                      /^appConfig$/, // App configuration objects
+                      /^modalOptions$/, // Modal options objects
+                      /^storeState$/, // Generic store state objects
                     ];
 
                     if (dangerousPatterns.some(pattern => pattern.test(dep.name))) {
