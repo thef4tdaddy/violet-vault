@@ -216,13 +216,16 @@ const storeInitializer = (set, _get) => ({
 
   // PWA Update Action
   async updateApp() {
-    // Safe external store access (prevents React error #185)
-    const state = useUiStore.getState();
-    if (!state.updateAvailable) return;
-
+    // Use set() to check state safely (prevents React error #185)
+    let shouldUpdate = false;
     set((state) => {
-      state.isUpdating = true;
+      shouldUpdate = state.updateAvailable;
+      if (shouldUpdate) {
+        state.isUpdating = true;
+      }
     });
+
+    if (!shouldUpdate) return;
 
     try {
       // Clear the modal state before updating

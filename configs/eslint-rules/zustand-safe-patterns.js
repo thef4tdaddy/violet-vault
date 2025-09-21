@@ -123,7 +123,7 @@ export default {
         return {
           CallExpression(node) {
             // Check if we're in module scope (not inside a function/method)
-            const ancestors = context.getAncestors();
+            const ancestors = context.sourceCode?.getAncestors?.(node) || [];
             const inFunction = ancestors.some(
               (ancestor) =>
                 ancestor.type === "FunctionDeclaration" ||
