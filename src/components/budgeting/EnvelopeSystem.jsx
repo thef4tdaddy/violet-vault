@@ -139,7 +139,7 @@ const useEnvelopeSystem = () => {
       logger.debug("All bills removed, clearing biweekly allocations");
       lastBillsRef.current = null;
     }
-  }, [bills, updateBiweeklyAllocations]);
+  }, [bills]); // updateBiweeklyAllocations is stable in Zustand
 
   // Envelope operations with TanStack integration
   const createEnvelope = useCallback(
