@@ -159,6 +159,11 @@ export default [
       "zustand-safe-patterns/zustand-selective-subscriptions": "warn", // Performance optimization
       "zustand-safe-patterns/zustand-no-conditional-subscriptions": "warn", // Memory leak prevention
 
+      // Enhanced React error #185 prevention rules (added in commit)
+      "zustand-safe-patterns/zustand-no-object-dependencies": "error", // CRITICAL: Prevent uiState pattern
+      "zustand-safe-patterns/zustand-proper-store-initialization": "error", // CRITICAL: Prevent PWA manager pattern
+      "zustand-safe-patterns/zustand-no-recreating-functions": "warn", // Performance: unstable function dependencies
+
       // Block window.confirm patterns that no-restricted-globals doesn't catch
       "no-restricted-syntax": [
         "warn", // Temporarily warn instead of error for icon rule rollout
