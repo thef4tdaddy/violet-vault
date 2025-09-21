@@ -151,11 +151,10 @@ export default [
       "no-console": "error",
 
       // 🏗️ Zustand Store Safety Rules (Issue #658-659) - Start with 'warn' for gradual adoption
-      // TODO: Fix recursion issue in custom rules, then re-enable
-      // "zustand-safe-patterns/zustand-no-get-in-actions": "warn", // Prevent React error #185
-      // "zustand-safe-patterns/zustand-store-reference-pattern": "warn", // Safe async patterns
-      // "zustand-safe-patterns/zustand-selective-subscriptions": "warn", // Performance optimization
-      // "zustand-safe-patterns/zustand-no-conditional-subscriptions": "warn", // Memory leak prevention
+      "zustand-safe-patterns/zustand-no-get-in-actions": "warn", // Prevent React error #185
+      "zustand-safe-patterns/zustand-store-reference-pattern": "warn", // Safe async patterns
+      "zustand-safe-patterns/zustand-selective-subscriptions": "warn", // Performance optimization
+      "zustand-safe-patterns/zustand-no-conditional-subscriptions": "warn", // Memory leak prevention
 
       // Block window.confirm patterns that no-restricted-globals doesn't catch
       "no-restricted-syntax": [
