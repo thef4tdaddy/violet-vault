@@ -5,6 +5,155 @@
 
 export default {
   rules: {
+    "zustand-no-getstate-in-useeffect": {
+      meta: {
+        type: "error",
+        docs: {
+          description: "Prevent getState() calls in useEffect hooks to avoid React error #185",
+          category: "Possible Errors",
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          noGetStateInUseEffect:
+            "Dangerous pattern: getState() call in useEffect detected! This causes React error #185 infinite render loops. " +
+            "Use proper store subscription instead: const data = useStore(state => state.data). " +
+            "See docs/Zustand-Safe-Patterns.md for correct patterns.",
+        },
+      },
+      create(context) {
+        let inUseEffect = false;
+
+        return {
+          CallExpression(node) {
+            // Detect useEffect calls
+            if (node.callee.name === "useEffect") {
+              inUseEffect = true;
+              return;
+            }
+
+            // Check for getState() calls inside useEffect
+            if (
+              inUseEffect &&
+              node.callee.type === "MemberExpression" &&
+              node.callee.property.name === "getState" &&
+              node.arguments.length === 0
+            ) {
+              context.report({
+                node,
+                messageId: "noGetStateInUseEffect",
+              });
+            }
+          },
+
+          "CallExpression:exit"(node) {
+            if (node.callee.name === "useEffect") {
+              inUseEffect = false;
+            }
+          },
+        };
+      },
+    },
+
+    "zustand-no-store-actions-in-deps": {
+      meta: {
+        type: "error",
+        docs: {
+          description: "Prevent Zustand store actions in useEffect dependency arrays",
+          category: "Possible Errors",
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          noStoreActionsInDeps:
+            "Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. " +
+            "Zustand store actions are stable and should not be in dependency arrays. " +
+            "Remove store actions from the dependency array to fix this issue.",
+        },
+      },
+      create(context) {
+        return {
+          CallExpression(node) {
+            // Look for useEffect calls
+            if (node.callee.name === "useEffect" && node.arguments.length >= 2) {
+              const depsArray = node.arguments[1];
+
+              // Check if dependencies array exists
+              if (depsArray && depsArray.type === "ArrayExpression") {
+                depsArray.elements.forEach((dep) => {
+                  // Check for store hook calls that return actions
+                  if (
+                    dep &&
+                    dep.type === "Identifier" &&
+                    // Common store action patterns
+                    /^(set|get|add|remove|update|delete|create|save|load|sync|login|logout|reset)/.test(
+                      dep.name
+                    )
+                  ) {
+                    context.report({
+                      node: dep,
+                      messageId: "noStoreActionsInDeps",
+                    });
+                  }
+                });
+              }
+            }
+          },
+        };
+      },
+    },
+
+    "zustand-no-auto-executing-store-calls": {
+      meta: {
+        type: "error",
+        docs: {
+          description: "Prevent auto-executing store operations in module scope",
+          category: "Possible Errors",
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          noAutoExecutingStoreCalls:
+            "Dangerous pattern: Store operation called in module scope! This can trigger React error #185 during app initialization. " +
+            "Move this call to explicit initialization functions instead of auto-executing on module load. " +
+            "Example: Create an init() function and call it from App component.",
+        },
+      },
+      create(context) {
+        return {
+          CallExpression(node) {
+            // Check if we're in module scope (not inside a function/method)
+            const ancestors = context.getAncestors();
+            const inFunction = ancestors.some(
+              (ancestor) =>
+                ancestor.type === "FunctionDeclaration" ||
+                ancestor.type === "FunctionExpression" ||
+                ancestor.type === "ArrowFunctionExpression" ||
+                ancestor.type === "MethodDefinition"
+            );
+
+            if (!inFunction) {
+              // Look for store-related method calls that could trigger operations
+              if (
+                node.callee.type === "MemberExpression" &&
+                node.callee.property &&
+                /^(restore|initialize|start|trigger|execute|run|sync|fetch|load|save)/.test(
+                  node.callee.property.name
+                ) &&
+                // Exclude safe operations like addEventListener
+                !/^(addEventListener|removeEventListener)$/.test(node.callee.property.name)
+              ) {
+                context.report({
+                  node,
+                  messageId: "noAutoExecutingStoreCalls",
+                });
+              }
+            }
+          },
+        };
+      },
+    },
+
     "zustand-no-get-in-actions": {
       meta: {
         type: "problem",
