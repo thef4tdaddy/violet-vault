@@ -58,7 +58,13 @@ async function runHealthChecksInternal(results) {
 
     await budgetDb.envelopes.add(testEnvelope);
     // Skip cloud sync call that hangs - just check if service exists
-    const syncData = cloudSyncService ? { envelopes: [] } : null;
+    const syncData = cloudSyncService ? {
+      envelopes: [],
+      lastModified: Date.now()
+    } : {
+      envelopes: [],
+      lastModified: Date.now() // Fallback for when cloud service is not available
+    };
 
     // Clean up
     await budgetDb.envelopes.where("id").equals(testEnvelope.id).delete();
