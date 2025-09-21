@@ -22,22 +22,17 @@ const HighlightLoader = React.lazy(
 
 const App = () => {
   // Initialize PWA manager and touch feedback
-  // Subscribe to store properly to avoid React error #185
-  const uiState = useUiStore((state) => ({
-    installPromptEvent: state.installPromptEvent,
-    showInstallPrompt: state.showInstallPrompt,
-  }));
-
   useEffect(() => {
     const initializePWA = async () => {
-      await pwaManager.initialize(uiState);
+      // Pass the actual store, not just state data
+      await pwaManager.initialize(useUiStore);
     };
 
     initializePWA();
 
     // Initialize haptic feedback for mobile interactions
     initializeTouchFeedback();
-  }, [uiState]);
+  }, []); // Empty deps - only initialize once
 
   return (
     <BrowserRouter>
