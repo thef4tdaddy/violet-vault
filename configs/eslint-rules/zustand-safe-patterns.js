@@ -26,7 +26,7 @@ export default {
       let storeActionDepth = 0;
 
       return {
-        // Detect Zustand store creation patterns
+        // Detect Zustand store creation patterns and get() calls
         CallExpression(node) {
           // Check for create() calls (Zustand stores)
           if (
@@ -36,6 +36,20 @@ export default {
           ) {
             inStoreAction = true;
             storeActionDepth++;
+            return;
+          }
+
+          // Check for get() calls within store actions
+          if (
+            inStoreAction &&
+            node.callee.name === "get" &&
+            // Make sure it's not a different get() function
+            node.arguments.length === 0
+          ) {
+            context.report({
+              node,
+              messageId: "noGetInActions",
+            });
           }
         },
 
@@ -50,21 +64,6 @@ export default {
             if (storeActionDepth === 0) {
               inStoreAction = false;
             }
-          }
-        },
-
-        // Check for get() calls within store actions
-        CallExpression(node) {
-          if (
-            inStoreAction &&
-            node.callee.name === "get" &&
-            // Make sure it's not a different get() function
-            node.arguments.length === 0
-          ) {
-            context.report({
-              node,
-              messageId: "noGetInActions",
-            });
           }
         },
       };
@@ -90,14 +89,28 @@ export default {
       let inAsyncOperation = false;
 
       return {
-        // Detect async operations (setTimeout, setInterval, Promise chains)
+        // Detect async operations and get() calls
         CallExpression(node) {
+          // Check for async operations (setTimeout, setInterval, Promise chains)
           if (
             ["setTimeout", "setInterval"].includes(node.callee.name) ||
             (node.callee.type === "MemberExpression" &&
              ["then", "catch", "finally"].includes(node.callee.property.name))
           ) {
             inAsyncOperation = true;
+            return;
+          }
+
+          // Check for get() calls in async operations
+          if (
+            inAsyncOperation &&
+            node.callee.name === "get" &&
+            node.arguments.length === 0
+          ) {
+            context.report({
+              node,
+              messageId: "useStoreReference",
+            });
           }
         },
 
@@ -108,20 +121,6 @@ export default {
              ["then", "catch", "finally"].includes(node.callee.property.name))
           ) {
             inAsyncOperation = false;
-          }
-        },
-
-        // Check for get() calls in async operations
-        CallExpression(node) {
-          if (
-            inAsyncOperation &&
-            node.callee.name === "get" &&
-            node.arguments.length === 0
-          ) {
-            context.report({
-              node,
-              messageId: "useStoreReference",
-            });
           }
         },
       };
@@ -180,11 +179,14 @@ export default {
       },
     },
     create(context) {
+      const visited = new Set();
+
       return {
         // Check for store hooks inside conditional statements
         IfStatement(node) {
           function checkForStoreHooks(nodeToCheck) {
             if (nodeToCheck.type === "CallExpression" &&
+                nodeToCheck.callee &&
                 nodeToCheck.callee.name &&
                 nodeToCheck.callee.name.includes("Store") &&
                 nodeToCheck.callee.name.startsWith("use")) {
@@ -195,22 +197,36 @@ export default {
             }
           }
 
-          // Recursively check the consequent for store hooks
-          function traverse(node) {
+          // Recursively check for store hooks with cycle prevention
+          function traverse(node, depth = 0) {
+            // Prevent infinite recursion
+            if (!node || typeof node !== "object" || depth > 20) return;
+
+            // Create a unique key for this node
+            const nodeKey = `${node.type}_${node.start}_${node.end}`;
+            if (visited.has(nodeKey)) return;
+            visited.add(nodeKey);
+
             if (node.type === "CallExpression") {
               checkForStoreHooks(node);
+              return; // Don't traverse into call expressions further
             }
-            for (const key in node) {
-              if (node[key] && typeof node[key] === "object") {
+
+            // Only traverse specific safe properties
+            const safeKeys = ['body', 'consequent', 'alternate', 'expression', 'declarations'];
+            for (const key of safeKeys) {
+              if (node[key]) {
                 if (Array.isArray(node[key])) {
-                  node[key].forEach(traverse);
+                  node[key].forEach(child => traverse(child, depth + 1));
                 } else if (node[key].type) {
-                  traverse(node[key]);
+                  traverse(node[key], depth + 1);
                 }
               }
             }
           }
 
+          // Clear visited set for each if statement
+          visited.clear();
           traverse(node.consequent);
           if (node.alternate) {
             traverse(node.alternate);
