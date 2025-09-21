@@ -17,6 +17,7 @@ The React error #185 ("Maximum update depth exceeded") was caused by unsafe Zust
 **Level**: `warn` (will become `error` after store refactors)
 
 #### ❌ Bad - Triggers React Error #185
+
 ```javascript
 const useStore = create((set, get) => ({
   count: 0,
@@ -28,11 +29,12 @@ const useStore = create((set, get) => ({
   asyncAction: async () => {
     const state = get(); // ❌ FORBIDDEN - Unsafe in async operations
     await someAsyncCall(state.value);
-  }
+  },
 }));
 ```
 
 #### ✅ Good - Safe Patterns
+
 ```javascript
 const useStore = create((set, get) => ({
   count: 0,
@@ -45,7 +47,7 @@ const useStore = create((set, get) => ({
     // Define store object to reference actions safely
     const store = useStore.getState();
     await someAsyncCall(store.value);
-  }
+  },
 }));
 ```
 
@@ -56,6 +58,7 @@ const useStore = create((set, get) => ({
 **Level**: `warn`
 
 #### ❌ Bad - Unsafe Async Patterns
+
 ```javascript
 const useToastStore = create((set, get) => ({
   toasts: [],
@@ -66,11 +69,12 @@ const useToastStore = create((set, get) => ({
     setTimeout(() => {
       get().removeToast(toast.id);
     }, 3000);
-  }
+  },
 }));
 ```
 
 #### ✅ Good - Store Reference Pattern
+
 ```javascript
 const useToastStore = create((set, get) => {
   const store = {
@@ -85,9 +89,10 @@ const useToastStore = create((set, get) => {
       }, 3000);
     },
 
-    removeToast: (id) => set((state) => ({
-      toasts: state.toasts.filter(t => t.id !== id)
-    }))
+    removeToast: (id) =>
+      set((state) => ({
+        toasts: state.toasts.filter((t) => t.id !== id),
+      })),
   };
 
   return store;
@@ -101,6 +106,7 @@ const useToastStore = create((set, get) => {
 **Level**: `warn`
 
 #### ❌ Bad - Full Store Subscription
+
 ```javascript
 const MyComponent = () => {
   const store = useMyStore(); // ❌ Subscribes to entire store
@@ -110,9 +116,10 @@ const MyComponent = () => {
 ```
 
 #### ✅ Good - Selective Subscription
+
 ```javascript
 const MyComponent = () => {
-  const specificValue = useMyStore(state => state.specificValue); // ✅ Selective subscription
+  const specificValue = useMyStore((state) => state.specificValue); // ✅ Selective subscription
 
   return <div>{specificValue}</div>;
 };
@@ -125,11 +132,12 @@ const MyComponent = () => {
 **Level**: `warn`
 
 #### ❌ Bad - Conditional Subscriptions
+
 ```javascript
 const MyComponent = ({ shouldUseStore }) => {
   // ❌ BAD - Violates hooks rules, causes memory leaks
   if (shouldUseStore) {
-    const data = useMyStore(state => state.data);
+    const data = useMyStore((state) => state.data);
     return <div>{data}</div>;
   }
 
@@ -138,10 +146,11 @@ const MyComponent = ({ shouldUseStore }) => {
 ```
 
 #### ✅ Good - Unconditional Subscription with Conditional Usage
+
 ```javascript
 const MyComponent = ({ shouldUseStore }) => {
   // ✅ GOOD - Always subscribe, conditionally use
-  const data = useMyStore(state => state.data);
+  const data = useMyStore((state) => state.data);
 
   if (shouldUseStore) {
     return <div>{data}</div>;
@@ -154,12 +163,15 @@ const MyComponent = ({ shouldUseStore }) => {
 ## Rule Progression Plan
 
 ### Phase 1: Warning Mode (Current)
+
 - All rules set to `warn` level
 - Allows existing code to continue working
 - Developers see warnings for new violations
 
 ### Phase 2: Error Mode (After Store Refactors)
+
 After issues #660-662 are completed:
+
 ```javascript
 // Will be upgraded to:
 "zustand-safe-patterns/zustand-no-get-in-actions": "error",
@@ -171,11 +183,13 @@ After issues #660-662 are completed:
 ## Testing the Rules
 
 Run ESLint to see current violations:
+
 ```bash
 npm run lint
 ```
 
 Focus on Zustand-related warnings:
+
 ```bash
 npm run lint | grep "zustand-safe-patterns"
 ```
@@ -183,12 +197,15 @@ npm run lint | grep "zustand-safe-patterns"
 ## Exceptions
 
 ### Temporary Exclusions
+
 The following stores are temporarily excluded during refactoring:
+
 - `src/stores/ui/onboardingStore.js` - Being refactored in #660
 - `src/stores/ui/fabStore.js` - Being refactored in #660
 - `src/stores/ui/toastStore.js` - Recently fixed, may need minor adjustments
 
 ### Permanent Exclusions
+
 None planned - all stores should follow safe patterns.
 
 ## Related Documentation
@@ -199,9 +216,9 @@ None planned - all stores should follow safe patterns.
 
 ## Quick Reference
 
-| Rule | Purpose | Level | Fix Strategy |
-|------|---------|-------|--------------|
-| `zustand-no-get-in-actions` | Prevent React error #185 | warn→error | Use `set((state) => ...)` |
-| `zustand-store-reference-pattern` | Safe async operations | warn→error | Create store object reference |
-| `zustand-selective-subscriptions` | Performance optimization | warn | Use `useStore(state => state.prop)` |
-| `zustand-no-conditional-subscriptions` | Memory leak prevention | warn→error | Move conditions inside component |
+| Rule                                   | Purpose                  | Level      | Fix Strategy                        |
+| -------------------------------------- | ------------------------ | ---------- | ----------------------------------- |
+| `zustand-no-get-in-actions`            | Prevent React error #185 | warn→error | Use `set((state) => ...)`           |
+| `zustand-store-reference-pattern`      | Safe async operations    | warn→error | Create store object reference       |
+| `zustand-selective-subscriptions`      | Performance optimization | warn       | Use `useStore(state => state.prop)` |
+| `zustand-no-conditional-subscriptions` | Memory leak prevention   | warn→error | Move conditions inside component    |

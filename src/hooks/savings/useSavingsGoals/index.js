@@ -1,6 +1,9 @@
 // Main useSavingsGoals Hook - Orchestrates all savings goal functionality
 import { useMemo } from "react";
-import { useSavingsGoalsQuery, useSavingsGoalsQueryEvents } from "./savingsQueries";
+import {
+  useSavingsGoalsQuery,
+  useSavingsGoalsQueryEvents,
+} from "./savingsQueries";
 import {
   useAddSavingsGoalMutation,
   useUpdateSavingsGoalMutation,
@@ -164,7 +167,9 @@ const useSavingsGoals = (options = {}) => {
       hasGoalsNeedingAttention: () => {
         return savingsGoals.some(
           (goal) =>
-            goal.urgency === "urgent" || goal.urgency === "overdue" || goal.urgency === "behind"
+            goal.urgency === "urgent" ||
+            goal.urgency === "overdue" ||
+            goal.urgency === "behind",
         );
       },
     }),
@@ -175,7 +180,7 @@ const useSavingsGoals = (options = {}) => {
       deleteSavingsGoalMutation,
       addContributionMutation,
       distributeFundsMutation,
-    ]
+    ],
   );
 
   return {

@@ -5,7 +5,10 @@ import { getIcon } from "../../../utils/icons";
  * Clipboard security settings section
  * Extracted from SecuritySettings.jsx with enhanced UI standards
  */
-const ClipboardSecuritySection = ({ securitySettings, handleSettingChange }) => {
+const ClipboardSecuritySection = ({
+  securitySettings,
+  handleSettingChange,
+}) => {
   return (
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-purple-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
@@ -34,7 +37,12 @@ const ClipboardSecuritySection = ({ securitySettings, handleSettingChange }) => 
           min="5"
           max="300"
           value={securitySettings.clipboardClearTimeout}
-          onChange={(e) => handleSettingChange("clipboardClearTimeout", parseInt(e.target.value))}
+          onChange={(e) =>
+            handleSettingChange(
+              "clipboardClearTimeout",
+              parseInt(e.target.value),
+            )
+          }
           className="w-full h-3 bg-gradient-to-r from-purple-200 to-purple-400 rounded-lg appearance-none cursor-pointer slider-thumb"
           style={{
             background: `linear-gradient(to right, #a855f7 0%, #a855f7 ${((securitySettings.clipboardClearTimeout - 5) / 295) * 100}%, #e9d5ff ${((securitySettings.clipboardClearTimeout - 5) / 295) * 100}%, #e9d5ff 100%)`,

@@ -20,7 +20,10 @@ const TransactionFilters = ({
 
   // Check if any filters are active (for mobile indicator)
   const hasActiveFilters =
-    searchTerm || dateFilter !== "all" || typeFilter !== "all" || envelopeFilter !== "all";
+    searchTerm ||
+    dateFilter !== "all" ||
+    typeFilter !== "all" ||
+    envelopeFilter !== "all";
 
   return (
     <div className="glassmorphism rounded-xl border border-white/20">
@@ -30,7 +33,9 @@ const TransactionFilters = ({
           {React.createElement(getIcon("Filter"), {
             className: "h-4 w-4 text-gray-600",
           })}
-          <span className="text-sm font-medium text-gray-700">Search & Filters</span>
+          <span className="text-sm font-medium text-gray-700">
+            Search & Filters
+          </span>
           {hasActiveFilters && (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
               Active
@@ -57,7 +62,9 @@ const TransactionFilters = ({
       >
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search
+            </label>
             <div className="relative">
               {React.createElement(getIcon("Search"), {
                 className:
@@ -74,7 +81,9 @@ const TransactionFilters = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Date Filter</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Date Filter
+            </label>
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
@@ -88,7 +97,9 @@ const TransactionFilters = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Type
+            </label>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
@@ -101,7 +112,9 @@ const TransactionFilters = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Envelope</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Envelope
+            </label>
             <select
               value={envelopeFilter}
               onChange={(e) => setEnvelopeFilter(e.target.value)}
@@ -118,7 +131,9 @@ const TransactionFilters = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Sort By
+            </label>
             <div className="flex gap-2">
               <select
                 value={sortBy}
@@ -130,7 +145,9 @@ const TransactionFilters = ({
                 <option value="description">Description</option>
               </select>
               <button
-                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
                 className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
               >
                 {sortOrder === "asc"

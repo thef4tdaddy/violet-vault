@@ -30,7 +30,7 @@ export const useDebtForm = (
   debt = null,
   isOpen = false,
   connectedBill = null,
-  connectedEnvelope = null
+  connectedEnvelope = null,
 ) => {
   const isEditMode = !!debt;
   const [formData, setFormData] = useState(initialFormState);
@@ -94,7 +94,8 @@ export const useDebtForm = (
     // Validate interest rate
     if (
       formData.interestRate &&
-      (parseFloat(formData.interestRate) < 0 || parseFloat(formData.interestRate) > 100)
+      (parseFloat(formData.interestRate) < 0 ||
+        parseFloat(formData.interestRate) > 100)
     ) {
       newErrors.interestRate = "Interest rate must be between 0 and 100";
     }
@@ -104,11 +105,18 @@ export const useDebtForm = (
     }
 
     // Validate payment method specific fields
-    if (formData.paymentMethod === "connect_existing" && !formData.existingBillId) {
+    if (
+      formData.paymentMethod === "connect_existing" &&
+      !formData.existingBillId
+    ) {
       newErrors.existingBillId = "Please select a bill to connect";
     }
 
-    if (formData.paymentMethod === "create_new" && formData.createBill && !formData.envelopeId) {
+    if (
+      formData.paymentMethod === "create_new" &&
+      formData.createBill &&
+      !formData.envelopeId
+    ) {
       newErrors.envelopeId = "Please select an envelope for payment funding";
     }
 
@@ -154,7 +162,10 @@ export const useDebtForm = (
 
       return true;
     } catch (error) {
-      logger.error(`Error ${isEditMode ? "updating" : "creating"} debt:`, error);
+      logger.error(
+        `Error ${isEditMode ? "updating" : "creating"} debt:`,
+        error,
+      );
       setErrors({
         submit: `Failed to ${isEditMode ? "update" : "create"} debt. Please try again.`,
       });

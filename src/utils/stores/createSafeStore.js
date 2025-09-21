@@ -1,18 +1,18 @@
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { persist, devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import logger from '../common/logger.js';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import logger from "../common/logger.js";
 
-const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === 'true';
+const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 // Validation helpers
 const validateConfig = (name, initialState) => {
-  if (!name || typeof name !== 'string') {
-    throw new Error('Store name is required and must be a string');
+  if (!name || typeof name !== "string") {
+    throw new Error("Store name is required and must be a string");
   }
-  if (!initialState || typeof initialState !== 'object') {
-    throw new Error('Initial state is required and must be an object');
+  if (!initialState || typeof initialState !== "object") {
+    throw new Error("Initial state is required and must be an object");
   }
 };
 
@@ -27,7 +27,7 @@ const wrapActions = (actions, name, set, useStore, store) => {
         logger.debug(`Action ${actionName} executed in ${name}`, {
           actionName,
           storeName: name,
-          args: args.length
+          args: args.length,
         });
 
         return result;
@@ -42,7 +42,8 @@ const wrapActions = (actions, name, set, useStore, store) => {
 
 // Middleware stack builder
 const buildMiddlewareStack = (storeInitializer, options, name) => {
-  const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } = options;
+  const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } =
+    options;
   let middlewareStack = storeInitializer;
 
   if (enableImmer) {
@@ -73,13 +74,18 @@ const buildMiddlewareStack = (storeInitializer, options, name) => {
 /**
  * Creates a safe Zustand store with standard middleware and error handling
  */
-export const createSafeStore = ({ name, initialState, actions = {}, options = {} }) => {
+export const createSafeStore = ({
+  name,
+  initialState,
+  actions = {},
+  options = {},
+}) => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
     immer: enableImmer = true,
     devtools: enableDevtools = true,
-    version = 1
+    version = 1,
   } = options;
 
   validateConfig(name, initialState);
@@ -95,8 +101,13 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
       },
       getDebugInfo: () => {
         const state = useStore.getState();
-        return { storeName: name, stateKeys: Object.keys(state), timestamp: Date.now(), version };
-      }
+        return {
+          storeName: name,
+          stateKeys: Object.keys(state),
+          timestamp: Date.now(),
+          version,
+        };
+      },
     };
 
     // Add wrapped actions
@@ -104,9 +115,17 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
     return store;
   };
 
-  const middlewareStack = buildMiddlewareStack(storeInitializer, {
-    enablePersist, persistedKeys, enableImmer, enableDevtools, version
-  }, name);
+  const middlewareStack = buildMiddlewareStack(
+    storeInitializer,
+    {
+      enablePersist,
+      persistedKeys,
+      enableImmer,
+      enableDevtools,
+      version,
+    },
+    name,
+  );
 
   useStore = create(middlewareStack);
 
@@ -114,7 +133,7 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
     persist: enablePersist && !LOCAL_ONLY_MODE,
     immer: enableImmer,
     devtools: enableDevtools,
-    actions: Object.keys(actions)
+    actions: Object.keys(actions),
   });
 
   return useStore;
@@ -128,8 +147,8 @@ export const createPersistedStore = (config) => {
     ...config,
     options: {
       ...config.options,
-      persist: true
-    }
+      persist: true,
+    },
   });
 };
 
@@ -141,7 +160,7 @@ export const createEphemeralStore = (config) => {
     ...config,
     options: {
       ...config.options,
-      persist: false
-    }
+      persist: false,
+    },
   });
 };

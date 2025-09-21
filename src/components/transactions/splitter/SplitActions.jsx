@@ -1,7 +1,13 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel }) => {
+const SplitActions = ({
+  totals,
+  hasUnsavedChanges,
+  isSaving,
+  onSave,
+  onCancel,
+}) => {
   const { isValid, isOverAllocated, remaining } = totals;
 
   const getValidationMessage = () => {
@@ -23,7 +29,9 @@ const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel })
             {React.createElement(getIcon("AlertCircle"), {
               className: "h-5 w-5 text-orange-600 mr-2",
             })}
-            <span className="text-sm font-bold text-orange-800">{getValidationMessage()}</span>
+            <span className="text-sm font-bold text-orange-800">
+              {getValidationMessage()}
+            </span>
           </div>
         </div>
       )}

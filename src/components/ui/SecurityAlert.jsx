@@ -87,11 +87,16 @@ const SecurityAlert = ({
 
   return (
     <div className={containerClasses}>
-      {React.createElement(Icon, { className: `h-4 w-4 flex-shrink-0 ${colors.icon}` })}
+      {React.createElement(Icon, {
+        className: `h-4 w-4 flex-shrink-0 ${colors.icon}`,
+      })}
       <span className="text-sm flex-1">{message}</span>
 
       {dismissible && onDismiss && (
-        <button onClick={onDismiss} className={`ml-2 hover:opacity-75 ${colors.icon}`}>
+        <button
+          onClick={onDismiss}
+          className={`ml-2 hover:opacity-75 ${colors.icon}`}
+        >
           {React.createElement(getIconFromRegistry("X"), {
             className: "h-3 w-3",
           })}

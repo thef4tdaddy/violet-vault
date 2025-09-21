@@ -23,7 +23,9 @@ const PerformanceHeader = ({ alertsEnabled, setAlertsEnabled }) => {
           </div>
           Performance Monitor
         </h3>
-        <p className="text-gray-600 mt-1">Real-time financial health tracking</p>
+        <p className="text-gray-600 mt-1">
+          Real-time financial health tracking
+        </p>
       </div>
 
       <div className="flex items-center gap-2">

@@ -56,7 +56,10 @@ export const useEnvelopeSwipeGestures = ({
         if (direction === "right") {
           const swipeIntensity = Math.min(Math.abs(eventData.deltaX) / 200, 1);
           const baseAmount = Math.min(unassignedCash * 0.1, 50);
-          const suggestedAmount = Math.max(baseAmount * (0.5 + swipeIntensity), 5);
+          const suggestedAmount = Math.max(
+            baseAmount * (0.5 + swipeIntensity),
+            5,
+          );
 
           hapticFeedback(20, "success"); // Success feedback for funding
           onQuickFund?.(envelopeId, Math.round(suggestedAmount * 100) / 100);

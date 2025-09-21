@@ -12,7 +12,9 @@ const ArchivingHeader = ({ onRefresh, isLoading }) => {
             })}
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Transaction Archiving</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Transaction Archiving
+            </h2>
             <p className="text-gray-600 mt-1">
               Archive old transactions while preserving analytics data
             </p>

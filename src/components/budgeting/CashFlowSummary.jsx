@@ -12,7 +12,9 @@ const CashFlowSummary = ({ cashFlow }) => {
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-green-50 p-4 rounded-lg">
-          <div className="text-sm text-green-600 font-medium">Unassigned Cash</div>
+          <div className="text-sm text-green-600 font-medium">
+            Unassigned Cash
+          </div>
           <div className="text-2xl font-bold text-green-700">
             ${cashFlow.unassignedCash?.toFixed(2) || "0.00"}
           </div>

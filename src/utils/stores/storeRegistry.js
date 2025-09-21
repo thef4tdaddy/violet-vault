@@ -1,4 +1,4 @@
-import logger from '../common/logger.js';
+import logger from "../common/logger.js";
 
 /**
  * Global store registry for development and debugging
@@ -22,8 +22,8 @@ class StoreRegistry {
       metadata: {
         ...metadata,
         registeredAt: Date.now(),
-        name
-      }
+        name,
+      },
     });
 
     logger.debug(`Registered store: ${name}`, metadata);
@@ -49,11 +49,13 @@ class StoreRegistry {
    * Get all registered stores
    */
   getAll() {
-    return Array.from(this.stores.entries()).map(([name, { store, metadata }]) => ({
-      name,
-      store,
-      metadata
-    }));
+    return Array.from(this.stores.entries()).map(
+      ([name, { store, metadata }]) => ({
+        name,
+        store,
+        metadata,
+      }),
+    );
   }
 
   /**
@@ -69,7 +71,7 @@ class StoreRegistry {
    */
   resetAll() {
     this.stores.forEach(({ store }, name) => {
-      if (store.getState && typeof store.getState().reset === 'function') {
+      if (store.getState && typeof store.getState().reset === "function") {
         store.getState().reset();
         logger.debug(`Reset store: ${name}`);
       }
@@ -88,14 +90,14 @@ class StoreRegistry {
         info[name] = {
           metadata,
           stateKeys: Object.keys(state),
-          hasReset: typeof state.reset === 'function',
-          hasDebugInfo: typeof state.getDebugInfo === 'function',
-          debugInfo: state.getDebugInfo ? state.getDebugInfo() : null
+          hasReset: typeof state.reset === "function",
+          hasDebugInfo: typeof state.getDebugInfo === "function",
+          debugInfo: state.getDebugInfo ? state.getDebugInfo() : null,
         };
       } catch (error) {
         info[name] = {
           metadata,
-          error: error.message
+          error: error.message,
         };
       }
     });
@@ -114,11 +116,11 @@ class StoreRegistry {
       stores: () => this.getDebugInfo(),
       resetAll: () => this.resetAll(),
       getStore: (name) => this.get(name),
-      listStores: () => Array.from(this.stores.keys())
+      listStores: () => Array.from(this.stores.keys()),
     };
 
-    logger.info('Store registry dev helpers initialized', {
-      stores: Array.from(this.stores.keys())
+    logger.info("Store registry dev helpers initialized", {
+      stores: Array.from(this.stores.keys()),
     });
 
     this.initialized = true;

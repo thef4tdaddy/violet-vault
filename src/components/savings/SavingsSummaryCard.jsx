@@ -4,9 +4,16 @@ import { getIcon } from "../../utils";
 
 const SavingsSummaryCard = ({ savingsGoals = [] }) => {
   // Calculate summary statistics
-  const totalSaved = savingsGoals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0);
-  const totalTargets = savingsGoals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0);
-  const overallProgress = totalTargets > 0 ? (totalSaved / totalTargets) * 100 : 0;
+  const totalSaved = savingsGoals.reduce(
+    (sum, goal) => sum + (goal.currentAmount || 0),
+    0,
+  );
+  const totalTargets = savingsGoals.reduce(
+    (sum, goal) => sum + (goal.targetAmount || 0),
+    0,
+  );
+  const overallProgress =
+    totalTargets > 0 ? (totalSaved / totalTargets) * 100 : 0;
 
   const completedGoals = savingsGoals.filter((goal) => {
     const current = goal.currentAmount || 0;
@@ -30,7 +37,9 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
           <span>Savings Goals</span>
         </h2>
         <div className="text-right">
-          <div className="text-2xl font-bold text-green-600">${totalSaved.toFixed(2)}</div>
+          <div className="text-2xl font-bold text-green-600">
+            ${totalSaved.toFixed(2)}
+          </div>
           <div className="text-sm text-gray-600">Total Saved</div>
         </div>
       </div>
@@ -44,7 +53,9 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
             })}
             <span className="font-medium">Overall Progress</span>
           </div>
-          <div className="text-2xl font-bold text-blue-600">{overallProgress.toFixed(1)}%</div>
+          <div className="text-2xl font-bold text-blue-600">
+            {overallProgress.toFixed(1)}%
+          </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
@@ -61,7 +72,9 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
             })}
             <span className="font-medium">Goals</span>
           </div>
-          <div className="text-2xl font-bold text-purple-600">{savingsGoals.length}</div>
+          <div className="text-2xl font-bold text-purple-600">
+            {savingsGoals.length}
+          </div>
           <div className="text-sm text-gray-600">
             {completedGoals.length} completed, {activeGoals.length} active
           </div>
@@ -75,7 +88,9 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
             })}
             <span className="font-medium">Target Amount</span>
           </div>
-          <div className="text-2xl font-bold text-green-600">${totalTargets.toFixed(2)}</div>
+          <div className="text-2xl font-bold text-green-600">
+            ${totalTargets.toFixed(2)}
+          </div>
           <div className="text-sm text-gray-600">
             ${(totalTargets - totalSaved).toFixed(2)} remaining
           </div>

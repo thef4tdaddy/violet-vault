@@ -29,11 +29,14 @@ export class PageDetectionService {
       // Enhanced route analysis using route configuration
       const currentView = pathToViewMap[pathname] || "unknown";
       const isAppRoute =
-        Object.keys(pathToViewMap).includes(pathname) || pathname.startsWith("/app");
+        Object.keys(pathToViewMap).includes(pathname) ||
+        pathname.startsWith("/app");
       const isMarketingRoute = !isAppRoute && !pathname.startsWith("/app");
 
       // Check build environment for PWA detection
-      const isPWA = typeof process !== "undefined" && process.env?.REACT_APP_BUILD_TARGET === "pwa";
+      const isPWA =
+        typeof process !== "undefined" &&
+        process.env?.REACT_APP_BUILD_TARGET === "pwa";
 
       return {
         pathname,
@@ -160,7 +163,9 @@ export class PageDetectionService {
    */
   static extractMainHeading() {
     try {
-      const mainHeading = document.querySelector("main h1, section h1, .content h1, h1");
+      const mainHeading = document.querySelector(
+        "main h1, section h1, .content h1, h1",
+      );
       return mainHeading ? mainHeading.textContent?.trim() : null;
     } catch {
       return null;
@@ -198,15 +203,23 @@ export class PageDetectionService {
           activity: "Activity History",
         };
 
-        const viewName = viewNames[routeInfo.currentView] || routeInfo.currentView;
-        location = routeInfo.buildTarget === "pwa" ? `PWA: ${viewName}` : `App: ${viewName}`;
+        const viewName =
+          viewNames[routeInfo.currentView] || routeInfo.currentView;
+        location =
+          routeInfo.buildTarget === "pwa"
+            ? `PWA: ${viewName}`
+            : `App: ${viewName}`;
       } else {
         // Fallback to legacy detection
         location = this.identifyCurrentPage();
       }
 
       // Add screen title if different
-      if (screenTitle && screenTitle !== document.title && screenTitle !== "Unknown") {
+      if (
+        screenTitle &&
+        screenTitle !== document.title &&
+        screenTitle !== "Unknown"
+      ) {
         location += ` > ${screenTitle}`;
       }
 

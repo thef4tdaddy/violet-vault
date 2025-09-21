@@ -35,7 +35,7 @@ const useSlideUpModal = (initialConfig = {}) => {
         openModal(newConfig);
       }
     },
-    [isOpen, openModal, closeModal]
+    [isOpen, openModal, closeModal],
   );
 
   const updateConfig = useCallback((newConfig) => {

@@ -132,7 +132,9 @@ const useBugReportV2 = (options = {}) => {
             </html>
           `);
         } else {
-          logger.warn("Failed to open screenshot preview - popup may be blocked");
+          logger.warn(
+            "Failed to open screenshot preview - popup may be blocked",
+          );
           setPreviewScreenshot(screenshotData);
         }
       }
@@ -258,19 +260,28 @@ const useBugReportV2 = (options = {}) => {
           } catch (startError) {
             logger.debug(
               "Highlight.io start failed (session may already be active)",
-              startError.message
+              startError.message,
             );
           }
         } else {
-          logger.debug("Highlight.io session already active - using existing session");
+          logger.debug(
+            "Highlight.io session already active - using existing session",
+          );
         }
       } else if (typeof H.start === "function") {
         try {
-          if (typeof H.getSessionMetadata === "function" || typeof H.getSessionURL === "function") {
-            logger.debug("Using existing Highlight.io session (no isRecording method available)");
+          if (
+            typeof H.getSessionMetadata === "function" ||
+            typeof H.getSessionURL === "function"
+          ) {
+            logger.debug(
+              "Using existing Highlight.io session (no isRecording method available)",
+            );
           } else {
             H.start();
-            logger.debug("Started Highlight.io session (no session detection available)");
+            logger.debug(
+              "Started Highlight.io session (no session detection available)",
+            );
           }
         } catch (error) {
           logger.debug("Highlight.io start attempt ignored", error.message);

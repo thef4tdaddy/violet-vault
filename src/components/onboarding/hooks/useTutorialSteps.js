@@ -85,7 +85,8 @@ export const useTutorialSteps = () => {
       {
         id: "link-bills",
         title: "Link Bills to Envelopes 🔗",
-        description: "Connect your bills to envelopes so they're automatically budgeted for.",
+        description:
+          "Connect your bills to envelopes so they're automatically budgeted for.",
         target: "[data-tour='envelope-grid']",
         position: "top",
         action: () => startTutorialStep("linkedEnvelopes"),
@@ -121,7 +122,7 @@ export const useTutorialSteps = () => {
         action: () => startTutorialStep("syncExplained"),
       },
     ],
-    [navigate, startTutorialStep]
+    [navigate, startTutorialStep],
   );
 
   const getCurrentStepElement = useCallback(
@@ -130,7 +131,7 @@ export const useTutorialSteps = () => {
       if (!step?.target) return null;
       return document.querySelector(step.target);
     },
-    [tutorialSteps]
+    [tutorialSteps],
   );
 
   return {

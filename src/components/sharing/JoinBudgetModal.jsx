@@ -22,8 +22,13 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
   const [step, setStep] = useState(1); // 1: Enter code, 2: Set password, 3: Join
 
   // Custom hooks for business logic
-  const { shareInfo, creatorInfo, isValidating, validateShareCode, resetValidation } =
-    useShareCodeValidation();
+  const {
+    shareInfo,
+    creatorInfo,
+    isValidating,
+    validateShareCode,
+    resetValidation,
+  } = useShareCodeValidation();
 
   const { isJoining, joinBudget } = useBudgetJoining();
 
@@ -61,7 +66,14 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
   };
 
   const handleJoinBudget = async () => {
-    await joinBudget(shareCode, password, userName, userColor, onJoinSuccess, onClose);
+    await joinBudget(
+      shareCode,
+      password,
+      userName,
+      userColor,
+      onJoinSuccess,
+      onClose,
+    );
   };
 
   const _handleProcessQRData = (qrData) => {
@@ -85,7 +97,8 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-black text-black">
-              <span className="text-2xl">J</span>OIN <span className="text-2xl">B</span>UDGET
+              <span className="text-2xl">J</span>OIN{" "}
+              <span className="text-2xl">B</span>UDGET
             </h2>
             <button
               onClick={onClose}

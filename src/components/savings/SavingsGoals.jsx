@@ -69,7 +69,10 @@ const SavingsGoals = ({
       {/* Goals Grid or Empty State */}
       {savingsGoals.length === 0 ? (
         <div className="glassmorphism rounded-2xl p-8 text-center text-gray-500 border border-white/20">
-          <p>No savings goals yet. Click "Add Goal" to create your first savings goal!</p>
+          <p>
+            No savings goals yet. Click "Add Goal" to create your first savings
+            goal!
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

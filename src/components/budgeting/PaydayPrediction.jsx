@@ -1,6 +1,9 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
+import {
+  formatPaydayPrediction,
+  getDaysUntilPayday,
+} from "../../utils/budgeting/paydayPredictor";
 
 const PaydayPrediction = ({
   prediction,
@@ -53,13 +56,19 @@ const PaydayPrediction = ({
   const confidenceColor = getConfidenceColor();
 
   return (
-    <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle()} ${className}`}>
+    <div
+      className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle()} ${className}`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0 mt-0.5">{getPaydayIcon()}</div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-gray-900 text-sm">Next Payday Prediction</h4>
-            <p className="text-sm text-gray-700 mt-1">{formattedPrediction.displayText}</p>
+            <h4 className="font-semibold text-gray-900 text-sm">
+              Next Payday Prediction
+            </h4>
+            <p className="text-sm text-gray-700 mt-1">
+              {formattedPrediction.displayText}
+            </p>
             <div className="flex items-center space-x-4 mt-2">
               <div className="flex items-center text-xs text-gray-600">
                 <span className="font-medium">Pattern:</span>
@@ -74,7 +83,9 @@ const PaydayPrediction = ({
                       style={{ width: `${prediction.confidence}%` }}
                     />
                   </div>
-                  <span className={`ml-1 text-${confidenceColor}-600 font-medium`}>
+                  <span
+                    className={`ml-1 text-${confidenceColor}-600 font-medium`}
+                  >
                     {prediction.confidence}%
                   </span>
                 </div>
@@ -97,7 +108,9 @@ const PaydayPrediction = ({
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
-              {React.createElement(getIcon("Zap"), { className: "h-4 w-4 text-purple-600 mr-2" })}
+              {React.createElement(getIcon("Zap"), {
+                className: "h-4 w-4 text-purple-600 mr-2",
+              })}
               <span className="text-sm font-semibold text-purple-700">
                 {daysUntil === 0 ? "Payday Actions" : "Get Ready for Payday"}
               </span>
@@ -138,7 +151,9 @@ const PaydayPrediction = ({
                     {React.createElement(getIcon("TrendingUp"), {
                       className: "h-4 w-4 text-emerald-600 mr-2",
                     })}
-                    <span className="text-sm font-medium text-emerald-800">Payday Tomorrow!</span>
+                    <span className="text-sm font-medium text-emerald-800">
+                      Payday Tomorrow!
+                    </span>
                   </div>
                   {onPrepareEnvelopes && (
                     <button
@@ -175,7 +190,9 @@ const PaydayPrediction = ({
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-amber-600 mt-1">Plan your envelope funding strategy</p>
+                <p className="text-xs text-amber-600 mt-1">
+                  Plan your envelope funding strategy
+                </p>
               </div>
             )}
           </div>

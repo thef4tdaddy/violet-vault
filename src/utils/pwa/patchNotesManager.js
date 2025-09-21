@@ -18,7 +18,11 @@ class PatchNotesManager {
   async fetchChangelog() {
     // Check cache first
     const now = Date.now();
-    if (this.changelogCache && this.cacheTimestamp && now - this.cacheTimestamp < this.cacheTTL) {
+    if (
+      this.changelogCache &&
+      this.cacheTimestamp &&
+      now - this.cacheTimestamp < this.cacheTTL
+    ) {
       logger.debug("Using cached changelog");
       return this.changelogCache;
     }
@@ -72,7 +76,7 @@ class PatchNotesManager {
     // Look for version header (e.g., "## [1.9.0]" or "# v1.9.0")
     const versionRegex = new RegExp(
       `(?:^|\\n)(?:##?\\s*(?:\\[?v?${version.replace(/\./g, "\\.")}\\]?|${version.replace(/\./g, "\\.")}))(?:\\s*-[^\\n]*)?(?:\\n|$)`,
-      "i"
+      "i",
     );
 
     const match = changelog.match(versionRegex);
@@ -86,7 +90,9 @@ class PatchNotesManager {
 
     // Find the next version header or end of file
     const remainingContent = changelog.slice(startIndex);
-    const nextVersionMatch = remainingContent.match(/^##?\s*(?:\[?v?\d+\.\d+\.\d+|\d+\.\d+\.\d+)/m);
+    const nextVersionMatch = remainingContent.match(
+      /^##?\s*(?:\[?v?\d+\.\d+\.\d+|\d+\.\d+\.\d+)/m,
+    );
 
     let versionContent;
     if (nextVersionMatch) {
@@ -129,7 +135,9 @@ class PatchNotesManager {
       } else if (trimmedLine.match(/^###?\s*(breaking|breaking\s*changes?)/i)) {
         currentSection = "breaking";
         continue;
-      } else if (trimmedLine.match(/^###?\s*(changed|improvements?|enhanced?)/i)) {
+      } else if (
+        trimmedLine.match(/^###?\s*(changed|improvements?|enhanced?)/i)
+      ) {
         currentSection = "other";
         continue;
       }
@@ -153,9 +161,15 @@ class PatchNotesManager {
             break;
           default:
             // If no specific section, try to categorize automatically
-            if (item.toLowerCase().includes("fix") || item.toLowerCase().includes("bug")) {
+            if (
+              item.toLowerCase().includes("fix") ||
+              item.toLowerCase().includes("bug")
+            ) {
               fixes.push(item);
-            } else if (item.toLowerCase().includes("feat") || item.toLowerCase().includes("add")) {
+            } else if (
+              item.toLowerCase().includes("feat") ||
+              item.toLowerCase().includes("add")
+            ) {
               features.push(item);
             } else {
               other.push(item);
@@ -168,19 +182,27 @@ class PatchNotesManager {
     }
 
     // Generate a summary if none was found
-    if (!summary && (features.length > 0 || fixes.length > 0 || other.length > 0)) {
+    if (
+      !summary &&
+      (features.length > 0 || fixes.length > 0 || other.length > 0)
+    ) {
       const totalChanges = features.length + fixes.length + other.length;
       summary = `Version ${version} includes ${totalChanges} improvements and updates.`;
     }
 
     return {
       version,
-      summary: summary || `New features and improvements in version ${version}.`,
+      summary:
+        summary || `New features and improvements in version ${version}.`,
       features,
       fixes,
       breaking,
       other,
-      hasContent: features.length > 0 || fixes.length > 0 || other.length > 0 || summary.length > 0,
+      hasContent:
+        features.length > 0 ||
+        fixes.length > 0 ||
+        other.length > 0 ||
+        summary.length > 0,
     };
   }
 
@@ -193,28 +215,36 @@ class PatchNotesManager {
     // Prioritize breaking changes, then features, then fixes
     if (patchNotes.breaking.length > 0) {
       highlights.push(
-        ...patchNotes.breaking.slice(0, 2).map((item) => ({ type: "breaking", text: item }))
+        ...patchNotes.breaking
+          .slice(0, 2)
+          .map((item) => ({ type: "breaking", text: item })),
       );
     }
 
     if (highlights.length < 5 && patchNotes.features.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.features.slice(0, remaining).map((item) => ({ type: "feature", text: item }))
+        ...patchNotes.features
+          .slice(0, remaining)
+          .map((item) => ({ type: "feature", text: item })),
       );
     }
 
     if (highlights.length < 5 && patchNotes.fixes.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.fixes.slice(0, remaining).map((item) => ({ type: "fix", text: item }))
+        ...patchNotes.fixes
+          .slice(0, remaining)
+          .map((item) => ({ type: "fix", text: item })),
       );
     }
 
     if (highlights.length < 5 && patchNotes.other.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.other.slice(0, remaining).map((item) => ({ type: "other", text: item }))
+        ...patchNotes.other
+          .slice(0, remaining)
+          .map((item) => ({ type: "other", text: item })),
       );
     }
 
@@ -274,13 +304,17 @@ class PatchNotesManager {
   getCacheStatus() {
     const now = Date.now();
     const isValid =
-      this.changelogCache && this.cacheTimestamp && now - this.cacheTimestamp < this.cacheTTL;
+      this.changelogCache &&
+      this.cacheTimestamp &&
+      now - this.cacheTimestamp < this.cacheTTL;
 
     return {
       hasCache: !!this.changelogCache,
       isValid,
       cacheAge: this.cacheTimestamp ? now - this.cacheTimestamp : 0,
-      timeUntilExpiry: isValid ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
+      timeUntilExpiry: isValid
+        ? this.cacheTTL - (now - this.cacheTimestamp)
+        : 0,
     };
   }
 }

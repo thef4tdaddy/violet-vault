@@ -91,7 +91,9 @@ const NotificationSettingsSection = () => {
               className: "w-5 h-5 text-green-600 flex-shrink-0 mt-0.5",
             })}
             <div className="flex-1">
-              <p className="font-medium text-green-800">Notifications Enabled</p>
+              <p className="font-medium text-green-800">
+                Notifications Enabled
+              </p>
               <p className="text-sm text-green-700 mt-1">
                 You'll receive push notifications for important updates.
               </p>
@@ -140,7 +142,8 @@ const NotificationSettingsSection = () => {
     <div className="space-y-6">
       <div>
         <h3 className="font-black text-black text-base">
-          🔔 <span className="text-lg">N</span>OTIFICATION <span className="text-lg">S</span>ETTINGS
+          🔔 <span className="text-lg">N</span>OTIFICATION{" "}
+          <span className="text-lg">S</span>ETTINGS
         </h3>
         <p className="text-purple-900 text-sm mt-1">
           Manage push notifications and alerts for your budget management.
@@ -153,7 +156,9 @@ const NotificationSettingsSection = () => {
             {React.createElement(getIcon("Loader"), {
               className: "w-4 h-4 text-yellow-600 animate-spin",
             })}
-            <span className="text-yellow-800 text-sm">Initializing notification service...</span>
+            <span className="text-yellow-800 text-sm">
+              Initializing notification service...
+            </span>
           </div>
         </div>
       )}
@@ -212,19 +217,39 @@ const NotificationSettingsSection = () => {
 
       {hasToken && (
         <div className="bg-white rounded-lg border-2 border-black p-4">
-          <h4 className="font-bold text-gray-900 mb-3">Notification Preferences</h4>
+          <h4 className="font-bold text-gray-900 mb-3">
+            Notification Preferences
+          </h4>
           <div className="space-y-3">
             <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Bill payment reminders</span>
+              <input
+                type="checkbox"
+                defaultChecked
+                className="w-4 h-4 text-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                Bill payment reminders
+              </span>
             </label>
             <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Budget alerts and warnings</span>
+              <input
+                type="checkbox"
+                defaultChecked
+                className="w-4 h-4 text-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                Budget alerts and warnings
+              </span>
             </label>
             <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Account activity notifications</span>
+              <input
+                type="checkbox"
+                defaultChecked
+                className="w-4 h-4 text-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                Account activity notifications
+              </span>
             </label>
           </div>
         </div>
@@ -242,10 +267,16 @@ const NotificationSettingsSection = () => {
         </button>
         {showAdvanced && (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-3">Debug Information</h4>
+            <h4 className="font-medium text-gray-900 mb-3">
+              Debug Information
+            </h4>
             <div className="space-y-2 text-sm font-mono">
-              <div>Service Status: {JSON.stringify(getServiceStatus(), null, 2)}</div>
-              <div>Permission Status: {JSON.stringify(permissionStatus, null, 2)}</div>
+              <div>
+                Service Status: {JSON.stringify(getServiceStatus(), null, 2)}
+              </div>
+              <div>
+                Permission Status: {JSON.stringify(permissionStatus, null, 2)}
+              </div>
               {error && <div className="text-red-600">Error: {error}</div>}
             </div>
           </div>

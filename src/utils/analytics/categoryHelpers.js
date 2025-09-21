@@ -28,7 +28,10 @@ export const calculateCategoryStats = (filteredTransactions) => {
     stats[category].totalAmount += Math.abs(transaction.amount);
 
     const transactionDate = new Date(transaction.date);
-    if (!stats[category].lastUsed || transactionDate > stats[category].lastUsed) {
+    if (
+      !stats[category].lastUsed ||
+      transactionDate > stats[category].lastUsed
+    ) {
       stats[category].lastUsed = transactionDate;
     }
   });
@@ -40,7 +43,8 @@ export const calculateCategoryStats = (filteredTransactions) => {
 
       // Calculate frequency (transactions per month)
       if (stat.lastUsed) {
-        const monthsAgo = (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
+        const monthsAgo =
+          (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
         stat.frequency = stat.transactionCount / Math.max(1, monthsAgo);
       }
     }
@@ -56,7 +60,7 @@ export const processSuggestions = (
   transactionAnalysis,
   billAnalysis,
   dismissedSuggestions,
-  maxResults = 12
+  maxResults = 12,
 ) => {
   return [...transactionAnalysis, ...billAnalysis]
     .filter((s) => !dismissedSuggestions.has(s.id))
@@ -73,7 +77,11 @@ export const processSuggestions = (
 /**
  * Apply suggestion to appropriate data source
  */
-export const applySuggestionToData = async (suggestion, onApplyToTransactions, onApplyToBills) => {
+export const applySuggestionToData = async (
+  suggestion,
+  onApplyToTransactions,
+  onApplyToBills,
+) => {
   try {
     if (suggestion.category === "transactions" && onApplyToTransactions) {
       await onApplyToTransactions(suggestion);
@@ -156,7 +164,7 @@ export const validateCategoryName = (name) => {
 
   if (name && !/^[a-zA-Z0-9\s\-_]+$/.test(name)) {
     errors.push(
-      "Category name can only contain letters, numbers, spaces, hyphens, and underscores"
+      "Category name can only contain letters, numbers, spaces, hyphens, and underscores",
     );
   }
 

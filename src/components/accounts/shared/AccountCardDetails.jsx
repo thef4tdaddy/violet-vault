@@ -1,7 +1,12 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const AccountCardDetails = ({ account, expirationStatus, showBalances, onStartTransfer }) => (
+const AccountCardDetails = ({
+  account,
+  expirationStatus,
+  showBalances,
+  onStartTransfer,
+}) => (
   <>
     <div className="space-y-2">
       <div className="flex justify-between items-center">
@@ -15,7 +20,9 @@ const AccountCardDetails = ({ account, expirationStatus, showBalances, onStartTr
         <div className="flex justify-between items-center">
           <span className="text-xs text-gray-600">Annual Contribution:</span>
           <span className="text-xs text-gray-700">
-            {showBalances ? `$${account.annualContribution.toFixed(2)}` : "••••"}
+            {showBalances
+              ? `$${account.annualContribution.toFixed(2)}`
+              : "••••"}
           </span>
         </div>
       )}

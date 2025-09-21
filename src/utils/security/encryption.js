@@ -15,7 +15,7 @@ export const encryptionUtils = {
       encoder.encode(password),
       { name: "PBKDF2" },
       false,
-      ["deriveBits", "deriveKey"]
+      ["deriveBits", "deriveKey"],
     );
 
     const key = await safeCryptoOperation(
@@ -29,7 +29,7 @@ export const encryptionUtils = {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
 
     return key;
@@ -43,12 +43,16 @@ export const encryptionUtils = {
       encoder.encode(password),
       { name: "PBKDF2" },
       false,
-      ["deriveBits", "deriveKey"]
+      ["deriveBits", "deriveKey"],
     );
 
     // Generate deterministic salt from password to ensure same password = same key
     const passwordBytes = encoder.encode(password + "VioletVault_Salt");
-    const saltHash = await safeCryptoOperation("digest", "SHA-256", passwordBytes);
+    const saltHash = await safeCryptoOperation(
+      "digest",
+      "SHA-256",
+      passwordBytes,
+    );
     const salt = new Uint8Array(saltHash.slice(0, 16));
 
     const key = await safeCryptoOperation(
@@ -62,7 +66,7 @@ export const encryptionUtils = {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
 
     return { key, salt };
@@ -79,7 +83,7 @@ export const encryptionUtils = {
       "encrypt",
       { name: "AES-GCM", iv: iv },
       key,
-      encoder.encode(stringData)
+      encoder.encode(stringData),
     );
 
     return {
@@ -107,7 +111,7 @@ export const encryptionUtils = {
         "decrypt",
         { name: "AES-GCM", iv: new Uint8Array(iv) },
         key,
-        new Uint8Array(encryptedData)
+        new Uint8Array(encryptedData),
       );
 
       const decoder = new TextDecoder();
@@ -130,7 +134,7 @@ export const encryptionUtils = {
       "decrypt",
       { name: "AES-GCM", iv: new Uint8Array(iv) },
       key,
-      new Uint8Array(encryptedData)
+      new Uint8Array(encryptedData),
     );
 
     const decoder = new TextDecoder();
@@ -168,7 +172,9 @@ export const encryptionUtils = {
     // NEW: Deterministic budget ID using password + share code
     // Replaces device-specific system with user-controlled share codes
     if (!shareCode) {
-      throw new Error("Share code is required for deterministic budget ID generation");
+      throw new Error(
+        "Share code is required for deterministic budget ID generation",
+      );
     }
 
     // Import and validate share code
@@ -176,13 +182,15 @@ export const encryptionUtils = {
     const normalizedShareCode = shareCodeUtils.normalizeShareCode(shareCode);
 
     if (!shareCodeUtils.validateShareCode(normalizedShareCode)) {
-      throw new Error("Invalid share code format - must be exactly 4 valid words");
+      throw new Error(
+        "Invalid share code format - must be exactly 4 valid words",
+      );
     }
 
     // Use SHA-256 with password + share code for deterministic cross-device budget ID
     const encoder = new TextEncoder();
     const data = encoder.encode(
-      `budget_seed_${masterPassword}_${normalizedShareCode}_violet_vault`
+      `budget_seed_${masterPassword}_${normalizedShareCode}_violet_vault`,
     );
     const hashBuffer = await safeCryptoOperation("digest", "SHA-256", data);
     const hashArray = new Uint8Array(hashBuffer);
@@ -196,7 +204,8 @@ export const encryptionUtils = {
 
     logger.info("Generated deterministic budget ID", {
       budgetIdPreview: budgetId.substring(0, 10) + "...",
-      shareCodePreview: normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+      shareCodePreview:
+        normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
     });
 
     return budgetId;
@@ -230,7 +239,7 @@ export const encryptionUtils = {
         "encrypt",
         { name: "AES-GCM", iv: iv },
         key,
-        compressedData
+        compressedData,
       );
 
       const duration = performance.now() - startTime;
@@ -239,8 +248,10 @@ export const encryptionUtils = {
         originalSize: analysis.originalSize,
         compressedSize: compressedData.length,
         encryptedSize: encrypted.byteLength,
-        compressionRatio: (analysis.originalSize / compressedData.length).toFixed(2) + "x",
-        totalReduction: (analysis.originalSize / encrypted.byteLength).toFixed(2) + "x",
+        compressionRatio:
+          (analysis.originalSize / compressedData.length).toFixed(2) + "x",
+        totalReduction:
+          (analysis.originalSize / encrypted.byteLength).toFixed(2) + "x",
         duration: Math.round(duration) + "ms",
       });
 
@@ -274,11 +285,13 @@ export const encryptionUtils = {
         "decrypt",
         { name: "AES-GCM", iv: new Uint8Array(iv) },
         key,
-        new Uint8Array(encryptedData)
+        new Uint8Array(encryptedData),
       );
 
       // Step 2: Deserialize (decompress + MessagePack decode + JSON parse)
-      const data = optimizedSerialization.deserialize(new Uint8Array(decrypted));
+      const data = optimizedSerialization.deserialize(
+        new Uint8Array(decrypted),
+      );
 
       const duration = performance.now() - startTime;
 

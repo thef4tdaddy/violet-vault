@@ -50,7 +50,9 @@ const EditLockIndicator = ({
           className: "h-4 w-4 text-green-600",
         })}
         <div className="flex-1">
-          <p className="text-sm font-medium text-green-900">You are editing this record</p>
+          <p className="text-sm font-medium text-green-900">
+            You are editing this record
+          </p>
           {showDetails && timeRemaining > 0 && (
             <p className="text-xs text-green-700">
               {secondsRemaining > 60

@@ -57,7 +57,9 @@ export const generateNewUserBudgetId = async (password, shareCode) => {
   const { encryptionUtils } = await import("../security/encryption");
 
   if (!shareCode) {
-    throw new Error("Share code missing from user data - should be provided by setup flow");
+    throw new Error(
+      "Share code missing from user data - should be provided by setup flow",
+    );
   }
 
   const budgetId = await encryptionUtils.generateBudgetId(password, shareCode);

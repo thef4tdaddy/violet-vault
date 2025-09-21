@@ -10,7 +10,7 @@ export const useConnectionData = (
   currentEntity,
   bills,
   envelopes,
-  _debts
+  _debts,
 ) => {
   // Get current connections based on entity type
   const currentConnections = useMemo(() => {
@@ -39,13 +39,19 @@ export const useConnectionData = (
   const availableOptions = useMemo(() => {
     switch (entityType) {
       case "bill":
-        return envelopes.filter((envelope) => !envelope.billId || envelope.billId === entityId);
+        return envelopes.filter(
+          (envelope) => !envelope.billId || envelope.billId === entityId,
+        );
 
       case "envelope":
-        return bills.filter((bill) => !bill.envelopeId || bill.envelopeId === entityId);
+        return bills.filter(
+          (bill) => !bill.envelopeId || bill.envelopeId === entityId,
+        );
 
       case "debt":
-        return envelopes.filter((envelope) => !envelope.debtId || envelope.debtId === entityId);
+        return envelopes.filter(
+          (envelope) => !envelope.debtId || envelope.debtId === entityId,
+        );
 
       default:
         return [];

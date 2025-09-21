@@ -5,7 +5,11 @@ import { getIcon } from "../../utils";
  * Conflict resolution modal component
  * Extracted from Layout.jsx for better organization
  */
-const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }) => {
+const ConflictResolutionModal = ({
+  syncConflicts,
+  onResolveConflict,
+  onDismiss,
+}) => {
   if (!syncConflicts?.hasConflict) return null;
 
   return (
@@ -22,12 +26,13 @@ const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }
           </div>
 
           <h3 className="font-black text-black text-base mb-4">
-            <span className="text-lg">S</span>YNC <span className="text-lg">C</span>ONFLICT{" "}
+            <span className="text-lg">S</span>YNC{" "}
+            <span className="text-lg">C</span>ONFLICT{" "}
             <span className="text-lg">D</span>ETECTED
           </h3>
           <p className="text-gray-600 mb-6">
-            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another device.
-            Would you like to load their latest changes?
+            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on
+            another device. Would you like to load their latest changes?
           </p>
 
           <div className="flex gap-3">

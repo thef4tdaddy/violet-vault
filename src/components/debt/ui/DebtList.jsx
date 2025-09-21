@@ -80,7 +80,9 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
               </div>
 
               {/* Status Badge */}
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyle}`}>
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyle}`}
+              >
                 {statusText}
               </span>
             </div>
@@ -90,7 +92,9 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
               {/* Current Balance */}
               <div>
                 <p className="text-xs text-gray-500">Current Balance</p>
-                <p className="text-base md:text-lg font-bold text-red-600">${currentBalance}</p>
+                <p className="text-base md:text-lg font-bold text-red-600">
+                  ${currentBalance}
+                </p>
               </div>
 
               {/* Payment */}

@@ -40,11 +40,16 @@ const UserSetupStep = ({
             <>
               <p className="text-xs text-green-700 mt-1">
                 Created by:{" "}
-                <strong style={{ color: creatorInfo.userColor }}>{creatorInfo.userName}</strong>
+                <strong style={{ color: creatorInfo.userColor }}>
+                  {creatorInfo.userName}
+                </strong>
               </p>
               <p className="text-xs text-green-700">
                 {creatorInfo.createdAt && (
-                  <>Shared: {new Date(creatorInfo.createdAt).toLocaleDateString()}</>
+                  <>
+                    Shared:{" "}
+                    {new Date(creatorInfo.createdAt).toLocaleDateString()}
+                  </>
                 )}
               </p>
               <p className="text-xs text-green-600 mt-2">
@@ -56,7 +61,9 @@ const UserSetupStep = ({
               <p className="text-xs text-green-700 mt-1">
                 Type: <strong>Deterministic Budget</strong>
               </p>
-              <p className="text-xs text-green-700">Access: {shareInfo.userCount}</p>
+              <p className="text-xs text-green-700">
+                Access: {shareInfo.userCount}
+              </p>
               <p className="text-xs text-green-600 mt-2">
                 Same code + password = same budget across devices
               </p>
@@ -128,8 +135,8 @@ const UserSetupStep = ({
               </button>
             </div>
             <p className="text-xs text-purple-900">
-              This password encrypts your budget data. Use the same password as the person who
-              shared this code.
+              This password encrypts your budget data. Use the same password as
+              the person who shared this code.
             </p>
           </div>
         </div>

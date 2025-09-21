@@ -27,7 +27,9 @@ export const shareCodeUtils = {
 
       // Validate that our own generated words are valid
       const wordlist = bip39.wordlists.english;
-      const invalidGenerated = words.filter((word) => !wordlist.includes(word.toLowerCase()));
+      const invalidGenerated = words.filter(
+        (word) => !wordlist.includes(word.toLowerCase()),
+      );
 
       logger.info("Generated new share code", {
         wordCount: words.length,
@@ -84,7 +86,9 @@ export const shareCodeUtils = {
       sampleWord: wordlist?.includes("abandon"), // 'abandon' is first BIP39 word
     });
 
-    const invalidWords = words.filter((word) => !wordlist.includes(word.toLowerCase()));
+    const invalidWords = words.filter(
+      (word) => !wordlist.includes(word.toLowerCase()),
+    );
 
     if (invalidWords.length > 0) {
       logger.debug("Share code validation failed - invalid words", {
@@ -121,19 +125,25 @@ export const shareCodeUtils = {
    */
   async generateBudgetId(password, shareCode) {
     if (!password || !shareCode) {
-      throw new Error("Both password and share code are required for budget ID generation");
+      throw new Error(
+        "Both password and share code are required for budget ID generation",
+      );
     }
 
     const normalizedShareCode = this.normalizeShareCode(shareCode);
 
     if (!this.validateShareCode(normalizedShareCode)) {
-      throw new Error("Invalid share code format - must be exactly 4 valid words");
+      throw new Error(
+        "Invalid share code format - must be exactly 4 valid words",
+      );
     }
 
     try {
       // Use SHA-256 with password + normalized share code for deterministic budget ID
       const encoder = new TextEncoder();
-      const data = encoder.encode(`budget_seed_${password}_${normalizedShareCode}_violet_vault`);
+      const data = encoder.encode(
+        `budget_seed_${password}_${normalizedShareCode}_violet_vault`,
+      );
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = new Uint8Array(hashBuffer);
 
@@ -146,7 +156,8 @@ export const shareCodeUtils = {
 
       logger.info("Generated deterministic budget ID", {
         budgetIdPreview: budgetId.substring(0, 10) + "...",
-        shareCodePreview: normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+        shareCodePreview:
+          normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
       });
 
       return budgetId;

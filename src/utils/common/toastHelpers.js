@@ -17,7 +17,8 @@ import { useToastStore } from "../../stores/ui/toastStore";
  * showErrorToast("Failed to save data", "Save Error");
  */
 export const useToastHelpers = () => {
-  const { showSuccess, showError, showWarning, showInfo, showPayday } = useToastStore();
+  const { showSuccess, showError, showWarning, showInfo, showPayday } =
+    useToastStore();
 
   return {
     showSuccessToast: showSuccess,
@@ -99,19 +100,28 @@ export const TOAST_MESSAGES = {
  */
 export const quickToast = {
   // Auth toasts
-  loginSuccess: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.AUTH.LOGIN_SUCCESS),
-  passwordUpdated: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.AUTH.PASSWORD_UPDATED),
-  passwordMismatch: () => useToastStore.getState().showError(TOAST_MESSAGES.AUTH.PASSWORD_MISMATCH),
+  loginSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.AUTH.LOGIN_SUCCESS),
+  passwordUpdated: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.AUTH.PASSWORD_UPDATED),
+  passwordMismatch: () =>
+    useToastStore.getState().showError(TOAST_MESSAGES.AUTH.PASSWORD_MISMATCH),
 
   // Data toasts
-  exportSuccess: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.EXPORT_SUCCESS),
-  importSuccess: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.IMPORT_SUCCESS),
-  saveSuccess: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.SAVE_SUCCESS),
+  exportSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.EXPORT_SUCCESS),
+  importSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.IMPORT_SUCCESS),
+  saveSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.SAVE_SUCCESS),
 
   // Sync toasts
-  syncSuccess: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.SYNC.SUCCESS),
+  syncSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.SYNC.SUCCESS),
   syncFailed: (error) =>
-    useToastStore.getState().showError(`${TOAST_MESSAGES.SYNC.FAILED}: ${error}`),
+    useToastStore
+      .getState()
+      .showError(`${TOAST_MESSAGES.SYNC.FAILED}: ${error}`),
 };
 
 export default {

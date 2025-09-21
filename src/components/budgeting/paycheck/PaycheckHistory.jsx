@@ -2,7 +2,11 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { formatPaycheckAmount } from "../../../utils/budgeting/paycheckUtils";
 
-const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck = () => {} }) => {
+const PaycheckHistory = ({
+  paycheckHistory = [],
+  paycheckStats,
+  onSelectPaycheck = () => {},
+}) => {
   if (paycheckHistory.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
@@ -34,7 +38,9 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
   };
 
   const getModeColor = (mode) => {
-    return mode === "allocate" ? "text-green-600 bg-green-50" : "text-blue-600 bg-blue-50";
+    return mode === "allocate"
+      ? "text-green-600 bg-green-50"
+      : "text-blue-600 bg-blue-50";
   };
 
   return (
@@ -51,7 +57,9 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <span className="text-gray-600 block">Total Processed</span>
-              <span className="font-bold text-gray-900">{paycheckStats.count}</span>
+              <span className="font-bold text-gray-900">
+                {paycheckStats.count}
+              </span>
             </div>
             <div>
               <span className="text-gray-600 block">Average Amount</span>
@@ -97,7 +105,9 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
                   {React.createElement(getIcon("User"), {
                     className: "h-4 w-4 text-gray-500 mr-2",
                   })}
-                  <span className="font-medium text-gray-900">{paycheck.payerName}</span>
+                  <span className="font-medium text-gray-900">
+                    {paycheck.payerName}
+                  </span>
                   <span
                     className={`ml-2 px-2 py-1 text-xs rounded-md ${getModeColor(paycheck.allocationMode)}`}
                   >
@@ -123,7 +133,8 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
                   </span>
                   {paycheck.remainingAmount > 0 && (
                     <span className="text-blue-600 ml-2">
-                      ({formatPaycheckAmount(paycheck.remainingAmount)} remaining)
+                      ({formatPaycheckAmount(paycheck.remainingAmount)}{" "}
+                      remaining)
                     </span>
                   )}
                 </div>

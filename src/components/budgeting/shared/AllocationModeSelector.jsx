@@ -5,10 +5,16 @@ import { getIcon } from "../../../utils";
  * Shared component for allocation mode selection using radio buttons
  * Follows the CSS Grid pattern from docs/UI-Component-Patterns.md
  */
-const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled = false }) => {
+const AllocationModeSelector = ({
+  autoAllocate,
+  onAutoAllocateChange,
+  disabled = false,
+}) => {
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">Paycheck Allocation</label>
+      <label className="block text-sm font-medium text-gray-700">
+        Paycheck Allocation
+      </label>
 
       <div className="space-y-2">
         {/* Auto-allocate option */}
@@ -32,7 +38,8 @@ const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled =
                 <span className="font-medium text-sm">Auto-allocate</span>
               </div>
               <p className="text-xs text-gray-600 leading-tight">
-                Automatically allocate funds from paychecks based on envelope priority
+                Automatically allocate funds from paychecks based on envelope
+                priority
               </p>
             </div>
           </div>

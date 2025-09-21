@@ -13,12 +13,16 @@ const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
         <label className="text-sm font-black text-purple-800 uppercase tracking-wide">
           {label}
         </label>
-        <p className="text-xs text-purple-700 mt-1 font-medium">{description}</p>
+        <p className="text-xs text-purple-700 mt-1 font-medium">
+          {description}
+        </p>
       </div>
       <button
         onClick={onChange}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
-          enabled ? "bg-gradient-to-r from-blue-500 to-purple-600" : "bg-gray-300"
+          enabled
+            ? "bg-gradient-to-r from-blue-500 to-purple-600"
+            : "bg-gray-300"
         }`}
       >
         <span
@@ -45,7 +49,12 @@ const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
         {/* Enable Auto-Lock Toggle */}
         <ToggleSwitch
           enabled={securitySettings.autoLockEnabled}
-          onChange={() => handleSettingChange("autoLockEnabled", !securitySettings.autoLockEnabled)}
+          onChange={() =>
+            handleSettingChange(
+              "autoLockEnabled",
+              !securitySettings.autoLockEnabled,
+            )
+          }
           label="Enable Auto-Lock"
           description="Automatically lock the app after period of inactivity"
         />
@@ -66,7 +75,12 @@ const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
                 min="1"
                 max="120"
                 value={securitySettings.autoLockTimeout}
-                onChange={(e) => handleSettingChange("autoLockTimeout", parseInt(e.target.value))}
+                onChange={(e) =>
+                  handleSettingChange(
+                    "autoLockTimeout",
+                    parseInt(e.target.value),
+                  )
+                }
                 className="w-full h-3 bg-gradient-to-r from-orange-200 to-orange-400 rounded-lg appearance-none cursor-pointer slider-thumb"
                 style={{
                   background: `linear-gradient(to right, #fb923c 0%, #fb923c ${(securitySettings.autoLockTimeout / 120) * 100}%, #fed7aa ${(securitySettings.autoLockTimeout / 120) * 100}%, #fed7aa 100%)`,
@@ -84,7 +98,12 @@ const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
         {/* Lock on Page Hide Toggle */}
         <ToggleSwitch
           enabled={securitySettings.lockOnPageHide}
-          onChange={() => handleSettingChange("lockOnPageHide", !securitySettings.lockOnPageHide)}
+          onChange={() =>
+            handleSettingChange(
+              "lockOnPageHide",
+              !securitySettings.lockOnPageHide,
+            )
+          }
           label="Lock on Page Hide"
           description="Lock when switching tabs or minimizing window"
         />

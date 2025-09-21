@@ -16,7 +16,8 @@ export const useAutoFundingExecution = () => {
   const [lastExecution, setLastExecution] = useState(null);
 
   // Use focused sub-hooks
-  const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budget);
+  const { executeRulesWithContext, executeSingleRule } =
+    useRuleExecution(budget);
   const {
     executeTransfer,
     simulateExecution,
@@ -55,7 +56,11 @@ export const useAutoFundingExecution = () => {
           availableCash: context.data.unassignedCash,
         });
 
-        const result = await executeRulesWithContext(rules, context, executeTransfer);
+        const result = await executeRulesWithContext(
+          rules,
+          context,
+          executeTransfer,
+        );
 
         if (result.success) {
           setLastExecution(result.execution);
@@ -77,7 +82,7 @@ export const useAutoFundingExecution = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting, executeRulesWithContext, executeTransfer]
+    [budget, isExecuting, executeRulesWithContext, executeTransfer],
   );
 
   return {

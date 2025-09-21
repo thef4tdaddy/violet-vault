@@ -14,7 +14,9 @@ export const validatePaycheckDeletion = (paycheckId, paycheckHistory) => {
 
   const paycheckToDelete = paycheckHistory.find((p) => p.id === paycheckId);
   if (!paycheckToDelete) {
-    throw new Error(`Paycheck with ID ${paycheckId} not found in paycheckHistory`);
+    throw new Error(
+      `Paycheck with ID ${paycheckId} not found in paycheckHistory`,
+    );
   }
 
   logger.info("Found paycheck to delete", {
@@ -30,8 +32,14 @@ export const validatePaycheckDeletion = (paycheckId, paycheckHistory) => {
 /**
  * Reverse envelope allocations for deleted paycheck
  */
-export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => {
-  if (paycheckToDelete.mode !== "allocate" || !paycheckToDelete.envelopeAllocations) {
+export const reverseEnvelopeAllocations = async (
+  paycheckToDelete,
+  budgetDb,
+) => {
+  if (
+    paycheckToDelete.mode !== "allocate" ||
+    !paycheckToDelete.envelopeAllocations
+  ) {
     return 0;
   }
 
@@ -42,7 +50,10 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => 
     const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
     if (envelope) {
       await budgetDb.envelopes.update(allocation.envelopeId, {
-        currentBalance: Math.max(0, (envelope.currentBalance || 0) - allocation.amount),
+        currentBalance: Math.max(
+          0,
+          (envelope.currentBalance || 0) - allocation.amount,
+        ),
       });
       logger.debug("Reversed envelope allocation", {
         envelopeId: allocation.envelopeId,
@@ -54,7 +65,7 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => 
   // Calculate how much went to unassigned cash originally
   const totalAllocated = paycheckToDelete.envelopeAllocations.reduce(
     (sum, alloc) => sum + alloc.amount,
-    0
+    0,
   );
   return paycheckToDelete.amount - totalAllocated;
 };
@@ -62,7 +73,11 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => 
 /**
  * Calculate new balances after paycheck deletion
  */
-export const calculateReversedBalances = async (paycheckToDelete, budgetDb, getBudgetMetadata) => {
+export const calculateReversedBalances = async (
+  paycheckToDelete,
+  budgetDb,
+  getBudgetMetadata,
+) => {
   // Get current metadata
   const currentMetadata = await getBudgetMetadata();
   const currentActualBalance = currentMetadata?.actualBalance || 0;
@@ -73,13 +88,22 @@ export const calculateReversedBalances = async (paycheckToDelete, budgetDb, getB
   let newUnassignedCash = currentUnassignedCash;
 
   // Handle envelope balance reversals if this was an "allocate" paycheck
-  if (paycheckToDelete.mode === "allocate" && paycheckToDelete.envelopeAllocations) {
-    const leftoverAmount = await reverseEnvelopeAllocations(paycheckToDelete, budgetDb);
+  if (
+    paycheckToDelete.mode === "allocate" &&
+    paycheckToDelete.envelopeAllocations
+  ) {
+    const leftoverAmount = await reverseEnvelopeAllocations(
+      paycheckToDelete,
+      budgetDb,
+    );
     newUnassignedCash = Math.max(0, currentUnassignedCash - leftoverAmount);
   } else {
     logger.info("Reversing leftover mode paycheck from unassigned cash");
     // "leftover" mode - all went to unassigned cash, so subtract it all
-    newUnassignedCash = Math.max(0, currentUnassignedCash - paycheckToDelete.amount);
+    newUnassignedCash = Math.max(
+      0,
+      currentUnassignedCash - paycheckToDelete.amount,
+    );
   }
 
   return {

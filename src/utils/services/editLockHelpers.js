@@ -38,7 +38,13 @@ export const generateUserId = (currentUser) => {
 /**
  * Create lock document structure
  */
-export const createLockDocument = (recordType, recordId, budgetId, currentUser, options = {}) => {
+export const createLockDocument = (
+  recordType,
+  recordId,
+  budgetId,
+  currentUser,
+  options = {},
+) => {
   const lockId = `${recordType}_${recordId}`;
   const userId = generateUserId(currentUser);
 
@@ -58,7 +64,11 @@ export const createLockDocument = (recordType, recordId, budgetId, currentUser, 
 /**
  * Handle existing lock scenarios
  */
-export const handleExistingLock = async (existingLock, currentUser, releaseLockFn) => {
+export const handleExistingLock = async (
+  existingLock,
+  currentUser,
+  releaseLockFn,
+) => {
   if (!existingLock) {
     return { action: "acquire_new" };
   }
@@ -109,10 +119,13 @@ export const handleLockError = (error, currentUser, budgetId) => {
     error.code === "permission-denied" ||
     error.message?.includes("Missing or insufficient permissions")
   ) {
-    logger.warn("❌ Edit locks unavailable - insufficient Firebase permissions", {
-      userId: currentUser?.id,
-      budgetId: budgetId?.slice(0, 8),
-    });
+    logger.warn(
+      "❌ Edit locks unavailable - insufficient Firebase permissions",
+      {
+        userId: currentUser?.id,
+        budgetId: budgetId?.slice(0, 8),
+      },
+    );
     return { success: true, reason: "locks_disabled", lockDoc: null };
   }
 

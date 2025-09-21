@@ -36,13 +36,14 @@ const InstallPromptModal = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            📱 <span className="text-2xl">I</span>NSTALL <span className="text-2xl">V</span>IOLET
+            📱 <span className="text-2xl">I</span>NSTALL{" "}
+            <span className="text-2xl">V</span>IOLET
             <span className="text-2xl">V</span>AULT
           </h2>
 
           <p className="text-purple-900 text-sm leading-relaxed">
-            Install VioletVault on your device for a better experience with offline access and quick
-            launch.
+            Install VioletVault on your device for a better experience with
+            offline access and quick launch.
           </p>
         </div>
 
@@ -65,7 +66,9 @@ const InstallPromptModal = () => {
               {React.createElement(getIcon("Zap"), {
                 className: "w-4 h-4 text-purple-600 flex-shrink-0",
               })}
-              <span className="text-gray-700">Faster loading and performance</span>
+              <span className="text-gray-700">
+                Faster loading and performance
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               {React.createElement(getIcon("Home"), {

@@ -3,7 +3,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUnassignedCash } from "./useBudgetMetadata";
 import useEnvelopes from "./useEnvelopes";
 import useBills from "../bills/useBills";
-import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import {
+  ENVELOPE_TYPES,
+  AUTO_CLASSIFY_ENVELOPE_TYPE,
+} from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import { budgetDb } from "../../db/budgetDb";
 import { queryKeys } from "../../utils/common/queryClient";
@@ -29,7 +32,10 @@ const useUnassignedCashDistribution = () => {
 
   // Calculate total being distributed
   const totalDistributed = useMemo(() => {
-    return Object.values(distributions).reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
+    return Object.values(distributions).reduce(
+      (sum, amount) => sum + (parseFloat(amount) || 0),
+      0,
+    );
   }, [distributions]);
 
   // Calculate remaining unassigned cash
@@ -66,7 +72,8 @@ const useUnassignedCashDistribution = () => {
   const distributeEqually = useCallback(() => {
     if (envelopes.length === 0) return;
 
-    const amountPerEnvelope = Math.floor((unassignedCash * 100) / envelopes.length) / 100;
+    const amountPerEnvelope =
+      Math.floor((unassignedCash * 100) / envelopes.length) / 100;
     const newDistributions = {};
 
     envelopes.forEach((envelope) => {
@@ -82,17 +89,28 @@ const useUnassignedCashDistribution = () => {
 
     // Calculate total budget across all envelope types
     const totalBudget = envelopes.reduce((sum, env) => {
-      const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+      const envelopeType =
+        env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
       if (envelopeType === ENVELOPE_TYPES.BILL) {
         // For bills, use biweeklyAllocation (convert to monthly equivalent)
-        return sum + (env.biweeklyAllocation ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 0);
+        return (
+          sum +
+          (env.biweeklyAllocation
+            ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER
+            : 0)
+        );
       } else if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
         // For variables, use monthlyBudget
         return sum + (env.monthlyBudget || env.monthlyAmount || 0);
       } else if (envelopeType === ENVELOPE_TYPES.SAVINGS) {
         // For savings, use biweeklyAllocation or a reasonable monthly contribution
-        return sum + (env.biweeklyAllocation ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 50);
+        return (
+          sum +
+          (env.biweeklyAllocation
+            ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER
+            : 50)
+        );
       }
       return sum;
     }, 0);
@@ -106,7 +124,8 @@ const useUnassignedCashDistribution = () => {
     const newDistributions = {};
 
     envelopes.forEach((envelope) => {
-      const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+      const envelopeType =
+        envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
       let monthlyBudget = 0;
 
       if (envelopeType === ENVELOPE_TYPES.BILL) {
@@ -142,7 +161,7 @@ const useUnassignedCashDistribution = () => {
     const billEnvelopes = envelopes.filter(
       (env) =>
         env.envelopeType === ENVELOPE_TYPES.BILL ||
-        AUTO_CLASSIFY_ENVELOPE_TYPE(env.category) === ENVELOPE_TYPES.BILL
+        AUTO_CLASSIFY_ENVELOPE_TYPE(env.category) === ENVELOPE_TYPES.BILL,
     );
 
     if (billEnvelopes.length === 0) {
@@ -154,7 +173,11 @@ const useUnassignedCashDistribution = () => {
     // Calculate priorities and recommendations for each bill envelope
     const envelopeRecommendations = billEnvelopes.map((envelope) => {
       const priority = calculateBillEnvelopePriority(envelope, bills);
-      const recommendation = getRecommendedBillFunding(envelope, bills, unassignedCash);
+      const recommendation = getRecommendedBillFunding(
+        envelope,
+        bills,
+        unassignedCash,
+      );
 
       return {
         envelope,
@@ -173,23 +196,27 @@ const useUnassignedCashDistribution = () => {
     let remainingCash = unassignedCash;
 
     // First pass: Fund urgent/critical envelopes fully
-    envelopeRecommendations.forEach(({ envelope, recommendedAmount, isUrgent }) => {
-      if (isUrgent && remainingCash >= recommendedAmount) {
-        newDistributions[envelope.id] = recommendedAmount;
-        remainingCash -= recommendedAmount;
-      }
-    });
+    envelopeRecommendations.forEach(
+      ({ envelope, recommendedAmount, isUrgent }) => {
+        if (isUrgent && remainingCash >= recommendedAmount) {
+          newDistributions[envelope.id] = recommendedAmount;
+          remainingCash -= recommendedAmount;
+        }
+      },
+    );
 
     // Second pass: Fund other envelopes based on availability
-    envelopeRecommendations.forEach(({ envelope, recommendedAmount, isUrgent }) => {
-      if (!isUrgent && remainingCash > 0) {
-        const amountToAllocate = Math.min(recommendedAmount, remainingCash);
-        if (amountToAllocate > 0) {
-          newDistributions[envelope.id] = amountToAllocate;
-          remainingCash -= amountToAllocate;
+    envelopeRecommendations.forEach(
+      ({ envelope, recommendedAmount, isUrgent }) => {
+        if (!isUrgent && remainingCash > 0) {
+          const amountToAllocate = Math.min(recommendedAmount, remainingCash);
+          if (amountToAllocate > 0) {
+            newDistributions[envelope.id] = amountToAllocate;
+            remainingCash -= amountToAllocate;
+          }
         }
-      }
-    });
+      },
+    );
 
     setDistributions(newDistributions);
   }, [envelopes, bills, unassignedCash, distributeProportionally]);
@@ -211,7 +238,8 @@ const useUnassignedCashDistribution = () => {
           if (envelope) {
             envelopeUpdates.push({
               ...envelope,
-              currentBalance: (envelope.currentBalance || 0) + distributionAmount,
+              currentBalance:
+                (envelope.currentBalance || 0) + distributionAmount,
             });
           }
         }

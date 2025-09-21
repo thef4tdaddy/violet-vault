@@ -9,7 +9,7 @@ import { hapticFeedback } from "../../utils/ui/touchFeedback";
  */
 export const usePullToRefresh = (
   onRefresh,
-  { threshold = 80, resistance = 2.5, enabled = true } = {}
+  { threshold = 80, resistance = 2.5, enabled = true } = {},
 ) => {
   const [isPulling, setIsPulling] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);

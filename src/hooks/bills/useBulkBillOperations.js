@@ -1,12 +1,20 @@
 import { useCallback } from "react";
 import logger from "../../utils/common/logger";
-import { executeBillUpdate, processBulkOperation } from "../../utils/bills/billUpdateHelpers";
+import {
+  executeBillUpdate,
+  processBulkOperation,
+} from "../../utils/bills/billUpdateHelpers";
 
 /**
  * Hook for bulk bill operations (updates and payments)
  * Extracted from useBillOperations.js to reduce complexity
  */
-export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handlePayBill }) => {
+export const useBulkBillOperations = ({
+  updateBill,
+  onUpdateBill,
+  budget,
+  handlePayBill,
+}) => {
   /**
    * Handle bulk bill updates (amounts, due dates, or both)
    */
@@ -21,7 +29,11 @@ export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handle
         await executeBillUpdate(bill, { updateBill, onUpdateBill, budget });
       };
 
-      const result = await processBulkOperation(updatedBills, "bill update", updateSingleBill);
+      const result = await processBulkOperation(
+        updatedBills,
+        "bill update",
+        updateSingleBill,
+      );
 
       if (result.success && result.errorCount === 0) {
         logger.info(`Bulk update completed`, {
@@ -31,7 +43,7 @@ export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handle
 
       return result;
     },
-    [updateBill, onUpdateBill, budget]
+    [updateBill, onUpdateBill, budget],
   );
 
   /**
@@ -46,7 +58,11 @@ export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handle
         }
       };
 
-      const result = await processBulkOperation(billIds, "bill payment", paySingleBill);
+      const result = await processBulkOperation(
+        billIds,
+        "bill payment",
+        paySingleBill,
+      );
 
       if (result.success && result.errorCount === 0) {
         logger.info(`Bulk payment completed`, {
@@ -56,7 +72,7 @@ export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handle
 
       return result;
     },
-    [handlePayBill]
+    [handlePayBill],
   );
 
   return {

@@ -14,6 +14,7 @@ Comprehensive guide to safe Zustand patterns that prevent React error #185 and e
 This is the **#1 cause** of React error #185 ("Maximum update depth exceeded").
 
 #### ❌ DANGEROUS - Causes Infinite Loops
+
 ```javascript
 const useDangerousStore = create((set, get) => ({
   count: 0,
@@ -28,11 +29,12 @@ const useDangerousStore = create((set, get) => ({
   saveCount: async () => {
     const state = get(); // Dangerous in async operations
     await api.save(state.count);
-  }
+  },
 }));
 ```
 
 #### ✅ SAFE - Prevents React Error #185
+
 ```javascript
 const useSafeStore = create((set) => ({
   count: 0,
@@ -44,7 +46,7 @@ const useSafeStore = create((set) => ({
   saveCount: async () => {
     const state = useSafeStore.getState(); // Safe external access
     await api.save(state.count);
-  }
+  },
 }));
 ```
 
@@ -58,14 +60,14 @@ For complex async operations that need to call multiple store actions:
 const useAsyncStore = create((set) => {
   // Store object for safe cross-references
   const store = {
-    status: 'idle',
+    status: "idle",
     data: null,
     error: null,
 
     // Safe async action
     fetchData: async (id) => {
       // Set loading state
-      set({ status: 'loading', error: null });
+      set({ status: "loading", error: null });
 
       try {
         const response = await api.fetchData(id);
@@ -73,23 +75,22 @@ const useAsyncStore = create((set) => {
         // ✅ SAFE - Use store reference for subsequent actions
         store.setData(response.data);
         store.scheduleRefresh(response.refreshInterval);
-
       } catch (error) {
         // ✅ SAFE - Error handling with store reference
         store.setError(error.message);
       }
     },
 
-    setData: (data) => set({ data, status: 'success' }),
+    setData: (data) => set({ data, status: "success" }),
 
-    setError: (error) => set({ error, status: 'error' }),
+    setError: (error) => set({ error, status: "error" }),
 
     scheduleRefresh: (interval) => {
       // ✅ SAFE - setTimeout with store reference
       setTimeout(() => {
         store.fetchData(store.lastFetchedId);
       }, interval);
-    }
+    },
   };
 
   return store;
@@ -110,21 +111,22 @@ const useSimpleAsyncStore = create((set) => ({
 
     // Add to store
     set((state) => ({
-      notifications: [...state.notifications, newNotification]
+      notifications: [...state.notifications, newNotification],
     }));
 
     // ✅ SAFE - Auto-remove with external access
     setTimeout(() => {
       const currentState = useSimpleAsyncStore.getState();
       set({
-        notifications: currentState.notifications.filter(n => n.id !== id)
+        notifications: currentState.notifications.filter((n) => n.id !== id),
       });
     }, notification.duration || 5000);
   },
 
-  removeNotification: (id) => set((state) => ({
-    notifications: state.notifications.filter(n => n.id !== id)
-  }))
+  removeNotification: (id) =>
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== id),
+    })),
 }));
 ```
 
@@ -138,14 +140,14 @@ Always subscribe to specific values, never the entire store:
 // ✅ OPTIMAL - Selective subscriptions
 const OptimizedComponent = () => {
   // Each subscription is specific and optimized
-  const username = useUserStore(state => state.username);
-  const isOnline = useStatusStore(state => state.isOnline);
-  const notifications = useNotificationStore(state => state.notifications);
+  const username = useUserStore((state) => state.username);
+  const isOnline = useStatusStore((state) => state.isOnline);
+  const notifications = useNotificationStore((state) => state.notifications);
 
   return (
     <div>
       <h1>Welcome, {username}</h1>
-      <div>Status: {isOnline ? 'Online' : 'Offline'}</div>
+      <div>Status: {isOnline ? "Online" : "Offline"}</div>
       <NotificationList notifications={notifications} />
     </div>
   );
@@ -159,7 +161,7 @@ const SlowComponent = () => {
   return (
     <div>
       <h1>Welcome, {userStore.username}</h1>
-      <div>Status: {statusStore.isOnline ? 'Online' : 'Offline'}</div>
+      <div>Status: {statusStore.isOnline ? "Online" : "Offline"}</div>
     </div>
   );
 };
@@ -173,13 +175,13 @@ Use selectors for derived values:
 // ✅ EFFICIENT - Computed selectors
 const CartSummary = () => {
   // Memoized selectors prevent unnecessary re-renders
-  const itemCount = useCartStore(state => state.items.length);
+  const itemCount = useCartStore((state) => state.items.length);
 
-  const totalPrice = useCartStore(state =>
-    state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const totalPrice = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
 
-  const hasItems = useCartStore(state => state.items.length > 0);
+  const hasItems = useCartStore((state) => state.items.length > 0);
 
   return (
     <div>
@@ -199,28 +201,31 @@ Separate action binding from state subscriptions:
 // ✅ CLEAN SEPARATION - Actions and state separated
 const TodoList = () => {
   // State subscriptions
-  const todos = useTodoStore(state => state.todos);
-  const filter = useTodoStore(state => state.filter);
+  const todos = useTodoStore((state) => state.todos);
+  const filter = useTodoStore((state) => state.filter);
 
   // Action bindings (don't cause re-renders)
-  const actions = useTodoStore(state => ({
+  const actions = useTodoStore((state) => ({
     addTodo: state.addTodo,
     toggleTodo: state.toggleTodo,
     deleteTodo: state.deleteTodo,
-    setFilter: state.setFilter
+    setFilter: state.setFilter,
   }));
 
   const filteredTodos = useMemo(() => {
-    return todos.filter(todo => {
-      if (filter === 'completed') return todo.completed;
-      if (filter === 'active') return !todo.completed;
+    return todos.filter((todo) => {
+      if (filter === "completed") return todo.completed;
+      if (filter === "active") return !todo.completed;
       return true;
     });
   }, [todos, filter]);
 
   return (
     <div>
-      <FilterButtons onFilterChange={actions.setFilter} currentFilter={filter} />
+      <FilterButtons
+        onFilterChange={actions.setFilter}
+        currentFilter={filter}
+      />
       <TodoItems
         todos={filteredTodos}
         onToggle={actions.toggleTodo}
@@ -244,12 +249,12 @@ const useAppSettingsStore = create(
   persist(
     (set) => ({
       // Persistent settings
-      theme: 'light',
-      language: 'en',
+      theme: "light",
+      language: "en",
       notifications: {
         email: true,
         push: false,
-        sounds: true
+        sounds: true,
       },
 
       // Simple setters only
@@ -257,26 +262,30 @@ const useAppSettingsStore = create(
 
       setLanguage: (language) => set({ language }),
 
-      updateNotificationSetting: (key, value) => set((state) => ({
-        notifications: {
-          ...state.notifications,
-          [key]: value
-        }
-      })),
+      updateNotificationSetting: (key, value) =>
+        set((state) => ({
+          notifications: {
+            ...state.notifications,
+            [key]: value,
+          },
+        })),
 
       // Bulk update for settings import
-      importSettings: (settings) => set((state) => ({
-        ...state,
-        ...settings,
-        // Validate critical settings
-        theme: ['light', 'dark'].includes(settings.theme) ? settings.theme : state.theme
-      }))
+      importSettings: (settings) =>
+        set((state) => ({
+          ...state,
+          ...settings,
+          // Validate critical settings
+          theme: ["light", "dark"].includes(settings.theme)
+            ? settings.theme
+            : state.theme,
+        })),
     }),
     {
-      name: 'app-settings',
-      version: 1
-    }
-  )
+      name: "app-settings",
+      version: 1,
+    },
+  ),
 );
 ```
 
@@ -288,21 +297,22 @@ For scoped functionality:
 // Feature-specific state (e.g., search, filters, modal state)
 const useSearchStore = create((set, get) => ({
   // Search state
-  query: '',
+  query: "",
   results: [],
   isLoading: false,
   filters: {
-    category: 'all',
-    sortBy: 'relevance',
-    dateRange: null
+    category: "all",
+    sortBy: "relevance",
+    dateRange: null,
   },
 
   // Actions
   setQuery: (query) => set({ query }),
 
-  setFilters: (filters) => set((state) => ({
-    filters: { ...state.filters, ...filters }
-  })),
+  setFilters: (filters) =>
+    set((state) => ({
+      filters: { ...state.filters, ...filters },
+    })),
 
   // ✅ SAFE - Async search with external access
   performSearch: async (searchQuery) => {
@@ -314,34 +324,36 @@ const useSearchStore = create((set, get) => ({
 
       set({
         results,
-        isLoading: false
+        isLoading: false,
       });
     } catch (error) {
       set({
         results: [],
         isLoading: false,
-        error: error.message
+        error: error.message,
       });
     }
   },
 
-  clearSearch: () => set({
-    query: '',
-    results: [],
-    error: null
-  }),
+  clearSearch: () =>
+    set({
+      query: "",
+      results: [],
+      error: null,
+    }),
 
-  reset: () => set({
-    query: '',
-    results: [],
-    isLoading: false,
-    error: null,
-    filters: {
-      category: 'all',
-      sortBy: 'relevance',
-      dateRange: null
-    }
-  })
+  reset: () =>
+    set({
+      query: "",
+      results: [],
+      isLoading: false,
+      error: null,
+      filters: {
+        category: "all",
+        sortBy: "relevance",
+        dateRange: null,
+      },
+    }),
 }));
 ```
 
@@ -363,17 +375,19 @@ const useUIStore = create((set) => {
     loadingStates: new Map(),
 
     // Modal management
-    openModal: (modalId, props = {}) => set((state) => {
-      const newModals = new Map(state.modals);
-      newModals.set(modalId, { isOpen: true, props });
-      return { modals: newModals };
-    }),
+    openModal: (modalId, props = {}) =>
+      set((state) => {
+        const newModals = new Map(state.modals);
+        newModals.set(modalId, { isOpen: true, props });
+        return { modals: newModals };
+      }),
 
-    closeModal: (modalId) => set((state) => {
-      const newModals = new Map(state.modals);
-      newModals.delete(modalId);
-      return { modals: newModals };
-    }),
+    closeModal: (modalId) =>
+      set((state) => {
+        const newModals = new Map(state.modals);
+        newModals.delete(modalId);
+        return { modals: newModals };
+      }),
 
     // ✅ SAFE - Toast with auto-removal
     addToast: (toast) => {
@@ -381,7 +395,7 @@ const useUIStore = create((set) => {
       const newToast = { ...toast, id };
 
       set((state) => ({
-        toasts: [...state.toasts, newToast]
+        toasts: [...state.toasts, newToast],
       }));
 
       // Auto-remove with store reference
@@ -392,20 +406,22 @@ const useUIStore = create((set) => {
       }
     },
 
-    removeToast: (id) => set((state) => ({
-      toasts: state.toasts.filter(t => t.id !== id)
-    })),
+    removeToast: (id) =>
+      set((state) => ({
+        toasts: state.toasts.filter((t) => t.id !== id),
+      })),
 
     // Loading state management
-    setLoading: (key, isLoading) => set((state) => {
-      const newLoadingStates = new Map(state.loadingStates);
-      if (isLoading) {
-        newLoadingStates.set(key, true);
-      } else {
-        newLoadingStates.delete(key);
-      }
-      return { loadingStates: newLoadingStates };
-    })
+    setLoading: (key, isLoading) =>
+      set((state) => {
+        const newLoadingStates = new Map(state.loadingStates);
+        if (isLoading) {
+          newLoadingStates.set(key, true);
+        } else {
+          newLoadingStates.delete(key);
+        }
+        return { loadingStates: newLoadingStates };
+      }),
   };
 
   return store;
@@ -417,10 +433,10 @@ const useUIStore = create((set) => {
 ### Pattern 1: Store Testing Setup
 
 ```javascript
-import { renderHook, act } from '@testing-library/react';
-import { useMyStore } from '../stores/myStore';
+import { renderHook, act } from "@testing-library/react";
+import { useMyStore } from "../stores/myStore";
 
-describe('MyStore', () => {
+describe("MyStore", () => {
   // Reset store before each test
   beforeEach(() => {
     act(() => {
@@ -428,25 +444,25 @@ describe('MyStore', () => {
     });
   });
 
-  it('should handle safe async operations', async () => {
+  it("should handle safe async operations", async () => {
     const { result } = renderHook(() => useMyStore());
 
     // Test async action
     await act(async () => {
-      await result.current.fetchData('test-id');
+      await result.current.fetchData("test-id");
     });
 
     expect(result.current.data).toBeDefined();
-    expect(result.current.status).toBe('success');
+    expect(result.current.status).toBe("success");
   });
 
-  it('should handle store reference pattern', () => {
+  it("should handle store reference pattern", () => {
     const { result } = renderHook(() => useMyStore());
 
     act(() => {
       result.current.addNotification({
-        message: 'Test notification',
-        duration: 100 // Short duration for testing
+        message: "Test notification",
+        duration: 100, // Short duration for testing
       });
     });
 
@@ -463,15 +479,15 @@ describe('MyStore', () => {
 ### Pattern 2: Integration Testing
 
 ```javascript
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MyComponent } from '../components/MyComponent';
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MyComponent } from "../components/MyComponent";
 
-describe('Store Integration', () => {
-  it('should update UI when store changes', async () => {
+describe("Store Integration", () => {
+  it("should update UI when store changes", async () => {
     render(<MyComponent />);
 
-    const button = screen.getByRole('button', { name: /increment/i });
+    const button = screen.getByRole("button", { name: /increment/i });
 
     await userEvent.click(button);
 
@@ -487,6 +503,7 @@ describe('Store Integration', () => {
 ### Migrating from Unsafe to Safe Patterns
 
 #### Before (Unsafe)
+
 ```javascript
 const useUnsafeStore = create((set, get) => ({
   items: [],
@@ -501,25 +518,27 @@ const useUnsafeStore = create((set, get) => ({
   saveItems: async () => {
     const items = get().items;
     await api.save(items);
-  }
+  },
 }));
 ```
 
 #### After (Safe)
+
 ```javascript
 const useSafeStore = create((set) => ({
   items: [],
 
   // ✅ SAFE - Use set function parameter
-  addItem: (item) => set((state) => ({
-    items: [...state.items, item]
-  })),
+  addItem: (item) =>
+    set((state) => ({
+      items: [...state.items, item],
+    })),
 
   // ✅ SAFE - External store access
   saveItems: async () => {
     const { items } = useSafeStore.getState();
     await api.save(items);
-  }
+  },
 }));
 ```
 
@@ -530,20 +549,28 @@ const useSafeStore = create((set) => ({
 ```javascript
 // ✅ OPTIMIZED - Specific subscriptions
 const UserProfile = () => {
-  const name = useUserStore(state => state.name);
-  const avatar = useUserStore(state => state.avatar);
+  const name = useUserStore((state) => state.name);
+  const avatar = useUserStore((state) => state.avatar);
 
-  return <div>{name} <img src={avatar} /></div>;
+  return (
+    <div>
+      {name} <img src={avatar} />
+    </div>
+  );
 };
 
 // ❌ UNOPTIMIZED - Object creation causes re-renders
 const UserProfile = () => {
-  const { name, avatar } = useUserStore(state => ({
+  const { name, avatar } = useUserStore((state) => ({
     name: state.name,
-    avatar: state.avatar
+    avatar: state.avatar,
   })); // New object every render
 
-  return <div>{name} <img src={avatar} /></div>;
+  return (
+    <div>
+      {name} <img src={avatar} />
+    </div>
+  );
 };
 ```
 
@@ -552,17 +579,20 @@ const UserProfile = () => {
 ```javascript
 // ✅ MEMOIZED - Actions don't cause re-renders
 const TodoList = () => {
-  const todos = useTodoStore(state => state.todos);
+  const todos = useTodoStore((state) => state.todos);
 
   // Memoize actions to prevent child re-renders
-  const actions = useMemo(() => ({
-    toggle: useTodoStore.getState().toggleTodo,
-    delete: useTodoStore.getState().deleteTodo,
-  }), []); // Empty deps - actions are stable
+  const actions = useMemo(
+    () => ({
+      toggle: useTodoStore.getState().toggleTodo,
+      delete: useTodoStore.getState().deleteTodo,
+    }),
+    [],
+  ); // Empty deps - actions are stable
 
   return (
     <div>
-      {todos.map(todo => (
+      {todos.map((todo) => (
         <TodoItem
           key={todo.id}
           todo={todo}
@@ -578,6 +608,7 @@ const TodoList = () => {
 ## 🚨 Common Anti-Patterns
 
 ### 1. Store Coupling
+
 ```javascript
 // ❌ BAD - Direct store coupling
 const useStoreA = create((set, get) => ({
@@ -585,7 +616,7 @@ const useStoreA = create((set, get) => ({
   updateBasedOnB: () => {
     const bValue = useStoreB.getState().value; // Tight coupling
     set({ value: bValue * 2 });
-  }
+  },
 }));
 
 // ✅ GOOD - Event-based communication
@@ -601,43 +632,57 @@ useEffect(() => {
     useStoreA.getState().updateValue(event.detail * 2);
   };
 
-  window.addEventListener('store-b-change', handleBChange);
-  return () => window.removeEventListener('store-b-change', handleBChange);
+  window.addEventListener("store-b-change", handleBChange);
+  return () => window.removeEventListener("store-b-change", handleBChange);
 }, []);
 ```
 
 ### 2. State Normalization Issues
+
 ```javascript
 // ❌ BAD - Denormalized state
 const useBadStore = create((set) => ({
   users: [
-    { id: 1, name: 'John', posts: [/* post objects */] },
-    { id: 2, name: 'Jane', posts: [/* post objects */] }
-  ]
+    {
+      id: 1,
+      name: "John",
+      posts: [
+        /* post objects */
+      ],
+    },
+    {
+      id: 2,
+      name: "Jane",
+      posts: [
+        /* post objects */
+      ],
+    },
+  ],
 }));
 
 // ✅ GOOD - Normalized state
 const useUserStore = create((set) => ({
-  users: { 1: { id: 1, name: 'John' }, 2: { id: 2, name: 'Jane' } },
-  posts: { 1: { id: 1, userId: 1, content: '...' } },
-  userPosts: { 1: [1], 2: [2, 3] }
+  users: { 1: { id: 1, name: "John" }, 2: { id: 2, name: "Jane" } },
+  posts: { 1: { id: 1, userId: 1, content: "..." } },
+  userPosts: { 1: [1], 2: [2, 3] },
 }));
 ```
 
 ## 🔗 Integration Examples
 
 ### With TanStack Query
+
 ```javascript
 // Use Zustand for UI state, TanStack Query for server state
 const usePostsPage = () => {
   // UI state in Zustand
-  const filter = useUIStore(state => state.postsFilter);
-  const setFilter = useUIStore(state => state.setPostsFilter);
+  const filter = useUIStore((state) => state.postsFilter);
+  const setFilter = useUIStore((state) => state.setPostsFilter);
 
   // Server state in TanStack Query
   const { data: posts, isLoading } = useQuery({
-    queryKey: ['posts', filter],
-    queryFn: () => fetchPosts(filter)
+    queryKey: ["posts", filter],
+    queryFn: () => fetchPosts(filter),
   });
 
   return { posts, isLoading, filter, setFilter };
@@ -645,6 +690,7 @@ const usePostsPage = () => {
 ```
 
 ### With React Context
+
 ```javascript
 // Use Context for feature-scoped state
 const FeatureContext = createContext();
@@ -662,13 +708,14 @@ const FeatureProvider = ({ children }) => {
 
 // Use Zustand for global state
 const useGlobalSettings = () => {
-  return useSettingsStore(state => state.featureSettings);
+  return useSettingsStore((state) => state.featureSettings);
 };
 ```
 
 ## 📚 Quick Reference
 
 ### ✅ Safe Patterns Checklist
+
 - [ ] No `get()` calls inside store actions
 - [ ] Use `useStore.getState()` for external access
 - [ ] Selective subscriptions only
@@ -679,6 +726,7 @@ const useGlobalSettings = () => {
 - [ ] Normalize complex state structures
 
 ### ❌ Patterns to Avoid
+
 - [ ] `get()` calls in store actions
 - [ ] Full store subscriptions
 - [ ] Conditional store subscriptions

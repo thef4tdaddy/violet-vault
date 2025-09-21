@@ -3,7 +3,10 @@ import { getIcon } from "../../../utils";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
-import { getButtonClasses, withHapticFeedback } from "../../../utils/ui/touchFeedback";
+import {
+  getButtonClasses,
+  withHapticFeedback,
+} from "../../../utils/ui/touchFeedback";
 import { useEnvelopeSwipeGestures } from "../../../hooks/useEnvelopeSwipeGestures";
 import SwipeIndicatorOverlay from "./SwipeIndicatorOverlay";
 import EnvelopeActivitySummary from "./EnvelopeActivitySummary";
@@ -11,7 +14,9 @@ import EnvelopeStatusDisplay from "./EnvelopeStatusDisplay";
 import EnvelopeActions from "./EnvelopeActions";
 
 // Lazy load the bill funding info component
-const BillEnvelopeFundingInfo = React.lazy(() => import("../BillEnvelopeFundingInfo"));
+const BillEnvelopeFundingInfo = React.lazy(
+  () => import("../BillEnvelopeFundingInfo"),
+);
 
 const EnvelopeItem = ({
   envelope,
@@ -57,7 +62,10 @@ const EnvelopeItem = ({
           const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
           if (!displayInfo) {
             // Fallback to original function
-            return getUtilizationColor(envelope.utilizationRate, envelope.status);
+            return getUtilizationColor(
+              envelope.utilizationRate,
+              envelope.status,
+            );
           }
 
           const { displayText } = displayInfo;
@@ -80,7 +88,7 @@ const EnvelopeItem = ({
         `relative p-6 rounded-lg border-2 cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
           isSelected ? "ring-2 ring-purple-500" : ""
         } ${swipeState.isSwipeActive ? "select-none" : ""}`,
-        "card"
+        "card",
       )}
       style={swipeStyles}
     >
@@ -97,13 +105,16 @@ const EnvelopeItem = ({
           }, "light")}
           className={getButtonClasses(
             "md:hidden flex-shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
-            "small"
+            "small",
           )}
           aria-label={isCollapsed ? "Expand envelope" : "Collapse envelope"}
         >
-          {React.createElement(getIcon(isCollapsed ? "ChevronRight" : "ChevronDown"), {
-            className: "h-4 w-4",
-          })}
+          {React.createElement(
+            getIcon(isCollapsed ? "ChevronRight" : "ChevronDown"),
+            {
+              className: "h-4 w-4",
+            },
+          )}
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -115,7 +126,9 @@ const EnvelopeItem = ({
                 title={`Color: ${envelope.color}`}
               />
             )}
-            <h3 className="font-semibold text-gray-900 truncate">{envelope.name}</h3>
+            <h3 className="font-semibold text-gray-900 truncate">
+              {envelope.name}
+            </h3>
           </div>
           <p className="text-xs text-gray-600 mt-1">{envelope.category}</p>
         </div>
@@ -125,7 +138,9 @@ const EnvelopeItem = ({
             className={`flex items-center px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}
           >
             {envelope.status !== "healthy" && getStatusIcon(envelope.status)}
-            <span className="ml-1">{(envelope.utilizationRate * 100).toFixed(0)}%</span>
+            <span className="ml-1">
+              {(envelope.utilizationRate * 100).toFixed(0)}%
+            </span>
           </div>
 
           <div className="flex gap-1">
@@ -136,7 +151,7 @@ const EnvelopeItem = ({
               }, "light")}
               className={getButtonClasses(
                 "p-2 text-gray-400 hover:text-blue-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
-                "small"
+                "small",
               )}
             >
               {React.createElement(getIcon("Edit"), { className: "h-4 w-4" })}
@@ -148,7 +163,7 @@ const EnvelopeItem = ({
               }, "light")}
               className={getButtonClasses(
                 "p-2 text-gray-400 hover:text-green-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
-                "small"
+                "small",
               )}
             >
               {React.createElement(getIcon("History"), {
@@ -177,16 +192,21 @@ const EnvelopeItem = ({
                 if (!displayInfo) {
                   // Fallback to simple calculation if sophisticated logic fails
                   const linkedBills = bills.filter(
-                    (bill) => bill.envelopeId === envelope.id && !bill.isPaid
+                    (bill) => bill.envelopeId === envelope.id && !bill.isPaid,
                   );
                   const nextBill = linkedBills
                     .filter((bill) => new Date(bill.dueDate) >= new Date())
-                    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+                    .sort(
+                      (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
+                    )[0];
                   const targetAmount = nextBill
                     ? nextBill.amount || 0
                     : envelope.monthlyBudget || envelope.monthlyAmount || 0;
                   const currentBalance = envelope.currentBalance || 0;
-                  const amountNeeded = Math.max(0, targetAmount - currentBalance);
+                  const amountNeeded = Math.max(
+                    0,
+                    targetAmount - currentBalance,
+                  );
 
                   return (
                     <>
@@ -200,10 +220,15 @@ const EnvelopeItem = ({
                   );
                 }
 
-                const { displayText, remainingToFund, currentBalance, targetMonthlyAmount } =
-                  displayInfo;
+                const {
+                  displayText,
+                  remainingToFund,
+                  currentBalance,
+                  targetMonthlyAmount,
+                } = displayInfo;
                 const isOnTrack = displayText.primaryStatus === "On Track";
-                const isFullyFunded = displayText.primaryStatus === "Fully Funded";
+                const isFullyFunded =
+                  displayText.primaryStatus === "Fully Funded";
                 const isBehind = displayText.primaryStatus.startsWith("Behind");
 
                 // Calculate amount to display based on status
@@ -258,7 +283,11 @@ const EnvelopeItem = ({
         {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
           <div className="mt-4 pt-3 border-t border-gray-200">
             <Suspense
-              fallback={<div className="text-xs text-gray-500">Loading funding info...</div>}
+              fallback={
+                <div className="text-xs text-gray-500">
+                  Loading funding info...
+                </div>
+              }
             >
               {(() => {
                 // Use the imported function
@@ -266,7 +295,8 @@ const EnvelopeItem = ({
 
                 if (!displayInfo) return null;
 
-                const { nextBill, daysUntilNextBill, displayText } = displayInfo;
+                const { nextBill, daysUntilNextBill, displayText } =
+                  displayInfo;
 
                 return (
                   <div className="space-y-1">
@@ -307,7 +337,10 @@ const EnvelopeItem = ({
                 className={`h-2 rounded-full transition-all duration-300 ${
                   envelope.envelopeType === ENVELOPE_TYPES.BILL
                     ? (() => {
-                        const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+                        const displayInfo = getBillEnvelopeDisplayInfo(
+                          envelope,
+                          bills,
+                        );
                         if (!displayInfo) {
                           // Fallback to old logic if sophisticated calculation fails
                           return envelope.utilizationRate > 1
@@ -320,9 +353,12 @@ const EnvelopeItem = ({
                         }
 
                         const { displayText } = displayInfo;
-                        const isOnTrack = displayText.primaryStatus === "On Track";
-                        const isFullyFunded = displayText.primaryStatus === "Fully Funded";
-                        const isBehind = displayText.primaryStatus.startsWith("Behind");
+                        const isOnTrack =
+                          displayText.primaryStatus === "On Track";
+                        const isFullyFunded =
+                          displayText.primaryStatus === "Fully Funded";
+                        const isBehind =
+                          displayText.primaryStatus.startsWith("Behind");
 
                         if (isFullyFunded) return "bg-green-500";
                         if (isOnTrack) return "bg-blue-500";
@@ -348,7 +384,10 @@ const EnvelopeItem = ({
       </div>{" "}
       {/* End collapsible content */}
       {/* Enhanced Swipe Indicator Overlays */}
-      <SwipeIndicatorOverlay swipeState={swipeState} unassignedCash={unassignedCash} />
+      <SwipeIndicatorOverlay
+        swipeState={swipeState}
+        unassignedCash={unassignedCash}
+      />
     </div>
   );
 };

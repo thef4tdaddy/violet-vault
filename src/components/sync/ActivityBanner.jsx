@@ -2,14 +2,21 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
 
-const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = null }) => {
+const ActivityBanner = ({
+  activeUsers = [],
+  recentActivity = [],
+  currentUser = null,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [displayedActivities, setDisplayedActivities] = useState([]);
 
   useEffect(() => {
     // Sort activities by timestamp and get recent ones
     const sortedActivities = [...recentActivity]
-      .sort((activityA, activityB) => new Date(activityB.timestamp) - new Date(activityA.timestamp))
+      .sort(
+        (activityA, activityB) =>
+          new Date(activityB.timestamp) - new Date(activityA.timestamp),
+      )
       .slice(0, 10);
 
     setDisplayedActivities(sortedActivities);
@@ -100,7 +107,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
     return time.toLocaleDateString();
   };
 
-  const otherActiveUsers = activeUsers.filter((user) => currentUser && user.id !== currentUser.id);
+  const otherActiveUsers = activeUsers.filter(
+    (user) => currentUser && user.id !== currentUser.id,
+  );
 
   if (otherActiveUsers.length === 0 && displayedActivities.length === 0) {
     return null;
@@ -116,7 +125,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-purple-100 rounded-lg">
-              {React.createElement(getIcon("Activity"), { className: "h-5 w-5 text-purple-600" })}
+              {React.createElement(getIcon("Activity"), {
+                className: "h-5 w-5 text-purple-600",
+              })}
             </div>
 
             <div>
@@ -141,7 +152,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
                 <div className="h-2 w-2 bg-emerald-500 rounded-full">
                   <div className="absolute h-2 w-2 bg-emerald-500 rounded-full animate-ping" />
                 </div>
-                <span className="text-xs font-medium text-emerald-700">Live</span>
+                <span className="text-xs font-medium text-emerald-700">
+                  Live
+                </span>
               </div>
             )}
 
@@ -167,7 +180,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
                 {React.createElement(getIcon("Users"), {
                   className: "h-4 w-4 text-purple-600 mr-2",
                 })}
-                <span className="font-medium text-purple-900">Currently Online</span>
+                <span className="font-medium text-purple-900">
+                  Currently Online
+                </span>
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -201,7 +216,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
                 {React.createElement(getIcon("Clock"), {
                   className: "h-4 w-4 text-gray-600 mr-2",
                 })}
-                <span className="font-medium text-gray-900">Recent Activity</span>
+                <span className="font-medium text-gray-900">
+                  Recent Activity
+                </span>
               </div>
 
               <div className="space-y-3 max-h-64 overflow-y-auto">
@@ -209,9 +226,16 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
                   const color = getActivityColor(activity.type);
 
                   return (
-                    <div key={activity.id || index} className="flex items-start space-x-3">
-                      <div className={`p-1.5 bg-${color}-100 rounded-lg flex-shrink-0`}>
-                        <div className={`text-${color}-600`}>{getActivityIcon(activity.type)}</div>
+                    <div
+                      key={activity.id || index}
+                      className="flex items-start space-x-3"
+                    >
+                      <div
+                        className={`p-1.5 bg-${color}-100 rounded-lg flex-shrink-0`}
+                      >
+                        <div className={`text-${color}-600`}>
+                          {getActivityIcon(activity.type)}
+                        </div>
                       </div>
 
                       <div className="flex-1 min-w-0">

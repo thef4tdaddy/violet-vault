@@ -86,7 +86,8 @@ class ServiceWorkerDiagnostics {
         }
 
         // Estimate total cache size
-        const estimatedSize = keys.length > 0 ? (cacheSize / sampleKeys.length) * keys.length : 0;
+        const estimatedSize =
+          keys.length > 0 ? (cacheSize / sampleKeys.length) * keys.length : 0;
 
         report.cacheDetails[cacheName] = {
           entries: keys.length,
@@ -126,7 +127,8 @@ class ServiceWorkerDiagnostics {
       report.recommendations.push({
         type: "warning",
         message: `Total cache size (${Math.round(report.totalSize / 1024 / 1024)}MB) exceeds recommended limit (${sizeLimitMB}MB)`,
-        action: "Consider reducing cache expiration times or clearing old caches",
+        action:
+          "Consider reducing cache expiration times or clearing old caches",
       });
     }
 
@@ -140,7 +142,7 @@ class ServiceWorkerDiagnostics {
 
     // Check for unknown caches
     const unknownCaches = Object.keys(report.cacheDetails).filter(
-      (name) => !report.cacheDetails[name].isKnownCache
+      (name) => !report.cacheDetails[name].isKnownCache,
     );
 
     if (unknownCaches.length > 0) {
@@ -185,12 +187,18 @@ class ServiceWorkerDiagnostics {
   async clearAllCaches() {
     try {
       const cacheNames = await caches.keys();
-      const results = await Promise.allSettled(cacheNames.map((name) => caches.delete(name)));
+      const results = await Promise.allSettled(
+        cacheNames.map((name) => caches.delete(name)),
+      );
 
-      const successful = results.filter((r) => r.status === "fulfilled" && r.value).length;
+      const successful = results.filter(
+        (r) => r.status === "fulfilled" && r.value,
+      ).length;
       const failed = results.length - successful;
 
-      logger.info(`🧹 Cache cleanup completed: ${successful} cleared, ${failed} failed`);
+      logger.info(
+        `🧹 Cache cleanup completed: ${successful} cleared, ${failed} failed`,
+      );
 
       return {
         total: results.length,
@@ -296,7 +304,8 @@ class ServiceWorkerDiagnostics {
       results.deleteTime = performance.now() - deleteStart;
 
       results.success = true;
-      results.totalTime = results.writeTime + results.readTime + results.deleteTime;
+      results.totalTime =
+        results.writeTime + results.readTime + results.deleteTime;
 
       logger.info("⚡ Cache performance test completed", {
         writeMs: Math.round(results.writeTime * 100) / 100,
@@ -329,7 +338,9 @@ class ServiceWorkerDiagnostics {
           ? cacheHealth.value
           : { error: cacheHealth.reason?.message },
       serviceWorker:
-        swStatus.status === "fulfilled" ? swStatus.value : { error: swStatus.reason?.message },
+        swStatus.status === "fulfilled"
+          ? swStatus.value
+          : { error: swStatus.reason?.message },
       performance:
         performance.status === "fulfilled"
           ? performance.value

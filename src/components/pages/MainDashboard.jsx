@@ -27,12 +27,15 @@ const Dashboard = ({ setActiveView }) => {
   // Enhanced TanStack Query integration with optimistic updates
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
-  const { data: savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
+  const { data: savingsGoals = [], isLoading: savingsLoading } =
+    useSavingsGoals();
 
-  const { data: transactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { data: transactions = [], isLoading: transactionsLoading } =
+    useTransactions();
 
   // Use TanStack Query for budget metadata
-  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
+  const { unassignedCash, isLoading: unassignedCashLoading } =
+    useUnassignedCash();
   const {
     actualBalance,
     updateActualBalance,
@@ -60,17 +63,27 @@ const Dashboard = ({ setActiveView }) => {
     totalVirtualBalance,
     difference,
     isBalanced,
-  } = useDashboardCalculations(envelopes, savingsGoals, unassignedCash, actualBalance);
+  } = useDashboardCalculations(
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    actualBalance,
+  );
 
   // Transaction reconciliation logic
-  const { handleReconcileTransaction, handleAutoReconcileDifference, getEnvelopeOptions } =
-    useTransactionReconciliation(reconcileTransaction, envelopes, savingsGoals);
+  const {
+    handleReconcileTransaction,
+    handleAutoReconcileDifference,
+    getEnvelopeOptions,
+  } = useTransactionReconciliation(
+    reconcileTransaction,
+    envelopes,
+    savingsGoals,
+  );
 
   // Payday management
-  const { paydayPrediction, handleProcessPaycheck, handlePrepareEnvelopes } = usePaydayManager(
-    paycheckHistory,
-    setActiveView
-  );
+  const { paydayPrediction, handleProcessPaycheck, handlePrepareEnvelopes } =
+    usePaydayManager(paycheckHistory, setActiveView);
 
   // Dashboard helpers
   const { getRecentTransactions } = useDashboardHelpers();
@@ -171,7 +184,9 @@ const Dashboard = ({ setActiveView }) => {
           if (setActiveView) {
             setActiveView("debts");
           } else {
-            logger.debug("Navigate to debts requested - setActiveView not available");
+            logger.debug(
+              "Navigate to debts requested - setActiveView not available",
+            );
           }
         }}
       />
