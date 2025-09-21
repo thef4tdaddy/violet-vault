@@ -782,7 +782,7 @@ export const AuthProvider = ({ children }) => {
         });
       };
     }
-  }, [isUnlocked, logout, setLastActivity]);
+  }, [isUnlocked]); // Only depend on isUnlocked - store actions are stable
 
   return <>{children}</>;
 };
