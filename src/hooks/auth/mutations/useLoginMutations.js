@@ -37,7 +37,7 @@ const handleNewUserSetup = async (userData, password) => {
 
   const deterministicBudgetId = await encryptionUtils.generateBudgetId(
     password,
-    shareCode
+    shareCode,
   );
 
   const finalUserData = {
@@ -74,7 +74,7 @@ const handleNewUserSetup = async (userData, password) => {
       encryptedData: encrypted.data,
       salt: Array.from(newSalt),
       iv: encrypted.iv,
-    })
+    }),
   );
 
   // Save user profile
@@ -138,7 +138,7 @@ const handleExistingUserLogin = async (password) => {
     ) {
       localStorage.removeItem("envelopeBudgetData");
       throw new Error(
-        "Legacy data cleared - please create a new budget with share code system"
+        "Legacy data cleared - please create a new budget with share code system",
       );
     }
 
@@ -189,8 +189,8 @@ export const useLoginMutation = () => {
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Login timeout after 10 seconds")),
-          10000
-        )
+          10000,
+        ),
       );
 
       const loginPromise = async () => {
@@ -233,7 +233,7 @@ export const useLoginMutation = () => {
             {
               isNewUser: result.isNewUser || false,
               delayMs: syncDelay,
-            }
+            },
           );
 
           await new Promise((resolve) => setTimeout(resolve, syncDelay));

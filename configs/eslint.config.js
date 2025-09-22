@@ -73,7 +73,7 @@ export default [
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "react-refresh/only-export-components": "off", // Disabled - causes false positives for React Context patterns
       "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^(_|[A-Z_]+)" }],
       "no-undef": "warn",
       "no-case-declarations": "warn",
@@ -335,6 +335,13 @@ export default [
       "max-depth": "off", // Validation and state management needs deep conditional logic
       "max-params": "off", // Infrastructure methods may need many parameters
       "no-restricted-imports": "off", // Allow service imports for core operations
+    },
+  },
+  {
+    // Exclusions for core auth components with legitimate complexity (Issue #665)
+    files: ["**/UserSetup.jsx"],
+    rules: {
+      "max-lines-per-function": "off", // Multi-step auth wizard needs comprehensive state management
     },
   },
   {

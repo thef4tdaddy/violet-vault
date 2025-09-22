@@ -29,7 +29,7 @@ export const useChangePasswordMutation = () => {
         const decryptedData = await encryptionUtils.decrypt(
           encryptedData,
           oldKey,
-          iv
+          iv,
         );
 
         const { key: newKey, salt: newSalt } =
@@ -42,7 +42,7 @@ export const useChangePasswordMutation = () => {
             encryptedData: encrypted.data,
             salt: Array.from(newSalt),
             iv: encrypted.iv,
-          })
+          }),
         );
 
         if (import.meta?.env?.MODE === "development") {

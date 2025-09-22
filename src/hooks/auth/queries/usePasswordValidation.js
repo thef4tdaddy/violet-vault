@@ -29,7 +29,7 @@ export const usePasswordValidation = (password, options = {}) => {
         const savedData = localStorage.getItem("envelopeBudgetData");
         if (!savedData) {
           logger.auth(
-            "TanStack: No saved data found - cannot validate password"
+            "TanStack: No saved data found - cannot validate password",
           );
           return {
             isValid: false,
@@ -54,7 +54,7 @@ export const usePasswordValidation = (password, options = {}) => {
           return { isValid: true };
         } catch {
           logger.auth(
-            "TanStack: Password validation failed - decryption failed"
+            "TanStack: Password validation failed - decryption failed",
           );
           return { isValid: false, reason: "decryption_failed" };
         }
