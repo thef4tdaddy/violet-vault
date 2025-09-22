@@ -13,7 +13,7 @@ import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
 // eslint-disable-next-line no-restricted-imports -- Required for edit lock service initialization
 import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
@@ -66,7 +66,7 @@ const AddBillModal = ({
   });
 
   // Get auth context for edit locking
-  const { budgetId, currentUser } = useAuth();
+  const { securityContext: { budgetId }, user: currentUser } = useAuthManager();
 
   // Standardized confirmation modal
   const confirm = useConfirm();

@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { getIcon } from "../../utils";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
+import { usePasswordValidation } from "../../hooks/auth/queries/usePasswordValidation";
 import shieldLogo from "../../assets/logo-512x512.png";
 import SecurityAlert from "../ui/SecurityAlert";
 
 const LockScreen = () => {
   const { isLocked, unlockSession, securityEvents } = useSecurityManager();
-  const logout = useAuth((state) => state.logout);
+  const { logout } = useAuthManager();
   const confirm = useConfirm();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +17,87 @@ const LockScreen = () => {
   const [error, setError] = useState("");
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [pendingConfirm, setPendingConfirm] = useState(null);
+  const [passwordToValidate, setPasswordToValidate] = useState("");
   const passwordInputRef = useRef(null);
+
+  // Password validation query
+  const { data: validationResult, isLoading: isValidating } = usePasswordValidation(passwordToValidate, {
+    enabled: !!passwordToValidate
+  });
+
+  // Handle validation results
+  useEffect(() => {
+    if (passwordToValidate && validationResult !== undefined && !isValidating) {
+      if (validationResult?.isValid) {
+        // Password is correct, unlock the session
+        if (pendingConfirm) {
+          pendingConfirm.cancel();
+          setPendingConfirm(null);
+        }
+        unlockSession();
+        setPassword("");
+        setPasswordToValidate("");
+        setFailedAttempts(0);
+        setError("");
+        setIsUnlocking(false);
+      } else {
+        // Password is incorrect
+        handleIncorrectPassword();
+      }
+    }
+  }, [validationResult, isValidating, passwordToValidate, pendingConfirm, unlockSession, handleIncorrectPassword]);
+
+  // Handle incorrect password
+  const handleIncorrectPassword = useCallback(async () => {
+    setIsUnlocking(false);
+
+    // Enhanced error message for wrong password
+    const confirmPromise = new Promise((resolve) => {
+      const originalConfirm = confirm({
+        title: "Incorrect Password",
+        message:
+          "That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?",
+        confirmText: "Start New Budget",
+        cancelText: "Try Again",
+        variant: "destructive",
+      });
+
+      originalConfirm.then(resolve).catch(() => resolve(false));
+
+      // Store cancellation function
+      setPendingConfirm({
+        cancel: () => {
+          resolve(false); // Resolve as cancelled
+        },
+      });
+    });
+
+    let shouldCreateNew;
+    try {
+      shouldCreateNew = await confirmPromise;
+    } finally {
+      setPendingConfirm(null);
+    }
+
+    if (shouldCreateNew) {
+      // User wants to create new budget - logout and clear data
+      localStorage.removeItem("envelopeBudgetData");
+      localStorage.removeItem("userProfile");
+      logout();
+      window.location.reload();
+      return;
+    }
+
+    setError("Invalid password");
+    setFailedAttempts((prev) => prev + 1);
+    setPassword("");
+    setPasswordToValidate("");
+
+    // Add delay after failed attempts
+    if (failedAttempts >= 3) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }, [confirm, logout, failedAttempts]);
 
   // Count recent failed attempts from security events
   useEffect(() => {
@@ -58,80 +139,8 @@ const LockScreen = () => {
     setIsUnlocking(true);
     setError("");
 
-    try {
-      // Validate password with auth store
-      const authStore = useAuth.getState();
-      const isValidPassword = await authStore.validatePassword(password);
-
-      if (isValidPassword) {
-        // Password is correct, unlock the session
-        // Cancel any pending confirmation modals to prevent race condition
-        if (pendingConfirm) {
-          pendingConfirm.cancel();
-          setPendingConfirm(null);
-        }
-
-        unlockSession();
-        setPassword("");
-        setFailedAttempts(0);
-        setError("");
-      } else {
-        // Reset loading state immediately to unblock the UI
-        setIsUnlocking(false);
-
-        // Enhanced error message for wrong password
-        // Wrap confirmation in a cancellable promise to prevent race conditions
-        const confirmPromise = new Promise((resolve, reject) => {
-          const originalConfirm = confirm({
-            title: "Incorrect Password",
-            message:
-              "That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?",
-            confirmText: "Start New Budget",
-            cancelText: "Try Again",
-            variant: "destructive",
-          });
-
-          originalConfirm.then(resolve).catch(reject);
-
-          // Store cancellation function
-          setPendingConfirm({
-            cancel: () => {
-              resolve(false); // Resolve as cancelled
-            },
-          });
-        });
-
-        let shouldCreateNew;
-        try {
-          shouldCreateNew = await confirmPromise;
-        } finally {
-          setPendingConfirm(null);
-        }
-
-        if (shouldCreateNew) {
-          // User wants to create new budget - logout and clear data
-          localStorage.removeItem("envelopeBudgetData");
-          localStorage.removeItem("userProfile");
-          logout();
-          window.location.reload();
-          return;
-        }
-
-        setError("Invalid password");
-        setFailedAttempts((prev) => prev + 1);
-        setPassword("");
-
-        // Add delay after failed attempts
-        if (failedAttempts >= 3) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-      }
-    } catch {
-      setError("Failed to unlock application");
-      setPassword("");
-    } finally {
-      setIsUnlocking(false);
-    }
+    // Trigger password validation
+    setPasswordToValidate(password);
   };
 
   const handleKeyPress = (e) => {

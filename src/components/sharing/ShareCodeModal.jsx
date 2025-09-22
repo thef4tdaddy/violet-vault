@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "../../utils";
 import { shareCodeManager } from "../../utils/auth/shareCodeManager";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
@@ -16,7 +16,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { currentUser, _encryptionKey, updateProfile } = useAuth();
+  const { user: currentUser, securityContext: { encryptionKey: _encryptionKey }, updateProfile } = useAuthManager();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 
