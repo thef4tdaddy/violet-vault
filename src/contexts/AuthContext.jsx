@@ -65,25 +65,37 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Create auth action callbacks with useCallback for optimization
-  const setAuthenticated = useCallback((userData, sessionData = {}) => {
-    createSetAuthenticated(setAuthState)(userData, sessionData);
-  }, [setAuthState]);
+  const setAuthenticated = useCallback(
+    (userData, sessionData = {}) => {
+      createSetAuthenticated(setAuthState)(userData, sessionData);
+    },
+    [setAuthState],
+  );
 
   const clearAuth = useCallback(() => {
     createClearAuth(setAuthState)();
   }, [setAuthState]);
 
-  const updateUser = useCallback((updatedUserData) => {
-    createUpdateUser(setAuthState)(updatedUserData);
-  }, [setAuthState]);
+  const updateUser = useCallback(
+    (updatedUserData) => {
+      createUpdateUser(setAuthState)(updatedUserData);
+    },
+    [setAuthState],
+  );
 
-  const setLoading = useCallback((loading) => {
-    createSetLoading(setAuthState)(loading);
-  }, [setAuthState]);
+  const setLoading = useCallback(
+    (loading) => {
+      createSetLoading(setAuthState)(loading);
+    },
+    [setAuthState],
+  );
 
-  const setError = useCallback((error) => {
-    createSetError(setAuthState)(error);
-  }, [setAuthState]);
+  const setError = useCallback(
+    (error) => {
+      createSetError(setAuthState)(error);
+    },
+    [setAuthState],
+  );
 
   const updateActivity = useCallback(() => {
     createUpdateActivity(setAuthState)();

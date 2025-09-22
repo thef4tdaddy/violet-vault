@@ -2,7 +2,7 @@
 import React, { useState, Suspense, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useAuthenticationManager } from "../../hooks/auth";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import { useLayoutData } from "../../hooks/layout";
 import useDataManagement from "../../hooks/common/useDataManagement";
 import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
@@ -51,19 +51,25 @@ const MainLayout = ({ firebaseSync }) => {
   const navigate = useNavigate();
 
   // Consolidated authentication manager
-  const auth = useAuthenticationManager();
+  const auth = useAuthManager();
   const {
     isUnlocked,
-    currentUser,
-    isLocalOnlyMode,
-    _localOnlyUser,
+    user: currentUser,
     securityContext,
-    handleSetup,
-    handleLogout,
-    handleChangePassword,
-    handleUpdateProfile,
+    login: _login,
+    logout: _logout,
+    changePassword: _changePassword,
+    updateProfile: _updateProfile,
     shouldShowAuthGateway,
-    _internal: { securityManager },
+    _legacy: {
+      isLocalOnlyMode,
+      _localOnlyUser,
+      handleSetup,
+      handleLogout,
+      handleChangePassword,
+      handleUpdateProfile,
+      _internal: { securityManager } = {}
+    } = {}
   } = auth;
 
   // Onboarding state - prevent security warning during tutorial
@@ -219,7 +225,7 @@ const MainContent = ({
   const navigate = useNavigate();
 
   // Onboarding state - prevent security warning during tutorial
-  const _isOnboarded = useOnboardingStore((state) => state.isOnboarded);
+  const isOnboarded = useOnboardingStore((state) => state.isOnboarded);
 
   // Extract data from shared hooks
   const { securityContext } = auth;
@@ -258,7 +264,7 @@ const MainContent = ({
   // Show security warning for authenticated users who haven't acknowledged it
   // But don't show during onboarding tutorial to avoid conflicts
   useEffect(() => {
-    if (auth.isUnlocked && auth.currentUser && isOnboarded) {
+    if (auth.isUnlocked && auth.user && isOnboarded) {
       const hasAcknowledged = localStorage.getItem(
         "localDataSecurityAcknowledged",
       );
@@ -270,7 +276,7 @@ const MainContent = ({
         return () => clearTimeout(timer);
       }
     }
-  }, [auth.isUnlocked, auth.currentUser, isOnboarded]);
+  }, [auth.isUnlocked, auth.user, isOnboarded]);
 
   // Listen for corruption detection events
   useEffect(() => {

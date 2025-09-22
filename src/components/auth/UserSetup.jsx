@@ -9,7 +9,7 @@ import ReturningUserActions from "./components/ReturningUserActions";
 import StepButtons from "./components/StepButtons";
 import ShareCodeDisplay from "./components/ShareCodeDisplay";
 import JoinBudgetModal from "../sharing/JoinBudgetModal";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import { renderIcon } from "../../utils";
 import logger from "../../utils/common/logger";
 
@@ -20,7 +20,7 @@ import logger from "../../utils/common/logger";
  */
 const UserSetup = ({ onSetupComplete }) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const { joinBudgetWithShareCode } = useAuth();
+  const { joinBudget } = useAuthManager();
 
   // Removed noisy debug log - component renders on every prop change/keystroke
 
@@ -54,10 +54,10 @@ const UserSetup = ({ onSetupComplete }) => {
     logger.info("Join budget successful, setting up auth", joinData);
 
     try {
-      const result = await joinBudgetWithShareCode(joinData);
+      const result = await joinBudget(joinData);
       if (result.success) {
         // Don't call onSetupComplete for shared budget joins -
-        // the auth state is already set by joinBudgetWithShareCode
+        // the auth state is already set by joinBudget
         logger.auth("Shared budget join completed - auth state already set");
         // The AuthGateway will automatically hide once shouldShowAuthGateway returns false
       }

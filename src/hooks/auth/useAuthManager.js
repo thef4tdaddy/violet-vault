@@ -43,12 +43,14 @@ export const useAuthManager = () => {
     joinBudgetMutation.isPending ||
     logoutMutation.isPending;
 
-
   // Create auth operations
   const login = createLoginOperation(loginMutation);
   const joinBudget = createJoinBudgetOperation(joinBudgetMutation);
   const logout = createLogoutOperation(logoutMutation);
-  const changePassword = createChangePasswordOperation(changePasswordMutation, authContext);
+  const changePassword = createChangePasswordOperation(
+    changePasswordMutation,
+    authContext,
+  );
   const updateProfile = createUpdateProfileOperation(updateProfileMutation);
   const lockSession = createLockSessionOperation(authContext);
   const updateActivity = createUpdateActivityOperation(authContext);
@@ -93,7 +95,10 @@ export const useAuthManager = () => {
 
     // Utilities
     shouldShowAuthGateway: () => !isAuthenticated,
-    createPasswordValidator: (password) => ({ password, enabled: !!password && password.length > 0 }),
+    createPasswordValidator: (password) => ({
+      password,
+      enabled: !!password && password.length > 0,
+    }),
     securityContext: {
       encryptionKey: authContext.encryptionKey,
       budgetId: authContext.budgetId,

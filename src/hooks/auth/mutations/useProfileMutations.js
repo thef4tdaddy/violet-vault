@@ -35,7 +35,7 @@ export const useUpdateProfileMutation = () => {
           const decryptedData = await encryptionUtils.decrypt(
             encryptedData,
             encryptionKey,
-            iv
+            iv,
           );
 
           const updatedData = {
@@ -45,7 +45,7 @@ export const useUpdateProfileMutation = () => {
 
           const encrypted = await encryptionUtils.encrypt(
             updatedData,
-            encryptionKey
+            encryptionKey,
           );
           localStorage.setItem(
             "envelopeBudgetData",
@@ -53,7 +53,7 @@ export const useUpdateProfileMutation = () => {
               encryptedData: encrypted.data,
               salt: Array.from(salt),
               iv: encrypted.iv,
-            })
+            }),
           );
         }
 
