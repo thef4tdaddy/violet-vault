@@ -2,6 +2,7 @@ import React, { Suspense, useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/common/queryClient";
+import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
 import { cloudSyncService } from "./services/cloudSyncService";
 import BugReportButton from "./components/feedback/BugReportButton";
@@ -37,25 +38,27 @@ const App = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <div className="font-sans">
-          <MainLayout firebaseSync={cloudSyncService} />
-          <BugReportButton />
-          <ConfirmProvider />
-          <PromptProvider />
+        <AuthProvider>
+          <div className="font-sans">
+            <MainLayout firebaseSync={cloudSyncService} />
+            <BugReportButton />
+            <ConfirmProvider />
+            <PromptProvider />
 
-          {/* PWA Modals */}
-          <UpdateAvailableModal />
-          <InstallPromptModal />
-          <PatchNotesModal />
+            {/* PWA Modals */}
+            <UpdateAvailableModal />
+            <InstallPromptModal />
+            <PatchNotesModal />
 
-          {/* PWA Status Indicators */}
-          <OfflineStatusIndicator />
+            {/* PWA Status Indicators */}
+            <OfflineStatusIndicator />
 
-          {/* Load monitoring system after main app renders */}
-          <Suspense fallback={null}>
-            <HighlightLoader />
-          </Suspense>
-        </div>
+            {/* Load monitoring system after main app renders */}
+            <Suspense fallback={null}>
+              <HighlightLoader />
+            </Suspense>
+          </div>
+        </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
   );

@@ -110,7 +110,7 @@ export default [
               name: "react",
               importNames: ["createContext", "useContext"],
               message:
-                "Avoid React Context. For data: use TanStack Query + Dexie (see hooks in src/hooks/). For UI/auth state: use Zustand stores in src/stores/.",
+                "Avoid React Context for server data - use TanStack Query + Dexie (see hooks in src/hooks/). For auth state, React Context is acceptable. For UI state: use Zustand stores in src/stores/.",
             },
             {
               name: "lucide-react",
@@ -368,6 +368,28 @@ export default [
     ],
     rules: {
       "no-restricted-imports": "off", // These files can import lucide-react directly
+    },
+  },
+  {
+    // Allow React Context usage in auth-related files (Issue #665 - Auth migration to Context + TanStack)
+    files: [
+      "**/AuthContext.jsx", // Core auth context
+      "**/contexts/AuthContext.jsx", // Auth context location
+      "src/contexts/**/*Auth*.{js,jsx}", // Any auth-related context files
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "lucide-react",
+              message:
+                "Use centralized icon system instead of direct lucide-react imports. Import icons from '@/utils/icons' or use { getIcon, renderIcon } from '@/utils'. See docs/ICON_MIGRATION_PLAN.md for details.",
+            },
+          ],
+        },
+      ], // Allow React Context imports for auth but still block lucide-react
     },
   },
 ];
