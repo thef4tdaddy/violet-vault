@@ -8,7 +8,7 @@ import React from "react";
 import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import logger from "../../utils/common/logger";
@@ -113,7 +113,7 @@ const BillManager = ({
   const _summaryCards = getSummaryCards(totals);
 
   // Edit lock for collaborative editing
-  const { budgetId, currentUser } = useAuth();
+  const { securityContext: { budgetId }, user: currentUser } = useAuthManager();
   const { isLocked: isEditLocked, currentEditor } = useEditLock(
     `bills-${budgetId}`,
     currentUser?.userName || "User",
