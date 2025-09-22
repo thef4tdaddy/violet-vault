@@ -141,7 +141,9 @@ export default {
                   node.callee.property.name
                 ) &&
                 // Exclude safe operations like addEventListener and safe initialization functions
-                !/^(addEventListener|removeEventListener|initializeErrorCapture|initializeDevHelpers)$/.test(node.callee.property.name)
+                !/^(addEventListener|removeEventListener|initializeErrorCapture|initializeDevHelpers)$/.test(
+                  node.callee.property.name
+                )
               ) {
                 context.report({
                   node,
@@ -456,7 +458,7 @@ export default {
                       /^storeState$/, // Generic store state objects
                     ];
 
-                    if (dangerousPatterns.some(pattern => pattern.test(dep.name))) {
+                    if (dangerousPatterns.some((pattern) => pattern.test(dep.name))) {
                       context.report({
                         node: dep,
                         messageId: "noObjectDependencies",
@@ -550,7 +552,7 @@ export default {
                       /Handler$/, // clickHandler, etc.
                     ];
 
-                    if (functionPatterns.some(pattern => pattern.test(dep.name))) {
+                    if (functionPatterns.some((pattern) => pattern.test(dep.name))) {
                       context.report({
                         node: dep,
                         messageId: "useStableFunction",

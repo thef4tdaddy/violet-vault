@@ -240,10 +240,12 @@ class PWAManager {
 
         // Show patch notes after a short delay to allow app to fully load
         setTimeout(() => {
-          this.uiStore.getState().loadPatchNotesForUpdate(
-            versionCheck.lastSeenVersion,
-            versionCheck.currentVersion,
-          );
+          this.uiStore
+            .getState()
+            .loadPatchNotesForUpdate(
+              versionCheck.lastSeenVersion,
+              versionCheck.currentVersion,
+            );
         }, 2000); // 2 second delay
       } else if (versionCheck.isFirstTime) {
         logger.info("👋 First time user detected, not showing patch notes");

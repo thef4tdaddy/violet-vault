@@ -147,9 +147,9 @@ export const useAuth = create((set, _get) => ({
           });
 
           // Start background sync after successful login (new user path)
-          // Safe external store access (prevents React error #185)
-          const { startBackgroundSyncAfterLogin } = useAuth.getState();
-          await startBackgroundSyncAfterLogin(true); // Pass true for new user
+          // Use get() parameter to avoid React error #185
+          const currentState = _get();
+          await currentState.startBackgroundSyncAfterLogin(true); // Pass true for new user
 
           return { success: true };
         } else {
@@ -184,10 +184,9 @@ export const useAuth = create((set, _get) => ({
 
           // SECURITY FIX: Validate password BEFORE setting auth state (Issue #577)
           logger.auth("Validating password before allowing login");
-          // Safe external store access (prevents React error #185)
-          const passwordValid = await useAuth
-            .getState()
-            .validatePassword(password);
+          // Use get() parameter to avoid React error #185
+          const currentState = _get();
+          const passwordValid = await currentState.validatePassword(password);
           if (!passwordValid) {
             logger.auth(
               "Password validation failed - offering new budget creation",
@@ -318,9 +317,9 @@ export const useAuth = create((set, _get) => ({
           });
 
           // Start background sync after successful login
-          // Safe external store access (prevents React error #185)
-          const { startBackgroundSyncAfterLogin } = useAuth.getState();
-          await startBackgroundSyncAfterLogin();
+          // Use get() parameter to avoid React error #185
+          const authState = _get();
+          await authState.startBackgroundSyncAfterLogin();
 
           return { success: true, data: migratedData };
         }
@@ -429,9 +428,9 @@ export const useAuth = create((set, _get) => ({
         );
 
         // Start background sync after successful join
-        // Safe external store access (prevents React error #185)
-        const { startBackgroundSyncAfterLogin } = useAuth.getState();
-        await startBackgroundSyncAfterLogin(false); // Not a new user
+        // Use get() parameter to avoid React error #185
+        const currentState = _get();
+        await currentState.startBackgroundSyncAfterLogin(false); // Not a new user
 
         return { success: true, sharedBudget: true };
       } catch (error) {
@@ -576,7 +575,9 @@ export const useAuth = create((set, _get) => ({
 
   async updateProfile(updatedProfile) {
     try {
-      const { encryptionKey, salt: currentSalt } = useAuth.getState();
+      // TEMP: Get state via store reference - need to restructure this method
+      const storeState = useAuth.getState();
+      const { encryptionKey, salt: currentSalt } = storeState;
 
       if (!encryptionKey || !currentSalt) {
         return { success: false, error: "Not authenticated." };
@@ -641,7 +642,8 @@ export const useAuth = create((set, _get) => ({
       const { encryptionUtils } = await import(
         "../../utils/security/encryption"
       );
-      const authState = useAuth.getState();
+      // Get current state without triggering React error #185
+      const authState = _get();
       const savedData = localStorage.getItem("envelopeBudgetData");
 
       logger.auth("validatePassword: Data check", {
