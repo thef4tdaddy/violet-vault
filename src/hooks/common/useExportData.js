@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAuth } from "../../stores/auth/authStore.jsx";
+import { useAuthManager } from "../auth/useAuthManager";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 import { budgetDb, getBudgetMetadata } from "../../db/budgetDb.js";
@@ -109,7 +109,7 @@ const triggerDownload = (exportableData) => {
 };
 
 export const useExportData = () => {
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuthManager();
   const { showSuccessToast, showErrorToast, showWarningToast } =
     useToastHelpers();
 

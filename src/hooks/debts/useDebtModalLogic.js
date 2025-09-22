@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useMemo } from "react";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../auth/useAuthManager";
 import { initializeEditLocks } from "../../services/editLockService";
 import useEditLock from "../common/useEditLock";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
@@ -17,7 +17,7 @@ import {
 
 export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
   // Get auth context for edit locking
-  const { budgetId, currentUser } = useAuth();
+  const { securityContext: { budgetId }, user: currentUser } = useAuthManager();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { renderIcon } from "../../../utils";
 import ShareCodeModal from "../../sharing/ShareCodeModal";
 import JoinBudgetModal from "../../sharing/JoinBudgetModal";
-import { useAuth } from "../../../stores/auth/authStore";
+import { useAuthManager } from "../../../hooks/auth/useAuthManager";
 import logger from "../../../utils/common/logger";
 
 const AccountSettingsSection = ({
@@ -13,11 +13,11 @@ const AccountSettingsSection = ({
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const { joinBudgetWithShareCode } = useAuth();
+  const { joinBudget } = useAuthManager();
 
   const handleJoinSuccess = async (joinData) => {
     try {
-      const result = await joinBudgetWithShareCode(joinData);
+      const result = await joinBudget(joinData);
       if (result.success) {
         // Refresh the page or trigger a re-render to show the shared budget
         window.location.reload();

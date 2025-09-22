@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../auth/useAuthManager";
 import { useConfirm } from "../common/useConfirm";
 import useEditLock from "../common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
@@ -50,7 +50,7 @@ const useSupplementalAccounts = ({
   });
 
   // Auth and Locking
-  const { budgetId, currentUser: authCurrentUser } = useAuth();
+  const { securityContext: { budgetId }, user: authCurrentUser } = useAuthManager();
   const confirm = useConfirm();
 
   // Initialize edit lock service when component mounts
