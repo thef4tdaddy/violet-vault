@@ -68,8 +68,8 @@ const MainLayout = ({ firebaseSync }) => {
       handleLogout,
       handleChangePassword,
       handleUpdateProfile,
-      _internal: { securityManager } = {}
-    } = {}
+      _internal: { securityManager } = {},
+    } = {},
   } = auth;
 
   // Onboarding state - prevent security warning during tutorial
