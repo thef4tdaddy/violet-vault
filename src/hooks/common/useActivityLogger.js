@@ -4,14 +4,14 @@ import activityLogger, {
   ACTIVITY_TYPES,
   ENTITY_TYPES,
 } from "../../services/activityLogger";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../auth/useAuthManager";
 
 /**
  * Hook to provide activity logging functionality
  * Automatically sets current user and provides logging methods
  */
 const useActivityLogger = () => {
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuthManager();
 
   // Set current user when it changes
   useEffect(() => {

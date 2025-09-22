@@ -3,7 +3,7 @@ import { globalToast } from "../../stores/ui/toastStore";
 import useEditLock from "../../hooks/common/useEditLock";
 // eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use useEditLock hook instead
 import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/auth/authStore";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
@@ -21,7 +21,7 @@ const TransactionForm = ({
   onPayBill, // Optional callback for handling bill payments
 }) => {
   // Get auth context for edit locking
-  const { budgetId, currentUser } = useAuth();
+  const { securityContext: { budgetId }, user: currentUser } = useAuthManager();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {

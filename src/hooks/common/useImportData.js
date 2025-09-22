@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAuth } from "../../stores/auth/authStore.jsx";
+import { useAuthManager } from "../auth/useAuthManager";
 import { useConfirm } from "./useConfirm";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
@@ -58,7 +58,7 @@ const performImport = async (validatedData, showSuccessToast) => {
 };
 
 export const useImportData = () => {
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuthManager();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 
