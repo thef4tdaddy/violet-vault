@@ -159,7 +159,7 @@ const UserSetup = ({ onSetupComplete }) => {
               onClick={() => setShowJoinModal(true)}
               className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black flex items-center justify-center gap-2"
             >
-              {renderIcon("UserPlus", "h-4 w-4")}
+              {renderIcon("UserPlus", { className: "h-4 w-4" })}
               JOIN SHARED BUDGET
             </button>
           </div>
