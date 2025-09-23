@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAuth } from "../../stores/auth/authStore.jsx";
+import { useAuthManager } from "./useAuthManager";
 import logger from "../../utils/common/logger";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import {
@@ -15,15 +15,13 @@ import {
 const useAuthFlow = () => {
   const {
     isUnlocked,
-    encryptionKey,
-    currentUser,
+    user: currentUser,
     login,
     logout,
-    budgetId,
-    salt,
     changePassword,
     updateProfile,
-  } = useAuth();
+    securityContext: { encryptionKey, budgetId, salt }
+  } = useAuthManager();
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
