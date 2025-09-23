@@ -34,7 +34,7 @@ import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
 import PasswordRotationModal from "../auth/PasswordRotationModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
-import useBugReportV2 from "../../hooks/common/useBugReportV2";
+// import useBugReportV2 from "../../hooks/common/useBugReportV2"; // Not needed - FAB disabled
 import { pathToViewMap, viewToPathMap } from "./routeConfig";
 import BottomNavigationBar from "../mobile/BottomNavigationBar";
 
@@ -43,8 +43,9 @@ import BottomNavigationBar from "../mobile/BottomNavigationBar";
 const MainLayout = ({ firebaseSync }) => {
   // Removed noisy debug log - layout renders constantly
 
-  // Bug report functionality for FAB
-  const { openModal: openBugReport } = useBugReportV2();
+  // Bug report functionality for FAB - only initialize if FAB is enabled
+  // Currently FAB is not used, so don't initialize bug report hook
+  const openBugReport = null;
 
   // Navigation hooks for post-login redirect
   const location = useLocation();
