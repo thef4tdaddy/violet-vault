@@ -99,11 +99,9 @@ const MainLayout = ({ firebaseSync }) => {
 
   const [syncConflicts, setSyncConflicts] = useState(null);
 
-  // Toast notifications from Zustand store
-  const { toasts, removeToast } = useToastStore((state) => ({
-    toasts: state.toasts,
-    removeToast: state.removeToast,
-  }));
+  // Toast notifications from Zustand store - using shallow selector to prevent infinite loops
+  const toasts = useToastStore((state) => state.toasts);
+  const removeToast = useToastStore((state) => state.removeToast);
 
   // Log auth state changes only (not on every render)
   useEffect(() => {
@@ -217,9 +215,7 @@ const MainContent = ({
   securityManager,
   _openBugReport,
 }) => {
-  const budget = useBudgetStore((state) => ({
-    resetAllData: state.resetAllData,
-  }));
+  const resetAllData = useBudgetStore((state) => state.resetAllData);
   // Get current route for view determination
   const location = useLocation();
   const navigate = useNavigate();
@@ -318,7 +314,8 @@ const MainContent = ({
   const handleChangePassword = onChangePassword;
 
   // Get UI state from Zustand
-  const { isOnline, isSyncing } = budget;
+  const isOnline = useBudgetStore((state) => state.isOnline);
+  const isSyncing = useBudgetStore((state) => state.isSyncing);
 
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
@@ -409,7 +406,7 @@ const MainContent = ({
             onLogout={onLogout}
             onResetEncryption={() => {
               // Reset the budget context data first
-              budget.resetAllData();
+              resetAllData();
               // Then call the original reset function (clears localStorage and calls logout)
               onResetEncryption();
             }}
