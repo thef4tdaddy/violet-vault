@@ -1,17 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { keyManagementService } from "../keyManagementService";
 
-// Mock dependencies
-vi.mock("../../../stores/auth/authStore", () => ({
-  useAuth: {
-    getState: vi.fn(() => ({
-      encryptionKey: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-      salt: new Uint8Array([9, 10, 11, 12, 13, 14, 15, 16]),
-      currentUser: "testuser",
-      budgetId: "test-budget-id",
-    })),
-  },
-}));
+// Test data
+const mockEncryptionKey = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+const mockSalt = new Uint8Array([9, 10, 11, 12, 13, 14, 15, 16]);
+const mockCurrentUser = "testuser";
+const mockBudgetId = "test-budget-id";
+const mockLoginFunction = vi.fn().mockResolvedValue({ success: true });
 
 vi.mock("../../../utils/security/encryption", () => ({
   encryptionUtils: {
@@ -78,7 +73,7 @@ describe("keyManagementService", () => {
 
   describe("getCurrentKeyFingerprint", () => {
     it("should generate fingerprint for encryption key", async () => {
-      const fingerprint = await keyManagementService.getCurrentKeyFingerprint();
+      const fingerprint = await keyManagementService.getCurrentKeyFingerprint(mockEncryptionKey);
 
       expect(fingerprint).toBeTruthy();
       expect(typeof fingerprint).toBe("string");
@@ -86,14 +81,8 @@ describe("keyManagementService", () => {
     });
 
     it("should throw error when no encryption key available", async () => {
-      const { useAuth } = await import("../../../stores/auth/authStore");
-      useAuth.getState.mockReturnValueOnce({
-        encryptionKey: null,
-        salt: null,
-      });
-
       await expect(
-        keyManagementService.getCurrentKeyFingerprint(),
+        keyManagementService.getCurrentKeyFingerprint(null)
       ).rejects.toThrow("No encryption key available");
     });
   });
@@ -102,7 +91,7 @@ describe("keyManagementService", () => {
     it("should copy key to clipboard with auto-clear", async () => {
       vi.useFakeTimers();
 
-      await keyManagementService.copyKeyToClipboard(5);
+      await keyManagementService.copyKeyToClipboard(mockEncryptionKey, mockSalt, 5);
 
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
         expect.stringContaining('"type":"unprotected"'),
@@ -142,15 +131,9 @@ describe("keyManagementService", () => {
     });
 
     it("should handle missing auth state", async () => {
-      const { useAuth } = await import("../../../stores/auth/authStore");
-      useAuth.getState.mockReturnValueOnce({
-        encryptionKey: null,
-        salt: null,
-      });
-
-      await expect(keyManagementService.downloadKeyFile()).rejects.toThrow(
-        "No encryption key or salt available",
-      );
+      await expect(
+        keyManagementService.downloadKeyFile(null, null, mockCurrentUser, mockBudgetId)
+      ).rejects.toThrow("No encryption key or salt available");
     });
   });
 
@@ -186,12 +169,7 @@ describe("keyManagementService", () => {
     });
 
     it("should handle missing auth state", async () => {
-      const { useAuth } = await import("../../../stores/auth/authStore");
-      useAuth.getState.mockReturnValueOnce({
-        encryptionKey: null,
-        salt: null,
-      });
-
+      
       await expect(keyManagementService.generateQRCode()).rejects.toThrow(
         "No encryption key or salt available",
       );
@@ -258,13 +236,8 @@ describe("keyManagementService", () => {
         budgetId: "imported-budget",
       };
 
-      const { useAuth } = await import("../../../stores/auth/authStore");
+      
       const mockLogin = vi.fn(() => Promise.resolve());
-      useAuth.getState.mockReturnValueOnce({
-        login: mockLogin,
-      });
-
-      const result = await keyManagementService.importAndLogin(
         keyFile,
         null,
         "vaultpassword",
@@ -286,13 +259,8 @@ describe("keyManagementService", () => {
         user: "protected-user",
       };
 
-      const { useAuth } = await import("../../../stores/auth/authStore");
+      
       const mockLogin = vi.fn(() => Promise.resolve());
-      useAuth.getState.mockReturnValueOnce({
-        login: mockLogin,
-      });
-
-      const result = await keyManagementService.importAndLogin(
         keyFile,
         "exportpassword",
         "vaultpassword",

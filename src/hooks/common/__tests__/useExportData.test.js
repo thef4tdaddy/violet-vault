@@ -1,18 +1,18 @@
 import { renderHook } from "@testing-library/react";
 import { useExportData } from "../useExportData";
-import { useAuth } from "../../../stores/auth/authStore";
+import { useAuthManager } from "../../auth/useAuthManager";
 import { useToastHelpers } from "../../../utils/common/toastHelpers";
 import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
 import { vi } from "vitest";
 
-vi.mock("../../../stores/auth/authStore");
+vi.mock("../../auth/useAuthManager");
 vi.mock("../../../utils/common/toastHelpers");
 vi.mock("../../../db/budgetDb");
 
 describe("useExportData", () => {
   it("should export data successfully", async () => {
-    useAuth.mockReturnValue({
-      currentUser: { userName: "testuser", budgetId: "123" },
+    useAuthManager.mockReturnValue({
+      user: { userName: "testuser", budgetId: "123" },
     });
     const showSuccessToast = vi.fn();
     useToastHelpers.mockReturnValue({

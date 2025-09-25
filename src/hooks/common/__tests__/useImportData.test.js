@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { useImportData } from "../useImportData";
-import { useAuth } from "../../../stores/auth/authStore";
+import { useAuthManager } from "../../auth/useAuthManager";
 import { useToastHelpers } from "../../../utils/common/toastHelpers";
 import { useConfirm } from "../useConfirm";
 import { readFileContent } from "../../../utils/dataManagement/fileUtils";
@@ -17,7 +17,7 @@ import {
 import { queryClient } from "../../../utils/common/queryClient";
 import { vi } from "vitest";
 
-vi.mock("../../../stores/auth/authStore");
+vi.mock("../../auth/useAuthManager");
 vi.mock("../../../utils/common/toastHelpers");
 vi.mock("../useConfirm");
 vi.mock("../../../utils/dataManagement/fileUtils");
@@ -29,8 +29,8 @@ vi.mock("../../../utils/common/queryClient");
 
 describe("useImportData", () => {
   it("should import data successfully", async () => {
-    useAuth.mockReturnValue({
-      currentUser: { userName: "testuser", budgetId: "123" },
+    useAuthManager.mockReturnValue({
+      user: { userName: "testuser", budgetId: "123" },
     });
     const showSuccessToast = vi.fn();
     useToastHelpers.mockReturnValue({

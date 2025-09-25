@@ -588,10 +588,11 @@ export const changePassword = async (oldPassword, newPassword) => {
 
 /**
  * Initialize background sync after login
+ * @param {Object} authContext - Auth context with user data
  * @param {boolean} isNewUser - Whether this is a new user
  * @returns {Promise<void>}
  */
-export const startBackgroundSyncAfterLogin = async (isNewUser = false) => {
+export const startBackgroundSyncAfterLogin = async (authContext, isNewUser = false) => {
   try {
     // Add delay to prevent race conditions
     const syncDelay = isNewUser ? 3000 : 2500;
@@ -606,7 +607,7 @@ export const startBackgroundSyncAfterLogin = async (isNewUser = false) => {
     const budgetState = useBudgetStore.getState();
 
     if (budgetState.cloudSyncEnabled) {
-      await budgetState.startBackgroundSync();
+      await budgetState.startBackgroundSync(authContext);
       logger.auth("Background sync started successfully after login");
     } else {
       logger.auth("Cloud sync disabled - skipping background sync");
