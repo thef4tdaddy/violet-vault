@@ -98,7 +98,7 @@ export const useAuthCompatibility = () => {
  *
  * Components can change:
  * ```
- * import { useAuth } from "../../stores/auth/authStore";
+ * import { useAuth } from "@deprecated-removed-authStore";
  * ```
  *
  * To:

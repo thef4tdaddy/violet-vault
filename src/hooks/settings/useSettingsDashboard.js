@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { globalToast } from "../../stores/ui/toastStore";
+import { useAuthManager } from "../auth/useAuthManager";
 import logger from "../../utils/common/logger";
 
 /**
@@ -101,6 +102,7 @@ export const useSettingsDashboardUI = () => {
  */
 export const useCloudSyncManager = () => {
   const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
+  const { user: currentUser, securityContext: { encryptionKey, budgetId } } = useAuthManager();
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleToggleCloudSync = useCallback(async () => {
@@ -113,18 +115,12 @@ export const useCloudSyncManager = () => {
         const { cloudSyncService } = await import(
           "../../services/cloudSyncService"
         );
-        const { useAuth } = await import("../../stores/auth/authStore");
-        const authState = useAuth.getState();
 
-        if (
-          authState.encryptionKey &&
-          authState.currentUser &&
-          authState.budgetId
-        ) {
+        if (encryptionKey && currentUser && budgetId) {
           await cloudSyncService.start({
-            encryptionKey: authState.encryptionKey,
-            currentUser: authState.currentUser,
-            budgetId: authState.budgetId,
+            encryptionKey: encryptionKey,
+            currentUser: currentUser,
+            budgetId: budgetId,
           });
         }
       } catch (error) {
@@ -141,7 +137,7 @@ export const useCloudSyncManager = () => {
         logger.error("Failed to stop cloud sync:", error);
       }
     }
-  }, [cloudSyncEnabled, setCloudSyncEnabled]);
+  }, [cloudSyncEnabled, setCloudSyncEnabled, encryptionKey, currentUser, budgetId]);
 
   const handleManualSync = useCallback(async () => {
     if (!cloudSyncEnabled || isSyncing) return;
@@ -157,18 +153,12 @@ export const useCloudSyncManager = () => {
         logger.warn(
           "⚠️ Cloud sync service not running, starting temporarily...",
         );
-        const { useAuth } = await import("../../stores/auth/authStore");
-        const authState = useAuth.getState();
 
-        if (
-          authState.encryptionKey &&
-          authState.currentUser &&
-          authState.budgetId
-        ) {
+        if (encryptionKey && currentUser && budgetId) {
           await cloudSyncService.start({
-            encryptionKey: authState.encryptionKey,
-            currentUser: authState.currentUser,
-            budgetId: authState.budgetId,
+            encryptionKey: encryptionKey,
+            currentUser: currentUser,
+            budgetId: budgetId,
           });
         } else {
           throw new Error("Missing authentication context for sync");
@@ -189,7 +179,7 @@ export const useCloudSyncManager = () => {
     } finally {
       setIsSyncing(false);
     }
-  }, [cloudSyncEnabled, isSyncing]);
+  }, [cloudSyncEnabled, isSyncing, encryptionKey, currentUser, budgetId]);
 
   return {
     // State

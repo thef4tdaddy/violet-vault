@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { getIcon } from "../../utils";
 // eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use hooks instead of direct service calls
 import { keyManagementService } from "../../services/keys/keyManagementService";
+import { useAuthManager } from "../../hooks/auth/useAuthManager";
 import {
   useKeyManagementUI,
   useKeyManagementOperations,
@@ -13,6 +14,9 @@ import AdvancedSection from "./key-management/AdvancedSection";
 import logger from "../../utils/common/logger";
 
 const KeyManagementSettings = ({ isOpen, onClose }) => {
+  // Get auth context
+  const { login, user: currentUser, securityContext: { encryptionKey, salt, budgetId } } = useAuthManager();
+  
   // Use extracted UI hooks
   const {
     activeTab,
@@ -51,7 +55,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
   React.useEffect(() => {
     if (isOpen) {
       keyManagementService
-        .getCurrentKeyFingerprint()
+        .getCurrentKeyFingerprint(encryptionKey)
         .then(setKeyFingerprint)
         .catch(logger.error);
     }
@@ -66,7 +70,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
 
   const handleCopyToClipboard = async () => {
     try {
-      await keyManagementService.copyKeyToClipboard(30);
+      await keyManagementService.copyKeyToClipboard(encryptionKey, salt, 30);
       handleClipboardSuccess();
     } catch (err) {
       handleOperationError("Clipboard copy", err);
@@ -75,7 +79,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
 
   const handleDownloadUnprotected = async () => {
     try {
-      await keyManagementService.downloadKeyFile();
+      await keyManagementService.downloadKeyFile(encryptionKey, salt, currentUser, budgetId);
     } catch (err) {
       handleOperationError("Download", err);
     }
@@ -87,7 +91,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
     }
 
     try {
-      await keyManagementService.downloadProtectedKeyFile(exportPassword);
+      await keyManagementService.downloadProtectedKeyFile(encryptionKey, salt, currentUser, budgetId, exportPassword);
       updatePassword("export", "");
     } catch (err) {
       handleOperationError("Protected download", err);
@@ -117,6 +121,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
         keyFileData,
         validation.type === "protected" ? importPassword : null,
         vaultPassword,
+        login
       );
 
       setImportResult(result);
@@ -130,7 +135,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
   const handleGenerateQRCode = async () => {
     try {
       setLoading(true);
-      await keyManagementService.generateQRCode();
+      await keyManagementService.generateQRCode(encryptionKey, salt);
       // QR code display functionality can be added to the service
     } catch (err) {
       handleOperationError("QR code generation", err);

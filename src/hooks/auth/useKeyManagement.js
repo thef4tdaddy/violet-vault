@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "../../stores/auth/authStore.jsx";
+import { useAuthManager } from "./useAuthManager";
 import { keyExportUtils } from "../../utils/security/keyExport";
 import logger from "../../utils/common/logger";
 
@@ -12,7 +12,7 @@ export const useKeyManagement = () => {
   const [error, setError] = useState(null);
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
 
-  const { encryptionKey, salt, budgetId, login } = useAuth();
+  const { login, securityContext: { encryptionKey, salt, budgetId } } = useAuthManager();
 
   // Clear error state
   const clearError = useCallback(() => {

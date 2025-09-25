@@ -9,11 +9,8 @@ class KeyManagementService {
   /**
    * Generate a cryptographic fingerprint for the current encryption key
    */
-  async getCurrentKeyFingerprint() {
+  async getCurrentKeyFingerprint(encryptionKey) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey } = useAuth.getState();
-
       if (!encryptionKey) {
         throw new Error("No encryption key available");
       }
@@ -50,11 +47,8 @@ class KeyManagementService {
   /**
    * Copy the current encryption key to clipboard with auto-clear
    */
-  async copyKeyToClipboard(clearTimeoutSeconds = 30) {
+  async copyKeyToClipboard(encryptionKey, salt, clearTimeoutSeconds = 30) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
         throw new Error("No encryption key or salt available");
       }
@@ -94,11 +88,8 @@ class KeyManagementService {
   /**
    * Download unprotected key file
    */
-  async downloadKeyFile() {
+  async downloadKeyFile(encryptionKey, salt, currentUser, budgetId) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt, currentUser, budgetId } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
         throw new Error("No encryption key or salt available");
       }
@@ -136,11 +127,8 @@ class KeyManagementService {
   /**
    * Download password-protected key file
    */
-  async downloadProtectedKeyFile(exportPassword) {
+  async downloadProtectedKeyFile(encryptionKey, salt, currentUser, budgetId, exportPassword) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt, currentUser, budgetId } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
         throw new Error("No encryption key or salt available");
       }
@@ -197,11 +185,8 @@ class KeyManagementService {
   /**
    * Generate QR code for key sharing
    */
-  async generateQRCode() {
+  async generateQRCode(encryptionKey, salt) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
         throw new Error("No encryption key or salt available");
       }
@@ -287,7 +272,7 @@ class KeyManagementService {
   /**
    * Import key file and perform login
    */
-  async importAndLogin(keyFileData, importPassword, vaultPassword) {
+  async importAndLogin(keyFileData, importPassword, vaultPassword, loginFunction) {
     try {
       logger.debug("Starting key import and login process");
 
@@ -327,8 +312,7 @@ class KeyManagementService {
       };
 
       // Perform login with imported key
-      const { useAuth } = await import("../../stores/auth/authStore");
-      await useAuth.getState().login(vaultPassword, userData);
+      await loginFunction(vaultPassword, userData);
 
       const result = {
         success: true,
