@@ -17,7 +17,7 @@ import type {
   TypedResponse,
   SafeUnknown
 } from '../types/firebase';
-import type { isString, isObject } from '../types/common';
+import { isString, isObject } from '../types/common';
 import {
   firebaseErrorHandler,
   syncOperationWrapper,
