@@ -2,6 +2,8 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import typescriptParser from "@typescript-eslint/parser";
 import zustandSafePatterns from "./eslint-rules/zustand-safe-patterns.js";
 
 export default [
@@ -397,6 +399,75 @@ export default [
           ],
         },
       ], // Allow React Context imports for auth but still block lucide-react
+    },
+  },
+  // TypeScript configuration
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: typescriptParser,
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        // Vitest globals (when globals: true in vitest.config.js)
+        vi: "readonly",
+        describe: "readonly",
+        test: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+      },
+      sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      "@typescript-eslint": typescriptEslint,
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+      "zustand-safe-patterns": zustandSafePatterns,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      // TypeScript-specific rules
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { 
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^(_|[A-Z_]+)",
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": "off", // Allow any for gradual migration
+      "@typescript-eslint/no-non-null-assertion": "off", // Allow ! for gradual migration
+      // Disable base rule as it can report incorrect errors with TypeScript
+      "no-unused-vars": "off",
+      // Standard rules for TypeScript files
+      "no-console": [
+        "warn",
+        {
+          allow: ["warn", "error", "info", "debug"],
+        },
+      ],
+      "max-lines-per-function": ["warn", { max: 75 }],
+      "max-statements": ["warn", { max: 25 }],
+      "max-params": ["warn", { max: 5 }],
+      complexity: ["warn", { max: 15 }],
+      "prefer-const": "warn",
+      "no-var": "error",
+      "no-duplicate-imports": "error",
+      "no-unreachable": "error",
+      "no-unused-expressions": "error",
+      // Zustand safe patterns rules
+      "zustand-safe-patterns/zustand-no-get-in-actions": "error",
+      "zustand-safe-patterns/zustand-no-recreating-functions": "warn",
+      "zustand-safe-patterns/zustand-selective-subscriptions": "warn",
     },
   },
 ];
