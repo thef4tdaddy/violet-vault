@@ -3,10 +3,22 @@
  * Extracted from PerformanceMonitor.jsx for better organization
  */
 
+// Performance score ranges for consistency
+export type PerformanceScore = number;
+
+// Icon configuration types
+export interface IconConfig {
+  name: string;
+  color: string;
+}
+
+export type AlertType = "error" | "warning" | "info" | "success";
+export type RecommendationType = "success" | "info" | "warning" | "tip";
+
 /**
  * Get color classes for performance score display
  */
-export const getScoreColor = (score) => {
+export const getScoreColor = (score: PerformanceScore): string => {
   if (score >= 90) return "text-green-600 bg-green-100";
   if (score >= 70) return "text-blue-600 bg-blue-100";
   if (score >= 50) return "text-yellow-600 bg-yellow-100";
@@ -16,7 +28,7 @@ export const getScoreColor = (score) => {
 /**
  * Get background color classes for performance score bars
  */
-export const getScoreBgColor = (score) => {
+export const getScoreBgColor = (score: PerformanceScore): string => {
   if (score >= 90) return "bg-green-500";
   if (score >= 70) return "bg-blue-500";
   if (score >= 50) return "bg-yellow-500";
@@ -26,7 +38,7 @@ export const getScoreBgColor = (score) => {
 /**
  * Get performance message based on overall score
  */
-export const getPerformanceMessage = (score) => {
+export const getPerformanceMessage = (score: PerformanceScore): string => {
   if (score >= 90) {
     return "Excellent financial management with strong performance across all areas";
   }
@@ -42,7 +54,7 @@ export const getPerformanceMessage = (score) => {
 /**
  * Get alert icon type based on alert type
  */
-export const getAlertIconType = (type) => {
+export const getAlertIconType = (type: AlertType): IconConfig => {
   switch (type) {
     case "error":
       return { name: "AlertTriangle", color: "text-red-500" };
@@ -58,7 +70,7 @@ export const getAlertIconType = (type) => {
 /**
  * Get recommendation icon type based on recommendation type
  */
-export const getRecommendationIconType = (type) => {
+export const getRecommendationIconType = (type: RecommendationType): IconConfig => {
   switch (type) {
     case "success":
       return { name: "CheckCircle", color: "text-green-500" };

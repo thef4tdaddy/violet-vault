@@ -3,10 +3,68 @@
  * Handles account data formatting, type definitions, and ID generation
  */
 
+// Type definitions for account helpers
+export interface AccountType {
+  value: string;
+  label: string;
+  icon: string;
+}
+
+export interface User {
+  displayName?: string;
+  email?: string;
+  uid?: string;
+}
+
+export interface AccountForm {
+  name: string;
+  type: string;
+  currentBalance: string | number;
+  annualContribution?: string | number;
+  expirationDate?: string;
+  description?: string;
+  color: string;
+  isActive: boolean;
+}
+
+export interface FormattedAccount {
+  id: string;
+  name: string;
+  type: string;
+  currentBalance: number;
+  annualContribution: number;
+  expirationDate: string | null;
+  description: string | null;
+  color: string;
+  isActive: boolean;
+  createdBy: string;
+  transactions: any[];
+  createdAt: string;
+  lastUpdated: string;
+}
+
+export interface Transaction {
+  id: string;
+  accountId: string | number;
+  type: string;
+  amount: number;
+  description: string;
+  relatedEntityId?: string | null;
+  metadata?: Record<string, any>;
+  timestamp: string;
+}
+
+export interface TransferForm {
+  fromAccount: string;
+  toEnvelope: string;
+  amount: string | number;
+  description: string;
+}
+
 /**
  * Account type definitions with icons and labels
  */
-export const ACCOUNT_TYPES = [
+export const ACCOUNT_TYPES: AccountType[] = [
   { value: "FSA", label: "FSA (Flexible Spending Account)", icon: "🏥" },
   { value: "HSA", label: "HSA (Health Savings Account)", icon: "💊" },
   { value: "Dependent Care FSA", label: "Dependent Care FSA", icon: "👶" },
@@ -20,7 +78,7 @@ export const ACCOUNT_TYPES = [
 /**
  * Available color options for accounts
  */
-export const ACCOUNT_COLORS = [
+export const ACCOUNT_COLORS: string[] = [
   "#06b6d4", // cyan
   "#10b981", // emerald
   "#8b5cf6", // violet
@@ -35,33 +93,29 @@ export const ACCOUNT_COLORS = [
 
 /**
  * Gets account type information by value
- * @param {string} type - Account type value
- * @returns {Object} Account type info with icon and label
  */
-export const getAccountTypeInfo = (type) => {
+export const getAccountTypeInfo = (type: string): AccountType => {
   return (
     ACCOUNT_TYPES.find((t) => t.value === type) ||
-    ACCOUNT_TYPES.find((t) => t.value === "Other")
+    ACCOUNT_TYPES.find((t) => t.value === "Other")!
   );
 };
 
 /**
  * Formats account form data into a complete account object
- * @param {Object} accountForm - Form data
- * @param {Object} currentUser - Current user info
- * @returns {Object} Formatted account data
  */
-export const formatAccountData = (accountForm, currentUser) => {
+export const formatAccountData = (accountForm: AccountForm, currentUser: User): FormattedAccount => {
   return {
+    id: generateAccountId(),
     name: accountForm.name.trim(),
     type: accountForm.type,
-    currentBalance: parseFloat(accountForm.currentBalance) || 0,
-    annualContribution: parseFloat(accountForm.annualContribution) || 0,
+    currentBalance: parseFloat(String(accountForm.currentBalance)) || 0,
+    annualContribution: parseFloat(String(accountForm.annualContribution || 0)) || 0,
     expirationDate: accountForm.expirationDate || null,
     description: accountForm.description?.trim() || null,
     color: accountForm.color,
     isActive: accountForm.isActive,
-    createdBy: currentUser.userName,
+    createdBy: currentUser.displayName || currentUser.email || "Unknown User",
     createdAt: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     transactions: [],
@@ -70,19 +124,17 @@ export const formatAccountData = (accountForm, currentUser) => {
 
 /**
  * Generates a unique account ID
- * @returns {number} Timestamp-based ID
  */
 let idCounter = 0;
-export const generateAccountId = () => {
+export const generateAccountId = (): string => {
   // Ensure unique IDs even when called in quick succession
-  return Date.now() + ++idCounter;
+  return String(Date.now() + ++idCounter);
 };
 
 /**
  * Creates a default account form object
- * @returns {Object} Default form data
  */
-export const createDefaultAccountForm = () => {
+export const createDefaultAccountForm = (): AccountForm => {
   return {
     name: "",
     type: "FSA",
@@ -97,12 +149,11 @@ export const createDefaultAccountForm = () => {
 
 /**
  * Creates a default transfer form object
- * @param {string} fromAccountName - Name of source account
- * @returns {Object} Default transfer form data
  */
-export const createDefaultTransferForm = (fromAccountName = "") => {
+export const createDefaultTransferForm = (fromAccountName = ""): Partial<TransferForm> => {
   return {
-    envelopeId: "",
+    fromAccount: "",
+    toEnvelope: "",
     amount: "",
     description: fromAccountName ? `Transfer from ${fromAccountName}` : "",
   };
@@ -110,12 +161,9 @@ export const createDefaultTransferForm = (fromAccountName = "") => {
 
 /**
  * Formats currency amount for display
- * @param {number} amount - Amount to format
- * @param {boolean} showDecimals - Whether to show decimal places
- * @returns {string} Formatted currency string
  */
-export const formatCurrency = (amount, showDecimals = true) => {
-  if (typeof amount !== "number" || isNaN(amount)) {
+export const formatCurrency = (amount: number, showDecimals = true): string => {
+  if (typeof amount !== "number" || isNaN(amount) || !isFinite(amount)) {
     return "$0.00";
   }
 
@@ -124,17 +172,14 @@ export const formatCurrency = (amount, showDecimals = true) => {
 
 /**
  * Formats date for display
- * @param {string} dateString - ISO date string
- * @param {Object} options - Formatting options
- * @returns {string} Formatted date string
  */
-export const formatDate = (dateString, options = {}) => {
+export const formatDate = (dateString: string, options: Intl.DateTimeFormatOptions = {}): string => {
   if (!dateString) return "";
 
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return "Invalid Date";
 
-  const defaultOptions = {
+  const defaultOptions: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -145,8 +190,6 @@ export const formatDate = (dateString, options = {}) => {
 
 /**
  * Creates a transaction record for account operations
- * @param {Object} params - Transaction parameters
- * @returns {Object} Transaction record
  */
 export const createAccountTransaction = ({
   accountId,
@@ -155,7 +198,14 @@ export const createAccountTransaction = ({
   description,
   relatedEntityId = null, // envelope ID for transfers
   metadata = {},
-}) => {
+}: {
+  accountId: string | number;
+  type: string;
+  amount: number;
+  description: string;
+  relatedEntityId?: string | null;
+  metadata?: Record<string, any>;
+}): Transaction => {
   return {
     id: generateAccountId(),
     accountId,
@@ -170,10 +220,8 @@ export const createAccountTransaction = ({
 
 /**
  * Validates account color
- * @param {string} color - Hex color string
- * @returns {boolean} Whether color is valid
  */
-export const isValidAccountColor = (color) => {
+export const isValidAccountColor = (color: string): boolean => {
   if (!color || typeof color !== "string") return false;
 
   // Check if it's a valid hex color
@@ -183,14 +231,12 @@ export const isValidAccountColor = (color) => {
 
 /**
  * Gets the appropriate icon component name for account type
- * @param {string} type - Account type
- * @returns {string} Icon component name
  */
-export const getAccountIconName = (type) => {
+export const getAccountIconName = (type: string): string => {
   const _typeInfo = getAccountTypeInfo(type);
 
   // Map account types to Lucide icon names
-  const iconMap = {
+  const iconMap: Record<string, string> = {
     FSA: "Heart",
     HSA: "Shield",
     "Dependent Care FSA": "Baby",
@@ -206,14 +252,11 @@ export const getAccountIconName = (type) => {
 
 /**
  * Calculates account utilization percentage
- * @param {number} currentBalance - Current balance
- * @param {number} annualContribution - Annual contribution limit
- * @returns {number} Utilization percentage (0-100)
  */
 export const calculateAccountUtilization = (
-  currentBalance,
-  annualContribution,
-) => {
+  currentBalance: number,
+  annualContribution: number,
+): number => {
   if (!annualContribution || annualContribution <= 0) return 0;
   if (!currentBalance || currentBalance <= 0) return 0;
 
@@ -221,16 +264,24 @@ export const calculateAccountUtilization = (
   return Math.min(100, Math.max(0, utilization));
 };
 
+export interface FilterCriteria {
+  activeOnly?: boolean;
+  type?: string;
+  minBalance?: number;
+  expiringSoon?: boolean;
+  expirationDays?: number;
+  search?: string;
+}
+
+type SortCriteria = "name" | "balance" | "type" | "expiration" | "lastUpdated";
+
 /**
  * Sorts accounts by priority criteria
- * @param {Array} accounts - Array of accounts
- * @param {string} sortBy - Sort criteria
- * @returns {Array} Sorted accounts
  */
-export const sortAccounts = (accounts, sortBy = "name") => {
+export const sortAccounts = (accounts: FormattedAccount[], sortBy: SortCriteria = "name"): FormattedAccount[] => {
   if (!Array.isArray(accounts)) return [];
 
-  const sortFunctions = {
+  const sortFunctions: Record<SortCriteria, (a: FormattedAccount, b: FormattedAccount) => number> = {
     name: (a, b) => a.name.localeCompare(b.name),
     balance: (a, b) => b.currentBalance - a.currentBalance,
     type: (a, b) => a.type.localeCompare(b.type),
@@ -238,9 +289,9 @@ export const sortAccounts = (accounts, sortBy = "name") => {
       if (!a.expirationDate && !b.expirationDate) return 0;
       if (!a.expirationDate) return 1;
       if (!b.expirationDate) return -1;
-      return new Date(a.expirationDate) - new Date(b.expirationDate);
+      return new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime();
     },
-    lastUpdated: (a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated),
+    lastUpdated: (a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
   };
 
   return [...accounts].sort(sortFunctions[sortBy] || sortFunctions.name);
@@ -248,11 +299,8 @@ export const sortAccounts = (accounts, sortBy = "name") => {
 
 /**
  * Filters accounts by various criteria
- * @param {Array} accounts - Array of accounts
- * @param {Object} filters - Filter criteria
- * @returns {Array} Filtered accounts
  */
-export const filterAccounts = (accounts, filters = {}) => {
+export const filterAccounts = (accounts: FormattedAccount[], filters: FilterCriteria = {}): FormattedAccount[] => {
   if (!Array.isArray(accounts)) return [];
 
   let filteredAccounts = [...accounts];
@@ -272,7 +320,7 @@ export const filterAccounts = (accounts, filters = {}) => {
   // Filter by minimum balance
   if (filters.minBalance !== undefined) {
     filteredAccounts = filteredAccounts.filter(
-      (account) => account.currentBalance >= filters.minBalance,
+      (account) => account.currentBalance >= filters.minBalance!,
     );
   }
 
@@ -300,7 +348,7 @@ export const filterAccounts = (accounts, filters = {}) => {
 };
 
 // Helper function for expiration calculation (imported from validation)
-const calculateDaysUntilExpiration = (expirationDate) => {
+const calculateDaysUntilExpiration = (expirationDate: string): number | null => {
   if (!expirationDate) return null;
 
   const today = new Date();
@@ -309,7 +357,7 @@ const calculateDaysUntilExpiration = (expirationDate) => {
   today.setHours(0, 0, 0, 0);
   expiry.setHours(0, 0, 0, 0);
 
-  const diffTime = expiry - today;
+  const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return diffDays;

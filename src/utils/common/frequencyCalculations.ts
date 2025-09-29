@@ -14,8 +14,19 @@
 
 import logger from "../common/logger";
 
+// Type definitions for frequency calculations
+export type Frequency = "weekly" | "biweekly" | "monthly" | "quarterly" | "yearly";
+
+export interface FrequencyMultipliers {
+  weekly: number;
+  biweekly: number;
+  monthly: number;
+  quarterly: number;
+  yearly: number;
+}
+
 // Precise frequency multipliers (periods per year)
-export const FREQUENCY_MULTIPLIERS = {
+export const FREQUENCY_MULTIPLIERS: FrequencyMultipliers = {
   weekly: 52.1775, // More precise than 52
   biweekly: 26, // Use simple 26 for consistency across app
   monthly: 12,
@@ -24,7 +35,7 @@ export const FREQUENCY_MULTIPLIERS = {
 };
 
 // Legacy multipliers for compatibility (less precise)
-export const LEGACY_MULTIPLIERS = {
+export const LEGACY_MULTIPLIERS: FrequencyMultipliers = {
   weekly: 52,
   biweekly: 26,
   monthly: 12,
@@ -34,18 +45,13 @@ export const LEGACY_MULTIPLIERS = {
 
 /**
  * Convert any amount from one frequency to another
- * @param {number} amount - The amount to convert
- * @param {string} fromFrequency - Source frequency
- * @param {string} toFrequency - Target frequency
- * @param {boolean} usePrecise - Use precise multipliers (default: true)
- * @returns {number} Converted amount
  */
 export function convertFrequency(
-  amount,
-  fromFrequency,
-  toFrequency,
+  amount: number,
+  fromFrequency: Frequency,
+  toFrequency: Frequency,
   usePrecise = true,
-) {
+): number {
   if (!amount || fromFrequency === toFrequency) return amount;
 
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
@@ -65,62 +71,42 @@ export function convertFrequency(
 
 /**
  * Convert any amount to biweekly amount
- * @param {number} amount - The amount to convert
- * @param {string} fromFrequency - Source frequency
- * @param {boolean} usePrecise - Use precise multipliers (default: true)
- * @returns {number} Biweekly amount
  */
-export function toBiweekly(amount, fromFrequency, usePrecise = true) {
+export function toBiweekly(amount: number, fromFrequency: Frequency, usePrecise = true): number {
   return convertFrequency(amount, fromFrequency, "biweekly", usePrecise);
 }
 
 /**
  * Convert any amount to monthly amount
- * @param {number} amount - The amount to convert
- * @param {string} fromFrequency - Source frequency
- * @param {boolean} usePrecise - Use precise multipliers (default: true)
- * @returns {number} Monthly amount
  */
-export function toMonthly(amount, fromFrequency, usePrecise = true) {
+export function toMonthly(amount: number, fromFrequency: Frequency, usePrecise = true): number {
   return convertFrequency(amount, fromFrequency, "monthly", usePrecise);
 }
 
 /**
  * Convert any amount to yearly amount
- * @param {number} amount - The amount to convert
- * @param {string} fromFrequency - Source frequency
- * @param {boolean} usePrecise - Use precise multipliers (default: true)
- * @returns {number} Yearly amount
  */
-export function toYearly(amount, fromFrequency, usePrecise = true) {
+export function toYearly(amount: number, fromFrequency: Frequency, usePrecise = true): number {
   return convertFrequency(amount, fromFrequency, "yearly", usePrecise);
 }
 
 /**
  * Get frequency multiplier for a given frequency
- * @param {string} frequency - The frequency to get multiplier for
- * @param {boolean} usePrecise - Use precise multipliers (default: true)
- * @returns {number} Frequency multiplier (periods per year)
  */
-export function getMultiplier(frequency, usePrecise = true) {
+export function getMultiplier(frequency: Frequency, usePrecise = true): number {
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
   return multipliers[frequency] || 1;
 }
 
 /**
  * Calculate how much needs to be saved per paycheck to reach a target
- * @param {number} targetAmount - Target amount to reach
- * @param {string} targetFrequency - Frequency of the target amount
- * @param {string} paycheckFrequency - How often you get paid (default: biweekly)
- * @param {boolean} usePrecise - Use precise multipliers (default: true)
- * @returns {number} Amount needed per paycheck
  */
 export function calculatePaycheckAmount(
-  targetAmount,
-  targetFrequency,
-  paycheckFrequency = "biweekly",
+  targetAmount: number,
+  targetFrequency: Frequency,
+  paycheckFrequency: Frequency = "biweekly",
   usePrecise = true,
-) {
+): number {
   return convertFrequency(
     targetAmount,
     targetFrequency,
@@ -129,20 +115,23 @@ export function calculatePaycheckAmount(
   );
 }
 
+export interface FrequencyOption {
+  value: Frequency;
+  label: string;
+  multiplier: number;
+}
+
 /**
  * Validate frequency string
- * @param {string} frequency - The frequency to validate
- * @returns {boolean} Whether the frequency is valid
  */
-export function isValidFrequency(frequency) {
+export function isValidFrequency(frequency: string): frequency is Frequency {
   return Object.keys(FREQUENCY_MULTIPLIERS).includes(frequency);
 }
 
 /**
  * Get all supported frequencies
- * @returns {Array<{value: string, label: string, multiplier: number}>} Array of frequency options
  */
-export function getFrequencyOptions(usePrecise = true) {
+export function getFrequencyOptions(usePrecise = true): FrequencyOption[] {
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
 
   return [
@@ -160,11 +149,8 @@ export function getFrequencyOptions(usePrecise = true) {
 
 /**
  * Get display text for a frequency value
- * @param {string} frequency - The frequency to get display text for
- * @param {number} customFrequency - Custom multiplier for the frequency
- * @returns {string} Human readable frequency text
  */
-export function getFrequencyDisplayText(frequency, customFrequency = 1) {
+export function getFrequencyDisplayText(frequency: string, customFrequency = 1): string {
   if (!frequency) return "Not set";
 
   const baseLabels = {

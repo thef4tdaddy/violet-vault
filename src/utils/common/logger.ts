@@ -1,33 +1,64 @@
 // Dynamic import to avoid circular dependency with highlight.js
-let H = null;
+// Type definitions for the logger utility
+
+/**
+ * Data payload for logging methods
+ */
+export interface LogData {
+  [key: string]: any;
+}
+
+/**
+ * Highlight.io client interface - matches actual highlight.run package
+ */
+interface HighlightClient {
+  track: (event: string, data: LogData) => void;
+  consumeError: (error: Error, message?: string, payload?: {
+    [key: string]: string;
+  }) => void;
+}
+
+/**
+ * Highlight.io module interface
+ */
+interface HighlightModule {
+  H: HighlightClient;
+}
+
+// Initialize H with proper typing
+let H: HighlightClient | null = null;
 
 class Logger {
+  private readonly isDevelopment: boolean;
+  private readonly isDevSite: boolean;
+  private readonly debugThrottles: Map<string, number>;
+
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
     this.isDevSite = this.getIsDevSite();
-    this.debugThrottles = new Map(); // For throttling frequent debug messages
+    this.debugThrottles = new Map<string, number>(); // For throttling frequent debug messages
   }
 
   // Initialize H when needed
-  initH() {
+  private initH(): HighlightClient {
     if (!H) {
       try {
         // Use dynamic import to avoid circular dependency
         import("../common/highlight.js")
-          .then((module) => {
+          .then((module: HighlightModule) => {
             H = module.H;
           })
           .catch(() => {
-            H = { track: () => {}, consumeError: () => {} }; // Fallback mock
+            H = { track: () => {}, consumeError: () => {} } as HighlightClient; // Fallback mock
           });
       } catch {
-        H = { track: () => {}, consumeError: () => {} }; // Fallback mock
+        H = { track: () => {}, consumeError: () => {} } as HighlightClient; // Fallback mock
       }
     }
-    return H || { track: () => {}, consumeError: () => {} };
+    return H || { track: () => {}, consumeError: () => {} } as HighlightClient;
   }
 
-  getIsDevSite() {
+  private getIsDevSite(): boolean {
     if (typeof window === "undefined") return false;
     return (
       window.location.hostname === "localhost" ||
@@ -44,11 +75,11 @@ class Logger {
   }
 
   // Debug-level logging for development and sync issues
-  debug(message, data = {}) {
+  public debug(message: string, data: LogData = {}): void {
     // Show debug logs only in development or on dev.* sites
     if (this.isDevelopment || this.isDevSite) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
-      const consoleLog = window.originalConsoleLog || console.log;
+      const consoleLog = (typeof window !== "undefined" && (window as any).originalConsoleLog) || console.log;
       consoleLog(
         `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
         data,
@@ -71,7 +102,7 @@ class Logger {
   }
 
   // Throttled debug logging for frequently called functions (like React renders)
-  debugThrottled(message, data = {}, throttleMs = 1000) {
+  public debugThrottled(message: string, data: LogData = {}, throttleMs: number = 1000): void {
     const key = message;
     const now = Date.now();
     const lastCall = this.debugThrottles.get(key);
@@ -83,10 +114,10 @@ class Logger {
   }
 
   // Info-level logging for important events
-  info(message, data = {}) {
+  public info(message: string, data: LogData = {}): void {
     // Show info logs only in development or on dev.* sites
     if (this.isDevelopment || this.isDevSite) {
-      const consoleLog = window.originalConsoleLog || console.log;
+      const consoleLog = (typeof window !== "undefined" && (window as any).originalConsoleLog) || console.log;
       consoleLog(`ℹ️ ${message}`, data);
     }
 
@@ -105,7 +136,7 @@ class Logger {
   }
 
   // Warning-level logging
-  warn(message, data = {}) {
+  public warn(message: string, data: LogData = {}): void {
     console.warn(`⚠️ ${message}`, data);
 
     const h = this.initH();
@@ -119,23 +150,36 @@ class Logger {
   }
 
   // Error-level logging
-  error(message, error = null, data = {}) {
+  public error(message: string, error: Error | null = null, data: LogData = {}): void {
     console.error(`❌ ${message}`, error, data);
 
     const h = this.initH();
     if (h && h.consumeError) {
       if (error instanceof Error) {
-        h.consumeError(error, {
-          metadata: { message, ...data },
-          tags: { component: "app" },
-        });
+        h.consumeError(error, message, this.convertToStringPayload({ ...data, component: "app" }));
       } else {
-        h.consumeError(new Error(message), {
-          metadata: data,
-          tags: { component: "app" },
-        });
+        h.consumeError(new Error(message), undefined, this.convertToStringPayload({ ...data, component: "app" }));
       }
     }
+  }
+
+  /**
+   * Convert LogData to string payload for Highlight.io compatibility
+   */
+  private convertToStringPayload(data: LogData): { [key: string]: string } {
+    const payload: { [key: string]: string } = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== null && value !== undefined) {
+        try {
+          payload[key] = typeof value === 'string' ? value : JSON.stringify(value);
+        } catch (error) {
+          payload[key] = String(value);
+        }
+      }
+    }
+    
+    return payload;
   }
 
   // Production-level logging for important user-visible events
@@ -153,9 +197,9 @@ class Logger {
   // - Debug/development info
   // - Frequent operations (renders, calculations)
   // - Internal state changes
-  production(message, data = {}) {
+  public production(message: string, data: LogData = {}): void {
     // Always show production logs in console with distinctive styling
-    const consoleLog = window.originalConsoleLog || console.log;
+    const consoleLog = (typeof window !== "undefined" && (window as any).originalConsoleLog) || console.log;
     consoleLog(`🟢 [PROD] ${message}`, data);
 
     try {
@@ -173,7 +217,7 @@ class Logger {
   }
 
   // Specific methods for common debugging scenarios
-  budgetSync(message, data = {}) {
+  public budgetSync(message: string, data: LogData = {}): void {
     // Only log budget sync in development mode to reduce production noise
     if (this.isDevelopment) {
       console.log(`💰 [BUDGET-SYNC] ${message}`, data);
@@ -195,10 +239,11 @@ class Logger {
           message.includes("sync issue")
         ) {
           if (h.consumeError) {
-            h.consumeError(new Error(`Budget Sync: ${message}`), {
-              metadata: data,
-              tags: { category: "budget-sync", critical: "true" },
-            });
+            h.consumeError(
+              new Error(`Budget Sync: ${message}`), 
+              `Critical budget sync: ${message}`,
+              this.convertToStringPayload({ ...data, category: "budget-sync", critical: "true" })
+            );
           }
         }
       }
@@ -207,7 +252,7 @@ class Logger {
     }
   }
 
-  auth(message, data = {}) {
+  public auth(message: string, data: LogData = {}): void {
     // Filter sensitive data
     const sanitizedData = { ...data };
     delete sanitizedData.password;
@@ -220,7 +265,7 @@ class Logger {
     });
   }
 
-  firebase(message, data = {}) {
+  public firebase(message: string, data: LogData = {}): void {
     this.debug(`[FIREBASE] ${message}`, {
       ...data,
       category: "firebase",
@@ -228,7 +273,7 @@ class Logger {
   }
 
   // Performance logging
-  performance(operation, duration, data = {}) {
+  public performance(operation: string, duration: number, data: LogData = {}): void {
     this.info(`[PERFORMANCE] ${operation} completed in ${duration}ms`, {
       duration,
       operation,
@@ -237,7 +282,7 @@ class Logger {
   }
 
   // User action logging
-  userAction(action, data = {}) {
+  public userAction(action: string, data: LogData = {}): void {
     this.info(`[USER-ACTION] ${action}`, {
       action,
       ...data,
@@ -245,7 +290,7 @@ class Logger {
   }
 
   // Test Highlight.io connectivity
-  testHighlight() {
+  public testHighlight(): void {
     console.log("🧪 Testing Highlight.io connectivity...");
 
     // Send a test event
@@ -262,11 +307,12 @@ class Logger {
     try {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
-      if (h && h.consumeError) {
-        h.consumeError(error, {
-          metadata: { test: true, source: "logger" },
-          tags: { category: "test" },
-        });
+      if (h && h.consumeError && error instanceof Error) {
+        h.consumeError(
+          error, 
+          "Test error message",
+          this.convertToStringPayload({ test: "true", source: "logger", category: "test" })
+        );
       }
     }
 
@@ -279,6 +325,14 @@ class Logger {
 export const logger = new Logger();
 
 // Make logger available globally for testing
+declare global {
+  interface Window {
+    logger: Logger;
+    testHighlight: () => void;
+    originalConsoleLog?: typeof console.log;
+  }
+}
+
 if (typeof window !== "undefined") {
   window.logger = logger;
   window.testHighlight = () => logger.testHighlight();

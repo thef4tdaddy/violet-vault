@@ -32,3 +32,14 @@ export {
   sortAccounts,
   filterAccounts,
 } from "./accountHelpers";
+
+// Re-export types for external use
+export type {
+  AccountType,
+  User,
+  AccountForm,
+  FormattedAccount,
+  Transaction,
+  TransferForm,
+  FilterCriteria,
+} from "./accountHelpers";
