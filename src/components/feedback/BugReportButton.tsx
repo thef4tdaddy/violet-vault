@@ -4,11 +4,46 @@ import useBugReportV2 from "../../hooks/common/useBugReportV2";
 import useToast from "../../hooks/common/useToast";
 import logger from "../../utils/common/logger";
 
+// Type definitions for hooks (temporary until hooks are typed)
+interface BugReportHook {
+  isModalOpen: boolean;
+  title: string;
+  description: string;
+  steps: string;
+  expected: string;
+  actual: string;
+  includeScreenshot: boolean;
+  isSubmitting: boolean;
+  screenshot: string | null;
+  severity: string;
+  openModal: () => void;
+  closeModal: () => void;
+  setTitle: (title: string) => void;
+  setDescription: (description: string) => void;
+  setSteps: (steps: string) => void;
+  setExpected: (expected: string) => void;
+  setActual: (actual: string) => void;
+  setIncludeScreenshot: (include: boolean) => void;
+  setSeverity: (severity: string) => void;
+  setScreenshot: (screenshot: string | null) => void;
+  submitReport: () => Promise<any>;
+  captureScreenshot: () => void;
+}
+
+interface ToastHook {
+  addToast: (toast: {
+    type: string;
+    title: string;
+    message: string;
+    duration?: number;
+  }) => void;
+}
+
 /**
  * Floating bug report button with screenshot capability
  * Enhanced to use all V2 hook features for comprehensive bug reporting
  */
-const BugReportButton = () => {
+const BugReportButton: React.FC = () => {
   const {
     isModalOpen,
     title,
@@ -32,11 +67,11 @@ const BugReportButton = () => {
     setScreenshot,
     submitReport,
     captureScreenshot,
-  } = useBugReportV2();
+  } = useBugReportV2() as BugReportHook;
 
-  const { addToast } = useToast();
+  const { addToast } = useToast() as ToastHook;
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     const result = await submitReport();
     if (result) {
       // Show success message with GitHub issue link if available
@@ -70,6 +105,78 @@ const BugReportButton = () => {
         message: "Failed to submit bug report. Please try again.",
         duration: 5000,
       });
+    }
+  };
+
+  const handleScreenCapture = async (): Promise<void> => {
+    if (
+      navigator.mediaDevices &&
+      navigator.mediaDevices.getDisplayMedia
+    ) {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+          audio: false,
+        });
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.play();
+
+        await new Promise<void>(
+          (resolve) => (video.onloadedmetadata = () => resolve()),
+        );
+
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(video, 0, 0);
+        }
+
+        stream.getTracks().forEach((track) => track.stop());
+
+        const screenshotDataUrl = canvas.toDataURL(
+          "image/png",
+          0.9,
+        );
+        setScreenshot(screenshotDataUrl);
+      } catch (error) {
+        logger.warn("Manual screen capture failed:", error as Error);
+        addToast({
+          type: "error",
+          title: "Screen Capture Failed",
+          message:
+            "Please try the Auto Capture option or include a manual screenshot.",
+        });
+      }
+    } else {
+      addToast({
+        type: "warning",
+        title: "Screen Capture Not Supported",
+        message:
+          "Please use Auto Capture or include a manual screenshot.",
+      });
+    }
+  };
+
+  const openScreenshotPreview = (): void => {
+    if (!screenshot) return;
+    
+    // Open screenshot in new tab for full view
+    const win = window.open();
+    if (win) {
+      win.document.write(`
+        <html>
+          <head><title>Bug Report Screenshot</title></head>
+          <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+            <img src="${screenshot}" style="max-width: 95%; max-height: 95%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+          </body>
+        </html>
+      `);
     }
   };
 
@@ -228,59 +335,7 @@ const BugReportButton = () => {
                       Auto Capture
                     </button>
                     <button
-                      onClick={async () => {
-                        if (
-                          navigator.mediaDevices &&
-                          navigator.mediaDevices.getDisplayMedia
-                        ) {
-                          try {
-                            const stream =
-                              await navigator.mediaDevices.getDisplayMedia({
-                                video: {
-                                  width: { ideal: 1920 },
-                                  height: { ideal: 1080 },
-                                },
-                                audio: false,
-                              });
-                            const video = document.createElement("video");
-                            video.srcObject = stream;
-                            video.play();
-
-                            await new Promise(
-                              (resolve) => (video.onloadedmetadata = resolve),
-                            );
-
-                            const canvas = document.createElement("canvas");
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            const ctx = canvas.getContext("2d");
-                            ctx.drawImage(video, 0, 0);
-
-                            stream.getTracks().forEach((track) => track.stop());
-
-                            const screenshotDataUrl = canvas.toDataURL(
-                              "image/png",
-                              0.9,
-                            );
-                            setScreenshot(screenshotDataUrl);
-                          } catch (error) {
-                            logger.warn("Manual screen capture failed:", error);
-                            addToast({
-                              type: "error",
-                              title: "Screen Capture Failed",
-                              message:
-                                "Please try the Auto Capture option or include a manual screenshot.",
-                            });
-                          }
-                        } else {
-                          addToast({
-                            type: "warning",
-                            title: "Screen Capture Not Supported",
-                            message:
-                              "Please use Auto Capture or include a manual screenshot.",
-                          });
-                        }
-                      }}
+                      onClick={handleScreenCapture}
                       className="text-sm text-green-600 hover:text-green-800 flex items-center"
                       title="Use browser's native screen capture (requires permission)"
                     >
@@ -300,20 +355,7 @@ const BugReportButton = () => {
                       src={screenshot}
                       alt="Screenshot preview"
                       className="w-full h-32 object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => {
-                        // Open screenshot in new tab for full view
-                        const win = window.open();
-                        if (win) {
-                          win.document.write(`
-                            <html>
-                              <head><title>Bug Report Screenshot</title></head>
-                              <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-                                <img src="${screenshot}" style="max-width: 95%; max-height: 95%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
-                              </body>
-                            </html>
-                          `);
-                        }
-                      }}
+                      onClick={openScreenshotPreview}
                     />
                     <button
                       onClick={() => setScreenshot(null)}
