@@ -1,7 +1,7 @@
 // Main transaction hook that combines all focused hooks
 import { useQueryClient } from "@tanstack/react-query";
-import { useTransactionQuery } from "../transactions/useTransactionQuery.js";
-import { useTransactionMutations } from "../transactions/useTransactionMutations.js";
+import { useTransactionQuery } from "../transactions/useTransactionQuery.ts";
+import { useTransactionMutations } from "../transactions/useTransactionMutations.ts";
 import { useTransactionAnalytics } from "../transactions/useTransactionAnalytics.js";
 import { useTransactionUtils } from "../transactions/useTransactionUtils.js";
 import { queryKeys } from "../../utils/common/queryClient.js";
@@ -81,8 +81,8 @@ const useTransactions = (options = {}) => {
 };
 
 // Re-export focused hooks for direct use
-export { useTransactionQuery } from "../transactions/useTransactionQuery.js";
-export { useTransactionMutations } from "../transactions/useTransactionMutations.js";
+export { useTransactionQuery } from "../transactions/useTransactionQuery.ts";
+export { useTransactionMutations } from "../transactions/useTransactionMutations.ts";
 export { useTransactionAnalytics } from "../transactions/useTransactionAnalytics.js";
 export { useTransactionUtils } from "../transactions/useTransactionUtils.js";
 export { useTransactionBalanceUpdater } from "../transactions/useTransactionBalanceUpdater.js";
