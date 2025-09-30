@@ -46,7 +46,8 @@ jobs:
         id: previous
         run: |
           if [ -f .github/data/type-errors.json ]; then
-            PREVIOUS_COUNT=$(cat .github/data/type-errors.json | jq -r '.currentStatus.totalErrors // 0')
+            PREVIOUS_COUNT=$(cat .github/data/type-errors.json | \
+              jq -r '.currentStatus.totalErrors // 0')
           else
             PREVIOUS_COUNT=0
           fi
@@ -58,12 +59,16 @@ jobs:
         run: |
           # Run tsc and capture output (will exit 0 even with errors)
           npx tsc --noEmit > tsc-output.txt 2>&1 || true
-          
+
           # Parse the output into JSON
-          node scripts/parse-tsc-errors.js tsc-output.txt > new-type-errors.json 2>/dev/null || echo '{"currentStatus":{"totalErrors":0}}' > new-type-errors.json
-          
+          node scripts/parse-tsc-errors.js tsc-output.txt \
+            > new-type-errors.json 2>/dev/null || \
+            echo '{"currentStatus":{"totalErrors":0}}' \
+            > new-type-errors.json
+
           # Get the new count
-          NEW_COUNT=$(cat new-type-errors.json | jq -r '.currentStatus.totalErrors // 0')
+          NEW_COUNT=$(cat new-type-errors.json | \
+            jq -r '.currentStatus.totalErrors // 0')
           echo "new_count=$NEW_COUNT" >> $GITHUB_OUTPUT
           echo "Current type errors: $NEW_COUNT"
 
@@ -72,32 +77,36 @@ jobs:
         run: |
           PREVIOUS_COUNT="${{ steps.previous.outputs.count }}"
           NEW_COUNT="${{ steps.typecheck.outputs.new_count }}"
-          
+
           # Calculate the delta
           DELTA=$((NEW_COUNT - PREVIOUS_COUNT))
-          
+
           echo "📊 **Type Error Analysis**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Previous errors:** $PREVIOUS_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Previous errors:** $PREVIOUS_COUNT" \
+            >> $GITHUB_STEP_SUMMARY
           echo "- **Current errors:** $NEW_COUNT" >> $GITHUB_STEP_SUMMARY
           echo "- **Change:** $DELTA" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Set outputs
           echo "delta=$DELTA" >> $GITHUB_OUTPUT
           echo "previous=$PREVIOUS_COUNT" >> $GITHUB_OUTPUT
           echo "current=$NEW_COUNT" >> $GITHUB_OUTPUT
-          
+
           # Check if there's a regression (increase in errors)
           if [ "$DELTA" -gt 0 ]; then
-            echo "❌ **REGRESSION:** Type errors increased by $DELTA" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **REGRESSION:** Type errors increased by $DELTA" \
+              >> $GITHUB_STEP_SUMMARY
             echo "regression=true" >> $GITHUB_OUTPUT
             exit 1  # Fail the check if errors increased
           elif [ "$DELTA" -lt 0 ]; then
-            echo "✅ **IMPROVED:** Type errors decreased by $((-DELTA))" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **IMPROVED:** Type errors decreased by $((-DELTA))" \
+              >> $GITHUB_STEP_SUMMARY
             echo "regression=false" >> $GITHUB_OUTPUT
           else
-            echo "✅ **STABLE:** No change in type error count" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **STABLE:** No change in type error count" \
+              >> $GITHUB_STEP_SUMMARY
             echo "regression=false" >> $GITHUB_OUTPUT
           fi
 
@@ -110,25 +119,24 @@ jobs:
           retention-days: 30
 
       - name: Update type-errors.json on main/develop push
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        if: |
+          github.event_name == 'push' &&
+          (github.ref == 'refs/heads/main' ||
+           github.ref == 'refs/heads/develop')
         run: |
           # Replace the existing type-errors.json with the new data
           cp new-type-errors.json .github/data/type-errors.json
-          
+
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Check if there are changes
           if git diff --quiet .github/data/type-errors.json; then
             echo "No changes to type-errors.json"
           else
             git add .github/data/type-errors.json
-            git commit -m "chore: update type errors tracking data [skip ci]
-
-Updated by GitHub Action after type checking
-
-🤖 Generated with GitHub Actions"
+            git commit -m "chore: update type errors data [skip ci]"
             git push
           fi
 
@@ -141,10 +149,10 @@ Updated by GitHub Action after type checking
             const currentCount = '${{ steps.typecheck.outputs.new_count }}';
             const delta = parseInt(currentCount) - parseInt(previousCount);
             const hasRegression = delta > 0;
-            
+
             let emoji = '✅';
             let status = 'PASSED';
-            
+
             if (hasRegression) {
               emoji = '❌';
               status = 'BLOCKED - REGRESSION DETECTED';
@@ -152,7 +160,7 @@ Updated by GitHub Action after type checking
               emoji = '✨';
               status = 'IMPROVED';
             }
-            
+
             const body = `## ${emoji} TypeScript Type Check - ${status}
 
             | Metric | Value |
@@ -162,10 +170,12 @@ Updated by GitHub Action after type checking
             | **Change** | ${delta > 0 ? '+' : ''}${delta} |
             | **Policy** | Zero tolerance for regressions |
 
-            ${hasRegression 
-              ? '🚨 **This PR introduces new type errors and will be blocked.** Please fix the type errors before merging.' 
+            ${hasRegression
+              ? '🚨 **This PR introduces new type errors and will be blocked.** ' +
+                'Please fix the type errors before merging.'
               : delta < 0
-                ? `🎉 **Great work!** This PR fixes ${-delta} type error${-delta === 1 ? '' : 's'}!`
+                ? `🎉 **Great work!** This PR fixes ${-delta} type ` +
+                  `error${-delta === 1 ? '' : 's'}!`
                 : '✅ **This PR maintains type safety with no new errors.**'
             }
 
@@ -173,7 +183,8 @@ Updated by GitHub Action after type checking
             <summary>View type error details</summary>
 
             The full type error analysis is available in the workflow artifacts.
-            You can download the \`type-errors-json\` artifact to see detailed breakdown by category and file.
+            You can download the \`type-errors-json\` artifact to see detailed
+            breakdown by category and file.
 
             To check locally, run:
             \`\`\`bash
@@ -181,10 +192,11 @@ Updated by GitHub Action after type checking
             \`\`\`
 
             </details>`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: body
             });
+

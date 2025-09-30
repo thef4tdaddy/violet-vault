@@ -1,4 +1,0 @@
-
-> violetvault@1.9.0 tsc:check
-> tsc --noEmit
-
