@@ -1,5 +1,5 @@
 name = "violet-vault-bug-reporter"
-main = "bug-report-worker.js"
+main = "bug-report-worker.ts"
 compatibility_date = "2024-01-01"
 
 # Environment variables (set these in Cloudflare Dashboard → Workers → violet-vault-bug-reporter → Settings → Variables)

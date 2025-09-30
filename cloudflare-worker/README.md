@@ -2,6 +2,8 @@
 
 This Cloudflare Worker handles bug reports submitted from the VioletVault application, automatically creating GitHub issues and optionally storing screenshots.
 
+**Note:** This worker is written in TypeScript and uses Wrangler's built-in TypeScript compilation for type safety and better developer experience.
+
 ## Quick Start
 
 1. **Install Wrangler CLI:**
@@ -11,13 +13,25 @@ npm install -g wrangler
 wrangler login
 ```
 
-2. **Deploy the worker:**
+2. **Install dependencies:**
+
+```bash
+npm install
+```
+
+3. **Type check the worker:**
+
+```bash
+npm run typecheck
+```
+
+4. **Deploy the worker:**
 
 ```bash
 npm run deploy
 ```
 
-3. **Configure environment variables** in Cloudflare Dashboard:
+5. **Configure environment variables** in Cloudflare Dashboard:
    - `GITHUB_TOKEN`: Personal access token with Issues write permission
    - `GITHUB_REPO`: Repository in format "username/repo-name"
    - `R2_PUBLIC_DOMAIN`: Custom domain for R2 screenshots (optional)
@@ -25,10 +39,30 @@ npm run deploy
 
 ## Files
 
-- **`bug-report-worker.js`** - Main worker code
+- **`bug-report-worker.ts`** - Main worker code (TypeScript)
+- **`tsconfig.json`** - TypeScript configuration for Cloudflare Workers
 - **`wrangler.toml`** - Worker configuration
 - **`package.json`** - Dependencies and scripts
 - **`README.md`** - This file
+
+## TypeScript Support
+
+This worker is written in TypeScript for improved type safety and developer experience:
+
+- **Type definitions:** Full type coverage for all functions and data structures
+- **Cloudflare Workers types:** Uses `@cloudflare/workers-types` for platform-specific types
+- **Type checking:** Run `npm run typecheck` to validate types before deployment
+- **Build:** Wrangler automatically compiles TypeScript during deployment
+
+### Type Checking
+
+```bash
+# Check types without deploying
+npm run typecheck
+
+# Build and dry-run deployment (includes type checking)
+npm run build
+```
 
 ## Environment Variables
 
