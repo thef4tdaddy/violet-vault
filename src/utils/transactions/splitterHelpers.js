@@ -4,7 +4,49 @@
  */
 
 /**
+ * @typedef {Object} SplitAllocation
+ * @property {string|number} id - Unique split identifier
+ * @property {string} description - Split description
+ * @property {number} amount - Split amount
+ * @property {string} category - Split category
+ * @property {string|null} envelopeId - Associated envelope ID
+ */
+
+/**
+ * @typedef {Object} SplitTotals
+ * @property {number} original - Original transaction amount
+ * @property {number} allocated - Total allocated amount across splits
+ * @property {number} remaining - Remaining unallocated amount
+ * @property {boolean} isValid - Whether the split is valid (fully allocated)
+ * @property {boolean} isOverAllocated - Whether splits exceed original amount
+ * @property {boolean} isUnderAllocated - Whether splits are less than original amount
+ */
+
+/**
+ * @typedef {Object} ValidationResult
+ * @property {boolean} isValid - Whether validation passed
+ * @property {string[]} errors - Array of error messages
+ */
+
+/**
+ * @typedef {Object} AllSplitsValidationResult
+ * @property {boolean} isValid - Whether all splits are valid
+ * @property {Array<{index: number, splitId: string|number, errors: string[]}>} errors - Array of split errors
+ */
+
+/**
+ * @typedef {Object} SplitStatistics
+ * @property {number} totalAmount - Total amount across all splits
+ * @property {number} splitCount - Number of splits
+ * @property {number} categoryCount - Number of unique categories
+ * @property {number} envelopeCount - Number of splits with envelopes
+ * @property {number} averageAmount - Average amount per split
+ */
+
+/**
  * Format currency for display
+ * @param {number} amount - Amount to format
+ * @returns {string} Formatted currency string
  */
 export const formatCurrency = (amount) => {
   if (amount == null || isNaN(amount)) return "$0.00";
@@ -16,6 +58,9 @@ export const formatCurrency = (amount) => {
 
 /**
  * Calculate split totals and validation status
+ * @param {number} originalAmount - Original transaction amount
+ * @param {SplitAllocation[]} splitAllocations - Array of split allocations
+ * @returns {SplitTotals} Calculation results
  */
 export const calculateSplitTotals = (originalAmount, splitAllocations) => {
   const original = Math.abs(originalAmount);
@@ -41,6 +86,8 @@ export const calculateSplitTotals = (originalAmount, splitAllocations) => {
 
 /**
  * Validate individual split allocation
+ * @param {SplitAllocation} split - Split allocation to validate
+ * @returns {ValidationResult} Validation result
  */
 export const validateSplitAllocation = (split) => {
   const errors = [];
@@ -65,6 +112,8 @@ export const validateSplitAllocation = (split) => {
 
 /**
  * Validate all split allocations
+ * @param {SplitAllocation[]} splitAllocations - Array of splits to validate
+ * @returns {AllSplitsValidationResult} Validation results for all splits
  */
 export const validateAllSplits = (splitAllocations) => {
   const allErrors = [];
@@ -90,6 +139,7 @@ export const validateAllSplits = (splitAllocations) => {
 
 /**
  * Generate unique split ID
+ * @returns {string} Unique split identifier
  */
 export const generateSplitId = () => {
   return `split_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -97,6 +147,9 @@ export const generateSplitId = () => {
 
 /**
  * Create new split allocation with defaults
+ * @param {string} [defaultCategory=''] - Default category
+ * @param {number} [defaultAmount=0] - Default amount
+ * @returns {SplitAllocation} New split allocation
  */
 export const createNewSplitAllocation = (
   defaultCategory = "",
@@ -111,6 +164,10 @@ export const createNewSplitAllocation = (
 
 /**
  * Smart split algorithm - distribute amount evenly with intelligent defaults
+ * @param {number} originalAmount - Original transaction amount
+ * @param {number} [numSplits=2] - Number of splits to create
+ * @param {string[]} [availableCategories=[]] - Available categories for assignment
+ * @returns {SplitAllocation[]} Array of split allocations
  */
 export const performSmartSplit = (
   originalAmount,
@@ -135,6 +192,9 @@ export const performSmartSplit = (
 
 /**
  * Auto-balance remaining amount to last split
+ * @param {SplitAllocation[]} splitAllocations - Current split allocations
+ * @param {number} originalAmount - Original transaction amount
+ * @returns {SplitAllocation[]} Balanced split allocations
  */
 export const autoBalanceToLastSplit = (splitAllocations, originalAmount) => {
   if (splitAllocations.length === 0) return splitAllocations;
@@ -160,6 +220,9 @@ export const autoBalanceToLastSplit = (splitAllocations, originalAmount) => {
 
 /**
  * Check if splits have unsaved changes compared to original
+ * @param {SplitAllocation[]} currentSplits - Current split allocations
+ * @param {SplitAllocation[]} originalSplits - Original split allocations
+ * @returns {boolean} True if there are unsaved changes
  */
 export const hasUnsavedChanges = (currentSplits, originalSplits) => {
   if (currentSplits.length !== originalSplits.length) return true;
@@ -177,6 +240,9 @@ export const hasUnsavedChanges = (currentSplits, originalSplits) => {
 
 /**
  * Prepare splits for save - clean and validate data
+ * @param {SplitAllocation[]} splitAllocations - Split allocations to prepare
+ * @param {string} originalTransactionId - Original transaction ID
+ * @returns {Array<Object>} Prepared split data for saving
  */
 export const prepareSplitsForSave = (
   splitAllocations,
@@ -195,6 +261,8 @@ export const prepareSplitsForSave = (
 
 /**
  * Calculate split statistics for display
+ * @param {SplitAllocation[]} splitAllocations - Split allocations to analyze
+ * @returns {SplitStatistics} Statistics about the splits
  */
 export const calculateSplitStatistics = (splitAllocations) => {
   const total = splitAllocations.reduce(

@@ -29,6 +29,42 @@ const EnvelopeHistoryModal = lazy(
 );
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
+/**
+ * @typedef {Object} Envelope
+ * @property {string} id - Envelope ID
+ * @property {string} name - Envelope name
+ * @property {string} category - Envelope category
+ * @property {number} allocated - Allocated amount
+ * @property {number} spent - Spent amount
+ * @property {string} [envelopeId] - Optional envelope ID reference
+ */
+
+/**
+ * @typedef {Object} Transaction
+ * @property {string} id - Transaction ID
+ * @property {string} date - Transaction date (ISO string)
+ * @property {string} description - Transaction description
+ * @property {number} amount - Transaction amount
+ * @property {string} category - Transaction category
+ * @property {string} [envelopeId] - Optional envelope ID reference
+ * @property {Object} [metadata] - Optional transaction metadata
+ */
+
+/**
+ * @typedef {Object} UnifiedEnvelopeManagerProps
+ * @property {Envelope[]} [envelopes] - Array of envelopes to display
+ * @property {Transaction[]} [transactions] - Array of transactions for envelope calculations
+ * @property {number} [unassignedCash] - Amount of unassigned cash
+ * @property {string} [className] - Additional CSS classes
+ */
+
+/**
+ * Unified Envelope Manager Component
+ * Displays and manages envelopes with TanStack Query integration
+ * 
+ * @param {UnifiedEnvelopeManagerProps} props - Component props
+ * @returns {React.ReactElement} Envelope management interface
+ */
 const UnifiedEnvelopeManager = ({
   envelopes: propEnvelopes = [],
   transactions: propTransactions = [],

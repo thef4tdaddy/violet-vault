@@ -2,9 +2,70 @@
  * Transaction Splitting Service
  * Handles all business logic for transaction splitting operations
  */
+
+/**
+ * @typedef {Object} Envelope
+ * @property {string} id - Envelope ID
+ * @property {string} name - Envelope name
+ * @property {string} [category] - Envelope category
+ */
+
+/**
+ * @typedef {Object} TransactionItem
+ * @property {string} [name] - Item name
+ * @property {number} [totalPrice] - Total price
+ * @property {number} [price] - Item price
+ * @property {Object} [category] - Item category
+ * @property {string} [category.name] - Category name
+ */
+
+/**
+ * @typedef {Object} TransactionMetadata
+ * @property {TransactionItem[]} [items] - Itemized transaction items
+ * @property {number} [shipping] - Shipping cost
+ * @property {number} [tax] - Tax amount
+ */
+
+/**
+ * @typedef {Object} Transaction
+ * @property {string} id - Transaction ID
+ * @property {string} date - Transaction date
+ * @property {string} description - Transaction description
+ * @property {number} amount - Transaction amount
+ * @property {string} category - Transaction category
+ * @property {string} [envelopeId] - Envelope ID
+ * @property {string} [source] - Transaction source
+ * @property {boolean} [reconciled] - Reconciliation status
+ * @property {string} [createdBy] - Creator name
+ * @property {TransactionMetadata} [metadata] - Transaction metadata
+ */
+
+/**
+ * @typedef {Object} SplitAllocation
+ * @property {string|number} id - Split ID
+ * @property {string} description - Split description
+ * @property {number} amount - Split amount
+ * @property {string} category - Split category
+ * @property {string} envelopeId - Envelope ID
+ * @property {boolean} [isOriginalItem] - Whether this is an original itemized item
+ * @property {TransactionItem} [originalItem] - Original item data
+ */
+
+/**
+ * @typedef {Object} SplitTotals
+ * @property {number} original - Original amount
+ * @property {number} allocated - Allocated amount
+ * @property {number} remaining - Remaining amount
+ * @property {boolean} isValid - Whether splits are valid
+ * @property {boolean} isOverAllocated - Whether over-allocated
+ */
+
 class TransactionSplitterService {
   /**
    * Find envelope by category name
+   * @param {Envelope[]} envelopes - Available envelopes
+   * @param {string} categoryName - Category to search for
+   * @returns {Envelope|null} Matching envelope or null
    */
   findEnvelopeForCategory(envelopes, categoryName) {
     if (!categoryName) return null;
@@ -17,6 +78,9 @@ class TransactionSplitterService {
 
   /**
    * Initialize splits from transaction metadata
+   * @param {Transaction} transaction - Transaction to split
+   * @param {Envelope[]} envelopes - Available envelopes
+   * @returns {SplitAllocation[]} Initial split allocations
    */
   initializeSplitsFromTransaction(transaction, envelopes) {
     // Check if transaction has itemized metadata (like Amazon orders)
@@ -78,6 +142,9 @@ class TransactionSplitterService {
 
   /**
    * Calculate split totals and validation
+   * @param {SplitAllocation[]} splitAllocations - Split allocations
+   * @param {number} originalAmount - Original transaction amount
+   * @returns {SplitTotals} Calculation results
    */
   calculateSplitTotals(splitAllocations, originalAmount) {
     const allocated = splitAllocations.reduce(
@@ -99,6 +166,9 @@ class TransactionSplitterService {
 
   /**
    * Validate splits and return errors
+   * @param {SplitAllocation[]} splitAllocations - Split allocations to validate
+   * @param {number} originalAmount - Original transaction amount
+   * @returns {string[]} Array of validation error messages
    */
   validateSplits(splitAllocations, originalAmount) {
     const errors = [];
@@ -143,6 +213,9 @@ class TransactionSplitterService {
 
   /**
    * Auto-balance splits to equal the total
+   * @param {SplitAllocation[]} splitAllocations - Current split allocations
+   * @param {number} originalAmount - Original transaction amount
+   * @returns {SplitAllocation[]} Balanced split allocations
    */
   autoBalanceSplits(splitAllocations, originalAmount) {
     const totals = this.calculateSplitTotals(splitAllocations, originalAmount);
@@ -160,6 +233,9 @@ class TransactionSplitterService {
 
   /**
    * Split evenly across all allocations
+   * @param {SplitAllocation[]} splitAllocations - Current split allocations
+   * @param {number} originalAmount - Original transaction amount
+   * @returns {SplitAllocation[]} Evenly split allocations
    */
   splitEvenly(splitAllocations, originalAmount) {
     if (splitAllocations.length === 0) return splitAllocations;
@@ -178,6 +254,9 @@ class TransactionSplitterService {
 
   /**
    * Create split transactions from allocations
+   * @param {Transaction} transaction - Original transaction
+   * @param {SplitAllocation[]} splitAllocations - Split allocations
+   * @returns {Transaction[]} Array of split transactions
    */
   createSplitTransactions(transaction, splitAllocations) {
     return splitAllocations.map((split, index) => ({
@@ -211,6 +290,9 @@ class TransactionSplitterService {
 
   /**
    * Create a new split allocation
+   * @param {Transaction} transaction - Original transaction
+   * @param {SplitAllocation[]} existingSplits - Existing split allocations
+   * @returns {SplitAllocation} New split allocation
    */
   createNewSplitAllocation(transaction, existingSplits) {
     const totalAmount = Math.abs(transaction.amount);
@@ -232,6 +314,12 @@ class TransactionSplitterService {
 
   /**
    * Update a split allocation field
+   * @param {SplitAllocation[]} splitAllocations - Current split allocations
+   * @param {string|number} id - Split ID to update
+   * @param {string} field - Field name to update
+   * @param {any} value - New value
+   * @param {Envelope[]} envelopes - Available envelopes for category matching
+   * @returns {SplitAllocation[]} Updated split allocations
    */
   updateSplitAllocation(splitAllocations, id, field, value, envelopes) {
     return splitAllocations.map((split) => {

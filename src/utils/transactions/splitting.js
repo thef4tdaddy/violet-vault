@@ -6,10 +6,81 @@
 import logger from "../common/logger.js";
 
 /**
+ * @typedef {Object} Envelope
+ * @property {string} id - Envelope ID
+ * @property {string} name - Envelope name
+ * @property {string} [category] - Envelope category
+ */
+
+/**
+ * @typedef {Object} TransactionItem
+ * @property {string} [name] - Item name
+ * @property {number} [totalPrice] - Total price
+ * @property {number} [price] - Item price
+ * @property {Object} [category] - Item category
+ * @property {string} [category.name] - Category name
+ */
+
+/**
+ * @typedef {Object} TransactionMetadata
+ * @property {TransactionItem[]} [items] - Itemized transaction items
+ * @property {number} [shipping] - Shipping cost
+ * @property {number} [tax] - Tax amount
+ */
+
+/**
+ * @typedef {Object} Transaction
+ * @property {string} id - Transaction ID
+ * @property {string} date - Transaction date
+ * @property {string} description - Transaction description
+ * @property {number} amount - Transaction amount
+ * @property {string} category - Transaction category
+ * @property {string} [envelopeId] - Envelope ID
+ * @property {string} [account] - Account ID
+ * @property {string} [type] - Transaction type
+ * @property {boolean} [reconciled] - Reconciliation status
+ * @property {TransactionMetadata} [metadata] - Transaction metadata
+ */
+
+/**
+ * @typedef {Object} SplitAllocation
+ * @property {string|number} id - Split ID
+ * @property {string} description - Split description
+ * @property {number} amount - Split amount
+ * @property {string} category - Split category
+ * @property {string} envelopeId - Envelope ID
+ * @property {boolean} [isOriginalItem] - Whether this is an original itemized item
+ * @property {TransactionItem} [originalItem] - Original item data
+ */
+
+/**
+ * @typedef {Object} SplitTotals
+ * @property {number} original - Original amount
+ * @property {number} allocated - Allocated amount
+ * @property {number} remaining - Remaining amount
+ * @property {boolean} isValid - Whether splits are valid
+ * @property {boolean} isOverAllocated - Whether over-allocated
+ * @property {boolean} isUnderAllocated - Whether under-allocated
+ * @property {string} [error] - Error message if any
+ */
+
+/**
+ * @typedef {Object} SplitSummary
+ * @property {number} totalSplits - Number of splits
+ * @property {number} originalAmount - Original transaction amount
+ * @property {number} allocatedAmount - Total allocated amount
+ * @property {number} remainingAmount - Remaining amount
+ * @property {boolean} isValid - Whether all splits are valid
+ * @property {boolean} isBalanced - Whether splits balance to original
+ * @property {string[]} validationErrors - Array of validation errors
+ * @property {boolean} canSubmit - Whether splits can be submitted
+ */
+
+/**
  * Find envelope by category name
- * @param {Array} envelopes - Available envelopes
+ * @param {Envelope[]} envelopes - Available envelopes
  * @param {string} categoryName - Category to search for
- * @returns {Object|null} Matching envelope or null
+ * @returns {Envelope|null} Matching envelope or null
  */
 export const findEnvelopeForCategory = (envelopes, categoryName) => {
   if (!categoryName || !Array.isArray(envelopes)) return null;
@@ -25,9 +96,9 @@ export const findEnvelopeForCategory = (envelopes, categoryName) => {
 
 /**
  * Initialize split allocations from transaction
- * @param {Object} transaction - Transaction to split
- * @param {Array} envelopes - Available envelopes
- * @returns {Array} Initial split allocations
+ * @param {Transaction} transaction - Transaction to split
+ * @param {Envelope[]} [envelopes=[]] - Available envelopes
+ * @returns {SplitAllocation[]} Initial split allocations
  */
 export const initializeSplitsFromTransaction = (
   transaction,
@@ -103,9 +174,9 @@ export const initializeSplitsFromTransaction = (
 
 /**
  * Calculate split totals and validation status
- * @param {Object} transaction - Original transaction
- * @param {Array} splitAllocations - Current split allocations
- * @returns {Object} Calculation results
+ * @param {Transaction} transaction - Original transaction
+ * @param {SplitAllocation[]} [splitAllocations=[]] - Current split allocations
+ * @returns {SplitTotals} Calculation results
  */
 export const calculateSplitTotals = (transaction, splitAllocations = []) => {
   try {
@@ -155,9 +226,9 @@ export const calculateSplitTotals = (transaction, splitAllocations = []) => {
 
 /**
  * Validate split allocations
- * @param {Array} splitAllocations - Split allocations to validate
- * @param {Object} transaction - Original transaction
- * @returns {Array} Array of error messages
+ * @param {SplitAllocation[]} [splitAllocations=[]] - Split allocations to validate
+ * @param {Transaction} transaction - Original transaction
+ * @returns {string[]} Array of error messages
  */
 export const validateSplitAllocations = (
   splitAllocations = [],
@@ -200,9 +271,9 @@ export const validateSplitAllocations = (
 
 /**
  * Auto-balance splits to equal the total transaction amount
- * @param {Array} splitAllocations - Current split allocations
- * @param {Object} transaction - Original transaction
- * @returns {Array} Balanced split allocations
+ * @param {SplitAllocation[]} [splitAllocations=[]] - Current split allocations
+ * @param {Transaction} transaction - Original transaction
+ * @returns {SplitAllocation[]} Balanced split allocations
  */
 export const autoBalanceSplits = (splitAllocations = [], transaction) => {
   try {
@@ -220,10 +291,24 @@ export const autoBalanceSplits = (splitAllocations = [], transaction) => {
       splitCount: splitAllocations.length,
     });
 
-    return splitAllocations.map((split) => ({
+    // Apply adjustments, rounding each split to 2 decimal places
+    const balanced = splitAllocations.map((split) => ({
       ...split,
       amount: parseFloat((split.amount + adjustmentPerSplit).toFixed(2)),
     }));
+
+    // Adjust the last split to absorb any remaining rounding differences
+    const balancedTotal = balanced.reduce((sum, split) => sum + split.amount, 0);
+    const finalRounding = Math.abs(transaction.amount) - balancedTotal;
+    
+    if (Math.abs(finalRounding) > 0.001 && balanced.length > 0) {
+      balanced[balanced.length - 1] = {
+        ...balanced[balanced.length - 1],
+        amount: parseFloat((balanced[balanced.length - 1].amount + finalRounding).toFixed(2)),
+      };
+    }
+
+    return balanced;
   } catch (error) {
     logger.error("Error auto-balancing splits", error);
     return splitAllocations;
@@ -232,9 +317,9 @@ export const autoBalanceSplits = (splitAllocations = [], transaction) => {
 
 /**
  * Split transaction amount evenly across all allocations
- * @param {Array} splitAllocations - Current split allocations
- * @param {Object} transaction - Original transaction
- * @returns {Array} Evenly split allocations
+ * @param {SplitAllocation[]} [splitAllocations=[]] - Current split allocations
+ * @param {Transaction} transaction - Original transaction
+ * @returns {SplitAllocation[]} Evenly split allocations
  */
 export const splitEvenly = (splitAllocations = [], transaction) => {
   try {
@@ -270,10 +355,10 @@ export const splitEvenly = (splitAllocations = [], transaction) => {
 
 /**
  * Add a new split allocation with remaining amount
- * @param {Array} currentSplits - Current split allocations
- * @param {Object} transaction - Original transaction
- * @param {Object} defaults - Default values for new split
- * @returns {Array} Updated split allocations with new split added
+ * @param {SplitAllocation[]} [currentSplits=[]] - Current split allocations
+ * @param {Transaction} transaction - Original transaction
+ * @param {Partial<SplitAllocation>} [defaults={}] - Default values for new split
+ * @returns {SplitAllocation[]} Updated split allocations with new split added
  */
 export const addNewSplit = (currentSplits = [], transaction, defaults = {}) => {
   try {
@@ -308,12 +393,12 @@ export const addNewSplit = (currentSplits = [], transaction, defaults = {}) => {
 
 /**
  * Update a specific split allocation field
- * @param {Array} currentSplits - Current split allocations
+ * @param {SplitAllocation[]} [currentSplits=[]] - Current split allocations
  * @param {string|number} splitId - ID of split to update
  * @param {string} field - Field to update
  * @param {any} value - New value
- * @param {Array} envelopes - Available envelopes (for category matching)
- * @returns {Array} Updated split allocations
+ * @param {Envelope[]} [envelopes=[]] - Available envelopes (for category matching)
+ * @returns {SplitAllocation[]} Updated split allocations
  */
 export const updateSplitField = (
   currentSplits = [],
@@ -345,9 +430,9 @@ export const updateSplitField = (
 
 /**
  * Remove a split allocation
- * @param {Array} currentSplits - Current split allocations
+ * @param {SplitAllocation[]} [currentSplits=[]] - Current split allocations
  * @param {string|number} splitId - ID of split to remove
- * @returns {Array} Updated split allocations with split removed
+ * @returns {SplitAllocation[]} Updated split allocations with split removed
  */
 export const removeSplit = (currentSplits = [], splitId) => {
   try {
@@ -366,9 +451,9 @@ export const removeSplit = (currentSplits = [], splitId) => {
 
 /**
  * Prepare split data for transaction submission
- * @param {Array} splitAllocations - Validated split allocations
- * @param {Object} originalTransaction - Original transaction being split
- * @returns {Array} Prepared transactions for submission
+ * @param {SplitAllocation[]} [splitAllocations=[]] - Validated split allocations
+ * @param {Transaction} originalTransaction - Original transaction being split
+ * @returns {Transaction[]} Prepared transactions for submission
  */
 export const prepareSplitTransactions = (
   splitAllocations = [],
@@ -408,9 +493,9 @@ export const prepareSplitTransactions = (
 
 /**
  * Get split summary for display
- * @param {Array} splitAllocations - Split allocations
- * @param {Object} transaction - Original transaction
- * @returns {Object} Summary information
+ * @param {SplitAllocation[]} [splitAllocations=[]] - Split allocations
+ * @param {Transaction} transaction - Original transaction
+ * @returns {SplitSummary} Summary information
  */
 export const getSplitSummary = (splitAllocations = [], transaction) => {
   try {

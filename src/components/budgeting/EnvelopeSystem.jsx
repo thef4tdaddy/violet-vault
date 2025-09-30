@@ -10,6 +10,51 @@ import {
 } from "../../constants/categories";
 import logger from "../../utils/common/logger";
 
+/**
+ * @typedef {Object} Envelope
+ * @property {string} id - Envelope ID
+ * @property {string} name - Envelope name
+ * @property {string} category - Envelope category
+ * @property {number} allocated - Allocated amount
+ * @property {number} spent - Spent amount
+ * @property {number} [biweeklyAllocation] - Biweekly allocation amount
+ * @property {string} [envelopeType] - Type of envelope (bill, variable, savings)
+ */
+
+/**
+ * @typedef {Object} Bill
+ * @property {string} id - Bill ID
+ * @property {string} name - Bill name
+ * @property {number} amount - Bill amount
+ * @property {string} frequency - Payment frequency (monthly, biweekly, weekly, quarterly, yearly)
+ * @property {string} [envelopeId] - Associated envelope ID
+ */
+
+/**
+ * @typedef {Object} OperationResult
+ * @property {boolean} success - Whether the operation succeeded
+ * @property {string} [error] - Error message if operation failed
+ */
+
+/**
+ * @typedef {Object} EnvelopeSystemReturn
+ * @property {Envelope[]} envelopes - Array of envelopes
+ * @property {Bill[]} bills - Array of bills
+ * @property {number} unassignedCash - Amount of unassigned cash
+ * @property {boolean} isLoading - Loading state
+ * @property {(envelopeData: Partial<Envelope>) => Promise<OperationResult>} createEnvelope - Create new envelope
+ * @property {(envelopeId: string, updates: Partial<Envelope>) => Promise<OperationResult>} updateEnvelope - Update envelope
+ * @property {(envelopeId: string, deleteBillsToo?: boolean) => Promise<OperationResult>} deleteEnvelope - Delete envelope
+ * @property {() => void} updateBiweeklyAllocations - Update biweekly allocations for all envelopes
+ * @property {(amount: number) => void} setUnassignedCash - Set unassigned cash amount (Zustand)
+ */
+
+/**
+ * Envelope System Hook
+ * Manages envelope operations with TanStack Query and Zustand integration
+ * 
+ * @returns {EnvelopeSystemReturn} Envelope system state and operations
+ */
 const useEnvelopeSystem = () => {
   // Enhanced TanStack Query integration
   const {
