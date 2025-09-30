@@ -47,7 +47,9 @@
     "test:run": "vitest run",
     "test:ci": "vitest run --coverage",
     "test:manual": "echo 'Run manual testing checklist'",
-    "backup:data": "node scripts/backup-data.js"
+    "backup:data": "node scripts/backup-data.js",
+    "typecheck": "tsc --noEmit",
+    "typecheck:sw": "tsc --noEmit --project tsconfig.sw.json"
   },
   "dependencies": {
     "@highlight-run/react": "^20.0.1",
@@ -86,6 +88,7 @@
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^24.6.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^5.0.0",
@@ -101,6 +104,7 @@
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
     "terser": "^5.43.1",
+    "typescript": "^5.9.2",
     "util": "^0.12.5",
     "vite": "^7.0.6",
     "vite-plugin-pwa": "^1.0.3",

@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    // Target modern JavaScript
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    
+    // Enable JavaScript support with type checking
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "react-jsx",
+    
+    // Type checking strictness (start lenient, increase gradually)
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    
+    // Module resolution
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    
+    // Emit
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    
+    // Interop
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    
+    // Advanced
+    "types": ["vite/client", "node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".git",
+    ".github",
+    "public/firebase-messaging-sw.js"
+  ]
+}
