@@ -66,15 +66,22 @@ wrangler login
 
 ### 3.2 Deploy Worker
 
-1. Copy the worker files to your project:
+The worker is written in **TypeScript** for improved type safety and developer experience.
+
+1. Install worker dependencies:
 
 ```bash
-# From your project root
-mkdir -p cloudflare-worker
-# Copy the provided bug-report-worker.js and wrangler.toml files
+cd cloudflare-worker
+npm install
 ```
 
-2. Update `wrangler.toml` with your settings:
+2. (Optional) Type check the worker:
+
+```bash
+npm run typecheck
+```
+
+3. Update `wrangler.toml` with your settings:
 
 ```toml
 name = "violet-vault-bug-reporter"
@@ -82,12 +89,15 @@ name = "violet-vault-bug-reporter"
 # Configure R2 bucket name if using
 ```
 
-3. Deploy the worker:
+4. Deploy the worker:
 
 ```bash
-cd cloudflare-worker
-wrangler deploy
+npm run deploy
+# or for production
+npm run deploy:production
 ```
+
+**Note:** Wrangler automatically compiles the TypeScript worker during deployment. No separate build step is required.
 
 ### 3.3 Configure Environment Variables
 
@@ -320,7 +330,7 @@ The worker will automatically send notifications for new bug reports.
 
 ### Custom Issue Templates
 
-Modify the `createGitHubIssue` function in `bug-report-worker.js` to customize the GitHub issue format.
+Modify the `createGitHubIssue` function in `bug-report-worker.ts` to customize the GitHub issue format. The worker is written in TypeScript, providing type safety when making modifications.
 
 ### Screenshot Processing
 

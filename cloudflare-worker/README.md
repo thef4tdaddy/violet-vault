@@ -235,6 +235,17 @@ wrangler tail
 wrangler dev
 ```
 
+## Migration from JavaScript
+
+If you previously deployed the JavaScript version of this worker:
+
+1. Pull the latest changes from the repository
+2. Install dependencies: `npm install`
+3. Run type checking: `npm run typecheck`
+4. Deploy the updated worker: `npm run deploy`
+
+The TypeScript version is functionally identical to the JavaScript version. Wrangler handles all compilation automatically - no configuration changes needed beyond updating `wrangler.toml` to point to the `.ts` file (already done in the repository).
+
 ## License
 
 MIT - See main project LICENSE file.
