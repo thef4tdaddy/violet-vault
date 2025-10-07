@@ -1,11 +1,7 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const HistoryTab = ({
-  executionHistory,
-  showExecutionDetails,
-  onToggleDetails,
-}) => {
+const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails }) => {
   return (
     <div className="space-y-4">
       {executionHistory.length === 0 ? (
@@ -13,28 +9,20 @@ const HistoryTab = ({
           {React.createElement(getIcon("History"), {
             className: "h-12 w-12 text-gray-400 mx-auto mb-4",
           })}
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No Execution History
-          </h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Execution History</h3>
           <p className="text-gray-600 max-w-sm mx-auto">
-            Your rule execution history will appear here once you start running
-            auto-funding rules.
+            Your rule execution history will appear here once you start running auto-funding rules.
           </p>
         </div>
       ) : (
         <div className="space-y-3">
           {executionHistory.map((execution, index) => (
-            <div
-              key={execution.id}
-              className="border border-gray-200 rounded-lg p-4 bg-white"
-            >
+            <div key={execution.id} className="border border-gray-200 rounded-lg p-4 bg-white">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-start gap-3">
                   <div
                     className={`p-2 rounded-lg ${
-                      execution.success
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
+                      execution.success ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
                     }`}
                   >
                     {execution.success
@@ -73,8 +61,7 @@ const HistoryTab = ({
                             {React.createElement(getIcon("TrendingUp"), {
                               className: "h-3 w-3",
                             })}
-                            ${execution.totalFunded?.toFixed(2) || "0.00"}{" "}
-                            funded
+                            ${execution.totalFunded?.toFixed(2) || "0.00"} funded
                           </span>
                           <span>{execution.rulesExecuted || 0} rules</span>
                         </>
@@ -84,11 +71,7 @@ const HistoryTab = ({
                 </div>
                 <button
                   onClick={() =>
-                    onToggleDetails(
-                      showExecutionDetails === execution.id
-                        ? null
-                        : execution.id,
-                    )
+                    onToggleDetails(showExecutionDetails === execution.id ? null : execution.id)
                   }
                   className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                 >
@@ -109,14 +92,10 @@ const HistoryTab = ({
                       <div key={resultIndex} className="text-sm">
                         <div
                           className={`flex items-center justify-between p-2 rounded ${
-                            result.success
-                              ? "bg-green-50 text-green-800"
-                              : "bg-red-50 text-red-800"
+                            result.success ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
                           }`}
                         >
-                          <span>
-                            {result.ruleName || `Rule ${resultIndex + 1}`}
-                          </span>
+                          <span>{result.ruleName || `Rule ${resultIndex + 1}`}</span>
                           <span>
                             {result.success
                               ? `$${result.amount?.toFixed(2) || "0.00"}`

@@ -2,6 +2,8 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tsparser from "@typescript-eslint/parser";
 import zustandSafePatterns from "./eslint-rules/zustand-safe-patterns.js";
 
 export default [
@@ -22,10 +24,13 @@ export default [
       "public/**/*.js",
       "**/*.test.js",
       "**/*.spec.js",
+      "**/*.test.ts",
+      "**/*.spec.ts",
       "**/__tests__/**", // Exclude test directories
       "scripts/**", // Allow console in build scripts
       "cloudflare-worker/**", // Allow console in worker
       "vite.config.js", // Allow console in build config
+      "configs/eslint.config.js", // Exclude ESLint config itself from linting
       "**/logger.js", // Allow console in logger utility
       "configs/eslint-rules/**", // Exclude custom ESLint rule definitions
       "**/debug/**", // Debug utilities that output to browser console
@@ -197,9 +202,169 @@ export default [
     },
   },
   {
+    // TypeScript files configuration
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: { jsx: true },
+        project: "./tsconfig.json",
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        // Vitest globals (when globals: true in vitest.config.js)
+        vi: "readonly",
+        describe: "readonly",
+        test: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        suite: "readonly",
+        // Node.js globals
+        process: "readonly",
+        module: "readonly",
+        require: "readonly",
+        __dirname: "readonly",
+      },
+    },
+    plugins: {
+      "@typescript-eslint": tseslint,
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+      "zustand-safe-patterns": zustandSafePatterns,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      
+      // Disable JS rules that TypeScript handles better
+      "no-unused-vars": "off",
+      "no-undef": "off",
+      
+      // TypeScript-specific rules
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^(_|[A-Z_]+)" }],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-non-null-assertion": "warn",
+      
+      // Keep existing rules
+      "react-refresh/only-export-components": "off",
+      "no-case-declarations": "warn",
+      "no-useless-escape": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      
+      // Block browser dialogs (same as JS)
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "alert",
+          message:
+            "Use toast notifications instead of alert(). Import { globalToast } from '../../stores/ui/toastStore' and use globalToast.showError(), globalToast.showSuccess(), etc.",
+        },
+        {
+          name: "confirm",
+          message:
+            "Use ConfirmModal instead of confirm(). Import { useConfirm } from '../../hooks/common/useConfirm' and use the returned confirm function.",
+        },
+        {
+          name: "prompt",
+          message:
+            "Use PromptModal instead of prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function.",
+        },
+      ],
+      
+      // Block React Context usage (same as JS)
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react",
+              importNames: ["createContext", "useContext"],
+              message:
+                "Avoid React Context for server data - use TanStack Query + Dexie (see hooks in src/hooks/). For auth state, React Context is acceptable. For UI state: use Zustand stores in src/stores/.",
+            },
+            {
+              name: "lucide-react",
+              message:
+                "Use centralized icon system instead of direct lucide-react imports. Import icons from '@/utils/icons' or use { getIcon, renderIcon } from '@/utils'. See docs/ICON_MIGRATION_PLAN.md for details.",
+            },
+          ],
+        },
+      ],
+      
+      // File size enforcement
+      "max-lines": [
+        "warn",
+        {
+          max: 300,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
+      
+      // Complexity rules
+      complexity: ["warn", { max: 15 }],
+      "max-depth": ["warn", 5],
+      "max-params": ["warn", 5],
+      "max-statements": ["warn", 25],
+      "max-lines-per-function": [
+        "warn",
+        {
+          max: 75,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
+      "max-nested-callbacks": ["warn", 4],
+      
+      // Block all console statements
+      "no-console": "error",
+      
+      // Zustand Store Safety Rules
+      "zustand-safe-patterns/zustand-no-get-in-actions": "warn",
+      "zustand-safe-patterns/zustand-store-reference-pattern": "error",
+      "zustand-safe-patterns/zustand-no-getstate-in-useeffect": "error",
+      "zustand-safe-patterns/zustand-no-store-actions-in-deps": "error",
+      "zustand-safe-patterns/zustand-no-auto-executing-store-calls": "error",
+      "zustand-safe-patterns/zustand-selective-subscriptions": "warn",
+      "zustand-safe-patterns/zustand-no-conditional-subscriptions": "warn",
+      "zustand-safe-patterns/zustand-no-object-dependencies": "error",
+      "zustand-safe-patterns/zustand-proper-store-initialization": "error",
+      "zustand-safe-patterns/zustand-no-recreating-functions": "warn",
+      
+      // Block window.confirm patterns
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='confirm']",
+          message:
+            "Use ConfirmModal instead of window.confirm(). Import { useConfirm } from '../../hooks/common/useConfirm' and use the returned confirm function.",
+        },
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='alert']",
+          message:
+            "Use toast notifications instead of window.alert(). Import { globalToast } from '../../stores/ui/toastStore' and use globalToast.showError(), globalToast.showSuccess(), etc.",
+        },
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='prompt']",
+          message:
+            "Use PromptModal instead of window.prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function.",
+        },
+      ],
+    },
+  },
+  {
     // Component architecture enforcement (Issue #515 - prevent direct service imports in components only)
     // Icon system enforcement (Issue #575 - prevent direct lucide-react imports in components)
-    files: ["src/components/**/*.{js,jsx}"],
+    files: ["src/components/**/*.{js,jsx,ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error", // CHANGED FROM "warn"
@@ -244,7 +409,7 @@ export default [
   },
   {
     // Files over 400 lines need attention (Issue #569)
-    files: ["**/*.{js,jsx}"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     rules: {
       "max-lines": [
         "error",
@@ -258,7 +423,7 @@ export default [
   },
   {
     // Files over 500 lines must be refactored (Issue #569)
-    files: ["**/*.{js,jsx}"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     rules: {
       "max-lines": [
         "error",
@@ -368,13 +533,16 @@ export default [
   },
   {
     // Allow direct lucide-react imports only in centralized icon utilities (Issue #575)
+    // Allow all imports in type definition files
     files: [
       "src/utils/icons/index.js", // Centralized icon system
       "src/utils/billIcons/**/*.js", // Legacy bill icon utilities (compatibility layer)
       "src/utils/receipts/receiptHelpers.jsx", // Receipt utilities using icons
+      "**/*.d.ts", // Type definition files need unrestricted imports
+      "vite-env.d.ts", // Vite environment types
     ],
     rules: {
-      "no-restricted-imports": "off", // These files can import lucide-react directly
+      "no-restricted-imports": "off", // These files can import anything for type definitions
     },
   },
   {

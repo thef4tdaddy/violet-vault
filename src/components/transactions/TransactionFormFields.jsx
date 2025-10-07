@@ -33,9 +33,7 @@ const TransactionFormFields = ({
     <form onSubmit={handleFormSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Date *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Date *</label>
           <input
             type="date"
             value={transactionForm.date}
@@ -47,18 +45,14 @@ const TransactionFormFields = ({
             }
             disabled={editingTransaction && !canEdit}
             className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-              editingTransaction && !canEdit
-                ? "bg-gray-100 cursor-not-allowed"
-                : ""
+              editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -105,9 +99,7 @@ const TransactionFormFields = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Description *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
         <input
           type="text"
           value={transactionForm.description}
@@ -119,9 +111,7 @@ const TransactionFormFields = ({
           }
           disabled={editingTransaction && !canEdit}
           className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            editingTransaction && !canEdit
-              ? "bg-gray-100 cursor-not-allowed"
-              : ""
+            editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           placeholder="e.g., Grocery shopping at Walmart"
           required
@@ -130,9 +120,7 @@ const TransactionFormFields = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Amount *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
           <input
             type="number"
             step="0.01"
@@ -145,9 +133,7 @@ const TransactionFormFields = ({
             }
             disabled={editingTransaction && !canEdit}
             className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-              editingTransaction && !canEdit
-                ? "bg-gray-100 cursor-not-allowed"
-                : ""
+              editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
             placeholder="0.00"
             required
@@ -155,9 +141,7 @@ const TransactionFormFields = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
           <select
             value={transactionForm.category}
             onChange={(e) =>
@@ -168,9 +152,7 @@ const TransactionFormFields = ({
             }
             disabled={editingTransaction && !canEdit}
             className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-              editingTransaction && !canEdit
-                ? "bg-gray-100 cursor-not-allowed"
-                : ""
+              editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
           >
             <option value="">Select category...</option>
@@ -184,9 +166,7 @@ const TransactionFormFields = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Assign to Envelope
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Envelope</label>
         <select
           value={transactionForm.envelopeId}
           onChange={(e) =>
@@ -197,9 +177,7 @@ const TransactionFormFields = ({
           }
           disabled={editingTransaction && !canEdit}
           className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            editingTransaction && !canEdit
-              ? "bg-gray-100 cursor-not-allowed"
-              : ""
+            editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
         >
           <option value="">Leave unassigned</option>
@@ -214,16 +192,13 @@ const TransactionFormFields = ({
         </select>
         {transactionForm.envelopeId &&
           (() => {
-            const selectedEnvelope = envelopes.find(
-              (env) => env.id === transactionForm.envelopeId,
-            );
-            return selectedEnvelope &&
-              selectedEnvelope.envelopeType === "bill" ? (
+            const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
+            return selectedEnvelope && selectedEnvelope.envelopeType === "bill" ? (
               <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  💡 <strong>Bill Payment:</strong> Assigning this transaction
-                  to "{selectedEnvelope.name}" will automatically mark it as a
-                  bill payment and deduct from the envelope balance.
+                  💡 <strong>Bill Payment:</strong> Assigning this transaction to "
+                  {selectedEnvelope.name}" will automatically mark it as a bill payment and deduct
+                  from the envelope balance.
                 </p>
               </div>
             ) : null;
@@ -255,9 +230,7 @@ const TransactionFormFields = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Notes (Optional)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
         <textarea
           value={transactionForm.notes}
           onChange={(e) =>
@@ -269,9 +242,7 @@ const TransactionFormFields = ({
           rows={3}
           disabled={editingTransaction && !canEdit}
           className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            editingTransaction && !canEdit
-              ? "bg-gray-100 cursor-not-allowed"
-              : ""
+            editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           placeholder="Additional notes about this transaction..."
         />
@@ -301,9 +272,7 @@ const TransactionFormFields = ({
         <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-purple-900 mb-1">
-                Have a receipt?
-              </p>
+              <p className="font-medium text-purple-900 mb-1">Have a receipt?</p>
               <p className="text-sm text-purple-700">
                 Scan a receipt to automatically fill in transaction details
               </p>
@@ -311,10 +280,7 @@ const TransactionFormFields = ({
             <ReceiptButton
               variant="secondary"
               onTransactionCreated={(transaction) => {
-                logger.info(
-                  "Transaction created from receipt in form",
-                  transaction,
-                );
+                logger.info("Transaction created from receipt in form", transaction);
                 onClose(); // Close the form since transaction was created
               }}
             />

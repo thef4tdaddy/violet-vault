@@ -178,7 +178,7 @@ const CartSummary = () => {
   const itemCount = useCartStore((state) => state.items.length);
 
   const totalPrice = useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   );
 
   const hasItems = useCartStore((state) => state.items.length > 0);
@@ -222,10 +222,7 @@ const TodoList = () => {
 
   return (
     <div>
-      <FilterButtons
-        onFilterChange={actions.setFilter}
-        currentFilter={filter}
-      />
+      <FilterButtons onFilterChange={actions.setFilter} currentFilter={filter} />
       <TodoItems
         todos={filteredTodos}
         onToggle={actions.toggleTodo}
@@ -276,16 +273,14 @@ const useAppSettingsStore = create(
           ...state,
           ...settings,
           // Validate critical settings
-          theme: ["light", "dark"].includes(settings.theme)
-            ? settings.theme
-            : state.theme,
+          theme: ["light", "dark"].includes(settings.theme) ? settings.theme : state.theme,
         })),
     }),
     {
       name: "app-settings",
       version: 1,
-    },
-  ),
+    }
+  )
 );
 ```
 
@@ -587,18 +582,13 @@ const TodoList = () => {
       toggle: useTodoStore.getState().toggleTodo,
       delete: useTodoStore.getState().deleteTodo,
     }),
-    [],
+    []
   ); // Empty deps - actions are stable
 
   return (
     <div>
       {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          onToggle={actions.toggle}
-          onDelete={actions.delete}
-        />
+        <TodoItem key={todo.id} todo={todo} onToggle={actions.toggle} onDelete={actions.delete} />
       ))}
     </div>
   );

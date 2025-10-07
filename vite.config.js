@@ -71,7 +71,10 @@ export default defineConfig(() => {
 
   return {
     plugins: [
-      react(),
+      react({
+        // Enable TypeScript and JSX support
+        jsxRuntime: "automatic",
+      }),
       tailwindcss(),
       VitePWA({
         registerType: "prompt", // Changed from autoUpdate to prompt for manual control

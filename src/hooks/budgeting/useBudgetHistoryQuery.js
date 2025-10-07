@@ -35,13 +35,8 @@ export const useBudgetCommits = (options = {}) => {
     mutationFn: async (commitData) => {
       // Generate hash and encrypt snapshot
       const hash = encryptionUtils.generateHash(JSON.stringify(commitData));
-      const encryptionKey = await encryptionUtils.deriveKeyFromPassword(
-        commitData.password,
-      );
-      const encryptedSnapshot = await encryptionUtils.encrypt(
-        commitData.snapshot,
-        encryptionKey,
-      );
+      const encryptionKey = await encryptionUtils.deriveKeyFromPassword(commitData.password);
+      const encryptedSnapshot = await encryptionUtils.encrypt(commitData.snapshot, encryptionKey);
 
       const commit = {
         ...commitData,
@@ -145,12 +140,11 @@ export const useBudgetHistoryOperations = () => {
       }
 
       // Decrypt and restore the snapshot
-      const encryptionKey =
-        await encryptionUtils.deriveKeyFromPassword(password);
+      const encryptionKey = await encryptionUtils.deriveKeyFromPassword(password);
       const snapshot = await encryptionUtils.decrypt(
         commit.encryptedSnapshot,
         encryptionKey,
-        commit.encryptedSnapshotIv,
+        commit.encryptedSnapshotIv
       );
 
       // Restore all data to the snapshot state using Dexie
@@ -176,19 +170,16 @@ export const useBudgetHistoryOperations = () => {
           ]);
 
           // Restore snapshot data
-          if (snapshot.envelopes?.length)
-            await budgetDb.envelopes.bulkAdd(snapshot.envelopes);
+          if (snapshot.envelopes?.length) await budgetDb.envelopes.bulkAdd(snapshot.envelopes);
           if (snapshot.transactions?.length)
             await budgetDb.transactions.bulkAdd(snapshot.transactions);
-          if (snapshot.bills?.length)
-            await budgetDb.bills.bulkAdd(snapshot.bills);
+          if (snapshot.bills?.length) await budgetDb.bills.bulkAdd(snapshot.bills);
           if (snapshot.savingsGoals?.length)
             await budgetDb.savingsGoals.bulkAdd(snapshot.savingsGoals);
-          if (snapshot.debts?.length)
-            await budgetDb.debts.bulkAdd(snapshot.debts);
+          if (snapshot.debts?.length) await budgetDb.debts.bulkAdd(snapshot.debts);
           if (snapshot.paycheckHistory?.length)
             await budgetDb.paycheckHistory.bulkAdd(snapshot.paycheckHistory);
-        },
+        }
       );
 
       return { commitHash, snapshot };

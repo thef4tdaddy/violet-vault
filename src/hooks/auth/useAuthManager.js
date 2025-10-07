@@ -47,10 +47,7 @@ export const useAuthManager = () => {
   const login = createLoginOperation(loginMutation);
   const joinBudget = createJoinBudgetOperation(joinBudgetMutation);
   const logout = createLogoutOperation(logoutMutation);
-  const changePassword = createChangePasswordOperation(
-    changePasswordMutation,
-    authContext,
-  );
+  const changePassword = createChangePasswordOperation(changePasswordMutation, authContext);
   const updateProfile = createUpdateProfileOperation(updateProfileMutation);
   const lockSession = createLockSessionOperation(authContext);
   const updateActivity = createUpdateActivityOperation(authContext);

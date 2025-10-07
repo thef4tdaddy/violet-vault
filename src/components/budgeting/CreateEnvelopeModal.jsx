@@ -114,9 +114,7 @@ const CreateEnvelopeModal = ({
 
       {/* Color Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Envelope Color
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Color</label>
         <div className="grid grid-cols-8 gap-2">
           {[
             "#ef4444", // red
@@ -198,12 +196,9 @@ const CreateEnvelopeModal = ({
               </div>
               <div>
                 <h2 className="font-black text-white text-base">
-                  <span className="text-lg">C</span>REATE{" "}
-                  <span className="text-lg">E</span>NVELOPE
+                  <span className="text-lg">C</span>REATE <span className="text-lg">E</span>NVELOPE
                 </h2>
-                <p className="text-green-100 text-sm">
-                  Set up a new budget envelope
-                </p>
+                <p className="text-green-100 text-sm">Set up a new budget envelope</p>
               </div>
             </div>
             <button

@@ -24,8 +24,7 @@ export const useDebtDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState(null);
   const [editingDebt, setEditingDebt] = useState(null);
-  const [showUpcomingPaymentsModal, setShowUpcomingPaymentsModal] =
-    useState(false);
+  const [showUpcomingPaymentsModal, setShowUpcomingPaymentsModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     type: "all",
     status: "all",
@@ -52,9 +51,7 @@ export const useDebtDashboard = () => {
 
     // Filter by status
     if (filterOptions.status !== "all") {
-      filtered = filtered.filter(
-        (debt) => debt.status === filterOptions.status,
-      );
+      filtered = filtered.filter((debt) => debt.status === filterOptions.status);
     }
 
     // Sort debts

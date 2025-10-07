@@ -18,9 +18,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
       {/* Debug Info Panel */}
       {isDebugMode && (
         <div className="mb-3 p-2 bg-blue-50 rounded text-xs border border-blue-200">
-          <p className="font-semibold text-blue-800 mb-1">
-            🛠️ Development Sync Tools
-          </p>
+          <p className="font-semibold text-blue-800 mb-1">🛠️ Development Sync Tools</p>
           <p className="text-blue-700">
             Available Functions:{" "}
             {Object.keys(window)
@@ -28,8 +26,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
               .join(", ")}
           </p>
           <p className="text-blue-600 mt-1">
-            Advanced sync debugging and validation tools for development and
-            testing.
+            Advanced sync debugging and validation tools for development and testing.
           </p>
         </div>
       )}
@@ -76,12 +73,8 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 className: "h-4 w-4 text-blue-600 mr-3",
               })}
               <div className="text-left">
-                <p className="font-medium text-blue-900">
-                  🧪 Run Full Sync Validation
-                </p>
-                <p className="text-xs text-blue-700">
-                  Comprehensive sync system check (4 phases)
-                </p>
+                <p className="font-medium text-blue-900">🧪 Run Full Sync Validation</p>
+                <p className="text-xs text-blue-700">Comprehensive sync system check (4 phases)</p>
               </div>
             </button>
 
@@ -101,9 +94,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 className: "h-4 w-4 text-purple-600 mr-3",
               })}
               <div className="text-left">
-                <p className="font-medium text-purple-900">
-                  🔍 Detect Local Data
-                </p>
+                <p className="font-medium text-purple-900">🔍 Detect Local Data</p>
                 <p className="text-xs text-purple-700">
                   Comprehensive local data detection with debugging
                 </p>
@@ -126,9 +117,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 className: "h-4 w-4 text-indigo-600 mr-3",
               })}
               <div className="text-left">
-                <p className="font-medium text-indigo-900">
-                  ⚡ Quick Data Check
-                </p>
+                <p className="font-medium text-indigo-900">⚡ Quick Data Check</p>
                 <p className="text-xs text-indigo-700">
                   Fast boolean check for local data presence
                 </p>
@@ -160,9 +149,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 className: "h-4 w-4 text-orange-600 mr-3",
               })}
               <div className="text-left">
-                <p className="font-medium text-orange-900">
-                  🛡️ Safe Cloud Data Reset
-                </p>
+                <p className="font-medium text-orange-900">🛡️ Safe Cloud Data Reset</p>
                 <p className="text-xs text-orange-700">
                   Reset with comprehensive local data validation
                 </p>
@@ -194,9 +181,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
               })}
               <div className="text-left">
                 <p className="font-medium text-red-900">🚨 Reset Cloud Data</p>
-                <p className="text-xs text-red-700">
-                  Emergency recovery: clear and re-upload
-                </p>
+                <p className="text-xs text-red-700">Emergency recovery: clear and re-upload</p>
               </div>
             </button>
           </>

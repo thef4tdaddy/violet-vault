@@ -26,9 +26,7 @@ export const simulateRuleExecution = (rules, context) => {
 
   try {
     // Filter and sort rules by priority
-    const executableRules = rules.filter((rule) =>
-      shouldRuleExecute(rule, context),
-    );
+    const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
     const sortedRules = sortRulesByPriority(executableRules);
 
     let availableCash = context.data.unassignedCash;
@@ -108,10 +106,7 @@ export const simulateSingleRule = (rule, context, availableCash) => {
         ruleId: rule.id,
         ruleName: rule.name,
         success: false,
-        error:
-          availableCash <= 0
-            ? "No funds available"
-            : "Amount calculated as zero",
+        error: availableCash <= 0 ? "No funds available" : "Amount calculated as zero",
         amount: 0,
         plannedTransfers: [],
       };
@@ -175,8 +170,7 @@ export const planRuleTransfers = (rule, totalAmount) => {
           // Handle rounding by giving any remainder to the last envelope
           const amount =
             index === rule.config.targetIds.length - 1
-              ? totalAmount -
-                amountPerEnvelope * (rule.config.targetIds.length - 1)
+              ? totalAmount - amountPerEnvelope * (rule.config.targetIds.length - 1)
               : amountPerEnvelope;
 
           transfers.push({
@@ -285,9 +279,7 @@ export const validateTransfers = (transfers, context) => {
   transfers.forEach((transfer, index) => {
     // Check if target envelope exists
     if (transfer.toEnvelopeId !== "unassigned") {
-      const targetEnvelope = envelopes.find(
-        (e) => e.id === transfer.toEnvelopeId,
-      );
+      const targetEnvelope = envelopes.find((e) => e.id === transfer.toEnvelopeId);
       if (!targetEnvelope) {
         errors.push({
           transferIndex: index,
@@ -350,9 +342,7 @@ export const calculateTransferImpact = (transfers, context) => {
       newBalance: envelope.currentBalance,
       monthlyAmount: envelope.monthlyAmount,
       fillPercentage:
-        envelope.monthlyAmount > 0
-          ? (envelope.currentBalance / envelope.monthlyAmount) * 100
-          : 0,
+        envelope.monthlyAmount > 0 ? (envelope.currentBalance / envelope.monthlyAmount) * 100 : 0,
       newFillPercentage: 0,
     });
   });
@@ -366,8 +356,7 @@ export const calculateTransferImpact = (transfers, context) => {
     if (impact.envelopes.has(transfer.toEnvelopeId)) {
       const envelopeImpact = impact.envelopes.get(transfer.toEnvelopeId);
       envelopeImpact.change += transfer.amount;
-      envelopeImpact.newBalance =
-        envelopeImpact.currentBalance + envelopeImpact.change;
+      envelopeImpact.newBalance = envelopeImpact.currentBalance + envelopeImpact.change;
 
       if (envelopeImpact.monthlyAmount > 0) {
         envelopeImpact.newFillPercentage =

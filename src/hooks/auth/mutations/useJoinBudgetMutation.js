@@ -45,7 +45,7 @@ const processJoinBudget = async (joinData) => {
       encryptedData: encrypted.data,
       salt: Array.from(newSalt),
       iv: encrypted.iv,
-    }),
+    })
   );
 
   // Identify shared user for tracking
@@ -80,10 +80,7 @@ export const useJoinBudgetMutation = () => {
       });
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Join timeout after 10 seconds")),
-          10000,
-        ),
+        setTimeout(() => reject(new Error("Join timeout after 10 seconds")), 10000)
       );
 
       const joinPromise = async () => {

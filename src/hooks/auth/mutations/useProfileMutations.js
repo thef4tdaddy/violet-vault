@@ -32,28 +32,21 @@ export const useUpdateProfileMutation = () => {
         const savedData = localStorage.getItem("envelopeBudgetData");
         if (savedData) {
           const { encryptedData, iv } = JSON.parse(savedData);
-          const decryptedData = await encryptionUtils.decrypt(
-            encryptedData,
-            encryptionKey,
-            iv,
-          );
+          const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
           const updatedData = {
             ...decryptedData,
             currentUser: updatedProfile,
           };
 
-          const encrypted = await encryptionUtils.encrypt(
-            updatedData,
-            encryptionKey,
-          );
+          const encrypted = await encryptionUtils.encrypt(updatedData, encryptionKey);
           localStorage.setItem(
             "envelopeBudgetData",
             JSON.stringify({
               encryptedData: encrypted.data,
               salt: Array.from(salt),
               iv: encrypted.iv,
-            }),
+            })
           );
         }
 

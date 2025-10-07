@@ -36,27 +36,27 @@ export const useExecutionHistory = (initialHistory = []) => {
         // Apply filters
         if (filters.trigger) {
           filteredHistory = filteredHistory.filter(
-            (execution) => execution.trigger === filters.trigger,
+            (execution) => execution.trigger === filters.trigger
           );
         }
 
         if (filters.successful !== undefined) {
           filteredHistory = filteredHistory.filter(
-            (execution) => (execution.success !== false) === filters.successful,
+            (execution) => (execution.success !== false) === filters.successful
           );
         }
 
         if (filters.dateFrom) {
           const fromDate = new Date(filters.dateFrom);
           filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate,
+            (execution) => new Date(execution.executedAt) >= fromDate
           );
         }
 
         if (filters.dateTo) {
           const toDate = new Date(filters.dateTo);
           filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) <= toDate,
+            (execution) => new Date(execution.executedAt) <= toDate
           );
         }
 
@@ -67,7 +67,7 @@ export const useExecutionHistory = (initialHistory = []) => {
         return [];
       }
     },
-    [executionHistory],
+    [executionHistory]
   );
 
   // Get execution by ID
@@ -75,7 +75,7 @@ export const useExecutionHistory = (initialHistory = []) => {
     (executionId) => {
       return executionHistory.find((execution) => execution.id === executionId);
     },
-    [executionHistory],
+    [executionHistory]
   );
 
   // Clear execution history

@@ -17,7 +17,7 @@ const useLongPress = (callback, threshold = 500) => {
         callback(event);
       }, threshold);
     },
-    [callback, threshold],
+    [callback, threshold]
   );
 
   const clear = useCallback(() => {
@@ -54,11 +54,10 @@ const useKeyboardNavigation = (isExpanded, setExpanded, containerRef) => {
         case "ArrowDown": {
           e.preventDefault();
           // Focus management for action buttons
-          const actionButtons =
-            containerRef.current?.querySelectorAll('[role="menuitem"]');
+          const actionButtons = containerRef.current?.querySelectorAll('[role="menuitem"]');
           if (actionButtons && actionButtons.length > 0) {
             const currentIndex = Array.from(actionButtons).findIndex(
-              (btn) => btn === document.activeElement,
+              (btn) => btn === document.activeElement
             );
             const nextIndex =
               e.key === "ArrowUp"

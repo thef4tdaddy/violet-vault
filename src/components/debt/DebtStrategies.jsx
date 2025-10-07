@@ -25,9 +25,7 @@ const DebtStrategies = ({ debts }) => {
         {React.createElement(getIcon("CheckCircle"), {
           className: "w-12 h-12 text-green-500 mx-auto mb-3",
         })}
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          No Active Debts!
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">No Active Debts!</h3>
         <p className="text-gray-600">
           Congratulations! You don't have any active debts to strategize about.
         </p>
@@ -43,13 +41,10 @@ const DebtStrategies = ({ debts }) => {
           {React.createElement(getIcon("Target"), {
             className: "w-6 h-6 text-purple-600",
           })}
-          <h2 className="text-xl font-semibold text-gray-900">
-            Debt Payoff Strategies
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900">Debt Payoff Strategies</h2>
         </div>
         <p className="text-gray-600">
-          Compare proven debt payoff strategies to find the best approach for
-          your situation.
+          Compare proven debt payoff strategies to find the best approach for your situation.
         </p>
       </div>
 
@@ -84,33 +79,23 @@ const DebtStrategies = ({ debts }) => {
       {insights.length > 0 && (
         <div className="space-y-3">
           {insights.map((insight, index) => {
-            const iconName =
-              insight.type === "warning" ? "AlertCircle" : "Info";
+            const iconName = insight.type === "warning" ? "AlertCircle" : "Info";
             const colorClass =
               insight.type === "warning"
                 ? "border-orange-200 bg-orange-50"
                 : "border-blue-200 bg-blue-50";
-            const textClass =
-              insight.type === "warning" ? "text-orange-800" : "text-blue-800";
-            const iconClass =
-              insight.type === "warning" ? "text-orange-600" : "text-blue-600";
+            const textClass = insight.type === "warning" ? "text-orange-800" : "text-blue-800";
+            const iconClass = insight.type === "warning" ? "text-orange-600" : "text-blue-600";
 
             return (
-              <div
-                key={index}
-                className={`rounded-xl p-4 border ${colorClass}`}
-              >
+              <div key={index} className={`rounded-xl p-4 border ${colorClass}`}>
                 <div className="flex items-start gap-3">
                   {React.createElement(getIcon(iconName), {
                     className: `w-5 h-5 ${iconClass} flex-shrink-0 mt-0.5`,
                   })}
                   <div>
-                    <h4 className={`font-medium ${textClass}`}>
-                      {insight.title}
-                    </h4>
-                    <p className={`text-sm ${textClass} mt-1`}>
-                      {insight.message}
-                    </p>
+                    <h4 className={`font-medium ${textClass}`}>{insight.title}</h4>
+                    <p className={`text-sm ${textClass} mt-1`}>{insight.message}</p>
                   </div>
                 </div>
               </div>

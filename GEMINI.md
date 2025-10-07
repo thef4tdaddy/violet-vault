@@ -4,6 +4,13 @@
 
 - Always Commit Changes Frequently so changes can be easily reverted
 
+## Code Standards
+
+- **Error Logging**: ALWAYS use the logger system (`logger.error`, `logger.warn`, etc.) instead of `console.*` methods
+- **ESLint Rules**: NEVER disable the `no-console` ESLint rule - use proper logging instead
+- **Error Handling**: Properly handle and log errors using the existing logger utility
+- **TypeScript Support**: TypeScript is configured with `allowJs: true` for gradual migration. Both `.js/.jsx` and `.ts/.tsx` files are supported. Use `npm run typecheck` to validate types.
+
 ## Branch Strategy
 
 - **feature/\* → milestone-X.Y**: Individual features

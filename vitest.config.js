@@ -7,6 +7,8 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./src/test/setup.js"],
+    // Support both .js and .ts test files
+    include: ["**/*.{test,spec}.{js,jsx,ts,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
@@ -20,6 +22,7 @@ export default defineConfig({
         "src/test/**",
         "**/*.d.ts",
         "src/main.jsx",
+        "src/main.tsx",
       ],
       thresholds: {
         global: {

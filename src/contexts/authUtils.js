@@ -35,9 +35,7 @@ export const initializeAuthFromStorage = async (setAuthState) => {
       }));
     } else if (savedBudgetData) {
       // Has budget data but no profile - legacy state
-      logger.auth(
-        "AuthContext: Found budget data without profile - legacy state",
-      );
+      logger.auth("AuthContext: Found budget data without profile - legacy state");
       setAuthState((prev) => ({
         ...prev,
         isAuthenticated: false,

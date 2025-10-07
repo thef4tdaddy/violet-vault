@@ -66,17 +66,13 @@ export const useAuthCompatibility = () => {
 
     // Additional methods that some components might use
     setEncryption: ({ key: _key, salt: _salt }) => {
-      logger.warn(
-        "setEncryption called via compatibility layer - this should be migrated",
-      );
+      logger.warn("setEncryption called via compatibility layer - this should be migrated");
       // This would need to be handled through the new auth context
       // For now, log a warning since this should be rare
     },
 
     startBackgroundSyncAfterLogin: async (_isNewUser = false) => {
-      logger.info(
-        "startBackgroundSyncAfterLogin called via compatibility layer",
-      );
+      logger.info("startBackgroundSyncAfterLogin called via compatibility layer");
       // This is now handled automatically in the login mutations
       // So we can just return success
       return Promise.resolve();

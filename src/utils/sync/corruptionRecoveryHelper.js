@@ -50,9 +50,7 @@ export const safeCloudDataReset = async () => {
     }
 
     // Step 3: Proceed with cloud reset (this would be implemented by the calling function)
-    logger.info(
-      "✅ Safety checks passed. Local data confirmed present and accessible.",
-    );
+    logger.info("✅ Safety checks passed. Local data confirmed present and accessible.");
 
     return {
       success: true,
@@ -85,11 +83,7 @@ if (typeof window !== "undefined") {
   window.hasLocalDataDebug = hasLocalData;
 
   logger.info("🔧 Enhanced corruption recovery tools exposed to window:", {
-    functions: [
-      "safeCloudDataReset",
-      "detectLocalDataDebug",
-      "hasLocalDataDebug",
-    ],
+    functions: ["safeCloudDataReset", "detectLocalDataDebug", "hasLocalDataDebug"],
   });
 }
 

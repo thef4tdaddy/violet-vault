@@ -16,23 +16,19 @@ const LandingPage = () => {
             <span className="text-white font-black text-4xl">V</span>
           </div>
           <h1 className="font-black text-black text-5xl mb-2">
-            <span className="text-6xl">V</span>IOLET{" "}
-            <span className="text-6xl">V</span>AULT
+            <span className="text-6xl">V</span>IOLET <span className="text-6xl">V</span>AULT
           </h1>
-          <p className="text-purple-900 text-xl">
-            Secure Envelope-Based Budgeting
-          </p>
+          <p className="text-purple-900 text-xl">Secure Envelope-Based Budgeting</p>
         </div>
 
         {/* Coming Soon Content */}
         <div className="glassmorphism rounded-lg p-8 border-2 border-black bg-white/80 backdrop-blur-sm mb-8">
           <h2 className="font-black text-black text-3xl mb-4">
-            <span className="text-4xl">C</span>OMING{" "}
-            <span className="text-4xl">S</span>OON
+            <span className="text-4xl">C</span>OMING <span className="text-4xl">S</span>OON
           </h2>
           <p className="text-purple-900 text-lg mb-6">
-            We're building something amazing for your financial freedom. In the
-            meantime, you can access the full budgeting app below.
+            We're building something amazing for your financial freedom. In the meantime, you can
+            access the full budgeting app below.
           </p>
 
           {/* App Launch Button */}
@@ -71,12 +67,9 @@ const LandingPage = () => {
               className="glassmorphism rounded-lg p-4 border-2 border-black bg-white/60 backdrop-blur-sm"
             >
               <div className="w-12 h-12 mx-auto mb-2 bg-purple-100 rounded-full flex items-center justify-center border-2 border-black">
-                {React.createElement(
-                  getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)),
-                  {
-                    className: "w-6 h-6 text-purple-600",
-                  },
-                )}
+                {React.createElement(getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)), {
+                  className: "w-6 h-6 text-purple-600",
+                })}
               </div>
               <h3 className="font-black text-black text-sm mb-1">
                 <span className="text-base">{title.charAt(0)}</span>

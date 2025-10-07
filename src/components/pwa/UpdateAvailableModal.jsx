@@ -7,8 +7,7 @@ import useUiStore from "../../stores/ui/uiStore";
  * Shows when a new version of the PWA is available
  */
 const UpdateAvailableModal = () => {
-  const { updateAvailable, isUpdating, setUpdateAvailable, updateApp } =
-    useUiStore();
+  const { updateAvailable, isUpdating, setUpdateAvailable, updateApp } = useUiStore();
 
   if (!updateAvailable) return null;
 
@@ -32,14 +31,13 @@ const UpdateAvailableModal = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            🚀 <span className="text-2xl">N</span>EW{" "}
-            <span className="text-2xl">V</span>ERSION{" "}
+            🚀 <span className="text-2xl">N</span>EW <span className="text-2xl">V</span>ERSION{" "}
             <span className="text-2xl">R</span>EADY!
           </h2>
 
           <p className="text-purple-900 text-sm leading-relaxed">
-            We've updated VioletVault with new features and fixes. Update now to
-            get the latest improvements.
+            We've updated VioletVault with new features and fixes. Update now to get the latest
+            improvements.
           </p>
         </div>
 
@@ -62,9 +60,7 @@ const UpdateAvailableModal = () => {
               {React.createElement(getIcon("CheckCircle"), {
                 className: "w-4 h-4 text-green-600 flex-shrink-0",
               })}
-              <span className="text-gray-700">
-                Enhanced offline functionality
-              </span>
+              <span className="text-gray-700">Enhanced offline functionality</span>
             </div>
           </div>
         </div>

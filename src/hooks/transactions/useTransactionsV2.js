@@ -117,14 +117,11 @@ const useTransactionsV2 = (options = {}) => {
     /**
      * Split transaction with automatic data refresh
      */
-    splitTransactionWithRefresh: async (
-      originalTransaction,
-      splitTransactions,
-    ) => {
+    splitTransactionWithRefresh: async (originalTransaction, splitTransactions) => {
       try {
         const result = await operationsHook.splitTransaction(
           originalTransaction,
-          splitTransactions,
+          splitTransactions
         );
         await dataHook.refetch();
         return result;
@@ -153,11 +150,7 @@ const useTransactionsV2 = (options = {}) => {
      */
     bulkOperationWithRefresh: async (operation, transactions, updates) => {
       try {
-        const result = await operationsHook.bulkOperation(
-          operation,
-          transactions,
-          updates,
-        );
+        const result = await operationsHook.bulkOperation(operation, transactions, updates);
         await dataHook.refetch();
         return result;
       } catch (error) {

@@ -2,10 +2,7 @@ import React from "react";
 
 const AccountFormActions = ({ editingAccount, canEdit, onClose, onSubmit }) => (
   <div className="flex gap-3 mt-6">
-    <button
-      onClick={onClose}
-      className="flex-1 btn btn-secondary border-2 border-black"
-    >
+    <button onClick={onClose} className="flex-1 btn btn-secondary border-2 border-black">
       Cancel
     </button>
     <button

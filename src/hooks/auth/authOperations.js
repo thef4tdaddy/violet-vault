@@ -39,30 +39,29 @@ export const createLoginOperation =
 /**
  * Join budget with share code
  */
-export const createJoinBudgetOperation =
-  (joinBudgetMutation) => async (joinData) => {
-    try {
-      logger.auth("AuthManager: Starting budget join", {
-        budgetId: joinData.budgetId?.substring(0, 8) + "...",
-        sharedBy: joinData.sharedBy,
-      });
+export const createJoinBudgetOperation = (joinBudgetMutation) => async (joinData) => {
+  try {
+    logger.auth("AuthManager: Starting budget join", {
+      budgetId: joinData.budgetId?.substring(0, 8) + "...",
+      sharedBy: joinData.sharedBy,
+    });
 
-      const result = await joinBudgetMutation.mutateAsync(joinData);
+    const result = await joinBudgetMutation.mutateAsync(joinData);
 
-      if (result.success) {
-        logger.auth("AuthManager: Budget join successful");
-        return { success: true, data: result };
-      } else {
-        return { success: false, error: result.error };
-      }
-    } catch (error) {
-      logger.error("AuthManager: Budget join error", error);
-      return {
-        success: false,
-        error: error.message || "Failed to join budget",
-      };
+    if (result.success) {
+      logger.auth("AuthManager: Budget join successful");
+      return { success: true, data: result };
+    } else {
+      return { success: false, error: result.error };
     }
-  };
+  } catch (error) {
+    logger.error("AuthManager: Budget join error", error);
+    return {
+      success: false,
+      error: error.message || "Failed to join budget",
+    };
+  }
+};
 
 /**
  * Logout user and clear session
@@ -115,29 +114,28 @@ export const createChangePasswordOperation =
 /**
  * Update user profile
  */
-export const createUpdateProfileOperation =
-  (updateProfileMutation) => async (updatedProfile) => {
-    try {
-      logger.auth("AuthManager: Starting profile update", {
-        userName: updatedProfile.userName,
-      });
+export const createUpdateProfileOperation = (updateProfileMutation) => async (updatedProfile) => {
+  try {
+    logger.auth("AuthManager: Starting profile update", {
+      userName: updatedProfile.userName,
+    });
 
-      const result = await updateProfileMutation.mutateAsync(updatedProfile);
+    const result = await updateProfileMutation.mutateAsync(updatedProfile);
 
-      if (result.success) {
-        logger.auth("AuthManager: Profile update successful");
-        return { success: true };
-      } else {
-        return { success: false, error: result.error };
-      }
-    } catch (error) {
-      logger.error("AuthManager: Profile update error", error);
-      return {
-        success: false,
-        error: error.message || "Failed to update profile",
-      };
+    if (result.success) {
+      logger.auth("AuthManager: Profile update successful");
+      return { success: true };
+    } else {
+      return { success: false, error: result.error };
     }
-  };
+  } catch (error) {
+    logger.error("AuthManager: Profile update error", error);
+    return {
+      success: false,
+      error: error.message || "Failed to update profile",
+    };
+  }
+};
 
 /**
  * Lock the current session (keep user data but require re-auth)

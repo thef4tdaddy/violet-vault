@@ -47,16 +47,14 @@ class OfflineDataValidator {
 
       // Specific validations
       const envelopeCount = results.criticalDataAvailable.envelopes?.count || 0;
-      const transactionCount =
-        results.criticalDataAvailable.transactions?.count || 0;
+      const transactionCount = results.criticalDataAvailable.transactions?.count || 0;
 
       // Generate recommendations
       if (envelopeCount === 0) {
         results.recommendations.push({
           type: "warning",
           message: "No envelopes found in offline storage",
-          action:
-            "Create budget envelopes while online to enable full offline functionality",
+          action: "Create budget envelopes while online to enable full offline functionality",
         });
       }
 
@@ -64,8 +62,7 @@ class OfflineDataValidator {
         results.recommendations.push({
           type: "info",
           message: "No transactions in offline storage",
-          action:
-            "Add transactions while online to view transaction history offline",
+          action: "Add transactions while online to view transaction history offline",
         });
       }
 
@@ -73,8 +70,7 @@ class OfflineDataValidator {
         results.recommendations.push({
           type: "success",
           message: "Budget data is ready for offline use",
-          action:
-            "You can view budgets, add transactions, and manage finances offline",
+          action: "You can view budgets, add transactions, and manage finances offline",
         });
       }
 
@@ -149,10 +145,7 @@ class OfflineDataValidator {
 
       return {
         totalEnvelopes: envelopes.length,
-        totalAllocated: envelopes.reduce(
-          (sum, env) => sum + (env.allocated || 0),
-          0,
-        ),
+        totalAllocated: envelopes.reduce((sum, env) => sum + (env.allocated || 0), 0),
         totalSpent: envelopes.reduce((sum, env) => sum + (env.spent || 0), 0),
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
@@ -189,8 +182,7 @@ class OfflineDataValidator {
       await budgetDb.transactions.limit(20).toArray();
       results.transactionLoadTime = performance.now() - transactionStart;
 
-      results.totalTime =
-        results.envelopeLoadTime + results.transactionLoadTime;
+      results.totalTime = results.envelopeLoadTime + results.transactionLoadTime;
       results.success = true;
 
       logger.info("⚡ Offline data performance test completed", {
@@ -210,13 +202,14 @@ class OfflineDataValidator {
    * Get comprehensive offline readiness report
    */
   async getOfflineReadinessReport() {
-    const [validation, envelopeSummary, recentTransactions, performance] =
-      await Promise.allSettled([
+    const [validation, envelopeSummary, recentTransactions, performance] = await Promise.allSettled(
+      [
         this.validateOfflineReadiness(),
         this.getEnvelopeSummary(),
         this.getRecentTransactionsPreview(),
         this.testOfflinePerformance(),
-      ]);
+      ]
+    );
 
     return {
       timestamp: new Date().toISOString(),
@@ -228,10 +221,7 @@ class OfflineDataValidator {
         envelopeSummary.status === "fulfilled"
           ? envelopeSummary.value
           : { error: envelopeSummary.reason?.message },
-      recentTransactions:
-        recentTransactions.status === "fulfilled"
-          ? recentTransactions.value
-          : [],
+      recentTransactions: recentTransactions.status === "fulfilled" ? recentTransactions.value : [],
       performance:
         performance.status === "fulfilled"
           ? performance.value

@@ -31,12 +31,11 @@ class FirebaseLazyLoader {
       logger.info("🔥 Lazy loading Firebase services...");
 
       // Import Firebase services dynamically
-      const [{ initializeApp }, { getAuth }, { getFirestore }] =
-        await Promise.all([
-          import("firebase/app"),
-          import("firebase/auth"),
-          import("firebase/firestore"),
-        ]);
+      const [{ initializeApp }, { getAuth }, { getFirestore }] = await Promise.all([
+        import("firebase/app"),
+        import("firebase/auth"),
+        import("firebase/firestore"),
+      ]);
 
       // Import config and services
       const { firebaseConfig } = await import("../utils/common/firebaseConfig");

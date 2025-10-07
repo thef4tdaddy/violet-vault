@@ -16,9 +16,7 @@ const BillManagerHeader = ({
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Bill Manager</h2>
-        <p className="text-purple-900">
-          Track and manage your recurring bills and payments
-        </p>
+        <p className="text-purple-900">Track and manage your recurring bills and payments</p>
       </div>
 
       <div className="flex items-center gap-2">

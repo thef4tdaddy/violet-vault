@@ -35,10 +35,7 @@ const handleNewUserSetup = async (userData, password) => {
     throw new Error("Share code missing from user data during login");
   }
 
-  const deterministicBudgetId = await encryptionUtils.generateBudgetId(
-    password,
-    shareCode,
-  );
+  const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
 
   const finalUserData = {
     ...userData,
@@ -74,7 +71,7 @@ const handleNewUserSetup = async (userData, password) => {
       encryptedData: encrypted.data,
       salt: Array.from(newSalt),
       iv: encrypted.iv,
-    }),
+    })
   );
 
   // Save user profile
@@ -131,15 +128,9 @@ const handleExistingUserLogin = async (password) => {
     const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
     let currentUserData = decryptedData.currentUser;
 
-    if (
-      !currentUserData ||
-      !currentUserData.budgetId ||
-      !currentUserData.shareCode
-    ) {
+    if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
       localStorage.removeItem("envelopeBudgetData");
-      throw new Error(
-        "Legacy data cleared - please create a new budget with share code system",
-      );
+      throw new Error("Legacy data cleared - please create a new budget with share code system");
     }
 
     const sanitizedUserData = {
@@ -187,10 +178,7 @@ export const useLoginMutation = () => {
       });
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Login timeout after 10 seconds")),
-          10000,
-        ),
+        setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
       );
 
       const loginPromise = async () => {
@@ -202,10 +190,7 @@ export const useLoginMutation = () => {
           }
         } catch (error) {
           logger.error("Login failed.", error);
-          if (
-            error.name === "OperationError" ||
-            error.message.toLowerCase().includes("decrypt")
-          ) {
+          if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
             return { success: false, error: "Invalid password." };
           }
           return {
@@ -233,7 +218,7 @@ export const useLoginMutation = () => {
             {
               isNewUser: result.isNewUser || false,
               delayMs: syncDelay,
-            },
+            }
           );
 
           await new Promise((resolve) => setTimeout(resolve, syncDelay));
