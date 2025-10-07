@@ -4,8 +4,17 @@ import TransactionRow from "./components/TransactionRow";
 import DeleteConfirmation from "./components/DeleteConfirmation";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 import { COLUMN_WIDTHS } from "../../utils/transactions/tableHelpers";
+import type { Transaction, Envelope } from "../../types/finance";
 
-const TransactionTable = ({
+interface TransactionTableProps {
+  transactions?: Transaction[];
+  envelopes?: Envelope[];
+  onEdit: (transaction: Transaction) => void;
+  onDelete: (transactionId: string | number) => void;
+  onSplit: (transaction: Transaction) => void;
+}
+
+const TransactionTable: React.FC<TransactionTableProps> = ({
   transactions = [],
   envelopes = [],
   onEdit,
@@ -80,7 +89,7 @@ const TransactionTable = ({
           >
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   No transactions found
                 </td>
               </tr>
