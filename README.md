@@ -6,11 +6,13 @@ Automated performance monitoring reports for Violet Vault.
 
 ## Latest Reports
 
-### 2025-10-13 06:33:28 UTC - main
+### 2025-10-13 08:31:16 UTC - main
 
 **Commit:** [`029339b54650dbe673f036ef89f74d3bade4fa6d`](https://github.com/thef4tdaddy/violet-vault/commit/029339b54650dbe673f036ef89f74d3bade4fa6d)
-**Workflow:** [View Run](https://github.com/thef4tdaddy/violet-vault/actions/runs/18457172761)
-**Reports:** [Browse Reports](https://github.com/thef4tdaddy/violet-vault/tree/lighthouse-reports/reports/main/2025-10-13_06-33-26)
+**Workflow:** [View Run](https://github.com/thef4tdaddy/violet-vault/actions/runs/18459752889)
+**Reports:** [Browse Reports](https://github.com/thef4tdaddy/violet-vault/tree/lighthouse-reports/reports/main/2025-10-13_08-31-14)
+
+**❌ [View Test & Lighthouse Failure Report](./reports/main/2025-10-13_08-31-14/test-and-lighthouse-failures.md)**
 
 
 ---
