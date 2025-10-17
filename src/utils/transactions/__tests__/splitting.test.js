@@ -15,7 +15,7 @@ import {
   removeSplit,
   prepareSplitTransactions,
   getSplitSummary,
-} from "../splitting.js";
+} from "../splitting";
 
 // Mock logger
 vi.mock("../../common/logger.js", () => ({
