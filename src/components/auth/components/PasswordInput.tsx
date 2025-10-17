@@ -6,7 +6,16 @@ import { getIcon } from "../../../utils";
  * Password field with show/hide toggle functionality
  * Extracted from UserSetup with UI standards compliance
  */
-const PasswordInput = ({
+interface PasswordInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  showPassword: boolean;
+  onToggleVisibility: () => void;
+  disabled?: boolean;
+  placeholder?: string;
+}
+
+const PasswordInput: React.FC<PasswordInputProps> = ({
   value,
   onChange,
   showPassword,
