@@ -19,7 +19,7 @@ import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 
-// eslint-disable-next-line max-lines-per-function -- Component orchestrates extracted components
+ 
 const AddBillModal = ({
   isOpen,
   onClose,

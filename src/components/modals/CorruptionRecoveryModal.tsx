@@ -106,19 +106,19 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
       </div>
 
       <div className="flex gap-3 justify-end">
-        <button
+        <Button
           onClick={onClose}
           className="px-4 py-2 border-2 border-black rounded-lg font-bold hover:bg-gray-50"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleExport}
           disabled={isExporting}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white border-2 border-black rounded-lg font-bold disabled:opacity-50"
         >
           {isExporting ? "Exporting..." : "📤 Export Data First"}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -154,18 +154,18 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
       </div>
 
       <div className="flex gap-3 justify-end">
-        <button
+        <Button
           onClick={onClose}
           className="px-4 py-2 border-2 border-black rounded-lg font-bold hover:bg-gray-50"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleCreateNewProfile}
           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white border-2 border-black rounded-lg font-bold"
         >
           🆕 Create New Profile
-        </button>
+        </Button>
       </div>
     </div>
   );

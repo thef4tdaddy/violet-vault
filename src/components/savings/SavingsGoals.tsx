@@ -45,23 +45,23 @@ const SavingsGoals = ({
       <div className="flex justify-between items-center">
         <div className="flex gap-3">
           {/* Add Goal Button */}
-          <button
+          <Button
             onClick={openAddForm}
             className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
           >
             {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
             <span>Add Goal</span>
-          </button>
+          </Button>
 
           {/* Distribute Cash Button */}
           {unassignedCash > 0 && savingsGoals.length > 0 && (
-            <button
+            <Button
               onClick={openDistributeModal}
               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
               <span>Distribute Cash (${unassignedCash.toFixed(2)})</span>
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -96,7 +96,7 @@ const BillFormFields = ({
         {/* Frequency */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
-          <select
+          <Select
             value={formData.frequency}
             onChange={(e) => updateField("frequency", e.target.value)}
             disabled={editingBill && !canEdit}
@@ -109,13 +109,13 @@ const BillFormFields = ({
                 {option.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-          <select
+          <Select
             value={formData.category}
             onChange={(e) => updateField("category", e.target.value)}
             disabled={editingBill && !canEdit}
@@ -129,7 +129,7 @@ const BillFormFields = ({
                 {category}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -151,7 +151,7 @@ const BillFormFields = ({
             const IconComponent = getIconByName(iconName);
             const isSelected = formData.iconName === iconName;
             return (
-              <button
+              <Button
                 key={iconName}
                 type="button"
                 onClick={() => updateField("iconName", iconName)}
@@ -164,7 +164,7 @@ const BillFormFields = ({
                 {React.createElement(IconComponent, {
                   className: `h-5 w-5 ${isSelected ? "text-blue-600" : "text-gray-600"}`,
                 })}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -207,15 +207,15 @@ const BillFormFields = ({
         </div>
 
         <div className="flex gap-3">
-          <button
+          <Button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
             className="px-4 py-2 border-2 border-black rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSubmitting || (editingBill && !canEdit)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black disabled:opacity-50 flex items-center"
@@ -224,7 +224,7 @@ const BillFormFields = ({
               className: "h-4 w-4 mr-2",
             })}
             {isSubmitting ? "Saving..." : editingBill ? "Update Bill" : "Add Bill"}
-          </button>
+          </Button>
         </div>
       </div>
     </form>

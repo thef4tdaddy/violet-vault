@@ -50,15 +50,15 @@ const TransferModalContent = ({
       />
 
       <div className="flex gap-3 pt-2">
-        <button onClick={onClose} className="flex-1 btn btn-secondary border-2 border-black">
+        <Button onClick={onClose} className="flex-1 btn btn-secondary border-2 border-black">
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={confirmFeedback.onClick(onTransfer)}
           className={`flex-1 btn btn-primary border-2 border-black ${confirmFeedback.className}`}
         >
           Transfer ${transferForm.amount || "0.00"}
-        </button>
+        </Button>
       </div>
     </div>
   );

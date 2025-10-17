@@ -52,13 +52,13 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
             {unassignedCash < 0 ? "Overspent" : "Available"}
           </div>
 
-          <button
+          <Button
             onClick={handleHistoryClick}
             className="p-1 text-gray-400 hover:text-green-600 transition-colors"
             title="View transaction history"
           >
             {React.createElement(getIcon("History"), { className: "h-4 w-4" })}
-          </button>
+          </Button>
         </div>
       </div>
 

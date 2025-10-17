@@ -44,11 +44,11 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Change Password</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             {React.createElement(getIcon("X"), {
               className: "h-5 w-5",
             })}
-          </button>
+          </Button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -77,21 +77,21 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
           />
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <div className="flex justify-end gap-3 pt-2">
-            <button
+            <Button
               type="button"
               onClick={onClose}
               className="btn btn-secondary border-2 border-black"
               disabled={isLoading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="btn btn-primary border-2 border-black"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

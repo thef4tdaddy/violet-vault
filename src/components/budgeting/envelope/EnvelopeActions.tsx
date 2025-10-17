@@ -17,7 +17,7 @@ const EnvelopeActions = ({ isCollapsed, onToggleCollapse, onEdit, onViewHistory 
 
   return (
     <div className="flex items-center space-x-2 mt-4">
-      <button
+      <Button
         onClick={withHapticFeedback(onEdit, "tap")}
         className={getButtonClasses(
           "px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 border-2 border-black text-sm",
@@ -25,8 +25,8 @@ const EnvelopeActions = ({ isCollapsed, onToggleCollapse, onEdit, onViewHistory 
         )}
       >
         {React.createElement(getIcon("Edit"), { className: "h-4 w-4" })}
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={withHapticFeedback(onViewHistory, "navigation")}
         className={getButtonClasses(
           "px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 border-2 border-black text-sm",
@@ -34,8 +34,8 @@ const EnvelopeActions = ({ isCollapsed, onToggleCollapse, onEdit, onViewHistory 
         )}
       >
         {React.createElement(getIcon("History"), { className: "h-4 w-4" })}
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={withHapticFeedback(onToggleCollapse, "tap")}
         className={getButtonClasses(
           "px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 border-2 border-black text-sm ml-auto",
@@ -43,7 +43,7 @@ const EnvelopeActions = ({ isCollapsed, onToggleCollapse, onEdit, onViewHistory 
         )}
       >
         {getToggleIcon(isCollapsed)}
-      </button>
+      </Button>
     </div>
   );
 };

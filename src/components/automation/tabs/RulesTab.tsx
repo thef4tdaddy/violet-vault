@@ -79,26 +79,26 @@ const RulesTab = ({
     <div className="space-y-4">
       {/* Create Rule Button */}
       <div className="text-center py-4">
-        <button
+        <Button
           onClick={onCreateRule}
           className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
         >
           {React.createElement(getIcon("Plus"), { className: "h-5 w-5" })}
           Create New Rule
-        </button>
+        </Button>
       </div>
 
       {/* Execute All Rules Button */}
       {rules.filter((r) => r.enabled).length > 0 && (
         <div className="text-center py-2">
-          <button
+          <Button
             onClick={onExecuteRules}
             disabled={isExecuting}
             className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {React.createElement(getIcon("Play"), { className: "h-4 w-4" })}
             {isExecuting ? "Executing..." : "Execute All Rules"}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -174,7 +174,7 @@ const RulesTab = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <button
+                    <Button
                       onClick={() => onToggleRule(rule.id)}
                       className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                       title={rule.enabled ? "Disable rule" : "Enable rule"}
@@ -186,8 +186,8 @@ const RulesTab = ({
                         : React.createElement(getIcon("EyeOff"), {
                             className: "h-4 w-4",
                           })}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onEditRule(rule)}
                       className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
                       title="Edit rule"
@@ -195,8 +195,8 @@ const RulesTab = ({
                       {React.createElement(getIcon("Edit3"), {
                         className: "h-4 w-4",
                       })}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onDeleteRule(rule.id)}
                       className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
                       title="Delete rule"
@@ -204,7 +204,7 @@ const RulesTab = ({
                       {React.createElement(getIcon("Trash2"), {
                         className: "h-4 w-4",
                       })}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

@@ -92,7 +92,7 @@ const ActivityFeed = () => {
             {React.createElement(getIcon("Filter"), {
               className: "h-4 w-4 text-gray-500",
             })}
-            <select
+            <Select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -102,7 +102,7 @@ const ActivityFeed = () => {
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -163,12 +163,12 @@ const ActivityFeed = () => {
             {/* Load More Button */}
             {activities.length >= limit && (
               <div className="text-center pt-4">
-                <button
+                <Button
                   onClick={() => setLimit(limit + 20)}
                   className="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Load More Activity
-                </button>
+                </Button>
               </div>
             )}
           </div>

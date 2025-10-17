@@ -85,12 +85,12 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           <p className="text-gray-600 mb-6">
             Your browser doesn't support the features required for local-only mode.
           </p>
-          <button
+          <Button
             onClick={onSwitchToAuth}
             className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
           >
             Use Standard Mode
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -161,7 +161,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
+                <Button
                   onClick={() => setStep("customize")}
                   disabled={loading}
                   className="p-4 border border-purple-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors disabled:opacity-50 text-left"
@@ -171,9 +171,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                   })}
                   <div className="font-medium text-gray-900">Start Fresh</div>
                   <div className="text-sm text-gray-600">Create a new local-only budget</div>
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={() => setStep("import")}
                   disabled={loading}
                   className="p-4 border border-green-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 text-left"
@@ -183,16 +183,16 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                   })}
                   <div className="font-medium text-gray-900">Import Data</div>
                   <div className="text-sm text-gray-600">Restore from previous export</div>
-                </button>
+                </Button>
               </div>
 
               <div className="text-center">
-                <button
+                <Button
                   onClick={onSwitchToAuth}
                   className="text-sm text-gray-600 hover:text-gray-800 underline"
                 >
                   Use standard mode with cloud sync instead
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -227,7 +227,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                     </label>
                     <div className="grid grid-cols-4 gap-3">
                       {colors.map((color) => (
-                        <button
+                        <Button
                           key={color.value}
                           type="button"
                           onClick={() => setUserColor(color.value)}
@@ -261,19 +261,19 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
               </div>
 
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={() => setStep("welcome")}
                   className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Back
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleStartLocalOnly}
                   disabled={loading || !userName.trim()}
                   className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
                 >
                   {loading ? "Starting..." : "Start Local-Only Mode"}
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -323,19 +323,19 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
               </div>
 
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={() => setStep("welcome")}
                   className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Back
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleImportAndStart}
                   disabled={loading || !importFile}
                   className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
                 >
                   {loading ? "Importing..." : "Import & Start"}
-                </button>
+                </Button>
               </div>
             </div>
           )}

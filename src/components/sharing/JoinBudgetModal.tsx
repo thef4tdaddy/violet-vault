@@ -87,12 +87,12 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
             <h2 className="text-xl font-black text-black">
               <span className="text-2xl">J</span>OIN <span className="text-2xl">B</span>UDGET
             </h2>
-            <button
+            <Button
               onClick={onClose}
               className="text-gray-500 hover:text-black transition-colors p-1"
             >
               {renderIcon("X", "h-6 w-6")}
-            </button>
+            </Button>
           </div>
           <p className="text-sm text-purple-900 mt-2">
             Join someone else's budget with a share code

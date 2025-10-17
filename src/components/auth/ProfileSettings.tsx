@@ -81,7 +81,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             })}
             Profile Settings
           </h3>
-          <button
+          <Button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             disabled={isLoading}
@@ -89,7 +89,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             {React.createElement(getIcon("X"), {
               className: "h-5 w-5 text-gray-500",
             })}
-          </button>
+          </Button>
         </div>
 
         <div className="space-y-6">
@@ -117,7 +117,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             </label>
             <div className="grid grid-cols-4 gap-3">
               {colors.map((color) => (
-                <button
+                <Button
                   key={color.value}
                   type="button"
                   onClick={() => setUserColor(color.value)}
@@ -149,14 +149,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
         {/* Actions */}
         <div className="flex gap-3 mt-8">
-          <button
+          <Button
             onClick={onClose}
             className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={isLoading}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center"
             disabled={isLoading || !userName.trim()}
@@ -171,7 +171,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                 Save Changes
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

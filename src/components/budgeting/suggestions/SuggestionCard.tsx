@@ -69,7 +69,7 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
             </div>
           </div>
           <div className="flex items-center gap-1 ml-2">
-            <button
+            <Button
               onClick={() => onApply(suggestion)}
               className="p-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
               title={getActionButtonText(suggestion.action)}
@@ -77,14 +77,14 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
               {React.createElement(getIcon("CheckCircle"), {
                 className: "h-3 w-3",
               })}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => onDismiss(suggestion.id)}
               className="p-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
               title="Dismiss"
             >
               {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -121,13 +121,13 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
             </div>
           </div>
         </div>
-        <button
+        <Button
           onClick={() => onDismiss(suggestion.id)}
           className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
           title="Dismiss suggestion"
         >
           {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
-        </button>
+        </Button>
       </div>
 
       <p className="text-sm text-gray-700 mb-2">{suggestion.description}</p>
@@ -141,7 +141,7 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
             ${suggestion.suggestedAmount.toFixed(0)}/month
           </span>
         </div>
-        <button
+        <Button
           onClick={() => onApply(suggestion)}
           className={`px-3 py-1.5 text-white rounded-lg text-xs font-medium transition-colors ${getActionButtonColor(suggestion.action)}`}
         >
@@ -149,7 +149,7 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
             className: "h-3 w-3 mr-1 inline",
           })}
           {getActionButtonText(suggestion.action)}
-        </button>
+        </Button>
       </div>
     </div>
   );

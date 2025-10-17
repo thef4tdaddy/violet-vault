@@ -74,21 +74,21 @@ const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSugge
               </span>
             </div>
             <div className="flex gap-2">
-              <button
+              <Button
                 onClick={() => onApplySuggestion(suggestion)}
                 className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg text-xs font-bold hover:from-emerald-600 hover:to-green-700 transition-all border-2 border-black shadow-md hover:shadow-lg"
               >
                 {getActionIcon(suggestion.action)}
                 Apply
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => onDismissSuggestion(suggestion.id)}
                 className="p-1 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded border border-gray-300 shadow-sm hover:shadow-md transition-all"
               >
                 {React.createElement(getIcon("X"), {
                   className: "h-3 w-3",
                 })}
-              </button>
+              </Button>
             </div>
           </div>
 

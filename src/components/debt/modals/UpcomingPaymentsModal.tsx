@@ -27,9 +27,9 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
             <h3 className="text-xl font-semibold text-gray-900">Upcoming Payments</h3>
             <p className="text-gray-600">Next 30 days</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         {/* Summary */}
@@ -79,12 +79,12 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
 
         {/* Actions */}
         <div className="flex justify-end mt-6 pt-4 border-t">
-          <button
+          <Button
             onClick={onClose}
             className="px-6 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors"
           >
             Close
-          </button>
+          </Button>
         </div>
       </div>
     </div>

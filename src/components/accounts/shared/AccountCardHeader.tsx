@@ -17,12 +17,12 @@ const AccountCardHeader = ({ account, typeInfo, onEdit, onDelete }) => (
       {!account.isActive && (
         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Inactive</span>
       )}
-      <button onClick={() => onEdit(account)} className="p-1 text-gray-400 hover:text-cyan-600">
+      <Button onClick={() => onEdit(account)} className="p-1 text-gray-400 hover:text-cyan-600">
         {React.createElement(getIcon("Edit3"), { className: "h-3 w-3" })}
-      </button>
-      <button onClick={() => onDelete(account.id)} className="p-1 text-gray-400 hover:text-red-600">
+      </Button>
+      <Button onClick={() => onDelete(account.id)} className="p-1 text-gray-400 hover:text-red-600">
         {React.createElement(getIcon("Trash2"), { className: "h-3 w-3" })}
-      </button>
+      </Button>
     </div>
   </div>
 );

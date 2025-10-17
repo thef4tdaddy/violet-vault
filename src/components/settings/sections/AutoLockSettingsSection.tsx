@@ -15,7 +15,7 @@ const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
         </label>
         <p className="text-xs text-purple-700 mt-1 font-medium">{description}</p>
       </div>
-      <button
+      <Button
         onClick={onChange}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
           enabled ? "bg-gradient-to-r from-blue-500 to-purple-600" : "bg-gray-300"
@@ -26,7 +26,7 @@ const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
             enabled ? "translate-x-6" : "translate-x-1"
           }`}
         />
-      </button>
+      </Button>
     </div>
   );
 

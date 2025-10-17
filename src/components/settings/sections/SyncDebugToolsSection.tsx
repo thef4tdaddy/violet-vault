@@ -33,7 +33,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
 
       <div className="space-y-3">
         {/* Always Available - Refresh Sync Status */}
-        <button
+        <Button
           onClick={async () => {
             logger.info("🔄 TESTING: window.getQuickSyncStatus");
             try {
@@ -52,12 +52,12 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
             <p className="font-medium text-green-900">🔄 Refresh Sync Status</p>
             <p className="text-xs text-green-700">Check current sync health</p>
           </div>
-        </button>
+        </Button>
 
         {/* Development Mode - Advanced Debug Tools */}
         {isDebugMode && (
           <>
-            <button
+            <Button
               onClick={async () => {
                 logger.info("🚀 TESTING: window.runMasterSyncValidation");
                 try {
@@ -76,9 +76,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 <p className="font-medium text-blue-900">🧪 Run Full Sync Validation</p>
                 <p className="text-xs text-blue-700">Comprehensive sync system check (4 phases)</p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={async () => {
                 logger.info("🔍 TESTING: window.detectLocalDataDebug");
                 try {
@@ -99,9 +99,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                   Comprehensive local data detection with debugging
                 </p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={async () => {
                 logger.info("⚡ TESTING: window.hasLocalDataDebug");
                 try {
@@ -122,9 +122,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                   Fast boolean check for local data presence
                 </p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={async () => {
                 logger.info("🛡️ TESTING: window.safeCloudDataReset");
                 const confirmed = await confirm({
@@ -154,9 +154,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                   Reset with comprehensive local data validation
                 </p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={async () => {
                 logger.info("🧹 TESTING: window.forceCloudDataReset");
                 const confirmed = await confirm({
@@ -183,7 +183,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 <p className="font-medium text-red-900">🚨 Reset Cloud Data</p>
                 <p className="text-xs text-red-700">Emergency recovery: clear and re-upload</p>
               </div>
-            </button>
+            </Button>
           </>
         )}
       </div>

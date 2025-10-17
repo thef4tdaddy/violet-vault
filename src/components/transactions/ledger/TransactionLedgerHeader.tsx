@@ -26,7 +26,7 @@ const TransactionLedgerHeader = ({
       </div>
 
       <div className="flex flex-row gap-3">
-        <button
+        <Button
           onClick={onImportTransactions}
           className="btn btn-primary border-2 border-black flex items-center"
         >
@@ -34,15 +34,15 @@ const TransactionLedgerHeader = ({
             className: "h-4 w-4 mr-2",
           })}
           Import File
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onAddTransaction}
           className="btn btn-primary border-2 border-black flex items-center"
           data-tour="add-transaction"
         >
           {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
           Add Transaction
-        </button>
+        </Button>
       </div>
     </div>
   );

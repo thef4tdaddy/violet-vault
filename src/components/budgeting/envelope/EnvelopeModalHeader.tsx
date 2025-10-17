@@ -42,7 +42,7 @@ const EnvelopeModalHeader = ({
           <div className="flex items-center gap-2">
             {/* Lock Controls */}
             {isLocked && !isOwnLock && isExpired && (
-              <button
+              <Button
                 onClick={onBreakLock}
                 className="bg-red-500/20 hover:bg-red-500/30 text-red-100 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
               >
@@ -50,14 +50,14 @@ const EnvelopeModalHeader = ({
                   className: "h-3 w-3 mr-1",
                 })}
                 Break Lock
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={onClose}
               className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

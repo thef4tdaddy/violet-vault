@@ -197,7 +197,7 @@ const SyncIndicator = ({
         </div>
 
         {/* GitHub Issue #576: Sync Health Dashboard Button */}
-        <button
+        <Button
           onClick={() => setShowHealthDashboard(true)}
           className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 border-black transition-all ${
             healthData?.status === "healthy"
@@ -220,7 +220,7 @@ const SyncIndicator = ({
               %
             </span>
           )}
-        </button>
+        </Button>
 
         {/* Active Users */}
         {otherActiveUsers.length > 0 && (
@@ -329,9 +329,9 @@ const SyncIndicator = ({
 
               {/* Regular retry button for non-blocking errors */}
               {!(syncError.includes("blocked") || syncError.includes("ad blocker")) && (
-                <button className="text-sm text-rose-700 underline mt-2 hover:text-rose-800">
+                <Button className="text-sm text-rose-700 underline mt-2 hover:text-rose-800">
                   Retry sync
-                </button>
+                </Button>
               )}
             </div>
           </div>

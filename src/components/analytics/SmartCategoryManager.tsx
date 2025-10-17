@@ -16,7 +16,7 @@ const SmartCategoryManager = ({
   _currentCategories = [],
   onAddCategory,
   onRemoveCategory,
-  onUpdateCategory, // eslint-disable-line no-unused-vars
+  onUpdateCategory,  
   onApplyToTransactions,
   onApplyToBills,
   dateRange: initialDateRange = "6months",

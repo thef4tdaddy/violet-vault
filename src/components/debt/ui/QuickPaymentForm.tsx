@@ -18,12 +18,12 @@ const QuickPaymentForm = ({
   if (!showPaymentForm) {
     return (
       <div className="mb-6">
-        <button
+        <Button
           onClick={onShowForm}
           className="w-full py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-medium"
         >
           Record Payment
-        </button>
+        </Button>
       </div>
     );
   }
@@ -43,19 +43,19 @@ const QuickPaymentForm = ({
             placeholder="Payment amount"
             required
           />
-          <button
+          <Button
             type="submit"
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
             Record
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={onCancel}
             className="px-4 py-2 text-green-700 border border-green-300 rounded-lg hover:bg-green-100"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </form>
     </div>

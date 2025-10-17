@@ -25,7 +25,7 @@ const FrequencySelector = ({
             className: "h-4 w-4 text-gray-400",
           })}
         </div>
-        <select
+        <Select
           value={selectedFrequency}
           onChange={(e) => !disabled && onFrequencyChange(e.target.value)}
           disabled={disabled}
@@ -38,7 +38,7 @@ const FrequencySelector = ({
               {freq.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>

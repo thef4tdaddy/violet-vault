@@ -47,7 +47,7 @@ const AccountSettingsSection = ({
           </p>
 
           <div className="space-y-2">
-            <button
+            <Button
               onClick={() => setShowShareModal(true)}
               className="w-full flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
             >
@@ -56,9 +56,9 @@ const AccountSettingsSection = ({
                 <p className="font-medium text-gray-900">Share Your Budget</p>
                 <p className="text-sm text-gray-500">Generate a share code for others to join</p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={() => setShowJoinModal(true)}
               className="w-full flex items-center p-3 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
             >
@@ -67,11 +67,11 @@ const AccountSettingsSection = ({
                 <p className="font-medium text-gray-900">Join Shared Budget</p>
                 <p className="text-sm text-gray-500">Enter a share code to join someone's budget</p>
               </div>
-            </button>
+            </Button>
           </div>
         </div>
 
-        <button
+        <Button
           onClick={onOpenPasswordModal}
           className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
@@ -80,7 +80,7 @@ const AccountSettingsSection = ({
             <p className="font-medium text-gray-900">Change Password</p>
             <p className="text-sm text-gray-500">Update your encryption password</p>
           </div>
-        </button>
+        </Button>
 
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start">
@@ -89,18 +89,18 @@ const AccountSettingsSection = ({
               <h4 className="font-medium text-red-900">Danger Zone</h4>
               <p className="text-sm text-red-700 mt-1">These actions cannot be undone.</p>
               <div className="mt-3 space-y-2">
-                <button
+                <Button
                   onClick={onLogout}
                   className="block w-full text-left px-3 py-2 text-sm border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
                 >
                   Logout Only (Keep Data)
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={onOpenResetConfirm}
                   className="block w-full text-left px-3 py-2 text-sm bg-red-100 border border-red-300 rounded-lg hover:bg-red-200 transition-colors text-red-800"
                 >
                   Clear All Data
-                </button>
+                </Button>
               </div>
             </div>
           </div>

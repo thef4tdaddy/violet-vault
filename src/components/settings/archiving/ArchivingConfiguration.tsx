@@ -17,7 +17,7 @@ const ArchivingConfiguration = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Archive transactions older than:
           </label>
-          <select
+          <Select
             value={selectedPeriod}
             onChange={(e) => handlePeriodChange(e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
@@ -32,7 +32,7 @@ const ArchivingConfiguration = ({
             <option value={36}>36 months (3 years)</option>
             <option value={48}>48 months (4 years)</option>
             <option value={60}>60 months (5 years)</option>
-          </select>
+          </Select>
           <p className="text-xs text-gray-500 mt-1">
             Transactions older than this period will be archived but analytics will be preserved
           </p>
@@ -57,13 +57,13 @@ const ArchivingConfiguration = ({
 
         {/* Advanced Options */}
         <div>
-          <button
+          <Button
             onClick={toggleAdvancedOptions}
             className="flex items-center space-x-2 text-sm text-purple-600 hover:text-purple-700"
           >
             {React.createElement(getIcon("Settings"), { className: "h-4 w-4" })}
             <span>Advanced Options</span>
-          </button>
+          </Button>
 
           {showAdvancedOptions && (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg space-y-3">

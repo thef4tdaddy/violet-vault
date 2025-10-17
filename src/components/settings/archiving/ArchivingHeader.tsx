@@ -18,14 +18,14 @@ const ArchivingHeader = ({ onRefresh, isLoading }) => {
             </p>
           </div>
         </div>
-        <button
+        <Button
           onClick={onRefresh}
           className="btn btn-secondary flex items-center space-x-2"
           disabled={isLoading}
         >
           {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4" })}
           <span>Refresh</span>
-        </button>
+        </Button>
       </div>
     </div>
   );

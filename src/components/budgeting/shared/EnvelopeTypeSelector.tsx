@@ -42,7 +42,7 @@ const EnvelopeTypeSelector = ({
             const isSelected = selectedType === type;
 
             return (
-              <button
+              <Button
                 key={type}
                 type="button"
                 onClick={() => !disabled && onTypeChange(type)}
@@ -81,7 +81,7 @@ const EnvelopeTypeSelector = ({
                     <p className="text-sm text-gray-600 leading-relaxed">{config.description}</p>
                   </div>
                 </div>
-              </button>
+              </Button>
             );
           })}
       </div>

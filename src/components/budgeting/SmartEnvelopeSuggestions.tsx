@@ -51,7 +51,7 @@ const SmartEnvelopeSuggestions = ({
     >
       {/* Header */}
       <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
-        <button
+        <Button
           onClick={toggleCollapse}
           className={`flex items-center font-semibold text-gray-900 hover:text-gray-700 transition-colors group ${
             isCollapsed ? "text-base" : "text-lg"
@@ -76,11 +76,11 @@ const SmartEnvelopeSuggestions = ({
               className: "h-4 w-4",
             })}
           </div>
-        </button>
+        </Button>
 
         {!isCollapsed && (
           <div className="flex items-center space-x-2">
-            <button
+            <Button
               onClick={toggleSettings}
               className={`p-2 rounded-lg transition-colors ${
                 showSettings
@@ -92,7 +92,7 @@ const SmartEnvelopeSuggestions = ({
               {React.createElement(getIcon("Settings"), {
                 className: "h-4 w-4",
               })}
-            </button>
+            </Button>
           </div>
         )}
       </div>

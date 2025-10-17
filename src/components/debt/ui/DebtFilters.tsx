@@ -38,7 +38,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
             </span>
           )}
         </div>
-        <button
+        <Button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
         >
@@ -49,7 +49,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
             : React.createElement(getIcon("ChevronDown"), {
                 className: "h-4 w-4 text-gray-600",
               })}
-        </button>
+        </Button>
       </div>
 
       {/* Collapsible Content */}
@@ -58,7 +58,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
-              <select
+              <Select
                 value={filterOptions.type}
                 onChange={(e) => handleFilterChange("type", e.target.value)}
                 className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-purple-500"
@@ -73,12 +73,12 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
                     </option>
                   );
                 })}
-              </select>
+              </Select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-              <select
+              <Select
                 value={filterOptions.status}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
                 className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-purple-500"
@@ -87,12 +87,12 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
                 <option value="active">Active</option>
                 <option value="paid_off">Paid Off</option>
                 <option value="deferred">Deferred</option>
-              </select>
+              </Select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-              <select
+              <Select
                 value={filterOptions.sortBy}
                 onChange={(e) => handleFilterChange("sortBy", e.target.value)}
                 className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-purple-500"
@@ -102,7 +102,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
                 <option value="payment_desc">Highest Payment</option>
                 <option value="rate_desc">Highest Interest Rate</option>
                 <option value="name">Name A-Z</option>
-              </select>
+              </Select>
             </div>
 
             <div>

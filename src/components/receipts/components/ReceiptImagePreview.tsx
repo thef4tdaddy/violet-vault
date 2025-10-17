@@ -15,7 +15,7 @@ const ReceiptImagePreview = ({ uploadedImage, showImagePreview, onTogglePreview 
         <h3 className="font-black text-black text-base">
           <span className="text-lg">S</span>CANNED <span className="text-lg">R</span>ECEIPT
         </h3>
-        <button
+        <Button
           onClick={onTogglePreview}
           className="glassmorphism flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-black bg-purple-200/40 hover:bg-purple-300/40 transition-colors backdrop-blur-sm"
         >
@@ -34,7 +34,7 @@ const ReceiptImagePreview = ({ uploadedImage, showImagePreview, onTogglePreview 
             )}{" "}
             <span className="text-base">I</span>MAGE
           </span>
-        </button>
+        </Button>
       </div>
 
       {showImagePreview && (

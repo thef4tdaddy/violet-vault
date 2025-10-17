@@ -33,7 +33,7 @@ const ExportSection: React.FC<ExportSectionProps> = ({
       <div>
         <h4 className="font-medium text-gray-900 mb-4">Quick Export</h4>
         <div className="grid grid-cols-2 gap-4">
-          <button
+          <Button
             onClick={onCopyToClipboard}
             disabled={loading}
             className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
@@ -51,9 +51,9 @@ const ExportSection: React.FC<ExportSectionProps> = ({
               {copiedToClipboard ? "Copied!" : "Copy to Clipboard"}
             </div>
             <div className="text-xs text-gray-500 mt-1">Temporary (30s)</div>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={onDownloadUnprotected}
             disabled={loading}
             className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
@@ -63,9 +63,9 @@ const ExportSection: React.FC<ExportSectionProps> = ({
             })}
             <div className="text-sm font-medium text-gray-900">Download File</div>
             <div className="text-xs text-gray-500 mt-1">Unprotected</div>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={onGenerateQRCode}
             disabled={loading}
             className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
@@ -75,7 +75,7 @@ const ExportSection: React.FC<ExportSectionProps> = ({
             })}
             <div className="text-sm font-medium text-gray-900">Generate QR Code</div>
             <div className="text-xs text-gray-500 mt-1">For mobile</div>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -95,7 +95,7 @@ const ExportSection: React.FC<ExportSectionProps> = ({
             required
           />
 
-          <button
+          <Button
             onClick={onDownloadProtected}
             disabled={loading || !exportPassword}
             className="w-full flex items-center justify-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
@@ -104,7 +104,7 @@ const ExportSection: React.FC<ExportSectionProps> = ({
               className: "h-4 w-4 mr-2",
             })}
             Download Protected File
-          </button>
+          </Button>
         </div>
       </div>
     </div>

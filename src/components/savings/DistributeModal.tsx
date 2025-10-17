@@ -86,9 +86,9 @@ const DistributeModal = ({
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+          <Button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         {/* Available Cash Display */}
@@ -117,13 +117,13 @@ const DistributeModal = ({
               />
             </div>
             <div className="flex items-end">
-              <button
+              <Button
                 onClick={handleAutoDistribute}
                 disabled={!totalToDistribute || parseFloat(totalToDistribute) <= 0}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 Auto-Distribute
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -188,20 +188,20 @@ const DistributeModal = ({
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3">
-          <button
+          <Button
             onClick={handleClose}
             className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleDistribute}
             disabled={!isValidDistribution}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
           >
             {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
             <span>Distribute Funds</span>
-          </button>
+          </Button>
         </div>
       </div>
     </div>

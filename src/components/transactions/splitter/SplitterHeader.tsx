@@ -36,12 +36,12 @@ const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
             </p>
           </div>
         </div>
-        <button
+        <Button
           onClick={handleClose}
           className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-all border-2 border-white/20 shadow-md hover:shadow-lg glassmorphism backdrop-blur-sm"
         >
           {renderIcon("X", "h-5 w-5")}
-        </button>
+        </Button>
       </div>
     </div>
   );

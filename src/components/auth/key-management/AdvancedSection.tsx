@@ -14,7 +14,7 @@ const AdvancedSection: React.FC<AdvancedSectionProps> = ({
 }) => {
   return (
     <div>
-      <button
+      <Button
         onClick={onToggleAdvanced}
         className="flex items-center text-sm text-gray-600 hover:text-gray-900"
       >
@@ -22,7 +22,7 @@ const AdvancedSection: React.FC<AdvancedSectionProps> = ({
           className: "h-4 w-4 mr-1",
         })}
         Advanced Options & Security Info
-      </button>
+      </Button>
 
       {showAdvanced && (
         <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">

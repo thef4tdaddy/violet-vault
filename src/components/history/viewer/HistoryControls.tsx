@@ -8,7 +8,7 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
       <div className="flex items-center gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Author</label>
-          <select
+          <Select
             value={filter.author}
             onChange={(e) => updateFilter({ author: e.target.value })}
             className="border border-gray-300 rounded px-3 py-1 text-sm"
@@ -16,12 +16,12 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
             <option value="all">All Authors</option>
             <option value="user">User</option>
             <option value="system">System</option>
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Limit</label>
-          <select
+          <Select
             value={filter.limit}
             onChange={(e) => updateFilter({ limit: parseInt(e.target.value) })}
             className="border border-gray-300 rounded px-3 py-1 text-sm"
@@ -30,12 +30,12 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
             <option value={50}>50 changes</option>
             <option value={100}>100 changes</option>
             <option value={-1}>All changes</option>
-          </select>
+          </Select>
         </div>
       </div>
 
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={() => {
             // Integrity verification will be implemented in future version
             globalToast.showInfo("Integrity verification coming soon!", "Feature Coming Soon");
@@ -47,9 +47,9 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
             className: "h-4 w-4 mr-2",
           })}
           Verify Integrity
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={() => exportHistory()}
           disabled={loading}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 flex items-center text-sm"
@@ -58,7 +58,7 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
             className: "h-4 w-4 mr-2",
           })}
           Export
-        </button>
+        </Button>
       </div>
     </div>
   );

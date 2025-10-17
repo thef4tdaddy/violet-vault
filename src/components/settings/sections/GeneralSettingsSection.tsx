@@ -89,12 +89,12 @@ const GeneralSettingsSection = ({
               <p className="text-sm text-purple-700 mt-1">
                 You're running in local-only mode. Data is stored locally only.
               </p>
-              <button
+              <Button
                 onClick={onOpenLocalOnlySettings}
                 className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline border-2 border-black px-2 py-1 rounded bg-white/60"
               >
                 Manage Local-Only Settings
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ const GeneralSettingsSection = ({
                 Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
               </p>
             </div>
-            <button
+            <Button
               onClick={onToggleCloudSync}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors border-2 border-black ${
                 cloudSyncEnabled ? "bg-green-600" : "bg-gray-200"
@@ -121,12 +121,12 @@ const GeneralSettingsSection = ({
                   cloudSyncEnabled ? "translate-x-6" : "translate-x-1"
                 }`}
               />
-            </button>
+            </Button>
           </div>
 
           {cloudSyncEnabled && (
             <div className="pt-2">
-              <button
+              <Button
                 onClick={onManualSync}
                 disabled={isSyncing}
                 className="flex items-center px-3 py-2 text-sm border-2 border-black bg-purple-200/60 rounded-lg hover:bg-purple-300/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -135,7 +135,7 @@ const GeneralSettingsSection = ({
                   className: `h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`,
                 })}
                 {isSyncing ? "Syncing..." : "Sync Now"}
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -198,7 +198,7 @@ const GeneralSettingsSection = ({
                 </div>
               </div>
             ) : pwaStatus.canPromptInstall ? (
-              <button
+              <Button
                 onClick={handleManualInstall}
                 disabled={isInstalling}
                 className="flex items-center px-3 py-2 text-sm border-2 border-black bg-blue-200/60 rounded-lg hover:bg-blue-300/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -218,7 +218,7 @@ const GeneralSettingsSection = ({
                     Install App
                   </>
                 )}
-              </button>
+              </Button>
             ) : (
               <p className="text-xs text-gray-500 italic">
                 Installation not available in this browser or app is already installed.

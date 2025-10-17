@@ -38,15 +38,15 @@ const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel })
         </div>
 
         <div className="flex gap-3">
-          <button
+          <Button
             onClick={onCancel}
             className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-200/80 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
             {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
             Cancel
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={onSave}
             disabled={!canSave}
             className={`flex items-center gap-2 px-6 py-2 text-white rounded-lg transition-all border-2 border-black shadow-md hover:shadow-lg font-black ${
@@ -61,7 +61,7 @@ const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel })
                 })
               : React.createElement(getIcon("Save"), { className: "h-4 w-4" })}
             {isSaving ? "Saving..." : "Save Split"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

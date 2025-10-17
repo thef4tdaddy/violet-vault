@@ -57,9 +57,9 @@ const BillDetailModal = ({
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         {/* Status Badge */}
@@ -194,12 +194,12 @@ const BillDetailModal = ({
         {bill.status !== "paid" && (
           <div className="mb-6">
             {!showPaymentForm ? (
-              <button
+              <Button
                 onClick={handleShowPaymentForm}
                 className="w-full py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-medium"
               >
                 Mark as Paid
-              </button>
+              </Button>
             ) : (
               <form onSubmit={handleMarkPaid} className="bg-green-50 rounded-xl p-4">
                 <h4 className="font-medium text-green-900 mb-3">Mark as Paid</h4>
@@ -214,19 +214,19 @@ const BillDetailModal = ({
                     placeholder="Payment amount"
                     required
                   />
-                  <button
+                  <Button
                     type="submit"
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                   >
                     Mark Paid
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={handleHidePaymentForm}
                     className="px-4 py-2 text-green-700 border border-green-300 rounded-lg hover:bg-green-100"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
@@ -235,15 +235,15 @@ const BillDetailModal = ({
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
+          <Button
             onClick={onClose}
             className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50"
           >
             Close
-          </button>
+          </Button>
 
           {bill.frequency === "once" && (
-            <button
+            <Button
               onClick={handleCreateRecurring}
               className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center justify-center"
             >
@@ -251,10 +251,10 @@ const BillDetailModal = ({
                 className: "h-4 w-4 mr-2",
               })}
               Make Recurring
-            </button>
+            </Button>
           )}
 
-          <button
+          <Button
             onClick={handleEdit}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
@@ -262,9 +262,9 @@ const BillDetailModal = ({
               className: "h-4 w-4 mr-2",
             })}
             Edit Bill
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={handleDelete}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center justify-center"
           >
@@ -272,7 +272,7 @@ const BillDetailModal = ({
               className: "h-4 w-4 mr-2",
             })}
             Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>

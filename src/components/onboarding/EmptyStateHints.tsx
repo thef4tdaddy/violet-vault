@@ -202,7 +202,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
           {/* Actions */}
           <div className="flex flex-wrap gap-2">
             {(customActions || config.actions).map((action, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={action.onClick}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -212,7 +212,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
                 }`}
               >
                 {action.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

@@ -131,7 +131,7 @@ const OnboardingProgress = () => {
               Complete!
             </span>
           )}
-          <button
+          <Button
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             aria-label={isExpanded ? "Collapse onboarding progress" : "Expand onboarding progress"}
           >
@@ -142,7 +142,7 @@ const OnboardingProgress = () => {
               : React.createElement(getIcon("ChevronDown"), {
                   className: "w-5 h-5",
                 })}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -225,18 +225,18 @@ const OnboardingProgress = () => {
           {/* Actions */}
           <div className="flex justify-between items-center pt-3 border-t border-purple-200 dark:border-purple-700">
             <div className="flex space-x-2">
-              <button
+              <Button
                 onClick={handleDismiss}
                 className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               >
                 Dismiss this guide
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setPreference("tourCompleted", false)}
                 className="text-sm text-purple-500 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
               >
                 Restart Tutorial
-              </button>
+              </Button>
             </div>
 
             {progress.percentage === 100 && (

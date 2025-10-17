@@ -139,7 +139,7 @@ const EnvelopeBudgetFields = ({
       {formData.envelopeType === ENVELOPE_TYPES.BILL && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Payment Frequency</label>
-          <select
+          <Select
             value={formData.frequency || "monthly"}
             onChange={(e) => onUpdateField("frequency", e.target.value)}
             disabled={!canEdit}
@@ -152,7 +152,7 @@ const EnvelopeBudgetFields = ({
                 {freq.label}
               </option>
             ))}
-          </select>
+          </Select>
           {errors.frequency && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
               {React.createElement(getIcon("AlertCircle"), {

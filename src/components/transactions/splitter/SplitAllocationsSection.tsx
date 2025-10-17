@@ -26,21 +26,21 @@ const SplitAllocationsSection = ({
         </h3>
 
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={onSmartSplit}
             className="flex items-center gap-1 px-3 py-2 text-sm bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
             {React.createElement(getIcon("Target"), { className: "h-4 w-4" })}
             Smart Split
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={onAddSplit}
             className="flex items-center gap-1 px-3 py-2 text-sm bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
             {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
             Add Split
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ const SplitAllocationsSection = ({
       {/* Auto Balance Button */}
       {canAutoBalance && (
         <div className="flex justify-center pt-2">
-          <button
+          <Button
             onClick={onAutoBalance}
             className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
@@ -90,7 +90,7 @@ const SplitAllocationsSection = ({
               className: "h-4 w-4",
             })}
             Auto Balance Remaining ${Math.abs(0).toFixed(2)}
-          </button>
+          </Button>
         </div>
       )}
     </div>

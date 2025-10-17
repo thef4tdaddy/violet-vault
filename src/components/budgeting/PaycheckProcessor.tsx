@@ -123,7 +123,7 @@ const PaycheckForm = ({ formHook }) => (
  */
 const PaycheckFormButtons = ({ formHook }) => (
   <div className="flex gap-4">
-    <button
+    <Button
       onClick={() => formHook.setShowPreview(true)}
       disabled={!formHook.canSubmit}
       className="flex-1 btn btn-secondary py-4 text-lg font-semibold rounded-2xl border-2 border-black"
@@ -132,10 +132,10 @@ const PaycheckFormButtons = ({ formHook }) => (
         className: "h-5 w-5 mr-2",
       })}
       Preview Allocation
-    </button>
+    </Button>
 
     {formHook.showPreview && (
-      <button
+      <Button
         onClick={formHook.handleProcessPaycheck}
         disabled={formHook.isProcessing}
         className="flex-1 btn btn-success py-4 text-lg font-semibold rounded-2xl border-2 border-black"
@@ -154,7 +154,7 @@ const PaycheckFormButtons = ({ formHook }) => (
             Confirm & Process
           </>
         )}
-      </button>
+      </Button>
     )}
   </div>
 );

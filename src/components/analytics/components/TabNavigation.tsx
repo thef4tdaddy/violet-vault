@@ -17,7 +17,7 @@ const TabNavigation = ({ activeTab, handleTabChange }) => {
     <div className="glassmorphism rounded-xl overflow-hidden">
       <nav className="flex">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
             className={`px-6 py-4 text-sm font-semibold border-b-2 transition-all ${
@@ -30,7 +30,7 @@ const TabNavigation = ({ activeTab, handleTabChange }) => {
               className: "h-4 w-4 inline mr-2",
             })}
             {tab.name}
-          </button>
+          </Button>
         ))}
       </nav>
     </div>

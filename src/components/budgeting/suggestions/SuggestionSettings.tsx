@@ -22,7 +22,7 @@ const SuggestionSettings = ({
           Analysis Settings
         </h4>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={onRefresh}
             className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors"
             title="Refresh suggestions"
@@ -30,8 +30,8 @@ const SuggestionSettings = ({
             {React.createElement(getIcon("RefreshCw"), {
               className: "h-4 w-4",
             })}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onResetSettings}
             className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors"
             title="Reset to defaults"
@@ -39,7 +39,7 @@ const SuggestionSettings = ({
             {React.createElement(getIcon("RotateCcw"), {
               className: "h-4 w-4",
             })}
-          </button>
+          </Button>
         </div>
       </div>
 

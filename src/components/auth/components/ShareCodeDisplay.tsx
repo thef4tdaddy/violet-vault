@@ -83,23 +83,23 @@ Generated: ${new Date().toLocaleDateString()}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
+            <Button
               type="button"
               onClick={handleCopy}
               className="flex items-center justify-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
               {renderIcon(copied ? "Check" : "Copy", "w-4 h-4")}
               <span>{copied ? "Copied!" : "Copy Code"}</span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
               onClick={handleDownload}
               className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               {renderIcon("Download", "w-4 h-4")}
               <span>Save to File</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -117,7 +117,7 @@ Generated: ${new Date().toLocaleDateString()}
 
       {/* Final Action Buttons */}
       <div className="flex gap-4">
-        <button
+        <Button
           type="button"
           onClick={onBack}
           disabled={isLoading}
@@ -125,9 +125,9 @@ Generated: ${new Date().toLocaleDateString()}
         >
           {renderIcon("ArrowLeft", "w-4 h-4 mr-2")}
           Back
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
           onClick={onCreateBudget}
           disabled={isLoading}
@@ -144,7 +144,7 @@ Generated: ${new Date().toLocaleDateString()}
               Create My Budget
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

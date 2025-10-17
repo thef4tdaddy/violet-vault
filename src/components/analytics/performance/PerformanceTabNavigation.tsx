@@ -34,7 +34,7 @@ const PerformanceTabNavigation = ({
   return (
     <div className="flex border-b border-gray-200 mb-6">
       {tabs.map((tab) => (
-        <button
+        <Button
           key={tab.id}
           onClick={() => setSelectedMetric(tab.id)}
           className={`px-4 py-2 text-sm font-medium border-b-2 flex items-center gap-2 ${
@@ -50,7 +50,7 @@ const PerformanceTabNavigation = ({
               {tab.count}
             </span>
           )}
-        </button>
+        </Button>
       ))}
     </div>
   );

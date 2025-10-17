@@ -82,19 +82,19 @@ const OfflinePage = () => {
 
         {/* Actions */}
         <div className="space-y-4">
-          <button
+          <Button
             onClick={retryConnection}
             className="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 transition-colors"
           >
             Try Again
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => window.history.back()}
             className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors"
           >
             Go Back
-          </button>
+          </Button>
         </div>
 
         {/* Connection Status */}

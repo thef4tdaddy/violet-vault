@@ -154,21 +154,21 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <button
+            <Button
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`px-3 py-2 text-xs rounded-lg border-2 border-black ${
                 autoRefresh ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
               }`}
             >
               {autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg border-2 border-black"
             >
               {renderIcon("X", { className: "h-4 w-4" })}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -255,21 +255,21 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
 
                 {/* Quick Actions */}
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <button
+                  <Button
                     onClick={handleExportBackup}
                     className="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg border-2 border-black hover:bg-blue-700 transition-colors"
                   >
                     {renderIcon("Download", { className: "h-4 w-4 mr-2" })}
                     Export Backup
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     onClick={() => window.location.reload()}
                     className="px-4 py-2 bg-orange-600 text-white text-sm font-bold rounded-lg border-2 border-black hover:bg-orange-700 transition-colors"
                   >
                     {renderIcon("RefreshCw", { className: "h-4 w-4 mr-2" })}
                     Refresh App
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

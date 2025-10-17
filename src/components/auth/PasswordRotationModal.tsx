@@ -35,12 +35,12 @@ const PasswordRotationModal = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg"
         />
         <div className="flex gap-3 mt-6">
-          <button
+          <Button
             onClick={onSubmit}
             className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700"
           >
             Update Password
-          </button>
+          </Button>
         </div>
       </div>
     </div>

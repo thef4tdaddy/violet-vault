@@ -245,7 +245,7 @@ const LockScreen = () => {
                     placeholder="Enter your password"
                     className="w-full px-4 py-3 bg-white/90 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:bg-white focus:border-black focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                   />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={isUnlocking}
@@ -254,7 +254,7 @@ const LockScreen = () => {
                     {React.createElement(getIcon(showPassword ? "EyeOff" : "Eye"), {
                       className: "h-5 w-5",
                     })}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -272,7 +272,7 @@ const LockScreen = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <button
+                <Button
                   type="submit"
                   disabled={isUnlocking || !password.trim()}
                   className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-black transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 border-2 border-black uppercase tracking-wider"
@@ -290,9 +290,9 @@ const LockScreen = () => {
                       <span>UNLOCK APPLICATION</span>
                     </>
                   )}
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={logout}
                   className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
                 >
@@ -300,7 +300,7 @@ const LockScreen = () => {
                     className: "h-4 w-4",
                   })}
                   <span>LOG OUT</span>
-                </button>
+                </Button>
               </div>
             </form>
           </div>

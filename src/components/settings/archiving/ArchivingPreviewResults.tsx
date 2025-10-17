@@ -8,9 +8,9 @@ const ArchivingPreviewResults = ({ showPreview, previewData, onClosePreview }) =
     <div className="bg-white rounded-xl p-6 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">Archive Preview</h3>
-        <button onClick={onClosePreview} className="text-gray-400 hover:text-gray-600">
+        <Button onClick={onClosePreview} className="text-gray-400 hover:text-gray-600">
           ✕
-        </button>
+        </Button>
       </div>
 
       {previewData.totalCount === 0 ? (
