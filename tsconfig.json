@@ -1,47 +1,36 @@
 {
   "compilerOptions": {
-    // Target modern browsers (same as Vite config)
     "target": "ES2020",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "skipLibCheck": true,
+    "allowJs": true, // Allow JavaScript files during transition
+    "checkJs": false, // Don't check JS files yet
+    
+    /* Bundler mode */
     "moduleResolution": "bundler",
-    
-    // Allow JS files during incremental conversion
-    "allowJs": true,
-    "checkJs": false,
-    
-    // Enable React JSX
-    "jsx": "react-jsx",
-    
-    // Type checking
-    "strict": false, // Start non-strict, gradually tighten
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
-    
-    // Module resolution
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "allowImportingTsExtensions": false,
+    "jsx": "react-jsx",
     
-    // Allow synthetic default imports for compatibility
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    /* Linting */
+    "strict": false, // Start with loose mode for gradual adoption
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
     
-    // Skip lib checking for faster builds
-    "skipLibCheck": true,
-    
-    // Path mapping for cleaner imports
+    /* Path mapping for imports */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/utils": ["./src/utils"],
-      "@/components": ["./src/components"],
-      "@/hooks": ["./src/hooks"],
-      "@/constants": ["./src/constants"],
-      "@/types": ["./src/types"]
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/stores/*": ["src/stores/*"],
+      "@/types/*": ["src/types/*"]
     }
   },
   "include": [
