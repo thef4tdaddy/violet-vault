@@ -1,5 +1,18 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { initialAuthState, createContextValue } from "./authConstants";
+import type {
+  AuthContextValue,
+  AuthContextState,
+  SessionData,
+} from "./authConstants";
+import type { UserData } from "../types/auth";
 import {
   initializeAuthFromStorage,
   createSetAuthenticated,
@@ -23,10 +36,10 @@ import {
  */
 
 // Create the context
-const AuthContext = createContext(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 // Custom hook to use auth context
-const useAuth = () => {
+const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
 
   if (!context) {
@@ -50,8 +63,8 @@ const useAuth = () => {
  *
  * Note: Auth operations (login, logout, etc.) are handled by TanStack Query
  */
-export const AuthProvider = ({ children }) => {
-  const [authState, setAuthState] = useState(initialAuthState);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [authState, setAuthState] = useState<AuthContextState>(initialAuthState);
 
   // Initialize auth state from localStorage on mount
   useEffect(() => {
@@ -60,44 +73,35 @@ export const AuthProvider = ({ children }) => {
 
   // Create auth action callbacks with useCallback for optimization
   const setAuthenticated = useCallback(
-    (userData, sessionData = {}) => {
+    (userData: UserData, sessionData: SessionData = {}) => {
       createSetAuthenticated(setAuthState)(userData, sessionData);
     },
-    [setAuthState]
+    []
   );
 
   const clearAuth = useCallback(() => {
     createClearAuth(setAuthState)();
-  }, [setAuthState]);
+  }, []);
 
-  const updateUser = useCallback(
-    (updatedUserData) => {
-      createUpdateUser(setAuthState)(updatedUserData);
-    },
-    [setAuthState]
-  );
+  const updateUser = useCallback((updatedUserData: Partial<UserData>) => {
+    createUpdateUser(setAuthState)(updatedUserData);
+  }, []);
 
-  const setLoading = useCallback(
-    (loading) => {
-      createSetLoading(setAuthState)(loading);
-    },
-    [setAuthState]
-  );
+  const setLoading = useCallback((loading: boolean) => {
+    createSetLoading(setAuthState)(loading);
+  }, []);
 
-  const setError = useCallback(
-    (error) => {
-      createSetError(setAuthState)(error);
-    },
-    [setAuthState]
-  );
+  const setError = useCallback((error: string | null) => {
+    createSetError(setAuthState)(error);
+  }, []);
 
   const updateActivity = useCallback(() => {
     createUpdateActivity(setAuthState)();
-  }, [setAuthState]);
+  }, []);
 
   const lockSession = useCallback(() => {
     createLockSession(setAuthState)();
-  }, [setAuthState]);
+  }, []);
 
   const actions = {
     setAuthenticated,
