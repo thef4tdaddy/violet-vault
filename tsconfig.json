@@ -1,86 +1,53 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    // Target modern JavaScript
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
+    
+    // Enable JavaScript support with type checking
     "allowJs": true,
     "checkJs": false,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-
-    /* Path aliases */
-    // Target modern browsers
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "skipLibCheck": true,
-
-    // Enable all strict checks incrementally
-    "strict": false, // Will enable incrementally
+    "jsx": "react-jsx",
+    
+    // Type checking strictness (start lenient, increase gradually)
+    "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "strictFunctionTypes": false,
-    "strictPropertyInitialization": false,
-
-    // Allow JS during migration
-    "allowJs": true,
-    "checkJs": false,
-
-    // React and JSX
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-
+    
     // Module resolution
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-
-    // Vite compatibility
-    "useDefineForClassFields": true,
-    "types": ["vite/client", "vitest/globals", "node"],
-
-    // Output (not needed for Vite, but useful for IDE)
+    
+    // Emit
     "noEmit": true,
-
-    // Path aliases
-    "baseUrl": ".",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    
+    // Interop
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    
+    // Advanced
+    "types": ["vite/client", "node"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "build", "coverage"]
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "vite.config.js",
-    "vitest.config.js"
+    "src/**/*",
+    "src/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "build"
+    "build",
+    ".git",
+    ".github",
+    "public/firebase-messaging-sw.js"
   ]
 }
