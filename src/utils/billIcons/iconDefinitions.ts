@@ -67,7 +67,7 @@ import {
 
   // Default fallback
   Receipt,
-} from "lucide-react";
+} from "../icons";
 
 // All available icons mapped by name for component lookup
 export const ALL_ICONS = {
