@@ -5,20 +5,122 @@
  */
 import logger from "../../utils/common/logger";
 
+/**
+ * Performance timing information
+ */
+interface PerformanceTiming {
+  navigationStart: number;
+  domContentLoaded: number;
+  loadComplete: number;
+  domInteractive: number;
+}
+
+/**
+ * Memory information
+ */
+interface MemoryInfo {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+/**
+ * Navigation information
+ */
+interface NavigationInfo {
+  type: number;
+  redirectCount: number;
+}
+
+/**
+ * Performance information structure
+ */
+export interface PerformanceInfo {
+  available: boolean;
+  timing?: PerformanceTiming;
+  memory?: MemoryInfo | null;
+  navigation?: NavigationInfo;
+  resourceCount?: number;
+  error?: string;
+}
+
+/**
+ * Storage info for localStorage/sessionStorage
+ */
+interface StorageInfo {
+  available: boolean;
+  itemCount?: number;
+  estimatedSizeBytes?: number;
+  error?: string;
+}
+
+/**
+ * IndexedDB information
+ */
+interface IndexedDBInfo {
+  available: boolean;
+  note?: string;
+  error?: string;
+}
+
+/**
+ * Storage quota information
+ */
+interface StorageQuotaInfo {
+  available: boolean;
+  quota?: number;
+  usage?: number;
+  usageDetails?: Record<string, number>;
+  error?: string;
+}
+
+/**
+ * Complete storage information
+ */
+export interface StorageInformation {
+  localStorage: StorageInfo;
+  sessionStorage: StorageInfo;
+  indexedDB: IndexedDBInfo;
+  quota: StorageQuotaInfo;
+}
+
+/**
+ * Connection information
+ */
+interface ConnectionInfo {
+  effectiveType?: string;
+  type?: string;
+  downlink?: number;
+  downlinkMax?: number;
+  rtt?: number;
+  saveData?: boolean;
+}
+
+/**
+ * Network information structure
+ */
+export interface NetworkInfo {
+  onLine: boolean;
+  connection: ConnectionInfo | null;
+  effectiveType: string | null;
+  downlink: number | null;
+  rtt: number | null;
+  saveData?: boolean;
+}
+
 export class PerformanceInfoService {
   /**
    * Get performance information
-   * @returns {Object} Performance metrics
    */
-  static getPerformanceInfo() {
+  static getPerformanceInfo(): PerformanceInfo {
     try {
       const perf = window.performance;
       if (!perf) {
         return { available: false };
       }
 
-      const navigation = perf.getEntriesByType("navigation")[0];
-      const memory = perf.memory;
+      const navigation = perf.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+      const memory = (perf as any).memory;
 
       return {
         available: true,
@@ -45,16 +147,15 @@ export class PerformanceInfoService {
       logger.warn("Error collecting performance info", error);
       return {
         available: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }
 
   /**
    * Get storage information
-   * @returns {Promise<Object>} Storage information
    */
-  static async getStorageInfo() {
+  static async getStorageInfo(): Promise<StorageInformation> {
     try {
       const storageInfo = {
         localStorage: this.getLocalStorageInfo(),
@@ -77,9 +178,8 @@ export class PerformanceInfoService {
 
   /**
    * Get localStorage information
-   * @returns {Object} localStorage info
    */
-  static getLocalStorageInfo() {
+  static getLocalStorageInfo(): StorageInfo {
     try {
       if (typeof localStorage === "undefined") {
         return { available: false };
@@ -103,16 +203,15 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }
 
   /**
    * Get sessionStorage information
-   * @returns {Object} sessionStorage info
    */
-  static getSessionStorageInfo() {
+  static getSessionStorageInfo(): StorageInfo {
     try {
       if (typeof sessionStorage === "undefined") {
         return { available: false };
@@ -136,16 +235,15 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }
 
   /**
    * Get IndexedDB information
-   * @returns {Promise<Object>} IndexedDB info
    */
-  static async getIndexedDBInfo() {
+  static async getIndexedDBInfo(): Promise<IndexedDBInfo> {
     try {
       if (!window.indexedDB) {
         return { available: false };
@@ -160,16 +258,15 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }
 
   /**
    * Get storage quota information
-   * @returns {Promise<Object>} Storage quota info
    */
-  static async getStorageQuota() {
+  static async getStorageQuota(): Promise<StorageQuotaInfo> {
     try {
       if (!navigator.storage || !navigator.storage.estimate) {
         return { available: false };
@@ -185,16 +282,15 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }
 
   /**
    * Get network information
-   * @returns {Promise<Object>} Network information
    */
-  static async getNetworkInfo() {
+  static async getNetworkInfo(): Promise<NetworkInfo> {
     try {
       const networkInfo = {
         onLine: navigator.onLine,
@@ -205,8 +301,9 @@ export class PerformanceInfoService {
       };
 
       // Network Information API (if available)
-      const connection =
-        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const connection = (navigator as any).connection || 
+        (navigator as any).mozConnection || 
+        (navigator as any).webkitConnection;
       if (connection) {
         networkInfo.effectiveType = connection.effectiveType;
         networkInfo.downlink = connection.downlink;
@@ -229,12 +326,12 @@ export class PerformanceInfoService {
 
   /**
    * Get connection information
-   * @returns {Object|null} Connection info
    */
-  static getConnectionInfo() {
+  static getConnectionInfo(): ConnectionInfo | null {
     try {
-      const connection =
-        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const connection = (navigator as any).connection || 
+        (navigator as any).mozConnection || 
+        (navigator as any).webkitConnection;
       if (!connection) return null;
 
       return {
