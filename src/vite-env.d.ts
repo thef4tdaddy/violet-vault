@@ -7,6 +7,7 @@
 
 interface ImportMetaEnv {
   // Build-time Git information
+interface ImportMetaEnv {
   readonly VITE_GIT_BRANCH: string;
   readonly VITE_GIT_COMMIT_DATE: string;
   readonly VITE_GIT_AUTHOR_DATE: string;
@@ -39,6 +40,7 @@ interface ImportMetaEnv {
   readonly PROD: boolean;
   readonly DEV: boolean;
   readonly SSR: boolean;
+  readonly VITE_NODE_ENV: string;
 }
 
 interface ImportMeta {

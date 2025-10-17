@@ -1,7 +1,12 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const TabNavigation = ({ activeTab, onTabChange }) => {
+interface TabNavigationProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
+
+const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
   return (
     <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
       <button

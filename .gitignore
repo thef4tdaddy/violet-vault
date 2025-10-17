@@ -34,3 +34,12 @@ dist-ssr
 .env*.local
 CLAUDE.local.md
 .env.development
+
+# Build and lint artifacts
+.eslintcache
+tsc-output.txt
+eslint-output.txt
+eslint_output.txt
+eslint_current.txt
+.eslintcache
+js-version/

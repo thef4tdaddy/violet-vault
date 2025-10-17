@@ -8,6 +8,37 @@ import {
   hasRecoveryActions,
 } from "../../../utils/sync/syncHealthHelpers";
 
+/**
+ * @typedef {Object} RecoveryResult
+ * @property {boolean} success - Whether recovery succeeded
+ * @property {string} [message] - Recovery message
+ * @property {string} [error] - Error message if failed
+ */
+
+/**
+ * @typedef {Object} SyncStatus
+ * @property {'CHECKING'|'HEALTHY'|'ISSUES_DETECTED'|'ERROR'|'CRITICAL_FAILURE'} status - Current sync health status
+ * @property {boolean|null} isHealthy - Whether sync is healthy
+ * @property {string|null} lastChecked - ISO timestamp of last health check
+ * @property {boolean} isLoading - Whether health check is in progress
+ * @property {number} [failedTests] - Number of failed tests
+ * @property {string} [error] - Error message if check failed
+ */
+
+/**
+ * SyncHealthDetails component displays detailed sync health information
+ * Shows status, test results, and recovery actions in a dropdown panel
+ *
+ * @param {Object} props - Component props
+ * @param {SyncStatus} props.syncStatus - Current sync health status
+ * @param {boolean} props.isBackgroundSyncing - Whether sync is currently running
+ * @param {boolean} props.isRecovering - Whether recovery is in progress
+ * @param {RecoveryResult|null} props.recoveryResult - Result of last recovery attempt
+ * @param {Function} props.onRefresh - Callback to refresh health status
+ * @param {Function} props.onRunValidation - Callback to run sync validation
+ * @param {Function} props.onResetData - Callback to reset sync data
+ * @returns {React.ReactElement} Rendered health details panel
+ */
 const SyncHealthDetails = ({
   syncStatus,
   isBackgroundSyncing,
