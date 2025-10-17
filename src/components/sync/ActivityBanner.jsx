@@ -2,6 +2,34 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
 
+/**
+ * @typedef {Object} User
+ * @property {string} id - User ID
+ * @property {string} userName - User's display name
+ * @property {string} [color] - User's avatar color
+ */
+
+/**
+ * @typedef {Object} Activity
+ * @property {string} id - Activity ID
+ * @property {string} type - Activity type (envelope_update, envelope_create, envelope_delete, bill_create, bill_update, transfer, view)
+ * @property {string} timestamp - ISO timestamp of activity
+ * @property {string} userId - ID of user who performed activity
+ * @property {string} userName - Name of user who performed activity
+ * @property {string} [description] - Activity description
+ * @property {string} [entityName] - Name of affected entity
+ */
+
+/**
+ * ActivityBanner component displays real-time user activity and presence
+ * Shows active users and recent activities with expandable view
+ *
+ * @param {Object} props - Component props
+ * @param {User[]} [props.activeUsers=[]] - List of currently active users
+ * @param {Activity[]} [props.recentActivity=[]] - List of recent user activities
+ * @param {User|null} [props.currentUser=null] - Current logged-in user
+ * @returns {React.ReactElement} Rendered activity banner component
+ */
 const ActivityBanner = ({
   activeUsers = [],
   recentActivity = [],
@@ -22,6 +50,11 @@ const ActivityBanner = ({
     setDisplayedActivities(sortedActivities);
   }, [recentActivity]);
 
+  /**
+   * Get icon component for activity type
+   * @param {string} type - Activity type
+   * @returns {React.ReactElement} Icon component
+   */
   const getActivityIcon = (type) => {
     switch (type) {
       case "envelope_update":
@@ -47,6 +80,11 @@ const ActivityBanner = ({
     }
   };
 
+  /**
+   * Get Tailwind color name for activity type
+   * @param {string} type - Activity type
+   * @returns {string} Tailwind color name
+   */
   const getActivityColor = (type) => {
     switch (type) {
       case "envelope_create":

@@ -1,47 +1,45 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES6"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "skipLibCheck": true,
+    "allowJs": true, // Allow JavaScript files during transition
+    "checkJs": false, // Don't check JS files yet
+    
+    /* Bundler mode */
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": false,
-    "outDir": "dist",
+    
+    /* Linting */
+    "strict": false, // Start with loose mode for gradual adoption
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    
+    /* Path mapping for imports */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@/types/*": ["src/types/*"],
-      "@/services/*": ["src/services/*"],
+      "@/components/*": ["src/components/*"],
+      "@/hooks/*": ["src/hooks/*"],
       "@/utils/*": ["src/utils/*"],
-      "@/components/*": ["src/components/*"]
-    },
-    "types": ["vite/client", "vitest/globals"]
+      "@/stores/*": ["src/stores/*"],
+      "@/types/*": ["src/types/*"]
+    }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "vite.config.js",
-    "vitest.config.js"
+    "src/**/*",
+    "vite.config.js"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "build",
-    "coverage"
-  ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+    "build"
+  ]
 }

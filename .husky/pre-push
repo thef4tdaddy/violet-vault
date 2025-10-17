@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "🔍 Running full ESLint check before push..."
 
 # Run ESLint with cache and parallel processing for better performance

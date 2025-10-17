@@ -3,6 +3,24 @@ import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
 
+/**
+ * @typedef {Object} SyncHealthStatus
+ * @property {boolean|null} isHealthy - Whether sync is healthy
+ * @property {'CHECKING'|'HEALTHY'|'ISSUES_DETECTED'|'ERROR'|'CRITICAL_FAILURE'} status - Current health status
+ * @property {string|null} lastChecked - ISO timestamp of last health check
+ * @property {boolean} isLoading - Whether health check is in progress
+ * @property {string} [error] - Error message if check failed
+ * @property {number} [failedTests] - Number of failed health tests
+ */
+
+/**
+ * SyncHealthIndicator component displays sync health status with periodic checks
+ * Shows spinning indicator during sync and color-coded status based on health
+ *
+ * @param {Object} props - Component props
+ * @param {Function} props.onOpenSettings - Callback to open sync settings/tools
+ * @returns {React.ReactElement} Rendered health indicator button
+ */
 const SyncHealthIndicator = ({ onOpenSettings }) => {
   const [syncStatus, setSyncStatus] = useState({
     isHealthy: null,
@@ -40,6 +58,10 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
     return () => clearInterval(activityInterval);
   }, []);
 
+  /**
+   * Check sync health status
+   * @returns {Promise<void>}
+   */
   const checkSyncHealth = async () => {
     try {
       setSyncStatus((prev) => ({ ...prev, isLoading: true }));
@@ -60,6 +82,10 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
     }
   };
 
+  /**
+   * Get Tailwind CSS color class based on sync status
+   * @returns {string} Tailwind text color class
+   */
   const getStatusColor = () => {
     if (syncStatus.isLoading) return "text-gray-400";
 
@@ -76,6 +102,10 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
     }
   };
 
+  /**
+   * Get status icon based on current sync state
+   * @returns {React.ReactElement} SVG icon element
+   */
   const getStatusIcon = () => {
     // Show spinning indicator for loading or background sync activity
     if (syncStatus.isLoading || isBackgroundSyncing) {
@@ -143,6 +173,10 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
     }
   };
 
+  /**
+   * Get human-readable status text
+   * @returns {string} Status text for display
+   */
   const getStatusText = () => {
     if (syncStatus.isLoading) return "Checking...";
     if (isBackgroundSyncing) return "Syncing...";
