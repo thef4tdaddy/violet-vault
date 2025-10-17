@@ -15,7 +15,7 @@ import {
   removeSplit,
   prepareSplitTransactions,
   getSplitSummary,
-} from "../../utils/transactions/splitting.js";
+} from "../../utils/transactions/splitting";
 import logger from "../../utils/common/logger.js";
 
 /**

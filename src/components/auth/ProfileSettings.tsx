@@ -2,18 +2,23 @@ import React, { useState } from "react";
 import { getIcon } from "../../utils";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
-import type { UserData } from "../../types/auth";
 
-interface ColorOption {
-  name: string;
-  value: string;
+interface User {
+  userName: string;
+  userColor: string;
+  [key: string]: any;
 }
 
 interface ProfileSettingsProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: UserData | null;
-  onUpdateProfile: (updatedProfile: UserData) => Promise<void>;
+  currentUser: User | null;
+  onUpdateProfile: (profile: User) => Promise<void>;
+}
+
+interface ColorOption {
+  name: string;
+  value: string;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
@@ -34,20 +39,15 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose, curr
     { name: "Teal", value: "#14b8a6" },
   ];
 
-  const handleSave = async (): Promise<void> => {
+  const handleSave = async () => {
     if (!userName.trim()) {
       globalToast.showError("Please enter a name", "Name Required");
       return;
     }
 
-    if (!currentUser) {
-      logger.error("Cannot update profile: currentUser is null");
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const updatedProfile: UserData = {
+      const updatedProfile: User = {
         ...currentUser,
         userName: userName.trim(),
         userColor,
@@ -57,9 +57,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose, curr
       onClose();
     } catch (error) {
       logger.error("Failed to update profile:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       globalToast.showError(
-        `Failed to update profile: ${errorMessage}`,
+        `Failed to update profile: ${(error as Error).message}`,
         "Update Failed",
       );
     } finally {
