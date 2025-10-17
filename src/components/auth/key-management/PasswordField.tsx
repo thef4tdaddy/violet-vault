@@ -1,7 +1,19 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const PasswordField = ({
+interface PasswordFieldProps {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onToggleVisibility: () => void;
+  showPassword: boolean;
+  placeholder: string;
+  disabled?: boolean;
+  minLength?: number;
+  required?: boolean;
+}
+
+const PasswordField: React.FC<PasswordFieldProps> = ({
   label,
   value,
   onChange,
