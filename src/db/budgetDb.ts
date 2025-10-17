@@ -150,8 +150,9 @@ export class VioletVaultDB extends Dexie {
               } catch (finalError: any) {
                 logger.warn("Complete object replacement failed:", finalError.message);
                 // As a last resort, try to modify the transaction
-                if (typeof trans.source === "object" && trans.source !== null) {
-                  trans.source = extensibleObj;
+                // Note: trans.source is a Dexie internal property
+                if (typeof (trans as any).source === "object" && (trans as any).source !== null) {
+                  (trans as any).source = extensibleObj;
                 }
               }
             }
@@ -162,7 +163,7 @@ export class VioletVaultDB extends Dexie {
       });
 
       table.hook("updating", (modifications, _primKey, _obj, _trans) => {
-        modifications.lastModified = Date.now();
+        (modifications as any).lastModified = Date.now();
       });
     };
 
@@ -240,7 +241,7 @@ export class VioletVaultDB extends Dexie {
       } else {
         result = await this.envelopes
           .where("[category+archived]")
-          .equals([category, false])
+          .equals([category, false] as any)
           .toArray();
       }
       await this.setCachedValue(cacheKey, result, 60000); // 1 minute cache
@@ -250,7 +251,7 @@ export class VioletVaultDB extends Dexie {
   }
 
   async getActiveEnvelopes(): Promise<Envelope[]> {
-    return this.envelopes.where("archived").equals(false).toArray();
+    return this.envelopes.where("archived").equals(false as any).toArray();
   }
 
   // Transaction queries with compound indexes
@@ -331,7 +332,7 @@ export class VioletVaultDB extends Dexie {
         .between([true, dateRange.start], [true, dateRange.end], true, true)
         .toArray();
     }
-    return this.bills.where("isPaid").equals(true).toArray();
+    return this.bills.where("isPaid").equals(true as any).toArray();
   }
 
   async getBillsByCategory(category: string): Promise<Bill[]> {
@@ -339,16 +340,19 @@ export class VioletVaultDB extends Dexie {
   }
 
   async getRecurringBills(): Promise<Bill[]> {
-    return this.bills.where("isRecurring").equals(true).toArray();
+    return this.bills.where("isRecurring").equals(true as any).toArray();
   }
 
   // Savings Goals queries with status and priority optimization
   async getActiveSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("[isCompleted+isPaused]").equals([false, false]).toArray();
+    return this.savingsGoals
+      .where("[isCompleted+isPaused]")
+      .equals([false, false] as any)
+      .toArray();
   }
 
   async getCompletedSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("isCompleted").equals(true).toArray();
+    return this.savingsGoals.where("isCompleted").equals(true as any).toArray();
   }
 
   async getSavingsGoalsByCategory(category: string): Promise<SavingsGoal[]> {
@@ -517,8 +521,8 @@ export class VioletVaultDB extends Dexie {
     return this.budgetCommits.put(commit);
   }
 
-  async createBudgetChanges(changes: BudgetChange[]): Promise<number[]> {
-    return this.budgetChanges.bulkPut(changes);
+  async createBudgetChanges(changes: BudgetChange[]): Promise<number> {
+    return this.budgetChanges.bulkPut(changes) as Promise<number>;
   }
 
   async createBudgetBranch(branch: BudgetBranch): Promise<number> {

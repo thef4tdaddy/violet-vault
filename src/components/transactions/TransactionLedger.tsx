@@ -1,7 +1,7 @@
 import React from "react";
 
 import TransactionSummaryCards from "./TransactionSummaryCards";
-import StandardFilters from "../ui/StandardFilters";
+import StandardFilters, { type FilterConfig } from "../ui/StandardFilters";
 import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
@@ -86,7 +86,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
   } = useTransactionLedger(currentUser);
 
   const { netCashFlow } = calculateTransactionTotals(transactions);
-  const filterConfigs = getTransactionFilterConfigs(envelopes);
+  const filterConfigs = getTransactionFilterConfigs(envelopes) as FilterConfig[];
 
   // Show loading state while data is fetching
   if (isLoading) {

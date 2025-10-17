@@ -12,7 +12,7 @@ import type { TypedResponse, SafeUnknown, EnhancedFirebaseError } from "../types
 import logger from "../../utils/common/logger";
 
 // Example budget data structure
-interface BudgetData {
+interface BudgetData extends Record<string, unknown> {
   transactions: Array<{
     id: string;
     amount: number;
@@ -105,7 +105,10 @@ export class TypedFirebaseExample {
         });
         return true;
       } else {
-        this.handleSaveError(result.error);
+        if (result.error) {
+          const enhancedError = enhancedFirebaseErrorHandler.handleError(result.error);
+          this.handleSaveError(enhancedError);
+        }
         return false;
       }
     } catch (error) {
@@ -148,7 +151,8 @@ export class TypedFirebaseExample {
           return null;
         }
       } else if (result.error) {
-        this.handleLoadError(result.error);
+        const enhancedError = enhancedFirebaseErrorHandler.handleError(result.error);
+        this.handleLoadError(enhancedError);
         return null;
       } else {
         logger.info("No budget data found in cloud");

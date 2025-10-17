@@ -171,7 +171,7 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
   );
 
   return (
-    <ConfirmModal isOpen={isOpen} onCancel={onClose} className="max-w-2xl">
+    <ConfirmModal isOpen={isOpen} onCancel={onClose}>
       {step === 1 ? renderStep1() : renderStep2()}
     </ConfirmModal>
   );
