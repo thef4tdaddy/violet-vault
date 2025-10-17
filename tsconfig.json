@@ -26,6 +26,43 @@
     "allowSyntheticDefaultImports": true,
 
     /* Path aliases */
+    // Target modern browsers
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+
+    // Enable all strict checks incrementally
+    "strict": false, // Will enable incrementally
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+
+    // Allow JS during migration
+    "allowJs": true,
+    "checkJs": false,
+
+    // React and JSX
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+
+    // Module resolution
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    // Vite compatibility
+    "useDefineForClassFields": true,
+    "types": ["vite/client", "vitest/globals", "node"],
+
+    // Output (not needed for Vite, but useful for IDE)
+    "noEmit": true,
+
+    // Path aliases
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
@@ -33,4 +70,17 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "build", "coverage"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "vite.config.js",
+    "vitest.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
 }

@@ -38,3 +38,5 @@ tsc-output.txt
 eslint-output.txt
 eslint_output.txt
 eslint_current.txt
+.eslintcache
+js-version/
