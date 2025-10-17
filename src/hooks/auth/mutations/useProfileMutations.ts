@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
+import localStorageService from "../../../services/storage/localStorageService";
 
 /**
  * Profile-related TanStack Query mutations
@@ -26,12 +27,12 @@ export const useUpdateProfileMutation = () => {
           userName: updatedProfile.userName,
           userColor: updatedProfile.userColor,
         };
-        localStorage.setItem("userProfile", JSON.stringify(profileData));
+        localStorageService.setUserProfile(profileData);
 
         // Update encrypted budget data
-        const savedData = localStorage.getItem("envelopeBudgetData");
+        const savedData = localStorageService.getBudgetData();
         if (savedData) {
-          const { encryptedData, iv } = JSON.parse(savedData);
+          const { encryptedData, iv } = savedData;
           const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
           const updatedData = {
@@ -40,14 +41,11 @@ export const useUpdateProfileMutation = () => {
           };
 
           const encrypted = await encryptionUtils.encrypt(updatedData, encryptionKey);
-          localStorage.setItem(
-            "envelopeBudgetData",
-            JSON.stringify({
-              encryptedData: encrypted.data,
-              salt: Array.from(salt),
-              iv: encrypted.iv,
-            })
-          );
+          localStorageService.setBudgetData({
+            encryptedData: encrypted.data,
+            salt: Array.from(salt),
+            iv: encrypted.iv,
+          });
         }
 
         return { success: true, profile: updatedProfile };

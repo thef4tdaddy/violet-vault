@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
+import localStorageService from "../../../services/storage/localStorageService";
 
 /**
  * Password validation TanStack Query
@@ -26,7 +27,7 @@ export const usePasswordValidation = (password, options = {}) => {
           hasPassword: !!password,
         });
 
-        const savedData = localStorage.getItem("envelopeBudgetData");
+        const savedData = localStorageService.getBudgetData();
         if (!savedData) {
           logger.auth("TanStack: No saved data found - cannot validate password");
           return {
@@ -35,8 +36,7 @@ export const usePasswordValidation = (password, options = {}) => {
           };
         }
 
-        const parsedData = JSON.parse(savedData);
-        const { salt: savedSalt, encryptedData, iv } = parsedData;
+        const { salt: savedSalt, encryptedData, iv } = savedData;
 
         if (!savedSalt || !encryptedData || !iv) {
           logger.auth("TanStack: Missing required encryption components");
