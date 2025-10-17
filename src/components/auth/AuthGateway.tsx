@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
 import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
+import { useEncryptedDataCheck } from "../../hooks/auth/useEncryptedDataCheck";
 import logger from "../../utils/common/logger";
 import UserSetup from "./UserSetup";
 import LocalOnlySetup from "./LocalOnlySetup";
@@ -10,6 +11,7 @@ import LocalOnlySetup from "./LocalOnlySetup";
  */
 const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
   const { isLocalOnlyMode, localOnlyUser, checkLocalOnlyMode } = useLocalOnlyMode();
+  const { hasEncryptedData } = useEncryptedDataCheck();
   const [authMode, setAuthMode] = useState(null); // null, 'standard', 'local-only'
   const [isCheckingLocalMode, setIsCheckingLocalMode] = useState(true);
 
@@ -24,8 +26,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
           onLocalOnlyReady(localOnlyUser);
         } else {
           // Check if there's saved encrypted data (standard mode)
-          const savedData = localStorage.getItem("envelopeBudgetData");
-          if (savedData) {
+          if (hasEncryptedData()) {
             setAuthMode("standard");
           } else {
             // New user - default to standard mode instead of showing mode selection

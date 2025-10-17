@@ -202,5 +202,3 @@ export const useTrendAnalysis = (analyticsData, _timeFilter) => {
     insights,
   };
 };
-
-export default useTrendAnalysis;

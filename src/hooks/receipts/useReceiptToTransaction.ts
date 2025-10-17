@@ -166,5 +166,3 @@ const suggestEnvelopeForMerchant = (merchant, envelopes) => {
 
   return null;
 };
-
-export default useReceiptToTransaction;

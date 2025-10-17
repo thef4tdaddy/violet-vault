@@ -18,7 +18,7 @@ import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
 import EmptyStateHints from "../onboarding/EmptyStateHints";
 import logger from "../../utils/common/logger";
 import PullToRefreshIndicator from "../mobile/PullToRefreshIndicator";
-import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
+import { usePullToRefresh } from "../../hooks/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
 
 // Lazy load modals for better performance

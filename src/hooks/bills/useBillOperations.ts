@@ -54,5 +54,3 @@ export const useBillOperations = ({
     isProcessing,
   };
 };
-
-export default useBillOperations;

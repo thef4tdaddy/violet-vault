@@ -4,7 +4,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../../../utils/common/queryClient";
-import { queryFunctions } from "./queryFunctions";
+import { queryFunctions } from "./query-functions";
 
 export const useBudgetQueries = () => {
   const envelopesQuery = useQuery({

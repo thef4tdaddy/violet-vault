@@ -119,5 +119,3 @@ export const usePullToRefresh = (
     pullRotation: pullProgress * 180,
   };
 };
-
-export default usePullToRefresh;

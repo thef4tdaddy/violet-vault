@@ -13,7 +13,7 @@ import { useTransactions } from "../../hooks/common/useTransactions";
 import useBudgetData from "../../hooks/budgeting/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 import PullToRefreshIndicator from "../mobile/PullToRefreshIndicator";
-import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
+import { usePullToRefresh } from "../../hooks/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useMainDashboardUI,

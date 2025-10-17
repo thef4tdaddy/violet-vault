@@ -10,7 +10,7 @@ import {
   useSettingsSections,
   useSettingsActions,
 } from "../../hooks/settings/useSettingsDashboard";
-import useSettingsSectionRenderer from "../../hooks/settings/useSettingsSectionRenderer";
+import { useSettingsSectionRenderer } from "../../hooks/settings/useSettingsSectionRenderer";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));

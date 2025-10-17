@@ -168,4 +168,3 @@ const useReceipts = () => {
 };
 
 export { useReceipts };
-export default useReceipts;

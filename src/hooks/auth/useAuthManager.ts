@@ -14,7 +14,7 @@ import {
   createUpdateProfileOperation,
   createLockSessionOperation,
   createUpdateActivityOperation,
-} from "./authOperations";
+} from "./auth-operations";
 
 /**
  * Unified auth manager hook that combines AuthContext and TanStack Query operations
@@ -105,5 +105,3 @@ export const useAuthManager = () => {
     _legacy: legacyInterface,
   };
 };
-
-export default useAuthManager;

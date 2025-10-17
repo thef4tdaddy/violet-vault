@@ -69,5 +69,3 @@ export const useBulkBillUpdate = (selectedBills = [], _isOpen) => {
     resetChanges,
   };
 };
-
-export default useBulkBillUpdate;

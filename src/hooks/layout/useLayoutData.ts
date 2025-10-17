@@ -74,5 +74,3 @@ export const useLayoutData = () => {
     hasError: budgetData.error || bills.error,
   };
 };
-
-export default useLayoutData;

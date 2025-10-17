@@ -1,5 +1,5 @@
 import React from "react";
-import useTransactionTable from "../../hooks/transactions/useTransactionTable";
+import { useTransactionTable } from "../../hooks/transactions/useTransactionTable";
 import TransactionRow from "./components/TransactionRow";
 import DeleteConfirmation from "./components/DeleteConfirmation";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";

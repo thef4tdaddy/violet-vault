@@ -105,5 +105,3 @@ export const useAuthCompatibility = () => {
  * And everything should work the same way.
  */
 export const useAuth = useAuthCompatibility;
-
-export default useAuthCompatibility;

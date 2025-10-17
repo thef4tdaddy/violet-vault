@@ -129,5 +129,3 @@ export const useAuthenticationManager = () => {
     },
   };
 };
-
-export default useAuthenticationManager;

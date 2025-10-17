@@ -23,14 +23,6 @@ interface LogoutResult {
   success: boolean;
 }
 
-// Query Keys
-export const authQueryKeys = {
-  all: ["auth"] as const,
-  user: () => [...authQueryKeys.all, "user"] as const,
-  session: () => [...authQueryKeys.all, "session"] as const,
-  validation: (password: string) => [...authQueryKeys.all, "validation", password] as const,
-};
-
 /**
  * Hook for logout mutation
  */

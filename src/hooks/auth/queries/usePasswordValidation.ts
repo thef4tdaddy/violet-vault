@@ -1,16 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
+import { passwordValidationQueryKeys } from "./password-validation-constants";
 
 /**
  * Password validation TanStack Query
  * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
  */
-
-// Query Keys
-export const passwordValidationQueryKeys = {
-  validation: (password) => ["auth", "validation", password],
-};
 
 /**
  * Hook for password validation query

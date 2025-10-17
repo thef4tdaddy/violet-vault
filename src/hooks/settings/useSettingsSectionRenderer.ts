@@ -91,5 +91,3 @@ export const useSettingsSectionRenderer = ({
 
   return { renderSectionContent };
 };
-
-export default useSettingsSectionRenderer;

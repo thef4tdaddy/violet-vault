@@ -74,5 +74,3 @@ export const usePaycheckOperations = () => {
     handleDeletePaycheck,
   };
 };
-
-export default usePaycheckOperations;

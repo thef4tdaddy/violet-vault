@@ -52,5 +52,3 @@ export const useTransactionTable = (transactions = []) => {
     closeHistory,
   };
 };
-
-export default useTransactionTable;

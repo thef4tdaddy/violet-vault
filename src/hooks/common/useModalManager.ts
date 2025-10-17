@@ -102,5 +102,3 @@ export const useSettingsModals = () => {
     showEnvelopeChecker: modalManager.isModalOpen("envelopeChecker"),
   };
 };
-
-export default useModalManager;

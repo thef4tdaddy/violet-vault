@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { getIcon } from "../../utils";
+import { useSecurityAcknowledgment } from "../../hooks/security/useSecurityAcknowledgment";
 import logger from "../../utils/common/logger";
 
 /**
@@ -7,22 +8,11 @@ import logger from "../../utils/common/logger";
  * Addresses GitHub Issue #589 - Warning about unencrypted local data
  */
 const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
-  const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(false);
-
-  useEffect(() => {
-    // Check if user has already acknowledged this warning
-    const acknowledged = localStorage.getItem("localDataSecurityAcknowledged");
-    if (acknowledged) {
-      setHasBeenAcknowledged(true);
-    }
-  }, []);
+  const { hasBeenAcknowledged, acknowledgeSecurityWarning } = useSecurityAcknowledgment();
 
   const handleAcknowledge = () => {
-    // Store acknowledgment in localStorage
-    localStorage.setItem("localDataSecurityAcknowledged", "true");
-    localStorage.setItem("localDataSecurityAcknowledgedAt", Date.now().toString());
-
-    setHasBeenAcknowledged(true);
+    // Store acknowledgment
+    acknowledgeSecurityWarning();
 
     logger.info("🔒 User acknowledged local data security warning");
 

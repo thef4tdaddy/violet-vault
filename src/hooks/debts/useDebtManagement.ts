@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import useDebts from "./useDebts";
 import useBills from "../bills/useBills";
 import useEnvelopes from "../budgeting/useEnvelopes";
-import useTransactions from "../common/useTransactions";
+import { useTransactions } from "../common/useTransactions";
 import {
   DEBT_TYPES,
   DEBT_STATUS,

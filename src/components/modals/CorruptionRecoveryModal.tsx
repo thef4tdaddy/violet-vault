@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ConfirmModal from "../ui/ConfirmModal";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import useDataManagement from "../../hooks/common/useDataManagement";
+import { useProfileCleanup } from "../../hooks/auth/useProfileCleanup";
 import logger from "../../utils/common/logger";
 
 // Type definitions for props
@@ -32,6 +33,7 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const { showSuccessToast, showErrorToast } = useToastHelpers() as ToastHelpers;
   const { exportData } = useDataManagement() as DataManagement;
+  const { clearProfile } = useProfileCleanup();
 
   const handleExport = async (): Promise<void> => {
     try {
@@ -50,15 +52,7 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
 
   const handleCreateNewProfile = (): void => {
     // Clear the current user profile to trigger fresh setup
-    const keysToRemove = [
-      "violet_vault_user_profile",
-      "violet-vault-user-data",
-      "violet-vault-auth-salt",
-    ];
-
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearProfile();
 
     showSuccessToast(
       "Profile cleared. The page will reload to start fresh setup.",
