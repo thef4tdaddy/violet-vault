@@ -141,7 +141,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
               })}
               Local-Only Mode Settings
             </h3>
-            <button
+            <Button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 text-xl"
               disabled={loading}
@@ -149,7 +149,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
               {React.createElement(getIcon("X"), {
                 className: "h-5 w-5",
               })}
-            </button>
+            </Button>
           </div>
 
           {/* Status Banner */}
@@ -226,7 +226,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
               <h4 className="font-medium text-gray-900 mb-4">Data Management</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Export Data */}
-                <button
+                <Button
                   onClick={handleExportData}
                   disabled={loading}
                   className="p-4 border border-green-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 text-left"
@@ -238,10 +238,10 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
                   <div className="text-sm text-gray-600">
                     Download all your budget data as a backup file
                   </div>
-                </button>
+                </Button>
 
                 {/* Import Data */}
-                <button
+                <Button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={loading}
                   className="p-4 border border-blue-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50 text-left"
@@ -253,7 +253,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
                   <div className="text-sm text-gray-600">
                     Restore data from a previous export file
                   </div>
-                </button>
+                </Button>
 
                 <input
                   ref={fileInputRef}
@@ -285,13 +285,13 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
                         preserved.
                       </p>
                     </div>
-                    <button
+                    <Button
                       onClick={() => setShowConfirmExit(true)}
                       disabled={loading}
                       className="ml-4 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
                     >
                       Switch Mode
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -310,13 +310,13 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
                         undone.
                       </p>
                     </div>
-                    <button
+                    <Button
                       onClick={() => setShowConfirmClear(true)}
                       disabled={loading}
                       className="ml-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                     >
                       Clear Data
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -363,19 +363,19 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
                 be preserved and you can set up encryption.
               </p>
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={() => setShowConfirmExit(false)}
                   className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleExitLocalMode(false)}
                   disabled={loading}
                   className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50"
                 >
                   Switch Mode
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -401,19 +401,19 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
                 </p>
               </div>
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={() => setShowConfirmClear(false)}
                   className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleClearAllData}
                   disabled={loading}
                   className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50"
                 >
                   Clear All Data
-                </button>
+                </Button>
               </div>
             </div>
           </div>

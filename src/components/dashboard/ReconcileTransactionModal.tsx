@@ -22,7 +22,7 @@ const ReconcileTransactionModal = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Transaction Type</label>
             <div className="grid grid-cols-2 gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => onUpdateTransaction({ type: "expense" })}
                 className={`p-3 rounded-lg border-2 transition-all ${
@@ -35,9 +35,9 @@ const ReconcileTransactionModal = ({
                   className: "h-5 w-5 mx-auto mb-1",
                 })}
                 <span className="text-sm">Expense</span>
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => onUpdateTransaction({ type: "income" })}
                 className={`p-3 rounded-lg border-2 transition-all ${
@@ -50,7 +50,7 @@ const ReconcileTransactionModal = ({
                   className: "h-5 w-5 mx-auto mb-1",
                 })}
                 <span className="text-sm">Income</span>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -81,7 +81,7 @@ const ReconcileTransactionModal = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Assign to Envelope
             </label>
-            <select
+            <Select
               value={newTransaction.envelopeId}
               onChange={(e) => onUpdateTransaction({ envelopeId: e.target.value })}
               className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
@@ -92,7 +92,7 @@ const ReconcileTransactionModal = ({
                   {option.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
@@ -107,18 +107,18 @@ const ReconcileTransactionModal = ({
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button
+          <Button
             onClick={onClose}
             className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onReconcile}
             className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
           >
             Reconcile
-          </button>
+          </Button>
         </div>
       </div>
     </div>

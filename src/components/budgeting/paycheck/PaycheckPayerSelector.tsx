@@ -30,7 +30,7 @@ const PaycheckPayerSelector = ({
       {!showAddNewPayer && uniquePayers.length > 0 ? (
         <div className="space-y-3">
           {/* Dropdown for existing payers */}
-          <select
+          <Select
             value={payerName}
             onChange={(e) => {
               if (e.target.value === "ADD_NEW") {
@@ -52,7 +52,7 @@ const PaycheckPayerSelector = ({
               );
             })}
             <option value="ADD_NEW">+ Add New Person</option>
-          </select>
+          </Select>
 
           {/* Show prediction info for selected payer */}
           {payerName && getPayerPrediction(payerName) && (
@@ -122,7 +122,7 @@ const AddNewPayerForm = ({
           onKeyPress={(e) => e.key === "Enter" && onAddNewPayer()}
           autoFocus
         />
-        <button
+        <Button
           onClick={confirmTouchFeedback.onClick(onAddNewPayer)}
           onTouchStart={confirmTouchFeedback.onTouchStart}
           className={`px-6 py-4 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 border-2 border-black ${confirmTouchFeedback.className}`}
@@ -131,9 +131,9 @@ const AddNewPayerForm = ({
           {React.createElement(getIcon("CheckCircle"), {
             className: "h-5 w-5",
           })}
-        </button>
+        </Button>
         {uniquePayers.length > 0 ? (
-          <button
+          <Button
             onClick={cancelTouchFeedback.onClick(() => {
               onToggleAddNewPayer(false);
               onNewPayerNameChange("");
@@ -143,9 +143,9 @@ const AddNewPayerForm = ({
             title="Back to person selection"
           >
             ←
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             onClick={cancelTouchFeedback.onClick(() => {
               onToggleAddNewPayer(false);
               onNewPayerNameChange("");
@@ -155,7 +155,7 @@ const AddNewPayerForm = ({
             title="Cancel"
           >
             ✕
-          </button>
+          </Button>
         )}
       </div>
     </div>

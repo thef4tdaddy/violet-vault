@@ -182,7 +182,7 @@ const AnalyticsDashboard = () => {
             {React.createElement(getIcon("Calendar"), {
               className: "h-4 w-4 text-gray-500",
             })}
-            <select
+            <Select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
               className="border-2 border-black rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -192,17 +192,17 @@ const AnalyticsDashboard = () => {
                   {filter.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {/* Export Button */}
-          <button
+          <Button
             onClick={() => setShowExportModal(true)}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 border-2 border-black flex items-center gap-2 text-sm"
           >
             {React.createElement(getIcon("Download"), { className: "h-4 w-4" })}
             Export
-          </button>
+          </Button>
         </div>
       </div>
 

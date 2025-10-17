@@ -23,7 +23,7 @@ const AccountModalHeader = ({
 
     <div className="flex items-center gap-2">
       {isLocked && !isOwnLock && (
-        <button
+        <Button
           onClick={breakLock}
           className="bg-red-100 hover:bg-red-200 text-red-800 px-2 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
         >
@@ -31,11 +31,11 @@ const AccountModalHeader = ({
             className: "h-3 w-3 mr-1",
           })}
           Break
-        </button>
+        </Button>
       )}
-      <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
         {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-      </button>
+      </Button>
     </div>
   </div>
 );

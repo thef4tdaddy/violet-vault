@@ -67,50 +67,50 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
     switch (variant) {
       case "secondary":
         return (
-          <button
+          <Button
             onClick={handleScanReceipt}
             disabled={isPreloading}
             className={`${baseClasses} px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50`}
           >
             {React.createElement(getIcon("Camera"), { className: "h-4 w-4" })}
             {isPreloading ? "Loading..." : "Scan Receipt"}
-          </button>
+          </Button>
         );
 
       case "icon":
         return (
-          <button
+          <Button
             onClick={handleScanReceipt}
             disabled={isPreloading}
             className={`${baseClasses} p-2 text-purple-600 hover:bg-purple-50 rounded-xl`}
             title="Scan Receipt"
           >
             {React.createElement(getIcon("Camera"), { className: "h-5 w-5" })}
-          </button>
+          </Button>
         );
 
       case "fab":
         return (
-          <button
+          <Button
             onClick={handleScanReceipt}
             disabled={isPreloading}
             className={`${baseClasses} fixed bottom-20 right-6 w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 hover:shadow-xl z-40`}
             title="Scan Receipt"
           >
             {React.createElement(getIcon("Receipt"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         );
 
       default: // primary
         return (
-          <button
+          <Button
             onClick={handleScanReceipt}
             disabled={isPreloading}
             className={`${baseClasses} px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700`}
           >
             {React.createElement(getIcon("Camera"), { className: "h-5 w-5" })}
             {isPreloading ? "Loading OCR..." : "Scan Receipt"}
-          </button>
+          </Button>
         );
     }
   };

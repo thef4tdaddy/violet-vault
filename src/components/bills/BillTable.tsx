@@ -28,18 +28,18 @@ const BillTable = ({
             {selectionState.selectedCount > 1 ? "s" : ""} selected
           </span>
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => setShowBulkUpdateModal(true)}
               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
             >
               Bulk Update
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={clearSelection}
               className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
             >
               Clear
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -50,7 +50,7 @@ const BillTable = ({
           <thead className="bg-gray-50 border-b-2 border-black">
             <tr>
               <th className="px-6 py-3 text-center">
-                <button
+                <Button
                   onClick={selectionState.isAllSelected ? clearSelection : selectAllBills}
                   className="flex items-center justify-center w-6 h-6 mx-auto hover:bg-gray-200 rounded transition-colors"
                   title={selectionState.isAllSelected ? "Deselect all bills" : "Select all bills"}
@@ -62,7 +62,7 @@ const BillTable = ({
                     : React.createElement(getIcon("Square"), {
                         className: "h-5 w-5 text-gray-400",
                       })}
-                </button>
+                </Button>
               </th>
               <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
                 <span className="text-lg">B</span>ILL
@@ -130,7 +130,7 @@ const BillTable = ({
                   >
                     <div className="flex items-center justify-end gap-2">
                       {!bill.isPaid && (
-                        <button
+                        <Button
                           onClick={() => billOperations.handlePayBill(bill.id)}
                           className="px-3 py-1.5 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors font-medium text-xs flex items-center gap-1.5"
                           title="Mark as Paid"
@@ -139,7 +139,7 @@ const BillTable = ({
                             className: "h-3.5 w-3.5",
                           })}
                           Pay
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </td>

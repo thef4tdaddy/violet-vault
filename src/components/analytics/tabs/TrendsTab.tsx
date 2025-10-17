@@ -14,7 +14,7 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
           <h3 className="text-lg font-semibold text-gray-900">Spending Trends</h3>
           <div className="flex gap-2">
             {["line", "bar", "area"].map((type) => (
-              <button
+              <Button
                 key={type}
                 onClick={() => handleChartTypeChange(type)}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
@@ -24,7 +24,7 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
                 }`}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

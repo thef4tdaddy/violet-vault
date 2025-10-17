@@ -55,7 +55,7 @@ const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm,
           <label className="block text-sm font-medium text-gray-700 mb-2">Quick Amounts</label>
           <div className="grid grid-cols-4 gap-2">
             {quickAmounts.map((quickAmount) => (
-              <button
+              <Button
                 key={quickAmount}
                 onClick={withHapticFeedback(() => handleQuickAmounts(quickAmount), "light")}
                 className={getButtonClasses(
@@ -64,7 +64,7 @@ const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm,
                 )}
               >
                 ${quickAmount}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -84,7 +84,7 @@ const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm,
 
       {/* Actions */}
       <div className="space-y-3">
-        <button
+        <Button
           onClick={withHapticFeedback(onConfirm, "confirm")}
           disabled={amount <= 0}
           className={getButtonClasses(
@@ -93,9 +93,9 @@ const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm,
           )}
         >
           Fund ${amount.toFixed(2)}
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={withHapticFeedback(onClose, "light")}
           className={getButtonClasses(
             "w-full bg-white text-gray-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50",
@@ -103,7 +103,7 @@ const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm,
           )}
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </>
   );

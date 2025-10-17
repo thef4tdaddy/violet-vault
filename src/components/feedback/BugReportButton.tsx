@@ -168,14 +168,14 @@ const BugReportButton: React.FC = () => {
   return (
     <>
       {/* Floating Bug Report Button */}
-      <button
+      <Button
         onClick={openModal}
         className="fixed bottom-24 right-4 lg:bottom-4 z-50 bg-red-500 hover:bg-red-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-105"
         title="Report a Problem"
         data-bug-report="true"
       >
         {React.createElement(getIcon("Bug"), { className: "h-5 w-5" })}
-      </button>
+      </Button>
 
       {/* Bug Report Modal */}
       {isModalOpen && (
@@ -194,9 +194,9 @@ const BugReportButton: React.FC = () => {
                 })}
                 <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
               </div>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
+              <Button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-4">
@@ -240,7 +240,7 @@ const BugReportButton: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Severity</label>
-                  <select
+                  <Select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -249,7 +249,7 @@ const BugReportButton: React.FC = () => {
                     <option value="medium">Medium - Normal bug</option>
                     <option value="high">High - Important issue</option>
                     <option value="critical">Critical - Blocking</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
@@ -300,7 +300,7 @@ const BugReportButton: React.FC = () => {
 
                 {includeScreenshot && (
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={captureScreenshot}
                       className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
                       title="Automatically capture screenshot using html2canvas"
@@ -309,8 +309,8 @@ const BugReportButton: React.FC = () => {
                         className: "h-4 w-4 mr-1",
                       })}
                       Auto Capture
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={handleScreenCapture}
                       className="text-sm text-green-600 hover:text-green-800 flex items-center"
                       title="Use browser's native screen capture (requires permission)"
@@ -319,7 +319,7 @@ const BugReportButton: React.FC = () => {
                         className: "h-4 w-4 mr-1",
                       })}
                       Screen Capture
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -333,7 +333,7 @@ const BugReportButton: React.FC = () => {
                       className="w-full h-32 object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={openScreenshotPreview}
                     />
-                    <button
+                    <Button
                       onClick={() => setScreenshot(null)}
                       className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                       title="Remove screenshot"
@@ -341,7 +341,7 @@ const BugReportButton: React.FC = () => {
                       {React.createElement(getIcon("X"), {
                         className: "h-3 w-3",
                       })}
-                    </button>
+                    </Button>
                   </div>
                   <div className="flex justify-between items-center mt-2">
                     <p className="text-xs text-gray-500">
@@ -356,13 +356,13 @@ const BugReportButton: React.FC = () => {
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button
+              <Button
                 onClick={closeModal}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleSubmit}
                 disabled={(!title.trim() && !description.trim()) || isSubmitting}
                 className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
@@ -380,7 +380,7 @@ const BugReportButton: React.FC = () => {
                     Submit Report
                   </>
                 )}
-              </button>
+              </Button>
             </div>
 
             <p className="text-xs text-gray-500 mt-4 text-center">

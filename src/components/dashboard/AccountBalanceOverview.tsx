@@ -123,7 +123,7 @@ const AccountBalanceOverview = ({
 
       {/* Quick Actions */}
       <div className="flex gap-3 mt-6">
-        <button
+        <Button
           onClick={onOpenReconcileModal}
           className="btn btn-secondary border-2 border-black flex items-center"
         >
@@ -131,10 +131,10 @@ const AccountBalanceOverview = ({
             className: "h-4 w-4 mr-2",
           })}
           Reconcile Transaction
-        </button>
+        </Button>
 
         {!isBalanced && Math.abs(difference) > 0.01 && (
-          <button
+          <Button
             onClick={onAutoReconcileDifference}
             className="btn btn-secondary border-2 border-black flex items-center"
           >
@@ -142,7 +142,7 @@ const AccountBalanceOverview = ({
               className: "h-4 w-4 mr-2",
             })}
             Auto-Reconcile Difference
-          </button>
+          </Button>
         )}
       </div>
     </div>

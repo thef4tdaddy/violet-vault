@@ -26,18 +26,18 @@ const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({ isOpen, onClose, 
           This will permanently delete all your budget data. This action cannot be undone.
         </p>
         <div className="flex gap-3">
-          <button
+          <Button
             onClick={onClose}
             className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 border-2 border-black"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 border-2 border-black"
           >
             Delete All Data
-          </button>
+          </Button>
         </div>
       </div>
     </div>

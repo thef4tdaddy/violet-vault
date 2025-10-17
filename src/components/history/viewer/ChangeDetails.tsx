@@ -99,7 +99,7 @@ const ChangeDetails = ({
           </div>
 
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <button
+            <Button
               onClick={() => handleRestoreFromHistory(selectedCommit)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
             >
@@ -107,7 +107,7 @@ const ChangeDetails = ({
                 className: "h-4 w-4 mr-2",
               })}
               Restore to This State
-            </button>
+            </Button>
           </div>
         </div>
       )}

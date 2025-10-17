@@ -70,7 +70,7 @@ const DebtDashboard = () => {
         </div>
 
         <div className="flex flex-row gap-3">
-          <button
+          <Button
             onClick={handleAddDebt}
             className="btn btn-primary border-2 border-black flex items-center"
             data-tour="add-debt"
@@ -79,7 +79,7 @@ const DebtDashboard = () => {
               className: "h-4 w-4 mr-2",
             })}
             Add Debt
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -137,7 +137,7 @@ const DebtDashboard = () => {
                       <p className="text-gray-500 mb-4">
                         Start tracking your debts to get insights into your debt payoff journey.
                       </p>
-                      <button
+                      <Button
                         onClick={handleAddDebt}
                         className="btn btn-primary border-2 border-black"
                       >
@@ -145,7 +145,7 @@ const DebtDashboard = () => {
                           className: "h-4 w-4 mr-2",
                         })}
                         Add Your First Debt
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <DebtList

@@ -33,12 +33,12 @@ const ClearConfirmationModal: React.FC<ClearConfirmationModalProps> = ({
               CLEAR SECURITY EVENTS
             </h4>
           </div>
-          <button
+          <Button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
           >
             {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-          </button>
+          </Button>
         </div>
 
         {/* Warning Message */}
@@ -53,18 +53,18 @@ const ClearConfirmationModal: React.FC<ClearConfirmationModalProps> = ({
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          <button
+          <Button
             onClick={onClose}
             className="flex-1 px-4 py-3 text-gray-800 bg-gray-200/80 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold uppercase tracking-wide"
           >
             ❌ CANCEL
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
             className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-black uppercase tracking-wide"
           >
             🗑️ CLEAR EVENTS
-          </button>
+          </Button>
         </div>
       </div>
     </div>

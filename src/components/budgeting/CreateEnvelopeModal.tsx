@@ -126,7 +126,7 @@ const CreateEnvelopeModal = ({
             "#8b5cf6", // violet
             "#ec4899", // pink
           ].map((color) => (
-            <button
+            <Button
               key={color}
               type="button"
               onClick={() => updateFormField("color", color)}
@@ -143,14 +143,14 @@ const CreateEnvelopeModal = ({
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-3 pt-4">
-        <button
+        <Button
           type="button"
           onClick={handleClose}
           className="px-6 py-2 border-2 border-black text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit || isLoading}
@@ -158,7 +158,7 @@ const CreateEnvelopeModal = ({
         >
           {React.createElement(getIcon("Save"), { className: "h-4 w-4 mr-2" })}
           {isLoading ? "Creating..." : "Create Envelope"}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -201,12 +201,12 @@ const CreateEnvelopeModal = ({
                 <p className="text-green-100 text-sm">Set up a new budget envelope</p>
               </div>
             </div>
-            <button
+            <Button
               onClick={handleClose}
               className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </button>
+            </Button>
           </div>
         </div>
 

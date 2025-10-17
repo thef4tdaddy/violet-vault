@@ -26,9 +26,9 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
             })}
             Envelope History: {envelope.name}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         <div className="p-6">

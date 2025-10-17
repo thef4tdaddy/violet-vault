@@ -181,7 +181,7 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
           const confidenceIconName = getConfidenceIcon(suggestion.confidence);
 
           return (
-            <button
+            <Button
               key={`${suggestion.envelope.id}-${index}`}
               onClick={() => onSuggestEnvelope(suggestion.envelope)}
               className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
@@ -209,7 +209,7 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
                   className: "h-4 w-4 text-gray-400",
                 })}
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>

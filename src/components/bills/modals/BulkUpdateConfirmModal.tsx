@@ -22,12 +22,12 @@ const BulkUpdateConfirmModal = ({
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-black text-black">CONFIRM BULK CHANGES</h3>
-            <button
+            <Button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
             >
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -80,18 +80,18 @@ const BulkUpdateConfirmModal = ({
             </div>
 
             <div className="flex gap-3 pt-4">
-              <button
+              <Button
                 onClick={onClose}
                 className="flex-1 bg-gray-200/80 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
               >
                 Back to Edit
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={onConfirm}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-black"
               >
                 Apply Changes
-              </button>
+              </Button>
             </div>
           </div>
         </div>

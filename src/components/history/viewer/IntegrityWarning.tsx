@@ -34,12 +34,12 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
 
             {integrityCheck.details && (
               <div className="space-y-2">
-                <button
+                <Button
                   onClick={toggleIntegrityDetails}
                   className="text-sm text-red-700 hover:text-red-900 underline"
                 >
                   {showIntegrityDetails ? "Hide Details" : "Show Details"}
-                </button>
+                </Button>
 
                 {showIntegrityDetails && (
                   <div className="bg-red-100 p-3 rounded border border-red-200 text-sm">

@@ -9,7 +9,7 @@ interface TabNavigationProps {
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
   return (
     <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
-      <button
+      <Button
         onClick={() => onTabChange("export")}
         className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
           activeTab === "export"
@@ -21,8 +21,8 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
           className: "h-4 w-4 inline mr-2",
         })}
         Export Key
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={() => onTabChange("import")}
         className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
           activeTab === "import"
@@ -34,7 +34,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
           className: "h-4 w-4 inline mr-2",
         })}
         Import Key
-      </button>
+      </Button>
     </div>
   );
 };

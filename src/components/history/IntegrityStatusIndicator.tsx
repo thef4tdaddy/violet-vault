@@ -111,15 +111,15 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
               : "Integrity Issues"}
         </span>
 
-        <button
+        <Button
           onClick={() => setShowDetails(!showDetails)}
           className="p-1 hover:bg-white/50 rounded"
           title="View details"
         >
           {React.createElement(getIcon("Eye"), { className: "h-4 w-4" })}
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={performSecurityScan}
           disabled={isLoading}
           className="p-1 hover:bg-white/50 rounded disabled:opacity-50"
@@ -128,7 +128,7 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           {React.createElement(getIcon("RefreshCw"), {
             className: `h-4 w-4 ${isLoading ? "animate-spin" : ""}`,
           })}
-        </button>
+        </Button>
       </div>
 
       {/* Warnings */}

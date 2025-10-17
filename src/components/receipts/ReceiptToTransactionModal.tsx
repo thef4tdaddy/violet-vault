@@ -90,12 +90,12 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 </p>
               </div>
             </div>
-            <button
+            <Button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
             >
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </button>
+            </Button>
           </div>
 
           {/* Progress Bar */}
@@ -131,7 +131,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-6 border-t-2 border-black">
-            <button
+            <Button
               onClick={step > 1 ? handleBack : onClose}
               className="px-6 py-3 text-gray-700 hover:text-gray-900 glassmorphism backdrop-blur-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold flex items-center"
             >
@@ -140,11 +140,11 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   className: "h-4 w-4 mr-2",
                 })}
               {step > 1 ? "Back" : "Cancel"}
-            </button>
+            </Button>
 
             <div className="flex gap-4">
               {step < 3 ? (
-                <button
+                <Button
                   onClick={handleNext}
                   disabled={!canProceed()}
                   className="px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black flex items-center"
@@ -153,9 +153,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   {React.createElement(getIcon("ArrowRight"), {
                     className: "h-4 w-4 ml-2",
                   })}
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   onClick={handleFormSubmit}
                   disabled={isSubmitting}
                   className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black flex items-center"
@@ -164,7 +164,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   {React.createElement(getIcon("Check"), {
                     className: "h-4 w-4 ml-2",
                   })}
-                </button>
+                </Button>
               )}
             </div>
           </div>

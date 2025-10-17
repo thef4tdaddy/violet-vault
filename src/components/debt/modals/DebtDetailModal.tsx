@@ -47,9 +47,9 @@ const DebtDetailModal = ({
               {debt.creditor} • {debt.type}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         {/* Main Stats */}
@@ -166,13 +166,13 @@ const DebtDetailModal = ({
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
+          <Button
             onClick={onClose}
             className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50"
           >
             Close
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleEdit}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
@@ -180,8 +180,8 @@ const DebtDetailModal = ({
               className: "h-4 w-4 mr-2",
             })}
             Edit Debt
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleDelete}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center justify-center"
           >
@@ -189,7 +189,7 @@ const DebtDetailModal = ({
               className: "h-4 w-4 mr-2",
             })}
             Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>

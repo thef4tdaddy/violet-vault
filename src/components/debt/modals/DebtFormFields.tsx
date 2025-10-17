@@ -66,7 +66,7 @@ const DebtFormFields = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
-          <select
+          <Select
             value={formData.type}
             onChange={(e) => setFormData({ type: e.target.value })}
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -77,7 +77,7 @@ const DebtFormFields = ({
                 {config.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -209,7 +209,7 @@ const DebtFormFields = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Payment Frequency</label>
-          <select
+          <Select
             value={formData.paymentFrequency}
             onChange={(e) => setFormData({ paymentFrequency: e.target.value })}
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -220,7 +220,7 @@ const DebtFormFields = ({
                 {freq.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -271,7 +271,7 @@ const DebtFormFields = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Connect to Existing Bill
             </label>
-            <select
+            <Select
               value={formData.existingBillId || ""}
               onChange={(e) => setFormData({ existingBillId: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -283,7 +283,7 @@ const DebtFormFields = ({
                   {bill.name} - ${bill.amount?.toFixed(2)}
                 </option>
               ))}
-            </select>
+            </Select>
             {errors.existingBillId && (
               <p className="mt-1 text-sm text-red-600">{errors.existingBillId}</p>
             )}
@@ -313,20 +313,20 @@ const DebtFormFields = ({
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-6 border-t">
-        <button
+        <Button
           type="button"
           onClick={onClose}
           className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-medium transition-colors"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={isSubmitting || !canEdit}
           className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors"
         >
           {isSubmitting ? "Saving..." : isEditMode ? "Update Debt" : "Add Debt"}
-        </button>
+        </Button>
       </div>
     </form>
   );

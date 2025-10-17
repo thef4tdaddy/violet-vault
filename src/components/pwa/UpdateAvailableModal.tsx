@@ -67,7 +67,7 @@ const UpdateAvailableModal = () => {
 
         {/* Actions */}
         <div className="space-y-3">
-          <button
+          <Button
             onClick={handleUpdate}
             disabled={isUpdating}
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
@@ -85,15 +85,15 @@ const UpdateAvailableModal = () => {
                 <span>Update Now</span>
               </>
             )}
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={handleDismiss}
             disabled={isUpdating}
             className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Remind Me Later
-          </button>
+          </Button>
         </div>
 
         {/* Update Info */}

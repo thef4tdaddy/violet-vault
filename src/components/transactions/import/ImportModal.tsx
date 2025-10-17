@@ -30,9 +30,9 @@ const ImportModal = ({
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Import Transactions</h3>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+          <Button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         {importStep === 1 && <FileUploader onFileUpload={onFileUpload} />}

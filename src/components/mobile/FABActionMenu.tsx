@@ -49,7 +49,7 @@ const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
       <span className="bg-black/75 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
         {action.label}
       </span>
-      <button
+      <Button
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={buttonClasses.join(" ")}
@@ -63,7 +63,7 @@ const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
               className: "h-4 w-4 animate-spin",
             })
           : React.createElement(getIcon(action.icon), { className: "h-4 w-4" })}
-      </button>
+      </Button>
     </div>
   );
 };

@@ -141,19 +141,19 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                     </span>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg"
                 >
                   {React.createElement(getIcon("X"), {
                     className: "h-5 w-5",
                   })}
-                </button>
+                </Button>
               </div>
 
               {/* Tabs */}
               <div className="flex space-x-8 mt-6">
-                <button
+                <Button
                   onClick={() => setActiveTab("rules")}
                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === "rules"
@@ -162,8 +162,8 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                   }`}
                 >
                   Rules ({rules.length})
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setActiveTab("history")}
                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === "history"
@@ -172,7 +172,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                   }`}
                 >
                   History ({executionHistory.length})
-                </button>
+                </Button>
               </div>
             </div>
 

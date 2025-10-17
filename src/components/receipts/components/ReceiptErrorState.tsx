@@ -17,14 +17,14 @@ const ReceiptErrorState = ({ error, onRetry }) => {
         </p>
       </div>
       <p className="text-red-900 text-sm mt-2">{error}</p>
-      <button
+      <Button
         onClick={onRetry}
         className="glassmorphism mt-3 px-4 py-2 rounded-lg border-2 border-black bg-red-200/40 hover:bg-red-300/40 transition-colors backdrop-blur-sm"
       >
         <span className="font-black text-black text-sm">
           <span className="text-base">T</span>RY <span className="text-base">A</span>GAIN
         </span>
-      </button>
+      </Button>
     </div>
   );
 };

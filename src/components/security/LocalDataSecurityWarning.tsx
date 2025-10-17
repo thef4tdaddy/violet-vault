@@ -57,13 +57,13 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
             </div>
           </div>
 
-          <button
+          <Button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             title="Close"
           >
             {React.createElement(getIcon("X"), { className: "w-6 h-6" })}
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -190,19 +190,19 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
           </div>
 
           <div className="flex space-x-3">
-            <button
+            <Button
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg border-2 border-gray-300 dark:border-gray-500 transition-colors"
             >
               Remind Me Later
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={handleAcknowledge}
               className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg border-2 border-blue-700 hover:border-blue-800 transition-colors"
             >
               I Understand
-            </button>
+            </Button>
           </div>
         </div>
       </div>

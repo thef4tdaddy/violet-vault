@@ -123,12 +123,12 @@ const OfflineStatusIndicator = () => {
               })}
               Connection Status
             </h3>
-            <button
+            <Button
               onClick={() => setShowDetails(false)}
               className="text-gray-400 hover:text-gray-600"
             >
               {React.createElement(getIcon("X"), { className: "w-4 h-4" })}
-            </button>
+            </Button>
           </div>
 
           {/* Connection Info */}
@@ -225,7 +225,7 @@ const OfflineStatusIndicator = () => {
           {/* Actions */}
           <div className="mt-4 pt-3 border-t border-gray-200 flex space-x-2">
             {syncStatus.pendingCount > 0 && isOnline && (
-              <button
+              <Button
                 onClick={() => {
                   backgroundSyncManager.syncPendingOperations();
                   setShowDetails(false);
@@ -233,10 +233,10 @@ const OfflineStatusIndicator = () => {
                 className="flex-1 bg-blue-600 text-white text-xs font-medium py-2 px-3 rounded border border-black shadow-sm hover:bg-blue-700 transition-colors"
               >
                 Sync Now
-              </button>
+              </Button>
             )}
 
-            <button
+            <Button
               onClick={async () => {
                 // Clear any failed operations after confirmation
                 const confirmed = await confirm({
@@ -255,7 +255,7 @@ const OfflineStatusIndicator = () => {
               className="flex-1 bg-gray-600 text-white text-xs font-medium py-2 px-3 rounded border border-black shadow-sm hover:bg-gray-700 transition-colors"
             >
               Clear Queue
-            </button>
+            </Button>
           </div>
         </div>
       )}

@@ -17,12 +17,12 @@ const SecurityActionsSection: React.FC<SecurityActionsSectionProps> = ({ onClose
             💾 Security settings are automatically saved
           </div>
         </div>
-        <button
+        <Button
           onClick={onClose}
           className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-black uppercase tracking-wide shadow-lg hover:shadow-xl border-2 border-black transition-all hover:from-blue-600 hover:to-purple-700"
         >
           ✅ DONE
-        </button>
+        </Button>
       </div>
     </div>
   );

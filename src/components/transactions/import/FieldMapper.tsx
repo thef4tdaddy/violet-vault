@@ -22,7 +22,7 @@ const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImpo
                   {field.charAt(0).toUpperCase() + field.slice(1)}
                   {["date", "description", "amount"].includes(field) && " *"}
                 </label>
-                <select
+                <Select
                   value={fieldMapping[field] || ""}
                   onChange={(e) =>
                     setFieldMapping({
@@ -38,7 +38,7 @@ const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImpo
                       {header}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             ))}
           </div>
@@ -83,19 +83,19 @@ const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImpo
       </div>
 
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={onBack}
           className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onImport}
           disabled={!isValid}
           className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Import Transactions
-        </button>
+        </Button>
       </div>
     </div>
   );

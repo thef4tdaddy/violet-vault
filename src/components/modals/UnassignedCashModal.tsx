@@ -126,13 +126,13 @@ const UnassignedCashModal = () => {
               )}
             </p>
           </div>
-          <button
+          <Button
             onClick={closeUnassignedCashModal}
             disabled={isProcessing}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
           >
             {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-          </button>
+          </Button>
         </div>
 
         {/* Distribution Summary */}
@@ -188,7 +188,7 @@ const UnassignedCashModal = () => {
 
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
-          <button
+          <Button
             onClick={distributeBillPriority}
             disabled={isProcessing || envelopes.length === 0}
             className="btn btn-primary border-2 border-black flex items-center text-sm disabled:opacity-50"
@@ -198,8 +198,8 @@ const UnassignedCashModal = () => {
               className: "h-4 w-4 mr-2",
             })}
             Smart Bills First
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={distributeEqually}
             disabled={isProcessing || envelopes.length === 0}
             className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
@@ -208,8 +208,8 @@ const UnassignedCashModal = () => {
               className: "h-4 w-4 mr-2",
             })}
             Distribute Equally
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={distributeProportionally}
             disabled={isProcessing || envelopes.length === 0}
             className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
@@ -218,8 +218,8 @@ const UnassignedCashModal = () => {
               className: "h-4 w-4 mr-2",
             })}
             Distribute Proportionally
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={clearDistributions}
             disabled={isProcessing || !hasDistributions}
             className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
@@ -228,7 +228,7 @@ const UnassignedCashModal = () => {
               className: "h-4 w-4 mr-2",
             })}
             Clear All
-          </button>
+          </Button>
         </div>
 
         {/* Envelope List */}
@@ -281,14 +281,14 @@ const UnassignedCashModal = () => {
 
         {/* Footer Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
-          <button
+          <Button
             onClick={closeUnassignedCashModal}
             disabled={isProcessing}
             className="flex-1 btn btn-secondary disabled:opacity-50"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={applyDistribution}
             disabled={!isValidDistribution || isProcessing}
             className="flex-1 btn btn-primary border-2 border-black disabled:opacity-50 flex items-center justify-center"
@@ -308,7 +308,7 @@ const UnassignedCashModal = () => {
                 Distribute ${totalDistributed.toFixed(2)}
               </>
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Error Message */}

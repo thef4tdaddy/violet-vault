@@ -4,10 +4,10 @@ import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
 const UserButton = memo(({ onClick, icon: Icon, label }) => (
-  <button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
+  <Button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
     {Icon && React.createElement(Icon, { className: "h-4 w-4 mr-2" })}
     {label}
-  </button>
+  </Button>
 ));
 
 const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
@@ -23,7 +23,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
     <>
       <div className="flex items-center gap-3">
         <div className="relative">
-          <button
+          <Button
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 ring-1 ring-gray-800/10 backdrop-blur-sm hover:bg-white/20 transition-all"
           >
@@ -40,7 +40,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
             {React.createElement(getIcon("ChevronDown"), {
               className: `h-4 w-4 text-gray-500 ml-2 transition-transform ${showDropdown ? "rotate-180" : ""}`,
             })}
-          </button>
+          </Button>
 
           {showDropdown && (
             <>
@@ -48,7 +48,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
               {/* Dropdown Menu */}
               <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-xl shadow-xl border border-gray-200 ring-1 ring-gray-800/10 py-2 min-w-[180px]">
-                <button
+                <Button
                   onClick={() => {
                     setShowProfileModal(true);
                     setShowDropdown(false);
@@ -59,8 +59,8 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                     className: "h-4 w-4 mr-3",
                   })}
                   Profile Settings
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     setShowKeyManagement(true);
                     setShowDropdown(false);
@@ -71,9 +71,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                     className: "h-4 w-4 mr-3",
                   })}
                   Backup Key
-                </button>
+                </Button>
                 <div className="border-t border-gray-100 my-1"></div>
-                <button
+                <Button
                   onClick={() => {
                     onUserChange?.();
                     setShowDropdown(false);
@@ -84,7 +84,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                     className: "h-4 w-4 mr-3",
                   })}
                   Switch User
-                </button>
+                </Button>
               </div>
             </>
           )}

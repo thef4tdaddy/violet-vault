@@ -90,7 +90,7 @@ const EnvelopeItem = ({
         onClick={withHapticFeedback(() => onSelect?.(envelope.id), "light")}
       >
         {/* Mobile collapse button */}
-        <button
+        <Button
           onClick={withHapticFeedback((e) => {
             e.stopPropagation();
             setIsCollapsed(!isCollapsed);
@@ -104,7 +104,7 @@ const EnvelopeItem = ({
           {React.createElement(getIcon(isCollapsed ? "ChevronRight" : "ChevronDown"), {
             className: "h-4 w-4",
           })}
-        </button>
+        </Button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
             {/* Color indicator */}
@@ -129,7 +129,7 @@ const EnvelopeItem = ({
           </div>
 
           <div className="flex gap-1">
-            <button
+            <Button
               onClick={withHapticFeedback((e) => {
                 e.stopPropagation();
                 onEdit?.(envelope);
@@ -140,8 +140,8 @@ const EnvelopeItem = ({
               )}
             >
               {React.createElement(getIcon("Edit"), { className: "h-4 w-4" })}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={withHapticFeedback((e) => {
                 e.stopPropagation();
                 onViewHistory?.(envelope);
@@ -154,7 +154,7 @@ const EnvelopeItem = ({
               {React.createElement(getIcon("History"), {
                 className: "h-4 w-4",
               })}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

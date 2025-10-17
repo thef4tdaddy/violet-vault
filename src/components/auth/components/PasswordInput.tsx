@@ -34,7 +34,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         disabled={disabled}
         required
       />
-      <button
+      <Button
         type="button"
         onClick={onToggleVisibility}
         className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-purple-600"
@@ -48,7 +48,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           : React.createElement(getIcon("Eye"), {
               className: "h-5 w-5",
             })}
-      </button>
+      </Button>
     </div>
   );
 };

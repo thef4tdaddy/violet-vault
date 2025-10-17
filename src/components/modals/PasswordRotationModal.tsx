@@ -48,20 +48,20 @@ const PasswordRotationModal = ({
 
           <div className="flex gap-3">
             {onClose && (
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
                 className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Cancel
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               type="submit"
               className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors"
             >
               Update Password
-            </button>
+            </Button>
           </div>
         </form>
       </div>

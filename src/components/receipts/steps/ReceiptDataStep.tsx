@@ -63,7 +63,7 @@ const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => 
 
         <div>
           <label className="block text-sm font-bold text-gray-900 mb-2">CATEGORY</label>
-          <select
+          <Select
             value={transactionForm.category}
             onChange={(e) => handleFormChange("category", e.target.value)}
             className="w-full px-4 py-2 border-2 border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-medium"
@@ -76,7 +76,7 @@ const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => 
             <option value="entertainment">Entertainment</option>
             <option value="utilities">Utilities</option>
             <option value="other">Other</option>
-          </select>
+          </Select>
         </div>
       </div>
 

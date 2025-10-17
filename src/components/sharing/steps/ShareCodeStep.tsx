@@ -27,13 +27,13 @@ const ShareCodeStep = ({ shareCode, setShareCode, onValidate, onQRScan, isValida
               className="flex-1 px-4 py-3 bg-white border-2 border-black rounded-lg text-sm text-center tracking-wide lowercase"
               maxLength={50}
             />
-            <button
+            <Button
               onClick={onQRScan}
               className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-black transition-colors border-2 border-black"
               title="Scan QR Code"
             >
               {renderIcon("QrCode", "h-5 w-5")}
-            </button>
+            </Button>
           </div>
 
           <p className="text-xs text-purple-900">Enter 4 BIP39 words or scan a QR code</p>
@@ -41,7 +41,7 @@ const ShareCodeStep = ({ shareCode, setShareCode, onValidate, onQRScan, isValida
       </div>
 
       <div className="text-center">
-        <button
+        <Button
           onClick={handleSubmit}
           disabled={!shareCode.trim() || isValidating}
           className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg font-black transition-colors border-2 border-black disabled:cursor-not-allowed"
@@ -54,7 +54,7 @@ const ShareCodeStep = ({ shareCode, setShareCode, onValidate, onQRScan, isValida
           ) : (
             "Validate Share Code"
           )}
-        </button>
+        </Button>
       </div>
     </>
   );

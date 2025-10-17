@@ -25,18 +25,18 @@ const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) =>
             <span className="font-medium">Delete "{transaction.description}"?</span>
           </div>
           <div className="flex gap-2 flex-shrink-0">
-            <button
+            <Button
               onClick={onCancel}
               className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onConfirm}
               className="px-3 py-1 text-sm bg-red-600 text-white hover:bg-red-700 rounded transition-colors"
             >
               Delete
-            </button>
+            </Button>
           </div>
         </div>
       </td>

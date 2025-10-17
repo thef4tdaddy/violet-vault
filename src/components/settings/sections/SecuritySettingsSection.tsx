@@ -13,7 +13,7 @@ const SecuritySettingsSection = ({
       <div className="space-y-4">
         {securityManager && (
           <>
-            <button
+            <Button
               onClick={securityManager.lockApp}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
@@ -24,9 +24,9 @@ const SecuritySettingsSection = ({
                 <p className="font-medium text-gray-900">Lock Application</p>
                 <p className="text-sm text-gray-500">Immediately lock the app</p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={onOpenSecuritySettings}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
@@ -37,9 +37,9 @@ const SecuritySettingsSection = ({
                 <p className="font-medium text-gray-900">Advanced Security</p>
                 <p className="text-sm text-gray-500">Auto-lock, logging, and privacy</p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={onShowLocalDataSecurity}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
@@ -52,7 +52,7 @@ const SecuritySettingsSection = ({
                   View information about local data encryption
                 </p>
               </div>
-            </button>
+            </Button>
           </>
         )}
       </div>

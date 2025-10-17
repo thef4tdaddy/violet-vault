@@ -41,7 +41,7 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
       {/* Category */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-        <select
+        <Select
           value={formData.category || ""}
           onChange={(e) => onUpdateField("category", e.target.value)}
           disabled={!canEdit}
@@ -55,7 +55,7 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
               {category}
             </option>
           ))}
-        </select>
+        </Select>
         {errors.category && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
             {React.createElement(getIcon("AlertCircle"), {

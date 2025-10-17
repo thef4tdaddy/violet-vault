@@ -109,14 +109,14 @@ const DeleteEnvelopeModal = ({
           </div>
 
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={handleClose}
               className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
               disabled={isDeleting}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleConfirm}
               className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center"
               disabled={isDeleting}
@@ -125,7 +125,7 @@ const DeleteEnvelopeModal = ({
                 className: "h-4 w-4 mr-2",
               })}
               {isDeleting ? "Deleting..." : "Delete Envelope"}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

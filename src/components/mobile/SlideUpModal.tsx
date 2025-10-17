@@ -184,7 +184,7 @@ const SlideUpModal = ({
             <h2 id="slide-modal-title" className="font-bold text-lg text-black">
               {title}
             </h2>
-            <button
+            <Button
               onClick={closeFeedback.onClick(onClose)}
               onTouchStart={closeFeedback.onTouchStart}
               className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${closeFeedback.className}`}
@@ -193,7 +193,7 @@ const SlideUpModal = ({
               {React.createElement(getIcon("X"), {
                 className: "h-5 w-5 text-gray-500",
               })}
-            </button>
+            </Button>
           </div>
         )}
 

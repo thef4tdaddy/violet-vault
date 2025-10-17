@@ -211,14 +211,14 @@ const SummaryCard = memo(
     );
 
     return clickable ? (
-      <button
+      <Button
         onClick={onClick}
         className={`${baseClasses} ${clickableClasses} text-left w-full`}
         disabled={!onClick}
         data-tour={dataTour}
       >
         {cardContent}
-      </button>
+      </Button>
     ) : (
       <div className={baseClasses} data-tour={dataTour}>
         {cardContent}

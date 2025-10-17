@@ -31,7 +31,7 @@ const BillConnectionSelector = ({
           🔗 Connect to Bill
         </label>
 
-        <select
+        <Select
           value={selectedBillId || ""}
           onChange={(e) => !disabled && onBillSelection(e.target.value)}
           disabled={disabled}
@@ -48,7 +48,7 @@ const BillConnectionSelector = ({
               ({bill.frequency || "monthly"})
             </option>
           ))}
-        </select>
+        </Select>
 
         {/* Connected Bill Display */}
         {selectedBill && (
@@ -99,13 +99,13 @@ const BillConnectionSelector = ({
                     Create a new bill that will be automatically connected to this envelope
                   </p>
                   {!disabled && (
-                    <button
+                    <Button
                       type="button"
                       onClick={onCreateBill}
                       className="mt-2 px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                     >
                       Create Bill
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

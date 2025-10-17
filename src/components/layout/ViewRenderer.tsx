@@ -122,7 +122,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
           </div>
 
           <div className="flex flex-row gap-3">
-            <button
+            <Button
               onClick={() => setActiveView("automation")}
               className="btn btn-secondary border-2 border-black flex items-center"
               title="Manage automatic envelope funding rules"
@@ -131,7 +131,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
                 className: "h-4 w-4 mr-2",
               })}
               Auto-Funding
-            </button>
+            </Button>
           </div>
         </div>
 

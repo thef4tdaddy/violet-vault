@@ -23,12 +23,12 @@ const ReceiptScannerHeader = ({ onClose }) => {
           </p>
         </div>
       </div>
-      <button
+      <Button
         onClick={onClose}
         className="glassmorphism p-2 rounded-lg border-2 border-black hover:bg-purple-200/40 transition-colors"
       >
         <span className="text-black font-bold">×</span>
-      </button>
+      </Button>
     </div>
   );
 };

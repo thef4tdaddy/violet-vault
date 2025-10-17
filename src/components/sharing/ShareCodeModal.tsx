@@ -171,12 +171,12 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
             <h2 className="text-xl font-black text-black">
               <span className="text-2xl">S</span>HARE <span className="text-2xl">B</span>UDGET
             </h2>
-            <button
+            <Button
               onClick={onClose}
               className="text-gray-500 hover:text-black transition-colors p-1"
             >
               {renderIcon("X", "h-6 w-6")}
-            </button>
+            </Button>
           </div>
           <p className="text-sm text-purple-900 mt-2">
             Let others join your budget with a secure share code
@@ -221,7 +221,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                     readOnly
                     className="flex-1 px-4 py-3 bg-gray-50 border-2 border-black rounded-lg text-lg font-mono text-center tracking-wider"
                   />
-                  <button
+                  <Button
                     onClick={copyShareCode}
                     className={`px-4 py-3 rounded-lg font-black transition-colors border-2 border-black ${
                       copied
@@ -230,7 +230,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                     }`}
                   >
                     {copied ? renderIcon("Check", "h-5 w-5") : renderIcon("Copy", "h-5 w-5")}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -246,12 +246,12 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                     readOnly
                     className="flex-1 px-4 py-2 bg-gray-50 border-2 border-black rounded-lg text-sm"
                   />
-                  <button
+                  <Button
                     onClick={copyShareUrl}
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-black transition-colors border-2 border-black"
                   >
                     {renderIcon("Copy", "h-4 w-4")}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -285,31 +285,31 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
               {/* Actions */}
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={generateShareCode}
                   className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black"
                 >
                   {renderIcon("RefreshCw", "h-4 w-4 mr-2")}
                   NEW CODE
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={generateNewCode}
                   className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black"
                 >
                   {renderIcon("Shuffle", "h-4 w-4 mr-2")}
                   NEW CODE
-                </button>
+                </Button>
               </div>
             </>
           ) : (
             <div className="text-center py-8">
-              <button
+              <Button
                 onClick={generateShareCode}
                 className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-black transition-colors border-2 border-black"
               >
                 {renderIcon("Share", "h-5 w-5 mr-2")}
                 GENERATE SHARE CODE
-              </button>
+              </Button>
             </div>
           )}
         </div>

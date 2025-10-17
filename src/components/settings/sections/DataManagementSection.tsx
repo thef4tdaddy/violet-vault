@@ -22,7 +22,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
       <h3 className="text-lg font-semibold text-gray-900">Data Management</h3>
 
       <div className="space-y-4">
-        <button
+        <Button
           onClick={onOpenActivityFeed}
           className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
@@ -33,9 +33,9 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
             <p className="font-medium text-gray-900">Activity History</p>
             <p className="text-sm text-gray-500">View recent budget activities and changes</p>
           </div>
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={onExport}
           className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
@@ -46,7 +46,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
             <p className="font-medium text-gray-900">Export Data</p>
             <p className="text-sm text-gray-500">Download your budget data</p>
           </div>
-        </button>
+        </Button>
 
         <div className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
           <input
@@ -68,7 +68,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
         </div>
 
         {getLocalOnlyMode() && (
-          <button
+          <Button
             onClick={onSync}
             className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
           >
@@ -79,7 +79,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
               <p className="font-medium text-blue-900">Sync to Cloud</p>
               <p className="text-sm text-blue-600">Upload your data to cloud storage</p>
             </div>
-          </button>
+          </Button>
         )}
 
         {/* Sync Health Tools */}
@@ -109,7 +109,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
 
           <div className="space-y-3">
             {/* Always Available - Refresh Sync Status */}
-            <button
+            <Button
               onClick={async () => {
                 logger.debug("🔄 TESTING: window.getQuickSyncStatus");
                 try {
@@ -128,12 +128,12 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
                 <p className="font-medium text-green-900">Refresh Sync Status</p>
                 <p className="text-xs text-green-700">Check current sync health</p>
               </div>
-            </button>
+            </Button>
 
             {/* Development Mode Only - Advanced Debug Tools */}
             {isDevelopmentMode() && (
               <>
-                <button
+                <Button
                   onClick={async () => {
                     logger.debug("🚀 TESTING: window.runMasterSyncValidation");
                     try {
@@ -154,9 +154,9 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
                       Comprehensive sync system check (Dev Only)
                     </p>
                   </div>
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={async () => {
                     logger.debug("🧹 TESTING: window.forceCloudDataReset");
                     const confirmed = await confirm({
@@ -185,7 +185,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
                       Emergency recovery: clear and re-upload (Dev Only)
                     </p>
                   </div>
-                </button>
+                </Button>
               </>
             )}
 

@@ -192,7 +192,7 @@ const PatchNotesModal = () => {
 
         {/* Actions */}
         <div className="space-y-3">
-          <button
+          <Button
             onClick={handleViewFullNotes}
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2"
           >
@@ -200,14 +200,14 @@ const PatchNotesModal = () => {
               className: "w-4 h-4",
             })}
             <span>View Full Release Notes</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={handleClose}
             className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors"
           >
             Continue Using VioletVault
-          </button>
+          </Button>
         </div>
 
         {/* Footer */}

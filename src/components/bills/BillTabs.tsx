@@ -5,7 +5,7 @@ const BillTabs = ({ activeTab, onTabChange, bills }) => {
   return (
     <div className="border-b border-gray-200">
       <nav className="flex">
-        <button
+        <Button
           onClick={() => onTabChange("monthly")}
           className={`px-6 py-4 text-sm font-medium border-b-2 ${
             activeTab === "monthly"
@@ -17,8 +17,8 @@ const BillTabs = ({ activeTab, onTabChange, bills }) => {
             className: "h-4 w-4 inline mr-2",
           })}
           Monthly Bills ({bills.monthly?.length || 0})
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => onTabChange("longerTerm")}
           className={`px-6 py-4 text-sm font-medium border-b-2 ${
             activeTab === "longerTerm"
@@ -30,7 +30,7 @@ const BillTabs = ({ activeTab, onTabChange, bills }) => {
             className: "h-4 w-4 inline mr-2",
           })}
           Longer Term Bills ({bills.longerTerm?.length || 0})
-        </button>
+        </Button>
       </nav>
     </div>
   );

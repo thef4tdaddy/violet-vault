@@ -96,7 +96,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
             </h2>
             <p className="text-gray-600 mt-1">Generate comprehensive analytics reports</p>
           </div>
-          <button
+          <Button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
             disabled={isExporting}
@@ -104,7 +104,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
             {React.createElement(getIcon("X"), {
               className: "h-5 w-5",
             })}
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
@@ -146,7 +146,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Templates</h3>
                 <div className="grid grid-cols-1 gap-3">
                   {reportTemplates.map((template) => (
-                    <button
+                    <Button
                       key={template.key}
                       onClick={() => handleTemplateSelect(template.key)}
                       className="text-left border border-gray-200 rounded-lg p-3 hover:border-gray-300 hover:bg-gray-50 transition-colors"
@@ -164,7 +164,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                           </span>
                         ))}
                       </div>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -266,14 +266,14 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
           )}
 
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={onClose}
               className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
               disabled={isExporting}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onExportClick}
               disabled={isExporting}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
@@ -291,7 +291,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                   Export Report
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

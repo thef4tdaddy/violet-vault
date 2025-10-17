@@ -3,7 +3,7 @@ import React from "react";
 const TransferEnvelopeSelect = ({ transferForm, setTransferForm, envelopes }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">Transfer to Envelope *</label>
-    <select
+    <Select
       value={transferForm.envelopeId}
       onChange={(e) =>
         setTransferForm({
@@ -21,7 +21,7 @@ const TransferEnvelopeSelect = ({ transferForm, setTransferForm, envelopes }) =>
           {envelope.currentAmount?.toFixed(2) || "0.00"})
         </option>
       ))}
-    </select>
+    </Select>
   </div>
 );
 

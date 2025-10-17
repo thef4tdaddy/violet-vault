@@ -7,7 +7,7 @@ const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editing
       <label className="block text-sm font-semibold text-purple-900 mb-2">Color</label>
       <div className="flex gap-2 flex-wrap">
         {ACCOUNT_COLORS.map((color) => (
-          <button
+          <Button
             key={color}
             type="button"
             onClick={() => setAccountForm({ ...accountForm, color })}

@@ -36,7 +36,7 @@ const EnvelopeHeader = ({
           {React.createElement(getIcon("Filter"), {
             className: "h-4 w-4 text-gray-500",
           })}
-          <select
+          <Select
             value={filterOptions.envelopeType}
             onChange={(e) =>
               setFilterOptions((prev) => ({
@@ -49,9 +49,9 @@ const EnvelopeHeader = ({
             <option value="all">All Types</option>
             <option value={ENVELOPE_TYPES.BILL}>Bills</option>
             <option value={ENVELOPE_TYPES.VARIABLE}>Variable</option>
-          </select>
+          </Select>
 
-          <select
+          <Select
             value={filterOptions.sortBy}
             onChange={(e) =>
               setFilterOptions((prev) => ({
@@ -66,9 +66,9 @@ const EnvelopeHeader = ({
             <option value="amount_desc">Amount High → Low</option>
             <option value="name">Name A → Z</option>
             <option value="status">Status (Issues First)</option>
-          </select>
+          </Select>
 
-          <select
+          <Select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
             className="px-2 py-1 border border-gray-300 rounded text-xs"
@@ -76,7 +76,7 @@ const EnvelopeHeader = ({
           >
             <option value="overview">Compact Cards</option>
             <option value="detailed">Expanded Cards</option>
-          </select>
+          </Select>
 
           <label className="flex items-center text-xs">
             <input
@@ -94,14 +94,14 @@ const EnvelopeHeader = ({
           </label>
         </div>
 
-        <button
+        <Button
           onClick={() => setShowCreateModal(true)}
           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center text-sm"
           data-tour="add-envelope"
         >
           {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
           Add Envelope
-        </button>
+        </Button>
       </div>
     </div>
   );

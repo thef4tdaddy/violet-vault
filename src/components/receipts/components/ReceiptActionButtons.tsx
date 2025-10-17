@@ -8,15 +8,15 @@ import { hasMinimumExtractedData } from "../../../utils/receipts/receiptHelpers.
 const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }) => {
   return (
     <div className="flex gap-3 pt-4">
-      <button
+      <Button
         onClick={onReset}
         className="glassmorphism flex-1 px-6 py-3 rounded-lg transition-colors border-2 border-black bg-gray-200/40 hover:bg-gray-300/40 backdrop-blur-sm"
       >
         <span className="font-black text-black">
           <span className="text-base">S</span>CAN <span className="text-base">A</span>NOTHER
         </span>
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={onConfirm}
         className="glassmorphism flex-1 px-6 py-3 rounded-lg transition-colors border-2 border-black bg-purple-600/80 hover:bg-purple-700/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={!hasMinimumExtractedData(extractedData)}
@@ -24,7 +24,7 @@ const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }) => {
         <span className="font-black text-white">
           <span className="text-base">C</span>REATE <span className="text-base">T</span>RANSACTION
         </span>
-      </button>
+      </Button>
     </div>
   );
 };
