@@ -1,11 +1,17 @@
 import React from "react";
 import { getIcon } from "../../../utils/icons";
 
+interface ClearConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
 /**
  * Clear security events confirmation modal
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const ClearConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+const ClearConfirmationModal: React.FC<ClearConfirmationModalProps> = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
