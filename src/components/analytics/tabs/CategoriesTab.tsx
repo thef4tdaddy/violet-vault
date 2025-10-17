@@ -9,6 +9,7 @@ const CategoriesTab = ({ categoryBreakdown }) => {
   return (
     <DistributionPieChartWithDetails
       title="Spending by Category"
+      subtitle=""
       data={categoryBreakdown || []}
       dataKey="amount"
       nameKey="name"

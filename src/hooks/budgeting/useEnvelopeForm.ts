@@ -65,7 +65,7 @@ const useEnvelopeForm = ({
             }));
           } else if (compatibility.warnings.length > 0) {
             compatibility.warnings.forEach((warning) => {
-              globalToast.showWarning(warning, "Type Change Warning");
+              globalToast.showWarning(warning, "Type Change Warning", 6000);
             });
           }
         }
@@ -111,7 +111,7 @@ const useEnvelopeForm = ({
 
       // Validate form
       if (!validateForm()) {
-        globalToast.showError("Please fix the form errors before saving", "Validation Error");
+        globalToast.showError("Please fix the form errors before saving", "Validation Error", 8000);
         return false;
       }
 
@@ -129,7 +129,7 @@ const useEnvelopeForm = ({
       return true;
     } catch (error) {
       logger.error("Error saving envelope", error);
-      globalToast.showError(error.message || "Failed to save envelope", "Save Error");
+      globalToast.showError(error.message || "Failed to save envelope", "Save Error", 8000);
       return false;
     } finally {
       setIsLoading(false);

@@ -108,7 +108,7 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
   const handleReconcileTransaction = useCallback(
     (newTransaction, onSuccess) => {
       if (!newTransaction.amount || !newTransaction.description.trim()) {
-        globalToast.showError("Please enter amount and description", "Required Fields");
+        globalToast.showError("Please enter amount and description", "Required Fields", 8000);
         return false;
       }
 

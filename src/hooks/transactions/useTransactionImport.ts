@@ -39,7 +39,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
       try {
         await clearExistingData();
       } catch {
-        globalToast.showError("Failed to clear existing data. Import cancelled.", "Clear Failed");
+        globalToast.showError("Failed to clear existing data. Import cancelled.", "Clear Failed", 8000);
         return;
       }
     }
@@ -69,7 +69,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
 
     // Enhanced success message including auto-funding results
     const message = generateSuccessMessage(processedTransactions, importData, autoFundingPromises);
-    globalToast.showInfo(message, "Import Update");
+    globalToast.showInfo(message, "Import Update", 5000);
   };
 
   const resetImport = () => {

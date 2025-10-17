@@ -47,7 +47,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
       setEditingRule(null);
     } catch (error) {
       logger.error("Failed to save rule", error);
-      globalToast.showError("Failed to save rule: " + error.message, "Rule Save Failed");
+      globalToast.showError("Failed to save rule: " + error.message, "Rule Save Failed", 8000);
     }
   };
 
@@ -65,7 +65,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         deleteRule(ruleId);
       } catch (error) {
         logger.error("Failed to delete rule", error);
-        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed");
+        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed", 8000);
       }
     }
   };
@@ -83,17 +83,14 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
     setIsExecuting(true);
     try {
-      const context = {
-        trigger: TRIGGER_TYPES.MANUAL,
+      const triggerData = {
         currentDate: new Date().toISOString(),
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          transactions: budget.allTransactions || [],
-        },
+        envelopes: budget.envelopes || [],
+        unassignedCash: budget.unassignedCash || 0,
+        transactions: budget.allTransactions || [],
       };
 
-      const result = await executeRules(context, budget);
+      const result = await executeRules(TRIGGER_TYPES.MANUAL, triggerData);
 
       if (result.success) {
         const totalFunded = result.execution.totalFunded || 0;
@@ -102,20 +99,22 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         if (totalFunded > 0) {
           globalToast.showSuccess(
             `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
-            "Auto-Funding Complete"
+            "Auto-Funding Complete",
+            5000
           );
         } else {
           globalToast.showWarning(
             "Rules executed but no funds were transferred. Check your rules and available balances.",
-            "No Funds Transferred"
+            "No Funds Transferred",
+            6000
           );
         }
       } else {
-        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed");
+        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed", 8000);
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed");
+      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed", 8000);
     } finally {
       setIsExecuting(false);
     }

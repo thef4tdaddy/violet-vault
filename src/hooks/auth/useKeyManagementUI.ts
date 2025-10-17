@@ -121,7 +121,7 @@ export const useKeyManagementOperations = () => {
   const validateImportRequirements = useCallback(
     (keyFileData, importPassword, vaultPassword, validation) => {
       if (!validation.valid) {
-        globalToast.showError(`Invalid key file: ${validation.error}`, "Invalid Key File");
+        globalToast.showError(`Invalid key file: ${validation.error}`, "Invalid Key File", 8000);
         return false;
       }
 
@@ -162,7 +162,7 @@ export const useKeyManagementOperations = () => {
 
   const handleImportError = useCallback((err) => {
     logger.error("Import failed:", err);
-    globalToast.showError("Import failed: " + (err.message || "Unknown error"), "Import Failed");
+    globalToast.showError("Import failed: " + (err.message || "Unknown error"), "Import Failed", 8000);
   }, []);
 
   const handleOperationError = useCallback((operation, err) => {

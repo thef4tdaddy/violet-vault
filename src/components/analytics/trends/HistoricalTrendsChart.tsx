@@ -48,7 +48,7 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
                 dataKey="net"
                 stroke={CHART_COLORS.NET}
                 strokeWidth={3}
-                strokeDasharray={(entry) => (entry?.forecast ? "5 5" : "none")}
+                strokeDasharray="none"
                 name="Net Amount"
               />
             </ComposedChart>

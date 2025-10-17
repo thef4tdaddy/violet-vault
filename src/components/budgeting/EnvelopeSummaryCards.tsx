@@ -57,6 +57,7 @@ const EnvelopeSummaryCards = ({ totals = {}, _unassignedCash = 0 }) => {
           subtext={card.subtext}
           color={card.color}
           alert={card.alert}
+          onClick={() => {}}
         />
       ))}
     </div>

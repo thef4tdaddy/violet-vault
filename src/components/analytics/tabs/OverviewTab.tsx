@@ -11,18 +11,25 @@ const OverviewTab = ({ monthlyTrends, envelopeSpending }) => {
       {/* Monthly Cash Flow */}
       <CashFlowChart
         title="Monthly Cash Flow"
+        subtitle=""
         data={(monthlyTrends || []).filter(Boolean)}
         height={300}
+        actions={null}
+        formatTooltip={undefined}
       />
 
       {/* Top Spending Envelopes */}
       <DistributionPieChart
         title="Top Spending Envelopes"
+        subtitle=""
         data={(envelopeSpending || []).filter(Boolean).slice(0, 8)}
         dataKey="amount"
         nameKey="name"
         height={300}
         emptyMessage="No envelope spending data available"
+        actions={null}
+        formatTooltip={undefined}
+        labelFormatter={undefined}
       />
     </div>
   );

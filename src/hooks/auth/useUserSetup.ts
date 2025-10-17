@@ -136,7 +136,7 @@ export const useUserSetup = (onSetupComplete) => {
     if (isReturningUser) {
       // For returning users, try to login directly
       if (!masterPassword) {
-        globalToast.showError("Please enter your password", "Password Required");
+        globalToast.showError("Please enter your password", "Password Required", 8000);
         return;
       }
 
@@ -168,7 +168,7 @@ export const useUserSetup = (onSetupComplete) => {
           return; // Don't show generic error toast
         }
 
-        globalToast.showError("Incorrect password. Please try again.", "Login Failed");
+        globalToast.showError("Incorrect password. Please try again.", "Login Failed", 8000);
       } finally {
         setIsLoading(false);
       }
@@ -193,7 +193,7 @@ export const useUserSetup = (onSetupComplete) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
-      globalToast.showError("Please fill in both password and name", "Required Fields");
+      globalToast.showError("Please fill in both password and name", "Required Fields", 8000);
       return;
     }
 
@@ -209,7 +209,7 @@ export const useUserSetup = (onSetupComplete) => {
       logger.debug("✅ Moved to Step 3 (Share Code Display)");
     } catch (error) {
       logger.error("❌ Setup failed from Start Tracking:", error);
-      globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed");
+      globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed", 8000);
     } finally {
       setIsLoading(false);
     }
@@ -243,7 +243,7 @@ export const useUserSetup = (onSetupComplete) => {
       logger.debug("✅ onSetupComplete succeeded with share code");
     } catch (error) {
       logger.error("❌ Setup failed with share code:", error);
-      globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed");
+      globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed", 8000);
     } finally {
       setIsLoading(false);
     }

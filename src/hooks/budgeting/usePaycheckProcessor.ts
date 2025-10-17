@@ -133,7 +133,7 @@ const usePaycheckProcessor = ({
 
       // Validate form
       if (!validateForm()) {
-        globalToast.showError("Please fix the form errors before processing", "Validation Error");
+        globalToast.showError("Please fix the form errors before processing", "Validation Error", 8000);
         return false;
       }
 
@@ -163,7 +163,7 @@ const usePaycheckProcessor = ({
       return true;
     } catch (error) {
       logger.error("Error processing paycheck", error);
-      globalToast.showError(error.message || "Failed to process paycheck", "Processing Error");
+      globalToast.showError(error.message || "Failed to process paycheck", "Processing Error", 8000);
       return false;
     } finally {
       setIsLoading(false);

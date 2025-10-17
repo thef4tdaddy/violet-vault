@@ -10,7 +10,7 @@ import useEditLock from "../common/useEditLock";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
 import useBills from "../bills/useBills";
 import { useDebtForm } from "./useDebtForm";
-import { calculateDebtMetrics, formatDebtMetrics } from "../../utils/debts/debtFormValidation";
+import { calculateDebtMetrics } from "../../utils/debts/debtFormValidation";
 
 export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
   // Get auth context for edit locking
@@ -68,7 +68,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
         minimumPayment: parseFloat(formData.minimumPayment) || 0,
         paymentFrequency: formData.paymentFrequency,
       });
-      return formatDebtMetrics(metrics);
+      return metrics;
     }
     return null;
   }, [debtFormHook]);

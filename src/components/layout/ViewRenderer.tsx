@@ -232,7 +232,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         }}
         onError={(error) => {
           logger.error("Bill management error:", error);
-          globalToast.showError(`Error: ${error.message || error}`, "Error");
+          globalToast.showError(`Error: ${error.message || error}`, "Error", 8000);
         }}
       />
     ),

@@ -72,7 +72,7 @@ const useSmartSuggestions = ({
       setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
       onDismissSuggestion?.(suggestionId);
 
-      globalToast.showInfo("Suggestion dismissed", "Dismissed");
+      globalToast.showInfo("Suggestion dismissed", "Dismissed", 5000);
     },
     [onDismissSuggestion]
   );
@@ -125,7 +125,7 @@ const useSmartSuggestions = ({
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
-        globalToast.showError(error.message || "Failed to apply suggestion", "Application Error");
+        globalToast.showError(error.message || "Failed to apply suggestion", "Application Error", 8000);
       }
     },
     [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]
@@ -134,14 +134,14 @@ const useSmartSuggestions = ({
   // Clear all dismissed suggestions
   const clearDismissedSuggestions = useCallback(() => {
     setDismissedSuggestions(new Set());
-    globalToast.showInfo("All dismissed suggestions cleared", "Cleared");
+    globalToast.showInfo("All dismissed suggestions cleared", "Cleared", 5000);
   }, []);
 
   // Refresh suggestions (useful for manual refresh)
   const refreshSuggestions = useCallback(() => {
     // Force re-render by updating a timestamp or clearing dismissed
     setDismissedSuggestions(new Set());
-    globalToast.showInfo("Suggestions refreshed", "Refreshed");
+    globalToast.showInfo("Suggestions refreshed", "Refreshed", 5000);
   }, []);
 
   // Toggle settings panel
