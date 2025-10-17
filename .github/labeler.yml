@@ -1,0 +1,26 @@
+feature:
+  - "**/feat:*"
+
+bug:
+  - "**/fix:*"
+
+chore:
+  - "**/chore:*"
+
+docs:
+  - "**/docs:*"
+
+refactor:
+  - "**/refactor:*"
+
+testing:
+  - "**/test:*"
+
+typescript:
+  - "**/ts:*"
+
+performance:
+  - "**/perf:*"
+
+security:
+  - "**/security:*"
