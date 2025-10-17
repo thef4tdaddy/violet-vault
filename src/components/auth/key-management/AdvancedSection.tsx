@@ -1,7 +1,13 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const AdvancedSection = ({
+interface AdvancedSectionProps {
+  showAdvanced: boolean;
+  keyFingerprint: string;
+  onToggleAdvanced: () => void;
+}
+
+const AdvancedSection: React.FC<AdvancedSectionProps> = ({
   showAdvanced,
   keyFingerprint,
   onToggleAdvanced,

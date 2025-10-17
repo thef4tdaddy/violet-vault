@@ -1,7 +1,13 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const ResetConfirmModal = ({ isOpen, onClose, onConfirm }) => {
+interface ResetConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (

@@ -17,8 +17,13 @@ import {
   calculateTransactionTotals,
   getTransactionFilterConfigs,
 } from "../../utils/transactions/ledgerHelpers";
+import type { User } from "../../types/finance";
 
-const TransactionLedger = ({
+interface TransactionLedgerProps {
+  currentUser?: User;
+}
+
+const TransactionLedger: React.FC<TransactionLedgerProps> = ({
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
   const {
@@ -121,7 +126,7 @@ const TransactionLedger = ({
         transactions={paginatedTransactions}
         envelopes={envelopes}
         onEdit={startEdit}
-        onDelete={deleteTransaction}
+        onDelete={(id) => deleteTransaction(id as never)}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
 
@@ -153,6 +158,7 @@ const TransactionLedger = ({
         importStep={importStep}
         setImportStep={setImportStep}
         importData={importData}
+        setImportData={() => {}} // TODO: Import hook should provide this
         fieldMapping={fieldMapping}
         setFieldMapping={setFieldMapping}
         importProgress={importProgress}
@@ -167,7 +173,7 @@ const TransactionLedger = ({
         transaction={splittingTransaction}
         envelopes={envelopes}
         availableCategories={TRANSACTION_CATEGORIES}
-        onSplitTransaction={handleSplitTransaction}
+        onSave={handleSplitTransaction}
       />
     </div>
   );

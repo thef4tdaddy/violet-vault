@@ -1,7 +1,22 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const SettingsLayout = ({
+interface Section {
+  id: string;
+  label: string;
+  icon: string;
+}
+
+interface SettingsLayoutProps {
+  isOpen: boolean;
+  onClose: () => void;
+  activeSection: string;
+  sections: Section[];
+  onSectionChange: (sectionId: string) => void;
+  children: React.ReactNode;
+}
+
+const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   isOpen,
   onClose,
   activeSection,
