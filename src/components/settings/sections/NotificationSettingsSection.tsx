@@ -163,7 +163,7 @@ const NotificationSettingsSection = () => {
       {isSupported && (
         <div className="flex flex-wrap gap-3">
           {!hasToken && canRequestPermission && (
-            <button
+            <Button
               onClick={handleEnableNotifications}
               disabled={isLoading}
               className="bg-purple-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
@@ -176,12 +176,12 @@ const NotificationSettingsSection = () => {
                     className: "w-4 h-4",
                   })}
               <span>Enable Notifications</span>
-            </button>
+            </Button>
           )}
 
           {hasToken && (
             <>
-              <button
+              <Button
                 onClick={handleDisableNotifications}
                 className="bg-gray-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-gray-700 flex items-center space-x-2"
               >
@@ -189,9 +189,9 @@ const NotificationSettingsSection = () => {
                   className: "w-4 h-4",
                 })}
                 <span>Disable Notifications</span>
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={handleTestMessage}
                 disabled={isTestingMessage}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
@@ -204,7 +204,7 @@ const NotificationSettingsSection = () => {
                       className: "w-4 h-4",
                     })}
                 <span>Test Message</span>
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -231,7 +231,7 @@ const NotificationSettingsSection = () => {
       )}
 
       <div className="pt-4 border-t border-gray-200">
-        <button
+        <Button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1"
         >
@@ -239,7 +239,7 @@ const NotificationSettingsSection = () => {
             className: `w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`,
           })}
           <span>Advanced Debug Info</span>
-        </button>
+        </Button>
         {showAdvanced && (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
             <h4 className="font-medium text-gray-900 mb-3">Debug Information</h4>

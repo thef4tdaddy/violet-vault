@@ -22,7 +22,7 @@ const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccou
       </div>
 
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={onToggleBalances}
           className="p-2 text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50 border-2 border-transparent hover:border-cyan-200"
           title={showBalances ? "Hide account balances" : "Show account balances"}
@@ -30,14 +30,14 @@ const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccou
           {showBalances
             ? React.createElement(getIcon("Eye"), { className: "h-4 w-4" })
             : React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onAddAccount}
           className="btn btn-primary border-2 border-black text-sm flex items-center"
         >
           {React.createElement(getIcon("Plus"), { className: "h-3 w-3 mr-1" })}
           Add Account
-        </button>
+        </Button>
       </div>
     </div>
   );

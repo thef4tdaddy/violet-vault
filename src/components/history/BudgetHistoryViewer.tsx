@@ -62,19 +62,19 @@ const BudgetHistoryViewer = ({ onClose }) => {
                 })}
                 History Error
               </h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+              <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
                 ✕
-              </button>
+              </Button>
             </div>
 
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-red-800">{error.message || error}</p>
-              <button
+              <Button
                 onClick={onClose}
                 className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>

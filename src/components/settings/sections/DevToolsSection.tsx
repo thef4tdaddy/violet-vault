@@ -28,7 +28,7 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
       {/* Development Tools */}
       <div className="space-y-4">
         {/* Envelope Integrity Checker */}
-        <button
+        <Button
           onClick={onOpenEnvelopeChecker}
           className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
         >
@@ -39,10 +39,10 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
             <p className="font-medium text-purple-900">🔍 Envelope Integrity Checker</p>
             <p className="text-sm text-purple-700">Detect and fix empty/corrupted envelopes</p>
           </div>
-        </button>
+        </Button>
 
         {/* Test Budget History */}
-        <button
+        <Button
           onClick={onCreateTestHistory}
           className="w-full flex items-center p-3 border border-yellow-200 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
         >
@@ -53,7 +53,7 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
             <p className="font-medium text-yellow-900">🧪 Test Budget History</p>
             <p className="text-sm text-yellow-700">Create test commits for family collaboration</p>
           </div>
-        </button>
+        </Button>
 
         {/* Sync Debug Tools */}
         <SyncDebugToolsSection isDebugMode={isDebugMode} />

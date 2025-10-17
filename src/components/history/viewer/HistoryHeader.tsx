@@ -25,9 +25,9 @@ const HistoryHeader = ({ onClose }) => {
           <IntegrityStatusIndicator />
         </div>
       </div>
-      <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
         ✕
-      </button>
+      </Button>
     </div>
   );
 };

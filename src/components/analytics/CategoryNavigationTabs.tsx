@@ -25,7 +25,7 @@ const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categ
   return (
     <div className="flex border-b-2 border-black mb-6">
       {tabs.map((tab) => (
-        <button
+        <Button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={`px-4 py-2 text-sm font-bold border-b-2 flex items-center gap-2 transition-all shadow-sm hover:shadow-md ${
@@ -41,7 +41,7 @@ const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categ
               {tab.count}
             </span>
           )}
-        </button>
+        </Button>
       ))}
     </div>
   );

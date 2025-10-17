@@ -281,9 +281,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
 
               {recentActivity.length > 10 && (
                 <div className="text-center mt-4">
-                  <button className="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                  <Button className="text-sm text-purple-600 hover:text-purple-700 font-medium">
                     View all activity
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

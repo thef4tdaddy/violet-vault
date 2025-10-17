@@ -16,7 +16,7 @@ function _compareUint8Arrays(a, b) {
   return true;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export const useAuth = create((set, _get) => ({
   isUnlocked: false,
   encryptionKey: null,

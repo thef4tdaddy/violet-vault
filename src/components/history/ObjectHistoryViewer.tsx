@@ -104,9 +104,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 Complete change history for this {objectType.toLowerCase()}
               </p>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+            <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </button>
+            </Button>
           </div>
 
           {/* Loading State */}
@@ -183,7 +183,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                         </div>
                       </div>
 
-                      <button
+                      <Button
                         onClick={() => toggleCommitExpanded(commit.hash)}
                         className="text-gray-400 hover:text-gray-600 p-1 rounded"
                       >
@@ -194,7 +194,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                           : React.createElement(getIcon("ChevronRight"), {
                               className: "h-4 w-4",
                             })}
-                      </button>
+                      </Button>
                     </div>
 
                     {/* Basic commit info */}

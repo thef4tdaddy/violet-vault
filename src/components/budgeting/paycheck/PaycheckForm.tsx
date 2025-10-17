@@ -191,7 +191,7 @@ const PaycheckForm = ({
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4">
-        <button
+        <Button
           type="button"
           onClick={successFeedback.onClick(onProcess)}
           disabled={!canSubmit}
@@ -201,14 +201,14 @@ const PaycheckForm = ({
             className: "h-4 w-4 mr-2",
           })}
           {isLoading ? "Processing..." : "Process Paycheck"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={onReset}
           className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
         >
           {React.createElement(getIcon("RotateCcw"), { className: "h-4 w-4" })}
-        </button>
+        </Button>
       </div>
 
       {errors.allocations && (

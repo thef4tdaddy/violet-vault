@@ -92,7 +92,7 @@ const SyncStatusIndicator = ({ syncStatus, isBackgroundSyncing, onClick, showDet
   const statusText = getStatusText(syncStatus, isBackgroundSyncing);
 
   return (
-    <button
+    <Button
       onClick={onClick}
       className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 glassmorphism backdrop-blur-sm border-2 border-black shadow-md hover:shadow-lg ${backgroundColor} ${statusColor} ${
         showDetails ? "ring-2 ring-purple-500" : ""
@@ -101,7 +101,7 @@ const SyncStatusIndicator = ({ syncStatus, isBackgroundSyncing, onClick, showDet
     >
       <div className="flex items-center justify-center">{getStatusIcon()}</div>
       <span className="text-sm font-bold whitespace-nowrap">{statusText}</span>
-    </button>
+    </Button>
   );
 };
 

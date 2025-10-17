@@ -108,12 +108,12 @@ const ShareTargetHandler = () => {
 
             <p className="text-gray-700 mb-4 text-sm leading-relaxed">{error}</p>
 
-            <button
+            <Button
               onClick={() => navigate("/app")}
               className="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 transition-colors"
             >
               Return to App
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -209,7 +209,7 @@ const ShareTargetHandler = () => {
         {/* Manual Navigation */}
         {sharedData && !isProcessing && (
           <div className="space-y-3">
-            <button
+            <Button
               onClick={() => handleManualNavigation("/app/transactions")}
               className="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
             >
@@ -217,9 +217,9 @@ const ShareTargetHandler = () => {
                 className: "w-4 h-4",
               })}
               <span>Import to Transactions</span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={() => handleManualNavigation("/app/settings")}
               className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
             >
@@ -227,7 +227,7 @@ const ShareTargetHandler = () => {
                 className: "w-4 h-4",
               })}
               <span>Go to Settings</span>
-            </button>
+            </Button>
           </div>
         )}
       </div>

@@ -194,14 +194,14 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
   return (
     <div className="relative">
       {/* Main Health Indicator */}
-      <button
+      <Button
         onClick={onOpenSettings}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${getStatusColor()} hover:bg-gray-100 dark:hover:bg-gray-800`}
         title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click to open sync tools`}
       >
         {getStatusIcon()}
         <span className="text-sm font-medium">{getStatusText()}</span>
-      </button>
+      </Button>
     </div>
   );
 };

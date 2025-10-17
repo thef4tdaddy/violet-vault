@@ -69,7 +69,7 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                     </div>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() =>
                     onToggleDetails(showExecutionDetails === execution.id ? null : execution.id)
                   }
@@ -82,7 +82,7 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                     : React.createElement(getIcon("Eye"), {
                         className: "h-4 w-4",
                       })}
-                </button>
+                </Button>
               </div>
 
               {showExecutionDetails === execution.id && (
@@ -113,12 +113,12 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                   )}
 
                   <div className="mt-3 flex justify-end">
-                    <button className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                    <Button className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1">
                       {React.createElement(getIcon("RotateCcw"), {
                         className: "h-3 w-3",
                       })}
                       Revert Changes
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

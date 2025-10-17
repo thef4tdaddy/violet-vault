@@ -15,7 +15,7 @@ const ColorPicker = ({ selectedColor, onColorChange, disabled = false }) => {
       </label>
       <div className="grid grid-cols-4 gap-3">
         {USER_COLORS.map((color) => (
-          <button
+          <Button
             key={color.value}
             type="button"
             onClick={() => onColorChange(color.value)}

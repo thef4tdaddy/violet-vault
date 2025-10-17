@@ -30,12 +30,12 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full max-w-4xl max-h-[90vh] shadow-2xl relative flex flex-col">
         {/* Close Button - Top Right Corner */}
-        <button
+        <Button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
         >
           {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-        </button>
+        </Button>
 
         <div className="flex flex-1 min-h-0">
           {/* Sidebar */}
@@ -54,7 +54,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
                 {sections.map((section) => {
                   // Dynamic icon rendering
                   return (
-                    <button
+                    <Button
                       key={section.id}
                       onClick={() => onSectionChange(section.id)}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors border-2 border-black ${
@@ -67,7 +67,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
                         className: "h-4 w-4 mr-3",
                       })}
                       {section.label}
-                    </button>
+                    </Button>
                   );
                 })}
               </nav>

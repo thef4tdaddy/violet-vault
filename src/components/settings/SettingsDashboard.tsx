@@ -149,12 +149,12 @@ const SettingsDashboard = ({
         {showActivityFeed && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60">
             <div className="glassmorphism rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative border-2 border-black">
-              <button
+              <Button
                 onClick={closeActivityFeed}
                 className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
               >
                 {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-              </button>
+              </Button>
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-48px)]">
                 <ActivityFeed />
               </div>

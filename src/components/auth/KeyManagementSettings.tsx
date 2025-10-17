@@ -147,14 +147,14 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
               })}
               <h2 className="text-xl font-semibold text-gray-900">Key Management</h2>
             </div>
-            <button
+            <Button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
               {React.createElement(getIcon("X"), {
                 className: "h-6 w-6",
               })}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -265,12 +265,12 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
                 Learn more about VioletVault encryption
               </a>
             </div>
-            <button
+            <Button
               onClick={onClose}
               className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Close
-            </button>
+            </Button>
           </div>
         </div>
       </div>

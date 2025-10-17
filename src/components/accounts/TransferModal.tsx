@@ -49,9 +49,9 @@ const TransferModal = ({
       <div className="bg-white rounded-xl p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold">Transfer from {transferringAccount.name}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-          </button>
+          </Button>
         </div>
 
         <TransferModalContent

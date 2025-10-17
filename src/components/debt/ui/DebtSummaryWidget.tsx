@@ -33,7 +33,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         </h3>
 
         {onNavigateToDebts && (
-          <button
+          <Button
             onClick={onNavigateToDebts}
             className="text-base text-blue-600 hover:text-blue-700 flex items-center font-medium"
           >
@@ -41,7 +41,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
             {React.createElement(getIcon("ArrowRight"), {
               className: "h-4 w-4 ml-1",
             })}
-          </button>
+          </Button>
         )}
       </div>
 

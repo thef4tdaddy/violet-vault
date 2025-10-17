@@ -18,7 +18,7 @@ const AccountBasicFields = ({ accountForm, setAccountForm, canEdit, editingAccou
 
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-2">Account Type *</label>
-      <select
+      <Select
         value={accountForm.type}
         onChange={(e) => setAccountForm({ ...accountForm, type: e.target.value })}
         disabled={editingAccount && !canEdit}
@@ -29,7 +29,7 @@ const AccountBasicFields = ({ accountForm, setAccountForm, canEdit, editingAccou
             {type.icon} {type.label}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   </>
 );

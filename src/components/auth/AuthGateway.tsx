@@ -94,7 +94,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Standard Mode */}
-            <button
+            <Button
               onClick={() => setAuthMode("standard")}
               className="p-6 border border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-left group"
             >
@@ -122,10 +122,10 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
                   <span>Full feature set</span>
                 </div>
               </div>
-            </button>
+            </Button>
 
             {/* Local-Only Mode */}
-            <button
+            <Button
               onClick={() => setAuthMode("local-only")}
               className="p-6 border border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
             >
@@ -153,7 +153,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
                   <span>Data stored only on this device</span>
                 </div>
               </div>
-            </button>
+            </Button>
           </div>
 
           <div className="mt-8 text-center">

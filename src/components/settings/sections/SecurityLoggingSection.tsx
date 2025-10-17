@@ -67,7 +67,7 @@ const SecurityLoggingSection = ({
               🔍 Track security events and access attempts
             </p>
           </div>
-          <button
+          <Button
             onClick={() =>
               handleSettingChange(
                 "securityLoggingEnabled",
@@ -85,7 +85,7 @@ const SecurityLoggingSection = ({
                 securitySettings.securityLoggingEnabled ? "translate-x-6" : "translate-x-1"
               }`}
             />
-          </button>
+          </Button>
         </div>
 
         {/* Security Events Management */}
@@ -93,7 +93,7 @@ const SecurityLoggingSection = ({
           <div className="space-y-4">
             {/* Action Buttons */}
             <div className="flex items-center gap-3 flex-wrap">
-              <button
+              <Button
                 onClick={toggleEventsDisplay}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-blue-500/20 hover:bg-blue-500/30 font-bold text-blue-700"
               >
@@ -105,9 +105,9 @@ const SecurityLoggingSection = ({
                       className: "h-4 w-4",
                     })}
                 {showEvents ? "HIDE" : "VIEW"} EVENTS ({securityEvents.length})
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={exportSecurityEvents}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-green-500/20 hover:bg-green-500/30 font-bold text-green-700"
               >
@@ -115,9 +115,9 @@ const SecurityLoggingSection = ({
                   className: "h-4 w-4",
                 })}
                 EXPORT
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={showClearConfirmDialog}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-red-500/20 hover:bg-red-500/30 font-bold text-red-700"
               >
@@ -125,7 +125,7 @@ const SecurityLoggingSection = ({
                   className: "h-4 w-4",
                 })}
                 CLEAR
-              </button>
+              </Button>
             </div>
 
             {/* Security Events List */}

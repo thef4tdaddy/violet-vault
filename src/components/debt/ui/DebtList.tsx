@@ -153,13 +153,13 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
         {/* Action Button */}
         <div className="ml-2 md:ml-4 flex items-center space-x-1 md:space-x-2 flex-shrink-0">
           {canQuickPay && (
-            <button
+            <Button
               onClick={handleRecordPayment}
               className="px-2 md:px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors"
             >
               <span className="hidden sm:inline">Quick Pay</span>
               <span className="sm:hidden">Pay</span>
-            </button>
+            </Button>
           )}
           {React.createElement(getIcon("ArrowRight"), {
             className: "h-4 w-4 md:h-5 md:w-5 text-gray-400",

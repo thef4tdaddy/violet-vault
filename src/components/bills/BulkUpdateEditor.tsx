@@ -56,13 +56,13 @@ const BulkUpdateEditor = ({
             </div>
           )}
 
-          <button
+          <Button
             onClick={resetChanges}
             className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 glassmorphism backdrop-blur-sm rounded-lg text-sm border-2 border-black shadow-md hover:shadow-lg transition-all font-medium"
           >
             {React.createElement(getIcon("Undo2"), { className: "h-4 w-4" })}
             Reset All
-          </button>
+          </Button>
         </div>
       </div>
 

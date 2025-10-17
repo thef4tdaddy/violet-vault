@@ -54,7 +54,7 @@ const TransactionFormFields = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
           <div className="grid grid-cols-2 gap-2">
-            <button
+            <Button
               type="button"
               onClick={() =>
                 setTransactionForm({
@@ -73,8 +73,8 @@ const TransactionFormFields = ({
                 className: "h-4 w-4 mx-auto mb-1",
               })}
               <span className="text-sm">Expense</span>
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() =>
                 setTransactionForm({
@@ -93,7 +93,7 @@ const TransactionFormFields = ({
                 className: "h-4 w-4 mx-auto mb-1",
               })}
               <span className="text-sm">Income</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@ const TransactionFormFields = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-          <select
+          <Select
             value={transactionForm.category}
             onChange={(e) =>
               setTransactionForm({
@@ -161,13 +161,13 @@ const TransactionFormFields = ({
                 {category}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Envelope</label>
-        <select
+        <Select
           value={transactionForm.envelopeId}
           onChange={(e) =>
             setTransactionForm({
@@ -189,7 +189,7 @@ const TransactionFormFields = ({
               {envelope.envelopeType === "savings" ? " 💰 (Savings)" : ""}
             </option>
           ))}
-        </select>
+        </Select>
         {transactionForm.envelopeId &&
           (() => {
             const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
@@ -208,7 +208,7 @@ const TransactionFormFields = ({
             {(() => {
               const suggested = suggestEnvelope(transactionForm.description);
               return suggested ? (
-                <button
+                <Button
                   type="button"
                   onClick={() =>
                     setTransactionForm({
@@ -222,7 +222,7 @@ const TransactionFormFields = ({
                     className: "h-3 w-3 mr-1",
                   })}
                   Suggested: {suggested.name}
-                </button>
+                </Button>
               ) : null;
             })()}
           </div>
@@ -289,14 +289,14 @@ const TransactionFormFields = ({
       )}
 
       <div className="flex flex-col sm:flex-row gap-3 mt-6">
-        <button
+        <Button
           type="button"
           onClick={onClose}
           className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={editingTransaction && !canEdit}
           className={`flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center ${
@@ -315,7 +315,7 @@ const TransactionFormFields = ({
           ) : (
             "Add Transaction"
           )}
-        </button>
+        </Button>
       </div>
     </form>
   );

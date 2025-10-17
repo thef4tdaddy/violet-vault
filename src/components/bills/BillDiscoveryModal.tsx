@@ -120,9 +120,9 @@ const BillDiscoveryModal = ({
                 history
               </p>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </button>
+            </Button>
           </div>
 
           {discoveredBills.length === 0 ? (
@@ -154,7 +154,7 @@ const BillDiscoveryModal = ({
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => {
                         const allIds = new Set(discoveredBills.map((b) => b.id));
                         setSelectedBills(allIds);
@@ -162,13 +162,13 @@ const BillDiscoveryModal = ({
                       className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                     >
                       Select All
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => setSelectedBills(new Set())}
                       className="text-xs px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
                     >
                       Clear All
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -250,7 +250,7 @@ const BillDiscoveryModal = ({
                               {React.createElement(getIcon("Target"), {
                                 className: "h-4 w-4 text-gray-400",
                               })}
-                              <select
+                              <Select
                                 value={billEnvelopeMap[bill.id] || ""}
                                 onChange={(e) => updateBillEnvelope(bill.id, e.target.value)}
                                 className="text-sm px-2 py-1 border border-gray-300 rounded flex-1"
@@ -262,7 +262,7 @@ const BillDiscoveryModal = ({
                                     {envelope.id === bill.suggestedEnvelopeId && " (Suggested)"}
                                   </option>
                                 ))}
-                              </select>
+                              </Select>
                             </div>
 
                             {bill.suggestedEnvelopeName && (
@@ -308,13 +308,13 @@ const BillDiscoveryModal = ({
                     Selected bills will be added to your bill tracker
                   </div>
                   <div className="flex gap-3">
-                    <button
+                    <Button
                       onClick={onClose}
                       className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
                     >
                       Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={handleAddSelected}
                       disabled={selectedBills.size === 0 || isProcessing}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center"
@@ -334,7 +334,7 @@ const BillDiscoveryModal = ({
                           Add {selectedBills.size} Bills
                         </>
                       )}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

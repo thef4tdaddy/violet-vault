@@ -26,7 +26,7 @@ const ArchivingActionButtons = ({
 
         <div className="flex space-x-3">
           {!showPreview && (
-            <button
+            <Button
               onClick={handlePreview}
               disabled={isArchiving}
               className="btn btn-secondary flex items-center space-x-2"
@@ -35,23 +35,23 @@ const ArchivingActionButtons = ({
                 className: "h-4 w-4",
               })}
               <span>Preview First</span>
-            </button>
+            </Button>
           )}
 
           {confirmArchiving && (
-            <button onClick={toggleConfirmArchiving} className="btn btn-secondary">
+            <Button onClick={toggleConfirmArchiving} className="btn btn-secondary">
               Cancel
-            </button>
+            </Button>
           )}
 
-          <button
+          <Button
             onClick={onArchiveClick}
             className={`btn ${confirmArchiving ? "btn-danger" : "btn-primary"} flex items-center space-x-2`}
             disabled={isArchiving}
           >
             {React.createElement(getIcon("Archive"), { className: "h-4 w-4" })}
             <span>{confirmArchiving ? "Confirm Archive" : "Start Archiving"}</span>
-          </button>
+          </Button>
         </div>
       </div>
     </div>

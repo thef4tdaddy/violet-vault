@@ -44,22 +44,22 @@ const ReceiptUploadArea = ({
           </div>
 
           <div className="flex justify-center gap-3">
-            <button
+            <Button
               onClick={() => fileInputRef.current?.click()}
               className="glassmorphism px-6 py-2 bg-purple-600/80 text-white rounded-lg hover:bg-purple-700/80 transition-colors border-2 border-black backdrop-blur-sm"
             >
               <span className="font-black text-white">
                 <span className="text-base">B</span>ROWSE <span className="text-base">F</span>ILES
               </span>
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => cameraInputRef.current?.click()}
               className="glassmorphism px-6 py-2 bg-blue-600/80 text-white rounded-lg hover:bg-blue-700/80 transition-colors border-2 border-black backdrop-blur-sm"
             >
               <span className="font-black text-white">
                 <span className="text-base">T</span>AKE <span className="text-base">P</span>HOTO
               </span>
-            </button>
+            </Button>
           </div>
 
           <p className="text-xs text-purple-900">

@@ -187,11 +187,11 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
               <p className="text-sm text-gray-600">Detect and fix corrupted envelopes</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <Button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             {React.createElement(getIcon("X"), {
               className: "h-5 w-5",
             })}
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -264,7 +264,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                 <div className="space-y-6">
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-3">
-                    <button
+                    <Button
                       onClick={handleSelectAll}
                       className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
                       disabled={isProcessing}
@@ -272,9 +272,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                       {selectedEnvelopes.size === report.corruptedEnvelopes.length
                         ? "Deselect All"
                         : "Select All"}
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       onClick={handleRepairSelected}
                       disabled={selectedEnvelopes.size === 0 || isProcessing}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
@@ -283,9 +283,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                         className: "h-4 w-4 mr-2",
                       })}
                       Repair Selected ({selectedEnvelopes.size})
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       onClick={handleRemoveSelected}
                       disabled={selectedEnvelopes.size === 0 || isProcessing}
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
@@ -294,9 +294,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                         className: "h-4 w-4 mr-2",
                       })}
                       Remove Selected ({selectedEnvelopes.size})
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       onClick={scanForCorruptedEnvelopes}
                       disabled={isProcessing || isScanning}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
@@ -305,7 +305,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                         className: "h-4 w-4 mr-2",
                       })}
                       Rescan
-                    </button>
+                    </Button>
                   </div>
 
                   {/* Corrupted Envelopes List */}
@@ -379,12 +379,12 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
-          <button
+          <Button
             onClick={onClose}
             className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             Close
-          </button>
+          </Button>
         </div>
       </div>
     </div>

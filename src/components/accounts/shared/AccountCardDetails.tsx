@@ -37,13 +37,13 @@ const AccountCardDetails = ({ account, expirationStatus, showBalances, onStartTr
     {/* Transfer Button */}
     {account.currentBalance > 0 && (
       <div className="mt-3 pt-3 border-t border-gray-200">
-        <button
+        <Button
           onClick={() => onStartTransfer(account)}
           className="w-full btn btn-sm btn-primary border-2 border-black flex items-center justify-center"
         >
           {React.createElement(getIcon("Zap"), { className: "h-3 w-3 mr-1" })}
           Transfer to Budget
-        </button>
+        </Button>
       </div>
     )}
 

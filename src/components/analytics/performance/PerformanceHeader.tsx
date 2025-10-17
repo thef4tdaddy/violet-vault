@@ -27,7 +27,7 @@ const PerformanceHeader = ({ alertsEnabled, setAlertsEnabled }) => {
       </div>
 
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={() => setAlertsEnabled(!alertsEnabled)}
           className={`p-2 rounded-lg transition-colors ${
             alertsEnabled
@@ -38,7 +38,7 @@ const PerformanceHeader = ({ alertsEnabled, setAlertsEnabled }) => {
           {React.createElement(alertsEnabled ? Bell : BellOff, {
             className: "h-4 w-4",
           })}
-        </button>
+        </Button>
 
         <div className="flex items-center gap-1 text-sm text-gray-500">
           {React.createElement(Clock, { className: "h-4 w-4" })}

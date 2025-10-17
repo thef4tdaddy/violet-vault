@@ -24,7 +24,7 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
       </div>
 
       <div className="flex gap-3">
-        <select
+        <Select
           value={dateRange}
           onChange={handleDateRangeChange}
           className="px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-lg"
@@ -34,9 +34,9 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
           <option value="6months">Last 6 Months</option>
           <option value="1year">Last Year</option>
           <option value="all">All Time</option>
-        </select>
+        </Select>
 
-        <button
+        <Button
           onClick={handleExport}
           className="btn btn-secondary border-2 border-black flex items-center rounded-xl px-4 py-2"
         >
@@ -44,7 +44,7 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
             className: "h-4 w-4 mr-2",
           })}
           Export
-        </button>
+        </Button>
       </div>
     </div>
   );

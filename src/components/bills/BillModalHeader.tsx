@@ -25,14 +25,14 @@ const BillModalHeader = ({ editingBill, formData, onClose }) => {
         </div>
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={onClose}
         className="text-gray-400 hover:text-gray-600 transition-colors"
         aria-label="Close modal"
       >
         {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-      </button>
+      </Button>
     </div>
   );
 };

@@ -93,9 +93,9 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
           <h3 className="text-xl font-semibold">
             {editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
           </h3>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+          <Button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -163,7 +163,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
             {/* Priority */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-              <select
+              <Select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
@@ -173,13 +173,13 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
                     {priority.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* Category */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-              <select
+              <Select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
@@ -189,7 +189,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
                     {category}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* Color */}
@@ -197,7 +197,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
               <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
               <div className="flex gap-2 flex-wrap">
                 {SAVINGS_COLORS.map((color) => (
-                  <button
+                  <Button
                     key={color}
                     type="button"
                     onClick={() => setFormData({ ...formData, color })}
@@ -227,20 +227,20 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-3 pt-4 border-t">
-            <button
+            <Button
               type="button"
               onClick={handleClose}
               className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
             >
               {React.createElement(getIcon("Save"), { className: "h-4 w-4" })}
               <span>{editingGoal ? "Update Goal" : "Create Goal"}</span>
-            </button>
+            </Button>
           </div>
         </form>
       </div>

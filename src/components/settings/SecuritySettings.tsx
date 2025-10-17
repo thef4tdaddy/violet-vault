@@ -59,12 +59,12 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isOpen, onClose }) 
                   </p>
                 </div>
               </div>
-              <button
+              <Button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-3 shadow-lg hover:shadow-xl transition-all border-2 border-black"
               >
                 {React.createElement(getIcon("x"), { className: "h-6 w-6" })}
-              </button>
+              </Button>
             </div>
 
             {/* Scrollable Content */}

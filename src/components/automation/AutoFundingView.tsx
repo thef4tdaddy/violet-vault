@@ -148,7 +148,7 @@ const AutoFundingView = () => {
 
           {/* Tabs */}
           <div className="flex space-x-8 mt-6 border-b border-gray-200">
-            <button
+            <Button
               onClick={() => setActiveTab("rules")}
               className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === "rules"
@@ -157,8 +157,8 @@ const AutoFundingView = () => {
               }`}
             >
               Rules ({rules.length})
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveTab("history")}
               className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === "history"
@@ -167,7 +167,7 @@ const AutoFundingView = () => {
               }`}
             >
               History ({displayHistory.length})
-            </button>
+            </Button>
           </div>
         </div>
 

@@ -27,7 +27,7 @@ const FloatingActionButton = () => {
       <FABActionMenu />
 
       {/* Main FAB Button */}
-      <button
+      <Button
         onClick={handlePrimaryClick}
         onMouseDown={handleLongPress.onMouseDown}
         onTouchStart={handleLongPress.onTouchStart}
@@ -48,7 +48,7 @@ const FloatingActionButton = () => {
         {React.createElement(getIcon(isExpanded ? "X" : primaryAction?.icon || "Plus"), {
           className: "h-6 w-6",
         })}
-      </button>
+      </Button>
 
       {/* Backdrop */}
       {isExpanded && (

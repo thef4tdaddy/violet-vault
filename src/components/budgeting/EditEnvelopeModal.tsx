@@ -124,7 +124,7 @@ const EditEnvelopeModal = ({
           {/* Priority */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-            <select
+            <Select
               value={formData.priority || "medium"}
               onChange={(e) => updateFormField("priority", e.target.value)}
               disabled={!canEdit}
@@ -136,7 +136,7 @@ const EditEnvelopeModal = ({
               <option value="medium">Medium Priority</option>
               <option value="high">High Priority</option>
               <option value="critical">Critical</option>
-            </select>
+            </Select>
           </div>
 
           {/* Auto Allocate */}
@@ -161,7 +161,7 @@ const EditEnvelopeModal = ({
         {/* Delete Button */}
         <div>
           {canDelete && !isUnassignedCash && (
-            <button
+            <Button
               type="button"
               onClick={handleDeleteClick}
               className="flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition-colors"
@@ -170,20 +170,20 @@ const EditEnvelopeModal = ({
                 className: "h-4 w-4 mr-2",
               })}
               Delete Envelope
-            </button>
+            </Button>
           )}
         </div>
 
         {/* Save/Cancel Buttons */}
         <div className="flex gap-3">
-          <button
+          <Button
             type="button"
             onClick={handleClose}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 transition-colors"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handleSubmit}
             disabled={!canSubmit || isLoading}
@@ -193,7 +193,7 @@ const EditEnvelopeModal = ({
               className: "h-4 w-4 mr-2",
             })}
             {isLoading ? "Saving..." : "Save Changes"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

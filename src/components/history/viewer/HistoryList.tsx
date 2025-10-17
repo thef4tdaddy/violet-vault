@@ -69,7 +69,7 @@ const HistoryList = ({
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRestoreFromHistory(commit.hash);
@@ -80,9 +80,9 @@ const HistoryList = ({
                     {React.createElement(getIcon("RotateCcw"), {
                       className: "h-4 w-4",
                     })}
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleCommitExpanded(commit.hash);
@@ -96,7 +96,7 @@ const HistoryList = ({
                       : React.createElement(getIcon("ChevronRight"), {
                           className: "h-4 w-4",
                         })}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

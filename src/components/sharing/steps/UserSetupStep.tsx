@@ -96,12 +96,12 @@ const UserSetupStep = ({
               className="w-12 h-12 rounded-lg border-2 border-black"
               style={{ backgroundColor: userColor }}
             ></div>
-            <button
+            <Button
               onClick={onGenerateRandomColor}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border-2 border-black rounded-lg text-sm font-black transition-colors"
             >
               Random Color
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -119,13 +119,13 @@ const UserSetupStep = ({
                 className="w-full px-4 py-3 pr-12 bg-white border-2 border-black rounded-lg text-sm"
                 required
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
               >
                 {renderIcon(showPassword ? "EyeOff" : "Eye", "h-5 w-5")}
-              </button>
+              </Button>
             </div>
             <p className="text-xs text-purple-900">
               This password encrypts your budget data. Use the same password as the person who
@@ -137,13 +137,13 @@ const UserSetupStep = ({
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={onBack}
           className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-black rounded-lg font-black transition-colors border-2 border-black"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleSubmit}
           disabled={!password || !userName.trim() || isJoining}
           className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-black transition-colors border-2 border-black disabled:cursor-not-allowed"
@@ -156,7 +156,7 @@ const UserSetupStep = ({
           ) : (
             "Join Budget"
           )}
-        </button>
+        </Button>
       </div>
     </>
   );

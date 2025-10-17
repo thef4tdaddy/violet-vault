@@ -46,18 +46,18 @@ const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }
           </p>
 
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={onDismiss}
               className="flex-1 btn btn-secondary border-2 border-black rounded-2xl py-3"
             >
               Keep Mine
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onResolveConflict}
               className="flex-1 btn btn-primary border-2 border-black rounded-2xl py-3"
             >
               Load Theirs
-            </button>
+            </Button>
           </div>
         </div>
       </div>

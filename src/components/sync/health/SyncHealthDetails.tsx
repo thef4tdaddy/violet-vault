@@ -148,7 +148,7 @@ const SyncHealthDetails = ({
             <p className="text-xs font-black text-gray-700 uppercase">ACTIONS:</p>
 
             <div className="flex flex-col gap-2">
-              <button
+              <Button
                 onClick={onRefresh}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
@@ -157,14 +157,14 @@ const SyncHealthDetails = ({
                   className: `h-3 w-3 mr-2 ${syncStatus.isLoading ? "animate-spin" : ""}`,
                 })}
                 {syncStatus.isLoading ? "Refreshing..." : "Refresh Status"}
-              </button>
+              </Button>
 
-              <button onClick={onRunValidation} className={getActionButtonStyle("validate")}>
+              <Button onClick={onRunValidation} className={getActionButtonStyle("validate")}>
                 {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
                 Run Full Validation
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={onResetData}
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
@@ -173,7 +173,7 @@ const SyncHealthDetails = ({
                   className: `h-3 w-3 mr-2 ${isRecovering ? "animate-pulse" : ""}`,
                 })}
                 {isRecovering ? "Resetting..." : "Reset Cloud Data"}
-              </button>
+              </Button>
             </div>
           </div>
         )}

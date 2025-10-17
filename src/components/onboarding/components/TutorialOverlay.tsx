@@ -51,13 +51,13 @@ const TutorialOverlay = ({
               Step {currentStep + 1} of {tutorialStepsLength}
             </span>
           </div>
-          <button
+          <Button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             title="Close tutorial"
           >
             {React.createElement(getIcon("X"), { className: "w-5 h-5" })}
-          </button>
+          </Button>
         </div>
 
         {/* Progress Bar */}
@@ -79,7 +79,7 @@ const TutorialOverlay = ({
         {/* Actions */}
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
-            <button
+            <Button
               onClick={onPrev}
               disabled={currentStep === 0}
               className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -88,17 +88,17 @@ const TutorialOverlay = ({
                 className: "w-4 h-4",
               })}
               <span>Back</span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={onSkip}
               className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             >
               Skip Tour
-            </button>
+            </Button>
           </div>
 
-          <button
+          <Button
             onClick={onNext}
             className="flex items-center space-x-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
           >
@@ -110,7 +110,7 @@ const TutorialOverlay = ({
               : React.createElement(getIcon("ChevronRight"), {
                   className: "w-4 h-4",
                 })}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -119,12 +119,12 @@ const PaydayPrediction = ({
                     </span>
                   </div>
                   {onProcessPaycheck && (
-                    <button
+                    <Button
                       onClick={onProcessPaycheck}
                       className="text-xs bg-purple-600 text-white px-3 py-1 rounded-md hover:bg-purple-700 transition-colors"
                     >
                       Process Now
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <p className="text-xs text-purple-600 mt-1">
@@ -143,12 +143,12 @@ const PaydayPrediction = ({
                     <span className="text-sm font-medium text-emerald-800">Payday Tomorrow!</span>
                   </div>
                   {onPrepareEnvelopes && (
-                    <button
+                    <Button
                       onClick={onPrepareEnvelopes}
                       className="text-xs bg-emerald-600 text-white px-3 py-1 rounded-md hover:bg-emerald-700 transition-colors"
                     >
                       Review Plan
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <p className="text-xs text-emerald-600 mt-1">
@@ -169,12 +169,12 @@ const PaydayPrediction = ({
                     </span>
                   </div>
                   {onPrepareEnvelopes && (
-                    <button
+                    <Button
                       onClick={onPrepareEnvelopes}
                       className="text-xs bg-amber-600 text-white px-3 py-1 rounded-md hover:bg-amber-700 transition-colors"
                     >
                       Plan Ahead
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <p className="text-xs text-amber-600 mt-1">Plan your envelope funding strategy</p>

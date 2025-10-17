@@ -75,17 +75,17 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     Update amounts and due dates for {selectedBills.length} selected bills
                   </p>
                 </div>
-                <button
+                <Button
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
                 >
                   {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-                </button>
+                </Button>
               </div>
 
               {/* Update Mode Selector */}
               <div className="flex gap-2 mb-6">
-                <button
+                <Button
                   onClick={() => setUpdateMode("amounts")}
                   className={`px-4 py-2 rounded-lg flex items-center border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
                     updateMode === "amounts"
@@ -97,8 +97,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     className: "h-4 w-4 mr-2",
                   })}
                   Amounts Only
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setUpdateMode("dates")}
                   className={`px-4 py-2 rounded-lg flex items-center border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
                     updateMode === "dates"
@@ -110,8 +110,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     className: "h-4 w-4 mr-2",
                   })}
                   Due Dates Only
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setUpdateMode("both")}
                   className={`px-4 py-2 rounded-lg flex items-center border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
                     updateMode === "both"
@@ -123,7 +123,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     className: "h-4 w-4 mr-2",
                   })}
                   Both
-                </button>
+                </Button>
               </div>
 
               <BulkUpdateEditor
@@ -165,19 +165,19 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                   </div>
 
                   <div className="flex gap-3">
-                    <button
+                    <Button
                       onClick={onClose}
                       className="px-4 py-2 text-gray-800 bg-gray-200/80 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
                     >
                       Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={handleSubmit}
                       disabled={!summary.hasChanges}
                       className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black"
                     >
                       Update {summary.changedBills} Bills
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

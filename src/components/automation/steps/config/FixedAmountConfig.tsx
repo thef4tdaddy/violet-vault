@@ -35,7 +35,7 @@ const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Target Envelope *</label>
-        <select
+        <Select
           value={ruleData.config.targetId || ""}
           onChange={(e) => updateConfig({ targetId: e.target.value })}
           className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -49,7 +49,7 @@ const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
               {envelope.currentBalance?.toFixed(2) || "0.00"})
             </option>
           ))}
-        </select>
+        </Select>
         {errors.targetId && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
             {React.createElement(getIcon("AlertCircle"), {
