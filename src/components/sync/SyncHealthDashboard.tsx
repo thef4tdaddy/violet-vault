@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils/icons";
-import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";
+import { useSyncHealthMonitor } from "../../hooks/sync/useSyncHealthMonitor";
 import { useExportData } from "../../hooks/common/useExportData";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 
