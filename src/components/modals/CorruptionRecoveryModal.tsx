@@ -4,17 +4,36 @@ import { useToastHelpers } from "../../utils/common/toastHelpers";
 import useDataManagement from "../../hooks/common/useDataManagement";
 import logger from "../../utils/common/logger";
 
+// Type definitions for props
+interface CorruptionRecoveryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Type definitions for hooks (temporary until hooks are typed)
+interface ToastHelpers {
+  showSuccessToast: (message: string, title: string) => void;
+  showErrorToast: (message: string, title: string) => void;
+}
+
+interface DataManagement {
+  exportData: () => Promise<void>;
+}
+
 /**
  * Modal that guides users through encryption corruption recovery
  * Shows when repeated decryption failures indicate corrupted sync data
  */
-export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState(1);
-  const [isExporting, setIsExporting] = useState(false);
-  const { showSuccessToast, showErrorToast } = useToastHelpers();
-  const { exportData } = useDataManagement();
+export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = ({ 
+  isOpen, 
+  onClose 
+}) => {
+  const [step, setStep] = useState<number>(1);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const { showSuccessToast, showErrorToast } = useToastHelpers() as ToastHelpers;
+  const { exportData } = useDataManagement() as DataManagement;
 
-  const handleExport = async () => {
+  const handleExport = async (): Promise<void> => {
     try {
       setIsExporting(true);
       await exportData();
@@ -24,14 +43,15 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
         "Backup Complete",
       );
     } catch (error) {
-      logger.error("Failed to export data during corruption recovery", error);
-      showErrorToast(`Export failed: ${error.message}`, "Export Error");
+      logger.error("Failed to export data during corruption recovery", { error });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      showErrorToast(`Export failed: ${errorMessage}`, "Export Error");
     } finally {
       setIsExporting(false);
     }
   };
 
-  const handleCreateNewProfile = () => {
+  const handleCreateNewProfile = (): void => {
     // Clear the current user profile to trigger fresh setup
     const keysToRemove = [
       "violet_vault_user_profile",
@@ -54,7 +74,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
     }, 1500);
   };
 
-  const renderStep1 = () => (
+  const renderStep1 = (): React.ReactElement => (
     <div className="space-y-4">
       <div className="text-center">
         <div className="text-6xl mb-4">⚠️</div>
@@ -108,7 +128,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
     </div>
   );
 
-  const renderStep2 = () => (
+  const renderStep2 = (): React.ReactElement => (
     <div className="space-y-4">
       <div className="text-center">
         <div className="text-6xl mb-4">✅</div>
@@ -159,7 +179,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
   );
 
   return (
-    <ConfirmModal isOpen={isOpen} onClose={onClose} className="max-w-2xl">
+    <ConfirmModal isOpen={isOpen} onCancel={onClose} className="max-w-2xl">
       {step === 1 ? renderStep1() : renderStep2()}
     </ConfirmModal>
   );
