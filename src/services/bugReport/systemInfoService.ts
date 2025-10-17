@@ -8,14 +8,55 @@ import { BrowserInfoService } from "./browserInfoService";
 import { PerformanceInfoService } from "./performanceInfoService";
 import { ErrorTrackingService } from "./errorTrackingService";
 
+/**
+ * System information structure
+ */
+export interface SystemInfo {
+  timestamp: string;
+  browser: {
+    name: string;
+    version: string;
+    [key: string]: any;
+  };
+  viewport: {
+    width: number;
+    height: number;
+  };
+  url: {
+    href: string;
+    [key: string]: any;
+  };
+  performance: {
+    available: boolean;
+    [key: string]: any;
+  };
+  storage: {
+    localStorage: {
+      available: boolean;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  network: {
+    onLine: boolean;
+    [key: string]: any;
+  };
+  errors: {
+    recentErrors: any[];
+    consoleLogs: any[];
+    [key: string]: any;
+  };
+  userAgent: string;
+  fallback?: boolean;
+}
+
 export class SystemInfoService {
   /**
    * Collect comprehensive system information for bug reports
-   * @returns {Promise<Object>} System information object
    */
-  static async collectSystemInfo() {
+  static async collectSystemInfo(): Promise<SystemInfo> {
     try {
-      const systemInfo = {
+      const systemInfo: SystemInfo = {
         timestamp: new Date().toISOString(),
         browser: BrowserInfoService.getBrowserInfo(),
         viewport: BrowserInfoService.getViewportInfo(),
@@ -37,9 +78,8 @@ export class SystemInfoService {
 
   /**
    * Get fallback system information when collection fails
-   * @returns {Object} Minimal system information
    */
-  static getFallbackSystemInfo() {
+  static getFallbackSystemInfo(): SystemInfo {
     return {
       timestamp: new Date().toISOString(),
       browser: { name: "Unknown", version: "Unknown" },
@@ -58,37 +98,35 @@ export class SystemInfoService {
    * Initialize error capture system
    * Delegates to ErrorTrackingService
    */
-  static initializeErrorCapture() {
+  static initializeErrorCapture(): void {
     ErrorTrackingService.initializeErrorCapture();
   }
 
   /**
    * Get recent errors - convenience method
-   * @returns {Object} Recent errors and logs
    */
-  static getRecentErrors() {
+  static getRecentErrors(): ReturnType<typeof ErrorTrackingService.getRecentErrors> {
     return ErrorTrackingService.getRecentErrors();
   }
 
   /**
    * Clear captured error data - convenience method
    */
-  static clearCapturedData() {
+  static clearCapturedData(): void {
     ErrorTrackingService.clearCapturedData();
   }
 
   /**
    * Get error statistics - convenience method
-   * @returns {Object} Error statistics
    */
-  static getErrorStats() {
+  static getErrorStats(): ReturnType<typeof ErrorTrackingService.getErrorStats> {
     return ErrorTrackingService.getErrorStats();
   }
 
   /**
    * Cleanup system info services
    */
-  static cleanup() {
+  static cleanup(): void {
     ErrorTrackingService.cleanup();
   }
 }
