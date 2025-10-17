@@ -23,7 +23,7 @@ UserButton.displayName = "UserButton";
 interface UserIndicatorProps {
   currentUser: UserData | null;
   onUserChange?: () => void;
-  onUpdateProfile?: (updatedProfile: Partial<UserData>) => void;
+  onUpdateProfile?: (updatedProfile: Partial<UserData>) => Promise<void>;
 }
 
 const UserIndicator = memo<UserIndicatorProps>(({ currentUser, onUserChange, onUpdateProfile }) => {

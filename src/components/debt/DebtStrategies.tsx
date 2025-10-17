@@ -58,20 +58,12 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
       <div className="grid gap-6 lg:grid-cols-2">
         <StrategyCard
           strategy={avalancheStrategy}
-          title="Debt Avalanche"
-          description="Pay minimums on all debts, then put extra money toward the debt with the highest interest rate"
-          icon="TrendingDown"
-          color="red"
-          isRecommended={recommendation === "avalanche"}
+          isRecommended={recommendation?.strategy === "avalanche"}
         />
 
         <StrategyCard
           strategy={snowballStrategy}
-          title="Debt Snowball"
-          description="Pay minimums on all debts, then put extra money toward the debt with the smallest balance"
-          icon="Snowflake"
-          color="blue"
-          isRecommended={recommendation === "snowball"}
+          isRecommended={recommendation?.strategy === "snowball"}
         />
       </div>
 
@@ -112,7 +104,10 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
                 {React.createElement(getIcon("Info"), {
                   className: "w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0",
                 })}
-                <p className="text-gray-700 text-sm">{insight}</p>
+                <div>
+                  <p className="text-gray-900 text-sm font-medium">{insight.title}</p>
+                  <p className="text-gray-700 text-sm">{insight.message}</p>
+                </div>
               </div>
             ))}
           </div>
