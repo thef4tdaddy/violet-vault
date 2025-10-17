@@ -39,12 +39,12 @@ const DebtDashboard: React.FC = () => {
 
   // Tab configuration
   const tabs = [
-    { id: "overview", label: "Overview", icon: "CreditCard", color: "red" },
+    { id: "overview", label: "Overview", icon: getIcon("CreditCard"), color: "red" as const },
     {
       id: "strategies",
       label: "Payoff Strategies",
-      icon: "Target",
-      color: "purple",
+      icon: getIcon("Target"),
+      color: "purple" as const,
     },
   ];
 
@@ -103,7 +103,10 @@ const DebtDashboard: React.FC = () => {
           <div className="space-y-6">
             {/* Summary Cards */}
             {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") && (
-              <DebtSummaryCards debtStats={debtStats} />
+              <DebtSummaryCards 
+                stats={debtStats} 
+                onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
+              />
             )}
 
             {/* Filters */}
@@ -111,7 +114,8 @@ const DebtDashboard: React.FC = () => {
               <DebtFilters
                 filterOptions={filterOptions}
                 setFilterOptions={setFilterOptions}
-                debtStats={debtStats}
+                debtTypes={Object.keys(debtStats.debtsByType || {})}
+                debtsByType={debtStats.debtsByType}
               />
             )}
 
@@ -120,8 +124,6 @@ const DebtDashboard: React.FC = () => {
               <DebtList
                 debts={filteredDebts}
                 onDebtClick={handleDebtClick}
-                onEditDebt={handleEditDebt}
-                onDeleteDebt={handleDeleteDebt}
                 onRecordPayment={handleRecordPayment}
               />
             )}
@@ -148,7 +150,7 @@ const DebtDashboard: React.FC = () => {
               isOpen={showAddModal}
               onSubmit={handleModalSubmit}
               onClose={() => setSelectedDebt(null)}
-              editingDebt={editingDebt}
+              debt={editingDebt}
             />
           )}
 
@@ -160,15 +162,15 @@ const DebtDashboard: React.FC = () => {
               onEdit={handleEditDebt}
               onDelete={handleDeleteDebt}
               onRecordPayment={handleRecordPayment}
+              _onLinkToBill={() => {}}
             />
           )}
 
           {showUpcomingPaymentsModal && (
             <UpcomingPaymentsModal
-              payments={upcomingPayments}
+              upcomingPayments={upcomingPayments}
               isOpen={showUpcomingPaymentsModal}
               onClose={() => setShowUpcomingPaymentsModal(false)}
-              onRecordPayment={handleRecordPayment}
             />
           )}
         </>

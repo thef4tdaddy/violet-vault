@@ -148,7 +148,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
 
   // Get chunked sync statistics with type safety
   getStats(): ChunkedSyncStats {
-    const rawStats = chunkedSyncService.getStats();
+    const rawStats = chunkedSyncService.getStats() as any;
 
     // Validate stats structure and provide defaults
     if (!this.isValidStats(rawStats)) {
@@ -203,6 +203,8 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
           timestamp: Date.now(),
           stats: this.getStats(),
         });
+
+        return true; // Return a value to satisfy SafeUnknown constraint
       })
       .then((response) => {
         if (!response.success) {

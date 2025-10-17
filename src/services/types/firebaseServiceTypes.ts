@@ -18,7 +18,18 @@ import type {
 import type { ApiResponse } from "../../types/common";
 
 // Enhanced sync service interface with type safety
-export interface TypedFirebaseSyncService extends IFirebaseSyncService {
+// Note: Does not extend IFirebaseSyncService due to incompatible return types
+export interface TypedFirebaseSyncService {
+  readonly app: unknown; // Firebase App
+  readonly db: unknown; // Firestore
+  readonly auth: unknown; // Auth
+  
+  initialize(budgetId: string, encryptionKey: string): void;
+  ensureAuthenticated(): Promise<boolean>;
+  getStatus(): FirebaseServiceStatus;
+  cleanup(): void;
+  
+  // Type-safe methods with TypedResponse wrappers
   saveToCloud<T extends SafeUnknown>(
     data: T,
     metadata?: Partial<SyncMetadata>
@@ -26,13 +37,32 @@ export interface TypedFirebaseSyncService extends IFirebaseSyncService {
 
   loadFromCloud<T extends SafeUnknown>(): Promise<TypedResponse<T>>;
 
-  setupRealTimeSync<T extends SafeUnknown>(callback: (data: TypedResponse<T>) => void): void;
+  setupRealTimeSync<T extends SafeUnknown>(
+    callback: (data: TypedResponse<T>) => void
+  ): void;
 
-  addSyncListener(callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void;
+  stopRealTimeSync(): void;
+
+  addSyncListener(
+    callback: (event: string, data: TypedResponse<SafeUnknown>) => void
+  ): void;
+
+  removeSyncListener(
+    callback: (event: string, data: TypedResponse<SafeUnknown>) => void
+  ): void;
 }
 
 // Enhanced chunked sync service with type safety
-export interface TypedChunkedSyncService extends IChunkedSyncService {
+// Note: Does not extend IChunkedSyncService due to incompatible return types
+export interface TypedChunkedSyncService {
+  initialize(budgetId: string, encryptionKey: string): Promise<void>;
+  getStats(): ChunkedSyncStats;
+  
+  // Chunk management
+  generateChunkId(arrayName: string, chunkIndex: number): string;
+  clearCorruptedData(): Promise<void>;
+  
+  // Type-safe methods with TypedResponse wrappers
   saveToCloud<T extends SafeUnknown>(
     data: T,
     currentUser: CloudSyncConfig["currentUser"]
