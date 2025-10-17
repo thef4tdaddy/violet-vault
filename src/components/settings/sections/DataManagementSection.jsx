@@ -1,8 +1,8 @@
-/* eslint-disable no-console */
 import React from "react";
 import { getIcon } from "../../../utils";
 import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
 import { useConfirm } from "../../../hooks/common/useConfirm";
+import logger from "@/utils/common/logger";
 
 // Check if we're in development mode
 const isDevelopmentMode = () => {
@@ -111,12 +111,12 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
             {/* Always Available - Refresh Sync Status */}
             <button
               onClick={async () => {
-                console.log("🔄 TESTING: window.getQuickSyncStatus");
+                logger.debug("🔄 TESTING: window.getQuickSyncStatus");
                 try {
                   const result = await window.getQuickSyncStatus();
-                  console.log("🔄 SUCCESS:", result);
+                  logger.debug("🔄 SUCCESS", { result });
                 } catch (error) {
-                  console.error("🔄 ERROR:", error);
+                  logger.error("🔄 ERROR", error);
                 }
               }}
               className="w-full flex items-center p-3 border border-green-200 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
@@ -135,12 +135,12 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
               <>
                 <button
                   onClick={async () => {
-                    console.log("🚀 TESTING: window.runMasterSyncValidation");
+                    logger.debug("🚀 TESTING: window.runMasterSyncValidation");
                     try {
                       const result = await window.runMasterSyncValidation();
-                      console.log("🚀 SUCCESS:", result);
+                      logger.debug("🚀 SUCCESS", { result });
                     } catch (error) {
-                      console.error("🚀 ERROR:", error);
+                      logger.error("🚀 ERROR", error);
                     }
                   }}
                   className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
@@ -158,7 +158,7 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
 
                 <button
                   onClick={async () => {
-                    console.log("🧹 TESTING: window.forceCloudDataReset");
+                    logger.debug("🧹 TESTING: window.forceCloudDataReset");
                     const confirmed = await confirm({
                       title: "Reset Cloud Data",
                       message: "⚠️ Reset Cloud Data? This cannot be undone!",
@@ -168,9 +168,9 @@ const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync 
                     if (confirmed) {
                       try {
                         const result = await window.forceCloudDataReset();
-                        console.log("🧹 SUCCESS:", result);
+                        logger.debug("🧹 SUCCESS", { result });
                       } catch (error) {
-                        console.error("🧹 ERROR:", error);
+                        logger.error("🧹 ERROR", error);
                       }
                     }
                   }}

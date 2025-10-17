@@ -3,6 +3,8 @@
  * Enable/disable debt components and features step by step
  */
 
+import logger from "@/utils/common/logger";
+
 // Main feature toggles - disable entire sections
 export const DEBT_DEBUG_CONFIG = {
   // Core debt functionality
@@ -47,7 +49,7 @@ export function isDebtFeatureEnabled(feature: DebtDebugFeature): boolean {
 export function disableDebtFeature(feature: DebtDebugFeature): void {
   // TypeScript prevents direct mutation, so we cast to mutable
   (DEBT_DEBUG_CONFIG as any)[feature] = false;
-  console.log(`[DEBT DEBUG] Disabled feature: ${feature}`);
+  logger.debug(`[DEBT DEBUG] Disabled feature: ${feature}`, { feature });
 }
 
 /**
@@ -56,7 +58,7 @@ export function disableDebtFeature(feature: DebtDebugFeature): void {
 export function enableDebtFeature(feature: DebtDebugFeature): void {
   // TypeScript prevents direct mutation, so we cast to mutable
   (DEBT_DEBUG_CONFIG as any)[feature] = true;
-  console.log(`[DEBT DEBUG] Enabled feature: ${feature}`);
+  logger.debug(`[DEBT DEBUG] Enabled feature: ${feature}`, { feature });
 }
 
 /**
