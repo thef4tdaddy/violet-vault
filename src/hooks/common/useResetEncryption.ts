@@ -1,8 +1,15 @@
 import { useCallback } from "react";
 import logger from "../../utils/common/logger";
 
-export const useResetEncryption = () => {
-  const resetEncryptionAndStartFresh = useCallback(() => {
+/**
+ * Reset encryption hook return type
+ */
+interface UseResetEncryptionReturn {
+  resetEncryptionAndStartFresh: () => void;
+}
+
+export const useResetEncryption = (): UseResetEncryptionReturn => {
+  const resetEncryptionAndStartFresh = useCallback((): void => {
     logger.info("Resetting encryption and starting fresh");
 
     const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
