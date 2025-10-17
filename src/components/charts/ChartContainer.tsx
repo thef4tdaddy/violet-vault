@@ -1,14 +1,13 @@
 import React from "react";
 import { ResponsiveContainer } from "recharts";
 import { getIcon } from "../../utils";
-import { ChartContainerProps } from "../../types/analytics";
 
 /**
  * Reusable chart container component
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
  */
-const ChartContainer: React.FC<ChartContainerProps> = ({
+const ChartContainer = ({
   title,
   subtitle,
   children,
@@ -32,9 +31,7 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
         </div>
         <div className="flex items-center justify-center text-gray-500" style={{ height }}>
           <div className="text-center">
-            {React.createElement(getIcon("Loader2"), {
-              className: "h-8 w-8 animate-spin mx-auto mb-3",
-            })}
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-3"></div>
             <p>Loading chart data...</p>
           </div>
         </div>
@@ -54,13 +51,11 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
         </div>
         <div className="flex items-center justify-center text-red-500" style={{ height }}>
           <div className="text-center">
-            {React.createElement(getIcon("AlertCircle"), {
-              className: "h-8 w-8 mx-auto mb-3",
+            {React.createElement(getIcon("BarChart3"), {
+              className: "h-12 w-12 mx-auto mb-3 opacity-50",
             })}
             <p className="font-medium">Error loading chart</p>
-            <p className="text-sm text-gray-500 mt-1">
-              {typeof error === "string" ? error : error.message}
-            </p>
+            <p className="text-sm text-gray-500 mt-1">{error.message || error}</p>
           </div>
         </div>
       </div>
@@ -84,20 +79,20 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
         {actions}
       </div>
 
-      {hasData ? (
-        <ResponsiveContainer width="100%" height={height}>
-          {children as React.ReactElement}
-        </ResponsiveContainer>
-      ) : (
-        <div className="flex items-center justify-center text-gray-500" style={{ height }}>
-          <div className="text-center">
-            {React.createElement(getIcon("BarChart3"), {
-              className: "h-12 w-12 mx-auto mb-3 opacity-50",
-            })}
-            <p>{emptyMessage}</p>
+      <ResponsiveContainer width="100%" height={height}>
+        {hasData ? (
+          children
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            <div className="text-center">
+              {React.createElement(getIcon("BarChart3"), {
+                className: "h-12 w-12 mx-auto mb-3 opacity-50",
+              })}
+              <p>{emptyMessage}</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </ResponsiveContainer>
     </div>
   );
 };

@@ -2,14 +2,13 @@ import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
-import { CategoryBarChartProps, ChartDataPoint, ChartSeries } from "../../types/analytics";
 
 /**
  * Reusable category bar chart component
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
  */
-const CategoryBarChart: React.FC<CategoryBarChartProps> = ({
+const CategoryBarChart = ({
   title = "Category Analysis",
   subtitle,
   data = [],
@@ -33,25 +32,25 @@ const CategoryBarChart: React.FC<CategoryBarChartProps> = ({
   const TooltipComponent = formatTooltip || CustomTooltip;
 
   // Ensure data is valid
-  const chartData: ChartDataPoint[] = Array.isArray(data) ? data : [];
+  const chartData = Array.isArray(data) ? data : [];
   const hasData = chartData.length > 0;
 
   // Default bars configuration if not provided
-  const defaultBars: ChartSeries[] = [
-    { type: "bar", dataKey: "income", name: "Income", fill: "#10b981" },
-    { type: "bar", dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
+  const defaultBars = [
+    { dataKey: "income", name: "Income", fill: "#10b981" },
+    { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
   ];
 
-  const barConfig: ChartSeries[] = bars.length > 0 ? bars : defaultBars;
+  const barConfig = bars.length > 0 ? bars : defaultBars;
 
   // Configure chart orientation
   const isHorizontal = orientation === "horizontal";
   const AxisConfig = isHorizontal
     ? {
-        XAxis: { type: "number" as const, stroke: chartDefaults.axis.stroke },
+        XAxis: { type: "number", stroke: chartDefaults.axis.stroke },
         YAxis: {
           dataKey: "name",
-          type: "category" as const,
+          type: "category",
           stroke: chartDefaults.axis.stroke,
           width: 100,
         },
@@ -85,26 +84,21 @@ const CategoryBarChart: React.FC<CategoryBarChartProps> = ({
           <XAxis
             {...AxisConfig.XAxis}
             fontSize={12}
-            tickFormatter={
-              isHorizontal ? (value: number) => `$${(value / 1000).toFixed(0)}K` : undefined
-            }
+            tickFormatter={isHorizontal ? (value) => `$${(value / 1000).toFixed(0)}K` : undefined}
           />
           <YAxis
             {...AxisConfig.YAxis}
             fontSize={12}
-            tickFormatter={
-              !isHorizontal ? (value: number) => `$${(value / 1000).toFixed(0)}K` : undefined
-            }
+            tickFormatter={!isHorizontal ? (value) => `$${(value / 1000).toFixed(0)}K` : undefined}
           />
 
           <Tooltip content={<TooltipComponent />} />
           {showLegend && <Legend />}
 
-          {/* Render bars with proper configuration */}
           {barConfig.map((barProps, index) => (
             <Bar
-              key={`bar-${barProps.dataKey}`}
-              radius={chartTypeConfigs.bar.radius as [number, number, number, number]}
+              key={barProps.dataKey}
+              radius={chartTypeConfigs.bar.radius}
               maxBarSize={maxBarSize}
               fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
               {...barProps}

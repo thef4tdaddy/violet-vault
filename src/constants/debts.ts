@@ -1,56 +1,47 @@
 // Debt tracking constants and configurations
 import logger from "../utils/common/logger";
-import type {
-  DebtType,
-  DebtStatus,
-  PaymentFrequency,
-  CompoundFrequency,
-  DebtTypeConfig,
-  DebtAccount,
-  DebtStats,
-} from "../types/debt";
 
-// Re-export enums as constants for backward compatibility
+// Debt types for classification
 export const DEBT_TYPES = {
-  MORTGAGE: "mortgage" as const,
-  AUTO: "auto" as const,
-  CREDIT_CARD: "credit_card" as const,
-  CHAPTER13: "chapter13" as const,
-  STUDENT: "student" as const,
-  PERSONAL: "personal" as const,
-  BUSINESS: "business" as const,
-  OTHER: "other" as const,
-} as const;
+  MORTGAGE: "mortgage",
+  AUTO: "auto",
+  CREDIT_CARD: "credit_card",
+  CHAPTER13: "chapter13",
+  STUDENT: "student",
+  PERSONAL: "personal",
+  BUSINESS: "business",
+  OTHER: "other",
+};
 
 // Default debt type for new debts
 export const DEFAULT_DEBT_TYPE = DEBT_TYPES.PERSONAL;
 
 // Debt status options
 export const DEBT_STATUS = {
-  ACTIVE: "active" as const,
-  PAID_OFF: "paid_off" as const,
-  DEFERRED: "deferred" as const,
-  DEFAULT: "default" as const,
-} as const;
+  ACTIVE: "active",
+  PAID_OFF: "paid_off",
+  DEFERRED: "deferred",
+  DEFAULT: "default",
+};
 
 // Payment frequencies
 export const PAYMENT_FREQUENCIES = {
-  WEEKLY: "weekly" as const,
-  BIWEEKLY: "biweekly" as const,
-  MONTHLY: "monthly" as const,
-  QUARTERLY: "quarterly" as const,
-  ANNUALLY: "annually" as const,
-} as const;
+  WEEKLY: "weekly",
+  BIWEEKLY: "biweekly",
+  MONTHLY: "monthly",
+  QUARTERLY: "quarterly",
+  ANNUALLY: "annually",
+};
 
 // Interest compound frequencies
 export const COMPOUND_FREQUENCIES = {
-  DAILY: "daily" as const,
-  MONTHLY: "monthly" as const,
-  ANNUALLY: "annually" as const,
-} as const;
+  DAILY: "daily",
+  MONTHLY: "monthly",
+  ANNUALLY: "annually",
+};
 
 // Debt type configurations with properties
-export const DEBT_TYPE_CONFIG: Record<string, DebtTypeConfig> = {
+export const DEBT_TYPE_CONFIG = {
   [DEBT_TYPES.MORTGAGE]: {
     name: "Mortgage",
     description: "Home loan with principal, interest, and potentially PMI/escrow",
@@ -153,7 +144,7 @@ export const DEBT_TYPE_CONFIG: Record<string, DebtTypeConfig> = {
 };
 
 // Auto-classify debt type based on creditor/name patterns
-export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string): DebtType => {
+export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName, debtName) => {
   const text = `${creditorName} ${debtName}`.toLowerCase();
 
   // Mortgage patterns
@@ -170,7 +161,7 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
     "us bank home",
   ];
   if (mortgagePatterns.some((pattern) => text.includes(pattern))) {
-    return DEBT_TYPES.MORTGAGE as DebtType;
+    return DEBT_TYPES.MORTGAGE;
   }
 
   // Auto loan patterns
@@ -187,7 +178,7 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
     "bmw financial",
   ];
   if (autoPatterns.some((pattern) => text.includes(pattern))) {
-    return DEBT_TYPES.AUTO as DebtType;
+    return DEBT_TYPES.AUTO;
   }
 
   // Credit card patterns
@@ -204,7 +195,7 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
     "card",
   ];
   if (creditCardPatterns.some((pattern) => text.includes(pattern))) {
-    return DEBT_TYPES.CREDIT_CARD as DebtType;
+    return DEBT_TYPES.CREDIT_CARD;
   }
 
   // Chapter 13 patterns
@@ -216,7 +207,7 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
     "plan payment",
   ];
   if (bankruptcyPatterns.some((pattern) => text.includes(pattern))) {
-    return DEBT_TYPES.CHAPTER13 as DebtType;
+    return DEBT_TYPES.CHAPTER13;
   }
 
   // Student loan patterns
@@ -232,21 +223,21 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
     "mohela",
   ];
   if (studentLoanPatterns.some((pattern) => text.includes(pattern))) {
-    return DEBT_TYPES.STUDENT as DebtType;
+    return DEBT_TYPES.STUDENT;
   }
 
   // Default to personal loan
-  return DEBT_TYPES.PERSONAL as DebtType;
+  return DEBT_TYPES.PERSONAL;
 };
 
 // Calculate debt statistics
-export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
+export const calculateDebtStats = (debts = []) => {
   if (!debts.length) {
     return {
       totalDebt: 0,
       totalMonthlyPayments: 0,
       averageInterestRate: 0,
-      debtsByType: {} as Record<DebtType, DebtAccount[]>,
+      debtsByType: {},
       totalInterestPaid: 0,
       activeDebtCount: 0,
       totalDebtCount: 0,
@@ -261,53 +252,75 @@ export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
     debtStatuses: debts.map((d) => ({
       name: d.name,
       status: d.status,
+      balance: d.currentBalance,
     })),
+    DEBT_STATUS_ACTIVE: DEBT_STATUS.ACTIVE,
   });
 
-  // Filter active debts only
   const activeDebts = debts.filter((debt) => debt.status === DEBT_STATUS.ACTIVE);
 
-  logger.debug("🔍 calculateDebtStats filtered:", {
-    activeDebts: activeDebts.length,
-    statuses: activeDebts.map((d) => d.status),
+  logger.debug("🔍 Active debts after filtering:", {
+    activeCount: activeDebts.length,
+    filteredOut: debts.length - activeDebts.length,
   });
 
-  const totalDebt = activeDebts.reduce((sum, debt) => sum + debt.balance, 0);
-  const totalMonthlyPayments = activeDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
+  const totalDebt = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
 
-  // Calculate weighted average interest rate
-  const weightedInterestSum = activeDebts.reduce(
-    (sum, debt) => sum + debt.interestRate * debt.balance,
-    0
-  );
+  const totalMonthlyPayments = activeDebts.reduce((sum, debt) => {
+    const payment = debt.minimumPayment || 0;
+    // Convert payment to monthly if needed
+    switch (debt.paymentFrequency) {
+      case PAYMENT_FREQUENCIES.WEEKLY:
+        return sum + (payment * 52) / 12;
+      case PAYMENT_FREQUENCIES.BIWEEKLY:
+        return sum + (payment * 26) / 12;
+      case PAYMENT_FREQUENCIES.QUARTERLY:
+        return sum + payment / 3;
+      case PAYMENT_FREQUENCIES.ANNUALLY:
+        return sum + payment / 12;
+      default: // monthly
+        return sum + payment;
+    }
+  }, 0);
+
+  const weightedInterestSum = activeDebts.reduce((sum, debt) => {
+    return sum + (debt.interestRate || 0) * (debt.currentBalance || 0);
+  }, 0);
+
   const averageInterestRate = totalDebt > 0 ? weightedInterestSum / totalDebt : 0;
 
-  // Group debts by type
-  const debtsByType = activeDebts.reduce(
-    (acc, debt) => {
-      if (!acc[debt.type as DebtType]) {
-        acc[debt.type as DebtType] = [];
-      }
-      acc[debt.type as DebtType].push(debt);
-      return acc;
-    },
-    {} as Record<DebtType, DebtAccount[]>
-  );
+  const debtsByType = activeDebts.reduce((acc, debt) => {
+    const type = debt.type || DEBT_TYPES.OTHER;
+    if (!acc[type]) {
+      acc[type] = { count: 0, balance: 0, payments: 0 };
+    }
+    acc[type].count += 1;
+    acc[type].balance += debt.currentBalance || 0;
+    acc[type].payments += debt.minimumPayment || 0;
+    return acc;
+  }, {});
 
-  // Calculate total interest paid (this would need transaction history)
-  const totalInterestPaid = 0; // Placeholder - would require transaction analysis
+  const totalInterestPaid = debts.reduce((sum, debt) => {
+    return (
+      sum +
+      (debt.paymentHistory || []).reduce((historySum, payment) => {
+        return historySum + (payment.interestPortion || 0);
+      }, 0)
+    );
+  }, 0);
 
   // Calculate debts due soon (within 7 days)
   const today = new Date();
-  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const dueSoonCutoff = new Date();
+  dueSoonCutoff.setDate(today.getDate() + 7);
 
   const dueSoonDebts = activeDebts.filter((debt) => {
-    if (!debt.nextPaymentDate) return false;
-    const dueDate = new Date(debt.nextPaymentDate);
-    return dueDate >= today && dueDate <= nextWeek;
+    if (!debt.paymentDueDate) return false;
+    const dueDate = new Date(debt.paymentDueDate);
+    return dueDate >= today && dueDate <= dueSoonCutoff;
   });
 
-  const dueSoonAmount = dueSoonDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
+  const dueSoonAmount = dueSoonDebts.reduce((sum, debt) => sum + (debt.minimumPayment || 0), 0);
   const dueSoonCount = dueSoonDebts.length;
 
   return {

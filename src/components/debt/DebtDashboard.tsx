@@ -14,7 +14,7 @@ import StandardTabs from "../ui/StandardTabs";
  * Main debt tracking dashboard component
  * Pure UI component - all business logic handled by useDebtDashboard hook
  */
-const DebtDashboard: React.FC = () => {
+const DebtDashboard = () => {
   const {
     debts: filteredDebts,
     debtStats,
@@ -39,142 +39,165 @@ const DebtDashboard: React.FC = () => {
 
   // Tab configuration
   const tabs = [
-    { id: "overview", label: "Overview", icon: getIcon("CreditCard"), color: "red" as const },
+    { id: "overview", label: "Overview", icon: "CreditCard", color: "red" },
     {
       id: "strategies",
       label: "Payoff Strategies",
-      icon: getIcon("Target"),
-      color: "purple" as const,
+      icon: "Target",
+      color: "purple",
     },
   ];
 
-  if (!isDebtFeatureEnabled("ENABLE_DEBT_DASHBOARD")) {
-    return (
-      <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h2 className="text-lg font-semibold text-yellow-800 mb-2">Debt Dashboard Disabled</h2>
-        <p className="text-yellow-700">
-          The debt dashboard is currently disabled for debugging. Enable it in debtDebugConfig.js
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Header with Quick Actions */}
-      <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-black text-black mb-2">
-              <span className="text-3xl">D</span>EBT <span className="text-3xl">T</span>RACKING
-            </h1>
-            <p className="text-purple-900">Manage your debt payoff strategy and track progress</p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {upcomingPayments.length > 0 && (
-              <button
-                onClick={() => setShowUpcomingPaymentsModal(true)}
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg border-2 border-black font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
-              >
-                {React.createElement(getIcon("Clock"), {
-                  className: "w-4 h-4",
+    <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap md:flex-nowrap justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="font-black text-black text-base flex items-center">
+            <div className="relative mr-4">
+              <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
+              <div className="relative bg-red-500 p-3 rounded-2xl">
+                {React.createElement(getIcon("CreditCard"), {
+                  className: "h-6 w-6 text-white",
                 })}
-                {upcomingPayments.length} Due Soon
-              </button>
-            )}
+              </div>
+            </div>
+            <span className="text-lg">D</span>EBT <span className="text-lg">T</span>RACKING
+          </h2>
+          <p className="text-purple-900 mt-1">
+            {debtStats.activeDebtCount} active debts • Total: ${debtStats.totalDebt.toFixed(2)}
+          </p>
+        </div>
 
-            <button
-              onClick={handleAddDebt}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg border-2 border-black font-semibold hover:bg-red-600 transition-colors flex items-center gap-2"
-            >
-              {React.createElement(getIcon("Plus"), { className: "w-4 h-4" })}
-              Add Debt
-            </button>
-          </div>
+        <div className="flex flex-row gap-3">
+          <button
+            onClick={handleAddDebt}
+            className="btn btn-primary border-2 border-black flex items-center"
+            data-tour="add-debt"
+          >
+            {React.createElement(getIcon("Plus"), {
+              className: "h-4 w-4 mr-2",
+            })}
+            Add Debt
+          </button>
         </div>
       </div>
 
-      {/* Main Content with Tabs */}
-      <div className="rounded-lg p-6 border-2 border-black bg-white/90 backdrop-blur-sm">
-        <StandardTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Tab Content with connected navigation */}
+      <div className="bg-white rounded-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10">
+        {/* Tab Navigation */}
+        <StandardTabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          variant="colored"
+          className="border-b border-gray-200"
+        />
 
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            {/* Summary Cards */}
-            {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") && (
-              <DebtSummaryCards 
-                stats={debtStats} 
-                onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
-              />
-            )}
+        {/* Tab Content */}
+        <div className="p-6">
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              {/* Summary Cards */}
+              {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") ? (
+                <DebtSummaryCards
+                  stats={debtStats}
+                  onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
+                />
+              ) : (
+                <div className="rounded-lg border border-gray-200 p-6 text-center">
+                  <p className="text-gray-500">Summary Cards disabled for debugging</p>
+                </div>
+              )}
 
-            {/* Filters */}
-            {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-              <DebtFilters
-                filterOptions={filterOptions}
-                setFilterOptions={setFilterOptions}
-                debtTypes={Object.keys(debtStats.debtsByType || {})}
-                debtsByType={debtStats.debtsByType}
-              />
-            )}
+              {/* Filters and Controls */}
+              {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
+                <DebtFilters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
+              )}
 
-            {/* Debt List */}
-            {isDebtFeatureEnabled("ENABLE_DEBT_LIST") && (
-              <DebtList
-                debts={filteredDebts}
-                onDebtClick={handleDebtClick}
-                onRecordPayment={handleRecordPayment}
-              />
-            )}
-          </div>
-        )}
+              {/* Debt List */}
+              {isDebtFeatureEnabled("ENABLE_DEBT_LIST") ? (
+                <div className="rounded-lg border border-gray-200">
+                  <div className="p-4 border-b bg-gray-50 rounded-t-lg">
+                    <h3 className="font-black text-black text-base flex items-center">
+                      {React.createElement(getIcon("TrendingDown"), {
+                        className: "h-4 w-4 mr-2 text-red-600",
+                      })}
+                      <span className="text-lg">Y</span>OUR <span className="text-lg">D</span>EBTS (
+                      {filteredDebts.length})
+                    </h3>
+                  </div>
 
-        {activeTab === "strategies" && (
-          <div className="p-6">
-            <div className="text-center text-gray-500">
-              <p>Debt payoff strategies feature is currently disabled.</p>
-              <p className="text-sm mt-2">
-                Enable ENABLE_DEBT_STRATEGIES in debtDebugConfig.js to use this feature.
-              </p>
+                  {filteredDebts.length === 0 ? (
+                    <div className="text-center py-12">
+                      {React.createElement(getIcon("CreditCard"), {
+                        className: "h-12 w-12 mx-auto text-gray-300 mb-4",
+                      })}
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Debts Found</h3>
+                      <p className="text-gray-500 mb-4">
+                        Start tracking your debts to get insights into your debt payoff journey.
+                      </p>
+                      <button
+                        onClick={handleAddDebt}
+                        className="btn btn-primary border-2 border-black"
+                      >
+                        {React.createElement(getIcon("Plus"), {
+                          className: "h-4 w-4 mr-2",
+                        })}
+                        Add Your First Debt
+                      </button>
+                    </div>
+                  ) : (
+                    <DebtList
+                      debts={filteredDebts}
+                      onDebtClick={handleDebtClick}
+                      onRecordPayment={handleRecordPayment}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-gray-200 p-6 text-center">
+                  <p className="text-purple-900">Debt List disabled for debugging</p>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Strategies Tab */}
+          {activeTab === "strategies" && (
+            <div className="text-center">
+              <p className="text-gray-600">Debt strategies temporarily disabled for debugging</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modals */}
-      {isDebtFeatureEnabled("ENABLE_DEBT_MODALS") && (
-        <>
-          {showAddModal && (
-            <AddDebtModal
-              isOpen={showAddModal}
-              onSubmit={handleModalSubmit}
-              onClose={() => setSelectedDebt(null)}
-              debt={editingDebt}
-            />
-          )}
-
-          {selectedDebt && !showAddModal && (
-            <DebtDetailModal
-              debt={selectedDebt}
-              isOpen={!!selectedDebt}
-              onClose={() => setSelectedDebt(null)}
-              onEdit={handleEditDebt}
-              onDelete={handleDeleteDebt}
-              onRecordPayment={handleRecordPayment}
-              _onLinkToBill={() => {}}
-            />
-          )}
-
-          {showUpcomingPaymentsModal && (
-            <UpcomingPaymentsModal
-              upcomingPayments={upcomingPayments}
-              isOpen={showUpcomingPaymentsModal}
-              onClose={() => setShowUpcomingPaymentsModal(false)}
-            />
-          )}
-        </>
+      {isDebtFeatureEnabled("ENABLE_ADD_DEBT_MODAL") && (
+        <AddDebtModal
+          isOpen={showAddModal || !!editingDebt}
+          onClose={() => setSelectedDebt(null)}
+          onSubmit={handleModalSubmit}
+          debt={editingDebt}
+        />
       )}
+
+      {selectedDebt && isDebtFeatureEnabled("ENABLE_DEBT_DETAIL_MODAL") && (
+        <DebtDetailModal
+          debt={selectedDebt}
+          isOpen={!!selectedDebt}
+          onClose={() => setSelectedDebt(null)}
+          onDelete={handleDeleteDebt}
+          onRecordPayment={handleRecordPayment}
+          onEdit={handleEditDebt}
+        />
+      )}
+
+      <UpcomingPaymentsModal
+        isOpen={showUpcomingPaymentsModal}
+        onClose={() => setShowUpcomingPaymentsModal(false)}
+        upcomingPayments={upcomingPayments}
+      />
     </div>
   );
 };

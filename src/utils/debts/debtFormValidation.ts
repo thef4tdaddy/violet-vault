@@ -3,30 +3,14 @@
  * Extracted financial validation logic for debt forms
  */
 
-import type { DebtFormData, DebtFormErrors } from "../../types/debt";
-
-interface ValidationResult {
-  isValid: boolean;
-  errors: DebtFormErrors;
-  warnings: string[];
-  parsedData: DebtFormData;
-}
-
-interface DebtMetrics {
-  payoffTimeMonths: number;
-  totalInterestPaid: number;
-  totalAmountPaid: number;
-  effectiveAPR: number;
-  monthlyInterestCost: number;
-  payoffDate: Date;
-}
-
 /**
  * Validate debt form data with financial business rules
+ * @param {Object} formData - Raw form data
+ * @returns {Object} Validation result with errors and parsed data
  */
-export function validateDebtFormData(formData: any): ValidationResult {
-  const errors: DebtFormErrors = {};
-  const warnings: string[] = [];
+export function validateDebtFormData(formData) {
+  const errors = {};
+  const warnings = [];
 
   // Basic required field validation
   if (!formData.name?.trim()) {
@@ -38,13 +22,9 @@ export function validateDebtFormData(formData: any): ValidationResult {
   }
 
   // Financial validation
-  const currentBalance = parseFloat(formData.currentBalance || formData.balance);
-  if (
-    (!formData.currentBalance && !formData.balance) ||
-    isNaN(currentBalance) ||
-    currentBalance < 0
-  ) {
-    errors.balance = "Valid current balance is required";
+  const currentBalance = parseFloat(formData.currentBalance);
+  if (!formData.currentBalance || isNaN(currentBalance) || currentBalance < 0) {
+    errors.currentBalance = "Valid current balance is required";
   }
 
   const originalBalance = formData.originalBalance ? parseFloat(formData.originalBalance) : null;
@@ -94,81 +74,133 @@ export function validateDebtFormData(formData: any): ValidationResult {
     errors,
     warnings,
     parsedData: {
-      name: formData.name?.trim() || "",
-      creditor: formData.creditor?.trim() || "",
+      name: formData.name?.trim(),
+      creditor: formData.creditor?.trim(),
       type: formData.type,
-      balance: currentBalance,
+      currentBalance,
+      originalBalance: originalBalance || currentBalance,
       interestRate,
       minimumPayment,
-      status: formData.status,
       paymentFrequency: formData.paymentFrequency,
-      compoundFrequency: formData.compoundFrequency,
+      paymentDueDate: formData.paymentDueDate,
       notes: formData.notes?.trim() || "",
-      specialTerms: formData.specialTerms,
-    } as DebtFormData,
+    },
   };
 }
 
 /**
  * Calculate debt metrics for display and analysis
+ * @param {Object} debtData - Validated debt data
+ * @returns {Object} Calculated debt metrics
  */
-export function calculateDebtMetrics(debtData: DebtFormData): DebtMetrics | null {
-  const { balance, interestRate, minimumPayment, paymentFrequency = "monthly" } = debtData;
+export function calculateDebtMetrics(debtData) {
+  const {
+    currentBalance,
+    originalBalance,
+    interestRate,
+    minimumPayment,
+    paymentFrequency = "monthly",
+  } = debtData;
 
-  if (!balance || !minimumPayment) {
+  if (!currentBalance || !minimumPayment) {
     return null;
   }
 
-  // Convert annual interest rate to monthly
-  const monthlyInterestRate = interestRate / 100 / 12;
-
-  // Calculate payoff time using amortization formula
-  let payoffTimeMonths = 0;
-  let totalInterestPaid = 0;
-
-  if (monthlyInterestRate === 0) {
-    // No interest case
-    payoffTimeMonths = balance / minimumPayment;
-    totalInterestPaid = 0;
-  } else {
-    // With interest - use standard loan amortization
-    if (minimumPayment <= balance * monthlyInterestRate) {
-      // Payment doesn't cover interest - never pays off
-      payoffTimeMonths = 999; // Cap at 999 months for UI purposes
-      totalInterestPaid = balance * 10; // Rough estimate
-    } else {
-      payoffTimeMonths =
-        -Math.log(1 - (balance * monthlyInterestRate) / minimumPayment) /
-        Math.log(1 + monthlyInterestRate);
-      totalInterestPaid = minimumPayment * payoffTimeMonths - balance;
-    }
+  // Convert annual interest rate to appropriate period rate
+  let periodsPerYear = 12; // default to monthly
+  switch (paymentFrequency) {
+    case "weekly":
+      periodsPerYear = 52;
+      break;
+    case "biweekly":
+      periodsPerYear = 26;
+      break;
+    case "monthly":
+      periodsPerYear = 12;
+      break;
+    case "quarterly":
+      periodsPerYear = 4;
+      break;
+    case "annually":
+      periodsPerYear = 1;
+      break;
   }
 
-  const totalAmountPaid = balance + totalInterestPaid;
-  const payoffDate = new Date();
-  payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(payoffTimeMonths));
+  const periodInterestRate = interestRate / 100 / periodsPerYear;
 
-  // Calculate effective APR (accounting for payment frequency)
-  const paymentsPerYear =
-    paymentFrequency === "weekly"
-      ? 52
-      : paymentFrequency === "biweekly"
-        ? 26
-        : paymentFrequency === "quarterly"
-          ? 4
-          : paymentFrequency === "annually"
-            ? 1
-            : 12;
+  // Calculate basic metrics
+  const totalPaid = originalBalance - currentBalance;
+  const paymentToBalanceRatio = minimumPayment / currentBalance;
 
-  const effectiveAPR = Math.pow(1 + monthlyInterestRate, 12) - 1;
-  const monthlyInterestCost = balance * monthlyInterestRate;
+  // Simple payoff calculation (assumes minimum payments only)
+  let monthsToPayoff = null;
+  let totalInterest = null;
+
+  if (periodInterestRate > 0) {
+    // Formula: n = -log(1 - (r * P) / A) / log(1 + r)
+    // Where: P = principal, A = payment, r = period interest rate
+    const ratio = (periodInterestRate * currentBalance) / minimumPayment;
+
+    if (ratio < 1) {
+      // Payment is sufficient to pay off debt
+      monthsToPayoff = -Math.log(1 - ratio) / Math.log(1 + periodInterestRate);
+      totalInterest = monthsToPayoff * minimumPayment - currentBalance;
+
+      // Convert periods back to months for consistency
+      if (paymentFrequency !== "monthly") {
+        monthsToPayoff = monthsToPayoff * (12 / periodsPerYear);
+      }
+    } else {
+      // Payment is not sufficient (only covers interest)
+      monthsToPayoff = Infinity;
+      totalInterest = Infinity;
+    }
+  } else {
+    // No interest case
+    monthsToPayoff = currentBalance / minimumPayment;
+    totalInterest = 0;
+  }
 
   return {
-    payoffTimeMonths: Math.ceil(payoffTimeMonths),
-    totalInterestPaid,
-    totalAmountPaid,
-    effectiveAPR: effectiveAPR * 100,
-    monthlyInterestCost,
-    payoffDate,
+    totalPaid,
+    paymentToBalanceRatio,
+    monthsToPayoff: monthsToPayoff === Infinity ? null : Math.ceil(monthsToPayoff),
+    totalInterest: totalInterest === Infinity ? null : Math.max(0, totalInterest),
+    isPaymentSufficient: monthsToPayoff !== Infinity,
+    monthlyInterestCost: currentBalance * (interestRate / 100 / 12),
+  };
+}
+
+/**
+ * Format debt metrics for display
+ * @param {Object} metrics - Calculated debt metrics
+ * @returns {Object} Formatted strings for display
+ */
+export function formatDebtMetrics(metrics) {
+  if (!metrics) {
+    return null;
+  }
+
+  const { monthsToPayoff, totalInterest, isPaymentSufficient, monthlyInterestCost } = metrics;
+
+  let payoffTimeDisplay = "Unable to calculate";
+  if (isPaymentSufficient && monthsToPayoff) {
+    const years = Math.floor(monthsToPayoff / 12);
+    const months = monthsToPayoff % 12;
+
+    if (years > 0) {
+      payoffTimeDisplay = `${years} year${years > 1 ? "s" : ""}${months > 0 ? ` ${months} month${months > 1 ? "s" : ""}` : ""}`;
+    } else {
+      payoffTimeDisplay = `${months} month${months > 1 ? "s" : ""}`;
+    }
+  } else if (!isPaymentSufficient) {
+    payoffTimeDisplay = "Payment insufficient (covers interest only)";
+  }
+
+  return {
+    payoffTime: payoffTimeDisplay,
+    totalInterest: totalInterest ? `$${totalInterest.toFixed(2)}` : "N/A",
+    monthlyInterest: `$${monthlyInterestCost.toFixed(2)}`,
+    isPaymentSufficient,
   };
 }
