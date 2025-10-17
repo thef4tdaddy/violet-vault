@@ -5,14 +5,38 @@ import logger from "../../utils/common/logger";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 
 /**
+ * Firebase sync hook props
+ */
+interface UseFirebaseSyncProps {
+  firebaseSync: any; // Type will be properly defined when cloudSyncService is converted
+  encryptionKey: CryptoKey | null;
+  budgetId: string | null;
+  currentUser: any; // Type will be properly defined when UserData is imported
+}
+
+/**
+ * Firebase sync hook return type
+ */
+interface UseFirebaseSyncReturn {
+  activeUsers: any[];
+  recentActivity: any[];
+  handleManualSync: () => Promise<void>;
+}
+
+/**
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
+const useFirebaseSync = (
+  firebaseSync: any,
+  encryptionKey: CryptoKey | null,
+  budgetId: string | null,
+  currentUser: any
+): UseFirebaseSyncReturn => {
   const budget = useBudgetStore();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [activeUsers, setActiveUsers] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [_isLoading, _setIsLoading] = useState(false); // TODO: Use for loading states
 
   // Auto-initialize Firebase sync when dependencies are ready
@@ -60,7 +84,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   }, [firebaseSync, currentUser, budgetId, encryptionKey]);
 
   // Legacy code for manual save operations (if needed)
-  const _handleManualSave = async () => {
+  const _handleManualSave = async (): Promise<void> => {
     // TODO: Implement manual save functionality
     try {
       logger.production("Manual save triggered");
@@ -72,12 +96,12 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
         showErrorToast("Failed to save data");
       }
     } catch (error) {
-      logger.warn("Manual save failed:", error.message);
+      logger.warn("Manual save failed:", (error as Error).message);
       showErrorToast("Failed to save data");
     }
   };
 
-  const handleManualSync = useCallback(async () => {
+  const handleManualSync = useCallback(async (): Promise<void> => {
     try {
       if (!firebaseSync) return;
 
@@ -93,7 +117,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
       }
     } catch (err) {
       logger.error("Manual sync failed", err);
-      showErrorToast(`Sync failed: ${err.message}`, "Sync Failed");
+      showErrorToast(`Sync failed: ${(err as Error).message}`, "Sync Failed");
     }
   }, [firebaseSync, showErrorToast, showSuccessToast]);
 
@@ -101,7 +125,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   useEffect(() => {
     if (!budget.getActiveUsers || !budget.getRecentActivity) return;
 
-    const updateActivityData = () => {
+    const updateActivityData = (): void => {
       try {
         const users = budget.getActiveUsers();
         const activity = budget.getRecentActivity();
