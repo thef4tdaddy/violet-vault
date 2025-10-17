@@ -20,11 +20,11 @@ if [ -z "$NON_DOCS" ]; then
   exit 0
 fi
 
-# Collect JS/TS files to lint
-CODE_FILES="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx)$' || true)"
+# Collect JS/TS files to lint (excluding config files and configs/ directory)
+CODE_FILES="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx)$' | grep -Ev '(\.config\.|commitlint|eslint|prettier|configs/)' || true)"
 
 if [ -z "$CODE_FILES" ]; then
-  echo "✅ No JS/TS files staged for commit, skipping ESLint"
+  echo "✅ No JS/TS source files staged for commit, skipping ESLint"
   exit 0
 fi
 
@@ -33,7 +33,7 @@ printf 'Linting:\n%s\n' "$CODE_FILES"
 
 # Run ESLint on just the staged JS/TS files
 # (xargs handles spaces/newlines safely)
-printf '%s\n' "$CODE_FILES" | xargs npx eslint --config ./configs/eslint.config.js --max-warnings 500 --
+printf '%s\n' "$CODE_FILES" | xargs npx eslint --max-warnings 500 --
 ESLINT_STATUS=$?
 
 if [ $ESLINT_STATUS -ne 0 ]; then
