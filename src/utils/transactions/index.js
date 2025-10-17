@@ -17,7 +17,7 @@ export {
   removeSplit,
   prepareSplitTransactions,
   getSplitSummary,
-} from "./splitting.js";
+} from "./splitting";
 
 // Filtering and processing utilities
 export {

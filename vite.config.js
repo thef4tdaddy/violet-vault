@@ -378,7 +378,14 @@ export default defineConfig(() => {
       dedupe: ["react", "react-dom"],
       alias: {
         buffer: "buffer",
+        "@": "/src",
+        "@/components": "/src/components",
+        "@/hooks": "/src/hooks",
+        "@/utils": "/src/utils",
+        "@/stores": "/src/stores",
+        "@/types": "/src/types",
       },
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     },
     // Increase memory limits and optimize for build performance
     server: {
