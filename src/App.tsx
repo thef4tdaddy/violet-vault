@@ -15,12 +15,13 @@ import OfflineStatusIndicator from "./components/pwa/OfflineStatusIndicator";
 import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
+import { initializeStoreRegistry } from "./utils/stores/storeRegistry";
 
 // Lazy load monitoring to reduce main bundle size
 const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
 
 const App = () => {
-  // Initialize PWA manager and touch feedback
+  // Initialize PWA manager, touch feedback, and store registry
   useEffect(() => {
     const initializePWA = async () => {
       // Pass the actual store, not just state data
@@ -31,6 +32,9 @@ const App = () => {
 
     // Initialize haptic feedback for mobile interactions
     initializeTouchFeedback();
+
+    // Initialize store registry dev helpers (must be after component mount to avoid React Error #185)
+    initializeStoreRegistry();
   }, []); // Empty deps - only initialize once
 
   return (

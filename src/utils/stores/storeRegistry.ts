@@ -128,7 +128,13 @@ class StoreRegistry {
 // Global instance
 export const storeRegistry = new StoreRegistry();
 
-// Auto-initialize in development
-if (import.meta.env.DEV) {
-  storeRegistry.initializeDevHelpers();
-}
+/**
+ * Initialize store registry dev helpers
+ * MUST be called from App.tsx useEffect during mount, not at module scope
+ * to avoid React Error #185 infinite render loops
+ */
+export const initializeStoreRegistry = () => {
+  if (import.meta.env.DEV) {
+    storeRegistry.initializeDevHelpers();
+  }
+};
