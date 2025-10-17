@@ -48,7 +48,7 @@ const AutoFundingView = () => {
       );
     } catch (error) {
       logger.error("Failed to save rule", error);
-      globalToast.showError("Failed to save rule: " + error.message, "Save Failed");
+      globalToast.showError("Failed to save rule: " + error.message, "Save Failed", 8000);
     }
   };
 
@@ -64,10 +64,10 @@ const AutoFundingView = () => {
     if (confirmed) {
       try {
         deleteRule(ruleId);
-        globalToast.showSuccess("Rule deleted successfully!", "Success");
+        globalToast.showSuccess("Rule deleted successfully!", "Success", 5000);
       } catch (error) {
         logger.error("Failed to delete rule", error);
-        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed");
+        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed", 8000);
       }
     }
   };
@@ -77,7 +77,7 @@ const AutoFundingView = () => {
       toggleRule(ruleId);
     } catch (error) {
       logger.error("Failed to toggle rule", error);
-      globalToast.showError("Failed to toggle rule: " + error.message, "Toggle Failed");
+      globalToast.showError("Failed to toggle rule: " + error.message, "Toggle Failed", 8000);
     }
   };
 
@@ -114,11 +114,11 @@ const AutoFundingView = () => {
           );
         }
       } else {
-        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed");
+        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed", 8000);
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed");
+      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed", 8000);
     } finally {
       setIsExecuting(false);
     }

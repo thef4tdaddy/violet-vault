@@ -109,7 +109,7 @@ const useSupplementalAccounts = ({
   const handleAddAccount = () => {
     const validation = validateAccountForm(accountForm);
     if (!validation.isValid) {
-      globalToast.showError(validation.message, "Validation Error");
+      globalToast.showError(validation.message, "Validation Error", 8000);
       return;
     }
 
@@ -188,7 +188,7 @@ const useSupplementalAccounts = ({
   const handleTransfer = () => {
     const validation = validateTransferForm(transferForm, transferringAccount);
     if (!validation.isValid) {
-      globalToast.showError(validation.message, "Transfer Error");
+      globalToast.showError(validation.message, "Transfer Error", 8000);
       return;
     }
 

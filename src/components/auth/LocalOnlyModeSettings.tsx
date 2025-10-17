@@ -81,7 +81,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
 
       const validation = validateImportFile();
       if (!validation.valid) {
-        globalToast.showError(`Invalid import file: ${validation.error}`, "Invalid File");
+        globalToast.showError(`Invalid import file: ${validation.error}`, "Invalid File", 8000);
         return;
       }
 
@@ -93,10 +93,10 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
         setStats(newStats as Stats);
       }
 
-      globalToast.showSuccess("Data imported successfully!", "Import Complete");
+      globalToast.showSuccess("Data imported successfully!", "Import Complete", 5000);
     } catch (err) {
       logger.error("Import failed:", err);
-      globalToast.showError(`Import failed: ${(err as Error).message}`, "Import Failed");
+      globalToast.showError(`Import failed: ${(err as Error).message}`, "Import Failed", 8000);
     }
   };
 
@@ -121,7 +121,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
       }
 
       setShowConfirmClear(false);
-      globalToast.showSuccess("All data cleared successfully!", "Data Cleared");
+      globalToast.showSuccess("All data cleared successfully!", "Data Cleared", 5000);
     } catch (err) {
       logger.error("Failed to clear data:", err);
     }

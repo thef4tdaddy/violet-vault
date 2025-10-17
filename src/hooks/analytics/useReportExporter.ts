@@ -313,7 +313,7 @@ export const useReportExporter = () => {
         onClose?.();
       } catch (error) {
         logger.error("Export failed", error);
-        globalToast.showError("Export failed. Please try again.", "Export Failed");
+        globalToast.showError("Export failed. Please try again.", "Export Failed", 8000);
       } finally {
         setIsExporting(false);
         setExportProgress(0);

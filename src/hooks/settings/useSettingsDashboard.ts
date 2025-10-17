@@ -231,7 +231,7 @@ export const useSettingsActions = () => {
         "Test History Created"
       );
     } catch (error) {
-      globalToast.showError("❌ Failed to create test history: " + error.message, "Test Failed");
+      globalToast.showError("❌ Failed to create test history: " + error.message, "Test Failed", 8000);
     }
   }, []);
 

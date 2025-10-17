@@ -65,6 +65,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
           subtext={card.subtext}
           color={card.color}
           alert={card.alert}
+          onClick={() => {}}
         />
       ))}
     </div>

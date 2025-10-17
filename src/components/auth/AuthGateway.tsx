@@ -18,10 +18,10 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
     const checkExistingMode = async () => {
       try {
         const result = await checkLocalOnlyMode();
-        if (result.success) {
+        if (result.success && localOnlyUser) {
           // Already in local-only mode
           setAuthMode("local-only");
-          onLocalOnlyReady(result.user);
+          onLocalOnlyReady(localOnlyUser);
         } else {
           // Check if there's saved encrypted data (standard mode)
           const savedData = localStorage.getItem("envelopeBudgetData");
@@ -42,7 +42,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
     };
 
     checkExistingMode();
-  }, [checkLocalOnlyMode, onLocalOnlyReady]);
+  }, [checkLocalOnlyMode, onLocalOnlyReady, localOnlyUser]);
 
   // Loading state while checking for existing modes
   if (isCheckingLocalMode) {

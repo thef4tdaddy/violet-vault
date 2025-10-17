@@ -54,6 +54,7 @@ const BillSummaryCards = ({ totals = {} }) => {
           subtext={card.subtext}
           color={card.color}
           alert={card.alert}
+          onClick={() => {}}
         />
       ))}
     </div>
