@@ -4,8 +4,6 @@
  */
 
 import type {
-  IFirebaseSyncService,
-  IChunkedSyncService,
   FirebaseServiceStatus,
   ChunkedSyncStats,
   SyncMetadata,
@@ -15,7 +13,6 @@ import type {
   TypedResponse,
   SafeUnknown,
 } from "../../types/firebase";
-import type { ApiResponse } from "../../types/common";
 
 // Enhanced sync service interface with type safety
 // Note: Does not extend IFirebaseSyncService due to incompatible return types
