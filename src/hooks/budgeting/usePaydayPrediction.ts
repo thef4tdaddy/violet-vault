@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { predictNextPayday, checkRecentPayday } from "../../utils/budgeting/paydayPredictor";
 import useToast from "../common/useToast";
 import logger from "../../utils/common/logger";
+import { budgetStorageService } from "../../services/budgetStorageService";
 
 /**
  * Custom hook for payday prediction and notifications
@@ -22,7 +23,7 @@ const usePaydayPrediction = (paycheckHistory, isUnlocked) => {
         const recentPayday = checkRecentPayday(prediction);
 
         // Check if we should show a payday notification
-        const lastNotification = localStorage.getItem("lastPaydayNotification");
+        const lastNotification = budgetStorageService.getItem("lastPaydayNotification");
         const today = new Date().toDateString();
 
         // Show notification if:
@@ -44,7 +45,7 @@ const usePaydayPrediction = (paycheckHistory, isUnlocked) => {
 
           if (title && message) {
             showPayday(title, message, 10000); // Show for 10 seconds
-            localStorage.setItem("lastPaydayNotification", today);
+            budgetStorageService.setItem("lastPaydayNotification", today);
           }
         }
       } catch (error) {

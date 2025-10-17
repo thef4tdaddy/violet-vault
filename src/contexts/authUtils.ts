@@ -6,6 +6,7 @@ import type {
   SessionData,
 } from "./authConstants";
 import type { UserData } from "../types/auth";
+import { authStorageService } from "../services/authStorageService";
 
 /**
  * Utility functions for AuthContext
@@ -17,19 +18,19 @@ import type { UserData } from "../types/auth";
  */
 type SetAuthState = React.Dispatch<React.SetStateAction<AuthContextState>>;
 
-// Helper function to initialize auth state from localStorage
+// Helper function to initialize auth state from storage
 export const initializeAuthFromStorage = async (
   setAuthState: SetAuthState
 ): Promise<void> => {
   try {
-    logger.auth("AuthContext: Initializing auth state from localStorage");
+    logger.auth("AuthContext: Initializing auth state from storage");
 
     // Check for saved user profile
-    const savedProfile = localStorage.getItem("userProfile");
-    const savedBudgetData = localStorage.getItem("envelopeBudgetData");
+    const savedProfile = authStorageService.loadUserProfile();
+    const hasBudgetData = authStorageService.hasBudgetData();
 
     if (savedProfile) {
-      const profile = JSON.parse(savedProfile) as UserData;
+      const profile = savedProfile;
       logger.auth("AuthContext: Found saved profile", {
         userName: profile.userName,
         hasColor: !!profile.userColor,
@@ -46,7 +47,7 @@ export const initializeAuthFromStorage = async (
         isUnlocked: false,
         isLoading: false,
       }));
-    } else if (savedBudgetData) {
+    } else if (hasBudgetData) {
       // Has budget data but no profile - legacy state
       logger.auth("AuthContext: Found budget data without profile - legacy state");
       setAuthState((prev) => ({

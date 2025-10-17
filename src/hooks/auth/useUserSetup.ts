@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 import { budgetDb, clearData } from "../../db/budgetDb";
+import { authStorageService } from "../../services/authStorageService";
+import { budgetStorageService } from "../../services/budgetStorageService";
 
 /**
  * User Setup Hook
@@ -23,18 +25,18 @@ export const useUserSetup = (onSetupComplete) => {
   useEffect(() => {
     const checkUserData = async () => {
       logger.debug("🔍 UserSetup mounted, checking for saved profile");
-      const savedProfile = localStorage.getItem("userProfile");
-      const savedData = localStorage.getItem("envelopeBudgetData");
+      const savedProfile = authStorageService.loadUserProfile();
+      const hasSavedBudgetData = authStorageService.hasBudgetData();
 
       if (savedProfile) {
         try {
-          const profile = JSON.parse(savedProfile);
+          const profile = savedProfile;
           logger.debug("📋 Found saved profile:", profile);
           setUserName(profile.userName || "");
           setUserColor(profile.userColor || "#a855f7");
 
           // Check for budget data in localStorage first, then Dexie
-          let hasBudgetData = !!savedData;
+          let hasBudgetData = hasSavedBudgetData;
 
           if (!hasBudgetData) {
             try {
@@ -59,8 +61,8 @@ export const useUserSetup = (onSetupComplete) => {
             setIsReturningUser(true);
             logger.debug("👋 Returning user detected", {
               hasProfile: !!savedProfile,
-              hasLocalStorageData: !!savedData,
-              hasDexieData: hasBudgetData && !savedData,
+              hasLocalStorageData: hasSavedBudgetData,
+              hasDexieData: hasBudgetData && !hasSavedBudgetData,
               userName: profile.userName,
             });
           } else {
@@ -254,8 +256,7 @@ export const useUserSetup = (onSetupComplete) => {
     logger.debug("🗑️ Clearing saved profile and budget data");
 
     // Clear localStorage data
-    localStorage.removeItem("userProfile");
-    localStorage.removeItem("envelopeBudgetData");
+    authStorageService.clearAll();
 
     // Clear IndexedDB/Dexie data
     try {
@@ -280,7 +281,7 @@ export const useUserSetup = (onSetupComplete) => {
     ];
 
     keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
+      budgetStorageService.removeItem(key);
       logger.debug(`🗑️ Cleared localStorage key: ${key}`);
     });
 

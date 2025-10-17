@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers, prefetchHelpers } from "../../../utils/common/queryClient";
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.ts";
+import { budgetStorageService } from "../../../services/budgetStorageService";
 
 export const useBudgetUtilities = () => {
   const queryClient = useQueryClient();
@@ -20,7 +21,7 @@ export const useBudgetUtilities = () => {
   // Sync utilities
   const syncStatus = {
     isOnline: navigator.onLine,
-    lastSyncTime: localStorage.getItem("lastSyncTime"),
+    lastSyncTime: budgetStorageService.getLastSyncTime(),
     hasPendingChanges: false,
   };
 
@@ -28,7 +29,7 @@ export const useBudgetUtilities = () => {
   const forceSync = async () => {
     try {
       await queryClient.refetchQueries();
-      localStorage.setItem("lastSyncTime", new Date().toISOString());
+      budgetStorageService.setLastSyncTime(new Date().toISOString());
       logger.info("Force sync completed", { source: "forceSync" });
     } catch (error) {
       logger.error("Force sync failed", error, { source: "forceSync" });

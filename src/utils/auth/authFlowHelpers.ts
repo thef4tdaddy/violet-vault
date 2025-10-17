@@ -3,6 +3,7 @@
  * Extracted from useAuthFlow for better maintainability and ESLint compliance
  */
 import logger from "../common/logger";
+import { authStorageService } from "../../services/authStorageService";
 
 /**
  * Handle existing user login flow
@@ -98,8 +99,8 @@ export const handleNewUserSetup = async (password, userData, login) => {
 
     logger.auth("✅ Budget history system ready (Dexie-based)");
 
-    if (!localStorage.getItem("passwordLastChanged")) {
-      localStorage.setItem("passwordLastChanged", Date.now().toString());
+    if (!authStorageService.getPasswordLastChanged()) {
+      authStorageService.setPasswordLastChanged(Date.now());
     }
 
     return result;

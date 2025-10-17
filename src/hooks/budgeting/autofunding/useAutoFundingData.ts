@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import logger from "../../../utils/common/logger";
+import { budgetStorageService } from "../../../services/budgetStorageService";
 
 const STORAGE_KEY = "violetVault_autoFunding";
 
@@ -18,7 +19,7 @@ export const useAutoFundingData = () => {
     try {
       setIsLoading(true);
 
-      const savedData = localStorage.getItem(STORAGE_KEY);
+      const savedData = budgetStorageService.getItem(STORAGE_KEY);
       let data = null;
 
       if (savedData) {
@@ -54,7 +55,7 @@ export const useAutoFundingData = () => {
         version: "1.1", // Increment version for new extracted utilities format
       };
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+      budgetStorageService.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
       setLastSaved(dataToSave.lastSaved);
       setHasUnsavedChanges(false);
 
@@ -73,7 +74,7 @@ export const useAutoFundingData = () => {
   // Load data from localStorage
   const loadData = useCallback(() => {
     try {
-      const savedData = localStorage.getItem(STORAGE_KEY);
+      const savedData = budgetStorageService.getItem(STORAGE_KEY);
       if (!savedData) {
         return null;
       }
@@ -163,7 +164,7 @@ export const useAutoFundingData = () => {
   // Clear all data
   const clearData = useCallback(() => {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      budgetStorageService.removeItem(STORAGE_KEY);
       setLastSaved(null);
       setHasUnsavedChanges(false);
 
@@ -214,22 +215,23 @@ export const useAutoFundingData = () => {
       const testKey = `${STORAGE_KEY}_test`;
       const testData = JSON.stringify({ test: true });
 
-      localStorage.setItem(testKey, testData);
-      const retrieved = localStorage.getItem(testKey);
-      localStorage.removeItem(testKey);
+      budgetStorageService.setItem(testKey, testData);
+      const retrieved = budgetStorageService.getItem(testKey);
+      budgetStorageService.removeItem(testKey);
 
       if (retrieved !== testData) {
         throw new Error("Storage read/write test failed");
       }
 
       // Get current data size
-      const currentData = localStorage.getItem(STORAGE_KEY);
+      const currentData = budgetStorageService.getItem(STORAGE_KEY);
       const currentSize = currentData ? new Blob([currentData]).size : 0;
 
       // Estimate available space (rough approximation)
       const storageQuota = 5 * 1024 * 1024; // Assume 5MB localStorage limit
-      const usedSpace = Object.keys(localStorage)
-        .map((key) => localStorage.getItem(key))
+      const usedSpace = budgetStorageService
+        .getAllKeys()
+        .map((key) => budgetStorageService.getItem(key))
         .reduce((total, item) => total + (item ? new Blob([item]).size : 0), 0);
 
       return {
