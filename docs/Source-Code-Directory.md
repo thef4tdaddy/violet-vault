@@ -632,3 +632,16 @@ _Testing utilities and test files_
 - Comprehensive activity logging with tamper detection
 - Hash chain verification for budget history integrity
 - Real-time security status monitoring
+
+---
+
+## 📚 Related Documentation
+
+For contributors working with this codebase:
+
+- **[📘 TypeScript Patterns Guide](./TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
+- **[🎨 Shared UI Components](./Shared-UI-Components.md)** - Standardized components and design patterns
+- **[🧪 Testing Strategy](./Testing-Strategy.md)** - Comprehensive testing approach
+- **[🏗️ Component Refactoring Standards](./Component-Refactoring-Standards.md)** - Systematic refactoring methodology
+- **[🔄 Zustand Safe Patterns](./Zustand-Safe-Patterns.md)** - State management best practices
+- **[⚠️ ESLint Rules](./ESLint-Rules.md)** - Code quality and linting standards
