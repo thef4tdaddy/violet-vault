@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, type UseMutationResult } from "@tanstack/react-query";
 import { useAuth } from "../../contexts/AuthContext";
 import logger from "../../utils/common/logger";
 
@@ -16,23 +16,30 @@ import { usePasswordValidation } from "./queries/usePasswordValidation";
  * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
  */
 
+/**
+ * Logout result type
+ */
+interface LogoutResult {
+  success: boolean;
+}
+
 // Query Keys
 export const authQueryKeys = {
-  all: ["auth"],
-  user: () => [...authQueryKeys.all, "user"],
-  session: () => [...authQueryKeys.all, "session"],
-  validation: (password) => [...authQueryKeys.all, "validation", password],
+  all: ["auth"] as const,
+  user: () => [...authQueryKeys.all, "user"] as const,
+  session: () => [...authQueryKeys.all, "session"] as const,
+  validation: (password: string) => [...authQueryKeys.all, "validation", password] as const,
 };
 
 /**
  * Hook for logout mutation
  */
-export const useLogoutMutation = () => {
+export const useLogoutMutation = (): UseMutationResult<LogoutResult, Error, void, unknown> => {
   const { clearAuth } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (): Promise<LogoutResult> => {
       logger.auth("Logging out and clearing auth state.");
       // Clear any sensitive data if needed
       return { success: true };
@@ -41,7 +48,7 @@ export const useLogoutMutation = () => {
       clearAuth();
       queryClient.clear(); // Clear all cached data on logout
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Logout failed", error);
       // Still clear auth state even if something goes wrong
       clearAuth();
