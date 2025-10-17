@@ -5,10 +5,86 @@ import logger from "../common/logger";
  * Handles browser compatibility and permission management for push notifications
  */
 
+export interface BrowserSupport {
+  serviceWorker: boolean;
+  pushManager: boolean;
+  notifications: boolean;
+  showNotification: boolean;
+  firebase: boolean;
+}
+
+export interface BrowserInfo {
+  isChrome: boolean;
+  isFirefox: boolean;
+  isSafari: boolean;
+  isEdge: boolean;
+  isIOS: boolean;
+  isAndroid: boolean;
+  isMobile: boolean;
+}
+
+export interface BrowserSupportResult {
+  isSupported: boolean;
+  support: BrowserSupport;
+  browserInfo: BrowserInfo;
+  details: {
+    userAgent: string;
+    platform: string;
+  };
+}
+
+export interface NotificationPermissionStatus {
+  status: NotificationPermission | "unsupported";
+  granted: boolean;
+  denied: boolean;
+  default: boolean;
+  canRequest: boolean;
+}
+
+export interface PermissionRequestResult {
+  success: boolean;
+  permission: NotificationPermission | "unsupported" | "error";
+  reason: string;
+  timestamp?: number;
+  error?: string;
+  browserSupport?: BrowserSupportResult;
+  instructions?: PermissionInstructions;
+}
+
+export interface PermissionInstructions {
+  browser: string;
+  steps: string[];
+  alternative?: string;
+  note?: string;
+}
+
+export interface NotificationHistory {
+  hasGranted: boolean;
+  hasDenied: boolean;
+  hasDismissed: boolean;
+  grantedAt: Date | null;
+  deniedAt: Date | null;
+  dismissedAt: Date | null;
+}
+
+export interface PromptAvailability {
+  canShow: boolean;
+  reason: string;
+  nextAvailable: Date | null;
+}
+
+export interface PermissionStatusForUI extends NotificationPermissionStatus, BrowserSupportResult {
+  canShowPrompt: boolean;
+  promptCooldownReason: string;
+  nextPromptAvailable: Date | null;
+  hasHistory: boolean;
+  instructions: PermissionInstructions | null;
+}
+
 /**
  * Check if push notifications are supported in the current browser
  */
-export const isPushNotificationSupported = () => {
+export const isPushNotificationSupported = (): boolean => {
   return (
     "serviceWorker" in navigator &&
     "PushManager" in window &&
@@ -20,8 +96,8 @@ export const isPushNotificationSupported = () => {
 /**
  * Get detailed browser support information
  */
-export const getBrowserSupport = () => {
-  const support = {
+export const getBrowserSupport = (): BrowserSupportResult => {
+  const support: BrowserSupport = {
     serviceWorker: "serviceWorker" in navigator,
     pushManager: "PushManager" in window,
     notifications: "Notification" in window,
@@ -33,7 +109,7 @@ export const getBrowserSupport = () => {
 
   // Detect browser and platform
   const userAgent = navigator.userAgent;
-  const browserInfo = {
+  const browserInfo: BrowserInfo = {
     isChrome: /Chrome/.test(userAgent),
     isFirefox: /Firefox/.test(userAgent),
     isSafari: /Safari/.test(userAgent) && !/Chrome/.test(userAgent),
@@ -57,7 +133,7 @@ export const getBrowserSupport = () => {
 /**
  * Get current notification permission status
  */
-export const getNotificationPermission = () => {
+export const getNotificationPermission = (): NotificationPermissionStatus => {
   if (!isPushNotificationSupported()) {
     return {
       status: "unsupported",
@@ -82,7 +158,7 @@ export const getNotificationPermission = () => {
 /**
  * Request notification permission with user-friendly messaging
  */
-export const requestNotificationPermission = async () => {
+export const requestNotificationPermission = async (): Promise<PermissionRequestResult> => {
   const browserSupport = getBrowserSupport();
 
   if (!browserSupport.isSupported) {
@@ -142,7 +218,7 @@ export const requestNotificationPermission = async () => {
       success: false,
       permission: "error",
       reason: "request_failed",
-      error: error.message,
+      error: (error as Error).message,
     };
   }
 };
@@ -150,7 +226,7 @@ export const requestNotificationPermission = async () => {
 /**
  * Get browser-specific instructions for enabling notifications
  */
-export const getPermissionInstructions = (browserInfo) => {
+export const getPermissionInstructions = (browserInfo: BrowserInfo): PermissionInstructions => {
   if (browserInfo.isChrome) {
     return {
       browser: "Chrome",
@@ -226,7 +302,7 @@ export const getPermissionInstructions = (browserInfo) => {
 /**
  * Check if user has interacted with notifications before
  */
-export const hasNotificationHistory = () => {
+export const hasNotificationHistory = (): NotificationHistory => {
   const grantedTime = localStorage.getItem("notification_permission_granted");
   const deniedTime = localStorage.getItem("notification_permission_denied");
   const dismissedTime = localStorage.getItem("notification_prompt_dismissed");
@@ -244,7 +320,7 @@ export const hasNotificationHistory = () => {
 /**
  * Track notification permission denial
  */
-export const trackPermissionDenial = () => {
+export const trackPermissionDenial = (): void => {
   localStorage.setItem("notification_permission_denied", Date.now().toString());
   logger.info("Notification permission denial tracked");
 };
@@ -252,7 +328,7 @@ export const trackPermissionDenial = () => {
 /**
  * Track notification prompt dismissal
  */
-export const trackPromptDismissal = () => {
+export const trackPromptDismissal = (): void => {
   localStorage.setItem("notification_prompt_dismissed", Date.now().toString());
   logger.info("Notification prompt dismissal tracked");
 };
@@ -260,7 +336,7 @@ export const trackPromptDismissal = () => {
 /**
  * Check if enough time has passed to show permission prompt again
  */
-export const canShowPermissionPrompt = () => {
+export const canShowPermissionPrompt = (): PromptAvailability => {
   const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours
   const history = hasNotificationHistory();
 
@@ -274,7 +350,7 @@ export const canShowPermissionPrompt = () => {
   }
 
   // Check if recently dismissed
-  if (history.hasDismissed) {
+  if (history.hasDismissed && history.dismissedAt) {
     const timeSinceDismissed = Date.now() - history.dismissedAt.getTime();
     if (timeSinceDismissed < cooldownPeriod) {
       return {
@@ -295,7 +371,7 @@ export const canShowPermissionPrompt = () => {
 /**
  * Get notification permission status for UI display
  */
-export const getPermissionStatusForUI = () => {
+export const getPermissionStatusForUI = (): PermissionStatusForUI => {
   const permission = getNotificationPermission();
   const browserSupport = getBrowserSupport();
   const canShow = canShowPermissionPrompt();
@@ -315,7 +391,7 @@ export const getPermissionStatusForUI = () => {
 /**
  * Clear all notification permission tracking data
  */
-export const clearPermissionHistory = () => {
+export const clearPermissionHistory = (): void => {
   localStorage.removeItem("notification_permission_granted");
   localStorage.removeItem("notification_permission_denied");
   localStorage.removeItem("notification_prompt_dismissed");

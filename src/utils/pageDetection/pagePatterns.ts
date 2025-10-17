@@ -3,10 +3,32 @@
  * Extracted from pageDetectionService.js to reduce complexity
  */
 
+export type PageType = "bills" | "debt" | "envelope" | "transaction" | "savings" | "analytics" | "settings" | "onboarding" | "dashboard" | "supplemental" | "paycheck" | "unknown";
+
+interface PagePattern {
+  patterns: string[];
+  page: PageType;
+}
+
+interface NavPattern {
+  keywords: string[];
+  page: PageType;
+}
+
+interface TitlePattern {
+  keywords: string[];
+  page: PageType;
+}
+
+interface DomPattern {
+  selector: string;
+  page: PageType;
+}
+
 /**
  * Page pattern mapping for URL detection
  */
-export const PAGE_URL_PATTERNS = [
+export const PAGE_URL_PATTERNS: PagePattern[] = [
   { patterns: ["/bills", "bills"], page: "bills" },
   { patterns: ["/debt", "debt"], page: "debt" },
   { patterns: ["/envelope", "/budget", "envelope"], page: "envelope" },
@@ -20,7 +42,7 @@ export const PAGE_URL_PATTERNS = [
 /**
  * View key mapping for navigation detection
  */
-export const VIEW_KEY_MAPPING = {
+export const VIEW_KEY_MAPPING: Record<string, PageType> = {
   bills: "bills",
   debts: "debt",
   envelopes: "envelope",
@@ -35,7 +57,7 @@ export const VIEW_KEY_MAPPING = {
 /**
  * Navigation text patterns for fallback detection
  */
-export const NAV_TEXT_PATTERNS = [
+export const NAV_TEXT_PATTERNS: NavPattern[] = [
   { keywords: ["bill"], page: "bills" },
   { keywords: ["debt"], page: "debt" },
   { keywords: ["envelope"], page: "envelope" },
@@ -50,7 +72,7 @@ export const NAV_TEXT_PATTERNS = [
 /**
  * Document title patterns for detection
  */
-export const TITLE_PATTERNS = [
+export const TITLE_PATTERNS: TitlePattern[] = [
   { keywords: ["bill"], page: "bills" },
   { keywords: ["debt"], page: "debt" },
   { keywords: ["envelope", "budget"], page: "envelope" },
@@ -63,7 +85,7 @@ export const TITLE_PATTERNS = [
 /**
  * DOM class patterns for fallback detection
  */
-export const DOM_CLASS_PATTERNS = [
+export const DOM_CLASS_PATTERNS: DomPattern[] = [
   { selector: '[class*="bill"]', page: "bills" },
   { selector: '[class*="debt"]', page: "debt" },
   { selector: '[class*="envelope"]', page: "envelope" },
@@ -72,7 +94,7 @@ export const DOM_CLASS_PATTERNS = [
 /**
  * Check URL patterns against current location
  */
-export const checkUrlPatterns = (path, hash) => {
+export const checkUrlPatterns = (path: string, hash: string): PageType | null => {
   for (const { patterns, page } of PAGE_URL_PATTERNS) {
     if (patterns.some((pattern) => path.includes(pattern) || hash.includes(pattern))) {
       return page;
@@ -84,7 +106,7 @@ export const checkUrlPatterns = (path, hash) => {
 /**
  * Check navigation text patterns
  */
-export const checkNavTextPatterns = (navText) => {
+export const checkNavTextPatterns = (navText: string | null): PageType | null => {
   if (!navText) return null;
 
   const lowerText = navText.toLowerCase().trim();
@@ -99,7 +121,7 @@ export const checkNavTextPatterns = (navText) => {
 /**
  * Check document title patterns
  */
-export const checkTitlePatterns = (title) => {
+export const checkTitlePatterns = (title: string | null): PageType | null => {
   if (!title) return null;
 
   const lowerTitle = title.toLowerCase();
@@ -114,7 +136,7 @@ export const checkTitlePatterns = (title) => {
 /**
  * Check DOM class patterns
  */
-export const checkDomClassPatterns = () => {
+export const checkDomClassPatterns = (): PageType | null => {
   for (const { selector, page } of DOM_CLASS_PATTERNS) {
     if (document.querySelector(selector)) {
       return page;
