@@ -32,3 +32,4 @@ dist-ssr
 CLAUDE.local.md
 .env.development
 .eslintcache
+js-version/

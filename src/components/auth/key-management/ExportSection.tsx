@@ -2,7 +2,20 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import PasswordField from "./PasswordField";
 
-const ExportSection = ({
+interface ExportSectionProps {
+  exportPassword: string;
+  showExportPassword: boolean;
+  copiedToClipboard: boolean;
+  loading: boolean;
+  onUpdatePassword: (field: string, value: string) => void;
+  onTogglePasswordVisibility: (field: string) => void;
+  onCopyToClipboard: () => void;
+  onDownloadUnprotected: () => void;
+  onDownloadProtected: () => void;
+  onGenerateQRCode: () => void;
+}
+
+const ExportSection: React.FC<ExportSectionProps> = ({
   exportPassword,
   showExportPassword,
   copiedToClipboard,
