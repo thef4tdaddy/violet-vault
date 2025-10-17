@@ -21,7 +21,7 @@ const useAuthFlow = (): AuthFlowHook => {
     logout,
     changePassword,
     updateProfile,
-    securityContext: { encryptionKey, budgetId, salt }
+    securityContext: { encryptionKey, budgetId, salt },
   } = useAuthManager();
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
@@ -74,7 +74,7 @@ const useAuthFlow = (): AuthFlowHook => {
         };
       }
     },
-    [login, showErrorToast],
+    [login, showErrorToast]
   );
 
   const handleLogout = useCallback(() => {
@@ -103,7 +103,7 @@ const useAuthFlow = (): AuthFlowHook => {
         };
       }
     },
-    [changePassword, showSuccessToast, showErrorToast],
+    [changePassword, showSuccessToast, showErrorToast]
   );
 
   const handleUpdateProfile = useCallback(
@@ -126,7 +126,7 @@ const useAuthFlow = (): AuthFlowHook => {
         };
       }
     },
-    [updateProfile, showSuccessToast, showErrorToast],
+    [updateProfile, showSuccessToast, showErrorToast]
   );
 
   return {

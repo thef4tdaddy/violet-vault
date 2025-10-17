@@ -12,19 +12,16 @@ import {
   getIconNameForStorage,
 } from "../../utils/common/billIcons";
 import { toMonthly } from "../../utils/common/frequencyCalculations";
-import {
-  BIWEEKLY_MULTIPLIER,
-  convertToBiweekly,
-} from "../../constants/frequency";
+import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";
-import type { 
-  Bill, 
-  BillFormData, 
-  BillFormOptions, 
-  BillFormHookReturn, 
+import type {
+  Bill,
+  BillFormData,
+  BillFormOptions,
+  BillFormHookReturn,
   BillFrequency,
-  CalculationFrequency
+  CalculationFrequency,
 } from "../../types/bills";
 
 /**
@@ -47,11 +44,7 @@ const getInitialFormData = (bill: Bill | null = null): BillFormData => {
         bill.iconName ||
         getIconNameForStorage(
           bill.icon ||
-            getBillIcon(
-              bill.name || bill.provider || "",
-              bill.notes || "",
-              bill.category || "",
-            ),
+            getBillIcon(bill.name || bill.provider || "", bill.notes || "", bill.category || "")
         ),
     };
   }
@@ -112,19 +105,12 @@ export const useBillForm = ({
 
   // Suggest icon based on form data
   const suggestedIconName = useMemo(() => {
-    const suggestedIcon = getBillIcon(
-      formData.name,
-      formData.notes,
-      formData.category,
-    );
+    const suggestedIcon = getBillIcon(formData.name, formData.notes, formData.category);
     return getIconNameForStorage(suggestedIcon);
   }, [formData.name, formData.notes, formData.category]);
 
   // Icon suggestions for current category
-  const iconSuggestions = useMemo(
-    () => getBillIconOptions(formData.category),
-    [formData.category],
-  );
+  const iconSuggestions = useMemo(() => getBillIconOptions(formData.category), [formData.category]);
 
   // Available categories
   const categories = useMemo(() => getBillCategories(), []);
@@ -132,24 +118,20 @@ export const useBillForm = ({
   // Business Logic Functions
   const calculateMonthlyAmount = useCallback(
     (amount: string | number, frequency: BillFrequency, customFrequency = 1): number => {
-      const numAmount = typeof amount === 'string' ? parseFloat(amount) || 0 : amount;
+      const numAmount = typeof amount === "string" ? parseFloat(amount) || 0 : amount;
       // Handle 'once' frequency by treating it as monthly for calculation purposes
-      const calcFrequency: CalculationFrequency = frequency === 'once' ? 'monthly' : frequency;
+      const calcFrequency: CalculationFrequency = frequency === "once" ? "monthly" : frequency;
       return toMonthly(numAmount, calcFrequency);
     },
-    [],
+    []
   );
 
   const calculateBiweeklyAmount = useCallback(
     (amount: string | number, frequency: BillFrequency, customFrequency = 1): number => {
-      const monthlyAmount = calculateMonthlyAmount(
-        amount,
-        frequency,
-        customFrequency,
-      );
+      const monthlyAmount = calculateMonthlyAmount(amount, frequency, customFrequency);
       return convertToBiweekly(monthlyAmount);
     },
-    [calculateMonthlyAmount],
+    [calculateMonthlyAmount]
   );
 
   const getNextDueDate = useCallback((frequency: BillFrequency, dueDate: string): string => {
@@ -234,12 +216,12 @@ export const useBillForm = ({
         const monthlyAmount = calculateMonthlyAmount(
           formData.amount,
           formData.frequency,
-          parseInt(formData.customFrequency) || 1,
+          parseInt(formData.customFrequency) || 1
         );
         const biweeklyAmount = calculateBiweeklyAmount(
           formData.amount,
           formData.frequency,
-          parseInt(formData.customFrequency) || 1,
+          parseInt(formData.customFrequency) || 1
         );
 
         const billData: Bill = {
@@ -295,7 +277,7 @@ export const useBillForm = ({
       onUpdateBill,
       onClose,
       onError,
-    ],
+    ]
   );
 
   // Delete Bill
@@ -307,7 +289,10 @@ export const useBillForm = ({
       setShowDeleteConfirm(false);
       onClose?.();
     } catch (error) {
-      logger.error("Error deleting bill:", error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        "Error deleting bill:",
+        error instanceof Error ? error : new Error(String(error))
+      );
       const errorMessage = error instanceof Error ? error.message : "Failed to delete bill";
       onError?.(errorMessage);
     }

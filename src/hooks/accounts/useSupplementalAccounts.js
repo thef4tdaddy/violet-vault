@@ -50,7 +50,10 @@ const useSupplementalAccounts = ({
   });
 
   // Auth and Locking
-  const { securityContext: { budgetId }, user: authCurrentUser } = useAuthManager();
+  const {
+    securityContext: { budgetId },
+    user: authCurrentUser,
+  } = useAuthManager();
   const confirm = useConfirm();
 
   // Initialize edit lock service when component mounts
@@ -114,7 +117,7 @@ const useSupplementalAccounts = ({
     if (editingAccount && !canEdit) {
       globalToast.showError(
         "Cannot save changes - account is locked by another user",
-        "Account Locked",
+        "Account Locked"
       );
       return;
     }
@@ -194,7 +197,7 @@ const useSupplementalAccounts = ({
       transferringAccount.id,
       transferForm.envelopeId,
       amount,
-      transferForm.description,
+      transferForm.description
     );
 
     setShowTransferModal(false);

@@ -77,12 +77,8 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isOpen, onClose }) 
                   timeUntilAutoLock,
                 }}
               />
-              <AutoLockSettingsSection
-                {...{ securitySettings, handleSettingChange }}
-              />
-              <ClipboardSecuritySection
-                {...{ securitySettings, handleSettingChange }}
-              />
+              <AutoLockSettingsSection {...{ securitySettings, handleSettingChange }} />
+              <ClipboardSecuritySection {...{ securitySettings, handleSettingChange }} />
               <SecurityLoggingSection
                 {...{
                   securitySettings,

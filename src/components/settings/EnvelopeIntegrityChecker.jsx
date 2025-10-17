@@ -76,9 +76,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
     if (selectedEnvelopes.size === report?.corruptedEnvelopes.length) {
       setSelectedEnvelopes(new Set());
     } else {
-      setSelectedEnvelopes(
-        new Set(report?.corruptedEnvelopes.map((env) => env.id) || []),
-      );
+      setSelectedEnvelopes(new Set(report?.corruptedEnvelopes.map((env) => env.id) || []));
     }
   };
 
@@ -135,9 +133,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
     if (selectedEnvelopes.size === 0) return;
 
     const selectedEnvelopeObjects =
-      report?.corruptedEnvelopes.filter((env) =>
-        selectedEnvelopes.has(env.id),
-      ) || [];
+      report?.corruptedEnvelopes.filter((env) => selectedEnvelopes.has(env.id)) || [];
 
     setIsProcessing(true);
     try {
@@ -187,18 +183,11 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
               className: "h-6 w-6 text-purple-600 mr-3",
             })}
             <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                Envelope Integrity Checker
-              </h2>
-              <p className="text-sm text-gray-600">
-                Detect and fix corrupted envelopes
-              </p>
+              <h2 className="text-xl font-bold text-gray-900">Envelope Integrity Checker</h2>
+              <p className="text-sm text-gray-600">Detect and fix corrupted envelopes</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             {React.createElement(getIcon("X"), {
               className: "h-5 w-5",
             })}
@@ -216,9 +205,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                     className: "h-8 w-8 text-green-600",
                   })}
                   <div className="ml-3">
-                    <p className="text-2xl font-bold text-green-900">
-                      {report.healthy}
-                    </p>
+                    <p className="text-2xl font-bold text-green-900">{report.healthy}</p>
                     <p className="text-sm text-green-700">Healthy Envelopes</p>
                   </div>
                 </div>
@@ -230,9 +217,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                     className: "h-8 w-8 text-yellow-600",
                   })}
                   <div className="ml-3">
-                    <p className="text-2xl font-bold text-yellow-900">
-                      {report.corrupted}
-                    </p>
+                    <p className="text-2xl font-bold text-yellow-900">{report.corrupted}</p>
                     <p className="text-sm text-yellow-700">Issues Found</p>
                   </div>
                 </div>
@@ -244,9 +229,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                     className: "h-8 w-8 text-blue-600",
                   })}
                   <div className="ml-3">
-                    <p className="text-2xl font-bold text-blue-900">
-                      {report.total}
-                    </p>
+                    <p className="text-2xl font-bold text-blue-900">{report.total}</p>
                     <p className="text-sm text-blue-700">Total Envelopes</p>
                   </div>
                 </div>
@@ -260,9 +243,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
               {React.createElement(getIcon("RefreshCw"), {
                 className: "h-8 w-8 text-purple-600 animate-spin mx-auto mb-3",
               })}
-              <p className="text-gray-600">
-                Scanning envelopes for integrity issues...
-              </p>
+              <p className="text-gray-600">Scanning envelopes for integrity issues...</p>
             </div>
           )}
 
@@ -277,9 +258,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     All Envelopes Healthy!
                   </h3>
-                  <p className="text-gray-600">
-                    No integrity issues found in your envelope data.
-                  </p>
+                  <p className="text-gray-600">No integrity issues found in your envelope data.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -290,8 +269,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                       className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
                       disabled={isProcessing}
                     >
-                      {selectedEnvelopes.size ===
-                      report.corruptedEnvelopes.length
+                      {selectedEnvelopes.size === report.corruptedEnvelopes.length
                         ? "Deselect All"
                         : "Select All"}
                     </button>
@@ -350,9 +328,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                               <input
                                 type="checkbox"
                                 checked={selectedEnvelopes.has(envelope.id)}
-                                onChange={() =>
-                                  handleSelectEnvelope(envelope.id)
-                                }
+                                onChange={() => handleSelectEnvelope(envelope.id)}
                                 className="mt-1 mr-3"
                               />
                               <div>
@@ -360,12 +336,11 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                                   {envelope.name || "[MISSING NAME]"}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  ID: {envelope.id} | Category:{" "}
-                                  {envelope.category || "[MISSING]"}
+                                  ID: {envelope.id} | Category: {envelope.category || "[MISSING]"}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Balance: ${envelope.currentBalance ?? "N/A"} |
-                                  Monthly: ${envelope.monthlyAmount ?? "N/A"}
+                                  Balance: ${envelope.currentBalance ?? "N/A"} | Monthly: $
+                                  {envelope.monthlyAmount ?? "N/A"}
                                 </p>
                               </div>
                             </div>
@@ -387,9 +362,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
 
                   {/* Recommendations */}
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-900 mb-3">
-                      Recommendations
-                    </h3>
+                    <h3 className="font-semibold text-blue-900 mb-3">Recommendations</h3>
                     <ul className="list-disc list-inside text-blue-800 space-y-1">
                       {report.recommendations.map((rec, idx) => (
                         <li key={idx} className="text-sm">

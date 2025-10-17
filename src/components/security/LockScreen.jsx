@@ -21,9 +21,12 @@ const LockScreen = () => {
   const passwordInputRef = useRef(null);
 
   // Password validation query
-  const { data: validationResult, isLoading: isValidating } = usePasswordValidation(passwordToValidate, {
-    enabled: !!passwordToValidate
-  });
+  const { data: validationResult, isLoading: isValidating } = usePasswordValidation(
+    passwordToValidate,
+    {
+      enabled: !!passwordToValidate,
+    }
+  );
 
   // Handle validation results
   useEffect(() => {
@@ -45,7 +48,14 @@ const LockScreen = () => {
         handleIncorrectPassword();
       }
     }
-  }, [validationResult, isValidating, passwordToValidate, pendingConfirm, unlockSession, handleIncorrectPassword]);
+  }, [
+    validationResult,
+    isValidating,
+    passwordToValidate,
+    pendingConfirm,
+    unlockSession,
+    handleIncorrectPassword,
+  ]);
 
   // Handle incorrect password
   const handleIncorrectPassword = useCallback(async () => {
@@ -105,7 +115,7 @@ const LockScreen = () => {
       const recentFailures = securityEvents.filter(
         (event) =>
           event.type === "FAILED_UNLOCK" &&
-          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000, // last 5 minutes
+          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
       ).length;
       setFailedAttempts(recentFailures);
     }
@@ -196,23 +206,21 @@ const LockScreen = () => {
               />
             </div>
             <h1 className="text-2xl font-black text-black mb-2">
-              <span className="text-3xl">V</span>IOLET{" "}
-              <span className="text-3xl">V</span>AULT
+              <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
             </h1>
             <div
               className="text-black font-medium uppercase tracking-wider text-justify space-y-1"
               style={{ textAlign: "justify", textAlignLast: "justify" }}
             >
               <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
-                <span className="text-lg">Y</span>OUR{" "}
-                <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR
+                <span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS
+                BEEN LOCKED FOR
               </p>
               <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
                 YOUR SAFETY BECAUSE YOU LEFT THE
               </p>
               <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
-                SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET
-                BACK IN.
+                SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET BACK IN.
               </p>
             </div>
           </div>
@@ -223,8 +231,7 @@ const LockScreen = () => {
               {/* Password Input */}
               <div className="space-y-2">
                 <label className="block text-sm font-black text-black uppercase tracking-wider">
-                  <span className="text-base">E</span>NTER{" "}
-                  <span className="text-base">P</span>
+                  <span className="text-base">E</span>NTER <span className="text-base">P</span>
                   ASSWORD TO <span className="text-base">U</span>NLOCK
                 </label>
                 <div className="relative">
@@ -244,24 +251,15 @@ const LockScreen = () => {
                     disabled={isUnlocking}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
                   >
-                    {React.createElement(
-                      getIcon(showPassword ? "EyeOff" : "Eye"),
-                      {
-                        className: "h-5 w-5",
-                      },
-                    )}
+                    {React.createElement(getIcon(showPassword ? "EyeOff" : "Eye"), {
+                      className: "h-5 w-5",
+                    })}
                   </button>
                 </div>
               </div>
 
               {/* Error Message */}
-              {error && (
-                <SecurityAlert
-                  type="error"
-                  message={error}
-                  variant="fullscreen"
-                />
-              )}
+              {error && <SecurityAlert type="error" message={error} variant="fullscreen" />}
 
               {/* Failed Attempts Warning */}
               {failedAttempts > 0 && (

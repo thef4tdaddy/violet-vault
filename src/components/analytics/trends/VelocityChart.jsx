@@ -8,10 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import {
-  velocityTooltipFormatter,
-  CHART_COLORS,
-} from "../../../utils/analytics/trendHelpers";
+import { velocityTooltipFormatter, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
 import { getIcon } from "../../../utils";
 
 const VelocityChart = ({ spendingVelocity = [] }) => {
@@ -20,8 +17,7 @@ const VelocityChart = ({ spendingVelocity = [] }) => {
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
       <h3 className="font-black text-black text-base mb-4">
-        <span className="text-lg">S</span>PENDING{" "}
-        <span className="text-lg">V</span>ELOCITY{" "}
+        <span className="text-lg">S</span>PENDING <span className="text-lg">V</span>ELOCITY{" "}
         <span className="text-lg">A</span>NALYSIS
       </h3>
       <div className="h-64">
@@ -47,9 +43,7 @@ const VelocityChart = ({ spendingVelocity = [] }) => {
               className: "h-12 w-12 mb-4 opacity-50",
             })}
             <p className="text-lg font-medium">No Velocity Data</p>
-            <p className="text-sm">
-              Need at least 2 months of data to calculate velocity
-            </p>
+            <p className="text-sm">Need at least 2 months of data to calculate velocity</p>
           </div>
         )}
       </div>

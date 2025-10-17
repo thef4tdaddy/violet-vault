@@ -42,9 +42,8 @@ export const trackStoreAction = (actionName, storeName = "unknown") => {
         storeName,
         callCount: currentCount + 1,
         warning: "This pattern often causes infinite render loops",
-        solution:
-          "Check for get() calls in store actions or useEffect dependency issues",
-      },
+        solution: "Check for get() calls in store actions or useEffect dependency issues",
+      }
     );
   }
 
@@ -61,22 +60,16 @@ export const warnDangerousUseEffect = (hookName, dependencies) => {
     (dep) =>
       typeof dep === "function" &&
       dep.name &&
-      /^(set|get|add|remove|update|delete|create|save|load|sync|login|logout|reset)/.test(
-        dep.name,
-      ),
+      /^(set|get|add|remove|update|delete|create|save|load|sync|login|logout|reset)/.test(dep.name)
   );
 
   if (storeActionDeps.length > 0) {
-    logger.warn(
-      `🚨 DANGEROUS USEEFFECT PATTERN: Store actions in dependency array detected!`,
-      {
-        hookName,
-        storeActions: storeActionDeps.map((dep) => dep.name),
-        warning: "This pattern causes React error #185",
-        solution:
-          "Remove store actions from dependency array - they are stable in Zustand",
-      },
-    );
+    logger.warn(`🚨 DANGEROUS USEEFFECT PATTERN: Store actions in dependency array detected!`, {
+      hookName,
+      storeActions: storeActionDeps.map((dep) => dep.name),
+      warning: "This pattern causes React error #185",
+      solution: "Remove store actions from dependency array - they are stable in Zustand",
+    });
   }
 };
 
@@ -86,9 +79,7 @@ export const warnDangerousUseEffect = (hookName, dependencies) => {
 export const initializeReactErrorDetector = () => {
   if (import.meta?.env?.MODE !== "development") return;
 
-  logger.info(
-    "🛡️ React Error #185 detector initialized - monitoring for dangerous patterns",
-  );
+  logger.info("🛡️ React Error #185 detector initialized - monitoring for dangerous patterns");
 
   // Monitor render count to detect infinite loops
   let renderCount = 0;
@@ -98,24 +89,18 @@ export const initializeReactErrorDetector = () => {
   console.error = (...args) => {
     const errorMessage = args[0];
 
-    if (
-      typeof errorMessage === "string" &&
-      errorMessage.includes("error #185")
-    ) {
-      logger.error(
-        `🚨 REACT ERROR #185 DETECTED! Infinite render loop in progress`,
-        {
-          renderCount,
-          timeElapsed: Date.now() - lastRenderTime,
-          recentStoreActions: Array.from(storeActionCallCount.entries()),
-          troubleshootingTips: [
-            "1. Check for get() calls inside store actions",
-            "2. Look for store actions in useEffect dependency arrays",
-            "3. Search for auto-executing module code",
-            "4. Verify no circular store action calls",
-          ],
-        },
-      );
+    if (typeof errorMessage === "string" && errorMessage.includes("error #185")) {
+      logger.error(`🚨 REACT ERROR #185 DETECTED! Infinite render loop in progress`, {
+        renderCount,
+        timeElapsed: Date.now() - lastRenderTime,
+        recentStoreActions: Array.from(storeActionCallCount.entries()),
+        troubleshootingTips: [
+          "1. Check for get() calls inside store actions",
+          "2. Look for store actions in useEffect dependency arrays",
+          "3. Search for auto-executing module code",
+          "4. Verify no circular store action calls",
+        ],
+      });
     }
 
     originalError.apply(console, args);
@@ -125,16 +110,13 @@ export const initializeReactErrorDetector = () => {
   setInterval(() => {
     const totalActionCalls = Array.from(storeActionCallCount.values()).reduce(
       (sum, count) => sum + count,
-      0,
+      0
     );
     if (totalActionCalls > 50) {
-      logger.warn(
-        `🚨 HIGH STORE ACTIVITY: ${totalActionCalls} store actions in last 5 seconds`,
-        {
-          breakdown: Object.fromEntries(storeActionCallCount),
-          warning: "High activity might indicate infinite loops",
-        },
-      );
+      logger.warn(`🚨 HIGH STORE ACTIVITY: ${totalActionCalls} store actions in last 5 seconds`, {
+        breakdown: Object.fromEntries(storeActionCallCount),
+        warning: "High activity might indicate infinite loops",
+      });
     }
   }, 5000);
 };

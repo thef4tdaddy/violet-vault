@@ -1,7 +1,7 @@
 /**
  * PWA Service Worker Type Declarations
  * Comprehensive types for service workers, Workbox, and PWA events
- * 
+ *
  * This file provides TypeScript declarations for:
  * - Service Worker global scope and APIs
  * - Workbox library types
@@ -74,7 +74,7 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
 // Workbox Types
 // ============================================================================
 
-declare module 'workbox-core' {
+declare module "workbox-core" {
   export function setCacheNameDetails(details: {
     prefix?: string;
     suffix?: string;
@@ -104,7 +104,7 @@ declare module 'workbox-core' {
 
     cacheKeyWillBeUsed?(options: {
       request: Request;
-      mode: 'read' | 'write';
+      mode: "read" | "write";
       params?: any;
       event?: ExtendableEvent;
       state?: any;
@@ -177,9 +177,12 @@ declare module 'workbox-core' {
   }
 }
 
-declare module 'workbox-routing' {
+declare module "workbox-routing" {
   export function registerRoute(
-    capture: RegExp | string | ((options: { request: Request; url: URL; event: FetchEvent }) => boolean),
+    capture:
+      | RegExp
+      | string
+      | ((options: { request: Request; url: URL; event: FetchEvent }) => boolean),
     handler: any,
     method?: string
   ): void;
@@ -193,15 +196,18 @@ declare module 'workbox-routing' {
   }
 
   export class NavigationRoute extends Route {
-    constructor(handler: any, options?: { 
-      allowlist?: RegExp[]; 
-      denylist?: RegExp[];
-    });
+    constructor(
+      handler: any,
+      options?: {
+        allowlist?: RegExp[];
+        denylist?: RegExp[];
+      }
+    );
   }
 }
 
-declare module 'workbox-strategies' {
-  import { WorkboxPlugin } from 'workbox-core';
+declare module "workbox-strategies" {
+  import { WorkboxPlugin } from "workbox-core";
 
   interface StrategyOptions {
     cacheName?: string;
@@ -240,12 +246,15 @@ declare module 'workbox-strategies' {
   }
 }
 
-declare module 'workbox-precaching' {
-  export function precacheAndRoute(entries: Array<{ url: string; revision: string | null }>, options?: {
-    directoryIndex?: string;
-    cleanUrls?: boolean;
-    urlManipulation?: (options: { url: URL }) => URL[];
-  }): void;
+declare module "workbox-precaching" {
+  export function precacheAndRoute(
+    entries: Array<{ url: string; revision: string | null }>,
+    options?: {
+      directoryIndex?: string;
+      cleanUrls?: boolean;
+      urlManipulation?: (options: { url: URL }) => URL[];
+    }
+  ): void;
 
   export function cleanupOutdatedCaches(): void;
 
@@ -253,11 +262,13 @@ declare module 'workbox-precaching' {
 
   export function getCacheKeyForURL(url: string): string | undefined;
 
-  export function createHandlerBoundToURL(url: string): (options: { request: Request; event: FetchEvent }) => Promise<Response>;
+  export function createHandlerBoundToURL(
+    url: string
+  ): (options: { request: Request; event: FetchEvent }) => Promise<Response>;
 }
 
-declare module 'workbox-expiration' {
-  import { WorkboxPlugin } from 'workbox-core';
+declare module "workbox-expiration" {
+  import { WorkboxPlugin } from "workbox-core";
 
   export class ExpirationPlugin implements WorkboxPlugin {
     constructor(options?: {
@@ -269,11 +280,14 @@ declare module 'workbox-expiration' {
   }
 
   export class CacheExpiration {
-    constructor(cacheName: string, options?: {
-      maxEntries?: number;
-      maxAgeSeconds?: number;
-      matchOptions?: CacheQueryOptions;
-    });
+    constructor(
+      cacheName: string,
+      options?: {
+        maxEntries?: number;
+        maxAgeSeconds?: number;
+        matchOptions?: CacheQueryOptions;
+      }
+    );
     expireEntries(): Promise<void>;
     updateTimestamp(url: string): Promise<void>;
     isURLExpired(url: string): Promise<boolean>;
@@ -281,33 +295,36 @@ declare module 'workbox-expiration' {
   }
 }
 
-declare module 'workbox-cacheable-response' {
-  import { WorkboxPlugin } from 'workbox-core';
+declare module "workbox-cacheable-response" {
+  import { WorkboxPlugin } from "workbox-core";
 
   export class CacheableResponsePlugin implements WorkboxPlugin {
-    constructor(options?: {
-      statuses?: number[];
-      headers?: { [key: string]: string };
-    });
+    constructor(options?: { statuses?: number[]; headers?: { [key: string]: string } });
   }
 }
 
-declare module 'workbox-background-sync' {
-  import { WorkboxPlugin } from 'workbox-core';
+declare module "workbox-background-sync" {
+  import { WorkboxPlugin } from "workbox-core";
 
   export class BackgroundSyncPlugin implements WorkboxPlugin {
-    constructor(name: string, options?: {
-      maxRetentionTime?: number;
-      onSync?: (options: { queue: Queue }) => void | Promise<void>;
-    });
+    constructor(
+      name: string,
+      options?: {
+        maxRetentionTime?: number;
+        onSync?: (options: { queue: Queue }) => void | Promise<void>;
+      }
+    );
   }
 
   export class Queue {
-    constructor(name: string, options?: {
-      maxRetentionTime?: number;
-      onSync?: (options: { queue: Queue }) => void | Promise<void>;
-      forceSyncFallback?: boolean;
-    });
+    constructor(
+      name: string,
+      options?: {
+        maxRetentionTime?: number;
+        onSync?: (options: { queue: Queue }) => void | Promise<void>;
+        forceSyncFallback?: boolean;
+      }
+    );
     pushRequest(options: { request: Request }): Promise<void>;
     unshiftRequest(options: { request: Request }): Promise<void>;
     popRequest(): Promise<Request | undefined>;
@@ -318,8 +335,8 @@ declare module 'workbox-background-sync' {
   }
 }
 
-declare module 'workbox-broadcast-update' {
-  import { WorkboxPlugin } from 'workbox-core';
+declare module "workbox-broadcast-update" {
+  import { WorkboxPlugin } from "workbox-core";
 
   export class BroadcastUpdatePlugin implements WorkboxPlugin {
     constructor(options?: {
@@ -341,14 +358,14 @@ declare module 'workbox-broadcast-update' {
   ) => boolean;
 }
 
-declare module 'workbox-navigation-preload' {
+declare module "workbox-navigation-preload" {
   export function enable(): void;
   export function disable(): void;
   export function isSupported(): boolean;
 }
 
-declare module 'workbox-range-requests' {
-  import { WorkboxPlugin } from 'workbox-core';
+declare module "workbox-range-requests" {
+  import { WorkboxPlugin } from "workbox-core";
 
   export class RangeRequestsPlugin implements WorkboxPlugin {
     constructor();
@@ -357,13 +374,16 @@ declare module 'workbox-range-requests' {
   export function createPartialResponse(request: Request, response: Response): Promise<Response>;
 }
 
-declare module 'workbox-window' {
+declare module "workbox-window" {
   export class Workbox {
-    constructor(scriptURL: string, options?: {
-      scope?: string;
-      type?: 'classic' | 'module';
-      updateViaCache?: 'all' | 'imports' | 'none';
-    });
+    constructor(
+      scriptURL: string,
+      options?: {
+        scope?: string;
+        type?: "classic" | "module";
+        updateViaCache?: "all" | "imports" | "none";
+      }
+    );
 
     readonly active: Promise<ServiceWorker | undefined>;
     readonly controlling: Promise<ServiceWorker | undefined>;
@@ -378,12 +398,15 @@ declare module 'workbox-window' {
   }
 
   export class WorkboxLifecycleEvent extends Event {
-    constructor(type: string, props: {
-      sw?: ServiceWorker;
-      originalEvent?: Event;
-      isUpdate?: boolean;
-      isExternal?: boolean;
-    });
+    constructor(
+      type: string,
+      props: {
+        sw?: ServiceWorker;
+        originalEvent?: Event;
+        isUpdate?: boolean;
+        isExternal?: boolean;
+      }
+    );
     readonly sw?: ServiceWorker;
     readonly originalEvent?: Event;
     readonly isUpdate?: boolean;
@@ -391,23 +414,26 @@ declare module 'workbox-window' {
   }
 
   export type WorkboxLifecycleEventType =
-    | 'installing'
-    | 'installed'
-    | 'waiting'
-    | 'controlling'
-    | 'activated'
-    | 'redundant'
-    | 'externalinstalling'
-    | 'externalinstalled'
-    | 'externalwaiting'
-    | 'externalactivated';
+    | "installing"
+    | "installed"
+    | "waiting"
+    | "controlling"
+    | "activated"
+    | "redundant"
+    | "externalinstalling"
+    | "externalinstalled"
+    | "externalwaiting"
+    | "externalactivated";
 
   export class WorkboxMessageEvent extends Event {
-    constructor(type: string, props: {
-      data: any;
-      originalEvent: ExtendableMessageEvent;
-      sw: ServiceWorker;
-    });
+    constructor(
+      type: string,
+      props: {
+        data: any;
+        originalEvent: ExtendableMessageEvent;
+        sw: ServiceWorker;
+      }
+    );
     readonly data: any;
     readonly originalEvent: ExtendableMessageEvent;
     readonly sw: ServiceWorker;
@@ -421,7 +447,7 @@ declare module 'workbox-window' {
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed';
+    outcome: "accepted" | "dismissed";
     platform: string;
   }>;
   prompt(): Promise<void>;
@@ -436,19 +462,19 @@ declare global {
   interface Window {
     // PWA Install Events
     addEventListener(
-      type: 'beforeinstallprompt',
+      type: "beforeinstallprompt",
       listener: (this: Window, ev: BeforeInstallPromptEvent) => any,
       options?: boolean | AddEventListenerOptions
     ): void;
     addEventListener(
-      type: 'appinstalled',
+      type: "appinstalled",
       listener: (this: Window, ev: Event) => any,
       options?: boolean | AddEventListenerOptions
     ): void;
 
     // Service Worker Registration
     addEventListener(
-      type: 'message',
+      type: "message",
       listener: (this: Window, ev: MessageEvent) => any,
       options?: boolean | AddEventListenerOptions
     ): void;
@@ -464,7 +490,7 @@ declare global {
 // Vite PWA Plugin Virtual Modules
 // ============================================================================
 
-declare module 'virtual:pwa-register' {
+declare module "virtual:pwa-register" {
   export interface RegisterSWOptions {
     immediate?: boolean;
     onNeedRefresh?: () => void;
@@ -476,7 +502,7 @@ declare module 'virtual:pwa-register' {
   export function registerSW(options?: RegisterSWOptions): (reloadPage?: boolean) => Promise<void>;
 }
 
-declare module 'virtual:pwa-register/react' {
+declare module "virtual:pwa-register/react" {
   export interface RegisterSWOptions {
     immediate?: boolean;
     onNeedRefresh?: () => void;
@@ -492,7 +518,7 @@ declare module 'virtual:pwa-register/react' {
   };
 }
 
-declare module 'virtual:pwa-info' {
+declare module "virtual:pwa-info" {
   export const pwaInfo: {
     pwaInDevEnvironment: boolean;
   };
@@ -597,9 +623,9 @@ interface ClientQueryOptions {
   type?: ClientType;
 }
 
-type ClientType = 'window' | 'worker' | 'sharedworker' | 'all';
-type FrameType = 'auxiliary' | 'top-level' | 'nested' | 'none';
-type VisibilityState = 'hidden' | 'visible' | 'prerender';
+type ClientType = "window" | "worker" | "sharedworker" | "all";
+type FrameType = "auxiliary" | "top-level" | "nested" | "none";
+type VisibilityState = "hidden" | "visible" | "prerender";
 
 // ============================================================================
 // Additional Utility Types

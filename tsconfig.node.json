@@ -3,12 +3,9 @@
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "vite.config.js",
-    "vitest.config.js",
-    "configs/**/*"
-  ]
+  "include": ["vite.config.js", "vitest.config.js", "configs/**/*", ".commitlintrc.cjs"]
 }

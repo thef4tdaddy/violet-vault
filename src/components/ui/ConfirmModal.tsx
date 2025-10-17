@@ -97,15 +97,10 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ icon, destructive, title }) =
         })}
       </div>
       <div className="flex-1">
-        <h3
-          id="confirm-modal-title"
-          className="font-black text-black text-base"
-        >
+        <h3 id="confirm-modal-title" className="font-black text-black text-base">
           {title}
         </h3>
-        {destructive && (
-          <p className="text-sm text-red-600">This action cannot be undone</p>
-        )}
+        {destructive && <p className="text-sm text-red-600">This action cannot be undone</p>}
       </div>
     </div>
   );
@@ -128,7 +123,7 @@ const ModalActions: React.FC<ModalActionsProps> = ({
   const cancelTouchFeedback = useTouchFeedback("tap", "secondary");
   const confirmTouchFeedback = useTouchFeedback(
     destructive ? "warning" : "confirm",
-    destructive ? "destructive" : "success",
+    destructive ? "destructive" : "success"
   );
 
   return (
@@ -150,9 +145,7 @@ const ModalActions: React.FC<ModalActionsProps> = ({
         onTouchStart={confirmTouchFeedback.onTouchStart}
         disabled={isLoading}
         className={`px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed ${confirmTouchFeedback.className} ${
-          isLoading
-            ? colorScheme.confirmBtnDisabled
-            : `${colorScheme.confirmBtn}`
+          isLoading ? colorScheme.confirmBtnDisabled : `${colorScheme.confirmBtn}`
         }`}
       >
         {isLoading ? (
@@ -196,14 +189,7 @@ const useKeyboardHandling = ({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [
-    isOpen,
-    isLoading,
-    onCancel,
-    onConfirm,
-    cancelButtonRef,
-    confirmButtonRef,
-  ]);
+  }, [isOpen, isLoading, onCancel, onConfirm, cancelButtonRef, confirmButtonRef]);
 };
 
 /**

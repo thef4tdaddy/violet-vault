@@ -20,8 +20,11 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 // Extract function return type
-export type AsyncReturnType<T extends (...args: any[]) => Promise<any>> = 
-  T extends (...args: any[]) => Promise<infer R> ? R : any;
+export type AsyncReturnType<T extends (...args: any[]) => Promise<any>> = T extends (
+  ...args: any[]
+) => Promise<infer R>
+  ? R
+  : any;
 
 // Configuration types
 export interface BaseConfig {
@@ -58,15 +61,15 @@ export interface ValidationResult {
 
 // Type guards for common patterns
 export function isString(value: unknown): value is string {
-  return typeof value === 'string';
+  return typeof value === "string";
 }
 
 export function isNumber(value: unknown): value is number {
-  return typeof value === 'number' && !isNaN(value);
+  return typeof value === "number" && !isNaN(value);
 }
 
 export function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function isArray(value: unknown): value is unknown[] {
@@ -74,7 +77,7 @@ export function isArray(value: unknown): value is unknown[] {
 }
 
 export function isFunction(value: unknown): value is Function {
-  return typeof value === 'function';
+  return typeof value === "function";
 }
 
 export function isNotNull<T>(value: T | null): value is T {
@@ -90,10 +93,7 @@ export function isDefined<T>(value: T | null | undefined): value is T {
 }
 
 // Safe parsing utilities
-export function safeJsonParse<T = unknown>(
-  jsonString: string,
-  fallback?: T
-): T | null {
+export function safeJsonParse<T = unknown>(jsonString: string, fallback?: T): T | null {
   try {
     return JSON.parse(jsonString) as T;
   } catch {
@@ -108,7 +108,7 @@ export function safeStringify(
   try {
     return JSON.stringify(value, replacer);
   } catch {
-    return JSON.stringify({ error: 'Serialization failed' });
+    return JSON.stringify({ error: "Serialization failed" });
   }
 }
 
@@ -125,11 +125,11 @@ export interface PromiseWithResolvers<T> {
 export function createPromiseWithResolvers<T>(): PromiseWithResolvers<T> {
   let resolve: PromiseResolver<T>;
   let reject: PromiseRejecter;
-  
+
   const promise = new Promise<T>((res, rej) => {
     resolve = res;
     reject = rej;
   });
-  
+
   return { promise, resolve: resolve!, reject: reject! };
 }

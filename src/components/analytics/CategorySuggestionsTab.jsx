@@ -1,11 +1,7 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const CategorySuggestionsTab = ({
-  suggestions,
-  onApplySuggestion,
-  onDismissSuggestion,
-}) => {
+const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSuggestion }) => {
   const getPriorityIcon = (priority) => {
     switch (priority) {
       case "high":
@@ -96,23 +92,15 @@ const CategorySuggestionsTab = ({
             </div>
           </div>
 
-          <p className="text-sm text-purple-800 font-medium mb-3">
-            {suggestion.description}
-          </p>
+          <p className="text-sm text-purple-800 font-medium mb-3">{suggestion.description}</p>
 
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-4">
               <span className="text-purple-700 font-medium">
-                Impact:{" "}
-                <span className="font-bold">
-                  {suggestion.impact.toFixed(1)}
-                </span>
+                Impact: <span className="font-bold">{suggestion.impact.toFixed(1)}</span>
               </span>
               <span className="text-purple-700 font-medium">
-                Priority:{" "}
-                <span className="font-bold capitalize">
-                  {suggestion.priority}
-                </span>
+                Priority: <span className="font-bold capitalize">{suggestion.priority}</span>
               </span>
             </div>
             {suggestion.data && (
@@ -121,9 +109,7 @@ const CategorySuggestionsTab = ({
                   <span>{suggestion.data.transactionCount} transactions</span>
                 )}
                 {suggestion.data.totalAmount && (
-                  <span className="ml-2 font-bold">
-                    ${suggestion.data.totalAmount.toFixed(2)}
-                  </span>
+                  <span className="ml-2 font-bold">${suggestion.data.totalAmount.toFixed(2)}</span>
                 )}
               </div>
             )}

@@ -42,8 +42,7 @@ const wrapActions = (actions, name, set, useStore, store) => {
 
 // Middleware stack builder
 const buildMiddlewareStack = (storeInitializer, options, name) => {
-  const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } =
-    options;
+  const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } = options;
   let middlewareStack = storeInitializer;
 
   if (enableImmer) {
@@ -74,12 +73,7 @@ const buildMiddlewareStack = (storeInitializer, options, name) => {
 /**
  * Creates a safe Zustand store with standard middleware and error handling
  */
-export const createSafeStore = ({
-  name,
-  initialState,
-  actions = {},
-  options = {},
-}) => {
+export const createSafeStore = ({ name, initialState, actions = {}, options = {} }) => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
@@ -124,7 +118,7 @@ export const createSafeStore = ({
       enableDevtools,
       version,
     },
-    name,
+    name
   );
 
   useStore = create(middlewareStack);

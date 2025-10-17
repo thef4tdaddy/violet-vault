@@ -116,9 +116,7 @@ describe("receiptHelpers", () => {
 
       const result = validateReceiptData(invalidData);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Valid date in YYYY-MM-DD format is required",
-      );
+      expect(result.errors).toContain("Valid date in YYYY-MM-DD format is required");
     });
   });
 

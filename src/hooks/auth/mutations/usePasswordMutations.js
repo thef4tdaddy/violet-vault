@@ -26,14 +26,9 @@ export const useChangePasswordMutation = () => {
         const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
         const oldKey = oldKeyData.key;
 
-        const decryptedData = await encryptionUtils.decrypt(
-          encryptedData,
-          oldKey,
-          iv,
-        );
+        const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
 
-        const { key: newKey, salt: newSalt } =
-          await encryptionUtils.generateKey(newPassword);
+        const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
         const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
         localStorage.setItem(
@@ -42,7 +37,7 @@ export const useChangePasswordMutation = () => {
             encryptedData: encrypted.data,
             salt: Array.from(newSalt),
             iv: encrypted.iv,
-          }),
+          })
         );
 
         if (import.meta?.env?.MODE === "development") {
@@ -59,10 +54,7 @@ export const useChangePasswordMutation = () => {
         return { success: true, newKey, newSalt };
       } catch (error) {
         logger.error("Password change failed.", error);
-        if (
-          error.name === "OperationError" ||
-          error.message.toLowerCase().includes("decrypt")
-        ) {
+        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
           return { success: false, error: "Invalid current password." };
         }
         return { success: false, error: error.message };

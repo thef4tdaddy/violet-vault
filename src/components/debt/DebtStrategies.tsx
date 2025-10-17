@@ -30,9 +30,7 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
         {React.createElement(getIcon("CheckCircle"), {
           className: "w-12 h-12 text-green-500 mx-auto mb-3",
         })}
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          No Active Debts!
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">No Active Debts!</h3>
         <p className="text-gray-600">
           Congratulations! You don't have any active debts to strategize about.
         </p>
@@ -48,14 +46,11 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
           {React.createElement(getIcon("Target"), {
             className: "w-6 h-6 text-purple-600",
           })}
-          <h2 className="text-xl font-semibold text-gray-900">
-            Debt Payoff Strategies
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900">Debt Payoff Strategies</h2>
         </div>
         <p className="text-gray-600">
-          Compare different debt payoff strategies to find the best approach for
-          your situation. Each strategy has different benefits depending on your
-          goals and motivation style.
+          Compare different debt payoff strategies to find the best approach for your situation.
+          Each strategy has different benefits depending on your goals and motivation style.
         </p>
       </div>
 
@@ -113,10 +108,7 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
           </h3>
           <div className="space-y-3">
             {insights.map((insight, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
-              >
+              <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                 {React.createElement(getIcon("Info"), {
                   className: "w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0",
                 })}

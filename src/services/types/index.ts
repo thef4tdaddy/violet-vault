@@ -4,24 +4,22 @@
  */
 
 // Main typed service implementations
-export { typedFirebaseSyncService } from '../typedFirebaseSyncService';
-export { typedChunkedSyncService } from '../typedChunkedSyncService';
+export { typedFirebaseSyncService } from "../typedFirebaseSyncService";
+export { typedChunkedSyncService } from "../typedChunkedSyncService";
 
 // Type definitions and interfaces
-export type * from './firebaseServiceTypes';
-export type * from './errorHandling';
+export type * from "./firebaseServiceTypes";
+export type * from "./errorHandling";
 
 // Utility instances for standalone use
 export {
   firebaseErrorHandler,
   syncOperationWrapper,
-  syncDataValidator
-} from './firebaseServiceTypes';
+  syncDataValidator,
+} from "./firebaseServiceTypes";
 
-export {
-  enhancedFirebaseErrorHandler
-} from './errorHandling';
+export { enhancedFirebaseErrorHandler } from "./errorHandling";
 
 // Re-export core Firebase types
-export type * from '../../types/firebase';
-export type * from '../../types/common';
+export type * from "../../types/firebase";
+export type * from "../../types/common";

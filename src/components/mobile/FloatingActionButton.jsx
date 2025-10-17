@@ -12,12 +12,8 @@ import FABActionMenu from "./FABActionMenu";
  */
 const FloatingActionButton = () => {
   const { shouldShowFAB, primaryAction, isExpanded } = useFABSelectors();
-  const {
-    containerRef,
-    handlePrimaryClick,
-    handleLongPress,
-    handleBackdropClick,
-  } = useFABBehavior();
+  const { containerRef, handlePrimaryClick, handleLongPress, handleBackdropClick } =
+    useFABBehavior();
   const { adjustedStyle } = useFABSmartPositioning();
   const { isAnyActionLoading } = useFABLoadingStates();
 
@@ -26,11 +22,7 @@ const FloatingActionButton = () => {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed right-4 z-50 lg:hidden"
-      style={adjustedStyle}
-    >
+    <div ref={containerRef} className="fixed right-4 z-50 lg:hidden" style={adjustedStyle}>
       {/* Pop-out menu */}
       <FABActionMenu />
 
@@ -53,12 +45,9 @@ const FloatingActionButton = () => {
         aria-haspopup="menu"
         style={{ width: "56px", height: "56px" }}
       >
-        {React.createElement(
-          getIcon(isExpanded ? "X" : primaryAction?.icon || "Plus"),
-          {
-            className: "h-6 w-6",
-          },
-        )}
+        {React.createElement(getIcon(isExpanded ? "X" : primaryAction?.icon || "Plus"), {
+          className: "h-6 w-6",
+        })}
       </button>
 
       {/* Backdrop */}

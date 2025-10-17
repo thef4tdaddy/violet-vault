@@ -61,7 +61,7 @@ export const useActualBalanceOperations = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation, actualBalance],
+    [metadata, updateMetadataMutation, actualBalance]
   );
 
   return {

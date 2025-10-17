@@ -22,12 +22,7 @@ const TabContent: React.FC<TabContentProps> = ({
 }) => {
   switch (activeTab) {
     case "overview":
-      return (
-        <OverviewTab
-          monthlyTrends={monthlyTrends}
-          envelopeSpending={envelopeSpending}
-        />
-      );
+      return <OverviewTab monthlyTrends={monthlyTrends} envelopeSpending={envelopeSpending} />;
 
     case "trends":
       return (
@@ -40,19 +35,10 @@ const TabContent: React.FC<TabContentProps> = ({
       );
 
     case "health":
-      return (
-        <HealthTab
-          envelopeHealth={envelopeHealth}
-          budgetVsActual={budgetVsActual}
-        />
-      );
+      return <HealthTab envelopeHealth={envelopeHealth} budgetVsActual={budgetVsActual} />;
 
     case "categories":
-      return (
-        <CategoriesTab
-          categoryBreakdown={categoryBreakdown}
-        />
-      );
+      return <CategoriesTab categoryBreakdown={categoryBreakdown} />;
 
     default:
       return (

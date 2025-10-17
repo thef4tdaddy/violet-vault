@@ -19,9 +19,7 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Development Tools
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900">Development Tools</h3>
         <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
           {currentMode} Mode
         </div>
@@ -38,12 +36,8 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
             className: "h-5 w-5 text-purple-600 mr-3",
           })}
           <div className="text-left">
-            <p className="font-medium text-purple-900">
-              🔍 Envelope Integrity Checker
-            </p>
-            <p className="text-sm text-purple-700">
-              Detect and fix empty/corrupted envelopes
-            </p>
+            <p className="font-medium text-purple-900">🔍 Envelope Integrity Checker</p>
+            <p className="text-sm text-purple-700">Detect and fix empty/corrupted envelopes</p>
           </div>
         </button>
 
@@ -56,12 +50,8 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
             className: "h-5 w-5 text-yellow-600 mr-3",
           })}
           <div className="text-left">
-            <p className="font-medium text-yellow-900">
-              🧪 Test Budget History
-            </p>
-            <p className="text-sm text-yellow-700">
-              Create test commits for family collaboration
-            </p>
+            <p className="font-medium text-yellow-900">🧪 Test Budget History</p>
+            <p className="text-sm text-yellow-700">Create test commits for family collaboration</p>
           </div>
         </button>
 

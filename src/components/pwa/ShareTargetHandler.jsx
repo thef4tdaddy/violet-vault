@@ -102,15 +102,11 @@ const ShareTargetHandler = () => {
             </div>
 
             <h2 className="font-black text-black text-xl mb-3">
-              <span className="text-2xl">E</span>RROR{" "}
-              <span className="text-2xl">P</span>ROCESSING{" "}
-              <span className="text-2xl">S</span>HARED{" "}
-              <span className="text-2xl">D</span>ATA
+              <span className="text-2xl">E</span>RROR <span className="text-2xl">P</span>ROCESSING{" "}
+              <span className="text-2xl">S</span>HARED <span className="text-2xl">D</span>ATA
             </h2>
 
-            <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-              {error}
-            </p>
+            <p className="text-gray-700 mb-4 text-sm leading-relaxed">{error}</p>
 
             <button
               onClick={() => navigate("/app")}
@@ -133,8 +129,7 @@ const ShareTargetHandler = () => {
             <span className="text-white font-black text-3xl">V</span>
           </div>
           <h1 className="font-black text-black text-3xl mb-2">
-            <span className="text-4xl">V</span>IOLET{" "}
-            <span className="text-4xl">V</span>AULT
+            <span className="text-4xl">V</span>IOLET <span className="text-4xl">V</span>AULT
           </h1>
         </div>
 
@@ -147,8 +142,7 @@ const ShareTargetHandler = () => {
               </div>
 
               <h2 className="font-black text-black text-xl mb-3">
-                <span className="text-2xl">P</span>ROCESSING{" "}
-                <span className="text-2xl">S</span>
+                <span className="text-2xl">P</span>ROCESSING <span className="text-2xl">S</span>
                 HARED <span className="text-2xl">D</span>ATA
               </h2>
 
@@ -165,8 +159,7 @@ const ShareTargetHandler = () => {
               </div>
 
               <h2 className="font-black text-black text-xl mb-3">
-                <span className="text-2xl">S</span>HARED{" "}
-                <span className="text-2xl">D</span>ATA{" "}
+                <span className="text-2xl">S</span>HARED <span className="text-2xl">D</span>ATA{" "}
                 <span className="text-2xl">R</span>ECEIVED
               </h2>
 
@@ -174,9 +167,7 @@ const ShareTargetHandler = () => {
                 {sharedData.title && (
                   <div>
                     <span className="font-medium text-gray-600">Title:</span>
-                    <span className="ml-2 text-gray-800">
-                      {sharedData.title}
-                    </span>
+                    <span className="ml-2 text-gray-800">{sharedData.title}</span>
                   </div>
                 )}
 
@@ -194,9 +185,7 @@ const ShareTargetHandler = () => {
                 {sharedData.url && (
                   <div>
                     <span className="font-medium text-gray-600">URL:</span>
-                    <span className="ml-2 text-blue-600 break-all">
-                      {sharedData.url}
-                    </span>
+                    <span className="ml-2 text-blue-600 break-all">{sharedData.url}</span>
                   </div>
                 )}
 

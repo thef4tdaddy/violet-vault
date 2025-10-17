@@ -20,9 +20,7 @@ const useSmartSuggestions = ({
   showDismissed = false,
 }) => {
   // Settings and state
-  const [analysisSettings, setAnalysisSettings] = useState(
-    DEFAULT_ANALYSIS_SETTINGS,
-  );
+  const [analysisSettings, setAnalysisSettings] = useState(DEFAULT_ANALYSIS_SETTINGS);
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set());
   const [showSettings, setShowSettings] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -33,10 +31,7 @@ const useSmartSuggestions = ({
 
   // Persist collapse state to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "smartSuggestions_collapsed",
-      JSON.stringify(isCollapsed),
-    );
+    localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
   // Generate suggestions based on current data and settings
@@ -48,20 +43,13 @@ const useSmartSuggestions = ({
         analysisSettings,
         dateRange,
         dismissedSuggestions,
-        showDismissed,
+        showDismissed
       );
     } catch (error) {
       logger.error("Error generating smart suggestions:", error);
       return [];
     }
-  }, [
-    transactions,
-    envelopes,
-    analysisSettings,
-    dateRange,
-    dismissedSuggestions,
-    showDismissed,
-  ]);
+  }, [transactions, envelopes, analysisSettings, dateRange, dismissedSuggestions, showDismissed]);
 
   // Toggle collapse state
   const toggleCollapse = useCallback(() => {
@@ -86,7 +74,7 @@ const useSmartSuggestions = ({
 
       globalToast.showInfo("Suggestion dismissed", "Dismissed");
     },
-    [onDismissSuggestion],
+    [onDismissSuggestion]
   );
 
   // Apply suggestion action
@@ -99,7 +87,7 @@ const useSmartSuggestions = ({
               await onCreateEnvelope(suggestion.data);
               globalToast.showSuccess(
                 `Created "${suggestion.data.name}" envelope`,
-                "Suggestion Applied",
+                "Suggestion Applied"
               );
             }
             break;
@@ -111,7 +99,7 @@ const useSmartSuggestions = ({
               });
               globalToast.showSuccess(
                 `Increased budget to $${suggestion.data.suggestedAmount}`,
-                "Budget Updated",
+                "Budget Updated"
               );
             }
             break;
@@ -123,7 +111,7 @@ const useSmartSuggestions = ({
               });
               globalToast.showSuccess(
                 `Reduced budget to $${suggestion.data.suggestedAmount}`,
-                "Budget Updated",
+                "Budget Updated"
               );
             }
             break;
@@ -137,13 +125,10 @@ const useSmartSuggestions = ({
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
-        globalToast.showError(
-          error.message || "Failed to apply suggestion",
-          "Application Error",
-        );
+        globalToast.showError(error.message || "Failed to apply suggestion", "Application Error");
       }
     },
-    [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion],
+    [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]
   );
 
   // Clear all dismissed suggestions
@@ -172,7 +157,7 @@ const useSmartSuggestions = ({
         acc[s.priority] = (acc[s.priority] || 0) + 1;
         return acc;
       },
-      { high: 0, medium: 0, low: 0 },
+      { high: 0, medium: 0, low: 0 }
     );
 
     const typeCounts = suggestions.reduce((acc, s) => {
@@ -181,11 +166,7 @@ const useSmartSuggestions = ({
     }, {});
 
     const potentialSavings = suggestions.reduce((sum, s) => {
-      if (
-        s.type === "decrease_envelope" &&
-        s.data.currentAmount &&
-        s.data.suggestedAmount
-      ) {
+      if (s.type === "decrease_envelope" && s.data.currentAmount && s.data.suggestedAmount) {
         return sum + (s.data.currentAmount - s.data.suggestedAmount);
       }
       return sum;
@@ -222,9 +203,7 @@ const useSmartSuggestions = ({
     // Computed values
     hasSuggestions: suggestions.length > 0,
     highPrioritySuggestions: suggestions.filter((s) => s.priority === "high"),
-    mediumPrioritySuggestions: suggestions.filter(
-      (s) => s.priority === "medium",
-    ),
+    mediumPrioritySuggestions: suggestions.filter((s) => s.priority === "medium"),
     lowPrioritySuggestions: suggestions.filter((s) => s.priority === "low"),
   };
 };

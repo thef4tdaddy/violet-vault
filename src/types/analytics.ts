@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 // Base data types
 export interface Transaction {
@@ -8,7 +8,7 @@ export interface Transaction {
   category: string;
   envelope?: string;
   date: string;
-  type: 'income' | 'expense' | 'transfer';
+  type: "income" | "expense" | "transfer";
   userId?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -20,7 +20,7 @@ export interface Envelope {
   balance: number;
   budgetedAmount: number;
   category?: string;
-  type: 'bill' | 'variable' | 'savings';
+  type: "bill" | "variable" | "savings";
   priority?: number;
   userId?: string;
   createdAt?: string;
@@ -48,7 +48,7 @@ export interface ChartDataPoint {
 }
 
 export interface ChartSeries {
-  type: 'bar' | 'line' | 'area';
+  type: "bar" | "line" | "area";
   dataKey: string;
   name: string;
   fill?: string;
@@ -170,7 +170,7 @@ export interface CategoryBarChartProps {
   actions?: ReactNode;
   showGrid?: boolean;
   showLegend?: boolean;
-  orientation?: 'vertical' | 'horizontal';
+  orientation?: "vertical" | "horizontal";
   formatTooltip?: any;
   maxBarSize?: number;
   [key: string]: any;
@@ -206,10 +206,10 @@ export interface TabContentProps {
 }
 
 // Time filter types
-export type TimeFilter = 'thisWeek' | 'thisMonth' | 'lastMonth' | 'thisYear' | 'custom';
+export type TimeFilter = "thisWeek" | "thisMonth" | "lastMonth" | "thisYear" | "custom";
 
 // Chart types
-export type ChartType = 'bar' | 'line' | 'area' | 'composed' | 'pie';
+export type ChartType = "bar" | "line" | "area" | "composed" | "pie";
 
 // Focus types
-export type FocusType = 'overview' | 'spending' | 'income' | 'trends' | 'health';
+export type FocusType = "overview" | "spending" | "income" | "trends" | "health";

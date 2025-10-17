@@ -31,9 +31,7 @@ export const validatePassword = async (password) => {
 
     // SECURITY FIX: Always validate against actual encrypted data when it exists
     if (!savedData) {
-      logger.auth(
-        "validatePassword: No saved data found - cannot validate password",
-      );
+      logger.auth("validatePassword: No saved data found - cannot validate password");
       logger.production("Password validation failed", {
         reason: "no_encrypted_data_to_validate_against",
       });
@@ -64,14 +62,11 @@ export const validatePassword = async (password) => {
     }
 
     // Use deterministic key derivation to validate password
-    logger.auth(
-      "validatePassword: Using deterministic key derivation for validation",
-      {
-        saltLength: savedSalt.length,
-        ivLength: iv.length,
-        hasEncryptedData: !!encryptedData,
-      },
-    );
+    logger.auth("validatePassword: Using deterministic key derivation for validation", {
+      saltLength: savedSalt.length,
+      ivLength: iv.length,
+      hasEncryptedData: !!encryptedData,
+    });
 
     const keyData = await encryptionUtils.deriveKey(password);
     const key = keyData.key;
@@ -81,9 +76,7 @@ export const validatePassword = async (password) => {
     // Attempt to decrypt the data to validate the password
     const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
 
-    logger.auth(
-      "validatePassword: Decryption successful - password is correct",
-    );
+    logger.auth("validatePassword: Decryption successful - password is correct");
     logger.production("Password validation successful", {
       method: "encrypted_data_validation",
     });
@@ -115,10 +108,7 @@ export const login = async (password, userData = null) => {
   });
 
   const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(
-      () => reject(new Error("Login timeout after 10 seconds")),
-      10000,
-    ),
+    setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
   );
 
   const loginPromise = (async () => {
@@ -150,10 +140,7 @@ export const login = async (password, userData = null) => {
         if (!shareCode) {
           throw new Error("Share code missing from user data during login");
         }
-        const deterministicBudgetId = await encryptionUtils.generateBudgetId(
-          password,
-          shareCode,
-        );
+        const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
 
         const finalUserData = {
           ...userData,
@@ -203,7 +190,7 @@ export const login = async (password, userData = null) => {
             encryptedData: encrypted.data,
             salt: Array.from(newSalt),
             iv: encrypted.iv,
-          }),
+          })
         );
 
         logger.auth("New budget created and saved with share code system.", {
@@ -244,8 +231,7 @@ export const login = async (password, userData = null) => {
           });
           return {
             success: false,
-            error:
-              "Local data is corrupted. Please clear data and start fresh.",
+            error: "Local data is corrupted. Please clear data and start fresh.",
           };
         }
 
@@ -253,9 +239,7 @@ export const login = async (password, userData = null) => {
         logger.auth("Validating password before allowing login");
         const passwordValid = await validatePassword(password);
         if (!passwordValid) {
-          logger.auth(
-            "Password validation failed - offering new budget creation",
-          );
+          logger.auth("Password validation failed - offering new budget creation");
           return {
             success: false,
             error: "This password doesn't match the existing budget.",
@@ -277,21 +261,15 @@ export const login = async (password, userData = null) => {
             Array.from(deterministicSalt.slice(0, 8))
               .map((b) => b.toString(16).padStart(2, "0"))
               .join("") + "...";
-          logger.auth(
-            "Using deterministic key derivation for cross-browser sync",
-            {
-              saltPreview,
-              passwordLength: password?.length || 0,
-              keyType: key.constructor?.name || "unknown",
-            },
-          );
+          logger.auth("Using deterministic key derivation for cross-browser sync", {
+            saltPreview,
+            passwordLength: password?.length || 0,
+            keyType: key.constructor?.name || "unknown",
+          });
         }
 
         logger.auth("Encryption key derived successfully", {
-          keyPreview:
-            key instanceof CryptoKey
-              ? `CryptoKey(${key.algorithm.name})`
-              : "error",
+          keyPreview: key instanceof CryptoKey ? `CryptoKey(${key.algorithm.name})` : "error",
           keyType: key?.constructor?.name || "unknown",
         });
 
@@ -300,34 +278,24 @@ export const login = async (password, userData = null) => {
           decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
           logger.auth("Successfully decrypted local data.");
         } catch (decryptError) {
-          logger.error(
-            "Unexpected decryption failure after password validation",
-            {
-              error: decryptError.message,
-              errorType: decryptError.constructor?.name,
-            },
-          );
+          logger.error("Unexpected decryption failure after password validation", {
+            error: decryptError.message,
+            errorType: decryptError.constructor?.name,
+          });
           return {
             success: false,
-            error:
-              "Unable to decrypt data. Please try again or contact support.",
+            error: "Unable to decrypt data. Please try again or contact support.",
             code: "DECRYPTION_FAILED",
           };
         }
 
         let currentUserData = decryptedData.currentUser;
 
-        if (
-          !currentUserData ||
-          !currentUserData.budgetId ||
-          !currentUserData.shareCode
-        ) {
-          logger.auth(
-            "Legacy data detected - clearing for fresh start with share code system.",
-          );
+        if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
+          logger.auth("Legacy data detected - clearing for fresh start with share code system.");
           localStorage.removeItem("envelopeBudgetData");
           throw new Error(
-            "Legacy data cleared - please create a new budget with share code system",
+            "Legacy data cleared - please create a new budget with share code system"
           );
         }
 
@@ -363,10 +331,7 @@ export const login = async (password, userData = null) => {
       }
     } catch (error) {
       logger.error("Login failed.", error);
-      if (
-        error.name === "OperationError" ||
-        error.message.toLowerCase().includes("decrypt")
-      ) {
+      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
         return { success: false, error: "Invalid password." };
       }
       return { success: false, error: "Invalid password or corrupted data." };
@@ -390,7 +355,7 @@ export const joinBudgetWithShareCode = async (joinData) => {
   });
 
   const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Join timeout after 10 seconds")), 10000),
+    setTimeout(() => reject(new Error("Join timeout after 10 seconds")), 10000)
   );
 
   const joinPromise = (async () => {
@@ -441,11 +406,9 @@ export const joinBudgetWithShareCode = async (joinData) => {
           encryptedData: encrypted.data,
           salt: Array.from(newSalt),
           iv: encrypted.iv,
-        }),
+        })
       );
-      logger.auth(
-        "Saved encrypted shared budget data to localStorage for persistence.",
-      );
+      logger.auth("Saved encrypted shared budget data to localStorage for persistence.");
 
       return {
         success: true,
@@ -494,11 +457,7 @@ export const updateProfile = async (updatedProfile, currentSession) => {
     const savedData = localStorage.getItem("envelopeBudgetData");
     if (savedData) {
       const { encryptedData, iv } = JSON.parse(savedData);
-      const decryptedData = await encryptionUtils.decrypt(
-        encryptedData,
-        encryptionKey,
-        iv,
-      );
+      const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
       // Update the currentUser in the encrypted data
       const updatedData = {
@@ -506,17 +465,14 @@ export const updateProfile = async (updatedProfile, currentSession) => {
         currentUser: updatedProfile,
       };
 
-      const encrypted = await encryptionUtils.encrypt(
-        updatedData,
-        encryptionKey,
-      );
+      const encrypted = await encryptionUtils.encrypt(updatedData, encryptionKey);
       localStorage.setItem(
         "envelopeBudgetData",
         JSON.stringify({
           encryptedData: encrypted.data,
           salt: Array.from(currentSalt),
           iv: encrypted.iv,
-        }),
+        })
       );
     }
 
@@ -545,14 +501,9 @@ export const changePassword = async (oldPassword, newPassword) => {
     const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
     const oldKey = oldKeyData.key;
 
-    const decryptedData = await encryptionUtils.decrypt(
-      encryptedData,
-      oldKey,
-      iv,
-    );
+    const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
 
-    const { key: newKey, salt: newSalt } =
-      await encryptionUtils.generateKey(newPassword);
+    const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
     const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
     localStorage.setItem(
@@ -561,7 +512,7 @@ export const changePassword = async (oldPassword, newPassword) => {
         encryptedData: encrypted.data,
         salt: Array.from(newSalt),
         iv: encrypted.iv,
-      }),
+      })
     );
 
     return {
@@ -573,10 +524,7 @@ export const changePassword = async (oldPassword, newPassword) => {
     };
   } catch (error) {
     logger.error("Password change failed:", error);
-    if (
-      error.name === "OperationError" ||
-      error.message.toLowerCase().includes("decrypt")
-    ) {
+    if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
       return { success: false, error: "Current password is incorrect." };
     }
     return {

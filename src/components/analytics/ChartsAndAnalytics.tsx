@@ -44,7 +44,8 @@ const ChartsAnalytics: React.FC<ChartsAnalyticsProps> = ({
 
   // Check if we have any transaction data
   const hasTransactions = Array.isArray(transactions) && transactions.length > 0;
-  const hasFilteredTransactions = Array.isArray(filteredTransactions) && filteredTransactions.length > 0;
+  const hasFilteredTransactions =
+    Array.isArray(filteredTransactions) && filteredTransactions.length > 0;
 
   const handleExport = () => {
     exportAnalyticsData(

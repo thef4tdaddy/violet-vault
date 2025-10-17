@@ -17,10 +17,7 @@ export const runImmediateSyncHealthCheck = async () => {
   return Promise.race([
     runHealthChecksInternal(results),
     new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Health check timed out after 60 seconds")),
-        60000,
-      ),
+      setTimeout(() => reject(new Error("Health check timed out after 60 seconds")), 60000)
     ),
   ]);
 };
@@ -114,10 +111,7 @@ async function runHealthChecksInternal(results) {
     const syncResult = await Promise.race([
       cloudSyncService.determineSyncDirection(mockDexieData, mockFirestoreData),
       new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Sync direction determination timed out")),
-          10000,
-        ),
+        setTimeout(() => reject(new Error("Sync direction determination timed out")), 10000)
       ),
     ]);
 
@@ -129,9 +123,7 @@ async function runHealthChecksInternal(results) {
       });
       results.passed++;
     } else {
-      throw new Error(
-        `Wrong direction: ${syncResult.direction}, expected: toFirestore`,
-      );
+      throw new Error(`Wrong direction: ${syncResult.direction}, expected: toFirestore`);
     }
   } catch (error) {
     results.tests.push({
@@ -224,10 +216,7 @@ async function runHealthChecksInternal(results) {
 
     const syncData = await cloudSyncService.fetchDexieData();
 
-    if (
-      typeof syncData.unassignedCash === "number" &&
-      typeof syncData.actualBalance === "number"
-    ) {
+    if (typeof syncData.unassignedCash === "number" && typeof syncData.actualBalance === "number") {
       results.tests.push({
         name: "Metadata Handling",
         status: "✅ PASSED",
@@ -307,17 +296,13 @@ async function runHealthChecksInternal(results) {
   });
 
   results.tests.forEach((test) => {
-    logger.info(
-      `${test.status} ${test.name}: ${test.details || test.error || ""}`,
-    );
+    logger.info(`${test.status} ${test.name}: ${test.details || test.error || ""}`);
   });
 
   if (results.failed === 0) {
     logger.info("🎉 ALL SYNC HEALTH CHECKS PASSED! Sync system is ready.");
   } else {
-    logger.warn(
-      `⚠️ ${results.failed} health check(s) failed. Please investigate.`,
-    );
+    logger.warn(`⚠️ ${results.failed} health check(s) failed. Please investigate.`);
   }
 
   return results;

@@ -119,13 +119,8 @@ class PWAManager {
       const lastDismissed = localStorage.getItem("pwa_install_last_dismissed");
       const dismissCooldown = 24 * 60 * 60 * 1000; // 24 hours
 
-      if (
-        lastDismissed &&
-        Date.now() - parseInt(lastDismissed) < dismissCooldown
-      ) {
-        logger.info(
-          "Install prompt dismissed recently, skipping automatic prompt",
-        );
+      if (lastDismissed && Date.now() - parseInt(lastDismissed) < dismissCooldown) {
+        logger.info("Install prompt dismissed recently, skipping automatic prompt");
         return;
       }
 
@@ -171,9 +166,7 @@ class PWAManager {
 
       switch (type) {
         case "UPDATE_AVAILABLE":
-          logger.info(
-            "📡 Received update available message from service worker",
-          );
+          logger.info("📡 Received update available message from service worker");
           this.uiStore.getState().setUpdateAvailable(true);
           break;
         case "UPDATE_INSTALLED":
@@ -211,9 +204,7 @@ class PWAManager {
    * Get PWA installation status
    */
   getInstallationStatus() {
-    const isStandalone = window.matchMedia(
-      "(display-mode: standalone)",
-    ).matches;
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
     const isInstallable = !!this.uiStore?.installPromptEvent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
@@ -242,10 +233,7 @@ class PWAManager {
         setTimeout(() => {
           this.uiStore
             .getState()
-            .loadPatchNotesForUpdate(
-              versionCheck.lastSeenVersion,
-              versionCheck.currentVersion,
-            );
+            .loadPatchNotesForUpdate(versionCheck.lastSeenVersion, versionCheck.currentVersion);
         }, 2000); // 2 second delay
       } else if (versionCheck.isFirstTime) {
         logger.info("👋 First time user detected, not showing patch notes");

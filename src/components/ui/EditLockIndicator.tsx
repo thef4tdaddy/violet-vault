@@ -53,7 +53,7 @@ const EditLockIndicator: React.FC<EditLockIndicatorProps> = ({
   // Handle both Firebase Timestamp and Date objects
   const getExpirationDate = (expiresAt: Date | { toDate: () => Date } | string | number): Date => {
     if (!expiresAt) return new Date(0);
-    if (typeof expiresAt === 'object' && 'toDate' in expiresAt) {
+    if (typeof expiresAt === "object" && "toDate" in expiresAt) {
       return expiresAt.toDate();
     }
     return new Date(expiresAt);
@@ -75,9 +75,7 @@ const EditLockIndicator: React.FC<EditLockIndicatorProps> = ({
           className: "h-4 w-4 text-green-600",
         })}
         <div className="flex-1">
-          <p className="text-sm font-medium text-green-900">
-            You are editing this record
-          </p>
+          <p className="text-sm font-medium text-green-900">You are editing this record</p>
           {showDetails && timeRemaining > 0 && (
             <p className="text-xs text-green-700">
               {secondsRemaining > 60
@@ -159,7 +157,7 @@ export const CompactEditLockIndicator: React.FC<CompactEditLockIndicatorProps> =
 
   const getExpirationDate = (expiresAt: Date | { toDate: () => Date } | string | number): Date => {
     if (!expiresAt) return new Date(0);
-    if (typeof expiresAt === 'object' && 'toDate' in expiresAt) {
+    if (typeof expiresAt === "object" && "toDate" in expiresAt) {
       return expiresAt.toDate();
     }
     return new Date(expiresAt);

@@ -12,10 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getIcon } from "../../../utils";
-import {
-  formatCurrency,
-  CHART_COLORS,
-} from "../../../utils/analytics/trendHelpers";
+import { formatCurrency, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
 
 const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
   const tooltipFormatter = (value, name) => [formatCurrency(value), name];
@@ -25,8 +22,7 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
       <h3 className="font-black text-black text-base mb-4">
-        <span className="text-lg">12-M</span>ONTH{" "}
-        <span className="text-lg">F</span>INANCIAL{" "}
+        <span className="text-lg">12-M</span>ONTH <span className="text-lg">F</span>INANCIAL{" "}
         <span className="text-lg">T</span>RENDS
       </h3>
       <div className="h-80">
@@ -36,10 +32,7 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip
-                formatter={tooltipFormatter}
-                labelFormatter={(month) => `Month: ${month}`}
-              />
+              <Tooltip formatter={tooltipFormatter} labelFormatter={(month) => `Month: ${month}`} />
               <Legend />
               <Area
                 type="monotone"
@@ -49,11 +42,7 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
                 stroke={CHART_COLORS.INCOME}
                 name="Income"
               />
-              <Bar
-                dataKey="spending"
-                fill={CHART_COLORS.SPENDING}
-                name="Spending"
-              />
+              <Bar dataKey="spending" fill={CHART_COLORS.SPENDING} name="Spending" />
               <Line
                 type="monotone"
                 dataKey="net"
@@ -70,9 +59,7 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
               className: "h-12 w-12 mb-4 opacity-50",
             })}
             <p className="text-lg font-medium">No Data Available</p>
-            <p className="text-sm">
-              Add some transactions to see your financial trends
-            </p>
+            <p className="text-sm">Add some transactions to see your financial trends</p>
           </div>
         )}
       </div>

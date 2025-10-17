@@ -23,12 +23,7 @@ import {
  * @param {boolean} props.showDetails - Whether details panel is currently shown
  * @returns {React.ReactElement} Rendered status indicator button
  */
-const SyncStatusIndicator = ({
-  syncStatus,
-  isBackgroundSyncing,
-  onClick,
-  showDetails,
-}) => {
+const SyncStatusIndicator = ({ syncStatus, isBackgroundSyncing, onClick, showDetails }) => {
   /**
    * Get appropriate icon for current sync status
    * @returns {React.ReactElement} SVG icon element
@@ -93,10 +88,7 @@ const SyncStatusIndicator = ({
   };
 
   const statusColor = getStatusColor(syncStatus, isBackgroundSyncing);
-  const backgroundColor = getStatusBackgroundColor(
-    syncStatus,
-    isBackgroundSyncing,
-  );
+  const backgroundColor = getStatusBackgroundColor(syncStatus, isBackgroundSyncing);
   const statusText = getStatusText(syncStatus, isBackgroundSyncing);
 
   return (

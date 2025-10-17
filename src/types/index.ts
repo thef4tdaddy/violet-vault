@@ -4,7 +4,7 @@
  */
 
 // Auth types
-export * from './auth';
+export * from "./auth";
 
 // Common utility types
 export type Nullable<T> = T | null;
@@ -36,4 +36,4 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 // Central types export
-export * from './debt'
+export * from "./debt";

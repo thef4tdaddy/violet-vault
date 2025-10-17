@@ -88,21 +88,22 @@ Parses TypeScript compiler output into structured JSON:
 
 ## Common TypeScript Error Codes
 
-| Code   | Description                          | Action                                |
-| ------ | ------------------------------------ | ------------------------------------- |
-| TS2304 | Cannot find name                     | Add type definitions or import types  |
-| TS2345 | Argument type mismatch               | Fix argument types                    |
-| TS2322 | Type not assignable                  | Ensure type compatibility             |
-| TS2339 | Property does not exist              | Add property or fix spelling          |
-| TS2307 | Cannot find module                   | Install module or fix import path     |
-| TS7006 | Implicit 'any' type                  | Add explicit type annotations         |
-| TS7016 | Could not find declaration file      | Install @types/package-name           |
+| Code   | Description                     | Action                               |
+| ------ | ------------------------------- | ------------------------------------ |
+| TS2304 | Cannot find name                | Add type definitions or import types |
+| TS2345 | Argument type mismatch          | Fix argument types                   |
+| TS2322 | Type not assignable             | Ensure type compatibility            |
+| TS2339 | Property does not exist         | Add property or fix spelling         |
+| TS2307 | Cannot find module              | Install module or fix import path    |
+| TS7006 | Implicit 'any' type             | Add explicit type annotations        |
+| TS7016 | Could not find declaration file | Install @types/package-name          |
 
 ## Best Practices
 
 ### For JavaScript Files
 
 1. **Use JSDoc comments** for type information:
+
    ```javascript
    /**
     * @param {string} name - The user's name
@@ -169,15 +170,19 @@ The current setup supports gradual TypeScript adoption:
 ### Common Issues
 
 **Issue:** Type errors in node_modules
+
 - **Solution:** Add to `exclude` in tsconfig.json or enable `skipLibCheck: true`
 
 **Issue:** Can't find type definitions
+
 - **Solution:** Install @types package: `npm install --save-dev @types/package-name`
 
 **Issue:** False positives in JavaScript files
+
 - **Solution:** Add `// @ts-ignore` comment above the line (use sparingly)
 
 **Issue:** Workflow failing but local check passes
+
 - **Solution:** Ensure package-lock.json is committed and dependencies match
 
 ## Notes

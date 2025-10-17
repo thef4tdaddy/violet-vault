@@ -1,9 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import {
-  getScoreColor,
-  getScoreBgColor,
-} from "../../../utils/performanceUtils";
+import { getScoreColor, getScoreBgColor } from "../../../utils/performanceUtils";
 
 /**
  * MetricCard component for displaying performance metrics
@@ -21,9 +18,7 @@ const MetricCard = ({ title, score, iconName, description }) => {
           })}
           <span className="font-medium text-gray-900">{title}</span>
         </div>
-        <span
-          className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(score)}`}
-        >
+        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(score)}`}>
           {score}/100
         </span>
       </div>

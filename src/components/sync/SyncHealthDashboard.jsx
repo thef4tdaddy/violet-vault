@@ -109,10 +109,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
       await exportBackup();
       showSuccessToast("Backup exported successfully", "Backup Created");
     } catch (error) {
-      showErrorToast(
-        `Failed to export backup: ${error.message}`,
-        "Export Failed",
-      );
+      showErrorToast(`Failed to export backup: ${error.message}`, "Export Failed");
     }
   };
 
@@ -147,13 +144,10 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h2 className="text-xl font-black text-black uppercase tracking-wider">
-                <span className="text-2xl">S</span>YNC{" "}
-                <span className="text-2xl">H</span>EALTH{" "}
+                <span className="text-2xl">S</span>YNC <span className="text-2xl">H</span>EALTH{" "}
                 <span className="text-2xl">D</span>ASHBOARD
               </h2>
-              <p
-                className={`text-sm font-medium text-${statusColor}-600 capitalize`}
-              >
+              <p className={`text-sm font-medium text-${statusColor}-600 capitalize`}>
                 Status: {healthData.status}
               </p>
             </div>
@@ -163,9 +157,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`px-3 py-2 text-xs rounded-lg border-2 border-black ${
-                autoRefresh
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-700"
+                autoRefresh ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
               }`}
             >
               {autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
@@ -185,9 +177,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
           <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-black text-black uppercase">
-                  Success Rate
-                </p>
+                <p className="text-xs font-black text-black uppercase">Success Rate</p>
                 <p
                   className={`text-2xl font-black text-${successRate > 95 ? "green" : successRate > 90 ? "yellow" : "red"}-600`}
                 >
@@ -203,9 +193,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
           <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-black text-black uppercase">
-                  Avg Sync Time
-                </p>
+                <p className="text-xs font-black text-black uppercase">Avg Sync Time</p>
                 <p
                   className={`text-2xl font-black text-${healthData.metrics.averageSyncTime < 5000 ? "green" : healthData.metrics.averageSyncTime < 10000 ? "yellow" : "red"}-600`}
                 >
@@ -219,9 +207,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
           <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-black text-black uppercase">
-                  Total Syncs
-                </p>
+                <p className="text-xs font-black text-black uppercase">Total Syncs</p>
                 <p className="text-2xl font-black text-purple-600">
                   {healthData.metrics.totalAttempts}
                 </p>
@@ -235,9 +221,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
           <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-black text-black uppercase">
-                  Failures
-                </p>
+                <p className="text-xs font-black text-black uppercase">Failures</p>
                 <p
                   className={`text-2xl font-black text-${healthData.metrics.consecutiveFailures > 0 ? "red" : "green"}-600`}
                 >
@@ -260,8 +244,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
               })}
               <div className="flex-1">
                 <h3 className="font-black text-red-800 text-sm uppercase mb-2">
-                  <span className="text-base">S</span>YNC{" "}
-                  <span className="text-base">I</span>SSUES{" "}
+                  <span className="text-base">S</span>YNC <span className="text-base">I</span>SSUES{" "}
                   <span className="text-base">D</span>ETECTED
                 </h3>
                 <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
@@ -302,12 +285,10 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
               })}
               <div>
                 <h3 className="font-black text-green-800 text-sm uppercase">
-                  <span className="text-base">S</span>YNC{" "}
-                  <span className="text-base">H</span>EALTHY
+                  <span className="text-base">S</span>YNC <span className="text-base">H</span>EALTHY
                 </h3>
                 <p className="text-sm text-green-700">
-                  All sync operations are performing normally. No issues
-                  detected.
+                  All sync operations are performing normally. No issues detected.
                 </p>
               </div>
             </div>
@@ -317,24 +298,19 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
         {/* Recent Sync History */}
         <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
           <h3 className="font-black text-black text-sm uppercase mb-4">
-            <span className="text-base">R</span>ECENT{" "}
-            <span className="text-base">S</span>YNC{" "}
+            <span className="text-base">R</span>ECENT <span className="text-base">S</span>YNC{" "}
             <span className="text-base">H</span>ISTORY
           </h3>
 
           {healthData.recentSyncs.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
-              No sync history available
-            </p>
+            <p className="text-gray-500 text-center py-4">No sync history available</p>
           ) : (
             <div className="space-y-2">
               {healthData.recentSyncs.slice(0, 5).map((sync, index) => (
                 <div
                   key={sync.id || index}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
-                    sync.success
-                      ? "bg-green-50 border-green-200"
-                      : "bg-red-50 border-red-200"
+                    sync.success ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -349,22 +325,14 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
                       >
                         {sync.type || "Unknown"} sync
                       </p>
-                      {sync.error && (
-                        <p className="text-xs text-red-600">
-                          {sync.error.message}
-                        </p>
-                      )}
+                      {sync.error && <p className="text-xs text-red-600">{sync.error.message}</p>}
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <p className="text-xs text-gray-600">
-                      {formatDuration(sync.duration || 0)}
-                    </p>
+                    <p className="text-xs text-gray-600">{formatDuration(sync.duration || 0)}</p>
                     <p className="text-xs text-gray-500">
-                      {new Date(
-                        sync.endTime || sync.startTime,
-                      ).toLocaleTimeString()}
+                      {new Date(sync.endTime || sync.startTime).toLocaleTimeString()}
                     </p>
                   </div>
                 </div>

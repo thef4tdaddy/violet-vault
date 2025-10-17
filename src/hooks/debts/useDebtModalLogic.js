@@ -10,14 +10,14 @@ import useEditLock from "../common/useEditLock";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
 import useBills from "../bills/useBills";
 import { useDebtForm } from "./useDebtForm";
-import {
-  calculateDebtMetrics,
-  formatDebtMetrics,
-} from "../../utils/debts/debtFormValidation";
+import { calculateDebtMetrics, formatDebtMetrics } from "../../utils/debts/debtFormValidation";
 
 export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
   // Get auth context for edit locking
-  const { securityContext: { budgetId }, user: currentUser } = useAuthManager();
+  const {
+    securityContext: { budgetId },
+    user: currentUser,
+  } = useAuthManager();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {
@@ -33,7 +33,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
   // Find connected bill and envelope for this debt
   const connectedBill = useMemo(
     () => (debt?.id ? bills.find((bill) => bill.debtId === debt.id) : null),
-    [debt?.id, bills],
+    [debt?.id, bills]
   );
 
   const connectedEnvelope = useMemo(() => {
@@ -47,12 +47,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
   }, [connectedBill, debt?.envelopeId, envelopes]);
 
   // Use the debt form hook
-  const debtFormHook = useDebtForm(
-    debt,
-    isOpen,
-    connectedBill,
-    connectedEnvelope,
-  );
+  const debtFormHook = useDebtForm(debt, isOpen, connectedBill, connectedEnvelope);
 
   // Edit locking for the debt (only when editing existing debt)
   const editLockHook = useEditLock("debt", debt?.id, {
@@ -68,9 +63,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
       const metrics = calculateDebtMetrics({
         currentBalance: parseFloat(formData.currentBalance) || 0,
         originalBalance:
-          parseFloat(formData.originalBalance) ||
-          parseFloat(formData.currentBalance) ||
-          0,
+          parseFloat(formData.originalBalance) || parseFloat(formData.currentBalance) || 0,
         interestRate: parseFloat(formData.interestRate) || 0,
         minimumPayment: parseFloat(formData.minimumPayment) || 0,
         paymentFrequency: formData.paymentFrequency,
@@ -107,8 +100,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
     debtFormHook.isEditMode && editLockHook.isLocked && !editLockHook.isOwnLock;
 
   // Check if own lock indicator should be shown
-  const shouldShowOwnLockIndicator =
-    debtFormHook.isEditMode && editLockHook.isOwnLock;
+  const shouldShowOwnLockIndicator = debtFormHook.isEditMode && editLockHook.isOwnLock;
 
   // Check if existing connections should be shown
   const shouldShowExistingConnections =

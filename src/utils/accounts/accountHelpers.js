@@ -40,8 +40,7 @@ export const ACCOUNT_COLORS = [
  */
 export const getAccountTypeInfo = (type) => {
   return (
-    ACCOUNT_TYPES.find((t) => t.value === type) ||
-    ACCOUNT_TYPES.find((t) => t.value === "Other")
+    ACCOUNT_TYPES.find((t) => t.value === type) || ACCOUNT_TYPES.find((t) => t.value === "Other")
   );
 };
 
@@ -210,10 +209,7 @@ export const getAccountIconName = (type) => {
  * @param {number} annualContribution - Annual contribution limit
  * @returns {number} Utilization percentage (0-100)
  */
-export const calculateAccountUtilization = (
-  currentBalance,
-  annualContribution,
-) => {
+export const calculateAccountUtilization = (currentBalance, annualContribution) => {
   if (!annualContribution || annualContribution <= 0) return 0;
   if (!currentBalance || currentBalance <= 0) return 0;
 
@@ -264,15 +260,13 @@ export const filterAccounts = (accounts, filters = {}) => {
 
   // Filter by account type
   if (filters.type) {
-    filteredAccounts = filteredAccounts.filter(
-      (account) => account.type === filters.type,
-    );
+    filteredAccounts = filteredAccounts.filter((account) => account.type === filters.type);
   }
 
   // Filter by minimum balance
   if (filters.minBalance !== undefined) {
     filteredAccounts = filteredAccounts.filter(
-      (account) => account.currentBalance >= filters.minBalance,
+      (account) => account.currentBalance >= filters.minBalance
     );
   }
 
@@ -292,7 +286,7 @@ export const filterAccounts = (accounts, filters = {}) => {
     filteredAccounts = filteredAccounts.filter(
       (account) =>
         account.name.toLowerCase().includes(searchTerm) ||
-        account.description?.toLowerCase().includes(searchTerm),
+        account.description?.toLowerCase().includes(searchTerm)
     );
   }
 

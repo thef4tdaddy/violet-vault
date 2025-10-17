@@ -58,7 +58,9 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
               className: "h-8 w-8 mx-auto mb-3",
             })}
             <p className="font-medium">Error loading chart</p>
-            <p className="text-sm text-gray-500 mt-1">{typeof error === 'string' ? error : error.message}</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {typeof error === "string" ? error : error.message}
+            </p>
           </div>
         </div>
       </div>

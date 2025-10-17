@@ -40,8 +40,8 @@ const useCoreStore = create(
       setting: defaultValue,
       setSetting: (value) => set({ setting: value }),
     }),
-    { name: "core-store" },
-  ),
+    { name: "core-store" }
+  )
 );
 ```
 
@@ -218,11 +218,11 @@ const useStandardStore = create(
         {
           name: "store-name",
           version: 1,
-        },
+        }
       ),
-      { name: "store-devtools" },
-    ),
-  ),
+      { name: "store-devtools" }
+    )
+  )
 );
 ```
 

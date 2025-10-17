@@ -51,17 +51,9 @@ const BillTable = ({
             <tr>
               <th className="px-6 py-3 text-center">
                 <button
-                  onClick={
-                    selectionState.isAllSelected
-                      ? clearSelection
-                      : selectAllBills
-                  }
+                  onClick={selectionState.isAllSelected ? clearSelection : selectAllBills}
                   className="flex items-center justify-center w-6 h-6 mx-auto hover:bg-gray-200 rounded transition-colors"
-                  title={
-                    selectionState.isAllSelected
-                      ? "Deselect all bills"
-                      : "Select all bills"
-                  }
+                  title={selectionState.isAllSelected ? "Deselect all bills" : "Select all bills"}
                 >
                   {selectionState.isAllSelected
                     ? React.createElement(getIcon("CheckSquare"), {
@@ -79,8 +71,7 @@ const BillTable = ({
                 <span className="text-lg">A</span>MOUNT
               </th>
               <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
-                <span className="text-lg">D</span>UE{" "}
-                <span className="text-lg">D</span>ATE
+                <span className="text-lg">D</span>UE <span className="text-lg">D</span>ATE
               </th>
               <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
                 <span className="text-lg">S</span>TATUS
@@ -100,10 +91,7 @@ const BillTable = ({
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => setShowBillDetail(bill)}
                 >
-                  <td
-                    className="px-6 py-4 whitespace-nowrap"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       checked={displayData.isSelected}
@@ -115,12 +103,8 @@ const BillTable = ({
                     <div className="flex items-center">
                       <displayData.Icon className="h-5 w-5 text-gray-400 mr-3" />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {bill.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {bill.category}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{bill.name}</div>
+                        <div className="text-sm text-gray-500">{bill.category}</div>
                       </div>
                     </div>
                   </td>
@@ -130,9 +114,7 @@ const BillTable = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {displayData.dueDateDisplay}
                     {displayData.daysDisplay && (
-                      <div className="text-xs text-gray-500">
-                        {displayData.daysDisplay}
-                      </div>
+                      <div className="text-xs text-gray-500">{displayData.daysDisplay}</div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -172,9 +154,7 @@ const BillTable = ({
             {React.createElement(getIcon("FileText"), {
               className: "mx-auto h-12 w-12 text-gray-400",
             })}
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No bills found
-            </h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No bills found</h3>
             <p className="mt-1 text-sm text-gray-500">
               {viewMode === "all"
                 ? "Get started by adding a new bill."
@@ -183,9 +163,7 @@ const BillTable = ({
             <div className="mt-4 text-xs text-gray-400 font-mono">
               DEBUG: Bills={filteredBills.length}, Categorized=
               {JSON.stringify(
-                Object.keys(categorizedBills).map(
-                  (k) => `${k}:${categorizedBills[k]?.length || 0}`,
-                ),
+                Object.keys(categorizedBills).map((k) => `${k}:${categorizedBills[k]?.length || 0}`)
               )}
               , ViewMode={viewMode}
             </div>

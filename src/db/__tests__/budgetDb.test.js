@@ -163,22 +163,22 @@ describe("Typed Dexie Database", () => {
     it("should return database statistics", async () => {
       try {
         const stats = await budgetDb.getDatabaseStats();
-        
+
         expect(stats).toBeDefined();
         expect(typeof stats).toBe("object");
         expect(typeof stats.lastOptimized).toBe("number");
-        
+
         // Should have counts for all tables
         const expectedStats = [
           "envelopes",
-          "transactions", 
+          "transactions",
           "bills",
           "savingsGoals",
           "paychecks",
-          "cache"
+          "cache",
         ];
-        
-        expectedStats.forEach(stat => {
+
+        expectedStats.forEach((stat) => {
           expect(typeof stats[stat]).toBe("number");
           expect(stats[stat]).toBeGreaterThanOrEqual(0);
         });

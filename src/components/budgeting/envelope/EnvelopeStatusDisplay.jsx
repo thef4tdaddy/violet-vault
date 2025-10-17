@@ -35,9 +35,7 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
         const { displayText } = displayInfo;
         return (
           <>
-            <p className="text-xs text-gray-500">
-              {displayText.balanceLabel || "Balance"}
-            </p>
+            <p className="text-xs text-gray-500">{displayText.balanceLabel || "Balance"}</p>
             <p
               className={`text-lg font-semibold ${
                 envelope.available >= 0 ? "text-green-600" : "text-red-600"
@@ -70,13 +68,9 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2">
           {getStatusIcon(envelope.status)}
-          <h3 className="font-black text-black text-base">
-            {envelope.envelopeName}
-          </h3>
+          <h3 className="font-black text-black text-base">{envelope.envelopeName}</h3>
         </div>
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}
-        >
+        <span className={`px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}>
           {envelope.status}
         </span>
       </div>

@@ -45,12 +45,8 @@ const ImportSection: React.FC<ImportSectionProps> = ({
           {React.createElement(getIcon("Upload"), {
             className: "h-8 w-8 text-gray-400 mx-auto mb-3",
           })}
-          <p className="text-sm text-gray-600 mb-2">
-            Click to select your key file
-          </p>
-          <p className="text-xs text-gray-500">
-            Supports both protected and unprotected key files
-          </p>
+          <p className="text-sm text-gray-600 mb-2">Click to select your key file</p>
+          <p className="text-xs text-gray-500">Supports both protected and unprotected key files</p>
         </div>
         <input
           ref={fileInputRef}
@@ -72,9 +68,7 @@ const ImportSection: React.FC<ImportSectionProps> = ({
           placeholder="Enter export password"
           disabled={loading}
         />
-        <p className="text-xs text-gray-500">
-          Only required if the key file is password-protected
-        </p>
+        <p className="text-xs text-gray-500">Only required if the key file is password-protected</p>
 
         <PasswordField
           label="Vault Password"
@@ -86,18 +80,14 @@ const ImportSection: React.FC<ImportSectionProps> = ({
           disabled={loading}
           required
         />
-        <p className="text-xs text-gray-500">
-          Your current vault password to complete the import
-        </p>
+        <p className="text-xs text-gray-500">Your current vault password to complete the import</p>
       </div>
 
       {/* Import Result */}
       {importResult && (
         <div
           className={`p-4 rounded-lg border ${
-            importResult.success
-              ? "bg-green-50 border-green-200"
-              : "bg-red-50 border-red-200"
+            importResult.success ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
           }`}
         >
           <div className="flex items-start">

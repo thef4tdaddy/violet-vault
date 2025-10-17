@@ -73,7 +73,7 @@ export interface AuthFlowHook {
   currentUser: UserData | null;
   budgetId: string | null;
   salt: Uint8Array | null;
-  
+
   // Actions
   handleSetup: (userDataOrPassword: string | UserData) => Promise<AuthResult>;
   handleLogout: () => void;
@@ -92,7 +92,7 @@ export interface UserSetupHook {
   isLoading: boolean;
   isReturningUser: boolean;
   shareCode: string;
-  
+
   // Actions
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   handleStep1Continue: () => void;
@@ -143,7 +143,7 @@ export interface ProfileSettingsProps {
 export interface UserIndicatorProps {
   user: UserData;
   showDetails?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
 // Auth manager hook interface

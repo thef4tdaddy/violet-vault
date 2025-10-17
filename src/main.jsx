@@ -24,9 +24,7 @@ if (typeof window !== "undefined") {
       events.forEach((event) => document.removeEventListener(event, loadOnce));
     };
 
-    events.forEach((event) =>
-      document.addEventListener(event, loadOnce, { once: true }),
-    );
+    events.forEach((event) => document.addEventListener(event, loadOnce, { once: true }));
 
     // Fallback: load after 3 seconds if no user interaction
     setTimeout(() => {
@@ -80,10 +78,7 @@ import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.js";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.js";
-import {
-  runMasterSyncValidation,
-  getQuickSyncStatus,
-} from "./utils/sync/masterSyncValidator.js";
+import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.js";
 import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.js";
 
 if (
@@ -106,17 +101,13 @@ if (
 
   // Service Worker Diagnostics
   window.swDiagnostics = async () => {
-    const { default: swDiagnostics } = await import(
-      "./utils/pwa/serviceWorkerDiagnostics.js"
-    );
+    const { default: swDiagnostics } = await import("./utils/pwa/serviceWorkerDiagnostics.js");
     return await swDiagnostics.getFullDiagnostics();
   };
 
   // Offline Data Validation
   window.offlineReadiness = async () => {
-    const { default: offlineDataValidator } = await import(
-      "./utils/pwa/offlineDataValidator.js"
-    );
+    const { default: offlineDataValidator } = await import("./utils/pwa/offlineDataValidator.js");
     return await offlineDataValidator.getOfflineReadinessReport();
   };
 
@@ -134,7 +125,7 @@ if (
 
   const logLocalDataStats = (localData) => {
     logger.info(
-      `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`,
+      `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`
     );
   };
 
@@ -156,14 +147,10 @@ if (
 
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
-    logger.warn(
-      "🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...",
-    );
+    logger.warn("🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...");
 
     try {
-      const { cloudSyncService } = await import(
-        "./services/cloudSyncService.js"
-      );
+      const { cloudSyncService } = await import("./services/cloudSyncService.js");
 
       // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
       logger.info("🔍 Checking local data before clearing cloud...");
@@ -182,9 +169,7 @@ if (
       const result = await performCloudReset(cloudSyncService);
 
       if (result.success) {
-        logger.info(
-          "✅ Cloud data reset completed successfully - sync will resume automatically",
-        );
+        logger.info("✅ Cloud data reset completed successfully - sync will resume automatically");
         return {
           success: true,
           message: "Cloud data reset completed successfully",
@@ -202,9 +187,7 @@ if (
   window.clearCloudDataOnly = async () => {
     logger.info("🧹 Clearing cloud data only (no restart)...");
     try {
-      const { cloudSyncService } = await import(
-        "./services/cloudSyncService.js"
-      );
+      const { cloudSyncService } = await import("./services/cloudSyncService.js");
       cloudSyncService.stop();
       logger.info("⏸️ Stopped sync service");
 
@@ -220,12 +203,8 @@ if (
 
   // Bug report testing tools
   window.testBugReportCapture = async () => {
-    const { SystemInfoService } = await import(
-      "./services/bugReport/systemInfoService.js"
-    );
-    const { ScreenshotService } = await import(
-      "./services/bugReport/screenshotService.js"
-    );
+    const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
+    const { ScreenshotService } = await import("./services/bugReport/screenshotService.js");
 
     logger.info("🐛 Testing bug report capture...");
 
@@ -237,13 +216,8 @@ if (
     // Test screenshot capture
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
-      const info = screenshot
-        ? ScreenshotService.getScreenshotInfo(screenshot)
-        : null;
-      logger.info(
-        "📸 Screenshot capture:",
-        info ? `Success (${info.sizeKB}KB)` : "Failed",
-      );
+      const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
+      logger.info("📸 Screenshot capture:", info ? `Success (${info.sizeKB}KB)` : "Failed");
       return {
         success: true,
         errors,
@@ -273,5 +247,5 @@ SystemInfoService.initializeErrorCapture();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <App />
-  </QueryClientProvider>,
+  </QueryClientProvider>
 );

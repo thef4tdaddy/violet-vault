@@ -31,12 +31,7 @@ interface BugReportHook {
 }
 
 interface ToastHook {
-  addToast: (toast: {
-    type: string;
-    title: string;
-    message: string;
-    duration?: number;
-  }) => void;
+  addToast: (toast: { type: string; title: string; message: string; duration?: number }) => void;
 }
 
 /**
@@ -109,10 +104,7 @@ const BugReportButton: React.FC = () => {
   };
 
   const handleScreenCapture = async (): Promise<void> => {
-    if (
-      navigator.mediaDevices &&
-      navigator.mediaDevices.getDisplayMedia
-    ) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
       try {
         const stream = await navigator.mediaDevices.getDisplayMedia({
           video: {
@@ -125,9 +117,7 @@ const BugReportButton: React.FC = () => {
         video.srcObject = stream;
         video.play();
 
-        await new Promise<void>(
-          (resolve) => (video.onloadedmetadata = () => resolve()),
-        );
+        await new Promise<void>((resolve) => (video.onloadedmetadata = () => resolve()));
 
         const canvas = document.createElement("canvas");
         canvas.width = video.videoWidth;
@@ -139,33 +129,28 @@ const BugReportButton: React.FC = () => {
 
         stream.getTracks().forEach((track) => track.stop());
 
-        const screenshotDataUrl = canvas.toDataURL(
-          "image/png",
-          0.9,
-        );
+        const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
         setScreenshot(screenshotDataUrl);
       } catch (error) {
         logger.warn("Manual screen capture failed:", error as Error);
         addToast({
           type: "error",
           title: "Screen Capture Failed",
-          message:
-            "Please try the Auto Capture option or include a manual screenshot.",
+          message: "Please try the Auto Capture option or include a manual screenshot.",
         });
       }
     } else {
       addToast({
         type: "warning",
         title: "Screen Capture Not Supported",
-        message:
-          "Please use Auto Capture or include a manual screenshot.",
+        message: "Please use Auto Capture or include a manual screenshot.",
       });
     }
   };
 
   const openScreenshotPreview = (): void => {
     if (!screenshot) return;
-    
+
     // Open screenshot in new tab for full view
     const win = window.open();
     if (win) {
@@ -207,14 +192,9 @@ const BugReportButton: React.FC = () => {
                 {React.createElement(getIcon("AlertCircle"), {
                   className: "h-5 w-5 text-red-500 mr-2",
                 })}
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Report a Problem
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
               </div>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-gray-600"
-              >
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
               </button>
             </div>
@@ -234,9 +214,7 @@ const BugReportButton: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -261,9 +239,7 @@ const BugReportButton: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Severity
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Severity</label>
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
@@ -388,9 +364,7 @@ const BugReportButton: React.FC = () => {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={
-                  (!title.trim() && !description.trim()) || isSubmitting
-                }
+                disabled={(!title.trim() && !description.trim()) || isSubmitting}
                 className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
               >
                 {isSubmitting ? (
@@ -410,8 +384,8 @@ const BugReportButton: React.FC = () => {
             </div>
 
             <p className="text-xs text-gray-500 mt-4 text-center">
-              Your detailed report helps us improve VioletVault. System info and
-              browser details will be included automatically.
+              Your detailed report helps us improve VioletVault. System info and browser details
+              will be included automatically.
               {includeScreenshot &&
                 " Screenshots may contain sensitive info - review before submitting."}
             </p>

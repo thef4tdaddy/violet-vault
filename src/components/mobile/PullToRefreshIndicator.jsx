@@ -49,11 +49,7 @@ const PullToRefreshIndicator = ({
       {/* Status text */}
       <div className="absolute top-16 left-0 right-0 text-center">
         <p className="text-sm font-medium text-gray-700">
-          {isRefreshing
-            ? "Refreshing..."
-            : isReady
-              ? "Release to refresh"
-              : "Pull to refresh"}
+          {isRefreshing ? "Refreshing..." : isReady ? "Release to refresh" : "Pull to refresh"}
         </p>
       </div>
     </div>

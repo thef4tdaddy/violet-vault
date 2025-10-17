@@ -1,6 +1,14 @@
 // Debt tracking constants and configurations
 import logger from "../utils/common/logger";
-import type { DebtType, DebtStatus, PaymentFrequency, CompoundFrequency, DebtTypeConfig, DebtAccount, DebtStats } from "../types/debt";
+import type {
+  DebtType,
+  DebtStatus,
+  PaymentFrequency,
+  CompoundFrequency,
+  DebtTypeConfig,
+  DebtAccount,
+  DebtStats,
+} from "../types/debt";
 
 // Re-export enums as constants for backward compatibility
 export const DEBT_TYPES = {
@@ -45,8 +53,7 @@ export const COMPOUND_FREQUENCIES = {
 export const DEBT_TYPE_CONFIG: Record<string, DebtTypeConfig> = {
   [DEBT_TYPES.MORTGAGE]: {
     name: "Mortgage",
-    description:
-      "Home loan with principal, interest, and potentially PMI/escrow",
+    description: "Home loan with principal, interest, and potentially PMI/escrow",
     color: "blue",
     borderColor: "border-blue-500",
     bgColor: "bg-blue-50",
@@ -266,27 +273,26 @@ export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
   });
 
   const totalDebt = activeDebts.reduce((sum, debt) => sum + debt.balance, 0);
-  const totalMonthlyPayments = activeDebts.reduce(
-    (sum, debt) => sum + debt.minimumPayment,
-    0,
-  );
+  const totalMonthlyPayments = activeDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
 
   // Calculate weighted average interest rate
   const weightedInterestSum = activeDebts.reduce(
     (sum, debt) => sum + debt.interestRate * debt.balance,
-    0,
+    0
   );
-  const averageInterestRate =
-    totalDebt > 0 ? weightedInterestSum / totalDebt : 0;
+  const averageInterestRate = totalDebt > 0 ? weightedInterestSum / totalDebt : 0;
 
   // Group debts by type
-  const debtsByType = activeDebts.reduce((acc, debt) => {
-    if (!acc[debt.type as DebtType]) {
-      acc[debt.type as DebtType] = [];
-    }
-    acc[debt.type as DebtType].push(debt);
-    return acc;
-  }, {} as Record<DebtType, DebtAccount[]>);
+  const debtsByType = activeDebts.reduce(
+    (acc, debt) => {
+      if (!acc[debt.type as DebtType]) {
+        acc[debt.type as DebtType] = [];
+      }
+      acc[debt.type as DebtType].push(debt);
+      return acc;
+    },
+    {} as Record<DebtType, DebtAccount[]>
+  );
 
   // Calculate total interest paid (this would need transaction history)
   const totalInterestPaid = 0; // Placeholder - would require transaction analysis
@@ -301,10 +307,7 @@ export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
     return dueDate >= today && dueDate <= nextWeek;
   });
 
-  const dueSoonAmount = dueSoonDebts.reduce(
-    (sum, debt) => sum + debt.minimumPayment,
-    0,
-  );
+  const dueSoonAmount = dueSoonDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
   const dueSoonCount = dueSoonDebts.length;
 
   return {
