@@ -30,9 +30,12 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
         </div>
 
         <TrendLineChart
+          subtitle=""
           data={(monthlyTrends || []).filter(Boolean)}
           height={400}
           type={chartType}
+          actions={null}
+          formatTooltip={undefined}
         />
       </div>
 
@@ -41,10 +44,13 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
         <div className="glassmorphism rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Spending Patterns</h3>
           <CategoryBarChart
+            subtitle=""
             data={weeklyPatterns.filter(Boolean)}
             height={300}
             dataKey="amount"
             xDataKey="day"
+            actions={null}
+            formatTooltip={undefined}
           />
         </div>
       )}

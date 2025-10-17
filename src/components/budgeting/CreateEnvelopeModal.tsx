@@ -72,7 +72,7 @@ const CreateEnvelopeModal = ({
       {/* Envelope Type Selection */}
       <EnvelopeTypeSelector
         selectedType={formData.envelopeType}
-        onChange={(type) => updateFormField("envelopeType", type)}
+        onTypeChange={(type) => updateFormField("envelopeType", type)}
         disabled={isLoading}
       />
 
@@ -80,7 +80,7 @@ const CreateEnvelopeModal = ({
       <EnvelopeBasicFields
         formData={formData}
         errors={errors}
-        onChange={updateFormField}
+        onUpdateField={updateFormField}
         disabled={isLoading}
       />
 
@@ -89,24 +89,24 @@ const CreateEnvelopeModal = ({
         formData={formData}
         errors={errors}
         calculatedAmounts={calculatedAmounts}
-        onChange={updateFormField}
+        onUpdateField={updateFormField}
         disabled={isLoading}
         showBiweeklyPreview={true}
       />
 
       {/* Allocation Mode */}
       <AllocationModeSelector
-        selectedMode={formData.allocationMode}
-        onChange={(mode) => updateFormField("allocationMode", mode)}
+        autoAllocate={formData.autoAllocate}
+        onAutoAllocateChange={(value) => updateFormField("autoAllocate", value)}
         disabled={isLoading}
       />
 
       {/* Bill Connection */}
       {allBills.length > 0 && (
         <BillConnectionSelector
-          bills={allBills}
+          allBills={allBills}
           selectedBillId={formData.billId}
-          onChange={handleBillSelection}
+          onBillSelection={handleBillSelection}
           onCreateBill={onCreateBill}
           disabled={isLoading}
         />

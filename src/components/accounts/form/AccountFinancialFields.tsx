@@ -76,7 +76,7 @@ const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingA
         disabled={editingAccount && !canEdit}
         className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         placeholder="Optional account description..."
-        rows="3"
+        rows={3}
       />
     </div>
   </>

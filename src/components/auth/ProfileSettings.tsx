@@ -44,7 +44,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
   const handleSave = async () => {
     if (!userName.trim()) {
-      globalToast.showError("Please enter a name", "Name Required");
+      globalToast.showError("Please enter a name", "Name Required", 8000);
       return;
     }
 

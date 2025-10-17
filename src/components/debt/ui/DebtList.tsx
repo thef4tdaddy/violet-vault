@@ -15,7 +15,7 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
           key={debt.id}
           debt={debt}
           onClick={() => onDebtClick(debt)}
-          onRecordPayment={onRecordPayment}
+          _onRecordPayment={onRecordPayment}
         />
       ))}
     </div>

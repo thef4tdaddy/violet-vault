@@ -102,8 +102,11 @@ const UserSetup = ({ onSetupComplete }) => {
               <StepButtons
                 step={step}
                 onContinue={handleStep1Continue}
+                onBack={() => {}}
+                onStartTracking={() => {}}
                 isLoading={isLoading}
                 canContinue={!!masterPassword}
+                canStartTracking={false}
               />
             )}
           </>
@@ -122,9 +125,11 @@ const UserSetup = ({ onSetupComplete }) => {
 
             <StepButtons
               step={step}
+              onContinue={() => {}}
               onBack={goBackToStep1}
               onStartTracking={handleStartTrackingClick}
               isLoading={isLoading}
+              canContinue={false}
               canStartTracking={!!userName.trim()}
             />
           </>

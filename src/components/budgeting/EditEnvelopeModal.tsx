@@ -10,6 +10,7 @@ import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
 import { getIcon } from "../../utils";
 import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import SlideUpModal from "../mobile/SlideUpModal";
+import { ENVELOPE_TYPES } from "../../constants/categories";
 
 const EditEnvelopeModal = ({
   isOpen = false,
@@ -82,8 +83,8 @@ const EditEnvelopeModal = ({
         <EnvelopeTypeSelector
           selectedType={formData.envelopeType}
           onTypeChange={(type) => updateFormField("envelopeType", type)}
-          excludeTypes={formData.envelopeType === "SAVINGS" ? [] : ["SAVINGS"]}
-          canEdit={canEdit}
+          excludeTypes={formData.envelopeType === ENVELOPE_TYPES.SAVINGS ? [] : [ENVELOPE_TYPES.SAVINGS]}
+          disabled={!canEdit}
         />
       )}
 

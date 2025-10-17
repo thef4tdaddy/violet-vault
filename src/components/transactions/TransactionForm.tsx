@@ -46,7 +46,7 @@ const TransactionForm = ({
     e.preventDefault();
 
     if (!transactionForm.description.trim() || !transactionForm.amount) {
-      globalToast.showError("Please fill in description and amount", "Required Fields");
+      globalToast.showError("Please fill in description and amount", "Required Fields", 8000);
       return;
     }
 

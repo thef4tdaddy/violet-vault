@@ -50,7 +50,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
   const handleImportAndStart = async () => {
     if (!importFile) {
-      globalToast.showError("Please select a file to import", "File Required");
+      globalToast.showError("Please select a file to import", "File Required", 8000);
       return;
     }
 
@@ -61,7 +61,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
       const validation = validateImportFile(fileData);
       if (!validation.valid) {
-        globalToast.showError(`Invalid import file: ${validation.error}`, "Invalid File");
+        globalToast.showError(`Invalid import file: ${validation.error}`, "Invalid File", 8000);
         return;
       }
 
@@ -70,7 +70,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
       onModeSelected("local-only");
     } catch (err) {
       logger.error("Failed to import and start:", err);
-      globalToast.showError(`Import failed: ${err.message}`, "Import Failed");
+      globalToast.showError(`Import failed: ${err.message}`, "Import Failed", 8000);
     }
   };
 

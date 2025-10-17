@@ -62,6 +62,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
           subtext={card.subtext}
           color={card.color}
           alert={card.alert}
+          onClick={() => {}}
         />
       ))}
     </div>
