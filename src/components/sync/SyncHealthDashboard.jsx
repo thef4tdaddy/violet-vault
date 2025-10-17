@@ -9,6 +9,33 @@ import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";
 import { useExportData } from "../../hooks/common/useExportData";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 
+/**
+ * @typedef {Object} HealthMetrics
+ * @property {number} successfulSyncs - Count of successful syncs
+ * @property {number} failedSyncs - Count of failed syncs
+ * @property {number} averageSyncTime - Average sync duration in ms
+ * @property {number} consecutiveFailures - Count of consecutive failures
+ * @property {number} errorRate - Error rate percentage (0-1)
+ * @property {number} lastSyncTime - Timestamp of last sync
+ */
+
+/**
+ * @typedef {Object} HealthData
+ * @property {'healthy'|'slow'|'degraded'|'unhealthy'|'unknown'} status - Overall health status
+ * @property {HealthMetrics} metrics - Health metrics
+ * @property {Array} recentSyncs - Recent sync history
+ */
+
+/**
+ * SyncHealthDashboard component displays detailed sync health metrics and history
+ * Provides backup export functionality and real-time health monitoring
+ * GitHub Issue #576 Phase 3: Visual health monitoring and backup tools
+ *
+ * @param {Object} props - Component props
+ * @param {boolean} props.isOpen - Whether the dashboard modal is open
+ * @param {Function} props.onClose - Callback to close the dashboard
+ * @returns {React.ReactElement|null} Rendered dashboard modal or null if closed
+ */
 const SyncHealthDashboard = ({ isOpen, onClose }) => {
   const [healthData, setHealthData] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -33,6 +60,11 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
 
   if (!isOpen || !healthData) return null;
 
+  /**
+   * Get Tailwind color name for health status
+   * @param {string} status - Health status
+   * @returns {string} Tailwind color name
+   */
   const getStatusColor = (status) => {
     switch (status) {
       case "healthy":
@@ -48,6 +80,11 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
     }
   };
 
+  /**
+   * Get icon name for health status
+   * @param {string} status - Health status
+   * @returns {string} Icon name for renderIcon
+   */
   const getStatusIcon = (status) => {
     switch (status) {
       case "healthy":
@@ -63,6 +100,10 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
     }
   };
 
+  /**
+   * Handle backup export with toast notifications
+   * @returns {Promise<void>}
+   */
   const handleExportBackup = async () => {
     try {
       await exportBackup();
@@ -75,6 +116,11 @@ const SyncHealthDashboard = ({ isOpen, onClose }) => {
     }
   };
 
+  /**
+   * Format duration in milliseconds to human-readable string
+   * @param {number} ms - Duration in milliseconds
+   * @returns {string} Formatted duration string
+   */
   const formatDuration = (ms) => {
     if (ms < 1000) return `${ms}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
