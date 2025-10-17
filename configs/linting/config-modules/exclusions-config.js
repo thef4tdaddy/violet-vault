@@ -30,6 +30,7 @@ export default [
     files: [
       '**/firebase.{js,ts}',
       '**/dexie-config.{js,ts}',
+      '**/budgetDb.{js,ts}', // Core database configuration
       '**/main.{jsx,tsx}', // App entry point
       '**/App.{jsx,tsx}', // Main app component
     ],

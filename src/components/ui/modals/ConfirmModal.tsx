@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { getIcon } from "../../utils";
-import { useTouchFeedback } from "../../utils/ui/touchFeedback";
+import { getIcon } from "@/utils";
+import { useTouchFeedback } from "@/utils/ui/touchFeedback";
 
 interface ColorScheme {
   iconBg: string;
@@ -9,7 +9,7 @@ interface ColorScheme {
   confirmBtnDisabled: string;
 }
 
-interface ConfirmModalProps {
+export interface ConfirmModalProps {
   isOpen?: boolean;
   title?: string;
   message?: string;

@@ -12,7 +12,7 @@ import {
   getIconNameForStorage,
 } from "../../utils/common/billIcons";
 import { toMonthly } from "../../utils/common/frequencyCalculations";
-import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
+import { convertToBiweekly } from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";
 import type {
@@ -117,7 +117,7 @@ export const useBillForm = ({
 
   // Business Logic Functions
   const calculateMonthlyAmount = useCallback(
-    (amount: string | number, frequency: BillFrequency, customFrequency = 1): number => {
+    (amount: string | number, frequency: BillFrequency, _customFrequency = 1): number => {
       const numAmount = typeof amount === "string" ? parseFloat(amount) || 0 : amount;
       // Handle 'once' frequency by treating it as monthly for calculation purposes
       const calcFrequency: CalculationFrequency = frequency === "once" ? "monthly" : frequency;
