@@ -1,24 +1,48 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
+    // Target modern browsers (same as Vite config)
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    
+    // Allow JS files during incremental conversion
+    "allowJs": true,
+    "checkJs": false,
+    
+    // Enable React JSX
+    "jsx": "react-jsx",
+    
+    // Type checking
+    "strict": false, // Start non-strict, gradually tighten
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    
+    // Module resolution
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "allowImportingTsExtensions": false,
+    
+    // Allow synthetic default imports for compatibility
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Skip lib checking for faster builds
+    "skipLibCheck": true,
+    
+    // Path mapping for cleaner imports
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    },
-    "types": ["vite/client"]
+      "@/*": ["./src/*"],
+      "@/utils": ["./src/utils"],
+      "@/components": ["./src/components"],
+      "@/hooks": ["./src/hooks"],
+      "@/constants": ["./src/constants"],
+      "@/types": ["./src/types"]
+    }
   },
   "include": [
     "src/**/*",
@@ -27,9 +51,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "build",
-    ".git",
-    ".github",
-    "public/firebase-messaging-sw.js"
+    "build"
   ]
 }
