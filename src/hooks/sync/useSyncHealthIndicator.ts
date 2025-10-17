@@ -1,14 +1,52 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type RefObject } from "react";
 import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
 
 /**
+ * Sync status structure
+ */
+interface SyncStatus {
+  isHealthy: boolean | null;
+  status: string;
+  lastChecked: string | null;
+  isLoading: boolean;
+  error?: string;
+  failedTests?: number;
+  fullResults?: any;
+}
+
+/**
+ * Recovery result structure
+ */
+interface RecoveryResult {
+  success: boolean;
+  error?: string;
+  [key: string]: any;
+}
+
+/**
+ * Sync health indicator hook return type
+ */
+interface UseSyncHealthIndicatorReturn {
+  syncStatus: SyncStatus;
+  showDetails: boolean;
+  isBackgroundSyncing: boolean;
+  isRecovering: boolean;
+  recoveryResult: RecoveryResult | null;
+  dropdownRef: RefObject<HTMLDivElement>;
+  setShowDetails: (show: boolean) => void;
+  checkSyncHealth: () => Promise<void>;
+  runFullValidation: () => Promise<void>;
+  resetCloudData: () => Promise<void>;
+}
+
+/**
  * Hook for managing sync health indicator state and operations
  * Handles health checking, background sync monitoring, and recovery operations
  */
-export const useSyncHealthIndicator = () => {
-  const [syncStatus, setSyncStatus] = useState({
+export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     isHealthy: null,
     status: "CHECKING",
     lastChecked: null,
@@ -18,8 +56,8 @@ export const useSyncHealthIndicator = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
   const [isRecovering, setIsRecovering] = useState(false);
-  const [recoveryResult, setRecoveryResult] = useState(null);
-  const dropdownRef = useRef(null);
+  const [recoveryResult, setRecoveryResult] = useState<RecoveryResult | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Check sync health on component mount and periodically
   useEffect(() => {
@@ -33,7 +71,7 @@ export const useSyncHealthIndicator = () => {
   // Monitor background sync activity
   useEffect(() => {
     // Check if sync is running by monitoring the service state
-    const checkSyncActivity = () => {
+    const checkSyncActivity = (): void => {
       const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
       setIsBackgroundSyncing(isRunning);
     };
@@ -49,7 +87,7 @@ export const useSyncHealthIndicator = () => {
 
   // Click-outside handling is now managed in SyncHealthDetails component since it's portaled
 
-  const checkSyncHealth = async () => {
+  const checkSyncHealth = async (): Promise<void> => {
     logger.info("🔄 Sync Health: Checking sync health...");
     try {
       setSyncStatus((prev) => ({ ...prev, isLoading: true }));
@@ -64,19 +102,19 @@ export const useSyncHealthIndicator = () => {
       setSyncStatus({
         isHealthy: false,
         status: "ERROR",
-        error: error.message,
+        error: (error as Error).message,
         lastChecked: new Date().toISOString(),
         isLoading: false,
       });
     }
   };
 
-  const runFullValidation = async () => {
+  const runFullValidation = async (): Promise<void> => {
     logger.info("🚀 Sync Health UI: Full validation button clicked");
-    if (typeof window !== "undefined" && window.runMasterSyncValidation) {
+    if (typeof window !== "undefined" && (window as any).runMasterSyncValidation) {
       logger.info("🚀 Running full sync validation from UI...");
       try {
-        const results = await window.runMasterSyncValidation();
+        const results = await (window as any).runMasterSyncValidation();
         logger.info("✅ Sync Health: Full validation completed", results.summary);
         // Update status based on results
         setSyncStatus({
@@ -96,15 +134,15 @@ export const useSyncHealthIndicator = () => {
     }
   };
 
-  const resetCloudData = async () => {
+  const resetCloudData = async (): Promise<void> => {
     logger.info("🧹 Sync Health UI: Reset cloud data button clicked");
-    if (typeof window !== "undefined" && window.forceCloudDataReset) {
+    if (typeof window !== "undefined" && (window as any).forceCloudDataReset) {
       setIsRecovering(true);
       setRecoveryResult(null);
 
       try {
         logger.info("🧹 Resetting cloud data from UI...");
-        const result = await window.forceCloudDataReset();
+        const result = await (window as any).forceCloudDataReset();
         logger.info("✅ Sync Health: Cloud data reset completed", result);
 
         setRecoveryResult(result);
@@ -115,7 +153,7 @@ export const useSyncHealthIndicator = () => {
         logger.error("Cloud data reset failed:", error);
         setRecoveryResult({
           success: false,
-          error: error.message,
+          error: (error as Error).message,
         });
       } finally {
         setIsRecovering(false);
