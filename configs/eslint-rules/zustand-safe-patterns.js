@@ -1,24 +1,28 @@
 /**
- * Custom ESLint rules for safe Zustand patterns
- * Prevents React error #185 and enforces best practices
+ * Custom ESLint rules for safe Zustand patterns in ChastityOS
+ * Prevents React error #185 and enforces architectural best practices
+ *
+ * These rules ensure proper separation between server state (TanStack Query)
+ * and UI state (Zustand) while preventing dangerous patterns that cause
+ * infinite render loops.
  */
 
 export default {
   rules: {
-    "zustand-no-getstate-in-useeffect": {
+    'zustand-no-getstate-in-useeffect': {
       meta: {
-        type: "error",
+        type: 'error',
         docs: {
-          description: "Prevent getState() calls in useEffect hooks to avoid React error #185",
-          category: "Possible Errors",
+          description: 'Prevent getState() calls in useEffect hooks to avoid React error #185',
+          category: 'Possible Errors',
           recommended: true,
         },
         schema: [],
         messages: {
           noGetStateInUseEffect:
-            "Dangerous pattern: getState() call in useEffect detected! This causes React error #185 infinite render loops. " +
-            "Use proper store subscription instead: const data = useStore(state => state.data). " +
-            "See docs/Zustand-Safe-Patterns.md for correct patterns.",
+            'Dangerous pattern: getState() call in useEffect detected! This causes React error #185 infinite render loops. ' +
+            'Use proper store subscription instead: const data = useUIStore(state => state.data). ' +
+            'For server data, use TanStack Query hooks instead. See docs/development/architecture/data-flow.md for correct patterns.',
         },
       },
       create(context) {
@@ -27,7 +31,7 @@ export default {
         return {
           CallExpression(node) {
             // Detect useEffect calls
-            if (node.callee.name === "useEffect") {
+            if (node.callee.name === 'useEffect') {
               inUseEffect = true;
               return;
             }
@@ -35,19 +39,19 @@ export default {
             // Check for getState() calls inside useEffect
             if (
               inUseEffect &&
-              node.callee.type === "MemberExpression" &&
-              node.callee.property.name === "getState" &&
+              node.callee.type === 'MemberExpression' &&
+              node.callee.property.name === 'getState' &&
               node.arguments.length === 0
             ) {
               context.report({
                 node,
-                messageId: "noGetStateInUseEffect",
+                messageId: 'noGetStateInUseEffect',
               });
             }
           },
 
-          "CallExpression:exit"(node) {
-            if (node.callee.name === "useEffect") {
+          'CallExpression:exit'(node) {
+            if (node.callee.name === 'useEffect') {
               inUseEffect = false;
             }
           },
@@ -55,44 +59,134 @@ export default {
       },
     },
 
-    "zustand-no-store-actions-in-deps": {
+    'zustand-no-server-data': {
       meta: {
-        type: "error",
+        type: 'error',
         docs: {
-          description: "Prevent Zustand store actions in useEffect dependency arrays",
-          category: "Possible Errors",
+          description: 'Prevent storing server data in Zustand stores - use TanStack Query instead',
+          category: 'Architecture',
+          recommended: true,
+        },
+        schema: [],
+        messages: {
+          noServerDataInZustand:
+            "Zustand should only contain UI state! Server data like 'sessions', 'events', 'tasks', 'users' should use TanStack Query. " +
+            'Move this to a service with TanStack Query hooks. See docs/development/architecture/overview.md for data flow patterns.',
+        },
+      },
+      create(context) {
+        const serverDataPatterns = [
+          // ChastityOS server data
+          /^(sessions?|currentSession)$/,
+          /^(events?|sessionEvents?)$/,
+          /^(tasks?|userTasks?)$/,
+          /^(users?|userProfile|profile)$/,
+          /^(keyholders?|keyholderData)$/,
+          /^(settings|userSettings)$/,
+          // Firebase/API data patterns
+          /firebase/i,
+          /api/i,
+          /sync/i,
+          /cache(?!d)/i, // Allow 'cached' but not 'cache'
+          /server/i,
+          /remote/i,
+        ];
+
+        return {
+          ObjectExpression(node) {
+            // Check if we're in a Zustand store (looking for patterns in store objects)
+            const parent = node.parent;
+            if (
+              parent &&
+              parent.type === 'CallExpression' &&
+              (parent.callee.name === 'create' ||
+                (parent.callee.type === 'MemberExpression' &&
+                  parent.callee.property.name === 'create'))
+            ) {
+              // We're in a Zustand store, check for server data properties
+              node.properties.forEach(prop => {
+                if (prop.type === 'Property' && prop.key) {
+                  const keyName = prop.key.name || prop.key.value;
+                  if (typeof keyName === 'string') {
+                    const hasServerDataPattern = serverDataPatterns.some(pattern =>
+                      pattern.test(keyName)
+                    );
+
+                    if (hasServerDataPattern) {
+                      context.report({
+                        node: prop,
+                        messageId: 'noServerDataInZustand',
+                      });
+                    }
+                  }
+                }
+              });
+            }
+          },
+        };
+      },
+    },
+
+    'zustand-no-store-actions-in-deps': {
+      meta: {
+        type: 'error',
+        docs: {
+          description: 'Prevent Zustand store actions in useEffect dependency arrays',
+          category: 'Possible Errors',
           recommended: true,
         },
         schema: [],
         messages: {
           noStoreActionsInDeps:
-            "Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. " +
-            "Zustand store actions are stable and should not be in dependency arrays. " +
-            "Remove store actions from the dependency array to fix this issue.",
+            'Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. ' +
+            'Zustand store actions are stable and should not be in dependency arrays. ' +
+            'Remove store actions from the dependency array to fix this issue.',
         },
       },
       create(context) {
         return {
           CallExpression(node) {
             // Look for useEffect calls
-            if (node.callee.name === "useEffect" && node.arguments.length >= 2) {
+            if (node.callee.name === 'useEffect' && node.arguments.length >= 2) {
               const depsArray = node.arguments[1];
 
               // Check if dependencies array exists
-              if (depsArray && depsArray.type === "ArrayExpression") {
-                depsArray.elements.forEach((dep) => {
+              if (depsArray && depsArray.type === 'ArrayExpression') {
+                depsArray.elements.forEach(dep => {
+                  if (!dep || dep.type !== 'Identifier') return;
+
+                  const depName = dep.name;
+
+                  // Exclude common non-action patterns (props, state, config, flags)
+                  const nonActionPatterns = [
+                    /Enabled$/, // realTimeSyncEnabled, featureEnabled, etc.
+                    /Interval$/, // syncInterval, updateInterval, etc.
+                    /Permissions$/, // syncPermissions, userPermissions, etc.
+                    /Settings$/, // appSettings, userSettings, etc.
+                    /Config$/, // syncConfig, apiConfig, etc.
+                    /Status$/, // syncStatus, loadStatus, etc.
+                    /^is[A-Z]/, // isLoading, isOpen, etc.
+                    /^has[A-Z]/, // hasData, hasError, etc.
+                    /^can[A-Z]/, // canEdit, canDelete, etc.
+                    /^should[A-Z]/, // shouldUpdate, shouldSync, etc.
+                    /Data$/, // userData, sessionData, etc.
+                    /State$/, // appState, formState, etc.
+                  ];
+
+                  // Check if it's a non-action pattern
+                  const isNonAction = nonActionPatterns.some(pattern => pattern.test(depName));
+                  if (isNonAction) return;
+
                   // Check for store hook calls that return actions
                   if (
-                    dep &&
-                    dep.type === "Identifier" &&
-                    // Common store action patterns
-                    /^(set|get|add|remove|update|delete|create|save|load|sync|login|logout|reset)/.test(
-                      dep.name
+                    // ChastityOS store action patterns (verbs only)
+                    /^(open|close|set|toggle|update|reset|clear|add|remove|save|load|sync|start|end|pause|resume)[A-Z]/.test(
+                      depName
                     )
                   ) {
                     context.report({
                       node: dep,
-                      messageId: "noStoreActionsInDeps",
+                      messageId: 'noStoreActionsInDeps',
                     });
                   }
                 });
@@ -103,20 +197,20 @@ export default {
       },
     },
 
-    "zustand-no-auto-executing-store-calls": {
+    'zustand-no-auto-executing-store-calls': {
       meta: {
-        type: "error",
+        type: 'error',
         docs: {
-          description: "Prevent auto-executing store operations in module scope",
-          category: "Possible Errors",
+          description: 'Prevent auto-executing store operations in module scope',
+          category: 'Possible Errors',
           recommended: true,
         },
         schema: [],
         messages: {
           noAutoExecutingStoreCalls:
-            "Dangerous pattern: Store operation called in module scope! This can trigger React error #185 during app initialization. " +
-            "Move this call to explicit initialization functions instead of auto-executing on module load. " +
-            "Example: Create an init() function and call it from App component.",
+            'Dangerous pattern: Store operation called in module scope! This can trigger React error #185 during app initialization. ' +
+            'Move this call to explicit initialization functions instead of auto-executing on module load. ' +
+            'Example: Create an init() function and call it from App component.',
         },
       },
       create(context) {
@@ -125,29 +219,29 @@ export default {
             // Check if we're in module scope (not inside a function/method)
             const ancestors = context.sourceCode?.getAncestors?.(node) || [];
             const inFunction = ancestors.some(
-              (ancestor) =>
-                ancestor.type === "FunctionDeclaration" ||
-                ancestor.type === "FunctionExpression" ||
-                ancestor.type === "ArrowFunctionExpression" ||
-                ancestor.type === "MethodDefinition"
+              ancestor =>
+                ancestor.type === 'FunctionDeclaration' ||
+                ancestor.type === 'FunctionExpression' ||
+                ancestor.type === 'ArrowFunctionExpression' ||
+                ancestor.type === 'MethodDefinition'
             );
 
             if (!inFunction) {
               // Look for store-related method calls that could trigger operations
               if (
-                node.callee.type === "MemberExpression" &&
+                node.callee.type === 'MemberExpression' &&
                 node.callee.property &&
                 /^(restore|initialize|start|trigger|execute|run|sync|fetch|load|save)/.test(
                   node.callee.property.name
                 ) &&
-                // Exclude safe operations like addEventListener and safe initialization functions
-                !/^(addEventListener|removeEventListener|initializeErrorCapture|initializeDevHelpers)$/.test(
+                // Exclude safe operations
+                !/^(addEventListener|removeEventListener|initializeLogger|initializeFirebase)$/.test(
                   node.callee.property.name
                 )
               ) {
                 context.report({
                   node,
-                  messageId: "noAutoExecutingStoreCalls",
+                  messageId: 'noAutoExecutingStoreCalls',
                 });
               }
             }
@@ -156,84 +250,20 @@ export default {
       },
     },
 
-    "zustand-no-get-in-actions": {
+    'zustand-store-reference-pattern': {
       meta: {
-        type: "problem",
+        type: 'error',
         docs: {
-          description: "Prevent get() calls inside Zustand store actions to avoid React error #185",
-          category: "Possible Errors",
-          recommended: true,
-        },
-        schema: [],
-        messages: {
-          noGetInActions:
-            "Avoid get() calls inside store actions. Use set((state) => ...) pattern instead. " +
-            "This prevents React error #185 infinite render loops. " +
-            "See docs/Zustand-Safe-Patterns.md for alternatives.",
-        },
-      },
-      create(context) {
-        let inStoreAction = false;
-        let storeActionDepth = 0;
-
-        return {
-          // Detect Zustand store creation patterns and get() calls
-          CallExpression(node) {
-            // Check for create() calls (Zustand stores)
-            if (
-              node.callee.name === "create" ||
-              (node.callee.type === "MemberExpression" && node.callee.property.name === "create")
-            ) {
-              inStoreAction = true;
-              storeActionDepth++;
-              return;
-            }
-
-            // Check for get() calls within store actions
-            if (
-              inStoreAction &&
-              node.callee.name === "get" &&
-              // Make sure it's not a different get() function
-              node.arguments.length === 0
-            ) {
-              context.report({
-                node,
-                messageId: "noGetInActions",
-              });
-            }
-          },
-
-          "CallExpression:exit"(node) {
-            if (
-              (node.callee.name === "create" ||
-                (node.callee.type === "MemberExpression" &&
-                  node.callee.property.name === "create")) &&
-              inStoreAction
-            ) {
-              storeActionDepth--;
-              if (storeActionDepth === 0) {
-                inStoreAction = false;
-              }
-            }
-          },
-        };
-      },
-    },
-
-    "zustand-store-reference-pattern": {
-      meta: {
-        type: "suggestion",
-        docs: {
-          description: "Enforce store reference pattern for async operations in Zustand stores",
-          category: "Best Practices",
+          description: 'Enforce store reference pattern for async operations in Zustand stores',
+          category: 'Best Practices',
           recommended: true,
         },
         schema: [],
         messages: {
           useStoreReference:
-            "Dangerous async store pattern detected! Use external store reference instead. " +
-            "Replace get().action() or store.action() with useStoreName.getState().action() in setTimeout/Promise callbacks. " +
-            "This prevents React error #185 infinite render loops. See docs/Zustand-Safe-Patterns.md for examples.",
+            'Dangerous async store pattern detected! Use external store reference instead. ' +
+            'Replace get().action() or store.action() with useStoreName.getState().action() in setTimeout/Promise callbacks. ' +
+            'This prevents React error #185 infinite render loops. See docs/development/architecture/data-flow.md for examples.',
         },
       },
       create(context) {
@@ -245,8 +275,8 @@ export default {
           CallExpression(node) {
             // Check for create() calls (Zustand stores)
             if (
-              node.callee.name === "create" ||
-              (node.callee.type === "MemberExpression" && node.callee.property.name === "create")
+              node.callee.name === 'create' ||
+              (node.callee.type === 'MemberExpression' && node.callee.property.name === 'create')
             ) {
               inZustandStore = true;
               return;
@@ -254,9 +284,9 @@ export default {
 
             // Check for async operations (setTimeout, setInterval, Promise chains)
             if (
-              ["setTimeout", "setInterval"].includes(node.callee.name) ||
-              (node.callee.type === "MemberExpression" &&
-                ["then", "catch", "finally"].includes(node.callee.property.name))
+              ['setTimeout', 'setInterval'].includes(node.callee.name) ||
+              (node.callee.type === 'MemberExpression' &&
+                ['then', 'catch', 'finally'].includes(node.callee.property.name))
             ) {
               inAsyncOperation = true;
               return;
@@ -265,41 +295,40 @@ export default {
             // Check for dangerous patterns in async operations
             if (inAsyncOperation) {
               // 1. Check for get() calls in async operations
-              if (node.callee.name === "get" && node.arguments.length === 0) {
+              if (node.callee.name === 'get' && node.arguments.length === 0) {
                 context.report({
                   node,
-                  messageId: "useStoreReference",
+                  messageId: 'useStoreReference',
                 });
                 return;
               }
 
-              // 2. Check for store.action() calls in async operations (the toastStore bug!)
+              // 2. Check for store.action() calls in async operations
               if (
-                node.callee.type === "MemberExpression" &&
-                node.callee.object.name === "store" &&
+                node.callee.type === 'MemberExpression' &&
+                node.callee.object.name === 'store' &&
                 inZustandStore
               ) {
                 context.report({
                   node,
-                  messageId: "useStoreReference",
+                  messageId: 'useStoreReference',
                 });
-                return;
               }
             }
           },
 
-          "CallExpression:exit"(node) {
+          'CallExpression:exit'(node) {
             if (
-              node.callee.name === "create" ||
-              (node.callee.type === "MemberExpression" && node.callee.property.name === "create")
+              node.callee.name === 'create' ||
+              (node.callee.type === 'MemberExpression' && node.callee.property.name === 'create')
             ) {
               inZustandStore = false;
             }
 
             if (
-              ["setTimeout", "setInterval"].includes(node.callee.name) ||
-              (node.callee.type === "MemberExpression" &&
-                ["then", "catch", "finally"].includes(node.callee.property.name))
+              ['setTimeout', 'setInterval'].includes(node.callee.name) ||
+              (node.callee.type === 'MemberExpression' &&
+                ['then', 'catch', 'finally'].includes(node.callee.property.name))
             ) {
               inAsyncOperation = false;
             }
@@ -308,20 +337,20 @@ export default {
       },
     },
 
-    "zustand-selective-subscriptions": {
+    'zustand-selective-subscriptions': {
       meta: {
-        type: "suggestion",
+        type: 'suggestion',
         docs: {
-          description: "Encourage selective subscriptions over full store subscriptions",
-          category: "Performance",
+          description: 'Encourage selective subscriptions over full store subscriptions',
+          category: 'Performance',
           recommended: true,
         },
         schema: [],
         messages: {
           useSelectiveSubscription:
-            "Use selective subscriptions instead of subscribing to entire store. " +
-            "Replace useStore() with useStore(state => state.specificValue) to prevent unnecessary re-renders. " +
-            "See docs/Zustand-Safe-Patterns.md for performance patterns.",
+            'Use selective subscriptions instead of subscribing to entire store. ' +
+            'Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. ' +
+            'See docs/development/architecture/data-flow.md for performance patterns.',
         },
       },
       create(context) {
@@ -330,13 +359,13 @@ export default {
             // Check for useStore() calls without selector
             if (
               node.callee.name &&
-              node.callee.name.includes("Store") &&
-              node.callee.name.startsWith("use") &&
+              (node.callee.name.includes('Store') || node.callee.name.includes('UI')) &&
+              node.callee.name.startsWith('use') &&
               node.arguments.length === 0
             ) {
               context.report({
                 node,
-                messageId: "useSelectiveSubscription",
+                messageId: 'useSelectiveSubscription',
               });
             }
           },
@@ -344,222 +373,88 @@ export default {
       },
     },
 
-    "zustand-no-conditional-subscriptions": {
+    'zustand-no-conditional-subscriptions': {
       meta: {
-        type: "problem",
+        type: 'problem',
         docs: {
           description:
-            "Prevent conditional Zustand store subscriptions that can cause memory leaks",
-          category: "Possible Errors",
+            'Prevent conditional Zustand store subscriptions that can cause memory leaks',
+          category: 'Possible Errors',
           recommended: true,
         },
         schema: [],
         messages: {
           noConditionalSubscriptions:
-            "Avoid conditional store subscriptions. Move conditions inside the component instead of conditionally calling useStore hooks. " +
-            "This prevents React hooks rule violations and memory leaks.",
+            'Avoid conditional store subscriptions. Move conditions inside the component instead of conditionally calling useStore hooks. ' +
+            'This prevents React hooks rule violations and memory leaks.',
         },
       },
       create(context) {
-        const visited = new Set();
-
         return {
-          // Check for store hooks inside conditional statements
-          IfStatement(node) {
-            function checkForStoreHooks(nodeToCheck) {
-              if (
-                nodeToCheck.type === "CallExpression" &&
-                nodeToCheck.callee &&
-                nodeToCheck.callee.name &&
-                nodeToCheck.callee.name.includes("Store") &&
-                nodeToCheck.callee.name.startsWith("use")
-              ) {
-                context.report({
-                  node: nodeToCheck,
-                  messageId: "noConditionalSubscriptions",
-                });
-              }
-            }
+          // Check for store hooks directly inside conditional statements
+          CallExpression(node) {
+            // Check if this is a store hook call
+            if (
+              node.callee &&
+              node.callee.name &&
+              (node.callee.name.includes('Store') || node.callee.name.includes('UI')) &&
+              node.callee.name.startsWith('use')
+            ) {
+              // Check if this hook call is directly inside a conditional
+              const ancestors = context.sourceCode?.getAncestors?.(node) || [];
 
-            // Recursively check for store hooks with cycle prevention
-            function traverse(node, depth = 0) {
-              // Prevent infinite recursion
-              if (!node || typeof node !== "object" || depth > 20) return;
+              // Look for immediate conditional parents (not deep nesting)
+              for (let i = ancestors.length - 1; i >= 0; i--) {
+                const ancestor = ancestors[i];
 
-              // Create a unique key for this node
-              const nodeKey = `${node.type}_${node.start}_${node.end}`;
-              if (visited.has(nodeKey)) return;
-              visited.add(nodeKey);
+                // If we hit a function boundary, stop - we're at top level
+                if (
+                  ancestor.type === 'FunctionDeclaration' ||
+                  ancestor.type === 'FunctionExpression' ||
+                  ancestor.type === 'ArrowFunctionExpression'
+                ) {
+                  break;
+                }
 
-              if (node.type === "CallExpression") {
-                checkForStoreHooks(node);
-                return; // Don't traverse into call expressions further
-              }
+                // Check for conditional patterns
+                if (
+                  ancestor.type === 'IfStatement' ||
+                  ancestor.type === 'ConditionalExpression' ||
+                  (ancestor.type === 'LogicalExpression' &&
+                    (ancestor.operator === '&&' || ancestor.operator === '||'))
+                ) {
+                  // Check if we're in the conditional branches
+                  let isInConditionalBranch = false;
 
-              // Only traverse specific safe properties
-              const safeKeys = ["body", "consequent", "alternate", "expression", "declarations"];
-              for (const key of safeKeys) {
-                if (node[key]) {
-                  if (Array.isArray(node[key])) {
-                    node[key].forEach((child) => traverse(child, depth + 1));
-                  } else if (node[key].type) {
-                    traverse(node[key], depth + 1);
+                  if (ancestor.type === 'IfStatement') {
+                    // For if statements, check if we're in consequent or alternate
+                    const nextAncestor = ancestors[i + 1];
+                    if (
+                      nextAncestor &&
+                      (ancestor.consequent === nextAncestor || ancestor.alternate === nextAncestor)
+                    ) {
+                      isInConditionalBranch = true;
+                    }
+                  } else if (ancestor.type === 'ConditionalExpression') {
+                    // For ternary operators, we need to check if the hook is in the consequent or alternate
+                    // This is more complex due to how AST represents ternaries
+                    isInConditionalBranch = true; // Any hook inside a ternary is conditional
+                  } else if (ancestor.type === 'LogicalExpression') {
+                    // For logical expressions (&&, ||), check if we're in the right side
+                    const nextAncestor = ancestors[i + 1];
+                    if (nextAncestor && ancestor.right === nextAncestor) {
+                      isInConditionalBranch = true;
+                    }
+                  }
+
+                  if (isInConditionalBranch) {
+                    context.report({
+                      node,
+                      messageId: 'noConditionalSubscriptions',
+                    });
+                    break;
                   }
                 }
-              }
-            }
-
-            // Clear visited set for each if statement
-            visited.clear();
-            traverse(node.consequent);
-            if (node.alternate) {
-              traverse(node.alternate);
-            }
-          },
-        };
-      },
-    },
-
-    "zustand-no-object-dependencies": {
-      meta: {
-        type: "error",
-        docs: {
-          description: "Prevent object dependencies in useEffect that recreate on every render",
-          category: "Possible Errors",
-          recommended: true,
-        },
-        schema: [],
-        messages: {
-          noObjectDependencies:
-            "Dangerous pattern: Object dependency in useEffect creates infinite render loops! " +
-            "Objects recreate on every render causing the effect to run infinitely. " +
-            "Use primitive values or useMemo/useCallback for object dependencies.",
-        },
-      },
-      create(context) {
-        return {
-          CallExpression(node) {
-            // Look for useEffect calls
-            if (node.callee.name === "useEffect" && node.arguments.length >= 2) {
-              const depsArray = node.arguments[1];
-
-              // Check if dependencies array exists
-              if (depsArray && depsArray.type === "ArrayExpression") {
-                depsArray.elements.forEach((dep) => {
-                  if (dep && dep.type === "Identifier") {
-                    // Check for common object dependency patterns that cause infinite renders
-                    // Focus on Zustand store subscriptions and computed objects
-                    const dangerousPatterns = [
-                      /^uiState$/, // Zustand uiState subscription
-                      /^authState$/, // Zustand authState subscription
-                      /^formState$/, // Form state objects
-                      /^appConfig$/, // App configuration objects
-                      /^modalOptions$/, // Modal options objects
-                      /^storeState$/, // Generic store state objects
-                    ];
-
-                    if (dangerousPatterns.some((pattern) => pattern.test(dep.name))) {
-                      context.report({
-                        node: dep,
-                        messageId: "noObjectDependencies",
-                      });
-                    }
-                  }
-                });
-              }
-            }
-          },
-        };
-      },
-    },
-
-    "zustand-proper-store-initialization": {
-      meta: {
-        type: "error",
-        docs: {
-          description: "Ensure stores are initialized with proper store instances, not state data",
-          category: "Possible Errors",
-          recommended: true,
-        },
-        schema: [],
-        messages: {
-          useStoreInstance:
-            "Dangerous pattern: Initializing service with state data instead of store instance! " +
-            "Pass the store function (useStore) not state data (useStore(...)) to initialization functions. " +
-            "Services need access to store methods, not just current state.",
-        },
-      },
-      create(context) {
-        return {
-          CallExpression(node) {
-            // Look for initialization function calls
-            if (
-              node.callee.type === "MemberExpression" &&
-              node.callee.property.name === "initialize" &&
-              node.arguments.length > 0
-            ) {
-              const arg = node.arguments[0];
-
-              // Check if argument is a store hook call with selector (state data)
-              if (
-                arg.type === "CallExpression" &&
-                arg.callee.name &&
-                arg.callee.name.includes("Store") &&
-                arg.callee.name.startsWith("use") &&
-                arg.arguments.length > 0
-              ) {
-                context.report({
-                  node: arg,
-                  messageId: "useStoreInstance",
-                });
-              }
-            }
-          },
-        };
-      },
-    },
-
-    "zustand-no-recreating-functions": {
-      meta: {
-        type: "error",
-        docs: {
-          description: "Prevent function dependencies that recreate on every render",
-          category: "Possible Errors",
-          recommended: true,
-        },
-        schema: [],
-        messages: {
-          useStableFunction:
-            "Dangerous pattern: Function dependency recreates on every render! " +
-            "Wrap the function in useCallback or move it outside the component to prevent infinite renders.",
-        },
-      },
-      create(context) {
-        return {
-          CallExpression(node) {
-            // Look for useEffect calls
-            if (node.callee.name === "useEffect" && node.arguments.length >= 2) {
-              const depsArray = node.arguments[1];
-
-              if (depsArray && depsArray.type === "ArrayExpression") {
-                depsArray.elements.forEach((dep) => {
-                  if (dep && dep.type === "Identifier") {
-                    // Check for function names that might recreate on every render
-                    const functionPatterns = [
-                      /^handle[A-Z]/, // handleClick, handleSubmit, etc.
-                      /^on[A-Z]/, // onClick, onSubmit, etc.
-                      /Callback$/, // submitCallback, etc.
-                      /Handler$/, // clickHandler, etc.
-                    ];
-
-                    if (functionPatterns.some((pattern) => pattern.test(dep.name))) {
-                      context.report({
-                        node: dep,
-                        messageId: "useStableFunction",
-                      });
-                    }
-                  }
-                });
               }
             }
           },
