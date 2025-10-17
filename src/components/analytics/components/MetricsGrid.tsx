@@ -6,7 +6,7 @@ import { MetricsGridProps } from "../../../types/analytics";
  * Metrics grid component for analytics overview
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const MetricsGrid: React.FC<MetricsGridProps> = ({ filteredTransactions, metrics, envelopes }) => {
+const MetricsGrid: React.FC<MetricsGridProps> = ({ filteredTransactions, metrics: _metrics, envelopes }) => {
   // Safe calculation of average transaction amount
   const averageTransactionAmount =
     filteredTransactions && filteredTransactions.length > 0

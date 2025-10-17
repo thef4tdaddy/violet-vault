@@ -7,9 +7,7 @@
 import chunkedSyncService from "./chunkedSyncService";
 import type {
   TypedChunkedSyncService,
-  FirebaseErrorHandler,
   SyncOperationWrapper,
-  SyncDataValidator,
 } from "./types/firebaseServiceTypes";
 import type {
   ChunkedSyncStats,
@@ -19,9 +17,7 @@ import type {
 } from "../types/firebase";
 import { isString, isObject } from "../types/common";
 import {
-  firebaseErrorHandler,
   syncOperationWrapper,
-  syncDataValidator,
 } from "./types/firebaseServiceTypes";
 import logger from "../utils/common/logger";
 
@@ -30,14 +26,10 @@ import logger from "../utils/common/logger";
  * Maintains compatibility while adding comprehensive type safety for chunked operations
  */
 class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
-  private errorHandler: FirebaseErrorHandler;
   private operationWrapper: SyncOperationWrapper;
-  private dataValidator: SyncDataValidator;
 
   constructor() {
-    this.errorHandler = firebaseErrorHandler;
     this.operationWrapper = syncOperationWrapper;
-    this.dataValidator = syncDataValidator;
   }
 
   // Type-safe initialization with validation

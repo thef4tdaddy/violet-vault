@@ -1,32 +1,16 @@
 import React, { memo, useState } from "react";
 import { getIcon } from "../../utils";
-import { UserData } from "../../types/auth";
 import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
-import type { LucideIcon } from "lucide-react";
 
-interface UserButtonProps {
-  onClick: () => void;
-  icon?: LucideIcon;
-  label: string;
-}
-
-const UserButton = memo<UserButtonProps>(({ onClick, icon: Icon, label }) => (
+const UserButton = memo(({ onClick, icon: Icon, label }) => (
   <button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
     {Icon && React.createElement(Icon, { className: "h-4 w-4 mr-2" })}
     {label}
   </button>
 ));
 
-UserButton.displayName = "UserButton";
-
-interface UserIndicatorProps {
-  currentUser: UserData | null;
-  onUserChange?: () => void;
-  onUpdateProfile?: (updatedProfile: Partial<UserData>) => Promise<void>;
-}
-
-const UserIndicator = memo<UserIndicatorProps>(({ currentUser, onUserChange, onUpdateProfile }) => {
+const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showKeyManagement, setShowKeyManagement] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -121,7 +105,5 @@ const UserIndicator = memo<UserIndicatorProps>(({ currentUser, onUserChange, onU
     </>
   );
 });
-
-UserIndicator.displayName = "UserIndicator";
 
 export default UserIndicator;

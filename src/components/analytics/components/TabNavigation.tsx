@@ -1,19 +1,12 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { TabNavigationProps } from "../../../types/analytics";
-
-interface Tab {
-  id: string;
-  name: string;
-  icon: string;
-}
 
 /**
  * Tab navigation component for analytics
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, handleTabChange }) => {
-  const tabs: Tab[] = [
+const TabNavigation = ({ activeTab, handleTabChange }) => {
+  const tabs = [
     { id: "overview", name: "Overview", icon: "BarChart3" },
     { id: "trends", name: "Trends", icon: "TrendingUp" },
     { id: "health", name: "Health", icon: "Heart" },

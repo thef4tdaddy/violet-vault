@@ -3,6 +3,8 @@
  * Enable/disable debt components and features step by step
  */
 
+import logger from "@/utils/common/logger";
+
 // Main feature toggles - disable entire sections
 export const DEBT_DEBUG_CONFIG = {
   // Core debt functionality
@@ -30,38 +32,39 @@ export const DEBT_DEBUG_CONFIG = {
   ENABLE_DEBT_DETAIL_MODAL: true, // DebtDetailModal (ENABLED)
   ENABLE_ADD_DEBT_MODAL: true, // AddDebtModal (TDZ FIXED)
   ENABLE_DEBT_STRATEGIES: false, // DebtStrategies (already disabled)
-} as const;
-
-export type DebtDebugFeature = keyof typeof DEBT_DEBUG_CONFIG;
+};
 
 /**
  * Check if a debt feature is enabled
+ * @param {string} feature - Feature key from DEBT_DEBUG_CONFIG
+ * @returns {boolean} Whether feature is enabled
  */
-export function isDebtFeatureEnabled(feature: DebtDebugFeature): boolean {
+export function isDebtFeatureEnabled(feature) {
   return DEBT_DEBUG_CONFIG[feature] === true;
 }
 
 /**
  * Disable a debt feature for testing
+ * @param {string} feature - Feature key to disable
  */
-export function disableDebtFeature(feature: DebtDebugFeature): void {
-  // TypeScript prevents direct mutation, so we cast to mutable
-  (DEBT_DEBUG_CONFIG as any)[feature] = false;
-  console.log(`[DEBT DEBUG] Disabled feature: ${feature}`);
+export function disableDebtFeature(feature) {
+  DEBT_DEBUG_CONFIG[feature] = false;
+  logger.debug(`[DEBT DEBUG] Disabled feature: ${feature}`, { feature });
 }
 
 /**
  * Enable a debt feature for testing
+ * @param {string} feature - Feature key to enable
  */
-export function enableDebtFeature(feature: DebtDebugFeature): void {
-  // TypeScript prevents direct mutation, so we cast to mutable
-  (DEBT_DEBUG_CONFIG as any)[feature] = true;
-  console.log(`[DEBT DEBUG] Enabled feature: ${feature}`);
+export function enableDebtFeature(feature) {
+  DEBT_DEBUG_CONFIG[feature] = true;
+  logger.debug(`[DEBT DEBUG] Enabled feature: ${feature}`, { feature });
 }
 
 /**
  * Get current debug configuration status
+ * @returns {Object} Current feature states
  */
-export function getDebtDebugStatus(): typeof DEBT_DEBUG_CONFIG {
+export function getDebtDebugStatus() {
   return { ...DEBT_DEBUG_CONFIG };
 }

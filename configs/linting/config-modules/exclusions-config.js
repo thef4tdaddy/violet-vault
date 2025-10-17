@@ -30,6 +30,7 @@ export default [
     files: [
       '**/firebase.{js,ts}',
       '**/dexie-config.{js,ts}',
+      '**/budgetDb.{js,ts}', // Core database configuration
       '**/main.{jsx,tsx}', // App entry point
       '**/App.{jsx,tsx}', // Main app component
     ],
@@ -127,6 +128,22 @@ export default [
       'zustand-safe-patterns/zustand-store-reference-pattern': 'warn',
       'zustand-safe-patterns/zustand-no-store-actions-in-deps': 'warn',
       'zustand-safe-patterns/zustand-no-auto-executing-store-calls': 'warn',
+    },
+  },
+  {
+    // Backend and legacy code - not subject to app linting rules
+    files: [
+      'cloudflare-worker/**/*.{js,ts}', // Backend/edge computing - console is useful for debugging
+      'js-version/**/*.{js,jsx,ts,tsx}', // Legacy codebase
+    ],
+    rules: {
+      'no-console': 'off', // Allow console in backend and legacy code
+      'max-lines': 'off',
+      'max-lines-per-function': 'off',
+      'max-statements': 'off',
+      complexity: 'off',
+      'max-depth': 'off',
+      'max-params': 'off',
     },
   },
   {

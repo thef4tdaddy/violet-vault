@@ -2,9 +2,6 @@
 import logger from "../utils/common/logger";
 import type {
   DebtType,
-  DebtStatus,
-  PaymentFrequency,
-  CompoundFrequency,
   DebtTypeConfig,
   DebtAccount,
   DebtStats,

@@ -1,12 +1,19 @@
-// Export TypeScript chart components
+// Chart Components - Issue #151 ChartsAndAnalytics refactoring
+// Reusable chart components extracted for better maintainability
+
 export { default as ChartContainer } from "./ChartContainer";
+export { default as TrendLineChart } from "./TrendLineChart";
+export { default as CategoryBarChart } from "./CategoryBarChart";
+export {
+  default as DistributionPieChart,
+  DistributionPieChartWithDetails,
+} from "./DistributionPieChart";
 export {
   default as ComposedFinancialChart,
   CashFlowChart,
   BudgetVsActualChart,
 } from "./ComposedFinancialChart";
-export { default as CategoryBarChart } from "./CategoryBarChart";
 
-// Re-export remaining JavaScript components for now
-export { default as DistributionPieChart } from "./DistributionPieChart.jsx";
-export { default as TrendLineChart } from "./TrendLineChart.jsx";
+// Hook exports for convenience
+export { useChartConfig } from "../../hooks/common/useChartConfig.tsx";
+export { useAnalyticsData } from "../../hooks/analytics/useAnalyticsData";

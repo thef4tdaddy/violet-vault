@@ -169,6 +169,7 @@ export class ErrorTrackingService {
    */
   static interceptConsole(): void {
     try {
+      /* eslint-disable no-console -- Need to store and override console for error tracking */
       const originalConsole = {
         log: console.log,
         warn: console.warn,
@@ -187,6 +188,7 @@ export class ErrorTrackingService {
           this.addConsoleLog(level, args);
         };
       });
+      /* eslint-enable no-console */
 
       // Store original methods for potential restoration
       this.originalConsole = originalConsole;
