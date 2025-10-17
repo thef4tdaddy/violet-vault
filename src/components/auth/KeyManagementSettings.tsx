@@ -12,7 +12,12 @@ import ImportSection from "./key-management/ImportSection";
 import AdvancedSection from "./key-management/AdvancedSection";
 import logger from "../../utils/common/logger";
 
-const KeyManagementSettings = ({ isOpen, onClose }) => {
+interface KeyManagementSettingsProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, onClose }) => {
   // Use extracted UI hooks
   const {
     activeTab,
@@ -44,7 +49,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
     handleOperationError,
   } = useKeyManagementOperations();
 
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
   // Load current key fingerprint on open
@@ -94,8 +99,8 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleFileImport = async (event) => {
-    const file = event.target.files[0];
+  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     try {

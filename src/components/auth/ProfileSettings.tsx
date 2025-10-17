@@ -3,14 +3,32 @@ import { getIcon } from "../../utils";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
-const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
+interface User {
+  userName: string;
+  userColor: string;
+  [key: string]: any;
+}
+
+interface ProfileSettingsProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentUser: User | null;
+  onUpdateProfile: (profile: User) => Promise<void>;
+}
+
+interface ColorOption {
+  name: string;
+  value: string;
+}
+
+const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
   const [userName, setUserName] = useState(currentUser?.userName || "");
   const [userColor, setUserColor] = useState(
     currentUser?.userColor || "#a855f7",
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  const colors = [
+  const colors: ColorOption[] = [
     { name: "Purple", value: "#a855f7" },
     { name: "Emerald", value: "#10b981" },
     { name: "Cyan", value: "#06b6d4" },
@@ -29,7 +47,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
 
     setIsLoading(true);
     try {
-      const updatedProfile = {
+      const updatedProfile: User = {
         ...currentUser,
         userName: userName.trim(),
         userColor,
@@ -40,7 +58,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
     } catch (error) {
       logger.error("Failed to update profile:", error);
       globalToast.showError(
-        `Failed to update profile: ${error.message}`,
+        `Failed to update profile: ${(error as Error).message}`,
         "Update Failed",
       );
     } finally {

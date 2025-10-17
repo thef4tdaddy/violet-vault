@@ -1,10 +1,14 @@
 import React from "react";
 
+interface SecurityActionsSectionProps {
+  onClose: () => void;
+}
+
 /**
  * Security settings actions section with save info and close button
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const SecurityActionsSection = ({ onClose }) => {
+const SecurityActionsSection: React.FC<SecurityActionsSectionProps> = ({ onClose }) => {
   return (
     <div className="mt-6 pt-6 border-t-2 border-black">
       <div className="flex justify-between items-center">
