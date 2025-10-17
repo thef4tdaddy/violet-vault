@@ -1,6 +1,0 @@
-
-> violetvault@1.9.0 typecheck
-> tsc --noEmit
-
-src/vite-env.d.ts(35,1): error TS1131: Property or signature expected.
-src/vite-env.d.ts(37,1): error TS1131: Property or signature expected.
