@@ -5,22 +5,78 @@
  */
 import logger from "../../utils/common/logger";
 
+/**
+ * Error information structure
+ */
+export interface ErrorInfo {
+  type: string;
+  message: string;
+  stack: string;
+  filename?: string;
+  lineno?: number;
+  colno?: number;
+  timestamp: string;
+  id?: number;
+  captured?: string;
+}
+
+/**
+ * Console log entry structure
+ */
+export interface ConsoleLogEntry {
+  level: string;
+  message: string;
+  timestamp: string;
+  args: string[];
+}
+
+/**
+ * Error listener structure
+ */
+interface ErrorListener {
+  type: string;
+  handler: EventListenerOrEventListenerObject;
+}
+
+/**
+ * Recent errors response structure
+ */
+export interface RecentErrorsResponse {
+  recentErrors: ErrorInfo[];
+  consoleLogs: ConsoleLogEntry[];
+  errorCount: number;
+  logCount: number;
+  captureEnabled: boolean;
+  error?: string;
+}
+
+/**
+ * Error statistics structure
+ */
+export interface ErrorStats {
+  total: number;
+  lastHour: number;
+  lastDay: number;
+  types: Record<string, number>;
+}
+
 export class ErrorTrackingService {
   // Static storage for captured errors and logs
-  static recentErrors = [];
-  static consoleLogs = [];
-  static errorListeners = [];
+  static recentErrors: ErrorInfo[] = [];
+  static consoleLogs: ConsoleLogEntry[] = [];
+  static errorListeners: ErrorListener[] = [];
   static isInitialized = false;
+  static originalConsole?: Record<string, (...args: any[]) => void>;
 
   /**
    * Initialize error capture system
    */
-  static initializeErrorCapture() {
+  static initializeErrorCapture(): void {
     if (this.isInitialized) return;
 
     try {
       // Capture uncaught errors
-      const errorHandler = (event) => {
+      const errorHandler = (event: ErrorEvent): void => {
         this.addError({
           type: "uncaughtError",
           message: event.error?.message || event.message || "Unknown error",
@@ -33,7 +89,7 @@ export class ErrorTrackingService {
       };
 
       // Capture unhandled promise rejections
-      const rejectionHandler = (event) => {
+      const rejectionHandler = (event: PromiseRejectionEvent): void => {
         this.addError({
           type: "unhandledRejection",
           message: event.reason?.message || String(event.reason) || "Unhandled promise rejection",
@@ -63,9 +119,8 @@ export class ErrorTrackingService {
 
   /**
    * Add an error to the tracking system
-   * @param {Object} errorInfo - Error information
    */
-  static addError(errorInfo) {
+  static addError(errorInfo: Omit<ErrorInfo, 'id' | 'captured'>): void {
     const maxErrors = 50; // Keep last 50 errors
 
     this.recentErrors.push({
@@ -84,10 +139,8 @@ export class ErrorTrackingService {
 
   /**
    * Add a console log entry
-   * @param {string} level - Log level (log, warn, error, etc.)
-   * @param {Array} args - Console arguments
    */
-  static addConsoleLog(level, args) {
+  static addConsoleLog(level: string, args: any[]): void {
     const maxLogs = 100; // Keep last 100 log entries
 
     try {
@@ -114,7 +167,7 @@ export class ErrorTrackingService {
   /**
    * Intercept console methods to capture logs
    */
-  static interceptConsole() {
+  static interceptConsole(): void {
     try {
       const originalConsole = {
         log: console.log,
@@ -125,8 +178,8 @@ export class ErrorTrackingService {
       };
 
       // Override console methods
-      ["log", "warn", "error", "info", "debug"].forEach((level) => {
-        console[level] = (...args) => {
+      (["log", "warn", "error", "info", "debug"] as const).forEach((level) => {
+        (console as any)[level] = (...args: any[]) => {
           // Call original method first
           originalConsole[level](...args);
 
@@ -146,9 +199,8 @@ export class ErrorTrackingService {
 
   /**
    * Get recent errors and console logs for bug reports
-   * @returns {Object} Error and log information
    */
-  static getRecentErrors() {
+  static getRecentErrors(): RecentErrorsResponse {
     try {
       return {
         recentErrors: [...this.recentErrors], // Create copy
@@ -165,7 +217,7 @@ export class ErrorTrackingService {
         errorCount: 0,
         logCount: 0,
         captureEnabled: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }
@@ -173,7 +225,7 @@ export class ErrorTrackingService {
   /**
    * Clear captured errors and logs
    */
-  static clearCapturedData() {
+  static clearCapturedData(): void {
     this.recentErrors = [];
     this.consoleLogs = [];
     logger.debug("Captured error data cleared");
@@ -182,7 +234,7 @@ export class ErrorTrackingService {
   /**
    * Cleanup error capture system
    */
-  static cleanup() {
+  static cleanup(): void {
     try {
       // Remove event listeners
       this.errorListeners.forEach(({ type, handler }) => {
@@ -205,9 +257,8 @@ export class ErrorTrackingService {
 
   /**
    * Get error statistics
-   * @returns {Object} Error statistics
    */
-  static getErrorStats() {
+  static getErrorStats(): ErrorStats {
     const now = Date.now();
     const oneHourAgo = now - 60 * 60 * 1000;
     const oneDayAgo = now - 24 * 60 * 60 * 1000;
@@ -223,7 +274,7 @@ export class ErrorTrackingService {
       total: this.recentErrors.length,
       lastHour: recentErrorsHour.length,
       lastDay: recentErrorsDay.length,
-      types: this.recentErrors.reduce((acc, error) => {
+      types: this.recentErrors.reduce((acc: Record<string, number>, error) => {
         acc[error.type] = (acc[error.type] || 0) + 1;
         return acc;
       }, {}),
