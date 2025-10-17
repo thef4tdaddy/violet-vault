@@ -7,13 +7,75 @@ import logger from "../../utils/common/logger";
 import { GitHubAPIService } from "./githubApiService";
 import { ReportSubmissionService } from "./reportSubmissionService";
 
+/**
+ * Bug report data structure
+ */
+export interface BugReportData {
+  title: string;
+  description?: string;
+  severity?: "low" | "medium" | "high" | "critical";
+  labels?: string[];
+  systemInfo?: Record<string, any>;
+  screenshot?: string;
+  steps?: string[];
+  expectedBehavior?: string;
+  actualBehavior?: string;
+  [key: string]: any;
+}
+
+/**
+ * Validation result structure
+ */
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+/**
+ * Submission result structure
+ */
+interface SubmissionResult {
+  success: boolean;
+  error?: string;
+  validationErrors?: string[];
+  [key: string]: any;
+}
+
+/**
+ * Fallback submission result
+ */
+interface FallbackSubmissionResult {
+  overallSuccess: boolean;
+  error?: string;
+  validationErrors?: string[];
+  attempts: number;
+  results: any[];
+}
+
+/**
+ * Provider configuration
+ */
+interface ProviderConfig {
+  type: "github" | "webhook" | "email" | "console";
+  config?: any;
+}
+
+/**
+ * Supported provider information
+ */
+interface SupportedProvider {
+  type: string;
+  name: string;
+  description: string;
+  available: boolean;
+}
+
 export class BugReportAPIService {
   /**
    * Submit bug report to GitHub Issues API
-   * @param {Object} reportData - Bug report data
-   * @returns {Promise<Object>} Submission result
    */
-  static async submitToGitHub(reportData) {
+  static async submitToGitHub(reportData: BugReportData): Promise<SubmissionResult> {
     const validation = this.validateReportData(reportData);
     if (!validation.isValid) {
       logger.error("Invalid report data for submission", validation);
@@ -29,31 +91,31 @@ export class BugReportAPIService {
 
   /**
    * Submit bug report to webhook
-   * @param {Object} reportData - Bug report data
-   * @param {string} webhookUrl - Webhook URL
-   * @returns {Promise<Object>} Submission result
    */
-  static async submitToWebhook(reportData, webhookUrl) {
+  static async submitToWebhook(
+    reportData: BugReportData,
+    webhookUrl: string
+  ): Promise<SubmissionResult> {
     return ReportSubmissionService.submitToWebhook(reportData, webhookUrl);
   }
 
   /**
    * Submit bug report to email
-   * @param {Object} reportData - Bug report data
-   * @param {Object} emailConfig - Email configuration
-   * @returns {Promise<Object>} Submission result
    */
-  static async submitToEmail(reportData, emailConfig) {
+  static async submitToEmail(
+    reportData: BugReportData,
+    emailConfig: Record<string, any>
+  ): Promise<SubmissionResult> {
     return ReportSubmissionService.submitToEmail(reportData, emailConfig);
   }
 
   /**
    * Submit bug report with fallback providers
-   * @param {Object} reportData - Bug report data
-   * @param {Array} providers - Array of provider configurations
-   * @returns {Promise<Object>} Submission result
    */
-  static async submitWithFallbacks(reportData, providers = []) {
+  static async submitWithFallbacks(
+    reportData: BugReportData,
+    providers: ProviderConfig[] = []
+  ): Promise<FallbackSubmissionResult> {
     const validation = this.validateReportData(reportData);
     if (!validation.isValid) {
       logger.error("Invalid report data for submission", validation);
@@ -71,12 +133,10 @@ export class BugReportAPIService {
 
   /**
    * Validate bug report data
-   * @param {Object} reportData - Report data to validate
-   * @returns {Object} Validation result
    */
-  static validateReportData(reportData) {
-    const errors = [];
-    const warnings = [];
+  static validateReportData(reportData: BugReportData): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
 
     // Basic validations
     if (!reportData || typeof reportData !== "object") {
@@ -136,42 +196,36 @@ export class BugReportAPIService {
 
   /**
    * Format GitHub issue body - delegate to GitHubAPIService
-   * @param {Object} reportData - Bug report data
-   * @returns {string} Formatted issue body
    */
-  static formatGitHubIssueBody(reportData) {
+  static formatGitHubIssueBody(reportData: BugReportData): string {
     return GitHubAPIService.formatGitHubIssueBody(reportData);
   }
 
   /**
    * Format console logs for GitHub - delegate to GitHubAPIService
-   * @param {Array} errors - Error array
-   * @returns {string} Formatted error information
    */
-  static formatConsoleLogsForGitHub(errors) {
+  static formatConsoleLogsForGitHub(errors: any[]): string {
     return GitHubAPIService.formatConsoleLogsForGitHub(errors);
   }
 
   /**
    * Get submission statistics - delegate to ReportSubmissionService
-   * @returns {Object} Submission statistics
    */
-  static getSubmissionStats() {
+  static getSubmissionStats(): Record<string, any> {
     return ReportSubmissionService.getSubmissionStats();
   }
 
   /**
    * Clear stored bug reports - delegate to ReportSubmissionService
    */
-  static clearStoredReports() {
+  static clearStoredReports(): void {
     return ReportSubmissionService.clearStoredReports();
   }
 
   /**
    * Get supported providers
-   * @returns {Array} Array of supported provider types
    */
-  static getSupportedProviders() {
+  static getSupportedProviders(): SupportedProvider[] {
     return [
       {
         type: "github",
