@@ -17,11 +17,6 @@ interface Stats {
   totalBills: number;
 }
 
-interface ApiResponse {
-  success: boolean;
-  error?: string;
-}
-
 const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
   isOpen,
   onClose,
@@ -66,7 +61,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
       setShowConfirmExit(false);
       setShowConfirmClear(false);
     }
-  }, [isOpen, clearError]);
+  }, [isOpen]); // clearError is a stable Zustand action
 
   const handleExportData = async () => {
     try {
@@ -82,7 +77,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
 
     try {
       const fileText = await file.text();
-      const _fileData = JSON.parse(fileText);
+      JSON.parse(fileText); // Validate JSON format
 
       const validation = validateImportFile();
       if (!validation.valid) {

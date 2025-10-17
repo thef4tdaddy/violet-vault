@@ -28,14 +28,6 @@ export const DEBT_STRATEGIES = getDebtStrategies();
 // Helper functions (placed before usage to avoid temporal dead zone issues)
 
 /**
- * Simulate minimum payments only (for comparison baseline)
- */
-function simulateMinimumPayments(debts: DebtAccount[]): DebtStrategyResult {
-  const sortedDebts = [...debts].sort((a, b) => b.interestRate - a.interestRate);
-  return simulatePayoffStrategy(sortedDebts, 0);
-}
-
-/**
  * Simulate month-by-month debt payoff
  */
 function simulatePayoffStrategy(debts: DebtAccount[], extraPayment: number): DebtStrategyResult {

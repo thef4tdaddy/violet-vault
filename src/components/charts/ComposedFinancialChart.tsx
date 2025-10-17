@@ -12,7 +12,6 @@ import {
 } from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
-import { ComposedFinancialChartProps, ChartDataPoint, ChartSeries } from "../../types/analytics";
 
 /**
  * Reusable composed financial chart component
@@ -20,7 +19,7 @@ import { ComposedFinancialChartProps, ChartDataPoint, ChartSeries } from "../../
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
  */
-const ComposedFinancialChart: React.FC<ComposedFinancialChartProps> = ({
+const ComposedFinancialChart = ({
   title = "Financial Analysis",
   subtitle,
   data = [],
@@ -43,11 +42,11 @@ const ComposedFinancialChart: React.FC<ComposedFinancialChartProps> = ({
   const TooltipComponent = formatTooltip || CustomTooltip;
 
   // Ensure data is valid
-  const chartData: ChartDataPoint[] = Array.isArray(data) ? data : [];
+  const chartData = Array.isArray(data) ? data : [];
   const hasData = chartData.length > 0;
 
   // Default series configuration for income/expense analysis
-  const defaultSeries: ChartSeries[] = [
+  const defaultSeries = [
     {
       type: "bar",
       dataKey: "income",
@@ -69,7 +68,7 @@ const ComposedFinancialChart: React.FC<ComposedFinancialChartProps> = ({
     },
   ];
 
-  const seriesConfig: ChartSeries[] = series.length > 0 ? series : defaultSeries;
+  const seriesConfig = series.length > 0 ? series : defaultSeries;
 
   // Group series by type for rendering
   const barSeries = seriesConfig.filter((s) => s.type === "bar");
@@ -101,59 +100,50 @@ const ComposedFinancialChart: React.FC<ComposedFinancialChartProps> = ({
           <YAxis
             stroke={chartDefaults.axis.stroke}
             fontSize={12}
-            tickFormatter={(value: number) => `$${(value / 1000).toFixed(0)}K`}
+            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
           />
 
           <Tooltip content={<TooltipComponent />} />
           {showLegend && <Legend />}
 
           {/* Render Areas first (background) */}
-          {areaSeries.map((areaProps, index) => {
-            const { type, ...restAreaProps } = areaProps;
-            return (
-              <Area
-                key={`area-${areaProps.dataKey}`}
-                type="monotone"
-                fillOpacity={chartTypeConfigs.area.fillOpacity}
-                strokeWidth={chartTypeConfigs.area.strokeWidth}
-                fill={areaProps.fill || getColorByCategory(areaProps.dataKey, index)}
-                stroke={
-                  areaProps.stroke || areaProps.fill || getColorByCategory(areaProps.dataKey, index)
-                }
-                {...restAreaProps}
-              />
-            );
-          })}
+          {areaSeries.map((areaProps, index) => (
+            <Area
+              key={`area-${areaProps.dataKey}`}
+              type={chartTypeConfigs.area.type}
+              fillOpacity={chartTypeConfigs.area.fillOpacity}
+              strokeWidth={chartTypeConfigs.area.strokeWidth}
+              fill={areaProps.fill || getColorByCategory(areaProps.dataKey, index)}
+              stroke={
+                areaProps.stroke || areaProps.fill || getColorByCategory(areaProps.dataKey, index)
+              }
+              {...areaProps}
+            />
+          ))}
 
           {/* Render Bars */}
-          {barSeries.map((barProps, index) => {
-            const { type, ...restBarProps } = barProps;
-            return (
-              <Bar
-                key={`bar-${barProps.dataKey}`}
-                radius={chartTypeConfigs.bar.radius as [number, number, number, number]}
-                maxBarSize={chartTypeConfigs.bar.maxBarSize}
-                fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
-                {...restBarProps}
-              />
-            );
-          })}
+          {barSeries.map((barProps, index) => (
+            <Bar
+              key={`bar-${barProps.dataKey}`}
+              radius={chartTypeConfigs.bar.radius}
+              maxBarSize={chartTypeConfigs.bar.maxBarSize}
+              fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
+              {...barProps}
+            />
+          ))}
 
           {/* Render Lines on top */}
-          {lineSeries.map((lineProps, index) => {
-            const { type, ...restLineProps } = lineProps;
-            return (
-              <Line
-                key={`line-${lineProps.dataKey}`}
-                type="monotone"
-                strokeWidth={lineProps.strokeWidth || chartTypeConfigs.line.strokeWidth}
-                dot={lineProps.dot !== undefined ? lineProps.dot : chartTypeConfigs.line.dot}
-                activeDot={lineProps.activeDot || chartTypeConfigs.line.activeDot}
-                stroke={lineProps.stroke || getColorByCategory(lineProps.dataKey, index)}
-                {...restLineProps}
-              />
-            );
-          })}
+          {lineSeries.map((lineProps, index) => (
+            <Line
+              key={`line-${lineProps.dataKey}`}
+              type={chartTypeConfigs.line.type}
+              strokeWidth={lineProps.strokeWidth || chartTypeConfigs.line.strokeWidth}
+              dot={lineProps.dot !== undefined ? lineProps.dot : chartTypeConfigs.line.dot}
+              activeDot={lineProps.activeDot || chartTypeConfigs.line.activeDot}
+              stroke={lineProps.stroke || getColorByCategory(lineProps.dataKey, index)}
+              {...lineProps}
+            />
+          ))}
         </ComposedChart>
       )}
     </ChartContainer>
@@ -161,12 +151,8 @@ const ComposedFinancialChart: React.FC<ComposedFinancialChartProps> = ({
 };
 
 // Specialized cash flow chart
-export const CashFlowChart: React.FC<{
-  data: ChartDataPoint[];
-  title?: string;
-  [key: string]: any;
-}> = ({ data, title = "Monthly Cash Flow", ...props }) => {
-  const series: ChartSeries[] = [
+export const CashFlowChart = ({ data, title = "Monthly Cash Flow", ...props }) => {
+  const series = [
     {
       type: "bar",
       dataKey: "income",
@@ -192,13 +178,13 @@ export const CashFlowChart: React.FC<{
 };
 
 // Specialized budget vs actual chart
-export const BudgetVsActualChart: React.FC<{
-  data: ChartDataPoint[];
-  title?: string;
-  _orientation?: string;
-  [key: string]: any;
-}> = ({ data, title = "Budget vs Actual Spending", _orientation = "horizontal", ...props }) => {
-  const series: ChartSeries[] = [
+export const BudgetVsActualChart = ({
+  data,
+  title = "Budget vs Actual Spending",
+  _orientation = "horizontal",
+  ...props
+}) => {
+  const series = [
     {
       type: "bar",
       dataKey: "budgeted",

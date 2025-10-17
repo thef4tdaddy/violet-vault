@@ -16,7 +16,7 @@ import type {
   TypedResponse,
   SafeUnknown,
 } from "../types/firebase";
-import { isObject, isString } from "../types/common";
+import { isString } from "../types/common";
 import { firebaseErrorHandler, syncOperationWrapper } from "./types/firebaseServiceTypes";
 import logger from "../utils/common/logger";
 
@@ -192,7 +192,7 @@ class TypedFirebaseSyncServiceImpl implements TypedFirebaseSyncService {
     });
   }
 
-  removeSyncListener(callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void {
+  removeSyncListener(_callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void {
     // Note: The original service doesn't provide a direct way to remove specific callbacks
     // This would need to be enhanced in the original service
     logger.warn("removeSyncListener: Not fully implemented - requires enhancement of base service");

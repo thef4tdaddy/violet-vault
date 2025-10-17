@@ -113,7 +113,7 @@ export function validateDebtFormData(formData: any): ValidationResult {
  * Calculate debt metrics for display and analysis
  */
 export function calculateDebtMetrics(debtData: DebtFormData): DebtMetrics | null {
-  const { balance, interestRate, minimumPayment, paymentFrequency = "monthly" } = debtData;
+  const { balance, interestRate, minimumPayment } = debtData;
 
   if (!balance || !minimumPayment) {
     return null;
@@ -147,18 +147,6 @@ export function calculateDebtMetrics(debtData: DebtFormData): DebtMetrics | null
   const totalAmountPaid = balance + totalInterestPaid;
   const payoffDate = new Date();
   payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(payoffTimeMonths));
-
-  // Calculate effective APR (accounting for payment frequency)
-  const paymentsPerYear =
-    paymentFrequency === "weekly"
-      ? 52
-      : paymentFrequency === "biweekly"
-        ? 26
-        : paymentFrequency === "quarterly"
-          ? 4
-          : paymentFrequency === "annually"
-            ? 1
-            : 12;
 
   const effectiveAPR = Math.pow(1 + monthlyInterestRate, 12) - 1;
   const monthlyInterestCost = balance * monthlyInterestRate;
