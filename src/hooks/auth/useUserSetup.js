@@ -254,8 +254,8 @@ export const useUserSetup = (onSetupComplete) => {
 
       // Add timeout protection
       await handleWithTimeout(async () => {
-        await onSetupComplete({
-          password: masterPassword,
+        // Pass password as first param, userData as second param for new user creation
+        await onSetupComplete(masterPassword, {
           userName: userName.trim(),
           userColor,
           shareCode, // Pass the share code that was displayed to the user

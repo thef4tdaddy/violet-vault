@@ -33,6 +33,7 @@ export default [
       "**/masterSyncValidator.js", // Sync validation testing
       "**/highlight.js", // Error monitoring utility
       "src/stores/authStore.jsx", // Main Zustand store for UI/State, low priority for refactoring
+      "js-version/**", // Backup of original JS source
     ],
   },
   {
