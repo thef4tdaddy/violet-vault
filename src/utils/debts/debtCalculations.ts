@@ -5,16 +5,13 @@ import type {
   DebtAccount,
   DebtType,
   PaymentFrequency,
-  CompoundFrequency,
   DebtSpecialTerms,
-  PayoffProjection,
 } from "../../types/debt";
 
 import {
   DEBT_TYPES,
   DEBT_STATUS,
   PAYMENT_FREQUENCIES,
-  COMPOUND_FREQUENCIES,
 } from "../../constants/debts";
 
 // Import separated debt calculation functions

@@ -90,7 +90,7 @@ export class VioletVaultDB extends Dexie {
 
     // Enhanced hooks for automatic timestamping across all tables
     const addTimestampHooks = (table: Table<any, any>) => {
-      table.hook("creating", (primKey, obj, trans) => {
+      table.hook("creating", (_primKey, obj, trans) => {
         // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
         try {
           obj.lastModified = Date.now();
