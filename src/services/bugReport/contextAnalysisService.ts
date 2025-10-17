@@ -7,12 +7,85 @@ import logger from "../../utils/common/logger";
 import { PageDetectionService } from "./pageDetectionService";
 import { UIStateService } from "./uiStateService";
 
+// Type definitions
+interface PagePerformance {
+  available: boolean;
+  domContentLoaded?: number | null;
+  loadComplete?: number | null;
+  firstPaint?: number | null;
+  firstContentfulPaint?: number | null;
+  resourceCount?: number;
+  error?: string;
+}
+
+interface AccessibilityInfo {
+  available: boolean;
+  focusedElement?: {
+    tagName: string;
+    role: string | null;
+    ariaLabel: string | null;
+  } | null;
+  headingStructure?: HeadingStructure;
+  landmarksCount?: number;
+  formLabels?: FormLabels;
+  altTexts?: ImageAltTexts;
+  error?: string;
+}
+
+interface HeadingStructure {
+  counts: Record<string, number>;
+  total: number;
+  hasH1: boolean;
+}
+
+interface FormLabels {
+  total: number;
+  labeled: number;
+  unlabeled: number;
+  labelPercentage: number;
+}
+
+interface ImageAltTexts {
+  total: number;
+  withAlt: number;
+  withoutAlt: number;
+  altPercentage: number;
+}
+
+interface DataState {
+  available: boolean;
+  formsWithData?: number;
+  tablesWithData?: number;
+  listsWithData?: number;
+  loadingStates?: number;
+  error?: string;
+}
+
+interface RecentInteractions {
+  availableActions?: ReturnType<typeof UIStateService.getVisibleInteractions>;
+  hasActiveForm?: boolean;
+  hasOpenModal?: boolean;
+  keyboardNavigable?: number;
+}
+
+interface PageContext {
+  page: string;
+  route: ReturnType<typeof PageDetectionService.getRouteInfo>;
+  screen: ReturnType<typeof PageDetectionService.getScreenContext>;
+  userLocation: string;
+  ui: ReturnType<typeof UIStateService.getUIState>;
+  performance: PagePerformance;
+  accessibility: AccessibilityInfo;
+  data: DataState;
+  interactions: RecentInteractions | unknown[];
+  fallback?: boolean;
+}
+
 export class ContextAnalysisService {
   /**
    * Get comprehensive page context for bug reports
-   * @returns {Object} Page context information
    */
-  static getCurrentPageContext() {
+  static getCurrentPageContext(): PageContext {
     try {
       const context = {
         page: PageDetectionService.identifyCurrentPage(),
@@ -36,9 +109,8 @@ export class ContextAnalysisService {
 
   /**
    * Get fallback context when analysis fails
-   * @returns {Object} Minimal context information
    */
-  static getFallbackContext() {
+  static getFallbackContext(): PageContext {
     return {
       page: "unknown",
       route: { currentPage: "unknown", pathname: window.location.pathname },
@@ -55,14 +127,13 @@ export class ContextAnalysisService {
 
   /**
    * Get page performance information
-   * @returns {Object} Performance metrics
    */
-  static getPagePerformance() {
+  static getPagePerformance(): PagePerformance {
     try {
       const perf = window.performance;
       if (!perf) return { available: false };
 
-      const navigation = perf.getEntriesByType("navigation")[0];
+      const navigation = perf.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
       const paintEntries = perf.getEntriesByType("paint");
 
       return {
@@ -78,15 +149,14 @@ export class ContextAnalysisService {
       };
     } catch (error) {
       logger.debug("Error getting page performance", error);
-      return { available: false, error: error.message };
+      return { available: false, error: (error as Error).message };
     }
   }
 
   /**
    * Get accessibility information
-   * @returns {Object} Accessibility state
    */
-  static getAccessibilityInfo() {
+  static getAccessibilityInfo(): AccessibilityInfo {
     try {
       const a11yInfo = {
         available: true,
@@ -108,15 +178,14 @@ export class ContextAnalysisService {
       return a11yInfo;
     } catch (error) {
       logger.debug("Error getting accessibility info", error);
-      return { available: false, error: error.message };
+      return { available: false, error: (error as Error).message };
     }
   }
 
   /**
    * Get data state information
-   * @returns {Object} Data state
    */
-  static getDataState() {
+  static getDataState(): DataState {
     try {
       return {
         available: true,
@@ -129,15 +198,14 @@ export class ContextAnalysisService {
       };
     } catch (error) {
       logger.debug("Error getting data state", error);
-      return { available: false, error: error.message };
+      return { available: false, error: (error as Error).message };
     }
   }
 
   /**
    * Get recent interaction information
-   * @returns {Array} Recent interactions
    */
-  static getRecentInteractions() {
+  static getRecentInteractions(): RecentInteractions | unknown[] {
     try {
       // Simple interaction tracking - could be enhanced with actual event monitoring
       return {
@@ -158,9 +226,8 @@ export class ContextAnalysisService {
 
   /**
    * Get heading structure for accessibility
-   * @returns {Object} Heading structure information
    */
-  static getHeadingStructure() {
+  static getHeadingStructure(): HeadingStructure {
     try {
       const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
       const structure = {};
@@ -182,9 +249,8 @@ export class ContextAnalysisService {
 
   /**
    * Check form label associations
-   * @returns {Object} Form label information
    */
-  static checkFormLabels() {
+  static checkFormLabels(): FormLabels {
     try {
       const inputs = document.querySelectorAll("input, textarea, select");
       let labeled = 0;
@@ -215,9 +281,8 @@ export class ContextAnalysisService {
 
   /**
    * Check image alt text coverage
-   * @returns {Object} Image alt text information
    */
-  static checkImageAltTexts() {
+  static checkImageAltTexts(): ImageAltTexts {
     try {
       const images = document.querySelectorAll("img");
       let withAlt = 0;

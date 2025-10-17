@@ -8,20 +8,40 @@ import logger from "../../utils/common/logger";
 import { identifyCurrentPage as detectCurrentPage } from "../../utils/pageDetection/pageIdentifier";
 import { pathToViewMap } from "../../components/layout/routeConfig";
 
+// Type definitions
+interface RouteInfo {
+  pathname: string;
+  search: string;
+  hash: string;
+  searchParams: Record<string, string>;
+  segments: string[];
+  currentPage: string;
+  currentView: string;
+  isAppRoute: boolean;
+  isMarketingRoute: boolean;
+  buildTarget: string;
+  routeType: string;
+}
+
+interface ScreenContext {
+  documentTitle: string;
+  screenTitle: string;
+  breadcrumbs: string[];
+  mainHeading: string | null;
+}
+
 export class PageDetectionService {
   /**
    * Identify the current page/view based on URL and DOM
-   * @returns {string} Current page identifier
    */
-  static identifyCurrentPage() {
+  static identifyCurrentPage(): string {
     return detectCurrentPage();
   }
 
   /**
    * Get detailed route information with React Router awareness
-   * @returns {Object} Route information
    */
-  static getRouteInfo() {
+  static getRouteInfo(): RouteInfo {
     try {
       const url = new URL(window.location.href);
       const pathname = url.pathname;
@@ -69,9 +89,8 @@ export class PageDetectionService {
 
   /**
    * Get screen title and context information
-   * @returns {Object} Screen context
    */
-  static getScreenContext() {
+  static getScreenContext(): ScreenContext {
     try {
       const context = {
         documentTitle: document.title || "Unknown",
@@ -94,9 +113,8 @@ export class PageDetectionService {
 
   /**
    * Extract the main screen title from DOM
-   * @returns {string} Screen title
    */
-  static extractScreenTitle() {
+  static extractScreenTitle(): string {
     try {
       // Try various selectors for main title
       const titleSelectors = [
@@ -123,9 +141,8 @@ export class PageDetectionService {
 
   /**
    * Extract breadcrumb navigation if available
-   * @returns {Array} Breadcrumb items
    */
-  static extractBreadcrumbs() {
+  static extractBreadcrumbs(): string[] {
     try {
       const breadcrumbs = [];
 
@@ -156,9 +173,8 @@ export class PageDetectionService {
 
   /**
    * Extract main page heading
-   * @returns {string|null} Main heading text
    */
-  static extractMainHeading() {
+  static extractMainHeading(): string | null {
     try {
       const mainHeading = document.querySelector("main h1, section h1, .content h1, h1");
       return mainHeading ? mainHeading.textContent?.trim() : null;
@@ -169,9 +185,8 @@ export class PageDetectionService {
 
   /**
    * Get user's location within the app with hierarchy (Router-enhanced)
-   * @returns {string} User location string
    */
-  static getUserLocation() {
+  static getUserLocation(): string {
     try {
       const routeInfo = this.getRouteInfo();
       const screenTitle = this.extractScreenTitle();
@@ -184,7 +199,7 @@ export class PageDetectionService {
         location = `Marketing: ${routeInfo.pathname}`;
       } else if (routeInfo.isAppRoute) {
         // Convert view to user-friendly name
-        const viewNames = {
+        const viewNames: Record<string, string> = {
           dashboard: "Dashboard",
           envelopes: "Envelopes",
           savings: "Savings Goals",
@@ -223,9 +238,8 @@ export class PageDetectionService {
 
   /**
    * Get active modal title if any
-   * @returns {string|null} Active modal title
    */
-  static getActiveModalTitle() {
+  static getActiveModalTitle(): string | null {
     try {
       const modalSelectors = [
         '[role="dialog"] h1',
