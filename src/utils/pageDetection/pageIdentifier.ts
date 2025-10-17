@@ -2,14 +2,14 @@
  * Main page identification logic
  * Extracted from pageDetectionService.js to reduce complexity
  */
-import { checkUrlPatterns, checkTitlePatterns, checkDomClassPatterns } from "./pagePatterns.js";
+import { checkUrlPatterns, checkTitlePatterns, checkDomClassPatterns, PageType } from "./pagePatterns.js";
 import { detectFromActiveNavigation } from "./navigationDetector.js";
 import logger from "../common/logger.js";
 
 /**
  * Identify current page using multiple detection strategies
  */
-export const identifyCurrentPage = () => {
+export const identifyCurrentPage = (): PageType => {
   try {
     // Strategy 1: URL path patterns (most reliable)
     const urlResult = checkUrlPatterns(window.location.pathname, window.location.hash);
