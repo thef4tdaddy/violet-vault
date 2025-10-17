@@ -121,10 +121,13 @@ export const initHighlight = () => {
 };
 
 const _setupConsoleCapture = () => {
+  // eslint-disable-next-line no-console -- Need to store original console references for capture
   const originalConsoleError = console.error;
+  // eslint-disable-next-line no-console -- Need to store original console references for capture
   const originalConsoleWarn = console.warn;
 
   // Capture console errors and send to Highlight.io
+  // eslint-disable-next-line no-console -- Overriding console for error tracking
   console.error = (...args) => {
     originalConsoleError(...args);
 
@@ -149,6 +152,7 @@ const _setupConsoleCapture = () => {
     H.consumeError(new Error(message));
   };
 
+  // eslint-disable-next-line no-console -- Overriding console for warning tracking
   console.warn = (...args) => {
     originalConsoleWarn(...args);
 
@@ -168,7 +172,7 @@ const _setupConsoleCapture = () => {
 
     // Log warnings for debugging but don't send to Highlight (they handle this automatically)
     if (import.meta.env.MODE === "development") {
-      console.log("⚠️ Warning captured:", message);
+      logger.debug("⚠️ Warning captured", { message });
     }
   };
 };
