@@ -31,3 +31,4 @@ dist-ssr
 .env*.local
 CLAUDE.local.md
 .env.development
+js-version/
