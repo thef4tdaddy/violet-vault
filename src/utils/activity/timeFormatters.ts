@@ -6,10 +6,10 @@
 /**
  * Format timestamp to relative time string
  */
-export const formatTimestamp = (timestamp) => {
+export const formatTimestamp = (timestamp: string | number | Date): string => {
   const date = new Date(timestamp);
   const now = new Date();
-  const diffMs = now - date;
+  const diffMs = now.getTime() - date.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffHours / 24);
 

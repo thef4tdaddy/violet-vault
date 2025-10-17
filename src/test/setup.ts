@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 // Mock modules that require browser APIs
 const mockIndexedDB = {
@@ -12,7 +13,7 @@ Object.defineProperty(global, "indexedDB", {
 });
 
 // Mock crypto.getRandomValues
-const mockGetRandomValues = vi.fn((array) => {
+const mockGetRandomValues = vi.fn((array: Uint8Array) => {
   for (let i = 0; i < array.length; i++) {
     array[i] = Math.floor(Math.random() * 256);
   }
@@ -20,10 +21,10 @@ const mockGetRandomValues = vi.fn((array) => {
 });
 
 // Mock crypto.subtle.digest with proper implementation
-const mockDigest = vi.fn(async (algorithm, data) => {
+const mockDigest = vi.fn(async (algorithm: string, data: BufferSource) => {
   // Create a simple deterministic hash for testing
   let hash = 0;
-  const uint8Array = new Uint8Array(data);
+  const uint8Array = new Uint8Array(data as ArrayBuffer);
   for (let i = 0; i < uint8Array.length; i++) {
     hash = (hash * 31 + uint8Array[i]) % 0xffffffff;
   }

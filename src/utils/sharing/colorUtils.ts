@@ -14,8 +14,8 @@ const USER_COLORS = [
   "#ec4899", // pink
 ];
 
-export const generateRandomColor = () => {
+export const generateRandomColor = (): string => {
   return USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)];
 };
 
-export const getUserColors = () => USER_COLORS;
+export const getUserColors = (): string[] => USER_COLORS;
