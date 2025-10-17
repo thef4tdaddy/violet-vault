@@ -2,7 +2,26 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import PasswordField from "./PasswordField";
 
-const ImportSection = ({
+interface ImportResult {
+  success: boolean;
+  error?: string;
+  user?: string;
+}
+
+interface ImportSectionProps {
+  importPassword: string;
+  vaultPassword: string;
+  showImportPassword: boolean;
+  showVaultPassword: boolean;
+  importResult: ImportResult | null;
+  loading: boolean;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  onUpdatePassword: (field: string, value: string) => void;
+  onTogglePasswordVisibility: (field: string) => void;
+  onFileImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const ImportSection: React.FC<ImportSectionProps> = ({
   importPassword,
   vaultPassword,
   showImportPassword,

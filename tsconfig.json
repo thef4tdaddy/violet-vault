@@ -27,6 +27,9 @@
   "exclude": [
     "node_modules",
     "dist",
-    "build"
+    "build",
+    ".git",
+    ".github",
+    "public/firebase-messaging-sw.js"
   ]
 }
