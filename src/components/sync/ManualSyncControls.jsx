@@ -8,8 +8,20 @@ import useManualSync from "../../hooks/common/useManualSync";
 import logger from "../../utils/common/logger";
 
 /**
+ * @typedef {Object} SyncResult
+ * @property {boolean} success - Whether sync operation succeeded
+ * @property {string} [message] - Success message
+ * @property {string} [error] - Error message if failed
+ */
+
+/**
  * Manual sync controls component for family budget collaboration
  * Allows explicit control over Dexie ↔ Firebase synchronization
+ * Provides upload, download, and full bidirectional sync operations
+ *
+ * @param {Object} props - Component props
+ * @param {string} [props.className=""] - Additional CSS classes for container
+ * @returns {React.ReactElement} Rendered manual sync controls
  */
 export const ManualSyncControls = ({ className = "" }) => {
   const {
@@ -27,6 +39,10 @@ export const ManualSyncControls = ({ className = "" }) => {
 
   const syncStatus = getSyncStatus();
 
+  /**
+   * Handle upload sync operation (Dexie → Firebase)
+   * @returns {Promise<void>}
+   */
   const handleUploadSync = async () => {
     clearSyncError();
     const result = await forceUploadSync();
@@ -37,6 +53,10 @@ export const ManualSyncControls = ({ className = "" }) => {
     }
   };
 
+  /**
+   * Handle download sync operation (Firebase → Dexie)
+   * @returns {Promise<void>}
+   */
   const handleDownloadSync = async () => {
     clearSyncError();
     const result = await forceDownloadSync();
@@ -47,6 +67,10 @@ export const ManualSyncControls = ({ className = "" }) => {
     }
   };
 
+  /**
+   * Handle full bidirectional sync operation
+   * @returns {Promise<void>}
+   */
   const handleFullSync = async () => {
     clearSyncError();
     const result = await forceFullSync();
@@ -57,6 +81,11 @@ export const ManualSyncControls = ({ className = "" }) => {
     }
   };
 
+  /**
+   * Format last sync timestamp into human-readable string
+   * @param {Date|null} time - Last sync timestamp
+   * @returns {string} Formatted time string
+   */
   const formatLastSyncTime = (time) => {
     if (!time) return "Never";
 

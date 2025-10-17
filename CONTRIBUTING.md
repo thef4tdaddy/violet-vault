@@ -92,6 +92,17 @@ The pre-commit hook will automatically check these requirements.
 
 See the **[Shared UI Components Guide](docs/Shared-UI-Components.md)** for complete documentation of available components, usage guidelines, and design patterns.
 
+### TypeScript/JSDoc Patterns
+
+VioletVault uses **JavaScript with JSDoc annotations** for type safety. Follow these guidelines:
+
+- **Document public APIs**: Type all exported hooks, components, and service functions
+- **Use `@typedef` for complex types**: Share type definitions across files
+- **Provide fallback values**: Handle `undefined`/`null` cases gracefully
+- **Validate critical inputs**: Add runtime checks for enum/union values
+
+See the **[TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** for comprehensive documentation on typing props, hooks, Dexie queries, and decision logs for type-related compromises.
+
 ### Getting Started
 
 1. Install dependencies: `npm install`

@@ -1,4 +1,6 @@
-export { default as debtCalculations } from "./debtCalculations.js";
-export { default as debtDebugConfig } from "./debtDebugConfig.js";
-export { default as debtStrategies } from "./debtStrategies.js";
+// Re-export TypeScript modules
+export * from "./debtCalculations";
+export * from "./debtDebugConfig";
+export * from "./debtStrategies";
+export * from "./debtFormValidation";
 export * from "./calculations/index.js";

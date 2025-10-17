@@ -4,6 +4,35 @@ import { renderIcon } from "../../utils/icons";
 import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";
 import SyncHealthDashboard from "./SyncHealthDashboard";
 
+/**
+ * @typedef {Object} User
+ * @property {string} id - User ID
+ * @property {string} userName - User's display name
+ * @property {string} [color] - User's avatar color
+ */
+
+/**
+ * @typedef {Object} SyncStatus
+ * @property {string} status - Status type: 'syncing' | 'error' | 'offline' | 'synced' | 'blocked' | 'slow' | 'degraded' | 'unhealthy'
+ * @property {string} color - Tailwind color name for status display
+ * @property {string} message - Human-readable status message
+ */
+
+/**
+ * SyncIndicator component displays real-time sync status with health monitoring
+ * GitHub Issue #576: Enhanced progress tracking and health monitoring
+ *
+ * @param {Object} props - Component props
+ * @param {boolean} props.isOnline - Whether the app is online
+ * @param {boolean} props.isSyncing - Whether sync is currently in progress
+ * @param {number|null} props.lastSyncTime - Timestamp of last successful sync
+ * @param {User[]} [props.activeUsers=[]] - List of active users in the system
+ * @param {string|null} [props.syncError=null] - Current sync error message, if any
+ * @param {User|null} [props.currentUser=null] - Current logged-in user
+ * @param {number|null} [props.syncProgress=null] - Sync progress (0-1) for progress bar
+ * @param {string|null} [props.syncStage=null] - Current sync stage (validating, encrypting, uploading, etc.)
+ * @returns {React.ReactElement} Rendered sync indicator component
+ */
 const SyncIndicator = ({
   isOnline,
   isSyncing,
@@ -28,6 +57,11 @@ const SyncIndicator = ({
     const interval = setInterval(updateHealth, 10000); // Update every 10 seconds
     return () => clearInterval(interval);
   }, []);
+  /**
+   * Format last sync timestamp into human-readable relative time
+   * @param {number|null} timestamp - Unix timestamp in milliseconds
+   * @returns {string} Formatted relative time string
+   */
   const formatLastSync = (timestamp) => {
     if (!timestamp) return "Never synced";
 
@@ -46,6 +80,11 @@ const SyncIndicator = ({
     return syncTime.toLocaleDateString();
   };
 
+  /**
+   * Determine current sync status based on health, errors, and network state
+   * GitHub Issue #576: Enhanced status with health monitoring
+   * @returns {SyncStatus} Current sync status object with status, color, and message
+   */
   const getSyncStatus = () => {
     // GitHub Issue #576: Enhanced status with health monitoring
     const healthStatus = healthData?.status || "unknown";

@@ -1,39 +1,56 @@
 {
   "compilerOptions": {
+    // Target modern browsers (same as Vite config)
     "target": "ES2020",
-    "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    
+    // Allow JS files during incremental conversion
+    "allowJs": true,
+    "checkJs": false,
+    
+    // Enable React JSX
+    "jsx": "react-jsx",
+    
+    // Type checking
+    "strict": false, // Start non-strict, gradually tighten
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    
+    // Module resolution
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Incremental migration */
-    "allowJs": true,
-    "checkJs": false,
-
-    /* Path mapping */
+    "allowImportingTsExtensions": false,
+    
+    // Allow synthetic default imports for compatibility
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Skip lib checking for faster builds
+    "skipLibCheck": true,
+    
+    // Path mapping for cleaner imports
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "@/utils": ["./src/utils"],
+      "@/components": ["./src/components"],
+      "@/hooks": ["./src/hooks"],
+      "@/constants": ["./src/constants"],
+      "@/types": ["./src/types"]
     }
   },
   "include": [
     "src/**/*",
-    "vite.config.js",
-    "vitest.config.js"
+    "vite.config.js"
   ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
 }
