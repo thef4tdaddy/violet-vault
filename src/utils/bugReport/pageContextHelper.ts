@@ -3,10 +3,21 @@
  * Extracted from useBugReport.js to reduce complexity
  */
 
+export interface PageContext {
+  page: string;
+  screenTitle: string;
+  documentTitle: string;
+  userLocation: string;
+  visibleModals: (string | null | undefined)[];
+  url: string;
+  path: string;
+  hash: string;
+}
+
 /**
  * Get current page context for better location tracking
  */
-export const getCurrentPageContext = () => {
+export const getCurrentPageContext = (): PageContext => {
   const path = window.location.pathname;
   const hash = window.location.hash;
 
@@ -30,10 +41,10 @@ export const getCurrentPageContext = () => {
   }
 
   // Detect visible modals
-  const visibleModals = [];
+  const visibleModals: (string | null | undefined)[] = [];
   const modals = document.querySelectorAll('[role="dialog"], [class*="modal"], [class*="Modal"]');
   modals.forEach((modal) => {
-    if (modal.offsetParent !== null) {
+    if ((modal as HTMLElement).offsetParent !== null) {
       // visible
       const modalTitle = modal.querySelector('h1, h2, h3, [class*="title"]');
       if (modalTitle) {

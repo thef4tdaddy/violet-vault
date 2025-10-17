@@ -5,10 +5,15 @@
 import { getIcon } from "../icons";
 import { ENTITY_TYPES } from "../../services/activityLogger";
 
+export interface IconInfo {
+  component: any;
+  className: string;
+}
+
 /**
  * Get icon component and props based on action type
  */
-export const getActionIconInfo = (action) => {
+export const getActionIconInfo = (action: string): IconInfo | null => {
   if (action.includes("created") || action.includes("added")) {
     return { component: getIcon("plus"), className: "h-4 w-4 text-green-600" };
   } else if (action.includes("updated") || action.includes("paid")) {
@@ -22,7 +27,7 @@ export const getActionIconInfo = (action) => {
 /**
  * Get icon component and props based on entity type
  */
-export const getEntityIconInfo = (entityType) => {
+export const getEntityIconInfo = (entityType: string): IconInfo => {
   switch (entityType) {
     case ENTITY_TYPES.ENVELOPE:
       return {
@@ -65,7 +70,7 @@ export const getEntityIconInfo = (entityType) => {
 /**
  * Get appropriate icon info for activity
  */
-export const getActivityIconInfo = (action, entityType) => {
+export const getActivityIconInfo = (action: string, entityType: string): IconInfo => {
   // First try to get action-specific icon
   const actionInfo = getActionIconInfo(action);
   if (actionInfo) return actionInfo;

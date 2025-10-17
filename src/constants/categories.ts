@@ -26,13 +26,15 @@ export const STANDARD_CATEGORIES = [
   "Gifts & Donations",
   "Business",
   "Other",
-];
+] as const;
+
+export type StandardCategory = (typeof STANDARD_CATEGORIES)[number];
 
 // Legacy transaction categories - kept for backwards compatibility
 export const TRANSACTION_CATEGORIES = STANDARD_CATEGORIES;
 
 // Default category for uncategorized transactions
-export const DEFAULT_CATEGORY = "Other";
+export const DEFAULT_CATEGORY = "Other" as const;
 
 // Categories specifically for expenses
 export const EXPENSE_CATEGORIES = STANDARD_CATEGORIES;
@@ -49,7 +51,7 @@ export const BILL_CATEGORIES_EXTENDED = [
   "Health & Medical",
   "Education",
   "Subscriptions",
-];
+] as const;
 
 // Categories that are typically bills/recurring expenses
 export const BILL_CATEGORIES = [
@@ -58,20 +60,35 @@ export const BILL_CATEGORIES = [
   "Transportation",
   "Education",
   "Subscriptions",
-];
+] as const;
 
 // Envelope types for classification
 export const ENVELOPE_TYPES = {
   BILL: "bill",
   VARIABLE: "variable",
   SAVINGS: "savings",
-};
+} as const;
+
+export type EnvelopeType = (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES];
 
 // Default envelope type for new envelopes
 export const DEFAULT_ENVELOPE_TYPE = ENVELOPE_TYPES.VARIABLE;
 
+// Envelope type configuration
+export interface EnvelopeTypeConfig {
+  name: string;
+  description: string;
+  color: string;
+  borderColor: string;
+  bgColor: string;
+  textColor: string;
+  icon: string;
+  fundingMethod: string;
+  displayFormat: string;
+}
+
 // Envelope type definitions with properties
-export const ENVELOPE_TYPE_CONFIG = {
+export const ENVELOPE_TYPE_CONFIG: Record<EnvelopeType, EnvelopeTypeConfig> = {
   [ENVELOPE_TYPES.BILL]: {
     name: "Bill Envelope",
     description: "Fixed recurring amounts (rent, insurance, phone bills)",
@@ -108,7 +125,7 @@ export const ENVELOPE_TYPE_CONFIG = {
 };
 
 // Auto-classify envelope type based on category
-export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
+export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category: string): EnvelopeType => {
   // Categories that are typically bills/recurring expenses
   const billCategories = ["Housing", "Bills & Utilities", "Insurance"];
   if (billCategories.includes(category)) {
@@ -147,7 +164,7 @@ export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
 };
 
 // Merchant pattern mapping to categories for smart suggestions
-export const MERCHANT_CATEGORY_PATTERNS = {
+export const MERCHANT_CATEGORY_PATTERNS: Record<string, RegExp> = {
   "Food & Dining":
     /grocery|market|food|kroger|safeway|walmart|target|costco|whole foods|restaurant|cafe|coffee|pizza|burger|taco|starbucks|mcdonalds/i,
   Transportation:
@@ -169,25 +186,25 @@ export const MERCHANT_CATEGORY_PATTERNS = {
 
 /**
  * Get all standard categories for use in UI components
- * @returns {Array<string>} Array of category names
+ * @returns Array of category names
  */
-export function getStandardCategories() {
+export function getStandardCategories(): readonly string[] {
   return [...STANDARD_CATEGORIES];
 }
 
 /**
  * Get categories appropriate for bills
  * Uses same categories as envelopes for consistency
- * @returns {Array<string>} Array of bill-appropriate category names
+ * @returns Array of bill-appropriate category names
  */
-export function getBillCategories() {
+export function getBillCategories(): readonly string[] {
   return [...STANDARD_CATEGORIES];
 }
 
 /**
  * Get categories appropriate for envelopes
- * @returns {Array<string>} Array of envelope-appropriate category names
+ * @returns Array of envelope-appropriate category names
  */
-export function getEnvelopeCategories() {
+export function getEnvelopeCategories(): readonly string[] {
   return [...ENVELOPE_CATEGORIES];
 }
