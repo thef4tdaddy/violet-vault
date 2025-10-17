@@ -7,13 +7,12 @@ import {
   handleSharedBudgetJoin,
   handleNewUserSetup,
 } from "../../utils/auth/authFlowHelpers";
-import type { AuthFlowHook, UserData, AuthResult } from "../../types/auth";
 
 /**
  * Custom hook for authentication flow management
  * Extracts authentication logic from Layout component
  */
-const useAuthFlow = (): AuthFlowHook => {
+const useAuthFlow = () => {
   const {
     isUnlocked,
     user: currentUser,
@@ -27,7 +26,7 @@ const useAuthFlow = (): AuthFlowHook => {
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   const handleSetup = useCallback(
-    async (userDataOrPassword: string | UserData): Promise<AuthResult> => {
+    async (userDataOrPassword) => {
       // Handle three scenarios:
       // 1. Existing user login (string password)
       // 2. Shared budget join (object with budgetId)
@@ -48,85 +47,53 @@ const useAuthFlow = (): AuthFlowHook => {
 
       try {
         if (isExistingUser) {
-          return await handleExistingUserLogin(password!, login);
+          return await handleExistingUserLogin(password, login);
         }
 
         if (isSharedBudgetJoin) {
-          return await handleSharedBudgetJoin(password!, userData!, login);
+          return await handleSharedBudgetJoin(password, userData, login);
         }
 
         // New user setup flow
-        return await handleNewUserSetup(password!, userData!, login);
+        return await handleNewUserSetup(password, userData, login);
       } catch (error) {
         logger.error("❌ Setup error:", error);
 
         // If this is our enhanced password validation error, re-throw it
-        if (error instanceof Error && (error as any).code) {
+        if (error.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET") {
           throw error;
         }
 
-        // Generic error handling
-        const message = error instanceof Error ? error.message : "Setup failed";
-        showErrorToast(message);
-        return {
-          success: false,
-          error: message,
-        };
+        showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
     [login, showErrorToast]
   );
 
   const handleLogout = useCallback(() => {
-    logger.auth("Logout requested");
     logout();
-    showSuccessToast("Logged out successfully");
-  }, [logout, showSuccessToast]);
+  }, [logout]);
 
   const handleChangePassword = useCallback(
-    async (oldPassword: string, newPassword: string): Promise<AuthResult> => {
-      try {
-        const result = await changePassword(oldPassword, newPassword);
-        if (result.success) {
-          showSuccessToast("Password changed successfully");
-        } else {
-          showErrorToast(result.error || "Failed to change password");
-        }
-        return result;
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Password change failed";
-        logger.error("Password change error:", error);
-        showErrorToast(message);
-        return {
-          success: false,
-          error: message,
-        };
+    async (oldPass, newPass) => {
+      const result = await changePassword(oldPass, newPass);
+      if (!result.success) {
+        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
+      } else {
+        showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showSuccessToast, showErrorToast]
+    [changePassword, showErrorToast, showSuccessToast]
   );
 
   const handleUpdateProfile = useCallback(
-    async (updatedProfile: Partial<UserData>): Promise<AuthResult> => {
-      try {
-        const result = await updateProfile(updatedProfile);
-        if (result.success) {
-          showSuccessToast("Profile updated successfully");
-        } else {
-          showErrorToast(result.error || "Failed to update profile");
-        }
-        return result;
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Profile update failed";
-        logger.error("Profile update error:", error);
-        showErrorToast(message);
-        return {
-          success: false,
-          error: message,
-        };
+    async (updatedProfile) => {
+      const result = await updateProfile(updatedProfile);
+      if (!result.success) {
+        throw new Error(result.error);
       }
     },
-    [updateProfile, showSuccessToast, showErrorToast]
+    [updateProfile]
   );
 
   return {

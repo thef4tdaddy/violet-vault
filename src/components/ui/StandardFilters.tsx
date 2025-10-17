@@ -1,51 +1,26 @@
 import React from "react";
 import { getIcon } from "../../utils/icons";
 
-export type FilterType = "select";
-export type FilterSize = "sm" | "md";
-
-export interface FilterOption {
-  value: string;
-  label: string;
-}
-
-export interface FilterConfig {
-  key: string;
-  type: FilterType;
-  options: FilterOption[];
-  defaultValue?: string;
-}
-
-export interface FilterValues {
-  search?: string;
-  [key: string]: any;
-}
-
-export interface StandardFiltersProps<T extends FilterValues = FilterValues> {
-  filters: T;
-  onFilterChange: (filterKey: keyof T, value: any) => void;
-  filterConfigs?: FilterConfig[];
-  showClearButton?: boolean;
-  searchPlaceholder?: string;
-  size?: FilterSize;
-  className?: string;
-}
-
 /**
  * Standardized compact filtering component with glassmorphism styling
  * Consistent, space-efficient filtering across all pages with proper borders and labeling
  *
- * Generic type T allows for strongly typed filter values
+ * @param {Object} filters - Current filter values
+ * @param {Function} onFilterChange - Callback for filter changes
+ * @param {Array} filterConfigs - Array of filter configurations
+ * @param {boolean} showClearButton - Show clear all filters button
+ * @param {string} searchPlaceholder - Placeholder text for search
+ * @param {string} size - 'sm' | 'md' for sizing
  */
-function StandardFilters<T extends FilterValues = FilterValues>({
-  filters = {} as T,
+const StandardFilters = ({
+  filters = {},
   onFilterChange,
   filterConfigs = [],
   showClearButton = true,
   searchPlaceholder = "Search...",
   size = "md",
   className = "",
-}: StandardFiltersProps<T>) {
+}) => {
   const sizeConfig = {
     sm: {
       input: "px-2 py-1 text-sm",
@@ -61,35 +36,35 @@ function StandardFilters<T extends FilterValues = FilterValues>({
 
   const config = sizeConfig[size];
 
-  const handleFilterChange = (filterKey: keyof T, value: any) => {
+  const handleFilterChange = (filterKey, value) => {
     onFilterChange(filterKey, value);
   };
 
   const clearAllFilters = () => {
-    const clearedFilters: Partial<T> = {};
+    const clearedFilters = {};
     // Set search to empty string
-    clearedFilters.search = "" as any;
+    clearedFilters.search = "";
 
     // Set all other filters to their default values
     filterConfigs.forEach((filterConfig) => {
       if (filterConfig.type === "select") {
-        (clearedFilters as any)[filterConfig.key] = filterConfig.defaultValue || "all";
+        clearedFilters[filterConfig.key] = filterConfig.defaultValue || "all";
       }
     });
 
     // Apply all cleared filters at once
     Object.entries(clearedFilters).forEach(([key, value]) => {
-      handleFilterChange(key as keyof T, value);
+      handleFilterChange(key, value);
     });
   };
 
   // Check if any filters are active (not default values)
-  const hasActiveFilters = (): boolean => {
+  const hasActiveFilters = () => {
     if (filters.search && filters.search.trim() !== "") return true;
 
     return filterConfigs.some((filterConfig) => {
       if (filterConfig.type === "select") {
-        const currentValue = filters[filterConfig.key as keyof T];
+        const currentValue = filters[filterConfig.key];
         const defaultValue = filterConfig.defaultValue || "all";
         return currentValue && currentValue !== defaultValue;
       }
@@ -129,7 +104,7 @@ function StandardFilters<T extends FilterValues = FilterValues>({
             type="text"
             placeholder={searchPlaceholder}
             value={filters.search || ""}
-            onChange={(e) => handleFilterChange("search" as keyof T, e.target.value)}
+            onChange={(e) => handleFilterChange("search", e.target.value)}
             className={`
               w-full pl-8 ${config.input} 
               border border-gray-300 rounded-md
@@ -139,7 +114,7 @@ function StandardFilters<T extends FilterValues = FilterValues>({
           />
           {filters.search && (
             <button
-              onClick={() => handleFilterChange("search" as keyof T, "")}
+              onClick={() => handleFilterChange("search", "")}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
               {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
@@ -153,12 +128,8 @@ function StandardFilters<T extends FilterValues = FilterValues>({
             return (
               <select
                 key={filterConfig.key}
-                value={
-                  (filters[filterConfig.key as keyof T] as string) ||
-                  filterConfig.defaultValue ||
-                  "all"
-                }
-                onChange={(e) => handleFilterChange(filterConfig.key as keyof T, e.target.value)}
+                value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
                 className={`
                   ${config.select} border border-gray-300 rounded-md
                   focus:ring-1 focus:ring-blue-500 focus:border-blue-500
@@ -178,6 +149,6 @@ function StandardFilters<T extends FilterValues = FilterValues>({
       </div>
     </div>
   );
-}
+};
 
 export default StandardFilters;

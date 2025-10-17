@@ -1,41 +1,23 @@
 import React from "react";
 
-export type TabSize = "sm" | "md" | "lg";
-export type TabVariant = "underline" | "pills" | "buttons" | "tabs" | "colored";
-export type TabColor = "blue" | "green" | "red" | "amber" | "purple" | "cyan" | "gray";
-
-export interface TabItem<T = string> {
-  id: T;
-  label: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  count?: number;
-  disabled?: boolean;
-  color?: TabColor;
-}
-
-export interface StandardTabsProps<T = string> {
-  tabs: TabItem<T>[];
-  activeTab: T;
-  onTabChange: (tabId: T) => void;
-  size?: TabSize;
-  variant?: TabVariant;
-  className?: string;
-}
-
 /**
  * Standardized tabs component with proper contrast and consistent styling
  * Follows accessibility guidelines with high-contrast text
  *
- * Generic type T allows for strongly typed tab IDs (string, enum, etc.)
+ * @param {Array} tabs - Array of tab objects with { id, label, icon, count?, disabled? }
+ * @param {string} activeTab - Currently active tab id
+ * @param {Function} onTabChange - Callback when tab changes
+ * @param {string} size - 'sm' | 'md' | 'lg' for different sizes
+ * @param {string} variant - 'underline' | 'pills' | 'buttons' | 'tabs' | 'colored' for different styles
  */
-function StandardTabs<T = string>({
+const StandardTabs = ({
   tabs = [],
   activeTab,
   onTabChange,
   size = "md",
   variant = "underline",
   className = "",
-}: StandardTabsProps<T>) {
+}) => {
   // Size configurations
   const sizeConfig = {
     sm: {
@@ -64,14 +46,7 @@ function StandardTabs<T = string>({
   const config = sizeConfig[size];
 
   // Color configurations for colored tabs
-  const colorConfig: Record<
-    TabColor,
-    {
-      pastel: string;
-      bright: string;
-      count: { pastel: string; bright: string };
-    }
-  > = {
+  const colorConfig = {
     blue: {
       pastel: "bg-blue-100 text-blue-700 border-blue-200",
       bright: "bg-blue-500 text-white border-blue-500",
@@ -131,7 +106,7 @@ function StandardTabs<T = string>({
   };
 
   // Variant-specific styling
-  const getVariantStyles = (isActive: boolean, isDisabled: boolean): string => {
+  const getVariantStyles = (isActive, isDisabled) => {
     if (isDisabled) {
       return "cursor-not-allowed opacity-50 text-gray-400";
     }
@@ -168,7 +143,7 @@ function StandardTabs<T = string>({
     }
   };
 
-  const getCountStyles = (isActive: boolean): string => {
+  const getCountStyles = (isActive) => {
     switch (variant) {
       case "underline":
         return isActive ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-800";
@@ -228,7 +203,7 @@ function StandardTabs<T = string>({
 
           return (
             <button
-              key={String(tab.id)}
+              key={tab.id}
               onClick={() => !isDisabled && onTabChange(tab.id)}
               disabled={isDisabled}
               className={`
@@ -257,6 +232,6 @@ function StandardTabs<T = string>({
       </nav>
     </div>
   );
-}
+};
 
 export default StandardTabs;

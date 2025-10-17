@@ -1,31 +1,5 @@
 import React from "react";
 
-export type SummaryCardColor =
-  | "red"
-  | "orange"
-  | "amber"
-  | "yellow"
-  | "green"
-  | "emerald"
-  | "teal"
-  | "cyan"
-  | "blue"
-  | "indigo"
-  | "purple"
-  | "pink"
-  | "gray";
-
-export interface PageSummaryCardProps {
-  icon?: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string | number;
-  subtext?: string;
-  color?: SummaryCardColor;
-  onClick?: () => void;
-  className?: string;
-  alert?: boolean;
-}
-
 /**
  * Page-Level Summary Card Component
  * Based on the bill summary card design pattern with gradient backgrounds
@@ -40,7 +14,7 @@ export interface PageSummaryCardProps {
  * Distinct from main dashboard summary cards (SummaryCard.jsx) which use solid colors.
  * Page-level cards use gradients and are for specific page metrics.
  */
-const PageSummaryCard: React.FC<PageSummaryCardProps> = ({
+const PageSummaryCard = ({
   icon: Icon,
   label,
   value,
@@ -51,15 +25,7 @@ const PageSummaryCard: React.FC<PageSummaryCardProps> = ({
   alert = false,
 }) => {
   // Color configurations for gradient backgrounds and text
-  const colorConfig: Record<
-    SummaryCardColor,
-    {
-      gradient: string;
-      textMain: string;
-      textValue: string;
-      textSub: string;
-    }
-  > = {
+  const colorConfig = {
     red: {
       gradient: "from-red-500 to-red-600",
       textMain: "text-red-100",

@@ -2,60 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { getIcon } from "../../utils";
 import { useTouchFeedback } from "../../utils/ui/touchFeedback";
 
-interface ColorScheme {
-  iconBg: string;
-  iconColor: string;
-  confirmBtn: string;
-  confirmBtnDisabled: string;
-}
-
-interface ConfirmModalProps {
-  isOpen?: boolean;
-  title?: string;
-  message?: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  destructive?: boolean;
-  isLoading?: boolean;
-  icon?: React.ComponentType<{ className?: string }> | null;
-  onConfirm?: () => void;
-  onCancel?: () => void;
-  children?: React.ReactNode; // For custom content between message and buttons
-}
-
-interface ModalHeaderProps {
-  icon?: React.ComponentType<{ className?: string }> | null;
-  destructive: boolean;
-  title: string;
-}
-
-interface ModalActionsProps {
-  cancelButtonRef: React.RefObject<HTMLButtonElement>;
-  confirmButtonRef: React.RefObject<HTMLButtonElement>;
-  cancelLabel: string;
-  confirmLabel: string;
-  destructive: boolean;
-  isLoading: boolean;
-  onCancel?: () => void;
-  onConfirm?: () => void;
-}
-
-interface KeyboardHandlingProps {
-  isOpen: boolean;
-  isLoading: boolean;
-  onCancel?: () => void;
-  onConfirm?: () => void;
-  cancelButtonRef: React.RefObject<HTMLButtonElement>;
-  confirmButtonRef: React.RefObject<HTMLButtonElement>;
-}
-
 /**
  * Get appropriate icon for modal type
  */
-const getModalIcon = (
-  icon?: React.ComponentType<{ className?: string }> | null,
-  destructive?: boolean
-): React.ComponentType<{ className?: string }> => {
+const getModalIcon = (icon, destructive) => {
   if (icon) return icon;
   if (destructive) return getIcon("Trash2");
   return getIcon("AlertTriangle");
@@ -64,7 +14,7 @@ const getModalIcon = (
 /**
  * Get color scheme for modal buttons
  */
-const getColorScheme = (destructive: boolean): ColorScheme => {
+const getColorScheme = (destructive) => {
   return destructive
     ? {
         iconBg: "bg-red-100",
@@ -83,7 +33,7 @@ const getColorScheme = (destructive: boolean): ColorScheme => {
 /**
  * Modal header component
  */
-const ModalHeader: React.FC<ModalHeaderProps> = ({ icon, destructive, title }) => {
+const ModalHeader = ({ icon, destructive, title }) => {
   const Icon = getModalIcon(icon, destructive);
   const colorScheme = getColorScheme(destructive);
 
@@ -109,7 +59,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ icon, destructive, title }) =
 /**
  * Modal action buttons component
  */
-const ModalActions: React.FC<ModalActionsProps> = ({
+const ModalActions = ({
   cancelButtonRef,
   confirmButtonRef,
   cancelLabel,
@@ -171,11 +121,11 @@ const useKeyboardHandling = ({
   onConfirm,
   cancelButtonRef,
   confirmButtonRef,
-}: KeyboardHandlingProps): void => {
+}) => {
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e) => {
       if (e.key === "Escape" && !isLoading) {
         onCancel?.();
       }
@@ -200,7 +150,7 @@ const useKeyboardHandling = ({
  * Addresses Issue #502 - Replace Confirms with ConfirmModal
  * Enhanced with Issue #159 - Touch Feedback and Animations
  */
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
+const ConfirmModal = ({
   isOpen = false,
   title = "Confirm Action",
   message = "Are you sure you want to continue?",
@@ -213,8 +163,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
   children, // For custom content between message and buttons
 }) => {
-  const cancelButtonRef = useRef<HTMLButtonElement>(null);
-  const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const cancelButtonRef = useRef(null);
+  const confirmButtonRef = useRef(null);
 
   // Focus management - focus cancel button by default for safety
   useEffect(() => {

@@ -3,17 +3,12 @@ import { getIcon } from "../../utils";
 import { useDebtStrategies } from "../../hooks/debts/useDebtStrategies";
 import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
-import type { DebtAccount } from "../../types/debt";
-
-interface DebtStrategiesProps {
-  debts: DebtAccount[];
-}
 
 /**
  * Debt Payment Strategies Component
  * Pure UI component - all business logic handled by useDebtStrategies hook
  */
-const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
+const DebtStrategies = ({ debts }) => {
   const {
     avalancheStrategy,
     snowballStrategy,
@@ -49,18 +44,16 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
           <h2 className="text-xl font-semibold text-gray-900">Debt Payoff Strategies</h2>
         </div>
         <p className="text-gray-600">
-          Compare different debt payoff strategies to find the best approach for your situation.
-          Each strategy has different benefits depending on your goals and motivation style.
+          Compare proven debt payoff strategies to find the best approach for your situation.
         </p>
       </div>
 
-      {/* Strategy Comparison */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Strategy Cards */}
+      <div className="grid md:grid-cols-2 gap-6">
         <StrategyCard
           strategy={avalancheStrategy}
           isRecommended={recommendation?.strategy === "avalanche"}
         />
-
         <StrategyCard
           strategy={snowballStrategy}
           isRecommended={recommendation?.strategy === "snowball"}
@@ -68,51 +61,51 @@ const DebtStrategies: React.FC<DebtStrategiesProps> = ({ debts }) => {
       </div>
 
       {/* Recommendation */}
-      {recommendationText && (
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
-          <div className="flex items-start gap-3">
+      {recommendation && (
+        <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="flex items-center gap-3 mb-4">
             {React.createElement(getIcon("Lightbulb"), {
-              className: "w-6 h-6 text-purple-600 mt-1 flex-shrink-0",
+              className: "w-5 h-5 text-yellow-500",
             })}
-            <div>
-              <h3 className="text-lg font-semibold text-purple-900 mb-2">
-                Strategy Recommendation
-              </h3>
-              <p className="text-purple-800">{recommendationText}</p>
-            </div>
+            <h3 className="font-semibold text-gray-900">Our Recommendation</h3>
           </div>
+          <div className="bg-blue-50 rounded-lg p-4">
+            <p className="text-blue-800">{recommendationText}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Insights */}
+      {insights.length > 0 && (
+        <div className="space-y-3">
+          {insights.map((insight, index) => {
+            const iconName = insight.type === "warning" ? "AlertCircle" : "Info";
+            const colorClass =
+              insight.type === "warning"
+                ? "border-orange-200 bg-orange-50"
+                : "border-blue-200 bg-blue-50";
+            const textClass = insight.type === "warning" ? "text-orange-800" : "text-blue-800";
+            const iconClass = insight.type === "warning" ? "text-orange-600" : "text-blue-600";
+
+            return (
+              <div key={index} className={`rounded-xl p-4 border ${colorClass}`}>
+                <div className="flex items-start gap-3">
+                  {React.createElement(getIcon(iconName), {
+                    className: `w-5 h-5 ${iconClass} flex-shrink-0 mt-0.5`,
+                  })}
+                  <div>
+                    <h4 className={`font-medium ${textClass}`}>{insight.title}</h4>
+                    <p className={`text-sm ${textClass} mt-1`}>{insight.message}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
       {/* Payment Impact Analysis */}
-      {paymentImpact && paymentImpact.length > 0 && (
-        <PaymentImpactTable paymentImpact={paymentImpact} />
-      )}
-
-      {/* Key Insights */}
-      {insights && insights.length > 0 && (
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            {React.createElement(getIcon("BarChart3"), {
-              className: "w-5 h-5 text-indigo-600",
-            })}
-            Key Insights
-          </h3>
-          <div className="space-y-3">
-            {insights.map((insight, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                {React.createElement(getIcon("Info"), {
-                  className: "w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0",
-                })}
-                <div>
-                  <p className="text-gray-900 text-sm font-medium">{insight.title}</p>
-                  <p className="text-gray-700 text-sm">{insight.message}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <PaymentImpactTable paymentImpact={paymentImpact} />
     </div>
   );
 };
