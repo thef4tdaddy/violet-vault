@@ -1,6 +1,38 @@
 import { useState } from "react";
-import { useSwipeable } from "react-swipeable";
+import { useSwipeable, type SwipeEventData } from "react-swipeable";
 import { hapticFeedback } from "../utils/ui/touchFeedback";
+
+/**
+ * Swipe state interface
+ */
+interface SwipeState {
+  isSwipeActive: boolean;
+  swipeDirection: "left" | "right" | null;
+  swipeProgress: number;
+}
+
+/**
+ * Swipe gesture hook props
+ */
+interface UseEnvelopeSwipeGesturesProps {
+  envelopeId: string;
+  unassignedCash?: number;
+  onQuickFund?: (envelopeId: string, amount: number) => void;
+  onViewHistory?: (envelopeId: string) => void;
+}
+
+/**
+ * Swipe gesture hook return type
+ */
+interface UseEnvelopeSwipeGesturesReturn {
+  swipeState: SwipeState;
+  swipeHandlers: ReturnType<typeof useSwipeable>;
+  swipeStyles: {
+    transform: string;
+    opacity: number;
+    transition: string;
+  };
+}
 
 /**
  * Custom hook for envelope swipe gesture handling
@@ -14,24 +46,24 @@ export const useEnvelopeSwipeGestures = ({
   unassignedCash = 0,
   onQuickFund,
   onViewHistory,
-}) => {
-  const [swipeState, setSwipeState] = useState({
+}: UseEnvelopeSwipeGesturesProps): UseEnvelopeSwipeGesturesReturn => {
+  const [swipeState, setSwipeState] = useState<SwipeState>({
     isSwipeActive: false,
     swipeDirection: null,
     swipeProgress: 0,
   });
 
-  const handleSwipeStart = () => {
+  const handleSwipeStart = (): void => {
     setSwipeState((prev) => ({ ...prev, isSwipeActive: true }));
     hapticFeedback(8, "light"); // Light feedback on swipe start
   };
 
-  const handleSwipeMove = (eventData) => {
+  const handleSwipeMove = (eventData: SwipeEventData): void => {
     if (!swipeState.isSwipeActive) return;
 
     const threshold = 100; // pixels to trigger action
     const progress = Math.min(Math.abs(eventData.deltaX) / threshold, 1);
-    const direction = eventData.deltaX > 0 ? "right" : "left";
+    const direction: "left" | "right" = eventData.deltaX > 0 ? "right" : "left";
 
     // Provide haptic feedback at threshold points
     if (progress >= 0.5 && swipeState.swipeProgress < 0.5) {
@@ -45,10 +77,10 @@ export const useEnvelopeSwipeGestures = ({
     }));
   };
 
-  const handleSwipeEnd = (eventData) => {
+  const handleSwipeEnd = (eventData: SwipeEventData): void => {
     const threshold = 100;
     const isSignificantSwipe = Math.abs(eventData.deltaX) > threshold;
-    const direction = eventData.deltaX > 0 ? "right" : "left";
+    const direction: "left" | "right" = eventData.deltaX > 0 ? "right" : "left";
 
     if (isSignificantSwipe) {
       if (unassignedCash > 0) {

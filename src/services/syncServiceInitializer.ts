@@ -2,17 +2,33 @@
 
 import logger from "../utils/common/logger";
 
+// Type for sync service modules
+interface ChunkedSyncServiceModule {
+  default: any; // Type will be defined properly when chunkedSyncService is converted
+}
+
+interface FirebaseSyncServiceModule {
+  default: any; // Type will be defined properly when firebaseSyncService is converted
+}
+
 class SyncServiceInitializer {
+  private initialized: boolean;
+  private initPromise: Promise<boolean> | null;
+  private chunkedSyncService: any;
+  private firebaseSyncService: any;
+
   constructor() {
     this.initialized = false;
     this.initPromise = null;
+    this.chunkedSyncService = null;
+    this.firebaseSyncService = null;
   }
 
   /**
    * Initialize sync services when first needed
    * This lazy loads Firebase and all sync-related services
    */
-  async initialize() {
+  async initialize(): Promise<boolean> {
     if (this.initialized) {
       return true;
     }
@@ -25,7 +41,7 @@ class SyncServiceInitializer {
     return this.initPromise;
   }
 
-  async _initializeSyncServices() {
+  private async _initializeSyncServices(): Promise<boolean> {
     try {
       logger.info("🔄 Lazy loading Firebase sync services...");
 
@@ -52,7 +68,7 @@ class SyncServiceInitializer {
   /**
    * Get chunked sync service (loads if needed)
    */
-  async getChunkedSyncService() {
+  async getChunkedSyncService(): Promise<any> {
     await this.initialize();
     return this.chunkedSyncService;
   }
@@ -60,7 +76,7 @@ class SyncServiceInitializer {
   /**
    * Get Firebase sync service (loads if needed)
    */
-  async getFirebaseSyncService() {
+  async getFirebaseSyncService(): Promise<any> {
     await this.initialize();
     return this.firebaseSyncService;
   }
@@ -68,7 +84,7 @@ class SyncServiceInitializer {
   /**
    * Check if sync services are initialized
    */
-  isInitialized() {
+  isInitialized(): boolean {
     return this.initialized;
   }
 }
