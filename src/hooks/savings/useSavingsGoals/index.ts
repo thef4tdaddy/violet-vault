@@ -205,5 +205,3 @@ const useSavingsGoals = (options = {}) => {
     },
   };
 };
-
-export default useSavingsGoals;

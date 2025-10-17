@@ -111,5 +111,3 @@ const useAuthFlow = () => {
     handleUpdateProfile,
   };
 };
-
-export default useAuthFlow;
