@@ -1,6 +1,14 @@
-// src/services/activityLogger.js
+// src/services/activityLogger.ts
 import { budgetDb } from "../db/budgetDb.js";
 import logger from "../utils/common/logger";
+import type { 
+  AuditLogEntry, 
+  Envelope, 
+  Transaction, 
+  Bill, 
+  PaycheckHistory, 
+  Debt 
+} from "../db/types";
 
 /**
  * Activity Logger Service - Level 1 Budget History Implementation
@@ -49,7 +57,7 @@ export const ACTIVITY_TYPES = {
   DATA_IMPORTED: "data_imported",
   DATA_EXPORTED: "data_exported",
   SYNC_COMPLETED: "sync_completed",
-};
+} as const;
 
 // Entity types for organization
 export const ENTITY_TYPES = {
@@ -60,9 +68,27 @@ export const ENTITY_TYPES = {
   DEBT: "debt",
   SAVINGS_GOAL: "savings_goal",
   SYSTEM: "system",
-};
+} as const;
+
+/**
+ * User info for activity attribution
+ */
+interface ActivityUser {
+  id: string;
+  userName: string;
+  userColor?: string;
+}
+
+/**
+ * Activity details for logging
+ */
+interface ActivityDetails {
+  [key: string]: any;
+}
 
 class ActivityLogger {
+  private currentUser: ActivityUser | null;
+
   constructor() {
     this.currentUser = null;
   }
@@ -70,14 +96,14 @@ class ActivityLogger {
   /**
    * Set the current user for activity attribution
    */
-  setCurrentUser(user) {
+  setCurrentUser(user: ActivityUser | null): void {
     this.currentUser = user;
   }
 
   /**
    * Get current user with fallback to localStorage
    */
-  getCurrentUser() {
+  getCurrentUser(): ActivityUser | null {
     // If we have a current user set, use it
     if (this.currentUser) {
       return this.currentUser;
@@ -87,7 +113,7 @@ class ActivityLogger {
     try {
       const profileData = localStorage.getItem("userProfile");
       if (profileData) {
-        const parsedProfile = JSON.parse(profileData);
+        const parsedProfile = JSON.parse(profileData) as ActivityUser & { id?: string };
         if (parsedProfile.userName) {
           return {
             id: parsedProfile.id || "local-user",
@@ -105,12 +131,13 @@ class ActivityLogger {
 
   /**
    * Log a user activity
-   * @param {string} action - Activity type from ACTIVITY_TYPES
-   * @param {string} entityType - Entity type from ENTITY_TYPES
-   * @param {string} entityId - ID of the affected entity
-   * @param {Object} details - Additional activity details
    */
-  async logActivity(action, entityType, entityId, details = {}) {
+  async logActivity(
+    action: string,
+    entityType: string,
+    entityId: string,
+    details: ActivityDetails = {}
+  ): Promise<AuditLogEntry | null> {
     try {
       const activity = {
         timestamp: Date.now(),
@@ -152,15 +179,15 @@ class ActivityLogger {
    */
 
   // Envelope activities
-  async logEnvelopeCreated(envelope) {
+  async logEnvelopeCreated(envelope: Envelope): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.ENVELOPE_CREATED, ENTITY_TYPES.ENVELOPE, envelope.id, {
       name: envelope.name,
       category: envelope.category,
-      monthlyBudget: envelope.monthlyBudget,
+      monthlyBudget: (envelope as any).monthlyBudget,
     });
   }
 
-  async logEnvelopeUpdated(envelope, changes = {}) {
+  async logEnvelopeUpdated(envelope: Envelope, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.ENVELOPE_UPDATED, ENTITY_TYPES.ENVELOPE, envelope.id, {
       name: envelope.name,
       changes: Object.keys(changes),
@@ -168,14 +195,14 @@ class ActivityLogger {
     });
   }
 
-  async logEnvelopeDeleted(envelope) {
+  async logEnvelopeDeleted(envelope: Envelope): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.ENVELOPE_DELETED, ENTITY_TYPES.ENVELOPE, envelope.id, {
       name: envelope.name,
       category: envelope.category,
     });
   }
 
-  async logEnvelopeFunded(envelopeId, amount, source = "manual") {
+  async logEnvelopeFunded(envelopeId: string, amount: number, source: string = "manual"): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.ENVELOPE_FUNDED, ENTITY_TYPES.ENVELOPE, envelopeId, {
       amount,
       source,
@@ -183,7 +210,7 @@ class ActivityLogger {
   }
 
   // Transaction activities
-  async logTransactionAdded(transaction) {
+  async logTransactionAdded(transaction: Transaction): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.TRANSACTION_ADDED,
       ENTITY_TYPES.TRANSACTION,
@@ -198,7 +225,7 @@ class ActivityLogger {
     );
   }
 
-  async logTransactionUpdated(transaction, changes = {}) {
+  async logTransactionUpdated(transaction: Transaction, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.TRANSACTION_UPDATED,
       ENTITY_TYPES.TRANSACTION,
@@ -212,7 +239,7 @@ class ActivityLogger {
     );
   }
 
-  async logTransactionDeleted(transaction) {
+  async logTransactionDeleted(transaction: Transaction): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.TRANSACTION_DELETED,
       ENTITY_TYPES.TRANSACTION,
@@ -225,7 +252,7 @@ class ActivityLogger {
     );
   }
 
-  async logTransactionsImported(count, source = "file") {
+  async logTransactionsImported(count: number, source: string = "file"): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.TRANSACTIONS_IMPORTED,
       ENTITY_TYPES.SYSTEM,
@@ -238,7 +265,7 @@ class ActivityLogger {
   }
 
   // Bill activities
-  async logBillCreated(bill) {
+  async logBillCreated(bill: Bill): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.BILL_CREATED, ENTITY_TYPES.BILL, bill.id, {
       name: bill.name,
       amount: bill.amount,
@@ -247,7 +274,7 @@ class ActivityLogger {
     });
   }
 
-  async logBillUpdated(bill, changes = {}) {
+  async logBillUpdated(bill: Bill, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.BILL_UPDATED, ENTITY_TYPES.BILL, bill.id, {
       name: bill.name,
       amount: bill.amount,
@@ -256,7 +283,7 @@ class ActivityLogger {
     });
   }
 
-  async logBillPaid(bill, paymentAmount) {
+  async logBillPaid(bill: Bill, paymentAmount: number): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.BILL_PAID, ENTITY_TYPES.BILL, bill.id, {
       name: bill.name,
       amount: paymentAmount,
@@ -266,7 +293,7 @@ class ActivityLogger {
   }
 
   // Paycheck activities
-  async logPaycheckProcessed(paycheck) {
+  async logPaycheckProcessed(paycheck: PaycheckHistory & { payerName?: string; mode?: string }): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.PAYCHECK_PROCESSED,
       ENTITY_TYPES.PAYCHECK,
@@ -280,7 +307,7 @@ class ActivityLogger {
     );
   }
 
-  async logPaycheckDeleted(paycheck) {
+  async logPaycheckDeleted(paycheck: PaycheckHistory & { payerName?: string; mode?: string }): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.PAYCHECK_DELETED, ENTITY_TYPES.PAYCHECK, paycheck.id, {
       amount: paycheck.amount,
       payerName: paycheck.payerName,
@@ -289,7 +316,7 @@ class ActivityLogger {
   }
 
   // Debt activities
-  async logDebtCreated(debt) {
+  async logDebtCreated(debt: Debt): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.DEBT_CREATED, ENTITY_TYPES.DEBT, debt.id, {
       name: debt.name,
       creditor: debt.creditor,
@@ -298,7 +325,7 @@ class ActivityLogger {
     });
   }
 
-  async logDebtUpdated(debt, changes = {}) {
+  async logDebtUpdated(debt: Debt, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.DEBT_UPDATED, ENTITY_TYPES.DEBT, debt.id, {
       name: debt.name,
       creditor: debt.creditor,
@@ -308,7 +335,7 @@ class ActivityLogger {
   }
 
   // System activities
-  async logSyncCompleted(syncType = "full", itemsChanged = 0) {
+  async logSyncCompleted(syncType: string = "full", itemsChanged: number = 0): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.SYNC_COMPLETED,
       ENTITY_TYPES.SYSTEM,
@@ -323,7 +350,7 @@ class ActivityLogger {
   /**
    * Retrieve activity history
    */
-  async getRecentActivity(limit = 50, entityType = null, entityId = null) {
+  async getRecentActivity(limit: number = 50, entityType: string | null = null, entityId: string | null = null): Promise<AuditLogEntry[]> {
     try {
       let query = budgetDb.auditLog.orderBy("timestamp").reverse().limit(limit);
 
@@ -349,7 +376,7 @@ class ActivityLogger {
   /**
    * Get activity count for entity
    */
-  async getActivityCount(entityType = null, entityId = null) {
+  async getActivityCount(entityType: string | null = null, entityId: string | null = null): Promise<number> {
     try {
       if (entityType && entityId) {
         return await budgetDb.auditLog
@@ -370,7 +397,7 @@ class ActivityLogger {
   /**
    * Clear old activities (cleanup)
    */
-  async clearOldActivities(daysToKeep = 90) {
+  async clearOldActivities(daysToKeep: number = 90): Promise<number> {
     try {
       const cutoffTime = Date.now() - daysToKeep * 24 * 60 * 60 * 1000;
       const deletedCount = await budgetDb.auditLog.where("timestamp").below(cutoffTime).delete();
