@@ -3,11 +3,11 @@
 ## Overview
 This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 
-**Current Status**: 16 files converted (30% complete)
+**Current Status**: 23 files converted (43% complete)
 **Build Status**: ✅ Passing
 **TypeCheck Status**: ✅ 0 errors
 
-## Completed Conversions (16 files)
+## Completed Conversions (23 files)
 
 ### Context Layer (4/5 files - 80% complete)
 - [x] src/contexts/AuthContext.jsx → AuthContext.tsx
@@ -27,12 +27,19 @@ This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 - [x] src/services/bugReport/errorTrackingService.js → errorTrackingService.ts
 - [x] src/services/bugReport/performanceInfoService.js → performanceInfoService.ts
 
-### Hook Layer (3/30 files - 10% complete)
+### Hook Layer (10/30 files - 33% complete)
 - [x] src/hooks/useEnvelopeSwipeGestures.js → useEnvelopeSwipeGestures.ts
 - [x] src/hooks/sync/useFirebaseSync.js → useFirebaseSync.ts
 - [x] src/hooks/sync/useSyncHealthIndicator.js → useSyncHealthIndicator.ts
+- [x] src/hooks/common/useSavingsGoals.js → useSavingsGoals.ts
+- [x] src/hooks/common/useDataManagement.js → useDataManagement.ts
+- [x] src/hooks/common/useResetEncryption.js → useResetEncryption.ts
+- [x] src/hooks/common/useNetworkStatus.js → useNetworkStatus.ts
+- [x] src/hooks/auth/index.js → index.ts
+- [x] src/hooks/auth/useAuthQueries.js → useAuthQueries.ts
+- [x] src/hooks/auth/usePasswordRotation.js → usePasswordRotation.ts
 
-## Remaining Work (37 files)
+## Remaining Work (30 files)
 
 ### State Management (1 file)
 - [ ] src/stores/auth/authStore.jsx (705 lines)
