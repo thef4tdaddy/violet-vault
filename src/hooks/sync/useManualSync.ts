@@ -5,20 +5,64 @@ import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
 
 /**
+ * Sync result type
+ */
+interface SyncResult {
+  success: boolean;
+  direction?: string;
+  counts?: Record<string, number>;
+  message?: string;
+  error?: string;
+}
+
+/**
+ * Sync status type
+ */
+interface SyncStatus {
+  isServiceRunning: boolean;
+  serviceStatus: any;
+  isUploadingSyncInProgress: boolean;
+  isDownloadingSyncInProgress: boolean;
+  lastSyncTime: Date | null;
+  syncError: string | null;
+}
+
+/**
+ * Use manual sync hook return type
+ */
+interface UseManualSyncReturn {
+  // Sync operations
+  forceUploadSync: () => Promise<SyncResult>;
+  forceDownloadSync: () => Promise<SyncResult>;
+  forceFullSync: () => Promise<SyncResult>;
+  
+  // Status
+  getSyncStatus: () => SyncStatus;
+  isUploadingSyncInProgress: boolean;
+  isDownloadingSyncInProgress: boolean;
+  isSyncInProgress: boolean;
+  lastSyncTime: Date | null;
+  syncError: string | null;
+  
+  // Utils
+  clearSyncError: () => void;
+}
+
+/**
  * Manual sync operations for family collaboration
  * Provides explicit sync controls for Dexie ↔ Firebase
  */
-export const useManualSync = () => {
+export const useManualSync = (): UseManualSyncReturn => {
   const queryClient = useQueryClient();
   const [isUploadingSyncInProgress, setIsUploadingSync] = useState(false);
   const [isDownloadingSyncInProgress, setIsDownloadingSync] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState(null);
-  const [syncError, setSyncError] = useState(null);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   /**
    * Force sync from Dexie to Firebase (upload local changes)
    */
-  const forceUploadSync = useCallback(async () => {
+  const forceUploadSync = useCallback(async (): Promise<SyncResult> => {
     if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
       logger.warn("Sync already in progress, skipping upload sync");
       return { success: false, error: "Sync already in progress" };
@@ -55,10 +99,10 @@ export const useManualSync = () => {
       }
     } catch (error) {
       logger.error("❌ Manual upload sync failed:", error);
-      setSyncError(error.message);
+      setSyncError((error as Error).message);
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     } finally {
       setIsUploadingSync(false);
@@ -68,7 +112,7 @@ export const useManualSync = () => {
   /**
    * Force sync from Firebase to Dexie to TanStack Query (download remote changes)
    */
-  const forceDownloadSync = useCallback(async () => {
+  const forceDownloadSync = useCallback(async (): Promise<SyncResult> => {
     if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
       logger.warn("Sync already in progress, skipping download sync");
       return { success: false, error: "Sync already in progress" };
@@ -119,10 +163,10 @@ export const useManualSync = () => {
       }
     } catch (error) {
       logger.error("❌ Manual download sync failed:", error);
-      setSyncError(error.message);
+      setSyncError((error as Error).message);
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     } finally {
       setIsDownloadingSync(false);
@@ -132,7 +176,7 @@ export const useManualSync = () => {
   /**
    * Full bidirectional sync (attempts both directions intelligently)
    */
-  const forceFullSync = useCallback(async () => {
+  const forceFullSync = useCallback(async (): Promise<SyncResult> => {
     if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
       logger.warn("Sync already in progress, skipping full sync");
       return { success: false, error: "Sync already in progress" };
@@ -163,10 +207,10 @@ export const useManualSync = () => {
       }
     } catch (error) {
       logger.error("❌ Full sync failed:", error);
-      setSyncError(error.message);
+      setSyncError((error as Error).message);
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }, [isUploadingSyncInProgress, isDownloadingSyncInProgress, queryClient]);
@@ -174,7 +218,7 @@ export const useManualSync = () => {
   /**
    * Get sync service status
    */
-  const getSyncStatus = useCallback(() => {
+  const getSyncStatus = useCallback((): SyncStatus => {
     return {
       isServiceRunning: cloudSyncService?.isRunning || false,
       serviceStatus: cloudSyncService.getStatus(),
@@ -188,7 +232,7 @@ export const useManualSync = () => {
   /**
    * Clear sync error
    */
-  const clearSyncError = useCallback(() => {
+  const clearSyncError = useCallback((): void => {
     setSyncError(null);
   }, []);
 
