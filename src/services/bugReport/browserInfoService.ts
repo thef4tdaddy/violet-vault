@@ -5,12 +5,72 @@
  */
 import logger from "../../utils/common/logger";
 
+/**
+ * Browser information structure
+ */
+export interface BrowserInfo {
+  name: string;
+  version: string;
+  engine: string;
+  userAgent: string;
+  platform: string;
+  language: string;
+  languages: readonly string[];
+  cookieEnabled: boolean;
+  onLine: boolean;
+  hardwareConcurrency: number;
+  permissions: PermissionStates;
+}
+
+/**
+ * Permission states structure
+ */
+export interface PermissionStates {
+  apiSupported?: boolean;
+  available?: string[];
+  clipboard?: boolean;
+  serviceWorker?: boolean;
+  geolocation?: boolean;
+  mediaDevices?: boolean;
+  notification?: boolean;
+}
+
+/**
+ * Viewport information structure
+ */
+export interface ViewportInfo {
+  width: number;
+  height: number;
+  devicePixelRatio: number;
+  screenWidth: number;
+  screenHeight: number;
+  availWidth: number;
+  availHeight: number;
+  colorDepth: number;
+  pixelDepth: number;
+  orientation: string;
+}
+
+/**
+ * URL information structure
+ */
+export interface UrlInfo {
+  href: string;
+  protocol: string;
+  host: string;
+  hostname: string;
+  port: string;
+  pathname: string;
+  search: string;
+  hash: string;
+  origin: string;
+}
+
 export class BrowserInfoService {
   /**
    * Get comprehensive browser information
-   * @returns {Object} Browser information
    */
-  static getBrowserInfo() {
+  static getBrowserInfo(): BrowserInfo {
     try {
       // Parse browser name and version from user agent
       const userAgent = navigator.userAgent;
@@ -73,10 +133,9 @@ export class BrowserInfoService {
 
   /**
    * Get permission states for various APIs
-   * @returns {Object} Permission states
    */
-  static getPermissionStates() {
-    const permissions = {};
+  static getPermissionStates(): PermissionStates {
+    const permissions: PermissionStates = {};
 
     try {
       // Check for permissions API support
@@ -106,9 +165,8 @@ export class BrowserInfoService {
 
   /**
    * Get viewport and display information
-   * @returns {Object} Viewport information
    */
-  static getViewportInfo() {
+  static getViewportInfo(): ViewportInfo {
     try {
       return {
         width: window.innerWidth || 0,
@@ -141,9 +199,8 @@ export class BrowserInfoService {
 
   /**
    * Get URL and location information
-   * @returns {Object} URL information
    */
-  static getUrlInfo() {
+  static getUrlInfo(): UrlInfo {
     try {
       const url = new URL(window.location.href);
       return {
