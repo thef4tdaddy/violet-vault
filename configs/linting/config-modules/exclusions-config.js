@@ -130,6 +130,22 @@ export default [
     },
   },
   {
+    // Backend and legacy code - not subject to app linting rules
+    files: [
+      'cloudflare-worker/**/*.{js,ts}', // Backend/edge computing - console is useful for debugging
+      'js-version/**/*.{js,jsx,ts,tsx}', // Legacy codebase
+    ],
+    rules: {
+      'no-console': 'off', // Allow console in backend and legacy code
+      'max-lines': 'off',
+      'max-lines-per-function': 'off',
+      'max-statements': 'off',
+      complexity: 'off',
+      'max-depth': 'off',
+      'max-params': 'off',
+    },
+  },
+  {
     // SettingsPage.tsx temporary exclusion - well-organized sections within file
     files: ['src/pages/SettingsPage.tsx'],
     rules: {
