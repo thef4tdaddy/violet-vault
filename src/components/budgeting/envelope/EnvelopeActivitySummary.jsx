@@ -15,14 +15,10 @@ const EnvelopeActivitySummary = ({ envelope }) => {
       <div className="grid grid-cols-3 gap-4 py-4">
         <div className="text-center bg-red-50 rounded-lg p-4 border border-red-100">
           <p className="text-sm font-medium text-red-700 mb-2">Spent (30d)</p>
-          <p className="text-2xl font-bold text-red-600">
-            ${envelope.totalSpent.toFixed(2)}
-          </p>
+          <p className="text-2xl font-bold text-red-600">${envelope.totalSpent.toFixed(2)}</p>
         </div>
         <div className="text-center bg-blue-50 rounded-lg p-4 border border-blue-100">
-          <p className="text-sm font-medium text-blue-700 mb-2">
-            Monthly Budget
-          </p>
+          <p className="text-sm font-medium text-blue-700 mb-2">Monthly Budget</p>
           <p className="text-2xl font-bold text-blue-600">
             ${(envelope.monthlyBudget || 0).toFixed(2)}
           </p>
@@ -42,21 +38,15 @@ const EnvelopeActivitySummary = ({ envelope }) => {
     <div className="grid grid-cols-3 gap-2 text-xs">
       <div className="text-center">
         <p className="text-gray-500">Spent</p>
-        <p className="font-medium text-red-600">
-          ${envelope.totalSpent.toFixed(2)}
-        </p>
+        <p className="font-medium text-red-600">${envelope.totalSpent.toFixed(2)}</p>
       </div>
       <div className="text-center">
         <p className="text-gray-500">Upcoming</p>
-        <p className="font-medium text-orange-600">
-          ${envelope.totalUpcoming.toFixed(2)}
-        </p>
+        <p className="font-medium text-orange-600">${envelope.totalUpcoming.toFixed(2)}</p>
       </div>
       <div className="text-center">
         <p className="text-gray-500">Overdue</p>
-        <p className="font-medium text-red-700">
-          ${envelope.totalOverdue.toFixed(2)}
-        </p>
+        <p className="font-medium text-red-700">${envelope.totalOverdue.toFixed(2)}</p>
       </div>
     </div>
   );

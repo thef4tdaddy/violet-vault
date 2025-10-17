@@ -13,7 +13,12 @@
  */
 
 import logger from "../common/logger";
-import type { Frequency, FrequencyMultipliers, FrequencyOption, FrequencyLabels } from "../../types/frequency";
+import type {
+  Frequency,
+  FrequencyMultipliers,
+  FrequencyOption,
+  FrequencyLabels,
+} from "../../types/frequency";
 
 // Precise frequency multipliers (periods per year)
 export const FREQUENCY_MULTIPLIERS: FrequencyMultipliers = {
@@ -40,7 +45,7 @@ export function convertFrequency(
   amount: number,
   fromFrequency: Frequency,
   toFrequency: Frequency,
-  usePrecise = true,
+  usePrecise = true
 ): number {
   if (!amount || fromFrequency === toFrequency) return amount;
 
@@ -95,14 +100,9 @@ export function calculatePaycheckAmount(
   targetAmount: number,
   targetFrequency: Frequency,
   paycheckFrequency: Frequency = "biweekly",
-  usePrecise = true,
+  usePrecise = true
 ): number {
-  return convertFrequency(
-    targetAmount,
-    targetFrequency,
-    paycheckFrequency,
-    usePrecise,
-  );
+  return convertFrequency(targetAmount, targetFrequency, paycheckFrequency, usePrecise);
 }
 
 /**

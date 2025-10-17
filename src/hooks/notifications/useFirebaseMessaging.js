@@ -80,8 +80,7 @@ export const useFirebaseMessaging = () => {
         return permissionResult;
       }
 
-      const tokenResult =
-        await firebaseMessagingService.requestPermissionAndGetToken();
+      const tokenResult = await firebaseMessagingService.requestPermissionAndGetToken();
       if (tokenResult.success && tokenResult.token) {
         setToken(tokenResult.token);
         logger.info("📱 FCM token obtained successfully");

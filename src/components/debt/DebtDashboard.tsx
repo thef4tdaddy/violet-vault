@@ -51,12 +51,9 @@ const DebtDashboard: React.FC = () => {
   if (!isDebtFeatureEnabled("ENABLE_DEBT_DASHBOARD")) {
     return (
       <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h2 className="text-lg font-semibold text-yellow-800 mb-2">
-          Debt Dashboard Disabled
-        </h2>
+        <h2 className="text-lg font-semibold text-yellow-800 mb-2">Debt Dashboard Disabled</h2>
         <p className="text-yellow-700">
-          The debt dashboard is currently disabled for debugging. Enable it in
-          debtDebugConfig.js
+          The debt dashboard is currently disabled for debugging. Enable it in debtDebugConfig.js
         </p>
       </div>
     );
@@ -69,12 +66,9 @@ const DebtDashboard: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black text-black mb-2">
-              <span className="text-3xl">D</span>EBT{" "}
-              <span className="text-3xl">T</span>RACKING
+              <span className="text-3xl">D</span>EBT <span className="text-3xl">T</span>RACKING
             </h1>
-            <p className="text-purple-900">
-              Manage your debt payoff strategy and track progress
-            </p>
+            <p className="text-purple-900">Manage your debt payoff strategy and track progress</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -103,11 +97,7 @@ const DebtDashboard: React.FC = () => {
 
       {/* Main Content with Tabs */}
       <div className="rounded-lg p-6 border-2 border-black bg-white/90 backdrop-blur-sm">
-        <StandardTabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
+        <StandardTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
         {activeTab === "overview" && (
           <div className="space-y-6">
@@ -143,8 +133,7 @@ const DebtDashboard: React.FC = () => {
             <div className="text-center text-gray-500">
               <p>Debt payoff strategies feature is currently disabled.</p>
               <p className="text-sm mt-2">
-                Enable ENABLE_DEBT_STRATEGIES in debtDebugConfig.js to use this
-                feature.
+                Enable ENABLE_DEBT_STRATEGIES in debtDebugConfig.js to use this feature.
               </p>
             </div>
           </div>

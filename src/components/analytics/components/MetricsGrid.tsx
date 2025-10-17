@@ -6,20 +6,18 @@ import { MetricsGridProps } from "../../../types/analytics";
  * Metrics grid component for analytics overview
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const MetricsGrid: React.FC<MetricsGridProps> = ({ 
-  filteredTransactions, 
-  metrics, 
-  envelopes 
-}) => {
+const MetricsGrid: React.FC<MetricsGridProps> = ({ filteredTransactions, metrics, envelopes }) => {
   // Safe calculation of average transaction amount
-  const averageTransactionAmount = filteredTransactions && filteredTransactions.length > 0
-    ? filteredTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0) / filteredTransactions.length
-    : 0;
+  const averageTransactionAmount =
+    filteredTransactions && filteredTransactions.length > 0
+      ? filteredTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0) /
+        filteredTransactions.length
+      : 0;
 
   // Safe calculation of total spending (absolute value of negative amounts)
   const totalSpending = filteredTransactions
     ? filteredTransactions
-        .filter(t => t.amount < 0)
+        .filter((t) => t.amount < 0)
         .reduce((sum, t) => sum + Math.abs(t.amount), 0)
     : 0;
 

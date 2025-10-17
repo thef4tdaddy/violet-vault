@@ -88,7 +88,7 @@ describe("BudgetDatabaseService", () => {
       budgetDb.open.mockRejectedValue(error);
 
       await expect(budgetDatabaseService.initialize()).rejects.toThrow(
-        "Database connection failed",
+        "Database connection failed"
       );
     });
   });
@@ -129,9 +129,7 @@ describe("BudgetDatabaseService", () => {
     });
 
     it("should get envelopes by category", async () => {
-      const mockEnvelopes = [
-        { id: "1", name: "Food", category: "expenses", archived: false },
-      ];
+      const mockEnvelopes = [{ id: "1", name: "Food", category: "expenses", archived: false }];
 
       budgetDb.getEnvelopesByCategory.mockResolvedValue(mockEnvelopes);
 
@@ -141,10 +139,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockEnvelopes);
-      expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith(
-        "expenses",
-        false,
-      );
+      expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith("expenses", false);
     });
 
     it("should use cached data when available", async () => {
@@ -157,10 +152,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockEnvelopes);
-      expect(budgetDb.getCachedValue).toHaveBeenCalledWith(
-        "budget_db_envelopes_active",
-        300000,
-      );
+      expect(budgetDb.getCachedValue).toHaveBeenCalledWith("budget_db_envelopes_active", 300000);
     });
   });
 
@@ -203,7 +195,7 @@ describe("BudgetDatabaseService", () => {
       expect(result).toEqual(mockTransactions);
       expect(budgetDb.getTransactionsByDateRange).toHaveBeenCalledWith(
         dateRange.start,
-        dateRange.end,
+        dateRange.end
       );
     });
 
@@ -217,10 +209,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockTransactions);
-      expect(budgetDb.getTransactionsByEnvelope).toHaveBeenCalledWith(
-        "env1",
-        undefined,
-      );
+      expect(budgetDb.getTransactionsByEnvelope).toHaveBeenCalledWith("env1", undefined);
     });
 
     it("should limit results when specified", async () => {

@@ -14,7 +14,7 @@ export const useAutoPopulate = () => {
     billId,
     bills,
     currentEntity,
-    updateEnvelope,
+    updateEnvelope
   ) => {
     if (entityType !== "envelope" || !billId) return;
 

@@ -34,7 +34,7 @@ export interface StandardFiltersProps<T extends FilterValues = FilterValues> {
 /**
  * Standardized compact filtering component with glassmorphism styling
  * Consistent, space-efficient filtering across all pages with proper borders and labeling
- * 
+ *
  * Generic type T allows for strongly typed filter values
  */
 function StandardFilters<T extends FilterValues = FilterValues>({
@@ -123,8 +123,7 @@ function StandardFilters<T extends FilterValues = FilterValues>({
         {/* Search Input */}
         <div className="relative flex-1 min-w-48">
           {React.createElement(getIcon("Search"), {
-            className:
-              "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
+            className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
           })}
           <input
             type="text"
@@ -159,9 +158,7 @@ function StandardFilters<T extends FilterValues = FilterValues>({
                   filterConfig.defaultValue ||
                   "all"
                 }
-                onChange={(e) =>
-                  handleFilterChange(filterConfig.key as keyof T, e.target.value)
-                }
+                onChange={(e) => handleFilterChange(filterConfig.key as keyof T, e.target.value)}
                 className={`
                   ${config.select} border border-gray-300 rounded-md
                   focus:ring-1 focus:ring-blue-500 focus:border-blue-500

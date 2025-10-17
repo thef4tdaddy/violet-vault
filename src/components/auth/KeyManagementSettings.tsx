@@ -55,10 +55,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
   // Load current key fingerprint on open
   React.useEffect(() => {
     if (isOpen) {
-      keyManagementService
-        .getCurrentKeyFingerprint()
-        .then(setKeyFingerprint)
-        .catch(logger.error);
+      keyManagementService.getCurrentKeyFingerprint().then(setKeyFingerprint).catch(logger.error);
     }
   }, [isOpen, setKeyFingerprint]);
 
@@ -107,21 +104,14 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
       const keyFileData = await handleFileRead(file);
       const validation = keyManagementService.validateKeyFile(keyFileData);
 
-      if (
-        !validateImportRequirements(
-          keyFileData,
-          importPassword,
-          vaultPassword,
-          validation,
-        )
-      ) {
+      if (!validateImportRequirements(keyFileData, importPassword, vaultPassword, validation)) {
         return;
       }
 
       const result = await keyManagementService.importAndLogin(
         keyFileData,
         validation.type === "protected" ? importPassword : null,
-        vaultPassword,
+        vaultPassword
       );
 
       setImportResult(result);
@@ -155,9 +145,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
               {React.createElement(getIcon("Shield"), {
                 className: "h-6 w-6 text-purple-600 mr-3",
               })}
-              <h2 className="text-xl font-semibold text-gray-900">
-                Key Management
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-900">Key Management</h2>
             </div>
             <button
               onClick={onClose}
@@ -178,13 +166,10 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
                 className: "h-5 w-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0",
               })}
               <div className="text-sm">
-                <p className="text-amber-800 font-medium mb-1">
-                  Critical Security Information
-                </p>
+                <p className="text-amber-800 font-medium mb-1">Critical Security Information</p>
                 <p className="text-amber-700">
-                  Without your encryption key, your data is{" "}
-                  <strong>unrecoverable</strong>. Store backups securely and
-                  never share your key with untrusted parties.
+                  Without your encryption key, your data is <strong>unrecoverable</strong>. Store
+                  backups securely and never share your key with untrusted parties.
                 </p>
               </div>
             </div>
@@ -215,9 +200,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
                   className: "h-4 w-4 text-green-600 mr-2 mt-0.5",
                 })}
                 <div className="text-sm">
-                  <p className="text-green-800 font-medium">
-                    Key Import Successful
-                  </p>
+                  <p className="text-green-800 font-medium">Key Import Successful</p>
                   <p className="text-green-700 mt-1">
                     Successfully imported and logged in with key from{" "}
                     {importResult.user || "unknown user"}

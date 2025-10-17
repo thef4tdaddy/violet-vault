@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { initialAuthState, createContextValue } from "./authConstants";
 import {
   initializeAuthFromStorage,
@@ -38,7 +32,7 @@ const useAuth = () => {
   if (!context) {
     throw new Error(
       "useAuth must be used within an AuthProvider. " +
-        "Make sure your component is wrapped with <AuthProvider>.",
+        "Make sure your component is wrapped with <AuthProvider>."
     );
   }
 
@@ -69,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     (userData, sessionData = {}) => {
       createSetAuthenticated(setAuthState)(userData, sessionData);
     },
-    [setAuthState],
+    [setAuthState]
   );
 
   const clearAuth = useCallback(() => {
@@ -80,21 +74,21 @@ export const AuthProvider = ({ children }) => {
     (updatedUserData) => {
       createUpdateUser(setAuthState)(updatedUserData);
     },
-    [setAuthState],
+    [setAuthState]
   );
 
   const setLoading = useCallback(
     (loading) => {
       createSetLoading(setAuthState)(loading);
     },
-    [setAuthState],
+    [setAuthState]
   );
 
   const setError = useCallback(
     (error) => {
       createSetError(setAuthState)(error);
     },
-    [setAuthState],
+    [setAuthState]
   );
 
   const updateActivity = useCallback(() => {
@@ -117,9 +111,7 @@ export const AuthProvider = ({ children }) => {
 
   const contextValue = createContextValue(authState, actions);
 
-  return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
 // Export both the hook and context

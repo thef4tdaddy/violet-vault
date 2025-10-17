@@ -59,18 +59,13 @@ export const getPayerPrediction = (payer, paycheckHistory = []) => {
   if (payerPaychecks.length === 0) return null;
 
   // Calculate average and standard deviation for confidence
-  const average =
-    payerPaychecks.reduce((a, b) => a + b, 0) / payerPaychecks.length;
+  const average = payerPaychecks.reduce((a, b) => a + b, 0) / payerPaychecks.length;
   const variance =
-    payerPaychecks.reduce((a, b) => a + Math.pow(b - average, 2), 0) /
-    payerPaychecks.length;
+    payerPaychecks.reduce((a, b) => a + Math.pow(b - average, 2), 0) / payerPaychecks.length;
   const stdDev = Math.sqrt(variance);
 
   // Confidence based on consistency (lower std dev = higher confidence)
-  const consistency = Math.max(
-    0,
-    Math.min(100, 100 - (stdDev / average) * 100),
-  );
+  const consistency = Math.max(0, Math.min(100, 100 - (stdDev / average) * 100));
 
   return {
     amount: Math.round(average * 100) / 100,
@@ -119,7 +114,7 @@ export const getUniquePayers = (paycheckHistory = [], tempPayers = []) => {
 export const calculateEnvelopeAllocations = (
   paycheckAmount,
   envelopes = [],
-  allocationMode = "allocate",
+  allocationMode = "allocate"
 ) => {
   if (!paycheckAmount || paycheckAmount <= 0) {
     return {
@@ -133,9 +128,7 @@ export const calculateEnvelopeAllocations = (
   const amount = parseFloat(paycheckAmount);
   const allocatableEnvelopes = envelopes.filter(
     (env) =>
-      env.autoAllocate &&
-      env.envelopeType !== ENVELOPE_TYPES.SAVINGS &&
-      env.id !== "unassigned",
+      env.autoAllocate && env.envelopeType !== ENVELOPE_TYPES.SAVINGS && env.id !== "unassigned"
   );
 
   if (allocatableEnvelopes.length === 0) {
@@ -177,7 +170,7 @@ export const calculateEnvelopeAllocations = (
     // Leftover mode: distribute remaining amount proportionally
     const totalMonthlyNeeds = allocatableEnvelopes.reduce(
       (sum, env) => sum + (env.monthlyAmount || 0),
-      0,
+      0
     );
 
     if (totalMonthlyNeeds > 0) {
@@ -211,8 +204,7 @@ export const calculateEnvelopeAllocations = (
     allocations,
     totalAllocated: Math.round(totalAllocated * 100) / 100,
     remainingAmount: Math.round((amount - totalAllocated) * 100) / 100,
-    allocationRate:
-      totalAllocated > 0 ? Math.round((totalAllocated / amount) * 100) : 0,
+    allocationRate: totalAllocated > 0 ? Math.round((totalAllocated / amount) * 100) : 0,
   };
 };
 
@@ -223,11 +215,7 @@ export const calculateEnvelopeAllocations = (
  * @param {Object} currentUser - Current user info
  * @returns {Object} Paycheck transaction
  */
-export const createPaycheckTransaction = (
-  formData,
-  allocations,
-  currentUser,
-) => {
+export const createPaycheckTransaction = (formData, allocations, currentUser) => {
   return {
     id: Date.now(),
     amount: parseFloat(formData.amount),
@@ -249,10 +237,7 @@ export const createPaycheckTransaction = (
  * @returns {Object} Validation result
  */
 export const validateAllocations = (allocations, paycheckAmount) => {
-  const totalAllocated = allocations.reduce(
-    (sum, alloc) => sum + alloc.amount,
-    0,
-  );
+  const totalAllocated = allocations.reduce((sum, alloc) => sum + alloc.amount, 0);
 
   if (totalAllocated > paycheckAmount) {
     return {

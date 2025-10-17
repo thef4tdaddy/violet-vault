@@ -18,9 +18,7 @@ export const hapticFeedback = (duration = 10, type = "light") => {
   }
 
   // Check if user prefers reduced motion (accessibility)
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (prefersReducedMotion) {
     return false;
   }
@@ -89,8 +87,7 @@ export const touchFeedbackClasses = {
     "active:scale-[0.97] active:brightness-95 transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-lg transform cursor-pointer",
 
   // Navigation items
-  navigation:
-    "active:scale-98 active:brightness-95 transition-all duration-100 ease-out transform",
+  navigation: "active:scale-98 active:brightness-95 transition-all duration-100 ease-out transform",
 
   // Comprehensive (recommended for most buttons)
   comprehensive:
@@ -116,8 +113,7 @@ export const withHapticFeedback = (originalHandler, feedbackType = "light") => {
  * @returns {string} Complete class string with touch feedback
  */
 export const getButtonClasses = (baseClasses, touchType = "primary") => {
-  const touchClasses =
-    touchFeedbackClasses[touchType] || touchFeedbackClasses.primary;
+  const touchClasses = touchFeedbackClasses[touchType] || touchFeedbackClasses.primary;
 
   // Ensure transition classes are not duplicated
   const cleanedBaseClasses = baseClasses
@@ -207,15 +203,13 @@ export const initializeTouchFeedback = () => {
     // Primary buttons
     document
       .querySelectorAll(
-        'button[class*="bg-emerald"], button[class*="bg-blue"], button[class*="bg-purple"]',
+        'button[class*="bg-emerald"], button[class*="bg-blue"], button[class*="bg-purple"]'
       )
       .forEach((button) => {
         if (!button.classList.contains("touch-feedback-enabled")) {
           button.classList.add("touch-feedback-enabled");
           button.classList.add(...touchFeedbackClasses.primary.split(" "));
-          button.addEventListener("touchstart", () =>
-            hapticFeedback(10, "tap"),
-          );
+          button.addEventListener("touchstart", () => hapticFeedback(10, "tap"));
         }
       });
 
@@ -226,24 +220,18 @@ export const initializeTouchFeedback = () => {
         if (!button.classList.contains("touch-feedback-enabled")) {
           button.classList.add("touch-feedback-enabled");
           button.classList.add(...touchFeedbackClasses.destructive.split(" "));
-          button.addEventListener("touchstart", () =>
-            hapticFeedback(10, "warning"),
-          );
+          button.addEventListener("touchstart", () => hapticFeedback(10, "warning"));
         }
       });
 
     // Cards and interactive elements
     document
-      .querySelectorAll(
-        '[class*="cursor-pointer"], .envelope-card, [role="button"]',
-      )
+      .querySelectorAll('[class*="cursor-pointer"], .envelope-card, [role="button"]')
       .forEach((element) => {
         if (!element.classList.contains("touch-feedback-enabled")) {
           element.classList.add("touch-feedback-enabled");
           element.classList.add(...touchFeedbackClasses.card.split(" "));
-          element.addEventListener("touchstart", () =>
-            hapticFeedback(10, "light"),
-          );
+          element.addEventListener("touchstart", () => hapticFeedback(10, "light"));
         }
       });
   }, 100);

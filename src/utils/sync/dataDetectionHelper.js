@@ -28,15 +28,10 @@ export const detectLocalData = async () => {
 
     // 3. Calculate total data items
     const totalItems =
-      stats.envelopes +
-      stats.transactions +
-      stats.bills +
-      stats.goals +
-      stats.paychecks;
+      stats.envelopes + stats.transactions + stats.bills + stats.goals + stats.paychecks;
 
     // 4. Check for any core budget data (envelopes, transactions, bills)
-    const hasCoreData =
-      stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
+    const hasCoreData = stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
 
     // 5. Sample actual data to verify counts are accurate
     const sampleData = await Promise.all([

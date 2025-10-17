@@ -1,11 +1,6 @@
 import React from "react";
 
-const AccountFinancialFields = ({
-  accountForm,
-  setAccountForm,
-  canEdit,
-  editingAccount,
-}) => (
+const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
   <>
     <div className="grid grid-cols-2 gap-3">
       <div>
@@ -69,9 +64,7 @@ const AccountFinancialFields = ({
     </div>
 
     <div>
-      <label className="block text-sm font-semibold text-purple-900 mb-2">
-        Description
-      </label>
+      <label className="block text-sm font-semibold text-purple-900 mb-2">Description</label>
       <textarea
         value={accountForm.description}
         onChange={(e) =>

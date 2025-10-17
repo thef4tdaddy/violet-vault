@@ -1,7 +1,7 @@
 echo "🔍 Running full ESLint check before push..."
 
 # Run ESLint with cache and parallel processing for better performance
-npx eslint . --max-warnings 1000 --cache --cache-location .eslintcache
+npx eslint . --config configs/linting/eslint.config.js --max-warnings 1000 --cache --cache-location .eslintcache
 
 if [ $? -ne 0 ]; then
   echo "❌ ESLint failed! Push aborted."

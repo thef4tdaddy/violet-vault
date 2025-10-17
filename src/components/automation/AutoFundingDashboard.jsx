@@ -13,15 +13,8 @@ import logger from "../../utils/common/logger";
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const budget = useBudgetStore();
   const confirm = useConfirm();
-  const {
-    rules,
-    executeRules,
-    addRule,
-    updateRule,
-    deleteRule,
-    toggleRule,
-    getHistory,
-  } = useAutoFunding();
+  const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
+    useAutoFunding();
   const [isExecuting, setIsExecuting] = useState(false);
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
   const [editingRule, setEditingRule] = useState(null);
@@ -54,18 +47,14 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
       setEditingRule(null);
     } catch (error) {
       logger.error("Failed to save rule", error);
-      globalToast.showError(
-        "Failed to save rule: " + error.message,
-        "Rule Save Failed",
-      );
+      globalToast.showError("Failed to save rule: " + error.message, "Rule Save Failed");
     }
   };
 
   const handleDeleteRule = async (ruleId) => {
     const confirmed = await confirm({
       title: "Delete Auto-Funding Rule",
-      message:
-        "Are you sure you want to delete this rule? This action cannot be undone.",
+      message: "Are you sure you want to delete this rule? This action cannot be undone.",
       confirmLabel: "Delete Rule",
       cancelLabel: "Cancel",
       destructive: true,
@@ -76,10 +65,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         deleteRule(ruleId);
       } catch (error) {
         logger.error("Failed to delete rule", error);
-        globalToast.showError(
-          "Failed to delete rule: " + error.message,
-          "Delete Failed",
-        );
+        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed");
       }
     }
   };
@@ -116,26 +102,20 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         if (totalFunded > 0) {
           globalToast.showSuccess(
             `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
-            "Auto-Funding Complete",
+            "Auto-Funding Complete"
           );
         } else {
           globalToast.showWarning(
             "Rules executed but no funds were transferred. Check your rules and available balances.",
-            "No Funds Transferred",
+            "No Funds Transferred"
           );
         }
       } else {
-        globalToast.showError(
-          "Failed to execute rules: " + result.error,
-          "Execution Failed",
-        );
+        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed");
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      globalToast.showError(
-        "Failed to execute rules: " + error.message,
-        "Execution Failed",
-      );
+      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed");
     } finally {
       setIsExecuting(false);
     }
@@ -152,9 +132,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Auto-Funding Dashboard
-                  </h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Auto-Funding Dashboard</h2>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
                       {rules.filter((r) => r.enabled).length} Active

@@ -42,8 +42,7 @@ const ChartsAnalytics = ({
   } = analyticsData;
 
   // Check if we have any transaction data
-  const hasTransactions =
-    Array.isArray(transactions) && transactions.length > 0;
+  const hasTransactions = Array.isArray(transactions) && transactions.length > 0;
   const hasFilteredTransactions =
     Array.isArray(filteredTransactions) && filteredTransactions.length > 0;
 
@@ -56,7 +55,7 @@ const ChartsAnalytics = ({
         envelopeSpending,
         categoryBreakdown,
       },
-      currentUser,
+      currentUser
     );
   };
 
@@ -78,18 +77,17 @@ const ChartsAnalytics = ({
               <span className="text-white font-black text-2xl">📊</span>
             </div>
             <h3 className="font-black text-black text-xl mb-3">
-              <span className="text-2xl">N</span>O{" "}
-              <span className="text-2xl">A</span>NALYTICS{" "}
+              <span className="text-2xl">N</span>O <span className="text-2xl">A</span>NALYTICS{" "}
               <span className="text-2xl">D</span>ATA
             </h3>
             <p className="text-purple-900 text-sm leading-relaxed mb-4">
-              Analytics will appear after you add some transactions. Try adding
-              at least 7-14 days of transaction data for meaningful insights.
+              Analytics will appear after you add some transactions. Try adding at least 7-14 days
+              of transaction data for meaningful insights.
             </p>
             <div className="bg-purple-50/60 rounded-lg p-3 border border-purple-200">
               <p className="text-xs text-purple-800">
-                💡 <strong>Tip:</strong> Import transactions or manually add a
-                few to get started with analytics
+                💡 <strong>Tip:</strong> Import transactions or manually add a few to get started
+                with analytics
               </p>
             </div>
           </div>
@@ -116,14 +114,12 @@ const ChartsAnalytics = ({
               <span className="text-white font-black text-2xl">📅</span>
             </div>
             <h3 className="font-black text-black text-xl mb-3">
-              <span className="text-2xl">N</span>O{" "}
-              <span className="text-2xl">D</span>ATA{" "}
-              <span className="text-2xl">F</span>OR{" "}
-              <span className="text-2xl">P</span>ERIOD
+              <span className="text-2xl">N</span>O <span className="text-2xl">D</span>ATA{" "}
+              <span className="text-2xl">F</span>OR <span className="text-2xl">P</span>ERIOD
             </h3>
             <p className="text-blue-900 text-sm leading-relaxed mb-4">
-              No transactions found for the selected time period. Try expanding
-              the date range or add more transactions.
+              No transactions found for the selected time period. Try expanding the date range or
+              add more transactions.
             </p>
             <div className="bg-blue-50/60 rounded-lg p-3 border border-blue-200">
               <p className="text-xs text-blue-800">

@@ -7,8 +7,7 @@ import BottomNavItem from "./BottomNavItem";
  * Mobile-first navigation with thumb-friendly positioning and smooth animations
  */
 const BottomNavigationBar = () => {
-  const { isVisible, getVisibleItems, isItemActive, shouldShowScrollHint } =
-    useBottomNavigation();
+  const { isVisible, getVisibleItems, isItemActive, shouldShowScrollHint } = useBottomNavigation();
 
   const navRef = useRef(null);
   const leftFadeRef = useRef(null);

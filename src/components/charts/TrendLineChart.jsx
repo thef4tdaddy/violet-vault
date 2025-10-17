@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
@@ -32,8 +24,7 @@ const TrendLineChart = ({
   formatTooltip,
   ...props
 }) => {
-  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } =
-    useChartConfig();
+  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
 
   // Use custom tooltip or default
   const TooltipComponent = formatTooltip || CustomTooltip;
@@ -71,11 +62,7 @@ const TrendLineChart = ({
               stroke={chartDefaults.cartesianGrid.stroke}
             />
           )}
-          <XAxis
-            dataKey="month"
-            stroke={chartDefaults.axis.stroke}
-            fontSize={12}
-          />
+          <XAxis dataKey="month" stroke={chartDefaults.axis.stroke} fontSize={12} />
           <YAxis
             stroke={chartDefaults.axis.stroke}
             fontSize={12}
@@ -91,9 +78,7 @@ const TrendLineChart = ({
               strokeWidth={chartTypeConfigs.line.strokeWidth}
               dot={chartTypeConfigs.line.dot}
               activeDot={chartTypeConfigs.line.activeDot}
-              stroke={
-                lineProps.color || getColorByCategory(lineProps.dataKey, index)
-              }
+              stroke={lineProps.color || getColorByCategory(lineProps.dataKey, index)}
               {...lineProps}
             />
           ))}

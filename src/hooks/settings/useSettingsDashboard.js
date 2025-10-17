@@ -110,17 +110,11 @@ export const useCloudSyncManager = () => {
     if (newValue) {
       logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
-        const { cloudSyncService } = await import(
-          "../../services/cloudSyncService"
-        );
+        const { cloudSyncService } = await import("../../services/cloudSyncService");
         const { useAuth } = await import("../../stores/auth/authStore");
         const authState = useAuth.getState();
 
-        if (
-          authState.encryptionKey &&
-          authState.currentUser &&
-          authState.budgetId
-        ) {
+        if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
           await cloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
@@ -133,9 +127,7 @@ export const useCloudSyncManager = () => {
     } else {
       logger.debug("💾 Cloud sync disabled - stopping background sync");
       try {
-        const { cloudSyncService } = await import(
-          "../../services/cloudSyncService"
-        );
+        const { cloudSyncService } = await import("../../services/cloudSyncService");
         cloudSyncService.stop();
       } catch (error) {
         logger.error("Failed to stop cloud sync:", error);
@@ -149,22 +141,14 @@ export const useCloudSyncManager = () => {
     setIsSyncing(true);
     try {
       logger.debug("🔄 Manual sync triggered from settings");
-      const { cloudSyncService } = await import(
-        "../../services/cloudSyncService"
-      );
+      const { cloudSyncService } = await import("../../services/cloudSyncService");
 
       if (!cloudSyncService.isRunning) {
-        logger.warn(
-          "⚠️ Cloud sync service not running, starting temporarily...",
-        );
+        logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
         const { useAuth } = await import("../../stores/auth/authStore");
         const authState = useAuth.getState();
 
-        if (
-          authState.encryptionKey &&
-          authState.currentUser &&
-          authState.budgetId
-        ) {
+        if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
           await cloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
@@ -240,19 +224,14 @@ export const useSettingsSections = () => {
 export const useSettingsActions = () => {
   const handleCreateTestHistory = useCallback(async () => {
     try {
-      const { createTestBudgetHistory } = await import(
-        "../../utils/common/testBudgetHistory"
-      );
+      const { createTestBudgetHistory } = await import("../../utils/common/testBudgetHistory");
       await createTestBudgetHistory();
       globalToast.showSuccess(
         "✅ Test budget history created! Check console for details.",
-        "Test History Created",
+        "Test History Created"
       );
     } catch (error) {
-      globalToast.showError(
-        "❌ Failed to create test history: " + error.message,
-        "Test Failed",
-      );
+      globalToast.showError("❌ Failed to create test history: " + error.message, "Test Failed");
     }
   }, []);
 

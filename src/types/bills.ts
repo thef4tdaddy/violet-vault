@@ -3,13 +3,13 @@
  */
 
 // Frequency types
-export type BillFrequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'once';
+export type BillFrequency = "weekly" | "biweekly" | "monthly" | "quarterly" | "yearly" | "once";
 
 // Convert BillFrequency to Frequency (excluding 'once' which isn't supported in calculations)
-export type CalculationFrequency = Exclude<BillFrequency, 'once'>;
+export type CalculationFrequency = Exclude<BillFrequency, "once">;
 
-// Bill status types  
-export type BillStatus = 'active' | 'paid' | 'overdue' | 'upcoming';
+// Bill status types
+export type BillStatus = "active" | "paid" | "overdue" | "upcoming";
 
 // Base bill interface
 export interface Bill {
@@ -99,8 +99,16 @@ export interface BillFormHookReturn {
   setDeleteEnvelopeToo: (deleteEnvelope: boolean) => void;
 
   // Utility Functions
-  calculateBiweeklyAmount: (amount: string | number, frequency: BillFrequency, customFrequency?: number) => number;
-  calculateMonthlyAmount: (amount: string | number, frequency: BillFrequency, customFrequency?: number) => number;
+  calculateBiweeklyAmount: (
+    amount: string | number,
+    frequency: BillFrequency,
+    customFrequency?: number
+  ) => number;
+  calculateMonthlyAmount: (
+    amount: string | number,
+    frequency: BillFrequency,
+    customFrequency?: number
+  ) => number;
   getNextDueDate: (frequency: BillFrequency, dueDate: string) => string;
   normalizeDateFormat: (dateString: string) => string;
 }

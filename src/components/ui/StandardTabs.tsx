@@ -25,7 +25,7 @@ export interface StandardTabsProps<T = string> {
 /**
  * Standardized tabs component with proper contrast and consistent styling
  * Follows accessibility guidelines with high-contrast text
- * 
+ *
  * Generic type T allows for strongly typed tab IDs (string, enum, etc.)
  */
 function StandardTabs<T = string>({
@@ -64,11 +64,14 @@ function StandardTabs<T = string>({
   const config = sizeConfig[size];
 
   // Color configurations for colored tabs
-  const colorConfig: Record<TabColor, {
-    pastel: string;
-    bright: string;
-    count: { pastel: string; bright: string };
-  }> = {
+  const colorConfig: Record<
+    TabColor,
+    {
+      pastel: string;
+      bright: string;
+      count: { pastel: string; bright: string };
+    }
+  > = {
     blue: {
       pastel: "bg-blue-100 text-blue-700 border-blue-200",
       bright: "bg-blue-500 text-white border-blue-500",
@@ -168,33 +171,23 @@ function StandardTabs<T = string>({
   const getCountStyles = (isActive: boolean): string => {
     switch (variant) {
       case "underline":
-        return isActive
-          ? "bg-blue-100 text-blue-700"
-          : "bg-gray-200 text-gray-800";
+        return isActive ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-800";
 
       case "pills":
-        return isActive
-          ? "bg-blue-200 text-blue-800"
-          : "bg-gray-300 text-gray-700";
+        return isActive ? "bg-blue-200 text-blue-800" : "bg-gray-300 text-gray-700";
 
       case "buttons":
-        return isActive
-          ? "bg-blue-500 text-blue-100"
-          : "bg-gray-100 text-gray-600";
+        return isActive ? "bg-blue-500 text-blue-100" : "bg-gray-100 text-gray-600";
 
       case "tabs":
-        return isActive
-          ? "bg-blue-100 text-blue-800"
-          : "bg-gray-200 text-gray-700";
+        return isActive ? "bg-blue-100 text-blue-800" : "bg-gray-200 text-gray-700";
 
       case "colored":
         // This will be handled per-tab with individual colors
         return "";
 
       default:
-        return isActive
-          ? "bg-blue-100 text-blue-700"
-          : "bg-gray-200 text-gray-800";
+        return isActive ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-800";
     }
   };
 
@@ -244,14 +237,9 @@ function StandardTabs<T = string>({
                 ${tabStyles}
                 ${isActive && variant === "colored" ? "border-2 border-black" : ""}
               `.trim()}
-              style={
-                isActive && variant === "colored"
-                  ? { border: "2px solid black" }
-                  : {}
-              }
+              style={isActive && variant === "colored" ? { border: "2px solid black" } : {}}
             >
-              {Icon &&
-                React.createElement(Icon, { className: config.iconSize })}
+              {Icon && React.createElement(Icon, { className: config.iconSize })}
               {tab.label}
               {tab.count !== undefined && tab.count !== null && (
                 <span

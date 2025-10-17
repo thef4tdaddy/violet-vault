@@ -16,23 +16,17 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
 
     if (diffDays < 0) return { text: "Overdue", status: "overdue" };
     if (diffDays === 0) return { text: "Due today", status: "due" };
-    if (diffDays <= 7)
-      return { text: `${diffDays} days left`, status: "urgent" };
-    if (diffDays <= 30)
-      return { text: `${diffDays} days left`, status: "soon" };
+    if (diffDays <= 7) return { text: `${diffDays} days left`, status: "urgent" };
+    if (diffDays <= 30) return { text: `${diffDays} days left`, status: "soon" };
 
     const diffWeeks = Math.ceil(diffDays / 7);
     const diffMonths = Math.ceil(diffDays / 30);
 
-    if (diffDays <= 84)
-      return { text: `${diffWeeks} weeks left`, status: "normal" };
+    if (diffDays <= 84) return { text: `${diffWeeks} weeks left`, status: "normal" };
     return { text: `${diffMonths} months left`, status: "normal" };
   };
 
-  const progressPercentage = getProgressPercentage(
-    goal.currentAmount,
-    goal.targetAmount,
-  );
+  const progressPercentage = getProgressPercentage(goal.currentAmount, goal.targetAmount);
   const timeRemaining = getTimeRemaining(goal.targetDate);
   const priority = priorities.find((p) => p.value === goal.priority);
 
@@ -55,16 +49,11 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
     <div className="glassmorphism rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-200">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: goal.color }}
-          />
+          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: goal.color }} />
           <div>
             <h3 className="font-semibold text-lg">{goal.name}</h3>
             {priority && (
-              <span
-                className={`text-xs px-2 py-1 rounded-full ${priority.color} bg-opacity-20`}
-              >
+              <span className={`text-xs px-2 py-1 rounded-full ${priority.color} bg-opacity-20`}>
                 {priority.label}
               </span>
             )}
@@ -91,9 +80,7 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
         <div>
           <div className="flex justify-between text-sm mb-1">
             <span>Progress</span>
-            <span className="font-medium">
-              {progressPercentage.toFixed(1)}%
-            </span>
+            <span className="font-medium">{progressPercentage.toFixed(1)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
@@ -110,9 +97,7 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
             <span className="text-gray-600">Current:</span>
-            <div className="font-bold text-green-600">
-              ${goal.currentAmount.toFixed(2)}
-            </div>
+            <div className="font-bold text-green-600">${goal.currentAmount.toFixed(2)}</div>
           </div>
           <div>
             <span className="text-gray-600">Target:</span>
@@ -142,9 +127,7 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
 
         {/* Description */}
         {goal.description && (
-          <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-2">
-            {goal.description}
-          </p>
+          <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-2">{goal.description}</p>
         )}
       </div>
     </div>

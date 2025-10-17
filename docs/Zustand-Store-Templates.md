@@ -29,34 +29,33 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
  * Use for: Persistent settings, global app state, user preferences
  * Characteristics: Persisted, global access, simple state
  */
-const createCoreStoreInitializer =
-  (storeName, initialState, actions) => (set, _get) => {
-    const store = {
-      // Initial state
-      ...initialState,
+const createCoreStoreInitializer = (storeName, initialState, actions) => (set, _get) => {
+  const store = {
+    // Initial state
+    ...initialState,
 
-      // Actions with safe patterns
-      ...Object.entries(actions).reduce((acc, [key, actionFn]) => {
-        acc[key] = (...args) => {
-          try {
-            // Safe external store access pattern
-            const getCurrentState = () => useStore.getState();
+    // Actions with safe patterns
+    ...Object.entries(actions).reduce((acc, [key, actionFn]) => {
+      acc[key] = (...args) => {
+        try {
+          // Safe external store access pattern
+          const getCurrentState = () => useStore.getState();
 
-            return actionFn(set, getCurrentState, ...args);
-          } catch (error) {
-            logger.error(`Action ${key} failed in ${storeName}`, error);
-            throw error;
-          }
-        };
-        return acc;
-      }, {}),
+          return actionFn(set, getCurrentState, ...args);
+        } catch (error) {
+          logger.error(`Action ${key} failed in ${storeName}`, error);
+          throw error;
+        }
+      };
+      return acc;
+    }, {}),
 
-      // Reset utility
-      reset: () => set(() => initialState),
-    };
-
-    return store;
+    // Reset utility
+    reset: () => set(() => initialState),
   };
+
+  return store;
+};
 
 // Usage example:
 const useSettingsStore = create(
@@ -83,17 +82,17 @@ const useSettingsStore = create(
                   state.language = language;
                   logger.info("Language updated", { language });
                 }),
-            },
-          ),
+            }
+          )
         ),
         {
           name: "violet-vault-settings",
           version: 1,
-        },
+        }
       ),
-      { name: "settings-devtools" },
-    ),
-  ),
+      { name: "settings-devtools" }
+    )
+  )
 );
 
 export default useSettingsStore;
@@ -145,9 +144,7 @@ const createFeatureStore = (storeName, initialState, actions) => {
   };
 
   return create(
-    subscribeWithSelector(
-      devtools(immer(storeInitializer), { name: `${storeName}-devtools` }),
-    ),
+    subscribeWithSelector(devtools(immer(storeInitializer), { name: `${storeName}-devtools` }))
   );
 };
 
@@ -181,7 +178,7 @@ const useNotificationStore = createFeatureStore(
       set((state) => {
         state.notifications = state.notifications.filter((n) => n.id !== id);
       }),
-  },
+  }
 );
 
 export default useNotificationStore;
@@ -229,8 +226,8 @@ const createEphemeralStore = (storeName, initialState) => {
         // Reset
         reset: () => set(() => initialState),
       })),
-      { name: `${storeName}-ephemeral-devtools` },
-    ),
+      { name: `${storeName}-ephemeral-devtools` }
+    )
   );
 };
 
@@ -275,12 +272,7 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
  *
  * @returns {Function} Zustand store hook
  */
-export const createSafeStore = ({
-  name,
-  initialState,
-  actions = {},
-  options = {},
-}) => {
+export const createSafeStore = ({ name, initialState, actions = {}, options = {} }) => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
@@ -483,13 +475,11 @@ class StoreRegistry {
    * Get all registered stores
    */
   getAll() {
-    return Array.from(this.stores.entries()).map(
-      ([name, { store, metadata }]) => ({
-        name,
-        store,
-        metadata,
-      }),
-    );
+    return Array.from(this.stores.entries()).map(([name, { store, metadata }]) => ({
+      name,
+      store,
+      metadata,
+    }));
   }
 
   /**
@@ -801,10 +791,7 @@ export const resetAllStores = () => {
 ```javascript
 // __tests__/stores/settingsStore.test.js
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createStoreTestHelper,
-  resetAllStores,
-} from "../../utils/testing/storeTestUtils.js";
+import { createStoreTestHelper, resetAllStores } from "../../utils/testing/storeTestUtils.js";
 import useSettingsStore from "../../stores/ui/settingsStore.js";
 
 describe("Settings Store", () => {

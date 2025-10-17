@@ -86,10 +86,7 @@ export const requestNotificationPermission = async () => {
   const browserSupport = getBrowserSupport();
 
   if (!browserSupport.isSupported) {
-    logger.warn(
-      "Push notifications not supported in this browser",
-      browserSupport,
-    );
+    logger.warn("Push notifications not supported in this browser", browserSupport);
     return {
       success: false,
       permission: "unsupported",
@@ -130,10 +127,7 @@ export const requestNotificationPermission = async () => {
 
     if (success) {
       // Store permission grant timestamp
-      localStorage.setItem(
-        "notification_permission_granted",
-        Date.now().toString(),
-      );
+      localStorage.setItem("notification_permission_granted", Date.now().toString());
     }
 
     return {
@@ -165,8 +159,7 @@ export const getPermissionInstructions = (browserInfo) => {
         'Set Notifications to "Allow"',
         "Refresh the page",
       ],
-      alternative:
-        "Go to Chrome Settings > Privacy and Security > Site Settings > Notifications",
+      alternative: "Go to Chrome Settings > Privacy and Security > Site Settings > Notifications",
     };
   }
 
@@ -178,8 +171,7 @@ export const getPermissionInstructions = (browserInfo) => {
         'Click "Turn off Blocking" for notifications',
         "Refresh the page",
       ],
-      alternative:
-        "Go to Firefox Preferences > Privacy & Security > Permissions > Notifications",
+      alternative: "Go to Firefox Preferences > Privacy & Security > Permissions > Notifications",
     };
   }
 
@@ -316,9 +308,7 @@ export const getPermissionStatusForUI = () => {
     promptCooldownReason: canShow.reason,
     nextPromptAvailable: canShow.nextAvailable,
     hasHistory: history.hasGranted || history.hasDenied || history.hasDismissed,
-    instructions: permission.denied
-      ? getPermissionInstructions(browserSupport.browserInfo)
-      : null,
+    instructions: permission.denied ? getPermissionInstructions(browserSupport.browserInfo) : null,
   };
 };
 

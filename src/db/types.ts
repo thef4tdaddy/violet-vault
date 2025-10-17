@@ -28,7 +28,7 @@ export interface Transaction {
   amount: number;
   envelopeId: string;
   category: string;
-  type: 'income' | 'expense' | 'transfer';
+  type: "income" | "expense" | "transfer";
   lastModified: number;
   createdAt?: number;
   // Additional transaction properties
@@ -45,7 +45,7 @@ export interface Bill {
   category: string;
   isPaid: boolean;
   isRecurring: boolean;
-  frequency?: 'monthly' | 'quarterly' | 'annually';
+  frequency?: "monthly" | "quarterly" | "annually";
   envelopeId?: string;
   lastModified: number;
   createdAt?: number;
@@ -58,7 +58,7 @@ export interface SavingsGoal {
   id: string;
   name: string;
   category: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
   targetAmount: number;
   currentAmount: number;
   targetDate?: Date;
@@ -109,8 +109,8 @@ export interface Debt {
   id: string;
   name: string;
   creditor: string;
-  type: 'credit_card' | 'loan' | 'mortgage' | 'other';
-  status: 'active' | 'paid_off' | 'delinquent';
+  type: "credit_card" | "loan" | "mortgage" | "other";
+  status: "active" | "paid_off" | "delinquent";
   currentBalance: number;
   minimumPayment: number;
   lastModified: number;
@@ -137,7 +137,7 @@ export interface BudgetChange {
   commitHash: string;
   entityType: string;
   entityId: string;
-  changeType: 'create' | 'update' | 'delete';
+  changeType: "create" | "update" | "delete";
   description?: string;
   // Additional change properties
   oldValue?: any;
@@ -164,7 +164,7 @@ export interface BudgetTag {
   name: string;
   description?: string;
   commitHash: string;
-  tagType: 'release' | 'milestone' | 'backup';
+  tagType: "release" | "milestone" | "backup";
   author: string;
   created: number;
   // Additional tag properties
@@ -174,8 +174,8 @@ export interface BudgetTag {
 export interface AutoBackup {
   id: string;
   timestamp: number;
-  type: 'manual' | 'scheduled' | 'sync_triggered';
-  syncType?: 'firebase' | 'export' | 'import';
+  type: "manual" | "scheduled" | "sync_triggered";
+  syncType?: "firebase" | "export" | "import";
   // Additional backup properties
   size?: number;
   checksum?: string;
@@ -189,7 +189,7 @@ export type DateRange = {
 };
 
 export type BulkUpdate = {
-  type: 'envelope' | 'transaction' | 'bill' | 'savingsGoal' | 'paycheck';
+  type: "envelope" | "transaction" | "bill" | "savingsGoal" | "paycheck";
   data: any;
 };
 

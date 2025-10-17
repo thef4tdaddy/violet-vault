@@ -48,10 +48,7 @@ const SyncHealthDetails = ({
   onRunValidation,
   onResetData,
 }) => {
-  const statusDescription = getStatusDescription(
-    syncStatus,
-    isBackgroundSyncing,
-  );
+  const statusDescription = getStatusDescription(syncStatus, isBackgroundSyncing);
   const lastCheckedText = formatLastChecked(syncStatus.lastChecked);
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
@@ -78,12 +75,9 @@ const SyncHealthDetails = ({
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">
-                Current Status:{" "}
-                <span className="text-purple-800">{syncStatus.status}</span>
+                Current Status: <span className="text-purple-800">{syncStatus.status}</span>
               </p>
-              <p className="text-xs text-purple-700 font-medium mt-1">
-                {statusDescription}
-              </p>
+              <p className="text-xs text-purple-700 font-medium mt-1">{statusDescription}</p>
             </div>
           </div>
 
@@ -97,12 +91,8 @@ const SyncHealthDetails = ({
         {/* Error Details */}
         {syncStatus.error && (
           <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-red-200 shadow-sm">
-            <p className="text-xs font-bold text-red-800 mb-1">
-              ERROR DETAILS:
-            </p>
-            <p className="text-xs text-red-700 font-medium">
-              {syncStatus.error}
-            </p>
+            <p className="text-xs font-bold text-red-800 mb-1">ERROR DETAILS:</p>
+            <p className="text-xs text-red-700 font-medium">{syncStatus.error}</p>
           </div>
         )}
 
@@ -132,18 +122,14 @@ const SyncHealthDetails = ({
           >
             <p
               className={`text-xs font-bold mb-1 ${
-                formattedRecoveryResult.type === "success"
-                  ? "text-green-800"
-                  : "text-red-800"
+                formattedRecoveryResult.type === "success" ? "text-green-800" : "text-red-800"
               }`}
             >
               RECOVERY RESULT:
             </p>
             <p
               className={`text-xs font-medium ${
-                formattedRecoveryResult.type === "success"
-                  ? "text-green-700"
-                  : "text-red-700"
+                formattedRecoveryResult.type === "success" ? "text-green-700" : "text-red-700"
               }`}
             >
               {formattedRecoveryResult.message}
@@ -159,9 +145,7 @@ const SyncHealthDetails = ({
         {/* Action Buttons */}
         {hasRecoveryActions() && (
           <div className="space-y-2 pt-2 border-t border-gray-200">
-            <p className="text-xs font-black text-gray-700 uppercase">
-              ACTIONS:
-            </p>
+            <p className="text-xs font-black text-gray-700 uppercase">ACTIONS:</p>
 
             <div className="flex flex-col gap-2">
               <button
@@ -175,10 +159,7 @@ const SyncHealthDetails = ({
                 {syncStatus.isLoading ? "Refreshing..." : "Refresh Status"}
               </button>
 
-              <button
-                onClick={onRunValidation}
-                className={getActionButtonStyle("validate")}
-              >
+              <button onClick={onRunValidation} className={getActionButtonStyle("validate")}>
                 {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
                 Run Full Validation
               </button>

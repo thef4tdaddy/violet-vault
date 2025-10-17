@@ -17,9 +17,7 @@ import useUiStore from "./stores/ui/uiStore";
 import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
 
 // Lazy load monitoring to reduce main bundle size
-const HighlightLoader = React.lazy(
-  () => import("./components/monitoring/HighlightLoader"),
-);
+const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
 
 const App = () => {
   // Initialize PWA manager and touch feedback

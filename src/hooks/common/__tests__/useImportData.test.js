@@ -6,14 +6,8 @@ import { useConfirm } from "../useConfirm";
 import { readFileContent } from "../../../utils/dataManagement/fileUtils";
 import { validateImportedData } from "../../../utils/dataManagement/validationUtils";
 import { backupCurrentData } from "../../../utils/dataManagement/backupUtils";
-import {
-  clearAllDexieData,
-  importDataToDexie,
-} from "../../../utils/dataManagement/dexieUtils";
-import {
-  clearFirebaseData,
-  forcePushToCloud,
-} from "../../../utils/dataManagement/firebaseUtils";
+import { clearAllDexieData, importDataToDexie } from "../../../utils/dataManagement/dexieUtils";
+import { clearFirebaseData, forcePushToCloud } from "../../../utils/dataManagement/firebaseUtils";
 import { queryClient } from "../../../utils/common/queryClient";
 import { vi } from "vitest";
 
@@ -56,7 +50,7 @@ describe("useImportData", () => {
     expect(forcePushToCloud).toHaveBeenCalled();
     expect(queryClient.invalidateQueries).toHaveBeenCalled();
     expect(showSuccessToast).toHaveBeenCalledWith(
-      "Import complete! Data synced to cloud successfully.",
+      "Import complete! Data synced to cloud successfully."
     );
   });
 });

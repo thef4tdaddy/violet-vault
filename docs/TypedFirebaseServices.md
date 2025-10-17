@@ -89,7 +89,7 @@ await syncOperationWrapper.executeWithRetry(
 ### Basic Initialization
 
 ```typescript
-import { typedFirebaseSyncService, typedChunkedSyncService } from '@/services/types';
+import { typedFirebaseSyncService, typedChunkedSyncService } from "@/services/types";
 
 // Initialize services with validation
 typedFirebaseSyncService.initialize(budgetId, encryptionKey);
@@ -101,14 +101,14 @@ await typedChunkedSyncService.initialize(budgetId, encryptionKey);
 ```typescript
 // Save with type safety
 const result = await typedFirebaseSyncService.saveToCloud(budgetData, {
-  version: '1.0',
-  operation: 'budget_save'
+  version: "1.0",
+  operation: "budget_save",
 });
 
 if (result.success) {
-  console.log('Data saved successfully');
+  console.log("Data saved successfully");
 } else {
-  console.error('Save failed:', result.error?.userMessage);
+  console.error("Save failed:", result.error?.userMessage);
 }
 ```
 
@@ -128,13 +128,13 @@ if (chunkInfo.wouldRequireChunking) {
 ### Error Handling with Recovery
 
 ```typescript
-import { enhancedFirebaseErrorHandler } from '@/services/types';
+import { enhancedFirebaseErrorHandler } from "@/services/types";
 
 try {
   await someFirebaseOperation();
 } catch (error) {
   const enhancedError = enhancedFirebaseErrorHandler.handleError(error);
-  
+
   if (enhancedError.recoveryStrategy.canRetry) {
     // Implement retry logic
     const retryDelay = enhancedFirebaseErrorHandler.getRetryDelay(enhancedError, attemptNumber);
@@ -151,31 +151,37 @@ try {
 The system provides detailed error categorization for precise handling:
 
 ### Network Errors
+
 - `network_timeout` - Connection timeouts (retryable)
 - `network_connection` - Connection failures (retryable)
 - `network_cors` - CORS policy violations (not retryable)
 
 ### Encryption Errors
+
 - `encryption_decrypt` - Decryption failures (not retryable)
 - `encryption_encrypt` - Encryption failures (retryable once)
 - `encryption_key_invalid` - Invalid encryption keys (not retryable)
 
 ### Firebase Errors
+
 - `firebase_permission` - Permission denied (not retryable)
 - `firebase_quota` - Quota exceeded (not retryable)
 - `firebase_rate_limit` - Rate limiting (retryable with delay)
 - `firestore_unavailable` - Service unavailable (retryable)
 
 ### Validation Errors
+
 - `validation_checksum` - Data integrity failures (not retryable)
 - `validation_corrupt` - Corrupted data (not retryable)
 - `validation_format` - Invalid data format (not retryable)
 
 ### Storage Errors
+
 - `storage_full` - Storage quota exceeded (not retryable)
 - `storage_unavailable` - Local storage issues (retryable)
 
 ### Authentication Errors
+
 - `auth_unauthenticated` - User not signed in (retryable)
 - `auth_expired` - Session expired (retryable)
 
@@ -197,9 +203,12 @@ interface IFirebaseSyncService {
 
 interface IChunkedSyncService {
   initialize(budgetId: string, encryptionKey: string): Promise<void>;
-  saveToCloud<T>(data: T, currentUser: CloudSyncConfig['currentUser']): Promise<TypedResponse<boolean>>;
+  saveToCloud<T>(
+    data: T,
+    currentUser: CloudSyncConfig["currentUser"]
+  ): Promise<TypedResponse<boolean>>;
   loadFromCloud<T>(): Promise<TypedResponse<T>>;
-  // ... other methods  
+  // ... other methods
 }
 ```
 
@@ -218,17 +227,17 @@ function isFirebaseError(error: unknown): error is FirebaseError;
 Comprehensive test coverage ensures type safety and error handling:
 
 ```typescript
-describe('TypedFirebaseSyncService', () => {
-  it('should validate initialization parameters', () => {
+describe("TypedFirebaseSyncService", () => {
+  it("should validate initialization parameters", () => {
     expect(() => {
-      typedFirebaseSyncService.initialize('', 'valid-key');
-    }).toThrow('budgetId and encryptionKey cannot be empty');
+      typedFirebaseSyncService.initialize("", "valid-key");
+    }).toThrow("budgetId and encryptionKey cannot be empty");
   });
 
-  it('should handle type-safe save operations', async () => {
+  it("should handle type-safe save operations", async () => {
     const result = await typedFirebaseSyncService.saveToCloud(testData);
     expect(result.success).toBe(true);
-    expect(typeof result.timestamp).toBe('number');
+    expect(typeof result.timestamp).toBe("number");
   });
 });
 ```
@@ -241,11 +250,11 @@ The typed services are designed as drop-in replacements:
 
 ```typescript
 // Before (JavaScript)
-import firebaseSyncService from '@/services/firebaseSyncService';
+import firebaseSyncService from "@/services/firebaseSyncService";
 await firebaseSyncService.saveToCloud(data);
 
 // After (TypeScript)
-import { typedFirebaseSyncService } from '@/services/types';
+import { typedFirebaseSyncService } from "@/services/types";
 const result = await typedFirebaseSyncService.saveToCloud(data);
 if (result.success) {
   // Handle success
@@ -342,14 +351,14 @@ if (isEncryptedData(cloudData)) {
 
 ```typescript
 switch (error.detailedCategory) {
-  case 'network_timeout':
+  case "network_timeout":
     // Implement retry logic
     break;
-  case 'encryption_decrypt':
+  case "encryption_decrypt":
     // Prompt for correct password
     break;
   default:
-    // Generic error handling
+  // Generic error handling
 }
 ```
 
@@ -358,7 +367,7 @@ switch (error.detailedCategory) {
 ```typescript
 // Always validate external data
 if (!this.isValidBudgetData(loadedData)) {
-  throw new Error('Invalid data structure received');
+  throw new Error("Invalid data structure received");
 }
 ```
 
@@ -376,10 +385,10 @@ if (!this.isValidBudgetData(loadedData)) {
 Enable detailed logging for troubleshooting:
 
 ```typescript
-import logger from '@/utils/common/logger';
+import logger from "@/utils/common/logger";
 
 // All typed services use the logger for debugging
-logger.debug('Typed Firebase operation details', context);
+logger.debug("Typed Firebase operation details", context);
 ```
 
 ## Contributing

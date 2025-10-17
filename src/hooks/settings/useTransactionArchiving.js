@@ -34,13 +34,10 @@ export const useTransactionArchivingUI = () => {
     try {
       setShowPreview(true);
       // Create a temporary archiver to get preview data
-      const { createArchiver } = await import(
-        "../../utils/transactionArchiving"
-      );
+      const { createArchiver } = await import("../../utils/transactionArchiving");
       const archiver = createArchiver();
       const cutoffDate = archiver.calculateCutoffDate(selectedPeriod);
-      const transactionsToArchive =
-        await archiver.getTransactionsForArchiving(cutoffDate);
+      const transactionsToArchive = await archiver.getTransactionsForArchiving(cutoffDate);
 
       // Group by category and envelope for preview
       const preview = {
@@ -76,16 +73,10 @@ export const useTransactionArchivingUI = () => {
         preview.totalAmount += transaction.amount || 0;
 
         // Date range
-        if (
-          !preview.dateRange.earliest ||
-          transaction.date < preview.dateRange.earliest
-        ) {
+        if (!preview.dateRange.earliest || transaction.date < preview.dateRange.earliest) {
           preview.dateRange.earliest = transaction.date;
         }
-        if (
-          !preview.dateRange.latest ||
-          transaction.date > preview.dateRange.latest
-        ) {
+        if (!preview.dateRange.latest || transaction.date > preview.dateRange.latest) {
           preview.dateRange.latest = transaction.date;
         }
       });
@@ -123,20 +114,17 @@ export const useTransactionArchivingUI = () => {
  * Manages the archiving workflow and error handling
  */
 export const useTransactionArchivingProcess = () => {
-  const handleArchive = useCallback(
-    async (selectedPeriod, executeArchiving, callbacks = {}) => {
-      const { onSuccess, onError, _onReset } = callbacks;
+  const handleArchive = useCallback(async (selectedPeriod, executeArchiving, callbacks = {}) => {
+    const { onSuccess, onError, _onReset } = callbacks;
 
-      try {
-        await executeArchiving(selectedPeriod);
-        onSuccess?.();
-      } catch (error) {
-        logger.error("Archiving failed:", error);
-        onError?.(error);
-      }
-    },
-    [],
-  );
+    try {
+      await executeArchiving(selectedPeriod);
+      onSuccess?.();
+    } catch (error) {
+      logger.error("Archiving failed:", error);
+      onError?.(error);
+    }
+  }, []);
 
   return {
     handleArchive,
@@ -186,7 +174,7 @@ export const useArchivingUIHelpers = () => {
         formatted: formatStorageSize(bytes),
       };
     },
-    [formatStorageSize],
+    [formatStorageSize]
   );
 
   return {

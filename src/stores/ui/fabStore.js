@@ -195,9 +195,9 @@ export const useFABStore = create(
               isExpanded: state.isExpanded,
               primaryActionsCount: state.primaryActions.size,
               secondaryActionsCount: state.secondaryActions.size,
-              defaultActionsWithHandlers: Object.values(
-                state.defaultSecondaryActions,
-              ).filter((a) => a.action !== null).length,
+              defaultActionsWithHandlers: Object.values(state.defaultSecondaryActions).filter(
+                (a) => a.action !== null
+              ).length,
             };
           },
         };
@@ -211,9 +211,9 @@ export const useFABStore = create(
             function: false, // Don't serialize functions
           },
         },
-      },
-    ),
-  ),
+      }
+    )
+  )
 );
 
 /**
@@ -225,9 +225,7 @@ export const useFABSelectors = () => {
   const isExpanded = useFABStore((state) => state.isExpanded);
   const shouldShowFAB = useFABStore((state) => getShouldShowFAB(state));
   const primaryAction = useFABStore((state) => getCurrentPrimaryAction(state));
-  const secondaryActions = useFABStore((state) =>
-    getAllSecondaryActions(state),
-  );
+  const secondaryActions = useFABStore((state) => getAllSecondaryActions(state));
 
   return {
     currentScreen,
@@ -247,21 +245,11 @@ export const useFABActions = () => {
   const setVisibility = useFABStore((state) => state.setVisibility);
   const setExpanded = useFABStore((state) => state.setExpanded);
   const toggleExpanded = useFABStore((state) => state.toggleExpanded);
-  const registerPrimaryAction = useFABStore(
-    (state) => state.registerPrimaryAction,
-  );
-  const unregisterPrimaryAction = useFABStore(
-    (state) => state.unregisterPrimaryAction,
-  );
-  const registerSecondaryAction = useFABStore(
-    (state) => state.registerSecondaryAction,
-  );
-  const unregisterSecondaryAction = useFABStore(
-    (state) => state.unregisterSecondaryAction,
-  );
-  const setDefaultActionHandler = useFABStore(
-    (state) => state.setDefaultActionHandler,
-  );
+  const registerPrimaryAction = useFABStore((state) => state.registerPrimaryAction);
+  const unregisterPrimaryAction = useFABStore((state) => state.unregisterPrimaryAction);
+  const registerSecondaryAction = useFABStore((state) => state.registerSecondaryAction);
+  const unregisterSecondaryAction = useFABStore((state) => state.unregisterSecondaryAction);
+  const setDefaultActionHandler = useFABStore((state) => state.setDefaultActionHandler);
   const clearScreenActions = useFABStore((state) => state.clearScreenActions);
 
   return {

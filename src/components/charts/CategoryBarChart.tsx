@@ -85,12 +85,16 @@ const CategoryBarChart: React.FC<CategoryBarChartProps> = ({
           <XAxis
             {...AxisConfig.XAxis}
             fontSize={12}
-            tickFormatter={isHorizontal ? (value: number) => `$${(value / 1000).toFixed(0)}K` : undefined}
+            tickFormatter={
+              isHorizontal ? (value: number) => `$${(value / 1000).toFixed(0)}K` : undefined
+            }
           />
           <YAxis
             {...AxisConfig.YAxis}
             fontSize={12}
-            tickFormatter={!isHorizontal ? (value: number) => `$${(value / 1000).toFixed(0)}K` : undefined}
+            tickFormatter={
+              !isHorizontal ? (value: number) => `$${(value / 1000).toFixed(0)}K` : undefined
+            }
           />
 
           <Tooltip content={<TooltipComponent />} />

@@ -10,7 +10,9 @@ import logger from "../../utils/common/logger";
  * Extracts password rotation logic from Layout component
  */
 const usePasswordRotation = () => {
-  const { securityContext: { encryptionKey } } = useAuthManager();
+  const {
+    securityContext: { encryptionKey },
+  } = useAuthManager();
   const changePasswordMutation = useChangePasswordMutation();
   const { showErrorToast, showSuccessToast } = useToastHelpers();
   const [rotationDue, setRotationDue] = useState(false);
@@ -53,19 +55,11 @@ const usePasswordRotation = () => {
 
       // For now, let's disable the rotation functionality until we implement a proper flow
       logger.warn("Password rotation attempted but requires current password implementation");
-
     } catch (error) {
       logger.error("Failed to change password:", error);
-      showErrorToast(
-        `Failed to change password: ${error.message}`,
-        "Password Update Failed",
-      );
+      showErrorToast(`Failed to change password: ${error.message}`, "Password Update Failed");
     }
-  }, [
-    newPassword,
-    confirmPassword,
-    showErrorToast,
-  ]);
+  }, [newPassword, confirmPassword, showErrorToast]);
 
   const dismissRotation = useCallback(() => {
     setShowRotationModal(false);

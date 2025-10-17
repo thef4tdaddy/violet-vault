@@ -3,7 +3,7 @@
  */
 
 // Frequency types (used in both bills and other areas)
-export type Frequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly';
+export type Frequency = "weekly" | "biweekly" | "monthly" | "quarterly" | "yearly";
 
 // Frequency multipliers interface
 export interface FrequencyMultipliers {

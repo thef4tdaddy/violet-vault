@@ -1,9 +1,19 @@
 import React from "react";
 
-export type SummaryCardColor = 
-  | "red" | "orange" | "amber" | "yellow" 
-  | "green" | "emerald" | "teal" | "cyan" 
-  | "blue" | "indigo" | "purple" | "pink" | "gray";
+export type SummaryCardColor =
+  | "red"
+  | "orange"
+  | "amber"
+  | "yellow"
+  | "green"
+  | "emerald"
+  | "teal"
+  | "cyan"
+  | "blue"
+  | "indigo"
+  | "purple"
+  | "pink"
+  | "gray";
 
 export interface PageSummaryCardProps {
   icon?: React.ComponentType<{ className?: string }>;
@@ -22,7 +32,7 @@ export interface PageSummaryCardProps {
  *
  * This component standardizes the look across all page-specific summary cards:
  * - Bills page
- * - Debt page  
+ * - Debt page
  * - Transactions page
  * - Envelopes page
  * - Stats/Analytics page
@@ -41,12 +51,15 @@ const PageSummaryCard: React.FC<PageSummaryCardProps> = ({
   alert = false,
 }) => {
   // Color configurations for gradient backgrounds and text
-  const colorConfig: Record<SummaryCardColor, {
-    gradient: string;
-    textMain: string;
-    textValue: string;
-    textSub: string;
-  }> = {
+  const colorConfig: Record<
+    SummaryCardColor,
+    {
+      gradient: string;
+      textMain: string;
+      textValue: string;
+      textSub: string;
+    }
+  > = {
     red: {
       gradient: "from-red-500 to-red-600",
       textMain: "text-red-100",
@@ -142,9 +155,7 @@ const PageSummaryCard: React.FC<PageSummaryCardProps> = ({
         <div>
           <p className={`${config.textMain} text-sm`}>{label}</p>
           <p className={`text-2xl font-bold ${config.textValue}`}>{value}</p>
-          {subtext && (
-            <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>
-          )}
+          {subtext && <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>}
         </div>
         {Icon &&
           React.createElement(Icon, {

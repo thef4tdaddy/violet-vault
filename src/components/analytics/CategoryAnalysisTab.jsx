@@ -50,40 +50,26 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
               </div>
               <div className="flex items-center gap-1">
                 {getFrequencyIndicator(stat.frequency)}
-                <span className="text-xs text-purple-800 font-bold capitalize">
-                  {stat.type}
-                </span>
+                <span className="text-xs text-purple-800 font-bold capitalize">{stat.type}</span>
               </div>
             </div>
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-purple-700 font-medium">
-                  Total Amount:
-                </span>
-                <span className="font-black text-gray-900">
-                  ${stat.totalAmount.toFixed(2)}
-                </span>
+                <span className="text-purple-700 font-medium">Total Amount:</span>
+                <span className="font-black text-gray-900">${stat.totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-purple-700 font-medium">
-                  Transactions:
-                </span>
-                <span className="font-bold text-gray-900">
-                  {stat.transactionCount}
-                </span>
+                <span className="text-purple-700 font-medium">Transactions:</span>
+                <span className="font-bold text-gray-900">{stat.transactionCount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Avg Amount:</span>
-                <span className="font-bold text-gray-900">
-                  ${stat.avgAmount.toFixed(2)}
-                </span>
+                <span className="font-bold text-gray-900">${stat.avgAmount.toFixed(2)}</span>
               </div>
               {stat.lastUsed && (
                 <div className="flex justify-between">
-                  <span className="text-purple-700 font-medium">
-                    Last Used:
-                  </span>
+                  <span className="text-purple-700 font-medium">Last Used:</span>
                   <span className="font-bold text-gray-900">
                     {new Date(stat.lastUsed).toLocaleDateString()}
                   </span>
@@ -91,9 +77,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
               )}
               <div className="flex justify-between pt-1 border-t border-gray-200">
                 <span className="text-purple-700 font-medium">Frequency:</span>
-                <span className="font-bold text-gray-900">
-                  {stat.frequency.toFixed(1)}/month
-                </span>
+                <span className="font-bold text-gray-900">{stat.frequency.toFixed(1)}/month</span>
               </div>
             </div>
           </div>

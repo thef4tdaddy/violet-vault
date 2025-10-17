@@ -38,8 +38,7 @@ const ReturningUserActions = ({
           disabled={isLoading}
           className="flex-1 py-3 text-sm font-black rounded-lg border-2 border-black bg-orange-600 hover:bg-orange-700 text-white uppercase tracking-wider"
         >
-          <span className="text-base">C</span>HANGE{" "}
-          <span className="text-base">P</span>ROFILE
+          <span className="text-base">C</span>HANGE <span className="text-base">P</span>ROFILE
         </button>
         <button
           type="button"
@@ -47,8 +46,7 @@ const ReturningUserActions = ({
           disabled={isLoading}
           className="flex-1 py-3 text-sm font-black rounded-lg border-2 border-black bg-red-600 hover:bg-red-700 text-white uppercase tracking-wider"
         >
-          <span className="text-base">S</span>TART{" "}
-          <span className="text-base">F</span>RESH
+          <span className="text-base">S</span>TART <span className="text-base">F</span>RESH
         </button>
       </div>
     </div>

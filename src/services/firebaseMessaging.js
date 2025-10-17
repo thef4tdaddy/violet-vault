@@ -1,10 +1,5 @@
 import { initializeApp } from "firebase/app";
-import {
-  getMessaging,
-  getToken,
-  onMessage,
-  isSupported,
-} from "firebase/messaging";
+import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
 import logger from "../utils/common/logger";
 
@@ -22,9 +17,7 @@ class FirebaseMessagingService {
 
     // Check for required environment variables
     if (!this.vapidKey) {
-      logger.warn(
-        "VITE_FIREBASE_VAPID_KEY not set - FCM will use default configuration",
-      );
+      logger.warn("VITE_FIREBASE_VAPID_KEY not set - FCM will use default configuration");
     }
   }
 
@@ -35,9 +28,7 @@ class FirebaseMessagingService {
     try {
       // Skip FCM initialization if using demo Firebase config to prevent service worker conflicts
       if (firebaseConfig.projectId === "demo-project") {
-        logger.info(
-          "📱 Skipping FCM initialization (demo Firebase config detected)",
-        );
+        logger.info("📱 Skipping FCM initialization (demo Firebase config detected)");
         return false;
       }
 
@@ -136,17 +127,12 @@ class FirebaseMessagingService {
     }
 
     try {
-      const tokenConfig = this.vapidKey
-        ? { vapidKey: this.vapidKey }
-        : undefined;
+      const tokenConfig = this.vapidKey ? { vapidKey: this.vapidKey } : undefined;
       const token = await getToken(this.messaging, tokenConfig);
 
       if (token) {
         logger.info("📱 FCM registration token generated successfully");
-        logger.debug(
-          "FCM Token (first 20 chars):",
-          token.substring(0, 20) + "...",
-        );
+        logger.debug("FCM Token (first 20 chars):", token.substring(0, 20) + "...");
         this.currentToken = token;
 
         // Store token in localStorage for debugging and backup
@@ -226,7 +212,7 @@ class FirebaseMessagingService {
       window.dispatchEvent(
         new CustomEvent("fcm-message", {
           detail: { payload, timestamp: Date.now() },
-        }),
+        })
       );
     });
 
@@ -295,10 +281,10 @@ class FirebaseMessagingService {
     // This would typically be done from your backend
     logger.info(
       "🧪 Test message would be sent to token:",
-      this.currentToken.substring(0, 20) + "...",
+      this.currentToken.substring(0, 20) + "..."
     );
     logger.info(
-      "💡 Use this token in your Firebase Console or backend service to send test messages",
+      "💡 Use this token in your Firebase Console or backend service to send test messages"
     );
 
     return true;

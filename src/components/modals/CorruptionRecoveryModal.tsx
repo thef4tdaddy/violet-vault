@@ -24,9 +24,9 @@ interface DataManagement {
  * Modal that guides users through encryption corruption recovery
  * Shows when repeated decryption failures indicate corrupted sync data
  */
-export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = ({ 
-  isOpen, 
-  onClose 
+export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = ({
+  isOpen,
+  onClose,
 }) => {
   const [step, setStep] = useState<number>(1);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -38,10 +38,7 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
       setIsExporting(true);
       await exportData();
       setStep(2);
-      showSuccessToast(
-        "Data exported successfully! Now create a new profile.",
-        "Backup Complete",
-      );
+      showSuccessToast("Data exported successfully! Now create a new profile.", "Backup Complete");
     } catch (error) {
       logger.error("Failed to export data during corruption recovery", { error });
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -65,7 +62,7 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
 
     showSuccessToast(
       "Profile cleared. The page will reload to start fresh setup.",
-      "Profile Reset",
+      "Profile Reset"
     );
 
     // Reload to trigger fresh user setup
@@ -78,12 +75,10 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
     <div className="space-y-4">
       <div className="text-center">
         <div className="text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-black text-black mb-2">
-          SYNC CORRUPTION DETECTED
-        </h3>
+        <h3 className="text-xl font-black text-black mb-2">SYNC CORRUPTION DETECTED</h3>
         <p className="text-purple-900">
-          Your sync data has encryption corruption that prevents normal
-          recovery. Don't worry - we can fix this safely!
+          Your sync data has encryption corruption that prevents normal recovery. Don't worry - we
+          can fix this safely!
         </p>
       </div>
 
@@ -105,8 +100,8 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
       <div className="bg-red-50 border-2 border-black rounded-lg p-4 ring-1 ring-gray-800/10">
         <h4 className="font-bold text-red-800 mb-2">⚠️ Important:</h4>
         <p className="text-red-700">
-          You <strong>must export your data first</strong>. Creating a new
-          profile will clear your current session.
+          You <strong>must export your data first</strong>. Creating a new profile will clear your
+          current session.
         </p>
       </div>
 
@@ -132,20 +127,17 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
     <div className="space-y-4">
       <div className="text-center">
         <div className="text-6xl mb-4">✅</div>
-        <h3 className="text-xl font-black text-black mb-2">
-          DATA EXPORTED SUCCESSFULLY
-        </h3>
+        <h3 className="text-xl font-black text-black mb-2">DATA EXPORTED SUCCESSFULLY</h3>
         <p className="text-purple-900">
-          Your backup is saved. Now let's create a fresh profile to eliminate
-          the corruption.
+          Your backup is saved. Now let's create a fresh profile to eliminate the corruption.
         </p>
       </div>
 
       <div className="bg-green-50 border-2 border-black rounded-lg p-4 ring-1 ring-gray-800/10">
         <h4 className="font-bold text-green-800 mb-2">✅ Backup Complete</h4>
         <p className="text-green-700">
-          Your data is safely exported. Now we'll clear your current profile and
-          start fresh with clean encryption.
+          Your data is safely exported. Now we'll clear your current profile and start fresh with
+          clean encryption.
         </p>
       </div>
 

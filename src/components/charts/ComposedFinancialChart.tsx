@@ -161,11 +161,11 @@ const ComposedFinancialChart: React.FC<ComposedFinancialChartProps> = ({
 };
 
 // Specialized cash flow chart
-export const CashFlowChart: React.FC<{ data: ChartDataPoint[]; title?: string; [key: string]: any }> = ({ 
-  data, 
-  title = "Monthly Cash Flow", 
-  ...props 
-}) => {
+export const CashFlowChart: React.FC<{
+  data: ChartDataPoint[];
+  title?: string;
+  [key: string]: any;
+}> = ({ data, title = "Monthly Cash Flow", ...props }) => {
   const series: ChartSeries[] = [
     {
       type: "bar",
@@ -197,12 +197,7 @@ export const BudgetVsActualChart: React.FC<{
   title?: string;
   _orientation?: string;
   [key: string]: any;
-}> = ({
-  data,
-  title = "Budget vs Actual Spending",
-  _orientation = "horizontal",
-  ...props
-}) => {
+}> = ({ data, title = "Budget vs Actual Spending", _orientation = "horizontal", ...props }) => {
   const series: ChartSeries[] = [
     {
       type: "bar",

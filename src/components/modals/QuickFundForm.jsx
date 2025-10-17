@@ -1,17 +1,7 @@
 import React from "react";
-import {
-  getButtonClasses,
-  withHapticFeedback,
-} from "../../utils/ui/touchFeedback";
+import { getButtonClasses, withHapticFeedback } from "../../utils/ui/touchFeedback";
 
-const QuickFundForm = ({
-  envelope,
-  amount,
-  setAmount,
-  unassignedCash,
-  onConfirm,
-  onClose,
-}) => {
+const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm, onClose }) => {
   const handleQuickAmounts = (quickAmount) => {
     setAmount(Math.min(quickAmount, unassignedCash));
   };
@@ -40,9 +30,7 @@ const QuickFundForm = ({
 
       {/* Amount Input */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Fund Amount
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Fund Amount</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span className="text-gray-500 text-lg">$</span>
@@ -58,28 +46,21 @@ const QuickFundForm = ({
             max={unassignedCash}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1">
-          Available: ${unassignedCash.toFixed(2)}
-        </p>
+        <p className="text-xs text-gray-500 mt-1">Available: ${unassignedCash.toFixed(2)}</p>
       </div>
 
       {/* Quick Amount Buttons */}
       {quickAmounts.length > 0 && (
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quick Amounts
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Quick Amounts</label>
           <div className="grid grid-cols-4 gap-2">
             {quickAmounts.map((quickAmount) => (
               <button
                 key={quickAmount}
-                onClick={withHapticFeedback(
-                  () => handleQuickAmounts(quickAmount),
-                  "light",
-                )}
+                onClick={withHapticFeedback(() => handleQuickAmounts(quickAmount), "light")}
                 className={getButtonClasses(
                   "py-2 px-3 text-sm font-medium border-2 border-black bg-white rounded-lg hover:bg-purple-50",
-                  "small",
+                  "small"
                 )}
               >
                 ${quickAmount}
@@ -108,7 +89,7 @@ const QuickFundForm = ({
           disabled={amount <= 0}
           className={getButtonClasses(
             "w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed",
-            "primary",
+            "primary"
           )}
         >
           Fund ${amount.toFixed(2)}
@@ -118,7 +99,7 @@ const QuickFundForm = ({
           onClick={withHapticFeedback(onClose, "light")}
           className={getButtonClasses(
             "w-full bg-white text-gray-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50",
-            "secondary",
+            "secondary"
           )}
         >
           Cancel

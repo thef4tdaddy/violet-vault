@@ -1,13 +1,13 @@
 // Debt calculation utilities to prevent temporal dead zone issues
 // This file contains pure functions that can be safely imported and used anywhere
 
-import type { 
-  DebtAccount, 
-  DebtType, 
-  PaymentFrequency, 
-  CompoundFrequency, 
-  DebtSpecialTerms, 
-  PayoffProjection 
+import type {
+  DebtAccount,
+  DebtType,
+  PaymentFrequency,
+  CompoundFrequency,
+  DebtSpecialTerms,
+  PayoffProjection,
 } from "../../types/debt";
 
 import {
@@ -23,11 +23,7 @@ import { calculatePayoffProjection } from "./calculations/payoffProjection";
 import { calculateInterestPortion } from "./calculations/interestCalculation";
 
 // Re-export the imported functions for backward compatibility
-export {
-  calculateNextPaymentDate,
-  calculatePayoffProjection,
-  calculateInterestPortion,
-};
+export { calculateNextPaymentDate, calculatePayoffProjection, calculateInterestPortion };
 
 /**
  * Convert debt payment frequency to bill frequency
@@ -50,7 +46,10 @@ export function convertPaymentFrequency(debtFrequency: PaymentFrequency): string
 /**
  * Create specialized terms based on debt type
  */
-export function createSpecialTerms(debtType: DebtType, providedTerms: DebtSpecialTerms = {}): DebtSpecialTerms {
+export function createSpecialTerms(
+  debtType: DebtType,
+  providedTerms: DebtSpecialTerms = {}
+): DebtSpecialTerms {
   switch (debtType) {
     case DEBT_TYPES.MORTGAGE:
       return {
@@ -120,10 +119,10 @@ export function getUpcomingPayments(debts: DebtAccount[], daysAhead: number = 30
  */
 export function calculateDebtToIncomeRatio(debts: DebtAccount[], monthlyIncome: number): number {
   if (monthlyIncome <= 0) return 0;
-  
+
   const totalMonthlyPayments = debts
     .filter((debt) => debt.status === DEBT_STATUS.ACTIVE)
     .reduce((sum, debt) => sum + debt.minimumPayment, 0);
-    
+
   return (totalMonthlyPayments / monthlyIncome) * 100;
 }

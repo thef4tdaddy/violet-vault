@@ -12,7 +12,7 @@ import type {
   QuerySnapshot,
   Timestamp,
   WriteBatch,
-} from 'firebase/firestore';
+} from "firebase/firestore";
 
 // Core data types
 export interface EncryptedData {
@@ -81,14 +81,14 @@ export interface FirebaseError {
   readonly context?: Record<string, unknown>;
 }
 
-export type ErrorCategory = 
-  | 'network'
-  | 'encryption' 
-  | 'firebase'
-  | 'validation'
-  | 'storage'
-  | 'authentication'
-  | 'unknown';
+export type ErrorCategory =
+  | "network"
+  | "encryption"
+  | "firebase"
+  | "validation"
+  | "storage"
+  | "authentication"
+  | "unknown";
 
 // Service initialization types
 export interface FirebaseSyncConfig {
@@ -105,7 +105,7 @@ export interface CloudSyncConfig extends FirebaseSyncConfig {
 
 // Sync operation types
 export interface SyncOperation {
-  readonly type: 'save' | 'load' | 'chunk_save' | 'chunk_load';
+  readonly type: "save" | "load" | "chunk_save" | "chunk_load";
   readonly budgetId: string;
   readonly timestamp: number;
   readonly metadata?: SyncMetadata;
@@ -116,7 +116,7 @@ export interface IFirebaseSyncService {
   readonly app: unknown; // Firebase App
   readonly db: unknown; // Firestore
   readonly auth: unknown; // Auth
-  
+
   initialize(budgetId: string, encryptionKey: string): void;
   ensureAuthenticated(): Promise<boolean>;
   saveToCloud(data: unknown, metadata?: Partial<SyncMetadata>): Promise<boolean>;
@@ -125,7 +125,7 @@ export interface IFirebaseSyncService {
   stopRealTimeSync(): void;
   getStatus(): FirebaseServiceStatus;
   cleanup(): void;
-  
+
   // Event listeners
   addSyncListener(callback: (event: string, data: unknown) => void): void;
   removeSyncListener(callback: (event: string, data: unknown) => void): void;
@@ -133,10 +133,10 @@ export interface IFirebaseSyncService {
 
 export interface IChunkedSyncService {
   initialize(budgetId: string, encryptionKey: string): Promise<void>;
-  saveToCloud(data: unknown, currentUser: CloudSyncConfig['currentUser']): Promise<boolean>;
+  saveToCloud(data: unknown, currentUser: CloudSyncConfig["currentUser"]): Promise<boolean>;
   loadFromCloud(): Promise<unknown>;
   getStats(): ChunkedSyncStats;
-  
+
   // Chunk management
   generateChunkId(arrayName: string, chunkIndex: number): string;
   clearCorruptedData(): Promise<void>;
@@ -170,48 +170,48 @@ export interface StorageMetadata {
 // Type guards for narrowing unknown types
 export function isEncryptedData(data: unknown): data is EncryptedData {
   return (
-    typeof data === 'object' &&
+    typeof data === "object" &&
     data !== null &&
-    'encryptedData' in data &&
-    'timestamp' in data &&
-    'metadata' in data &&
-    typeof (data as EncryptedData).encryptedData === 'string'
+    "encryptedData" in data &&
+    "timestamp" in data &&
+    "metadata" in data &&
+    typeof (data as EncryptedData).encryptedData === "string"
   );
 }
 
 export function isSyncResult(result: unknown): result is SyncResult {
   return (
-    typeof result === 'object' &&
+    typeof result === "object" &&
     result !== null &&
-    'success' in result &&
-    typeof (result as SyncResult).success === 'boolean'
+    "success" in result &&
+    typeof (result as SyncResult).success === "boolean"
   );
 }
 
 export function isChunkData(data: unknown): data is ChunkData {
   return (
-    typeof data === 'object' &&
+    typeof data === "object" &&
     data !== null &&
-    'id' in data &&
-    'data' in data &&
-    'index' in data &&
-    'total' in data &&
-    'checksum' in data &&
-    typeof (data as ChunkData).id === 'string' &&
-    typeof (data as ChunkData).data === 'string' &&
-    typeof (data as ChunkData).index === 'number'
+    "id" in data &&
+    "data" in data &&
+    "index" in data &&
+    "total" in data &&
+    "checksum" in data &&
+    typeof (data as ChunkData).id === "string" &&
+    typeof (data as ChunkData).data === "string" &&
+    typeof (data as ChunkData).index === "number"
   );
 }
 
 export function isFirebaseError(error: unknown): error is FirebaseError {
   return (
-    typeof error === 'object' &&
+    typeof error === "object" &&
     error !== null &&
-    'code' in error &&
-    'message' in error &&
-    'category' in error &&
-    typeof (error as FirebaseError).code === 'string' &&
-    typeof (error as FirebaseError).message === 'string'
+    "code" in error &&
+    "message" in error &&
+    "category" in error &&
+    typeof (error as FirebaseError).code === "string" &&
+    typeof (error as FirebaseError).message === "string"
   );
 }
 
@@ -241,65 +241,65 @@ export function createTypedResponse<T>(
 
 export function categorizeFirebaseError(error: unknown): ErrorCategory {
   if (!(error instanceof Error)) {
-    return 'unknown';
+    return "unknown";
   }
 
   const message = error.message.toLowerCase();
 
   if (
-    message.includes('network') ||
-    message.includes('timeout') ||
-    message.includes('connection') ||
-    message.includes('fetch') ||
-    message.includes('cors')
+    message.includes("network") ||
+    message.includes("timeout") ||
+    message.includes("connection") ||
+    message.includes("fetch") ||
+    message.includes("cors")
   ) {
-    return 'network';
+    return "network";
   }
 
   if (
-    message.includes('decrypt') ||
-    message.includes('encrypt') ||
-    message.includes('cipher') ||
-    message.includes('key derivation')
+    message.includes("decrypt") ||
+    message.includes("encrypt") ||
+    message.includes("cipher") ||
+    message.includes("key derivation")
   ) {
-    return 'encryption';
+    return "encryption";
   }
 
   if (
-    message.includes('firebase') ||
-    message.includes('firestore') ||
-    message.includes('permission') ||
-    message.includes('quota') ||
-    message.includes('rate limit')
+    message.includes("firebase") ||
+    message.includes("firestore") ||
+    message.includes("permission") ||
+    message.includes("quota") ||
+    message.includes("rate limit")
   ) {
-    return 'firebase';
+    return "firebase";
   }
 
   if (
-    message.includes('validation') ||
-    message.includes('invalid data') ||
-    message.includes('checksum') ||
-    message.includes('corrupt')
+    message.includes("validation") ||
+    message.includes("invalid data") ||
+    message.includes("checksum") ||
+    message.includes("corrupt")
   ) {
-    return 'validation';
+    return "validation";
   }
 
   if (
-    message.includes('storage') ||
-    message.includes('database') ||
-    message.includes('indexeddb')
+    message.includes("storage") ||
+    message.includes("database") ||
+    message.includes("indexeddb")
   ) {
-    return 'storage';
+    return "storage";
   }
 
   if (
-    message.includes('auth') ||
-    message.includes('unauthorized') ||
-    message.includes('token') ||
-    message.includes('credential')
+    message.includes("auth") ||
+    message.includes("unauthorized") ||
+    message.includes("token") ||
+    message.includes("credential")
   ) {
-    return 'authentication';
+    return "authentication";
   }
 
-  return 'unknown';
+  return "unknown";
 }

@@ -13,18 +13,18 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
 }) => {
   const formatDateRange = () => {
     if (!dateRange?.start || !dateRange?.end) return "All Time";
-    
+
     const start = new Date(dateRange.start);
     const end = new Date(dateRange.end);
-    
+
     const formatDate = (date: Date) => {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
       });
     };
-    
+
     return `${formatDate(start)} - ${formatDate(end)}`;
   };
 
@@ -42,9 +42,7 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
           </div>
           Analytics & Reports
         </h2>
-        <p className="text-gray-800 mt-1">
-          Financial insights and spending patterns
-        </p>
+        <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
       </div>
 
       <div className="flex items-center gap-3">

@@ -6,14 +6,8 @@ import logger from "../../utils/common/logger";
 import { readFileContent } from "../../utils/dataManagement/fileUtils";
 import { validateImportedData } from "../../utils/dataManagement/validationUtils";
 import { backupCurrentData } from "../../utils/dataManagement/backupUtils";
-import {
-  clearAllDexieData,
-  importDataToDexie,
-} from "../../utils/dataManagement/dexieUtils";
-import {
-  clearFirebaseData,
-  forcePushToCloud,
-} from "../../utils/dataManagement/firebaseUtils";
+import { clearAllDexieData, importDataToDexie } from "../../utils/dataManagement/dexieUtils";
+import { clearFirebaseData, forcePushToCloud } from "../../utils/dataManagement/firebaseUtils";
 import { queryClient } from "../../utils/common/queryClient";
 
 const handleConfirmation = async (
@@ -21,7 +15,7 @@ const handleConfirmation = async (
   validatedData,
   hasBudgetIdMismatch,
   importBudgetId,
-  currentUser,
+  currentUser
 ) => {
   let confirmMessage = `Import ${validatedData.envelopes?.length || 0} envelopes, ${validatedData.bills?.length || 0} bills, ${validatedData.debts?.length || 0} debts, ${validatedData.auditLog?.length || 0} audit entries, and ${validatedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`;
   if (hasBudgetIdMismatch) {
@@ -29,9 +23,7 @@ const handleConfirmation = async (
   }
 
   return confirm({
-    title: hasBudgetIdMismatch
-      ? "Import Data (Encryption Context Change)"
-      : "Import Data",
+    title: hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data",
     message: confirmMessage,
     confirmLabel: "Import Data",
     cancelLabel: "Cancel",
@@ -45,10 +37,7 @@ const performImport = async (validatedData, showSuccessToast) => {
   await clearAllDexieData();
   await importDataToDexie(validatedData);
 
-  showSuccessToast(
-    "Local data imported! Now syncing to cloud...",
-    "Import Complete",
-  );
+  showSuccessToast("Local data imported! Now syncing to cloud...", "Import Complete");
 
   await forcePushToCloud();
   showSuccessToast("Import complete! Data synced to cloud successfully.");
@@ -73,15 +62,17 @@ export const useImportData = () => {
         const fileContent = await readFileContent(file);
         const importedData = JSON.parse(fileContent);
 
-        const { validatedData, hasBudgetIdMismatch, importBudgetId } =
-          validateImportedData(importedData, currentUser);
+        const { validatedData, hasBudgetIdMismatch, importBudgetId } = validateImportedData(
+          importedData,
+          currentUser
+        );
 
         const confirmed = await handleConfirmation(
           confirm,
           validatedData,
           hasBudgetIdMismatch,
           importBudgetId,
-          currentUser,
+          currentUser
         );
 
         if (!confirmed) {
@@ -109,7 +100,7 @@ export const useImportData = () => {
         throw error;
       }
     },
-    [currentUser, confirm, showErrorToast, showSuccessToast],
+    [currentUser, confirm, showErrorToast, showSuccessToast]
   );
 
   return { importData };

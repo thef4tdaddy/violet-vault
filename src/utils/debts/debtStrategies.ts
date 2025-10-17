@@ -1,12 +1,12 @@
 // Debt payment strategy calculations
 // Implements Avalanche, Snowball, and Custom debt payoff strategies
 
-import type { 
-  DebtAccount, 
-  DebtStrategy, 
-  DebtStrategyResult, 
+import type {
+  DebtAccount,
+  DebtStrategy,
+  DebtStrategyResult,
   StrategyComparison,
-  StrategyMonth
+  StrategyMonth,
 } from "../../types/debt";
 
 /**
@@ -40,9 +40,9 @@ function simulateMinimumPayments(debts: DebtAccount[]): DebtStrategyResult {
  */
 function simulatePayoffStrategy(debts: DebtAccount[], extraPayment: number): DebtStrategyResult {
   // Create working copies of debts
-  const workingDebts = debts.map(debt => ({
+  const workingDebts = debts.map((debt) => ({
     ...debt,
-    remainingBalance: debt.balance
+    remainingBalance: debt.balance,
   }));
 
   const monthlyBreakdown: StrategyMonth[] = [];
@@ -50,27 +50,28 @@ function simulatePayoffStrategy(debts: DebtAccount[], extraPayment: number): Deb
   let totalInterest = 0;
   const debtPayoffOrder: string[] = [];
 
-  while (workingDebts.some(debt => debt.remainingBalance > 0) && month < 600) { // 50 year limit
+  while (workingDebts.some((debt) => debt.remainingBalance > 0) && month < 600) {
+    // 50 year limit
     month++;
     const monthData: StrategyMonth = {
       month,
       totalPayment: 0,
-      debts: []
+      debts: [],
     };
 
     // Calculate minimum payments for all debts
     let availableExtra = extraPayment;
-    
+
     for (const debt of workingDebts) {
       if (debt.remainingBalance <= 0) continue;
 
       // Calculate monthly interest
       const monthlyInterestRate = debt.interestRate / 100 / 12;
       const interestPayment = debt.remainingBalance * monthlyInterestRate;
-      
+
       // Minimum payment (at least covers interest)
       let principalPayment = Math.max(0, debt.minimumPayment - interestPayment);
-      
+
       // Add extra payment to first debt with balance (strategy-specific order)
       if (availableExtra > 0) {
         const extraForThisDebt = Math.min(availableExtra, debt.remainingBalance - principalPayment);
@@ -84,13 +85,13 @@ function simulatePayoffStrategy(debts: DebtAccount[], extraPayment: number): Deb
 
       debt.remainingBalance -= principalPayment;
       totalInterest += interestPayment;
-      
+
       monthData.debts.push({
         debtId: debt.id,
         payment: totalPayment,
         principal: principalPayment,
         interest: interestPayment,
-        remainingBalance: debt.remainingBalance
+        remainingBalance: debt.remainingBalance,
       });
 
       monthData.totalPayment += totalPayment;
@@ -105,54 +106,70 @@ function simulatePayoffStrategy(debts: DebtAccount[], extraPayment: number): Deb
   }
 
   return {
-    strategy: 'custom' as DebtStrategy,
+    strategy: "custom" as DebtStrategy,
     totalMonths: month,
     totalInterest,
     totalPayment: monthlyBreakdown.reduce((sum, m) => sum + m.totalPayment, 0),
     monthlyBreakdown,
-    debtPayoffOrder
+    debtPayoffOrder,
   };
 }
 
 /**
  * Core strategy calculation function
  */
-function calculateStrategy(sortedDebts: DebtAccount[], extraPayment: number, strategy: DebtStrategy): DebtStrategyResult {
+function calculateStrategy(
+  sortedDebts: DebtAccount[],
+  extraPayment: number,
+  strategy: DebtStrategy
+): DebtStrategyResult {
   const result = simulatePayoffStrategy(sortedDebts, extraPayment);
   return {
     ...result,
-    strategy
+    strategy,
   };
 }
 
 /**
  * Calculate Avalanche strategy (highest interest rate first)
  */
-export function calculateDebtAvalanche(debts: DebtAccount[], extraPayment: number = 0): DebtStrategyResult {
+export function calculateDebtAvalanche(
+  debts: DebtAccount[],
+  extraPayment: number = 0
+): DebtStrategyResult {
   const sortedDebts = [...debts].sort((a, b) => b.interestRate - a.interestRate);
-  return calculateStrategy(sortedDebts, extraPayment, 'avalanche');
+  return calculateStrategy(sortedDebts, extraPayment, "avalanche");
 }
 
 /**
  * Calculate Snowball strategy (smallest balance first)
  */
-export function calculateDebtSnowball(debts: DebtAccount[], extraPayment: number = 0): DebtStrategyResult {
+export function calculateDebtSnowball(
+  debts: DebtAccount[],
+  extraPayment: number = 0
+): DebtStrategyResult {
   const sortedDebts = [...debts].sort((a, b) => a.balance - b.balance);
-  return calculateStrategy(sortedDebts, extraPayment, 'snowball');
+  return calculateStrategy(sortedDebts, extraPayment, "snowball");
 }
 
 /**
  * Calculate custom strategy (user-defined order)
  */
-export function calculateDebtCustom(debts: DebtAccount[], extraPayment: number = 0): DebtStrategyResult {
+export function calculateDebtCustom(
+  debts: DebtAccount[],
+  extraPayment: number = 0
+): DebtStrategyResult {
   // For custom strategy, maintain the order provided by user
-  return calculateStrategy(debts, extraPayment, 'custom');
+  return calculateStrategy(debts, extraPayment, "custom");
 }
 
 /**
  * Compare all debt strategies
  */
-export function compareDebtStrategies(debts: DebtAccount[], extraPayment: number = 0): StrategyComparison {
+export function compareDebtStrategies(
+  debts: DebtAccount[],
+  extraPayment: number = 0
+): StrategyComparison {
   const avalanche = calculateDebtAvalanche(debts, extraPayment);
   const snowball = calculateDebtSnowball(debts, extraPayment);
 

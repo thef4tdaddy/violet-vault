@@ -15,7 +15,7 @@ export const useFABLoadingStates = () => {
     (actionId) => {
       return loadingActions.has(actionId);
     },
-    [loadingActions],
+    [loadingActions]
   );
 
   // Check if any action is loading
@@ -65,11 +65,7 @@ export const useFABLoadingStates = () => {
           });
 
           // Show error toast
-          showError(
-            `${actionLabel} Failed`,
-            error.message || "An unexpected error occurred",
-            5000,
-          );
+          showError(`${actionLabel} Failed`, error.message || "An unexpected error occurred", 5000);
 
           // Re-throw for component error boundaries if needed
           throw error;
@@ -78,7 +74,7 @@ export const useFABLoadingStates = () => {
         }
       };
     },
-    [isActionLoading, startLoading, stopLoading, showError],
+    [isActionLoading, startLoading, stopLoading, showError]
   );
 
   // Create a loading wrapper for FAB actions
@@ -86,7 +82,7 @@ export const useFABLoadingStates = () => {
     (actionId, actionFn, actionLabel) => {
       return wrapActionWithLoading(actionId, actionFn, actionLabel);
     },
-    [wrapActionWithLoading],
+    [wrapActionWithLoading]
   );
 
   // Bulk operations

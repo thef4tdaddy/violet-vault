@@ -93,9 +93,7 @@ describe("suggestionUtils", () => {
 
       // Should exclude the December transaction
       expect(result).toHaveLength(3);
-      expect(
-        result.every((t) => new Date(t.date) >= new Date("2024-01-01")),
-      ).toBe(true);
+      expect(result.every((t) => new Date(t.date) >= new Date("2024-01-01"))).toBe(true);
     });
 
     it("should handle default range", () => {
@@ -133,11 +131,7 @@ describe("suggestionUtils", () => {
       const monthsOfData = 1;
       const settings = DEFAULT_ANALYSIS_SETTINGS;
 
-      const result = analyzeUnassignedTransactions(
-        unassignedTxns,
-        monthsOfData,
-        settings,
-      );
+      const result = analyzeUnassignedTransactions(unassignedTxns, monthsOfData, settings);
 
       expect(result).toHaveLength(1); // Should suggest Food envelope
       expect(result[0]).toMatchObject({
@@ -156,11 +150,7 @@ describe("suggestionUtils", () => {
     it("should respect minimum amount threshold", () => {
       const settings = { ...DEFAULT_ANALYSIS_SETTINGS, minAmount: 200 };
 
-      const result = analyzeUnassignedTransactions(
-        mockTransactions,
-        1,
-        settings,
-      );
+      const result = analyzeUnassignedTransactions(mockTransactions, 1, settings);
 
       expect(result).toHaveLength(0); // No category meets 200 minimum
     });
@@ -168,11 +158,7 @@ describe("suggestionUtils", () => {
     it("should respect minimum transactions threshold", () => {
       const settings = { ...DEFAULT_ANALYSIS_SETTINGS, minTransactions: 5 };
 
-      const result = analyzeUnassignedTransactions(
-        mockTransactions,
-        1,
-        settings,
-      );
+      const result = analyzeUnassignedTransactions(mockTransactions, 1, settings);
 
       expect(result).toHaveLength(0); // No category has 5 transactions
     });
@@ -201,12 +187,7 @@ describe("suggestionUtils", () => {
         },
       ];
 
-      const result = analyzeMerchantPatterns(
-        coffeeTransactions,
-        [],
-        1,
-        DEFAULT_ANALYSIS_SETTINGS,
-      );
+      const result = analyzeMerchantPatterns(coffeeTransactions, [], 1, DEFAULT_ANALYSIS_SETTINGS);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
@@ -233,7 +214,7 @@ describe("suggestionUtils", () => {
         coffeeTransactions,
         existingEnvelopes,
         1,
-        DEFAULT_ANALYSIS_SETTINGS,
+        DEFAULT_ANALYSIS_SETTINGS
       );
 
       expect(result).toHaveLength(0);
@@ -259,16 +240,12 @@ describe("suggestionUtils", () => {
         overspendingTransactions,
         mockEnvelopes,
         1,
-        DEFAULT_ANALYSIS_SETTINGS,
+        DEFAULT_ANALYSIS_SETTINGS
       );
 
-      const overspendSuggestion = result.find(
-        (s) => s.type === "increase_envelope",
-      );
+      const overspendSuggestion = result.find((s) => s.type === "increase_envelope");
       expect(overspendSuggestion).toBeDefined();
-      expect(overspendSuggestion.title).toContain(
-        'Increase "Groceries" Budget',
-      );
+      expect(overspendSuggestion.title).toContain('Increase "Groceries" Budget');
     });
 
     it("should suggest decreasing budget for overfunding", () => {
@@ -284,16 +261,12 @@ describe("suggestionUtils", () => {
         lowSpendingTransactions,
         mockEnvelopes,
         1,
-        DEFAULT_ANALYSIS_SETTINGS,
+        DEFAULT_ANALYSIS_SETTINGS
       );
 
-      const overfundSuggestion = result.find(
-        (s) => s.type === "decrease_envelope",
-      );
+      const overfundSuggestion = result.find((s) => s.type === "decrease_envelope");
       expect(overfundSuggestion).toBeDefined();
-      expect(overfundSuggestion.title).toContain(
-        'Reduce "Entertainment" Budget',
-      );
+      expect(overfundSuggestion.title).toContain('Reduce "Entertainment" Budget');
     });
 
     it("should skip envelopes with no transactions", () => {
@@ -301,7 +274,7 @@ describe("suggestionUtils", () => {
         [], // No transactions
         mockEnvelopes,
         1,
-        DEFAULT_ANALYSIS_SETTINGS,
+        DEFAULT_ANALYSIS_SETTINGS
       );
 
       expect(result).toHaveLength(0);
@@ -316,7 +289,7 @@ describe("suggestionUtils", () => {
         DEFAULT_ANALYSIS_SETTINGS,
         30,
         new Set(),
-        false,
+        false
       );
 
       expect(result).toBeInstanceOf(Array);
@@ -332,12 +305,10 @@ describe("suggestionUtils", () => {
         DEFAULT_ANALYSIS_SETTINGS,
         30,
         dismissedSuggestions,
-        false,
+        false
       );
 
-      const dismissedSuggestion = result.find(
-        (s) => s.id === "unassigned_Food",
-      );
+      const dismissedSuggestion = result.find((s) => s.id === "unassigned_Food");
       expect(dismissedSuggestion).toBeUndefined();
     });
 
@@ -348,7 +319,7 @@ describe("suggestionUtils", () => {
         DEFAULT_ANALYSIS_SETTINGS,
         30,
         new Set(),
-        false,
+        false
       );
 
       if (result.length > 1) {
@@ -380,7 +351,7 @@ describe("suggestionUtils", () => {
         DEFAULT_ANALYSIS_SETTINGS,
         30,
         new Set(),
-        false,
+        false
       );
 
       expect(result.length).toBeLessThanOrEqual(10);

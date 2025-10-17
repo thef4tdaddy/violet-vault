@@ -18,7 +18,10 @@ const useEnvelopeEdit = ({
   currentUser = { userName: "User" },
 }) => {
   // Get auth context for edit locking
-  const { securityContext: { budgetId }, user: authCurrentUser } = useAuthManager();
+  const {
+    securityContext: { budgetId },
+    user: authCurrentUser,
+  } = useAuthManager();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {
@@ -58,9 +61,7 @@ const useEnvelopeEdit = ({
   const handleSave = async (envelopeData) => {
     // Check if we can edit before saving
     if (envelope && !canEdit) {
-      throw new Error(
-        "Cannot save changes - envelope is locked by another user",
-      );
+      throw new Error("Cannot save changes - envelope is locked by another user");
     }
 
     await onSave(envelopeData);

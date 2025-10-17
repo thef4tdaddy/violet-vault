@@ -15,13 +15,9 @@ import useSettingsSectionRenderer from "../../hooks/settings/useSettingsSectionR
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
-const LocalOnlyModeSettings = lazy(
-  () => import("../auth/LocalOnlyModeSettings"),
-);
+const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings"));
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
-const EnvelopeIntegrityChecker = lazy(
-  () => import("./EnvelopeIntegrityChecker"),
-);
+const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
 
 /**
  * Unified Settings Dashboard - Refactored with extracted components
@@ -67,8 +63,7 @@ const SettingsDashboard = ({
   const [activeSection, setActiveSection] = React.useState(initialSection);
 
   // Local data security modal state (not in useSettingsModals to avoid circular dependency with MainLayout)
-  const [showLocalDataSecurity, setShowLocalDataSecurity] =
-    React.useState(false);
+  const [showLocalDataSecurity, setShowLocalDataSecurity] = React.useState(false);
 
   // Update active section when initialSection changes (e.g., opening to specific section)
   React.useEffect(() => {
@@ -85,16 +80,11 @@ const SettingsDashboard = ({
     setShowLocalDataSecurity(true);
   }, []);
 
-  const {
-    cloudSyncEnabled,
-    isSyncing,
-    handleToggleCloudSync,
-    handleManualSync,
-  } = useCloudSyncManager();
+  const { cloudSyncEnabled, isSyncing, handleToggleCloudSync, handleManualSync } =
+    useCloudSyncManager();
 
   const { sections } = useSettingsSections();
-  const { handleCreateTestHistory, handleResetConfirmAction } =
-    useSettingsActions();
+  const { handleCreateTestHistory, handleResetConfirmAction } = useSettingsActions();
 
   // Use the extracted section renderer hook
   const { renderSectionContent } = useSettingsSectionRenderer({
@@ -187,18 +177,12 @@ const SettingsDashboard = ({
 
         {/* Security Settings */}
         {showSecuritySettings && securityManager && (
-          <SecuritySettings
-            isOpen={showSecuritySettings}
-            onClose={closeSecuritySettings}
-          />
+          <SecuritySettings isOpen={showSecuritySettings} onClose={closeSecuritySettings} />
         )}
 
         {/* Envelope Integrity Checker */}
         {showEnvelopeChecker && (
-          <EnvelopeIntegrityChecker
-            isOpen={showEnvelopeChecker}
-            onClose={closeEnvelopeChecker}
-          />
+          <EnvelopeIntegrityChecker isOpen={showEnvelopeChecker} onClose={closeEnvelopeChecker} />
         )}
 
         {/* Local Data Security Warning */}

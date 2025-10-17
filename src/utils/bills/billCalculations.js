@@ -35,7 +35,7 @@ export const normalizeBillDate = (dateInput) => {
         (match, month, day, year) => {
           const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
           return `${month}/${day}/${fullYear}`;
-        },
+        }
       );
 
       // Parse different formats
@@ -44,21 +44,13 @@ export const normalizeBillDate = (dateInput) => {
         // Already in YYYY-MM-DD format - use UTC to avoid timezone issues
         const parts = dateStr.split("-");
         parsedDate = new Date(
-          Date.UTC(
-            parseInt(parts[0]),
-            parseInt(parts[1]) - 1,
-            parseInt(parts[2]),
-          ),
+          Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
         );
       } else if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
         // MM/DD/YYYY or MM-DD-YYYY format
         const parts = dateStr.split(/[/-]/);
         parsedDate = new Date(
-          Date.UTC(
-            parseInt(parts[2]),
-            parseInt(parts[0]) - 1,
-            parseInt(parts[1]),
-          ),
+          Date.UTC(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]))
         );
       } else {
         // Try direct parsing
@@ -162,15 +154,9 @@ export const categorizeBills = (bills) => {
   const paidBills = bills.filter((b) => b.isPaid);
 
   return {
-    upcoming: upcomingBills.sort(
-      (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999),
-    ),
-    overdue: overdueBills.sort(
-      (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0),
-    ),
-    paid: paidBills.sort(
-      (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date),
-    ),
+    upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
+    overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
+    paid: paidBills.sort((a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)),
     all: bills,
   };
 };
@@ -183,15 +169,15 @@ export const categorizeBills = (bills) => {
 export const calculateBillTotals = (categorizedBills) => {
   const overdueTotal = (categorizedBills.overdue || []).reduce(
     (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
-    0,
+    0
   );
   const upcomingTotal = (categorizedBills.upcoming || []).reduce(
     (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
-    0,
+    0
   );
   const paidTotal = (categorizedBills.paid || []).reduce(
     (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
-    0,
+    0
   );
 
   return {
@@ -200,7 +186,7 @@ export const calculateBillTotals = (categorizedBills) => {
     paid: paidTotal,
     total: (categorizedBills.all || []).reduce(
       (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
-      0,
+      0
     ),
     // Add counts for summary cards
     overdueCount: (categorizedBills.overdue || []).length,
@@ -225,20 +211,16 @@ export const filterBills = (bills, filterOptions = {}) => {
       (bill) =>
         (bill.description || "").toLowerCase().includes(searchTerm) ||
         (bill.provider || "").toLowerCase().includes(searchTerm) ||
-        (bill.name || "").toLowerCase().includes(searchTerm),
+        (bill.name || "").toLowerCase().includes(searchTerm)
     );
   }
 
   if (filterOptions.urgency && filterOptions.urgency !== "all") {
-    filtered = filtered.filter(
-      (bill) => bill.urgency === filterOptions.urgency,
-    );
+    filtered = filtered.filter((bill) => bill.urgency === filterOptions.urgency);
   }
 
   if (filterOptions.envelope) {
-    filtered = filtered.filter(
-      (bill) => bill.envelopeId === filterOptions.envelope,
-    );
+    filtered = filtered.filter((bill) => bill.envelopeId === filterOptions.envelope);
   }
 
   if (filterOptions.amountMin !== undefined) {

@@ -113,10 +113,13 @@ const BillManager = ({
   const _summaryCards = getSummaryCards(totals);
 
   // Edit lock for collaborative editing
-  const { securityContext: { budgetId }, user: currentUser } = useAuthManager();
+  const {
+    securityContext: { budgetId },
+    user: currentUser,
+  } = useAuthManager();
   const { isLocked: isEditLocked, currentEditor } = useEditLock(
     `bills-${budgetId}`,
-    currentUser?.userName || "User",
+    currentUser?.userName || "User"
   );
 
   // Loading state
@@ -226,10 +229,7 @@ const BillManager = ({
           onCreateRecurring={(bill) => {
             // Handle making a one-time bill recurring
             // TODO: Implement recurring bill functionality
-            logger.warn(
-              "Recurring bill creation not yet implemented:",
-              bill.name,
-            );
+            logger.warn("Recurring bill creation not yet implemented:", bill.name);
           }}
         />
       )}

@@ -49,13 +49,11 @@ class StoreRegistry {
    * Get all registered stores
    */
   getAll() {
-    return Array.from(this.stores.entries()).map(
-      ([name, { store, metadata }]) => ({
-        name,
-        store,
-        metadata,
-      }),
-    );
+    return Array.from(this.stores.entries()).map(([name, { store, metadata }]) => ({
+      name,
+      store,
+      metadata,
+    }));
   }
 
   /**
