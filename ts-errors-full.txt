@@ -1,0 +1,91 @@
+
+> violetvault@1.9.0 typecheck
+> tsc --noEmit
+
+src/components/auth/UserIndicator.tsx(120,9): error TS2322: Type '(updatedProfile: Partial<UserData>) => void' is not assignable to type '(profile: User) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/debt/DebtDashboard.tsx(107,11): error TS2322: Type '{ id: string; label: string; icon: string; color: string; }[]' is not assignable to type 'TabItem<SetStateAction<string>>[]'.
+  Type '{ id: string; label: string; icon: string; color: string; }' is not assignable to type 'TabItem<SetStateAction<string>>'.
+    Types of property 'icon' are incompatible.
+      Type 'string' is not assignable to type 'ComponentType<{ className?: string; }>'.
+src/components/debt/DebtDashboard.tsx(116,33): error TS2322: Type '{ debtStats: { totalDebt: number; totalMonthlyPayments: number; averageInterestRate: number; debtsByType: {}; totalInterestPaid: number; activeDebtCount: number; totalDebtCount: number; dueSoonAmount: number; dueSoonCount: number; }; }' is not assignable to type 'IntrinsicAttributes & { stats: any; onDueSoonClick: any; }'.
+  Property 'debtStats' does not exist on type 'IntrinsicAttributes & { stats: any; onDueSoonClick: any; }'.
+src/components/debt/DebtDashboard.tsx(124,17): error TS2322: Type '{ filterOptions: { type: string; status: string; sortBy: string; sortOrder: string; }; setFilterOptions: Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>; debtStats: { ...; }; }' is not assignable to type 'IntrinsicAttributes & { filterOptions: any; setFilterOptions: any; debtTypes: any; debtsByType: any; }'.
+  Property 'debtStats' does not exist on type 'IntrinsicAttributes & { filterOptions: any; setFilterOptions: any; debtTypes: any; debtsByType: any; }'.
+src/components/debt/DebtDashboard.tsx(133,17): error TS2322: Type '{ debts: DebtAccount[]; onDebtClick: (debt: any) => void; onEditDebt: (debt: any) => void; onDeleteDebt: (debtId: any) => Promise<void>; onRecordPayment: (debtId: any, paymentData: any) => Promise<...>; }' is not assignable to type 'IntrinsicAttributes & { debts: any; onDebtClick: any; onRecordPayment: any; }'.
+  Property 'onEditDebt' does not exist on type 'IntrinsicAttributes & { debts: any; onDebtClick: any; onRecordPayment: any; }'.
+src/components/debt/DebtDashboard.tsx(162,15): error TS2322: Type '{ isOpen: true; onSubmit: (debtData: any) => Promise<void>; onClose: () => void; editingDebt: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; onSubmit: any; debt?: any; }'.
+  Property 'editingDebt' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; onSubmit: any; debt?: any; }'.
+src/components/debt/DebtDashboard.tsx(167,14): error TS2741: Property '_onLinkToBill' is missing in type '{ debt: any; isOpen: boolean; onClose: () => void; onEdit: (debt: any) => void; onDelete: (debtId: any) => Promise<void>; onRecordPayment: (debtId: any, paymentData: any) => Promise<void>; }' but required in type '{ debt: any; isOpen: any; onClose: any; onDelete: any; onRecordPayment: any; _onLinkToBill: any; onEdit: any; }'.
+src/components/debt/DebtDashboard.tsx(179,15): error TS2322: Type '{ payments: DebtAccount[]; isOpen: true; onClose: () => void; onRecordPayment: (debtId: any, paymentData: any) => Promise<void>; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; upcomingPayments?: any[]; }'.
+  Property 'payments' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; upcomingPayments?: any[]; }'.
+src/components/debt/DebtStrategies.tsx(66,11): error TS2322: Type '{ strategy: { debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; } | { debts: any[]; totalInterest: number; payoffTime: number; name: string; description: string; }; ... 4 more ...; isRecommended: boolean; }' is not assignable to type 'IntrinsicAttributes & { strategy: any; isRecommended?: boolean; }'.
+  Property 'title' does not exist on type 'IntrinsicAttributes & { strategy: any; isRecommended?: boolean; }'.
+src/components/debt/DebtStrategies.tsx(70,26): error TS2367: This comparison appears to be unintentional because the types '{ strategy: string; reason: string; savings: number; }' and 'string' have no overlap.
+src/components/debt/DebtStrategies.tsx(75,11): error TS2322: Type '{ strategy: { debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; } | { debts: any[]; totalInterest: number; payoffTime: number; name: string; description: string; }; ... 4 more ...; isRecommended: boolean; }' is not assignable to type 'IntrinsicAttributes & { strategy: any; isRecommended?: boolean; }'.
+  Property 'title' does not exist on type 'IntrinsicAttributes & { strategy: any; isRecommended?: boolean; }'.
+src/components/debt/DebtStrategies.tsx(79,26): error TS2367: This comparison appears to be unintentional because the types '{ strategy: string; reason: string; savings: number; }' and 'string' have no overlap.
+src/components/debt/DebtStrategies.tsx(123,54): error TS2322: Type '{ type: string; title: string; message: string; }' is not assignable to type 'ReactNode'.
+  Type '{ type: string; title: string; message: string; }' is missing the following properties from type 'ReactPortal': children, props, key
+src/components/modals/CorruptionRecoveryModal.tsx(182,54): error TS2322: Type '{ children: ReactElement<unknown, string | JSXElementConstructor<any>>; isOpen: boolean; onCancel: () => void; className: string; }' is not assignable to type 'IntrinsicAttributes & ConfirmModalProps'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ConfirmModalProps'.
+src/components/transactions/TransactionLedger.tsx(120,9): error TS2322: Type '{ key: string; type: string; defaultValue: string; options: any[]; }[]' is not assignable to type 'FilterConfig[]'.
+  Type '{ key: string; type: string; defaultValue: string; options: any[]; }' is not assignable to type 'FilterConfig'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type '"select"'.
+src/db/budgetDb.ts(165,34): error TS2339: Property 'source' does not exist on type 'Transaction'.
+src/db/budgetDb.ts(165,63): error TS2339: Property 'source' does not exist on type 'Transaction'.
+src/db/budgetDb.ts(166,25): error TS2339: Property 'source' does not exist on type 'Transaction'.
+src/db/budgetDb.ts(177,23): error TS2339: Property 'lastModified' does not exist on type 'Object'.
+src/db/budgetDb.ts(259,20): error TS2322: Type 'string' is not assignable to type 'void[]'.
+src/db/budgetDb.ts(259,30): error TS2322: Type 'boolean' is not assignable to type 'void[]'.
+src/db/budgetDb.ts(269,52): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'IndexableType'.
+src/db/budgetDb.ts(362,46): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'IndexableType'.
+src/db/budgetDb.ts(370,51): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'IndexableType'.
+src/db/budgetDb.ts(377,16): error TS2322: Type 'boolean' is not assignable to type 'void[]'.
+src/db/budgetDb.ts(377,23): error TS2322: Type 'boolean' is not assignable to type 'void[]'.
+src/db/budgetDb.ts(382,58): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'IndexableType'.
+src/db/budgetDb.ts(571,5): error TS2322: Type 'number' is not assignable to type 'number[]'.
+src/services/examples/typedFirebaseUsage.ts(82,65): error TS2345: Argument of type 'BudgetData' is not assignable to parameter of type 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(95,60): error TS2345: Argument of type 'BudgetData' is not assignable to parameter of type 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(98,61): error TS2345: Argument of type 'BudgetData' is not assignable to parameter of type 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(112,30): error TS2345: Argument of type 'FirebaseError' is not assignable to parameter of type 'EnhancedFirebaseError'.
+  Type 'FirebaseError' is missing the following properties from type 'EnhancedFirebaseError': detailedCategory, recoveryStrategy, userMessage, technicalDetails
+src/services/examples/typedFirebaseUsage.ts(137,66): error TS2344: Type 'BudgetData' does not satisfy the constraint 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(141,36): error TS2345: Argument of type 'BudgetData' is not assignable to parameter of type 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(155,30): error TS2345: Argument of type 'FirebaseError' is not assignable to parameter of type 'EnhancedFirebaseError'.
+  Type 'FirebaseError' is missing the following properties from type 'EnhancedFirebaseError': detailedCategory, recoveryStrategy, userMessage, technicalDetails
+src/services/examples/typedFirebaseUsage.ts(179,48): error TS2344: Type 'BudgetData' does not satisfy the constraint 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(181,36): error TS2345: Argument of type 'BudgetData' is not assignable to parameter of type 'SafeUnknown'.
+  Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/examples/typedFirebaseUsage.ts(223,57): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'BudgetData' is not assignable to type 'SafeUnknown'.
+    Type 'BudgetData' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'BudgetData'.
+src/services/typedChunkedSyncService.ts(154,35): error TS2339: Property 'lastSyncTimestamp' does not exist on type '{ resilience: { retry: any; circuit: { state: string; failures: number; successCount: number; totalRequests: number; failureThreshold: any; timeUntilRetry: number; isHealthy: boolean; }; queue: { currentQueueSize: number; ... 6 more ...; created: number; }; timestamp: number; }; ... 4 more ...; isInitialized: boolea...'.
+src/services/typedChunkedSyncService.ts(155,29): error TS2339: Property 'totalChunks' does not exist on type '{ resilience: { retry: any; circuit: { state: string; failures: number; successCount: number; totalRequests: number; failureThreshold: any; timeUntilRetry: number; isHealthy: boolean; }; queue: { currentQueueSize: number; ... 6 more ...; created: number; }; timestamp: number; }; ... 4 more ...; isInitialized: boolea...'.
+src/services/typedChunkedSyncService.ts(156,30): error TS2339: Property 'failedChunks' does not exist on type '{ resilience: { retry: any; circuit: { state: string; failures: number; successCount: number; totalRequests: number; failureThreshold: any; timeUntilRetry: number; isHealthy: boolean; }; queue: { currentQueueSize: number; ... 6 more ...; created: number; }; timestamp: number; }; ... 4 more ...; isInitialized: boolea...'.
+src/services/typedChunkedSyncService.ts(185,42): error TS2345: Argument of type '() => Promise<void>' is not assignable to parameter of type '() => Promise<SafeUnknown>'.
+  Type 'Promise<void>' is not assignable to type 'Promise<SafeUnknown>'.
+    Type 'void' is not assignable to type 'SafeUnknown'.
+src/services/types/firebaseServiceTypes.ts(21,18): error TS2430: Interface 'TypedFirebaseSyncService' incorrectly extends interface 'IFirebaseSyncService'.
+  The types returned by 'saveToCloud(...)' are incompatible between these types.
+    Type 'Promise<TypedResponse<boolean>>' is not assignable to type 'Promise<boolean>'.
+      Type 'TypedResponse<boolean>' is not assignable to type 'boolean'.
+src/services/types/firebaseServiceTypes.ts(39,18): error TS2430: Interface 'TypedChunkedSyncService' incorrectly extends interface 'IChunkedSyncService'.
+  The types returned by 'saveToCloud(...)' are incompatible between these types.
+    Type 'Promise<TypedResponse<boolean>>' is not assignable to type 'Promise<boolean>'.
+      Type 'TypedResponse<boolean>' is not assignable to type 'boolean'.
