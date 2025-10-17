@@ -6,10 +6,28 @@ import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 
 /**
+ * Password rotation hook return type
+ */
+interface UsePasswordRotationReturn {
+  // State
+  rotationDue: boolean;
+  showRotationModal: boolean;
+  newPassword: string;
+  confirmPassword: string;
+
+  // Actions
+  setNewPassword: (password: string) => void;
+  setConfirmPassword: (password: string) => void;
+  handleRotationPasswordChange: () => Promise<void>;
+  dismissRotation: () => void;
+  showRotationDialog: () => void;
+}
+
+/**
  * Custom hook for password rotation management
  * Extracts password rotation logic from Layout component
  */
-const usePasswordRotation = () => {
+const usePasswordRotation = (): UsePasswordRotationReturn => {
   const {
     securityContext: { encryptionKey },
   } = useAuthManager();
@@ -22,7 +40,7 @@ const usePasswordRotation = () => {
 
   // Check password age on component mount and when user unlocks
   useEffect(() => {
-    const checkPasswordAge = () => {
+    const checkPasswordAge = (): void => {
       const stored = localStorage.getItem("passwordLastChanged");
       if (!stored) {
         localStorage.setItem("passwordLastChanged", Date.now().toString());
@@ -41,7 +59,7 @@ const usePasswordRotation = () => {
     }
   }, [encryptionKey]);
 
-  const handleRotationPasswordChange = useCallback(async () => {
+  const handleRotationPasswordChange = useCallback(async (): Promise<void> => {
     if (!newPassword || newPassword !== confirmPassword) {
       showErrorToast("Passwords do not match", "Password Mismatch");
       return;
@@ -57,16 +75,16 @@ const usePasswordRotation = () => {
       logger.warn("Password rotation attempted but requires current password implementation");
     } catch (error) {
       logger.error("Failed to change password:", error);
-      showErrorToast(`Failed to change password: ${error.message}`, "Password Update Failed");
+      showErrorToast(`Failed to change password: ${(error as Error).message}`, "Password Update Failed");
     }
   }, [newPassword, confirmPassword, showErrorToast]);
 
-  const dismissRotation = useCallback(() => {
+  const dismissRotation = useCallback((): void => {
     setShowRotationModal(false);
     // Don't reset rotationDue - user should still see warning banner
   }, []);
 
-  const showRotationDialog = useCallback(() => {
+  const showRotationDialog = useCallback((): void => {
     setShowRotationModal(true);
   }, []);
 
