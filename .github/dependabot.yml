@@ -1,0 +1,163 @@
+version: 2
+updates:
+  # NPM Dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    target-branch: "main"
+    assignees:
+      - "thef4tdaddy"
+    labels:
+      - "dependencies"
+      - "autorelease: pending"
+    open-pull-requests-limit: 5
+    allow:
+      - dependency-type: "all"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps(dev)"
+      include: "scope"
+    pull-request-branch-name:
+      separator: "/"
+    groups:
+      # React ecosystem - block major versions during migration
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-router-dom"
+          - "react-swipeable"
+          - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # TypeScript ecosystem
+      typescript:
+        patterns:
+          - "typescript"
+          - "@typescript-eslint/*"
+          - "ts-*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Firebase - critical for sync
+      firebase:
+        patterns:
+          - "firebase"
+          - "@firebase/*"
+          - "@highlight-run/*"
+          - "highlight.run"
+
+      # TanStack ecosystem
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+
+      # Testing frameworks
+      testing:
+        patterns:
+          - "vitest"
+          - "@testing-library/*"
+          - "playwright"
+          - "jest"
+          - "chai"
+
+      # Build tools
+      build:
+        patterns:
+          - "vite"
+          - "rollup"
+          - "esbuild"
+          - "@rollup/*"
+          - "@vitejs/*"
+
+      # Linting & formatting
+      linting:
+        patterns:
+          - "eslint"
+          - "prettier"
+          - "commitlint"
+
+      # UI & styling
+      styling:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "postcss"
+          - "autoprefixer"
+          - "lucide-react"
+
+      # Data & crypto
+      dataops:
+        patterns:
+          - "dexie"
+          - "zustand"
+          - "uuid"
+          - "buffer"
+          - "bip39"
+          - "pako"
+          - "qrcode*"
+
+      # Other deps
+      other:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "react*"
+          - "@types/react*"
+          - "typescript"
+          - "@typescript-eslint/*"
+          - "ts-*"
+          - "firebase"
+          - "@firebase/*"
+          - "highlight*"
+          - "@tanstack/*"
+          - "vitest"
+          - "@testing-library/*"
+          - "playwright"
+          - "jest"
+          - "chai"
+          - "vite"
+          - "rollup"
+          - "esbuild"
+          - "@rollup/*"
+          - "@vitejs/*"
+          - "eslint"
+          - "prettier"
+          - "commitlint"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "postcss"
+          - "autoprefixer"
+          - "lucide-react"
+          - "dexie"
+          - "zustand"
+          - "uuid"
+          - "buffer"
+          - "bip39"
+          - "pako"
+          - "qrcode*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    target-branch: "main"
+    assignees:
+      - "thef4tdaddy"
+    labels:
+      - "dependencies"
+      - "ci"
+      - "autorelease: pending"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "ci"
+      include: "scope"
