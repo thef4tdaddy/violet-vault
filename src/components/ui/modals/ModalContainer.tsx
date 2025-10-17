@@ -51,6 +51,15 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  const closeOnEscapeRef = useRef(closeOnEscape);
+
+  // Keep refs updated with latest values
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    closeOnEscapeRef.current = closeOnEscape;
+    // eslint-disable-next-line zustand-safe-patterns/zustand-no-store-actions-in-deps
+  }, [onClose, closeOnEscape]);
 
   // Size classes
   const sizeClasses = {
@@ -65,8 +74,8 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (closeOnEscape && e.key === "Escape") {
-        onClose();
+      if (closeOnEscapeRef.current && e.key === "Escape") {
+        onCloseRef.current();
       }
     };
 
@@ -77,7 +86,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, closeOnEscape, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -111,12 +120,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
               className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
               aria-label="Close modal"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
