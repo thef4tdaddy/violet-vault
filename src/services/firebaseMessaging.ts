@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
+import { initializeApp, type FirebaseApp } from "firebase/app";
+import { getMessaging, getToken, onMessage, isSupported, type Messaging } from "firebase/messaging";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
 import logger from "../utils/common/logger";
 
@@ -8,7 +8,39 @@ import logger from "../utils/common/logger";
  * Handles push notification token generation, message reception, and permission management
  */
 
+interface TokenResult {
+  success: boolean;
+  token?: string | null;
+  permission?: NotificationPermission;
+  reason?: string;
+  error?: string;
+}
+
+interface FCMStatus {
+  isInitialized: boolean;
+  isAvailable: boolean;
+  hasToken: boolean;
+  permission: NotificationPermission;
+  hasVapidKey: boolean;
+  tokenAge: number | null;
+  shouldRefresh: boolean;
+}
+
+interface MessagePayload {
+  notification?: {
+    title?: string;
+    body?: string;
+    image?: string;
+  };
+  data?: Record<string, string>;
+}
+
 class FirebaseMessagingService {
+  private messaging: Messaging | null;
+  private isInitialized: boolean;
+  private currentToken: string | null;
+  private vapidKey: string | undefined;
+
   constructor() {
     this.messaging = null;
     this.isInitialized = false;
@@ -24,7 +56,7 @@ class FirebaseMessagingService {
   /**
    * Initialize Firebase Messaging
    */
-  async initialize() {
+  async initialize(): Promise<boolean> {
     try {
       // Skip FCM initialization if using demo Firebase config to prevent service worker conflicts
       if (firebaseConfig.projectId === "demo-project") {
@@ -40,10 +72,10 @@ class FirebaseMessagingService {
       }
 
       // Initialize Firebase app (may already be initialized)
-      let app;
+      let app: FirebaseApp;
       try {
         app = initializeApp(firebaseConfig);
-      } catch (error) {
+      } catch (error: any) {
         // App might already be initialized
         if (error.code === "app/duplicate-app") {
           const { getApp } = await import("firebase/app");
@@ -71,14 +103,14 @@ class FirebaseMessagingService {
   /**
    * Check if FCM is available and supported
    */
-  isAvailable() {
+  isAvailable(): boolean {
     return this.isInitialized && this.messaging !== null;
   }
 
   /**
    * Request notification permission and get FCM token
    */
-  async requestPermissionAndGetToken() {
+  async requestPermissionAndGetToken(): Promise<TokenResult> {
     if (!this.isAvailable()) {
       throw new Error("Firebase Messaging not initialized");
     }
@@ -121,7 +153,7 @@ class FirebaseMessagingService {
   /**
    * Get FCM registration token
    */
-  async getRegistrationToken() {
+  async getRegistrationToken(): Promise<string | null> {
     if (!this.isAvailable()) {
       throw new Error("Firebase Messaging not initialized");
     }
@@ -153,14 +185,14 @@ class FirebaseMessagingService {
   /**
    * Get current stored token
    */
-  getCurrentToken() {
+  getCurrentToken(): string | null {
     return this.currentToken;
   }
 
   /**
    * Check if token needs refresh (older than 7 days)
    */
-  shouldRefreshToken() {
+  shouldRefreshToken(): boolean {
     const timestamp = localStorage.getItem("fcm_token_timestamp");
     if (!timestamp) return true;
 
@@ -172,7 +204,7 @@ class FirebaseMessagingService {
   /**
    * Refresh FCM token if needed
    */
-  async refreshTokenIfNeeded() {
+  async refreshTokenIfNeeded(): Promise<boolean> {
     if (!this.isAvailable()) {
       return false;
     }
@@ -193,12 +225,12 @@ class FirebaseMessagingService {
   /**
    * Set up foreground message handling
    */
-  setupForegroundMessageHandling() {
-    if (!this.isAvailable()) {
+  setupForegroundMessageHandling(): void {
+    if (!this.isAvailable() || !this.messaging) {
       return;
     }
 
-    onMessage(this.messaging, (payload) => {
+    onMessage(this.messaging, (payload: MessagePayload) => {
       logger.info("📨 Received foreground message", payload);
 
       // Extract notification data
@@ -222,7 +254,10 @@ class FirebaseMessagingService {
   /**
    * Display notification in foreground
    */
-  displayNotification(notification, data = {}) {
+  displayNotification(
+    notification: { title?: string; body?: string; image?: string },
+    data: Record<string, string> = {}
+  ): void {
     const { title, body, image } = notification;
 
     // Check if we can show notifications
@@ -272,7 +307,7 @@ class FirebaseMessagingService {
   /**
    * Test message sending (development only)
    */
-  async sendTestMessage() {
+  async sendTestMessage(): Promise<boolean> {
     if (!this.currentToken) {
       logger.warn("No FCM token available for test message");
       return false;
@@ -293,7 +328,7 @@ class FirebaseMessagingService {
   /**
    * Get FCM service status for debugging
    */
-  getStatus() {
+  getStatus(): FCMStatus {
     return {
       isInitialized: this.isInitialized,
       isAvailable: this.isAvailable(),
@@ -308,7 +343,7 @@ class FirebaseMessagingService {
   /**
    * Get token age in hours
    */
-  getTokenAge() {
+  getTokenAge(): number | null {
     const timestamp = localStorage.getItem("fcm_token_timestamp");
     if (!timestamp) return null;
 
@@ -319,7 +354,7 @@ class FirebaseMessagingService {
   /**
    * Clear stored token and reset service
    */
-  clearToken() {
+  clearToken(): void {
     this.currentToken = null;
     localStorage.removeItem("fcm_token");
     localStorage.removeItem("fcm_token_timestamp");
@@ -332,7 +367,7 @@ const firebaseMessagingService = new FirebaseMessagingService();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.firebaseMessagingService = firebaseMessagingService;
+  (window as any).firebaseMessagingService = firebaseMessagingService;
 }
 
 export default firebaseMessagingService;
