@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# ESLint cache
+.eslintcache
+
 # Editor directories and files - keep essential VS Code configs for team consistency
 .vscode/*
 !.vscode/extensions.json
