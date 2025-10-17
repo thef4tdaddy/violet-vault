@@ -1,33 +1,11 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { AnalyticsHeaderProps } from "../../../types/analytics";
 
 /**
  * Analytics header component with title and controls
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
-  dateRange,
-  handleDateRangeChange,
-  handleExport,
-}) => {
-  const formatDateRange = () => {
-    if (!dateRange?.start || !dateRange?.end) return "All Time";
-
-    const start = new Date(dateRange.start);
-    const end = new Date(dateRange.end);
-
-    const formatDate = (date: Date) => {
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
-      });
-    };
-
-    return `${formatDate(start)} - ${formatDate(end)}`;
-  };
-
+const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => {
   return (
     <div className="flex justify-between items-center">
       <div>
@@ -45,39 +23,27 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
         <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Date Range Display */}
-        <div className="text-sm text-gray-600 bg-white px-3 py-2 rounded-lg border border-gray-200">
-          <span className="font-medium">Period: </span>
-          {formatDateRange()}
-        </div>
-
-        {/* Date Range Picker Button */}
-        <button
-          onClick={() => {
-            // This would typically open a date picker modal/dropdown
-            // For now, we'll just pass the current range back
-            const today = new Date();
-            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-            handleDateRangeChange({ start: lastMonth, end: today });
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      <div className="flex gap-3">
+        <select
+          value={dateRange}
+          onChange={handleDateRangeChange}
+          className="px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-lg"
         >
-          {React.createElement(getIcon("Calendar"), {
-            className: "h-4 w-4",
-          })}
-          Change Period
-        </button>
+          <option value="1month">Last Month</option>
+          <option value="3months">Last 3 Months</option>
+          <option value="6months">Last 6 Months</option>
+          <option value="1year">Last Year</option>
+          <option value="all">All Time</option>
+        </select>
 
-        {/* Export Button */}
         <button
           onClick={handleExport}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="btn btn-secondary border-2 border-black flex items-center rounded-xl px-4 py-2"
         >
           {React.createElement(getIcon("Download"), {
-            className: "h-4 w-4",
+            className: "h-4 w-4 mr-2",
           })}
-          Export Data
+          Export
         </button>
       </div>
     </div>
