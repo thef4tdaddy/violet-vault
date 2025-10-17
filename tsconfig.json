@@ -1,39 +1,34 @@
 {
   "compilerOptions": {
-    // Target modern JavaScript
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
     
-    // Enable JavaScript support with type checking
+    /* Incremental Migration */
     "allowJs": true,
     "checkJs": false,
-    "jsx": "react-jsx",
-    
-    // Type checking strictness (start lenient, increase gradually)
-    "strict": false,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
-    
-    // Module resolution
-    "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    
-    // Emit
-    "noEmit": true,
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": true,
-    
-    // Interop
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
     
-    // Advanced
-    "types": ["vite/client", "node"],
+    /* Path aliases */
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

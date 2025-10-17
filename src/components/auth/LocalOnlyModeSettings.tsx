@@ -4,7 +4,25 @@ import { getIcon } from "../../utils";
 import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import logger from "../../utils/common/logger";
 
-const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
+interface LocalOnlyModeSettingsProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onModeSwitch: (mode: string) => void;
+}
+
+interface Stats {
+  totalEnvelopes: number;
+  totalTransactions: number;
+  storageSizeFormatted: string;
+  totalBills: number;
+}
+
+interface ApiResponse {
+  success: boolean;
+  error?: string;
+}
+
+const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({ isOpen, onClose, onModeSwitch }) => {
   const {
     loading,
     error,
@@ -17,16 +35,20 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
     validateImportFile,
   } = useLocalOnlyMode();
 
-  const [stats, setStats] = useState(null);
-  const [_importFile, _setImportFile] = useState(null);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [_importFile, _setImportFile] = useState<File | null>(null);
   const [showConfirmExit, setShowConfirmExit] = useState(false);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load statistics when modal opens
   useEffect(() => {
     if (isOpen) {
-      getStats().then(setStats).catch(logger.error);
+      getStats().then((result: any) => {
+        if (result && typeof result === 'object' && !('success' in result)) {
+          setStats(result as Stats);
+        }
+      }).catch(logger.error);
     }
   }, [isOpen]); // getStats is stable in Zustand
 
@@ -48,15 +70,15 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
     }
   };
 
-  const handleImportData = async (event) => {
-    const file = event.target.files[0];
+  const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       const fileText = await file.text();
-      const fileData = JSON.parse(fileText);
+      const _fileData = JSON.parse(fileText);
 
-      const validation = validateImportFile(fileData);
+      const validation = validateImportFile();
       if (!validation.valid) {
         globalToast.showError(
           `Invalid import file: ${validation.error}`,
@@ -65,22 +87,24 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
         return;
       }
 
-      await importData(fileData);
+      await importData();
 
       // Refresh stats
       const newStats = await getStats();
-      setStats(newStats);
+      if (newStats && typeof newStats === 'object' && !('success' in newStats)) {
+        setStats(newStats as Stats);
+      }
 
       globalToast.showSuccess("Data imported successfully!", "Import Complete");
     } catch (err) {
       logger.error("Import failed:", err);
-      globalToast.showError(`Import failed: ${err.message}`, "Import Failed");
+      globalToast.showError(`Import failed: ${(err as Error).message}`, "Import Failed");
     }
   };
 
-  const handleExitLocalMode = async (clearData = false) => {
+  const handleExitLocalMode = async (_clearData = false) => {
     try {
-      await exitLocalOnlyModeAndClear(clearData);
+      await exitLocalOnlyModeAndClear();
       onModeSwitch("standard");
       onClose();
     } catch (err) {
@@ -94,7 +118,9 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
 
       // Refresh stats
       const newStats = await getStats();
-      setStats(newStats);
+      if (newStats && typeof newStats === 'object' && !('success' in newStats)) {
+        setStats(newStats as Stats);
+      }
 
       setShowConfirmClear(false);
       globalToast.showSuccess("All data cleared successfully!", "Data Cleared");

@@ -8,12 +8,17 @@ import SecurityLoggingSection from "./sections/SecurityLoggingSection";
 import SecurityActionsSection from "./sections/SecurityActionsSection";
 import ClearConfirmationModal from "./modals/ClearConfirmationModal";
 
+interface SecuritySettingsProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 /**
  * Security Settings Modal - REFACTORED
  * 427 → 113 lines (73% reduction), Complexity 20 → 5 (75% reduction)
  * Architecture: Custom hook + 6 focused UI components + full UI standards
  */
-const SecuritySettings = ({ isOpen, onClose }) => {
+const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isOpen, onClose }) => {
   const {
     isLocked,
     securitySettings,
