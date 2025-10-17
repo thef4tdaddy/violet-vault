@@ -1,0 +1,164 @@
+name: Label Issues Automatically
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  auto-label-by-keywords:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Auto-label issues by keywords
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const titleAndBody = `${issue.title} ${issue.body || ''}`.toLowerCase();
+
+            // Get existing labels
+            const { data: repoLabels } = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            const existingLabelNames = repoLabels.map(label => label.name);
+
+            // Define label keywords
+            const labelKeywords = {
+              'bug': ['bug', 'error', 'broken', 'crash', 'issue', 'problem', 'failing', 'fail', 'exception'],
+              'enhancement': ['enhancement', 'feature request', 'feature', 'improve', 'improvement', 'add support'],
+              'documentation': ['docs', 'documentation', 'readme', 'guide', 'tutorial'],
+              'testing': ['test', 'tests', 'testing', 'coverage', 'qa'],
+              'performance': ['performance', 'slow', 'optimize', 'speed', 'lag', 'memory'],
+              'security': ['security', 'vulnerability', 'cve', 'exploit', 'authentication', 'encryption'],
+              'accessibility': ['a11y', 'accessibility', 'wcag', 'keyboard', 'screen reader'],
+              'question': ['question', 'how do i', 'how to', 'help', '?'],
+              'good first issue': ['good first issue', 'beginner', 'easy fix']
+            };
+
+            // Component-based labels
+            const componentKeywords = {
+              'auth': ['auth', 'login', 'password', 'user account', 'sign up', 'sign in'],
+              'sync': ['sync', 'synchronization', 'firebase', 'offline'],
+              'budget': ['budget', 'envelope', 'allocation'],
+              'debt': ['debt', 'loan', 'payment'],
+              'bills': ['bill', 'invoice', 'recurring'],
+              'transactions': ['transaction', 'ledger', 'split'],
+              'analytics': ['analytics', 'chart', 'report', 'dashboard'],
+              'notifications': ['notification', 'alert', 'remind'],
+              'UI': ['ui', 'ux', 'button', 'modal', 'form', 'component'],
+              'PWA': ['pwa', 'offline', 'install', 'web app'],
+              'Electron': ['electron', 'desktop']
+            };
+
+            // Priority detection
+            const priorityKeywords = {
+              '🔴 Critical': ['critical', 'urgent', 'blocking', 'broken', 'down'],
+              '🟠 High': ['high priority', 'important', 'asap'],
+              '🟡 Medium': ['medium priority'],
+              '⚪ Low': ['low priority', 'nice to have']
+            };
+
+            const toLabel = [];
+            const missing = [];
+
+            // Check type labels
+            for (const [label, keywords] of Object.entries(labelKeywords)) {
+              if (keywords.some(keyword => titleAndBody.includes(keyword)) && existingLabelNames.includes(label)) {
+                toLabel.push(label);
+              } else if (keywords.some(keyword => titleAndBody.includes(keyword))) {
+                missing.push(label);
+              }
+            }
+
+            // Check component labels
+            for (const [label, keywords] of Object.entries(componentKeywords)) {
+              if (keywords.some(keyword => titleAndBody.includes(keyword)) && existingLabelNames.includes(label)) {
+                toLabel.push(label);
+              } else if (keywords.some(keyword => titleAndBody.includes(keyword))) {
+                missing.push(label);
+              }
+            }
+
+            // Check priority
+            for (const [label, keywords] of Object.entries(priorityKeywords)) {
+              if (keywords.some(keyword => titleAndBody.includes(keyword)) && existingLabelNames.includes(label)) {
+                toLabel.push(label);
+                break; // Only one priority
+              } else if (keywords.some(keyword => titleAndBody.includes(keyword))) {
+                missing.push(label);
+                break;
+              }
+            }
+
+            // Apply labels
+            if (toLabel.length > 0) {
+              const uniqueLabels = [...new Set(toLabel)];
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: uniqueLabels
+              });
+              console.log(`Applied labels: ${uniqueLabels.join(', ')}`);
+            }
+
+            // Comment about missing labels
+            if (missing.length > 0) {
+              const uniqueMissing = [...new Set(missing)];
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `⚠️ **Missing Labels**\n\nThe auto-labeler detected these categories but the labels don't exist:\n\n${uniqueMissing.map(l => `- \`${l}\``).join('\n')}\n\nPlease create them in [repository settings](https://github.com/${context.repo.owner}/${context.repo.repo}/labels) if needed.`
+              });
+            }
+
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add triage label to new issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+
+            // Only label on initial open
+            if (context.payload.action === 'opened') {
+              try {
+                await github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['Todo']
+                });
+              } catch (error) {
+                console.log('Could not add triage label:', error.message);
+              }
+            }
+
+  missing-info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Flag issues needing more information
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const bodyLength = (issue.body || '').trim().length;
+
+            if (bodyLength < 50) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `📋 **Please provide more details**\n\nYour issue description is quite brief. To help us better understand and fix the problem, please include:\n\n- **Environment**: OS, browser, app version\n- **Steps to reproduce**: Exact steps to trigger the issue\n- **Expected behavior**: What should happen\n- **Actual behavior**: What actually happens\n- **Screenshots/logs**: If applicable\n\nThank you! 🙏`
+              });
+            }
