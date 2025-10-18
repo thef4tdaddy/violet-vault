@@ -27,6 +27,264 @@ const EnvelopeEditModal = lazy(() => import("./EditEnvelopeModal"));
 const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"));
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
+// Empty state component
+const EmptyStateView = ({ filterOptions, setShowCreateModal }) => {
+  const isAllFilters = filterOptions.envelopeType === "all" && filterOptions.showEmpty;
+  
+  if (isAllFilters) {
+    return <EmptyStateHints type="envelopes" onAction={() => setShowCreateModal(true)} />;
+  }
+  
+  return (
+    <div className="text-center py-12">
+      <div className="text-gray-500 text-lg">No envelopes found</div>
+      <p className="text-gray-400 mt-2">Try adjusting your filters</p>
+    </div>
+  );
+};
+
+// Modals container component
+const EnvelopeModals = ({
+  showCreateModal,
+  setShowCreateModal,
+  handleCreateEnvelope,
+  envelopes,
+  budget,
+  unassignedCash,
+  editingEnvelope,
+  setEditingEnvelope,
+  handleUpdateEnvelope,
+  deleteEnvelope,
+  updateBill,
+  bills,
+  historyEnvelope,
+  setHistoryEnvelope,
+  quickFundModal,
+  closeQuickFundModal,
+  handleQuickFundConfirm,
+}) => (
+  <Suspense fallback={<div>Loading...</div>}>
+    {showCreateModal && (
+      <EnvelopeCreateModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreateEnvelope={handleCreateEnvelope}
+        existingEnvelopes={envelopes}
+        currentUser={budget.currentUser}
+        unassignedCash={unassignedCash}
+      />
+    )}
+
+    {editingEnvelope && (
+      <EnvelopeEditModal
+        isOpen={!!editingEnvelope}
+        onClose={() => setEditingEnvelope(null)}
+        envelope={editingEnvelope}
+        onUpdateEnvelope={handleUpdateEnvelope}
+        onDeleteEnvelope={deleteEnvelope}
+        onUpdateBill={(bill) => {
+          try {
+            updateBill({ id: bill.id, updates: bill });
+          } catch (error) {
+            logger.warn("TanStack updateBill failed, using Zustand fallback", error);
+            budget.updateBill(bill);
+          }
+        }}
+        existingEnvelopes={envelopes}
+        allBills={bills}
+        currentUser={budget.currentUser}
+      />
+    )}
+
+    {historyEnvelope && (
+      <EnvelopeHistoryModal
+        isOpen={!!historyEnvelope}
+        onClose={() => setHistoryEnvelope(null)}
+        envelope={historyEnvelope}
+      />
+    )}
+
+    {quickFundModal.isOpen && (
+      <QuickFundModal
+        isOpen={quickFundModal.isOpen}
+        onClose={closeQuickFundModal}
+        onConfirm={handleQuickFundConfirm}
+        envelope={quickFundModal.envelope}
+        suggestedAmount={quickFundModal.suggestedAmount}
+        unassignedCash={unassignedCash}
+      />
+    )}
+  </Suspense>
+);
+
+// Main grid view component
+const EnvelopeGridView = ({
+  containerRef,
+  touchHandlers,
+  pullStyles,
+  className,
+  isPulling,
+  isRefreshing,
+  pullProgress,
+  isReady,
+  pullRotation,
+  totals,
+  unassignedCash,
+  filterOptions,
+  setFilterOptions,
+  setShowCreateModal,
+  viewMode,
+  setViewMode,
+  handleViewHistory,
+  sortedEnvelopes,
+  handleEnvelopeSelect,
+  handleEnvelopeEdit,
+  handleQuickFund,
+  selectedEnvelopeId,
+  bills,
+  ...modalProps
+}) => (
+  <div
+    ref={containerRef}
+    {...touchHandlers}
+    className={`space-y-6 ${className} relative`}
+    style={pullStyles}
+  >
+    <PullToRefreshIndicator
+      isPulling={isPulling}
+      isRefreshing={isRefreshing}
+      pullProgress={pullProgress}
+      isReady={isReady}
+      pullRotation={pullRotation}
+    />
+
+    <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
+
+    <EnvelopeHeader
+      filterOptions={filterOptions}
+      setFilterOptions={setFilterOptions}
+      setShowCreateModal={setShowCreateModal}
+      viewMode={viewMode}
+      setViewMode={setViewMode}
+    />
+
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} />
+      {sortedEnvelopes.map((envelope) => (
+        <EnvelopeItem
+          key={envelope.id}
+          envelope={envelope}
+          onSelect={handleEnvelopeSelect}
+          onEdit={handleEnvelopeEdit}
+          onViewHistory={handleViewHistory}
+          onQuickFund={handleQuickFund}
+          isSelected={selectedEnvelopeId === envelope.id}
+          bills={bills}
+          unassignedCash={unassignedCash}
+        />
+      ))}
+    </div>
+
+    {sortedEnvelopes.length === 0 && (
+      <EmptyStateView filterOptions={filterOptions} setShowCreateModal={setShowCreateModal} />
+    )}
+
+    <EnvelopeModals {...modalProps} />
+  </div>
+);
+
+// Hook for envelope UI state and handlers
+const useEnvelopeUIState = (envelopeData, updateEnvelope, addEnvelope) => {
+  const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
+  const [viewMode, setViewMode] = useState("overview");
+  const [historyEnvelope, setHistoryEnvelope] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingEnvelope, setEditingEnvelope] = useState(null);
+  const [quickFundModal, setQuickFundModal] = useState({
+    isOpen: false,
+    envelope: null,
+    suggestedAmount: 0,
+  });
+  const [filterOptions, setFilterOptions] = useState({
+    timeRange: "current_month",
+    showEmpty: true,
+    sortBy: "usage_desc",
+    envelopeType: "all",
+  });
+
+  const handleEnvelopeSelect = (envelopeId) => {
+    setSelectedEnvelopeId(envelopeId === selectedEnvelopeId ? null : envelopeId);
+  };
+
+  const handleQuickFund = (envelopeId, suggestedAmount) => {
+    const envelope = envelopeData.find((env) => env.id === envelopeId);
+    if (envelope) {
+      setQuickFundModal({ isOpen: true, envelope, suggestedAmount });
+    }
+  };
+
+  const handleQuickFundConfirm = async (envelopeId, amount) => {
+    try {
+      const currentAllocated = envelopeData.find((env) => env.id === envelopeId)?.allocated || 0;
+      await updateEnvelope({
+        envelopeId,
+        updates: { allocated: currentAllocated + amount },
+      });
+      logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
+    } catch (error) {
+      logger.error("Failed to quick fund envelope:", error);
+    }
+  };
+
+  const closeQuickFundModal = () => {
+    setQuickFundModal({ isOpen: false, envelope: null, suggestedAmount: 0 });
+  };
+
+  const handleEnvelopeEdit = (envelope) => setEditingEnvelope(envelope);
+  const handleViewHistory = (envelope) => setHistoryEnvelope(envelope);
+
+  const handleCreateEnvelope = async (envelopeData) => {
+    try {
+      await addEnvelope(envelopeData);
+      setShowCreateModal(false);
+    } catch (error) {
+      logger.error("Failed to create envelope:", error);
+    }
+  };
+
+  const handleUpdateEnvelope = async (envelopeData) => {
+    try {
+      await updateEnvelope({ id: envelopeData.id, updates: envelopeData });
+      setEditingEnvelope(null);
+    } catch (error) {
+      logger.error("Failed to update envelope:", error);
+    }
+  };
+
+  return {
+    selectedEnvelopeId,
+    viewMode,
+    setViewMode,
+    historyEnvelope,
+    setHistoryEnvelope,
+    showCreateModal,
+    setShowCreateModal,
+    editingEnvelope,
+    setEditingEnvelope,
+    quickFundModal,
+    filterOptions,
+    setFilterOptions,
+    handleEnvelopeSelect,
+    handleQuickFund,
+    handleQuickFundConfirm,
+    closeQuickFundModal,
+    handleEnvelopeEdit,
+    handleViewHistory,
+    handleCreateEnvelope,
+    handleUpdateEnvelope,
+  };
+};
+
 // Hook to resolve data from multiple sources with priority
 const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) => {
   const {
@@ -113,29 +371,26 @@ const UnifiedEnvelopeManager = ({
     updateBill,
   } = useResolvedData(propEnvelopes, propTransactions, propUnassignedCash);
 
-  // UI State
-  const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
-  const [viewMode, setViewMode] = useState("overview");
-  const [historyEnvelope, setHistoryEnvelope] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingEnvelope, setEditingEnvelope] = useState(null);
-  const [quickFundModal, setQuickFundModal] = useState({
-    isOpen: false,
-    envelope: null,
-    suggestedAmount: 0,
-  });
-  const [filterOptions, setFilterOptions] = useState({
-    timeRange: "current_month",
-    showEmpty: true,
-    sortBy: "usage_desc",
-    envelopeType: "all",
-  });
+  // Calculate envelope data
+  const envelopeData = useMemo(
+    () => calculateEnvelopeData(envelopes, transactions, bills),
+    [envelopes, transactions, bills]
+  );
 
-  // Pull-to-refresh functionality for envelope data
+  // UI state and handlers
+  const uiState = useEnvelopeUIState(envelopeData, updateEnvelope, addEnvelope);
+
+  // Computed envelope data
+  const sortedEnvelopes = useMemo(() => {
+    const filtered = filterEnvelopes(envelopeData, uiState.filterOptions);
+    return sortEnvelopes(filtered, uiState.filterOptions.sortBy);
+  }, [envelopeData, uiState.filterOptions]);
+
+  const totals = useMemo(() => calculateEnvelopeTotals(envelopeData), [envelopeData]);
+
+  // Pull-to-refresh
   const queryClient = useQueryClient();
-
   const refreshEnvelopeData = async () => {
-    // Invalidate and refetch all envelope-related queries
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["envelopes"] }),
       queryClient.invalidateQueries({ queryKey: ["transactions"] }),
@@ -144,84 +399,11 @@ const UnifiedEnvelopeManager = ({
     ]);
   };
 
-  const {
-    isPulling,
-    isRefreshing,
-    pullProgress,
-    isReady,
-    touchHandlers,
-    containerRef,
-    pullStyles,
-    pullRotation,
-  } = usePullToRefresh(refreshEnvelopeData, {
+  const pullToRefresh = usePullToRefresh(refreshEnvelopeData, {
     threshold: 80,
     resistance: 2.5,
     enabled: true,
   });
-
-  // Calculate envelope data using utility functions
-  const envelopeData = useMemo(() => {
-    return calculateEnvelopeData(envelopes, transactions, bills);
-  }, [envelopes, transactions, bills]);
-
-  const sortedEnvelopes = useMemo(() => {
-    const filtered = filterEnvelopes(envelopeData, filterOptions);
-    return sortEnvelopes(filtered, filterOptions.sortBy);
-  }, [envelopeData, filterOptions]);
-
-  const totals = useMemo(() => {
-    return calculateEnvelopeTotals(envelopeData);
-  }, [envelopeData]);
-
-  // Event Handlers
-  const handleEnvelopeSelect = (envelopeId) => {
-    setSelectedEnvelopeId(envelopeId === selectedEnvelopeId ? null : envelopeId);
-  };
-
-  const handleQuickFund = (envelopeId, suggestedAmount) => {
-    const envelope = envelopeData.find((env) => env.id === envelopeId);
-    if (envelope) {
-      setQuickFundModal({ isOpen: true, envelope, suggestedAmount });
-    }
-  };
-
-  const handleQuickFundConfirm = async (envelopeId, amount) => {
-    try {
-      const currentAllocated = envelopeData.find((env) => env.id === envelopeId)?.allocated || 0;
-      await updateEnvelope({
-        envelopeId,
-        updates: { allocated: currentAllocated + amount },
-      });
-      logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
-    } catch (error) {
-      logger.error("Failed to quick fund envelope:", error);
-    }
-  };
-
-  const closeQuickFundModal = () => {
-    setQuickFundModal({ isOpen: false, envelope: null, suggestedAmount: 0 });
-  };
-
-  const handleEnvelopeEdit = (envelope) => setEditingEnvelope(envelope);
-  const handleViewHistory = (envelope) => setHistoryEnvelope(envelope);
-
-  const handleCreateEnvelope = async (envelopeData) => {
-    try {
-      await addEnvelope(envelopeData);
-      setShowCreateModal(false);
-    } catch (error) {
-      logger.error("Failed to create envelope:", error);
-    }
-  };
-
-  const handleUpdateEnvelope = async (envelopeData) => {
-    try {
-      await updateEnvelope({ id: envelopeData.id, updates: envelopeData });
-      setEditingEnvelope(null);
-    } catch (error) {
-      logger.error("Failed to update envelope:", error);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -232,117 +414,45 @@ const UnifiedEnvelopeManager = ({
   }
 
   return (
-    <div
-      ref={containerRef}
-      {...touchHandlers}
-      className={`space-y-6 ${className} relative`}
-      style={pullStyles}
-    >
-      {/* Pull-to-refresh indicator */}
-      <PullToRefreshIndicator
-        isPulling={isPulling}
-        isRefreshing={isRefreshing}
-        pullProgress={pullProgress}
-        isReady={isReady}
-        pullRotation={pullRotation}
-      />
-
-      <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
-
-      <EnvelopeHeader
-        filterOptions={filterOptions}
-        setFilterOptions={setFilterOptions}
-        setShowCreateModal={setShowCreateModal}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-
-      {/* Envelopes Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {/* Unassigned Cash Envelope - Always shown first */}
-        <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} />
-
-        {/* Regular Envelopes */}
-        {sortedEnvelopes.map((envelope) => (
-          <EnvelopeItem
-            key={envelope.id}
-            envelope={envelope}
-            onSelect={handleEnvelopeSelect}
-            onEdit={handleEnvelopeEdit}
-            onViewHistory={handleViewHistory}
-            onQuickFund={handleQuickFund}
-            isSelected={selectedEnvelopeId === envelope.id}
-            bills={bills}
-            unassignedCash={unassignedCash}
-          />
-        ))}
-      </div>
-
-      {sortedEnvelopes.length === 0 &&
-        (filterOptions.envelopeType === "all" && filterOptions.showEmpty ? (
-          <EmptyStateHints type="envelopes" onAction={() => setShowCreateModal(true)} />
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-500 text-lg">No envelopes found</div>
-            <p className="text-gray-400 mt-2">Try adjusting your filters</p>
-          </div>
-        ))}
-
-      {/* Modals */}
-      <Suspense fallback={<div>Loading...</div>}>
-        {showCreateModal && (
-          <EnvelopeCreateModal
-            isOpen={showCreateModal}
-            onClose={() => setShowCreateModal(false)}
-            onCreateEnvelope={handleCreateEnvelope}
-            existingEnvelopes={envelopes}
-            currentUser={budget.currentUser}
-            unassignedCash={unassignedCash}
-          />
-        )}
-
-        {editingEnvelope && (
-          <EnvelopeEditModal
-            isOpen={!!editingEnvelope}
-            onClose={() => setEditingEnvelope(null)}
-            envelope={editingEnvelope}
-            onUpdateEnvelope={handleUpdateEnvelope}
-            onDeleteEnvelope={deleteEnvelope}
-            onUpdateBill={(bill) => {
-              // Use TanStack mutation with Zustand fallback
-              try {
-                updateBill({ id: bill.id, updates: bill });
-              } catch (error) {
-                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
-                budget.updateBill(bill);
-              }
-            }}
-            existingEnvelopes={envelopes}
-            allBills={bills}
-            currentUser={budget.currentUser}
-          />
-        )}
-
-        {historyEnvelope && (
-          <EnvelopeHistoryModal
-            isOpen={!!historyEnvelope}
-            onClose={() => setHistoryEnvelope(null)}
-            envelope={historyEnvelope}
-          />
-        )}
-
-        {quickFundModal.isOpen && (
-          <QuickFundModal
-            isOpen={quickFundModal.isOpen}
-            onClose={closeQuickFundModal}
-            onConfirm={handleQuickFundConfirm}
-            envelope={quickFundModal.envelope}
-            suggestedAmount={quickFundModal.suggestedAmount}
-            unassignedCash={unassignedCash}
-          />
-        )}
-      </Suspense>
-    </div>
+    <EnvelopeGridView
+      containerRef={pullToRefresh.containerRef}
+      touchHandlers={pullToRefresh.touchHandlers}
+      pullStyles={pullToRefresh.pullStyles}
+      className={className}
+      isPulling={pullToRefresh.isPulling}
+      isRefreshing={pullToRefresh.isRefreshing}
+      pullProgress={pullToRefresh.pullProgress}
+      isReady={pullToRefresh.isReady}
+      pullRotation={pullToRefresh.pullRotation}
+      totals={totals}
+      unassignedCash={unassignedCash}
+      filterOptions={uiState.filterOptions}
+      setFilterOptions={uiState.setFilterOptions}
+      setShowCreateModal={uiState.setShowCreateModal}
+      viewMode={uiState.viewMode}
+      setViewMode={uiState.setViewMode}
+      handleViewHistory={uiState.handleViewHistory}
+      sortedEnvelopes={sortedEnvelopes}
+      handleEnvelopeSelect={uiState.handleEnvelopeSelect}
+      handleEnvelopeEdit={uiState.handleEnvelopeEdit}
+      handleQuickFund={uiState.handleQuickFund}
+      selectedEnvelopeId={uiState.selectedEnvelopeId}
+      bills={bills}
+      showCreateModal={uiState.showCreateModal}
+      handleCreateEnvelope={uiState.handleCreateEnvelope}
+      envelopes={envelopes}
+      budget={budget}
+      editingEnvelope={uiState.editingEnvelope}
+      setEditingEnvelope={uiState.setEditingEnvelope}
+      handleUpdateEnvelope={uiState.handleUpdateEnvelope}
+      deleteEnvelope={deleteEnvelope}
+      updateBill={updateBill}
+      historyEnvelope={uiState.historyEnvelope}
+      setHistoryEnvelope={uiState.setHistoryEnvelope}
+      quickFundModal={uiState.quickFundModal}
+      closeQuickFundModal={uiState.closeQuickFundModal}
+      handleQuickFundConfirm={uiState.handleQuickFundConfirm}
+    />
   );
 };
 
