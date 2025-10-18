@@ -3,6 +3,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
+import localStorageService from "../../../services/storage/localStorageService";
 
 /**
  * Login-related TanStack Query mutations
@@ -65,21 +66,18 @@ const handleNewUserSetup = async (userData, password) => {
 
   // Encrypt and save to localStorage
   const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
-  localStorage.setItem(
-    "envelopeBudgetData",
-    JSON.stringify({
-      encryptedData: encrypted.data,
-      salt: Array.from(newSalt),
-      iv: encrypted.iv,
-    })
-  );
+  localStorageService.setBudgetData({
+    encryptedData: encrypted.data,
+    salt: Array.from(newSalt),
+    iv: encrypted.iv,
+  });
 
   // Save user profile
   const profileData = {
     userName: finalUserData.userName,
     userColor: finalUserData.userColor,
   };
-  localStorage.setItem("userProfile", JSON.stringify(profileData));
+  localStorageService.setUserProfile(profileData);
 
   // Identify user for tracking
   identifyUser(finalUserData.budgetId, {
@@ -101,7 +99,7 @@ const handleNewUserSetup = async (userData, password) => {
  */
 const handleExistingUserLogin = async (password) => {
   logger.auth("Existing user login path.");
-  const savedData = localStorage.getItem("envelopeBudgetData");
+  const savedData = localStorageService.getBudgetData();
   if (!savedData) {
     return {
       success: false,
@@ -112,7 +110,7 @@ const handleExistingUserLogin = async (password) => {
     };
   }
 
-  const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+  const { salt: savedSalt, encryptedData, iv } = savedData;
   if (!savedSalt || !encryptedData || !iv) {
     return {
       success: false,
@@ -129,7 +127,7 @@ const handleExistingUserLogin = async (password) => {
     let currentUserData = decryptedData.currentUser;
 
     if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
-      localStorage.removeItem("envelopeBudgetData");
+      localStorageService.removeBudgetData();
       throw new Error("Legacy data cleared - please create a new budget with share code system");
     }
 

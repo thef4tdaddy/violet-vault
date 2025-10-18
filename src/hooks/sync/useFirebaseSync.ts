@@ -155,4 +155,4 @@ const useFirebaseSync = (
   };
 };
 
-export default useFirebaseSync;
+export { useFirebaseSync };
