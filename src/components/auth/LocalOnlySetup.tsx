@@ -5,37 +5,47 @@ import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import logoOnly from "../../assets/icon-512x512.png";
 import logger from "../../utils/common/logger";
 
-const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
-  const {
-    loading,
-    error,
-    clearError,
-    enterLocalOnlyMode,
-    importData,
-    validateImportFile,
-    isLocalOnlyModeSupported,
-  } = useLocalOnlyMode();
+const AVAILABLE_COLORS = [
+  { name: "Purple", value: "#a855f7" },
+  { name: "Emerald", value: "#10b981" },
+  { name: "Cyan", value: "#06b6d4" },
+  { name: "Rose", value: "#f43f5e" },
+  { name: "Amber", value: "#f59e0b" },
+  { name: "Indigo", value: "#6366f1" },
+  { name: "Pink", value: "#ec4899" },
+  { name: "Teal", value: "#14b8a6" },
+];
 
-  const [step, setStep] = useState("welcome"); // welcome, customize, import
-  const [userName, setUserName] = useState("Local User");
-  const [userColor, setUserColor] = useState("#a855f7");
-  const [importFile, setImportFile] = useState(null);
-  const [_showAdvanced, _setShowAdvanced] = useState(false);
+// Unsupported browser view
+const UnsupportedBrowserView = ({ onSwitchToAuth }) => (
+  <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="glassmorphism rounded-2xl p-8 w-full max-w-md text-center border border-white/30 shadow-2xl">
+      {React.createElement(getIcon("ShieldOff"), {
+        className: "h-16 w-16 text-red-500 mx-auto mb-4",
+      })}
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Local-Only Mode Unavailable</h2>
+      <p className="text-gray-600 mb-6">
+        Your browser doesn't support the features required for local-only mode.
+      </p>
+      <button
+        onClick={onSwitchToAuth}
+        className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
+      >
+        Use Standard Mode
+      </button>
+    </div>
+  </div>
+);
 
-  const colors = [
-    { name: "Purple", value: "#a855f7" },
-    { name: "Emerald", value: "#10b981" },
-    { name: "Cyan", value: "#06b6d4" },
-    { name: "Rose", value: "#f43f5e" },
-    { name: "Amber", value: "#f59e0b" },
-    { name: "Indigo", value: "#6366f1" },
-    { name: "Pink", value: "#ec4899" },
-    { name: "Teal", value: "#14b8a6" },
-  ];
-
-  const support = isLocalOnlyModeSupported();
-
-  const handleStartLocalOnly = async () => {
+// Custom hook for setup logic
+const useSetupLogic = (
+  onModeSelected,
+  clearError,
+  enterLocalOnlyMode,
+  importData,
+  validateImportFile
+) => {
+  const handleStartLocalOnly = async (userName, userColor) => {
     try {
       clearError();
       await enterLocalOnlyMode({
@@ -48,7 +58,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
     }
   };
 
-  const handleImportAndStart = async () => {
+  const handleImportAndStart = async (importFile) => {
     if (!importFile) {
       globalToast.showError("Please select a file to import", "File Required", 8000);
       return;
@@ -74,26 +84,37 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
     }
   };
 
+  return { handleStartLocalOnly, handleImportAndStart };
+};
+
+const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
+  const {
+    loading,
+    error,
+    clearError,
+    enterLocalOnlyMode,
+    importData,
+    validateImportFile,
+    isLocalOnlyModeSupported,
+  } = useLocalOnlyMode();
+
+  const [step, setStep] = useState("welcome");
+  const [userName, setUserName] = useState("Local User");
+  const [userColor, setUserColor] = useState("#a855f7");
+  const [importFile, setImportFile] = useState(null);
+
+  const { handleStartLocalOnly, handleImportAndStart } = useSetupLogic(
+    onModeSelected,
+    clearError,
+    enterLocalOnlyMode,
+    importData,
+    validateImportFile
+  );
+
+  const support = isLocalOnlyModeSupported();
+
   if (!support.supported) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="glassmorphism rounded-2xl p-8 w-full max-w-md text-center border border-white/30 shadow-2xl">
-          {React.createElement(getIcon("ShieldOff"), {
-            className: "h-16 w-16 text-red-500 mx-auto mb-4",
-          })}
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Local-Only Mode Unavailable</h2>
-          <p className="text-gray-600 mb-6">
-            Your browser doesn't support the features required for local-only mode.
-          </p>
-          <Button
-            onClick={onSwitchToAuth}
-            className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            Use Standard Mode
-          </Button>
-        </div>
-      </div>
-    );
+    return <UnsupportedBrowserView onSwitchToAuth={onSwitchToAuth} />;
   }
 
   return (
