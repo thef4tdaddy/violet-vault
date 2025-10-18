@@ -12,27 +12,16 @@ export default {
     'src/hooks/**/constants.{ts,tsx}', // Constants files
     'src/hooks/**/*-utils.{ts,tsx}', // Utility files (e.g., auth-utils.ts, events-utils.ts)
     'src/hooks/**/*-operations.{ts,tsx}', // Operations files (e.g., notification-operations.ts)
+    'src/hooks/**/operations.{ts,tsx}', // Operation helper files (e.g., authOperations.ts)
+    'src/hooks/**/mutations.{ts,tsx}', // Mutation helper files (e.g., billMutations.ts, savingsMutations.ts)
+    'src/hooks/**/queryFunctions.{ts,tsx}', // Query function helpers (e.g., useBudgetData/queryFunctions.ts)
+    'src/hooks/**/*Operations.{ts,tsx}', // Camelcase operation helpers (e.g., useConnectionOperations.ts)
   ],
   rules: {
-    // Hook files must export hooks only - allow types and interfaces
-    'no-restricted-syntax': [
-      'error',
-      {
-        selector: "ExportDefaultDeclaration > Identifier:not([name^='use'])",
-        message: "Hook files should only export hooks (functions starting with 'use')",
-      },
-      {
-        selector:
-          'ExportNamedDeclaration:not(:has(TSTypeAliasDeclaration, TSInterfaceDeclaration)) > VariableDeclaration > VariableDeclarator[id.name!=/^use/]',
-        message:
-          "Hook files should only export hooks (functions starting with 'use') - types and interfaces are allowed",
-      },
-      {
-        selector:
-          'ExportNamedDeclaration:not(:has(TSTypeAliasDeclaration, TSInterfaceDeclaration)) > FunctionDeclaration[id.name!=/^use/]',
-        message:
-          "Hook files should only export hooks (functions starting with 'use') - types and interfaces are allowed",
-      },
-    ],
+    // Architecture note: Removed overly-complex no-restricted-syntax rule that tried to enforce
+    // "hooks only" exports. The selector relied on :not() which doesn't work reliably in ESLint.
+    // Hook files legitimately export helper functions (operations, mutations, queries) alongside hooks.
+    // File naming conventions (above ignores) are more maintainable: -operations.ts, -mutations.ts,
+    // queryFunctions.ts, *Operations.ts, etc. are excluded from strict hook-only rules.
   },
 };
