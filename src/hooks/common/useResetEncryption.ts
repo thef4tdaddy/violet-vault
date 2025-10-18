@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import logger from "../../utils/common/logger";
+import localStorageService from "../../services/storage/localStorageService";
 
 /**
  * Reset encryption hook return type
@@ -15,14 +16,11 @@ export const useResetEncryption = (): UseResetEncryptionReturn => {
     const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
 
     keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
+      localStorageService.removeItem(key);
     });
 
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith("envelopeBudgetData_backup_")) {
-        localStorage.removeItem(key);
-      }
-    });
+    // Remove backup keys
+    localStorageService.removeByPrefix("envelopeBudgetData_backup_");
 
     logger.info("All data cleared, ready for fresh start");
 

@@ -3,6 +3,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
+import localStorageService from "../../../services/storage/localStorageService";
 
 /**
  * Helper function to process join budget operation
@@ -27,7 +28,7 @@ const processJoinBudget = async (joinData) => {
     joinedVia: "shareCode",
     sharedBy: joinData.sharedBy,
   };
-  localStorage.setItem("userProfile", JSON.stringify(profileData));
+  localStorageService.setUserProfile(profileData);
 
   // Save encrypted budget data for persistence
   const initialBudgetData = JSON.stringify({
@@ -39,14 +40,11 @@ const processJoinBudget = async (joinData) => {
   });
 
   const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
-  localStorage.setItem(
-    "envelopeBudgetData",
-    JSON.stringify({
-      encryptedData: encrypted.data,
-      salt: Array.from(newSalt),
-      iv: encrypted.iv,
-    })
-  );
+  localStorageService.setBudgetData({
+    encryptedData: encrypted.data,
+    salt: Array.from(newSalt),
+    iv: encrypted.iv,
+  });
 
   // Identify shared user for tracking
   identifyUser(finalUserData.budgetId, {

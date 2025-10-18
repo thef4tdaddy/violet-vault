@@ -2,10 +2,11 @@
  * Data Diagnostic Tool - Check current state of data and metadata
  * Usage: Copy and paste this into browser console to check data state
  */
+import logger from "@/utils/common/logger";
 
 export const runDataDiagnostic = async () => {
-  console.log("🔍 VioletVault Data Diagnostic Tool");
-  console.log("=".repeat(50));
+  logger.info("🔍 VioletVault Data Diagnostic Tool");
+  logger.info("=".repeat(50));
 
   const results = {
     timestamp: new Date().toISOString(),
@@ -19,14 +20,14 @@ export const runDataDiagnostic = async () => {
     // Check if budgetDb is available
     if (!window.budgetDb) {
       results.errors.push("budgetDb not available on window");
-      console.error("❌ budgetDb not available");
+      logger.error("❌ budgetDb not available");
       return results;
     }
 
-    console.log("📊 Checking all data tables...");
+    logger.info("📊 Checking all data tables...");
 
     // Check metadata specifically
-    console.log("💰 Checking Budget Metadata...");
+    logger.info("💰 Checking Budget Metadata...");
     const metadata = await window.budgetDb.budget.get("metadata");
     results.data.metadata = {
       exists: !!metadata,
@@ -37,10 +38,10 @@ export const runDataDiagnostic = async () => {
     };
 
     if (metadata) {
-      console.log("✅ Budget metadata found:", metadata);
+      logger.info("✅ Budget metadata found:", metadata);
     } else {
-      console.warn("⚠️ No budget metadata record found");
-      console.log("🔧 Attempting to create metadata record...");
+      logger.warn("⚠️ No budget metadata record found");
+      logger.info("🔧 Attempting to create metadata record...");
 
       // Try to create metadata record
       try {
@@ -54,11 +55,11 @@ export const runDataDiagnostic = async () => {
         };
 
         await window.budgetDb.budget.put(defaultMetadata);
-        console.log("✅ Created metadata record:", defaultMetadata);
+        logger.info("✅ Created metadata record:", defaultMetadata);
         results.data.metadata.created = true;
         results.data.metadata.record = defaultMetadata;
       } catch (error) {
-        console.error("❌ Failed to create metadata:", error);
+        logger.error("❌ Failed to create metadata:", error);
         results.errors.push(`Failed to create metadata: ${error.message}`);
       }
     }
@@ -75,42 +76,42 @@ export const runDataDiagnostic = async () => {
           count,
           sample: sample[0] || null,
         };
-        console.log(`📊 ${table}: ${count} records`);
+        logger.info(`📊 ${table}: ${count} records`);
       } catch (err) {
         counts[table] = { error: err.message };
-        console.error(`❌ Error checking ${table}:`, err);
+        logger.error(`❌ Error checking ${table}:`, err);
       }
     }
 
     results.data.tableCounts = counts;
 
     // Check budget table specifically
-    console.log("📋 Checking budget table contents...");
+    logger.info("📋 Checking budget table contents...");
     const budgetRecords = await window.budgetDb.budget.toArray();
     results.data.budgetTable = {
       totalRecords: budgetRecords.length,
       records: budgetRecords,
     };
 
-    console.log("📋 Budget table records:", budgetRecords);
+    logger.info("📋 Budget table records:", budgetRecords);
   } catch (error) {
     results.errors.push(`Diagnostic failed: ${error.message}`);
-    console.error("❌ Diagnostic error:", error);
+    logger.error("❌ Diagnostic error:", error);
   }
 
   // Summary
-  console.log("\n" + "=".repeat(50));
-  console.log("📋 DIAGNOSTIC SUMMARY");
-  console.log("=".repeat(50));
+  logger.info("\n" + "=".repeat(50));
+  logger.info("📋 DIAGNOSTIC SUMMARY");
+  logger.info("=".repeat(50));
 
   if (results.errors.length > 0) {
-    console.error("❌ ERRORS:", results.errors);
+    logger.error("❌ ERRORS:", results.errors);
   } else {
-    console.log("✅ Diagnostic completed successfully");
+    logger.info("✅ Diagnostic completed successfully");
   }
 
-  console.log("\n💾 Full diagnostic results:");
-  console.log(results);
+  logger.info("\n💾 Full diagnostic results:");
+  logger.info(results);
 
   return results;
 };
@@ -118,21 +119,21 @@ export const runDataDiagnostic = async () => {
 // Paycheck Data Cleanup Utility
 // Detailed Paycheck Inspection Tool
 export const inspectPaycheckRecords = async () => {
-  console.log("🔍 VioletVault Paycheck Inspection Tool");
-  console.log("=".repeat(50));
+  logger.info("🔍 VioletVault Paycheck Inspection Tool");
+  logger.info("=".repeat(50));
 
   if (!window.budgetDb) {
-    console.error("❌ budgetDb not available");
+    logger.error("❌ budgetDb not available");
     return { success: false, error: "budgetDb not available" };
   }
 
   try {
     const allPaychecks = await window.budgetDb.paycheckHistory.toArray();
-    console.log(`📊 Found ${allPaychecks.length} total paycheck records`);
+    logger.info(`📊 Found ${allPaychecks.length} total paycheck records`);
 
     allPaychecks.forEach((paycheck, index) => {
-      console.log(`\n📋 Paycheck Record #${index + 1}:`);
-      console.log({
+      logger.info(`\n📋 Paycheck Record #${index + 1}:`);
+      logger.info({
         id: paycheck.id,
         idType: typeof paycheck.id,
         idValid: !!(paycheck.id && typeof paycheck.id === "string" && paycheck.id !== ""),
@@ -151,24 +152,24 @@ export const inspectPaycheckRecords = async () => {
 
     return { success: true, total: allPaychecks.length, records: allPaychecks };
   } catch (error) {
-    console.error("❌ Paycheck inspection failed:", error);
+    logger.error("❌ Paycheck inspection failed:", error);
     return { success: false, error: error.message };
   }
 };
 
 export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
-  console.log("🧹 VioletVault Paycheck Cleanup Tool");
-  console.log("=".repeat(50));
+  logger.info("🧹 VioletVault Paycheck Cleanup Tool");
+  logger.info("=".repeat(50));
 
   if (!window.budgetDb) {
-    console.error("❌ budgetDb not available");
+    logger.error("❌ budgetDb not available");
     return { success: false, error: "budgetDb not available" };
   }
 
   try {
     // Get all paycheck history
     const allPaychecks = await window.budgetDb.paycheckHistory.toArray();
-    console.log(`📊 Found ${allPaychecks.length} paycheck records`);
+    logger.info(`📊 Found ${allPaychecks.length} paycheck records`);
 
     // Identify corrupted paychecks (missing required fields or invalid data)
     const corruptedPaychecks = allPaychecks.filter((paycheck) => {
@@ -193,7 +194,7 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
 
       // Log details for debugging
       if (hasInvalidId || hasInvalidAmount || hasInvalidDate) {
-        console.log(`🔍 Found potentially corrupted paycheck:`, {
+        logger.info(`🔍 Found potentially corrupted paycheck:`, {
           id: paycheck.id,
           idValid: !hasInvalidId,
           amount: paycheck.amount,
@@ -207,10 +208,10 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
       return hasInvalidId || hasInvalidAmount || hasInvalidDate;
     });
 
-    console.log(`🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`);
+    logger.info(`🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`);
 
     if (corruptedPaychecks.length > 0) {
-      console.log("💀 Corrupted paychecks:", corruptedPaychecks);
+      logger.info("💀 Corrupted paychecks:", corruptedPaychecks);
 
       const confirmed = confirmCallback
         ? await confirmCallback({
@@ -220,7 +221,8 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
             cancelLabel: "Cancel",
             destructive: true,
           })
-        : window.confirm(
+        : /* eslint-disable-next-line no-restricted-syntax -- diagnostic tool for browser console */
+          window.confirm(
             `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`
           );
 
@@ -240,13 +242,13 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
         });
 
         await Promise.all(deletePromises);
-        console.log(
+        logger.info(
           `✅ Successfully deleted ${corruptedPaychecks.length} corrupted paycheck records`
         );
 
         // Verify cleanup
         const remainingPaychecks = await window.budgetDb.paycheckHistory.toArray();
-        console.log(`📊 Remaining paycheck records: ${remainingPaychecks.length}`);
+        logger.info(`📊 Remaining paycheck records: ${remainingPaychecks.length}`);
 
         return {
           success: true,
@@ -254,15 +256,15 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
           remaining: remainingPaychecks.length,
         };
       } else {
-        console.log("❌ Cleanup cancelled by user");
+        logger.info("❌ Cleanup cancelled by user");
         return { success: false, error: "Cancelled by user" };
       }
     } else {
-      console.log("✅ No corrupted paycheck records found");
+      logger.info("✅ No corrupted paycheck records found");
       return { success: true, deleted: 0, remaining: allPaychecks.length };
     }
   } catch (error) {
-    console.error("❌ Paycheck cleanup failed:", error);
+    logger.error("❌ Paycheck cleanup failed:", error);
     return { success: false, error: error.message };
   }
 };
