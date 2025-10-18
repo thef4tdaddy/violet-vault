@@ -1,5 +1,4 @@
-import React from "react";
-import { useTouchFeedback } from "../../utils/ui/touchFeedback";
+import { useTouchFeedback } from "@/utils/ui/touchFeedback";
 import {
   TransferEnvelopeSelect,
   TransferAmountInput,

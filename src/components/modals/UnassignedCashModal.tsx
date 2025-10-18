@@ -1,5 +1,4 @@
 import React, { memo, lazy, Suspense } from "react";
-import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";

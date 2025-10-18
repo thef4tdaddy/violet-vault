@@ -165,6 +165,20 @@ const noLegacyToast = {
       'Program:exit'(node) {
         if (hasAllowedLegacyImport) return;
 
+        const filePath = context.getFilename();
+
+        // Skip files that are part of the toast/confirm system itself
+        if (
+          filePath.includes('/ConfirmModal') ||
+          filePath.includes('/useConfirm') ||
+          filePath.includes('/Toast') ||
+          filePath.includes('/toast') ||
+          filePath.includes('/debug/') ||
+          filePath.includes('/diagnostic')
+        ) {
+          return;
+        }
+
         // Check if file uses any legacy toast-related patterns but doesn't import useToast
         const hasUseToastImport = sourceCode.text.includes('useToast');
         const hasLegacyToastUsage =

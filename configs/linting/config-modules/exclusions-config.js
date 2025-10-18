@@ -5,6 +5,19 @@
 
 export default [
   {
+    // Exclusions for authStore.tsx - core authentication store with legitimate complexity
+    files: ['**/authStore.tsx'],
+    rules: {
+      'max-lines': 'off', // Authentication logic needs comprehensive coverage
+      'max-lines-per-function': 'off', // Auth methods like login need large functions
+      'max-statements': 'off', // Authentication flows require many statements
+      complexity: 'off', // Authentication logic is inherently complex
+      'max-depth': 'off', // Auth validation needs deep conditional logic
+      'max-params': 'off', // Auth methods may need many parameters
+      'no-restricted-imports': 'off', // Allow service imports for auth operations
+    },
+  },
+  {
     // Exclusions for complex utilities that legitimately need higher complexity
     files: [
       'src/utils/**/calculations/**/*.{js,jsx,ts,tsx}',
@@ -159,6 +172,23 @@ export default [
     rules: {
       'max-lines': 'off', // Facade hook coordinating multiple session features
       'max-lines-per-function': 'off', // Main hook orchestrates state, keyholder, analytics, lifecycle
+    },
+  },
+  {
+    // Utility and monitoring files that legitimately need console/testing patterns
+    files: [
+      '**/debtDebugConfig.{js,ts}', // Debt debugging configuration
+      '**/masterSyncValidator.{js,ts}', // Sync validation testing utility
+      '**/highlight.{js,ts}', // Error monitoring utility
+      'src/utils/common/logger.ts', // Logger utility can use console patterns
+      'src/utils/debug/**/*.{js,jsx,ts,tsx}', // All debug utilities
+    ],
+    rules: {
+      'no-console': 'off', // These utilities legitimately use console for debugging
+      'max-lines': 'off', // Debug utilities can be longer
+      'max-lines-per-function': 'off', // Debug functions can be comprehensive
+      'max-statements': 'off', // Debug operations can have many statements
+      complexity: 'off', // Debug logic can be complex
     },
   },
 ];

@@ -1,5 +1,4 @@
 import React from "react";
-import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useEnvelopeForm from "../../hooks/budgeting/useEnvelopeForm";
@@ -30,7 +29,6 @@ const CreateEnvelopeModal = ({
     isLoading,
     canSubmit,
     calculatedAmounts,
-    _isDirty,
 
     // Form actions
     updateFormField,

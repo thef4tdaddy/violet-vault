@@ -55,12 +55,7 @@ const BillDiscoveryModal = ({
     return "text-gray-600 bg-gray-100";
   };
 
-  const getConfidenceIcon = (confidence) => {
-    if (confidence >= 0.8) return "CheckCircle";
-    if (confidence >= 0.6) return "Target";
-    if (confidence >= 0.4) return "Clock";
-    return "AlertTriangle";
-  };
+
 
   const getBillIconComponent = (bill) => {
     if (bill.iconName && typeof bill.iconName === "string") {
@@ -179,7 +174,6 @@ const BillDiscoveryModal = ({
               <div className="overflow-y-auto max-h-96 space-y-3">
                 {discoveredBills.map((bill) => {
                   const isSelected = selectedBills.has(bill.id);
-                  const confidenceIconName = getConfidenceIcon(bill.confidence);
 
                   return (
                     <div

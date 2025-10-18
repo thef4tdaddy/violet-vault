@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { Link } from "react-router-dom";
 import { getIcon } from "../../utils";
 

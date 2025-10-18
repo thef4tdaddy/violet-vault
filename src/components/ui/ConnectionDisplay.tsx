@@ -1,6 +1,4 @@
 import React from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useConnectionManager } from "../../hooks/common/useConnectionManager";
 
