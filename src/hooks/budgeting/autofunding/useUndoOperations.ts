@@ -2,6 +2,65 @@ import { useState, useCallback } from "react";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
 import logger from "../../../utils/common/logger";
 
+// Helper to create single target transfer
+const createSingleTransfer = (executionRecord, result) => ({
+  fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
+  toEnvelopeId: result.targetEnvelopes[0].id,
+  amount: result.amount,
+  description: result.description || `Auto-funding: ${result.ruleName}`,
+  executedAt: executionRecord.executedAt,
+});
+
+// Helper to create multiple target transfers
+const createMultipleTransfers = (executionRecord, result) => {
+  const amountPerTarget = result.amount / result.targetEnvelopes.length;
+  return result.targetEnvelopes.map((envelope) => ({
+    fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
+    toEnvelopeId: envelope.id,
+    amount: amountPerTarget,
+    description: result.description || `Auto-funding: ${result.ruleName}`,
+    executedAt: executionRecord.executedAt,
+  }));
+};
+
+// Helper to extract undoable transfers from execution results
+const extractUndoableTransfers = (executionRecord, executionResults) => {
+  const transfers = [];
+  
+  executionResults.forEach((result) => {
+    if (result.success && result.targetEnvelopes) {
+      if (result.targetEnvelopes.length === 1) {
+        transfers.push(createSingleTransfer(executionRecord, result));
+      } else {
+        transfers.push(...createMultipleTransfers(executionRecord, result));
+      }
+    }
+  });
+  
+  return transfers;
+};
+
+// Helper to create undo record
+const createUndoRecord = (executionId, totalAmount) => ({
+  id: `undo_${executionId}_${Date.now()}`,
+  trigger: "manual_undo",
+  executedAt: new Date().toISOString(),
+  rulesExecuted: 0,
+  totalFunded: -totalAmount, // Negative to indicate reversal
+  results: [
+    {
+      ruleId: "undo_operation",
+      ruleName: "Undo Operation",
+      success: true,
+      amount: totalAmount,
+      executedAt: new Date().toISOString(),
+      originalExecutionId: executionId,
+    },
+  ],
+  isUndo: true,
+  originalExecutionId: executionId,
+});
+
 /**
  * Hook for managing auto-funding undo operations
  * Extracted from useAutoFundingHistory.js to reduce complexity
@@ -17,35 +76,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
         return; // No transfers to undo
       }
 
-      const undoableTransfers = [];
-
-      // Extract transfer information for undo
-      executionResults.forEach((result) => {
-        if (result.success && result.targetEnvelopes) {
-          if (result.targetEnvelopes.length === 1) {
-            // Single target transfer
-            undoableTransfers.push({
-              fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
-              toEnvelopeId: result.targetEnvelopes[0].id,
-              amount: result.amount,
-              description: result.description || `Auto-funding: ${result.ruleName}`,
-              executedAt: executionRecord.executedAt,
-            });
-          } else {
-            // Multiple target transfers - split amount
-            const amountPerTarget = result.amount / result.targetEnvelopes.length;
-            result.targetEnvelopes.forEach((envelope) => {
-              undoableTransfers.push({
-                fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
-                toEnvelopeId: envelope.id,
-                amount: amountPerTarget,
-                description: result.description || `Auto-funding: ${result.ruleName}`,
-                executedAt: executionRecord.executedAt,
-              });
-            });
-          }
-        }
-      });
+      const undoableTransfers = extractUndoableTransfers(executionRecord, executionResults);
 
       if (undoableTransfers.length > 0) {
         const undoItem = {
@@ -157,26 +188,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
         );
 
         // Add undo record to execution history
-        const undoRecord = {
-          id: `undo_${executionId}_${Date.now()}`,
-          trigger: "manual_undo",
-          executedAt: new Date().toISOString(),
-          rulesExecuted: 0,
-          totalFunded: -undoItem.totalAmount, // Negative to indicate reversal
-          results: [
-            {
-              ruleId: "undo_operation",
-              ruleName: "Undo Operation",
-              success: true,
-              amount: undoItem.totalAmount,
-              executedAt: new Date().toISOString(),
-              originalExecutionId: executionId,
-            },
-          ],
-          isUndo: true,
-          originalExecutionId: executionId,
-        };
-
+        const undoRecord = createUndoRecord(executionId, undoItem.totalAmount);
         addToHistory(undoRecord);
 
         logger.info("Undo operation completed successfully", {

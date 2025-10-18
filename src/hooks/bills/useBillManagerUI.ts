@@ -7,6 +7,41 @@
 import { useCallback, useMemo } from "react";
 import { getIconByName } from "../../utils/common/billIcons";
 
+// Urgency color mapping
+const URGENCY_COLORS = {
+  overdue: "text-red-600 bg-red-50",
+  urgent: "text-orange-600 bg-orange-50",
+  soon: "text-yellow-600 bg-yellow-50",
+  normal: "text-green-600 bg-green-50",
+};
+
+// Helper to create view mode configuration
+const createViewMode = (id, label, count, icon, color) => ({
+  id,
+  label,
+  count,
+  icon,
+  color,
+});
+
+// Helper to create summary card configuration
+const createSummaryCard = (label, value, color, bg, priority) => ({
+  label,
+  value,
+  color,
+  bg,
+  priority,
+});
+
+// Helper to format days display
+const formatDaysDisplay = (daysUntilDue) => {
+  if (daysUntilDue === null) return null;
+  if (daysUntilDue < 0) {
+    return `${Math.abs(daysUntilDue)} days overdue`;
+  }
+  return `${daysUntilDue} days left`;
+};
+
 /**
  * Custom hook for BillManager UI logic
  * @param {Object} options - Configuration options
@@ -25,34 +60,10 @@ export const useBillManagerUI = ({
   // View modes configuration with business logic
   const viewModes = useMemo(
     () => [
-      {
-        id: "upcoming",
-        label: "Upcoming",
-        count: categorizedBills.upcoming?.length || 0,
-        icon: "Calendar",
-        color: "blue",
-      },
-      {
-        id: "overdue",
-        label: "Overdue",
-        count: categorizedBills.overdue?.length || 0,
-        icon: "AlertTriangle",
-        color: "red",
-      },
-      {
-        id: "paid",
-        label: "Paid",
-        count: categorizedBills.paid?.length || 0,
-        icon: "CheckCircle",
-        color: "green",
-      },
-      {
-        id: "all",
-        label: "All Bills",
-        count: bills?.length || 0,
-        icon: "FileText",
-        color: "gray",
-      },
+      createViewMode("upcoming", "Upcoming", categorizedBills.upcoming?.length || 0, "Calendar", "blue"),
+      createViewMode("overdue", "Overdue", categorizedBills.overdue?.length || 0, "AlertTriangle", "red"),
+      createViewMode("paid", "Paid", categorizedBills.paid?.length || 0, "CheckCircle", "green"),
+      createViewMode("all", "All Bills", bills?.length || 0, "FileText", "gray"),
     ],
     [categorizedBills, bills]
   );
@@ -112,13 +123,7 @@ export const useBillManagerUI = ({
   }, []);
 
   const getUrgencyColors = useCallback((urgency) => {
-    const urgencyColors = {
-      overdue: "text-red-600 bg-red-50",
-      urgent: "text-orange-600 bg-orange-50",
-      soon: "text-yellow-600 bg-yellow-50",
-      normal: "text-green-600 bg-green-50",
-    };
-    return urgencyColors[urgency] || urgencyColors.normal;
+    return URGENCY_COLORS[urgency] || URGENCY_COLORS.normal;
   }, []);
 
   // Selection state helpers
@@ -139,34 +144,10 @@ export const useBillManagerUI = ({
     const { overdue = 0, upcoming = 0, paid = 0, total = 0 } = totals;
 
     return [
-      {
-        label: "Overdue",
-        value: overdue,
-        color: "text-red-600",
-        bg: "bg-red-50",
-        priority: 1,
-      },
-      {
-        label: "Upcoming",
-        value: upcoming,
-        color: "text-blue-600",
-        bg: "bg-blue-50",
-        priority: 2,
-      },
-      {
-        label: "Paid This Month",
-        value: paid,
-        color: "text-green-600",
-        bg: "bg-green-50",
-        priority: 3,
-      },
-      {
-        label: "Total",
-        value: total,
-        color: "text-gray-600",
-        bg: "bg-gray-50",
-        priority: 4,
-      },
+      createSummaryCard("Overdue", overdue, "text-red-600", "bg-red-50", 1),
+      createSummaryCard("Upcoming", upcoming, "text-blue-600", "bg-blue-50", 2),
+      createSummaryCard("Paid This Month", paid, "text-green-600", "bg-green-50", 3),
+      createSummaryCard("Total", total, "text-gray-600", "bg-gray-50", 4),
     ];
   }, []);
 
@@ -178,13 +159,7 @@ export const useBillManagerUI = ({
       const isSelected = selectedBills.has(bill.id);
 
       const dueDateDisplay = bill.dueDate ? new Date(bill.dueDate).toLocaleDateString() : "Not set";
-
-      const daysDisplay =
-        bill.daysUntilDue !== null
-          ? bill.daysUntilDue < 0
-            ? `${Math.abs(bill.daysUntilDue)} days overdue`
-            : `${bill.daysUntilDue} days left`
-          : null;
+      const daysDisplay = formatDaysDisplay(bill.daysUntilDue);
 
       return {
         Icon,

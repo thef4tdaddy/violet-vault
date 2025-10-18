@@ -11,6 +11,57 @@ const triggerBillSync = (changeType) => {
   }
 };
 
+// Helper to create payment transaction record
+const createPaymentTransaction = (bill, billId, paidAmount, paymentDate, envelopeId) => {
+  return {
+    id: `${billId}_payment_${Date.now()}`,
+    date: paymentDate,
+    description: bill.provider || bill.description || bill.name || "Bill Payment",
+    amount: -Math.abs(paidAmount), // Negative for expense
+    envelopeId: envelopeId || "unassigned",
+    category: bill.category || "Bills & Utilities",
+    type: "expense",
+    source: "bill_payment",
+    billId: billId,
+    notes: `Payment for ${bill.provider || bill.description || bill.name}`,
+    createdAt: new Date().toISOString(),
+  };
+};
+
+// Helper to update envelope balance after payment
+const updateEnvelopeForPayment = async (envelopeId, paidAmount, paymentDate, billId, transactionId) => {
+  const envelope = await budgetDb.envelopes.get(envelopeId);
+  if (!envelope) return;
+
+  const newBalance = (envelope.currentBalance || 0) - paidAmount;
+  const envelopeUpdate = {
+    currentBalance: newBalance,
+    updatedAt: new Date().toISOString(),
+    lastTransaction: {
+      type: "bill_payment",
+      amount: -paidAmount,
+      date: paymentDate,
+      billId: billId,
+      transactionId: transactionId,
+    },
+    name: envelope.name || `Envelope ${envelopeId}`,
+    category: envelope.category || "Other",
+  };
+
+  await budgetDb.envelopes.update(envelopeId, envelopeUpdate);
+  await optimisticHelpers.updateEnvelope(envelopeId, {
+    currentBalance: newBalance,
+  });
+
+  logger.debug("💰 Updated envelope balance for bill payment", {
+    envelopeId,
+    envelopeName: envelope.name,
+    oldBalance: envelope.currentBalance || 0,
+    newBalance,
+    paidAmount,
+  });
+};
+
 /**
  * Add bill mutation hook
  */
@@ -181,19 +232,7 @@ export const useMarkBillPaidMutation = () => {
       });
 
       // Create transaction record for the bill payment
-      const paymentTransaction = {
-        id: `${billId}_payment_${Date.now()}`,
-        date: paymentDate,
-        description: bill.provider || bill.description || bill.name || "Bill Payment",
-        amount: -Math.abs(paidAmount), // Negative for expense
-        envelopeId: envelopeId || "unassigned",
-        category: bill.category || "Bills & Utilities",
-        type: "expense",
-        source: "bill_payment",
-        billId: billId,
-        notes: `Payment for ${bill.provider || bill.description || bill.name}`,
-        createdAt: new Date().toISOString(),
-      };
+      const paymentTransaction = createPaymentTransaction(bill, billId, paidAmount, paymentDate, envelopeId);
 
       // Add transaction to Dexie
       await budgetDb.transactions.put(paymentTransaction);
@@ -201,37 +240,7 @@ export const useMarkBillPaidMutation = () => {
 
       // If bill is linked to envelope, update envelope balance
       if (envelopeId && paidAmount) {
-        const envelope = await budgetDb.envelopes.get(envelopeId);
-        if (envelope) {
-          const newBalance = (envelope.currentBalance || 0) - paidAmount;
-
-          const envelopeUpdate = {
-            currentBalance: newBalance,
-            updatedAt: new Date().toISOString(),
-            lastTransaction: {
-              type: "bill_payment",
-              amount: -paidAmount,
-              date: paymentDate,
-              billId: billId,
-              transactionId: paymentTransaction.id,
-            },
-            name: envelope.name || `Envelope ${envelopeId}`,
-            category: envelope.category || "Other",
-          };
-
-          await budgetDb.envelopes.update(envelopeId, envelopeUpdate);
-          await optimisticHelpers.updateEnvelope(envelopeId, {
-            currentBalance: newBalance,
-          });
-
-          logger.debug("💰 Updated envelope balance for bill payment", {
-            envelopeId,
-            envelopeName: envelope.name,
-            oldBalance: envelope.currentBalance || 0,
-            newBalance,
-            paidAmount,
-          });
-        }
+        await updateEnvelopeForPayment(envelopeId, paidAmount, paymentDate, billId, paymentTransaction.id);
       }
 
       return { billId, paymentTransaction };

@@ -47,20 +47,39 @@ const connectDebt = async (entityId, targetId, envelopes, updateDebt, addToast) 
   });
 };
 
+interface ConnectParams {
+  entityType: string;
+  entityId: string;
+  targetId: string;
+  currentEntity: any;
+  envelopes: any[];
+  bills: any[];
+  debts?: any[];
+  updateBill: (id: string, updates: any) => Promise<void>;
+  updateDebt: (params: { id: string; updates: any }) => Promise<void>;
+}
+
+interface DisconnectParams {
+  entityType: string;
+  entityId: string;
+  currentConnections: any[];
+  updateBill: (id: string, updates: any) => Promise<void>;
+  updateDebt: (params: { id: string; updates: any }) => Promise<void>;
+}
+
 export const useConnectionOperations = () => {
   const { addToast } = useToast();
 
-  const handleConnect = async (
+  const handleConnect = async ({
     entityType,
     entityId,
     targetId,
     currentEntity,
     envelopes,
     bills,
-    _debts,
     updateBill,
-    updateDebt
-  ) => {
+    updateDebt,
+  }: ConnectParams) => {
     if (!targetId || !currentEntity) return { success: false };
 
     logger.debug("🔗 Creating connection", {
@@ -107,13 +126,13 @@ export const useConnectionOperations = () => {
     }
   };
 
-  const handleDisconnect = async (
+  const handleDisconnect = async ({
     entityType,
     entityId,
     currentConnections,
     updateBill,
-    updateDebt
-  ) => {
+    updateDebt,
+  }: DisconnectParams) => {
     if (currentConnections.length === 0) return { success: false };
 
     logger.debug("🔗 Removing connection", {

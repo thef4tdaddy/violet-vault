@@ -5,17 +5,26 @@
 import useToast from "../useToast";
 import logger from "../../../utils/common/logger";
 
+interface AutoPopulateParams {
+  entityType: string;
+  entityId: string;
+  billId: string | null;
+  bills: any[];
+  currentEntity: any;
+  updateEnvelope: (id: string, updates: any) => Promise<void>;
+}
+
 export const useAutoPopulate = () => {
   const { addToast } = useToast();
 
-  const handleAutoPopulate = async (
+  const handleAutoPopulate = async ({
     entityType,
     entityId,
     billId,
     bills,
     currentEntity,
-    updateEnvelope
-  ) => {
+    updateEnvelope,
+  }: AutoPopulateParams) => {
     if (entityType !== "envelope" || !billId) return;
 
     const targetBill = bills.find((b) => b.id === billId);

@@ -94,6 +94,34 @@ const triggerDownload = (exportableData) => {
   return dataStr.length;
 };
 
+const logExportSuccess = (data, pureTransactions, fileSize) => {
+  const [envelopes, bills, , , debts, , ,] = data;
+  
+  logger.info("Export completed successfully", {
+    envelopes: envelopes.length,
+    bills: bills.length,
+    transactions: pureTransactions.length,
+    fileSizeKB: Math.round(fileSize / 1024),
+  });
+
+  return {
+    envelopes: envelopes.length,
+    bills: bills.length,
+    debts: debts.length,
+    transactions: pureTransactions.length,
+    fileSizeKB: Math.round(fileSize / 1024),
+  };
+};
+
+const buildExportSummary = (counts) => {
+  return [
+    `${counts.envelopes} envelopes`,
+    `${counts.bills} bills`,
+    `${counts.debts} debts`,
+    `${counts.transactions} transactions`,
+  ].join(", ");
+};
+
 export const useExportData = () => {
   const { user: currentUser } = useAuthManager();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
@@ -111,26 +139,13 @@ export const useExportData = () => {
 
       const exportableData = constructExportObject(data, currentUser);
       const fileSize = triggerDownload(exportableData);
-
-      const [envelopes, bills, , , debts, , ,] = data;
       const pureTransactions = exportableData.transactions;
 
-      logger.info("Export completed successfully", {
-        envelopes: envelopes.length,
-        bills: bills.length,
-        transactions: pureTransactions.length,
-        fileSizeKB: Math.round(fileSize / 1024),
-      });
-
-      const exportSummary = [
-        `${envelopes.length} envelopes`,
-        `${bills.length} bills`,
-        `${debts.length} debts`,
-        `${pureTransactions.length} transactions`,
-      ].join(", ");
+      const counts = logExportSuccess(data, pureTransactions, fileSize);
+      const exportSummary = buildExportSummary(counts);
 
       showSuccessToast(
-        `Export created with ${exportSummary} (${Math.round(fileSize / 1024)}KB)`,
+        `Export created with ${exportSummary} (${counts.fileSizeKB}KB)`,
         "Export Completed"
       );
     } catch (error) {
