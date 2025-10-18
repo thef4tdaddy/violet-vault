@@ -15,43 +15,56 @@ export interface PageContext {
 }
 
 /**
- * Get current page context for better location tracking
+ * Detect current page from URL path
  */
-export const getCurrentPageContext = (): PageContext => {
-  const path = window.location.pathname;
-  const hash = window.location.hash;
+const detectPageFromPath = (path: string): string => {
+  if (path.includes("/bills") || path.includes("bill")) return "bills";
+  if (path.includes("/debt") || path.includes("debt")) return "debt";
+  if (path.includes("/envelope") || path.includes("budget")) return "envelope";
+  if (path.includes("/transaction")) return "transaction";
+  if (path.includes("/saving")) return "savings";
+  if (path.includes("/analytic")) return "analytics";
+  if (path.includes("/setting")) return "settings";
+  return "unknown";
+};
 
-  // Detect active view from navigation or URL
-  let currentPage = "unknown";
-  let screenTitle = document.title || "Unknown";
-
-  // Detect from URL path
-  if (path.includes("/bills") || path.includes("bill")) currentPage = "bills";
-  else if (path.includes("/debt") || path.includes("debt")) currentPage = "debt";
-  else if (path.includes("/envelope") || path.includes("budget")) currentPage = "envelope";
-  else if (path.includes("/transaction")) currentPage = "transaction";
-  else if (path.includes("/saving")) currentPage = "savings";
-  else if (path.includes("/analytic")) currentPage = "analytics";
-  else if (path.includes("/setting")) currentPage = "settings";
-
-  // Try to get more specific screen info
+/**
+ * Get screen title from DOM elements
+ */
+const getScreenTitle = (): string => {
   const mainHeader = document.querySelector("h1, h2, [class*='title'], [class*='header']");
-  if (mainHeader) {
-    screenTitle = mainHeader.textContent?.trim() || screenTitle;
-  }
+  return mainHeader?.textContent?.trim() || document.title || "Unknown";
+};
 
-  // Detect visible modals
+/**
+ * Detect visible modals and their titles
+ */
+const getVisibleModals = (): (string | null | undefined)[] => {
   const visibleModals: (string | null | undefined)[] = [];
   const modals = document.querySelectorAll('[role="dialog"], [class*="modal"], [class*="Modal"]');
+  
   modals.forEach((modal) => {
     if ((modal as HTMLElement).offsetParent !== null) {
-      // visible
       const modalTitle = modal.querySelector('h1, h2, h3, [class*="title"]');
       if (modalTitle) {
         visibleModals.push(modalTitle.textContent?.trim());
       }
     }
   });
+  
+  return visibleModals;
+};
+
+/**
+ * Get current page context for better location tracking
+ */
+export const getCurrentPageContext = (): PageContext => {
+  const path = window.location.pathname;
+  const hash = window.location.hash;
+  
+  const currentPage = detectPageFromPath(path);
+  const screenTitle = getScreenTitle();
+  const visibleModals = getVisibleModals();
 
   return {
     page: currentPage,

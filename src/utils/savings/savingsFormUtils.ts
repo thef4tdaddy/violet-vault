@@ -66,12 +66,9 @@ export const getDefaultSavingsGoalFormData = (editingGoal = null) => {
 };
 
 /**
- * Validate savings goal form data
+ * Validate required fields
  */
-export const validateSavingsGoalForm = (formData) => {
-  const errors = [];
-
-  // Required field validation
+const validateRequiredFieldsSavings = (formData, errors) => {
   if (!formData.name?.trim()) {
     errors.push("Goal name is required");
   }
@@ -83,8 +80,12 @@ export const validateSavingsGoalForm = (formData) => {
   ) {
     errors.push("Valid target amount is required");
   }
+};
 
-  // Current amount validation
+/**
+ * Validate amount fields
+ */
+const validateAmountFields = (formData, errors) => {
   const currentAmount = parseFloat(formData.currentAmount) || 0;
   const targetAmount = parseFloat(formData.targetAmount) || 0;
 
@@ -95,45 +96,67 @@ export const validateSavingsGoalForm = (formData) => {
   if (currentAmount > targetAmount) {
     errors.push("Current amount cannot exceed target amount");
   }
+};
 
-  // Date validation
-  if (formData.targetDate) {
-    const targetDate = new Date(formData.targetDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+/**
+ * Validate date field
+ */
+const validateDateField = (formData, errors) => {
+  if (!formData.targetDate) return;
 
-    if (isNaN(targetDate.getTime())) {
-      errors.push("Invalid target date");
-    } else if (targetDate < today) {
-      errors.push("Target date cannot be in the past");
-    }
+  const targetDate = new Date(formData.targetDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (isNaN(targetDate.getTime())) {
+    errors.push("Invalid target date");
+  } else if (targetDate < today) {
+    errors.push("Target date cannot be in the past");
   }
+};
 
-  // Category validation
+/**
+ * Validate category and priority
+ */
+const validateCategoryAndPriority = (formData, errors) => {
   if (!SAVINGS_CATEGORIES.includes(formData.category)) {
     errors.push("Invalid category selected");
   }
 
-  // Priority validation
   const validPriorities = SAVINGS_PRIORITIES.map((p) => p.value);
   if (!validPriorities.includes(formData.priority)) {
     errors.push("Invalid priority level");
   }
+};
 
-  // Color validation (basic hex color check)
+/**
+ * Validate text fields and formatting
+ */
+const validateTextFields = (formData, errors) => {
   if (formData.color && !/^#[0-9A-F]{6}$/i.test(formData.color)) {
     errors.push("Invalid color format");
   }
 
-  // Name length validation
   if (formData.name && formData.name.length > 100) {
     errors.push("Goal name cannot exceed 100 characters");
   }
 
-  // Description length validation
   if (formData.description && formData.description.length > 500) {
     errors.push("Description cannot exceed 500 characters");
   }
+};
+
+/**
+ * Validate savings goal form data
+ */
+export const validateSavingsGoalForm = (formData) => {
+  const errors = [];
+
+  validateRequiredFieldsSavings(formData, errors);
+  validateAmountFields(formData, errors);
+  validateDateField(formData, errors);
+  validateCategoryAndPriority(formData, errors);
+  validateTextFields(formData, errors);
 
   return errors;
 };
