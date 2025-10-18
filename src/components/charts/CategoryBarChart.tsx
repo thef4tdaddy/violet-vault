@@ -8,6 +8,34 @@ import { useChartConfig } from "../../hooks/common/useChartConfig";
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
  */
+// Helper to format currency values
+const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
+
+// Helper function to get axis configuration based on orientation
+const getAxisConfig = (isHorizontal, chartDefaults) => {
+  if (isHorizontal) {
+    return {
+      XAxis: { type: "number", stroke: chartDefaults.axis.stroke },
+      YAxis: {
+        dataKey: "name",
+        type: "category",
+        stroke: chartDefaults.axis.stroke,
+        width: 100,
+      },
+    };
+  }
+  return {
+    XAxis: { dataKey: "name", stroke: chartDefaults.axis.stroke },
+    YAxis: { stroke: chartDefaults.axis.stroke },
+  };
+};
+
+// Default bars configuration
+const DEFAULT_BARS = [
+  { dataKey: "income", name: "Income", fill: "#10b981" },
+  { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
+];
+
 const CategoryBarChart = ({
   title = "Category Analysis",
   subtitle,
@@ -35,30 +63,11 @@ const CategoryBarChart = ({
   const chartData = Array.isArray(data) ? data : [];
   const hasData = chartData.length > 0;
 
-  // Default bars configuration if not provided
-  const defaultBars = [
-    { dataKey: "income", name: "Income", fill: "#10b981" },
-    { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
-  ];
-
-  const barConfig = bars.length > 0 ? bars : defaultBars;
+  const barConfig = bars.length > 0 ? bars : DEFAULT_BARS;
 
   // Configure chart orientation
   const isHorizontal = orientation === "horizontal";
-  const AxisConfig = isHorizontal
-    ? {
-        XAxis: { type: "number", stroke: chartDefaults.axis.stroke },
-        YAxis: {
-          dataKey: "name",
-          type: "category",
-          stroke: chartDefaults.axis.stroke,
-          width: 100,
-        },
-      }
-    : {
-        XAxis: { dataKey: "name", stroke: chartDefaults.axis.stroke },
-        YAxis: { stroke: chartDefaults.axis.stroke },
-      };
+  const AxisConfig = getAxisConfig(isHorizontal, chartDefaults);
 
   return (
     <ChartContainer
@@ -84,12 +93,12 @@ const CategoryBarChart = ({
           <XAxis
             {...AxisConfig.XAxis}
             fontSize={12}
-            tickFormatter={isHorizontal ? (value) => `$${(value / 1000).toFixed(0)}K` : undefined}
+            tickFormatter={isHorizontal ? formatCurrency : undefined}
           />
           <YAxis
             {...AxisConfig.YAxis}
             fontSize={12}
-            tickFormatter={!isHorizontal ? (value) => `$${(value / 1000).toFixed(0)}K` : undefined}
+            tickFormatter={!isHorizontal ? formatCurrency : undefined}
           />
 
           <Tooltip content={<TooltipComponent />} />

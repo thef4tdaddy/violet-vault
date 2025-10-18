@@ -1,83 +1,104 @@
 import { useMemo } from "react";
 
-export const useTransactionFilters = (
+// Helper: Check if transaction is valid
+const isValidTransaction = (transaction) => {
+  return transaction && typeof transaction.amount === "number" && transaction.description;
+};
+
+// Helper: Check if transaction matches search term
+const matchesSearchTerm = (transaction, searchTerm) => {
+  if (!searchTerm) return true;
+  return transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+};
+
+// Helper: Check if transaction matches type filter
+const matchesTypeFilter = (transaction, typeFilter) => {
+  if (typeFilter === "all") return true;
+  if (typeFilter === "income") return transaction.amount > 0;
+  if (typeFilter === "expense") return transaction.amount < 0;
+  return true;
+};
+
+// Helper: Check if transaction matches envelope filter
+const matchesEnvelopeFilter = (transaction, envelopeFilter) => {
+  if (envelopeFilter === "all") return true;
+  return transaction.envelopeId === envelopeFilter;
+};
+
+// Helper: Check if transaction matches date filter
+const matchesDateFilter = (transaction, dateFilter) => {
+  if (dateFilter === "all") return true;
+
+  const transactionDate = new Date(transaction.date);
+  const now = new Date();
+
+  if (dateFilter === "today") {
+    return transactionDate.toDateString() === now.toDateString();
+  }
+
+  if (dateFilter === "week") {
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    return transactionDate >= weekAgo;
+  }
+
+  if (dateFilter === "month") {
+    return (
+      transactionDate.getMonth() === now.getMonth() &&
+      transactionDate.getFullYear() === now.getFullYear()
+    );
+  }
+
+  return true;
+};
+
+// Helper: Get sort value for transaction
+const getSortValue = (transaction, sortBy) => {
+  switch (sortBy) {
+    case "date":
+      return new Date(transaction.date || 0);
+    case "amount":
+      return Math.abs(transaction.amount || 0);
+    case "description":
+      return (transaction.description || "").toLowerCase();
+    default:
+      return null;
+  }
+};
+
+// Helper: Compare transactions for sorting
+const compareTransactions = (a, b, sortBy, sortOrder) => {
+  if (!a || !b) return 0;
+
+  const aVal = getSortValue(a, sortBy);
+  const bVal = getSortValue(b, sortBy);
+
+  if (aVal === null || bVal === null) return 0;
+
+  const comparison = aVal > bVal ? 1 : -1;
+  return sortOrder === "asc" ? comparison : -comparison;
+};
+
+export const useTransactionFilters = ({
   transactions,
   searchTerm,
   dateFilter,
   typeFilter,
   envelopeFilter,
   sortBy,
-  sortOrder
-) => {
+  sortOrder,
+}) => {
   const filteredTransactions = useMemo(() => {
     return transactions
       .filter((transaction) => {
-        if (!transaction || typeof transaction.amount !== "number" || !transaction.description)
-          return false;
-        if (
-          searchTerm &&
-          !transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
-        ) {
-          return false;
-        }
-
-        if (typeFilter !== "all") {
-          if (typeFilter === "income" && transaction.amount <= 0) return false;
-          if (typeFilter === "expense" && transaction.amount >= 0) return false;
-        }
-
-        if (envelopeFilter !== "all" && transaction.envelopeId !== envelopeFilter) {
-          return false;
-        }
-
-        if (dateFilter !== "all") {
-          const transactionDate = new Date(transaction.date);
-          const now = new Date();
-
-          switch (dateFilter) {
-            case "today":
-              return transactionDate.toDateString() === now.toDateString();
-            case "week": {
-              const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-              return transactionDate >= weekAgo;
-            }
-            case "month":
-              return (
-                transactionDate.getMonth() === now.getMonth() &&
-                transactionDate.getFullYear() === now.getFullYear()
-              );
-          }
-        }
-
-        return true;
+        return (
+          isValidTransaction(transaction) &&
+          matchesSearchTerm(transaction, searchTerm) &&
+          matchesTypeFilter(transaction, typeFilter) &&
+          matchesEnvelopeFilter(transaction, envelopeFilter) &&
+          matchesDateFilter(transaction, dateFilter)
+        );
       })
-      .sort((a, b) => {
-        if (!a || !b) return 0;
-        let aVal, bVal;
-
-        switch (sortBy) {
-          case "date":
-            aVal = new Date(a.date || 0);
-            bVal = new Date(b.date || 0);
-            break;
-          case "amount":
-            aVal = Math.abs(a.amount || 0);
-            bVal = Math.abs(b.amount || 0);
-            break;
-          case "description":
-            aVal = (a.description || "").toLowerCase();
-            bVal = (b.description || "").toLowerCase();
-            break;
-          default:
-            return 0;
-        }
-
-        if (sortOrder === "asc") {
-          return aVal > bVal ? 1 : -1;
-        } else {
-          return aVal < bVal ? 1 : -1;
-        }
-      });
+      .sort((a, b) => compareTransactions(a, b, sortBy, sortOrder));
   }, [transactions, searchTerm, dateFilter, typeFilter, envelopeFilter, sortBy, sortOrder]);
 
   return filteredTransactions;

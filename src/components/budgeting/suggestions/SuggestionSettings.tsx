@@ -1,5 +1,48 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import { Button } from "../../ui";
+
+// SettingField component - reusable input field with label and help text
+const SettingField = ({ label, helpText, children }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    {children}
+    <p className="text-xs text-gray-500 mt-1">{helpText}</p>
+  </div>
+);
+
+// StatsDisplay component - shows suggestion statistics
+const StatsDisplay = ({ stats }) => (
+  <div className="bg-white rounded-lg p-3 border border-gray-200">
+    <h5 className="font-medium text-gray-900 mb-2 text-sm">Current Analysis</h5>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+      <div>
+        <span className="text-gray-600 block">Total</span>
+        <span className="font-bold text-gray-900">{stats.totalSuggestions}</span>
+      </div>
+      <div>
+        <span className="text-gray-600 block">High Priority</span>
+        <span className="font-bold text-red-600">{stats.priorityCounts.high}</span>
+      </div>
+      <div>
+        <span className="text-gray-600 block">Medium Priority</span>
+        <span className="font-bold text-amber-600">{stats.priorityCounts.medium}</span>
+      </div>
+      <div>
+        <span className="text-gray-600 block">Low Priority</span>
+        <span className="font-bold text-blue-600">{stats.priorityCounts.low}</span>
+      </div>
+    </div>
+    {stats.potentialSavings > 0 && (
+      <div className="mt-2 pt-2 border-t border-gray-100">
+        <span className="text-gray-600 text-xs">Potential Monthly Savings: </span>
+        <span className="font-bold text-green-600 text-xs">
+          ${stats.potentialSavings.toFixed(0)}
+        </span>
+      </div>
+    )}
+  </div>
+);
 
 const SuggestionSettings = ({
   settings,
@@ -45,10 +88,10 @@ const SuggestionSettings = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Minimum Amount */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Minimum Spending Amount
-          </label>
+        <SettingField
+          label="Minimum Spending Amount"
+          helpText="Minimum total spending to suggest an envelope"
+        >
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span className="text-gray-500 text-sm">$</span>
@@ -63,16 +106,13 @@ const SuggestionSettings = ({
               step="25"
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Minimum total spending to suggest an envelope
-          </p>
-        </div>
+        </SettingField>
 
         {/* Minimum Transactions */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Minimum Transactions
-          </label>
+        <SettingField
+          label="Minimum Transactions"
+          helpText="Minimum transaction count to suggest an envelope"
+        >
           <input
             type="number"
             value={settings.minTransactions}
@@ -82,16 +122,13 @@ const SuggestionSettings = ({
             min="1"
             max="20"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Minimum transaction count to suggest an envelope
-          </p>
-        </div>
+        </SettingField>
 
         {/* Overspending Threshold */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Overspending Threshold
-          </label>
+        <SettingField
+          label="Overspending Threshold"
+          helpText="Budget multiplier to trigger overspending alerts"
+        >
           <div className="relative">
             <input
               type="number"
@@ -109,14 +146,13 @@ const SuggestionSettings = ({
               <span className="text-gray-500 text-sm">x</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Budget multiplier to trigger overspending alerts
-          </p>
-        </div>
+        </SettingField>
 
         {/* Buffer Percentage */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Suggestion Buffer</label>
+        <SettingField
+          label="Suggestion Buffer"
+          helpText="Buffer multiplier for suggested amounts"
+        >
           <div className="relative">
             <input
               type="number"
@@ -134,45 +170,11 @@ const SuggestionSettings = ({
               <span className="text-gray-500 text-sm">x</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">Buffer multiplier for suggested amounts</p>
-        </div>
+        </SettingField>
       </div>
 
       {/* Statistics */}
-      {suggestionStats && (
-        <div className="bg-white rounded-lg p-3 border border-gray-200">
-          <h5 className="font-medium text-gray-900 mb-2 text-sm">Current Analysis</h5>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-            <div>
-              <span className="text-gray-600 block">Total</span>
-              <span className="font-bold text-gray-900">{suggestionStats.totalSuggestions}</span>
-            </div>
-            <div>
-              <span className="text-gray-600 block">High Priority</span>
-              <span className="font-bold text-red-600">{suggestionStats.priorityCounts.high}</span>
-            </div>
-            <div>
-              <span className="text-gray-600 block">Medium Priority</span>
-              <span className="font-bold text-amber-600">
-                {suggestionStats.priorityCounts.medium}
-              </span>
-            </div>
-            <div>
-              <span className="text-gray-600 block">Low Priority</span>
-              <span className="font-bold text-blue-600">{suggestionStats.priorityCounts.low}</span>
-            </div>
-          </div>
-
-          {suggestionStats.potentialSavings > 0 && (
-            <div className="mt-2 pt-2 border-t border-gray-100">
-              <span className="text-gray-600 text-xs">Potential Monthly Savings: </span>
-              <span className="font-bold text-green-600 text-xs">
-                ${suggestionStats.potentialSavings.toFixed(0)}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+      {suggestionStats && <StatsDisplay stats={suggestionStats} />}
     </div>
   );
 };

@@ -7,6 +7,127 @@ import RuleConfigurationStep from "./steps/RuleConfigurationStep";
 import ReviewStep from "./steps/ReviewStep";
 import StepNavigation from "./components/StepNavigation";
 
+// Modal footer navigation component
+const ModalFooter = ({ step, prevStep, onClose, nextStep, handleSave, editingRule }) => (
+  <div className="p-6 border-t border-gray-200">
+    <div className="flex justify-between">
+      <button
+        onClick={step > 1 ? prevStep : onClose}
+        className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
+      >
+        {step > 1 ? "Previous" : "Cancel"}
+      </button>
+
+      <div className="flex gap-3">
+        {step < 4 ? (
+          <button
+            onClick={nextStep}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            onClick={handleSave}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+          >
+            {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
+            {editingRule ? "Update Rule" : "Create Rule"}
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
+// Step content renderer
+const StepContent = ({
+  step,
+  ruleData,
+  updateRuleData,
+  updateConfig,
+  envelopes,
+  toggleTargetEnvelope,
+  errors,
+}) => {
+  if (step === 1) {
+    return <RuleTypeStep ruleData={ruleData} updateRuleData={updateRuleData} errors={errors} />;
+  }
+  if (step === 2) {
+    return <TriggerScheduleStep ruleData={ruleData} updateRuleData={updateRuleData} />;
+  }
+  if (step === 3) {
+    return (
+      <RuleConfigurationStep
+        ruleData={ruleData}
+        updateConfig={updateConfig}
+        envelopes={envelopes}
+        toggleTargetEnvelope={toggleTargetEnvelope}
+        errors={errors}
+      />
+    );
+  }
+  if (step === 4) {
+    return <ReviewStep ruleData={ruleData} envelopes={envelopes} />;
+  }
+  return null;
+};
+
+// Main modal wrapper
+const RuleBuilderModal = ({
+  editingRule,
+  onClose,
+  step,
+  ruleData,
+  updateRuleData,
+  updateConfig,
+  envelopes,
+  toggleTargetEnvelope,
+  errors,
+  prevStep,
+  nextStep,
+  handleSave,
+}) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="flex flex-col h-full">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">
+              {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
+            </h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+              {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
+            </button>
+          </div>
+          <StepNavigation currentStep={step} />
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          <StepContent
+            step={step}
+            ruleData={ruleData}
+            updateRuleData={updateRuleData}
+            updateConfig={updateConfig}
+            envelopes={envelopes}
+            toggleTargetEnvelope={toggleTargetEnvelope}
+            errors={errors}
+          />
+        </div>
+
+        <ModalFooter
+          step={step}
+          prevStep={prevStep}
+          onClose={onClose}
+          nextStep={nextStep}
+          handleSave={handleSave}
+          editingRule={editingRule}
+        />
+      </div>
+    </div>
+  </div>
+);
+
 const AutoFundingRuleBuilder = ({
   isOpen,
   onClose,
@@ -104,81 +225,20 @@ const AutoFundingRuleBuilder = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold">
-                  {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
-                </h3>
-              </div>
-              <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
-                {React.createElement(getIcon("X"), {
-                  className: "h-6 w-6",
-                })}
-              </Button>
-            </div>
-            <StepNavigation currentStep={step} />
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {step === 1 && (
-              <RuleTypeStep ruleData={ruleData} updateRuleData={updateRuleData} errors={errors} />
-            )}
-            {step === 2 && (
-              <TriggerScheduleStep ruleData={ruleData} updateRuleData={updateRuleData} />
-            )}
-            {step === 3 && (
-              <RuleConfigurationStep
-                ruleData={ruleData}
-                updateConfig={updateConfig}
-                envelopes={envelopes}
-                toggleTargetEnvelope={toggleTargetEnvelope}
-                errors={errors}
-              />
-            )}
-            {step === 4 && <ReviewStep ruleData={ruleData} envelopes={envelopes} />}
-          </div>
-
-          {/* Footer */}
-          <div className="p-6 border-t border-gray-200">
-            <div className="flex justify-between">
-              <Button
-                onClick={step > 1 ? prevStep : onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
-              >
-                {step > 1 ? "Previous" : "Cancel"}
-              </Button>
-
-              <div className="flex gap-3">
-                {step < 4 ? (
-                  <Button
-                    onClick={nextStep}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    Next
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleSave}
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-                  >
-                    {React.createElement(getIcon("Check"), {
-                      className: "h-4 w-4",
-                    })}
-                    {editingRule ? "Update Rule" : "Create Rule"}
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <RuleBuilderModal
+      editingRule={editingRule}
+      onClose={onClose}
+      step={step}
+      ruleData={ruleData}
+      updateRuleData={updateRuleData}
+      updateConfig={updateConfig}
+      envelopes={envelopes}
+      toggleTargetEnvelope={toggleTargetEnvelope}
+      errors={errors}
+      prevStep={prevStep}
+      nextStep={nextStep}
+      handleSave={handleSave}
+    />
   );
 };
 

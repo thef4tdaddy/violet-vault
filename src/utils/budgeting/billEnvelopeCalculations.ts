@@ -7,6 +7,63 @@ import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
 /**
+ * Get invalid bill envelope result
+ */
+const getInvalidBillEnvelopeResult = () => ({
+  isValidBillEnvelope: false,
+  nextBillAmount: 0,
+  remainingToFund: 0,
+  daysUntilNextBill: null,
+  fundingProgress: 0,
+  isFullyFunded: false,
+  nextBillDate: null,
+  linkedBills: [],
+});
+
+/**
+ * Get the next upcoming bill from linked bills
+ */
+const getNextUpcomingBill = (linkedBills) => {
+  const upcomingBills = linkedBills
+    .filter((bill) => new Date(bill.dueDate) >= new Date())
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+  
+  return upcomingBills[0] || null;
+};
+
+/**
+ * Calculate days until a given date
+ */
+const calculateDaysUntil = (targetDate) => {
+  if (!targetDate) return null;
+  const today = new Date();
+  const diffTime = targetDate.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+/**
+ * Calculate funding progress percentage
+ */
+const calculateFundingProgress = (currentBalance, targetAmount, nextBillAmount) => {
+  if (targetAmount > 0) {
+    return Math.min(100, (currentBalance / targetAmount) * 100);
+  }
+  return currentBalance >= nextBillAmount ? 100 : 0;
+};
+
+/**
+ * Calculate total amount of bills due within next 30 days
+ */
+const calculateUpcomingBillsAmount = (linkedBills) => {
+  const next30Days = new Date();
+  next30Days.setDate(next30Days.getDate() + 30);
+
+  return linkedBills
+    .filter((bill) => new Date(bill.dueDate) <= next30Days)
+    .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0);
+};
+
+/**
  * Calculate how much is left to fulfill the next bill payment for a bill envelope
  * @param {Object} envelope - The bill envelope
  * @param {Array} bills - Array of bills linked to this envelope
@@ -14,69 +71,32 @@ import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
  */
 export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
   if (!envelope || envelope.envelopeType !== ENVELOPE_TYPES.BILL) {
-    return {
-      isValidBillEnvelope: false,
-      nextBillAmount: 0,
-      remainingToFund: 0,
-      daysUntilNextBill: null,
-      fundingProgress: 0,
-      isFullyFunded: false,
-      nextBillDate: null,
-      linkedBills: [],
-    };
+    return getInvalidBillEnvelopeResult();
   }
 
   // Find bills linked to this envelope
   const linkedBills = bills.filter((bill) => bill.envelopeId === envelope.id && !bill.isPaid);
 
-  // Get the next upcoming bill (earliest due date)
-  const upcomingBills = linkedBills
-    .filter((bill) => new Date(bill.dueDate) >= new Date())
-    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-  const nextBill = upcomingBills[0];
+  // Get the next upcoming bill
+  const nextBill = getNextUpcomingBill(linkedBills);
   const nextBillAmount = nextBill ? nextBill.amount || nextBill.estimatedAmount || 0 : 0;
   const nextBillDate = nextBill ? new Date(nextBill.dueDate) : null;
 
   // Calculate days until next bill
-  let daysUntilNextBill = null;
-  if (nextBillDate) {
-    const today = new Date();
-    const diffTime = nextBillDate.getTime() - today.getTime();
-    daysUntilNextBill = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
+  const daysUntilNextBill = calculateDaysUntil(nextBillDate);
 
   // Calculate funding needs
   const currentBalance = envelope.currentBalance || 0;
   const biweeklyAllocation = envelope.biweeklyAllocation || 0;
-
-  // For bill envelopes, target should be the actual bill amount, not biweekly * multiplier
-  // The biweekly allocation is how much to save per paycheck, target is the bill amount
   const targetMonthlyAmount = nextBillAmount || biweeklyAllocation * BIWEEKLY_MULTIPLIER;
-
-  // Calculate remaining to fund for next bill
   const remainingToFund = Math.max(0, nextBillAmount - currentBalance);
-
-  // Calculate overall funding progress (current balance vs target monthly amount)
-  const fundingProgress =
-    targetMonthlyAmount > 0
-      ? Math.min(100, (currentBalance / targetMonthlyAmount) * 100)
-      : currentBalance >= nextBillAmount
-        ? 100
-        : 0;
-
   const isFullyFunded = remainingToFund <= 0;
 
-  // Calculate total upcoming bills amount in next 30 days
-  const next30Days = new Date();
-  next30Days.setDate(next30Days.getDate() + 30);
+  // Calculate overall funding progress
+  const fundingProgress = calculateFundingProgress(currentBalance, targetMonthlyAmount, nextBillAmount);
 
-  const upcomingBillsAmount = linkedBills
-    .filter((bill) => {
-      const billDate = new Date(bill.dueDate);
-      return billDate <= next30Days;
-    })
-    .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0);
+  // Calculate total upcoming bills amount
+  const upcomingBillsAmount = calculateUpcomingBillsAmount(linkedBills);
 
   return {
     isValidBillEnvelope: true,
