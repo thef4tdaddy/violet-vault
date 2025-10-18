@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import useDebts from "./useDebts";
+import { useDebts } from "./useDebts";
 import useBills from "../bills/useBills";
 import useEnvelopes from "../budgeting/useEnvelopes";
 import useTransactions from "../common/useTransactions";
@@ -145,60 +145,92 @@ export const useDebtManagement = () => {
     return grouped;
   }, [enrichedDebts]);
 
+  // Create envelope and bill for new debt
+  const createEnvelopeAndBill = async (cleanDebtData, createdDebt, newEnvelopeName) => {
+    const envelopeName = newEnvelopeName || `${cleanDebtData.name} Payment`;
+
+    const newEnvelope = await createEnvelope({
+      name: envelopeName,
+      targetAmount: cleanDebtData.minimumPayment * 2,
+      currentBalance: 0,
+      category: "Fixed Expenses",
+    });
+
+    await createBill({
+      name: `${cleanDebtData.name} Payment`,
+      amount: cleanDebtData.minimumPayment,
+      dueDate: cleanDebtData.paymentDueDate,
+      frequency: convertPaymentFrequency(cleanDebtData.paymentFrequency),
+      envelopeId: newEnvelope.id,
+      debtId: createdDebt.id,
+      isActive: true,
+    });
+
+    logger.info("Created new envelope and bill for debt");
+  };
+
+  // Helper: Handle bill connections for debt
+  const handleBillConnections = async (
+    connectionData,
+    cleanDebtData,
+    createdDebt
+  ) => {
+    if (!connectionData) return;
+
+    const { paymentMethod, createBill: shouldCreateBill, existingBillId, newEnvelopeName } =
+      connectionData;
+
+    if (paymentMethod === "create_new" && shouldCreateBill) {
+      await createEnvelopeAndBill(cleanDebtData, createdDebt, newEnvelopeName);
+    } else if (paymentMethod === "connect_existing_bill" && existingBillId) {
+      await updateBill(existingBillId, { debtId: createdDebt.id });
+      logger.info("Connected debt to existing bill");
+    }
+  };
+
   // Create a new debt with optional bill and envelope integration
   const createDebt = async (debtData) => {
     try {
       logger.info("Creating debt with data:", debtData);
 
-      // Extract connection data
       const { connectionData, ...cleanDebtData } = debtData;
-      const {
-        paymentMethod,
-        createBill: shouldCreateBill,
-        existingBillId,
-        newEnvelopeName,
-      } = connectionData || {};
-
-      // Step 1: Create the debt first
       const createdDebt = await createDebtData(cleanDebtData);
       logger.info("Debt created:", createdDebt);
 
-      // Step 2: Handle bill and envelope connections
-      if (paymentMethod === "create_new" && shouldCreateBill) {
-        // Create new envelope and bill
-        const envelopeName = newEnvelopeName || `${cleanDebtData.name} Payment`;
-
-        // Create envelope
-        const newEnvelope = await createEnvelope({
-          name: envelopeName,
-          targetAmount: cleanDebtData.minimumPayment * 2, // Buffer for 2 payments
-          currentBalance: 0,
-          category: "Fixed Expenses",
-        });
-
-        // Create bill linked to the debt and envelope
-        await createBill({
-          name: `${cleanDebtData.name} Payment`,
-          amount: cleanDebtData.minimumPayment,
-          dueDate: cleanDebtData.paymentDueDate,
-          frequency: convertPaymentFrequency(cleanDebtData.paymentFrequency),
-          envelopeId: newEnvelope.id,
-          debtId: createdDebt.id,
-          isActive: true,
-        });
-
-        logger.info("Created new envelope and bill for debt");
-      } else if (paymentMethod === "connect_existing_bill" && existingBillId) {
-        // Connect to existing bill (will use bill's envelope)
-        await updateBill(existingBillId, { debtId: createdDebt.id });
-        logger.info("Connected debt to existing bill");
-      }
+      await handleBillConnections(connectionData, cleanDebtData, createdDebt);
 
       return createdDebt;
     } catch (error) {
       logger.error("Error creating debt:", error);
       throw error;
     }
+  };
+
+  // Helper: Build updated debt with payment
+  const buildDebtWithPayment = (debt, amount, paymentDate, interestPortion, principalPortion) => {
+    const newBalance = Math.max(0, debt.currentBalance - principalPortion);
+    const updatedDebt = {
+      ...debt,
+      currentBalance: newBalance,
+      lastPaymentDate: paymentDate,
+      lastPaymentAmount: amount,
+      status: newBalance === 0 ? DEBT_STATUS.PAID_OFF : debt.status,
+    };
+
+    if (!updatedDebt.paymentHistory) {
+      updatedDebt.paymentHistory = [];
+    }
+
+    updatedDebt.paymentHistory.push({
+      date: paymentDate,
+      amount,
+      interestPortion,
+      principalPortion,
+      balanceAfter: newBalance,
+      notes: paymentDate.notes || "",
+    });
+
+    return updatedDebt;
   };
 
   // Record a debt payment
@@ -209,42 +241,18 @@ export const useDebtManagement = () => {
 
       const { amount, paymentDate, notes } = paymentData;
 
-      // Calculate interest and principal portions
       const interestPortion = calculateInterestPortion(debt, amount);
       const principalPortion = amount - interestPortion;
 
-      // Update debt balance
-      const newBalance = Math.max(0, debt.currentBalance - principalPortion);
-      const updatedDebt = {
-        ...debt,
-        currentBalance: newBalance,
-        lastPaymentDate: paymentDate,
-        lastPaymentAmount: amount,
-        status: newBalance === 0 ? DEBT_STATUS.PAID_OFF : debt.status,
-      };
+      const updatedDebt = buildDebtWithPayment(debt, amount, paymentDate, interestPortion, principalPortion);
 
-      // Add payment to history
-      if (!updatedDebt.paymentHistory) {
-        updatedDebt.paymentHistory = [];
-      }
-      updatedDebt.paymentHistory.push({
-        date: paymentDate,
-        amount: amount,
-        interestPortion: interestPortion,
-        principalPortion: principalPortion,
-        balanceAfter: newBalance,
-        notes: notes || "",
-      });
-
-      // Update the debt
       await updateDebtData({ id: debtId, updates: updatedDebt });
 
-      // Create a transaction record
       await createTransaction({
-        amount: -amount, // Negative for outgoing payment
+        amount: -amount,
         description: `${debt.name} Payment`,
         category: "Debt Payment",
-        debtId: debtId,
+        debtId,
         date: paymentDate,
         notes: notes || "",
       });
@@ -381,5 +389,3 @@ export const useDebtManagement = () => {
     COMPOUND_FREQUENCIES,
   };
 };
-
-export default useDebtManagement;
