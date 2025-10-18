@@ -105,5 +105,3 @@ export const useAuthManager = () => {
     _legacy: legacyInterface,
   };
 };
-
-export default useAuthManager;

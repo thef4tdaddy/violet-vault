@@ -291,5 +291,3 @@ const useTransactionSplitter = (options = {}) => {
     clearErrors: () => setErrors([]),
   };
 };
-
-export default useTransactionSplitter;

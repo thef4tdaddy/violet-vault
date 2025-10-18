@@ -4,7 +4,7 @@
  * Maps old API to new useTransactionsV2 implementation
  * Created for Issue #508 to ensure zero regressions
  */
-import useTransactionsV2 from "../transactions/useTransactionsV2.ts";
+import { useTransactionsV2 } from "../transactions/useTransactionsV2.ts";
 import _logger from "../../utils/common/logger.ts";
 
 /**
@@ -106,8 +106,6 @@ const useTransactionsCompat = (options = {}) => {
     },
   };
 };
-
-export default useTransactionsCompat;
 
 // Named export for backward compatibility
 export const useTransactions = useTransactionsCompat;

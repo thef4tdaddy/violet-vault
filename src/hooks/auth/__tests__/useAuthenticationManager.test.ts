@@ -4,7 +4,7 @@ import { useAuthenticationManager } from "../useAuthenticationManager";
 
 // Mock all dependencies
 vi.mock("../useAuthFlow", () => ({
-  default: vi.fn(() => ({
+  useAuthFlow: vi.fn(() => ({
     isUnlocked: true,
     currentUser: { id: 1, userName: "testuser" },
     encryptionKey: "test-key",
@@ -35,7 +35,7 @@ vi.mock("../../common/useLocalOnlyMode", () => ({
 }));
 
 // Import mocked dependencies
-import useAuthFlow from "../useAuthFlow";
+import { useAuthFlow } from "../useAuthFlow";
 import { useSecurityManager } from "../useSecurityManager";
 import { useLocalOnlyMode } from "../../common/useLocalOnlyMode";
 
