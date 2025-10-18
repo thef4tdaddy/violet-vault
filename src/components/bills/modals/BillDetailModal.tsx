@@ -31,7 +31,7 @@ const BillDetailModal = ({
     handlePaymentAmountChange,
     handleShowPaymentForm,
     handleHidePaymentForm,
-  } = useBillDetail(bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring);
+  } = useBillDetail({ bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring });
 
   if (!isOpen || !bill) return null;
 

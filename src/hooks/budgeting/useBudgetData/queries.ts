@@ -6,6 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../../../utils/common/queryClient";
 import { queryFunctions } from "./queryFunctions";
 
+const computeLoadingState = (queries) => {
+  return queries.some((query) => query.isLoading);
+};
+
+const computeErrorState = (queries) => {
+  return queries.find((query) => query.error)?.error || null;
+};
+
 export const useBudgetQueries = () => {
   const envelopesQuery = useQuery({
     queryKey: queryKeys.envelopesList(),
@@ -43,6 +51,15 @@ export const useBudgetQueries = () => {
     staleTime: 1000 * 60 * 1, // 1 minute
   });
 
+  const allQueries = [
+    envelopesQuery,
+    transactionsQuery,
+    billsQuery,
+    savingsGoalsQuery,
+    paycheckHistoryQuery,
+    dashboardQuery,
+  ];
+
   return {
     envelopesQuery,
     transactionsQuery,
@@ -60,21 +77,9 @@ export const useBudgetQueries = () => {
     dashboardSummary: dashboardQuery.data || {},
 
     // Loading states
-    isLoading:
-      envelopesQuery.isLoading ||
-      transactionsQuery.isLoading ||
-      billsQuery.isLoading ||
-      savingsGoalsQuery.isLoading ||
-      paycheckHistoryQuery.isLoading ||
-      dashboardQuery.isLoading,
+    isLoading: computeLoadingState(allQueries),
 
     // Error states
-    error:
-      envelopesQuery.error ||
-      transactionsQuery.error ||
-      billsQuery.error ||
-      savingsGoalsQuery.error ||
-      paycheckHistoryQuery.error ||
-      dashboardQuery.error,
+    error: computeErrorState(allQueries),
   };
 };
