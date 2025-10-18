@@ -6,7 +6,14 @@
 import { useState, useMemo, useEffect } from "react";
 import { useConfirm } from "../common/useConfirm";
 
-export const useDebtDetailModal = (debt, isOpen, onClose, onDelete, onRecordPayment, onEdit) => {
+export const useDebtDetailModal = ({ 
+  debt, 
+  isOpen, 
+  onClose, 
+  onDelete, 
+  onRecordPayment, 
+  onEdit 
+}) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const confirm = useConfirm();

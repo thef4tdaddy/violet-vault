@@ -12,7 +12,14 @@ export const useBudgetJoining = () => {
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
-  const joinBudget = async (shareCode, password, userName, userColor, onJoinSuccess, onClose) => {
+  const joinBudget = async ({ 
+    shareCode, 
+    password, 
+    userName, 
+    userColor, 
+    onJoinSuccess, 
+    onClose 
+  }) => {
     if (!shareCode || !password || !userName.trim()) {
       showErrorToast("Please fill in all required fields");
       return false;
