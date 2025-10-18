@@ -27,13 +27,8 @@ const EnvelopeEditModal = lazy(() => import("./EditEnvelopeModal"));
 const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"));
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
-const UnifiedEnvelopeManager = ({
-  envelopes: propEnvelopes = [],
-  transactions: propTransactions = [],
-  unassignedCash: propUnassignedCash,
-  className = "",
-}) => {
-  // Enhanced TanStack Query integration with loading states
+// Hook to resolve data from multiple sources with priority
+const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) => {
   const {
     envelopes: tanStackEnvelopes = [],
     addEnvelope,
@@ -44,17 +39,12 @@ const UnifiedEnvelopeManager = ({
 
   const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
   const { bills: tanStackBills = [], updateBill, isLoading: billsLoading } = useBills();
-
-  // Use TanStack Query for unassigned cash
   const { unassignedCash: tanStackUnassignedCash } = useUnassignedCash();
-
-  // Keep Zustand for non-migrated operations and fallbacks
   const budget = useBudgetStore();
 
-  // Data resolution with fallbacks
   const envelopes = useMemo(
     () =>
-      propEnvelopes && propEnvelopes.length
+      propEnvelopes?.length
         ? propEnvelopes
         : tanStackEnvelopes.length
           ? tanStackEnvelopes
@@ -64,7 +54,7 @@ const UnifiedEnvelopeManager = ({
 
   const transactions = useMemo(
     () =>
-      propTransactions && propTransactions.length
+      propTransactions?.length
         ? propTransactions
         : tanStackTransactions.length
           ? tanStackTransactions
@@ -87,6 +77,41 @@ const UnifiedEnvelopeManager = ({
     });
     return result;
   }, [tanStackBills, budget.bills]);
+
+  const isLoading = envelopesLoading || transactionsLoading || billsLoading;
+
+  return {
+    envelopes,
+    transactions,
+    bills,
+    unassignedCash,
+    budget,
+    isLoading,
+    addEnvelope,
+    updateEnvelope,
+    deleteEnvelope,
+    updateBill,
+  };
+};
+
+const UnifiedEnvelopeManager = ({
+  envelopes: propEnvelopes = [],
+  transactions: propTransactions = [],
+  unassignedCash: propUnassignedCash,
+  className = "",
+}) => {
+  const {
+    envelopes,
+    transactions,
+    bills,
+    unassignedCash,
+    budget,
+    isLoading,
+    addEnvelope,
+    updateEnvelope,
+    deleteEnvelope,
+    updateBill,
+  } = useResolvedData(propEnvelopes, propTransactions, propUnassignedCash);
 
   // UI State
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
@@ -156,21 +181,16 @@ const UnifiedEnvelopeManager = ({
   const handleQuickFund = (envelopeId, suggestedAmount) => {
     const envelope = envelopeData.find((env) => env.id === envelopeId);
     if (envelope) {
-      setQuickFundModal({
-        isOpen: true,
-        envelope,
-        suggestedAmount,
-      });
+      setQuickFundModal({ isOpen: true, envelope, suggestedAmount });
     }
   };
 
   const handleQuickFundConfirm = async (envelopeId, amount) => {
     try {
+      const currentAllocated = envelopeData.find((env) => env.id === envelopeId)?.allocated || 0;
       await updateEnvelope({
         envelopeId,
-        updates: {
-          allocated: (envelopeData.find((env) => env.id === envelopeId)?.allocated || 0) + amount,
-        },
+        updates: { allocated: currentAllocated + amount },
       });
       logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
     } catch (error) {
@@ -179,20 +199,11 @@ const UnifiedEnvelopeManager = ({
   };
 
   const closeQuickFundModal = () => {
-    setQuickFundModal({
-      isOpen: false,
-      envelope: null,
-      suggestedAmount: 0,
-    });
+    setQuickFundModal({ isOpen: false, envelope: null, suggestedAmount: 0 });
   };
 
-  const handleEnvelopeEdit = (envelope) => {
-    setEditingEnvelope(envelope);
-  };
-
-  const handleViewHistory = (envelope) => {
-    setHistoryEnvelope(envelope);
-  };
+  const handleEnvelopeEdit = (envelope) => setEditingEnvelope(envelope);
+  const handleViewHistory = (envelope) => setHistoryEnvelope(envelope);
 
   const handleCreateEnvelope = async (envelopeData) => {
     try {
@@ -212,7 +223,7 @@ const UnifiedEnvelopeManager = ({
     }
   };
 
-  if (envelopesLoading || transactionsLoading || billsLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
