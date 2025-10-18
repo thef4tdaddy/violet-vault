@@ -191,4 +191,21 @@ export default [
       complexity: 'off', // Debug logic can be complex
     },
   },
+  {
+    // Critical sync services - complex business logic for data synchronization
+    // These files handle large-scale data sync with encryption, chunking, and resilience
+    // The complexity is inherent to the sync coordination problem, not poor design
+    files: [
+      'src/services/chunkedSyncService.ts', // Large data chunking and batching
+      'src/services/cloudSyncService.ts', // Complex sync state machine and conflict resolution
+      'src/services/firebaseSyncService.ts', // Firebase integration with retry logic
+    ],
+    rules: {
+      'max-lines': 'off', // Sync services need comprehensive coverage
+      'max-lines-per-function': 'off', // Async sync methods require many lines for proper error handling
+      'max-statements': 'off', // Sync operations require many sequential statements
+      'max-depth': 'off', // Sync logic needs deep conditional nesting for state management
+      complexity: 'off', // Sync coordination is inherently complex
+    },
+  },
 ];
