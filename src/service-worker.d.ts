@@ -1,3 +1,4 @@
+/* eslint-disable no-undef, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, max-lines */
 /**
  * PWA Service Worker Type Declarations
  * Comprehensive types for service workers, Workbox, and PWA events
@@ -503,6 +504,8 @@ declare module "virtual:pwa-register" {
 }
 
 declare module "virtual:pwa-register/react" {
+  import { Dispatch, SetStateAction } from "react";
+
   export interface RegisterSWOptions {
     immediate?: boolean;
     onNeedRefresh?: () => void;
@@ -512,8 +515,8 @@ declare module "virtual:pwa-register/react" {
   }
 
   export function useRegisterSW(options?: RegisterSWOptions): {
-    needRefresh: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
-    offlineReady: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+    needRefresh: [boolean, Dispatch<SetStateAction<boolean>>];
+    offlineReady: [boolean, Dispatch<SetStateAction<boolean>>];
     updateServiceWorker: (reloadPage?: boolean) => Promise<void>;
   };
 }

@@ -1,7 +1,8 @@
+import React from "react";
 import logger from "../utils/common/logger";
 import { initialAuthState } from "./authConstants";
 import type { AuthContextState, SessionData } from "./authConstants";
-import type { UserData } from "../types/auth";
+import type { UserData } from "@/types/auth";
 
 /**
  * Utility functions for AuthContext

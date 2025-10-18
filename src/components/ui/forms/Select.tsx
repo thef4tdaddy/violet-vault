@@ -1,4 +1,5 @@
 import React from "react";
+import { Select } from "@/components/ui";
 
 export interface SelectOption {
   value: string | number;
@@ -85,11 +86,15 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               {placeholder}
             </option>
           )}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {options.length > 0 ? (
+            options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))
+          ) : (
+            props.children
+          )}
         </select>
         {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
         {helperText && !error && (

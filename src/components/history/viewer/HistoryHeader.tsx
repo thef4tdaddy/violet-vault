@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import IntegrityStatusIndicator from "../IntegrityStatusIndicator";
 import HelpTooltip from "../../ui/HelpTooltip";

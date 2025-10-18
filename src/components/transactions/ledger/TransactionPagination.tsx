@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 
 const TransactionPagination = ({ currentPage, totalPages, onPageChange }) => {
   return (

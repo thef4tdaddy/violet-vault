@@ -1,4 +1,5 @@
 // components/SyncIndicator.jsx
+import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils/icons";
 import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";

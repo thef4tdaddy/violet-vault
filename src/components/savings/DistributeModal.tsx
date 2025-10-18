@@ -1,4 +1,5 @@
 // components/savings/DistributeModal.jsx
+import { Button } from "@/components/ui";
 import React, { useState, useEffect, useCallback } from "react";
 import { getIcon } from "../../utils";
 import {

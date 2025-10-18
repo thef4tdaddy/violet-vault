@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
 // Lazy load the history viewer for better performance

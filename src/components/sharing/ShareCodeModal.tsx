@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "../../utils";
 import { shareCodeManager } from "../../utils/auth/shareCodeManager";

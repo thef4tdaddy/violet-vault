@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 
 // Configuration constants
 const SIZE_CONFIG = {

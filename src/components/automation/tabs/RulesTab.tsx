@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
 

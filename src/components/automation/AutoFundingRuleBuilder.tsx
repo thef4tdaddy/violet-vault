@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Select } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { createDefaultRule, validateRule } from "../../utils/budgeting/autofunding";
 import RuleTypeStep from "./steps/RuleTypeStep";

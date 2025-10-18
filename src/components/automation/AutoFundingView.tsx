@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "@/components/ui";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";

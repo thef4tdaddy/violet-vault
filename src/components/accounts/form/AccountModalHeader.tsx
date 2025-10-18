@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import { Button } from "../../../components/ui/buttons";
 
 const AccountModalHeader = ({
   editingAccount,

@@ -1,3 +1,6 @@
+
+import React from "react";
+
 /**
  * Type definitions index for VioletVault
  * Export all type definitions from this file
@@ -29,7 +32,7 @@ export interface LoadingState {
 }
 
 // API response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

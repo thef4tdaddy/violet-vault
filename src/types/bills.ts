@@ -1,3 +1,5 @@
+import React from "react";
+
 /**
  * TypeScript type definitions for bill components
  */

@@ -1,4 +1,5 @@
 /**
+import { Button } from "@/components/ui";
  * Sync Health Dashboard - Visual sync status with backup export
  * GitHub Issue #576 Phase 3: Visual health monitoring and backup tools
  */

@@ -1,5 +1,6 @@
 import React from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
+import Button from "../ui/buttons/Button";
 
 const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccount }) => {
   return (

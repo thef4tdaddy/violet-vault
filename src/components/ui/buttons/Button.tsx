@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 
 export type ButtonVariant = "primary" | "secondary" | "destructive" | "icon";
 export type ButtonColor =

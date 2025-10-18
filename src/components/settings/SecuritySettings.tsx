@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 import { useSecuritySettingsLogic } from "../../hooks/security/useSecuritySettingsLogic";
 import SecurityStatusSection from "./sections/SecurityStatusSection";

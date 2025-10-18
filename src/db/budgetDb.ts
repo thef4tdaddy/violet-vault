@@ -89,34 +89,39 @@ export class VioletVaultDB extends Dexie {
     });
 
     // Enhanced hooks for automatic timestamping across all tables
-    const addTimestampHooks = (table: Table<any, any>) => {
+    const addTimestampHooks = (table: Table<unknown, unknown>) => {
       table.hook("creating", (_primKey, obj, trans) => {
         // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
         try {
-          obj.lastModified = Date.now();
-          if (!obj.createdAt) obj.createdAt = Date.now();
-        } catch (error: any) {
+          (obj as { lastModified: number; createdAt?: number }).lastModified = Date.now();
+          if (!(obj as { createdAt: number }).createdAt)
+            (obj as { createdAt: number }).createdAt = Date.now();
+        } catch (error: unknown) {
           if (
-            error.message.includes("not extensible") ||
-            error.message.includes("Cannot add property") ||
-            error.message.includes("read only property") ||
-            error.message.includes("Cannot assign to read only")
+            error instanceof Error &&
+            (error.message.includes("not extensible") ||
+              error.message.includes("Cannot add property") ||
+              error.message.includes("read only property") ||
+              error.message.includes("Cannot assign to read only"))
           ) {
             logger.debug("🔧 Handling readonly/frozen object from Firebase", {
               errorType: error.message,
-              objectId: obj.id,
-              objectKeys: Object.keys(obj),
+              objectId: (obj as { id: string }).id,
+              objectKeys: Object.keys(obj as object),
             });
 
             // Create a completely new extensible object
-            const extensibleObj: any = {};
+            const extensibleObj: Record<string, unknown> = {};
 
             // Copy all properties from the readonly object
-            Object.keys(obj).forEach((key) => {
+            Object.keys(obj as object).forEach((key) => {
               try {
-                extensibleObj[key] = obj[key];
-              } catch (copyError: any) {
-                logger.warn(`Failed to copy property ${key}:`, copyError.message);
+                extensibleObj[key] = (obj as Record<string, unknown>)[key];
+              } catch (copyError: unknown) {
+                logger.warn(
+                  `Failed to copy property ${key}:`,
+                  (copyError as Error).message
+                );
               }
             });
 
@@ -131,9 +136,9 @@ export class VioletVaultDB extends Dexie {
               // If Object.assign fails, clear the object and reassign
               try {
                 // Clear existing properties (if possible)
-                Object.keys(obj).forEach((key) => {
+                Object.keys(obj as object).forEach((key) => {
                   try {
-                    delete obj[key];
+                    delete (obj as Record<string, unknown>)[key];
                   } catch {
                     // Property can't be deleted, skip it
                   }
@@ -142,17 +147,26 @@ export class VioletVaultDB extends Dexie {
                 // Add all properties from extensible object
                 Object.keys(extensibleObj).forEach((key) => {
                   try {
-                    obj[key] = extensibleObj[key];
-                  } catch (setError: any) {
-                    logger.warn(`Failed to set property ${key}:`, setError.message);
+                    (obj as Record<string, unknown>)[key] = extensibleObj[key];
+                  } catch (setError: unknown) {
+                    logger.warn(
+                      `Failed to set property ${key}:`,
+                      (setError as Error).message
+                    );
                   }
                 });
-              } catch (finalError: any) {
-                logger.warn("Complete object replacement failed:", finalError.message);
+              } catch (finalError: unknown) {
+                logger.warn(
+                  "Complete object replacement failed:",
+                  (finalError as Error).message
+                );
                 // As a last resort, try to modify the transaction
                 // Note: trans.source is a Dexie internal property
-                if (typeof (trans as any).source === "object" && (trans as any).source !== null) {
-                  (trans as any).source = extensibleObj;
+                if (
+                  typeof (trans as unknown as { source: unknown }).source === "object" &&
+                  (trans as unknown as { source: unknown }).source !== null
+                ) {
+                  (trans as unknown as { source: unknown }).source = extensibleObj;
                 }
               }
             }
@@ -163,7 +177,11 @@ export class VioletVaultDB extends Dexie {
       });
 
       table.hook("updating", (modifications, _primKey, _obj, _trans) => {
-        (modifications as any).lastModified = Date.now();
+        (
+          modifications as Partial<
+            Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
+          >
+        ).lastModified = Date.now();
       });
     };
 
@@ -215,7 +233,7 @@ export class VioletVaultDB extends Dexie {
   }
 
   // Enhanced cache management with categories
-  async getCachedValue(key: string, maxAge: number = 300000): Promise<any> {
+  async getCachedValue(key: string, maxAge: number = 300000): Promise<unknown> {
     // 5 minutes default
     const cached = await this.cache.get(key);
     const now = Date.now();
@@ -233,7 +251,7 @@ export class VioletVaultDB extends Dexie {
     includeArchived: boolean = false
   ): Promise<Envelope[]> {
     const cacheKey = `envelopes_${category}_${includeArchived}`;
-    let result = await this.getCachedValue(cacheKey);
+    let result = (await this.getCachedValue(cacheKey)) as Envelope[];
 
     if (!result) {
       if (includeArchived) {
@@ -241,7 +259,7 @@ export class VioletVaultDB extends Dexie {
       } else {
         result = await this.envelopes
           .where("[category+archived]")
-          .equals([category, false] as any)
+          .equals([category, 0])
           .toArray();
       }
       await this.setCachedValue(cacheKey, result, 60000); // 1 minute cache
@@ -251,7 +269,7 @@ export class VioletVaultDB extends Dexie {
   }
 
   async getActiveEnvelopes(): Promise<Envelope[]> {
-    return this.envelopes.where("archived").equals(false as any).toArray();
+    return this.envelopes.where("archived").equals(0).toArray();
   }
 
   // Transaction queries with compound indexes
@@ -311,7 +329,7 @@ export class VioletVaultDB extends Dexie {
 
     return this.bills
       .where("[dueDate+isPaid]")
-      .between([today, false], [futureDate, false], true, true)
+      .between([today, 0], [futureDate, 0], true, true)
       .toArray();
   }
 
@@ -321,7 +339,7 @@ export class VioletVaultDB extends Dexie {
 
     return this.bills
       .where("[isPaid+dueDate]")
-      .between([false, new Date(0)], [false, today], true, false)
+      .between([0, new Date(0)], [0, today], true, false)
       .toArray();
   }
 
@@ -329,10 +347,10 @@ export class VioletVaultDB extends Dexie {
     if (dateRange) {
       return this.bills
         .where("[isPaid+dueDate]")
-        .between([true, dateRange.start], [true, dateRange.end], true, true)
+        .between([1, dateRange.start], [1, dateRange.end], true, true)
         .toArray();
     }
-    return this.bills.where("isPaid").equals(true as any).toArray();
+    return this.bills.where("isPaid").equals(1).toArray();
   }
 
   async getBillsByCategory(category: string): Promise<Bill[]> {
@@ -340,19 +358,19 @@ export class VioletVaultDB extends Dexie {
   }
 
   async getRecurringBills(): Promise<Bill[]> {
-    return this.bills.where("isRecurring").equals(true as any).toArray();
+    return this.bills.where("isRecurring").equals(1).toArray();
   }
 
   // Savings Goals queries with status and priority optimization
   async getActiveSavingsGoals(): Promise<SavingsGoal[]> {
     return this.savingsGoals
       .where("[isCompleted+isPaused]")
-      .equals([false, false] as any)
+      .equals([0, 0])
       .toArray();
   }
 
   async getCompletedSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("isCompleted").equals(true as any).toArray();
+    return this.savingsGoals.where("isCompleted").equals(1).toArray();
   }
 
   async getSavingsGoalsByCategory(category: string): Promise<SavingsGoal[]> {
@@ -369,7 +387,7 @@ export class VioletVaultDB extends Dexie {
 
     return this.savingsGoals
       .where("[targetDate+isCompleted]")
-      .between([new Date(), false], [futureDate, false], true, true)
+      .between([new Date(), 0], [futureDate, 0], true, true)
       .toArray();
   }
 
@@ -387,7 +405,7 @@ export class VioletVaultDB extends Dexie {
   }
 
   // Enhanced batch operations for all data types
-  async batchUpdate(updates: BulkUpdate[]): Promise<any[]> {
+  async batchUpdate(updates: BulkUpdate[]): Promise<unknown[]> {
     return this.transaction(
       "rw",
       [this.envelopes, this.transactions, this.bills, this.savingsGoals, this.paycheckHistory],
@@ -460,7 +478,7 @@ export class VioletVaultDB extends Dexie {
 
   async setCachedValue(
     key: string,
-    value: any,
+    value: unknown,
     ttl: number = 300000,
     category: string = "general"
   ): Promise<void> {
@@ -543,7 +561,7 @@ if (
     window.location.hostname.includes("f4tdaddy.com") ||
     window.location.hostname.includes("vercel.app"))
 ) {
-  (window as any).budgetDb = budgetDb;
+  (window as { budgetDb?: VioletVaultDB }).budgetDb = budgetDb;
 }
 
 // Utility functions
@@ -611,12 +629,12 @@ export const setActualBalance = async (balance: number): Promise<void> => {
 
 export const getUnassignedCash = async (): Promise<number> => {
   const metadata = await getBudgetMetadata();
-  return (metadata as any)?.unassignedCash || 0;
+  return (metadata as BudgetRecord)?.unassignedCash || 0;
 };
 
 export const getActualBalance = async (): Promise<number> => {
   const metadata = await getBudgetMetadata();
-  return (metadata as any)?.actualBalance || 0;
+  return (metadata as BudgetRecord)?.actualBalance || 0;
 };
 
 export const clearData = async (): Promise<void> => {

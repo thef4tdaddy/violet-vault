@@ -52,6 +52,7 @@ const noLegacyToast = {
 
     // Track if file has legacy imports that might be allowed temporarily
     let hasAllowedLegacyImport = false;
+    let hasUseConfirmImport = false;
 
     return {
       // Check for react-toastify imports
@@ -75,6 +76,11 @@ const noLegacyToast = {
           } else {
             hasAllowedLegacyImport = true;
           }
+        }
+
+        // Check for useConfirm import
+        if (node.source.value.includes('useConfirm') || node.source.value.includes('/useConfirm')) {
+          hasUseConfirmImport = true;
         }
       },
 
@@ -146,8 +152,8 @@ const noLegacyToast = {
           });
         }
 
-        // Check for confirm() calls
-        if (node.callee.type === 'Identifier' && node.callee.name === 'confirm') {
+        // Check for confirm() calls - skip if using modern useConfirm hook
+        if (node.callee.type === 'Identifier' && node.callee.name === 'confirm' && !hasUseConfirmImport) {
           context.report({
             node,
             messageId: 'noConfirmCall',
@@ -159,14 +165,18 @@ const noLegacyToast = {
       'Program:exit'(node) {
         if (hasAllowedLegacyImport) return;
 
-        // Check if file uses any toast-related patterns but doesn't import useToast
+        // Check if file uses any legacy toast-related patterns but doesn't import useToast
         const hasUseToastImport = sourceCode.text.includes('useToast');
-        const hasToastUsage =
-          sourceCode.text.includes('toast.') ||
+        const hasLegacyToastUsage =
+          (sourceCode.text.includes('toast.success(') ||
+           sourceCode.text.includes('toast.error(') ||
+           sourceCode.text.includes('toast.warn(') ||
+           sourceCode.text.includes('toast.warning(') ||
+           sourceCode.text.includes('toast.info(')) ||
           sourceCode.text.includes('alert(') ||
-          sourceCode.text.includes('confirm(');
+          (sourceCode.text.includes('confirm(') && !hasUseConfirmImport);
 
-        if (hasToastUsage && !hasUseToastImport) {
+        if (hasLegacyToastUsage && !hasUseToastImport) {
           context.report({
             node,
             loc: { line: 1, column: 0 },
