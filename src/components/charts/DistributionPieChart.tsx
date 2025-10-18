@@ -3,6 +3,39 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recha
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
+// Default label formatter for pie chart
+const defaultLabelFormatter = ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`;
+
+// Helper to calculate total from data
+const calculateTotal = (chartData, dataKey) => {
+  return chartData
+    .filter((item) => item != null)
+    .reduce((sum, item) => sum + (item[dataKey] || 0), 0);
+};
+
+// Helper to calculate percentage
+const calculatePercentage = (value, total) => {
+  return total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+};
+
+// Helper to enhance data with percentages and colors
+const enhanceChartData = (chartData, dataKey, total, chartColors) => {
+  return chartData
+    .filter((item) => item != null)
+    .map((item, index) => ({
+      ...item,
+      percentage: calculatePercentage(item[dataKey] || 0, total),
+      color: item.color || chartColors[index % chartColors.length],
+    }));
+};
+
+// Helper to render pie cells
+const renderPieCells = (data) => {
+  return data.filter((entry) => entry != null).map((entry, index) => (
+    <Cell key={`cell-${index}`} fill={entry.color} />
+  ));
+};
+
 /**
  * Reusable distribution pie chart component
  * Extracted from ChartsAndAnalytics.jsx for better reusability
@@ -38,24 +71,13 @@ const DistributionPieChart = ({
   const chartData = Array.isArray(data) ? data.slice(0, maxItems) : [];
   const hasData = chartData.length > 0;
 
-  // Default label formatter
-  const defaultLabelFormatter = ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`;
-
   const labelFunc = labelFormatter || defaultLabelFormatter;
 
   // Calculate total for percentage display
-  const total = chartData
-    .filter((item) => item != null) // Filter out null/undefined items
-    .reduce((sum, item) => sum + (item[dataKey] || 0), 0);
+  const total = calculateTotal(chartData, dataKey);
 
   // Enhanced data with percentage for custom rendering
-  const enhancedData = chartData
-    .filter((item) => item != null) // Filter out null/undefined items
-    .map((item, index) => ({
-      ...item,
-      percentage: total > 0 ? (((item[dataKey] || 0) / total) * 100).toFixed(1) : 0,
-      color: item.color || chartColors[index % chartColors.length],
-    }));
+  const enhancedData = enhanceChartData(chartData, dataKey, total, chartColors);
 
   return (
     <ChartContainer
@@ -86,11 +108,7 @@ const DistributionPieChart = ({
               endAngle={chartTypeConfigs.pie.endAngle}
               {...props}
             >
-              {enhancedData
-                .filter((entry) => entry != null) // Additional safety filter
-                .map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
+              {renderPieCells(enhancedData)}
             </Pie>
             <Tooltip content={<TooltipComponent />} />
             {showLegend && <Legend />}
