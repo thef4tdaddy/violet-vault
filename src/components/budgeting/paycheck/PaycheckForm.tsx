@@ -1,6 +1,69 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
+import { Button } from "../../ui";
+
+// PayerStats component - displays payer history
+const PayerStats = ({ stats, payerName }) => {
+  if (!stats || stats.count === 0) return null;
+
+  return (
+    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <h4 className="font-medium text-blue-900 mb-2">Recent History for {payerName}</h4>
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span className="text-blue-700">Average:</span>
+          <span className="font-medium ml-2">${stats.averageAmount.toFixed(2)}</span>
+        </div>
+        <div>
+          <span className="text-blue-700">Count:</span>
+          <span className="font-medium ml-2">{stats.count}</span>
+        </div>
+        <div>
+          <span className="text-blue-700">Range:</span>
+          <span className="font-medium ml-2">
+            ${stats.minAmount.toFixed(2)} - ${stats.maxAmount.toFixed(2)}
+          </span>
+        </div>
+        <div>
+          <span className="text-blue-700">Last:</span>
+          <span className="font-medium ml-2">
+            {stats.lastPaycheckDate
+              ? new Date(stats.lastPaycheckDate).toLocaleDateString()
+              : "N/A"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// AllocationModeOption component - single radio option
+const AllocationModeOption = ({ value, checked, onChange, title, description }) => (
+  <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
+    <div className="relative grid place-items-center">
+      <input
+        type="radio"
+        name="allocationMode"
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        className="sr-only"
+      />
+      <div
+        className={`w-5 h-5 rounded-full border-2 border-black grid place-items-center transition-colors ${
+          checked ? "bg-green-600" : "bg-white hover:bg-gray-50"
+        }`}
+      >
+        {checked && <div className="w-2 h-2 rounded-full bg-white"></div>}
+      </div>
+    </div>
+    <div className="text-sm">
+      <div className="font-medium text-gray-900">{title}</div>
+      <div className="text-gray-600 mt-1">{description}</div>
+    </div>
+  </label>
+);
 
 const PaycheckForm = ({
   formData,
@@ -84,40 +147,7 @@ const PaycheckForm = ({
       </div>
 
       {/* Payer Statistics */}
-      {selectedPayerStats && selectedPayerStats.count > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <h4 className="font-medium text-blue-900 mb-2">
-            Recent History for {formData.payerName}
-          </h4>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-blue-700">Average:</span>
-              <span className="font-medium ml-2">
-                ${selectedPayerStats.averageAmount.toFixed(2)}
-              </span>
-            </div>
-            <div>
-              <span className="text-blue-700">Count:</span>
-              <span className="font-medium ml-2">{selectedPayerStats.count}</span>
-            </div>
-            <div>
-              <span className="text-blue-700">Range:</span>
-              <span className="font-medium ml-2">
-                ${selectedPayerStats.minAmount.toFixed(2)} - $
-                {selectedPayerStats.maxAmount.toFixed(2)}
-              </span>
-            </div>
-            <div>
-              <span className="text-blue-700">Last:</span>
-              <span className="font-medium ml-2">
-                {selectedPayerStats.lastPaycheckDate
-                  ? new Date(selectedPayerStats.lastPaycheckDate).toLocaleDateString()
-                  : "N/A"}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+      <PayerStats stats={selectedPayerStats} payerName={formData.payerName} />
 
       {/* Allocation Mode */}
       <div>
@@ -128,64 +158,20 @@ const PaycheckForm = ({
           Allocation Mode
         </label>
         <div className="grid grid-cols-1 gap-3">
-          <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
-            <div className="relative grid place-items-center">
-              <input
-                type="radio"
-                name="allocationMode"
-                value="allocate"
-                checked={formData.allocationMode === "allocate"}
-                onChange={(e) => onUpdateField("allocationMode", e.target.value)}
-                className="sr-only"
-              />
-              <div
-                className={`w-5 h-5 rounded-full border-2 border-black grid place-items-center transition-colors ${
-                  formData.allocationMode === "allocate"
-                    ? "bg-green-600"
-                    : "bg-white hover:bg-gray-50"
-                }`}
-              >
-                {formData.allocationMode === "allocate" && (
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                )}
-              </div>
-            </div>
-            <div className="text-sm">
-              <div className="font-medium text-gray-900">Standard Allocation</div>
-              <div className="text-gray-600 mt-1">
-                Allocate based on envelope monthly amounts (biweekly conversion)
-              </div>
-            </div>
-          </label>
-          <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
-            <div className="relative grid place-items-center">
-              <input
-                type="radio"
-                name="allocationMode"
-                value="leftover"
-                checked={formData.allocationMode === "leftover"}
-                onChange={(e) => onUpdateField("allocationMode", e.target.value)}
-                className="sr-only"
-              />
-              <div
-                className={`w-5 h-5 rounded-full border-2 border-black grid place-items-center transition-colors ${
-                  formData.allocationMode === "leftover"
-                    ? "bg-green-600"
-                    : "bg-white hover:bg-gray-50"
-                }`}
-              >
-                {formData.allocationMode === "leftover" && (
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                )}
-              </div>
-            </div>
-            <div className="text-sm">
-              <div className="font-medium text-gray-900">Proportional Distribution</div>
-              <div className="text-gray-600 mt-1">
-                Distribute entire paycheck proportionally across envelopes
-              </div>
-            </div>
-          </label>
+          <AllocationModeOption
+            value="allocate"
+            checked={formData.allocationMode === "allocate"}
+            onChange={(e) => onUpdateField("allocationMode", e.target.value)}
+            title="Standard Allocation"
+            description="Allocate based on envelope monthly amounts (biweekly conversion)"
+          />
+          <AllocationModeOption
+            value="leftover"
+            checked={formData.allocationMode === "leftover"}
+            onChange={(e) => onUpdateField("allocationMode", e.target.value)}
+            title="Proportional Distribution"
+            description="Distribute entire paycheck proportionally across envelopes"
+          />
         </div>
       </div>
 

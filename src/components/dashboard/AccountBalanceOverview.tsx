@@ -1,6 +1,20 @@
 import React from "react";
 import { getIcon } from "../../utils";
 import EditableBalance from "../ui/EditableBalance";
+import { Button } from "../ui";
+
+// Helper functions to reduce complexity
+const getDifferenceCardStyles = (isBalanced, difference) => {
+  if (isBalanced) return { bg: "bg-green-50", text: "text-green-900", icon: "text-green-600" };
+  if (Math.abs(difference) > 10)
+    return { bg: "bg-red-50", text: "text-red-900", icon: "text-red-600" };
+  return { bg: "bg-yellow-50", text: "text-yellow-900", icon: "text-yellow-600" };
+};
+
+const getDifferenceMessage = (isBalanced, difference) => {
+  if (isBalanced) return "Accounts are balanced!";
+  return difference > 0 ? "Extra money available" : "Virtual balance exceeds actual";
+};
 
 const AccountBalanceOverview = ({
   actualBalance,
@@ -14,6 +28,8 @@ const AccountBalanceOverview = ({
   onOpenReconcileModal,
   onAutoReconcileDifference,
 }) => {
+  const diffStyles = getDifferenceCardStyles(isBalanced, difference);
+
   return (
     <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
       <h2 className="font-black text-black text-base mb-6 flex items-center">
@@ -65,32 +81,13 @@ const AccountBalanceOverview = ({
         </div>
 
         {/* Difference */}
-        <div
-          className={`rounded-lg p-6 ${
-            isBalanced ? "bg-green-50" : Math.abs(difference) > 10 ? "bg-red-50" : "bg-yellow-50"
-          }`}
-        >
+        <div className={`rounded-lg p-6 ${diffStyles.bg}`}>
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`font-medium ${
-                isBalanced
-                  ? "text-green-900"
-                  : Math.abs(difference) > 10
-                    ? "text-red-900"
-                    : "text-yellow-900"
-              }`}
-            >
-              Difference
-            </h3>
-            {isBalanced
-              ? React.createElement(getIcon("CheckCircle"), {
-                  className: "h-5 w-5 text-green-600",
-                })
-              : React.createElement(getIcon("AlertTriangle"), {
-                  className: `h-5 w-5 ${
-                    Math.abs(difference) > 10 ? "text-red-600" : "text-yellow-600"
-                  }`,
-                })}
+            <h3 className={`font-medium ${diffStyles.text}`}>Difference</h3>
+            {React.createElement(
+              getIcon(isBalanced ? "CheckCircle" : "AlertTriangle"),
+              { className: `h-5 w-5 ${diffStyles.icon}` }
+            )}
           </div>
           <div className="space-y-3">
             <div
@@ -102,20 +99,8 @@ const AccountBalanceOverview = ({
                 ? "Accounts Balanced!"
                 : `${difference > 0 ? "+" : ""}$${difference.toFixed(2)}`}
             </div>
-            <p
-              className={`text-sm ${
-                isBalanced
-                  ? "text-green-700"
-                  : Math.abs(difference) > 10
-                    ? "text-red-700"
-                    : "text-yellow-700"
-              }`}
-            >
-              {isBalanced
-                ? "Accounts are balanced!"
-                : difference > 0
-                  ? "Extra money available"
-                  : "Virtual balance exceeds actual"}
+            <p className={`text-sm ${diffStyles.text.replace("900", "700")}`}>
+              {getDifferenceMessage(isBalanced, difference)}
             </p>
           </div>
         </div>

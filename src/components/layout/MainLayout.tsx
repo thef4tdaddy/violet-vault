@@ -1,5 +1,5 @@
 // src/components/layout/MainLayout.jsx
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useAuthManager } from "../../hooks/auth/useAuthManager";
@@ -7,7 +7,6 @@ import { useLayoutData } from "../../hooks/layout";
 import useDataManagement from "../../hooks/common/useDataManagement";
 import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
 import useNetworkStatus from "../../hooks/common/useNetworkStatus";
-// eslint-disable-next-line no-restricted-imports -- Pre-existing import, required for sync functionality
 import { useFirebaseSync } from "../../hooks/sync/useFirebaseSync";
 import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
 import useDataInitialization from "../../hooks/common/useDataInitialization";
@@ -16,13 +15,11 @@ import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import { useToastStore } from "../../stores/ui/toastStore";
-import ViewRendererComponent from "./ViewRenderer";
+import ViewRenderer from "./ViewRenderer";
 import logger from "../../utils/common/logger";
 import { getVersionInfo } from "../../utils/common/version";
 import NavigationTabs from "./NavigationTabs";
-// eslint-disable-next-line no-restricted-imports -- Pre-existing import, sync status UI component
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
-// eslint-disable-next-line no-restricted-imports -- Pre-existing import, conflict resolution UI component
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
 import BugReportButton from "../feedback/BugReportButton";
@@ -84,6 +81,7 @@ const MainLayout = ({ firebaseSync }) => {
 
   // Use centralized layout data hook
   const layoutData = useLayoutData();
+  const { budget, totalBiweeklyNeed } = layoutData;
 
   const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
