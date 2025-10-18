@@ -61,7 +61,8 @@ const OnboardingTutorial = ({ children }) => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [showTutorial, closeTutorial]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showTutorial]); // closeTutorial is stable (store actions are stable)
 
   // Use highlight effect hook
   useHighlightEffect(showTutorial, currentStepElement);
