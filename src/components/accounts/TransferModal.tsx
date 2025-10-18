@@ -3,6 +3,7 @@ import { getIcon } from "../../utils";
 import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
 import SlideUpModal from "../mobile/SlideUpModal";
 import TransferModalContent from "./TransferModalContent";
+import { Button } from "@/components/ui";
 
 const TransferModal = ({
   isOpen,

@@ -1,4 +1,6 @@
 import React from "react";
+import { Select } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useBugReportV2 from "../../hooks/common/useBugReportV2";
 import useToast from "../../hooks/common/useToast";

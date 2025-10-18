@@ -5,6 +5,7 @@ import {
   TransferAmountInput,
   TransferDescriptionInput,
 } from "./transfer/TransferFormFields";
+import { Button } from "@/components/ui";
 
 /**
  * Extracted content component for TransferModal

@@ -1,3 +1,5 @@
+import React from "react";
+
 /**
  * Authentication type definitions for VioletVault
  * Core types for auth flows and UI boundary components

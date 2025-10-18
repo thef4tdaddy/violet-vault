@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import SettingsLayout from "./layout/SettingsLayout";

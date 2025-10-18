@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "@/components/ui";
 import { renderIcon } from "../../../utils";
 import ShareCodeModal from "../../sharing/ShareCodeModal";
 import JoinBudgetModal from "../../sharing/JoinBudgetModal";

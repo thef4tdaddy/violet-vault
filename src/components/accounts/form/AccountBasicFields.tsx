@@ -1,5 +1,5 @@
-import React from "react";
-import { ACCOUNT_TYPES } from "../../../utils/accounts";
+import { ACCOUNT_TYPES } from "@/utils/accounts";
+import { Select } from "@/components/ui";
 
 const AccountBasicFields = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
   <>

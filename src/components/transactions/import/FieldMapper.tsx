@@ -1,4 +1,6 @@
 import React from "react";
+import { Select } from "@/components/ui";
+import { Button } from "@/components/ui";
 
 const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImport }) => {
   const isValid = fieldMapping.date && fieldMapping.description && fieldMapping.amount;

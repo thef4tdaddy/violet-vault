@@ -1,4 +1,5 @@
 import React, { memo, useState } from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../../components/ui/buttons";
 import { getIcon } from "../../utils";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
@@ -6,7 +7,8 @@ import logger from "../../utils/common/logger";
 interface User {
   userName: string;
   userColor: string;
-  [key: string]: any;
+  budgetId?: string;
+  [key: string]: unknown;
 }
 
 interface ProfileSettingsProps {

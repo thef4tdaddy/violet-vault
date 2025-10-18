@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback } from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { globalToast } from "../../stores/ui/toastStore";
 import Dashboard from "../pages/MainDashboard";

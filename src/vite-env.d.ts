@@ -41,6 +41,37 @@ interface ImportMetaEnv {
   readonly SSR: boolean;
 }
 
+// Global type declarations for browser APIs
+declare global {
+  // Notification API
+  type NotificationPermission = "default" | "denied" | "granted";
+
+  // Service Worker types
+  interface ServiceWorkerGlobalScope {
+    skipWaiting(): Promise<void>;
+    clients: Clients;
+    registration: ServiceWorkerRegistration;
+  }
+
+  // Buffer source for test setup
+  type BufferSource = ArrayBufferView | ArrayBuffer;
+
+  // Additional browser APIs
+  interface Notification {
+    new (title: string, options?: NotificationOptions): Notification;
+  }
+
+  interface NotificationOptions {
+    body?: string;
+    icon?: string;
+    badge?: string;
+    tag?: string;
+    requireInteraction?: boolean;
+    silent?: boolean;
+    data?: any;
+  }
+}
+
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }

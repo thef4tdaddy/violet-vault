@@ -1,4 +1,5 @@
 // src/components/layout/MainLayout.jsx
+import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";

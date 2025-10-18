@@ -1,4 +1,5 @@
 import React from "react";
+import { Select } from "@/components/ui";
 import { getIcon } from "../../../../utils";
 
 const SplitRemainderConfig = ({

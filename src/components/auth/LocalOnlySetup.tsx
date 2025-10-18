@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "@/components/ui";
 import { globalToast } from "../../stores/ui/toastStore";
 import { getIcon } from "../../utils";
 import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
@@ -247,7 +248,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                       Profile Color
                     </label>
                     <div className="grid grid-cols-4 gap-3">
-                      {colors.map((color) => (
+                      {AVAILABLE_COLORS.map((color) => (
                         <Button
                           key={color.value}
                           type="button"

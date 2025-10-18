@@ -20,11 +20,11 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 // Extract function return type
-export type AsyncReturnType<T extends (...args: any[]) => Promise<any>> = T extends (
-  ...args: any[]
+export type AsyncReturnType<T extends (...args: unknown[]) => Promise<unknown>> = T extends (
+  ...args: unknown[]
 ) => Promise<infer R>
   ? R
-  : any;
+  : unknown;
 
 // Configuration types
 export interface BaseConfig {

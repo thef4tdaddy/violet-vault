@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import ReceiptScanner from "./ReceiptScanner";
 import ReceiptToTransactionModal from "./ReceiptToTransactionModal";

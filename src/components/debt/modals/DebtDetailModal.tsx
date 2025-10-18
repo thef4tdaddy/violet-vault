@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useDebtDetailModal } from "../../../hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";

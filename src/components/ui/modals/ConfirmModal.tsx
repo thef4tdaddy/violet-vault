@@ -1,4 +1,5 @@
 /* eslint-disable no-legacy-toast/no-legacy-toast */
+import { Button } from "@/components/ui";
 import React, { useEffect, useRef } from "react";
 import { getIcon } from "@/utils";
 import { useTouchFeedback } from "@/utils/ui/touchFeedback";

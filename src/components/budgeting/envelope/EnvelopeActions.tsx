@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { getButtonClasses, withHapticFeedback } from "../../../utils/ui/touchFeedback";
 

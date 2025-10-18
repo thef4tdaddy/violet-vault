@@ -49,9 +49,9 @@ export interface DebtAccount {
 
   // Calculated fields (added by enrichment)
   payoffInfo?: PayoffProjection;
-  relatedBill?: any; // TODO: Type when bills are converted
-  relatedEnvelope?: any; // TODO: Type when envelopes are converted
-  relatedTransactions?: any[]; // TODO: Type when transactions are converted
+  relatedBill?: unknown; // TODO: Type when bills are converted
+  relatedEnvelope?: unknown; // TODO: Type when envelopes are converted
+  relatedTransactions?: unknown[]; // TODO: Type when transactions are converted
 
   // Metadata
   createdAt?: string | Date;
@@ -74,7 +74,7 @@ export interface DebtSpecialTerms {
   priorityAmount?: number;
 
   // Other debt specific terms
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Debt type configuration

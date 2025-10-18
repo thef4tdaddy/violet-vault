@@ -44,7 +44,7 @@ export interface ChartDataPoint {
   budgeted?: number;
   actual?: number;
   transactionCount?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ChartSeries {
@@ -56,7 +56,7 @@ export interface ChartSeries {
   strokeWidth?: number;
   dot?: boolean | object;
   activeDot?: object;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Analytics data types
@@ -69,10 +69,10 @@ export interface MonthlyTrend {
 }
 
 // Make this more flexible to handle both array and object formats
-export type CategoryBreakdown = any;
+export type CategoryBreakdown = unknown;
 
 // Make this more flexible to handle both array and object formats
-export type EnvelopeSpending = any;
+export type EnvelopeSpending = unknown;
 
 export interface WeeklyPattern {
   day: string;
@@ -86,7 +86,7 @@ export interface WeeklyPattern {
 }
 
 // Make this more flexible to handle both array and object formats
-export type EnvelopeHealth = any;
+export type EnvelopeHealth = unknown;
 
 export interface BudgetVsActual extends ChartDataPoint {
   name: string;
@@ -103,7 +103,7 @@ export interface AnalyticsMetrics {
   topSpendingCategory?: string;
   budgetUtilization?: number;
   // Allow for additional properties from existing hooks
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface AnalyticsData {
@@ -152,9 +152,9 @@ export interface ComposedFinancialChartProps {
   actions?: ReactNode;
   showGrid?: boolean;
   showLegend?: boolean;
-  formatTooltip?: any;
+  formatTooltip?: (value: unknown, name: string, props: unknown) => ReactNode;
   xAxisKey?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface CategoryBarChartProps {
@@ -171,14 +171,14 @@ export interface CategoryBarChartProps {
   showGrid?: boolean;
   showLegend?: boolean;
   orientation?: "vertical" | "horizontal";
-  formatTooltip?: any;
+  formatTooltip?: (value: unknown, name: string, props: unknown) => ReactNode;
   maxBarSize?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface AnalyticsHeaderProps {
-  dateRange: any; // Flexible to handle different date range formats
-  handleDateRangeChange: (range: any) => void;
+  dateRange: { start?: Date | string; end?: Date | string } | unknown; // Flexible to handle different date range formats
+  handleDateRangeChange: (range: { start?: Date | string; end?: Date | string } | unknown) => void;
   handleExport: () => void;
 }
 

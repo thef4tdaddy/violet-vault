@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { USER_COLORS } from "../../../utils/auth/userSetupHelpers.tsx";
 
 /**

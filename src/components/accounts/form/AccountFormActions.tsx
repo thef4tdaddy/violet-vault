@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "../../../components/ui/buttons";
 
 const AccountFormActions = ({ editingAccount, canEdit, onClose, onSubmit }) => (
   <div className="flex gap-3 mt-6">

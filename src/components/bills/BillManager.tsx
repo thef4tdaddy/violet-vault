@@ -1,4 +1,5 @@
 /**
+import { Select } from "@/components/ui";
  * BillManager Component - Refactored for Issue #152
  *
  * UI-only component using useBillManager hook for business logic

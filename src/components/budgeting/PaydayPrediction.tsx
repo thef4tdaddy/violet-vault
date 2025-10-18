@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
 

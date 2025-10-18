@@ -1,5 +1,6 @@
 import React from "react";
 import { ACCOUNT_COLORS } from "../../../utils/accounts";
+import { Button } from "@/components/ui";
 
 const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
   <>

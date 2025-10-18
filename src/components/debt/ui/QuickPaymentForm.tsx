@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 
 /**
  * Quick payment form component for recording debt payments

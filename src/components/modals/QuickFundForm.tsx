@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@/components/ui";
 import { getButtonClasses, withHapticFeedback } from "../../utils/ui/touchFeedback";
 
 const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm, onClose }) => {
