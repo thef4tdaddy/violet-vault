@@ -16,9 +16,9 @@ export default {
               'Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed.',
           },
           {
-            group: ['**/firebase*', '**/dexie*', '**/storage/*', '**/sync/*'],
+            group: ['**/firebase*', '**/dexie*', '**/storage/*', '**/utils/sync/*', '**/services/**/sync/*'],
             message:
-              'Components should not import storage or sync utilities directly. Use service hooks from src/hooks/api/ instead.',
+              'Components should not import storage or sync utilities directly. Use service hooks from src/hooks/ instead.',
           },
         ],
       },

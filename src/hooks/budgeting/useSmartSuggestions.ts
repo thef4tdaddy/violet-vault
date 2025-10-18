@@ -5,6 +5,7 @@ import {
 } from "../../utils/budgeting/suggestionUtils";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
+import localStorageService from "../../services/storage/localStorageService";
 
 /**
  * Custom hook for managing smart envelope suggestions
@@ -25,13 +26,12 @@ const useSmartSuggestions = ({
   const [showSettings, setShowSettings] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Initialize from localStorage, default to expanded (false)
-    const saved = localStorage.getItem("smartSuggestions_collapsed");
-    return saved ? JSON.parse(saved) : false;
+    return localStorageService.getSmartSuggestionsCollapsed();
   });
 
   // Persist collapse state to localStorage
   useEffect(() => {
-    localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(isCollapsed));
+    localStorageService.setSmartSuggestionsCollapsed(isCollapsed);
   }, [isCollapsed]);
 
   // Generate suggestions based on current data and settings

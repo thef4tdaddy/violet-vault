@@ -44,7 +44,7 @@ import {
   FileText,
   Printer,
   Receipt,
-} from "lucide-react";
+} from "../icons";
 
 // Category-based fallback icons when provider matching fails
 export const CATEGORY_FALLBACK_ICONS = {

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils/icons";
-import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";
+import { useSyncHealthMonitor } from "../../hooks/sync/useSyncHealthMonitor";
 import { useExportData } from "../../hooks/common/useExportData";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 
@@ -37,26 +37,19 @@ import { useToastHelpers } from "../../utils/common/toastHelpers";
  * @returns {React.ReactElement|null} Rendered dashboard modal or null if closed
  */
 const SyncHealthDashboard = ({ isOpen, onClose }) => {
-  const [healthData, setHealthData] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const { healthData, refreshHealthData } = useSyncHealthMonitor(
+    isOpen && autoRefresh,
+    5000
+  );
   const { exportBackup } = useExportData();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   useEffect(() => {
-    if (!isOpen) return;
-
-    const updateHealth = () => {
-      const health = syncHealthMonitor.getHealthStatus();
-      setHealthData(health);
-    };
-
-    updateHealth();
-
-    if (autoRefresh) {
-      const interval = setInterval(updateHealth, 5000); // Update every 5 seconds
-      return () => clearInterval(interval);
+    if (isOpen) {
+      refreshHealthData();
     }
-  }, [isOpen, autoRefresh]);
+  }, [isOpen, refreshHealthData]);
 
   if (!isOpen || !healthData) return null;
 

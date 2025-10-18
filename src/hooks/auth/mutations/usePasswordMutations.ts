@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
+import localStorageService from "../../../services/storage/localStorageService";
 
 /**
  * Password-related TanStack Query mutations
@@ -17,12 +18,12 @@ export const useChangePasswordMutation = () => {
   return useMutation({
     mutationFn: async ({ oldPassword, newPassword }) => {
       try {
-        const savedData = localStorage.getItem("envelopeBudgetData");
+        const savedData = localStorageService.getBudgetData();
         if (!savedData) {
           return { success: false, error: "No saved data found." };
         }
 
-        const { encryptedData, iv } = JSON.parse(savedData);
+        const { encryptedData, iv } = savedData;
         const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
         const oldKey = oldKeyData.key;
 
@@ -31,14 +32,11 @@ export const useChangePasswordMutation = () => {
         const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
         const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
-        localStorage.setItem(
-          "envelopeBudgetData",
-          JSON.stringify({
-            encryptedData: encrypted.data,
-            salt: Array.from(newSalt),
-            iv: encrypted.iv,
-          })
-        );
+        localStorageService.setBudgetData({
+          encryptedData: encrypted.data,
+          salt: Array.from(newSalt),
+          iv: encrypted.iv,
+        });
 
         if (import.meta?.env?.MODE === "development") {
           const saltPreview =

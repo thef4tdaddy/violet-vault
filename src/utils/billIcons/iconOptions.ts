@@ -44,7 +44,7 @@ import {
   FileText,
   Printer,
   Receipt,
-} from "lucide-react";
+} from "../icons";
 
 // Icon options grouped by category for UI selection
 export const ICON_OPTIONS_BY_CATEGORY = {
