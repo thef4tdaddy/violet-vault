@@ -1,5 +1,5 @@
 // Core icon utility functions
-import { FileText } from "lucide-react";
+import { FileText } from "../icons";
 import { ALL_ICONS } from "./iconDefinitions.ts";
 import { BILL_PROVIDER_ICONS } from "./providerMappings.ts";
 import { CATEGORY_FALLBACK_ICONS, CATEGORY_PATTERNS } from "./categoryMappings.ts";
