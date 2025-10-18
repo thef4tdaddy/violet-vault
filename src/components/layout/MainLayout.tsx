@@ -12,10 +12,8 @@ import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
 import useDataInitialization from "../../hooks/common/useDataInitialization";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
-import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import { useToastStore } from "../../stores/ui/toastStore";
-import ViewRenderer from "./ViewRenderer";
 import logger from "../../utils/common/logger";
 import { getVersionInfo } from "../../utils/common/version";
 import NavigationTabs from "./NavigationTabs";
@@ -219,7 +217,7 @@ const MainContent = ({
 
   // Extract data from shared hooks
   const { securityContext } = auth;
-  const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } = layoutData;
+  const { budget, totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } = layoutData;
 
   // Helper function to get current view from URL
   const getCurrentViewFromPath = (pathname) => {
