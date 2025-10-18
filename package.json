@@ -33,8 +33,15 @@
     "preview:staging": "vite preview --mode staging",
     "lint": "eslint . --config configs/linting/eslint.config.js --max-warnings 1000",
     "lint:fix": "eslint . --config configs/linting/eslint.config.js --fix",
+    "lint:json": "mkdir -p docs/audits && eslint . --config configs/linting/eslint.config.js --format json > docs/audits/lint-results.json || true",
+    "lint:audit": "npm run lint:json && bash scripts/sort-lint-audit.sh",
     "tsc:check": "tsc --noEmit",
     "tsc:watch": "tsc --noEmit --watch",
+    "typecheck": "tsc --noEmit",
+    "typecheck:raw": "mkdir -p docs/audits && tsc --noEmit > docs/audits/typecheck-results.txt || true",
+    "typecheck:audit": "npm run typecheck:raw && bash scripts/sort-typecheck-audit.sh",
+    "audit:full": "npm run lint:audit && npm run typecheck:audit && bash scripts/generate-markdown-report.sh",
+    "typecheck:sw": "tsc --noEmit --project tsconfig.sw.json",
     "format": "prettier --config ./configs/linting/prettier.config.js --write \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:check": "prettier --config ./configs/linting/prettier.config.js --check \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "prepare": "husky",
@@ -49,9 +56,7 @@
     "test:run": "vitest run",
     "test:ci": "vitest run --coverage",
     "test:manual": "echo 'Run manual testing checklist'",
-    "backup:data": "node scripts/backup-data.js",
-    "typecheck": "tsc --noEmit",
-    "typecheck:sw": "tsc --noEmit --project tsconfig.sw.json"
+    "backup:data": "node scripts/backup-data.js"
   },
   "dependencies": {
     "@highlight-run/react": "^20.0.1",
