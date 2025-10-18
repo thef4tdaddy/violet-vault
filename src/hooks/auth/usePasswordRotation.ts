@@ -4,6 +4,7 @@ import { useAuthManager } from "./useAuthManager";
 import { useChangePasswordMutation } from "./mutations/usePasswordMutations";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
+import localStorageService from "../../services/storage/localStorageService";
 
 /**
  * Password rotation hook return type
@@ -41,9 +42,9 @@ const usePasswordRotation = (): UsePasswordRotationReturn => {
   // Check password age on component mount and when user unlocks
   useEffect(() => {
     const checkPasswordAge = (): void => {
-      const stored = localStorage.getItem("passwordLastChanged");
+      const stored = localStorageService.getItem("passwordLastChanged");
       if (!stored) {
-        localStorage.setItem("passwordLastChanged", Date.now().toString());
+        localStorageService.setItem("passwordLastChanged", Date.now().toString());
       } else {
         const age = Date.now() - parseInt(stored, 10);
         // 90 days = 90 * 24 * 60 * 60 * 1000 milliseconds
