@@ -16,7 +16,7 @@ const SmartCategoryManager = ({
   _currentCategories = [],
   onAddCategory,
   onRemoveCategory,
-  onUpdateCategory,  
+  _onUpdateCategory,
   onApplyToTransactions,
   onApplyToBills,
   dateRange: initialDateRange = "6months",

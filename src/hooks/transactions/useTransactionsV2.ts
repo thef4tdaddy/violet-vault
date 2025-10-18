@@ -244,3 +244,5 @@ const useTransactionsV2 = (options = {}) => {
     },
   };
 };
+
+export default useTransactionsV2;

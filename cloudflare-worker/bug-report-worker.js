@@ -743,8 +743,8 @@ async function generateSmartLabels(
   const urlPath = reportEnv?.url ? new URL(reportEnv.url).pathname : "";
   const pageContext = reportEnv?.pageContext;
 
-  // Priority-based labeling
-  const criticalKeywords = [
+  // Priority-based labeling (keywords reserved for future use)
+  const _criticalKeywords = [
     "crash",
     "error",
     "broken",
@@ -754,8 +754,8 @@ async function generateSmartLabels(
     "500",
     "404",
   ];
-  const highPriorityKeywords = ["slow", "performance", "timeout", "loading"];
-  const mediumPriorityKeywords = ["improvement", "enhance", "better", "should"];
+  const _highPriorityKeywords = ["slow", "performance", "timeout", "loading"];
+  const _mediumPriorityKeywords = ["improvement", "enhance", "better", "should"];
 
   // Detect code pastes (requested feature)
   const codeIndicators = [
@@ -1135,7 +1135,7 @@ async function createGitHubIssue(data, env) {
     sessionUrl,
     env: reportEnv,
     systemInfo,
-    contextInfo,
+    _contextInfo,
     customData,
   } = data;
 

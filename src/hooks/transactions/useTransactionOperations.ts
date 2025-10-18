@@ -405,3 +405,5 @@ const useTransactionOperations = (options = {}) => {
     bulkError: bulkOperationMutation.error,
   };
 };
+
+export default useTransactionOperations;

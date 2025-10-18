@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { encryptionUtils } from "../../utils/security/encryption";
 import { useAuthManager } from "./useAuthManager";
-import { useChangePasswordMutation } from "./mutations/usePasswordMutations";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 import localStorageService from "../../services/storage/localStorageService";
@@ -32,8 +30,7 @@ const usePasswordRotation = (): UsePasswordRotationReturn => {
   const {
     securityContext: { encryptionKey },
   } = useAuthManager();
-  const changePasswordMutation = useChangePasswordMutation();
-  const { showErrorToast, showSuccessToast } = useToastHelpers();
+  const { showErrorToast } = useToastHelpers();
   const [rotationDue, setRotationDue] = useState(false);
   const [showRotationModal, setShowRotationModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");

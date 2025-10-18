@@ -114,7 +114,7 @@ const runCorruptionDetectionAndRecovery = async () => {
               (value.startsWith("{") && !JSON.parse(value)) ||
               (key.includes("encrypted") && value.length < 10))
           );
-        } catch (e) {
+        } catch (_e) {
           return true; // If we can't parse it, it might be corrupted
         }
       });
