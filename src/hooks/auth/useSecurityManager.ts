@@ -51,8 +51,11 @@ export const useSecurityManager = () => {
   }, [
     securitySettings.autoLockEnabled,
     isLocked,
+    // These are useCallback functions, not Zustand store actions - they should be in deps
+    // eslint-disable-next-line zustand-safe-patterns/zustand-no-store-actions-in-deps
     startAutoLockTimer,
     stopAutoLockTimer,
+    // eslint-disable-next-line zustand-safe-patterns/zustand-no-store-actions-in-deps
     clearClipboardTimer,
   ]);
 

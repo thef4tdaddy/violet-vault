@@ -61,6 +61,8 @@ const OnboardingTutorial = ({ children }) => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
+    // closeTutorial is a useCallback function, not a Zustand store action
+    // eslint-disable-next-line zustand-safe-patterns/zustand-no-store-actions-in-deps
   }, [showTutorial, closeTutorial]);
 
   // Use highlight effect hook

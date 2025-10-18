@@ -19,7 +19,7 @@ export const useTutorialControls = (
     endTutorialStep();
     setPreference("tourCompleted", true);
     logger.info("🏁 Tutorial closed by user");
-  }, [setShowTutorial, endTutorialStep, setPreference]);
+  }, [setShowTutorial]); // endTutorialStep and setPreference are stable Zustand actions
 
   const nextStep = useCallback(() => {
     const step = tutorialSteps[currentStep];
@@ -37,7 +37,7 @@ export const useTutorialControls = (
       markStepComplete("accountSetup");
       closeTutorial();
     }
-  }, [tutorialSteps, currentStep, setCurrentStep, markStepComplete, closeTutorial]);
+  }, [tutorialSteps, currentStep, setCurrentStep, closeTutorial]); // markStepComplete is a stable Zustand action
 
   const prevStep = useCallback(() => {
     if (currentStep > 0) {
@@ -48,7 +48,7 @@ export const useTutorialControls = (
   const skipTutorial = useCallback(() => {
     setPreference("showHints", false);
     closeTutorial();
-  }, [setPreference, closeTutorial]);
+  }, [closeTutorial]); // setPreference is a stable Zustand action
 
   return {
     closeTutorial,
