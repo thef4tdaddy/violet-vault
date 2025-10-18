@@ -96,13 +96,7 @@ const PromptModal = ({
 
   if (!isOpen) return null;
 
-  // Icon selection
-  const getModalIcon = () => {
-    if (icon) return icon;
-    return getIcon("Type");
-  };
-
-  const Icon = getModalIcon();
+  const Icon = icon || getIcon("Type");
 
   return (
     <div
@@ -114,85 +108,140 @@ const PromptModal = ({
     >
       <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
         <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-              {React.createElement(Icon, {
-                className: "h-6 w-6 text-blue-600",
-              })}
-            </div>
-            <div className="flex-1">
-              <h3 id="prompt-modal-title" className="text-lg font-semibold text-gray-900">
-                {title}
-              </h3>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="mb-6">
-            <p id="prompt-modal-description" className="text-gray-700 mb-4">
-              {message}
-            </p>
-            {children}
-
-            {/* Input Field */}
-            <div className="space-y-2">
-              <input
-                ref={inputRef}
-                type={inputType}
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder={placeholder}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  validationError ? "border-red-500" : "border-gray-300"
-                }`}
-                disabled={isLoading}
-                aria-invalid={!!validationError}
-                aria-describedby={validationError ? "input-error" : undefined}
-              />
-
-              {/* Validation Error */}
-              {validationError && (
-                <div id="input-error" className="flex items-center text-red-600 text-sm">
-                  {React.createElement(getIcon("AlertCircle"), {
-                    className: "h-4 w-4 mr-1",
-                  })}
-                  {validationError}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 justify-end">
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={isLoading}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {cancelLabel}
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                  Processing...
-                </div>
-              ) : (
-                confirmLabel
-              )}
-            </button>
-          </div>
+          <ModalHeader icon={Icon} title={title} />
+          <ModalContent
+            message={message}
+            children={children}
+            inputRef={inputRef}
+            inputType={inputType}
+            inputValue={inputValue}
+            handleInputChange={handleInputChange}
+            placeholder={placeholder}
+            validationError={validationError}
+            isLoading={isLoading}
+          />
+          <ModalActions
+            handleCancel={handleCancel}
+            handleConfirm={handleConfirm}
+            isLoading={isLoading}
+            cancelLabel={cancelLabel}
+            confirmLabel={confirmLabel}
+          />
         </div>
       </div>
     </div>
   );
 };
+
+const ModalHeader = ({ icon, title }) => (
+  <div className="flex items-center mb-4">
+    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+      {React.createElement(icon, {
+        className: "h-6 w-6 text-blue-600",
+      })}
+    </div>
+    <div className="flex-1">
+      <h3 id="prompt-modal-title" className="text-lg font-semibold text-gray-900">
+        {title}
+      </h3>
+    </div>
+  </div>
+);
+
+const ModalContent = ({
+  message,
+  children,
+  inputRef,
+  inputType,
+  inputValue,
+  handleInputChange,
+  placeholder,
+  validationError,
+  isLoading,
+}) => (
+  <div className="mb-6">
+    <p id="prompt-modal-description" className="text-gray-700 mb-4">
+      {message}
+    </p>
+    {children}
+    <InputField
+      inputRef={inputRef}
+      inputType={inputType}
+      inputValue={inputValue}
+      handleInputChange={handleInputChange}
+      placeholder={placeholder}
+      validationError={validationError}
+      isLoading={isLoading}
+    />
+  </div>
+);
+
+const InputField = ({
+  inputRef,
+  inputType,
+  inputValue,
+  handleInputChange,
+  placeholder,
+  validationError,
+  isLoading,
+}) => (
+  <div className="space-y-2">
+    <input
+      ref={inputRef}
+      type={inputType}
+      value={inputValue}
+      onChange={handleInputChange}
+      placeholder={placeholder}
+      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+        validationError ? "border-red-500" : "border-gray-300"
+      }`}
+      disabled={isLoading}
+      aria-invalid={!!validationError}
+      aria-describedby={validationError ? "input-error" : undefined}
+    />
+    {validationError && <ValidationError error={validationError} />}
+  </div>
+);
+
+const ValidationError = ({ error }) => (
+  <div id="input-error" className="flex items-center text-red-600 text-sm">
+    {React.createElement(getIcon("AlertCircle"), {
+      className: "h-4 w-4 mr-1",
+    })}
+    {error}
+  </div>
+);
+
+const ModalActions = ({ handleCancel, handleConfirm, isLoading, cancelLabel, confirmLabel }) => (
+  <div className="flex gap-3 justify-end">
+    <button
+      type="button"
+      onClick={handleCancel}
+      disabled={isLoading}
+      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    >
+      {cancelLabel}
+    </button>
+    <button
+      type="button"
+      onClick={handleConfirm}
+      disabled={isLoading}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+    >
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        confirmLabel
+      )}
+    </button>
+  </div>
+);
+
+const LoadingSpinner = () => (
+  <div className="flex items-center">
+    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+    Processing...
+  </div>
+);
 
 export default PromptModal;

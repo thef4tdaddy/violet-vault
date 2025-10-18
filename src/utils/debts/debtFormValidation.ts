@@ -21,6 +21,47 @@ interface DebtMetrics {
   payoffDate: Date;
 }
 
+// Helper to parse and validate numeric fields
+const parseNumericField = (value: any): number | null => {
+  if (!value) return null;
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? null : parsed;
+};
+
+// Helper to add payment ratio warnings
+const addPaymentRatioWarnings = (
+  currentBalance: number,
+  minimumPayment: number,
+  warnings: string[]
+) => {
+  if (currentBalance <= 0 || minimumPayment <= 0) return;
+
+  const paymentPercent = (minimumPayment / currentBalance) * 100;
+  if (paymentPercent < 1) {
+    warnings.push("Minimum payment is less than 1% of balance - this will take very long to pay off");
+  } else if (paymentPercent > 50) {
+    warnings.push("Minimum payment is more than 50% of balance - verify this is correct");
+  }
+};
+
+// Helper to add interest rate warnings
+const addInterestRateWarnings = (interestRate: number, warnings: string[]) => {
+  if (interestRate > 25) {
+    warnings.push("Interest rate is very high - consider debt consolidation options");
+  }
+};
+
+// Helper to add balance comparison warnings
+const addBalanceComparisonWarnings = (
+  currentBalance: number,
+  originalBalance: number | null,
+  warnings: string[]
+) => {
+  if (originalBalance !== null && currentBalance > originalBalance) {
+    warnings.push("Current balance is higher than original balance - interest and fees may have accrued");
+  }
+};
+
 /**
  * Validate debt form data with financial business rules
  */
@@ -28,66 +69,34 @@ export function validateDebtFormData(formData: any): ValidationResult {
   const errors: DebtFormErrors = {};
   const warnings: string[] = [];
 
-  // Basic required field validation
-  if (!formData.name?.trim()) {
-    errors.name = "Debt name is required";
-  }
+  // Basic validation
+  checkRequiredTextField(formData.name, "name", errors);
+  checkRequiredTextField(formData.creditor, "creditor", errors);
 
-  if (!formData.creditor?.trim()) {
-    errors.creditor = "Creditor name is required";
-  }
+  // Parse numeric fields
+  const currentBalance = parseNumericField(formData.currentBalance || formData.balance) ?? -1;
+  const originalBalance = parseNumericField(formData.originalBalance);
+  const interestRate = parseNumericField(formData.interestRate) ?? 0;
+  const minimumPayment = parseNumericField(formData.minimumPayment) ?? -1;
 
-  // Financial validation
-  const currentBalance = parseFloat(formData.currentBalance || formData.balance);
-  if (
-    (!formData.currentBalance && !formData.balance) ||
-    isNaN(currentBalance) ||
-    currentBalance < 0
-  ) {
+  // Validate balances
+  if (currentBalance < 0) {
     errors.balance = "Valid current balance is required";
   }
-
-  const originalBalance = formData.originalBalance ? parseFloat(formData.originalBalance) : null;
-  if (originalBalance !== null && (isNaN(originalBalance) || originalBalance < 0)) {
+  if (originalBalance !== null && originalBalance < 0) {
     errors.originalBalance = "Original balance must be positive";
   }
-
-  // Interest rate validation
-  const interestRate = formData.interestRate ? parseFloat(formData.interestRate) : 0;
-  if (formData.interestRate && (isNaN(interestRate) || interestRate < 0 || interestRate > 100)) {
+  if (formData.interestRate && (interestRate < 0 || interestRate > 100)) {
     errors.interestRate = "Interest rate must be between 0 and 100";
   }
-
-  // Minimum payment validation
-  const minimumPayment = parseFloat(formData.minimumPayment);
-  if (!formData.minimumPayment || isNaN(minimumPayment) || minimumPayment < 0) {
+  if (minimumPayment < 0) {
     errors.minimumPayment = "Valid minimum payment is required";
   }
 
-  // Business logic warnings
-  if (currentBalance > 0 && minimumPayment > 0) {
-    const minimumPaymentPercent = (minimumPayment / currentBalance) * 100;
-
-    if (minimumPaymentPercent < 1) {
-      warnings.push(
-        "Minimum payment is less than 1% of balance - this will take very long to pay off"
-      );
-    } else if (minimumPaymentPercent > 50) {
-      warnings.push("Minimum payment is more than 50% of balance - verify this is correct");
-    }
-  }
-
-  // Interest rate warnings
-  if (interestRate > 25) {
-    warnings.push("Interest rate is very high - consider debt consolidation options");
-  }
-
-  // Original vs current balance warnings
-  if (originalBalance !== null && currentBalance > originalBalance) {
-    warnings.push(
-      "Current balance is higher than original balance - interest and fees may have accrued"
-    );
-  }
+  // Add warnings
+  addPaymentRatioWarnings(currentBalance, minimumPayment, warnings);
+  addInterestRateWarnings(interestRate, warnings);
+  addBalanceComparisonWarnings(currentBalance, originalBalance, warnings);
 
   return {
     isValid: Object.keys(errors).length === 0,
@@ -107,6 +116,73 @@ export function validateDebtFormData(formData: any): ValidationResult {
       specialTerms: formData.specialTerms,
     } as DebtFormData,
   };
+}
+
+// Helper functions to reduce complexity
+const isValidNumber = (value: any): boolean => {
+  const num = parseFloat(value);
+  return !isNaN(num) && num >= 0;
+};
+
+const checkRequiredTextField = (value: any, fieldName: string, errors: Record<string, string>) => {
+  if (!value?.trim()) {
+    errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+  }
+};
+
+const checkBalanceField = (
+  value: any,
+  fieldName: string,
+  required: boolean,
+  errors: Record<string, string>
+) => {
+  if (required) {
+    if (!value || !isValidNumber(value)) {
+      errors[fieldName] = `Valid ${fieldName.replace(/([A-Z])/g, " $1").toLowerCase()} is required`;
+    }
+  } else if (value) {
+    const num = parseFloat(value);
+    if (isNaN(num) || num < 0) {
+      errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be positive`;
+    }
+  }
+};
+
+const checkInterestRate = (value: any, errors: Record<string, string>) => {
+  if (value) {
+    const rate = parseFloat(value);
+    if (isNaN(rate) || rate < 0 || rate > 100) {
+      errors.interestRate = "Interest rate must be between 0 and 100";
+    }
+  }
+};
+
+const checkPaymentMethodFields = (formData: any, errors: Record<string, string>) => {
+  if (formData.paymentMethod === "connect_existing" && !formData.existingBillId) {
+    errors.existingBillId = "Please select a bill to connect";
+  }
+
+  if (formData.paymentMethod === "create_new" && formData.createBill && !formData.envelopeId) {
+    errors.envelopeId = "Please select an envelope for payment funding";
+  }
+};
+
+/**
+ * Validate debt form fields (for useDebtForm hook)
+ * Returns object with field-specific error messages
+ */
+export function validateDebtFormFields(formData: any): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  checkRequiredTextField(formData.name, "name", errors);
+  checkRequiredTextField(formData.creditor, "creditor", errors);
+  checkBalanceField(formData.currentBalance, "currentBalance", true, errors);
+  checkBalanceField(formData.originalBalance, "originalBalance", false, errors);
+  checkInterestRate(formData.interestRate, errors);
+  checkBalanceField(formData.minimumPayment, "minimumPayment", true, errors);
+  checkPaymentMethodFields(formData, errors);
+
+  return errors;
 }
 
 /**

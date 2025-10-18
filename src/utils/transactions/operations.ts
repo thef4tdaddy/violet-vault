@@ -6,6 +6,47 @@
 import logger from "../common/logger.ts";
 
 /**
+ * Validate required fields
+ */
+const validateRequiredFields = (transactionData, errors) => {
+  if (!transactionData.description?.trim()) {
+    errors.push("Description is required");
+  }
+
+  if (transactionData.amount === undefined || transactionData.amount === null) {
+    errors.push("Amount is required");
+  } else if (isNaN(transactionData.amount) || transactionData.amount === 0) {
+    errors.push("Amount must be a non-zero number");
+  }
+
+  if (!transactionData.date) {
+    errors.push("Date is required");
+  } else {
+    const date = new Date(transactionData.date);
+    if (isNaN(date.getTime())) {
+      errors.push("Date must be a valid date");
+    }
+  }
+};
+
+/**
+ * Validate optional fields
+ */
+const validateOptionalFields = (transactionData, errors) => {
+  if (transactionData.category && typeof transactionData.category !== "string") {
+    errors.push("Category must be a string");
+  }
+
+  if (transactionData.account && typeof transactionData.account !== "string") {
+    errors.push("Account must be a string");
+  }
+
+  if (transactionData.envelopeId && typeof transactionData.envelopeId !== "string") {
+    errors.push("Envelope ID must be a string");
+  }
+};
+
+/**
  * Validate transaction data
  * @param {Object} transactionData - Transaction data to validate
  * @returns {Object} Validation result with isValid boolean and errors array
@@ -19,38 +60,8 @@ export const validateTransactionData = (transactionData) => {
       return { isValid: false, errors };
     }
 
-    // Required fields
-    if (!transactionData.description?.trim()) {
-      errors.push("Description is required");
-    }
-
-    if (transactionData.amount === undefined || transactionData.amount === null) {
-      errors.push("Amount is required");
-    } else if (isNaN(transactionData.amount) || transactionData.amount === 0) {
-      errors.push("Amount must be a non-zero number");
-    }
-
-    if (!transactionData.date) {
-      errors.push("Date is required");
-    } else {
-      const date = new Date(transactionData.date);
-      if (isNaN(date.getTime())) {
-        errors.push("Date must be a valid date");
-      }
-    }
-
-    // Optional but validated if present
-    if (transactionData.category && typeof transactionData.category !== "string") {
-      errors.push("Category must be a string");
-    }
-
-    if (transactionData.account && typeof transactionData.account !== "string") {
-      errors.push("Account must be a string");
-    }
-
-    if (transactionData.envelopeId && typeof transactionData.envelopeId !== "string") {
-      errors.push("Envelope ID must be a string");
-    }
+    validateRequiredFields(transactionData, errors);
+    validateOptionalFields(transactionData, errors);
 
     return {
       isValid: errors.length === 0,
@@ -275,6 +286,42 @@ export const categorizeTransaction = (transaction, categoryRules = []) => {
 };
 
 /**
+ * Check if two transactions are duplicates based on criteria
+ */
+const areDuplicateTransactions = (transaction, existing, options) => {
+  const { timeWindowMs, amountTolerance, checkDescription, checkAccount } = options;
+  
+  const timeDiff = Math.abs(new Date(transaction.date) - new Date(existing.date));
+  const amountDiff = Math.abs(transaction.amount - existing.amount);
+  const sameDescription = !checkDescription || transaction.description === existing.description;
+  const sameAccount = !checkAccount || transaction.account === existing.account;
+
+  return (
+    timeDiff <= timeWindowMs &&
+    amountDiff <= amountTolerance &&
+    sameDescription &&
+    sameAccount
+  );
+};
+
+/**
+ * Merge duplicate transaction metadata
+ */
+const mergeDuplicateMetadata = (existing, transaction) => {
+  existing.metadata = {
+    ...existing.metadata,
+    duplicates: existing.metadata.duplicates || [],
+    mergedAt: new Date().toISOString(),
+  };
+
+  existing.metadata.duplicates.push({
+    id: transaction.id,
+    originalDate: transaction.date,
+    mergedAt: new Date().toISOString(),
+  });
+};
+
+/**
  * Merge duplicate transactions
  * @param {Array} transactions - Transactions to check for duplicates
  * @param {Object} options - Merge options
@@ -291,37 +338,14 @@ export const mergeDuplicateTransactions = (transactions = [], options = {}) => {
 
     const processed = [];
     const timeWindowMs = timeWindowMinutes * 60 * 1000;
+    const mergeOptions = { timeWindowMs, amountTolerance, checkDescription, checkAccount };
 
     for (const transaction of transactions) {
       let isDuplicate = false;
 
       for (const existing of processed) {
-        // Check if transactions are similar enough to be duplicates
-        const timeDiff = Math.abs(new Date(transaction.date) - new Date(existing.date));
-        const amountDiff = Math.abs(transaction.amount - existing.amount);
-        const sameDescription =
-          !checkDescription || transaction.description === existing.description;
-        const sameAccount = !checkAccount || transaction.account === existing.account;
-
-        if (
-          timeDiff <= timeWindowMs &&
-          amountDiff <= amountTolerance &&
-          sameDescription &&
-          sameAccount
-        ) {
-          // Mark as duplicate and merge metadata
-          existing.metadata = {
-            ...existing.metadata,
-            duplicates: existing.metadata.duplicates || [],
-            mergedAt: new Date().toISOString(),
-          };
-
-          existing.metadata.duplicates.push({
-            id: transaction.id,
-            originalDate: transaction.date,
-            mergedAt: new Date().toISOString(),
-          });
-
+        if (areDuplicateTransactions(transaction, existing, mergeOptions)) {
+          mergeDuplicateMetadata(existing, transaction);
           isDuplicate = true;
           break;
         }
