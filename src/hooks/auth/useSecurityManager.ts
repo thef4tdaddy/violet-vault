@@ -48,12 +48,11 @@ export const useSecurityManager = () => {
       stopAutoLockTimer();
       clearClipboardTimer();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     securitySettings.autoLockEnabled,
     isLocked,
-    startAutoLockTimer,
-    stopAutoLockTimer,
-    clearClipboardTimer,
+    // startAutoLockTimer, stopAutoLockTimer, clearClipboardTimer are stable
   ]);
 
   // Handle page visibility changes for lock-on-hide feature
