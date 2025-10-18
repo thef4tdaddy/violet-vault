@@ -68,7 +68,7 @@ export default [
   },
   {
     // Allow direct icon imports only in the icon utility file
-    files: ['**/iconImport.{js,ts}'],
+    files: ['**/iconImport.{js,ts}', 'src/utils/icons/index.ts'],
     rules: {
       'no-restricted-imports': 'off', // Icon utility can import from react-icons and lucide-react
       'no-direct-icon-imports/no-direct-icon-imports': 'off', // Icon utility needs to import from react-icons

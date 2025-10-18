@@ -21,7 +21,7 @@ import {
   Fuel,
   Activity,
   Receipt,
-} from "lucide-react";
+} from "../icons";
 
 // Company-specific icon mappings based on provider names
 export const BILL_PROVIDER_ICONS = {

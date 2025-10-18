@@ -6,7 +6,7 @@ import {
   getActionButtonStyle,
   formatRecoveryResult,
   hasRecoveryActions,
-} from "../../../utils/sync/syncHealthHelpers";
+} from "../../../utils/common/syncHelpers";
 
 /**
  * @typedef {Object} RecoveryResult
