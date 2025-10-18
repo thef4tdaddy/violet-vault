@@ -4,14 +4,22 @@
  */
 import { useMemo } from "react";
 
-export const useConnectionData = (
+interface ConnectionDataParams {
+  entityType: string;
+  entityId: string;
+  currentEntity: any;
+  bills: any[];
+  envelopes: any[];
+  debts?: any[];
+}
+
+export const useConnectionData = ({
   entityType,
   entityId,
   currentEntity,
   bills,
   envelopes,
-  _debts
-) => {
+}: ConnectionDataParams) => {
   // Get current connections based on entity type
   const currentConnections = useMemo(() => {
     if (!currentEntity) return [];

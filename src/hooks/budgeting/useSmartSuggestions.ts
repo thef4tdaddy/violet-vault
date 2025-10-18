@@ -7,6 +7,30 @@ import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 import localStorageService from "../../services/storage/localStorageService";
 
+// Helper to apply create envelope suggestion
+const applyCreateEnvelope = async (suggestion, onCreateEnvelope) => {
+  if (onCreateEnvelope) {
+    await onCreateEnvelope(suggestion.data);
+    globalToast.showSuccess(
+      `Created "${suggestion.data.name}" envelope`,
+      "Suggestion Applied"
+    );
+  }
+};
+
+// Helper to apply budget change suggestion
+const applyBudgetChange = async (suggestion, onUpdateEnvelope, actionType) => {
+  if (onUpdateEnvelope) {
+    await onUpdateEnvelope(suggestion.data.envelopeId, {
+      monthlyAmount: suggestion.data.suggestedAmount,
+    });
+    const message = actionType === "increase" 
+      ? `Increased budget to $${suggestion.data.suggestedAmount}`
+      : `Reduced budget to $${suggestion.data.suggestedAmount}`;
+    globalToast.showSuccess(message, "Budget Updated");
+  }
+};
+
 /**
  * Custom hook for managing smart envelope suggestions
  * Handles analysis settings, suggestion generation, and user interactions
@@ -83,37 +107,15 @@ const useSmartSuggestions = ({
       try {
         switch (suggestion.action) {
           case "create_envelope":
-            if (onCreateEnvelope) {
-              await onCreateEnvelope(suggestion.data);
-              globalToast.showSuccess(
-                `Created "${suggestion.data.name}" envelope`,
-                "Suggestion Applied"
-              );
-            }
+            await applyCreateEnvelope(suggestion, onCreateEnvelope);
             break;
 
           case "increase_budget":
-            if (onUpdateEnvelope) {
-              await onUpdateEnvelope(suggestion.data.envelopeId, {
-                monthlyAmount: suggestion.data.suggestedAmount,
-              });
-              globalToast.showSuccess(
-                `Increased budget to $${suggestion.data.suggestedAmount}`,
-                "Budget Updated"
-              );
-            }
+            await applyBudgetChange(suggestion, onUpdateEnvelope, "increase");
             break;
 
           case "decrease_budget":
-            if (onUpdateEnvelope) {
-              await onUpdateEnvelope(suggestion.data.envelopeId, {
-                monthlyAmount: suggestion.data.suggestedAmount,
-              });
-              globalToast.showSuccess(
-                `Reduced budget to $${suggestion.data.suggestedAmount}`,
-                "Budget Updated"
-              );
-            }
+            await applyBudgetChange(suggestion, onUpdateEnvelope, "decrease");
             break;
 
           default:

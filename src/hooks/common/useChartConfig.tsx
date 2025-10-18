@@ -1,5 +1,49 @@
 import { useMemo, useCallback } from "react";
 
+// Helper to format month key to readable format
+const formatMonthYear = (monthKey) => {
+  if (!monthKey) return "";
+  const [year, month] = monthKey.split("-");
+  const date = new Date(year, month - 1);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+};
+
+// Helper to format currency values with K/M suffixes
+const formatShortCurrency = (value) => {
+  const num = value || 0;
+  if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
+  if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
+  return `$${num.toFixed(0)}`;
+};
+
+// Color scheme mapping
+const CATEGORY_COLORS = {
+  income: "#10b981",
+  expenses: "#ef4444",
+  net: "#06b6d4",
+  savings: "#8b5cf6",
+  budget: "#a855f7",
+  actual: "#06b6d4",
+};
+
+// Status color mapping
+const STATUS_COLORS = {
+  critical: { text: "text-red-600", bg: "bg-red-100" },
+  warning: { text: "text-yellow-600", bg: "bg-yellow-100" },
+  healthy: { text: "text-green-600", bg: "bg-green-100" },
+  overfunded: { text: "text-blue-600", bg: "bg-blue-100" },
+};
+
+// Responsive height mapping
+const RESPONSIVE_HEIGHTS = {
+  mobile: { default: 250, pie: 200, bar: 300 },
+  tablet: { default: 300, pie: 250, bar: 350 },
+  desktop: { default: 400, pie: 350, bar: 450 },
+};
+
 /**
  * Custom hook for chart configuration and styling
  * Extracted from ChartsAndAnalytics.jsx for better reusability
@@ -99,30 +143,18 @@ export const useChartConfig = () => {
   // Color scheme utilities
   const getColorByCategory = useCallback(
     (category, index) => {
-      const categoryColors = {
-        income: "#10b981",
-        expenses: "#ef4444",
-        net: "#06b6d4",
-        savings: "#8b5cf6",
-        budget: "#a855f7",
-        actual: "#06b6d4",
-      };
-
-      return categoryColors[category?.toLowerCase()] || chartColors[index % chartColors.length];
+      return CATEGORY_COLORS[category?.toLowerCase()] || chartColors[index % chartColors.length];
     },
     [chartColors]
   );
 
   // Status color utilities
   const getStatusColor = useCallback((status, type = "text") => {
-    const colors = {
-      critical: type === "text" ? "text-red-600" : "bg-red-100",
-      warning: type === "text" ? "text-yellow-600" : "bg-yellow-100",
-      healthy: type === "text" ? "text-green-600" : "bg-green-100",
-      overfunded: type === "text" ? "text-blue-600" : "bg-blue-100",
-    };
-
-    return colors[status] || (type === "text" ? "text-gray-600" : "bg-gray-100");
+    const colorScheme = STATUS_COLORS[status];
+    if (colorScheme) {
+      return type === "text" ? colorScheme.text : colorScheme.bg;
+    }
+    return type === "text" ? "text-gray-600" : "bg-gray-100";
   }, []);
 
   // Chart animation configurations
@@ -147,46 +179,15 @@ export const useChartConfig = () => {
       currency: (value) => `$${(value || 0).toLocaleString()}`,
       percentage: (value) => `${(value || 0).toFixed(1)}%`,
       count: (value) => (value || 0).toLocaleString(),
-      shortCurrency: (value) => {
-        const num = value || 0;
-        if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
-        if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
-        return `$${num.toFixed(0)}`;
-      },
-      monthYear: (monthKey) => {
-        if (!monthKey) return "";
-        const [year, month] = monthKey.split("-");
-        const date = new Date(year, month - 1);
-        return date.toLocaleDateString("en-US", {
-          month: "short",
-          year: "numeric",
-        });
-      },
+      shortCurrency: formatShortCurrency,
+      monthYear: formatMonthYear,
     }),
     []
   );
 
   // Responsive breakpoint utilities
   const getResponsiveHeight = useCallback((breakpoint, chartType) => {
-    const heights = {
-      mobile: {
-        default: 250,
-        pie: 200,
-        bar: 300,
-      },
-      tablet: {
-        default: 300,
-        pie: 250,
-        bar: 350,
-      },
-      desktop: {
-        default: 400,
-        pie: 350,
-        bar: 450,
-      },
-    };
-
-    return heights[breakpoint]?.[chartType] || heights[breakpoint]?.default || 300;
+    return RESPONSIVE_HEIGHTS[breakpoint]?.[chartType] || RESPONSIVE_HEIGHTS[breakpoint]?.default || 300;
   }, []);
 
   return {

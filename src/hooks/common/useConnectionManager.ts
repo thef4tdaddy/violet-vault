@@ -39,7 +39,7 @@ const useConnectionManager = (entityType, entityId) => {
 
   // Get connection data using extracted hook
   const { currentConnections, availableOptions, hasConnections, hasAvailableOptions } =
-    useConnectionData(entityType, entityId, currentEntity, bills, envelopes, debts);
+    useConnectionData({ entityType, entityId, currentEntity, bills, envelopes, debts });
 
   // Connection operations with state management
   const connectWithState = async (targetId) => {
@@ -47,7 +47,7 @@ const useConnectionManager = (entityType, entityId) => {
 
     setIsConnecting(true);
     try {
-      const result = await handleConnect(
+      const result = await handleConnect({
         entityType,
         entityId,
         targetId,
@@ -56,8 +56,8 @@ const useConnectionManager = (entityType, entityId) => {
         bills,
         debts,
         updateBill,
-        updateDebt
-      );
+        updateDebt,
+      });
       if (result.success) setSelectedConnectionId("");
       return result;
     } finally {
@@ -70,13 +70,13 @@ const useConnectionManager = (entityType, entityId) => {
 
     setIsConnecting(true);
     try {
-      return await handleDisconnect(
+      return await handleDisconnect({
         entityType,
         entityId,
         currentConnections,
         updateBill,
-        updateDebt
-      );
+        updateDebt,
+      });
     } finally {
       setIsConnecting(false);
     }
@@ -85,14 +85,14 @@ const useConnectionManager = (entityType, entityId) => {
   const handleSelectionChange = async (targetId) => {
     setSelectedConnectionId(targetId);
     if (entityType === "envelope" && targetId) {
-      await handleAutoPopulate(
+      await handleAutoPopulate({
         entityType,
         entityId,
-        targetId,
+        billId: targetId,
         bills,
         currentEntity,
-        updateEnvelope
-      );
+        updateEnvelope,
+      });
     }
   };
 

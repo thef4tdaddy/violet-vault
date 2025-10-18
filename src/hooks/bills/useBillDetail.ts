@@ -2,11 +2,27 @@ import { useState, useMemo } from "react";
 import { useConfirm } from "../common/useConfirm";
 import logger from "../../utils/common/logger";
 
+interface BillDetailParams {
+  bill: any;
+  onDelete: () => void;
+  onMarkPaid: (amount: number) => void;
+  onClose: () => void;
+  onEdit: () => void;
+  onCreateRecurring: () => void;
+}
+
 /**
  * Business logic hook for bill detail modal operations
  * Extracted from UI component following Issue #152 pattern
  */
-export const useBillDetail = (bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring) => {
+export const useBillDetail = ({
+  bill,
+  onDelete,
+  onMarkPaid,
+  onClose,
+  onEdit,
+  onCreateRecurring,
+}: BillDetailParams) => {
   // Form state
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(bill?.amount?.toString() || "");

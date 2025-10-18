@@ -11,6 +11,47 @@ import {
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
+// Helper to clear field error when updated
+const clearFieldError = (field, errors, setErrors) => {
+  if (errors[field]) {
+    setErrors((prevErrors) => {
+      const { [field]: _removed, ...remainingErrors } = prevErrors;
+      return remainingErrors;
+    });
+  }
+};
+
+// Helper to reset allocations to default state
+const getDefaultAllocations = () => ({
+  allocations: [],
+  totalAllocated: 0,
+  remainingAmount: 0,
+  allocationRate: 0,
+});
+
+// Helper to validate form and allocations
+const validateFormAndAllocations = (formData, currentAllocations, setErrors) => {
+  const validation = validatePaycheckForm(formData);
+  setErrors(validation.errors);
+
+  // Also validate allocations if form is valid
+  if (validation.isValid && currentAllocations.allocations.length > 0) {
+    const allocationValidation = validateAllocations(
+      currentAllocations.allocations,
+      parseFloat(formData.amount)
+    );
+    if (!allocationValidation.isValid) {
+      setErrors((prev) => ({
+        ...prev,
+        allocations: allocationValidation.message,
+      }));
+      return false;
+    }
+  }
+
+  return validation.isValid;
+};
+
 /**
  * Custom hook for managing paycheck processing state and operations
  * Handles form validation, allocations, and paycheck transactions
@@ -50,12 +91,7 @@ const usePaycheckProcessor = ({
       );
       setCurrentAllocations(allocations);
     } else {
-      setCurrentAllocations({
-        allocations: [],
-        totalAllocated: 0,
-        remainingAmount: 0,
-        allocationRate: 0,
-      });
+      setCurrentAllocations(getDefaultAllocations());
     }
   }, [formData.amount, formData.allocationMode, envelopes]);
 
@@ -64,15 +100,7 @@ const usePaycheckProcessor = ({
     (field, value) => {
       setFormData((prev) => {
         const newData = { ...prev, [field]: value };
-
-        // Clear field error when updated
-        if (errors[field]) {
-          setErrors((prevErrors) => {
-            const { [field]: _removed, ...remainingErrors } = prevErrors;
-            return remainingErrors;
-          });
-        }
-
+        clearFieldError(field, errors, setErrors);
         return newData;
       });
     },
@@ -105,25 +133,7 @@ const usePaycheckProcessor = ({
 
   // Validate current form
   const validateForm = useCallback(() => {
-    const validation = validatePaycheckForm(formData);
-    setErrors(validation.errors);
-
-    // Also validate allocations if form is valid
-    if (validation.isValid && currentAllocations.allocations.length > 0) {
-      const allocationValidation = validateAllocations(
-        currentAllocations.allocations,
-        parseFloat(formData.amount)
-      );
-      if (!allocationValidation.isValid) {
-        setErrors((prev) => ({
-          ...prev,
-          allocations: allocationValidation.message,
-        }));
-        return false;
-      }
-    }
-
-    return validation.isValid;
+    return validateFormAndAllocations(formData, currentAllocations, setErrors);
   }, [formData, currentAllocations]);
 
   // Process paycheck
@@ -186,12 +196,7 @@ const usePaycheckProcessor = ({
       allocationMode: "allocate",
     });
     setErrors({});
-    setCurrentAllocations({
-      allocations: [],
-      totalAllocated: 0,
-      remainingAmount: 0,
-      allocationRate: 0,
-    });
+    setCurrentAllocations(getDefaultAllocations());
   }, []);
 
   // Get unique payers for dropdown
