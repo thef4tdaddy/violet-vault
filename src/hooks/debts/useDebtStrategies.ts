@@ -140,61 +140,10 @@ export const useDebtStrategies = (debts = []) => {
   }, [avalancheStrategy, snowballStrategy, activeDebts]);
 
   // Generate insights based on debt portfolio
-  const insights = useMemo(() => {
-    if (!activeDebts.length) return [];
-
-    const insights = [];
-    const highInterestDebts = activeDebts.filter((debt) => (debt.interestRate || 0) > 15);
-    const totalBalance = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
-    const totalMinimumPayments = activeDebts.reduce(
-      (sum, debt) => sum + (debt.minimumPayment || 0),
-      0
-    );
-
-    if (highInterestDebts.length > 0) {
-      insights.push({
-        type: "warning",
-        title: "High Interest Debt Alert",
-        message: `You have ${highInterestDebts.length} debt(s) with interest rates above 15%. Consider prioritizing these for faster payoff.`,
-      });
-    }
-
-    if (totalMinimumPayments / totalBalance > 0.05) {
-      insights.push({
-        type: "info",
-        title: "High Payment Ratio",
-        message:
-          "Your minimum payments are high relative to balances. This is actually good for faster payoff!",
-      });
-    }
-
-    const creditCardDebts = activeDebts.filter((debt) => debt.type === "credit_card");
-    if (creditCardDebts.length > 2) {
-      insights.push({
-        type: "tip",
-        title: "Credit Card Consolidation",
-        message: `Consider consolidating ${creditCardDebts.length} credit cards to simplify payments and potentially lower rates.`,
-      });
-    }
-
-    return insights;
-  }, [activeDebts]);
+  const insights = useMemo(() => generateDebtInsights(activeDebts), [activeDebts]);
 
   // Format recommendation text
-  const recommendationText = useMemo(() => {
-    if (!recommendation) return "";
-
-    switch (recommendation.strategy) {
-      case "avalanche":
-        return `We recommend the Debt Avalanche strategy. ${recommendation.reason}. You could save $${recommendation.savings.toFixed(2)} in interest.`;
-      case "snowball":
-        return `We recommend the Debt Snowball strategy. ${recommendation.reason}. The interest cost difference is only $${recommendation.savings.toFixed(2)}.`;
-      case "either":
-        return `Both strategies work well for your situation. ${recommendation.reason}. Choose based on your preference for motivation vs. optimization.`;
-      default:
-        return "Add some debts to see personalized strategy recommendations.";
-    }
-  }, [recommendation]);
+  const recommendationText = useMemo(() => formatRecommendationText(recommendation), [recommendation]);
 
   return {
     avalancheStrategy,
@@ -256,4 +205,61 @@ function calculateStrategyWithExtraPayment(debt, extraPayment) {
     timeSavings: originalMonths - newMonths,
     interestSavings: originalInterest - newInterest,
   };
+}
+
+// Helper function to generate insights from active debts
+function generateDebtInsights(activeDebts) {
+  if (!activeDebts.length) return [];
+
+  const insights = [];
+  const highInterestDebts = activeDebts.filter((debt) => (debt.interestRate || 0) > 15);
+  const totalBalance = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
+  const totalMinimumPayments = activeDebts.reduce(
+    (sum, debt) => sum + (debt.minimumPayment || 0),
+    0
+  );
+
+  if (highInterestDebts.length > 0) {
+    insights.push({
+      type: "warning",
+      title: "High Interest Debt Alert",
+      message: `You have ${highInterestDebts.length} debt(s) with interest rates above 15%. Consider prioritizing these for faster payoff.`,
+    });
+  }
+
+  if (totalMinimumPayments / totalBalance > 0.05) {
+    insights.push({
+      type: "info",
+      title: "High Payment Ratio",
+      message:
+        "Your minimum payments are high relative to balances. This is actually good for faster payoff!",
+    });
+  }
+
+  const creditCardDebts = activeDebts.filter((debt) => debt.type === "credit_card");
+  if (creditCardDebts.length > 2) {
+    insights.push({
+      type: "tip",
+      title: "Credit Card Consolidation",
+      message: `Consider consolidating ${creditCardDebts.length} credit cards to simplify payments and potentially lower rates.`,
+    });
+  }
+
+  return insights;
+}
+
+// Helper function to format recommendation text
+function formatRecommendationText(recommendation) {
+  if (!recommendation) return "";
+
+  switch (recommendation.strategy) {
+    case "avalanche":
+      return `We recommend the Debt Avalanche strategy. ${recommendation.reason}. You could save $${recommendation.savings.toFixed(2)} in interest.`;
+    case "snowball":
+      return `We recommend the Debt Snowball strategy. ${recommendation.reason}. The interest cost difference is only $${recommendation.savings.toFixed(2)}.`;
+    case "either":
+      return `Both strategies work well for your situation. ${recommendation.reason}. Choose based on your preference for motivation vs. optimization.`;
+    default:
+      return "Add some debts to see personalized strategy recommendations.";
+  }
 }

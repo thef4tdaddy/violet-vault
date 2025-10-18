@@ -5,6 +5,123 @@ import { budgetDb } from "../../db/budgetDb";
 import BudgetHistoryTracker from "../../utils/common/budgetHistoryTracker";
 import logger from "../../utils/common/logger.ts";
 
+// Query function for fetching debts
+const fetchDebtsWithMigration = async () => {
+  try {
+    const debts = await budgetDb.debts.toArray();
+
+    // One-time migration: Fix debts with undefined status
+    const debtsNeedingStatus = debts.filter((debt) => !debt.status);
+    if (debtsNeedingStatus.length > 0) {
+      logger.info(`🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`);
+      for (const debt of debtsNeedingStatus) {
+        await budgetDb.debts.update(debt.id, { status: "active" });
+        logger.debug(`✅ Updated debt "${debt.name}" status to active`);
+      }
+      return await budgetDb.debts.toArray();
+    }
+
+    return debts || [];
+  } catch (error) {
+    logger.warn("Dexie query failed", {
+      error: error.message,
+      source: "useDebts",
+    });
+    return [];
+  }
+};
+
+// Mutation function for adding a debt
+const addDebtToDb = async (debtData) => {
+  const debt = debtData.id
+    ? { status: "active", ...debtData }
+    : { id: crypto.randomUUID(), status: "active", ...debtData };
+
+  await budgetDb.debts.put(debt);
+
+  await BudgetHistoryTracker.trackDebtChange({
+    debtId: debt.id,
+    changeType: "add",
+    previousData: null,
+    newData: debt,
+    author: debtData.author || "Unknown User",
+  });
+
+  return debt;
+};
+
+// Mutation function for updating a debt
+const updateDebtInDb = async ({ id, updates, author = "Unknown User" }) => {
+  const previousData = await budgetDb.debts.get(id);
+
+  await budgetDb.debts.update(id, {
+    ...updates,
+    lastModified: Date.now(),
+  });
+
+  const newData = await budgetDb.debts.get(id);
+
+  await BudgetHistoryTracker.trackDebtChange({
+    debtId: id,
+    changeType: "modify",
+    previousData,
+    newData,
+    author,
+  });
+
+  return { id, ...updates };
+};
+
+// Mutation function for deleting a debt
+const deleteDebtFromDb = async ({ id, author = "Unknown User" }) => {
+  const previousData = await budgetDb.debts.get(id);
+
+  await budgetDb.debts.delete(id);
+
+  if (previousData) {
+    await BudgetHistoryTracker.trackDebtChange({
+      debtId: id,
+      changeType: "delete",
+      previousData,
+      newData: null,
+      author,
+    });
+  }
+
+  return id;
+};
+
+// Mutation function for recording a payment
+const recordPaymentInDb = async ({ id, payment, author = "Unknown User" }) => {
+  const debt = await budgetDb.debts.get(id);
+  if (debt) {
+    const history = [...(debt.paymentHistory || []), { ...payment }];
+    const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
+
+    const updatedDebt = {
+      ...debt,
+      currentBalance: newBalance,
+      paymentHistory: history,
+      lastModified: Date.now(),
+    };
+
+    await budgetDb.debts.update(id, {
+      currentBalance: newBalance,
+      paymentHistory: history,
+      lastModified: Date.now(),
+    });
+
+    await BudgetHistoryTracker.trackDebtChange({
+      debtId: id,
+      changeType: "modify",
+      previousData: debt,
+      newData: updatedDebt,
+      author,
+    });
+  }
+  return { id, payment };
+};
+
 const useDebts = () => {
   const queryClient = useQueryClient();
 
@@ -29,35 +146,9 @@ const useDebts = () => {
     };
   }, [queryClient]);
 
-  const queryFunction = async () => {
-    try {
-      const debts = await budgetDb.debts.toArray();
-
-      // One-time migration: Fix debts with undefined status
-      const debtsNeedingStatus = debts.filter((debt) => !debt.status);
-      if (debtsNeedingStatus.length > 0) {
-        logger.info(`🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`);
-        for (const debt of debtsNeedingStatus) {
-          await budgetDb.debts.update(debt.id, { status: "active" });
-          logger.debug(`✅ Updated debt "${debt.name}" status to active`);
-        }
-        // Fetch updated debts
-        return await budgetDb.debts.toArray();
-      }
-
-      return debts || [];
-    } catch (error) {
-      logger.warn("Dexie query failed", {
-        error: error.message,
-        source: "useDebts",
-      });
-      return [];
-    }
-  };
-
   const debtsQuery = useQuery({
     queryKey: queryKeys.debtsList(),
-    queryFn: queryFunction,
+    queryFn: fetchDebtsWithMigration,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnMount: false,
@@ -68,24 +159,7 @@ const useDebts = () => {
 
   const addDebtMutation = useMutation({
     mutationKey: ["debts", "add"],
-    mutationFn: async (debtData) => {
-      const debt = debtData.id
-        ? { status: "active", ...debtData } // Ensure existing debts have status
-        : { id: crypto.randomUUID(), status: "active", ...debtData }; // Default status for new debts
-
-      await budgetDb.debts.put(debt);
-
-      // Track the change in budget history
-      await BudgetHistoryTracker.trackDebtChange({
-        debtId: debt.id,
-        changeType: "add",
-        previousData: null,
-        newData: debt,
-        author: debtData.author || "Unknown User",
-      });
-
-      return debt;
-    },
+    mutationFn: addDebtToDb,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
     },
@@ -93,29 +167,7 @@ const useDebts = () => {
 
   const updateDebtMutation = useMutation({
     mutationKey: ["debts", "update"],
-    mutationFn: async ({ id, updates, author = "Unknown User" }) => {
-      // Get previous data for tracking
-      const previousData = await budgetDb.debts.get(id);
-
-      await budgetDb.debts.update(id, {
-        ...updates,
-        lastModified: Date.now(),
-      });
-
-      // Get updated data for tracking
-      const newData = await budgetDb.debts.get(id);
-
-      // Track the change in budget history
-      await BudgetHistoryTracker.trackDebtChange({
-        debtId: id,
-        changeType: "modify",
-        previousData,
-        newData,
-        author,
-      });
-
-      return { id, ...updates };
-    },
+    mutationFn: updateDebtInDb,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
     },
@@ -123,25 +175,7 @@ const useDebts = () => {
 
   const deleteDebtMutation = useMutation({
     mutationKey: ["debts", "delete"],
-    mutationFn: async ({ id, author = "Unknown User" }) => {
-      // Get data before deletion for tracking
-      const previousData = await budgetDb.debts.get(id);
-
-      await budgetDb.debts.delete(id);
-
-      // Track the change in budget history
-      if (previousData) {
-        await BudgetHistoryTracker.trackDebtChange({
-          debtId: id,
-          changeType: "delete",
-          previousData,
-          newData: null,
-          author,
-        });
-      }
-
-      return id;
-    },
+    mutationFn: deleteDebtFromDb,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
     },
@@ -149,36 +183,7 @@ const useDebts = () => {
 
   const recordPaymentMutation = useMutation({
     mutationKey: ["debts", "recordPayment"],
-    mutationFn: async ({ id, payment, author = "Unknown User" }) => {
-      const debt = await budgetDb.debts.get(id);
-      if (debt) {
-        const history = [...(debt.paymentHistory || []), { ...payment }];
-        const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
-
-        const updatedDebt = {
-          ...debt,
-          currentBalance: newBalance,
-          paymentHistory: history,
-          lastModified: Date.now(),
-        };
-
-        await budgetDb.debts.update(id, {
-          currentBalance: newBalance,
-          paymentHistory: history,
-          lastModified: Date.now(),
-        });
-
-        // Track the payment in budget history
-        await BudgetHistoryTracker.trackDebtChange({
-          debtId: id,
-          changeType: "modify",
-          previousData: debt,
-          newData: updatedDebt,
-          author,
-        });
-      }
-      return { id, payment };
-    },
+    mutationFn: recordPaymentInDb,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
     },
@@ -210,4 +215,3 @@ const useDebts = () => {
 };
 
 export { useDebts };
-export default useDebts;

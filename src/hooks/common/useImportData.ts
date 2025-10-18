@@ -10,6 +10,34 @@ import { clearAllDexieData, importDataToDexie } from "../../utils/dataManagement
 import { clearFirebaseData, forcePushToCloud } from "../../utils/dataManagement/firebaseUtils";
 import { queryClient } from "../../utils/common/queryClient";
 
+const getImportCounts = (validatedData) => ({
+  envelopes: validatedData.envelopes?.length || 0,
+  bills: validatedData.bills?.length || 0,
+  debts: validatedData.debts?.length || 0,
+  auditLog: validatedData.auditLog?.length || 0,
+  transactions: validatedData.allTransactions?.length || 0,
+});
+
+const buildBaseMessage = (counts) =>
+  `Import ${counts.envelopes} envelopes, ${counts.bills} bills, ${counts.debts} debts, ${counts.auditLog} audit entries, and ${counts.transactions} transactions?\n\nThis will replace your current data.`;
+
+const buildMismatchWarning = (importBudgetId, currentUser) => {
+  const backupId = importBudgetId?.substring(0, 12) || 'unknown';
+  const currentId = currentUser?.budgetId?.substring(0, 12) || 'unknown';
+  return `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${backupId}...\nCurrent budgetId: ${currentId}...\n\nImport will re-encrypt data with your current session context.`;
+};
+
+const buildConfirmMessage = (validatedData, hasBudgetIdMismatch, importBudgetId, currentUser) => {
+  const counts = getImportCounts(validatedData);
+  const baseMessage = buildBaseMessage(counts);
+  
+  if (hasBudgetIdMismatch) {
+    return baseMessage + buildMismatchWarning(importBudgetId, currentUser);
+  }
+
+  return baseMessage;
+};
+
 const handleConfirmation = async (
   confirm,
   validatedData,
@@ -17,19 +45,30 @@ const handleConfirmation = async (
   importBudgetId,
   currentUser
 ) => {
-  let confirmMessage = `Import ${validatedData.envelopes?.length || 0} envelopes, ${validatedData.bills?.length || 0} bills, ${validatedData.debts?.length || 0} debts, ${validatedData.auditLog?.length || 0} audit entries, and ${validatedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`;
-  if (hasBudgetIdMismatch) {
-    confirmMessage += `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${importBudgetId?.substring(0, 12)}...\nCurrent budgetId: ${currentUser?.budgetId?.substring(0, 12)}...\n\nImport will re-encrypt data with your current session context.`;
-  }
+  const message = buildConfirmMessage(validatedData, hasBudgetIdMismatch, importBudgetId, currentUser);
+  const title = hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data";
 
   return confirm({
-    title: hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data",
-    message: confirmMessage,
+    title,
+    message,
     confirmLabel: "Import Data",
     cancelLabel: "Cancel",
     destructive: true,
   });
 };
+
+const buildImportResult = (validatedData) => ({
+  success: true,
+  imported: {
+    envelopes: validatedData.envelopes?.length || 0,
+    bills: validatedData.bills?.length || 0,
+    transactions: validatedData.allTransactions?.length || 0,
+    savingsGoals: validatedData.savingsGoals?.length || 0,
+    debts: validatedData.debts?.length || 0,
+    paycheckHistory: validatedData.paycheckHistory?.length || 0,
+    auditLog: validatedData.auditLog?.length || 0,
+  },
+});
 
 const performImport = async (validatedData, showSuccessToast) => {
   await backupCurrentData();
@@ -82,18 +121,7 @@ export const useImportData = () => {
 
         await performImport(validatedData, showSuccessToast);
 
-        return {
-          success: true,
-          imported: {
-            envelopes: validatedData.envelopes?.length || 0,
-            bills: validatedData.bills?.length || 0,
-            transactions: validatedData.allTransactions?.length || 0,
-            savingsGoals: validatedData.savingsGoals?.length || 0,
-            debts: validatedData.debts?.length || 0,
-            paycheckHistory: validatedData.paycheckHistory?.length || 0,
-            auditLog: validatedData.auditLog?.length || 0,
-          },
-        };
+        return buildImportResult(validatedData);
       } catch (error) {
         logger.error("Import failed", error);
         showErrorToast(`Import failed: ${error.message}`, "Import Failed");
