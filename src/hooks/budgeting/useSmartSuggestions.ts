@@ -42,8 +42,7 @@ const useSmartSuggestions = ({
         envelopes,
         analysisSettings,
         dateRange,
-        dismissedSuggestions,
-        showDismissed
+        { dismissedSuggestions, showDismissed }
       );
     } catch (error) {
       logger.error("Error generating smart suggestions:", error);

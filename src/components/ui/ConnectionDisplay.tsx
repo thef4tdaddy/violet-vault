@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import useConnectionManager from "../../hooks/common/useConnectionManager";
+import { useConnectionManager } from "../../hooks/common/useConnectionManager";
 
 /**
  * Shared component for displaying connected entity relationships in modals
@@ -139,115 +139,141 @@ export const ConnectionInfo = ({ children, className = "", theme = "purple" }) =
   );
 };
 
+const formatConnectionDetails = (connection) => {
+  if (connection.amount) {
+    return `$${parseFloat(connection.amount).toFixed(2)} (${connection.frequency || "monthly"})`;
+  }
+  return connection.description;
+};
+
+const getConnectionIcon = (entityType) => {
+  return entityType === "envelope" ? getIcon("Receipt") : getIcon("Target");
+};
+
+const shouldShowSelector = (showSelector, hasConnections, entityType) => {
+  return showSelector && (!hasConnections || entityType === "envelope");
+};
+
 /**
  * Universal Connection Manager Component
  * Pure UI component that uses useConnectionManager hook for all logic
  * Context-aware: shows appropriate relationships and options
  */
 export const UniversalConnectionManager = ({
-  entityType, // 'bill', 'envelope', 'debt'
+  entityType,
   entityId,
   canEdit = true,
   theme = "purple",
-  showSelector = true, // Whether to show the selection dropdown
+  showSelector = true,
 }) => {
-  const {
-    currentConnections,
-    availableOptions,
-    selectedConnectionId,
-    isConnecting,
-    hasConnections,
-    hasAvailableOptions,
-    handleConnect,
-    handleDisconnect,
-    handleSelectionChange,
-    canConnect,
-    getConnectionConfig,
-  } = useConnectionManager(entityType, entityId);
-
-  const config = getConnectionConfig();
+  const managerProps = useConnectionManager(entityType, entityId);
+  const config = managerProps.getConnectionConfig();
 
   return (
     <div className="space-y-4">
-      {/* Display existing connections */}
-      {hasConnections && (
-        <ConnectionDisplay
-          title={config.displayTitle}
-          icon={entityType === "envelope" ? getIcon("Receipt") : getIcon("Target")}
+      {managerProps.hasConnections && (
+        <ExistingConnections
+          config={config}
+          entityType={entityType}
           theme={theme}
-          onDisconnect={canEdit ? handleDisconnect : undefined}
-        >
-          <div className="space-y-2">
-            {currentConnections.map((connection) => (
-              <ConnectionItem
-                key={connection.id}
-                icon={getIcon("CheckCircle")}
-                title={connection.name || connection.provider || "Unnamed"}
-                details={
-                  connection.amount
-                    ? `$${parseFloat(connection.amount).toFixed(2)} (${connection.frequency || "monthly"})`
-                    : connection.description
-                }
-                badge={connection.category}
-                theme={theme}
-              />
-            ))}
-          </div>
-        </ConnectionDisplay>
+          canEdit={canEdit}
+          connections={managerProps.currentConnections}
+          onDisconnect={managerProps.handleDisconnect}
+        />
       )}
-
-      {/* Show selection dropdown when no connection exists or when explicitly requested */}
-      {showSelector && (!hasConnections || entityType === "envelope") && (
-        <ConnectionDisplay title={config.selectTitle} icon={getIcon("Sparkles")} theme={theme}>
-          <select
-            value={selectedConnectionId || ""}
-            onChange={(e) => handleSelectionChange(e.target.value)}
-            disabled={!canEdit || isConnecting}
-            className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
-              !canEdit || isConnecting ? "bg-gray-100 cursor-not-allowed" : ""
-            }`}
-          >
-            <option value="">
-              {hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`}
-            </option>
-            {availableOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.name || option.provider} - ${parseFloat(option.amount || 0).toFixed(2)} (
-                {option.frequency || "monthly"})
-              </option>
-            ))}
-          </select>
-
-          {/* Connect button */}
-          {selectedConnectionId && (
-            <button
-              type="button"
-              onClick={handleConnect}
-              disabled={!canConnect || isConnecting}
-              className={`mt-3 px-4 py-2 rounded-lg font-medium transition-colors ${
-                canConnect && !isConnecting
-                  ? "bg-purple-600 hover:bg-purple-700 text-white"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              {isConnecting ? "Connecting..." : "Connect"}
-            </button>
-          )}
-
-          <ConnectionInfo theme={theme}>
-            📝 <strong>Tip:</strong> {config.tip}
-          </ConnectionInfo>
-
-          {!hasAvailableOptions && (
-            <ConnectionInfo theme="yellow">
-              ⚠️ No {config.connectionType}s found. Create {config.connectionType}s first to connect
-              them.
-            </ConnectionInfo>
-          )}
-        </ConnectionDisplay>
+      {shouldShowSelector(showSelector, managerProps.hasConnections, entityType) && (
+        <ConnectionSelector
+          config={config}
+          theme={theme}
+          canEdit={canEdit}
+          managerProps={managerProps}
+        />
       )}
     </div>
   );
 };
+
+const ExistingConnections = ({ config, entityType, theme, canEdit, connections, onDisconnect }) => (
+  <ConnectionDisplay
+    title={config.displayTitle}
+    icon={getConnectionIcon(entityType)}
+    theme={theme}
+    onDisconnect={canEdit ? onDisconnect : undefined}
+  >
+    <div className="space-y-2">
+      {connections.map((connection) => (
+        <ConnectionItem
+          key={connection.id}
+          icon={getIcon("CheckCircle")}
+          title={connection.name || connection.provider || "Unnamed"}
+          details={formatConnectionDetails(connection)}
+          badge={connection.category}
+          theme={theme}
+        />
+      ))}
+    </div>
+  </ConnectionDisplay>
+);
+
+const ConnectionSelector = ({ config, theme, canEdit, managerProps }) => (
+  <ConnectionDisplay title={config.selectTitle} icon={getIcon("Sparkles")} theme={theme}>
+    <ConnectionDropdown
+      config={config}
+      canEdit={canEdit}
+      managerProps={managerProps}
+    />
+    {managerProps.selectedConnectionId && (
+      <ConnectButton
+        onClick={managerProps.handleConnect}
+        canConnect={managerProps.canConnect}
+        isConnecting={managerProps.isConnecting}
+      />
+    )}
+    <ConnectionInfo theme={theme}>
+      📝 <strong>Tip:</strong> {config.tip}
+    </ConnectionInfo>
+    {!managerProps.hasAvailableOptions && (
+      <ConnectionInfo theme="yellow">
+        ⚠️ No {config.connectionType}s found. Create {config.connectionType}s first to connect them.
+      </ConnectionInfo>
+    )}
+  </ConnectionDisplay>
+);
+
+const ConnectionDropdown = ({ config, canEdit, managerProps }) => (
+  <select
+    value={managerProps.selectedConnectionId || ""}
+    onChange={(e) => managerProps.handleSelectionChange(e.target.value)}
+    disabled={!canEdit || managerProps.isConnecting}
+    className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
+      !canEdit || managerProps.isConnecting ? "bg-gray-100 cursor-not-allowed" : ""
+    }`}
+  >
+    <option value="">
+      {managerProps.hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`}
+    </option>
+    {managerProps.availableOptions.map((option) => (
+      <option key={option.id} value={option.id}>
+        {option.name || option.provider} - ${parseFloat(option.amount || 0).toFixed(2)} (
+        {option.frequency || "monthly"})
+      </option>
+    ))}
+  </select>
+);
+
+const ConnectButton = ({ onClick, canConnect, isConnecting }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={!canConnect || isConnecting}
+    className={`mt-3 px-4 py-2 rounded-lg font-medium transition-colors ${
+      canConnect && !isConnecting
+        ? "bg-purple-600 hover:bg-purple-700 text-white"
+        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+    }`}
+  >
+    {isConnecting ? "Connecting..." : "Connect"}
+  </button>
+);
 
 export default ConnectionDisplay;

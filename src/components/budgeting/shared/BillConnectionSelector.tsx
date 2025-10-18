@@ -1,5 +1,50 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import { Button, Select } from "../../ui";
+
+// Helper to get available bills for selection
+const getAvailableBills = (allBills, envelopeId) => {
+  return allBills.filter((bill) => !bill.envelopeId || bill.envelopeId === envelopeId);
+};
+
+// Helper to find selected bill
+const findSelectedBill = (allBills, selectedBillId) => {
+  if (!selectedBillId) return null;
+  return allBills.find((bill) => bill.id === selectedBillId) || null;
+};
+
+// Helper to format bill option text
+const formatBillOption = (bill) => {
+  const name = bill.name || bill.provider || "Unnamed Bill";
+  const amount = bill.amount?.toFixed(2) || "0.00";
+  const frequency = bill.frequency || "monthly";
+  return `${name} - $${amount} (${frequency})`;
+};
+
+// ConnectedBillDisplay - shows details of selected bill
+const ConnectedBillDisplay = ({ bill }) => {
+  if (!bill) return null;
+
+  return (
+    <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4">
+      <div className="flex items-center mb-2">
+        {React.createElement(getIcon("CheckCircle"), {
+          className: "h-5 w-5 text-green-600 mr-2",
+        })}
+        <span className="font-medium text-green-800">Bill Connected</span>
+      </div>
+      <div className="text-sm text-green-700">
+        <p>
+          <strong>{bill.name || bill.provider}</strong>
+        </p>
+        <p>
+          Amount: ${bill.amount || "N/A"} ({bill.frequency || "monthly"})
+        </p>
+        <p className="text-xs mt-1">Bill settings will override manual envelope settings.</p>
+      </div>
+    </div>
+  );
+};
 
 /**
  * Shared component for bill connection functionality
@@ -14,11 +59,8 @@ const BillConnectionSelector = ({
   showCreateOption = false,
   disabled = false,
 }) => {
-  const availableBills = allBills.filter(
-    (bill) => !bill.envelopeId || bill.envelopeId === envelopeId
-  );
-
-  const selectedBill = selectedBillId ? allBills.find((bill) => bill.id === selectedBillId) : null;
+  const availableBills = getAvailableBills(allBills, envelopeId);
+  const selectedBill = findSelectedBill(allBills, selectedBillId);
 
   return (
     <div className="space-y-4">
@@ -44,32 +86,13 @@ const BillConnectionSelector = ({
           </option>
           {availableBills.map((bill) => (
             <option key={bill.id} value={bill.id}>
-              {bill.name || bill.provider || "Unnamed Bill"} - ${bill.amount?.toFixed(2) || "0.00"}{" "}
-              ({bill.frequency || "monthly"})
+              {formatBillOption(bill)}
             </option>
           ))}
         </Select>
 
         {/* Connected Bill Display */}
-        {selectedBill && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4">
-            <div className="flex items-center mb-2">
-              {React.createElement(getIcon("CheckCircle"), {
-                className: "h-5 w-5 text-green-600 mr-2",
-              })}
-              <span className="font-medium text-green-800">Bill Connected</span>
-            </div>
-            <div className="text-sm text-green-700">
-              <p>
-                <strong>{selectedBill.name || selectedBill.provider}</strong>
-              </p>
-              <p>
-                Amount: ${selectedBill.amount || "N/A"} ({selectedBill.frequency || "monthly"})
-              </p>
-              <p className="text-xs mt-1">Bill settings will override manual envelope settings.</p>
-            </div>
-          </div>
-        )}
+        <ConnectedBillDisplay bill={selectedBill} />
 
         {/* Create New Bill Option */}
         {showCreateOption && !selectedBillId && onCreateBill && (

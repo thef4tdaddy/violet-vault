@@ -292,4 +292,4 @@ const useTransactionSplitter = (options = {}) => {
   };
 };
 
-export default useTransactionSplitter;
+export { useTransactionSplitter };

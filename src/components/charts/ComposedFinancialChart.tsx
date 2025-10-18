@@ -13,6 +13,41 @@ import {
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
+// Helper to format currency values
+const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
+
+// Default series configuration for income/expense analysis
+const DEFAULT_SERIES = [
+  {
+    type: "bar",
+    dataKey: "income",
+    name: "Income",
+    fill: "#10b981",
+  },
+  {
+    type: "bar",
+    dataKey: "expenses",
+    name: "Expenses",
+    fill: "#ef4444",
+  },
+  {
+    type: "line",
+    dataKey: "net",
+    name: "Net Cash Flow",
+    stroke: "#06b6d4",
+    strokeWidth: 3,
+  },
+];
+
+// Helper to group series by type
+const groupSeriesByType = (seriesConfig) => {
+  return {
+    barSeries: seriesConfig.filter((s) => s.type === "bar"),
+    lineSeries: seriesConfig.filter((s) => s.type === "line"),
+    areaSeries: seriesConfig.filter((s) => s.type === "area"),
+  };
+};
+
 /**
  * Reusable composed financial chart component
  * Combines bars, lines, and areas for comprehensive financial analysis
@@ -45,35 +80,10 @@ const ComposedFinancialChart = ({
   const chartData = Array.isArray(data) ? data : [];
   const hasData = chartData.length > 0;
 
-  // Default series configuration for income/expense analysis
-  const defaultSeries = [
-    {
-      type: "bar",
-      dataKey: "income",
-      name: "Income",
-      fill: "#10b981",
-    },
-    {
-      type: "bar",
-      dataKey: "expenses",
-      name: "Expenses",
-      fill: "#ef4444",
-    },
-    {
-      type: "line",
-      dataKey: "net",
-      name: "Net Cash Flow",
-      stroke: "#06b6d4",
-      strokeWidth: 3,
-    },
-  ];
-
-  const seriesConfig = series.length > 0 ? series : defaultSeries;
+  const seriesConfig = series.length > 0 ? series : DEFAULT_SERIES;
 
   // Group series by type for rendering
-  const barSeries = seriesConfig.filter((s) => s.type === "bar");
-  const lineSeries = seriesConfig.filter((s) => s.type === "line");
-  const areaSeries = seriesConfig.filter((s) => s.type === "area");
+  const { barSeries, lineSeries, areaSeries } = groupSeriesByType(seriesConfig);
 
   return (
     <ChartContainer
@@ -97,11 +107,7 @@ const ComposedFinancialChart = ({
           )}
 
           <XAxis dataKey={xAxisKey} stroke={chartDefaults.axis.stroke} fontSize={12} />
-          <YAxis
-            stroke={chartDefaults.axis.stroke}
-            fontSize={12}
-            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
-          />
+          <YAxis stroke={chartDefaults.axis.stroke} fontSize={12} tickFormatter={formatCurrency} />
 
           <Tooltip content={<TooltipComponent />} />
           {showLegend && <Legend />}

@@ -305,4 +305,4 @@ const useTransactionData = (options = {}) => {
   };
 };
 
-export default useTransactionData;
+export { useTransactionData };

@@ -179,105 +179,91 @@ export const processSavingsGoal = (goal, fromDate = new Date()) => {
 };
 
 /**
+ * Get sort value from goal based on field
+ */
+const getSavingsGoalSortValue = (goal, sortBy) => {
+  const priorityOrder = { high: 3, medium: 2, low: 1 };
+  
+  const valueExtractors = {
+    name: () => goal.name?.toLowerCase() || "",
+    targetDate: () => goal.targetDate ? new Date(goal.targetDate) : new Date("2099-12-31"),
+    priority: () => priorityOrder[goal.priority] || 2,
+    progress: () => goal.progressRate || 0,
+    targetAmount: () => goal.targetAmount || 0,
+    currentAmount: () => goal.currentAmount || 0,
+    remainingAmount: () => goal.remainingAmount || 0,
+  };
+
+  const extractor = valueExtractors[sortBy];
+  return extractor ? extractor() : goal.createdAt || "";
+};
+
+/**
+ * Compare two values for sorting
+ */
+const compareSortValues = (aVal, bVal, sortOrder) => {
+  if (sortOrder === "desc") {
+    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+  }
+  return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+};
+
+/**
  * Sort savings goals by various criteria
  */
 export const sortSavingsGoals = (goals, sortBy = "targetDate", sortOrder = "asc") => {
   return [...goals].sort((a, b) => {
-    let aVal, bVal;
-
-    switch (sortBy) {
-      case "name":
-        aVal = a.name?.toLowerCase() || "";
-        bVal = b.name?.toLowerCase() || "";
-        break;
-      case "targetDate":
-        aVal = a.targetDate ? new Date(a.targetDate) : new Date("2099-12-31");
-        bVal = b.targetDate ? new Date(b.targetDate) : new Date("2099-12-31");
-        break;
-      case "priority": {
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
-        aVal = priorityOrder[a.priority] || 2;
-        bVal = priorityOrder[b.priority] || 2;
-        break;
-      }
-      case "progress":
-        aVal = a.progressRate || 0;
-        bVal = b.progressRate || 0;
-        break;
-      case "targetAmount":
-        aVal = a.targetAmount || 0;
-        bVal = b.targetAmount || 0;
-        break;
-      case "currentAmount":
-        aVal = a.currentAmount || 0;
-        bVal = b.currentAmount || 0;
-        break;
-      case "remainingAmount":
-        aVal = a.remainingAmount || 0;
-        bVal = b.remainingAmount || 0;
-        break;
-      default:
-        aVal = a.createdAt || "";
-        bVal = b.createdAt || "";
-    }
-
-    if (sortOrder === "desc") {
-      return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
-    } else {
-      return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-    }
+    const aVal = getSavingsGoalSortValue(a, sortBy);
+    const bVal = getSavingsGoalSortValue(b, sortBy);
+    return compareSortValues(aVal, bVal, sortOrder);
   });
+};
+
+/**
+ * Check if goal matches status filter
+ */
+const matchesStatusFilter = (goal, status) => {
+  if (status === "all") return true;
+
+  switch (status) {
+    case "active":
+      return !goal.isCompleted && goal.urgency !== "paused";
+    case "completed":
+      return goal.isCompleted;
+    case "overdue":
+      return goal.urgency === "overdue";
+    case "urgent":
+      return goal.urgency === "urgent";
+    default:
+      return true;
+  }
+};
+
+/**
+ * Check if goal matches attribute filters
+ */
+const matchesAttributeFilters = (goal, filters) => {
+  const { category, priority, urgency, includeCompleted, minAmount, maxAmount } = filters;
+
+  if (!includeCompleted && goal.isCompleted) return false;
+  if (category && goal.category !== category) return false;
+  if (priority && goal.priority !== priority) return false;
+  if (urgency && goal.urgency !== urgency) return false;
+  if (minAmount && (goal.targetAmount || 0) < parseFloat(minAmount)) return false;
+  if (maxAmount && (goal.targetAmount || 0) > parseFloat(maxAmount)) return false;
+
+  return true;
 };
 
 /**
  * Filter savings goals by status and other criteria
  */
 export const filterSavingsGoals = (goals, filters = {}) => {
-  const {
-    status = "all",
-    category,
-    priority,
-    urgency,
-    includeCompleted = true,
-    minAmount,
-    maxAmount,
-  } = filters;
+  const { status = "all", includeCompleted = true } = filters;
 
   return goals.filter((goal) => {
-    // Status filter
-    if (status !== "all") {
-      switch (status) {
-        case "active":
-          if (goal.isCompleted || goal.urgency === "paused") return false;
-          break;
-        case "completed":
-          if (!goal.isCompleted) return false;
-          break;
-        case "overdue":
-          if (goal.urgency !== "overdue") return false;
-          break;
-        case "urgent":
-          if (goal.urgency !== "urgent") return false;
-          break;
-      }
-    }
-
-    // Completed filter
-    if (!includeCompleted && goal.isCompleted) return false;
-
-    // Category filter
-    if (category && goal.category !== category) return false;
-
-    // Priority filter
-    if (priority && goal.priority !== priority) return false;
-
-    // Urgency filter
-    if (urgency && goal.urgency !== urgency) return false;
-
-    // Amount filters
-    if (minAmount && (goal.targetAmount || 0) < parseFloat(minAmount)) return false;
-    if (maxAmount && (goal.targetAmount || 0) > parseFloat(maxAmount)) return false;
-
+    if (!matchesStatusFilter(goal, status)) return false;
+    if (!matchesAttributeFilters(goal, { ...filters, includeCompleted })) return false;
     return true;
   });
 };
