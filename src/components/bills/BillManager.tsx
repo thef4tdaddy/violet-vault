@@ -5,7 +5,6 @@ import { Select } from "@/components/ui";
  * UI-only component using useBillManager hook for business logic
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
-import React from "react";
 import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
@@ -16,11 +15,7 @@ import logger from "../../utils/common/logger";
 import BillDiscoveryModal from "./BillDiscoveryModal";
 import BillDetailModal from "./modals/BillDetailModal";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-import ConnectionDisplay, {
-  ConnectionItem,
-  ConnectionInfo,
-  UniversalConnectionManager,
-} from "../ui/ConnectionDisplay";
+
 import BillManagerHeader from "./BillManagerHeader";
 import BillSummaryCards from "./BillSummaryCards";
 import BillViewTabs from "./BillViewTabs";
@@ -89,7 +84,6 @@ const BillManager = ({
   // UI logic hook
   const {
     viewModes,
-    getSummaryCards,
     toggleBillSelection,
     selectAllBills,
     clearSelection,
@@ -97,7 +91,6 @@ const BillManager = ({
     handleAddNewBill,
     handleEditBill,
     handleCloseModal,
-    _handleViewHistory,
     getBillDisplayData,
   } = useBillManagerUI({
     bills,
@@ -109,9 +102,6 @@ const BillManager = ({
     setEditingBill,
     setHistoryBill,
   });
-
-  // Generate summary cards from totals
-  const _summaryCards = getSummaryCards(totals);
 
   // Edit lock for collaborative editing
   const {

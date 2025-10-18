@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Select } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 
 /**
  * Reusable PromptModal Component

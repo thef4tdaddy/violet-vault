@@ -1,5 +1,4 @@
 // src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
-import { Select } from "@/components/ui";
 import React, { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";

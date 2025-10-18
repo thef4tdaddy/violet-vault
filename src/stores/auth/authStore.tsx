@@ -1,23 +1,88 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { create } from "zustand";
-import { encryptionUtils } from "../../utils/security/encryption";
-import logger from "../../utils/common/logger";
-import { identifyUser } from "../../utils/common/highlight";
+import { encryptionUtils } from "@/utils/security/encryption";
+import logger from "@/utils/common/logger";
+import { identifyUser } from "@/utils/common/highlight";
 
-/**
- * Compare two Uint8Array objects byte-wise for equality
- * More reliable than JSON.stringify comparison
- */
-function _compareUint8Arrays(a, b) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
+// --- TYPE DEFINITIONS ---
+
+interface NewUserData {
+  shareCode: string;
+  userName?: string;
+  userColor?: string;
+  [key: string]: unknown;
 }
 
- 
-export const useAuth = create((set, _get) => ({
+interface JoinData {
+  budgetId: string;
+  password: string;
+  userInfo: {
+    userName?: string;
+    userColor?: string;
+  };
+  sharedBy: string;
+}
+
+interface CurrentUser {
+  budgetId: string;
+  shareCode: string;
+  userName: string;
+  userColor: string;
+  [key: string]: unknown;
+}
+
+interface AuthState {
+  isUnlocked: boolean;
+  encryptionKey: CryptoKey | null;
+  salt: Uint8Array | null;
+  currentUser: CurrentUser | null;
+  lastActivity: number | null;
+  budgetId: string | null;
+}
+
+// Response types for async actions
+type LoginResponse = {
+  success: boolean;
+  error?: string;
+  suggestion?: string;
+  code?: string;
+  canCreateNew?: boolean;
+  data?: unknown;
+};
+
+type JoinResponse = { success: boolean; sharedBudget?: boolean; error?: string };
+type ChangePasswordResponse = { success: boolean; error?: string };
+type UpdateProfileResponse = { success: boolean; error?: string };
+
+interface AuthActions {
+  login: (password: string, userData?: NewUserData | null) => Promise<LoginResponse>;
+  joinBudgetWithShareCode: (joinData: JoinData) => Promise<JoinResponse>;
+  logout: () => void;
+  updateUser: (updatedUser: CurrentUser) => void;
+  startBackgroundSyncAfterLogin: (isNewUser?: boolean) => Promise<void>;
+  changePassword: (oldPassword: string, newPassword: string) => Promise<ChangePasswordResponse>;
+  setLastActivity: (value: number) => void;
+  setEncryption: ({ key, salt }: { key: CryptoKey; salt: Uint8Array }) => void;
+  updateProfile: (updatedProfile: CurrentUser) => Promise<UpdateProfileResponse>;
+  validatePassword: (password: string) => Promise<boolean>;
+}
+
+type AuthStore = AuthState & AuthActions;
+
+interface SavedData {
+  encryptedData: string;
+  salt: number[];
+  iv: string;
+}
+
+interface DecryptedData {
+  currentUser: CurrentUser;
+  [key: string]: unknown;
+}
+
+// --- ZUSTAND STORE ---
+
+export const useAuth = create<AuthStore>((set, get) => ({
   isUnlocked: false,
   encryptionKey: null,
   salt: null,
@@ -31,26 +96,23 @@ export const useAuth = create((set, _get) => ({
       hasUserData: !!userData,
     });
 
-    const timeoutPromise = new Promise((_, reject) =>
+    const timeoutPromise = new Promise<LoginResponse>((_, reject) =>
       setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
     );
 
-    const loginPromise = (async () => {
+    const loginPromise = (async (): Promise<LoginResponse> => {
       try {
         if (userData) {
           logger.auth("New user setup path.", userData);
 
-          // Always use deterministic key generation for cross-browser consistency
-          // Even for imported salt scenarios, we ensure deterministic derivation
           const keyData = await encryptionUtils.deriveKey(password);
           const newSalt = keyData.salt;
           const key = keyData.key;
 
-          // Log key derivation for cross-browser sync debugging
           if (import.meta?.env?.MODE === "development") {
             const saltPreview =
               Array.from(newSalt.slice(0, 8))
-                .map((b) => b.toString(16).padStart(2, "0"))
+                .map((b: number) => b.toString(16).padStart(2, "0"))
                 .join("") + "...";
             logger.auth("Key derived deterministically for cross-browser sync", {
               saltPreview,
@@ -59,19 +121,21 @@ export const useAuth = create((set, _get) => ({
           }
           logger.auth("Generated/restored key and salt for user.");
 
-          // ALWAYS use deterministic budgetId generation for cross-browser consistency
-          // Use share code from userData for deterministic budget ID
           const shareCode = userData.shareCode;
           if (!shareCode) {
             throw new Error("Share code missing from user data during login");
           }
-          const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
+          const deterministicBudgetId = await encryptionUtils.generateBudgetId(
+            password,
+            shareCode
+          );
 
-          const finalUserData = {
+          const finalUserData: CurrentUser = {
             ...userData,
             budgetId: deterministicBudgetId,
-            // Set default userName if empty or missing
             userName: userData.userName?.trim() || "User",
+            shareCode: userData.shareCode,
+            userColor: userData.userColor || "#000000",
           };
 
           logger.auth("Setting auth state for new user.", {
@@ -87,7 +151,6 @@ export const useAuth = create((set, _get) => ({
             lastActivity: Date.now(),
           });
 
-          // Identify user in Highlight.io for session tracking
           identifyUser(finalUserData.budgetId, {
             userName: finalUserData.userName,
             userColor: finalUserData.userColor,
@@ -101,7 +164,6 @@ export const useAuth = create((set, _get) => ({
           localStorage.setItem("userProfile", JSON.stringify(profileData));
           logger.auth("Saved user profile to localStorage.");
 
-          // Create initial empty budget data with user info and save to localStorage
           const initialBudgetData = {
             currentUser: finalUserData,
             envelopes: [],
@@ -117,7 +179,6 @@ export const useAuth = create((set, _get) => ({
             },
           };
 
-          // Encrypt and save the initial budget data to localStorage
           const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
           localStorage.setItem(
             "envelopeBudgetData",
@@ -133,11 +194,7 @@ export const useAuth = create((set, _get) => ({
             shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
           });
 
-          // Start background sync after successful login (new user path)
-          // Use get() parameter to avoid React error #185
-          const currentState = _get();
-          await currentState.startBackgroundSyncAfterLogin(true); // Pass true for new user
-
+          await get().startBackgroundSyncAfterLogin(true);
           return { success: true };
         } else {
           logger.auth("Existing user login path.");
@@ -153,7 +210,7 @@ export const useAuth = create((set, _get) => ({
             };
           }
 
-          const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+          const { salt: savedSalt, encryptedData, iv }: SavedData = JSON.parse(savedData);
           if (!savedSalt || !encryptedData || !iv) {
             logger.error("Corrupted local data found.", {
               hasSalt: !!savedSalt,
@@ -166,11 +223,8 @@ export const useAuth = create((set, _get) => ({
             };
           }
 
-          // SECURITY FIX: Validate password BEFORE setting auth state (Issue #577)
           logger.auth("Validating password before allowing login");
-          // Use get() parameter to avoid React error #185
-          const currentState = _get();
-          const passwordValid = await currentState.validatePassword(password);
+          const passwordValid = await get().validatePassword(password);
           if (!passwordValid) {
             logger.auth("Password validation failed - offering new budget creation");
             return {
@@ -183,17 +237,14 @@ export const useAuth = create((set, _get) => ({
           }
           logger.auth("Password validation successful - proceeding with login");
 
-          // CRITICAL: Use deterministic key generation for cross-browser consistency
-          // Instead of using saved salt, always derive from password
           const keyData = await encryptionUtils.deriveKey(password);
           const deterministicSalt = keyData.salt;
           const key = keyData.key;
 
-          // Debug encryption key derivation for cross-browser sync troubleshooting
           if (import.meta?.env?.MODE === "development") {
             const saltPreview =
               Array.from(deterministicSalt.slice(0, 8))
-                .map((b) => b.toString(16).padStart(2, "0"))
+                .map((b: number) => b.toString(16).padStart(2, "0"))
                 .join("") + "...";
             logger.auth("Using deterministic key derivation for cross-browser sync", {
               saltPreview,
@@ -202,37 +253,19 @@ export const useAuth = create((set, _get) => ({
             });
           }
 
-          // Debug derived key (safe preview only)
-          let keyPreview = "none";
+          let decryptedData: DecryptedData;
           try {
-            // CryptoKey objects cannot be directly viewed as Uint8Array
-            if (key instanceof CryptoKey) {
-              keyPreview = `CryptoKey(${key.algorithm.name})`;
-            } else {
-              // If it's an ArrayBuffer, get first 16 bytes as hex for debugging (safe to log)
-              const keyView = new Uint8Array(key);
-              keyPreview = Array.from(keyView.slice(0, 16))
-                .map((b) => b.toString(16).padStart(2, "0"))
-                .join("");
-            }
-          } catch {
-            keyPreview = "error";
-          }
-
-          logger.auth("Encryption key derived successfully", {
-            keyPreview,
-            keyType: key?.constructor?.name || "unknown",
-          });
-
-          let decryptedData;
-          try {
-            decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
+            decryptedData = (await encryptionUtils.decrypt(
+              encryptedData,
+              key,
+              iv
+            )) as DecryptedData;
             logger.auth("Successfully decrypted local data.");
-          } catch (decryptError) {
-            // This should not happen since we validated the password above
+          } catch (decryptError: unknown) {
+            const message = decryptError instanceof Error ? decryptError.message : String(decryptError);
             logger.error("Unexpected decryption failure after password validation", {
-              error: decryptError.message,
-              errorType: decryptError.constructor?.name,
+              error: message,
+              errorType: decryptError instanceof Error ? decryptError.constructor?.name : typeof decryptError,
             });
             return {
               success: false,
@@ -241,12 +274,12 @@ export const useAuth = create((set, _get) => ({
             };
           }
 
-          let migratedData = decryptedData;
-          let currentUserData = decryptedData.currentUser;
+          const currentUserData = decryptedData.currentUser;
 
           if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
-            logger.auth("Legacy data detected - clearing for fresh start with share code system.");
-            // Clear legacy data - all budgets now require share codes
+            logger.auth(
+              "Legacy data detected - clearing for fresh start with share code system."
+            );
             localStorage.removeItem("envelopeBudgetData");
             throw new Error(
               "Legacy data cleared - please create a new budget with share code system"
@@ -259,8 +292,7 @@ export const useAuth = create((set, _get) => ({
             userName: currentUserData.userName,
           });
 
-          // Ensure userName is not empty
-          const sanitizedUserData = {
+          const sanitizedUserData: CurrentUser = {
             ...currentUserData,
             userName: currentUserData.userName?.trim() || "User",
           };
@@ -274,23 +306,20 @@ export const useAuth = create((set, _get) => ({
             lastActivity: Date.now(),
           });
 
-          // Identify returning user in Highlight.io for session tracking
           identifyUser(sanitizedUserData.budgetId, {
             userName: sanitizedUserData.userName,
             userColor: sanitizedUserData.userColor,
             accountType: "returning_user",
           });
 
-          // Start background sync after successful login
-          // Use get() parameter to avoid React error #185
-          const authState = _get();
-          await authState.startBackgroundSyncAfterLogin();
+          await get().startBackgroundSyncAfterLogin();
 
-          return { success: true, data: migratedData };
+          return { success: true, data: decryptedData };
         }
-      } catch (error) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
         logger.error("Login failed.", error);
-        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+        if (error instanceof Error && (error.name === "OperationError" || message.toLowerCase().includes("decrypt"))) {
           return { success: false, error: "Invalid password." };
         }
         return { success: false, error: "Invalid password or corrupted data." };
@@ -308,25 +337,23 @@ export const useAuth = create((set, _get) => ({
       sharedBy: joinData.sharedBy,
     });
 
-    const timeoutPromise = new Promise((_, reject) =>
+    const timeoutPromise = new Promise<JoinResponse>((_, reject) =>
       setTimeout(() => reject(new Error("Join timeout after 10 seconds")), 10000)
     );
 
-    const joinPromise = (async () => {
+    const joinPromise = (async (): Promise<JoinResponse> => {
       try {
-        // Generate encryption key for this user's password
         const keyData = await encryptionUtils.deriveKey(joinData.password);
         const newSalt = keyData.salt;
         const key = keyData.key;
 
-        // Use the shared budgetId (not device-unique for sharing)
-        const finalUserData = {
-          ...joinData.userInfo,
-          budgetId: joinData.budgetId, // Use shared budgetId
+        const finalUserData: CurrentUser = {
+          budgetId: joinData.budgetId,
           joinedVia: "shareCode",
           sharedBy: joinData.sharedBy,
-          // Set default userName if empty or missing
           userName: joinData.userInfo?.userName?.trim() || "Shared User",
+          userColor: joinData.userInfo?.userColor || "#000000",
+          shareCode: "", // Share code not needed for joining user
         };
 
         logger.auth("Setting auth state for shared budget user.", {
@@ -345,7 +372,6 @@ export const useAuth = create((set, _get) => ({
           lastActivity: Date.now(),
         });
 
-        // Identify shared user in Highlight.io for session tracking
         identifyUser(finalUserData.budgetId, {
           userName: finalUserData.userName,
           userColor: finalUserData.userColor,
@@ -353,7 +379,6 @@ export const useAuth = create((set, _get) => ({
           sharedBy: joinData.sharedBy,
         });
 
-        // Save user profile to localStorage (with their own encryption key)
         const profileData = {
           userName: finalUserData.userName,
           userColor: finalUserData.userColor,
@@ -363,8 +388,6 @@ export const useAuth = create((set, _get) => ({
         localStorage.setItem("userProfile", JSON.stringify(profileData));
         logger.auth("Saved shared user profile to localStorage.");
 
-        // Save encrypted budget data to localStorage for persistence across refreshes
-        // This creates an initial encrypted budget structure that can be restored on refresh
         const initialBudgetData = JSON.stringify({
           ...finalUserData,
           bills: [],
@@ -382,15 +405,14 @@ export const useAuth = create((set, _get) => ({
             iv: encrypted.iv,
           })
         );
-        logger.auth("Saved encrypted shared budget data to localStorage for persistence.");
+        logger.auth(
+          "Saved encrypted shared budget data to localStorage for persistence."
+        );
 
-        // Start background sync after successful join
-        // Use get() parameter to avoid React error #185
-        const currentState = _get();
-        await currentState.startBackgroundSyncAfterLogin(false); // Not a new user
+        await get().startBackgroundSyncAfterLogin(false);
 
         return { success: true, sharedBudget: true };
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error("Join budget failed.", error);
         return {
           success: false,
@@ -422,7 +444,10 @@ export const useAuth = create((set, _get) => ({
     logger.auth("Updating user.", updatedUser);
     set((state) => ({
       currentUser: updatedUser,
-      budgetId: updatedUser.budgetId !== state.budgetId ? updatedUser.budgetId : state.budgetId,
+      budgetId:
+        updatedUser.budgetId !== state.budgetId
+          ? updatedUser.budgetId
+          : state.budgetId,
     }));
   },
 
@@ -432,16 +457,16 @@ export const useAuth = create((set, _get) => ({
         isNewUser,
       });
 
-      // GitHub Issue #576 Phase 2: Universal race condition prevention for ALL users
-      // Same delay for all users to prevent race conditions
-      const syncDelay = 2500; // 2.5s for all users to ensure encryption context is ready
-      logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
-        isNewUser,
-        delayMs: syncDelay,
-      });
+      const syncDelay = 2500;
+      logger.auth(
+        `⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`,
+        {
+          isNewUser,
+          delayMs: syncDelay,
+        }
+      );
       await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
-      // Import UI store to access startBackgroundSync
       const { useBudgetStore } = await import("../ui/uiStore");
       const budgetState = useBudgetStore.getState();
 
@@ -463,32 +488,32 @@ export const useAuth = create((set, _get) => ({
         return { success: false, error: "No saved data found." };
       }
 
-      const { encryptedData, iv } = JSON.parse(savedData);
-      // Use deterministic key derivation for old password
+      const { encryptedData, iv }: SavedData = JSON.parse(savedData);
       const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
       const oldKey = oldKeyData.key;
 
       const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
 
-      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(
+        newPassword
+      );
       const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
       localStorage.setItem(
         "envelopeBudgetData",
         JSON.stringify({
           encryptedData: encrypted.data,
-          salt: Array.from(newSalt), // Deterministic salt from new password
+          salt: Array.from(newSalt),
           iv: encrypted.iv,
         })
       );
 
       set({ salt: newSalt, encryptionKey: newKey });
 
-      // Log password change for cross-browser sync debugging
       if (import.meta?.env?.MODE === "development") {
         const saltPreview =
           Array.from(newSalt.slice(0, 8))
-            .map((b) => b.toString(16).padStart(2, "0"))
+            .map((b: number) => b.toString(16).padStart(2, "0"))
             .join("") + "...";
         logger.auth("Password changed with deterministic key", {
           saltPreview,
@@ -496,12 +521,13 @@ export const useAuth = create((set, _get) => ({
         });
       }
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       logger.error("Password change failed.", error);
-      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+      if (error instanceof Error && (error.name === "OperationError" || message.toLowerCase().includes("decrypt"))) {
         return { success: false, error: "Invalid current password." };
       }
-      return { success: false, error: error.message };
+      return { success: false, error: message };
     }
   },
 
@@ -518,33 +544,31 @@ export const useAuth = create((set, _get) => ({
 
   async updateProfile(updatedProfile) {
     try {
-      // TEMP: Get state via store reference - need to restructure this method
-      const storeState = useAuth.getState();
-      const { encryptionKey, salt: currentSalt } = storeState;
+      const { encryptionKey, salt: currentSalt } = get();
 
       if (!encryptionKey || !currentSalt) {
         return { success: false, error: "Not authenticated." };
       }
 
-      // Update the current user in the store
       set(() => ({
         currentUser: updatedProfile,
       }));
 
-      // Update localStorage profile
       const profileData = {
         userName: updatedProfile.userName,
         userColor: updatedProfile.userColor,
       };
       localStorage.setItem("userProfile", JSON.stringify(profileData));
 
-      // Update the encrypted budget data to include the updated user profile
       const savedData = localStorage.getItem("envelopeBudgetData");
       if (savedData) {
-        const { encryptedData, iv } = JSON.parse(savedData);
-        const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+        const { encryptedData, iv }: SavedData = JSON.parse(savedData);
+        const decryptedData = await encryptionUtils.decrypt(
+          encryptedData,
+          encryptionKey,
+          iv
+        );
 
-        // Update the currentUser in the encrypted data
         const updatedData = {
           ...decryptedData,
           currentUser: updatedProfile,
@@ -562,9 +586,10 @@ export const useAuth = create((set, _get) => ({
       }
 
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       logger.error("Failed to update profile:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: message };
     }
   },
 
@@ -575,9 +600,7 @@ export const useAuth = create((set, _get) => ({
       });
       logger.auth("validatePassword: Starting validation");
 
-      const { encryptionUtils } = await import("../../utils/security/encryption");
-      // Get current state without triggering React error #185
-      const authState = _get();
+      const authState = get();
       const savedData = localStorage.getItem("envelopeBudgetData");
 
       logger.auth("validatePassword: Data check", {
@@ -587,8 +610,6 @@ export const useAuth = create((set, _get) => ({
         authStateKeys: Object.keys(authState),
       });
 
-      // SECURITY FIX: Always validate against actual encrypted data when it exists
-      // The fallback method was insecure and allowed any password for session unlock
       if (!savedData) {
         logger.auth("validatePassword: No saved data found - cannot validate password");
         logger.production("Password validation failed", {
@@ -597,20 +618,19 @@ export const useAuth = create((set, _get) => ({
         return false;
       }
 
-      // Parse and validate the saved encrypted data
-      let parsedData;
+      let parsedData: SavedData;
       try {
-        parsedData = JSON.parse(savedData);
-      } catch (parseError) {
+        parsedData = JSON.parse(savedData) as SavedData;
+      } catch (parseError: unknown) {
+        const message = parseError instanceof Error ? parseError.message : String(parseError);
         logger.auth("validatePassword: Failed to parse saved data", {
-          error: parseError.message,
+          error: message,
         });
         return false;
       }
 
       const { salt: savedSalt, encryptedData, iv } = parsedData;
 
-      // Validate that we have all required encryption components
       if (!savedSalt || !encryptedData || !iv) {
         logger.auth("validatePassword: Missing required encryption components", {
           hasSavedSalt: !!savedSalt,
@@ -627,13 +647,11 @@ export const useAuth = create((set, _get) => ({
         hasEncryptedData: !!encryptedData,
       });
 
-      // Use deterministic key derivation to validate password
       const keyData = await encryptionUtils.deriveKey(password);
       const testKey = keyData.key;
 
       logger.auth("validatePassword: Key derived successfully");
 
-      // Try to decrypt actual data to validate password
       try {
         await encryptionUtils.decrypt(encryptedData, testKey, iv);
         logger.auth("validatePassword: Decryption successful - password is correct");
@@ -641,51 +659,63 @@ export const useAuth = create((set, _get) => ({
           method: "encrypted_data_validation",
         });
         return true;
-      } catch (decryptError) {
+      } catch (decryptError: unknown) {
+        const message = decryptError instanceof Error ? decryptError.message : String(decryptError);
         logger.auth("validatePassword: Decryption failed - password is incorrect", {
-          error: decryptError.message,
-          errorType: decryptError.constructor?.name,
+          error: message,
+          errorType: decryptError instanceof Error ? decryptError.constructor?.name : typeof decryptError,
         });
         logger.production("Password validation failed", {
           reason: "decryption_failed",
         });
         return false;
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       logger.error("validatePassword: Unexpected error", error);
       logger.production("Password validation failed", {
         reason: "unexpected_error",
-        error: error.message,
+        error: message,
       });
       return false;
     }
   },
 }));
 
-export const AuthProvider = ({ children }) => {
+// --- AUTH PROVIDER ---
+
+// Get stable actions once, outside the component scope.
+// This is safe because Zustand actions are stable and don't change.
+const { logout, setLastActivity } = useAuth.getState();
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isUnlocked = useAuth((state) => state.isUnlocked);
-  const logout = useAuth((state) => state.logout);
-  const setLastActivity = useAuth((state) => state.setLastActivity);
 
   useEffect(() => {
     if (isUnlocked) {
-      const TIMEOUT = 30 * 60 * 1000;
-      let timeoutId;
+      const TIMEOUT = 30 * 60 * 1000; // 30 minutes
+      let timeoutId: ReturnType<typeof setTimeout>;
 
       const resetTimeout = () => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           logger.info("Auto-locking due to inactivity.");
-          logout();
+          logout(); // Use the stable action
         }, TIMEOUT);
       };
 
       const handleActivity = () => {
-        setLastActivity(Date.now());
+        setLastActivity(Date.now()); // Use the stable action
         resetTimeout();
       };
 
-      const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
+      const events = [
+        "mousedown",
+        "mousemove",
+        "keypress",
+        "scroll",
+        "touchstart",
+      ];
       events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });
@@ -699,7 +729,7 @@ export const AuthProvider = ({ children }) => {
         });
       };
     }
-  }, [isUnlocked]); // Only depend on isUnlocked - store actions are stable
+  }, [isUnlocked]); // Only depend on isUnlocked - store actions are stable.
 
   return <>{children}</>;
 };

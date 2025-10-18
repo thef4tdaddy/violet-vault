@@ -1,7 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import MainLayout from "./MainLayout";
-import LandingPage from "../marketing/LandingPage";
 
 /**
  * App Wrapper Component

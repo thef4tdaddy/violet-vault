@@ -1,5 +1,4 @@
 import React, { Suspense, useState } from "react";
-import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
@@ -9,11 +8,6 @@ import { getButtonClasses, withHapticFeedback } from "../../../utils/ui/touchFee
 import { useEnvelopeSwipeGestures } from "../../../hooks/useEnvelopeSwipeGestures";
 import SwipeIndicatorOverlay from "./SwipeIndicatorOverlay";
 import EnvelopeActivitySummary from "./EnvelopeActivitySummary";
-import EnvelopeStatusDisplay from "./EnvelopeStatusDisplay";
-import EnvelopeActions from "./EnvelopeActions";
-
-// Lazy load the bill funding info component
-const BillEnvelopeFundingInfo = React.lazy(() => import("../BillEnvelopeFundingInfo"));
 
 const EnvelopeItem = ({
   envelope,

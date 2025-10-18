@@ -1,5 +1,3 @@
-import React from "react";
-import { Select } from "@/components/ui";
 import { usePerformanceMonitor } from "../../hooks/analytics/usePerformanceMonitor";
 import PerformanceHeader from "./performance/PerformanceHeader";
 import OverallScore from "./performance/OverallScore";

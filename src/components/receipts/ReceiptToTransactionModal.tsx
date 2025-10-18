@@ -1,8 +1,6 @@
 import React from "react";
-import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { Button } from "../ui";
 import { useReceiptToTransaction } from "../../hooks/receipts/useReceiptToTransaction";
 import logger from "../../utils/common/logger";
 import ReceiptDataStep from "./steps/ReceiptDataStep";

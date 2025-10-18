@@ -1,5 +1,4 @@
 import React, { useState, memo, useCallback } from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";

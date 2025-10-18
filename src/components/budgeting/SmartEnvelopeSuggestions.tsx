@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";

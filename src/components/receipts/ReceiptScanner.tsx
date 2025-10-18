@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { useReceiptScanner } from "../../hooks/receipts/useReceiptScanner";
 import ReceiptScannerHeader from "./components/ReceiptScannerHeader";
 import ReceiptUploadArea from "./components/ReceiptUploadArea";

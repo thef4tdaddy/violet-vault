@@ -1,9 +1,7 @@
 import React from "react";
-import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
-import { Button } from "../../ui";
 
 // PayerStats component - displays payer history
 const PayerStats = ({ stats, payerName }) => {
