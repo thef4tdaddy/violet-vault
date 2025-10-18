@@ -232,85 +232,110 @@ const getTargetVersionFallback = () => {
   }
 };
 
-// Branch and environment detection with actual git branch info
-export const getBranchInfo = (targetVersion = null) => {
-  // Get actual git branch from build-time injection
-  const actualGitBranch = import.meta.env.VITE_GIT_BRANCH;
+/**
+ * Detect Vercel deployment information from URL
+ */
+const detectVercelDeployment = () => {
+  if (typeof window === "undefined") {
+    return { isVercelDeploy: false, isMainBranch: false, isPreviewBranch: false };
+  }
 
-  // Check multiple environment detection methods
-  const appEnv = import.meta.env.VITE_APP_ENV;
-  const isDev = import.meta.env.DEV;
+  const hostname = window.location.hostname;
+  const isVercelDeploy = hostname.includes("vercel.app") || hostname.includes(".vercel.app");
+  const isMainBranch = isVercelDeploy && hostname.startsWith("violet-vault-") && !hostname.includes("git-");
+  const isPreviewBranch = isVercelDeploy && (hostname.includes("git-") || hostname.includes("-git-"));
 
-  // Vercel environment detection
-  const vercelEnv = import.meta.env.VITE_VERCEL_ENV; // production, preview, development
-  const isVercelProduction = vercelEnv === "production";
-  const isVercelPreview = vercelEnv === "preview";
+  return { isVercelDeploy, isMainBranch, isPreviewBranch };
+};
 
-  // Alternative detection: Check for Vercel URL patterns as fallback
-  const isVercelDeploy =
-    typeof window !== "undefined" &&
-    (window.location.hostname.includes("vercel.app") ||
-      window.location.hostname.includes(".vercel.app"));
-  const isMainBranchOnVercel =
-    isVercelDeploy &&
-    window.location.hostname.startsWith("violet-vault-") &&
-    !window.location.hostname.includes("git-");
-  const isPreviewBranchOnVercel =
-    isVercelDeploy &&
-    (window.location.hostname.includes("git-") || window.location.hostname.includes("-git-"));
+/**
+ * Determine environment type from various indicators
+ */
+const determineEnvironment = (envVars, vercelInfo) => {
+  const { appEnv, isDev, vercelEnv, nodeEnv } = envVars;
+  const { isMainBranch, isPreviewBranch } = vercelInfo;
 
-  // Other common environment indicators
-  const nodeEnv = import.meta.env.NODE_ENV;
-
-  const fallbackVersion = targetVersion || getTargetVersionFallback();
-
-  // Determine branch: Use actual git branch if available, otherwise fall back to environment detection
-  let branch = actualGitBranch || "unknown";
-
-  // Environment detection priority:
-  // 1. Local development (npm run dev)
-  // 2. Vercel Preview (PR/branch deploys)
-  // 3. Vercel Production (main branch deploy)
-
+  // Check for development environment
   if (isDev || appEnv === "development") {
-    return {
-      branch: branch,
+    return "development";
+  }
+
+  // Check for preview environment
+  const isVercelPreview = vercelEnv === "preview";
+  if (isVercelPreview || isPreviewBranch || appEnv === "preview") {
+    return "preview";
+  }
+
+  // Check for production environment
+  const isVercelProduction = vercelEnv === "production";
+  if (isVercelProduction || isMainBranch || appEnv === "production" || nodeEnv === "production") {
+    return "production";
+  }
+
+  // Default to production for safety
+  return "production";
+};
+
+/**
+ * Get branch info object for environment
+ */
+const createBranchInfo = (environment, branch, fallbackVersion, platform) => {
+  const configs = {
+    development: {
+      branch,
       environment: "development",
       futureVersion: fallbackVersion,
       isDevelopment: true,
       platform: "local",
-    };
-  } else if (isVercelPreview || isPreviewBranchOnVercel || appEnv === "preview") {
-    return {
-      branch: branch || "develop", // Default to develop for preview
+    },
+    preview: {
+      branch: branch || "develop",
       environment: "preview",
       futureVersion: fallbackVersion,
-      isDevelopment: true, // Preview shows dev features
+      isDevelopment: true,
       platform: "vercel-preview",
-    };
-  } else if (
-    isVercelProduction ||
-    isMainBranchOnVercel ||
-    appEnv === "production" ||
-    nodeEnv === "production"
-  ) {
-    return {
-      branch: branch || "main", // Default to main for production
-      environment: "production",
-      futureVersion: null,
-      isDevelopment: false,
-      platform: isVercelProduction ? "vercel-production" : "production",
-    };
-  } else {
-    // Default to production for safety
-    return {
+    },
+    production: {
       branch: branch || "main",
       environment: "production",
       futureVersion: null,
       isDevelopment: false,
-      platform: "unknown",
-    };
-  }
+      platform: platform || "production",
+    },
+  };
+
+  return configs[environment] || configs.production;
+};
+
+// Branch and environment detection with actual git branch info
+export const getBranchInfo = (targetVersion = null) => {
+  // Get actual git branch from build-time injection
+  const actualGitBranch = import.meta.env.VITE_GIT_BRANCH;
+  const branch = actualGitBranch || "unknown";
+
+  // Collect environment variables
+  const envVars = {
+    appEnv: import.meta.env.VITE_APP_ENV,
+    isDev: import.meta.env.DEV,
+    vercelEnv: import.meta.env.VITE_VERCEL_ENV,
+    nodeEnv: import.meta.env.NODE_ENV,
+  };
+
+  // Detect Vercel deployment info
+  const vercelInfo = detectVercelDeployment();
+
+  // Determine environment type
+  const environment = determineEnvironment(envVars, vercelInfo);
+
+  // Calculate fallback version
+  const fallbackVersion = targetVersion || getTargetVersionFallback();
+
+  // Determine platform
+  const isVercelProduction = envVars.vercelEnv === "production";
+  const platform = isVercelProduction ? "vercel-production" : environment;
+
+  // Return branch info for determined environment
+  return createBranchInfo(environment, branch, fallbackVersion, platform);
 };
 
 // Format version for display with branch differentiation (sync - immediate)
