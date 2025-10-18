@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import useConnectionManager from "../../hooks/common/useConnectionManager";
+import { useConnectionManager } from "../../hooks/common/useConnectionManager";
 
 /**
  * Shared component for displaying connected entity relationships in modals
