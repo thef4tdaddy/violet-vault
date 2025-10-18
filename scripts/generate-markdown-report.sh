@@ -39,20 +39,27 @@ echo "" >> "$OUTPUT_FILE"
 
 # Files with Most Issues
 echo "### Files with Most Issues" >> "$OUTPUT_FILE"
-sed -n '/--- Files with Most Issues ---/,/--- Issue Count by Category ---/p' "$LINT_INPUT" | sed '1d;$d' | sed '$d' | awk '{print "- " $0}' | sed -E 's/issues in (.*)/issues in `\1`/g' >> "$OUTPUT_FILE"
+sed -n '/--- Files with Most Issues (Errors + Warnings) ---/,/--- Issue Count by Category (ESLint Rule) ---/p' "$LINT_INPUT" | \
+    sed '1d;$d' | \
+    grep -v "^\s*$" | \
+    awk '{$1=$1; print "- " $0}' | \
+    sed -E 's/(issues in )(.*)/\1`\2`/g' >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
 # Issue Count by Category
 echo "### Issue Count by Category" >> "$OUTPUT_FILE"
 echo "| Count | Rule ID |" >> "$OUTPUT_FILE"
 echo "|---|---|" >> "$OUTPUT_FILE"
-sed -n '/--- Issue Count by Category ---/,/--- Detailed Lint Report ---/p' "$LINT_INPUT" | sed '1d;$d' | sed '$d' | awk '{printf "| %s | `%s` |\n", $1, $2}' >> "$OUTPUT_FILE"
+sed -n '/--- Issue Count by Category (ESLint Rule) ---/,/--- Detailed Lint Report ---/p' "$LINT_INPUT" | \
+    sed '1d;$d' | \
+    grep -v "^\s*$" | \
+    awk '{$1=$1; count=$1; $1=""; rule=substr($0,2); printf "| %s | `%s` |\n", count, rule}' >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
 # Detailed Report
 echo "### Detailed Lint Report" >> "$OUTPUT_FILE"
 echo "\`\`\`" >> "$OUTPUT_FILE"
-sed -n '/--- Detailed Lint Report ---/,$p' "$LINT_INPUT" | tail -n +2 >> "$OUTPUT_FILE"
+sed -n '/--- Detailed Lint Report ---/,$p' "$LINT_INPUT" | sed '1d' >> "$OUTPUT_FILE"
 echo "\`\`\`" >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
@@ -63,20 +70,27 @@ echo "" >> "$OUTPUT_FILE"
 
 # Files with Most Errors
 echo "### Files with Most Type Errors" >> "$OUTPUT_FILE"
-sed -n '/--- Files with Most Type Errors ---/,/--- Type Error Breakdown by Category ---/p' "$TYPECHECK_INPUT" | sed '1d;$d' | sed '$d' | awk '{print "- " $1 " errors in `" $2 "`"}' >> "$OUTPUT_FILE"
+sed -n '/--- Files with Most Type Errors ---/,/--- Type Error Breakdown by Category ---/p' "$TYPECHECK_INPUT" | \
+    sed '1d;$d' | \
+    grep -v "^\s*$" | \
+    awk '{$1=$1; print "- " $0}' | \
+    sed -E 's/([0-9]+) (.*)/\1 errors in `\2`/g' >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
 # Error Breakdown
 echo "### Type Error Breakdown by Category" >> "$OUTPUT_FILE"
 echo "| Count | Error Code |" >> "$OUTPUT_FILE"
 echo "|---|---|" >> "$OUTPUT_FILE"
-sed -n '/--- Type Error Breakdown by Category ---/,/--- Detailed Type Error Report ---/p' "$TYPECHECK_INPUT" | sed '1d;$d' | sed '$d' | awk '{printf "| %s | `%s` |\n", $1, $2}' >> "$OUTPUT_FILE"
+sed -n '/--- Type Error Breakdown by Category ---/,/--- Detailed Type Error Report ---/p' "$TYPECHECK_INPUT" | \
+    sed '1d;$d' | \
+    grep -v "^\s*$" | \
+    awk '{$1=$1; printf "| %s | `%s` |\n", $1, $2}' >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
 # Detailed Report
 echo "### Detailed Type Error Report" >> "$OUTPUT_FILE"
 echo "\`\`\`" >> "$OUTPUT_FILE"
-sed -n '/--- Detailed Type Error Report ---/,$p' "$TYPECHECK_INPUT" | tail -n +2 >> "$OUTPUT_FILE"
+sed -n '/--- Detailed Type Error Report ---/,$p' "$TYPECHECK_INPUT" | sed '1d' >> "$OUTPUT_FILE"
 echo "\`\`\`" >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
