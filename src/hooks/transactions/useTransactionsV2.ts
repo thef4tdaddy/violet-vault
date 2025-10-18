@@ -5,8 +5,8 @@
  */
 import { useEffect } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore.ts";
-import useTransactionData from "./useTransactionData.ts";
-import useTransactionOperations from "./useTransactionOperations.ts";
+import { useTransactionData } from "./useTransactionData.ts";
+import { useTransactionOperations } from "./useTransactionOperations.ts";
 import logger from "../../utils/common/logger.ts";
 
 /**
@@ -244,5 +244,3 @@ const useTransactionsV2 = (options = {}) => {
     },
   };
 };
-
-export default useTransactionsV2;

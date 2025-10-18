@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import useAuthFlow from "./useAuthFlow";
+import { useAuthFlow } from "./useAuthFlow";
 import { useSecurityManager } from "./useSecurityManager";
 import { useLocalOnlyMode } from "../common/useLocalOnlyMode";
 
@@ -129,5 +129,3 @@ export const useAuthenticationManager = () => {
     },
   };
 };
-
-export default useAuthenticationManager;
