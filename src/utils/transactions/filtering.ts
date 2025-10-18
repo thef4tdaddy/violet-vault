@@ -132,6 +132,39 @@ export const filterBySearch = (transactions = [], searchQuery) => {
 };
 
 /**
+ * Get sortable value from transaction based on field
+ */
+const getSortValue = (transaction, sortBy) => {
+  switch (sortBy) {
+    case "date":
+      return new Date(transaction.date);
+    case "amount":
+      return Math.abs(transaction.amount);
+    case "description":
+      return (transaction.description || "").toLowerCase();
+    case "category":
+      return (transaction.category || "").toLowerCase();
+    case "account":
+      return (transaction.account || "").toLowerCase();
+    default:
+      return transaction[sortBy];
+  }
+};
+
+/**
+ * Compare two values for sorting
+ */
+const compareValues = (aValue, bValue, sortOrder) => {
+  if (aValue < bValue) {
+    return sortOrder === "asc" ? -1 : 1;
+  }
+  if (aValue > bValue) {
+    return sortOrder === "asc" ? 1 : -1;
+  }
+  return 0;
+};
+
+/**
  * Sort transactions by field and order
  * @param {Array} transactions - Transactions to sort
  * @param {string} sortBy - Field to sort by (date, amount, description, category)
@@ -141,41 +174,9 @@ export const filterBySearch = (transactions = [], searchQuery) => {
 export const sortTransactions = (transactions = [], sortBy = "date", sortOrder = "desc") => {
   try {
     return [...transactions].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case "date":
-          aValue = new Date(a.date);
-          bValue = new Date(b.date);
-          break;
-        case "amount":
-          aValue = Math.abs(a.amount);
-          bValue = Math.abs(b.amount);
-          break;
-        case "description":
-          aValue = (a.description || "").toLowerCase();
-          bValue = (b.description || "").toLowerCase();
-          break;
-        case "category":
-          aValue = (a.category || "").toLowerCase();
-          bValue = (b.category || "").toLowerCase();
-          break;
-        case "account":
-          aValue = (a.account || "").toLowerCase();
-          bValue = (b.account || "").toLowerCase();
-          break;
-        default:
-          aValue = a[sortBy];
-          bValue = b[sortBy];
-      }
-
-      if (aValue < bValue) {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortOrder === "asc" ? 1 : -1;
-      }
-      return 0;
+      const aValue = getSortValue(a, sortBy);
+      const bValue = getSortValue(b, sortBy);
+      return compareValues(aValue, bValue, sortOrder);
     });
   } catch (error) {
     logger.error("Error sorting transactions", error);

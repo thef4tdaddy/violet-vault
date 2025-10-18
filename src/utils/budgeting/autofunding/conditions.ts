@@ -193,6 +193,54 @@ export const createDefaultCondition = (type = CONDITION_TYPES.BALANCE_LESS_THAN)
 });
 
 /**
+ * Validate balance-related condition
+ */
+const validateBalanceCondition = (condition) => {
+  if (condition.value === undefined || condition.value === null || condition.value < 0) {
+    return "Balance conditions require a non-negative value";
+  }
+  return null;
+};
+
+/**
+ * Validate date range condition
+ */
+const validateDateRangeCondition = (condition) => {
+  if (!condition.startDate || !condition.endDate) {
+    return "Date range conditions require both start and end dates";
+  }
+  if (new Date(condition.startDate) >= new Date(condition.endDate)) {
+    return "Start date must be before end date";
+  }
+  return null;
+};
+
+/**
+ * Validate transaction amount condition
+ */
+const validateTransactionAmountCondition = (condition) => {
+  const errors = [];
+  
+  if (condition.value === undefined || condition.value === null) {
+    errors.push("Transaction amount conditions require a value");
+  }
+  
+  const validOperators = [
+    "greater_than",
+    "less_than",
+    "equals",
+    "greater_than_or_equal",
+    "less_than_or_equal",
+  ];
+  
+  if (!condition.operator || !validOperators.includes(condition.operator)) {
+    errors.push("Transaction amount conditions require a valid operator");
+  }
+  
+  return errors;
+};
+
+/**
  * Validates a condition configuration
  * @param {Object} condition - Condition to validate
  * @returns {Object} Validation result with isValid flag and errors
@@ -207,37 +255,23 @@ export const validateCondition = (condition) => {
   switch (condition.type) {
     case CONDITION_TYPES.BALANCE_LESS_THAN:
     case CONDITION_TYPES.BALANCE_GREATER_THAN:
-    case CONDITION_TYPES.UNASSIGNED_ABOVE:
-      if (condition.value === undefined || condition.value === null || condition.value < 0) {
-        errors.push("Balance conditions require a non-negative value");
-      }
+    case CONDITION_TYPES.UNASSIGNED_ABOVE: {
+      const error = validateBalanceCondition(condition);
+      if (error) errors.push(error);
       break;
+    }
 
-    case CONDITION_TYPES.DATE_RANGE:
-      if (!condition.startDate || !condition.endDate) {
-        errors.push("Date range conditions require both start and end dates");
-      } else if (new Date(condition.startDate) >= new Date(condition.endDate)) {
-        errors.push("Start date must be before end date");
-      }
+    case CONDITION_TYPES.DATE_RANGE: {
+      const error = validateDateRangeCondition(condition);
+      if (error) errors.push(error);
       break;
+    }
 
-    case CONDITION_TYPES.TRANSACTION_AMOUNT:
-      if (condition.value === undefined || condition.value === null) {
-        errors.push("Transaction amount conditions require a value");
-      }
-      if (
-        !condition.operator ||
-        ![
-          "greater_than",
-          "less_than",
-          "equals",
-          "greater_than_or_equal",
-          "less_than_or_equal",
-        ].includes(condition.operator)
-      ) {
-        errors.push("Transaction amount conditions require a valid operator");
-      }
+    case CONDITION_TYPES.TRANSACTION_AMOUNT: {
+      const amountErrors = validateTransactionAmountCondition(condition);
+      errors.push(...amountErrors);
       break;
+    }
   }
 
   return {
