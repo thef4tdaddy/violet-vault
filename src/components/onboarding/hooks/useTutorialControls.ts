@@ -19,6 +19,7 @@ export const useTutorialControls = (
     endTutorialStep();
     setPreference("tourCompleted", true);
     logger.info("🏁 Tutorial closed by user");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setShowTutorial]); // endTutorialStep and setPreference are stable Zustand actions
 
   const nextStep = useCallback(() => {
@@ -37,6 +38,7 @@ export const useTutorialControls = (
       markStepComplete("accountSetup");
       closeTutorial();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutorialSteps, currentStep, setCurrentStep, closeTutorial]); // markStepComplete is a stable Zustand action
 
   const prevStep = useCallback(() => {
@@ -48,6 +50,7 @@ export const useTutorialControls = (
   const skipTutorial = useCallback(() => {
     setPreference("showHints", false);
     closeTutorial();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeTutorial]); // setPreference is a stable Zustand action
 
   return {
