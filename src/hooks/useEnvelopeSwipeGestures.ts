@@ -146,5 +146,3 @@ export const useEnvelopeSwipeGestures = ({
     swipeStyles,
   };
 };
-
-export default useEnvelopeSwipeGestures;
