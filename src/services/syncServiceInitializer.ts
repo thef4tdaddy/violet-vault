@@ -2,15 +2,6 @@
 
 import logger from "../utils/common/logger";
 
-// Type for sync service modules
-interface ChunkedSyncServiceModule {
-  default: any; // Type will be defined properly when chunkedSyncService is converted
-}
-
-interface FirebaseSyncServiceModule {
-  default: any; // Type will be defined properly when firebaseSyncService is converted
-}
-
 class SyncServiceInitializer {
   private initialized: boolean;
   private initPromise: Promise<boolean> | null;

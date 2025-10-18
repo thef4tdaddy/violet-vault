@@ -3,13 +3,6 @@ import { getIcon } from "../../utils";
 import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
-const UserButton = memo(({ onClick, icon: Icon, label }) => (
-  <Button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
-    {Icon && React.createElement(Icon, { className: "h-4 w-4 mr-2" })}
-    {label}
-  </Button>
-));
-
 const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showKeyManagement, setShowKeyManagement] = useState(false);

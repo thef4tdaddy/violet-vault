@@ -27,12 +27,12 @@ interface UseFirebaseSyncReturn {
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (
-  firebaseSync: any,
-  encryptionKey: CryptoKey | null,
-  budgetId: string | null,
-  currentUser: any
-): UseFirebaseSyncReturn => {
+const useFirebaseSync = ({
+  firebaseSync,
+  encryptionKey,
+  budgetId,
+  currentUser,
+}: UseFirebaseSyncProps): UseFirebaseSyncReturn => {
   const budget = useBudgetStore();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState<any[]>([]);

@@ -1,6 +1,5 @@
 import {
   ENVELOPE_TYPES,
-  ENVELOPE_TYPE_CONFIG,
   AUTO_CLASSIFY_ENVELOPE_TYPE,
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";

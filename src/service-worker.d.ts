@@ -453,12 +453,12 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-interface WindowEventMap {
-  beforeinstallprompt: BeforeInstallPromptEvent;
-  appinstalled: Event;
-}
-
 declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+    appinstalled: Event;
+  }
+
   interface Window {
     // PWA Install Events
     addEventListener(
@@ -631,10 +631,9 @@ type VisibilityState = "hidden" | "visible" | "prerender";
 // Additional Utility Types
 // ============================================================================
 
-interface ImportScripts {
-  (...urls: string[]): void;
+// Service Worker global function
+declare global {
+  function importScripts(...urls: string[]): void;
 }
-
-declare function importScripts(...urls: string[]): void;
 
 export {};

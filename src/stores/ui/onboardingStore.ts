@@ -9,7 +9,7 @@ import logger from "../../utils/common/logger";
  */
 const useOnboardingStore = create(
   persist(
-    (set, _get) => ({
+    (_set, _get) => ({
       // Onboarding completion status
       isOnboarded: true, // 🚨 TEMP: Set to true to skip onboarding functionality
 
@@ -68,11 +68,11 @@ const useOnboardingStore = create(
       },
 
       // 🚨 TEMP: Simplified helper methods that don't use get()
-      isStepComplete: (step) => {
+      isStepComplete: (_step) => {
         return true; // All steps "complete"
       },
 
-      shouldShowHint: (step) => {
+      shouldShowHint: (_step) => {
         return false; // No hints
       },
 
