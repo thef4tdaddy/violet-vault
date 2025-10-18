@@ -307,8 +307,7 @@ export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfDat
  * @param {Array} envelopes - Existing envelopes
  * @param {Object} settings - Analysis settings
  * @param {string} dateRange - Date range for analysis
- * @param {Set} dismissedSuggestions - Set of dismissed suggestion IDs
- * @param {boolean} showDismissed - Whether to show dismissed suggestions
+ * @param {Object} options - Additional options (dismissedSuggestions, showDismissed)
  * @returns {Array} Sorted array of all suggestions
  */
 export const generateAllSuggestions = (
@@ -316,9 +315,9 @@ export const generateAllSuggestions = (
   envelopes,
   settings,
   dateRange,
-  dismissedSuggestions = new Set(),
-  showDismissed = false
+  options = {}
 ) => {
+  const { dismissedSuggestions = new Set(), showDismissed = false } = options;
   const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
   const monthsOfData = calculateMonthsOfData(filteredTransactions);
 

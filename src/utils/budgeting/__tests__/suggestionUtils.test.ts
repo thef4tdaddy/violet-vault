@@ -288,8 +288,7 @@ describe("suggestionUtils", () => {
         mockEnvelopes,
         DEFAULT_ANALYSIS_SETTINGS,
         30,
-        new Set(),
-        false
+        { dismissedSuggestions: new Set(), showDismissed: false }
       );
 
       expect(result).toBeInstanceOf(Array);
@@ -304,8 +303,7 @@ describe("suggestionUtils", () => {
         mockEnvelopes,
         DEFAULT_ANALYSIS_SETTINGS,
         30,
-        dismissedSuggestions,
-        false
+        { dismissedSuggestions, showDismissed: false }
       );
 
       const dismissedSuggestion = result.find((s) => s.id === "unassigned_Food");
@@ -318,8 +316,7 @@ describe("suggestionUtils", () => {
         mockEnvelopes,
         DEFAULT_ANALYSIS_SETTINGS,
         30,
-        new Set(),
-        false
+        { dismissedSuggestions: new Set(), showDismissed: false }
       );
 
       if (result.length > 1) {
@@ -350,8 +347,7 @@ describe("suggestionUtils", () => {
         [],
         DEFAULT_ANALYSIS_SETTINGS,
         30,
-        new Set(),
-        false
+        { dismissedSuggestions: new Set(), showDismissed: false }
       );
 
       expect(result.length).toBeLessThanOrEqual(10);

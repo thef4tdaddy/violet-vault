@@ -61,11 +61,8 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
     // Calculate utilization rate based on envelope type and purpose
     const utilizationRate = calculateUtilizationRate(
       envelope,
-      upcomingBills,
-      paidTransactions,
-      currentBalance,
-      totalSpent,
-      committed
+      { upcomingBills, paidTransactions },
+      { currentBalance, totalSpent, committed }
     );
 
     const status = determineEnvelopeStatus(totalOverdue, available, envelope);
@@ -93,12 +90,11 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
  */
 export const calculateUtilizationRate = (
   envelope,
-  upcomingBills,
-  paidTransactions,
-  currentBalance,
-  totalSpent,
-  committed
+  billsAndTransactions,
+  balanceInfo
 ) => {
+  const { upcomingBills, paidTransactions } = billsAndTransactions;
+  const { currentBalance, totalSpent, committed } = balanceInfo;
   let utilizationRate = 0;
   const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
 
