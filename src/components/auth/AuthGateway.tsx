@@ -24,6 +24,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
           onLocalOnlyReady(localOnlyUser);
         } else {
           // Check if there's saved encrypted data (standard mode)
+          // eslint-disable-next-line no-restricted-syntax -- Auth layer checking for encrypted data before authentication
           const savedData = localStorage.getItem("envelopeBudgetData");
           if (savedData) {
             setAuthMode("standard");

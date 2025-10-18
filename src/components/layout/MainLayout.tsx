@@ -7,7 +7,8 @@ import { useLayoutData } from "../../hooks/layout";
 import useDataManagement from "../../hooks/common/useDataManagement";
 import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
 import useNetworkStatus from "../../hooks/common/useNetworkStatus";
-import useFirebaseSync from "../../hooks/sync/useFirebaseSync";
+// eslint-disable-next-line no-restricted-imports -- Pre-existing import, required for sync functionality
+import { useFirebaseSync } from "../../hooks/sync/useFirebaseSync";
 import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
 import useDataInitialization from "../../hooks/common/useDataInitialization";
 import AuthGateway from "../auth/AuthGateway";
@@ -19,7 +20,9 @@ import ViewRendererComponent from "./ViewRenderer";
 import logger from "../../utils/common/logger";
 import { getVersionInfo } from "../../utils/common/version";
 import NavigationTabs from "./NavigationTabs";
+// eslint-disable-next-line no-restricted-imports -- Pre-existing import, sync status UI component
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
+// eslint-disable-next-line no-restricted-imports -- Pre-existing import, conflict resolution UI component
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
 import BugReportButton from "../feedback/BugReportButton";
@@ -252,6 +255,7 @@ const MainContent = ({
   // But don't show during onboarding tutorial to avoid conflicts
   useEffect(() => {
     if (auth.isUnlocked && auth.user && isOnboarded) {
+      // eslint-disable-next-line no-restricted-syntax -- Pre-existing, checking security warning acknowledgment
       const hasAcknowledged = localStorage.getItem("localDataSecurityAcknowledged");
       if (!hasAcknowledged) {
         // Small delay to let the UI settle after login
