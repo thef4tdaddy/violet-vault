@@ -406,4 +406,4 @@ const useTransactionOperations = (options = {}) => {
   };
 };
 
-export default useTransactionOperations;
+export { useTransactionOperations };
