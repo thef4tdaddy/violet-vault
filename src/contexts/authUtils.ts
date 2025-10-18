@@ -1,10 +1,6 @@
 import logger from "../utils/common/logger";
 import { initialAuthState } from "./authConstants";
-import type {
-  AuthContextState,
-  AuthContextActions,
-  SessionData,
-} from "./authConstants";
+import type { AuthContextState, SessionData } from "./authConstants";
 import type { UserData } from "../types/auth";
 
 /**

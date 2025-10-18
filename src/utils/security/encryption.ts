@@ -1,6 +1,6 @@
 import logger from "../common/logger";
 import { optimizedSerialization } from "./optimizedSerialization";
-import { safeCryptoOperation, getRandomBytes, getCrypto } from "./cryptoCompat";
+import { safeCryptoOperation, getRandomBytes } from "./cryptoCompat";
 
 export const encryptionUtils = {
   async deriveKey(password) {

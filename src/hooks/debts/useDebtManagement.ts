@@ -9,7 +9,6 @@ import {
   PAYMENT_FREQUENCIES,
   COMPOUND_FREQUENCIES,
   calculateDebtStats,
-  AUTO_CLASSIFY_DEBT_TYPE,
 } from "../../constants/debts";
 import {
   calculateInterestPortion,
