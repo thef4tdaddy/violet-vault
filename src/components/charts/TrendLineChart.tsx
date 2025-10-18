@@ -3,6 +3,16 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "r
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
+// Helper to format currency values
+const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
+
+// Default lines configuration
+const DEFAULT_LINES = [
+  { dataKey: "income", name: "Income", color: "#10b981" },
+  { dataKey: "expenses", name: "Expenses", color: "#ef4444" },
+  { dataKey: "net", name: "Net", color: "#06b6d4" },
+];
+
 /**
  * Reusable trend line chart component
  * Extracted from ChartsAndAnalytics.jsx for better reusability
@@ -33,14 +43,7 @@ const TrendLineChart = ({
   const chartData = Array.isArray(data) ? data : [];
   const hasData = chartData.length > 0;
 
-  // Default lines configuration if not provided
-  const defaultLines = [
-    { dataKey: "income", name: "Income", color: "#10b981" },
-    { dataKey: "expenses", name: "Expenses", color: "#ef4444" },
-    { dataKey: "net", name: "Net", color: "#06b6d4" },
-  ];
-
-  const lineConfig = lines.length > 0 ? lines : defaultLines;
+  const lineConfig = lines.length > 0 ? lines : DEFAULT_LINES;
 
   return (
     <ChartContainer
@@ -63,11 +66,7 @@ const TrendLineChart = ({
             />
           )}
           <XAxis dataKey="month" stroke={chartDefaults.axis.stroke} fontSize={12} />
-          <YAxis
-            stroke={chartDefaults.axis.stroke}
-            fontSize={12}
-            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
-          />
+          <YAxis stroke={chartDefaults.axis.stroke} fontSize={12} tickFormatter={formatCurrency} />
           <Tooltip content={<TooltipComponent />} />
           {showLegend && <Legend />}
 
