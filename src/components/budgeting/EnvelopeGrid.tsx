@@ -30,11 +30,11 @@ const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 // Empty state component
 const EmptyStateView = ({ filterOptions, setShowCreateModal }) => {
   const isAllFilters = filterOptions.envelopeType === "all" && filterOptions.showEmpty;
-  
+
   if (isAllFilters) {
     return <EmptyStateHints type="envelopes" onAction={() => setShowCreateModal(true)} />;
   }
-  
+
   return (
     <div className="text-center py-12">
       <div className="text-gray-500 text-lg">No envelopes found</div>
@@ -298,7 +298,12 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
   const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
   const { bills: tanStackBills = [], updateBill, isLoading: billsLoading } = useBills();
   const { unassignedCash: tanStackUnassignedCash } = useUnassignedCash();
-  const budget = useBudgetStore();
+  // Selective subscriptions - only subscribe to specific properties needed
+  const budgetEnvelopes = useBudgetStore((state) => state.envelopes);
+  const budgetTransactions = useBudgetStore((state) => state.transactions);
+  const budgetBills = useBudgetStore((state) => state.bills);
+  const budgetCurrentUser = useBudgetStore((state) => state.currentUser);
+  const budgetUpdateBill = useBudgetStore((state) => state.updateBill);
 
   const envelopes = useMemo(
     () =>
@@ -306,8 +311,8 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
         ? propEnvelopes
         : tanStackEnvelopes.length
           ? tanStackEnvelopes
-          : budget.envelopes || [],
-    [propEnvelopes, tanStackEnvelopes, budget.envelopes]
+          : budgetEnvelopes || [],
+    [propEnvelopes, tanStackEnvelopes, budgetEnvelopes]
   );
 
   const transactions = useMemo(
@@ -316,25 +321,25 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
         ? propTransactions
         : tanStackTransactions.length
           ? tanStackTransactions
-          : budget.transactions || [],
-    [propTransactions, tanStackTransactions, budget.transactions]
+          : budgetTransactions || [],
+    [propTransactions, tanStackTransactions, budgetTransactions]
   );
 
   const unassignedCash =
     propUnassignedCash !== undefined ? propUnassignedCash : tanStackUnassignedCash || 0;
 
   const bills = useMemo(() => {
-    const result = tanStackBills.length ? tanStackBills : budget.bills || [];
+    const result = tanStackBills.length ? tanStackBills : budgetBills || [];
     logger.debug("🔍 EnvelopeGrid bills debug:", {
       tanStackBills,
       tanStackBillsLength: tanStackBills.length,
-      budgetBills: budget.bills,
-      budgetBillsLength: budget.bills?.length,
+      budgetBills: budgetBills,
+      budgetBillsLength: budgetBills?.length,
       finalResult: result,
       finalLength: result.length,
     });
     return result;
-  }, [tanStackBills, budget.bills]);
+  }, [tanStackBills, budgetBills]);
 
   const isLoading = envelopesLoading || transactionsLoading || billsLoading;
 
@@ -343,7 +348,10 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
     transactions,
     bills,
     unassignedCash,
-    budget,
+    budget: {
+      currentUser: budgetCurrentUser,
+      updateBill: budgetUpdateBill,
+    },
     isLoading,
     addEnvelope,
     updateEnvelope,
