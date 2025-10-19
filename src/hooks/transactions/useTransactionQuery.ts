@@ -19,7 +19,10 @@ export const useTransactionQuery = (options = {}) => {
 
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
   const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
-    useBudgetStore();
+    useBudgetStore((state) => ({
+      transactions: state.transactions,
+      allTransactions: state.allTransactions,
+    }));
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {

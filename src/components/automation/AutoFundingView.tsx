@@ -12,7 +12,9 @@ import logger from "../../utils/common/logger";
 
 const AutoFundingView = () => {
   const confirm = useConfirm();
-  const budget = useBudgetStore();
+  const envelopes = useBudgetStore((state) => state.envelopes);
+  const unassignedCash = useBudgetStore((state) => state.unassignedCash);
+  const allTransactions = useBudgetStore((state) => state.allTransactions);
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
@@ -91,13 +93,17 @@ const AutoFundingView = () => {
         trigger: TRIGGER_TYPES.MANUAL,
         currentDate: new Date().toISOString(),
         data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          transactions: budget.allTransactions || [],
+          envelopes: envelopes || [],
+          unassignedCash: unassignedCash || 0,
+          transactions: allTransactions || [],
         },
       };
 
-      const result = await executeRules(context, budget);
+      const result = await executeRules(context, {
+        envelopes,
+        unassignedCash,
+        allTransactions,
+      });
 
       if (result.success) {
         const totalFunded = result.execution.totalFunded || 0;
@@ -205,7 +211,7 @@ const AutoFundingView = () => {
           setShowRuleBuilder(false);
           setEditingRule(null);
         }}
-        envelopes={budget.envelopes || []}
+        envelopes={envelopes || []}
         onSaveRule={handleSaveRule}
         editingRule={editingRule}
       />

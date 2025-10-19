@@ -19,9 +19,11 @@ const useEnvelopeSystem = () => {
 
   const { bills = [], isLoading: billsLoading } = useBills();
 
-  // Keep Zustand for non-migrated operations
-  const { unassignedCash, setEnvelopes, setBiweeklyAllocation, setUnassignedCash } =
-    useBudgetStore();
+  // Keep Zustand for non-migrated operations - selective subscriptions
+  const unassignedCash = useBudgetStore(state => state.unassignedCash);
+  const setEnvelopes = useBudgetStore(state => state.setEnvelopes);
+  const setBiweeklyAllocation = useBudgetStore(state => state.setBiweeklyAllocation);
+  const setUnassignedCash = useBudgetStore(state => state.setUnassignedCash);
 
   const lastBillsRef = useRef(null);
   const isCalculatingRef = useRef(false);
