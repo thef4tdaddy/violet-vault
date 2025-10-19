@@ -37,7 +37,7 @@ async function fixAutoAllocateUndefinedValues() {
 const useDataInitialization = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [initError, setInitError] = useState(null);
-  const cloudSyncEnabled = useBudgetStore(state => state.cloudSyncEnabled);;
+  const { cloudSyncEnabled } = useBudgetStore();
 
   useEffect(() => {
     const initializeServices = async () => {

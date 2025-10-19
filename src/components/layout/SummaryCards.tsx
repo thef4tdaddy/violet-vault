@@ -19,7 +19,7 @@ import {
  * Now uses TanStack Query hooks for data loading
  */
 const SummaryCards = () => {
-  const openUnassignedCashModal = useUIStore(state => state.openUnassignedCashModal);;
+  const { openUnassignedCashModal } = useBudgetStore();
   const { unassignedCash, isLoading: _unassignedCashLoading } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();

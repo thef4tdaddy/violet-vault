@@ -11,7 +11,7 @@ import logger from "../../../utils/common/logger";
  * Extracted from useAutoFunding.js for Issue #506
  */
 export const useAutoFundingExecution = () => {
-  const budget = useUIStore(state => state.budget);
+  const budget = useBudgetStore();
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastExecution, setLastExecution] = useState(null);
 

@@ -20,7 +20,8 @@ const useEnvelopeSystem = () => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Keep Zustand for non-migrated operations
-  const unassignedCash, setEnvelopes, setBiweeklyAllocation, setUnassignedCash = useUIStore(state => state.unassignedCash, setEnvelopes, setBiweeklyAllocation, setUnassignedCash);;
+  const { unassignedCash, setEnvelopes, setBiweeklyAllocation, setUnassignedCash } =
+    useBudgetStore();
 
   const lastBillsRef = useRef(null);
   const isCalculatingRef = useRef(false);
