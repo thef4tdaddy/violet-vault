@@ -354,6 +354,23 @@ export default {
         },
       },
       create(context) {
+        // Hooks that have "UI" in their names but are NOT Zustand stores
+        const nonZustandHooks = [
+          'useBudgetHistoryViewerUI',
+          'useBudgetHistoryUIHelpers',
+          'useTransactionArchivingUI',
+          'useTransactionArchivingProcess',
+          'useArchivingUIHelpers',
+          'useSecurityManagerUI',
+          'useSecurityEventManager',
+          'useAutoLockManager',
+          'useClipboardSecurity',
+          'useTutorialControls',
+          'useTutorialSteps',
+          'useTutorialHighlight',
+          'useTutorialPositioning',
+        ];
+
         return {
           CallExpression(node) {
             // Check for useStore() calls without selector
@@ -361,7 +378,8 @@ export default {
               node.callee.name &&
               (node.callee.name.includes('Store') || node.callee.name.includes('UI')) &&
               node.callee.name.startsWith('use') &&
-              node.arguments.length === 0
+              node.arguments.length === 0 &&
+              !nonZustandHooks.includes(node.callee.name)
             ) {
               context.report({
                 node,
@@ -390,6 +408,23 @@ export default {
         },
       },
       create(context) {
+        // Hooks that have "UI" in their names but are NOT Zustand stores
+        const nonZustandHooks = [
+          'useBudgetHistoryViewerUI',
+          'useBudgetHistoryUIHelpers',
+          'useTransactionArchivingUI',
+          'useTransactionArchivingProcess',
+          'useArchivingUIHelpers',
+          'useSecurityManagerUI',
+          'useSecurityEventManager',
+          'useAutoLockManager',
+          'useClipboardSecurity',
+          'useTutorialControls',
+          'useTutorialSteps',
+          'useTutorialHighlight',
+          'useTutorialPositioning',
+        ];
+
         return {
           // Check for store hooks directly inside conditional statements
           CallExpression(node) {
@@ -398,7 +433,8 @@ export default {
               node.callee &&
               node.callee.name &&
               (node.callee.name.includes('Store') || node.callee.name.includes('UI')) &&
-              node.callee.name.startsWith('use')
+              node.callee.name.startsWith('use') &&
+              !nonZustandHooks.includes(node.callee.name)
             ) {
               // Check if this hook call is directly inside a conditional
               const ancestors = context.sourceCode?.getAncestors?.(node) || [];
