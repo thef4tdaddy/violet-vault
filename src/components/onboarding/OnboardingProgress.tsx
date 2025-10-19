@@ -8,7 +8,13 @@ import useOnboardingStore from "../../stores/ui/onboardingStore";
  */
 const OnboardingProgress = () => {
   const { isOnboarded, tutorialProgress, getProgress, preferences, setPreference } =
-    useOnboardingStore();
+    useOnboardingStore((state) => ({
+      isOnboarded: state.isOnboarded,
+      tutorialProgress: state.tutorialProgress,
+      getProgress: state.getProgress,
+      preferences: state.preferences,
+      setPreference: state.setPreference,
+    }));
 
   const [isExpanded, setIsExpanded] = useState(!isOnboarded);
 
