@@ -11,7 +11,9 @@ import { useConfirm } from "../../hooks/common/useConfirm";
  * Shows connection status, pending sync operations, and offline capabilities
  */
 const OfflineStatusIndicator = () => {
-  const { isOnline } = useUiStore();
+  const { isOnline } = useUiStore((state) => ({
+    isOnline: state.isOnline,
+  }));
   const confirm = useConfirm();
   const [syncStatus, setSyncStatus] = useState({
     pendingCount: 0,

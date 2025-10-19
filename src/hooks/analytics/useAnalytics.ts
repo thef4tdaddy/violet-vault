@@ -18,7 +18,14 @@ const useAnalytics = (options = {}) => {
 
   // Get data from Zustand store
   const { envelopes, transactions, savingsGoals, unassignedCash, actualBalance, paycheckHistory } =
-    useBudgetStore();
+    useBudgetStore((state) => ({
+      envelopes: state.envelopes,
+      transactions: state.transactions,
+      savingsGoals: state.savingsGoals,
+      unassignedCash: state.unassignedCash,
+      actualBalance: state.actualBalance,
+      paycheckHistory: state.paycheckHistory,
+    }));
 
   // Helper function to get date range based on period
   const getDateRange = () => {

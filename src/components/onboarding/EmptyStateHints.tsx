@@ -7,7 +7,11 @@ import useOnboardingStore from "../../stores/ui/onboardingStore";
  * EmptyStateHints - Provides contextual hints and guidance for empty states
  */
 const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
-  const { shouldShowHint, markStepComplete, preferences } = useOnboardingStore();
+  const { shouldShowHint, markStepComplete, preferences } = useOnboardingStore((state) => ({
+    shouldShowHint: state.shouldShowHint,
+    markStepComplete: state.markStepComplete,
+    preferences: state.preferences,
+  }));
 
   // Don't show hints if user has disabled them
   if (!preferences.showHints) {

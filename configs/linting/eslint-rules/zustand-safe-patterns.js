@@ -369,6 +369,11 @@ export default {
           'useTutorialSteps',
           'useTutorialHighlight',
           'useTutorialPositioning',
+          'useMainDashboardUI',
+          'useDashboardCalculations',
+          'useTransactionReconciliation',
+          'usePaydayManager',
+          'useDashboardHelpers',
         ];
 
         return {
@@ -423,6 +428,11 @@ export default {
           'useTutorialSteps',
           'useTutorialHighlight',
           'useTutorialPositioning',
+          'useMainDashboardUI',
+          'useDashboardCalculations',
+          'useTransactionReconciliation',
+          'usePaydayManager',
+          'useDashboardHelpers',
         ];
 
         return {
