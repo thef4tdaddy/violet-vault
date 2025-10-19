@@ -24,7 +24,11 @@ export const useTransactionLedger = (currentUser) => {
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Keep Zustand for legacy operations not yet migrated
-  const budget = useBudgetStore();
+  const budget = useBudgetStore((state) => ({
+    updateTransaction: state.updateTransaction,
+    setAllTransactions: state.setAllTransactions,
+    updateBill: state.updateBill,
+  }));
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // State management

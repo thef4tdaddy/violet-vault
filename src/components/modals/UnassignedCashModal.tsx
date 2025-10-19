@@ -72,7 +72,10 @@ const EnvelopeItem = memo(
 );
 
 const UnassignedCashModal = () => {
-  const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudgetStore();
+  const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudgetStore((state) => ({
+    isUnassignedCashModalOpen: state.isUnassignedCashModalOpen,
+    closeUnassignedCashModal: state.closeUnassignedCashModal,
+  }));
   const {
     // State (except modal state)
     distributions,

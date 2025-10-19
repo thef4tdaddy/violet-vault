@@ -36,7 +36,9 @@ const useTransactionsV2 = (options = {}) => {
   } = options;
 
   // Get UI state from Zustand (for legacy compatibility)
-  const budgetStore = useBudgetStore();
+  const budgetStore = useBudgetStore((state) => ({
+    updateTransactions: state.updateTransactions,
+  }));
 
   // Data management hook
   const dataHook = useTransactionData({

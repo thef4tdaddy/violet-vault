@@ -9,7 +9,14 @@ import { markVersionAsSeen } from "../../utils/common/version";
  * Shows what's new after app updates
  */
 const PatchNotesModal = () => {
-  const { showPatchNotes, patchNotesData, loadingPatchNotes, hidePatchNotesModal } = useUiStore();
+  const { showPatchNotes, patchNotesData, loadingPatchNotes, hidePatchNotesModal } = useUiStore(
+    (state) => ({
+      showPatchNotes: state.showPatchNotes,
+      patchNotesData: state.patchNotesData,
+      loadingPatchNotes: state.loadingPatchNotes,
+      hidePatchNotesModal: state.hidePatchNotesModal,
+    })
+  );
 
   if (!showPatchNotes || !patchNotesData) return null;
 

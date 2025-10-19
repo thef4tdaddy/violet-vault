@@ -374,6 +374,9 @@ export default {
           'useTransactionReconciliation',
           'usePaydayManager',
           'useDashboardHelpers',
+          'useFABSelectors',
+          'useFABActions',
+          'useKeyManagementUI',
         ];
 
         return {
@@ -433,6 +436,9 @@ export default {
           'useTransactionReconciliation',
           'usePaydayManager',
           'useDashboardHelpers',
+          'useFABSelectors',
+          'useFABActions',
+          'useKeyManagementUI',
         ];
 
         return {

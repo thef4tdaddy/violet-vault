@@ -46,7 +46,11 @@ export const useBillManager = ({
   } = useBills();
 
   // Fallback to Zustand for backward compatibility
-  const budget = useBudgetStore();
+  const budget = useBudgetStore((state) => ({
+    allTransactions: state.allTransactions,
+    envelopes: state.envelopes,
+    bills: state.bills,
+  }));
 
   // UI State Management
   const [selectedBills, setSelectedBills] = useState(new Set());
