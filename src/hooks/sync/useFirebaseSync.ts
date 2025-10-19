@@ -4,22 +4,43 @@ import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 
+interface FirebaseSyncService {
+  start: (config: unknown) => void;
+  forceSync: () => Promise<unknown>;
+  isRunning: boolean;
+}
+
+interface User {
+  uid: string;
+  email?: string;
+  displayName?: string;
+  [key: string]: unknown;
+}
+
+interface ActivityItem {
+  id: string;
+  timestamp: number;
+  action: string;
+  userId: string;
+  [key: string]: unknown;
+}
+
 /**
  * Firebase sync hook props
  */
 interface UseFirebaseSyncProps {
-  firebaseSync: any; // Type will be properly defined when cloudSyncService is converted
+  firebaseSync: FirebaseSyncService;
   encryptionKey: CryptoKey | null;
   budgetId: string | null;
-  currentUser: any; // Type will be properly defined when UserData is imported
+  currentUser: User | null;
 }
 
 /**
  * Firebase sync hook return type
  */
 interface UseFirebaseSyncReturn {
-  activeUsers: any[];
-  recentActivity: any[];
+  activeUsers: User[];
+  recentActivity: ActivityItem[];
   handleManualSync: () => Promise<void>;
 }
 
@@ -35,8 +56,8 @@ const useFirebaseSync = ({
 }: UseFirebaseSyncProps): UseFirebaseSyncReturn => {
   const budget = useBudgetStore();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
-  const [activeUsers, setActiveUsers] = useState<any[]>([]);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [activeUsers, setActiveUsers] = useState<User[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [_isLoading, _setIsLoading] = useState(false); // TODO: Use for loading states
 
   // Auto-initialize Firebase sync when dependencies are ready

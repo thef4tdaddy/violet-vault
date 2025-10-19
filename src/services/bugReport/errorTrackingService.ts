@@ -5,6 +5,9 @@
  */
 import logger from "../../utils/common/logger";
 
+// Explicit DOM type import for ESLint
+type EventListenerOrEventListenerObject = EventListenerOrEventListenerObject;
+
 /**
  * Error information structure
  */
@@ -66,7 +69,7 @@ export class ErrorTrackingService {
   static consoleLogs: ConsoleLogEntry[] = [];
   static errorListeners: ErrorListener[] = [];
   static isInitialized = false;
-  static originalConsole?: Record<string, (...args: any[]) => void>;
+  static originalConsole?: Record<string, (...args: unknown[]) => void>;
 
   /**
    * Initialize error capture system
@@ -140,7 +143,7 @@ export class ErrorTrackingService {
   /**
    * Add a console log entry
    */
-  static addConsoleLog(level: string, args: any[]): void {
+  static addConsoleLog(level: string, args: unknown[]): void {
     const maxLogs = 100; // Keep last 100 log entries
 
     try {
@@ -180,7 +183,7 @@ export class ErrorTrackingService {
 
       // Override console methods
       (["log", "warn", "error", "info", "debug"] as const).forEach((level) => {
-        (console as any)[level] = (...args: any[]) => {
+        (console as Record<string, (...args: unknown[]) => void>)[level] = (...args: unknown[]) => {
           // Call original method first
           originalConsole[level](...args);
 
@@ -191,7 +194,7 @@ export class ErrorTrackingService {
       /* eslint-enable no-console */
 
       // Store original methods for potential restoration
-      this.originalConsole = originalConsole;
+      this.originalConsole = originalConsole as Record<string, (...args: unknown[]) => void>;
 
       logger.debug("Console interception enabled");
     } catch (error) {

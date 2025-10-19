@@ -1,7 +1,6 @@
 import React from "react";
 
-export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   /** Label text */
   label?: string;
   /** Error message */
@@ -31,19 +30,13 @@ export interface TextareaProps
  * />
  */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  (
-    { label, error, helperText, className = "", id, disabled, ...props },
-    ref
-  ) => {
+  ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
     const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={textareaId}
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-2">
             {label}
           </label>
         )}
@@ -52,16 +45,12 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={textareaId}
           disabled={disabled}
           className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-offset-2 focus:border-transparent transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed resize-none ${
-            error
-              ? "border-red-500 focus:ring-red-500"
-              : "border-gray-300 focus:ring-blue-500"
+            error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
           } ${className}`}
           {...props}
         />
         {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
-        {helperText && !error && (
-          <p className="text-sm text-gray-500 mt-1">{helperText}</p>
-        )}
+        {helperText && !error && <p className="text-sm text-gray-500 mt-1">{helperText}</p>}
       </div>
     );
   }

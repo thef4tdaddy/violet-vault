@@ -2,6 +2,17 @@ import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, isSupported, type Messaging } from "firebase/messaging";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
 import logger from "../utils/common/logger";
+/// <reference types="../vite-env.d.ts" />
+
+// Type declarations for browser APIs
+type NotificationPermission = "default" | "denied" | "granted";
+
+// Extend window interface for debugging
+declare global {
+  interface Window {
+    firebaseMessagingService?: FirebaseMessagingService;
+  }
+}
 
 /**
  * Firebase Cloud Messaging Service
@@ -75,9 +86,10 @@ class FirebaseMessagingService {
       let app: FirebaseApp;
       try {
         app = initializeApp(firebaseConfig);
-      } catch (error: any) {
+      } catch (error: unknown) {
         // App might already be initialized
-        if (error.code === "app/duplicate-app") {
+        const firebaseError = error as { code?: string };
+        if (firebaseError.code === "app/duplicate-app") {
           const { getApp } = await import("firebase/app");
           app = getApp();
         } else {
@@ -367,7 +379,7 @@ const firebaseMessagingService = new FirebaseMessagingService();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as any).firebaseMessagingService = firebaseMessagingService;
+  window.firebaseMessagingService = firebaseMessagingService;
 }
 
 export default firebaseMessagingService;

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { renderIcon } from "../../../utils/icons";
+import { Checkbox } from "@/components/ui";
 
 const FileUploader = ({ onFileUpload }) => {
   const [clearExisting, setClearExisting] = useState(false);
@@ -33,11 +34,9 @@ const FileUploader = ({ onFileUpload }) => {
 
         <div className="glassmorphism rounded-lg p-4 border border-white/20">
           <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={clearExisting}
-              onChange={(e) => setClearExisting(e.target.checked)}
-              className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+              onCheckedChange={(checked) => setClearExisting(checked)}
             />
             <div className="flex items-center space-x-2">
               {renderIcon("Trash2", { className: "h-4 w-4 text-red-500" })}

@@ -43,9 +43,6 @@ interface ImportMetaEnv {
 
 // Global type declarations for browser APIs
 declare global {
-  // Notification API
-  type NotificationPermission = "default" | "denied" | "granted";
-
   // Service Worker types
   interface ServiceWorkerGlobalScope {
     skipWaiting(): Promise<void>;
@@ -53,13 +50,30 @@ declare global {
     registration: ServiceWorkerRegistration;
   }
 
-  // Buffer source for test setup
-  type BufferSource = ArrayBufferView | ArrayBuffer;
+  // Clients interface for Service Workers
+  interface Clients {
+    get(id: string): Promise<Client | undefined>;
+    matchAll(options?: ClientQueryOptions): Promise<Client[]>;
+    openWindow(url: string): Promise<Client | null>;
+    claim(): Promise<void>;
+  }
+
+  interface Client {
+    readonly id: string;
+    readonly url: string;
+    readonly type: ClientType;
+    postMessage(message: any, transfer?: Transferable[]): void;
+  }
+
+  interface ClientQueryOptions {
+    includeUncontrolled?: boolean;
+    type?: ClientType;
+  }
+
+  type ClientType = "window" | "worker" | "sharedworker";
 
   // Additional browser APIs
-  interface Notification {
-    new (title: string, options?: NotificationOptions): Notification;
-  }
+  // Note: Notification constructor is already defined by the browser
 
   interface NotificationOptions {
     body?: string;
@@ -68,8 +82,21 @@ declare global {
     tag?: string;
     requireInteraction?: boolean;
     silent?: boolean;
-    data?: any;
+    data?: unknown;
   }
+
+  // Highlight.io global interface
+  var H: {
+    start: () => void;
+    isRecording: () => boolean;
+    getSessionURL: () => string;
+    getSessionMetadata: () => { sessionId?: string } | null;
+  };
+
+  // Global type declarations
+  type NotificationPermission = "default" | "denied" | "granted";
+  type BufferSource = ArrayBufferView | ArrayBuffer;
+  type Transferable = ArrayBuffer | MessagePort | ImageBitmap;
 }
 
 interface ImportMeta {

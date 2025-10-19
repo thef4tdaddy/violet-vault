@@ -1,6 +1,6 @@
 import React from "react";
 import { ACCOUNT_COLORS } from "../../../utils/accounts";
-import { Button } from "@/components/ui";
+import { Button, Checkbox } from "@/components/ui";
 
 const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
   <>
@@ -24,18 +24,16 @@ const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editing
     </div>
 
     <div className="flex items-center">
-      <input
-        type="checkbox"
+      <Checkbox
         id="isActive"
         checked={accountForm.isActive}
-        onChange={(e) =>
+        onCheckedChange={(checked) =>
           setAccountForm({
             ...accountForm,
-            isActive: e.target.checked,
+            isActive: checked,
           })
         }
         disabled={editingAccount && !canEdit}
-        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-2 border-black rounded disabled:cursor-not-allowed"
       />
       <label htmlFor="isActive" className="ml-2 block text-sm font-medium text-purple-900">
         Account is active

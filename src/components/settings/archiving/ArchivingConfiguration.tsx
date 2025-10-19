@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "@/components/ui";
+import { Select, Checkbox } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
@@ -70,24 +70,20 @@ const ArchivingConfiguration = ({
           {showAdvancedOptions && (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg space-y-3">
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="preserveAnalytics"
-                  defaultChecked={true}
+                  checked={true}
                   disabled={true}
-                  className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
                 <label htmlFor="preserveAnalytics" className="text-sm text-gray-700">
                   Preserve analytics data (recommended)
                 </label>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="optimizeDatabase"
-                  defaultChecked={true}
+                  checked={true}
                   disabled={true}
-                  className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
                 <label htmlFor="optimizeDatabase" className="text-sm text-gray-700">
                   Optimize database after archiving

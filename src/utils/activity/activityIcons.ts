@@ -2,11 +2,12 @@
  * Activity icon utilities
  * Extracted from ActivityFeed.jsx for better maintainability and ESLint compliance
  */
+import React from "react";
 import { getIcon } from "../icons";
 import { ENTITY_TYPES } from "../../services/activityLogger";
 
 export interface IconInfo {
-  component: any;
+  component: React.ComponentType<{ className?: string }>;
   className: string;
 }
 

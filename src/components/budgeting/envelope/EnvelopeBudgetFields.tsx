@@ -1,4 +1,5 @@
 import React from "react";
+import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
@@ -63,25 +64,20 @@ const CurrencyInput = ({ label, value, onChange, error, canEdit, hint, icon, req
 // Frequency selector component
 const FrequencySelector = ({ value, onChange, error, canEdit }) => {
   const frequencies = getFrequencyOptions();
-  
+
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">Payment Frequency</label>
-      <select
+      <Select
+        label="Payment Frequency"
         value={value || "monthly"}
         onChange={onChange}
         disabled={!canEdit}
+        options={frequencies}
+        error={error}
         className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
           !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
         }`}
-      >
-        {frequencies.map((freq) => (
-          <option key={freq.value} value={freq.value}>
-            {freq.label}
-          </option>
-        ))}
-      </select>
-      <ErrorMessage error={error} />
+      />
     </div>
   );
 };

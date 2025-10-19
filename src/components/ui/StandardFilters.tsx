@@ -1,4 +1,5 @@
 import React from "react";
+import { Select } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 
 /**
@@ -126,22 +127,17 @@ const StandardFilters = ({
         {filterConfigs.map((filterConfig) => {
           if (filterConfig.type === "select") {
             return (
-              <select
+              <Select
                 key={filterConfig.key}
                 value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
                 onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
+                options={filterConfig.options}
                 className={`
                   ${config.select} border border-gray-300 rounded-md
                   focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                   bg-white text-gray-700
                 `.trim()}
-              >
-                {filterConfig.options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              />
             );
           }
           return null;

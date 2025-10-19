@@ -45,7 +45,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
   useEffect(() => {
     if (isOpen) {
       getStats()
-        .then((result: any) => {
+        .then((result: { success: boolean; error?: string } | Stats) => {
           if (result && typeof result === "object" && !("success" in result)) {
             setStats(result as Stats);
           }

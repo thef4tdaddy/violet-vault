@@ -16,11 +16,21 @@ interface SyncResult {
 }
 
 /**
+ * Service status type
+ */
+interface ServiceStatus {
+  isRunning: boolean;
+  lastSyncTime?: Date;
+  error?: string;
+  [key: string]: unknown;
+}
+
+/**
  * Sync status type
  */
 interface SyncStatus {
   isServiceRunning: boolean;
-  serviceStatus: any;
+  serviceStatus: ServiceStatus;
   isUploadingSyncInProgress: boolean;
   isDownloadingSyncInProgress: boolean;
   lastSyncTime: Date | null;

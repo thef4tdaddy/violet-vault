@@ -3,20 +3,67 @@
  * Lightweight hook using extracted bug reporting services
  * Created for Issue #513 - replaces the monolithic useBugReport.js
  */
-import { useState } from "react";
+import React, { useState } from "react";
 import BugReportService from "../../services/bugReport/index.ts";
 // Dynamic import of Highlight.io to avoid bundle size impact
 import logger from "../../utils/common/logger.ts";
+/// <reference types="../../vite-env.d.ts" />
+
+// Declare H global for Highlight.io
+declare var H: {
+  start: () => void;
+  isRecording: () => boolean;
+  getSessionURL: () => string;
+  getSessionMetadata: () => { sessionId?: string } | null;
+};
+
+/**
+ * Configuration options for the bug report hook
+ */
+interface BugReportOptions {
+  providers?: Record<string, unknown>;
+  autoCapture?: boolean;
+  defaultSeverity?: string;
+}
+
+/**
+ * Bug report submission result
+ */
+interface BugReportSubmissionResult {
+  success: boolean;
+  submissionId?: string;
+  url?: string;
+  primaryProvider?: string;
+  screenshotStatus?: {
+    captured: boolean;
+    size?: number;
+    uploaded: boolean;
+    reason?: string;
+  };
+  reportData: {
+    title: string;
+    hasScreenshot: boolean;
+    systemInfo: unknown;
+  };
+}
+
+/**
+ * Submit result state
+ */
+interface SubmitResult {
+  success: boolean;
+  submissionId?: string;
+  url?: string;
+  provider?: string;
+  screenshotStatus?: unknown;
+}
 
 /**
  * Enhanced bug report hook with service layer architecture
- * @param {Object} options - Configuration options
- * @param {Object} options.providers - Custom provider configurations
- * @param {boolean} options.autoCapture - Auto-capture screenshot on modal open
- * @param {string} options.defaultSeverity - Default severity level
- * @returns {Object} Bug report hook interface
+ * @param options - Configuration options
+ * @returns Bug report hook interface
  */
-const useBugReportV2 = (options = {}) => {
+const useBugReportV2 = (options: BugReportOptions = {}) => {
   // Form state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -30,10 +77,10 @@ const useBugReportV2 = (options = {}) => {
 
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [screenshot, setScreenshot] = useState(null);
-  const [previewScreenshot, setPreviewScreenshot] = useState(null);
-  const [submitError, setSubmitError] = useState(null);
-  const [submitResult, setSubmitResult] = useState(null);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [previewScreenshot, setPreviewScreenshot] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
 
   // Diagnostic state
   const [diagnostics, setDiagnostics] = useState(null);

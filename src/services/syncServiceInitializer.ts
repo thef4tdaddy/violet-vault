@@ -2,11 +2,25 @@
 
 import logger from "../utils/common/logger";
 
+interface ChunkedSyncService {
+  start: (config: unknown) => Promise<void>;
+  stop: () => Promise<void>;
+  isRunning: boolean;
+  [key: string]: unknown;
+}
+
+interface FirebaseSyncService {
+  start: (config: unknown) => Promise<void>;
+  stop: () => Promise<void>;
+  isRunning: boolean;
+  [key: string]: unknown;
+}
+
 class SyncServiceInitializer {
   private initialized: boolean;
   private initPromise: Promise<boolean> | null;
-  private chunkedSyncService: any;
-  private firebaseSyncService: any;
+  private chunkedSyncService: ChunkedSyncService | null;
+  private firebaseSyncService: FirebaseSyncService | null;
 
   constructor() {
     this.initialized = false;
@@ -59,7 +73,7 @@ class SyncServiceInitializer {
   /**
    * Get chunked sync service (loads if needed)
    */
-  async getChunkedSyncService(): Promise<any> {
+  async getChunkedSyncService(): Promise<ChunkedSyncService | null> {
     await this.initialize();
     return this.chunkedSyncService;
   }
@@ -67,7 +81,7 @@ class SyncServiceInitializer {
   /**
    * Get Firebase sync service (loads if needed)
    */
-  async getFirebaseSyncService(): Promise<any> {
+  async getFirebaseSyncService(): Promise<FirebaseSyncService | null> {
     await this.initialize();
     return this.firebaseSyncService;
   }

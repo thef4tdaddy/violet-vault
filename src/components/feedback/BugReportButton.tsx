@@ -28,7 +28,7 @@ interface BugReportHook {
   setIncludeScreenshot: (include: boolean) => void;
   setSeverity: (severity: string) => void;
   setScreenshot: (screenshot: string | null) => void;
-  submitReport: () => Promise<any>;
+  submitReport: () => Promise<boolean>;
   captureScreenshot: () => void;
 }
 

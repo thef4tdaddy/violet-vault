@@ -1,14 +1,22 @@
 import { useState, useMemo } from "react";
 import { useConfirm } from "../common/useConfirm";
 import logger from "../../utils/common/logger";
+import { Bill } from "../../db/types";
+
+interface PaymentData {
+  billId: string;
+  amount: number;
+  paidDate: string;
+  notes: string;
+}
 
 interface BillDetailParams {
-  bill: any;
-  onDelete: () => void;
-  onMarkPaid: (amount: number) => void;
+  bill: Bill;
+  onDelete: (billId: string) => void;
+  onMarkPaid: (billId: string, paymentData: PaymentData) => void;
   onClose: () => void;
-  onEdit: () => void;
-  onCreateRecurring: () => void;
+  onEdit: (bill: Bill) => void;
+  onCreateRecurring: (bill: Bill) => void;
 }
 
 /**
@@ -32,7 +40,9 @@ export const useBillDetail = ({
   // Computed values
   const daysUntilDue = useMemo(() => {
     if (!bill?.dueDate) return null;
-    return Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+    const now = Date.now();
+    const dueTime = bill.dueDate.getTime();
+    return Math.ceil((dueTime - now) / (1000 * 60 * 60 * 24));
   }, [bill?.dueDate]);
 
   const isOverdue = useMemo(() => {
@@ -45,7 +55,7 @@ export const useBillDetail = ({
 
   const statusInfo = useMemo(() => {
     const getStatusColor = () => {
-      if (bill?.status === "paid") return "green";
+      if (bill?.isPaid) return "green";
       if (isOverdue) return "red";
       if (isDueSoon) return "orange";
       return "blue";
@@ -80,7 +90,7 @@ export const useBillDetail = ({
     };
 
     const getStatusText = () => {
-      if (bill?.status === "paid") return "Paid";
+      if (bill?.isPaid) return "Paid";
       if (isOverdue) return `Overdue by ${Math.abs(daysUntilDue)} days`;
       if (isDueSoon) return `Due in ${daysUntilDue} days`;
       if (daysUntilDue !== null) return `Due in ${daysUntilDue} days`;
@@ -94,7 +104,7 @@ export const useBillDetail = ({
       isOverdue,
       isDueSoon,
     };
-  }, [bill?.status, isOverdue, isDueSoon, daysUntilDue]);
+  }, [bill?.isPaid, isOverdue, isDueSoon, daysUntilDue]);
 
   // Actions
   const handleMarkPaid = async (e) => {

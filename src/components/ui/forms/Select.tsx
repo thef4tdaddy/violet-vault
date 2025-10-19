@@ -6,8 +6,7 @@ export interface SelectOption {
   label: string;
 }
 
-export interface SelectProps
-  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   /** Label text */
   label?: string;
   /** Error message */
@@ -45,17 +44,7 @@ export interface SelectProps
  */
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   (
-    {
-      label,
-      error,
-      helperText,
-      options = [],
-      placeholder,
-      className = "",
-      id,
-      disabled,
-      ...props
-    },
+    { label, error, helperText, options = [], placeholder, className = "", id, disabled, ...props },
     ref
   ) => {
     const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
@@ -63,10 +52,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={selectId}
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <label htmlFor={selectId} className="block text-sm font-medium text-gray-700 mb-2">
             {label}
           </label>
         )}
@@ -75,9 +61,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           disabled={disabled}
           className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-offset-2 focus:border-transparent transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none bg-white ${
-            error
-              ? "border-red-500 focus:ring-red-500"
-              : "border-gray-300 focus:ring-blue-500"
+            error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
           } ${className}`}
           {...props}
         >
@@ -86,20 +70,16 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               {placeholder}
             </option>
           )}
-          {options.length > 0 ? (
-            options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))
-          ) : (
-            props.children
-          )}
+          {options.length > 0
+            ? options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))
+            : props.children}
         </select>
         {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
-        {helperText && !error && (
-          <p className="text-sm text-gray-500 mt-1">{helperText}</p>
-        )}
+        {helperText && !error && <p className="text-sm text-gray-500 mt-1">{helperText}</p>}
       </div>
     );
   }

@@ -8,6 +8,24 @@ import { GitHubAPIService } from "./githubApiService";
 import { ReportSubmissionService } from "./reportSubmissionService";
 
 /**
+ * System information structure
+ */
+interface SystemInfo {
+  browser?: string;
+  version?: string;
+  platform?: string;
+  userAgent?: string;
+  viewport?: {
+    width: number;
+    height: number;
+  };
+  performance?: Record<string, unknown>;
+  storage?: Record<string, unknown>;
+  network?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/**
  * Bug report data structure
  */
 export interface BugReportData {
@@ -15,12 +33,12 @@ export interface BugReportData {
   description?: string;
   severity?: "low" | "medium" | "high" | "critical";
   labels?: string[];
-  systemInfo?: Record<string, any>;
+  systemInfo?: SystemInfo;
   screenshot?: string;
   steps?: string[];
   expectedBehavior?: string;
   actualBehavior?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -39,7 +57,7 @@ interface SubmissionResult {
   success: boolean;
   error?: string;
   validationErrors?: string[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -50,7 +68,7 @@ interface FallbackSubmissionResult {
   error?: string;
   validationErrors?: string[];
   attempts: number;
-  results: any[];
+  results: unknown[];
 }
 
 /**
@@ -58,7 +76,7 @@ interface FallbackSubmissionResult {
  */
 interface ProviderConfig {
   type: "github" | "webhook" | "email" | "console";
-  config?: any;
+  config?: Record<string, unknown>;
 }
 
 /**
@@ -104,7 +122,7 @@ export class BugReportAPIService {
    */
   static async submitToEmail(
     reportData: BugReportData,
-    emailConfig: Record<string, any>
+    emailConfig: Record<string, unknown>
   ): Promise<SubmissionResult> {
     return ReportSubmissionService.submitToEmail(reportData, emailConfig);
   }
@@ -204,14 +222,14 @@ export class BugReportAPIService {
   /**
    * Format console logs for GitHub - delegate to GitHubAPIService
    */
-  static formatConsoleLogsForGitHub(errors: any[]): string {
+  static formatConsoleLogsForGitHub(errors: unknown[]): string {
     return GitHubAPIService.formatConsoleLogsForGitHub(errors);
   }
 
   /**
    * Get submission statistics - delegate to ReportSubmissionService
    */
-  static getSubmissionStats(): Record<string, any> {
+  static getSubmissionStats(): Record<string, unknown> {
     return ReportSubmissionService.getSubmissionStats();
   }
 
@@ -219,7 +237,7 @@ export class BugReportAPIService {
    * Clear stored bug reports - delegate to ReportSubmissionService
    */
   static clearStoredReports(): void {
-    return ReportSubmissionService.clearStoredReports();
+    ReportSubmissionService.clearStoredReports();
   }
 
   /**

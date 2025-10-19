@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../../utils";
+import { Checkbox } from "@/components/ui";
 
 const SplitRemainderConfig = ({
   ruleData,
@@ -27,11 +28,9 @@ const SplitRemainderConfig = ({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={isSelected}
-                      onChange={() => toggleTargetEnvelope(envelope.id)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      onCheckedChange={() => toggleTargetEnvelope(envelope.id)}
                     />
                     <div>
                       <p className="font-medium text-gray-900">{envelope.name}</p>

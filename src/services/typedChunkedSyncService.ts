@@ -122,7 +122,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
 
         // Additional validation for chunked data integrity
         if (isObject(result) && "transactions" in result) {
-          const transactions = (result as any).transactions;
+          const transactions = (result as Record<string, unknown>).transactions;
           if (Array.isArray(transactions)) {
             logger.info("Loaded chunked data contains transactions", {
               count: transactions.length,
@@ -140,7 +140,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
 
   // Get chunked sync statistics with type safety
   getStats(): ChunkedSyncStats {
-    const rawStats = chunkedSyncService.getStats() as any;
+    const rawStats = chunkedSyncService.getStats() as unknown;
 
     // Validate stats structure and provide defaults
     if (!this.isValidStats(rawStats)) {
@@ -152,13 +152,14 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
       };
     }
 
+    const stats = rawStats as Record<string, unknown>;
     return {
-      maxChunkSize: Number(rawStats.maxChunkSize) || 900 * 1024,
-      maxArrayChunkSize: Number(rawStats.maxArrayChunkSize) || 5000,
-      isInitialized: Boolean(rawStats.isInitialized),
-      lastSyncTimestamp: rawStats.lastSyncTimestamp || undefined,
-      totalChunks: rawStats.totalChunks || undefined,
-      failedChunks: rawStats.failedChunks || undefined,
+      maxChunkSize: Number(stats.maxChunkSize) || 900 * 1024,
+      maxArrayChunkSize: Number(stats.maxArrayChunkSize) || 5000,
+      isInitialized: Boolean(stats.isInitialized),
+      lastSyncTimestamp: stats.lastSyncTimestamp as number | undefined,
+      totalChunks: stats.totalChunks as number | undefined,
+      failedChunks: stats.failedChunks as number | undefined,
     };
   }
 
@@ -207,15 +208,16 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
 
   // Private validation helpers
   private isValidUser(user: unknown): user is CloudSyncConfig["currentUser"] {
+    const userObj = user as Record<string, unknown>;
     return (
       typeof user === "object" &&
       user !== null &&
-      "uid" in user &&
-      "userName" in user &&
-      typeof (user as any).uid === "string" &&
-      typeof (user as any).userName === "string" &&
-      (user as any).uid.length > 0 &&
-      (user as any).userName.length > 0
+      "uid" in userObj &&
+      "userName" in userObj &&
+      typeof userObj.uid === "string" &&
+      typeof userObj.userName === "string" &&
+      userObj.uid.length > 0 &&
+      userObj.userName.length > 0
     );
   }
 
@@ -256,15 +258,16 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
   }
 
   private isValidStats(stats: unknown): stats is ChunkedSyncStats {
+    const statsObj = stats as Record<string, unknown>;
     return (
       typeof stats === "object" &&
       stats !== null &&
-      "maxChunkSize" in stats &&
-      "maxArrayChunkSize" in stats &&
-      "isInitialized" in stats &&
-      typeof (stats as any).maxChunkSize === "number" &&
-      typeof (stats as any).maxArrayChunkSize === "number" &&
-      typeof (stats as any).isInitialized === "boolean"
+      "maxChunkSize" in statsObj &&
+      "maxArrayChunkSize" in statsObj &&
+      "isInitialized" in statsObj &&
+      typeof statsObj.maxChunkSize === "number" &&
+      typeof statsObj.maxArrayChunkSize === "number" &&
+      typeof statsObj.isInitialized === "boolean"
     );
   }
 

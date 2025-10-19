@@ -28,12 +28,12 @@ const UnsupportedBrowserView = ({ onSwitchToAuth }) => (
       <p className="text-gray-600 mb-6">
         Your browser doesn't support the features required for local-only mode.
       </p>
-      <button
+      <Button
         onClick={onSwitchToAuth}
         className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
       >
         Use Standard Mode
-      </button>
+      </Button>
     </div>
   </div>
 );
@@ -290,7 +290,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                   Back
                 </Button>
                 <Button
-                  onClick={handleStartLocalOnly}
+                  onClick={() => handleStartLocalOnly(userName, userColor)}
                   disabled={loading || !userName.trim()}
                   className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
                 >

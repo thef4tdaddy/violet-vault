@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
 import { createDefaultRule, validateRule } from "../../utils/budgeting/autofunding";
+import { Button } from "@/components/ui";
 import RuleTypeStep from "./steps/RuleTypeStep";
 import TriggerScheduleStep from "./steps/TriggerScheduleStep";
 import RuleConfigurationStep from "./steps/RuleConfigurationStep";
@@ -11,29 +12,31 @@ import StepNavigation from "./components/StepNavigation";
 const ModalFooter = ({ step, prevStep, onClose, nextStep, handleSave, editingRule }) => (
   <div className="p-6 border-t border-gray-200">
     <div className="flex justify-between">
-      <button
+      <Button
         onClick={step > 1 ? prevStep : onClose}
-        className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
+        variant="secondary"
       >
         {step > 1 ? "Previous" : "Cancel"}
-      </button>
+      </Button>
 
       <div className="flex gap-3">
         {step < 4 ? (
-          <button
+          <Button
             onClick={nextStep}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            variant="primary"
           >
             Next
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             onClick={handleSave}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+            variant="primary"
+            color="success"
+            className="flex items-center gap-2"
           >
             {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
             {editingRule ? "Update Rule" : "Create Rule"}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -96,9 +99,14 @@ const RuleBuilderModal = ({
             <h3 className="text-lg font-semibold">
               {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
             </h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:text-gray-600 p-1"
+            >
               {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-            </button>
+            </Button>
           </div>
           <StepNavigation currentStep={step} />
         </div>

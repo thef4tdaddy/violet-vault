@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button, TextInput } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
@@ -98,19 +98,18 @@ const PaycheckForm = ({
           Paycheck Amount
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
             <span className="text-gray-500 text-lg">$</span>
           </div>
-          <input
+          <TextInput
             type="number"
             value={formData.amount}
             onChange={(e) => onUpdateField("amount", e.target.value)}
-            className={`block w-full pl-8 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
-              errors.amount ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
-            }`}
+            className={`pl-8 ${errors.amount ? "border-red-300 bg-red-50" : ""}`}
             placeholder="0.00"
             step="0.01"
             min="0"
+            error={errors.amount}
           />
         </div>
         {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
@@ -125,17 +124,13 @@ const PaycheckForm = ({
           Payer
         </label>
         <div className="relative">
-          <input
+          <TextInput
             type="text"
             list="payers"
             value={formData.payerName}
             onChange={(e) => handlePayerChange(e.target.value)}
-            className={`block w-full px-3 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
-              errors.payerName
-                ? "border-red-300 bg-red-50"
-                : "border-gray-300 hover:border-gray-400"
-            }`}
             placeholder="Enter payer name"
+            error={errors.payerName}
           />
           <datalist id="payers">
             {uniquePayers.map((payer) => (

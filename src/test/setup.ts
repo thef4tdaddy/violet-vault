@@ -1,5 +1,9 @@
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
+/// <reference types="../vite-env.d.ts" />
+
+// Type declarations for browser APIs
+type BufferSource = ArrayBufferView | ArrayBuffer;
 
 // Mock modules that require browser APIs
 const mockIndexedDB = {
@@ -21,7 +25,7 @@ const mockGetRandomValues = vi.fn((array: Uint8Array) => {
 });
 
 // Mock crypto.subtle.digest with proper implementation
-const mockDigest = vi.fn(async (algorithm: string, data: BufferSource) => {
+const mockDigest = vi.fn(async (_algorithm: string, data: BufferSource) => {
   // Create a simple deterministic hash for testing
   let hash = 0;
   const uint8Array = new Uint8Array(data as ArrayBuffer);

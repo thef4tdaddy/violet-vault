@@ -18,11 +18,29 @@ interface HealthMetrics {
   sessionStartTime: number;
 }
 
+interface SyncRecord {
+  id: string;
+  type: string;
+  startTime: number;
+  stage: string;
+  endTime?: number;
+  duration?: number;
+  success?: boolean;
+  error?: {
+    message: string;
+    name: string;
+    code?: string;
+  };
+  metadata?: Record<string, unknown>;
+  progress?: unknown;
+  lastUpdate?: number;
+}
+
 interface HealthData {
   status: "healthy" | "slow" | "degraded" | "unhealthy" | "unknown";
   issues: string[];
   metrics: HealthMetrics;
-  recentSyncs: any[];
+  recentSyncs: SyncRecord[];
 }
 
 interface UseSyncHealthMonitorReturn {
@@ -45,7 +63,7 @@ export const useSyncHealthMonitor = (
   const [healthData, setHealthData] = useState<HealthData | null>(null);
 
   const refreshHealthData = () => {
-    const health = syncHealthMonitor.getHealthStatus();
+    const health = syncHealthMonitor.getHealthStatus() as HealthData;
     setHealthData(health);
   };
 

@@ -7,11 +7,13 @@ import { useConnectionOperations } from "./useConnectionManager/useConnectionOpe
 import { useConnectionData } from "./useConnectionManager/useConnectionData";
 import { useAutoPopulate } from "./useConnectionManager/useAutoPopulate";
 
+type EntityType = "bill" | "envelope" | "debt";
+
 /**
  * Smart connection manager hook that handles relationships between bills, envelopes, and debts
  * Context-aware: Envelopes get Bills, Bills and Debts get Envelopes
  */
-const useConnectionManager = (entityType, entityId) => {
+const useConnectionManager = (entityType: EntityType, entityId: string) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [selectedConnectionId, setSelectedConnectionId] = useState("");
 

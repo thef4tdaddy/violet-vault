@@ -9,43 +9,73 @@ import { PerformanceInfoService } from "./performanceInfoService";
 import { ErrorTrackingService } from "./errorTrackingService";
 
 /**
+ * Browser information
+ */
+interface BrowserInfo {
+  name: string;
+  version: string;
+  [key: string]: unknown;
+}
+
+/**
+ * URL information
+ */
+interface UrlInfo {
+  href: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Performance information
+ */
+interface PerformanceInfo {
+  available: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Storage information
+ */
+interface StorageInfo {
+  localStorage: {
+    available: boolean;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+/**
+ * Network information
+ */
+interface NetworkInfo {
+  onLine: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Error information
+ */
+interface ErrorInfo {
+  recentErrors: unknown[];
+  consoleLogs: unknown[];
+  [key: string]: unknown;
+}
+
+/**
  * System information structure
  */
 export interface SystemInfo {
   timestamp: string;
-  browser: {
-    name: string;
-    version: string;
-    [key: string]: any;
-  };
+  browser: BrowserInfo;
   viewport: {
     width: number;
     height: number;
   };
-  url: {
-    href: string;
-    [key: string]: any;
-  };
-  performance: {
-    available: boolean;
-    [key: string]: any;
-  };
-  storage: {
-    localStorage: {
-      available: boolean;
-      [key: string]: any;
-    };
-    [key: string]: any;
-  };
-  network: {
-    onLine: boolean;
-    [key: string]: any;
-  };
-  errors: {
-    recentErrors: any[];
-    consoleLogs: any[];
-    [key: string]: any;
-  };
+  url: UrlInfo;
+  performance: PerformanceInfo;
+  storage: StorageInfo;
+  network: NetworkInfo;
+  errors: ErrorInfo;
   userAgent: string;
   fallback?: boolean;
 }

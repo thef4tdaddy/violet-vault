@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui";
+import { Button, Checkbox } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useFirebaseMessaging } from "../../../hooks/notifications/useFirebaseMessaging";
 import logger from "../../../utils/common/logger";
@@ -215,18 +215,9 @@ const NotificationSettingsSection = () => {
         <div className="bg-white rounded-lg border-2 border-black p-4">
           <h4 className="font-bold text-gray-900 mb-3">Notification Preferences</h4>
           <div className="space-y-3">
-            <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Bill payment reminders</span>
-            </label>
-            <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Budget alerts and warnings</span>
-            </label>
-            <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Account activity notifications</span>
-            </label>
+            <Checkbox label="Bill payment reminders" defaultChecked />
+            <Checkbox label="Budget alerts and warnings" defaultChecked />
+            <Checkbox label="Account activity notifications" defaultChecked />
           </div>
         </div>
       )}
