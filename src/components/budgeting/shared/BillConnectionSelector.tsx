@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { Button, Select } from "../../ui";
+import { Button, Select, Radio } from "../../ui";
 
 // Helper to get available bills for selection
 const getAvailableBills = (allBills, envelopeId) => {
@@ -103,13 +103,12 @@ const BillConnectionSelector = ({
 
             <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
               <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                <input
-                  type="radio"
+                <Radio
                   id="createNewBill"
                   name="billOption"
                   value="create"
                   disabled={disabled}
-                  className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                  className="mt-0.5 justify-self-start"
                 />
                 <div>
                   <div className="flex items-center mb-1">

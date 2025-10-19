@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, TextInput } from "@/components/ui";
+import { Button, TextInput, Radio } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
@@ -42,8 +42,7 @@ const PayerStats = ({ stats, payerName }) => {
 const AllocationModeOption = ({ value, checked, onChange, title, description }) => (
   <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
     <div className="relative grid place-items-center">
-      <input
-        type="radio"
+      <Radio
         name="allocationMode"
         value={value}
         checked={checked}
