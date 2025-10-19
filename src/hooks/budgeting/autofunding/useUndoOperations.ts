@@ -66,7 +66,7 @@ const createUndoRecord = (executionId, totalAmount) => ({
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
 export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
-  const budget = useBudgetStore();
+  const budget = useUIStore(state => state.budget);
   const [undoStack, setUndoStack] = useState(initialUndoStack);
 
   // Add execution to undo stack if it has successful transfers

@@ -100,7 +100,7 @@ export const useSettingsDashboardUI = () => {
  * Extracts cloud sync toggle and manual sync operations
  */
 export const useCloudSyncManager = () => {
-  const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
+  const cloudSyncEnabled, setCloudSyncEnabled = useUIStore(state => state.cloudSyncEnabled, setCloudSyncEnabled);;
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleToggleCloudSync = useCallback(async () => {
