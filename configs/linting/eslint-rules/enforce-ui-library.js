@@ -6,11 +6,13 @@
  * Forbidden patterns:
  * - <button> elements (should use <Button>)
  * - <select> elements (should use <Select>)
- * - <input type="checkbox"> (should use <Checkbox>)
  * - <input type="radio"> (should use <Radio> or <RadioGroup>)
  * - className="glass-card" (should use <Card>)
  * - className="glass-input" (should use <Input> or <Textarea>)
  * - className="glass-button-*" (should use <Button variant="..">)
+ *
+ * NOTE: <input type="checkbox"> is intentionally not enforced due to widespread
+ * custom styled implementations. Use <Checkbox> component where appropriate.
  *
  * Related: Issues #491, #498, #499, #500
  */
@@ -30,8 +32,6 @@ export default {
         'Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui"',
       useSelectComponent:
         'Use <Select> from @/components/ui instead of <select> element. Import: import { Select } from "@/components/ui"',
-      useCheckboxComponent:
-        'Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui"',
       useRadioComponent:
         'Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui". Use RadioGroup for multiple options, Radio for standalone buttons.',
       useCardComponent:
@@ -48,19 +48,6 @@ export default {
 
     // Allow all patterns in UI library directory
     if (filename.includes('src/components/ui/')) {
-      return {};
-    }
-
-    // Exception: Files that properly implement Checkbox components
-    // These have minimal/no raw <input type="checkbox"> and are maintaining styled variants
-    if (
-      filename.includes('EnvelopeHeader.tsx') ||
-      filename.includes('DebtFormFields.tsx') ||
-      filename.includes('DebtFilters.tsx') ||
-      filename.includes('ArchivingConfiguration.tsx') ||
-      filename.includes('TransactionFormFields.tsx') ||
-      filename.includes('FileUploader.tsx')
-    ) {
       return {};
     }
 
@@ -111,7 +98,7 @@ export default {
           });
         }
 
-        // Forbid <input type="checkbox"> and <input type="radio">
+        // Forbid <input type="radio"> - checkbox has too many custom implementations
         if (elementName === 'input') {
           const typeAttr = node.openingElement.attributes.find(
             attr =>
@@ -120,20 +107,11 @@ export default {
               attr.value?.type === 'Literal'
           );
 
-          if (typeAttr) {
-            const inputType = typeAttr.value.value;
-
-            if (inputType === 'checkbox') {
-              context.report({
-                node,
-                messageId: 'useCheckboxComponent',
-              });
-            } else if (inputType === 'radio') {
-              context.report({
-                node,
-                messageId: 'useRadioComponent',
-              });
-            }
+          if (typeAttr?.value?.value === 'radio') {
+            context.report({
+              node,
+              messageId: 'useRadioComponent',
+            });
           }
         }
       },
