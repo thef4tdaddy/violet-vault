@@ -54,7 +54,7 @@ const useFirebaseSync = ({
   budgetId,
   currentUser,
 }: UseFirebaseSyncProps): UseFirebaseSyncReturn => {
-  const budget = useBudgetStore();
+  const budget = useUIStore(state => state.budget);
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState<User[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);

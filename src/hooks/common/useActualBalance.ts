@@ -7,11 +7,9 @@ import logger from "../../utils/common/logger";
  * Handles business logic for balance updates, validations, and state management
  */
 export const useActualBalance = () => {
-  const {
-    actualBalance,
-    isActualBalanceManual,
-    setActualBalance: setStoreBalance,
-  } = useBudgetStore();
+  const actualBalance = useBudgetStore(state => state.actualBalance);
+  const isActualBalanceManual = useBudgetStore(state => state.isActualBalanceManual);
+  const setStoreBalance = useBudgetStore(state => state.setActualBalance);;
 
   /**
    * Updates the actual balance with validation and audit logging

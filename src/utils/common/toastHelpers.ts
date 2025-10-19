@@ -17,7 +17,7 @@ import { useToastStore } from "../../stores/ui/toastStore";
  * showErrorToast("Failed to save data", "Save Error");
  */
 export const useToastHelpers = () => {
-  const { showSuccess, showError, showWarning, showInfo, showPayday } = useToastStore();
+  const showSuccess, showError, showWarning, showInfo, showPayday = useBudgetStore(state => state.showSuccess, showError, showWarning, showInfo, showPayday);;
 
   return {
     showSuccessToast: showSuccess,

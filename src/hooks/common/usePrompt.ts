@@ -42,7 +42,7 @@ const usePromptStore = create((set) => ({
  * }
  */
 export const usePrompt = () => {
-  const { showPrompt } = usePromptStore();
+  const showPrompt = usePromptStore(state => state.showPrompt);
 
   const prompt = useCallback(
     (config = {}) => {
@@ -75,7 +75,10 @@ export const usePrompt = () => {
  * Should be placed once at the app root level
  */
 export const usePromptModal = () => {
-  const { isOpen, config, resolver, hidePrompt } = usePromptStore();
+  const isOpen = usePromptStore(state => state.isOpen);
+  const config = usePromptStore(state => state.config);
+  const resolver = usePromptStore(state => state.resolver);
+  const hidePrompt = usePromptStore(state => state.hidePrompt);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = useCallback(
