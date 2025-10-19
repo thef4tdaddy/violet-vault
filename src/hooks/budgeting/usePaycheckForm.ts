@@ -13,7 +13,7 @@ const useInitializeNewPayerState = (uniquePayersLength, setShowAddNewPayer, init
       setShowAddNewPayer(hasNoPaychecks);
       initialRender.current = false;
     }
-  }, [uniquePayersLength, initialRender]); // setShowAddNewPayer is stable in useState
+  }, [uniquePayersLength, initialRender]); // setState functions are stable, safe to omit from deps
 };
 
 /**

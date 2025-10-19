@@ -142,7 +142,7 @@ export const useFirebaseMessaging = () => {
       const interval = setInterval(updatePermissionStatus, 30000); // Every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [isInitialized]); // updatePermissionStatus is stable in useCallback
+  }, [isInitialized, updatePermissionStatus]); // updatePermissionStatus is stable in useCallback
 
   return {
     // State
