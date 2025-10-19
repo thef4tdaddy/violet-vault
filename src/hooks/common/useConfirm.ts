@@ -33,7 +33,9 @@ const useConfirmStore = create((set) => ({
  * }
  */
 export const useConfirm = () => {
-  const { showConfirm } = useConfirmStore();
+  const { showConfirm } = useConfirmStore((state) => ({
+    showConfirm: state.showConfirm,
+  }));
 
   const confirm = useCallback(
     (config = {}) => {
@@ -62,7 +64,12 @@ export const useConfirm = () => {
  * Should be placed once at the app root level
  */
 export const useConfirmModal = () => {
-  const { isOpen, config, resolver, hideConfirm } = useConfirmStore();
+  const { isOpen, config, resolver, hideConfirm } = useConfirmStore((state) => ({
+    isOpen: state.isOpen,
+    config: state.config,
+    resolver: state.resolver,
+    hideConfirm: state.hideConfirm,
+  }));
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = useCallback(async () => {

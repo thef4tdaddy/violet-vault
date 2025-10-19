@@ -8,7 +8,11 @@ import useUiStore from "../../stores/ui/uiStore";
  * Shows when the app can be installed as a PWA
  */
 const InstallPromptModal = () => {
-  const { showInstallPrompt, dismissInstallPrompt, installApp } = useUiStore();
+  const { showInstallPrompt, dismissInstallPrompt, installApp } = useUiStore((state) => ({
+    showInstallPrompt: state.showInstallPrompt,
+    dismissInstallPrompt: state.dismissInstallPrompt,
+    installApp: state.installApp,
+  }));
 
   if (!showInstallPrompt) return null;
 

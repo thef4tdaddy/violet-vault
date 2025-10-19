@@ -11,7 +11,11 @@ export const useActualBalance = () => {
     actualBalance,
     isActualBalanceManual,
     setActualBalance: setStoreBalance,
-  } = useBudgetStore();
+  } = useBudgetStore((state) => ({
+    actualBalance: state.actualBalance,
+    isActualBalanceManual: state.isActualBalanceManual,
+    setActualBalance: state.setActualBalance,
+  }));
 
   /**
    * Updates the actual balance with validation and audit logging

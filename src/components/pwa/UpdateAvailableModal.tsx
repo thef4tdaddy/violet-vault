@@ -8,7 +8,12 @@ import useUiStore from "../../stores/ui/uiStore";
  * Shows when a new version of the PWA is available
  */
 const UpdateAvailableModal = () => {
-  const { updateAvailable, isUpdating, setUpdateAvailable, updateApp } = useUiStore();
+  const { updateAvailable, isUpdating, setUpdateAvailable, updateApp } = useUiStore((state) => ({
+    updateAvailable: state.updateAvailable,
+    isUpdating: state.isUpdating,
+    setUpdateAvailable: state.setUpdateAvailable,
+    updateApp: state.updateApp,
+  }));
 
   if (!updateAvailable) return null;
 

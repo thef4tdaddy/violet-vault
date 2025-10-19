@@ -4,7 +4,7 @@ import { getIcon } from "../../../utils";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
 
 const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
-  const { openUnassignedCashModal } = useBudgetStore();
+  const openUnassignedCashModal = useBudgetStore(state => state.openUnassignedCashModal);
 
   const handleClick = () => {
     openUnassignedCashModal();

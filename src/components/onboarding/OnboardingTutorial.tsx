@@ -11,7 +11,11 @@ import TutorialOverlay from "./components/TutorialOverlay";
  * OnboardingTutorial - Provides guided tours and contextual hints for new users
  */
 const OnboardingTutorial = ({ children }) => {
-  const { isOnboarded, getProgress, preferences } = useOnboardingStore();
+  const { isOnboarded, getProgress, preferences } = useOnboardingStore((state) => ({
+    isOnboarded: state.isOnboarded,
+    getProgress: state.getProgress,
+    preferences: state.preferences,
+  }));
 
   const [showTutorial, setShowTutorial] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);

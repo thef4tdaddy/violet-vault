@@ -10,7 +10,14 @@ import logger from "../../utils/common/logger";
  * Hook that automatically detects user actions and marks onboarding steps as complete
  */
 export const useOnboardingAutoComplete = () => {
-  const { markStepComplete, isStepComplete, preferences, isOnboarded } = useOnboardingStore();
+  const { markStepComplete, isStepComplete, preferences, isOnboarded } = useOnboardingStore(
+    (state) => ({
+      markStepComplete: state.markStepComplete,
+      isStepComplete: state.isStepComplete,
+      preferences: state.preferences,
+      isOnboarded: state.isOnboarded,
+    })
+  );
 
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();

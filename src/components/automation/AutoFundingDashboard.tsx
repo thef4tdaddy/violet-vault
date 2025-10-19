@@ -12,7 +12,9 @@ import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
-  const budget = useBudgetStore();
+  const envelopes = useBudgetStore((state) => state.envelopes);
+  const unassignedCash = useBudgetStore((state) => state.unassignedCash);
+  const allTransactions = useBudgetStore((state) => state.allTransactions);
   const confirm = useConfirm();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
@@ -86,9 +88,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
     try {
       const triggerData = {
         currentDate: new Date().toISOString(),
-        envelopes: budget.envelopes || [],
-        unassignedCash: budget.unassignedCash || 0,
-        transactions: budget.allTransactions || [],
+        envelopes: envelopes || [],
+        unassignedCash: unassignedCash || 0,
+        transactions: allTransactions || [],
       };
 
       const result = await executeRules(TRIGGER_TYPES.MANUAL, triggerData);
@@ -210,7 +212,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
           setShowRuleBuilder(false);
           setEditingRule(null);
         }}
-        envelopes={budget.envelopes || []}
+        envelopes={envelopes || []}
         onSaveRule={handleSaveRule}
         editingRule={editingRule}
       />
