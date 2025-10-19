@@ -40,7 +40,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
         validateShareCode(urlShareCode);
       }
     }
-  }, [isOpen]); // validateShareCode is stable in Zustand
+  }, [isOpen, validateShareCode]); // validateShareCode is stable in Zustand
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -51,7 +51,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
       setStep(1);
       resetValidation();
     }
-  }, [isOpen]); // resetValidation is stable in Zustand
+  }, [isOpen]); // resetValidation is stable in Zustand, no need to include
 
   // Handlers for step actions
   const handleValidateCode = async () => {

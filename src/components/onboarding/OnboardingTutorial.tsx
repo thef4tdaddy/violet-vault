@@ -49,7 +49,7 @@ const OnboardingTutorial = ({ children }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [isOnboarded, preferences]); // getProgress is stable in Zustand
+  }, [isOnboarded, preferences, getProgress]); // getProgress is stable in Zustand
 
   // Handle escape key to close tutorial
   useEffect(() => {

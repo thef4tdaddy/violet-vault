@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getIcon } from "../../utils";
@@ -15,14 +15,7 @@ const ShareTargetHandler = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Check if this is a share target request
-    if (location.pathname === "/app/import" && location.search) {
-      handleSharedContent();
-    }
-  }, [location]);
-
-  const handleSharedContent = async () => {
+  const handleSharedContent = useCallback(async () => {
     setIsProcessing(true);
     setError(null);
 
@@ -81,7 +74,14 @@ const ShareTargetHandler = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [location.search, navigate, setIsProcessing, setError, setSharedData]);
+
+  useEffect(() => {
+    // Check if this is a share target request
+    if (location.pathname === "/app/import" && location.search) {
+      handleSharedContent();
+    }
+  }, [location, handleSharedContent]);
 
   const handleManualNavigation = (path) => {
     navigate(path, { state: { importData: sharedData } });

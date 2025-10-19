@@ -52,7 +52,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
         })
         .catch(logger.error);
     }
-  }, [isOpen]); // getStats is stable in Zustand
+  }, [isOpen]); // getStats is stable in Zustand, no need to include
 
   // Clear states when closing
   useEffect(() => {
@@ -62,7 +62,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
       setShowConfirmExit(false);
       setShowConfirmClear(false);
     }
-  }, [isOpen]); // clearError is a stable Zustand action
+  }, [isOpen]); // clearError is a stable Zustand action, no need to include
 
   const handleExportData = async () => {
     try {

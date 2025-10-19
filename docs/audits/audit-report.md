@@ -14,7 +14,6 @@
 
 ### Files with Most Issues
 - 5 issues in `violet-vault/src/services/authService.ts`
-- 5 issues in `violet-vault/src/hooks/common/useFABActions.ts`
 - 5 issues in `violet-vault/src/hooks/common/useBugReportV2.ts`
 - 4 issues in `violet-vault/src/utils/common/highlight.ts`
 - 3 issues in `violet-vault/src/utils/sync/syncHealthChecker.ts`
@@ -22,13 +21,13 @@
 - 3 issues in `violet-vault/src/utils/budgeting/envelopeFormUtils.ts`
 - 3 issues in `violet-vault/src/hooks/transactions/useTransactionQuery.ts`
 - 3 issues in `violet-vault/src/hooks/transactions/useTransactionLedger.ts`
+- 3 issues in `violet-vault/src/hooks/common/useFABActions.ts`
 - 3 issues in `violet-vault/src/hooks/bills/useBillManager.ts`
 - 3 issues in `violet-vault/src/hooks/bills/useBillForm.ts`
 - 3 issues in `violet-vault/src/components/sync/SyncIndicator.tsx`
 - 3 issues in `violet-vault/src/components/security/LockScreen.tsx`
 - 3 issues in `violet-vault/src/components/pwa/PatchNotesModal.tsx`
 - 3 issues in `violet-vault/src/components/modals/UnassignedCashModal.tsx`
-- 3 issues in `violet-vault/src/components/auth/LocalOnlyModeSettings.tsx`
 - 2 issues in `violet-vault/src/utils/pwa/patchNotesManager.ts`
 - 2 issues in `violet-vault/src/utils/common/billDiscovery.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/envelopeIntegrityChecker.ts`
@@ -49,31 +48,22 @@
 - 2 issues in `violet-vault/src/components/sync/SyncHealthIndicator.tsx`
 - 2 issues in `violet-vault/src/components/sync/SyncHealthDashboard.tsx`
 - 2 issues in `violet-vault/src/components/sync/ActivityBanner.tsx`
-- 2 issues in `violet-vault/src/components/sharing/JoinBudgetModal.tsx`
 - 2 issues in `violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx`
 - 2 issues in `violet-vault/src/components/settings/TransactionArchiving.tsx`
-- 2 issues in `violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx`
-- 2 issues in `violet-vault/src/components/pwa/ShareTargetHandler.tsx`
 - 2 issues in `violet-vault/src/components/pwa/OfflineStatusIndicator.tsx`
 - 2 issues in `violet-vault/src/components/pages/MainDashboard.tsx`
-- 2 issues in `violet-vault/src/components/onboarding/OnboardingTutorial.tsx`
 - 2 issues in `violet-vault/src/components/onboarding/OnboardingProgress.tsx`
 - 2 issues in `violet-vault/src/components/onboarding/EmptyStateHints.tsx`
 - 2 issues in `violet-vault/src/components/mobile/SlideUpModal.tsx`
 - 2 issues in `violet-vault/src/components/layout/MainLayout.tsx`
 - 2 issues in `violet-vault/src/components/history/IntegrityStatusIndicator.tsx`
 - 2 issues in `violet-vault/src/components/history/BudgetHistoryViewer.tsx`
-- 2 issues in `violet-vault/src/components/feedback/BugReportButton.tsx`
 - 2 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 2 issues in `violet-vault/src/components/budgeting/EnvelopeSystem.tsx`
-- 2 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
-- 2 issues in `violet-vault/src/components/bills/BillTable.tsx`
-- 2 issues in `violet-vault/src/components/bills/BillDiscoveryModal.tsx`
-- 2 issues in `violet-vault/src/components/bills/AddBillModal.tsx`
 - 2 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
 - 2 issues in `violet-vault/src/components/automation/AutoFundingDashboard.tsx`
+- 2 issues in `violet-vault/src/components/auth/LocalOnlyModeSettings.tsx`
 - 2 issues in `violet-vault/src/components/auth/KeyManagementSettings.tsx`
-- 2 issues in `violet-vault/src/components/analytics/ReportExporter.tsx`
 - 1 issues in `violet-vault/src/vite-env.d.ts`
 - 1 issues in `violet-vault/src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 1 issues in `violet-vault/src/utils/debts/debtStrategies.ts`
@@ -94,10 +84,8 @@
 - 1 issues in `violet-vault/src/hooks/sync/useFirebaseSync.ts`
 - 1 issues in `violet-vault/src/hooks/sharing/useShareCodeValidation.ts`
 - 1 issues in `violet-vault/src/hooks/settings/useSettingsDashboard.ts`
-- 1 issues in `violet-vault/src/hooks/notifications/useFirebaseMessaging.ts`
 - 1 issues in `violet-vault/src/hooks/debts/useDebtManagement.ts`
 - 1 issues in `violet-vault/src/hooks/common/useOnboardingAutoComplete.ts`
-- 1 issues in `violet-vault/src/hooks/common/useNetworkStatus.ts`
 - 1 issues in `violet-vault/src/hooks/common/useExportData.ts`
 - 1 issues in `violet-vault/src/hooks/common/useDataInitialization.ts`
 - 1 issues in `violet-vault/src/hooks/common/useActualBalance.ts`
@@ -120,17 +108,22 @@
 - 1 issues in `violet-vault/src/components/sync/ManualSyncControls.tsx`
 - 1 issues in `violet-vault/src/components/sharing/steps/UserSetupStep.tsx`
 - 1 issues in `violet-vault/src/components/sharing/ShareCodeModal.tsx`
+- 1 issues in `violet-vault/src/components/sharing/JoinBudgetModal.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/DataManagementSection.tsx`
+- 1 issues in `violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx`
 - 1 issues in `violet-vault/src/components/pwa/UpdateAvailableModal.tsx`
+- 1 issues in `violet-vault/src/components/pwa/ShareTargetHandler.tsx`
 - 1 issues in `violet-vault/src/components/pwa/InstallPromptModal.tsx`
 - 1 issues in `violet-vault/src/components/onboarding/hooks/useTutorialSteps.ts`
 - 1 issues in `violet-vault/src/components/onboarding/hooks/useTutorialControls.ts`
+- 1 issues in `violet-vault/src/components/onboarding/OnboardingTutorial.tsx`
 - 1 issues in `violet-vault/src/components/modals/CorruptionRecoveryModal.tsx`
 - 1 issues in `violet-vault/src/components/layout/ViewRenderer.tsx`
 - 1 issues in `violet-vault/src/components/layout/SummaryCards.tsx`
 - 1 issues in `violet-vault/src/components/history/ObjectHistoryViewer.tsx`
+- 1 issues in `violet-vault/src/components/feedback/BugReportButton.tsx`
 - 1 issues in `violet-vault/src/components/debt/modals/DebtDetailModal.tsx`
 - 1 issues in `violet-vault/src/components/debt/DebtDashboard.tsx`
 - 1 issues in `violet-vault/src/components/charts/TrendLineChart.tsx`
@@ -140,14 +133,19 @@
 - 1 issues in `violet-vault/src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/PaydayPrediction.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/EnvelopeGrid.tsx`
+- 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/bills/modals/BillDetailModal.tsx`
 - 1 issues in `violet-vault/src/components/bills/SmartBillMatcher.tsx`
 - 1 issues in `violet-vault/src/components/bills/BulkUpdateEditor.tsx`
 - 1 issues in `violet-vault/src/components/bills/BulkBillUpdateModal.tsx`
+- 1 issues in `violet-vault/src/components/bills/BillTable.tsx`
 - 1 issues in `violet-vault/src/components/bills/BillManager.tsx`
+- 1 issues in `violet-vault/src/components/bills/BillDiscoveryModal.tsx`
+- 1 issues in `violet-vault/src/components/bills/AddBillModal.tsx`
 - 1 issues in `violet-vault/src/components/automation/tabs/RulesTab.tsx`
 - 1 issues in `violet-vault/src/components/auth/LocalOnlySetup.tsx`
+- 1 issues in `violet-vault/src/components/analytics/ReportExporter.tsx`
 - 1 issues in `violet-vault/src/components/analytics/AnalyticsDashboard.tsx`
 - 1 issues in `violet-vault/src/components/activity/ActivityFeed.tsx`
 
@@ -158,8 +156,7 @@
 | 42 | `zustand-safe-patterns/zustand-selective-subscriptions` |
 | 36 | `complexity` |
 | 21 | `max-statements` |
-| 17 | `react-hooks/exhaustive-deps` |
-| 7 | `enforce-ui-library/enforce-ui-library` |
+| 9 | `zustand-safe-patterns/zustand-no-store-actions-in-deps` |
 | 5 | `no-restricted-imports` |
 | 5 | `no-architecture-violations/no-architecture-violations` |
 | 4 | `null` |
@@ -178,35 +175,29 @@
 violet-vault/src/components/activity/ActivityFeed.tsx:7:1 - 2 - '../../services/activityLogger' import is restricted from being used by a pattern. Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed. (no-restricted-imports)
 violet-vault/src/components/analytics/AnalyticsDashboard.tsx:24:28 - 1 - Arrow function has too many lines (239). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/analytics/ReportExporter.tsx:10:24 - 1 - Arrow function has too many lines (279). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/analytics/ReportExporter.tsx:214:21 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/auth/KeyManagementSettings.tsx:21:69 - 1 - Arrow function has too many lines (232). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/auth/KeyManagementSettings.tsx:43:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:21:69 - 1 - Arrow function has too many lines (369). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:55:6 - 1 - React Hook useEffect has a missing dependency: 'getStats'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:65:6 - 1 - React Hook useEffect has a missing dependency: 'clearError'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
+violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:65:15 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/components/auth/LocalOnlySetup.tsx:91:24 - 1 - Arrow function has too many lines (258). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/AutoFundingDashboard.tsx:14:30 - 1 - Arrow function has too many lines (185). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/AutoFundingDashboard.tsx:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/automation/AutoFundingView.tsx:13:25 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/AutoFundingView.tsx:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/automation/tabs/RulesTab.tsx:6:18 - 1 - Arrow function has too many lines (206). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/bills/AddBillModal.tsx:102:6 - 1 - React Hook useEffect has a missing dependency: 'resetForm'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/components/bills/AddBillModal.tsx:108:9 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+violet-vault/src/components/bills/AddBillModal.tsx:102:15 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/components/bills/BillDiscoveryModal.tsx:7:28 - 1 - Arrow function has too many lines (313). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/bills/BillDiscoveryModal.tsx:190:27 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/bills/BillManager.tsx:24:21 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/BillTable.tsx:9:19 - 1 - Arrow function has too many lines (165). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/bills/BillTable.tsx:96:21 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/bills/BulkBillUpdateModal.tsx:12:29 - 1 - Arrow function has too many lines (167). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/BulkUpdateEditor.tsx:73:30 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/components/bills/SmartBillMatcher.tsx:6:26 - 1 - Arrow function has too many lines (180). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/modals/BillDetailModal.tsx:14:25 - 1 - Arrow function has too many lines (251). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx:13:29 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:17:27 - 1 - Arrow function has too many lines (222). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:147:13 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/budgeting/EnvelopeGrid.tsx:301:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/budgeting/EnvelopeSystem.tsx:24:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/budgeting/EnvelopeSystem.tsx:126:6 - 1 - React Hook useEffect has a missing dependency: 'updateBiweeklyAllocations'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
+violet-vault/src/components/budgeting/EnvelopeSystem.tsx:126:14 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/components/budgeting/PaydayPrediction.tsx:6:26 - 1 - Arrow function has too many lines (171). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx:12:22 - 1 - Arrow function has too many lines (307). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx:12:22 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
@@ -218,7 +209,6 @@ violet-vault/src/components/charts/TrendLineChart.tsx:21:24 - 1 - Arrow function
 violet-vault/src/components/debt/DebtDashboard.tsx:18:23 - 1 - Arrow function has too many lines (174). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/debt/modals/DebtDetailModal.tsx:13:25 - 1 - Arrow function has too many lines (175). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/feedback/BugReportButton.tsx:43:35 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/feedback/BugReportButton.tsx:288:19 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/history/BudgetHistoryViewer.tsx:41:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/history/BudgetHistoryViewer.tsx:44:45 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:34 - 1 - Arrow function has too many lines (251). Maximum allowed is 150. (max-lines-per-function)
@@ -239,7 +229,6 @@ violet-vault/src/components/onboarding/EmptyStateHints.tsx:10:61 - 1 - Use selec
 violet-vault/src/components/onboarding/OnboardingProgress.tsx:9:28 - 1 - Arrow function has too many lines (232). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/onboarding/OnboardingProgress.tsx:11:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/onboarding/OnboardingTutorial.tsx:14:53 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/onboarding/OnboardingTutorial.tsx:52:6 - 1 - React Hook useEffect has a missing dependency: 'getProgress'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/onboarding/hooks/useTutorialControls.ts:15:64 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/onboarding/hooks/useTutorialSteps.ts:12:33 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/pages/MainDashboard.tsx:26:19 - 1 - Arrow function has too many lines (153). Maximum allowed is 150. (max-lines-per-function)
@@ -251,13 +240,11 @@ violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function h
 violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function has a complexity of 25. Maximum allowed is 15. (complexity)
 violet-vault/src/components/pwa/PatchNotesModal.tsx:12:86 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/pwa/ShareTargetHandler.tsx:11:28 - 1 - Arrow function has too many lines (194). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pwa/ShareTargetHandler.tsx:23:6 - 1 - React Hook useEffect has a missing dependency: 'handleSharedContent'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/pwa/UpdateAvailableModal.tsx:11:74 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/security/LockScreen.tsx:11:20 - 1 - Arrow function has too many lines (260). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/security/LockScreen.tsx:95:7 - 2 - Components should not use localStorage directly. Use Dexie service through hooks instead. (no-restricted-syntax)
 violet-vault/src/components/security/LockScreen.tsx:96:7 - 2 - Components should not use localStorage directly. Use Dexie service through hooks instead. (no-restricted-syntax)
 violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx:17:34 - 1 - Arrow function has too many lines (345). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx:329:31 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/settings/TransactionArchiving.tsx:45:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/settings/TransactionArchiving.tsx:48:47 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/settings/sections/DataManagementSection.tsx:26:69 - 1 - Arrow function has too many lines (178). Maximum allowed is 150. (max-lines-per-function)
@@ -265,8 +252,7 @@ violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 
 violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:16:29 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx:11:37 - 1 - Arrow function has too many lines (221). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/SyncDebugToolsSection.tsx:7:31 - 1 - Arrow function has too many lines (179). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:43:6 - 1 - React Hook useEffect has a missing dependency: 'validateShareCode'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:54:6 - 1 - React Hook useEffect has a missing dependency: 'resetValidation'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
+violet-vault/src/components/sharing/JoinBudgetModal.tsx:54:15 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/components/sharing/ShareCodeModal.tsx:15:24 - 1 - Arrow function has too many lines (272). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/sharing/steps/UserSetupStep.tsx:9:23 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/sync/ActivityBanner.tsx:34:24 - 1 - Arrow function has too many lines (227). Maximum allowed is 150. (max-lines-per-function)
@@ -315,7 +301,7 @@ violet-vault/src/hooks/budgeting/metadata/useActualBalance.ts:39:7 - 2 - Validat
 violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts:76:17 - 1 - Async method 'mutationFn' has too many statements (30). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts:116:17 - 1 - Blocks are nested too deeply (6). Maximum allowed is 5. (max-depth)
 violet-vault/src/hooks/budgeting/useEnvelopes.ts:19:22 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:6 - 1 - React Hook useEffect has a missing dependency: 'setShowAddNewPayer'. Either include it or remove the dependency array. If 'setShowAddNewPayer' changes too often, find the parent component that defines it and wrap that definition in useCallback. (react-hooks/exhaustive-deps)
+violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:42 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:33:7 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
 violet-vault/src/hooks/common/useActualBalance.ts:14:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useBugReportV2.ts:6:8 - 1 - 'React' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
@@ -327,19 +313,15 @@ violet-vault/src/hooks/common/useConfirm.ts:36:27 - 1 - Use selective subscripti
 violet-vault/src/hooks/common/useConfirm.ts:65:53 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useDataInitialization.ts:40:32 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useExportData.ts:21:31 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
-violet-vault/src/hooks/common/useFABActions.ts:40:6 - 1 - React Hook useEffect has missing dependencies: 'registerPrimaryAction' and 'unregisterPrimaryAction'. Either include them or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useFABActions.ts:58:6 - 1 - React Hook useEffect has missing dependencies: 'registerSecondaryAction' and 'unregisterSecondaryAction'. Either include them or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useFABActions.ts:63:6 - 1 - React Hook useEffect has a missing dependency: 'setVisibility'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useFABActions.ts:79:6 - 1 - React Hook useEffect has a missing dependency: 'setDefaultActionHandler'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useFABActions.ts:95:6 - 1 - React Hook useEffect has a missing dependency: 'setCurrentScreen'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useNetworkStatus.ts:39:6 - 1 - React Hook useEffect has a missing dependency: 'setOnlineStatus'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
+violet-vault/src/hooks/common/useFABActions.ts:63:16 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
+violet-vault/src/hooks/common/useFABActions.ts:79:17 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
+violet-vault/src/hooks/common/useFABActions.ts:95:17 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/hooks/common/useOnboardingAutoComplete.ts:13:74 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/usePrompt.ts:45:26 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/usePrompt.ts:78:52 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/debts/useDebtManagement.ts:25:34 - 1 - Arrow function has too many lines (287). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/mobile/useFABBehavior.ts:24:5 - 2 - Expected an assignment or function call and instead saw an expression. (@typescript-eslint/no-unused-expressions)
-violet-vault/src/hooks/mobile/useFABBehavior.ts:83:6 - 1 - React Hook useEffect has a missing dependency: 'setExpanded'. Either include it or remove the dependency array. If 'setExpanded' changes too often, find the parent component that defines it and wrap that definition in useCallback. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/notifications/useFirebaseMessaging.ts:145:6 - 1 - React Hook useEffect has a missing dependency: 'updatePermissionStatus'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
+violet-vault/src/hooks/mobile/useFABBehavior.ts:83:33 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/hooks/settings/useSettingsDashboard.ts:103:53 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/sharing/useShareCodeValidation.ts:17:9 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
 violet-vault/src/hooks/sync/useFirebaseSync.ts:57:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
@@ -1237,8 +1219,8 @@ src/components/pwa/OfflineStatusIndicator.tsx(197,55): error TS2339: Property 'p
 src/components/pwa/OfflineStatusIndicator.tsx(206,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
 src/components/pwa/OfflineStatusIndicator.tsx(217,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
 src/components/pwa/OfflineStatusIndicator.tsx(219,34): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/ShareTargetHandler.tsx(47,14): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
-src/components/pwa/ShareTargetHandler.tsx(54,18): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
+src/components/pwa/ShareTargetHandler.tsx(40,14): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
+src/components/pwa/ShareTargetHandler.tsx(47,18): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
 src/components/receipts/__tests__/ReceiptScanner.test.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/receipts/__tests__/ReceiptScanner.test.tsx(2,1): error TS6133: 'Button' is declared but its value is never read.
 src/components/receipts/__tests__/ReceiptScanner.test.tsx(3,37): error TS6133: 'waitFor' is declared but its value is never read.
