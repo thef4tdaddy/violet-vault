@@ -33,7 +33,7 @@ export default {
       useCheckboxComponent:
         'Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui"',
       useRadioComponent:
-        'Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui"',
+        'Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui". Use RadioGroup for multiple options, Radio for standalone buttons.',
       useCardComponent:
         'Use <Card> from @/components/ui instead of className="glass-card". Import: import { Card } from "@/components/ui"',
       useInputComponent:
