@@ -80,7 +80,8 @@ const useKeyboardNavigation = (isExpanded, setExpanded, containerRef) => {
       document.addEventListener("keydown", handleKeyDown);
       return () => document.removeEventListener("keydown", handleKeyDown);
     }
-  }, [isExpanded, containerRef, setExpanded]); // setExpanded is stable in useState
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpanded, containerRef]); // setExpanded is stable and shouldn't be in deps
 };
 
 /**

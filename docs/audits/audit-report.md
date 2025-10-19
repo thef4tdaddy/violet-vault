@@ -19,85 +19,68 @@
 - 3 issues in `violet-vault/src/utils/sync/syncHealthChecker.ts`
 - 3 issues in `violet-vault/src/utils/sync/syncFlowValidator.ts`
 - 3 issues in `violet-vault/src/utils/budgeting/envelopeFormUtils.ts`
-- 3 issues in `violet-vault/src/hooks/transactions/useTransactionQuery.ts`
-- 3 issues in `violet-vault/src/hooks/transactions/useTransactionLedger.ts`
 - 3 issues in `violet-vault/src/hooks/common/useFABActions.ts`
-- 3 issues in `violet-vault/src/hooks/bills/useBillManager.ts`
 - 3 issues in `violet-vault/src/hooks/bills/useBillForm.ts`
 - 3 issues in `violet-vault/src/components/sync/SyncIndicator.tsx`
 - 3 issues in `violet-vault/src/components/security/LockScreen.tsx`
-- 3 issues in `violet-vault/src/components/pwa/PatchNotesModal.tsx`
-- 3 issues in `violet-vault/src/components/modals/UnassignedCashModal.tsx`
 - 3 issues in `violet-vault/src/components/auth/LocalOnlyModeSettings.tsx`
 - 2 issues in `violet-vault/src/utils/pwa/patchNotesManager.ts`
 - 2 issues in `violet-vault/src/utils/common/billDiscovery.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/autofunding/rules.ts`
 - 2 issues in `violet-vault/src/services/bugReport/browserInfoService.ts`
-- 2 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
+- 2 issues in `violet-vault/src/hooks/transactions/useTransactionQuery.ts`
+- 2 issues in `violet-vault/src/hooks/transactions/useTransactionLedger.ts`
 - 2 issues in `violet-vault/src/hooks/sync/useFirebaseSync.ts`
-- 2 issues in `violet-vault/src/hooks/mobile/useFABBehavior.ts`
-- 2 issues in `violet-vault/src/hooks/common/usePrompt.ts`
-- 2 issues in `violet-vault/src/hooks/common/useConfirm.ts`
 - 2 issues in `violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts`
 - 2 issues in `violet-vault/src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 2 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
-- 2 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts`
+- 2 issues in `violet-vault/src/hooks/bills/useBillManager.ts`
 - 2 issues in `violet-vault/src/hooks/auth/useUserSetup.ts`
 - 2 issues in `violet-vault/src/hooks/analytics/useReportExporter.ts`
 - 2 issues in `violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts`
-- 2 issues in `violet-vault/src/hooks/analytics/useAnalytics.ts`
 - 2 issues in `violet-vault/src/components/ui/forms/Select.tsx`
 - 2 issues in `violet-vault/src/components/ui/EditableBalance.tsx`
 - 2 issues in `violet-vault/src/components/sync/SyncHealthIndicator.tsx`
 - 2 issues in `violet-vault/src/components/sync/SyncHealthDashboard.tsx`
 - 2 issues in `violet-vault/src/components/sync/ActivityBanner.tsx`
-- 2 issues in `violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx`
-- 2 issues in `violet-vault/src/components/settings/TransactionArchiving.tsx`
-- 2 issues in `violet-vault/src/components/pwa/OfflineStatusIndicator.tsx`
-- 2 issues in `violet-vault/src/components/pages/MainDashboard.tsx`
-- 2 issues in `violet-vault/src/components/onboarding/OnboardingProgress.tsx`
-- 2 issues in `violet-vault/src/components/onboarding/EmptyStateHints.tsx`
+- 2 issues in `violet-vault/src/components/pwa/PatchNotesModal.tsx`
+- 2 issues in `violet-vault/src/components/modals/UnassignedCashModal.tsx`
 - 2 issues in `violet-vault/src/components/mobile/SlideUpModal.tsx`
 - 2 issues in `violet-vault/src/components/layout/MainLayout.tsx`
 - 2 issues in `violet-vault/src/components/history/IntegrityStatusIndicator.tsx`
-- 2 issues in `violet-vault/src/components/history/BudgetHistoryViewer.tsx`
 - 2 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx`
-- 2 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
-- 2 issues in `violet-vault/src/components/automation/AutoFundingDashboard.tsx`
-- 2 issues in `violet-vault/src/components/auth/KeyManagementSettings.tsx`
 - 1 issues in `violet-vault/src/vite-env.d.ts`
 - 1 issues in `violet-vault/src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 1 issues in `violet-vault/src/utils/debts/debtStrategies.ts`
 - 1 issues in `violet-vault/src/utils/debts/debtFormValidation.ts`
 - 1 issues in `violet-vault/src/utils/common/transactionArchiving.ts`
-- 1 issues in `violet-vault/src/utils/common/toastHelpers.ts`
 - 1 issues in `violet-vault/src/utils/bills/billCalculations.ts`
 - 1 issues in `violet-vault/src/types/common.ts`
 - 1 issues in `violet-vault/src/services/types/firebaseServiceTypes.ts`
 - 1 issues in `violet-vault/src/services/bugReport/performanceInfoService.ts`
 - 1 issues in `violet-vault/src/services/bugReport/githubApiService.ts`
 - 1 issues in `violet-vault/src/services/bugReport/apiService.ts`
+- 1 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionSplitter.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionOperations.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionFilters.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionData.ts`
 - 1 issues in `violet-vault/src/hooks/sharing/useShareCodeValidation.ts`
+- 1 issues in `violet-vault/src/hooks/mobile/useFABBehavior.ts`
 - 1 issues in `violet-vault/src/hooks/debts/useDebtManagement.ts`
-- 1 issues in `violet-vault/src/hooks/common/useOnboardingAutoComplete.ts`
 - 1 issues in `violet-vault/src/hooks/common/useExportData.ts`
-- 1 issues in `violet-vault/src/hooks/common/useDataInitialization.ts`
-- 1 issues in `violet-vault/src/hooks/common/useActualBalance.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/useEnvelopes.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/metadata/useActualBalance.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingRules.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingData.ts`
-- 1 issues in `violet-vault/src/hooks/auth/useSecurityManager.ts`
+- 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 1 issues in `violet-vault/src/hooks/auth/useKeyManagement.ts`
 - 1 issues in `violet-vault/src/hooks/analytics/usePerformanceMonitor.ts`
 - 1 issues in `violet-vault/src/hooks/analytics/useAnalyticsData.ts`
+- 1 issues in `violet-vault/src/hooks/analytics/useAnalytics.ts`
 - 1 issues in `violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
 - 1 issues in `violet-vault/src/components/ui/StandardTabs.tsx`
 - 1 issues in `violet-vault/src/components/sync/health/SyncStatusIndicator.tsx`
@@ -108,12 +91,14 @@
 - 1 issues in `violet-vault/src/components/sharing/JoinBudgetModal.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx`
+- 1 issues in `violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/DataManagementSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx`
-- 1 issues in `violet-vault/src/components/pwa/UpdateAvailableModal.tsx`
 - 1 issues in `violet-vault/src/components/pwa/ShareTargetHandler.tsx`
-- 1 issues in `violet-vault/src/components/pwa/InstallPromptModal.tsx`
-- 1 issues in `violet-vault/src/components/onboarding/OnboardingTutorial.tsx`
+- 1 issues in `violet-vault/src/components/pwa/OfflineStatusIndicator.tsx`
+- 1 issues in `violet-vault/src/components/pages/MainDashboard.tsx`
+- 1 issues in `violet-vault/src/components/onboarding/OnboardingProgress.tsx`
+- 1 issues in `violet-vault/src/components/onboarding/EmptyStateHints.tsx`
 - 1 issues in `violet-vault/src/components/modals/CorruptionRecoveryModal.tsx`
 - 1 issues in `violet-vault/src/components/layout/ViewRenderer.tsx`
 - 1 issues in `violet-vault/src/components/history/ObjectHistoryViewer.tsx`
@@ -137,7 +122,10 @@
 - 1 issues in `violet-vault/src/components/bills/BillDiscoveryModal.tsx`
 - 1 issues in `violet-vault/src/components/bills/AddBillModal.tsx`
 - 1 issues in `violet-vault/src/components/automation/tabs/RulesTab.tsx`
+- 1 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
+- 1 issues in `violet-vault/src/components/automation/AutoFundingDashboard.tsx`
 - 1 issues in `violet-vault/src/components/auth/LocalOnlySetup.tsx`
+- 1 issues in `violet-vault/src/components/auth/KeyManagementSettings.tsx`
 - 1 issues in `violet-vault/src/components/analytics/ReportExporter.tsx`
 - 1 issues in `violet-vault/src/components/analytics/AnalyticsDashboard.tsx`
 - 1 issues in `violet-vault/src/components/activity/ActivityFeed.tsx`
@@ -147,7 +135,6 @@
 |---|---|
 | 71 | `max-lines-per-function` |
 | 36 | `complexity` |
-| 32 | `zustand-safe-patterns/zustand-selective-subscriptions` |
 | 21 | `max-statements` |
 | 9 | `react-hooks/exhaustive-deps` |
 | 6 | `@typescript-eslint/no-unused-vars` |
@@ -156,7 +143,6 @@
 | 4 | `null` |
 | 3 | `no-undef` |
 | 3 | `no-restricted-syntax` |
-| 1 | `zustand-safe-patterns/zustand-no-store-actions-in-deps` |
 | 1 | `no-redeclare` |
 | 1 | `no-import-assign` |
 | 1 | `max-depth` |
@@ -170,15 +156,12 @@ violet-vault/src/components/activity/ActivityFeed.tsx:7:1 - 2 - '../../services/
 violet-vault/src/components/analytics/AnalyticsDashboard.tsx:24:28 - 1 - Arrow function has too many lines (239). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/analytics/ReportExporter.tsx:10:24 - 1 - Arrow function has too many lines (279). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/auth/KeyManagementSettings.tsx:21:69 - 1 - Arrow function has too many lines (232). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/auth/KeyManagementSettings.tsx:43:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:21:69 - 1 - Arrow function has too many lines (369). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:55:6 - 1 - React Hook useEffect has a missing dependency: 'getStats'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:65:6 - 1 - React Hook useEffect has a missing dependency: 'clearError'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/auth/LocalOnlySetup.tsx:91:24 - 1 - Arrow function has too many lines (258). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/automation/AutoFundingDashboard.tsx:14:30 - 1 - Arrow function has too many lines (185). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/automation/AutoFundingDashboard.tsx:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/automation/AutoFundingView.tsx:13:25 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/automation/AutoFundingView.tsx:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
+violet-vault/src/components/automation/AutoFundingDashboard.tsx:14:30 - 1 - Arrow function has too many lines (187). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/automation/AutoFundingView.tsx:13:25 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/tabs/RulesTab.tsx:6:18 - 1 - Arrow function has too many lines (206). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/AddBillModal.tsx:102:6 - 1 - React Hook useEffect has a missing dependency: 'resetForm'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/bills/BillDiscoveryModal.tsx:7:28 - 1 - Arrow function has too many lines (313). Maximum allowed is 150. (max-lines-per-function)
@@ -201,8 +184,6 @@ violet-vault/src/components/charts/TrendLineChart.tsx:21:24 - 1 - Arrow function
 violet-vault/src/components/debt/DebtDashboard.tsx:18:23 - 1 - Arrow function has too many lines (174). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/debt/modals/DebtDetailModal.tsx:13:25 - 1 - Arrow function has too many lines (175). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/feedback/BugReportButton.tsx:43:35 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/history/BudgetHistoryViewer.tsx:41:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/history/BudgetHistoryViewer.tsx:44:45 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:34 - 1 - Arrow function has too many lines (251). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:34 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
 violet-vault/src/components/history/ObjectHistoryViewer.tsx:14:29 - 1 - Arrow function has too many lines (199). Maximum allowed is 150. (max-lines-per-function)
@@ -212,33 +193,21 @@ violet-vault/src/components/layout/ViewRenderer.tsx:30:22 - 1 - Arrow function h
 violet-vault/src/components/mobile/SlideUpModal.tsx:27:22 - 1 - Arrow function has too many lines (158). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/mobile/SlideUpModal.tsx:27:22 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
 violet-vault/src/components/modals/CorruptionRecoveryModal.tsx:61:7 - 2 - Components should not use localStorage directly. Use Dexie service through hooks instead. (no-restricted-syntax)
-violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has too many lines (242). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has too many lines (245). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
-violet-vault/src/components/modals/UnassignedCashModal.tsx:75:67 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/onboarding/EmptyStateHints.tsx:9:25 - 1 - Arrow function has too many lines (196). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/onboarding/EmptyStateHints.tsx:10:61 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/onboarding/OnboardingProgress.tsx:9:28 - 1 - Arrow function has too many lines (232). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/onboarding/OnboardingProgress.tsx:11:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/onboarding/OnboardingTutorial.tsx:14:53 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
+violet-vault/src/components/onboarding/EmptyStateHints.tsx:9:25 - 1 - Arrow function has too many lines (200). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/onboarding/OnboardingProgress.tsx:9:28 - 1 - Arrow function has too many lines (238). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/pages/MainDashboard.tsx:26:19 - 1 - Arrow function has too many lines (153). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pages/MainDashboard.tsx:53:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/pwa/InstallPromptModal.tsx:11:67 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/pwa/OfflineStatusIndicator.tsx:13:32 - 1 - Arrow function has too many lines (222). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pwa/OfflineStatusIndicator.tsx:14:24 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/pwa/OfflineStatusIndicator.tsx:13:32 - 1 - Arrow function has too many lines (224). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function has a complexity of 25. Maximum allowed is 15. (complexity)
-violet-vault/src/components/pwa/PatchNotesModal.tsx:12:86 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/pwa/ShareTargetHandler.tsx:11:28 - 1 - Arrow function has too many lines (194). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pwa/UpdateAvailableModal.tsx:11:74 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/security/LockScreen.tsx:11:20 - 1 - Arrow function has too many lines (260). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/security/LockScreen.tsx:95:7 - 2 - Components should not use localStorage directly. Use Dexie service through hooks instead. (no-restricted-syntax)
 violet-vault/src/components/security/LockScreen.tsx:96:7 - 2 - Components should not use localStorage directly. Use Dexie service through hooks instead. (no-restricted-syntax)
 violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx:17:34 - 1 - Arrow function has too many lines (345). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/TransactionArchiving.tsx:45:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/settings/TransactionArchiving.tsx:48:47 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/settings/sections/DataManagementSection.tsx:26:69 - 1 - Arrow function has too many lines (178). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 1 - Arrow function has too many lines (235). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:16:29 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
+violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 1 - Arrow function has too many lines (237). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx:11:37 - 1 - Arrow function has too many lines (221). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/SyncDebugToolsSection.tsx:7:31 - 1 - Arrow function has too many lines (179). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/sharing/JoinBudgetModal.tsx:54:6 - 1 - React Hook useEffect has a missing dependency: 'resetValidation'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
@@ -262,8 +231,7 @@ violet-vault/src/components/ui/StandardTabs.tsx:2:10 - 1 - 'Button' is defined b
 violet-vault/src/components/ui/forms/Select.tsx:45:7 - 2 - 'Select' is already defined. (no-redeclare)
 violet-vault/src/components/ui/forms/Select.tsx:45:7 - 2 - 'Select' is read-only. (no-import-assign)
 violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:18:33 - 1 - Arrow function has too many lines (205). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/analytics/useAnalytics.ts:10:22 - 1 - Arrow function has too many lines (346). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/analytics/useAnalytics.ts:21:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
+violet-vault/src/hooks/analytics/useAnalytics.ts:10:22 - 1 - Arrow function has too many lines (353). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsData.ts:9:33 - 1 - Arrow function has too many lines (241). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts:17:40 - 1 - Arrow function has too many lines (193). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts:120:5 - 1 - Async arrow function has too many statements (27). Maximum allowed is 25. (max-statements)
@@ -271,17 +239,14 @@ violet-vault/src/hooks/analytics/usePerformanceMonitor.ts:8:38 - 1 - Arrow funct
 violet-vault/src/hooks/analytics/useReportExporter.ts:11:34 - 1 - Arrow function has too many lines (299). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useReportExporter.ts:26:5 - 1 - Async arrow function has too many statements (67). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/auth/useKeyManagement.ts:10:33 - 1 - Arrow function has too many lines (272). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/auth/useSecurityManager.ts:27:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/auth/useUserSetup.ts:12:29 - 1 - Arrow function has too many lines (269). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/auth/useUserSetup.ts:25:27 - 1 - Async arrow function has too many statements (26). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/bills/useBillForm.ts:30:28 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/bills/useBillForm.ts:69:28 - 1 - Arrow function has too many lines (227). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/bills/useBillForm.ts:202:5 - 1 - Async arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
-violet-vault/src/hooks/bills/useBillManager.ts:28:31 - 1 - Arrow function has too many lines (186). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/bills/useBillManager.ts:28:31 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/bills/useBillManager.ts:28:31 - 1 - Arrow function has too many statements (28). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/bills/useBillManager.ts:49:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts:14:31 - 1 - Arrow function has too many lines (270). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
+violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts:14:31 - 1 - Arrow function has too many lines (274). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingData.ts:11:35 - 1 - Arrow function has too many lines (259). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:3:10 - 1 - 'useBudgetStore' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:14:18 - 1 - 'useUIStore' is not defined. (no-undef)
@@ -294,40 +259,29 @@ violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts:116:17 - 1 - Blocks 
 violet-vault/src/hooks/budgeting/useEnvelopes.ts:19:22 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:6 - 1 - React Hook useEffect has a missing dependency: 'setShowAddNewPayer'. Either include it or remove the dependency array. If 'setShowAddNewPayer' changes too often, find the parent component that defines it and wrap that definition in useCallback. (react-hooks/exhaustive-deps)
 violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:33:7 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
-violet-vault/src/hooks/common/useActualBalance.ts:14:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useBugReportV2.ts:6:8 - 1 - 'React' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/common/useBugReportV2.ts:32:11 - 1 - 'BugReportSubmissionResult' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/common/useBugReportV2.ts:66:24 - 1 - Arrow function has too many lines (303). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/common/useBugReportV2.ts:66:24 - 1 - Arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/common/useBugReportV2.ts:381:9 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
-violet-vault/src/hooks/common/useConfirm.ts:36:27 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/hooks/common/useConfirm.ts:65:53 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/hooks/common/useDataInitialization.ts:40:32 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useExportData.ts:21:31 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/common/useFABActions.ts:63:6 - 1 - React Hook useEffect has a missing dependency: 'setVisibility'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/hooks/common/useFABActions.ts:79:6 - 1 - React Hook useEffect has a missing dependency: 'setDefaultActionHandler'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/hooks/common/useFABActions.ts:95:6 - 1 - React Hook useEffect has a missing dependency: 'setCurrentScreen'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useOnboardingAutoComplete.ts:13:74 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/hooks/common/usePrompt.ts:45:26 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/hooks/common/usePrompt.ts:78:52 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/debts/useDebtManagement.ts:25:34 - 1 - Arrow function has too many lines (287). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/mobile/useFABBehavior.ts:24:5 - 2 - Expected an assignment or function call and instead saw an expression. (@typescript-eslint/no-unused-expressions)
-violet-vault/src/hooks/mobile/useFABBehavior.ts:83:33 - 2 - Dangerous pattern: Store action in useEffect dependency array! This causes React error #185 infinite render loops. Zustand store actions are stable and should not be in dependency arrays. Remove store actions from the dependency array to fix this issue. (zustand-safe-patterns/zustand-no-store-actions-in-deps)
 violet-vault/src/hooks/sharing/useShareCodeValidation.ts:17:9 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
 violet-vault/src/hooks/sync/useFirebaseSync.ts:2:10 - 1 - 'useBudgetStore' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/sync/useFirebaseSync.ts:57:18 - 1 - 'useUIStore' is not defined. (no-undef)
 violet-vault/src/hooks/transactions/useTransactionData.ts:21:28 - 1 - Arrow function has too many lines (202). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/transactions/useTransactionFilters.ts:4:7 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
-violet-vault/src/hooks/transactions/useTransactionLedger.ts:15:37 - 1 - Arrow function has too many lines (187). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/transactions/useTransactionLedger.ts:15:37 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/transactions/useTransactionLedger.ts:15:37 - 1 - Arrow function has too many statements (33). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/transactions/useTransactionLedger.ts:27:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/transactions/useTransactionOperations.ts:30:34 - 1 - Arrow function has too many lines (278). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionQuery.ts:22:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/hooks/transactions/useTransactionQuery.ts:25:25 - 1 - Async arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/transactions/useTransactionQuery.ts:25:25 - 1 - Async arrow function has a complexity of 18. Maximum allowed is 15. (complexity)
+violet-vault/src/hooks/transactions/useTransactionQuery.ts:28:25 - 1 - Async arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
+violet-vault/src/hooks/transactions/useTransactionQuery.ts:28:25 - 1 - Async arrow function has a complexity of 18. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/transactions/useTransactionSplitter.ts:29:32 - 1 - Arrow function has too many lines (183). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionsV2.ts:17:27 - 1 - Arrow function has too many lines (162). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionsV2.ts:39:23 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
+violet-vault/src/hooks/transactions/useTransactionsV2.ts:17:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/services/authService.ts:39:33 - 1 - Async arrow function has too many statements (29). Maximum allowed is 25. (max-statements)
 violet-vault/src/services/authService.ts:124:22 - 1 - Async arrow function has too many lines (200). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/services/authService.ts:134:25 - 1 - Async arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
@@ -355,7 +309,6 @@ violet-vault/src/utils/common/highlight.ts:124:3 - 1 - Unused eslint-disable dir
 violet-vault/src/utils/common/highlight.ts:126:3 - 1 - Unused eslint-disable directive (no problems were reported from 'no-console'). (null)
 violet-vault/src/utils/common/highlight.ts:130:3 - 1 - Unused eslint-disable directive (no problems were reported from 'no-console'). (null)
 violet-vault/src/utils/common/highlight.ts:155:3 - 1 - Unused eslint-disable directive (no problems were reported from 'no-console'). (null)
-violet-vault/src/utils/common/toastHelpers.ts:20:73 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/utils/common/transactionArchiving.ts:141:26 - 1 - Arrow function has too many statements (28). Maximum allowed is 25. (max-statements)
 violet-vault/src/utils/debts/debtFormValidation.ts:68:8 - 1 - Function 'validateDebtFormData' has a complexity of 18. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayoffStrategy' has too many statements (28). Maximum allowed is 25. (max-statements)
@@ -893,9 +846,9 @@ src/components/auth/UserIndicator.tsx(7,31): error TS2339: Property 'currentUser
 src/components/auth/UserIndicator.tsx(7,44): error TS2339: Property 'onUserChange' does not exist on type '{}'.
 src/components/auth/UserIndicator.tsx(7,58): error TS2339: Property 'onUpdateProfile' does not exist on type '{}'.
 src/components/auth/UserSetup.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/automation/AutoFundingDashboard.tsx(97,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/components/automation/AutoFundingDashboard.tsx(99,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingDashboard.tsx(98,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/components/automation/AutoFundingDashboard.tsx(100,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/components/automation/AutoFundingRuleBuilder.tsx(34,13): error TS2322: Type '"success"' is not assignable to type 'ButtonColor'.
 src/components/automation/AutoFundingRuleBuilder.tsx(104,15): error TS2322: Type '"ghost"' is not assignable to type 'ButtonVariant'.
@@ -903,14 +856,14 @@ src/components/automation/AutoFundingRuleBuilder.tsx(111,12): error TS2741: Prop
 src/components/automation/AutoFundingRuleBuilder.tsx(172,46): error TS2339: Property 'name' does not exist on type '{}'.
 src/components/automation/AutoFundingRuleBuilder.tsx(175,46): error TS2339: Property 'type' does not exist on type '{}'.
 src/components/automation/AutoFundingView.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/automation/AutoFundingView.tsx(46,19): error TS2554: Expected 3 arguments, but got 2.
-src/components/automation/AutoFundingView.tsx(100,41): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: any; unassignedCash: any; transactions: any; }; }' is not assignable to parameter of type 'string'.
-src/components/automation/AutoFundingView.tsx(103,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/components/automation/AutoFundingView.tsx(48,19): error TS2554: Expected 3 arguments, but got 2.
+src/components/automation/AutoFundingView.tsx(102,41): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: any; unassignedCash: any; transactions: any; }; }' is not assignable to parameter of type 'string'.
+src/components/automation/AutoFundingView.tsx(109,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingView.tsx(104,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/components/automation/AutoFundingView.tsx(110,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingView.tsx(107,23): error TS2554: Expected 3 arguments, but got 2.
-src/components/automation/AutoFundingView.tsx(112,23): error TS2554: Expected 3 arguments, but got 2.
+src/components/automation/AutoFundingView.tsx(113,23): error TS2554: Expected 3 arguments, but got 2.
+src/components/automation/AutoFundingView.tsx(118,23): error TS2554: Expected 3 arguments, but got 2.
 src/components/automation/steps/config/SplitRemainderConfig.tsx(33,23): error TS2322: Type '{ checked: any; onCheckedChange: () => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/automation/steps/RuleConfigurationStep.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
@@ -1176,41 +1129,41 @@ src/components/modals/UnassignedCashModal.tsx(15,56): error TS2339: Property 'is
 src/components/modals/UnassignedCashModal.tsx(15,70): error TS2339: Property 'bills' does not exist on type '{}'.
 src/components/modals/UnassignedCashModal.tsx(65,40): error TS2322: Type '{ envelope: any; bills: any; showDetails: boolean; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'envelope' does not exist on type 'IntrinsicAttributes & object'.
-src/components/modals/UnassignedCashModal.tsx(104,28): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
-src/components/modals/UnassignedCashModal.tsx(105,29): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
-src/components/modals/UnassignedCashModal.tsx(147,36): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
-src/components/modals/UnassignedCashModal.tsx(253,19): error TS2322: Type '{ key: any; envelope: any; distributionAmount: any; updateDistribution: (envelopeId: any, amount: any) => void; isProcessing: boolean; bills: any[]; }' is not assignable to type 'IntrinsicAttributes & object'.
+src/components/modals/UnassignedCashModal.tsx(107,28): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
+src/components/modals/UnassignedCashModal.tsx(108,29): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
+src/components/modals/UnassignedCashModal.tsx(150,36): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/modals/UnassignedCashModal.tsx(256,19): error TS2322: Type '{ key: any; envelope: any; distributionAmount: any; updateDistribution: (envelopeId: any, amount: any) => void; isProcessing: boolean; bills: any[]; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'envelope' does not exist on type 'IntrinsicAttributes & object'.
-src/components/modals/UnassignedCashModal.tsx(309,47): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
-src/components/modals/UnassignedCashModal.tsx(324,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/onboarding/EmptyStateHints.tsx(10,11): error TS2339: Property 'shouldShowHint' does not exist on type '{}'.
-src/components/onboarding/EmptyStateHints.tsx(10,27): error TS2339: Property 'markStepComplete' does not exist on type '{}'.
-src/components/onboarding/EmptyStateHints.tsx(10,45): error TS2339: Property 'preferences' does not exist on type '{}'.
+src/components/modals/UnassignedCashModal.tsx(312,47): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/modals/UnassignedCashModal.tsx(327,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/onboarding/EmptyStateHints.tsx(11,27): error TS2339: Property 'shouldShowHint' does not exist on type 'unknown'.
+src/components/onboarding/EmptyStateHints.tsx(12,29): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
+src/components/onboarding/EmptyStateHints.tsx(13,24): error TS2339: Property 'preferences' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialControls.ts(15,61): error TS2339: Property 'endTutorialStep' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialControls.ts(16,62): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialControls.ts(17,59): error TS2339: Property 'setPreference' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialSteps.ts(12,63): error TS2339: Property 'startTutorialStep' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(10,11): error TS2339: Property 'isOnboarded' does not exist on type '{}'.
-src/components/onboarding/OnboardingProgress.tsx(10,24): error TS2339: Property 'tutorialProgress' does not exist on type '{}'.
-src/components/onboarding/OnboardingProgress.tsx(10,42): error TS2339: Property 'getProgress' does not exist on type '{}'.
-src/components/onboarding/OnboardingProgress.tsx(10,55): error TS2339: Property 'preferences' does not exist on type '{}'.
-src/components/onboarding/OnboardingProgress.tsx(10,68): error TS2339: Property 'setPreference' does not exist on type '{}'.
-src/components/onboarding/OnboardingProgress.tsx(173,32): error TS2339: Property 'map' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(12,26): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(13,31): error TS2339: Property 'tutorialProgress' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(14,26): error TS2339: Property 'getProgress' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(15,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(16,28): error TS2339: Property 'setPreference' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(179,32): error TS2339: Property 'map' does not exist on type 'unknown'.
 src/components/onboarding/OnboardingTutorial.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/onboarding/OnboardingTutorial.tsx(14,11): error TS2339: Property 'isOnboarded' does not exist on type '{}'.
-src/components/onboarding/OnboardingTutorial.tsx(14,24): error TS2339: Property 'getProgress' does not exist on type '{}'.
-src/components/onboarding/OnboardingTutorial.tsx(14,37): error TS2339: Property 'preferences' does not exist on type '{}'.
+src/components/onboarding/OnboardingTutorial.tsx(15,24): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingTutorial.tsx(16,24): error TS2339: Property 'getProgress' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingTutorial.tsx(17,24): error TS2339: Property 'preferences' does not exist on type 'unknown'.
 src/components/pages/MainDashboard.tsx(30,11): error TS2339: Property 'data' does not exist on type '{ savingsGoals: any[]; summary: { totalGoals: any; completedGoals: any; activeGoals: number; totalTargetAmount: any; totalCurrentAmount: any; totalRemainingAmount: number; overallProgressRate: number; urgentGoals: any; overdueGoals: any; totalMonthlyNeeded: number; }; ... 8 more ...; mutations: { ...; }; }'.
 src/components/pages/MainDashboard.tsx(32,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
 src/components/pages/MainDashboard.tsx(59,5): error TS2339: Property '_safeUnassignedCash' does not exist on type '{ totalEnvelopeBalance: any; totalSavingsBalance: any; safeUnassignedCash: number; totalVirtualBalance: any; difference: number; isBalanced: boolean; }'.
 src/components/pages/MainDashboard.tsx(59,5): error TS6133: '_safeUnassignedCash' is declared but its value is never read.
 src/components/pages/MainDashboard.tsx(114,11): error TS6133: '_success' is declared but its value is never read.
-src/components/pwa/OfflineStatusIndicator.tsx(74,18): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/pwa/OfflineStatusIndicator.tsx(197,23): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(197,55): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(206,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(217,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(219,34): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(76,18): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/pwa/OfflineStatusIndicator.tsx(199,23): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(199,55): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(208,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(219,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(221,34): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
 src/components/pwa/ShareTargetHandler.tsx(40,14): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
 src/components/pwa/ShareTargetHandler.tsx(47,18): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
 src/components/receipts/__tests__/ReceiptScanner.test.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
@@ -1443,24 +1396,24 @@ src/hooks/analytics/useAnalytics.ts(13,5): error TS2339: Property 'period' does 
 src/hooks/analytics/useAnalytics.ts(14,5): error TS2339: Property 'customDateRange' does not exist on type '{}'.
 src/hooks/analytics/useAnalytics.ts(15,5): error TS2339: Property 'includeTransfers' does not exist on type '{}'.
 src/hooks/analytics/useAnalytics.ts(16,5): error TS2339: Property 'groupBy' does not exist on type '{}'.
-src/hooks/analytics/useAnalytics.ts(193,38): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(194,37): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(194,50): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(196,51): error TS2698: Spread types may only be created from object types.
-src/hooks/analytics/useAnalytics.ts(199,38): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(200,37): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(200,48): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(202,51): error TS2698: Spread types may only be created from object types.
-src/hooks/analytics/useAnalytics.ts(324,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(324,38): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(335,34): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(335,44): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(379,54): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(382,33): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(383,33): error TS2339: Property 'count' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(397,34): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(398,32): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(399,29): error TS2339: Property 'net' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(200,38): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(201,37): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(201,50): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(203,51): error TS2698: Spread types may only be created from object types.
+src/hooks/analytics/useAnalytics.ts(206,38): error TS2339: Property 'income' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(207,37): error TS2339: Property 'income' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(207,48): error TS2339: Property 'income' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(209,51): error TS2698: Spread types may only be created from object types.
+src/hooks/analytics/useAnalytics.ts(331,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/analytics/useAnalytics.ts(331,38): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/analytics/useAnalytics.ts(342,34): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/analytics/useAnalytics.ts(342,44): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/analytics/useAnalytics.ts(386,54): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(389,33): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(390,33): error TS2339: Property 'count' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(404,34): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(405,32): error TS2339: Property 'income' does not exist on type 'unknown'.
+src/hooks/analytics/useAnalytics.ts(406,29): error TS2339: Property 'net' does not exist on type 'unknown'.
 src/hooks/analytics/useAnalyticsData.ts(26,45): error TS2345: Argument of type 'Date' is not assignable to parameter of type 'number'.
 src/hooks/analytics/useAnalyticsData.ts(109,61): error TS2339: Property 'month' does not exist on type 'unknown'.
 src/hooks/analytics/useAnalyticsData.ts(109,83): error TS2339: Property 'month' does not exist on type 'unknown'.
@@ -1657,7 +1610,7 @@ src/hooks/bills/useBillManager.ts(32,3): error TS2339: Property 'onCreateRecurri
 src/hooks/bills/useBillManager.ts(33,3): error TS2339: Property 'onSearchNewBills' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
 src/hooks/bills/useBillManager.ts(34,3): error TS2339: Property 'onError' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
 src/hooks/bills/useBillManager.ts(37,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
-src/hooks/bills/useBillManager.ts(117,22): error TS2345: Argument of type '{ id: any; updates: { isPaid: boolean; dueDate: any; paidDate: null; }; }' is not assignable to parameter of type 'void'.
+src/hooks/bills/useBillManager.ts(121,22): error TS2345: Argument of type '{ id: any; updates: { isPaid: boolean; dueDate: any; paidDate: null; }; }' is not assignable to parameter of type 'void'.
 src/hooks/bills/useBillManagerUI.ts(63,63): error TS2339: Property 'upcoming' does not exist on type '{}'.
 src/hooks/bills/useBillManagerUI.ts(64,61): error TS2339: Property 'overdue' does not exist on type '{}'.
 src/hooks/bills/useBillManagerUI.ts(65,55): error TS2339: Property 'paid' does not exist on type '{}'.
@@ -1709,23 +1662,23 @@ src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(167,36): error TS2339: Pro
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(168,36): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(187,36): error TS2339: Property 'name' does not exist on type '{}'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(193,34): error TS2554: Expected 1 arguments, but got 0.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(31,25): error TS2339: Property 'rules' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(32,45): error TS2339: Property 'rules' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(79,43): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(35,25): error TS2339: Property 'rules' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(36,45): error TS2339: Property 'rules' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(83,43): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(82,22): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(86,22): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(83,47): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(87,47): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(83,65): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(87,65): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'results' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(87,18): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(91,18): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'results' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(91,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(95,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(133,39): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(137,39): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(134,37): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(138,37): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(26,28): error TS2339: Property 'rules' does not exist on type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(27,30): error TS2339: Property 'executionHistory' does not exist on type 'unknown'.
@@ -1982,12 +1935,12 @@ src/hooks/common/__tests__/useModalManager.test.ts(331,27): error TS2339: Proper
 src/hooks/common/__tests__/useModalManager.test.ts(332,27): error TS2339: Property 'activeModal' does not exist on type '{ modals: {}; openModal: (modalName: any) => void; closeModal: (modalName: any) => void; toggleModal: (modalName: any) => void; closeAllModals: () => void; isModalOpen: (modalName: any) => boolean; getOpenModalsCount: () => number; }'.
 src/hooks/common/useActivityLogger.ts(16,37): error TS2345: Argument of type 'UserData' is not assignable to parameter of type 'ActivityUser'.
   Property 'id' is missing in type 'UserData' but required in type 'ActivityUser'.
-src/hooks/common/useActualBalance.ts(25,15): error TS2339: Property 'isManual' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(25,32): error TS2339: Property 'source' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(104,7): error TS2339: Property 'showCurrency' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(105,7): error TS2339: Property 'showSign' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(106,7): error TS2339: Property 'minimumFractionDigits' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(107,7): error TS2339: Property 'maximumFractionDigits' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(29,15): error TS2339: Property 'isManual' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(29,32): error TS2339: Property 'source' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(108,7): error TS2339: Property 'showCurrency' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(109,7): error TS2339: Property 'showSign' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(110,7): error TS2339: Property 'minimumFractionDigits' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(111,7): error TS2339: Property 'maximumFractionDigits' does not exist on type '{}'.
 src/hooks/common/useBugReportSubmission.ts(20,20): error TS2339: Property 'getSessionMetadata' does not exist on type 'HighlightPublicInterface'.
 src/hooks/common/useBugReportSubmission.ts(21,57): error TS2339: Property 'getSessionMetadata' does not exist on type 'HighlightPublicInterface'.
 src/hooks/common/useBugReportSubmission.ts(29,20): error TS2339: Property 'getCurrentSessionURL' does not exist on type 'HighlightPublicInterface'.
@@ -2003,11 +1956,11 @@ src/hooks/common/useBugReportV2.ts(232,28): error TS2339: Property 'primaryProvi
 src/hooks/common/useBugReportV2.ts(233,36): error TS2339: Property 'screenshotStatus' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
 src/hooks/common/useBugReportV2.ts(237,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
 src/hooks/common/useBugReportV2.ts(238,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useConfirm.ts(36,11): error TS2339: Property 'showConfirm' does not exist on type '{}'.
-src/hooks/common/useConfirm.ts(65,11): error TS2339: Property 'isOpen' does not exist on type '{}'.
-src/hooks/common/useConfirm.ts(65,19): error TS2339: Property 'config' does not exist on type '{}'.
-src/hooks/common/useConfirm.ts(65,27): error TS2339: Property 'resolver' does not exist on type '{}'.
-src/hooks/common/useConfirm.ts(65,37): error TS2339: Property 'hideConfirm' does not exist on type '{}'.
+src/hooks/common/useConfirm.ts(37,24): error TS2339: Property 'showConfirm' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(68,19): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(69,19): error TS2339: Property 'config' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(70,21): error TS2339: Property 'resolver' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(71,24): error TS2339: Property 'hideConfirm' does not exist on type 'unknown'.
 src/hooks/common/useConnectionManager.ts(60,9): error TS2322: Type 'UseMutateFunction<any, Error, void, unknown>' is not assignable to type '(id: string, updates: Partial<Bill>) => Promise<void>'.
   Types of parameters 'variables' and 'id' are incompatible.
     Type 'string' is not assignable to type 'void'.
@@ -2059,16 +2012,16 @@ src/hooks/common/useEditLock.ts(81,30): error TS2339: Property 'lockedBy' does n
   Property 'lockedBy' does not exist on type '{ success: boolean; reason: string; lockDoc: any; error?: undefined; }'.
 src/hooks/common/useEditLock.ts(182,90): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/hooks/common/useImportData.ts(102,41): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/hooks/common/useOnboardingAutoComplete.ts(13,11): error TS2339: Property 'markStepComplete' does not exist on type '{}'.
-src/hooks/common/useOnboardingAutoComplete.ts(13,29): error TS2339: Property 'isStepComplete' does not exist on type '{}'.
-src/hooks/common/useOnboardingAutoComplete.ts(13,45): error TS2339: Property 'preferences' does not exist on type '{}'.
-src/hooks/common/useOnboardingAutoComplete.ts(13,58): error TS2339: Property 'isOnboarded' does not exist on type '{}'.
-src/hooks/common/useOnboardingAutoComplete.ts(17,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
-src/hooks/common/usePrompt.ts(45,11): error TS2339: Property 'showPrompt' does not exist on type '{}'.
-src/hooks/common/usePrompt.ts(78,11): error TS2339: Property 'isOpen' does not exist on type '{}'.
-src/hooks/common/usePrompt.ts(78,19): error TS2339: Property 'config' does not exist on type '{}'.
-src/hooks/common/usePrompt.ts(78,27): error TS2339: Property 'resolver' does not exist on type '{}'.
-src/hooks/common/usePrompt.ts(78,37): error TS2339: Property 'hidePrompt' does not exist on type '{}'.
+src/hooks/common/useOnboardingAutoComplete.ts(15,31): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(16,29): error TS2339: Property 'isStepComplete' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(17,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(18,26): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(24,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
+src/hooks/common/usePrompt.ts(46,23): error TS2339: Property 'showPrompt' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(81,19): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(82,19): error TS2339: Property 'config' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(83,21): error TS2339: Property 'resolver' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(84,23): error TS2339: Property 'hidePrompt' does not exist on type 'unknown'.
 src/hooks/common/useReceipts.ts(13,59): error TS2339: Property 'receipts' does not exist on type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: {}) => {}[]; ... 44 more ...; syncActivity: () => string[]; }'.
 src/hooks/common/useReceipts.ts(14,59): error TS2339: Property 'receiptsList' does not exist on type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: {}) => {}[]; ... 44 more ...; syncActivity: () => string[]; }'.
 src/hooks/common/useReceipts.ts(33,39): error TS2339: Property 'receipts' does not exist on type 'VioletVaultDB'.
@@ -2373,8 +2326,8 @@ src/hooks/transactions/useTransactionImport.ts(29,45): error TS2339: Property 'd
 src/hooks/transactions/useTransactionImport.ts(29,74): error TS2339: Property 'amount' does not exist on type '{}'.
 src/hooks/transactions/useTransactionImport.ts(30,19): error TS2554: Expected 3 arguments, but got 2.
 src/hooks/transactions/useTransactionImport.ts(38,20): error TS2339: Property 'clearExisting' does not exist on type 'any[]'.
-src/hooks/transactions/useTransactionLedger.ts(71,5): error TS2554: Expected 1 arguments, but got 7.
-src/hooks/transactions/useTransactionLedger.ts(104,22): error TS2345: Argument of type '{ amount: number; createdBy: any; createdAt: string; importSource: string; date: string; description: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; id: number; }' is not assignable to parameter of type 'void'.
+src/hooks/transactions/useTransactionLedger.ts(75,5): error TS2554: Expected 1 arguments, but got 7.
+src/hooks/transactions/useTransactionLedger.ts(108,22): error TS2345: Argument of type '{ amount: number; createdBy: any; createdAt: string; importSource: string; date: string; description: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; id: number; }' is not assignable to parameter of type 'void'.
 src/hooks/transactions/useTransactionMutations.ts(9,47): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/hooks/transactions/useTransactionMutations.ts(10,12): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/hooks/transactions/useTransactionMutations.ts(28,9): error TS2698: Spread types may only be created from object types.
@@ -2426,7 +2379,7 @@ src/hooks/transactions/useTransactionQuery.ts(14,5): error TS2339: Property 'typ
 src/hooks/transactions/useTransactionQuery.ts(15,5): error TS2339: Property 'limit' does not exist on type '{}'.
 src/hooks/transactions/useTransactionQuery.ts(16,5): error TS2339: Property 'sortBy' does not exist on type '{}'.
 src/hooks/transactions/useTransactionQuery.ts(17,5): error TS2339: Property 'sortOrder' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(159,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
+src/hooks/transactions/useTransactionQuery.ts(162,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
 src/hooks/transactions/useTransactionSplitter.ts(30,11): error TS2339: Property 'transaction' does not exist on type '{}'.
 src/hooks/transactions/useTransactionSplitter.ts(30,24): error TS2339: Property 'envelopes' does not exist on type '{}'.
 src/hooks/transactions/useTransactionSplitter.ts(30,40): error TS2339: Property 'onSplit' does not exist on type '{}'.
@@ -3568,19 +3521,19 @@ src/utils/common/testBudgetHistory.ts(47,40): error TS2345: Argument of type '({
       Types of property 'changeType' are incompatible.
         Type 'string' is not assignable to type '"create" | "update" | "delete"'.
 src/utils/common/testBudgetHistory.ts(66,36): error TS2551: Property 'getBudgetCommits' does not exist on type 'VioletVaultDB'. Did you mean 'budgetCommits'?
-src/utils/common/toastHelpers.ts(20,11): error TS2339: Property 'showSuccess' does not exist on type '{}'.
-src/utils/common/toastHelpers.ts(20,24): error TS2339: Property 'showError' does not exist on type '{}'.
-src/utils/common/toastHelpers.ts(20,35): error TS2339: Property 'showWarning' does not exist on type '{}'.
-src/utils/common/toastHelpers.ts(20,48): error TS2339: Property 'showInfo' does not exist on type '{}'.
-src/utils/common/toastHelpers.ts(20,58): error TS2339: Property 'showPayday' does not exist on type '{}'.
-src/utils/common/toastHelpers.ts(102,48): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(103,51): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(104,52): error TS2339: Property 'showError' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(107,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(108,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(109,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(112,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(114,30): error TS2339: Property 'showError' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(21,24): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(22,22): error TS2339: Property 'showError' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(23,24): error TS2339: Property 'showWarning' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(24,21): error TS2339: Property 'showInfo' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(25,23): error TS2339: Property 'showPayday' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(108,48): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(109,51): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(110,52): error TS2339: Property 'showError' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(113,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(114,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(115,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(118,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(120,30): error TS2339: Property 'showError' does not exist on type 'unknown'.
 src/utils/common/transactionArchiving.ts(35,10): error TS2339: Property 'config' does not exist on type 'TransactionArchiver'.
 src/utils/common/transactionArchiving.ts(36,10): error TS2339: Property 'stats' does not exist on type 'TransactionArchiver'.
 src/utils/common/transactionArchiving.ts(47,55): error TS2339: Property 'config' does not exist on type 'TransactionArchiver'.
