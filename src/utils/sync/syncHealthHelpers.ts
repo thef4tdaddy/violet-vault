@@ -3,10 +3,25 @@
  * Handles status calculations, formatting, and display logic
  */
 
+interface SyncStatus {
+  status: string;
+  isLoading?: boolean;
+  failedTests?: number;
+  [key: string]: unknown;
+}
+
+interface RecoveryResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+  details?: unknown;
+  [key: string]: unknown;
+}
+
 /**
  * Get status color based on sync health status
  */
-export const getStatusColor = (syncStatus, isBackgroundSyncing) => {
+export const getStatusColor = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading || isBackgroundSyncing) return "text-blue-500";
 
   switch (syncStatus.status) {
@@ -25,7 +40,7 @@ export const getStatusColor = (syncStatus, isBackgroundSyncing) => {
 /**
  * Get background color for status indicator
  */
-export const getStatusBackgroundColor = (syncStatus, isBackgroundSyncing) => {
+export const getStatusBackgroundColor = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading || isBackgroundSyncing) return "bg-blue-100";
 
   switch (syncStatus.status) {
@@ -44,7 +59,7 @@ export const getStatusBackgroundColor = (syncStatus, isBackgroundSyncing) => {
 /**
  * Get status text for display
  */
-export const getStatusText = (syncStatus, isBackgroundSyncing) => {
+export const getStatusText = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading) return "Checking...";
   if (isBackgroundSyncing) return "Syncing...";
 
@@ -65,7 +80,7 @@ export const getStatusText = (syncStatus, isBackgroundSyncing) => {
 /**
  * Get status description for tooltip
  */
-export const getStatusDescription = (syncStatus, isBackgroundSyncing) => {
+export const getStatusDescription = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading) return "Checking sync health status...";
   if (isBackgroundSyncing) return "Background sync operation in progress...";
 
@@ -86,7 +101,7 @@ export const getStatusDescription = (syncStatus, isBackgroundSyncing) => {
 /**
  * Format last checked time for display
  */
-export const formatLastChecked = (lastChecked) => {
+export const formatLastChecked = (lastChecked: string | Date | null): string => {
   if (!lastChecked) return "Never checked";
 
   try {
@@ -112,7 +127,7 @@ export const formatLastChecked = (lastChecked) => {
 /**
  * Get priority level for status
  */
-export const getStatusPriority = (syncStatus) => {
+export const getStatusPriority = (syncStatus: SyncStatus): string => {
   switch (syncStatus.status) {
     case "CRITICAL_FAILURE":
       return "critical";
@@ -130,14 +145,14 @@ export const getStatusPriority = (syncStatus) => {
 /**
  * Check if status requires immediate attention
  */
-export const requiresImmediateAttention = (syncStatus) => {
+export const requiresImmediateAttention = (syncStatus: SyncStatus): boolean => {
   return ["ERROR", "CRITICAL_FAILURE"].includes(syncStatus.status);
 };
 
 /**
  * Check if recovery actions are available
  */
-export const hasRecoveryActions = () => {
+export const hasRecoveryActions = (): boolean => {
   return (
     typeof window !== "undefined" && (window.runMasterSyncValidation || window.forceCloudDataReset)
   );
@@ -146,7 +161,7 @@ export const hasRecoveryActions = () => {
 /**
  * Format recovery result for display
  */
-export const formatRecoveryResult = (result) => {
+export const formatRecoveryResult = (result: RecoveryResult | null) => {
   if (!result) return null;
 
   if (result.success) {
@@ -167,7 +182,7 @@ export const formatRecoveryResult = (result) => {
 /**
  * Get appropriate action button style based on status
  */
-export const getActionButtonStyle = (actionType, _syncStatus) => {
+export const getActionButtonStyle = (actionType: string, _syncStatus: SyncStatus): string => {
   const baseStyle =
     "px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold";
 

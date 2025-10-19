@@ -3,14 +3,15 @@
  * Extracted for better maintainability and ESLint compliance
  */
 import { useMemo } from "react";
+import { Envelope, Bill, Debt } from "../../../db/types";
 
 interface ConnectionDataParams {
-  entityType: string;
+  entityType: "bill" | "envelope" | "debt";
   entityId: string;
-  currentEntity: any;
-  bills: any[];
-  envelopes: any[];
-  debts?: any[];
+  currentEntity: Envelope | Bill | Debt;
+  bills: Bill[];
+  envelopes: Envelope[];
+  debts?: Debt[];
 }
 
 export const useConnectionData = ({

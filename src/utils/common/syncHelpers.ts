@@ -4,10 +4,31 @@
  * Components can import these helpers directly as they are pure display utilities
  */
 
+interface SyncStatus {
+  status: string;
+  isLoading?: boolean;
+  failedTests?: number;
+  [key: string]: unknown;
+}
+
+interface RecoveryResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+  details?: unknown;
+  [key: string]: unknown;
+}
+
+interface FormattedRecoveryResult {
+  type: "success" | "error";
+  message: string;
+  details: unknown;
+}
+
 /**
  * Get status color based on sync health status
  */
-export const getStatusColor = (syncStatus: any, isBackgroundSyncing: boolean): string => {
+export const getStatusColor = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading || isBackgroundSyncing) return "text-blue-500";
 
   switch (syncStatus.status) {
@@ -26,7 +47,7 @@ export const getStatusColor = (syncStatus: any, isBackgroundSyncing: boolean): s
 /**
  * Get background color for status indicator
  */
-export const getStatusBackgroundColor = (syncStatus: any, isBackgroundSyncing: boolean): string => {
+export const getStatusBackgroundColor = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading || isBackgroundSyncing) return "bg-blue-100";
 
   switch (syncStatus.status) {
@@ -45,7 +66,7 @@ export const getStatusBackgroundColor = (syncStatus: any, isBackgroundSyncing: b
 /**
  * Get status text for display
  */
-export const getStatusText = (syncStatus: any, isBackgroundSyncing: boolean): string => {
+export const getStatusText = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
   if (syncStatus.isLoading) return "Checking...";
   if (isBackgroundSyncing) return "Syncing...";
 
@@ -66,7 +87,7 @@ export const getStatusText = (syncStatus: any, isBackgroundSyncing: boolean): st
 /**
  * Get status description for tooltip
  */
-export const getStatusDescription = (syncStatus: any, isBackgroundSyncing?: boolean): string => {
+export const getStatusDescription = (syncStatus: SyncStatus, isBackgroundSyncing?: boolean): string => {
   if (syncStatus.isLoading) return "Checking sync health status...";
   if (isBackgroundSyncing) return "Background sync operation in progress...";
 
@@ -113,7 +134,7 @@ export const formatLastChecked = (lastChecked: string | null): string => {
 /**
  * Get priority level for status
  */
-export const getStatusPriority = (syncStatus: any): string => {
+export const getStatusPriority = (syncStatus: SyncStatus): string => {
   switch (syncStatus.status) {
     case "CRITICAL_FAILURE":
       return "critical";
@@ -131,7 +152,7 @@ export const getStatusPriority = (syncStatus: any): string => {
 /**
  * Check if status requires immediate attention
  */
-export const requiresImmediateAttention = (syncStatus: any): boolean => {
+export const requiresImmediateAttention = (syncStatus: SyncStatus): boolean => {
   return ["ERROR", "CRITICAL_FAILURE"].includes(syncStatus.status);
 };
 
@@ -141,14 +162,15 @@ export const requiresImmediateAttention = (syncStatus: any): boolean => {
 export const hasRecoveryActions = (): boolean => {
   return (
     typeof window !== "undefined" &&
-    ((window as any).runMasterSyncValidation || (window as any).forceCloudDataReset)
+    (typeof (window as Window & { runMasterSyncValidation?: unknown }).runMasterSyncValidation === "function" ||
+     typeof (window as Window & { forceCloudDataReset?: unknown }).forceCloudDataReset === "function")
   );
 };
 
 /**
  * Format recovery result for display
  */
-export const formatRecoveryResult = (result: any): any => {
+export const formatRecoveryResult = (result: RecoveryResult | null): FormattedRecoveryResult | null => {
   if (!result) return null;
 
   if (result.success) {
@@ -169,7 +191,7 @@ export const formatRecoveryResult = (result: any): any => {
 /**
  * Get appropriate action button style based on status
  */
-export const getActionButtonStyle = (actionType: string, _syncStatus?: any): string => {
+export const getActionButtonStyle = (actionType: string, _syncStatus?: SyncStatus): string => {
   const baseStyle =
     "px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold";
 

@@ -377,13 +377,14 @@ export class EnhancedFirebaseErrorHandler {
   }
 
   private extractErrorCode(error: unknown): string | null {
+    const errorObj = error as Record<string, unknown>;
     if (
       error &&
       typeof error === "object" &&
-      "code" in error &&
-      typeof (error as any).code === "string"
+      "code" in errorObj &&
+      typeof errorObj.code === "string"
     ) {
-      return (error as any).code;
+      return errorObj.code;
     }
     return null;
   }

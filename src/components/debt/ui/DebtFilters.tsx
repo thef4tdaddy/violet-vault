@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Select } from "@/components/ui";
+import { Select, Checkbox } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
@@ -110,12 +110,10 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
               <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="showPaidOff"
                   checked={filterOptions.showPaidOff}
-                  onChange={(e) => handleFilterChange("showPaidOff", e.target.checked)}
-                  className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  onCheckedChange={(checked) => handleFilterChange("showPaidOff", checked)}
                 />
                 <label htmlFor="showPaidOff" className="text-sm text-gray-700 cursor-pointer">
                   Show Paid Off

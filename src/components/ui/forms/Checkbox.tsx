@@ -1,7 +1,6 @@
 import React from "react";
 
-export interface CheckboxProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Label text */
   label?: string;
   /** Error message */
@@ -28,10 +27,7 @@ export interface CheckboxProps
  * />
  */
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  (
-    { label, error, helperText, className = "", id, disabled, ...props },
-    ref
-  ) => {
+  ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
     const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
@@ -55,9 +51,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           )}
         </div>
         {error && <p className="text-sm text-red-600 mt-1 ml-6">{error}</p>}
-        {helperText && !error && (
-          <p className="text-sm text-gray-500 mt-1 ml-6">{helperText}</p>
-        )}
+        {helperText && !error && <p className="text-sm text-gray-500 mt-1 ml-6">{helperText}</p>}
       </div>
     );
   }

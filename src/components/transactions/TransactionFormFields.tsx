@@ -1,7 +1,6 @@
 import React from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { Select, TextInput, Textarea, Checkbox, Button } from "@/components/ui";
+import { getIcon } from "@/utils";
 import ReceiptButton from "../receipts/ReceiptButton";
 import logger from "../../utils/common/logger";
 
@@ -102,7 +101,7 @@ const TransactionFormFields = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-        <input
+        <TextInput
           type="text"
           value={transactionForm.description}
           onChange={(e) =>
@@ -112,9 +111,6 @@ const TransactionFormFields = ({
             })
           }
           disabled={editingTransaction && !canEdit}
-          className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-          }`}
           placeholder="e.g., Grocery shopping at Walmart"
           required
         />
@@ -123,7 +119,7 @@ const TransactionFormFields = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
-          <input
+          <TextInput
             type="number"
             step="0.01"
             value={transactionForm.amount}
@@ -134,9 +130,6 @@ const TransactionFormFields = ({
               })
             }
             disabled={editingTransaction && !canEdit}
-            className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-              editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-            }`}
             placeholder="0.00"
             required
           />
@@ -233,7 +226,7 @@ const TransactionFormFields = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-        <textarea
+        <Textarea
           value={transactionForm.notes}
           onChange={(e) =>
             setTransactionForm({
@@ -243,26 +236,21 @@ const TransactionFormFields = ({
           }
           rows={3}
           disabled={editingTransaction && !canEdit}
-          className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-          }`}
           placeholder="Additional notes about this transaction..."
         />
       </div>
 
       <div className="flex items-center justify-start">
-        <input
-          type="checkbox"
+        <Checkbox
           id="reconciled"
           checked={transactionForm.reconciled}
-          onChange={(e) =>
+          onCheckedChange={(checked) =>
             setTransactionForm({
               ...transactionForm,
-              reconciled: e.target.checked,
+              reconciled: checked,
             })
           }
           disabled={editingTransaction && !canEdit}
-          className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
         />
         <label htmlFor="reconciled" className="ml-3 text-sm text-gray-700">
           Mark as reconciled

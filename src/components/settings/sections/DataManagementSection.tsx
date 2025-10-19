@@ -5,6 +5,13 @@ import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
 import { useConfirm } from "../../../hooks/common/useConfirm";
 import logger from "@/utils/common/logger";
 
+interface DataManagementSectionProps {
+  onOpenActivityFeed: () => void;
+  onExport: () => void;
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSync: () => void;
+}
+
 // Check if we're in development mode
 const isDevelopmentMode = () => {
   return (
@@ -16,7 +23,7 @@ const isDevelopmentMode = () => {
   );
 };
 
-const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync }) => {
+const DataManagementSection: React.FC<DataManagementSectionProps> = ({ onOpenActivityFeed, onExport, onImport, onSync }) => {
   const confirm = useConfirm();
   return (
     <div className="space-y-6">

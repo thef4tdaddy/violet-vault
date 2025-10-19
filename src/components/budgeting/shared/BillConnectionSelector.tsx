@@ -123,9 +123,9 @@ const BillConnectionSelector = ({
                   </p>
                   {!disabled && (
                     <Button
-                      type="button"
                       onClick={onCreateBill}
-                      className="mt-2 px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                      size="sm"
+                      className="mt-2"
                     >
                       Create Bill
                     </Button>

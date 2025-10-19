@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "@/components/ui";
+import { Select, TextInput, Textarea } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { getIconByName } from "../../utils/common/billIcons";
@@ -43,15 +43,11 @@ const BillFormFields = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Bill Name */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Bill Name *</label>
-          <input
-            type="text"
+          <TextInput
+            label="Bill Name *"
             value={formData.name}
             onChange={(e) => updateField("name", e.target.value)}
             disabled={editingBill && !canEdit}
-            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-              editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-            }`}
             placeholder="e.g., Electric Bill, Internet, Rent"
             required
           />
@@ -183,15 +179,12 @@ const BillFormFields = ({
 
       {/* Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-        <textarea
+        <Textarea
+          label="Notes"
           value={formData.notes}
           onChange={(e) => updateField("notes", e.target.value)}
           disabled={editingBill && !canEdit}
           rows={3}
-          className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-            editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-          }`}
           placeholder="Additional notes about this bill..."
         />
       </div>

@@ -1,7 +1,6 @@
 import React from "react";
 
-export interface TextInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Label text */
   label?: string;
   /** Error message */
@@ -34,35 +33,18 @@ export interface TextInputProps
  * />
  */
 const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
-  (
-    {
-      label,
-      error,
-      helperText,
-      icon,
-      className = "",
-      id,
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
+  ({ label, error, helperText, icon, className = "", id, disabled, ...props }, ref) => {
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-2">
             {label}
           </label>
         )}
         <div className="relative">
-          {icon && (
-            <div className="absolute left-3 top-3 text-gray-400">{icon}</div>
-          )}
+          {icon && <div className="absolute left-3 top-3 text-gray-400">{icon}</div>}
           <input
             ref={ref}
             id={inputId}
@@ -70,17 +52,13 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
             className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-offset-2 focus:border-transparent transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed ${
               icon ? "pl-10" : ""
             } ${
-              error
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:ring-blue-500"
+              error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
             } ${className}`}
             {...props}
           />
         </div>
         {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
-        {helperText && !error && (
-          <p className="text-sm text-gray-500 mt-1">{helperText}</p>
-        )}
+        {helperText && !error && <p className="text-sm text-gray-500 mt-1">{helperText}</p>}
       </div>
     );
   }

@@ -120,7 +120,7 @@ export class PerformanceInfoService {
       }
 
       const navigation = perf.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-      const memory = (perf as any).memory;
+      const memory = (perf as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
 
       return {
         available: true,
@@ -301,9 +301,9 @@ export class PerformanceInfoService {
       };
 
       // Network Information API (if available)
-      const connection = (navigator as any).connection || 
-        (navigator as any).mozConnection || 
-        (navigator as any).webkitConnection;
+      const connection = (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown }).connection ||
+        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown }).mozConnection ||
+        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown }).webkitConnection;
       if (connection) {
         networkInfo.effectiveType = connection.effectiveType;
         networkInfo.downlink = connection.downlink;
@@ -329,9 +329,9 @@ export class PerformanceInfoService {
    */
   static getConnectionInfo(): ConnectionInfo | null {
     try {
-      const connection = (navigator as any).connection || 
-        (navigator as any).mozConnection || 
-        (navigator as any).webkitConnection;
+      const connection = (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown }).connection ||
+        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown }).mozConnection ||
+        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown }).webkitConnection;
       if (!connection) return null;
 
       return {

@@ -4,14 +4,15 @@
  */
 import useToast from "../useToast";
 import logger from "../../../utils/common/logger";
+import { Envelope, Bill } from "../../../db/types";
 
 interface AutoPopulateParams {
   entityType: string;
   entityId: string;
   billId: string | null;
-  bills: any[];
-  currentEntity: any;
-  updateEnvelope: (id: string, updates: any) => Promise<void>;
+  bills: Bill[];
+  currentEntity: Envelope;
+  updateEnvelope: (id: string, updates: Partial<Envelope>) => Promise<void>;
 }
 
 export const useAutoPopulate = () => {
@@ -33,23 +34,15 @@ export const useAutoPopulate = () => {
     logger.debug("📝 Auto-populating envelope from bill", {
       envelopeId: entityId,
       billId,
-      billProvider: targetBill.provider,
+      billName: targetBill.name,
     });
 
     try {
-      const updates = {};
+      const updates: Partial<Envelope> = {};
 
       // Only update empty fields
-      if (!currentEntity.name && targetBill.provider) {
-        updates.name = targetBill.provider;
-      }
-
-      if (!currentEntity.amount && targetBill.amount) {
-        updates.amount = targetBill.amount;
-      }
-
-      if (!currentEntity.frequency && targetBill.frequency) {
-        updates.frequency = targetBill.frequency;
+      if (!currentEntity.name && targetBill.name) {
+        updates.name = targetBill.name;
       }
 
       if (!currentEntity.category && targetBill.category) {
@@ -62,7 +55,7 @@ export const useAutoPopulate = () => {
         addToast({
           type: "success",
           title: "Details Auto-filled",
-          message: `Envelope details populated from ${targetBill.provider}`,
+          message: `Envelope details populated from ${targetBill.name}`,
           duration: 3000,
         });
 

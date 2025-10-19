@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils";
+import { Button } from "@/components/ui";
 import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
@@ -29,30 +30,28 @@ const SuggestionBadge = ({ count, hasSuggestions }) => {
 
 // Settings button component
 const SettingsButton = ({ showSettings, onClick }) => {
-  const buttonClasses = showSettings
-    ? "bg-amber-100 text-amber-700"
-    : "bg-gray-100 text-gray-600 hover:bg-gray-200";
-
   return (
-    <button
+    <Button
       onClick={onClick}
-      className={`p-2 rounded-lg transition-colors ${buttonClasses}`}
+      variant={showSettings ? "secondary" : "ghost"}
+      size="sm"
       title="Settings"
     >
       {React.createElement(getIcon("Settings"), {
         className: "h-4 w-4",
       })}
-    </button>
+    </Button>
   );
 };
 
 // Header component
-const SuggestionsHeader = ({ isCollapsed, toggleCollapse, hasSuggestions, suggestions, 
+const SuggestionsHeader = ({ isCollapsed, toggleCollapse, hasSuggestions, suggestions,
   showSettings, toggleSettings }) => (
   <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
-    <button
+    <Button
       onClick={toggleCollapse}
-      className={`flex items-center font-semibold text-gray-900 hover:text-gray-700 transition-colors group ${
+      variant="ghost"
+      className={`flex items-center font-semibold text-gray-900 hover:text-gray-700 transition-colors group p-0 h-auto ${
         isCollapsed ? "text-base" : "text-lg"
       }`}
     >
@@ -64,7 +63,7 @@ const SuggestionsHeader = ({ isCollapsed, toggleCollapse, hasSuggestions, sugges
           className: "h-4 w-4",
         })}
       </div>
-    </button>
+    </Button>
 
     {!isCollapsed && (
       <div className="flex items-center space-x-2">

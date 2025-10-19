@@ -13,7 +13,7 @@ interface ActivityDetails {
   creditor?: string;
   itemsChanged?: number;
   userName?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface Activity {

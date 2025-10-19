@@ -83,7 +83,7 @@ interface ActivityUser {
  * Activity details for logging
  */
 interface ActivityDetails {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class ActivityLogger {
@@ -183,11 +183,11 @@ class ActivityLogger {
     return this.logActivity(ACTIVITY_TYPES.ENVELOPE_CREATED, ENTITY_TYPES.ENVELOPE, envelope.id, {
       name: envelope.name,
       category: envelope.category,
-      monthlyBudget: (envelope as any).monthlyBudget,
+      monthlyBudget: (envelope as Envelope & { monthlyBudget?: number }).monthlyBudget,
     });
   }
 
-  async logEnvelopeUpdated(envelope: Envelope, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
+  async logEnvelopeUpdated(envelope: Envelope, changes: Record<string, unknown> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.ENVELOPE_UPDATED, ENTITY_TYPES.ENVELOPE, envelope.id, {
       name: envelope.name,
       changes: Object.keys(changes),
@@ -225,7 +225,7 @@ class ActivityLogger {
     );
   }
 
-  async logTransactionUpdated(transaction: Transaction, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
+  async logTransactionUpdated(transaction: Transaction, changes: Record<string, unknown> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(
       ACTIVITY_TYPES.TRANSACTION_UPDATED,
       ENTITY_TYPES.TRANSACTION,
@@ -274,7 +274,7 @@ class ActivityLogger {
     });
   }
 
-  async logBillUpdated(bill: Bill, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
+  async logBillUpdated(bill: Bill, changes: Record<string, unknown> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.BILL_UPDATED, ENTITY_TYPES.BILL, bill.id, {
       name: bill.name,
       amount: bill.amount,
@@ -325,7 +325,7 @@ class ActivityLogger {
     });
   }
 
-  async logDebtUpdated(debt: Debt, changes: Record<string, any> = {}): Promise<AuditLogEntry | null> {
+  async logDebtUpdated(debt: Debt, changes: Record<string, unknown> = {}): Promise<AuditLogEntry | null> {
     return this.logActivity(ACTIVITY_TYPES.DEBT_UPDATED, ENTITY_TYPES.DEBT, debt.id, {
       name: debt.name,
       creditor: debt.creditor,

@@ -1,4 +1,5 @@
 import React from "react";
+import { Select } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useConnectionManager } from "../../hooks/common/useConnectionManager";
 
@@ -240,26 +241,30 @@ const ConnectionSelector = ({ config, theme, canEdit, managerProps }) => (
   </ConnectionDisplay>
 );
 
-const ConnectionDropdown = ({ config, canEdit, managerProps }) => (
-  <select
-    value={managerProps.selectedConnectionId || ""}
-    onChange={(e) => managerProps.handleSelectionChange(e.target.value)}
-    disabled={!canEdit || managerProps.isConnecting}
-    className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
-      !canEdit || managerProps.isConnecting ? "bg-gray-100 cursor-not-allowed" : ""
-    }`}
-  >
-    <option value="">
-      {managerProps.hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`}
-    </option>
-    {managerProps.availableOptions.map((option) => (
-      <option key={option.id} value={option.id}>
-        {option.name || option.provider} - ${parseFloat(option.amount || 0).toFixed(2)} (
-        {option.frequency || "monthly"})
-      </option>
-    ))}
-  </select>
-);
+const ConnectionDropdown = ({ config, canEdit, managerProps }) => {
+  const options = [
+    {
+      value: "",
+      label: managerProps.hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`
+    },
+    ...managerProps.availableOptions.map((option) => ({
+      value: option.id,
+      label: `${option.name || option.provider} - $${parseFloat(option.amount || 0).toFixed(2)} (${option.frequency || "monthly"})`
+    }))
+  ];
+
+  return (
+    <Select
+      value={managerProps.selectedConnectionId || ""}
+      onChange={(e) => managerProps.handleSelectionChange(e.target.value)}
+      disabled={!canEdit || managerProps.isConnecting}
+      options={options}
+      className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
+        !canEdit || managerProps.isConnecting ? "bg-gray-100 cursor-not-allowed" : ""
+      }`}
+    />
+  );
+};
 
 const ConnectButton = ({ onClick, canConnect, isConnecting }) => (
   <button

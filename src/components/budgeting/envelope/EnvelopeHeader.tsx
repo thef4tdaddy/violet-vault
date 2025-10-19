@@ -1,8 +1,7 @@
 import React from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
-import { ENVELOPE_TYPES } from "../../../constants/categories";
+import { Select, Checkbox, Button } from "@/components/ui";
+import { getIcon } from "@/utils";
+import { ENVELOPE_TYPES } from "@/constants/categories";
 
 const EnvelopeHeader = ({
   filterOptions,
@@ -81,13 +80,12 @@ const EnvelopeHeader = ({
           </Select>
 
           <label className="flex items-center text-xs">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={filterOptions.showEmpty}
-              onChange={(e) =>
+              onCheckedChange={(checked) =>
                 setFilterOptions((prev) => ({
                   ...prev,
-                  showEmpty: e.target.checked,
+                  showEmpty: checked,
                 }))
               }
               className="mr-1"

@@ -4,6 +4,7 @@
  */
 import useToast from "../useToast";
 import logger from "../../../utils/common/logger";
+import { Envelope, Bill, Debt } from "../../../db/types";
 
 const connectBill = async (entityId, targetId, envelopes, updateBill, addToast) => {
   const targetEnvelope = envelopes.find((e) => e.id === targetId);
@@ -48,23 +49,23 @@ const connectDebt = async (entityId, targetId, envelopes, updateDebt, addToast) 
 };
 
 interface ConnectParams {
-  entityType: string;
+  entityType: "bill" | "envelope" | "debt";
   entityId: string;
   targetId: string;
-  currentEntity: any;
-  envelopes: any[];
-  bills: any[];
-  debts?: any[];
-  updateBill: (id: string, updates: any) => Promise<void>;
-  updateDebt: (params: { id: string; updates: any }) => Promise<void>;
+  currentEntity: Envelope | Bill | Debt;
+  envelopes: Envelope[];
+  bills: Bill[];
+  debts?: Debt[];
+  updateBill: (id: string, updates: Partial<Bill>) => Promise<void>;
+  updateDebt: (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
 }
 
 interface DisconnectParams {
   entityType: string;
   entityId: string;
-  currentConnections: any[];
-  updateBill: (id: string, updates: any) => Promise<void>;
-  updateDebt: (params: { id: string; updates: any }) => Promise<void>;
+  currentConnections: Bill[];
+  updateBill: (id: string, updates: Partial<Bill>) => Promise<void>;
+  updateDebt: (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
 }
 
 export const useConnectionOperations = () => {

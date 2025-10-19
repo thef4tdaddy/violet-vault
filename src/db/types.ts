@@ -6,7 +6,7 @@ export interface BudgetRecord {
   lastModified: number;
   version?: number;
   // Additional properties for encrypted budget data
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Envelope {
@@ -92,13 +92,13 @@ export interface AuditLogEntry {
   entityId: string;
   // Additional audit properties
   userId?: string;
-  changes?: Record<string, any>;
-  metadata?: Record<string, any>;
+  changes?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CacheEntry {
   key: string;
-  value: any;
+  value: unknown;
   expiresAt: number;
   category: string;
   // Additional cache properties
@@ -129,7 +129,7 @@ export interface BudgetCommit {
   parentHash?: string;
   deviceFingerprint?: string;
   // Additional commit properties
-  changes?: Record<string, any>;
+  changes?: Record<string, unknown>;
 }
 
 export interface BudgetChange {
@@ -140,8 +140,8 @@ export interface BudgetChange {
   changeType: "create" | "update" | "delete";
   description?: string;
   // Additional change properties
-  oldValue?: any;
-  newValue?: any;
+  oldValue?: unknown;
+  newValue?: unknown;
 }
 
 export interface BudgetBranch {
@@ -179,7 +179,7 @@ export interface AutoBackup {
   // Additional backup properties
   size?: number;
   checksum?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Utility types for query operations
@@ -190,7 +190,7 @@ export type DateRange = {
 
 export type BulkUpdate = {
   type: "envelope" | "transaction" | "bill" | "savingsGoal" | "paycheck";
-  data: any;
+  data: unknown;
 };
 
 // Database statistics type

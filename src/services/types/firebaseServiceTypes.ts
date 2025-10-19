@@ -280,45 +280,48 @@ export class TypedSyncDataValidator implements SyncDataValidator {
   validateEncryptedData(
     data: unknown
   ): data is { encryptedData: string; timestamp: unknown; metadata: unknown } {
+    const dataObj = data as Record<string, unknown>;
     return (
       typeof data === "object" &&
       data !== null &&
-      "encryptedData" in data &&
-      "timestamp" in data &&
-      "metadata" in data &&
-      typeof (data as any).encryptedData === "string"
+      "encryptedData" in dataObj &&
+      "timestamp" in dataObj &&
+      "metadata" in dataObj &&
+      typeof dataObj.encryptedData === "string"
     );
   }
 
   validateManifest(
     manifest: unknown
   ): manifest is { totalChunks: number; dataSize: number; checksum: string } {
+    const manifestObj = manifest as Record<string, unknown>;
     return (
       typeof manifest === "object" &&
       manifest !== null &&
-      "totalChunks" in manifest &&
-      "dataSize" in manifest &&
-      "checksum" in manifest &&
-      typeof (manifest as any).totalChunks === "number" &&
-      typeof (manifest as any).dataSize === "number" &&
-      typeof (manifest as any).checksum === "string"
+      "totalChunks" in manifestObj &&
+      "dataSize" in manifestObj &&
+      "checksum" in manifestObj &&
+      typeof manifestObj.totalChunks === "number" &&
+      typeof manifestObj.dataSize === "number" &&
+      typeof manifestObj.checksum === "string"
     );
   }
 
   validateChunkData(
     chunk: unknown
   ): chunk is { id: string; data: string; index: number; total: number } {
+    const chunkObj = chunk as Record<string, unknown>;
     return (
       typeof chunk === "object" &&
       chunk !== null &&
-      "id" in chunk &&
-      "data" in chunk &&
-      "index" in chunk &&
-      "total" in chunk &&
-      typeof (chunk as any).id === "string" &&
-      typeof (chunk as any).data === "string" &&
-      typeof (chunk as any).index === "number" &&
-      typeof (chunk as any).total === "number"
+      "id" in chunkObj &&
+      "data" in chunkObj &&
+      "index" in chunkObj &&
+      "total" in chunkObj &&
+      typeof chunkObj.id === "string" &&
+      typeof chunkObj.data === "string" &&
+      typeof chunkObj.index === "number" &&
+      typeof chunkObj.total === "number"
     );
   }
 }

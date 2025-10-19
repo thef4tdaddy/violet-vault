@@ -14,6 +14,8 @@ import {
   PAYMENT_FREQUENCIES,
 } from "../../constants/debts";
 
+import { Bill, Envelope, Transaction } from "../../db/types";
+
 // Import separated debt calculation functions
 import { calculateNextPaymentDate } from "./calculations/nextPaymentDate";
 import { calculatePayoffProjection } from "./calculations/payoffProjection";
@@ -77,9 +79,9 @@ export function createSpecialTerms(
  */
 export function enrichDebt(
   debt: DebtAccount,
-  relatedBill: any = null,
-  relatedEnvelope: any = null,
-  relatedTransactions: any[] = []
+  relatedBill: Bill | null = null,
+  relatedEnvelope: Envelope | null = null,
+  relatedTransactions: Transaction[] = []
 ): DebtAccount {
   // Calculate next payment date (provide null for relatedBill parameter)
   const nextPaymentDate = calculateNextPaymentDate(debt, null);

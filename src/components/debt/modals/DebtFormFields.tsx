@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "@/components/ui";
+import { Select, TextInput, Checkbox } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
@@ -39,30 +39,28 @@ const DebtFormFields = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Debt Name <span className="text-red-500">*</span>
             </label>
-            <input
+            <TextInput
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ name: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               placeholder="e.g., Chase Credit Card"
               disabled={!canEdit}
+              error={errors.name}
             />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Creditor <span className="text-red-500">*</span>
             </label>
-            <input
+            <TextInput
               type="text"
               value={formData.creditor}
               onChange={(e) => setFormData({ creditor: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               placeholder="e.g., Chase Bank"
               disabled={!canEdit}
+              error={errors.creditor}
             />
-            {errors.creditor && <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>}
           </div>
         </div>
 
@@ -236,26 +234,11 @@ const DebtFormFields = ({
             <h4 className="font-medium text-gray-900">Automatic Bill Creation</h4>
             <p className="text-sm text-gray-600">Create recurring bills for this debt's payments</p>
           </div>
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.shouldCreateBill}
-              onChange={(e) => setFormData({ shouldCreateBill: e.target.checked })}
-              className="sr-only"
-              disabled={!canEdit}
-            />
-            <div
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                formData.shouldCreateBill ? "bg-blue-600" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  formData.shouldCreateBill ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </div>
-          </label>
+          <Checkbox
+            checked={formData.shouldCreateBill}
+            onCheckedChange={(checked) => setFormData({ shouldCreateBill: checked })}
+            disabled={!canEdit}
+          />
         </div>
 
         {/* Universal Connection Manager for standardized connection UI */}

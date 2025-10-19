@@ -1,5 +1,9 @@
 import logger from "../common/logger";
 
+// Type declarations for browser APIs
+type NotificationPermission = "default" | "denied" | "granted";
+/// <reference types="../../vite-env.d.ts" />
+
 /**
  * Notification Permission Utilities
  * Handles browser compatibility and permission management for push notifications

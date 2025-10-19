@@ -6,12 +6,45 @@
  */
 import logger from "../common/logger";
 
+interface Bill {
+  id: string;
+  name?: string;
+  description?: string;
+  provider?: string;
+  amount?: number;
+  monthlyAmount?: number;
+  dueDate?: string | Date;
+  date?: string | Date;
+  paidDate?: string | Date;
+  isPaid?: boolean;
+  envelopeId?: string;
+  daysUntilDue?: number;
+  urgency?: string;
+  [key: string]: unknown;
+}
+
+interface FilterOptions {
+  search?: string;
+  urgency?: string;
+  envelope?: string;
+  amountMin?: string | number;
+  amountMax?: string | number;
+  [key: string]: unknown;
+}
+
+interface CategorizedBills {
+  upcoming: Bill[];
+  overdue: Bill[];
+  paid: Bill[];
+  all: Bill[];
+}
+
 /**
  * Normalize date strings to YYYY-MM-DD format
  * @param {string|Date} dateInput - Raw date input
  * @returns {string} Normalized date string in YYYY-MM-DD format, or empty string if invalid
  */
-export const normalizeBillDate = (dateInput) => {
+export const normalizeBillDate = (dateInput: string | Date): string => {
   if (!dateInput) return "";
 
   try {
@@ -82,7 +115,7 @@ export const normalizeBillDate = (dateInput) => {
  * @param {Date} fromDate - Reference date (defaults to today)
  * @returns {number|null} Days until due (negative if overdue), null if invalid date
  */
-export const calculateDaysUntilDue = (dueDate, fromDate = new Date()) => {
+export const calculateDaysUntilDue = (dueDate: string | Date, fromDate: Date = new Date()): number | null => {
   if (!dueDate) return null;
 
   try {
@@ -113,7 +146,7 @@ export const calculateDaysUntilDue = (dueDate, fromDate = new Date()) => {
  * @param {number} daysUntilDue - Days until bill is due
  * @returns {string} Urgency level: 'overdue', 'urgent', 'soon', 'normal'
  */
-export const calculateBillUrgency = (daysUntilDue) => {
+export const calculateBillUrgency = (daysUntilDue: number | null | undefined): string => {
   if (daysUntilDue === null || daysUntilDue === undefined) return "normal";
 
   if (daysUntilDue < 0) return "overdue";
@@ -128,7 +161,7 @@ export const calculateBillUrgency = (daysUntilDue) => {
  * @param {Date} fromDate - Reference date (defaults to today)
  * @returns {Object} Processed bill with daysUntilDue and urgency
  */
-export const processBillCalculations = (bill, fromDate = new Date()) => {
+export const processBillCalculations = (bill: Bill, fromDate: Date = new Date()): Bill => {
   const daysUntilDue = calculateDaysUntilDue(bill.dueDate, fromDate);
   const urgency = calculateBillUrgency(daysUntilDue);
 
@@ -148,7 +181,7 @@ export const processBillCalculations = (bill, fromDate = new Date()) => {
  * @param {Array} bills - Array of processed bills
  * @returns {Object} Categorized bills object with sorting applied
  */
-export const categorizeBills = (bills) => {
+export const categorizeBills = (bills: Bill[]): CategorizedBills => {
   const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
   const overdueBills = bills.filter((b) => !b.isPaid && b.daysUntilDue < 0);
   const paidBills = bills.filter((b) => b.isPaid);
@@ -166,7 +199,7 @@ export const categorizeBills = (bills) => {
  * @param {Object} categorizedBills - Output from categorizeBills()
  * @returns {Object} Totals object with overdue, upcoming, and paid amounts
  */
-export const calculateBillTotals = (categorizedBills) => {
+export const calculateBillTotals = (categorizedBills: CategorizedBills) => {
   const overdueTotal = (categorizedBills.overdue || []).reduce(
     (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
     0
@@ -202,7 +235,7 @@ export const calculateBillTotals = (categorizedBills) => {
  * @param {Object} filterOptions - Filter criteria
  * @returns {Array} Filtered bills
  */
-export const filterBills = (bills, filterOptions = {}) => {
+export const filterBills = (bills: Bill[], filterOptions: FilterOptions = {}): Bill[] => {
   let filtered = [...bills];
 
   if (filterOptions.search) {

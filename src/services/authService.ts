@@ -11,12 +11,32 @@ import { encryptionUtils } from "../utils/security/encryption";
 import logger from "../utils/common/logger";
 import { identifyUser } from "../utils/common/highlight";
 
+interface UserData {
+  userName: string;
+  userColor?: string;
+  shareCode?: string;
+  budgetId?: string;
+  [key: string]: unknown;
+}
+
+interface SessionData {
+  encryptionKey: CryptoKey;
+  salt: Uint8Array;
+}
+
+interface JoinData {
+  budgetId: string;
+  password: string;
+  userInfo: UserData;
+  sharedBy?: string;
+}
+
 /**
  * Validate a password against stored encrypted data
  * @param {string} password - Password to validate
  * @returns {Promise<boolean>} - Whether password is valid
  */
-export const validatePassword = async (password) => {
+export const validatePassword = async (password: string): Promise<boolean> => {
   try {
     logger.production("Password validation started", {
       hasPassword: !!password,
@@ -98,10 +118,10 @@ export const validatePassword = async (password) => {
 /**
  * Login with password and optional user data for new users
  * @param {string} password - User's password
- * @param {Object|null} userData - New user data for registration
+ * @param {UserData|null} userData - New user data for registration
  * @returns {Promise<Object>} - Login result with success/error info
  */
-export const login = async (password, userData = null) => {
+export const login = async (password: string, userData: UserData | null = null) => {
   logger.auth("Login attempt started.", {
     hasPassword: !!password,
     hasUserData: !!userData,
@@ -343,10 +363,10 @@ export const login = async (password, userData = null) => {
 
 /**
  * Join a shared budget using a share code
- * @param {Object} joinData - Join data with budgetId, password, userInfo, etc.
+ * @param {JoinData} joinData - Join data with budgetId, password, userInfo, etc.
  * @returns {Promise<Object>} - Join result
  */
-export const joinBudgetWithShareCode = async (joinData) => {
+export const joinBudgetWithShareCode = async (joinData: JoinData) => {
   logger.auth("Join budget attempt started.", {
     budgetId: joinData.budgetId?.substring(0, 8) + "...",
     hasPassword: !!joinData.password,
@@ -434,11 +454,11 @@ export const joinBudgetWithShareCode = async (joinData) => {
 
 /**
  * Update user profile information
- * @param {Object} updatedProfile - Updated profile data
- * @param {Object} currentSession - Current session data (encryptionKey, salt)
+ * @param {UserData} updatedProfile - Updated profile data
+ * @param {SessionData} currentSession - Current session data (encryptionKey, salt)
  * @returns {Promise<Object>} - Update result
  */
-export const updateProfile = async (updatedProfile, currentSession) => {
+export const updateProfile = async (updatedProfile: UserData, currentSession: SessionData) => {
   try {
     const { encryptionKey, salt: currentSalt } = currentSession;
 
@@ -489,7 +509,7 @@ export const updateProfile = async (updatedProfile, currentSession) => {
  * @param {string} newPassword - New password
  * @returns {Promise<Object>} - Change result
  */
-export const changePassword = async (oldPassword, newPassword) => {
+export const changePassword = async (oldPassword: string, newPassword: string) => {
   try {
     const savedData = localStorage.getItem("envelopeBudgetData");
     if (!savedData) {

@@ -221,15 +221,16 @@ export class TypedFirebaseExample {
 
   // Private helper methods
   private isValidBudgetData(data: SafeUnknown): data is BudgetData {
+    const obj = data as Record<string, unknown>;
     return (
       typeof data === "object" &&
       data !== null &&
-      "transactions" in data &&
-      "envelopes" in data &&
-      "settings" in data &&
-      Array.isArray((data as any).transactions) &&
-      Array.isArray((data as any).envelopes) &&
-      typeof (data as any).settings === "object"
+      "transactions" in obj &&
+      "envelopes" in obj &&
+      "settings" in obj &&
+      Array.isArray(obj.transactions) &&
+      Array.isArray(obj.envelopes) &&
+      typeof obj.settings === "object"
     );
   }
 

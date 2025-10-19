@@ -22,9 +22,9 @@ interface DebtMetrics {
 }
 
 // Helper to parse and validate numeric fields
-const parseNumericField = (value: any): number | null => {
+const parseNumericField = (value: unknown): number | null => {
   if (!value) return null;
-  const parsed = parseFloat(value);
+  const parsed = parseFloat(String(value));
   return isNaN(parsed) ? null : parsed;
 };
 
@@ -65,7 +65,7 @@ const addBalanceComparisonWarnings = (
 /**
  * Validate debt form data with financial business rules
  */
-export function validateDebtFormData(formData: any): ValidationResult {
+export function validateDebtFormData(formData: Record<string, unknown>): ValidationResult {
   const errors: DebtFormErrors = {};
   const warnings: string[] = [];
 
@@ -119,19 +119,19 @@ export function validateDebtFormData(formData: any): ValidationResult {
 }
 
 // Helper functions to reduce complexity
-const isValidNumber = (value: any): boolean => {
-  const num = parseFloat(value);
+const isValidNumber = (value: unknown): boolean => {
+  const num = parseFloat(String(value));
   return !isNaN(num) && num >= 0;
 };
 
-const checkRequiredTextField = (value: any, fieldName: string, errors: Record<string, string>) => {
-  if (!value?.trim()) {
+const checkRequiredTextField = (value: unknown, fieldName: string, errors: Record<string, string>) => {
+  if (!value || typeof value !== 'string' || !value.trim()) {
     errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
   }
 };
 
 const checkBalanceField = (
-  value: any,
+  value: unknown,
   fieldName: string,
   required: boolean,
   errors: Record<string, string>
@@ -141,23 +141,23 @@ const checkBalanceField = (
       errors[fieldName] = `Valid ${fieldName.replace(/([A-Z])/g, " $1").toLowerCase()} is required`;
     }
   } else if (value) {
-    const num = parseFloat(value);
+    const num = parseFloat(String(value));
     if (isNaN(num) || num < 0) {
       errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be positive`;
     }
   }
 };
 
-const checkInterestRate = (value: any, errors: Record<string, string>) => {
+const checkInterestRate = (value: unknown, errors: Record<string, string>) => {
   if (value) {
-    const rate = parseFloat(value);
+    const rate = parseFloat(String(value));
     if (isNaN(rate) || rate < 0 || rate > 100) {
       errors.interestRate = "Interest rate must be between 0 and 100";
     }
   }
 };
 
-const checkPaymentMethodFields = (formData: any, errors: Record<string, string>) => {
+const checkPaymentMethodFields = (formData: Record<string, unknown>, errors: Record<string, string>) => {
   if (formData.paymentMethod === "connect_existing" && !formData.existingBillId) {
     errors.existingBillId = "Please select a bill to connect";
   }
@@ -171,7 +171,7 @@ const checkPaymentMethodFields = (formData: any, errors: Record<string, string>)
  * Validate debt form fields (for useDebtForm hook)
  * Returns object with field-specific error messages
  */
-export function validateDebtFormFields(formData: any): Record<string, string> {
+export function validateDebtFormFields(formData: Record<string, unknown>): Record<string, string> {
   const errors: Record<string, string> = {};
 
   checkRequiredTextField(formData.name, "name", errors);
