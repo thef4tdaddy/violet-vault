@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import { Radio } from "@/components/ui";
 
 /**
  * Shared component for allocation mode selection using radio buttons
@@ -14,15 +15,14 @@ const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled =
         {/* Auto-allocate option */}
         <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
           <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-            <input
-              type="radio"
+            <Radio
               id="autoAllocateTrue"
               name="autoAllocate"
               value="true"
               checked={autoAllocate === true}
               onChange={() => !disabled && onAutoAllocateChange(true)}
               disabled={disabled}
-              className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+              className="mt-0.5 justify-self-start"
             />
             <div>
               <div className="flex items-center mb-1">
@@ -41,15 +41,14 @@ const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled =
         {/* Manual allocation option */}
         <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
           <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-            <input
-              type="radio"
+            <Radio
               id="autoAllocateFalse"
               name="autoAllocate"
               value="false"
               checked={autoAllocate === false}
               onChange={() => !disabled && onAutoAllocateChange(false)}
               disabled={disabled}
-              className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+              className="mt-0.5 justify-self-start"
             />
             <div>
               <div className="flex items-center mb-1">

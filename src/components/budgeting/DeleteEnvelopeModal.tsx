@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui";
+import { Button, Radio } from "@/components/ui";
 import { getIcon } from "../../utils";
 
 const DeleteEnvelopeModal = ({
@@ -62,32 +62,21 @@ const DeleteEnvelopeModal = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="flex items-center text-sm">
-                    <input
-                      type="radio"
-                      name="billAction"
-                      checked={!deleteBillsToo}
-                      onChange={() => setDeleteBillsToo(false)}
-                      className="mr-2"
-                    />
-                    <span className="text-yellow-800">
-                      Keep bills and disconnect them (recommended)
-                    </span>
-                  </label>
+                  <Radio
+                    name="billAction"
+                    checked={!deleteBillsToo}
+                    onChange={() => setDeleteBillsToo(false)}
+                    label="Keep bills and disconnect them (recommended)"
+                    className="text-yellow-800"
+                  />
 
-                  <label className="flex items-center text-sm">
-                    <input
-                      type="radio"
-                      name="billAction"
-                      checked={deleteBillsToo}
-                      onChange={() => setDeleteBillsToo(true)}
-                      className="mr-2"
-                    />
-                    <span className="text-red-700">
-                      Also delete all {connectedBills.length} connected bill
-                      {connectedBills.length > 1 ? "s" : ""}
-                    </span>
-                  </label>
+                  <Radio
+                    name="billAction"
+                    checked={deleteBillsToo}
+                    onChange={() => setDeleteBillsToo(true)}
+                    label={`Also delete all ${connectedBills.length} connected bill${connectedBills.length > 1 ? "s" : ""}`}
+                    className="text-red-700"
+                  />
                 </div>
 
                 <p className="text-xs text-yellow-600 mt-2">

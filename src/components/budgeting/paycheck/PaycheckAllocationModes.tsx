@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import { Radio } from "@/components/ui";
 
 /**
  * Paycheck allocation mode selector component
@@ -56,15 +57,14 @@ const AllocationModeOption = ({
 }) => (
   <div className="glassmorphism border-2 border-black rounded-2xl hover:border-purple-300 transition-all p-6">
     <div className="grid grid-cols-[auto_1fr] gap-4 items-start">
-      <input
-        type="radio"
+      <Radio
         value={value}
         checked={checked}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-5 h-5 mt-0.5 justify-self-start ${
+        disabled={disabled}
+        className={`mt-0.5 justify-self-start ${
           value === "allocate" ? "text-purple-600" : "text-emerald-600"
         }`}
-        disabled={disabled}
       />
       <div>
         <div className="flex items-center mb-2">

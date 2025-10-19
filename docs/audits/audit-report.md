@@ -13,11 +13,10 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 16 issues in `violet-vault/src/hooks/common/useBugReportV2.ts`
 - 5 issues in `violet-vault/src/services/authService.ts`
 - 5 issues in `violet-vault/src/hooks/common/useFABActions.ts`
+- 5 issues in `violet-vault/src/hooks/common/useBugReportV2.ts`
 - 4 issues in `violet-vault/src/utils/common/highlight.ts`
-- 4 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
 - 3 issues in `violet-vault/src/utils/sync/syncHealthChecker.ts`
 - 3 issues in `violet-vault/src/utils/sync/syncFlowValidator.ts`
 - 3 issues in `violet-vault/src/utils/budgeting/envelopeFormUtils.ts`
@@ -31,11 +30,9 @@
 - 3 issues in `violet-vault/src/components/modals/UnassignedCashModal.tsx`
 - 3 issues in `violet-vault/src/components/auth/LocalOnlyModeSettings.tsx`
 - 2 issues in `violet-vault/src/utils/pwa/patchNotesManager.ts`
-- 2 issues in `violet-vault/src/utils/notifications/permissionUtils.ts`
 - 2 issues in `violet-vault/src/utils/common/billDiscovery.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/autofunding/rules.ts`
-- 2 issues in `violet-vault/src/services/firebaseMessaging.ts`
 - 2 issues in `violet-vault/src/services/bugReport/browserInfoService.ts`
 - 2 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
 - 2 issues in `violet-vault/src/hooks/mobile/useFABBehavior.ts`
@@ -54,7 +51,6 @@
 - 2 issues in `violet-vault/src/components/sync/ActivityBanner.tsx`
 - 2 issues in `violet-vault/src/components/sharing/JoinBudgetModal.tsx`
 - 2 issues in `violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx`
-- 2 issues in `violet-vault/src/components/settings/archiving/ArchivingConfiguration.tsx`
 - 2 issues in `violet-vault/src/components/settings/TransactionArchiving.tsx`
 - 2 issues in `violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx`
 - 2 issues in `violet-vault/src/components/pwa/ShareTargetHandler.tsx`
@@ -68,12 +64,9 @@
 - 2 issues in `violet-vault/src/components/history/IntegrityStatusIndicator.tsx`
 - 2 issues in `violet-vault/src/components/history/BudgetHistoryViewer.tsx`
 - 2 issues in `violet-vault/src/components/feedback/BugReportButton.tsx`
-- 2 issues in `violet-vault/src/components/budgeting/shared/AllocationModeSelector.tsx`
 - 2 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx`
-- 2 issues in `violet-vault/src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 2 issues in `violet-vault/src/components/budgeting/EnvelopeSystem.tsx`
 - 2 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
-- 2 issues in `violet-vault/src/components/budgeting/DeleteEnvelopeModal.tsx`
 - 2 issues in `violet-vault/src/components/bills/BillTable.tsx`
 - 2 issues in `violet-vault/src/components/bills/BillDiscoveryModal.tsx`
 - 2 issues in `violet-vault/src/components/bills/AddBillModal.tsx`
@@ -89,7 +82,6 @@
 - 1 issues in `violet-vault/src/utils/common/toastHelpers.ts`
 - 1 issues in `violet-vault/src/utils/bills/billCalculations.ts`
 - 1 issues in `violet-vault/src/types/common.ts`
-- 1 issues in `violet-vault/src/test/setup.ts`
 - 1 issues in `violet-vault/src/services/types/firebaseServiceTypes.ts`
 - 1 issues in `violet-vault/src/services/bugReport/performanceInfoService.ts`
 - 1 issues in `violet-vault/src/services/bugReport/githubApiService.ts`
@@ -123,8 +115,6 @@
 - 1 issues in `violet-vault/src/hooks/analytics/useAnalyticsData.ts`
 - 1 issues in `violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
 - 1 issues in `violet-vault/src/components/ui/StandardTabs.tsx`
-- 1 issues in `violet-vault/src/components/transactions/import/FileUploader.tsx`
-- 1 issues in `violet-vault/src/components/transactions/TransactionFormFields.tsx`
 - 1 issues in `violet-vault/src/components/sync/health/SyncStatusIndicator.tsx`
 - 1 issues in `violet-vault/src/components/sync/health/SyncHealthDetails.tsx`
 - 1 issues in `violet-vault/src/components/sync/ManualSyncControls.tsx`
@@ -141,19 +131,13 @@
 - 1 issues in `violet-vault/src/components/layout/ViewRenderer.tsx`
 - 1 issues in `violet-vault/src/components/layout/SummaryCards.tsx`
 - 1 issues in `violet-vault/src/components/history/ObjectHistoryViewer.tsx`
-- 1 issues in `violet-vault/src/components/debt/ui/DebtFilters.tsx`
-- 1 issues in `violet-vault/src/components/debt/modals/DebtFormFields.tsx`
 - 1 issues in `violet-vault/src/components/debt/modals/DebtDetailModal.tsx`
 - 1 issues in `violet-vault/src/components/debt/DebtDashboard.tsx`
 - 1 issues in `violet-vault/src/components/charts/TrendLineChart.tsx`
 - 1 issues in `violet-vault/src/components/charts/DistributionPieChart.tsx`
 - 1 issues in `violet-vault/src/components/charts/ComposedFinancialChart.tsx`
 - 1 issues in `violet-vault/src/components/charts/CategoryBarChart.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/shared/BillConnectionSelector.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/paycheck/PaycheckForm.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/paycheck/PaycheckAllocationModes.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeHeader.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/PaydayPrediction.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/EnvelopeGrid.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx`
@@ -163,11 +147,9 @@
 - 1 issues in `violet-vault/src/components/bills/BulkBillUpdateModal.tsx`
 - 1 issues in `violet-vault/src/components/bills/BillManager.tsx`
 - 1 issues in `violet-vault/src/components/automation/tabs/RulesTab.tsx`
-- 1 issues in `violet-vault/src/components/automation/steps/config/SplitRemainderConfig.tsx`
 - 1 issues in `violet-vault/src/components/auth/LocalOnlySetup.tsx`
 - 1 issues in `violet-vault/src/components/analytics/AnalyticsDashboard.tsx`
 - 1 issues in `violet-vault/src/components/activity/ActivityFeed.tsx`
-- 1 issues in `violet-vault/src/components/accounts/form/AccountColorAndSettings.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
@@ -175,10 +157,9 @@
 | 71 | `max-lines-per-function` |
 | 42 | `zustand-safe-patterns/zustand-selective-subscriptions` |
 | 36 | `complexity` |
-| 29 | `enforce-ui-library/enforce-ui-library` |
 | 21 | `max-statements` |
 | 17 | `react-hooks/exhaustive-deps` |
-| 16 | `no-undef` |
+| 7 | `enforce-ui-library/enforce-ui-library` |
 | 5 | `no-restricted-imports` |
 | 5 | `no-architecture-violations/no-architecture-violations` |
 | 4 | `null` |
@@ -194,7 +175,6 @@
 
 ### Detailed Lint Report
 ```
-violet-vault/src/components/accounts/form/AccountColorAndSettings.tsx:27:7 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/activity/ActivityFeed.tsx:7:1 - 2 - '../../services/activityLogger' import is restricted from being used by a pattern. Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed. (no-restricted-imports)
 violet-vault/src/components/analytics/AnalyticsDashboard.tsx:24:28 - 1 - Arrow function has too many lines (239). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/analytics/ReportExporter.tsx:10:24 - 1 - Arrow function has too many lines (279). Maximum allowed is 150. (max-lines-per-function)
@@ -207,13 +187,8 @@ violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:65:6 - 1 - React Hook
 violet-vault/src/components/auth/LocalOnlySetup.tsx:91:24 - 1 - Arrow function has too many lines (258). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/AutoFundingDashboard.tsx:14:30 - 1 - Arrow function has too many lines (185). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/AutoFundingDashboard.tsx:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:14:7 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:23:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:30:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:99:13 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/automation/AutoFundingView.tsx:13:25 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/AutoFundingView.tsx:15:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/automation/steps/config/SplitRemainderConfig.tsx:30:21 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/automation/tabs/RulesTab.tsx:6:18 - 1 - Arrow function has too many lines (206). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/AddBillModal.tsx:102:6 - 1 - React Hook useEffect has a missing dependency: 'resetForm'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/bills/AddBillModal.tsx:108:9 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
@@ -227,33 +202,21 @@ violet-vault/src/components/bills/BulkUpdateEditor.tsx:73:30 - 1 - Arrow functio
 violet-vault/src/components/bills/SmartBillMatcher.tsx:6:26 - 1 - Arrow function has too many lines (180). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/modals/BillDetailModal.tsx:14:25 - 1 - Arrow function has too many lines (251). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx:13:29 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/budgeting/DeleteEnvelopeModal.tsx:66:21 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/DeleteEnvelopeModal.tsx:79:21 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:17:27 - 1 - Arrow function has too many lines (222). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:147:13 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/budgeting/EnvelopeGrid.tsx:301:18 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/budgeting/EnvelopeSystem.tsx:24:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/budgeting/EnvelopeSystem.tsx:126:6 - 1 - React Hook useEffect has a missing dependency: 'updateBiweeklyAllocations'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 violet-vault/src/components/budgeting/PaydayPrediction.tsx:6:26 - 1 - Arrow function has too many lines (171). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/budgeting/SmartEnvelopeSuggestions.tsx:37:5 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/SmartEnvelopeSuggestions.tsx:53:5 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/envelope/EnvelopeHeader.tsx:84:13 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx:12:22 - 1 - Arrow function has too many lines (307). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx:12:22 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/components/budgeting/envelope/UnassignedCashEnvelope.tsx:7:39 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/budgeting/paycheck/PaycheckAllocationModes.tsx:59:7 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/paycheck/PaycheckForm.tsx:45:7 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/shared/AllocationModeSelector.tsx:17:13 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/shared/AllocationModeSelector.tsx:44:13 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/budgeting/shared/BillConnectionSelector.tsx:106:17 - 1 - Use <Radio> or <RadioGroup> from @/components/ui instead of <input type="radio">. Import: import { Radio, RadioGroup } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/charts/CategoryBarChart.tsx:39:26 - 1 - Arrow function has a complexity of 22. Maximum allowed is 15. (complexity)
 violet-vault/src/components/charts/ComposedFinancialChart.tsx:57:32 - 1 - Arrow function has a complexity of 18. Maximum allowed is 15. (complexity)
 violet-vault/src/components/charts/DistributionPieChart.tsx:44:30 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/components/charts/TrendLineChart.tsx:21:24 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
 violet-vault/src/components/debt/DebtDashboard.tsx:18:23 - 1 - Arrow function has too many lines (174). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/debt/modals/DebtDetailModal.tsx:13:25 - 1 - Arrow function has too many lines (175). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/debt/modals/DebtFormFields.tsx:240:13 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/debt/ui/DebtFilters.tsx:113:17 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/feedback/BugReportButton.tsx:43:35 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/feedback/BugReportButton.tsx:288:19 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/history/BudgetHistoryViewer.tsx:41:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
@@ -297,8 +260,6 @@ violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx:17:34 - 1 - Ar
 violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx:329:31 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/settings/TransactionArchiving.tsx:45:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/components/settings/TransactionArchiving.tsx:48:47 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
-violet-vault/src/components/settings/archiving/ArchivingConfiguration.tsx:73:17 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/settings/archiving/ArchivingConfiguration.tsx:85:17 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/settings/sections/DataManagementSection.tsx:26:69 - 1 - Arrow function has too many lines (178). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 1 - Arrow function has too many lines (235). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:16:29 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
@@ -320,13 +281,11 @@ violet-vault/src/components/sync/SyncIndicator.tsx:37:23 - 1 - Arrow function ha
 violet-vault/src/components/sync/SyncIndicator.tsx:37:23 - 1 - Arrow function has a complexity of 46. Maximum allowed is 15. (complexity)
 violet-vault/src/components/sync/health/SyncHealthDetails.tsx:43:27 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
 violet-vault/src/components/sync/health/SyncStatusIndicator.tsx:3:1 - 2 - '../../../utils/sync/syncHealthHelpers' import is restricted from being used by a pattern. Components should not import storage or sync utilities directly. Use service hooks from src/hooks/ instead. (no-restricted-imports)
-violet-vault/src/components/transactions/TransactionFormFields.tsx:254:9 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/components/transactions/import/FileUploader.tsx:36:13 - 1 - Use <Checkbox> from @/components/ui instead of <input type="checkbox">. Import: import { Checkbox } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
 violet-vault/src/components/ui/EditableBalance.tsx:4:25 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/ui/EditableBalance.tsx:4:25 - 1 - Arrow function has a complexity of 19. Maximum allowed is 15. (complexity)
 violet-vault/src/components/ui/StandardTabs.tsx:2:10 - 1 - 'Button' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
-violet-vault/src/components/ui/forms/Select.tsx:46:7 - 2 - 'Select' is already defined. (no-redeclare)
-violet-vault/src/components/ui/forms/Select.tsx:46:7 - 2 - 'Select' is read-only. (no-import-assign)
+violet-vault/src/components/ui/forms/Select.tsx:45:7 - 2 - 'Select' is already defined. (no-redeclare)
+violet-vault/src/components/ui/forms/Select.tsx:45:7 - 2 - 'Select' is read-only. (no-import-assign)
 violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:18:33 - 1 - Arrow function has too many lines (205). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalytics.ts:10:22 - 1 - Arrow function has too many lines (346). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalytics.ts:21:5 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
@@ -360,21 +319,10 @@ violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:6 - 1 - React Hook useEff
 violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:33:7 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
 violet-vault/src/hooks/common/useActualBalance.ts:14:7 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useBugReportV2.ts:6:8 - 1 - 'React' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
-violet-vault/src/hooks/common/useBugReportV2.ts:23:11 - 1 - 'BugReportSubmissionResult' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
-violet-vault/src/hooks/common/useBugReportV2.ts:57:24 - 1 - Arrow function has too many lines (303). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/common/useBugReportV2.ts:57:24 - 1 - Arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/common/useBugReportV2.ts:291:18 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:292:14 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:294:13 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:305:25 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:307:22 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:307:68 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:310:13 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:330:18 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:331:22 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:334:18 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:335:26 - 1 - 'H' is not defined. (no-undef)
-violet-vault/src/hooks/common/useBugReportV2.ts:372:9 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
+violet-vault/src/hooks/common/useBugReportV2.ts:32:11 - 1 - 'BugReportSubmissionResult' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/hooks/common/useBugReportV2.ts:66:24 - 1 - Arrow function has too many lines (303). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/common/useBugReportV2.ts:66:24 - 1 - Arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
+violet-vault/src/hooks/common/useBugReportV2.ts:381:9 - 2 - Validation functions (validate*, is*Valid) should be in /src/utils/validation/, not in hooks. Extract to utils/validation/ directory. See ARCHITECTURE_VIOLATIONS.md (no-architecture-violations/no-architecture-violations)
 violet-vault/src/hooks/common/useConfirm.ts:36:27 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useConfirm.ts:65:53 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
 violet-vault/src/hooks/common/useDataInitialization.ts:40:32 - 1 - Use selective subscriptions instead of subscribing to entire store. Replace useUIStore() with useUIStore(state => state.specificValue) to prevent unnecessary re-renders. See docs/development/architecture/data-flow.md for performance patterns. (zustand-safe-patterns/zustand-selective-subscriptions)
@@ -418,10 +366,7 @@ violet-vault/src/services/bugReport/browserInfoService.ts:73:24 - 1 - Static met
 violet-vault/src/services/bugReport/browserInfoService.ts:169:25 - 1 - Static method 'getViewportInfo' has a complexity of 20. Maximum allowed is 15. (complexity)
 violet-vault/src/services/bugReport/githubApiService.ts:68:31 - 1 - Static method 'formatGitHubIssueBody' has a complexity of 17. Maximum allowed is 15. (complexity)
 violet-vault/src/services/bugReport/performanceInfoService.ts:115:28 - 1 - Static method 'getPerformanceInfo' has a complexity of 22. Maximum allowed is 15. (complexity)
-violet-vault/src/services/firebaseMessaging.ts:22:16 - 1 - 'NotificationPermission' is not defined. (no-undef)
-violet-vault/src/services/firebaseMessaging.ts:31:15 - 1 - 'NotificationPermission' is not defined. (no-undef)
 violet-vault/src/services/types/firebaseServiceTypes.ts:85:18 - 1 - Method 'categorizeError' has a complexity of 34. Maximum allowed is 15. (complexity)
-violet-vault/src/test/setup.ts:25:59 - 1 - 'BufferSource' is not defined. (no-undef)
 violet-vault/src/types/common.ts:79:54 - 2 - The `Function` type accepts any function-like value.
 Prefer explicitly defining any function parameters and return type. (@typescript-eslint/no-unsafe-function-type)
 violet-vault/src/utils/bills/billCalculations.ts:47:34 - 1 - Arrow function has too many statements (26). Maximum allowed is 25. (max-statements)
@@ -442,8 +387,6 @@ violet-vault/src/utils/common/toastHelpers.ts:20:73 - 1 - Use selective subscrip
 violet-vault/src/utils/common/transactionArchiving.ts:141:26 - 1 - Arrow function has too many statements (28). Maximum allowed is 25. (max-statements)
 violet-vault/src/utils/debts/debtFormValidation.ts:68:8 - 1 - Function 'validateDebtFormData' has a complexity of 18. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayoffStrategy' has too many statements (28). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/notifications/permissionUtils.ts:38:11 - 1 - 'NotificationPermission' is not defined. (no-undef)
-violet-vault/src/utils/notifications/permissionUtils.ts:47:15 - 1 - 'NotificationPermission' is not defined. (no-undef)
 violet-vault/src/utils/pwa/patchNotesManager.ts:105:22 - 1 - Method 'parseVersionContent' has too many statements (30). Maximum allowed is 25. (max-statements)
 violet-vault/src/utils/pwa/patchNotesManager.ts:105:22 - 1 - Method 'parseVersionContent' has a complexity of 28. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/pwa/serviceWorkerDiagnostics.ts:44:23 - 1 - Async method 'getCacheHealth' has too many statements (29). Maximum allowed is 25. (max-statements)
@@ -503,7 +446,6 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 20 errors in `src/components/layout/MainLayout.tsx`
 - 19 errors in `src/utils/budgeting/suggestionUtils.ts`
 - 19 errors in `src/hooks/common/useReceipts.ts`
-- 19 errors in `src/hooks/common/useBugReportV2.ts`
 - 19 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
 - 18 errors in `src/utils/analytics/transactionAnalyzer.ts`
 - 17 errors in `src/utils/stores/storeRegistry.ts`
@@ -572,6 +514,7 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 8 errors in `src/hooks/transactions/useTransactionQuery.ts`
 - 8 errors in `src/hooks/security/__tests__/useSecuritySettingsLogic.test.ts`
 - 8 errors in `src/hooks/common/useConnectionManager/useConnectionData.ts`
+- 8 errors in `src/hooks/common/useBugReportV2.ts`
 - 8 errors in `src/hooks/common/__tests__/useExportData.test.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 8 errors in `src/components/ui/Header.tsx`
@@ -640,7 +583,9 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 5 errors in `src/components/sync/SyncHealthIndicator.tsx`
 - 5 errors in `src/components/pages/MainDashboard.tsx`
 - 5 errors in `src/components/history/IntegrityStatusIndicator.tsx`
+- 5 errors in `src/components/debt/ui/DebtFilters.tsx`
 - 5 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
+- 5 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 4 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 4 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 4 errors in `src/utils/budgeting/envelopeCalculations.ts`
@@ -654,7 +599,7 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 4 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
 - 4 errors in `src/components/onboarding/OnboardingTutorial.tsx`
 - 4 errors in `src/components/mobile/ResponsiveModal.tsx`
-- 4 errors in `src/components/debt/ui/DebtFilters.tsx`
+- 4 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 4 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 4 errors in `src/components/analytics/AnalyticsSummaryCards.tsx`
 - 3 errors in `src/utils/sync/syncHealthHelpers.ts`
@@ -692,11 +637,9 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 3 errors in `src/components/onboarding/EmptyStateHints.tsx`
 - 3 errors in `src/components/history/ObjectHistoryViewer.tsx`
 - 3 errors in `src/components/feedback/BugReportButton.tsx`
-- 3 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 3 errors in `src/components/charts/ComposedFinancialChart.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
 - 3 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
-- 3 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 3 errors in `src/components/auth/UserIndicator.tsx`
 - 3 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 3 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
@@ -729,6 +672,7 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 2 errors in `src/hooks/analytics/useReportExporter.ts`
 - 2 errors in `src/hooks/analytics/usePerformanceMonitor.ts`
 - 2 errors in `src/components/ui/VersionFooter.tsx`
+- 2 errors in `src/components/transactions/import/FileUploader.tsx`
 - 2 errors in `src/components/transactions/TransactionForm.tsx`
 - 2 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 2 errors in `src/components/sync/SyncHealthDashboard.tsx`
@@ -742,9 +686,11 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 2 errors in `src/components/debt/DebtDashboard.tsx`
 - 2 errors in `src/components/charts/DistributionPieChart.tsx`
 - 2 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
+- 2 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 2 errors in `src/components/bills/AddBillModal.tsx`
 - 2 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 2 errors in `src/components/automation/AutoFundingDashboard.tsx`
+- 2 errors in `src/components/accounts/form/AccountColorAndSettings.tsx`
 - 2 errors in `src/components/accounts/AccountCard.tsx`
 - 1 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 1 errors in `src/utils/sync/validation/__tests__/checksumUtils.test.ts`
@@ -804,11 +750,11 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 1 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
 - 1 errors in `src/components/transactions/ledger/TransactionLedgerLoading.tsx`
-- 1 errors in `src/components/transactions/import/FileUploader.tsx`
 - 1 errors in `src/components/transactions/import/FieldMapper.tsx`
 - 1 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
 - 1 errors in `src/components/transactions/TransactionSummaryCards.tsx`
 - 1 errors in `src/components/transactions/TransactionSplitter.tsx`
+- 1 errors in `src/components/transactions/TransactionFormFields.tsx`
 - 1 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 1 errors in `src/components/sync/SyncStatusIndicators.tsx`
 - 1 errors in `src/components/sharing/steps/UserSetupStep.tsx`
@@ -838,10 +784,12 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 1 errors in `src/components/budgeting/paycheck/PaycheckHistory.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeHeader.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 errors in `src/components/bills/BillViewTabs.tsx`
+- 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
 - 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
 - 1 errors in `src/components/auth/components/UserSetupHeader.tsx`
 - 1 errors in `src/components/auth/components/UserNameInput.tsx`
@@ -870,7 +818,6 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 - 1 errors in `src/components/accounts/form/AccountModalHeader.tsx`
 - 1 errors in `src/components/accounts/form/AccountFormActions.tsx`
 - 1 errors in `src/components/accounts/form/AccountFinancialFields.tsx`
-- 1 errors in `src/components/accounts/form/AccountColorAndSettings.tsx`
 - 1 errors in `src/components/accounts/AccountFormModal.tsx`
 
 ### Type Error Breakdown by Category
@@ -882,7 +829,7 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 | 118 | `TS2554` |
 | 106 | `TS2708` |
 | 103 | `TS2551` |
-| 88 | `TS2322` |
+| 99 | `TS2322` |
 | 36 | `TS2362` |
 | 35 | `TS2363` |
 | 19 | `TS2353` |
@@ -890,7 +837,6 @@ violet-vault/src/vite-env.d.ts:65:26 - 1 - Unexpected any. Specify a different t
 | 17 | `TS2307` |
 | 15 | `TS2365` |
 | 12 | `TS2769` |
-| 11 | `TS2304` |
 | 10 | `TS2698` |
 | 9 | `TS2741` |
 | 8 | `TS2305` |
@@ -919,6 +865,8 @@ src/components/accounts/AccountCard.tsx(1,1): error TS6133: 'React' is declared 
 src/components/accounts/AccountCard.tsx(8,3): error TS6133: '_daysUntilExpiration' is declared but its value is never read.
 src/components/accounts/AccountFormModal.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/accounts/form/AccountColorAndSettings.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/accounts/form/AccountColorAndSettings.tsx(30,9): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/accounts/form/AccountFinancialFields.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/accounts/form/AccountFormActions.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/accounts/form/AccountModalHeader.tsx(10,3): error TS6133: '_lock' is declared but its value is never read.
@@ -975,9 +923,11 @@ src/components/automation/AutoFundingDashboard.tsx(97,36): error TS2339: Propert
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/components/automation/AutoFundingDashboard.tsx(98,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingRuleBuilder.tsx(103,12): error TS2741: Property 'onStepChange' is missing in type '{ currentStep: any; }' but required in type '{ currentStep: any; onStepChange: any; }'.
-src/components/automation/AutoFundingRuleBuilder.tsx(164,46): error TS2339: Property 'name' does not exist on type '{}'.
-src/components/automation/AutoFundingRuleBuilder.tsx(167,46): error TS2339: Property 'type' does not exist on type '{}'.
+src/components/automation/AutoFundingRuleBuilder.tsx(34,13): error TS2322: Type '"success"' is not assignable to type 'ButtonColor'.
+src/components/automation/AutoFundingRuleBuilder.tsx(104,15): error TS2322: Type '"ghost"' is not assignable to type 'ButtonVariant'.
+src/components/automation/AutoFundingRuleBuilder.tsx(111,12): error TS2741: Property 'onStepChange' is missing in type '{ currentStep: any; }' but required in type '{ currentStep: any; onStepChange: any; }'.
+src/components/automation/AutoFundingRuleBuilder.tsx(172,46): error TS2339: Property 'name' does not exist on type '{}'.
+src/components/automation/AutoFundingRuleBuilder.tsx(175,46): error TS2339: Property 'type' does not exist on type '{}'.
 src/components/automation/AutoFundingView.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/components/automation/AutoFundingView.tsx(46,19): error TS2554: Expected 3 arguments, but got 2.
 src/components/automation/AutoFundingView.tsx(100,41): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: any; unassignedCash: any; transactions: any; }; }' is not assignable to parameter of type 'string'.
@@ -987,6 +937,8 @@ src/components/automation/AutoFundingView.tsx(104,38): error TS2339: Property 'e
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/components/automation/AutoFundingView.tsx(107,23): error TS2554: Expected 3 arguments, but got 2.
 src/components/automation/AutoFundingView.tsx(112,23): error TS2554: Expected 3 arguments, but got 2.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(33,23): error TS2322: Type '{ checked: any; onCheckedChange: () => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/automation/steps/RuleConfigurationStep.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/automation/steps/RuleConfigurationStep.tsx(38,11): error TS2322: Type '{ ruleData: any; updateConfig: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }' is not assignable to type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
   Property 'updateConfig' does not exist on type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
@@ -1047,6 +999,8 @@ src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(123,25): error TS2339
 src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(129,10): error TS2741: Property 'hint' is missing in type '{ label: string; icon: string; value: any; onChange: (e: any) => any; error: any; canEdit: boolean; required: true; }' but required in type '{ label: any; value: any; onChange: any; error: any; canEdit: any; hint: any; icon: any; required: any; }'.
 src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(134,25): error TS2339: Property 'targetAmount' does not exist on type '{}'.
 src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(144,25): error TS2339: Property 'frequency' does not exist on type '{}'.
+src/components/budgeting/envelope/EnvelopeHeader.tsx(85,15): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; className: string; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(48,15): error TS2322: Type '{ objectType: string; objectId: any; objectName: any; showModal: boolean; }' is not assignable to type 'IntrinsicAttributes & { objectId: any; objectType: any; objectName: any; onClose: any; }'.
   Property 'showModal' does not exist on type 'IntrinsicAttributes & { objectId: any; objectType: any; objectName: any; onClose: any; }'.
 src/components/budgeting/envelope/EnvelopeItem.tsx(180,37): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
@@ -1086,6 +1040,9 @@ src/components/budgeting/EnvelopeSystem.tsx(145,30): error TS2345: Argument of t
 src/components/budgeting/paycheck/PaycheckHistory.tsx(92,47): error TS2554: Expected 0 arguments, but got 1.
 src/components/budgeting/PaycheckProcessor.tsx(63,9): error TS2322: Type '{ paycheckHistory: any[]; onDeletePaycheck: (paycheck: any) => Promise<void>; deletingPaycheckId: any; }' is not assignable to type 'IntrinsicAttributes & { paycheckHistory?: any[]; paycheckStats: any; onSelectPaycheck?: () => void; }'.
   Property 'onDeletePaycheck' does not exist on type 'IntrinsicAttributes & { paycheckHistory?: any[]; paycheckStats: any; onSelectPaycheck?: () => void; }'. Did you mean 'onSelectPaycheck'?
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(36,7): error TS2322: Type '"secondary" | "ghost"' is not assignable to type 'ButtonVariant'.
+  Type '"ghost"' is not assignable to type 'ButtonVariant'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(53,7): error TS2322: Type '"ghost"' is not assignable to type 'ButtonVariant'.
 src/components/charts/CategoryBarChart.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/charts/CategoryBarChart.tsx(93,12): error TS2769: No overload matches this call.
   Overload 1 of 2, '(props: Props): XAxis', gave the following error.
@@ -1125,13 +1082,17 @@ src/components/debt/modals/AddDebtModal.tsx(63,11): error TS2322: Type '{ formDa
 src/components/debt/modals/DebtDetailModal.tsx(19,3): error TS6133: '_onLinkToBill' is declared but its value is never read.
 src/components/debt/modals/DebtDetailModal.tsx(36,32): error TS2554: Expected 1 arguments, but got 6.
 src/components/debt/modals/DebtFormFields.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/debt/modals/DebtFormFields.tsx(79,25): error TS2339: Property 'label' does not exist on type 'DebtTypeConfig'.
-src/components/debt/modals/DebtFormFields.tsx(220,34): error TS2339: Property 'map' does not exist on type '{ readonly WEEKLY: "weekly"; readonly BIWEEKLY: "biweekly"; readonly MONTHLY: "monthly"; readonly QUARTERLY: "quarterly"; readonly ANNUALLY: "annually"; }'.
+src/components/debt/modals/DebtFormFields.tsx(77,25): error TS2339: Property 'label' does not exist on type 'DebtTypeConfig'.
+src/components/debt/modals/DebtFormFields.tsx(218,34): error TS2339: Property 'map' does not exist on type '{ readonly WEEKLY: "weekly"; readonly BIWEEKLY: "biweekly"; readonly MONTHLY: "monthly"; readonly QUARTERLY: "quarterly"; readonly ANNUALLY: "annually"; }'.
+src/components/debt/modals/DebtFormFields.tsx(239,13): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/debt/ui/DebtCardProgressBar.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/debt/ui/DebtFilters.tsx(70,51): error TS2538: Type 'unknown' cannot be used as an index type.
 src/components/debt/ui/DebtFilters.tsx(71,45): error TS2538: Type 'unknown' cannot be used as an index type.
 src/components/debt/ui/DebtFilters.tsx(73,29): error TS2322: Type 'unknown' is not assignable to type 'Key'.
 src/components/debt/ui/DebtFilters.tsx(73,40): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/components/debt/ui/DebtFilters.tsx(116,19): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => void; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/debt/ui/DebtList.tsx(26,36): error TS6133: '_onRecordPayment' is declared but its value is never read.
 src/components/debt/ui/DebtList.tsx(79,45): error TS2339: Property 'name' does not exist on type '{ bgColor: string; textColor: string; }'.
 src/components/debt/ui/DebtList.tsx(101,32): error TS2339: Property 'display' does not exist on type '{}'.
@@ -1374,12 +1335,16 @@ src/components/sync/SyncStatusIndicators.tsx(1,1): error TS6133: 'React' is decl
 src/components/transactions/components/DeleteConfirmation.tsx(20,11): error TS2322: Type 'string' is not assignable to type 'number'.
 src/components/transactions/import/FieldMapper.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/transactions/import/FileUploader.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/transactions/import/FileUploader.tsx(39,15): error TS2322: Type '{ checked: boolean; onCheckedChange: (checked: any) => void; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/transactions/ledger/TransactionLedgerLoading.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/transactions/ledger/TransactionPagination.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/transactions/splitter/SplitterHeader.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/transactions/TransactionForm.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/components/transactions/TransactionForm.tsx(90,15): error TS2322: Type '{ isLocked: boolean; isOwnLock: boolean; isLoading: boolean; lock: { userName: any; expiresAt: Date; isExpired: boolean; }; onBreakLock: () => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; } | { ...; }>; showDetails: true; }' is not assignable to type 'IntrinsicAttributes & { isLocked: any; isOwnLock: any; lock: any; onBreakLock: any; className?: string; showDetails?: boolean; }'.
   Property 'isLoading' does not exist on type 'IntrinsicAttributes & { isLocked: any; isOwnLock: any; lock: any; onBreakLock: any; className?: string; showDetails?: boolean; }'.
+src/components/transactions/TransactionFormFields.tsx(247,11): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/transactions/TransactionLedger.tsx(4,32): error TS2614: Module '"../ui/StandardFilters"' has no exported member 'FilterConfig'. Did you mean to use 'import FilterConfig from "../ui/StandardFilters"' instead?
 src/components/transactions/TransactionLedger.tsx(148,9): error TS4104: The type 'readonly ["Housing", "Transportation", "Insurance", "Bills & Utilities", "Subscriptions", "Food & Dining", "Entertainment", "Shopping", "Health & Medical", "Personal Care", ... 7 more ..., "Other"]' is 'readonly' and cannot be assigned to the mutable type 'any[]'.
 src/components/transactions/TransactionLedger.tsx(175,9): error TS4104: The type 'readonly ["Housing", "Transportation", "Insurance", "Bills & Utilities", "Subscriptions", "Food & Dining", "Entertainment", "Shopping", "Health & Medical", "Personal Care", ... 7 more ..., "Other"]' is 'readonly' and cannot be assigned to the mutable type 'any[]'.
@@ -2053,24 +2018,13 @@ src/hooks/common/useBugReportSubmission.ts(72,63): error TS2345: Argument of typ
   Types of property 'severity' are incompatible.
     Type 'string' is not assignable to type '"low" | "medium" | "high" | "critical"'.
 src/hooks/common/useBugReportV2.ts(6,8): error TS6133: 'React' is declared but its value is never read.
-src/hooks/common/useBugReportV2.ts(23,11): error TS6196: 'BugReportSubmissionResult' is declared but never used.
-src/hooks/common/useBugReportV2.ts(221,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(222,23): error TS2339: Property 'url' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(223,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(224,36): error TS2339: Property 'screenshotStatus' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(228,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(229,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(291,18): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(292,14): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(294,13): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(305,25): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(307,22): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(307,68): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(310,13): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(330,18): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(331,22): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(334,18): error TS2304: Cannot find name 'H'.
-src/hooks/common/useBugReportV2.ts(335,26): error TS2304: Cannot find name 'H'.
+src/hooks/common/useBugReportV2.ts(32,11): error TS6196: 'BugReportSubmissionResult' is declared but never used.
+src/hooks/common/useBugReportV2.ts(230,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
+src/hooks/common/useBugReportV2.ts(231,23): error TS2339: Property 'url' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
+src/hooks/common/useBugReportV2.ts(232,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
+src/hooks/common/useBugReportV2.ts(233,36): error TS2339: Property 'screenshotStatus' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
+src/hooks/common/useBugReportV2.ts(237,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
+src/hooks/common/useBugReportV2.ts(238,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
 src/hooks/common/useConfirm.ts(36,11): error TS2339: Property 'showConfirm' does not exist on type '{}'.
 src/hooks/common/useConfirm.ts(65,11): error TS2339: Property 'isOpen' does not exist on type '{}'.
 src/hooks/common/useConfirm.ts(65,19): error TS2339: Property 'config' does not exist on type '{}'.
