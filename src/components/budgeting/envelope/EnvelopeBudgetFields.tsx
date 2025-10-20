@@ -13,7 +13,8 @@ const getSectionTitle = (envelopeType) => {
 
 // Build input classes
 const getInputClasses = (hasError, canEdit) => {
-  const baseClasses = "w-full pl-8 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all";
+  const baseClasses =
+    "w-full pl-8 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all";
   const errorClasses = hasError ? "border-red-300 bg-red-50" : "border-gray-300";
   const disabledClasses = !canEdit ? "bg-gray-100 cursor-not-allowed" : "";
   return `${baseClasses} ${errorClasses} ${disabledClasses}`;
@@ -22,7 +23,7 @@ const getInputClasses = (hasError, canEdit) => {
 // Error message component
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
-  
+
   return (
     <p className="mt-1 text-sm text-red-600 flex items-center">
       {React.createElement(getIcon("AlertCircle"), {

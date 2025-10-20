@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useBudgetStore } from "../../../stores/ui/uiStore";
+import { useUIStore } from "../../../stores/ui/uiStore";
 import logger from "../../../utils/common/logger";
 
 // Helper to create single target transfer
@@ -26,7 +26,7 @@ const createMultipleTransfers = (executionRecord, result) => {
 // Helper to extract undoable transfers from execution results
 const extractUndoableTransfers = (executionRecord, executionResults) => {
   const transfers = [];
-  
+
   executionResults.forEach((result) => {
     if (result.success && result.targetEnvelopes) {
       if (result.targetEnvelopes.length === 1) {
@@ -36,7 +36,7 @@ const extractUndoableTransfers = (executionRecord, executionResults) => {
       }
     }
   });
-  
+
   return transfers;
 };
 
@@ -66,7 +66,7 @@ const createUndoRecord = (executionId, totalAmount) => ({
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
 export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
-  const budget = useUIStore(state => state.budget);
+  const budget = useUIStore((state) => state.budget);
   const [undoStack, setUndoStack] = useState(initialUndoStack);
 
   // Add execution to undo stack if it has successful transfers

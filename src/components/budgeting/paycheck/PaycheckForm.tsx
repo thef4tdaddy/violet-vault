@@ -28,9 +28,7 @@ const PayerStats = ({ stats, payerName }) => {
         <div>
           <span className="text-blue-700">Last:</span>
           <span className="font-medium ml-2">
-            {stats.lastPaycheckDate
-              ? new Date(stats.lastPaycheckDate).toLocaleDateString()
-              : "N/A"}
+            {stats.lastPaycheckDate ? new Date(stats.lastPaycheckDate).toLocaleDateString() : "N/A"}
           </span>
         </div>
       </div>

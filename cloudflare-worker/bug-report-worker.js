@@ -98,7 +98,7 @@ export default {
             {
               status: 400,
               headers: { ...corsHeaders, "Content-Type": "application/json" },
-            },
+            }
           );
         }
 
@@ -120,7 +120,7 @@ export default {
           {
             status: 500,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+          }
         );
       }
     }
@@ -178,10 +178,7 @@ async function processBugReport(bugReport, env) {
     hasReportEnv: !!reportEnv,
     reportEnvKeys: reportEnv ? Object.keys(reportEnv) : null,
     hasPageContext: !!(reportEnv && reportEnv.pageContext),
-    pageContextKeys:
-      reportEnv && reportEnv.pageContext
-        ? Object.keys(reportEnv.pageContext)
-        : null,
+    pageContextKeys: reportEnv && reportEnv.pageContext ? Object.keys(reportEnv.pageContext) : null,
     hasContextInfo: !!contextInfo,
     contextInfoKeys: contextInfo ? Object.keys(contextInfo) : null,
     hasSessionUrl: !!sessionUrl,
@@ -221,7 +218,7 @@ async function processBugReport(bugReport, env) {
       contextInfo,
       customData,
     },
-    env,
+    env
   );
 
   // Send notification (optional)
@@ -233,7 +230,7 @@ async function processBugReport(bugReport, env) {
         sessionUrl,
         githubIssueUrl: githubIssue.html_url,
       },
-      env,
+      env
     );
   }
 
@@ -256,20 +253,13 @@ async function storeScreenshot(screenshotDataUrl, env) {
 
   try {
     // Extract base64 data from data URL
-    const base64Data = screenshotDataUrl.replace(
-      /^data:image\/png;base64,/,
-      "",
-    );
-    const imageBuffer = Uint8Array.from(atob(base64Data), (c) =>
-      c.charCodeAt(0),
-    );
+    const base64Data = screenshotDataUrl.replace(/^data:image\/png;base64,/, "");
+    const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
     // 🛡️ COST PROTECTION: Check file size (max 5MB to stay well under free tier)
     const maxSizeBytes = 5 * 1024 * 1024; // 5MB
     if (imageBuffer.length > maxSizeBytes) {
-      console.warn(
-        `Screenshot too large: ${imageBuffer.length} bytes (max: ${maxSizeBytes})`,
-      );
+      console.warn(`Screenshot too large: ${imageBuffer.length} bytes (max: ${maxSizeBytes})`);
       return null;
     }
 
@@ -280,16 +270,12 @@ async function storeScreenshot(screenshotDataUrl, env) {
     try {
       // Get current month's usage count
       const usageData = await env.R2_BUCKET.head(usageKey);
-      const currentCount = usageData
-        ? parseInt(usageData.customMetadata?.count || "0")
-        : 0;
+      const currentCount = usageData ? parseInt(usageData.customMetadata?.count || "0") : 0;
 
       // 🛡️ LIMIT: Max 1000 screenshots per month (well under 1M operations limit)
       const maxScreenshotsPerMonth = 1000;
       if (currentCount >= maxScreenshotsPerMonth) {
-        console.warn(
-          `Monthly screenshot limit reached: ${currentCount}/${maxScreenshotsPerMonth}`,
-        );
+        console.warn(`Monthly screenshot limit reached: ${currentCount}/${maxScreenshotsPerMonth}`);
         return null;
       }
 
@@ -302,7 +288,7 @@ async function storeScreenshot(screenshotDataUrl, env) {
         }),
         {
           customMetadata: { count: (currentCount + 1).toString() },
-        },
+        }
       );
     } catch (usageError) {
       // If usage tracking fails, still allow upload but log warning
@@ -323,18 +309,14 @@ async function storeScreenshot(screenshotDataUrl, env) {
       customMetadata: {
         uploadDate: new Date().toISOString(),
         sizeBytes: imageBuffer.length.toString(),
-        autoDelete: new Date(
-          Date.now() + 90 * 24 * 60 * 60 * 1000,
-        ).toISOString(), // 90 days
+        autoDelete: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days
       },
     });
 
     console.log(`Screenshot stored: ${filename} (${sizeKB}KB)`);
 
     // Return public URL (adjust based on your R2 setup)
-    return env.R2_PUBLIC_DOMAIN
-      ? `https://${env.R2_PUBLIC_DOMAIN}/${filename}`
-      : null;
+    return env.R2_PUBLIC_DOMAIN ? `https://${env.R2_PUBLIC_DOMAIN}/${filename}` : null;
   } catch (error) {
     console.error("Failed to store screenshot:", error);
     return null;
@@ -405,17 +387,12 @@ async function getUsageStats(env) {
 
     // Get current month usage
     const usageData = await env.R2_BUCKET.head(usageKey);
-    const currentCount = usageData
-      ? parseInt(usageData.customMetadata?.count || "0")
-      : 0;
+    const currentCount = usageData ? parseInt(usageData.customMetadata?.count || "0") : 0;
 
     // List objects to get storage stats
     const objects = await env.R2_BUCKET.list({ prefix: "bug-reports/" });
     const totalObjects = objects.objects.length;
-    const totalSize = objects.objects.reduce(
-      (sum, obj) => sum + (obj.size || 0),
-      0,
-    );
+    const totalSize = objects.objects.reduce((sum, obj) => sum + (obj.size || 0), 0);
 
     return {
       success: true,
@@ -453,7 +430,7 @@ async function getReleasePleaseInfo(env) {
           "User-Agent": "VioletVault-BugReporter/1.0",
           Accept: "application/vnd.github.v3+json",
         },
-      },
+      }
     );
 
     if (!releasesResponse.ok) {
@@ -471,7 +448,7 @@ async function getReleasePleaseInfo(env) {
           "User-Agent": "VioletVault-BugReporter/1.0",
           Accept: "application/vnd.github.v3+json",
         },
-      },
+      }
     );
 
     if (!prsResponse.ok) {
@@ -482,25 +459,19 @@ async function getReleasePleaseInfo(env) {
 
     // Find release-please PR (contains "chore(main): release" in title)
     const releasePR = prs.find(
-      (pr) =>
-        pr.title.includes("chore(main): release") &&
-        pr.head.ref.includes("release-please"),
+      (pr) => pr.title.includes("chore(main): release") && pr.head.ref.includes("release-please")
     );
 
     // Extract version from release PR title: "chore(main): release violet-vault 1.8.0"
     let nextVersion = null;
     if (releasePR) {
-      const versionMatch = releasePR.title.match(
-        /release\s+\S+\s+(\d+\.\d+\.\d+)/,
-      );
+      const versionMatch = releasePR.title.match(/release\s+\S+\s+(\d+\.\d+\.\d+)/);
       nextVersion = versionMatch ? versionMatch[1] : null;
     }
 
     // Get current/latest version from releases
     const latestRelease = releases.find((release) => !release.prerelease);
-    const currentVersion = latestRelease
-      ? latestRelease.tag_name.replace(/^v/, "")
-      : "1.8.0";
+    const currentVersion = latestRelease ? latestRelease.tag_name.replace(/^v/, "") : "1.8.0";
 
     // If no release PR found, increment the current version
     if (!nextVersion) {
@@ -559,7 +530,7 @@ async function getMilestones(env) {
           "User-Agent": "VioletVault-BugReporter/1.0",
           Accept: "application/vnd.github.v3+json",
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -641,9 +612,7 @@ async function getMilestones(env) {
           total: m.open_issues + m.closed_issues,
           percentComplete:
             m.open_issues + m.closed_issues > 0
-              ? Math.round(
-                  (m.closed_issues / (m.open_issues + m.closed_issues)) * 100,
-                )
+              ? Math.round((m.closed_issues / (m.open_issues + m.closed_issues)) * 100)
               : 0,
         },
       })),
@@ -660,9 +629,8 @@ async function getMilestones(env) {
             currentMilestone.open_issues + currentMilestone.closed_issues > 0
               ? Math.round(
                   (currentMilestone.closed_issues /
-                    (currentMilestone.open_issues +
-                      currentMilestone.closed_issues)) *
-                    100,
+                    (currentMilestone.open_issues + currentMilestone.closed_issues)) *
+                    100
                 )
               : 0,
         },
@@ -684,27 +652,19 @@ async function getMilestones(env) {
  * Generate smart labels based on bug report content and context
  * Uses existing GitHub labels instead of creating new ones
  */
-async function generateSmartLabels(
-  description,
-  reportEnv,
-  env,
-  severity = "medium",
-) {
+async function generateSmartLabels(description, reportEnv, env, severity = "medium") {
   const labels = ["bug", "user-reported"];
 
   // Fetch existing GitHub labels to avoid duplication
   let existingLabels = [];
   try {
-    const labelsResponse = await fetch(
-      `https://api.github.com/repos/${env.GITHUB_REPO}/labels`,
-      {
-        headers: {
-          Authorization: `token ${env.GITHUB_TOKEN}`,
-          "User-Agent": "VioletVault-BugReporter/1.0",
-          Accept: "application/vnd.github.v3+json",
-        },
+    const labelsResponse = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/labels`, {
+      headers: {
+        Authorization: `token ${env.GITHUB_TOKEN}`,
+        "User-Agent": "VioletVault-BugReporter/1.0",
+        Accept: "application/vnd.github.v3+json",
       },
-    );
+    });
 
     if (labelsResponse.ok) {
       const labelsData = await labelsResponse.json();
@@ -773,9 +733,7 @@ async function generateSmartLabels(
     /at\s+\w+\s*\(/, // Stack traces
   ];
 
-  const hasCodeContent = codeIndicators.some((pattern) =>
-    pattern.test(description),
-  );
+  const hasCodeContent = codeIndicators.some((pattern) => pattern.test(description));
   if (hasCodeContent) {
     addLabelIfExists("code");
     console.log("Detected code content in bug report");
@@ -818,10 +776,7 @@ async function generateSmartLabels(
   // Fallback to description and URL analysis
   for (const [component, keywords] of Object.entries(componentMap)) {
     if (
-      keywords.some(
-        (keyword) =>
-          descriptionLower.includes(keyword) || urlPath.includes(keyword),
-      )
+      keywords.some((keyword) => descriptionLower.includes(keyword) || urlPath.includes(keyword))
     ) {
       addLabelIfExists(component);
       break; // Only add one component label to avoid clutter
@@ -833,18 +788,15 @@ async function generateSmartLabels(
   const currentView = routeInfo.currentView || pageContext?.page;
 
   // Use enhanced router information for more accurate labeling
-  if (currentView === "debts" || urlPath.includes("/debt"))
-    addLabelIfExists("debt");
+  if (currentView === "debts" || urlPath.includes("/debt")) addLabelIfExists("debt");
   else if (currentView === "envelopes" || urlPath.includes("/envelope"))
     addLabelIfExists("envelope");
   else if (currentView === "transactions" || urlPath.includes("/transaction"))
     addLabelIfExists("transaction");
-  else if (currentView === "savings" || urlPath.includes("/savings"))
-    addLabelIfExists("savings");
+  else if (currentView === "savings" || urlPath.includes("/savings")) addLabelIfExists("savings");
   else if (currentView === "analytics" || urlPath.includes("/analytics"))
     addLabelIfExists("analytics");
-  else if (currentView === "bills" || urlPath.includes("/bills"))
-    addLabelIfExists("bills");
+  else if (currentView === "bills" || urlPath.includes("/bills")) addLabelIfExists("bills");
   else if (currentView === "automation" || urlPath.includes("/automation"))
     addLabelIfExists("automation");
   else if (currentView === "paycheck" || urlPath.includes("/paycheck"))
@@ -932,12 +884,8 @@ async function generateSmartLabels(
   // Enhanced context analysis using comprehensive browser info
   if (reportEnv?.browserInfo) {
     // Memory-related issues
-    if (
-      reportEnv.browserInfo.memory &&
-      typeof reportEnv.browserInfo.memory === "object"
-    ) {
-      const usedMemory =
-        parseInt(reportEnv.browserInfo.memory.usedJSHeapSize) || 0;
+    if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === "object") {
+      const usedMemory = parseInt(reportEnv.browserInfo.memory.usedJSHeapSize) || 0;
       if (usedMemory > 100) {
         // More than 100MB JS heap usage
         labels.push("performance", "memory");
@@ -958,8 +906,7 @@ async function generateSmartLabels(
   // Storage-related issues
   if (reportEnv?.storageInfo) {
     const localStorageKB = parseInt(reportEnv.storageInfo.localStorage) || 0;
-    const sessionStorageKB =
-      parseInt(reportEnv.storageInfo.sessionStorage) || 0;
+    const sessionStorageKB = parseInt(reportEnv.storageInfo.sessionStorage) || 0;
 
     if (localStorageKB > 1024 || sessionStorageKB > 512) {
       // Large storage usage
@@ -986,11 +933,7 @@ async function generateSmartLabels(
     // Focus-related issues
     if (reportEnv.domInfo.focusedElement) {
       const focusedType = reportEnv.domInfo.focusedElement.type;
-      if (
-        focusedType === "text" ||
-        focusedType === "email" ||
-        focusedType === "password"
-      ) {
+      if (focusedType === "text" || focusedType === "email" || focusedType === "password") {
         labels.push("forms", "input");
       }
     }
@@ -1188,11 +1131,7 @@ async function createGitHubIssue(data, env) {
         remainingLines
           .map((line) => {
             // Convert to checklist items - handle existing list formats
-            if (
-              line.startsWith("- ") ||
-              line.startsWith("* ") ||
-              line.startsWith("• ")
-            ) {
+            if (line.startsWith("- ") || line.startsWith("* ") || line.startsWith("• ")) {
               return `- [ ] ${line.substring(2).trim()}`;
             } else if (line.match(/^\d+\.\s*/)) {
               // Convert numbered list to checklist
@@ -1270,8 +1209,7 @@ async function createGitHubIssue(data, env) {
 
     // Use enhanced router-aware location if available
     const routeInfo = reportEnv.pageContext.route || {};
-    const currentView =
-      routeInfo.currentView || reportEnv.pageContext.page || "unknown";
+    const currentView = routeInfo.currentView || reportEnv.pageContext.page || "unknown";
 
     issueBody += `**Page:** ${currentView}\n`;
     issueBody += `**Screen:** ${reportEnv.pageContext.screenTitle || "Unknown"}\n`;
@@ -1285,10 +1223,7 @@ async function createGitHubIssue(data, env) {
       issueBody += `**Build Target:** ${routeInfo.buildTarget}\n`;
     }
 
-    if (
-      reportEnv.pageContext.visibleModals &&
-      reportEnv.pageContext.visibleModals.length > 0
-    ) {
+    if (reportEnv.pageContext.visibleModals && reportEnv.pageContext.visibleModals.length > 0) {
       issueBody += `**Active Modal(s):** ${reportEnv.pageContext.visibleModals.join(", ")}\n`;
     }
 
@@ -1318,11 +1253,7 @@ async function createGitHubIssue(data, env) {
         url.includes("staging.")
       ) {
         environmentType = "🚧 Development/Local";
-      } else if (
-        url.includes("preview") ||
-        url.includes("git-") ||
-        url.includes("vercel.app")
-      ) {
+      } else if (url.includes("preview") || url.includes("git-") || url.includes("vercel.app")) {
         environmentType = "🔄 Preview/Staging";
       } else {
         environmentType = "✅ Production/Live";
@@ -1341,24 +1272,15 @@ async function createGitHubIssue(data, env) {
       issueBody += `- **Screen Title:** ${reportEnv.pageContext.screenTitle || "Unknown"}\n`;
       issueBody += `- **Document Title:** ${reportEnv.pageContext.documentTitle || "N/A"}\n`;
 
-      if (
-        reportEnv.pageContext.visibleModals &&
-        reportEnv.pageContext.visibleModals.length > 0
-      ) {
+      if (reportEnv.pageContext.visibleModals && reportEnv.pageContext.visibleModals.length > 0) {
         issueBody += `- **Active Modals:** ${reportEnv.pageContext.visibleModals.join(", ")}\n`;
       }
 
-      if (
-        reportEnv.pageContext.activeButtons &&
-        reportEnv.pageContext.activeButtons.length > 0
-      ) {
+      if (reportEnv.pageContext.activeButtons && reportEnv.pageContext.activeButtons.length > 0) {
         issueBody += `- **Available Actions:** ${reportEnv.pageContext.activeButtons.slice(0, 3).join(", ")}\n`;
       }
 
-      if (
-        reportEnv.pageContext.componentHints &&
-        reportEnv.pageContext.componentHints.length > 0
-      ) {
+      if (reportEnv.pageContext.componentHints && reportEnv.pageContext.componentHints.length > 0) {
         issueBody += `- **Component Hints:** ${reportEnv.pageContext.componentHints.join(", ")}\n`;
       }
     }
@@ -1399,10 +1321,7 @@ async function createGitHubIssue(data, env) {
     // Add browser performance info
     if (reportEnv.browserInfo) {
       issueBody += `\n## Browser Performance\n`;
-      if (
-        reportEnv.browserInfo.memory &&
-        typeof reportEnv.browserInfo.memory === "object"
-      ) {
+      if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === "object") {
         issueBody += `- **JS Memory Usage:** ${reportEnv.browserInfo.memory.usedJSHeapSize} / ${reportEnv.browserInfo.memory.totalJSHeapSize}\n`;
       }
       if (reportEnv.browserInfo.hardwareConcurrency) {
@@ -1419,10 +1338,7 @@ async function createGitHubIssue(data, env) {
       if (reportEnv.storageInfo.localStorage && !reportEnv.storageInfo.error) {
         issueBody += `- **Local Storage:** ${reportEnv.storageInfo.localStorage} (${reportEnv.storageInfo.localStorageItems} items)\n`;
       }
-      if (
-        reportEnv.storageInfo.sessionStorage &&
-        !reportEnv.storageInfo.error
-      ) {
+      if (reportEnv.storageInfo.sessionStorage && !reportEnv.storageInfo.error) {
         issueBody += `- **Session Storage:** ${reportEnv.storageInfo.sessionStorage} (${reportEnv.storageInfo.sessionStorageItems} items)\n`;
       }
       if (reportEnv.storageInfo.error) {
@@ -1497,17 +1413,12 @@ async function createGitHubIssue(data, env) {
   issueBody += `---\n*This issue was automatically created from a bug report submitted via the VioletVault app.*`;
 
   // Generate smart labels and get milestone info
-  const smartLabels = await generateSmartLabels(
-    description,
-    reportEnv,
-    env,
-    severity,
-  );
+  const smartLabels = await generateSmartLabels(description, reportEnv, env, severity);
   console.log(`Generated smart labels: ${JSON.stringify(smartLabels)}`);
 
   const milestoneInfo = await getMilestones(env);
   console.log(
-    `Milestone info: ${JSON.stringify({ success: milestoneInfo.success, current: milestoneInfo.current?.title })}`,
+    `Milestone info: ${JSON.stringify({ success: milestoneInfo.success, current: milestoneInfo.current?.title })}`
   );
 
   // Check if body exceeds GitHub's 65536 character limit
@@ -1516,9 +1427,7 @@ async function createGitHubIssue(data, env) {
   let shouldCreateComment = false;
 
   if (issueBody.length > maxBodyLength) {
-    console.log(
-      `Issue body too long (${issueBody.length} chars), will create comment`,
-    );
+    console.log(`Issue body too long (${issueBody.length} chars), will create comment`);
     shouldCreateComment = true;
     // Create shorter body for initial issue
     finalIssueBody =
@@ -1558,18 +1467,16 @@ async function createGitHubIssue(data, env) {
           "User-Agent": "VioletVault-BugReporter/1.0",
           Accept: "application/vnd.github.v3+json",
         },
-      },
+      }
     );
 
     if (response.ok) {
       const allMilestones = await response.json();
-      const targetMilestone = allMilestones.find(
-        (m) => m.title === milestoneInfo.current.title,
-      );
+      const targetMilestone = allMilestones.find((m) => m.title === milestoneInfo.current.title);
       if (targetMilestone) {
         issueData.milestone = targetMilestone.number;
         console.log(
-          `Assigned bug report to milestone: ${targetMilestone.title} (#${targetMilestone.number})`,
+          `Assigned bug report to milestone: ${targetMilestone.title} (#${targetMilestone.number})`
         );
       } else {
         console.log(`Milestone not found: ${milestoneInfo.current.title}`);
@@ -1588,21 +1495,18 @@ async function createGitHubIssue(data, env) {
       labels: issueData.labels,
       milestone: issueData.milestone,
       hasScreenshot: !!screenshotUrl,
-    })}`,
+    })}`
   );
 
-  const response = await fetch(
-    `https://api.github.com/repos/${env.GITHUB_REPO}/issues`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `token ${env.GITHUB_TOKEN}`,
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "VioletVault-BugReporter/1.0",
-      },
-      body: JSON.stringify(issueData),
+  const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/issues`, {
+    method: "POST",
+    headers: {
+      Authorization: `token ${env.GITHUB_TOKEN}`,
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "VioletVault-BugReporter/1.0",
     },
-  );
+    body: JSON.stringify(issueData),
+  });
 
   if (!response.ok) {
     const errorData = await response.text();
@@ -1627,24 +1531,19 @@ async function createGitHubIssue(data, env) {
           body: JSON.stringify({
             body: `## Full Diagnostic Information\n\n${commentBody}`,
           }),
-        },
+        }
       );
 
       if (commentResponse.ok) {
-        console.log(
-          `Added comment with full diagnostic info to issue #${createdIssue.number}`,
-        );
+        console.log(`Added comment with full diagnostic info to issue #${createdIssue.number}`);
       } else {
         console.error(
           `Failed to add comment to issue #${createdIssue.number}:`,
-          await commentResponse.text(),
+          await commentResponse.text()
         );
       }
     } catch (commentError) {
-      console.error(
-        "Failed to create comment with full diagnostic info:",
-        commentError,
-      );
+      console.error("Failed to create comment with full diagnostic info:", commentError);
     }
   }
 
@@ -1667,8 +1566,7 @@ async function sendNotification(data, env) {
             {
               title: "Description",
               value:
-                data.description.substring(0, 200) +
-                (data.description.length > 200 ? "..." : ""),
+                data.description.substring(0, 200) + (data.description.length > 200 ? "..." : ""),
               short: false,
             },
             {
@@ -1678,9 +1576,7 @@ async function sendNotification(data, env) {
             },
             {
               title: "Session Replay",
-              value: data.sessionUrl
-                ? `<${data.sessionUrl}|View Session>`
-                : "Not available",
+              value: data.sessionUrl ? `<${data.sessionUrl}|View Session>` : "Not available",
               short: true,
             },
           ],

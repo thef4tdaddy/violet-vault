@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui";
 
 // Configuration constants
 const SIZE_CONFIG = {
@@ -69,7 +68,8 @@ const getVariantStyle = (variant, isActive) => {
   const styles = {
     underline: {
       active: "border-blue-500 text-blue-700 border-b-2",
-      inactive: "border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300 border-b-2",
+      inactive:
+        "border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300 border-b-2",
     },
     pills: {
       active: "bg-blue-100 text-blue-700 rounded-lg",
@@ -77,11 +77,14 @@ const getVariantStyle = (variant, isActive) => {
     },
     buttons: {
       active: "bg-blue-600 text-white rounded-md shadow-sm",
-      inactive: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:text-gray-900 rounded-md shadow-sm",
+      inactive:
+        "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:text-gray-900 rounded-md shadow-sm",
     },
     tabs: {
-      active: "bg-white text-blue-700 border-t-2 border-l border-r border-blue-500 rounded-t-lg shadow-sm relative z-10",
-      inactive: "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 rounded-t-lg relative",
+      active:
+        "bg-white text-blue-700 border-t-2 border-l border-r border-blue-500 rounded-t-lg shadow-sm relative z-10",
+      inactive:
+        "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 rounded-t-lg relative",
     },
     colored: { active: "", inactive: "" },
   };
@@ -167,7 +170,15 @@ const StandardTabs = ({
   );
 };
 
-const TabButton = ({ tab, isActive, config, variant, getVariantStyles, getCountStyles, onTabChange }) => {
+const TabButton = ({
+  tab,
+  isActive,
+  config,
+  variant,
+  getVariantStyles,
+  getCountStyles,
+  onTabChange,
+}) => {
   const isDisabled = tab.disabled || false;
   const Icon = tab.icon;
 

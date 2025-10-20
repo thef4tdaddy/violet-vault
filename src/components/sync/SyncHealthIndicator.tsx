@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui";
-import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
-import { cloudSyncService } from "../../services/cloudSyncService";
-import logger from "../../utils/common/logger";
+import { useSyncHealthIndicator } from "../../hooks/sync/useSyncHealthIndicator";
 
 /**
  * @typedef {Object} SyncHealthStatus
@@ -23,64 +21,7 @@ import logger from "../../utils/common/logger";
  * @returns {React.ReactElement} Rendered health indicator button
  */
 const SyncHealthIndicator = ({ onOpenSettings }) => {
-  const [syncStatus, setSyncStatus] = useState({
-    isHealthy: null,
-    status: "CHECKING",
-    lastChecked: null,
-    isLoading: true,
-  });
-
-  const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
-
-  // Check sync health on component mount and periodically
-  useEffect(() => {
-    checkSyncHealth();
-
-    // Check health every 2 minutes
-    const interval = setInterval(checkSyncHealth, 120000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Monitor background sync activity
-  useEffect(() => {
-    // Check if sync is running by monitoring the service state
-    const checkSyncActivity = () => {
-      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
-      setIsBackgroundSyncing(isRunning);
-    };
-
-    // Check immediately
-    checkSyncActivity();
-
-    // Check every 5 seconds when potentially syncing
-    const activityInterval = setInterval(checkSyncActivity, 5000);
-
-    return () => clearInterval(activityInterval);
-  }, []);
-
-  /**
-   * Check sync health status
-   * @returns {Promise<void>}
-   */
-  const checkSyncHealth = async () => {
-    try {
-      setSyncStatus((prev) => ({ ...prev, isLoading: true }));
-      const health = await getQuickSyncStatus();
-      setSyncStatus({
-        ...health,
-        isLoading: false,
-      });
-    } catch (error) {
-      logger.error("Failed to check sync health:", error);
-      setSyncStatus({
-        isHealthy: false,
-        status: "ERROR",
-        error: error.message,
-        lastChecked: new Date().toISOString(),
-        isLoading: false,
-      });
-    }
-  };
+  const { syncStatus, isBackgroundSyncing } = useSyncHealthIndicator();
 
   /**
    * Get Tailwind CSS color class based on sync status

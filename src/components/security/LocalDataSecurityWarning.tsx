@@ -74,13 +74,17 @@ const EncryptedDataCard = () => (
       className: "w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0",
     })}
     <div>
-      <h3 className="font-semibold text-green-800 dark:text-green-200">
-        ✅ ENCRYPTED & SECURE
-      </h3>
+      <h3 className="font-semibold text-green-800 dark:text-green-200">✅ ENCRYPTED & SECURE</h3>
       <ul className="mt-2 text-sm text-green-700 dark:text-green-300 space-y-1">
-        <li>• <strong>Cloud Data:</strong> All data sent to Firebase is fully encrypted</li>
-        <li>• <strong>Authentication:</strong> Login credentials are encrypted in browser storage</li>
-        <li>• <strong>Cross-Device Sync:</strong> Shared budgets use strong encryption</li>
+        <li>
+          • <strong>Cloud Data:</strong> All data sent to Firebase is fully encrypted
+        </li>
+        <li>
+          • <strong>Authentication:</strong> Login credentials are encrypted in browser storage
+        </li>
+        <li>
+          • <strong>Cross-Device Sync:</strong> Shared budgets use strong encryption
+        </li>
       </ul>
     </div>
   </div>
@@ -96,8 +100,13 @@ const UnencryptedDataCard = () => (
         ⚠️ UNENCRYPTED (LOCAL DEVICE ONLY)
       </h3>
       <ul className="mt-2 text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-        <li>• <strong>Local Budget Data:</strong> Envelopes, bills, and transactions in browser storage</li>
-        <li>• <strong>Basic Profile:</strong> Username and color preferences</li>
+        <li>
+          • <strong>Local Budget Data:</strong> Envelopes, bills, and transactions in browser
+          storage
+        </li>
+        <li>
+          • <strong>Basic Profile:</strong> Username and color preferences
+        </li>
       </ul>
     </div>
   </div>
@@ -112,13 +121,17 @@ const ImplicationsSection = () => (
       What This Means for You
     </h3>
     <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
-      <p><strong>✅ Your data IS protected from:</strong></p>
+      <p>
+        <strong>✅ Your data IS protected from:</strong>
+      </p>
       <ul className="ml-4 space-y-1 text-green-700 dark:text-green-300">
         <li>• Network interception (all cloud sync is encrypted)</li>
         <li>• Unauthorized cloud access (requires your password)</li>
         <li>• Data breaches of our servers (we can't decrypt your data)</li>
       </ul>
-      <p className="mt-3"><strong>⚠️ Your data is NOT protected from:</strong></p>
+      <p className="mt-3">
+        <strong>⚠️ Your data is NOT protected from:</strong>
+      </p>
       <ul className="ml-4 space-y-1 text-yellow-700 dark:text-yellow-300">
         <li>• Someone with physical access to your unlocked device</li>
         <li>• Malware running on your computer with browser access</li>
@@ -150,19 +163,18 @@ const TechnicalDetailsSection = () => (
     </summary>
     <div className="mt-2 space-y-2 text-xs pl-4">
       <p>
-        <strong>Local Storage:</strong> Unencrypted data is stored in your browser's
-        IndexedDB for performance. This allows fast access to your budget without requiring
-        decryption for every operation.
+        <strong>Local Storage:</strong> Unencrypted data is stored in your browser's IndexedDB for
+        performance. This allows fast access to your budget without requiring decryption for every
+        operation.
       </p>
       <p>
-        <strong>Cloud Storage:</strong> All data sent to Firebase is encrypted with
-        AES-256-GCM using your password-derived key. We cannot decrypt your cloud data
-        without your password.
+        <strong>Cloud Storage:</strong> All data sent to Firebase is encrypted with AES-256-GCM
+        using your password-derived key. We cannot decrypt your cloud data without your password.
       </p>
       <p>
-        <strong>Why not encrypt everything locally?</strong> Local encryption would
-        significantly slow down the app since every operation would require
-        encryption/decryption. The current design balances security with performance.
+        <strong>Why not encrypt everything locally?</strong> Local encryption would significantly
+        slow down the app since every operation would require encryption/decryption. The current
+        design balances security with performance.
       </p>
     </div>
   </details>

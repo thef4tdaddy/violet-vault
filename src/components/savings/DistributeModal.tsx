@@ -101,10 +101,7 @@ const DistributeModal = ({
           updateGoalAmount={updateGoalAmount}
           unassignedCash={unassignedCash}
         />
-        <DistributionSummary
-          total={distributionTotal}
-          unassignedCash={unassignedCash}
-        />
+        <DistributionSummary total={distributionTotal} unassignedCash={unassignedCash} />
         <ActionButtons
           onCancel={handleClose}
           onDistribute={handleDistribute}
@@ -133,7 +130,12 @@ const AvailableCash = ({ amount }) => (
   </div>
 );
 
-const DistributionControls = ({ totalToDistribute, setTotalToDistribute, onAutoDistribute, unassignedCash }) => (
+const DistributionControls = ({
+  totalToDistribute,
+  setTotalToDistribute,
+  onAutoDistribute,
+  unassignedCash,
+}) => (
   <div className="space-y-4 mb-6">
     <div className="flex gap-3">
       <div className="flex-1">

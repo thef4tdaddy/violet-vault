@@ -60,8 +60,20 @@ export const useBillManagerUI = ({
   // View modes configuration with business logic
   const viewModes = useMemo(
     () => [
-      createViewMode("upcoming", "Upcoming", categorizedBills.upcoming?.length || 0, "Calendar", "blue"),
-      createViewMode("overdue", "Overdue", categorizedBills.overdue?.length || 0, "AlertTriangle", "red"),
+      createViewMode(
+        "upcoming",
+        "Upcoming",
+        categorizedBills.upcoming?.length || 0,
+        "Calendar",
+        "blue"
+      ),
+      createViewMode(
+        "overdue",
+        "Overdue",
+        categorizedBills.overdue?.length || 0,
+        "AlertTriangle",
+        "red"
+      ),
       createViewMode("paid", "Paid", categorizedBills.paid?.length || 0, "CheckCircle", "green"),
       createViewMode("all", "All Bills", bills?.length || 0, "FileText", "gray"),
     ],

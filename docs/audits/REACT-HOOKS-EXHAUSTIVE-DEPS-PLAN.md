@@ -13,6 +13,7 @@
 ## The Problem
 
 ### Current (Bad) Pattern:
+
 ```typescript
 // ❌ Function defined outside, used in effect, but not in deps array
 const validateShareCode = async (code) => {
@@ -27,12 +28,14 @@ export function JoinBudgetModal() {
 ```
 
 ### The Issue:
+
 - Effects use variables/functions but don't declare them in dependency array
 - Effect runs with stale closure (old version of variables)
 - Can cause: missed updates, wrong data, infinite loops, memory leaks
 - React warning: "missing dependency in useEffect"
 
 ### Fixed (Good) Pattern:
+
 ```typescript
 // ✅ Option 1: Add to dependency array
 useEffect(() => {
@@ -63,32 +66,37 @@ useEffect(() => {
 
 ### Distribution by Type:
 
-| Missing Dependency | Count | Files | Severity |
-|-------------------|-------|-------|----------|
-| Function reference | 8 | `useConfirm`, `usePrompt`, `useFABActions` | CRITICAL |
-| State setter | 5 | `setShowAddNewPayer`, `setOnlineStatus`, `setExpanded` | HIGH |
-| Callback/handler | 3 | `handleSharedContent`, `resetValidation`, `getProgress` | HIGH |
-| Computed value | 1 | `updateBiweeklyAllocations` | MEDIUM |
+| Missing Dependency | Count | Files                                                   | Severity |
+| ------------------ | ----- | ------------------------------------------------------- | -------- |
+| Function reference | 8     | `useConfirm`, `usePrompt`, `useFABActions`              | CRITICAL |
+| State setter       | 5     | `setShowAddNewPayer`, `setOnlineStatus`, `setExpanded`  | HIGH     |
+| Callback/handler   | 3     | `handleSharedContent`, `resetValidation`, `getProgress` | HIGH     |
+| Computed value     | 1     | `updateBiweeklyAllocations`                             | MEDIUM   |
 
 ### Common Patterns:
 
 1. **Callback/Handler Missing:**
+
    ```typescript
-   const resetForm = () => { /* ... */ };
+   const resetForm = () => {
+     /* ... */
+   };
    useEffect(() => {
      resetForm(); // Missing resetForm in deps
    }, []);
    ```
 
 2. **State Setter Missing:**
+
    ```typescript
    const [status, setStatus] = useState();
    useEffect(() => {
-     setStatus('online'); // Missing setStatus
+     setStatus("online"); // Missing setStatus
    }, []);
    ```
 
 3. **Function Parameter Missing:**
+
    ```typescript
    function useCustom(onComplete) {
      useEffect(() => {
@@ -192,6 +200,7 @@ useEffect(() => {
 ### Phase 1: Analysis (Identify Root Cause per File)
 
 For each of the 17 instances, determine:
+
 1. **What's missing?** - Function, setState, callback?
 2. **Where's it defined?** - Parent component, hook param, same file?
 3. **How's it used?** - Called? Passed? Condition check?
@@ -200,6 +209,7 @@ For each of the 17 instances, determine:
 ### Phase 2: Categorize by Fix Type
 
 **Category A: Safe to Add to Deps (6 files)**
+
 - setState functions (usually stable)
 - Simple callbacks from props
 - **Strategy:** Just add to array
@@ -207,16 +217,17 @@ For each of the 17 instances, determine:
 ```typescript
 // BEFORE
 useEffect(() => {
-  setOnlineStatus('online');
+  setOnlineStatus("online");
 }, []);
 
 // AFTER
 useEffect(() => {
-  setOnlineStatus('online');
+  setOnlineStatus("online");
 }, [setOnlineStatus]); // or just leave empty [], setState is stable
 ```
 
 **Category B: Need useCallback Wrapper (5 files)**
+
 - Complex functions defined in component
 - Functions called multiple times
 - **Strategy:** useCallback(fn, deps) then add to effect deps
@@ -231,9 +242,14 @@ useEffect(() => {
 }, []); // ❌ Missing
 
 // AFTER
-const resetForm = useCallback(() => {
-  // ... 10 lines of logic
-}, [/* deps of resetForm */]);
+const resetForm = useCallback(
+  () => {
+    // ... 10 lines of logic
+  },
+  [
+    /* deps of resetForm */
+  ]
+);
 
 useEffect(() => {
   resetForm();
@@ -241,6 +257,7 @@ useEffect(() => {
 ```
 
 **Category C: Move Inside Effect (4 files)**
+
 - Utility functions that don't need to be component-scoped
 - Functions only used in one effect
 - **Strategy:** Move function definition into effect
@@ -264,14 +281,19 @@ useEffect(() => {
 ```
 
 **Category D: Complex - Multiple Effects (2 files)**
+
 - Multiple useEffects with different missing deps
 - Interdependent state updates
 - **Strategy:** Handle each effect separately
 
 ```typescript
 // BEFORE
-const getStats = async () => { /* ... */ };
-const clearError = () => { /* ... */ };
+const getStats = async () => {
+  /* ... */
+};
+const clearError = () => {
+  /* ... */
+};
 
 useEffect(() => {
   getStats(); // Missing
@@ -408,6 +430,7 @@ After fixing each file:
 ## Testing Strategy
 
 ### Per File:
+
 1. Run component with dev tools open
 2. Verify useEffect runs at expected times
 3. Check that effect captures current values (not stale)
@@ -415,6 +438,7 @@ After fixing each file:
 5. Look for console warnings/errors
 
 ### Integration:
+
 - Test modals open/close correctly
 - Test form resets work
 - Test async operations complete
@@ -424,46 +448,50 @@ After fixing each file:
 
 ## Quick Reference Table
 
-| File | Missing Dep | Type | Line | Fix Strategy |
-|------|-------------|------|------|--------------|
-| AddBillModal.tsx | resetForm | callback | 102 | useCallback |
-| JoinBudgetModal.tsx | validateShareCode | function | 43 | useCallback |
-| JoinBudgetModal.tsx | resetValidation | callback | 54 | Add to deps |
-| useFABActions.ts | multiple handlers | multiple | 40+ | useCallback per handler |
-| useNetworkStatus.ts | setOnlineStatus | setState | 39 | Add to deps |
-| OnboardingTutorial.tsx | getProgress | callback | 52 | Add to deps |
-| ShareTargetHandler.tsx | handleSharedContent | handler | 23 | useCallback |
-| usePaycheckForm.ts | setShowAddNewPayer | setState | 16 | Add to deps |
-| useFABBehavior.ts | setExpanded | setState | 83 | Add to deps |
-| useFirebaseMessaging.ts | updatePermissionStatus | param | 145 | Add to deps |
-| EnvelopeSystem.tsx | updateBiweeklyAllocations | function | 126 | Add to deps |
-| LocalOnlyModeSettings.tsx | getStats | callback | 55 | useCallback |
-| LocalOnlyModeSettings.tsx | clearError | callback | 65 | useCallback |
-| usePaycheckProcessor.ts | validation fn | function | TBD | useCallback |
-| useEnvelopes.ts | callback | callback | TBD | Add to deps |
-| useConfirm.ts | handler | callback | TBD | Add to deps |
-| usePrompt.ts | handler | callback | TBD | Add to deps |
+| File                      | Missing Dep               | Type     | Line | Fix Strategy            |
+| ------------------------- | ------------------------- | -------- | ---- | ----------------------- |
+| AddBillModal.tsx          | resetForm                 | callback | 102  | useCallback             |
+| JoinBudgetModal.tsx       | validateShareCode         | function | 43   | useCallback             |
+| JoinBudgetModal.tsx       | resetValidation           | callback | 54   | Add to deps             |
+| useFABActions.ts          | multiple handlers         | multiple | 40+  | useCallback per handler |
+| useNetworkStatus.ts       | setOnlineStatus           | setState | 39   | Add to deps             |
+| OnboardingTutorial.tsx    | getProgress               | callback | 52   | Add to deps             |
+| ShareTargetHandler.tsx    | handleSharedContent       | handler  | 23   | useCallback             |
+| usePaycheckForm.ts        | setShowAddNewPayer        | setState | 16   | Add to deps             |
+| useFABBehavior.ts         | setExpanded               | setState | 83   | Add to deps             |
+| useFirebaseMessaging.ts   | updatePermissionStatus    | param    | 145  | Add to deps             |
+| EnvelopeSystem.tsx        | updateBiweeklyAllocations | function | 126  | Add to deps             |
+| LocalOnlyModeSettings.tsx | getStats                  | callback | 55   | useCallback             |
+| LocalOnlyModeSettings.tsx | clearError                | callback | 65   | useCallback             |
+| usePaycheckProcessor.ts   | validation fn             | function | TBD  | useCallback             |
+| useEnvelopes.ts           | callback                  | callback | TBD  | Add to deps             |
+| useConfirm.ts             | handler                   | callback | TBD  | Add to deps             |
+| usePrompt.ts              | handler                   | callback | TBD  | Add to deps             |
 
 ---
 
 ## Implementation Order (by Impact)
 
 ### Priority 1: Multi-Effect Files (Fix All at Once)
+
 - `LocalOnlyModeSettings.tsx` (2 effects)
 - `useFABActions.ts` (5 effects)
 - `JoinBudgetModal.tsx` (2 effects)
 
 ### Priority 2: Complex Handlers
+
 - `ShareTargetHandler.tsx`
 - `OnboardingTutorial.tsx`
 - `AddBillModal.tsx`
 
 ### Priority 3: Simple State Setters
+
 - `useFABBehavior.ts`
 - `useNetworkStatus.ts`
 - `usePaycheckForm.ts`
 
 ### Priority 4: Function Parameters
+
 - `useFirebaseMessaging.ts`
 - `EnvelopeSystem.tsx`
 - Remaining hooks
@@ -494,4 +522,3 @@ After fixing each file:
 5. **Document why if deps are intentionally omitted**
    - Comment: `// setState is stable reference`
    - Or: `// Intentionally empty - one-time setup`
-

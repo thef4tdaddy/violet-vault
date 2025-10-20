@@ -24,9 +24,7 @@ const StatusHeader = ({ status, displayText, priority, iconName }) => (
       {React.createElement(getIcon(iconName), {
         className: `h-4 w-4 ${status.textColor}`,
       })}
-      <span className={`text-sm font-medium ${status.textColor}`}>
-        {displayText.primaryStatus}
-      </span>
+      <span className={`text-sm font-medium ${status.textColor}`}>{displayText.primaryStatus}</span>
     </div>
     {priority.priorityLevel === "critical" && (
       <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
@@ -55,8 +53,7 @@ const ProgressBar = ({ fundingProgress }) => (
 // Next bill info component
 const NextBillInfo = ({ nextBill, daysUntilNextBill }) => (
   <div className="text-sm text-gray-600 mb-1">
-    <span className="font-medium">Next Bill:</span> {nextBill.name} - $
-    {nextBill.amount.toFixed(2)}
+    <span className="font-medium">Next Bill:</span> {nextBill.name} - ${nextBill.amount.toFixed(2)}
     {daysUntilNextBill !== null && (
       <span className={`ml-2 ${getDaysUntilColor(daysUntilNextBill)}`}>
         ({daysUntilNextBill} day{daysUntilNextBill !== 1 ? "s" : ""})
@@ -84,8 +81,15 @@ const StatusDisplay = ({ targetMonthlyAmount, nextBill, remainingToFund, current
 );
 
 // Detailed info section
-const DetailedInfo = ({ displayInfo, upcomingBillsAmount, remainingToFund, targetMonthlyAmount, 
-  daysUntilNextBill, currentBalance, priority }) => (
+const DetailedInfo = ({
+  displayInfo,
+  upcomingBillsAmount,
+  remainingToFund,
+  targetMonthlyAmount,
+  daysUntilNextBill,
+  currentBalance,
+  priority,
+}) => (
   <div className="mt-3 pt-2 border-t border-gray-200">
     <div className="grid grid-cols-2 gap-2 text-xs mb-2">
       <div className="flex items-center space-x-1">
@@ -120,14 +124,17 @@ const DetailedInfo = ({ displayInfo, upcomingBillsAmount, remainingToFund, targe
       <WellFundedAlert currentBalance={currentBalance} targetMonthlyAmount={targetMonthlyAmount} />
     )}
 
-    {priority.reason && (
-      <div className="mt-2 text-xs text-gray-500 italic">{priority.reason}</div>
-    )}
+    {priority.reason && <div className="mt-2 text-xs text-gray-500 italic">{priority.reason}</div>}
   </div>
 );
 
 // Funding recommendations component
-const FundingRecommendations = ({ remainingToFund, daysUntilNextBill, targetMonthlyAmount, currentBalance }) => (
+const FundingRecommendations = ({
+  remainingToFund,
+  daysUntilNextBill,
+  targetMonthlyAmount,
+  currentBalance,
+}) => (
   <div className="bg-blue-50 p-2 rounded text-xs">
     <div className="flex items-center space-x-1 mb-1">
       {React.createElement(getIcon("TrendingUp"), {
@@ -162,8 +169,8 @@ const WellFundedAlert = ({ currentBalance, targetMonthlyAmount }) => (
       <span className="font-medium text-green-700">Well Funded</span>
     </div>
     <div className="text-green-600">
-      This envelope is {Math.round((currentBalance / targetMonthlyAmount) * 100)}% funded
-      for the month
+      This envelope is {Math.round((currentBalance / targetMonthlyAmount) * 100)}% funded for the
+      month
     </div>
   </div>
 );
@@ -197,7 +204,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
 
   return (
     <div className={`${status.bgColor} border border-${status.color}-200 rounded-lg p-3`}>
-      <StatusHeader 
+      <StatusHeader
         status={status}
         displayText={displayText}
         priority={priority}
@@ -206,9 +213,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
 
       {!isFullyFunded && <ProgressBar fundingProgress={fundingProgress} />}
 
-      {nextBill && (
-        <NextBillInfo nextBill={nextBill} daysUntilNextBill={daysUntilNextBill} />
-      )}
+      {nextBill && <NextBillInfo nextBill={nextBill} daysUntilNextBill={daysUntilNextBill} />}
 
       <StatusDisplay
         targetMonthlyAmount={targetMonthlyAmount}

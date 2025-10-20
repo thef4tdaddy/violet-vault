@@ -29,7 +29,13 @@ const createPaymentTransaction = (bill, billId, paidAmount, paymentDate, envelop
 };
 
 // Helper to update envelope balance after payment
-const updateEnvelopeForPayment = async (envelopeId, paidAmount, paymentDate, billId, transactionId) => {
+const updateEnvelopeForPayment = async (
+  envelopeId,
+  paidAmount,
+  paymentDate,
+  billId,
+  transactionId
+) => {
   const envelope = await budgetDb.envelopes.get(envelopeId);
   if (!envelope) return;
 
@@ -232,7 +238,13 @@ export const useMarkBillPaidMutation = () => {
       });
 
       // Create transaction record for the bill payment
-      const paymentTransaction = createPaymentTransaction(bill, billId, paidAmount, paymentDate, envelopeId);
+      const paymentTransaction = createPaymentTransaction(
+        bill,
+        billId,
+        paidAmount,
+        paymentDate,
+        envelopeId
+      );
 
       // Add transaction to Dexie
       await budgetDb.transactions.put(paymentTransaction);
@@ -240,7 +252,13 @@ export const useMarkBillPaidMutation = () => {
 
       // If bill is linked to envelope, update envelope balance
       if (envelopeId && paidAmount) {
-        await updateEnvelopeForPayment(envelopeId, paidAmount, paymentDate, billId, paymentTransaction.id);
+        await updateEnvelopeForPayment(
+          envelopeId,
+          paidAmount,
+          paymentDate,
+          billId,
+          paymentTransaction.id
+        );
       }
 
       return { billId, paymentTransaction };

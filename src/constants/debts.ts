@@ -1,11 +1,6 @@
 // Debt tracking constants and configurations
 import logger from "../utils/common/logger";
-import type {
-  DebtType,
-  DebtTypeConfig,
-  DebtAccount,
-  DebtStats,
-} from "../types/debt";
+import type { DebtType, DebtTypeConfig, DebtAccount, DebtStats } from "../types/debt";
 
 // Re-export enums as constants for backward compatibility
 export const DEBT_TYPES = {

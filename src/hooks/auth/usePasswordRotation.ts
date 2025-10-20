@@ -73,7 +73,10 @@ const usePasswordRotation = (): UsePasswordRotationReturn => {
       logger.warn("Password rotation attempted but requires current password implementation");
     } catch (error) {
       logger.error("Failed to change password:", error);
-      showErrorToast(`Failed to change password: ${(error as Error).message}`, "Password Update Failed");
+      showErrorToast(
+        `Failed to change password: ${(error as Error).message}`,
+        "Password Update Failed"
+      );
     }
   }, [newPassword, confirmPassword, showErrorToast]);
 

@@ -13,6 +13,7 @@ const useInitializeNewPayerState = (uniquePayersLength, setShowAddNewPayer, init
       setShowAddNewPayer(hasNoPaychecks);
       initialRender.current = false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setShowAddNewPayer is stable setState
   }, [uniquePayersLength, initialRender]); // setState functions are stable, safe to omit from deps
 };
 

@@ -70,21 +70,13 @@ const ArchivingConfiguration = ({
           {showAdvancedOptions && (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg space-y-3">
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="preserveAnalytics"
-                  checked={true}
-                  disabled={true}
-                />
+                <Checkbox id="preserveAnalytics" checked={true} disabled={true} />
                 <label htmlFor="preserveAnalytics" className="text-sm text-gray-700">
                   Preserve analytics data (recommended)
                 </label>
               </div>
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="optimizeDatabase"
-                  checked={true}
-                  disabled={true}
-                />
+                <Checkbox id="optimizeDatabase" checked={true} disabled={true} />
                 <label htmlFor="optimizeDatabase" className="text-sm text-gray-700">
                   Optimize database after archiving
                 </label>

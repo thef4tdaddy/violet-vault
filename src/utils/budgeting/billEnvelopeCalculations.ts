@@ -27,7 +27,7 @@ const getNextUpcomingBill = (linkedBills) => {
   const upcomingBills = linkedBills
     .filter((bill) => new Date(bill.dueDate) >= new Date())
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-  
+
   return upcomingBills[0] || null;
 };
 
@@ -93,7 +93,11 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
   const isFullyFunded = remainingToFund <= 0;
 
   // Calculate overall funding progress
-  const fundingProgress = calculateFundingProgress(currentBalance, targetMonthlyAmount, nextBillAmount);
+  const fundingProgress = calculateFundingProgress(
+    currentBalance,
+    targetMonthlyAmount,
+    nextBillAmount
+  );
 
   // Calculate total upcoming bills amount
   const upcomingBillsAmount = calculateUpcomingBillsAmount(linkedBills);

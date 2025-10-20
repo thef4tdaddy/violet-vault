@@ -15,9 +15,7 @@ import type { UserData } from "@/types/auth";
 type SetAuthState = React.Dispatch<React.SetStateAction<AuthContextState>>;
 
 // Helper function to initialize auth state from localStorage
-export const initializeAuthFromStorage = async (
-  setAuthState: SetAuthState
-): Promise<void> => {
+export const initializeAuthFromStorage = async (setAuthState: SetAuthState): Promise<void> => {
   try {
     logger.auth("AuthContext: Initializing auth state from localStorage");
 
@@ -93,28 +91,26 @@ export const createSetAuthenticated =
     }));
   };
 
-export const createClearAuth =
-  (setAuthState: SetAuthState) =>
-  (): void => {
-    logger.auth("AuthContext: Clearing auth state");
-    setAuthState(initialAuthState);
-  };
+export const createClearAuth = (setAuthState: SetAuthState) => (): void => {
+  logger.auth("AuthContext: Clearing auth state");
+  setAuthState(initialAuthState);
+};
 
 export const createUpdateUser =
   (setAuthState: SetAuthState) =>
   (updatedUserData: Partial<UserData>): void => {
-  logger.auth("AuthContext: Updating user data", {
-    userName: updatedUserData.userName,
-  });
+    logger.auth("AuthContext: Updating user data", {
+      userName: updatedUserData.userName,
+    });
 
-  setAuthState((prev) => ({
-    ...prev,
-    user: {
-      ...prev.user,
-      ...updatedUserData,
-    },
-  }));
-};
+    setAuthState((prev) => ({
+      ...prev,
+      user: {
+        ...prev.user,
+        ...updatedUserData,
+      },
+    }));
+  };
 
 export const createSetLoading =
   (setAuthState: SetAuthState) =>
@@ -135,23 +131,19 @@ export const createSetError =
     }));
   };
 
-export const createUpdateActivity =
-  (setAuthState: SetAuthState) =>
-  (): void => {
-    setAuthState((prev) => ({
-      ...prev,
-      lastActivity: Date.now(),
-    }));
-  };
+export const createUpdateActivity = (setAuthState: SetAuthState) => (): void => {
+  setAuthState((prev) => ({
+    ...prev,
+    lastActivity: Date.now(),
+  }));
+};
 
-export const createLockSession =
-  (setAuthState: SetAuthState) =>
-  (): void => {
-    logger.auth("AuthContext: Locking session");
-    setAuthState((prev) => ({
-      ...prev,
-      isUnlocked: false,
-      encryptionKey: null,
-      lastActivity: null,
-    }));
-  };
+export const createLockSession = (setAuthState: SetAuthState) => (): void => {
+  logger.auth("AuthContext: Locking session");
+  setAuthState((prev) => ({
+    ...prev,
+    isUnlocked: false,
+    encryptionKey: null,
+    lastActivity: null,
+  }));
+};

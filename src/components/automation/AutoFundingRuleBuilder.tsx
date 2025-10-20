@@ -12,19 +12,13 @@ import StepNavigation from "./components/StepNavigation";
 const ModalFooter = ({ step, prevStep, onClose, nextStep, handleSave, editingRule }) => (
   <div className="p-6 border-t border-gray-200">
     <div className="flex justify-between">
-      <Button
-        onClick={step > 1 ? prevStep : onClose}
-        variant="secondary"
-      >
+      <Button onClick={step > 1 ? prevStep : onClose} variant="secondary">
         {step > 1 ? "Previous" : "Cancel"}
       </Button>
 
       <div className="flex gap-3">
         {step < 4 ? (
-          <Button
-            onClick={nextStep}
-            variant="primary"
-          >
+          <Button onClick={nextStep} variant="primary">
             Next
           </Button>
         ) : (

@@ -6,22 +6,23 @@
 
 ## 📊 Conversion Summary
 
-| Category | Remaining | Priority |
-|----------|-----------|----------|
-| **Hooks** | 140 files | 🔴 HIGH (blocking components) |
-| **Components** | 192 files | 🔴 HIGH (core functionality) |
-| **Utils** | 134 files | 🟡 MEDIUM (supporting logic) |
-| **Services** | 16 files | 🔴 HIGH (backend integration) |
-| **Contexts/Stores** | 5 files | 🔴 HIGH (state management) |
-| **Constants** | 3 files | 🟢 LOW (simple data) |
-| **Database** | 2 files | 🔴 HIGH (data layer) |
-| **Other** | 250 files | 🟡 MEDIUM (misc files) |
+| Category            | Remaining | Priority                      |
+| ------------------- | --------- | ----------------------------- |
+| **Hooks**           | 140 files | 🔴 HIGH (blocking components) |
+| **Components**      | 192 files | 🔴 HIGH (core functionality)  |
+| **Utils**           | 134 files | 🟡 MEDIUM (supporting logic)  |
+| **Services**        | 16 files  | 🔴 HIGH (backend integration) |
+| **Contexts/Stores** | 5 files   | 🔴 HIGH (state management)    |
+| **Constants**       | 3 files   | 🟢 LOW (simple data)          |
+| **Database**        | 2 files   | 🔴 HIGH (data layer)          |
+| **Other**           | 250 files | 🟡 MEDIUM (misc files)        |
 
 ---
 
 ## 🎯 Priority Conversion Order
 
 ### Phase 1: Foundation & State (Critical Path)
+
 **Estimated**: 20-30 hours | **Impact**: Unblocks everything
 
 1. **Services** (16 files) - API/Firebase integration
@@ -47,6 +48,7 @@
    - High-usage hooks first
 
 ### Phase 2: UI Components (Bulk Work)
+
 **Estimated**: 40-50 hours | **Impact**: App UI becomes TS
 
 1. **Core Components** (192 files)
@@ -64,6 +66,7 @@
    - `hooks/common/*` (37 files)
 
 ### Phase 3: Utilities & Supporting Logic
+
 **Estimated**: 30-40 hours | **Impact**: Performance & stability
 
 1. **Utilities** (134 files)
@@ -79,6 +82,7 @@
    - `constants/frequency.js`
 
 ### Phase 4: Polish & Edge Cases
+
 **Estimated**: 20-30 hours | **Impact**: Completeness
 
 1. **Special Purpose** (250+ files)
@@ -93,6 +97,7 @@
 ## 🚀 Current Blockers (44 TS Errors to Fix First)
 
 **Top Issues**:
+
 1. **Debt Components** (8 errors) - Prop type mismatches
 2. **Database** (13 errors) - Dexie type issues
 3. **Services** (15 errors) - Firebase/sync type conflicts
@@ -107,18 +112,22 @@
 ## 📈 Recommended Weekly Targets
 
 **Week 1**: Fix 44 TS errors + convert Phase 1 (Services, Contexts, DB)
+
 - ~5-10 files converted
 - ~44 errors resolved
 
 **Week 2**: Convert Phase 2 Part A (UI Core + supporting hooks)
+
 - ~50-70 files converted
 - Should reach 30-35% completion
 
 **Week 3**: Convert Phase 2 Part B (Main components)
+
 - ~80-100 files converted
 - Should reach 50%+ completion
 
 **Week 4**: Phase 3 (Utilities) + Phase 4 (Polish)
+
 - Completion to 100%
 
 ---
@@ -141,20 +150,20 @@
 ```typescript
 // Before
 export const useMyHook = (param) => {
-  const [state, setState] = useState(defaultValue)
-  return { state, setState }
-}
+  const [state, setState] = useState(defaultValue);
+  return { state, setState };
+};
 
 // After
 interface UseMyHookReturn {
-  state: StateType
-  setState: React.Dispatch<React.SetStateAction<StateType>>
+  state: StateType;
+  setState: React.Dispatch<React.SetStateAction<StateType>>;
 }
 
 export const useMyHook = (param: ParamType): UseMyHookReturn => {
-  const [state, setState] = useState<StateType>(defaultValue)
-  return { state, setState }
-}
+  const [state, setState] = useState<StateType>(defaultValue);
+  return { state, setState };
+};
 ```
 
 ### Component Conversion Template
@@ -195,6 +204,7 @@ export default MyComponent
 ### Top Priority (Convert First)
 
 **Services** (11 files):
+
 - authService.js
 - firebaseSyncService.js
 - chunkedSyncService.js
@@ -208,31 +218,36 @@ export default MyComponent
 - syncServiceInitializer.js
 
 **State Management** (5 files):
+
 - AuthContext.jsx
 - stores/auth (1-2 files)
 - stores/ui (2-3 files)
 
 **Database** (2 files):
+
 - budgetDb.js
-- db/__tests__/
+- db/**tests**/
 
 ### Medium Priority (Convert Next)
 
 **Critical Hooks** (50 files):
-- hooks/auth/* (22 files)
-- hooks/sync/* (4 files)
+
+- hooks/auth/\* (22 files)
+- hooks/sync/\* (4 files)
 - hooks/common/critical ones (24 files)
 
 **Core Components** (50 files):
+
 - components/ui/core (15 files)
-- components/auth/* (14 files)
+- components/auth/\* (14 files)
 - components/layout/core (7 files)
-- components/modals/* (4 files)
+- components/modals/\* (4 files)
 - Other critical UI (10 files)
 
 ### Lower Priority (Convert Last)
 
 **Everything else** (642 files):
+
 - Analytics, Automation, Bills, Debt, etc.
 - These don't block other work
 
@@ -240,14 +255,14 @@ export default MyComponent
 
 ## ⏱️ Estimated Timeline
 
-| Milestone | Files | Errors | Est. Time |
-|-----------|-------|--------|-----------|
-| Fix current errors | 0 | 44 → 0 | 2-4 hrs |
-| Phase 1 complete | 25-30 | 0-5 | 20-30 hrs |
-| Phase 2A (50%) | 100+ | 0-10 | 40-50 hrs |
-| Phase 2B (100%) | 200+ | 0-20 | 80-100 hrs |
-| Phase 3-4 | 600+ | 0-50 | 100-150 hrs |
-| **TOTAL** | **808** | **0** | **240-300 hrs** |
+| Milestone          | Files   | Errors | Est. Time       |
+| ------------------ | ------- | ------ | --------------- |
+| Fix current errors | 0       | 44 → 0 | 2-4 hrs         |
+| Phase 1 complete   | 25-30   | 0-5    | 20-30 hrs       |
+| Phase 2A (50%)     | 100+    | 0-10   | 40-50 hrs       |
+| Phase 2B (100%)    | 200+    | 0-20   | 80-100 hrs      |
+| Phase 3-4          | 600+    | 0-50   | 100-150 hrs     |
+| **TOTAL**          | **808** | **0**  | **240-300 hrs** |
 
 ---
 

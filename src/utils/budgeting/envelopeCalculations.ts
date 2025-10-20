@@ -1,7 +1,4 @@
-import {
-  ENVELOPE_TYPES,
-  AUTO_CLASSIFY_ENVELOPE_TYPE,
-} from "../../constants/categories";
+import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";
 
 /**
@@ -88,11 +85,7 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
 /**
  * Calculate utilization rate based on envelope type
  */
-export const calculateUtilizationRate = (
-  envelope,
-  billsAndTransactions,
-  balanceInfo
-) => {
+export const calculateUtilizationRate = (envelope, billsAndTransactions, balanceInfo) => {
   const { upcomingBills, paidTransactions } = billsAndTransactions;
   const { currentBalance, totalSpent, committed } = balanceInfo;
   let utilizationRate = 0;

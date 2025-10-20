@@ -10,18 +10,18 @@ You've pulled down 107 files of merged TypeScript PRs. Before proceeding with an
 
 ### package.json Status
 
-| Package | Current | Latest Stable | Status | Action |
-|---------|---------|----------------|--------|--------|
-| **React** | 19.1.1 | 19.2.0+ | ⚠️ Behind | Consider updating |
-| **React Router** | 7.8.2 | 7.8.2+ | ✅ Current | No action |
-| **TypeScript** | 5.9.3 | 5.9.3+ | ✅ Current | No action |
-| **Vite** | 7.0.6 | 7.0.6+ | ✅ Current | No action |
-| **Vitest** | 3.2.4 | 3.2.4+ | ✅ Current | No action |
-| **Node.js (Implied)** | 20+ | 22.x LTS | ⚠️ Recommended | Consider for CI |
-| **Firebase** | 12.0.0 | 12.0.0+ | ✅ Current | No action |
-| **TanStack Query** | 5.29.0 | 5.29.0+ | ✅ Current | No action |
-| **Tailwind** | 4.1.11 | 4.1.11+ | ✅ Current | No action |
-| **Zustand** | 5.0.7 | 5.0.7+ | ✅ Current | No action |
+| Package               | Current | Latest Stable | Status         | Action            |
+| --------------------- | ------- | ------------- | -------------- | ----------------- |
+| **React**             | 19.1.1  | 19.2.0+       | ⚠️ Behind      | Consider updating |
+| **React Router**      | 7.8.2   | 7.8.2+        | ✅ Current     | No action         |
+| **TypeScript**        | 5.9.3   | 5.9.3+        | ✅ Current     | No action         |
+| **Vite**              | 7.0.6   | 7.0.6+        | ✅ Current     | No action         |
+| **Vitest**            | 3.2.4   | 3.2.4+        | ✅ Current     | No action         |
+| **Node.js (Implied)** | 20+     | 22.x LTS      | ⚠️ Recommended | Consider for CI   |
+| **Firebase**          | 12.0.0  | 12.0.0+       | ✅ Current     | No action         |
+| **TanStack Query**    | 5.29.0  | 5.29.0+       | ✅ Current     | No action         |
+| **Tailwind**          | 4.1.11  | 4.1.11+       | ✅ Current     | No action         |
+| **Zustand**           | 5.0.7   | 5.0.7+        | ✅ Current     | No action         |
 
 ### ✅ What's Good
 
@@ -35,21 +35,25 @@ You've pulled down 107 files of merged TypeScript PRs. Before proceeding with an
 ### ⚠️ Items to Review
 
 **1. React Version (19.1.1 → 19.2.0+)**
+
 - Minor version difference - safe to update
 - Brings bug fixes and improvements
 - No breaking changes expected
 
 **2. Node.js Version for CI/CD**
+
 - ChastityOS uses Node 22 (latest LTS)
 - Current workflows might use Node 20
 - Recommendation: Update to Node 22 for CI workflows
 
 **3. Script Additions Needed**
+
 ```json
 "typecheck": "tsc --noEmit"          // ✅ Present
 "typecheck:sw": "tsc --noEmit --project tsconfig.sw.json"  // ✅ Present
 "test": "vitest"                     // ✅ Present
 ```
+
 All present ✅
 
 ---
@@ -59,21 +63,23 @@ All present ✅
 ### tsconfig.json
 
 **Current Settings:**
+
 ```json
 {
   "compilerOptions": {
-    "target": "ES2020",                    // ✅ Good for modern browsers
+    "target": "ES2020", // ✅ Good for modern browsers
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "allowJs": true,                       // ✅ Transition mode (JS + TS)
-    "checkJs": false,                      // ✅ Not enforcing yet
-    "strict": false,                       // ⚠️ Gradual adoption
-    "jsx": "react-jsx"                     // ✅ React 17+ syntax
+    "allowJs": true, // ✅ Transition mode (JS + TS)
+    "checkJs": false, // ✅ Not enforcing yet
+    "strict": false, // ⚠️ Gradual adoption
+    "jsx": "react-jsx" // ✅ React 17+ syntax
   }
 }
 ```
 
 **Analysis:**
+
 - ✅ Perfect for gradual TypeScript migration
 - ✅ Allows JS files alongside TS during conversion
 - ⚠️ Loose type checking (intentional for now)
@@ -96,6 +102,7 @@ All present ✅
 **Status:** ✅ Excellent
 
 Includes:
+
 - ✅ Git info injection (build metadata)
 - ✅ PWA config with caching strategies
 - ✅ Code splitting for optimal bundle size
@@ -110,6 +117,7 @@ Includes:
 ### 1. **package-lock.json**
 
 The PR merge likely caused conflicts here. Current state shows:
+
 - 672 lines changed (significant updates)
 - Need to verify all dependencies resolve correctly
 
@@ -121,6 +129,7 @@ Current: Monolithic `configs/eslint.config.js` (403 lines)
 New (from chastityOS): Modular structure with 5 custom rules
 
 **Decision Needed:** Which structure to use?
+
 - Keep current (simpler for now)
 - Migrate to modular (better maintainability)
 
@@ -129,6 +138,7 @@ New (from chastityOS): Modular structure with 5 custom rules
 ### 3. **strictNullChecks & Other Type Flags**
 
 Currently disabled:
+
 ```json
 "strict": false,                  // All strictness off
 "noUnusedLocals": false,         // Allow unused variables
@@ -138,6 +148,7 @@ Currently disabled:
 **Current Approach:** ✅ Correct - soft landing for gradual adoption
 
 **Next Phase:** After all files converted, enable one-by-one:
+
 1. `noUnusedLocals: true`
 2. `noUnusedParameters: true`
 3. `strictNullChecks: true`
@@ -147,33 +158,36 @@ Currently disabled:
 
 ## ✅ DECISION MATRIX
 
-| Item | Current | Action | Timing |
-|------|---------|--------|--------|
-| React 19.1.1 → 19.2.0 | ⚠️ Minor diff | **Update** | Now (safe) |
-| Node.js in CI | Unknown | **Check & Update** | Now (review .github/workflows) |
-| tsconfig.json | ✅ Correct | Keep as-is | No change |
-| vite.config.js | ✅ Excellent | Keep as-is | No change |
-| ESLint Config | Old structure | Keep for now | After TS stabilizes |
-| package-lock.json | Likely conflicted | **Verify & Clean** | Now (run npm install) |
-| Type strictness | Loose (intentional) | Keep for now | Phase 2 (after conversions) |
+| Item                  | Current             | Action             | Timing                         |
+| --------------------- | ------------------- | ------------------ | ------------------------------ |
+| React 19.1.1 → 19.2.0 | ⚠️ Minor diff       | **Update**         | Now (safe)                     |
+| Node.js in CI         | Unknown             | **Check & Update** | Now (review .github/workflows) |
+| tsconfig.json         | ✅ Correct          | Keep as-is         | No change                      |
+| vite.config.js        | ✅ Excellent        | Keep as-is         | No change                      |
+| ESLint Config         | Old structure       | Keep for now       | After TS stabilizes            |
+| package-lock.json     | Likely conflicted   | **Verify & Clean** | Now (run npm install)          |
+| Type strictness       | Loose (intentional) | Keep for now       | Phase 2 (after conversions)    |
 
 ---
 
 ## 🎯 RECOMMENDED NEXT STEPS
 
 ### Step 1: Verify Dependencies (5 min)
+
 ```bash
 npm install
 npm run typecheck 2>&1 | head -100  # Check TS errors
 ```
 
 ### Step 2: Update React (2 min)
+
 ```bash
 npm update react react-dom
 npm install
 ```
 
 ### Step 3: Run All Checks (10 min)
+
 ```bash
 npm run lint
 npm run typecheck
@@ -182,11 +196,13 @@ npm run build
 ```
 
 ### Step 4: Review Errors
+
 - Count TS compilation errors
 - Identify patterns (missing types, import issues, etc)
 - Document for PR conflict resolution
 
 ### Step 5: Commit Stable Config
+
 ```bash
 git add package.json package-lock.json
 git commit -m "chore: update package versions and verify TypeScript config"
@@ -197,6 +213,7 @@ git commit -m "chore: update package versions and verify TypeScript config"
 ## 📊 EXPECTED TYPESCRIPT ERRORS
 
 Based on 107 files merged, expect:
+
 - **Missing type definitions**: 50-100 errors
 - **Import/Export issues**: 20-50 errors
 - **Firebase integration**: 30-80 errors

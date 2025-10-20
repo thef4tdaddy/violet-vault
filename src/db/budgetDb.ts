@@ -118,10 +118,7 @@ export class VioletVaultDB extends Dexie {
               try {
                 extensibleObj[key] = (obj as Record<string, unknown>)[key];
               } catch (copyError: unknown) {
-                logger.warn(
-                  `Failed to copy property ${key}:`,
-                  (copyError as Error).message
-                );
+                logger.warn(`Failed to copy property ${key}:`, (copyError as Error).message);
               }
             });
 
@@ -149,17 +146,11 @@ export class VioletVaultDB extends Dexie {
                   try {
                     (obj as Record<string, unknown>)[key] = extensibleObj[key];
                   } catch (setError: unknown) {
-                    logger.warn(
-                      `Failed to set property ${key}:`,
-                      (setError as Error).message
-                    );
+                    logger.warn(`Failed to set property ${key}:`, (setError as Error).message);
                   }
                 });
               } catch (finalError: unknown) {
-                logger.warn(
-                  "Complete object replacement failed:",
-                  (finalError as Error).message
-                );
+                logger.warn("Complete object replacement failed:", (finalError as Error).message);
                 // As a last resort, try to modify the transaction
                 // Note: trans.source is a Dexie internal property
                 if (
@@ -257,10 +248,7 @@ export class VioletVaultDB extends Dexie {
       if (includeArchived) {
         result = await this.envelopes.where("category").equals(category).toArray();
       } else {
-        result = await this.envelopes
-          .where("[category+archived]")
-          .equals([category, 0])
-          .toArray();
+        result = await this.envelopes.where("[category+archived]").equals([category, 0]).toArray();
       }
       await this.setCachedValue(cacheKey, result, 60000); // 1 minute cache
     }
@@ -363,10 +351,7 @@ export class VioletVaultDB extends Dexie {
 
   // Savings Goals queries with status and priority optimization
   async getActiveSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals
-      .where("[isCompleted+isPaused]")
-      .equals([0, 0])
-      .toArray();
+    return this.savingsGoals.where("[isCompleted+isPaused]").equals([0, 0]).toArray();
   }
 
   async getCompletedSavingsGoals(): Promise<SavingsGoal[]> {

@@ -31,21 +31,27 @@ npm run build      # Success
 ## 🎯 How to Continue
 
 ### Step 1: Read the Docs
+
 Start with **PHASE-1-CONVERSION-PROGRESS.md** - it has everything you need.
 
 ### Step 2: Pick a File
+
 Remaining files are listed by priority in the progress doc. Start with:
+
 - `src/stores/auth/authStore.jsx` (critical)
 - `src/services/authService.js` (heavily used)
 - `src/services/activityLogger.js` (foundational)
 
 ### Step 3: Follow the Pattern
+
 Each converted file is a reference implementation. For example:
+
 - Converting a **context**? Look at `AuthContext.tsx`
 - Converting a **service**? Look at `syncServiceInitializer.ts`
 - Converting a **hook**? Look at `useEnvelopeSwipeGestures.ts`
 
 ### Step 4: Convert the File
+
 ```bash
 # 1. Rename the file
 mv file.js file.ts  # or .jsx to .tsx
@@ -64,11 +70,13 @@ git commit -m "Convert file.js to TypeScript"
 ```
 
 ### Step 5: Repeat
+
 Continue with the next file in the priority list.
 
 ## 🎨 Pattern Examples
 
 ### Context
+
 ```typescript
 interface State { ... }
 interface Actions { ... }
@@ -76,6 +84,7 @@ interface Value extends State, Actions { ... }
 ```
 
 ### Service
+
 ```typescript
 class Service {
   private prop: Type;
@@ -84,6 +93,7 @@ class Service {
 ```
 
 ### Hook
+
 ```typescript
 interface Props { ... }
 interface Return { ... }

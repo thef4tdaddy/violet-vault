@@ -218,11 +218,7 @@ const ExistingConnections = ({ config, entityType, theme, canEdit, connections, 
 
 const ConnectionSelector = ({ config, theme, canEdit, managerProps }) => (
   <ConnectionDisplay title={config.selectTitle} icon={getIcon("Sparkles")} theme={theme}>
-    <ConnectionDropdown
-      config={config}
-      canEdit={canEdit}
-      managerProps={managerProps}
-    />
+    <ConnectionDropdown config={config} canEdit={canEdit} managerProps={managerProps} />
     {managerProps.selectedConnectionId && (
       <ConnectButton
         onClick={managerProps.handleConnect}
@@ -245,12 +241,14 @@ const ConnectionDropdown = ({ config, canEdit, managerProps }) => {
   const options = [
     {
       value: "",
-      label: managerProps.hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`
+      label: managerProps.hasAvailableOptions
+        ? config.selectPrompt
+        : `No ${config.connectionType}s available`,
     },
     ...managerProps.availableOptions.map((option) => ({
       value: option.id,
-      label: `${option.name || option.provider} - $${parseFloat(option.amount || 0).toFixed(2)} (${option.frequency || "monthly"})`
-    }))
+      label: `${option.name || option.provider} - $${parseFloat(option.amount || 0).toFixed(2)} (${option.frequency || "monthly"})`,
+    })),
   ];
 
   return (

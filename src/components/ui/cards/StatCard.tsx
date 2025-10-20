@@ -76,16 +76,11 @@ const StatCard: React.FC<StatCardProps> = ({
   };
 
   const iconColor =
-    iconColorClasses[color as keyof typeof iconColorClasses] ||
-    iconColorClasses.blue;
-  const bgColor =
-    bgColorClasses[color as keyof typeof bgColorClasses] ||
-    bgColorClasses.blue;
+    iconColorClasses[color as keyof typeof iconColorClasses] || iconColorClasses.blue;
+  const bgColor = bgColorClasses[color as keyof typeof bgColorClasses] || bgColorClasses.blue;
 
   return (
-    <div
-      className={`${bgColor} p-4 rounded-lg text-center border border-gray-200 ${className}`}
-    >
+    <div className={`${bgColor} p-4 rounded-lg text-center border border-gray-200 ${className}`}>
       {Icon && (
         <div className="flex justify-center mb-3">
           {React.createElement(Icon, {
@@ -95,9 +90,7 @@ const StatCard: React.FC<StatCardProps> = ({
       )}
       <p className="text-sm text-gray-600 font-medium">{title}</p>
       <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
-      {description && (
-        <p className="text-xs text-gray-500 mt-2">{description}</p>
-      )}
+      {description && <p className="text-xs text-gray-500 mt-2">{description}</p>}
     </div>
   );
 };

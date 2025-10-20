@@ -19,7 +19,8 @@ const ModalHeader = ({ step, onClose }) => (
       <div>
         <h2 className="text-xl font-black text-black">CONVERT RECEIPT TO TRANSACTION</h2>
         <p className="text-sm text-purple-800 font-medium mt-1">
-          Step {step} of 3: {step === 1 ? "Review Data" : step === 2 ? "Select Envelope" : "Confirm"}
+          Step {step} of 3:{" "}
+          {step === 1 ? "Review Data" : step === 2 ? "Select Envelope" : "Confirm"}
         </p>
       </div>
     </div>

@@ -9,7 +9,7 @@ import logger from "../../../utils/common/logger";
  */
 export const useTutorialSteps = () => {
   const navigate = useNavigate();
-  const startTutorialStep = useOnboardingStore(state => state.startTutorialStep);
+  const startTutorialStep = useOnboardingStore((state) => state.startTutorialStep);
 
   // Tutorial steps configuration
   const tutorialSteps = useMemo(

@@ -39,7 +39,11 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
       try {
         await clearExistingData();
       } catch {
-        globalToast.showError("Failed to clear existing data. Import cancelled.", "Clear Failed", 8000);
+        globalToast.showError(
+          "Failed to clear existing data. Import cancelled.",
+          "Clear Failed",
+          8000
+        );
         return;
       }
     }

@@ -149,10 +149,7 @@ const SuggestionSettings = ({
         </SettingField>
 
         {/* Buffer Percentage */}
-        <SettingField
-          label="Suggestion Buffer"
-          helpText="Buffer multiplier for suggested amounts"
-        >
+        <SettingField label="Suggestion Buffer" helpText="Buffer multiplier for suggested amounts">
           <div className="relative">
             <input
               type="number"

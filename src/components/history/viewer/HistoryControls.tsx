@@ -40,7 +40,11 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
         <Button
           onClick={() => {
             // Integrity verification will be implemented in future version
-            globalToast.showInfo("Integrity verification coming soon!", "Feature Coming Soon", 5000);
+            globalToast.showInfo(
+              "Integrity verification coming soon!",
+              "Feature Coming Soon",
+              5000
+            );
           }}
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center text-sm"

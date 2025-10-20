@@ -220,11 +220,11 @@ const validateDateRangeCondition = (condition) => {
  */
 const validateTransactionAmountCondition = (condition) => {
   const errors = [];
-  
+
   if (condition.value === undefined || condition.value === null) {
     errors.push("Transaction amount conditions require a value");
   }
-  
+
   const validOperators = [
     "greater_than",
     "less_than",
@@ -232,11 +232,11 @@ const validateTransactionAmountCondition = (condition) => {
     "greater_than_or_equal",
     "less_than_or_equal",
   ];
-  
+
   if (!condition.operator || !validOperators.includes(condition.operator)) {
     errors.push("Transaction amount conditions require a valid operator");
   }
-  
+
   return errors;
 };
 

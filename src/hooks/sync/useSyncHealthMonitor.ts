@@ -51,7 +51,7 @@ interface UseSyncHealthMonitorReturn {
 /**
  * Hook for accessing sync health monitor data
  * Provides health status, metrics, and recent sync history
- * 
+ *
  * @param autoRefresh - Whether to auto-refresh health data periodically
  * @param refreshInterval - Refresh interval in milliseconds (default: 5000)
  * @returns Health data and refresh function

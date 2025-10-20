@@ -13,6 +13,7 @@
 ## The Problem
 
 ### Current (Bad) Pattern:
+
 ```typescript
 // ❌ Subscribes to ENTIRE store - causes re-render on ANY property change
 const { modalOpen, sidebarOpen, theme, loading, notifications } = useUIStore();
@@ -21,17 +22,19 @@ const { modalOpen, sidebarOpen, theme, loading, notifications } = useUIStore();
 ```
 
 ### The Issue:
+
 - When **any** property in `useUIStore` changes, components subscribed to the whole store re-render
 - Example: If loading state changes, but component only uses `theme`, it still re-renders
 - With 42 instances × multiple components = massive performance degradation
 - This violates React error #185 prevention patterns
 
 ### Fixed (Good) Pattern:
+
 ```typescript
 // ✅ Selective subscription - only re-render on specific property changes
-const modalOpen = useUIStore(state => state.modalOpen);
-const sidebarOpen = useUIStore(state => state.sidebarOpen);
-const theme = useUIStore(state => state.theme);
+const modalOpen = useUIStore((state) => state.modalOpen);
+const sidebarOpen = useUIStore((state) => state.sidebarOpen);
+const theme = useUIStore((state) => state.theme);
 // Component only re-renders if these specific properties change
 ```
 
@@ -41,16 +44,17 @@ const theme = useUIStore(state => state.theme);
 
 ### Where These Occur:
 
-| Category | Count | Files |
-|----------|-------|-------|
-| Components | 28 | Most UI components using `useUIStore()` |
-| Hooks | 11 | Utility hooks, FAB actions, tutorialsteps |
-| Services | 2 | Service initialization files |
-| Utilities | 1 | Toast helpers |
+| Category   | Count | Files                                     |
+| ---------- | ----- | ----------------------------------------- |
+| Components | 28    | Most UI components using `useUIStore()`   |
+| Hooks      | 11    | Utility hooks, FAB actions, tutorialsteps |
+| Services   | 2     | Service initialization files              |
+| Utilities  | 1     | Toast helpers                             |
 
 ### Pattern Distribution:
 
 1. **Full Store Subscription (Most Common):**
+
    ```typescript
    const uiState = useUIStore(); // Then access: uiState.property
    // OR
@@ -58,13 +62,14 @@ const theme = useUIStore(state => state.theme);
    ```
 
 2. **Partial Destructuring (Less Common):**
+
    ```typescript
    const { showModal } = useUIStore(); // Still getting whole store in selector
    ```
 
 3. **Already Selective (Rare):**
    ```typescript
-   const showModal = useUIStore(state => state.showModal); // ✅ Already good
+   const showModal = useUIStore((state) => state.showModal); // ✅ Already good
    ```
 
 ---
@@ -72,6 +77,7 @@ const theme = useUIStore(state => state.theme);
 ## Implementation Strategy
 
 ### Phase 1: Analysis (Document Current State)
+
 1. ✅ Identify all 42 instances from lint report
 2. ✅ Categorize by component type
 3. ✅ Map dependencies per file
@@ -80,6 +86,7 @@ const theme = useUIStore(state => state.theme);
 ### Phase 2: Batch Fixes (7 files at a time)
 
 **Batch 1 - Core Components (7 files):**
+
 - `EnvelopeGrid.tsx` - Uses 6+ properties
 - `EnvelopeSummaryCards.tsx` - Uses 2-3 properties
 - `MainLayout.tsx` - Uses 2-3 properties
@@ -89,6 +96,7 @@ const theme = useUIStore(state => state.theme);
 - `UnassignedCashModal.tsx` - Uses modal state
 
 **Batch 2 - Modal/Form Components (7 files):**
+
 - `CreateEnvelopeModal.tsx`
 - `EditEnvelopeModal.tsx`
 - `AutoFundingDashboard.tsx`
@@ -98,6 +106,7 @@ const theme = useUIStore(state => state.theme);
 - `OnboardingEmptyStateHints.tsx`
 
 **Batch 3 - Hooks (7 files):**
+
 - `useFABActions.ts` - Multiple FAB states
 - `useTutorialSteps.ts` - Tutorial modal state
 - `useTutorialControls.ts` - Tutorial state
@@ -107,6 +116,7 @@ const theme = useUIStore(state => state.theme);
 - `useAutoFundingRules.ts` - Rules state
 
 **Batch 4 - Remaining Components (7 files):**
+
 - `ActivityBanner.tsx`
 - `OfflineStatusIndicator.tsx`
 - `ShareTargetHandler.tsx`
@@ -114,9 +124,11 @@ const theme = useUIStore(state => state.theme);
 - Other utility hooks
 
 **Batch 5 - Final Batch (14 files):**
+
 - All remaining instances
 
 ### Phase 3: Testing
+
 1. Run `npm run lint` to verify fixes
 2. Check that selective subscriptions removed all warnings
 3. Manual testing of affected components
@@ -128,6 +140,7 @@ const theme = useUIStore(state => state.theme);
 ### Strategy A: Components with Destructuring
 
 **Before:**
+
 ```typescript
 // src/components/sync/SyncHealthDashboard.tsx
 const { isOnboarded, showDebug, debugMode, lastLogKey } = useUIStore();
@@ -140,6 +153,7 @@ useEffect(() => {
 ```
 
 **After:**
+
 ```typescript
 // src/components/sync/SyncHealthDashboard.tsx
 const isOnboarded = useUIStore(state => state.isOnboarded);
@@ -157,6 +171,7 @@ useEffect(() => {
 ### Strategy B: Components with Whole Store Reference
 
 **Before:**
+
 ```typescript
 // src/components/budgeting/EnvelopeGrid.tsx
 const uiState = useUIStore();
@@ -167,6 +182,7 @@ const editing = uiState.editingId;
 ```
 
 **After:**
+
 ```typescript
 // src/components/budgeting/EnvelopeGrid.tsx
 const showModal = useUIStore(state => state.showModal);
@@ -180,6 +196,7 @@ const editing = editingId;
 ### Strategy C: Hooks with Selective Logic
 
 **Before:**
+
 ```typescript
 // src/hooks/common/useFABActions.ts
 const { visibility, primaryAction, secondaryActions } = useUIStore();
@@ -191,9 +208,10 @@ useEffect(() => {
 ```
 
 **After:**
+
 ```typescript
 // src/hooks/common/useFABActions.ts
-const visibility = useUIStore(state => state.visibility);
+const visibility = useUIStore((state) => state.visibility);
 // Don't subscribe to primaryAction/secondaryActions if not used
 
 useEffect(() => {
@@ -206,6 +224,7 @@ useEffect(() => {
 ## Common Patterns to Find & Replace
 
 ### Pattern 1: Destructured Imports
+
 ```diff
 - const { modalOpen, sidebarOpen, theme } = useUIStore();
 + const modalOpen = useUIStore(state => state.modalOpen);
@@ -214,6 +233,7 @@ useEffect(() => {
 ```
 
 ### Pattern 2: Whole Store Reference
+
 ```diff
 - const uiStore = useUIStore();
 - if (uiStore.showModal) { ... }
@@ -222,6 +242,7 @@ useEffect(() => {
 ```
 
 ### Pattern 3: Multiple Property Accesses
+
 ```diff
 - const state = useUIStore();
 - return state.prop1 + state.prop2 + state.prop3;
@@ -239,30 +260,25 @@ useEffect(() => {
 
 ```typescript
 // Modal/UI Visibility
-- showModal / modalOpen
-- isOpen / open
-- visible / visibility
-
-// Editing State
-- editingId / editingEnvelope
-- selectedId / currentSelection
-- editingItem
-
-// UI Theme/Display
-- theme / darkMode / sidebarOpen
-- debugMode / showDebug / showDetails
-
-// Form State
-- formData / formErrors
-- selectedTab / activeTab
-
-// Navigation
-- currentView / viewMode
-- lastLogKey
-
-// Notifications/Alerts
-- showNotification / notification
-- toasts (array)
+-showModal / modalOpen -
+  isOpen / open -
+  visible / visibility -
+  // Editing State
+  editingId / editingEnvelope -
+  selectedId / currentSelection -
+  editingItem -
+  // UI Theme/Display
+  theme / darkMode / sidebarOpen -
+  debugMode / showDebug / showDetails -
+  // Form State
+  formData / formErrors -
+  selectedTab / activeTab -
+  // Navigation
+  currentView / viewMode -
+  lastLogKey -
+  // Notifications/Alerts
+  showNotification / notification -
+  toasts(array);
 ```
 
 ---
@@ -270,12 +286,14 @@ useEffect(() => {
 ## File-by-File Breakdown (42 Instances)
 
 ### HIGH PRIORITY (Most Properties Used)
+
 1. **EnvelopeGrid.tsx** - 2 instances (uses 5+ properties)
 2. **EnvelopeSummaryCards.tsx** - 1 instance (uses 2+ properties)
 3. **SyncHealthDashboard.tsx** - 1 instance (uses 4+ properties)
 4. **BudgetHistoryViewer.tsx** - 2 instances (uses modal + history state)
 
 ### MEDIUM PRIORITY (3-4 Properties)
+
 5. **AutoFundingDashboard.tsx** - 2 instances
 6. **AutoFundingView.tsx** - 2 instances
 7. **MainLayout.tsx** - 1 instance
@@ -284,6 +302,7 @@ useEffect(() => {
 10. **UnassignedCashModal.tsx** - 2 instances
 
 ### COMPONENTS/HOOKS (1-2 Properties)
+
 - **useFABActions.ts** - 5 instances (FAB visibility/actions)
 - **useTutorialSteps.ts** - 1 instance
 - **useTutorialControls.ts** - 1 instance
@@ -292,6 +311,7 @@ useEffect(() => {
 - Plus 20+ more single-property accesses
 
 ### SPECIAL CASES
+
 - **onboarding/hooks/** - Tutorial state (3 instances)
 - **auth/** - Security manager state (1 instance)
 - **settings/** - Settings state (multiple)
@@ -313,11 +333,13 @@ After fixing, verify:
 ## Implementation Checklist
 
 ### Pre-Implementation
+
 - [ ] Read this plan
 - [ ] Understand selective subscriptions concept
 - [ ] Run current lint to baseline: `npm run lint | grep zustand-selective`
 
 ### Per File
+
 - [ ] Identify all `useUIStore()` calls
 - [ ] Map which properties are actually used
 - [ ] Replace with selective subscriptions
@@ -326,6 +348,7 @@ After fixing, verify:
 - [ ] Format with Prettier
 
 ### Post-Implementation
+
 - [ ] Run full lint check
 - [ ] Verify 42 warnings reduced to 0
 - [ ] Commit batch fixes
@@ -336,12 +359,14 @@ After fixing, verify:
 ## Expected Outcomes
 
 ### Before Fixes:
+
 ```
 42 × zustand-safe-patterns/zustand-selective-subscriptions warnings
 Performance: High re-render churn in modals, components
 ```
 
 ### After Fixes:
+
 ```
 0 × zustand-safe-patterns/zustand-selective-subscriptions warnings
 Performance: Minimal re-renders, only on relevant state changes
@@ -394,4 +419,3 @@ export function MyComponent() {
 3. **Test Interactions** - Some components may have subtle dependencies
 4. **Watch useEffect Deps** - Update dependency arrays to match new subscriptions
 5. **Commit per Batch** - Group fixes: "Fix zustand subscriptions: Batch 1 - EnvelopeComponents"
-

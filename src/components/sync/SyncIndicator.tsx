@@ -1,8 +1,8 @@
 // components/SyncIndicator.jsx
 import { Button } from "@/components/ui";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { renderIcon } from "../../utils/icons";
-import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";
+import { useSyncHealthMonitor } from "../../hooks/sync/useSyncHealthMonitor";
 import SyncHealthDashboard from "./SyncHealthDashboard";
 
 /**
@@ -44,20 +44,8 @@ const SyncIndicator = ({
   syncProgress = null, // GitHub Issue #576: Enhanced progress tracking
   syncStage = null, // Current sync stage (validating, encrypting, uploading, etc.)
 }) => {
-  const [healthData, setHealthData] = useState(null);
+  const { healthData } = useSyncHealthMonitor(true, 10000); // Auto-refresh every 10 seconds
   const [showHealthDashboard, setShowHealthDashboard] = useState(false);
-
-  // Monitor sync health
-  useEffect(() => {
-    const updateHealth = () => {
-      const health = syncHealthMonitor.getHealthStatus();
-      setHealthData(health);
-    };
-
-    updateHealth();
-    const interval = setInterval(updateHealth, 10000); // Update every 10 seconds
-    return () => clearInterval(interval);
-  }, []);
   /**
    * Format last sync timestamp into human-readable relative time
    * @param {number|null} timestamp - Unix timestamp in milliseconds

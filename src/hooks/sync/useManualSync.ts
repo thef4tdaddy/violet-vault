@@ -45,7 +45,7 @@ interface UseManualSyncReturn {
   forceUploadSync: () => Promise<SyncResult>;
   forceDownloadSync: () => Promise<SyncResult>;
   forceFullSync: () => Promise<SyncResult>;
-  
+
   // Status
   getSyncStatus: () => SyncStatus;
   isUploadingSyncInProgress: boolean;
@@ -53,7 +53,7 @@ interface UseManualSyncReturn {
   isSyncInProgress: boolean;
   lastSyncTime: Date | null;
   syncError: string | null;
-  
+
   // Utils
   clearSyncError: () => void;
 }

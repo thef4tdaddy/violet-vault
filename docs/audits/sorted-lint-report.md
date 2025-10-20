@@ -1,11 +1,13 @@
 # Lint Audit Report
 
 ## Table of Contents
+
 1. [Files with Most Issues](#files-with-most-issues)
 2. [Issue Count by Category](#issue-count-by-category)
 3. [Detailed Lint Report](#detailed-lint-report)
 
 ## Files with Most Issues
+
 1. \((.errorCount + .warningCount)) issues in \(.filePath)
 2. \((.errorCount + .warningCount)) issues in \(.filePath)
 3. \((.errorCount + .warningCount)) issues in \(.filePath)
@@ -255,10 +257,13 @@
 247. \((.errorCount + .warningCount)) issues in \(.filePath)
 
 ## Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 129 | @typescript-eslint/no-explicit-any |\n| 79 | max-lines-per-function |\n| 60 | no-restricted-syntax |\n| 54 | @typescript-eslint/no-unused-vars |\n| 45 | complexity |\n| 42 | zustand-safe-patterns/zustand-selective-subscriptions |\n| 41 | no-legacy-toast/no-legacy-toast |\n| 34 | enforce-ui-library/enforce-ui-library |\n| 30 | max-statements |\n| 27 | no-undef |\n| 18 | react-hooks/exhaustive-deps |\n| 5 | no-restricted-imports |\n| 5 | no-architecture-violations/no-architecture-violations |\n| 4 | no-redeclare |\n| 3 | max-lines |\n| 3 | max-depth |\n| 2 | no-import-assign |\n| 2 | no-console |\n| 1 | zustand-safe-patterns/zustand-no-auto-executing-store-calls |\n| 1 | @typescript-eslint/no-unused-expressions |\n| 1 | @typescript-eslint/no-unsafe-function-type |\n| 1 | @typescript-eslint/no-misused-new |\n
+
+| Count | Rule ID                            |
+| ----- | ---------------------------------- | --- | --- | ---------------------- | --- | --- | -------------------- | --- | --- | --------------------------------- | --- | --- | ---------- | --- | --- | ----------------------------------------------------- | --- | --- | ------------------------------- | --- | --- | ------------------------------------- | --- | --- | -------------- | --- | --- | -------- | --- | --- | --------------------------- | --- | --- | --------------------- | --- | --- | ----------------------------------------------------- | --- | --- | ------------ | --- | --- | --------- | --- | --- | --------- | --- | --- | ---------------- | --- | --- | ---------- | --- | --- | ----------------------------------------------------------- | --- | --- | ---------------------------------------- | --- | --- | ------------------------------------------ | --- | --- | --------------------------------- | --- |
+| 129   | @typescript-eslint/no-explicit-any | \n  | 79  | max-lines-per-function | \n  | 60  | no-restricted-syntax | \n  | 54  | @typescript-eslint/no-unused-vars | \n  | 45  | complexity | \n  | 42  | zustand-safe-patterns/zustand-selective-subscriptions | \n  | 41  | no-legacy-toast/no-legacy-toast | \n  | 34  | enforce-ui-library/enforce-ui-library | \n  | 30  | max-statements | \n  | 27  | no-undef | \n  | 18  | react-hooks/exhaustive-deps | \n  | 5   | no-restricted-imports | \n  | 5   | no-architecture-violations/no-architecture-violations | \n  | 4   | no-redeclare | \n  | 3   | max-lines | \n  | 3   | max-depth | \n  | 2   | no-import-assign | \n  | 2   | no-console | \n  | 1   | zustand-safe-patterns/zustand-no-auto-executing-store-calls | \n  | 1   | @typescript-eslint/no-unused-expressions | \n  | 1   | @typescript-eslint/no-unsafe-function-type | \n  | 1   | @typescript-eslint/no-misused-new | \n  |
+
 ## Detailed Lint Report
+
 ```
 \($file):\(.line):\(.column) - \(.severity) - \(.message) (\(.ruleId))
 \($file):\(.line):\(.column) - \(.severity) - \(.message) (\(.ruleId))

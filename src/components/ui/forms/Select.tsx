@@ -1,5 +1,4 @@
 import React from "react";
-import { Select } from "@/components/ui";
 
 export interface SelectOption {
   value: string | number;
@@ -42,7 +41,7 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
  *   placeholder="Select category"
  * />
  */
-const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+const SelectComponent = React.forwardRef<HTMLSelectElement, SelectProps>(
   (
     { label, error, helperText, options = [], placeholder, className = "", id, disabled, ...props },
     ref
@@ -85,6 +84,6 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   }
 );
 
-Select.displayName = "Select";
+SelectComponent.displayName = "Select";
 
-export default Select;
+export default SelectComponent;

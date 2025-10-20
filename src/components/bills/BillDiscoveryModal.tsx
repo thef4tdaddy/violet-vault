@@ -55,8 +55,6 @@ const BillDiscoveryModal = ({
     return "text-gray-600 bg-gray-100";
   };
 
-
-
   const getBillIconComponent = (bill) => {
     if (bill.iconName && typeof bill.iconName === "string") {
       const IconComponent = getIconByName(bill.iconName);

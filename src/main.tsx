@@ -122,7 +122,9 @@ const initializeApp = () => {
 
       // Offline Data Validation
       window.offlineReadiness = async () => {
-        const { default: offlineDataValidator } = await import("./utils/pwa/offlineDataValidator.js");
+        const { default: offlineDataValidator } = await import(
+          "./utils/pwa/offlineDataValidator.js"
+        );
         return await offlineDataValidator.getOfflineReadinessReport();
       };
 
@@ -162,7 +164,9 @@ const initializeApp = () => {
 
       // Emergency corruption recovery tool
       window.forceCloudDataReset = async () => {
-        logger.warn("🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...");
+        logger.warn(
+          "🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local..."
+        );
 
         try {
           const { cloudSyncService } = await import("./services/cloudSyncService.js");
@@ -184,7 +188,9 @@ const initializeApp = () => {
           const result = await performCloudReset(cloudSyncService);
 
           if (result.success) {
-            logger.info("✅ Cloud data reset completed successfully - sync will resume automatically");
+            logger.info(
+              "✅ Cloud data reset completed successfully - sync will resume automatically"
+            );
             return {
               success: true,
               message: "Cloud data reset completed successfully",

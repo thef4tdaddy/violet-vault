@@ -10,6 +10,7 @@ import {
 } from "../../utils/budgeting/paycheckUtils";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
+import { validateFormAndAllocations as validateFormAndAllocationsUtil } from "../../utils/validation";
 
 // Helper to clear field error when updated
 const clearFieldError = (field, errors, setErrors) => {
@@ -30,25 +31,15 @@ const getDefaultAllocations = () => ({
 });
 
 // Helper to validate form and allocations
+// eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
 const validateFormAndAllocations = (formData, currentAllocations, setErrors) => {
-  const validation = validatePaycheckForm(formData);
+  const validation = validateFormAndAllocationsUtil(
+    formData,
+    currentAllocations,
+    validatePaycheckForm,
+    validateAllocations
+  );
   setErrors(validation.errors);
-
-  // Also validate allocations if form is valid
-  if (validation.isValid && currentAllocations.allocations.length > 0) {
-    const allocationValidation = validateAllocations(
-      currentAllocations.allocations,
-      parseFloat(formData.amount)
-    );
-    if (!allocationValidation.isValid) {
-      setErrors((prev) => ({
-        ...prev,
-        allocations: allocationValidation.message,
-      }));
-      return false;
-    }
-  }
-
   return validation.isValid;
 };
 
@@ -143,7 +134,11 @@ const usePaycheckProcessor = ({
 
       // Validate form
       if (!validateForm()) {
-        globalToast.showError("Please fix the form errors before processing", "Validation Error", 8000);
+        globalToast.showError(
+          "Please fix the form errors before processing",
+          "Validation Error",
+          8000
+        );
         return false;
       }
 
@@ -173,7 +168,11 @@ const usePaycheckProcessor = ({
       return true;
     } catch (error) {
       logger.error("Error processing paycheck", error);
-      globalToast.showError(error.message || "Failed to process paycheck", "Processing Error", 8000);
+      globalToast.showError(
+        error.message || "Failed to process paycheck",
+        "Processing Error",
+        8000
+      );
       return false;
     } finally {
       setIsLoading(false);

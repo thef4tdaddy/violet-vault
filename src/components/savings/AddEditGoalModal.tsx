@@ -32,11 +32,7 @@ const mapGoalToFormData = (goal) => ({
 });
 
 const validateFormData = (formData) => {
-  return (
-    formData.name.trim() &&
-    formData.targetAmount &&
-    parseFloat(formData.targetAmount) > 0
-  );
+  return formData.name.trim() && formData.targetAmount && parseFloat(formData.targetAmount) > 0;
 };
 
 const createGoalData = (formData) => ({
@@ -80,19 +76,13 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
-        <ModalHeader 
+        <ModalHeader
           title={editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
           onClose={handleClose}
         />
         <form onSubmit={handleSubmit} className="space-y-6">
-          <GoalFormFields 
-            formData={formData}
-            updateFormField={updateFormField}
-          />
-          <FormActions 
-            onCancel={handleClose}
-            isEdit={!!editingGoal}
-          />
+          <GoalFormFields formData={formData} updateFormField={updateFormField} />
+          <FormActions onCancel={handleClose} isEdit={!!editingGoal} />
         </form>
       </div>
     </div>
@@ -181,7 +171,7 @@ const GoalFormFields = ({ formData, updateFormField }) => (
         ))}
       </Select>
     </div>
-    <ColorPicker 
+    <ColorPicker
       selectedColor={formData.color}
       onColorSelect={(color) => updateFormField("color", color)}
     />

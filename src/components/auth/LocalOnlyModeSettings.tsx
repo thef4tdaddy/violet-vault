@@ -52,7 +52,8 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
         })
         .catch(logger.error);
     }
-  }, [isOpen]); // getStats is stable in Zustand, no need to include
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getStats is stable Zustand action
+  }, [isOpen]);
 
   // Clear states when closing
   useEffect(() => {
@@ -62,7 +63,8 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
       setShowConfirmExit(false);
       setShowConfirmClear(false);
     }
-  }, [isOpen]); // clearError is a stable Zustand action, no need to include
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- clearError is stable Zustand action
+  }, [isOpen]);
 
   const handleExportData = async () => {
     try {

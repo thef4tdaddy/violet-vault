@@ -1,7 +1,4 @@
-import {
-  ENVELOPE_TYPE_CONFIG,
-  AUTO_CLASSIFY_ENVELOPE_TYPE,
-} from "../../constants/categories";
+import { ENVELOPE_TYPE_CONFIG, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 
 /**
  * Get styling based on envelope type

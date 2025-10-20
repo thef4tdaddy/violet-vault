@@ -3,6 +3,7 @@
 ## Executive Summary
 
 **Combined Issues: 107**
+
 - `max-lines-per-function`: 71 instances (functions over 150 lines)
 - `complexity`: 36 instances (cyclomatic complexity over 15)
 
@@ -16,6 +17,7 @@
 ## The Problem
 
 ### Current (Bad) Pattern:
+
 ```typescript
 // ❌ 400+ line component with 50+ local variables and 20+ conditions
 export function BugReportButton() {
@@ -57,6 +59,7 @@ export function BugReportButton() {
 ```
 
 ### Problems This Creates:
+
 1. **Hard to test** - Can't test individual pieces
 2. **Hard to maintain** - Changes affect multiple flows
 3. **Prone to bugs** - Complex logic hidden in long function
@@ -64,6 +67,7 @@ export function BugReportButton() {
 5. **Reusability** - Can't reuse parts in other components
 
 ### Fixed (Good) Pattern:
+
 ```typescript
 // ✅ Decomposed into focused units
 // 1. Custom hooks for logic
@@ -94,23 +98,23 @@ export function BugReportButton() {
 
 ### Distribution by Category:
 
-| Category | Count | Typical Size | Main Issues |
-|----------|-------|--------------|-------------|
-| Components with long JSX | 35 | 200-350 lines | Too many conditions in render |
-| Data fetching/mutation handlers | 20 | 150-250 lines | Multiple async operations bundled |
-| Complex validation logic | 15 | 160-200 lines | Nested conditions, many branches |
-| Utility calculation functions | 12 | 150-180 lines | Multiple algorithms in one function |
-| Hook orchestration functions | 15 | 150-300 lines | Too many sub-concerns |
-| Modal/form components | 10 | 200-280 lines | Multi-step flows bundled |
+| Category                        | Count | Typical Size  | Main Issues                         |
+| ------------------------------- | ----- | ------------- | ----------------------------------- |
+| Components with long JSX        | 35    | 200-350 lines | Too many conditions in render       |
+| Data fetching/mutation handlers | 20    | 150-250 lines | Multiple async operations bundled   |
+| Complex validation logic        | 15    | 160-200 lines | Nested conditions, many branches    |
+| Utility calculation functions   | 12    | 150-180 lines | Multiple algorithms in one function |
+| Hook orchestration functions    | 15    | 150-300 lines | Too many sub-concerns               |
+| Modal/form components           | 10    | 200-280 lines | Multi-step flows bundled            |
 
 ### Complexity Distribution:
 
-| Complexity | Count | Typical Causes |
-|-----------|-------|----------------|
-| 15-20 | 15 | 5-7 if/else branches |
-| 20-30 | 12 | 10-15 conditions |
-| 30-50 | 7 | 20+ complex branches |
-| 50+ | 2 | 30+ conditions (sync services) |
+| Complexity | Count | Typical Causes                 |
+| ---------- | ----- | ------------------------------ |
+| 15-20      | 15    | 5-7 if/else branches           |
+| 20-30      | 12    | 10-15 conditions               |
+| 30-50      | 7     | 20+ complex branches           |
+| 50+        | 2     | 30+ conditions (sync services) |
 
 ---
 
@@ -175,6 +179,7 @@ export function BugReportButton() {
 **When to use:** Forms with multiple steps, conditional rendering
 
 **Before:**
+
 ```typescript
 export function BugReportButton() {
   const [step, setStep] = useState(0);
@@ -199,6 +204,7 @@ export function BugReportButton() {
 ```
 
 **After:**
+
 ```typescript
 // Separate component per step
 function Step1({ formData, onChange }) {
@@ -235,6 +241,7 @@ export function BugReportButton() {
 **When to use:** Async operations, API calls, data transformations
 
 **Before:**
+
 ```typescript
 export function DashboardComponent() {
   const [data, setData] = useState(null);
@@ -254,6 +261,7 @@ export function DashboardComponent() {
 ```
 
 **After:**
+
 ```typescript
 // Extract hook
 function useDashboardData() {
@@ -283,38 +291,42 @@ export function DashboardComponent() {
 **When to use:** Complex decision logic, validation, calculations
 
 **Before:**
+
 ```typescript
 function processTransaction() {
   const isValid =
     amount > 0 &&
     recipient !== null &&
     account.balance >= amount &&
-    account.type !== 'readonly' &&
+    account.type !== "readonly" &&
     !hasActiveBlock &&
     timestamp > startDate &&
     (!requiresApproval || isApproved) &&
     !isDuplicate;
 
   const category =
-    transaction.type === 'transfer' && transaction.from === transaction.to
-      ? 'self-transfer'
-      : transaction.type === 'payment' && transaction.recurring
-      ? 'recurring-payment'
-      : transaction.type === 'payment'
-      ? 'regular-payment'
-      : 'other';
+    transaction.type === "transfer" && transaction.from === transaction.to
+      ? "self-transfer"
+      : transaction.type === "payment" && transaction.recurring
+        ? "recurring-payment"
+        : transaction.type === "payment"
+          ? "regular-payment"
+          : "other";
 
-  const priority =
-    transaction.urgent ? 'critical' :
-    transaction.deadline && isOverdue(transaction.deadline) ? 'high' :
-    transaction.deadline ? 'medium' :
-    'low';
+  const priority = transaction.urgent
+    ? "critical"
+    : transaction.deadline && isOverdue(transaction.deadline)
+      ? "high"
+      : transaction.deadline
+        ? "medium"
+        : "low";
 
   // 20+ more conditions...
 }
 ```
 
 **After:**
+
 ```typescript
 // Utility functions with clear intent
 function isValidTransaction(transaction, account) {
@@ -322,7 +334,7 @@ function isValidTransaction(transaction, account) {
     transaction.amount > 0 &&
     transaction.recipient !== null &&
     account.balance >= transaction.amount &&
-    account.type !== 'readonly' &&
+    account.type !== "readonly" &&
     !transaction.hasActiveBlock &&
     transaction.timestamp > account.startDate &&
     (!transaction.requiresApproval || transaction.isApproved) &&
@@ -331,23 +343,20 @@ function isValidTransaction(transaction, account) {
 }
 
 function categorizeTransaction(transaction) {
-  if (transaction.type === 'transfer' &&
-      transaction.from === transaction.to) {
-    return 'self-transfer';
+  if (transaction.type === "transfer" && transaction.from === transaction.to) {
+    return "self-transfer";
   }
-  if (transaction.type === 'payment' &&
-      transaction.recurring) {
-    return 'recurring-payment';
+  if (transaction.type === "payment" && transaction.recurring) {
+    return "recurring-payment";
   }
   // ...
 }
 
 function calculateTransactionPriority(transaction) {
-  if (transaction.urgent) return 'critical';
-  if (transaction.deadline &&
-      isOverdue(transaction.deadline)) return 'high';
-  if (transaction.deadline) return 'medium';
-  return 'low';
+  if (transaction.urgent) return "critical";
+  if (transaction.deadline && isOverdue(transaction.deadline)) return "high";
+  if (transaction.deadline) return "medium";
+  return "low";
 }
 
 // Main function now simple and readable
@@ -368,6 +377,7 @@ function processTransaction(transaction, account) {
 **When to use:** Multiple event handlers bundled in one component
 
 **Before:**
+
 ```typescript
 export function FormComponent() {
   const handleSubmit = async (e) => {
@@ -395,6 +405,7 @@ export function FormComponent() {
 ```
 
 **After:**
+
 ```typescript
 // Create handler module
 export function FormComponent() {
@@ -425,6 +436,7 @@ function useFormHandlers(formData, setFormData) {
 **When to use:** Complex conditional rendering for status/states
 
 **Before:**
+
 ```typescript
 function SyncIndicator() {
   // 287 lines
@@ -451,6 +463,7 @@ function SyncIndicator() {
 ```
 
 **After:**
+
 ```typescript
 // Status display components
 function SyncingStatus() { /* 30 lines */ }
@@ -481,6 +494,7 @@ function SyncIndicator() {
 ## Implementation Plan (Phases)
 
 ### Phase 1: Preparation (2-3 hours)
+
 - [ ] Read this entire plan
 - [ ] Review target files
 - [ ] Create feature branch: `refactor/reduce-complexity`
@@ -490,16 +504,19 @@ function SyncIndicator() {
 ### Phase 2: Tier 1 Refactoring (6-8 hours) - CRITICAL FILES
 
 **Day 1:**
+
 - [ ] BugReportButton.tsx - Extract steps + hooks
 - [ ] SyncIndicator.tsx - Extract status components
 - [ ] Test & commit
 
 **Day 2:**
+
 - [ ] EnvelopeItem.tsx - Extract status/actions
 - [ ] useBugReportV2.ts - Extract concern hooks
 - [ ] Test & commit
 
 **Day 3:**
+
 - [ ] useAutoFundingRules.ts - Extract logic
 - [ ] Test & commit
 
@@ -512,6 +529,7 @@ function SyncIndicator() {
 - Batch 5: Hook files (useKeyManagement, useDebtManagement, useTransactionOperations)
 
 ### Phase 4: Testing & Validation (3-4 hours)
+
 - [ ] Run full test suite
 - [ ] Manual testing of affected features
 - [ ] Performance check
@@ -519,6 +537,7 @@ function SyncIndicator() {
 - [ ] TypeScript: 0 errors
 
 ### Phase 5: Final Cleanup (1-2 hours)
+
 - [ ] Commit final batch
 - [ ] Create PR with summary
 - [ ] Document extracted components/hooks
@@ -595,6 +614,7 @@ For each file to refactor:
 ## Expected Outcomes
 
 ### Before:
+
 ```
 71 × max-lines-per-function warnings
 36 × complexity warnings
@@ -602,6 +622,7 @@ Difficulty: Hard to understand, test, maintain
 ```
 
 ### After:
+
 ```
 0 × max-lines-per-function warnings
 0 × complexity warnings
@@ -659,4 +680,3 @@ Bonus: Code is more reusable and performant
    - Comment why, not what
    - Use JSDoc for public functions
    - Examples: "This handles circular dependencies"
-

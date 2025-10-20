@@ -204,10 +204,7 @@
       "label": "🎯 Deploy Manager",
       "type": "shell",
       "command": "node",
-      "args": [
-        "${workspaceFolder}/scripts/deploy.js",
-        "${input:deployEnvironment}"
-      ],
+      "args": ["${workspaceFolder}/scripts/deploy.js", "${input:deployEnvironment}"],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -221,10 +218,7 @@
       "label": "🔄 Rollback Manager",
       "type": "shell",
       "command": "node",
-      "args": [
-        "${workspaceFolder}/scripts/rollback.js",
-        "${input:rollbackTarget}"
-      ],
+      "args": ["${workspaceFolder}/scripts/rollback.js", "${input:rollbackTarget}"],
       "group": "build",
       "presentation": {
         "echo": true,

@@ -3,10 +3,11 @@
  * Lightweight hook using extracted bug reporting services
  * Created for Issue #513 - replaces the monolithic useBugReport.js
  */
-import React, { useState } from "react";
+import { useState } from "react";
 import BugReportService from "../../services/bugReport/index.ts";
 // Dynamic import of Highlight.io to avoid bundle size impact
 import logger from "../../utils/common/logger.ts";
+import { validateBugReportForm } from "../../utils/validation";
 /// <reference types="../../vite-env.d.ts" />
 
 // Declare H global for Highlight.io
@@ -29,7 +30,7 @@ interface BugReportOptions {
 /**
  * Bug report submission result
  */
-interface BugReportSubmissionResult {
+interface _BugReportSubmissionResult {
   success: boolean;
   submissionId?: string;
   url?: string;
@@ -378,21 +379,9 @@ const useBugReportV2 = (options: BugReportOptions = {}) => {
   /**
    * Validate form data
    */
+  // eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
   const validateForm = () => {
-    const errors = [];
-
-    if (!title.trim() && !description.trim()) {
-      errors.push("Either title or description is required");
-    }
-
-    if (title.length > 200) {
-      errors.push("Title is too long (max 200 characters)");
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+    return validateBugReportForm(title, description);
   };
 
   /**

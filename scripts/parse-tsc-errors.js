@@ -54,7 +54,7 @@ function parseTscOutput(output) {
   for (const line of lines) {
     // Match TypeScript error format: "path/to/file.ts(line,col): error TSxxxx: message"
     const errorMatch = line.match(
-      /^(.+?\.(?:ts|tsx|js|jsx))\((\d+),(\d+)\):\s+error\s+(TS\d+):\s+(.+)$/,
+      /^(.+?\.(?:ts|tsx|js|jsx))\((\d+),(\d+)\):\s+error\s+(TS\d+):\s+(.+)$/
     );
 
     if (errorMatch) {
@@ -131,13 +131,11 @@ function parseTscOutput(output) {
   return {
     totalCount: errors.length,
     categories: categories,
-    errorsByFile: Array.from(errorsByFile.entries()).map(
-      ([file, fileErrors]) => ({
-        file,
-        count: fileErrors.length,
-        errors: fileErrors,
-      }),
-    ),
+    errorsByFile: Array.from(errorsByFile.entries()).map(([file, fileErrors]) => ({
+      file,
+      count: fileErrors.length,
+      errors: fileErrors,
+    })),
   };
 }
 

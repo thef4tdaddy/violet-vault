@@ -170,15 +170,15 @@ export const useDebtManagement = () => {
   };
 
   // Helper: Handle bill connections for debt
-  const handleBillConnections = async (
-    connectionData,
-    cleanDebtData,
-    createdDebt
-  ) => {
+  const handleBillConnections = async (connectionData, cleanDebtData, createdDebt) => {
     if (!connectionData) return;
 
-    const { paymentMethod, createBill: shouldCreateBill, existingBillId, newEnvelopeName } =
-      connectionData;
+    const {
+      paymentMethod,
+      createBill: shouldCreateBill,
+      existingBillId,
+      newEnvelopeName,
+    } = connectionData;
 
     if (paymentMethod === "create_new" && shouldCreateBill) {
       await createEnvelopeAndBill(cleanDebtData, createdDebt, newEnvelopeName);
@@ -244,7 +244,13 @@ export const useDebtManagement = () => {
       const interestPortion = calculateInterestPortion(debt, amount);
       const principalPortion = amount - interestPortion;
 
-      const updatedDebt = buildDebtWithPayment(debt, amount, paymentDate, interestPortion, principalPortion);
+      const updatedDebt = buildDebtWithPayment(
+        debt,
+        amount,
+        paymentDate,
+        interestPortion,
+        principalPortion
+      );
 
       await updateDebtData({ id: debtId, updates: updatedDebt });
 

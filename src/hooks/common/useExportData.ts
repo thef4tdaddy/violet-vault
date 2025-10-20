@@ -96,7 +96,7 @@ const triggerDownload = (exportableData) => {
 
 const logExportSuccess = (data, pureTransactions, fileSize) => {
   const [envelopes, bills, , , debts, , ,] = data;
-  
+
   logger.info("Export completed successfully", {
     envelopes: envelopes.length,
     bills: bills.length,

@@ -13,6 +13,7 @@
 ## The Problem: React Error #185
 
 Zustand can cause **React error #185** when:
+
 1. Store operations execute during module load (auto-executing)
 2. Store getState() called inside useEffect (bypasses subscriptions)
 3. Store actions included in useEffect dependencies (creates circular deps)
@@ -24,6 +25,7 @@ Zustand can cause **React error #185** when:
 ## Pattern 1: No Auto-Executing Store Calls
 
 ### The Issue
+
 ```typescript
 // ❌ DANGEROUS - Executes during module load
 const someValue = store.getState().value;
@@ -34,12 +36,14 @@ store.setState({ initialized: true }); // Auto-executes!
 ```
 
 **Why It's Bad:**
+
 - Runs before React renders
 - Can cause initialization order bugs
 - Zustand not fully initialized
 - May execute multiple times during bundling
 
 ### The Fix
+
 ```typescript
 // ✅ CORRECT - Execute in React lifecycle
 export function MyComponent() {
@@ -63,6 +67,7 @@ export function initializeApp() {
 ```
 
 ### Files Affected
+
 - `src/main.tsx`: Line 245 - Auto-executing store call in module scope
 
 ---
@@ -70,6 +75,7 @@ export function initializeApp() {
 ## Pattern 2: No getState() in useEffect
 
 ### The Issue
+
 ```typescript
 // ❌ WRONG - getState() creates stale closures
 useEffect(() => {
@@ -79,12 +85,14 @@ useEffect(() => {
 ```
 
 **Why It's Bad:**
+
 - `getState()` returns snapshot at that moment
 - If store updates, effect still uses old data
 - Closure becomes stale
 - Should use subscription instead
 
 ### The Fix
+
 ```typescript
 // ✅ CORRECT - Subscribe to changes
 useEffect(() => {
@@ -93,10 +101,7 @@ useEffect(() => {
   };
 
   // Subscribe returns unsubscribe function
-  const unsubscribe = store.subscribe(
-    (state) => state.value,
-    handleChange
-  );
+  const unsubscribe = store.subscribe((state) => state.value, handleChange);
 
   return unsubscribe; // Cleanup
 }, []);
@@ -113,6 +118,7 @@ useEffect(() => {
 ## Pattern 3: Store Reference Pattern
 
 ### The Issue
+
 ```typescript
 // ❌ WRONG - Storing store reference, causes stale closures
 const useMyHook = () => {
@@ -132,12 +138,14 @@ function Component({ store }) {
 ```
 
 **Why It's Bad:**
+
 - Store reference becomes stale
 - Props change constantly if store is passed
 - Causes unnecessary re-renders
 - Prevents proper dependency tracking
 
 ### The Fix
+
 ```typescript
 // ✅ CORRECT - Subscribe directly, no reference
 useEffect(() => {
@@ -163,6 +171,7 @@ function Component({ id }) {
 ## Pattern 4: No Store Actions in Dependencies
 
 ### The Issue
+
 ```typescript
 // ❌ WRONG - Store action in effect dependencies
 const resetForm = useStore((state) => state.resetForm);
@@ -173,12 +182,14 @@ useEffect(() => {
 ```
 
 **Why It's Bad:**
+
 - Store actions are functions that change reference
 - Including in dependencies = re-run on every store update
 - Creates circular dependency: action → effect → action
 - Effect runs too often
 
 ### The Fix
+
 ```typescript
 // ✅ CORRECT - Don't depend on actions, use state
 const reset = useStore((state) => state.reset); // The state flag
@@ -206,6 +217,7 @@ useEffect(() => {
 ## Pattern 5: No Conditional Subscriptions
 
 ### The Issue
+
 ```typescript
 // ❌ WRONG - Conditionally subscribing
 useEffect(() => {
@@ -218,12 +230,14 @@ useEffect(() => {
 ```
 
 **Why It's Bad:**
+
 - Component may not re-render when needed
 - Subscription lifecycle doesn't match render lifecycle
 - Can miss important state changes
 - Inconsistent component behavior
 
 ### The Fix
+
 ```typescript
 // ✅ CORRECT - Always subscribe, conditionally use
 useEffect(() => {
@@ -252,6 +266,7 @@ const data = useStore((state) =>
 ## Pattern 6: No Server Data in Zustand
 
 ### The Issue
+
 ```typescript
 // ❌ WRONG - Storing server data in Zustand
 const store = create((set) => ({
@@ -264,6 +279,7 @@ const store = create((set) => ({
 ```
 
 **Why It's Bad:**
+
 - Server state should use TanStack Query/API cache
 - Zustand is for UI state only
 - Creates sync problems between server and client
@@ -271,6 +287,7 @@ const store = create((set) => ({
 - Hard to reason about data flow
 
 ### The Fix
+
 ```typescript
 // ✅ CORRECT - Use TanStack Query for server data
 import { useQuery } from '@tanstack/react-query';
@@ -300,6 +317,7 @@ return (
 ```
 
 ### Data Flow Architecture
+
 ```
 Firebase (Cloud)
     ↓
@@ -313,12 +331,14 @@ Zustand (UI state only) ← USE FOR: Modals, form state, tabs
 ```
 
 **Server Data Examples (Use TanStack Query):**
+
 - User profile data
 - Fetched bills, transactions, envelopes
 - Sync data from Firebase
 - API responses
 
 **UI State Examples (Use Zustand):**
+
 - Modal open/close
 - Form errors
 - Selected tab
@@ -330,31 +350,37 @@ Zustand (UI state only) ← USE FOR: Modals, form state, tabs
 ## Implementation Order
 
 ### Phase 1: Auto-Executing Calls (1-2 hours)
+
 - Find all module-scope store operations
 - Move to useEffect or initialization functions
 - Most common: `src/main.tsx`
 
 ### Phase 2: getState() in useEffect (1-2 hours)
+
 - Replace with proper subscriptions
 - Use hook selectors instead
 - Add proper dependencies
 
 ### Phase 3: Store References (1-2 hours)
+
 - Remove store prop passing
 - Use selectors in components
 - Stabilize action references with useCallback if needed
 
 ### Phase 4: Action Dependencies (30-45 minutes)
+
 - Remove actions from effect dependencies
 - Depend on state instead
 - Use useCallback for functions
 
 ### Phase 5: Conditional Subscriptions (30-45 minutes)
+
 - Always subscribe, conditionally render
 - Fix lifecycle mismatches
 - Ensure re-renders happen
 
 ### Phase 6: Server Data Migration (2-4 hours)
+
 - Audit store for server data
 - Migrate to TanStack Query
 - Update data flow
@@ -377,6 +403,7 @@ For each pattern fix:
 ## Common Mistakes to Avoid
 
 ### ❌ Mistake 1: Mixing patterns
+
 ```typescript
 // DON'T do this
 const state = store.getState();
@@ -386,6 +413,7 @@ const subscription = store.subscribe(() => {
 ```
 
 ### ❌ Mistake 2: Forgetting cleanup
+
 ```typescript
 // DON'T do this
 useEffect(() => {
@@ -394,6 +422,7 @@ useEffect(() => {
 ```
 
 ### ❌ Mistake 3: Creating new functions in deps
+
 ```typescript
 // DON'T do this
 useEffect(() => {
@@ -402,6 +431,7 @@ useEffect(() => {
 ```
 
 ### ✅ Correct approach
+
 ```typescript
 // DO this
 useEffect(() => {
@@ -415,6 +445,7 @@ useEffect(() => {
 ## Files to Check
 
 Look for these patterns in:
+
 - `src/main.tsx` - Module-scope initialization
 - `src/hooks/**/*.ts` - Custom hooks using Zustand
 - `src/components/**/*.tsx` - Components accessing store
@@ -432,12 +463,11 @@ Look for these patterns in:
 
 ## Quick Reference
 
-| Pattern | Issue | Fix | Impact |
-|---------|-------|-----|--------|
-| Auto-executing | Runs at module load | Move to useEffect | Prevents init bugs |
-| getState() | Stale closure | Use subscription | Fresh data |
-| Store reference | Circular dependencies | Use selectors | Proper deps |
-| Action in deps | Too many re-renders | Depend on state | Performance |
-| Conditional sub | Missed updates | Always subscribe | Correct renders |
-| Server in store | Wrong layer | Use TanStack Query | Clean architecture |
-
+| Pattern         | Issue                 | Fix                | Impact             |
+| --------------- | --------------------- | ------------------ | ------------------ |
+| Auto-executing  | Runs at module load   | Move to useEffect  | Prevents init bugs |
+| getState()      | Stale closure         | Use subscription   | Fresh data         |
+| Store reference | Circular dependencies | Use selectors      | Proper deps        |
+| Action in deps  | Too many re-renders   | Depend on state    | Performance        |
+| Conditional sub | Missed updates        | Always subscribe   | Correct renders    |
+| Server in store | Wrong layer           | Use TanStack Query | Clean architecture |

@@ -125,10 +125,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
           if (!shareCode) {
             throw new Error("Share code missing from user data during login");
           }
-          const deterministicBudgetId = await encryptionUtils.generateBudgetId(
-            password,
-            shareCode
-          );
+          const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
 
           const finalUserData: CurrentUser = {
             ...userData,
@@ -262,10 +259,14 @@ export const useAuth = create<AuthStore>((set, get) => ({
             )) as DecryptedData;
             logger.auth("Successfully decrypted local data.");
           } catch (decryptError: unknown) {
-            const message = decryptError instanceof Error ? decryptError.message : String(decryptError);
+            const message =
+              decryptError instanceof Error ? decryptError.message : String(decryptError);
             logger.error("Unexpected decryption failure after password validation", {
               error: message,
-              errorType: decryptError instanceof Error ? decryptError.constructor?.name : typeof decryptError,
+              errorType:
+                decryptError instanceof Error
+                  ? decryptError.constructor?.name
+                  : typeof decryptError,
             });
             return {
               success: false,
@@ -277,9 +278,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
           const currentUserData = decryptedData.currentUser;
 
           if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
-            logger.auth(
-              "Legacy data detected - clearing for fresh start with share code system."
-            );
+            logger.auth("Legacy data detected - clearing for fresh start with share code system.");
             localStorage.removeItem("envelopeBudgetData");
             throw new Error(
               "Legacy data cleared - please create a new budget with share code system"
@@ -319,7 +318,10 @@ export const useAuth = create<AuthStore>((set, get) => ({
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
         logger.error("Login failed.", error);
-        if (error instanceof Error && (error.name === "OperationError" || message.toLowerCase().includes("decrypt"))) {
+        if (
+          error instanceof Error &&
+          (error.name === "OperationError" || message.toLowerCase().includes("decrypt"))
+        ) {
           return { success: false, error: "Invalid password." };
         }
         return { success: false, error: "Invalid password or corrupted data." };
@@ -405,9 +407,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
             iv: encrypted.iv,
           })
         );
-        logger.auth(
-          "Saved encrypted shared budget data to localStorage for persistence."
-        );
+        logger.auth("Saved encrypted shared budget data to localStorage for persistence.");
 
         await get().startBackgroundSyncAfterLogin(false);
 
@@ -444,10 +444,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
     logger.auth("Updating user.", updatedUser);
     set((state) => ({
       currentUser: updatedUser,
-      budgetId:
-        updatedUser.budgetId !== state.budgetId
-          ? updatedUser.budgetId
-          : state.budgetId,
+      budgetId: updatedUser.budgetId !== state.budgetId ? updatedUser.budgetId : state.budgetId,
     }));
   },
 
@@ -458,13 +455,10 @@ export const useAuth = create<AuthStore>((set, get) => ({
       });
 
       const syncDelay = 2500;
-      logger.auth(
-        `⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`,
-        {
-          isNewUser,
-          delayMs: syncDelay,
-        }
-      );
+      logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
+        isNewUser,
+        delayMs: syncDelay,
+      });
       await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
       const { useBudgetStore } = await import("../ui/uiStore");
@@ -494,9 +488,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
 
       const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
 
-      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(
-        newPassword
-      );
+      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
       const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
       localStorage.setItem(
@@ -524,7 +516,10 @@ export const useAuth = create<AuthStore>((set, get) => ({
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       logger.error("Password change failed.", error);
-      if (error instanceof Error && (error.name === "OperationError" || message.toLowerCase().includes("decrypt"))) {
+      if (
+        error instanceof Error &&
+        (error.name === "OperationError" || message.toLowerCase().includes("decrypt"))
+      ) {
         return { success: false, error: "Invalid current password." };
       }
       return { success: false, error: message };
@@ -563,11 +558,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
       const savedData = localStorage.getItem("envelopeBudgetData");
       if (savedData) {
         const { encryptedData, iv }: SavedData = JSON.parse(savedData);
-        const decryptedData = await encryptionUtils.decrypt(
-          encryptedData,
-          encryptionKey,
-          iv
-        );
+        const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
         const updatedData = {
           ...decryptedData,
@@ -663,7 +654,8 @@ export const useAuth = create<AuthStore>((set, get) => ({
         const message = decryptError instanceof Error ? decryptError.message : String(decryptError);
         logger.auth("validatePassword: Decryption failed - password is incorrect", {
           error: message,
-          errorType: decryptError instanceof Error ? decryptError.constructor?.name : typeof decryptError,
+          errorType:
+            decryptError instanceof Error ? decryptError.constructor?.name : typeof decryptError,
         });
         logger.production("Password validation failed", {
           reason: "decryption_failed",
@@ -709,13 +701,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         resetTimeout();
       };
 
-      const events = [
-        "mousedown",
-        "mousemove",
-        "keypress",
-        "scroll",
-        "touchstart",
-      ];
+      const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
       events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });

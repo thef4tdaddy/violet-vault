@@ -153,7 +153,11 @@ const noLegacyToast = {
         }
 
         // Check for confirm() calls - skip if using modern useConfirm hook
-        if (node.callee.type === 'Identifier' && node.callee.name === 'confirm' && !hasUseConfirmImport) {
+        if (
+          node.callee.type === 'Identifier' &&
+          node.callee.name === 'confirm' &&
+          !hasUseConfirmImport
+        ) {
           context.report({
             node,
             messageId: 'noConfirmCall',
@@ -182,11 +186,11 @@ const noLegacyToast = {
         // Check if file uses any legacy toast-related patterns but doesn't import useToast
         const hasUseToastImport = sourceCode.text.includes('useToast');
         const hasLegacyToastUsage =
-          (sourceCode.text.includes('toast.success(') ||
-           sourceCode.text.includes('toast.error(') ||
-           sourceCode.text.includes('toast.warn(') ||
-           sourceCode.text.includes('toast.warning(') ||
-           sourceCode.text.includes('toast.info(')) ||
+          sourceCode.text.includes('toast.success(') ||
+          sourceCode.text.includes('toast.error(') ||
+          sourceCode.text.includes('toast.warn(') ||
+          sourceCode.text.includes('toast.warning(') ||
+          sourceCode.text.includes('toast.info(') ||
           sourceCode.text.includes('alert(') ||
           (sourceCode.text.includes('confirm(') && !hasUseConfirmImport);
 

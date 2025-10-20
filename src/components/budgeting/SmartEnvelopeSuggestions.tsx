@@ -20,7 +20,7 @@ const IconBadge = ({ isCollapsed }) => (
 // Suggestion count badge
 const SuggestionBadge = ({ count, hasSuggestions }) => {
   if (!hasSuggestions) return null;
-  
+
   return (
     <span className="ml-2 bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
       {count}
@@ -45,8 +45,14 @@ const SettingsButton = ({ showSettings, onClick }) => {
 };
 
 // Header component
-const SuggestionsHeader = ({ isCollapsed, toggleCollapse, hasSuggestions, suggestions,
-  showSettings, toggleSettings }) => (
+const SuggestionsHeader = ({
+  isCollapsed,
+  toggleCollapse,
+  hasSuggestions,
+  suggestions,
+  showSettings,
+  toggleSettings,
+}) => (
   <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
     <Button
       onClick={toggleCollapse}
@@ -76,9 +82,10 @@ const SuggestionsHeader = ({ isCollapsed, toggleCollapse, hasSuggestions, sugges
 // Collapsed view component
 const CollapsedView = ({ suggestions }) => {
   const hasHighPriority = suggestions.some((s) => s.priority === "high");
-  const suggestionText = suggestions.length === 0 
-    ? "No suggestions"
-    : `${suggestions.length} suggestion${suggestions.length !== 1 ? "s" : ""}`;
+  const suggestionText =
+    suggestions.length === 0
+      ? "No suggestions"
+      : `${suggestions.length} suggestion${suggestions.length !== 1 ? "s" : ""}`;
 
   return (
     <div className="text-center">
@@ -97,9 +104,17 @@ const CollapsedView = ({ suggestions }) => {
 };
 
 // Expanded view component
-const ExpandedView = ({ showSettings, analysisSettings, updateAnalysisSettings, 
-  resetAnalysisSettings, refreshSuggestions, suggestionStats, suggestions, 
-  handleApplySuggestion, handleDismissSuggestion }) => (
+const ExpandedView = ({
+  showSettings,
+  analysisSettings,
+  updateAnalysisSettings,
+  resetAnalysisSettings,
+  refreshSuggestions,
+  suggestionStats,
+  suggestions,
+  handleApplySuggestion,
+  handleDismissSuggestion,
+}) => (
   <>
     {showSettings && (
       <div className="mb-6">
@@ -158,7 +173,9 @@ const SmartEnvelopeSuggestions = ({
   const containerPadding = isCollapsed ? "p-3" : "p-6";
 
   return (
-    <div className={`glassmorphism rounded-xl transition-all duration-200 ${containerPadding} ${className}`}>
+    <div
+      className={`glassmorphism rounded-xl transition-all duration-200 ${containerPadding} ${className}`}
+    >
       <SuggestionsHeader
         isCollapsed={isCollapsed}
         toggleCollapse={toggleCollapse}

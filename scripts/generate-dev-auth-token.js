@@ -24,11 +24,7 @@ const generateToken = (secret) => {
   const payload = `dev-auth-${timestamp}`;
 
   // Create a simple hash-based token
-  const hash = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex")
-    .substring(0, 32); // Truncate to 32 chars for simplicity
+  const hash = crypto.createHmac("sha256", secret).update(payload).digest("hex").substring(0, 32); // Truncate to 32 chars for simplicity
 
   return `${timestamp}.${hash}`;
 };
