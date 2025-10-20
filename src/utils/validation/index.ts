@@ -2,7 +2,7 @@
 export { validateBalance, validateBalanceInput } from "./balanceValidation";
 
 // Bug report validation
-export { validateBugReportForm } from "./bugReportValidation";
+export { validateBugReportForm, validateBugReportSubmission } from "./bugReportValidation";
 
 // Share code validation
 export { isValidShareCode } from "./shareCodeValidation";
