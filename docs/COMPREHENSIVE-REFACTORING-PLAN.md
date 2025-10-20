@@ -6,6 +6,24 @@
 
 ---
 
+## 🎉 TIER 1 COMPLETION UPDATE
+
+### ✅ Phase 1-2 COMPLETE (20 hours done!)
+
+**Tier 1 Files Successfully Refactored:**
+
+1. ✅ BugReportButton.tsx (332 → ~80 lines)
+2. ✅ SyncIndicator.tsx (278 → ~60 lines, complexity 46 → 8)
+3. ✅ EnvelopeItem.tsx (307 → ~80 lines, complexity 21 → 5)
+4. ✅ useBugReportV2.ts (293 → ~70 lines)
+5. ✅ useAutoFundingRules.ts (296 → ~80 lines)
+
+**Progress:** 40% Complete (5/20 critical files done)
+
+**Next Phase:** Start Tier 2 - 15 High-Priority Files (remaining 24 hours)
+
+---
+
 ## 📊 Violation Breakdown (Complete Analysis)
 
 | Category                 | Count   | % of Total | Priority | Fix Strategy                              |
@@ -318,157 +336,142 @@ src/hooks/budgeting/
 
 ### Phase 3: Tier 2 Refactoring - HIGH PRIORITY FILES (Hours 21-45)
 
-**15 Files - 200-250 lines AND/OR complexity 15-30**
+**15 Files across 5 Batches - 200-250+ lines AND/OR complexity 15-30**
+
+---
 
 #### Batch 1: Analytics Components (4 files, ~8 hours)
 
-**3.1: `src/components/analytics/ReportExporter.tsx` (279 lines)**
+| #   | File                                           | Lines | Complexity | Strategy | Expected  | Status |
+| --- | ---------------------------------------------- | ----- | ---------- | -------- | --------- | ------ |
+| 3.1 | `src/components/analytics/ReportExporter.tsx`  | 279   | —          | A + B    | 279 → ~80 | 🔲     |
+| 3.2 | `src/hooks/analytics/useReportExporter.ts`     | 299   | —          | B + D    | 299 → ~70 | 🔲     |
+| 3.3 | `src/hooks/analytics/useAnalyticsData.ts`      | 241   | —          | B + C    | 241 → ~70 | 🔲     |
+| 3.4 | `src/hooks/analytics/usePerformanceMonitor.ts` | 249   | —          | B + D    | 249 → ~75 | 🔲     |
 
-- **Strategy:** Strategy A + Strategy B
-- **Extract:** Export steps, data preparation hooks, utility functions
-- **Expected:** 279 → ~80 lines
+**Batch 1 Goals:**
 
-**3.2: `src/hooks/analytics/useReportExporter.ts` (299 lines)**
+- Extract export workflow into step components
+- Separate data gathering from rendering
+- Create reusable analytics utilities
+- Expected violations resolved: 8-10
 
-- **Strategy:** Strategy B + Strategy D
-- **Extract:** Data gathering, formatting, submission hooks
-- **Expected:** 299 → ~70 lines
+**Steps:**
 
-**Steps for both:**
-
-1. [ ] Identify distinct phases of export process
-2. [ ] Extract each phase to separate hooks
-3. [ ] Create utility functions for formatting
-4. [ ] Simplify main orchestrator
-5. [ ] Test export pipeline
-6. [ ] Commit
-
----
-
-#### Batch 2: Settings Components (3 files, ~6 hours)
-
-**3.3: `src/components/settings/sections/NotificationSettingsSection.tsx` (230 lines)**
-
-- **Strategy:** Strategy C + Strategy E
-- **Extract:** Status components, settings logic hooks
-- **Expected:** 230 → ~70 lines
-
-**3.4: `src/components/settings/EnvelopeIntegrityChecker.tsx` (345 lines)**
-
-- **Strategy:** Strategy A + Strategy C
-- **Extract:** Check steps, validation utilities, results display
-- **Expected:** 345 → ~90 lines
-
-**Steps for both:**
-
-1. [ ] Break multi-step process into components
-2. [ ] Extract validation logic
-3. [ ] Simplify rendering logic
-4. [ ] Test all flows
-5. [ ] Commit
+1. [ ] Create `ReportExporter/steps/` for export phases
+2. [ ] Extract `useReportExporterData` hook (data gathering)
+3. [ ] Extract `useReportExporterSubmit` hook (submission)
+4. [ ] Extract `useAnalyticsData` into focused query hooks
+5. [ ] Extract performance calculation utilities
+6. [ ] Run tests & lint
+7. [ ] Commit: "refactor: decompose analytics components"
 
 ---
 
-#### Batch 3: History & Status Components (3 files, ~6 hours)
+#### Batch 2: Settings & Configuration (3 files, ~6 hours)
 
-**3.5: `src/components/history/IntegrityStatusIndicator.tsx` (251 lines, Complexity: 20)**
+| #   | File                                                               | Lines | Complexity | Strategy | Expected  | Status |
+| --- | ------------------------------------------------------------------ | ----- | ---------- | -------- | --------- | ------ |
+| 3.5 | `src/components/settings/sections/NotificationSettingsSection.tsx` | 230   | —          | C + E    | 230 → ~70 | 🔲     |
+| 3.6 | `src/components/settings/EnvelopeIntegrityChecker.tsx`             | 345   | —          | A + C    | 345 → ~90 | 🔲     |
+| 3.7 | `src/hooks/auth/useKeyManagement.ts`                               | 272   | —          | B + D    | 272 → ~70 | 🔲     |
 
-- **Strategy:** Strategy E (Status Display)
-- **Extract:** Status display components, status calculation hook
-- **Expected:** 251 → ~60 lines, Complexity: 20 → 6
+**Batch 2 Goals:**
 
-**3.6: `src/components/history/ObjectHistoryViewer.tsx` (199 lines)**
+- Break settings into focused sections
+- Extract integrity checking into steps
+- Modularize key management operations
+- Expected violations resolved: 6-8
 
-- **Strategy:** Strategy C + Strategy B
-- **Extract:** History filtering, display components, data hooks
-- **Expected:** 199 → ~60 lines
+**Steps:**
 
-**Steps for both:**
+1. [ ] Extract notification settings sections as components
+2. [ ] Create `EnvelopeIntegrityChecker/steps/` directory
+3. [ ] Extract check logic to `useIntegrityCheck` hook
+4. [ ] Extract key operations (create, rotate, revoke, export)
+5. [ ] Create validation utilities for settings
+6. [ ] Run tests & lint
+7. [ ] Commit: "refactor: decompose settings components"
 
-1. [ ] Extract status/history display logic
-2. [ ] Create focused components for each view
-3. [ ] Extract data fetching to hooks
-4. [ ] Test filtering and display
-5. [ ] Commit
+---
+
+#### Batch 3: History & Status Display (3 files, ~6 hours)
+
+| #    | File                                                  | Lines | Complexity | Strategy | Expected           | Status |
+| ---- | ----------------------------------------------------- | ----- | ---------- | -------- | ------------------ | ------ |
+| 3.8  | `src/components/history/IntegrityStatusIndicator.tsx` | 251   | 20         | E        | 251 → ~60 (20 → 6) | 🔲     |
+| 3.9  | `src/components/history/ObjectHistoryViewer.tsx`      | 199   | —          | C + B    | 199 → ~60          | 🔲     |
+| 3.10 | `src/components/sync/SyncHealthDashboard.tsx`         | 258   | 16         | E        | 258 → ~65 (16 → 5) | 🔲     |
+
+**Batch 3 Goals:**
+
+- Create status display components for different states
+- Extract history filtering logic
+- Simplify sync dashboard rendering
+- Expected violations resolved: 5-7
+
+**Steps:**
+
+1. [ ] Create status components: Valid/Invalid/Warning/Error
+2. [ ] Extract `useIntegrityStatus` hook
+3. [ ] Extract history filtering to `useHistoryFilter` hook
+4. [ ] Create `SyncStatus/` components for different states
+5. [ ] Extract sync calculations to utilities
+6. [ ] Run tests & lint
+7. [ ] Commit: "refactor: decompose status display components"
 
 ---
 
 #### Batch 4: Modal Components (3 files, ~6 hours)
 
-**3.7: `src/components/modals/UnassignedCashModal.tsx` (242 lines, Complexity: 20)**
+| #    | File                                              | Lines | Complexity | Strategy | Expected  | Status |
+| ---- | ------------------------------------------------- | ----- | ---------- | -------- | --------- | ------ |
+| 3.11 | `src/components/bills/modals/BillDetailModal.tsx` | 251   | —          | A + B    | 251 → ~80 | 🔲     |
+| 3.12 | `src/components/bills/BillDiscoveryModal.tsx`     | 313   | —          | A + C    | 313 → ~90 | 🔲     |
+| 3.13 | `src/components/budgeting/PaydayPrediction.tsx`   | 171   | —          | C + B    | 171 → ~60 | 🔲     |
 
-- **Strategy:** Strategy A + Strategy C
-- **Extract:** Step components, validation hooks
-- **Expected:** 242 → ~70 lines, Complexity: 20 → 5
+**Batch 4 Goals:**
 
-**3.8: `src/components/bills/modals/BillDetailModal.tsx` (251 lines)**
+- Break modals into step/section components
+- Extract modal logic to hooks
+- Simplify prediction calculations
+- Expected violations resolved: 5-7
 
-- **Strategy:** Strategy A + Strategy B
-- **Extract:** Detail sections as components, data hooks
-- **Expected:** 251 → ~80 lines
+**Steps:**
 
-**3.9: `src/components/bills/BillDiscoveryModal.tsx` (313 lines)**
-
-- **Strategy:** Strategy A + Strategy C
-- **Extract:** Discovery steps, matching logic, validation
-- **Expected:** 313 → ~90 lines
-
-**Steps for all modals:**
-
-1. [ ] Identify modal sections/steps
-2. [ ] Extract to separate components
-3. [ ] Extract state and logic to hooks
-4. [ ] Simplify modal orchestrator
-5. [ ] Test all interactions
-6. [ ] Commit
+1. [ ] Create `BillDetailModal/sections/` (basic, payment, linked)
+2. [ ] Create `BillDiscoveryModal/steps/` (search, match, review)
+3. [ ] Extract `useBillDetail` hook (state + mutations)
+4. [ ] Extract discovery logic to `useBillDiscovery` hook
+5. [ ] Extract prediction calculations to utilities
+6. [ ] Run tests & lint
+7. [ ] Commit: "refactor: decompose modal components"
 
 ---
 
-#### Batch 5: Complex Hooks (6 files, ~8 hours)
+#### Batch 5: Complex Hooks & Views (2 files, ~4 hours)
 
-**3.10: `src/hooks/auth/useKeyManagement.ts` (272 lines)**
+| #    | File                                                 | Lines | Complexity | Strategy | Expected  | Status |
+| ---- | ---------------------------------------------------- | ----- | ---------- | -------- | --------- | ------ |
+| 3.14 | `src/components/layout/ViewRenderer.tsx`             | 230   | —          | C        | 230 → ~60 | 🔲     |
+| 3.15 | `src/hooks/transactions/useTransactionOperations.ts` | 278   | —          | C + B    | 278 → ~75 | 🔲     |
 
-- **Strategy:** Strategy B + Strategy D
-- **Extract:** Key operations, validation, submission
-- **Expected:** 272 → ~70 lines
+**Batch 5 Goals:**
 
-**3.11: `src/hooks/transactions/useTransactionOperations.ts` (278 lines)**
+- Extract view type detection logic
+- Simplify transaction operations
+- Create reusable view helpers
+- Expected violations resolved: 4-6
 
-- **Strategy:** Strategy C + Strategy B
-- **Extract:** Operation validators, executors, error handlers
-- **Expected:** 278 → ~75 lines
+**Steps:**
 
-**3.12: `src/hooks/debts/useDebtManagement.ts` (287 lines)**
-
-- **Strategy:** Strategy B + Strategy D
-- **Extract:** Debt operations, calculations, validations
-- **Expected:** 287 → ~75 lines
-
-**3.13: `src/components/security/LockScreen.tsx` (260 lines)**
-
-- **Strategy:** Strategy E + Strategy C
-- **Extract:** Lock modes, unlock logic, UI states
-- **Expected:** 260 → ~75 lines
-
-**3.14: `src/components/layout/ViewRenderer.tsx` (230 lines)**
-
-- **Strategy:** Strategy C (Complex Conditions)
-- **Extract:** View type detection, rendering helpers
-- **Expected:** 230 → ~60 lines
-
-**3.15: `src/components/budgeting/PaydayPrediction.tsx` (171 lines)**
-
-- **Strategy:** Strategy C + Strategy B
-- **Extract:** Prediction calculations, display logic
-- **Expected:** 171 → ~60 lines
-
-**Steps for all:**
-
-1. [ ] Identify distinct operations/phases
-2. [ ] Extract to focused sub-functions/hooks
-3. [ ] Test each operation independently
-4. [ ] Simplify orchestrator
-5. [ ] Commit
+1. [ ] Extract view detection to `useViewDetection` hook
+2. [ ] Create view type validators (pure functions)
+3. [ ] Extract transaction operation types (split, merge, categorize, etc.)
+4. [ ] Create separate hooks for each operation
+5. [ ] Extract operation validators to utilities
+6. [ ] Run tests & lint
+7. [ ] Commit: "refactor: decompose complex hooks"
 
 ---
 
@@ -691,14 +694,14 @@ Type check: ✅
 
 ## ⏱️ Timeline Summary
 
-| Phase       | Duration     | Tasks                        | Status     |
-| ----------- | ------------ | ---------------------------- | ---------- |
-| **Phase 1** | 4 hours      | Planning & preparation       | 🔲 Pending |
-| **Phase 2** | 16 hours     | 5 critical files refactoring | 🔲 Pending |
-| **Phase 3** | 24 hours     | 15 high-priority files       | 🔲 Pending |
-| **Phase 4** | 3 hours      | Testing & validation         | 🔲 Pending |
-| **Phase 5** | 2 hours      | Final integration & PR       | 🔲 Pending |
-| **TOTAL**   | **49 hours** | **20 files refactored**      | 🔲 Pending |
+| Phase       | Duration     | Tasks                        | Status           |
+| ----------- | ------------ | ---------------------------- | ---------------- |
+| **Phase 1** | 4 hours      | Planning & preparation       | ✅ Complete      |
+| **Phase 2** | 16 hours     | 5 critical files refactoring | ✅ Complete      |
+| **Phase 3** | 24 hours     | 15 high-priority files       | 🔄 In Progress   |
+| **Phase 4** | 3 hours      | Testing & validation         | 🔲 Pending       |
+| **Phase 5** | 2 hours      | Final integration & PR       | 🔲 Pending       |
+| **TOTAL**   | **49 hours** | **20 files refactored**      | **40% Complete** |
 
 ---
 
