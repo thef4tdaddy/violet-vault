@@ -1,44 +1,15 @@
 import React from "react";
-import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import useBugReportV2 from "../../hooks/common/useBugReportV2";
-import useToast from "../../hooks/common/useToast";
-import logger from "../../utils/common/logger";
-
-// Type definitions for hooks (temporary until hooks are typed)
-interface BugReportHook {
-  isModalOpen: boolean;
-  title: string;
-  description: string;
-  steps: string;
-  expected: string;
-  actual: string;
-  includeScreenshot: boolean;
-  isSubmitting: boolean;
-  screenshot: string | null;
-  severity: string;
-  openModal: () => void;
-  closeModal: () => void;
-  setTitle: (title: string) => void;
-  setDescription: (description: string) => void;
-  setSteps: (steps: string) => void;
-  setExpected: (expected: string) => void;
-  setActual: (actual: string) => void;
-  setIncludeScreenshot: (include: boolean) => void;
-  setSeverity: (severity: string) => void;
-  setScreenshot: (screenshot: string | null) => void;
-  submitReport: () => Promise<boolean>;
-  captureScreenshot: () => void;
-}
-
-interface ToastHook {
-  addToast: (toast: { type: string; title: string; message: string; duration?: number }) => void;
-}
+import { useBugReportState } from "./hooks/useBugReportState";
+import { StepOne } from "./steps/StepOne";
+import { StepTwo } from "./steps/StepTwo";
+import { StepThree } from "./steps/StepThree";
+import { StepFour } from "./steps/StepFour";
 
 /**
  * Floating bug report button with screenshot capability
- * Enhanced to use all V2 hook features for comprehensive bug reporting
+ * Refactored to use extracted components and hooks for better maintainability
  */
 const BugReportButton: React.FC = () => {
   const {
@@ -61,111 +32,12 @@ const BugReportButton: React.FC = () => {
     setActual,
     setIncludeScreenshot,
     setSeverity,
-    setScreenshot,
-    submitReport,
     captureScreenshot,
-  } = useBugReportV2() as BugReportHook;
-
-  const { addToast } = useToast() as ToastHook;
-
-  const handleSubmit = async (): Promise<void> => {
-    const result = await submitReport();
-    if (result) {
-      // Show success message with GitHub issue link if available
-      if (result.issueUrl) {
-        addToast({
-          type: "success",
-          title: "Bug Report Submitted!",
-          message: `Your report has been created as GitHub issue #${result.issueNumber || "N/A"}. Thank you for helping improve VioletVault!`,
-          duration: 8000,
-        });
-      } else if (result.localFallback) {
-        // Service unavailable, but we logged it locally
-        addToast({
-          type: "warning",
-          title: "Report Logged Locally",
-          message: `Service temporarily unavailable, but your report has been saved. Check browser console for details.`,
-          duration: 8000,
-        });
-      } else {
-        addToast({
-          type: "success",
-          title: "Report Submitted!",
-          message: "Your bug report has been submitted successfully.",
-          duration: 4000,
-        });
-      }
-    } else {
-      addToast({
-        type: "error",
-        title: "Submission Failed",
-        message: "Failed to submit bug report. Please try again.",
-        duration: 5000,
-      });
-    }
-  };
-
-  const handleScreenCapture = async (): Promise<void> => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-          },
-          audio: false,
-        });
-        const video = document.createElement("video");
-        video.srcObject = stream;
-        video.play();
-
-        await new Promise<void>((resolve) => (video.onloadedmetadata = () => resolve()));
-
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(video, 0, 0);
-        }
-
-        stream.getTracks().forEach((track) => track.stop());
-
-        const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
-        setScreenshot(screenshotDataUrl);
-      } catch (error) {
-        logger.warn("Manual screen capture failed:", error as Error);
-        addToast({
-          type: "error",
-          title: "Screen Capture Failed",
-          message: "Please try the Auto Capture option or include a manual screenshot.",
-        });
-      }
-    } else {
-      addToast({
-        type: "warning",
-        title: "Screen Capture Not Supported",
-        message: "Please use Auto Capture or include a manual screenshot.",
-      });
-    }
-  };
-
-  const openScreenshotPreview = (): void => {
-    if (!screenshot) return;
-
-    // Open screenshot in new tab for full view
-    const win = window.open();
-    if (win) {
-      win.document.write(`
-        <html>
-          <head><title>Bug Report Screenshot</title></head>
-          <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-            <img src="${screenshot}" style="max-width: 95%; max-height: 95%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
-          </body>
-        </html>
-      `);
-    }
-  };
+    handleSubmit,
+    handleScreenCapture,
+    openScreenshotPreview,
+    removeScreenshot,
+  } = useBugReportState();
 
   return (
     <>
@@ -202,159 +74,36 @@ const BugReportButton: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Brief summary of the issue"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-              </div>
+              <StepOne
+                title={title}
+                description={description}
+                onTitleChange={setTitle}
+                onDescriptionChange={setDescription}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What happened? What were you trying to do?&#10;&#10;📝 Tip: You can include code blocks using:&#10;```&#10;your code here&#10;```"
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono text-sm"
-                  rows={4}
-                />
-              </div>
+              <StepTwo
+                steps={steps}
+                severity={severity}
+                onStepsChange={setSteps}
+                onSeverityChange={setSeverity}
+              />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Steps to Reproduce (Optional)
-                  </label>
-                  <textarea
-                    value={steps}
-                    onChange={(e) => setSteps(e.target.value)}
-                    placeholder="1. Go to...&#10;2. Click on...&#10;3. See error"
-                    className="w-full p-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-                    rows={3}
-                  />
-                </div>
+              <StepThree
+                expected={expected}
+                actual={actual}
+                onExpectedChange={setExpected}
+                onActualChange={setActual}
+              />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Severity</label>
-                  <Select
-                    value={severity}
-                    onChange={(e) => setSeverity(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="low">Low - Minor issue</option>
-                    <option value="medium">Medium - Normal bug</option>
-                    <option value="high">High - Important issue</option>
-                    <option value="critical">Critical - Blocking</option>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Expected Behavior (Optional)
-                  </label>
-                  <textarea
-                    value={expected}
-                    onChange={(e) => setExpected(e.target.value)}
-                    placeholder="What should have happened?"
-                    className="w-full p-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-                    rows={2}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Actual Behavior (Optional)
-                  </label>
-                  <textarea
-                    value={actual}
-                    onChange={(e) => setActual(e.target.value)}
-                    placeholder="What actually happened?"
-                    className="w-full p-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-                    rows={2}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                  <input
-                    id="include-screenshot-checkbox"
-                    type="checkbox"
-                    checked={includeScreenshot}
-                    onChange={(e) => setIncludeScreenshot(e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5 justify-self-start"
-                  />
-                  <label
-                    htmlFor="include-screenshot-checkbox"
-                    className="text-sm text-gray-700 cursor-pointer"
-                  >
-                    Include screenshot
-                  </label>
-                </div>
-
-                {includeScreenshot && (
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={captureScreenshot}
-                      className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-                      title="Automatically capture screenshot using html2canvas"
-                    >
-                      {React.createElement(getIcon("Camera"), {
-                        className: "h-4 w-4 mr-1",
-                      })}
-                      Auto Capture
-                    </Button>
-                    <Button
-                      onClick={handleScreenCapture}
-                      className="text-sm text-green-600 hover:text-green-800 flex items-center"
-                      title="Use browser's native screen capture (requires permission)"
-                    >
-                      {React.createElement(getIcon("Camera"), {
-                        className: "h-4 w-4 mr-1",
-                      })}
-                      Screen Capture
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {screenshot && (
-                <div className="border border-gray-200 rounded-lg p-2">
-                  <div className="relative">
-                    <img
-                      src={screenshot}
-                      alt="Screenshot preview"
-                      className="w-full h-32 object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={openScreenshotPreview}
-                    />
-                    <Button
-                      onClick={() => setScreenshot(null)}
-                      className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                      title="Remove screenshot"
-                    >
-                      {React.createElement(getIcon("X"), {
-                        className: "h-3 w-3",
-                      })}
-                    </Button>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-xs text-gray-500">
-                      ✅ Screenshot ready (click to view full size)
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {Math.round(screenshot.length / 1024)}KB
-                    </p>
-                  </div>
-                </div>
-              )}
+              <StepFour
+                includeScreenshot={includeScreenshot}
+                screenshot={screenshot}
+                onIncludeScreenshotChange={setIncludeScreenshot}
+                onCaptureScreenshot={captureScreenshot}
+                onScreenCapture={handleScreenCapture}
+                onScreenshotPreview={openScreenshotPreview}
+                onRemoveScreenshot={removeScreenshot}
+              />
             </div>
 
             <div className="flex gap-3 mt-6">
