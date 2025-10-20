@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../../ui';
+import { Button } from '@/components/ui';
 import { getIcon } from '../../../utils';
 
 interface StepFourProps {
@@ -29,7 +29,7 @@ export const StepFour: React.FC<StepFourProps> = ({
             id="include-screenshot-checkbox"
             type="checkbox"
             checked={includeScreenshot}
-            onChange={(e) => onIncludeScreenshotChange(e.target.checked)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onIncludeScreenshotChange(e.target.checked)}
             className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5 justify-self-start"
           />
           <label
