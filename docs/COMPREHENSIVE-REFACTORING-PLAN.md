@@ -112,7 +112,25 @@
 4. useAnalytics.ts - 353 lines ⭐
 5. EnvelopeItem.tsx - 307 lines ⭐
 
-**TIER 2: 200-250 lines (15 files):** 6. BillDiscoveryModal.tsx - 313 lines 7. useReportExporter.ts - 299 lines 8. useAutoFundingRules.ts - 296 lines 9. useDebtManagement.ts - 293 lines 10. useBugReportV2.ts - 293 lines 11. useKeyManagement.ts - 272 lines 12. ReportExporter.tsx - 279 lines 13. SyncIndicator.tsx - 278 lines 14. useTransactionOperations.ts - 278 lines 15. useAutoFunding.ts - 274 lines 16. useAnalyticsData.ts - 241 lines 17. UnassignedCashModal.tsx - 245 lines 18. SyncHealthDashboard.tsx - 258 lines 19. LockScreen.tsx - 260 lines 20. LocalOnlyModeSettings.tsx - 369 lines (edge case)
+**TIER 2: Remaining High-Priority Files (15 files with active violations):**
+
+| #   | File                        | Lines | Status            |
+| --- | --------------------------- | ----- | ----------------- |
+| 6   | BillDiscoveryModal.tsx      | 313   | ❌ Needs refactor |
+| 7   | useReportExporter.ts        | 299   | ❌ Needs refactor |
+| 8   | useDebtManagement.ts        | 293   | ❌ Needs refactor |
+| 9   | useKeyManagement.ts         | 272   | ❌ Needs refactor |
+| 10  | useAutoFunding.ts           | 274   | ❌ Needs refactor |
+| 11  | useAnalyticsData.ts         | 241   | ❌ Needs refactor |
+| 12  | LocalOnlyModeSettings.tsx   | 369   | ❌ LARGEST        |
+| 13  | LockScreen.tsx              | 260   | ❌ Needs refactor |
+| 14  | UnassignedCashModal.tsx     | 245   | ❌ Needs refactor |
+| 15  | SyncHealthDashboard.tsx     | 258   | ❌ Needs refactor |
+| 16  | useTransactionOperations.ts | 278   | ❌ Needs refactor |
+| 17  | useAutoFundingData.ts       | 259   | ❌ Needs refactor |
+| 18  | ReportExporter.tsx          | 279   | ❌ Needs refactor |
+| 19  | CreateEnvelopeModal.tsx     | 184   | ❌ Needs refactor |
+| 20  | EditEnvelopeModal.tsx       | 224   | ❌ Needs refactor |
 
 **TIER 3: 150-200 lines (remaining 51 files):**
 Listed in detailed format below
