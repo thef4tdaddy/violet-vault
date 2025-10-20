@@ -20,3 +20,17 @@ export const validateBugReportForm = (
     errors,
   };
 };
+
+/**
+ * Validates bug report submission requirements
+ */
+export const validateBugReportSubmission = (
+  title?: string,
+  description?: string
+): { isValid: boolean; error?: string } => {
+  if (!title?.trim() && !description?.trim()) {
+    return { isValid: false, error: "Please provide either a title or description" };
+  }
+
+  return { isValid: true };
+};
