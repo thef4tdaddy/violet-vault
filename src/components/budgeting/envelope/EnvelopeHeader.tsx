@@ -1,110 +1,97 @@
-import React from "react";
-import { Select, Checkbox, Button } from "@/components/ui";
-import { getIcon } from "@/utils";
-import { ENVELOPE_TYPES } from "@/constants/categories";
+import React from 'react';
+import { Button } from '@/components/ui';
+import { getIcon } from '@/utils';
+import { getButtonClasses, withHapticFeedback } from '@/utils/ui/touchFeedback';
 
-const EnvelopeHeader = ({
-  filterOptions,
-  setFilterOptions,
-  setShowCreateModal,
-  viewMode,
-  setViewMode,
+interface Envelope {
+  id: string;
+  name: string;
+  category: string;
+  color?: string;
+}
+
+interface EnvelopeHeaderProps {
+  envelope: Envelope;
+  isCollapsed: boolean;
+  onSelect: (envelopeId: string) => void;
+  onEdit: (envelope: Envelope) => void;
+  onViewHistory: (envelope: Envelope) => void;
+  onToggleCollapse: () => void;
+}
+
+export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = ({
+  envelope,
+  isCollapsed,
+  onSelect,
+  onEdit,
+  onViewHistory,
+  onToggleCollapse,
 }) => {
   return (
-    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-          <div className="relative mr-4">
-            <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
-            <div className="relative bg-purple-500 p-3 rounded-2xl">
-              <svg className="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                <path
-                  fillRule="evenodd"
-                  d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-          </div>
-          Budget Envelopes
-        </h2>
-        <p className="text-gray-600 mt-1">Organize your money into spending categories</p>
+    <div
+      className="flex justify-between items-start mb-4"
+      onClick={withHapticFeedback(() => onSelect?.(envelope.id), "light")}
+    >
+      {/* Mobile collapse button */}
+      <Button
+        onClick={withHapticFeedback((e) => {
+          e.stopPropagation();
+          onToggleCollapse();
+        }, "light")}
+        className={getButtonClasses(
+          "md:hidden flex-shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
+          "small"
+        )}
+        aria-label={isCollapsed ? "Expand envelope" : "Collapse envelope"}
+      >
+        {React.createElement(getIcon(isCollapsed ? "ChevronRight" : "ChevronDown"), {
+          className: "h-4 w-4",
+        })}
+      </Button>
+
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          {/* Color indicator */}
+          {envelope.color && (
+            <div
+              className="w-3 h-3 rounded-full flex-shrink-0"
+              style={{ backgroundColor: envelope.color }}
+              title={`Color: ${envelope.color}`}
+            />
+          )}
+          <h3 className="font-semibold text-gray-900 truncate">{envelope.name}</h3>
+        </div>
+        <p className="text-xs text-gray-600 mt-1">{envelope.category}</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          {React.createElement(getIcon("Filter"), {
-            className: "h-4 w-4 text-gray-500",
-          })}
-          <Select
-            value={filterOptions.envelopeType}
-            onChange={(e) =>
-              setFilterOptions((prev) => ({
-                ...prev,
-                envelopeType: e.target.value,
-              }))
-            }
-            className="px-2 py-1 border border-gray-300 rounded text-xs"
-          >
-            <option value="all">All Types</option>
-            <option value={ENVELOPE_TYPES.BILL}>Bills</option>
-            <option value={ENVELOPE_TYPES.VARIABLE}>Variable</option>
-          </Select>
-
-          <Select
-            value={filterOptions.sortBy}
-            onChange={(e) =>
-              setFilterOptions((prev) => ({
-                ...prev,
-                sortBy: e.target.value,
-              }))
-            }
-            className="px-2 py-1 border border-gray-300 rounded text-xs"
-          >
-            <option value="usage_desc">Usage High → Low</option>
-            <option value="usage_asc">Usage Low → High</option>
-            <option value="amount_desc">Amount High → Low</option>
-            <option value="name">Name A → Z</option>
-            <option value="status">Status (Issues First)</option>
-          </Select>
-
-          <Select
-            value={viewMode}
-            onChange={(e) => setViewMode(e.target.value)}
-            className="px-2 py-1 border border-gray-300 rounded text-xs"
-            title="Choose how much information to show for each envelope"
-          >
-            <option value="overview">Compact Cards</option>
-            <option value="detailed">Expanded Cards</option>
-          </Select>
-
-          <label className="flex items-center text-xs">
-            <Checkbox
-              checked={filterOptions.showEmpty}
-              onCheckedChange={(checked) =>
-                setFilterOptions((prev) => ({
-                  ...prev,
-                  showEmpty: checked,
-                }))
-              }
-              className="mr-1"
-            />
-            Show Empty
-          </label>
-        </div>
-
+      <div className="flex gap-1">
         <Button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center text-sm"
-          data-tour="add-envelope"
+          onClick={withHapticFeedback((e) => {
+            e.stopPropagation();
+            onEdit?.(envelope);
+          }, "light")}
+          className={getButtonClasses(
+            "p-2 text-gray-400 hover:text-blue-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
+            "small"
+          )}
         >
-          {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
-          Add Envelope
+          {React.createElement(getIcon("Edit"), { className: "h-4 w-4" })}
+        </Button>
+        <Button
+          onClick={withHapticFeedback((e) => {
+            e.stopPropagation();
+            onViewHistory?.(envelope);
+          }, "light")}
+          className={getButtonClasses(
+            "p-2 text-gray-400 hover:text-green-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
+            "small"
+          )}
+        >
+          {React.createElement(getIcon("History"), {
+            className: "h-4 w-4",
+          })}
         </Button>
       </div>
     </div>
   );
 };
-
-export default EnvelopeHeader;
