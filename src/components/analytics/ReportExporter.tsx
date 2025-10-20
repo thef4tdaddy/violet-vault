@@ -1,11 +1,16 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { useReportExporter } from "../../hooks/analytics/useReportExporter";
+import { getIcon } from "@/utils";
+import { useReportExporter } from "@/hooks/analytics/useReportExporter";
+import { ExportFormatSelector } from "./report-exporter/ExportFormatSelector";
+import { ExportTemplates } from "./report-exporter/ExportTemplates";
+import { ExportOptionsForm } from "./report-exporter/ExportOptionsForm";
+import { ExportProgressIndicator } from "./report-exporter/ExportProgressIndicator";
 
 /**
  * Report Exporter for v1.10.0
- * Pure UI component - all logic extracted to useReportExporter hook
+ * Refactored using extracted components for better maintainability
+ * All logic extracted to useReportExporter hook
  */
 const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onClose }) => {
   const {
@@ -19,60 +24,11 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
     applyTemplate,
   } = useReportExporter();
 
-  const exportFormats = [
-    {
-      key: "pdf",
-      label: "PDF Report",
-      icon: "FileText",
-      description: "Comprehensive report with charts and analysis",
-      recommended: true,
-    },
-    {
-      key: "csv",
-      label: "CSV Data",
-      icon: "Table",
-      description: "Raw data export for spreadsheet analysis",
-    },
-    {
-      key: "png",
-      label: "Chart Images",
-      icon: "Image",
-      description: "Export charts as PNG images",
-    },
-  ];
-
-  const reportTemplates = [
-    {
-      key: "executive",
-      name: "Executive Summary",
-      description: "High-level overview for quick review",
-      includes: ["summary", "insights", "charts"],
-    },
-    {
-      key: "detailed",
-      name: "Detailed Analysis",
-      description: "Comprehensive report with all data",
-      includes: ["summary", "charts", "transactions", "envelopes", "savings", "insights"],
-    },
-    {
-      key: "budget",
-      name: "Budget Performance",
-      description: "Focus on budget adherence and envelope analysis",
-      includes: ["summary", "envelopes", "budget_charts", "insights"],
-    },
-    {
-      key: "trends",
-      name: "Trend Analysis",
-      description: "Historical trends and forecasting",
-      includes: ["charts", "trends", "insights"],
-    },
-  ];
-
-  const handleTemplateSelect = (templateKey) => {
+  const handleTemplateSelect = (templateKey: string) => {
     applyTemplate(templateKey);
   };
 
-  const handleOptionChange = (option, value) => {
+  const handleOptionChange = (option: string, value: boolean) => {
     setExportOptions((prev) => ({
       ...prev,
       [option]: value,
@@ -112,134 +68,24 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Export Format Selection */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Format</h3>
-              <div className="space-y-3">
-                {exportFormats.map((format) => (
-                  <div
-                    key={format.key}
-                    className={`relative border rounded-lg p-4 cursor-pointer transition-all ${
-                      exportFormat === format.key
-                        ? "border-blue-500 bg-blue-50 ring-1 ring-blue-500"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => setExportFormat(format.key)}
-                  >
-                    {format.recommended && (
-                      <span className="absolute -top-2 -right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                        Recommended
-                      </span>
-                    )}
-                    <div className="flex items-start">
-                      {React.createElement(getIcon(format.icon), {
-                        className: "h-6 w-6 text-blue-600 mt-0.5 mr-3 flex-shrink-0",
-                      })}
-                      <div>
-                        <h4 className="font-medium text-gray-900">{format.label}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{format.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Quick Templates */}
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Templates</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  {reportTemplates.map((template) => (
-                    <Button
-                      key={template.key}
-                      onClick={() => handleTemplateSelect(template.key)}
-                      className="text-left border border-gray-200 rounded-lg p-3 hover:border-gray-300 hover:bg-gray-50 transition-colors"
-                      disabled={isExporting}
-                    >
-                      <div className="font-medium text-gray-900">{template.name}</div>
-                      <div className="text-sm text-gray-600 mt-1">{template.description}</div>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {template.includes.map((include) => (
-                          <span
-                            key={include}
-                            className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                          >
-                            {include}
-                          </span>
-                        ))}
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </div>
+              <ExportFormatSelector
+                exportFormat={exportFormat}
+                onFormatChange={setExportFormat}
+                disabled={isExporting}
+              />
+              <ExportTemplates
+                onTemplateSelect={handleTemplateSelect}
+                disabled={isExporting}
+              />
             </div>
 
             {/* Export Options */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Include in Report</h3>
-              <div className="space-y-4">
-                {[
-                  {
-                    key: "includeSummary",
-                    label: "Financial Summary",
-                    icon: "DollarSign",
-                  },
-                  {
-                    key: "includeCharts",
-                    label: "Charts & Visualizations",
-                    icon: "Image",
-                  },
-                  {
-                    key: "includeTransactions",
-                    label: "Transaction Details",
-                    icon: "Table",
-                  },
-                  {
-                    key: "includeEnvelopes",
-                    label: "Envelope Analysis",
-                    icon: "FileText",
-                  },
-                  {
-                    key: "includeSavings",
-                    label: "Savings Goals",
-                    icon: "CheckCircle",
-                  },
-                  {
-                    key: "includeInsights",
-                    label: "AI Insights",
-                    icon: "Settings",
-                  },
-                ].map((option) => (
-                  <label
-                    key={option.key}
-                    className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={exportOptions[option.key]}
-                      onChange={(e) => handleOptionChange(option.key, e.target.checked)}
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                      disabled={isExporting}
-                    />
-                    {React.createElement(getIcon(option.icon), {
-                      className: "h-5 w-5 text-gray-500 ml-3 mr-3",
-                    })}
-                    <span className="font-medium text-gray-900">{option.label}</span>
-                  </label>
-                ))}
-              </div>
-
-              {/* Date Range */}
-              <div className="mt-6">
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                  {React.createElement(getIcon("Calendar"), {
-                    className: "h-4 w-4 mr-2",
-                  })}
-                  Report Period
-                </h4>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <span className="text-sm text-gray-600">Current filter: </span>
-                  <span className="font-medium text-gray-900">{timeFilter}</span>
-                </div>
-              </div>
-            </div>
+            <ExportOptionsForm
+              exportOptions={exportOptions}
+              timeFilter={timeFilter}
+              onOptionChange={handleOptionChange}
+              disabled={isExporting}
+            />
           </div>
         </div>
 
@@ -252,19 +98,10 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
             {exportFormat.toUpperCase()} export selected
           </div>
 
-          {isExporting && (
-            <div className="flex items-center">
-              <div className="flex items-center mr-4">
-                <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${exportProgress}%` }}
-                  />
-                </div>
-                <span className="text-sm text-gray-600">{exportProgress}%</span>
-              </div>
-            </div>
-          )}
+          <ExportProgressIndicator
+            isExporting={isExporting}
+            progress={exportProgress}
+          />
 
           <div className="flex gap-3">
             <Button
