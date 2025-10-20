@@ -21,7 +21,9 @@ const useLongPress = (callback, threshold = 500) => {
   );
 
   const clear = useCallback(() => {
-    timeout.current && clearTimeout(timeout.current);
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
     isLongPress.current = false;
   }, []);
 

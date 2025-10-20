@@ -19,7 +19,6 @@ import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 
- 
 const AddBillModal = ({
   isOpen,
   onClose,
@@ -99,7 +98,8 @@ const AddBillModal = ({
     if (isOpen) {
       resetForm();
     }
-  }, [isOpen]); // resetForm is stable in Zustand, no need to include
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resetForm is stable Zustand action
+  }, [isOpen]);
 
   // Custom delete handler using standardized confirm modal
   const handleDeleteClick = async () => {

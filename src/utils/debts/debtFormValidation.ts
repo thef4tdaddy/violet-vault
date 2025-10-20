@@ -38,7 +38,9 @@ const addPaymentRatioWarnings = (
 
   const paymentPercent = (minimumPayment / currentBalance) * 100;
   if (paymentPercent < 1) {
-    warnings.push("Minimum payment is less than 1% of balance - this will take very long to pay off");
+    warnings.push(
+      "Minimum payment is less than 1% of balance - this will take very long to pay off"
+    );
   } else if (paymentPercent > 50) {
     warnings.push("Minimum payment is more than 50% of balance - verify this is correct");
   }
@@ -58,7 +60,9 @@ const addBalanceComparisonWarnings = (
   warnings: string[]
 ) => {
   if (originalBalance !== null && currentBalance > originalBalance) {
-    warnings.push("Current balance is higher than original balance - interest and fees may have accrued");
+    warnings.push(
+      "Current balance is higher than original balance - interest and fees may have accrued"
+    );
   }
 };
 
@@ -124,8 +128,12 @@ const isValidNumber = (value: unknown): boolean => {
   return !isNaN(num) && num >= 0;
 };
 
-const checkRequiredTextField = (value: unknown, fieldName: string, errors: Record<string, string>) => {
-  if (!value || typeof value !== 'string' || !value.trim()) {
+const checkRequiredTextField = (
+  value: unknown,
+  fieldName: string,
+  errors: Record<string, string>
+) => {
+  if (!value || typeof value !== "string" || !value.trim()) {
     errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
   }
 };
@@ -143,7 +151,8 @@ const checkBalanceField = (
   } else if (value) {
     const num = parseFloat(String(value));
     if (isNaN(num) || num < 0) {
-      errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be positive`;
+      errors[fieldName] =
+        `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be positive`;
     }
   }
 };
@@ -157,7 +166,10 @@ const checkInterestRate = (value: unknown, errors: Record<string, string>) => {
   }
 };
 
-const checkPaymentMethodFields = (formData: Record<string, unknown>, errors: Record<string, string>) => {
+const checkPaymentMethodFields = (
+  formData: Record<string, unknown>,
+  errors: Record<string, string>
+) => {
   if (formData.paymentMethod === "connect_existing" && !formData.existingBillId) {
     errors.existingBillId = "Please select a bill to connect";
   }

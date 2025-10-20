@@ -62,7 +62,7 @@ declare global {
     readonly id: string;
     readonly url: string;
     readonly type: ClientType;
-    postMessage(message: any, transfer?: Transferable[]): void;
+    postMessage(message: unknown, transfer?: Transferable[]): void;
   }
 
   interface ClientQueryOptions {

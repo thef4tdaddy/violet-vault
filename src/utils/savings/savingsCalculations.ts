@@ -183,10 +183,10 @@ export const processSavingsGoal = (goal, fromDate = new Date()) => {
  */
 const getSavingsGoalSortValue = (goal, sortBy) => {
   const priorityOrder = { high: 3, medium: 2, low: 1 };
-  
+
   const valueExtractors = {
     name: () => goal.name?.toLowerCase() || "",
-    targetDate: () => goal.targetDate ? new Date(goal.targetDate) : new Date("2099-12-31"),
+    targetDate: () => (goal.targetDate ? new Date(goal.targetDate) : new Date("2099-12-31")),
     priority: () => priorityOrder[goal.priority] || 2,
     progress: () => goal.progressRate || 0,
     targetAmount: () => goal.targetAmount || 0,

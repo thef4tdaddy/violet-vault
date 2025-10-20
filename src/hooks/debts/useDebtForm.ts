@@ -33,11 +33,9 @@ const determinePaymentMethod = (connectedBill) => {
 
 const safeToString = (value) => value?.toString() || "";
 
-const getEnvelopeId = (debt, connectedEnvelope) => 
-  debt.envelopeId || connectedEnvelope?.id || "";
+const getEnvelopeId = (debt, connectedEnvelope) => debt.envelopeId || connectedEnvelope?.id || "";
 
-const getExistingBillId = (connectedBill) =>
-  connectedBill?.id || "";
+const getExistingBillId = (connectedBill) => connectedBill?.id || "";
 
 const buildBaseFormData = (debt) => ({
   name: debt.name || "",

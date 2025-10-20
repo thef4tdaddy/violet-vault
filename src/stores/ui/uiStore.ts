@@ -65,7 +65,7 @@ const migrateOldData = async () => {
 
     const transformedData = transformOldData(parsedOldData);
     localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-    
+
     logger.info("Data migration completed successfully - replaced existing data", {
       source: "migrateOldData",
     });

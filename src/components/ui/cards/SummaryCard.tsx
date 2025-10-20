@@ -178,9 +178,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
         <div>
           <p className={`${config.textMain} text-sm`}>{label}</p>
           <p className={`text-2xl font-bold ${config.textValue}`}>{value}</p>
-          {subtext && (
-            <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>
-          )}
+          {subtext && <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>}
         </div>
         {Icon &&
           React.createElement(Icon, {

@@ -51,6 +51,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
       setStep(1);
       resetValidation();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resetValidation is stable Zustand action
   }, [isOpen]); // resetValidation is stable in Zustand, no need to include
 
   // Handlers for step actions

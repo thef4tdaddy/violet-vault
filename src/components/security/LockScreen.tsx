@@ -92,7 +92,9 @@ const LockScreen = () => {
 
     if (shouldCreateNew) {
       // User wants to create new budget - logout and clear data
+      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed during session reset/logout
       localStorage.removeItem("envelopeBudgetData");
+      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed during session reset/logout
       localStorage.removeItem("userProfile");
       logout();
       window.location.reload();

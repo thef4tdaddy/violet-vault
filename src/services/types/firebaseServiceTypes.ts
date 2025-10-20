@@ -20,12 +20,12 @@ export interface TypedFirebaseSyncService {
   readonly app: unknown; // Firebase App
   readonly db: unknown; // Firestore
   readonly auth: unknown; // Auth
-  
+
   initialize(budgetId: string, encryptionKey: string): void;
   ensureAuthenticated(): Promise<boolean>;
   getStatus(): FirebaseServiceStatus;
   cleanup(): void;
-  
+
   // Type-safe methods with TypedResponse wrappers
   saveToCloud<T extends SafeUnknown>(
     data: T,
@@ -34,19 +34,13 @@ export interface TypedFirebaseSyncService {
 
   loadFromCloud<T extends SafeUnknown>(): Promise<TypedResponse<T>>;
 
-  setupRealTimeSync<T extends SafeUnknown>(
-    callback: (data: TypedResponse<T>) => void
-  ): void;
+  setupRealTimeSync<T extends SafeUnknown>(callback: (data: TypedResponse<T>) => void): void;
 
   stopRealTimeSync(): void;
 
-  addSyncListener(
-    callback: (event: string, data: TypedResponse<SafeUnknown>) => void
-  ): void;
+  addSyncListener(callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void;
 
-  removeSyncListener(
-    callback: (event: string, data: TypedResponse<SafeUnknown>) => void
-  ): void;
+  removeSyncListener(callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void;
 }
 
 // Enhanced chunked sync service with type safety
@@ -54,11 +48,11 @@ export interface TypedFirebaseSyncService {
 export interface TypedChunkedSyncService {
   initialize(budgetId: string, encryptionKey: string): Promise<void>;
   getStats(): ChunkedSyncStats;
-  
+
   // Chunk management
   generateChunkId(arrayName: string, chunkIndex: number): string;
   clearCorruptedData(): Promise<void>;
-  
+
   // Type-safe methods with TypedResponse wrappers
   saveToCloud<T extends SafeUnknown>(
     data: T,

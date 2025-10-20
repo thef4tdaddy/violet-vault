@@ -290,17 +290,14 @@ export const categorizeTransaction = (transaction, categoryRules = []) => {
  */
 const areDuplicateTransactions = (transaction, existing, options) => {
   const { timeWindowMs, amountTolerance, checkDescription, checkAccount } = options;
-  
+
   const timeDiff = Math.abs(new Date(transaction.date) - new Date(existing.date));
   const amountDiff = Math.abs(transaction.amount - existing.amount);
   const sameDescription = !checkDescription || transaction.description === existing.description;
   const sameAccount = !checkAccount || transaction.account === existing.account;
 
   return (
-    timeDiff <= timeWindowMs &&
-    amountDiff <= amountTolerance &&
-    sameDescription &&
-    sameAccount
+    timeDiff <= timeWindowMs && amountDiff <= amountTolerance && sameDescription && sameAccount
   );
 };
 

@@ -165,7 +165,10 @@ const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
       </div>
 
       <TransactionDetailsCard transactionForm={transactionForm} />
-      <EnvelopeAssignmentCard selectedEnvelope={selectedEnvelope} transactionForm={transactionForm} />
+      <EnvelopeAssignmentCard
+        selectedEnvelope={selectedEnvelope}
+        transactionForm={transactionForm}
+      />
       <ReceiptInformationCard receiptData={receiptData} />
       <ChangesWarningBanner receiptData={receiptData} transactionForm={transactionForm} />
     </div>

@@ -159,7 +159,11 @@ export class UIStateService {
       drawerSelectors.forEach((selector) => {
         const elements = document.querySelectorAll(selector);
         elements.forEach((element) => {
-          if (element instanceof HTMLElement && element.offsetParent !== null && this.isElementVisible(element)) {
+          if (
+            element instanceof HTMLElement &&
+            element.offsetParent !== null &&
+            this.isElementVisible(element)
+          ) {
             drawers.push({
               title: this.extractElementTitle(element) || "Drawer",
               position: this.getDrawerPosition(element),
@@ -284,12 +288,13 @@ export class UIStateService {
         if (input instanceof HTMLElement && this.isElementVisible(input)) {
           const inputEl = input as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
           inputs.push({
-            type: inputEl instanceof HTMLInputElement ? inputEl.type : inputEl.tagName.toLowerCase(),
-            name: 'name' in inputEl ? inputEl.name || "" : "",
-            placeholder: 'placeholder' in inputEl ? inputEl.placeholder || "" : "",
-            hasValue: !!('value' in inputEl && inputEl.value),
-            required: 'required' in inputEl ? inputEl.required : false,
-            disabled: 'disabled' in inputEl ? inputEl.disabled : false,
+            type:
+              inputEl instanceof HTMLInputElement ? inputEl.type : inputEl.tagName.toLowerCase(),
+            name: "name" in inputEl ? inputEl.name || "" : "",
+            placeholder: "placeholder" in inputEl ? inputEl.placeholder || "" : "",
+            hasValue: !!("value" in inputEl && inputEl.value),
+            required: "required" in inputEl ? inputEl.required : false,
+            disabled: "disabled" in inputEl ? inputEl.disabled : false,
             label: this.getInputLabel(input),
           });
         }
@@ -358,7 +363,10 @@ export class UIStateService {
             if (element instanceof HTMLElement && this.isElementVisible(element)) {
               const anchorEl = element as HTMLAnchorElement;
               interactions.push({
-                text: element.textContent?.trim()?.substring(0, 30) || (element as HTMLImageElement).alt || "Interactive",
+                text:
+                  element.textContent?.trim()?.substring(0, 30) ||
+                  (element as HTMLImageElement).alt ||
+                  "Interactive",
                 type: this.getInteractionType(element),
                 href: anchorEl.href || null,
               });
@@ -443,7 +451,7 @@ export class UIStateService {
    */
   static getInputLabel(input: Element): string | null {
     if (!(input instanceof HTMLElement)) return null;
-    
+
     // Try to find associated label
     if (input.id) {
       const label = document.querySelector(`label[for="${input.id}"]`);

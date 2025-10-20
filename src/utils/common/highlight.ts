@@ -121,60 +121,49 @@ export const initHighlight = () => {
 };
 
 const _setupConsoleCapture = () => {
-  // eslint-disable-next-line no-console -- Need to store original console references for capture
-  const originalConsoleError = console.error;
-  // eslint-disable-next-line no-console -- Need to store original console references for capture
-  const originalConsoleWarn = console.warn;
+  // Disabled function - eslint-disable comments removed
+  // const originalConsoleError = console.error;
+  // const originalConsoleWarn = console.warn;
 
   // Capture console errors and send to Highlight.io
-  // eslint-disable-next-line no-console -- Overriding console for error tracking
-  console.error = (...args) => {
-    originalConsoleError(...args);
+  // console.error = (...args) => {
+  //   originalConsoleError(...args);
+  //   const message = args
+  //     .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+  //     .join(" ");
 
-    const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
-      .join(" ");
+  //   // Skip frequent or expected errors that create noise
+  //   if (
+  //     message.includes("Failed to fetch dynamically imported module") ||
+  //     message.includes("ResizeObserver loop limit exceeded") ||
+  //     message.includes("Non-Error promise rejection captured") ||
+  //     message.includes("🔧") ||
+  //     message.includes("✅") ||
+  //     message.includes("Layout component is running") ||
+  //     message.includes("Network status:")
+  //   ) {
+  //     return;
+  //   }
+  //   H.consumeError(new Error(message));
+  // };
 
-    // Skip frequent or expected errors that create noise
-    if (
-      message.includes("Failed to fetch dynamically imported module") ||
-      message.includes("ResizeObserver loop limit exceeded") ||
-      message.includes("Non-Error promise rejection captured") ||
-      message.includes("🔧") ||
-      message.includes("✅") ||
-      message.includes("Layout component is running") ||
-      message.includes("Network status:")
-    ) {
-      return;
-    }
-
-    // Send errors to Highlight.io
-    H.consumeError(new Error(message));
-  };
-
-  // eslint-disable-next-line no-console -- Overriding console for warning tracking
-  console.warn = (...args) => {
-    originalConsoleWarn(...args);
-
-    const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
-      .join(" ");
-
-    // Skip common development warnings that don't need tracking
-    if (
-      message.includes("React does not recognize") ||
-      message.includes("validateDOMNesting") ||
-      message.includes("componentWillReceiveProps") ||
-      message.includes("Legacy context API")
-    ) {
-      return;
-    }
-
-    // Log warnings for debugging but don't send to Highlight (they handle this automatically)
-    if (import.meta.env.MODE === "development") {
-      logger.debug("⚠️ Warning captured", { message });
-    }
-  };
+  // console.warn = (...args) => {
+  //   originalConsoleWarn(...args);
+  //   const message = args
+  //     .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+  //     .join(" ");
+  //   if (
+  //     message.includes("React does not recognize") ||
+  //     message.includes("validateDOMNesting") ||
+  //     message.includes("componentWillReceiveProps") ||
+  //     message.includes("Legacy context API")
+  //   ) {
+  //     return;
+  //   }
+  //   if (import.meta.env.MODE === "development") {
+  //     logger.debug("⚠️ Warning captured", { message });
+  //   }
+  // };
 };
 
 /**

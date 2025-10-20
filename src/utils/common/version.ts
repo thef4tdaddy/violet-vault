@@ -242,8 +242,10 @@ const detectVercelDeployment = () => {
 
   const hostname = window.location.hostname;
   const isVercelDeploy = hostname.includes("vercel.app") || hostname.includes(".vercel.app");
-  const isMainBranch = isVercelDeploy && hostname.startsWith("violet-vault-") && !hostname.includes("git-");
-  const isPreviewBranch = isVercelDeploy && (hostname.includes("git-") || hostname.includes("-git-"));
+  const isMainBranch =
+    isVercelDeploy && hostname.startsWith("violet-vault-") && !hostname.includes("git-");
+  const isPreviewBranch =
+    isVercelDeploy && (hostname.includes("git-") || hostname.includes("-git-"));
 
   return { isVercelDeploy, isMainBranch, isPreviewBranch };
 };

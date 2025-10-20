@@ -123,7 +123,7 @@ export class ErrorTrackingService {
   /**
    * Add an error to the tracking system
    */
-  static addError(errorInfo: Omit<ErrorInfo, 'id' | 'captured'>): void {
+  static addError(errorInfo: Omit<ErrorInfo, "id" | "captured">): void {
     const maxErrors = 50; // Keep last 50 errors
 
     this.recentErrors.push({

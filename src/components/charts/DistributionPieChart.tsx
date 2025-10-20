@@ -31,9 +31,9 @@ const enhanceChartData = (chartData, dataKey, total, chartColors) => {
 
 // Helper to render pie cells
 const renderPieCells = (data) => {
-  return data.filter((entry) => entry != null).map((entry, index) => (
-    <Cell key={`cell-${index}`} fill={entry.color} />
-  ));
+  return data
+    .filter((entry) => entry != null)
+    .map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />);
 };
 
 /**

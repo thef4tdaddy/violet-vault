@@ -115,7 +115,10 @@ export const normalizeBillDate = (dateInput: string | Date): string => {
  * @param {Date} fromDate - Reference date (defaults to today)
  * @returns {number|null} Days until due (negative if overdue), null if invalid date
  */
-export const calculateDaysUntilDue = (dueDate: string | Date, fromDate: Date = new Date()): number | null => {
+export const calculateDaysUntilDue = (
+  dueDate: string | Date,
+  fromDate: Date = new Date()
+): number | null => {
   if (!dueDate) return null;
 
   try {

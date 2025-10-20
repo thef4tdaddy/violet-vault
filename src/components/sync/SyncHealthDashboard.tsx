@@ -39,10 +39,7 @@ import { useToastHelpers } from "../../utils/common/toastHelpers";
  */
 const SyncHealthDashboard = ({ isOpen, onClose }) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const { healthData, refreshHealthData } = useSyncHealthMonitor(
-    isOpen && autoRefresh,
-    5000
-  );
+  const { healthData, refreshHealthData } = useSyncHealthMonitor(isOpen && autoRefresh, 5000);
   const { exportBackup } = useExportData();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 

@@ -5,10 +5,7 @@
  */
 
 import chunkedSyncService from "./chunkedSyncService";
-import type {
-  TypedChunkedSyncService,
-  SyncOperationWrapper,
-} from "./types/firebaseServiceTypes";
+import type { TypedChunkedSyncService, SyncOperationWrapper } from "./types/firebaseServiceTypes";
 import type {
   ChunkedSyncStats,
   CloudSyncConfig,
@@ -16,9 +13,7 @@ import type {
   SafeUnknown,
 } from "../types/firebase";
 import { isString, isObject } from "../types/common";
-import {
-  syncOperationWrapper,
-} from "./types/firebaseServiceTypes";
+import { syncOperationWrapper } from "./types/firebaseServiceTypes";
 import logger from "../utils/common/logger";
 
 /**

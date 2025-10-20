@@ -100,8 +100,8 @@ export const useSettingsDashboardUI = () => {
  * Extracts cloud sync toggle and manual sync operations
  */
 export const useCloudSyncManager = () => {
-  const cloudSyncEnabled = useBudgetStore(state => state.cloudSyncEnabled);
-  const setCloudSyncEnabled = useBudgetStore(state => state.setCloudSyncEnabled);
+  const cloudSyncEnabled = useBudgetStore((state) => state.cloudSyncEnabled);
+  const setCloudSyncEnabled = useBudgetStore((state) => state.setCloudSyncEnabled);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleToggleCloudSync = useCallback(async () => {
@@ -232,7 +232,11 @@ export const useSettingsActions = () => {
         "Test History Created"
       );
     } catch (error) {
-      globalToast.showError("❌ Failed to create test history: " + error.message, "Test Failed", 8000);
+      globalToast.showError(
+        "❌ Failed to create test history: " + error.message,
+        "Test Failed",
+        8000
+      );
     }
   }, []);
 

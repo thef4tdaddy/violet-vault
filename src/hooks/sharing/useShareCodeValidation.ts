@@ -2,6 +2,7 @@ import { useState } from "react";
 import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
+import { isValidShareCode } from "../../utils/validation";
 
 /**
  * Custom hook for share code validation logic
@@ -14,9 +15,9 @@ export const useShareCodeValidation = () => {
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
+  // eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
   const validateShareCode = async (code) => {
-    if (!code.trim()) {
-      logger.warn("validateShareCode called with empty code");
+    if (!isValidShareCode(code)) {
       return false;
     }
 

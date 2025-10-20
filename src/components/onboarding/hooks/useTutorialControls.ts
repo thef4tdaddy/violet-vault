@@ -12,9 +12,9 @@ export const useTutorialControls = (
   setCurrentStep,
   setShowTutorial
 ) => {
-  const endTutorialStep = useOnboardingStore(state => state.endTutorialStep);
-  const markStepComplete = useOnboardingStore(state => state.markStepComplete);
-  const setPreference = useOnboardingStore(state => state.setPreference);
+  const endTutorialStep = useOnboardingStore((state) => state.endTutorialStep);
+  const markStepComplete = useOnboardingStore((state) => state.markStepComplete);
+  const setPreference = useOnboardingStore((state) => state.setPreference);
 
   const closeTutorial = useCallback(() => {
     setShowTutorial(false);

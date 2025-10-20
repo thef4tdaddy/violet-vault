@@ -15,12 +15,8 @@ const firebaseConfig = {
 
 // Only initialize Firebase if we have real config (not demo)
 if (firebaseConfig.projectId !== "demo-project") {
-  importScripts(
-    "https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js",
-  );
-  importScripts(
-    "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js",
-  );
+  importScripts("https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js");
+  importScripts("https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js");
 
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
@@ -28,9 +24,7 @@ if (firebaseConfig.projectId !== "demo-project") {
   // Initialize Firebase Messaging
   const messaging = firebase.messaging();
 } else {
-  console.log(
-    "[firebase-messaging-sw.js] Skipping Firebase initialization (demo config detected)",
-  );
+  console.log("[firebase-messaging-sw.js] Skipping Firebase initialization (demo config detected)");
   // Create mock messaging object to prevent errors
   const messaging = null;
 }
@@ -38,10 +32,7 @@ if (firebaseConfig.projectId !== "demo-project") {
 // Handle background messages (only if messaging is initialized)
 if (messaging) {
   messaging.onBackgroundMessage((payload) => {
-    console.log(
-      "[firebase-messaging-sw.js] Received background message:",
-      payload,
-    );
+    console.log("[firebase-messaging-sw.js] Received background message:", payload);
 
     const { notification, data } = payload;
 
@@ -71,18 +62,12 @@ if (messaging) {
           icon: action.icon || "/images/icon-192x192.png",
         }));
       } catch (error) {
-        console.warn(
-          "[firebase-messaging-sw.js] Failed to parse notification actions:",
-          error,
-        );
+        console.warn("[firebase-messaging-sw.js] Failed to parse notification actions:", error);
       }
     }
 
     // Show the notification
-    return self.registration.showNotification(
-      notificationTitle,
-      notificationOptions,
-    );
+    return self.registration.showNotification(notificationTitle, notificationOptions);
   });
 }
 
@@ -135,7 +120,7 @@ self.addEventListener("notificationclick", (event) => {
         if (clients.openWindow) {
           return clients.openWindow(targetUrl);
         }
-      }),
+      })
   );
 });
 
@@ -188,22 +173,12 @@ self.addEventListener("push", (event) => {
           tag: "violet-vault-push",
         };
 
-        event.waitUntil(
-          self.registration.showNotification(
-            notificationTitle,
-            notificationOptions,
-          ),
-        );
+        event.waitUntil(self.registration.showNotification(notificationTitle, notificationOptions));
       }
     } catch (error) {
-      console.error(
-        "[firebase-messaging-sw.js] Error parsing push data:",
-        error,
-      );
+      console.error("[firebase-messaging-sw.js] Error parsing push data:", error);
     }
   }
 });
 
-console.log(
-  "[firebase-messaging-sw.js] Firebase Messaging Service Worker loaded",
-);
+console.log("[firebase-messaging-sw.js] Firebase Messaging Service Worker loaded");

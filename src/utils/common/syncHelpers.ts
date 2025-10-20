@@ -47,7 +47,10 @@ export const getStatusColor = (syncStatus: SyncStatus, isBackgroundSyncing: bool
 /**
  * Get background color for status indicator
  */
-export const getStatusBackgroundColor = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
+export const getStatusBackgroundColor = (
+  syncStatus: SyncStatus,
+  isBackgroundSyncing: boolean
+): string => {
   if (syncStatus.isLoading || isBackgroundSyncing) return "bg-blue-100";
 
   switch (syncStatus.status) {
@@ -87,7 +90,10 @@ export const getStatusText = (syncStatus: SyncStatus, isBackgroundSyncing: boole
 /**
  * Get status description for tooltip
  */
-export const getStatusDescription = (syncStatus: SyncStatus, isBackgroundSyncing?: boolean): string => {
+export const getStatusDescription = (
+  syncStatus: SyncStatus,
+  isBackgroundSyncing?: boolean
+): string => {
   if (syncStatus.isLoading) return "Checking sync health status...";
   if (isBackgroundSyncing) return "Background sync operation in progress...";
 
@@ -162,15 +168,19 @@ export const requiresImmediateAttention = (syncStatus: SyncStatus): boolean => {
 export const hasRecoveryActions = (): boolean => {
   return (
     typeof window !== "undefined" &&
-    (typeof (window as Window & { runMasterSyncValidation?: unknown }).runMasterSyncValidation === "function" ||
-     typeof (window as Window & { forceCloudDataReset?: unknown }).forceCloudDataReset === "function")
+    (typeof (window as Window & { runMasterSyncValidation?: unknown }).runMasterSyncValidation ===
+      "function" ||
+      typeof (window as Window & { forceCloudDataReset?: unknown }).forceCloudDataReset ===
+        "function")
   );
 };
 
 /**
  * Format recovery result for display
  */
-export const formatRecoveryResult = (result: RecoveryResult | null): FormattedRecoveryResult | null => {
+export const formatRecoveryResult = (
+  result: RecoveryResult | null
+): FormattedRecoveryResult | null => {
   if (!result) return null;
 
   if (result.success) {

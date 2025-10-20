@@ -23,7 +23,12 @@ const isDevelopmentMode = () => {
   );
 };
 
-const DataManagementSection: React.FC<DataManagementSectionProps> = ({ onOpenActivityFeed, onExport, onImport, onSync }) => {
+const DataManagementSection: React.FC<DataManagementSectionProps> = ({
+  onOpenActivityFeed,
+  onExport,
+  onImport,
+  onSync,
+}) => {
   const confirm = useConfirm();
   return (
     <div className="space-y-6">

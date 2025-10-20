@@ -4,6 +4,7 @@ import { queryKeys } from "../../../utils/common/queryClient";
 import { getBudgetMetadata, setBudgetMetadata, getActualBalance } from "../../../db/budgetDb";
 import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
 import logger from "../../../utils/common/logger";
+import { validateBalance } from "../../../utils/validation";
 
 // Helper to initialize default metadata
 const initializeDefaultMetadata = async () => {
@@ -13,47 +14,28 @@ const initializeDefaultMetadata = async () => {
     isActualBalanceManual: false,
     biweeklyAllocation: 0,
   };
-  
+
   await setBudgetMetadata(defaultMetadata);
   logger.debug("TanStack Query: Budget metadata initialized in useActualBalance", defaultMetadata);
-  
+
   return defaultMetadata;
 };
 
 // Helper to fetch balance data
 const fetchBalanceData = async () => {
   let metadata = await getBudgetMetadata();
-  
+
   if (!metadata) {
-    logger.debug("TanStack Query: No metadata found in useActualBalance, initializing with defaults");
+    logger.debug(
+      "TanStack Query: No metadata found in useActualBalance, initializing with defaults"
+    );
     metadata = await initializeDefaultMetadata();
   }
-  
+
   return {
     actualBalance: await getActualBalance(),
     isActualBalanceManual: metadata?.isActualBalanceManual || false,
   };
-};
-
-// Helper to validate balance value
-const validateBalance = (balance) => {
-  if (typeof balance !== "number" || isNaN(balance)) {
-    logger.warn("Invalid balance value provided:", { value: balance });
-    return false;
-  }
-
-  const MAX_BALANCE = 1000000;
-  const MIN_BALANCE = -100000;
-
-  if (balance > MAX_BALANCE || balance < MIN_BALANCE) {
-    logger.warn("Balance outside reasonable limits:", {
-      value: balance,
-      limits: { max: MAX_BALANCE, min: MIN_BALANCE },
-    });
-    return false;
-  }
-
-  return true;
 };
 
 // Helper to track balance change

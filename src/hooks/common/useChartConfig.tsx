@@ -187,7 +187,9 @@ export const useChartConfig = () => {
 
   // Responsive breakpoint utilities
   const getResponsiveHeight = useCallback((breakpoint, chartType) => {
-    return RESPONSIVE_HEIGHTS[breakpoint]?.[chartType] || RESPONSIVE_HEIGHTS[breakpoint]?.default || 300;
+    return (
+      RESPONSIVE_HEIGHTS[breakpoint]?.[chartType] || RESPONSIVE_HEIGHTS[breakpoint]?.default || 300
+    );
   }, []);
 
   return {

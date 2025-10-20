@@ -1,17 +1,10 @@
 import React from "react";
 
 export type ButtonVariant = "primary" | "secondary" | "destructive" | "icon";
-export type ButtonColor =
-  | "red"
-  | "orange"
-  | "purple"
-  | "blue"
-  | "green"
-  | "gradient";
+export type ButtonColor = "red" | "orange" | "purple" | "blue" | "green" | "gradient";
 export type ButtonSize = "sm" | "md" | "lg";
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual variant */
   variant?: ButtonVariant;
   /** Color scheme */
@@ -89,8 +82,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Variant-specific classes
     const variantClasses = {
       primary: `${colorClasses[color]}`,
-      secondary:
-        "bg-gray-200 text-gray-700 hover:bg-gray-300 border-2 border-black",
+      secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300 border-2 border-black",
       destructive: "bg-red-600 hover:bg-red-700 text-white",
       icon: "p-3 bg-transparent hover:bg-gray-100 text-gray-700 border-0",
     };
@@ -116,12 +108,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       .join(" ");
 
     return (
-      <button
-        ref={ref}
-        disabled={disabled || loading}
-        className={finalClasses}
-        {...props}
-      >
+      <button ref={ref} disabled={disabled || loading} className={finalClasses} {...props}>
         {loading && (
           <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
         )}

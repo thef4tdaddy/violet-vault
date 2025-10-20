@@ -2,7 +2,12 @@
  * Main page identification logic
  * Extracted from pageDetectionService.js to reduce complexity
  */
-import { checkUrlPatterns, checkTitlePatterns, checkDomClassPatterns, PageType } from "./pagePatterns.js";
+import {
+  checkUrlPatterns,
+  checkTitlePatterns,
+  checkDomClassPatterns,
+  PageType,
+} from "./pagePatterns.js";
 import { detectFromActiveNavigation } from "./navigationDetector.js";
 import logger from "../common/logger.js";
 

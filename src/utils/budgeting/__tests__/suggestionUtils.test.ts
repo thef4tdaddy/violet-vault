@@ -342,13 +342,10 @@ describe("suggestionUtils", () => {
         envelopeId: null,
       }));
 
-      const result = generateAllSuggestions(
-        manyTransactions,
-        [],
-        DEFAULT_ANALYSIS_SETTINGS,
-        30,
-        { dismissedSuggestions: new Set(), showDismissed: false }
-      );
+      const result = generateAllSuggestions(manyTransactions, [], DEFAULT_ANALYSIS_SETTINGS, 30, {
+        dismissedSuggestions: new Set(),
+        showDismissed: false,
+      });
 
       expect(result.length).toBeLessThanOrEqual(10);
     });

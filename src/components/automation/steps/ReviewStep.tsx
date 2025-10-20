@@ -35,21 +35,21 @@ const FieldRow = ({ label, value }) => (
 // Amount field component
 const AmountField = ({ amount }) => {
   if (!amount || amount <= 0) return null;
-  
+
   return <FieldRow label="Amount" value={`$${amount.toFixed(2)}`} />;
 };
 
 // Percentage field component
 const PercentageField = ({ percentage }) => {
   if (!percentage || percentage <= 0) return null;
-  
+
   return <FieldRow label="Percentage" value={`${percentage}%`} />;
 };
 
 // Single target field component
 const SingleTargetField = ({ targetId, envelopes }) => {
   if (!targetId) return null;
-  
+
   const targetName = envelopes.find((e) => e.id === targetId)?.name || "Unknown";
   return <FieldRow label="Target" value={targetName} />;
 };
@@ -106,7 +106,7 @@ const ReviewStep = ({ ruleData, envelopes }) => {
           <FieldRow label="Type" value={getRuleTypeLabel(ruleData.type)} />
           <FieldRow label="Trigger" value={getTriggerTypeLabel(ruleData.trigger)} />
           <FieldRow label="Priority" value={ruleData.priority} />
-          
+
           <AmountField amount={ruleData.config.amount} />
           <PercentageField percentage={ruleData.config.percentage} />
           <SingleTargetField targetId={ruleData.config.targetId} envelopes={envelopes} />

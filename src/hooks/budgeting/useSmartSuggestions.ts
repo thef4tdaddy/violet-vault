@@ -11,10 +11,7 @@ import localStorageService from "../../services/storage/localStorageService";
 const applyCreateEnvelope = async (suggestion, onCreateEnvelope) => {
   if (onCreateEnvelope) {
     await onCreateEnvelope(suggestion.data);
-    globalToast.showSuccess(
-      `Created "${suggestion.data.name}" envelope`,
-      "Suggestion Applied"
-    );
+    globalToast.showSuccess(`Created "${suggestion.data.name}" envelope`, "Suggestion Applied");
   }
 };
 
@@ -24,9 +21,10 @@ const applyBudgetChange = async (suggestion, onUpdateEnvelope, actionType) => {
     await onUpdateEnvelope(suggestion.data.envelopeId, {
       monthlyAmount: suggestion.data.suggestedAmount,
     });
-    const message = actionType === "increase" 
-      ? `Increased budget to $${suggestion.data.suggestedAmount}`
-      : `Reduced budget to $${suggestion.data.suggestedAmount}`;
+    const message =
+      actionType === "increase"
+        ? `Increased budget to $${suggestion.data.suggestedAmount}`
+        : `Reduced budget to $${suggestion.data.suggestedAmount}`;
     globalToast.showSuccess(message, "Budget Updated");
   }
 };
@@ -61,13 +59,10 @@ const useSmartSuggestions = ({
   // Generate suggestions based on current data and settings
   const suggestions = useMemo(() => {
     try {
-      return generateAllSuggestions(
-        transactions,
-        envelopes,
-        analysisSettings,
-        dateRange,
-        { dismissedSuggestions, showDismissed }
-      );
+      return generateAllSuggestions(transactions, envelopes, analysisSettings, dateRange, {
+        dismissedSuggestions,
+        showDismissed,
+      });
     } catch (error) {
       logger.error("Error generating smart suggestions:", error);
       return [];
@@ -126,7 +121,11 @@ const useSmartSuggestions = ({
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
-        globalToast.showError(error.message || "Failed to apply suggestion", "Application Error", 8000);
+        globalToast.showError(
+          error.message || "Failed to apply suggestion",
+          "Application Error",
+          8000
+        );
       }
     },
     [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]

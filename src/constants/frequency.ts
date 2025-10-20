@@ -8,7 +8,14 @@
 export const BIWEEKLY_MULTIPLIER = 26 / 12;
 
 // Frequency types
-export type FrequencyType = "weekly" | "biweekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "custom";
+export type FrequencyType =
+  | "weekly"
+  | "biweekly"
+  | "monthly"
+  | "quarterly"
+  | "semiannual"
+  | "yearly"
+  | "custom";
 
 // Standard frequency multipliers (periods per year)
 // Keep these simple and consistent

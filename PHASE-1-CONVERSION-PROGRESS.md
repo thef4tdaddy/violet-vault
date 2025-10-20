@@ -1,6 +1,7 @@
 # Phase 1 TypeScript Conversion Progress
 
 ## Overview
+
 This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 
 **Current Status**: 24 files converted (45% complete)
@@ -10,6 +11,7 @@ This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 ## Completed Conversions (24 files)
 
 ### Context Layer (4/5 files - 80% complete)
+
 - [x] src/contexts/AuthContext.jsx → AuthContext.tsx
 - [x] src/contexts/authConstants.js → authConstants.ts
 - [x] src/contexts/authUtils.js → authUtils.ts
@@ -17,6 +19,7 @@ This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 - [ ] src/stores/auth/authStore.jsx → authStore.ts (705 lines - large file)
 
 ### Service Layer (9/16 files - 56% complete)
+
 - [x] src/services/syncServiceInitializer.js → syncServiceInitializer.ts
 - [x] src/services/firebaseLazyLoader.js → firebaseLazyLoader.ts
 - [x] src/services/activityLogger.js → activityLogger.ts
@@ -28,19 +31,23 @@ This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 - [x] src/services/bugReport/performanceInfoService.js → performanceInfoService.ts
 
 ### Hook Layer (11/30 files - 37% complete)
+
 **Sync Hooks (4/4 - 100% COMPLETE):**
+
 - [x] src/hooks/useEnvelopeSwipeGestures.js → useEnvelopeSwipeGestures.ts
 - [x] src/hooks/sync/useFirebaseSync.js → useFirebaseSync.ts
 - [x] src/hooks/sync/useSyncHealthIndicator.js → useSyncHealthIndicator.ts
 - [x] src/hooks/sync/useManualSync.js → useManualSync.ts
 
 **Common Hooks (4):**
+
 - [x] src/hooks/common/useSavingsGoals.js → useSavingsGoals.ts
 - [x] src/hooks/common/useDataManagement.js → useDataManagement.ts
 - [x] src/hooks/common/useResetEncryption.js → useResetEncryption.ts
 - [x] src/hooks/common/useNetworkStatus.js → useNetworkStatus.ts
 
 **Auth Hooks (3):**
+
 - [x] src/hooks/auth/index.js → index.ts
 - [x] src/hooks/auth/useAuthQueries.js → useAuthQueries.ts
 - [x] src/hooks/auth/usePasswordRotation.js → usePasswordRotation.ts
@@ -48,12 +55,15 @@ This document tracks the progress of converting 53 Phase 1 files to TypeScript.
 ## Remaining Work (29 files)
 
 ### Services (7 remaining)
+
 Core services and bug report services need completion
 
 ### Hooks (19 remaining)
+
 Auth hooks and other common hooks
 
 ### State & Tests (3 files)
+
 - authStore.jsx
 - Test files
 
@@ -67,13 +77,16 @@ Auth hooks and other common hooks
 ✅ **Clear Patterns** - Established for all remaining files
 
 ### State Management (1 file)
+
 - [ ] src/stores/auth/authStore.jsx (705 lines)
   - Complex Zustand store
   - Needs careful conversion of state slices
   - Use src/types/auth.ts for types
 
 ### Core Services (14 files)
+
 Priority order by complexity (simple → complex):
+
 1. [ ] src/services/editLockService.js (337 lines)
 2. [ ] src/services/firebaseMessaging.js (338 lines)
 3. [ ] src/services/firebaseSyncService.js (365 lines)
@@ -88,7 +101,9 @@ Priority order by complexity (simple → complex):
 12. [ ] src/services/keys/keyManagementService.js
 
 ### Bug Report Services (12 files)
+
 All in src/services/bugReport/:
+
 - [ ] index.js
 - [ ] apiService.js
 - [ ] browserInfoService.js
@@ -103,22 +118,26 @@ All in src/services/bugReport/:
 - [ ] uiStateService.js
 
 ### Service Tests (7 files)
-- [ ] src/services/__tests__/budgetDatabaseService.test.js
-- [ ] src/services/__tests__/budgetHistoryService.test.js
-- [ ] src/services/__tests__/types/firebaseTypes.test.js
-- [ ] src/services/__tests__/integration/syncIntegration.test.js
-- [ ] src/services/bugReport/__tests__/index.test.js
-- [ ] src/services/bugReport/__tests__/screenshotService.test.js
-- [ ] src/services/bugReport/__tests__/systemInfoService.test.js
-- [ ] src/services/security/__tests__/securityService.test.js
-- [ ] src/services/keys/__tests__/keyManagementService.test.js
+
+- [ ] src/services/**tests**/budgetDatabaseService.test.js
+- [ ] src/services/**tests**/budgetHistoryService.test.js
+- [ ] src/services/**tests**/types/firebaseTypes.test.js
+- [ ] src/services/**tests**/integration/syncIntegration.test.js
+- [ ] src/services/bugReport/**tests**/index.test.js
+- [ ] src/services/bugReport/**tests**/screenshotService.test.js
+- [ ] src/services/bugReport/**tests**/systemInfoService.test.js
+- [ ] src/services/security/**tests**/securityService.test.js
+- [ ] src/services/keys/**tests**/keyManagementService.test.js
 
 ### Database (1 file)
-- [ ] src/db/__tests__/budgetDb.test.js
-Note: src/db/budgetDb.ts already exists; .js file is just a re-export
+
+- [ ] src/db/**tests**/budgetDb.test.js
+      Note: src/db/budgetDb.ts already exists; .js file is just a re-export
 
 ### Auth Hooks (~22 files)
+
 All in src/hooks/auth/:
+
 - [ ] useLoginForm.js
 - [ ] useRegistrationForm.js
 - [ ] usePasswordReset.js
@@ -140,10 +159,12 @@ All in src/hooks/auth/:
 - [ ] mutations/useLoginMutations.js
 - [ ] mutations/useJoinBudgetMutation.js
 - [ ] index.js
-- [ ] __tests__/*.test.js (4 files)
+- [ ] **tests**/\*.test.js (4 files)
 
 ### Sync Hooks (3 files)
+
 All in src/hooks/sync/:
+
 - [ ] useFirebaseSync.js
 - [ ] useManualSync.js
 - [ ] useSyncHealthIndicator.js
@@ -151,6 +172,7 @@ All in src/hooks/sync/:
 ## Conversion Patterns
 
 ### Pattern 1: Context Files
+
 ```typescript
 // Import types
 import type { UserData } from "../types/auth";
@@ -173,6 +195,7 @@ export const Context = createContext<ContextValue | null>(null);
 ```
 
 ### Pattern 2: Service Classes
+
 ```typescript
 // Import Firebase types if needed
 import type { Firestore } from "firebase/firestore";
@@ -205,6 +228,7 @@ export default new ServiceName();
 ```
 
 ### Pattern 3: Custom Hooks
+
 ```typescript
 // Define prop interface
 interface UseHookProps {
@@ -221,10 +245,7 @@ interface UseHookReturn {
 }
 
 // Implement hook
-export const useHook = ({
-  id,
-  onComplete,
-}: UseHookProps): UseHookReturn => {
+export const useHook = ({ id, onComplete }: UseHookProps): UseHookReturn => {
   // Implementation
   return {
     state,
@@ -236,6 +257,7 @@ export const useHook = ({
 ```
 
 ### Pattern 4: Service Functions
+
 ```typescript
 // Define types for parameters and returns
 interface LoginData {
@@ -250,9 +272,7 @@ interface LoginResult {
 }
 
 // Type the function
-export const login = async (
-  data: LoginData
-): Promise<LoginResult> => {
+export const login = async (data: LoginData): Promise<LoginResult> => {
   try {
     // Implementation
     return { success: true, user };
@@ -268,6 +288,7 @@ export const login = async (
 ## Available Types
 
 Use existing types from:
+
 - `src/types/auth.ts` - User, Auth state, Auth results
 - `src/types/firebase.ts` - Firebase/Firestore types
 - `src/types/common.ts` - Common utility types
@@ -277,6 +298,7 @@ Use existing types from:
 ## Testing Checklist
 
 After each conversion:
+
 1. [ ] Rename file extension (.js → .ts or .jsx → .tsx)
 2. [ ] Add type imports
 3. [ ] Define interfaces for complex types
@@ -291,16 +313,21 @@ After each conversion:
 ## Common Issues & Solutions
 
 ### Issue: "Cannot find module"
+
 **Solution**: Ensure imports use correct paths and extensions
 
 ### Issue: "Type 'X' is not assignable to type 'Y'"
+
 **Solution**: Check existing types in src/types/ for correct interfaces
 
 ### Issue: "Property 'x' does not exist on type 'never'"
+
 **Solution**: Initialize state/variables with proper types, not empty objects
 
 ### Issue: Firebase types not found
+
 **Solution**: Import from firebase packages:
+
 ```typescript
 import type { Firestore } from "firebase/firestore";
 import type { Auth } from "firebase/auth";
@@ -312,21 +339,25 @@ import type { FirebaseApp } from "firebase/app";
 Update this section after each conversion batch:
 
 ### Week 1 - Foundation
+
 - [x] Initial 7 files (contexts + services)
 - [ ] authStore.jsx conversion
 - [ ] 5 core services
 
 ### Week 2 - Services & Hooks
+
 - [ ] Remaining 9 core services
 - [ ] Bug report services (12 files)
 - [ ] Auth hooks batch 1 (10 files)
 
 ### Week 3 - Tests & Polish
+
 - [ ] Auth hooks batch 2 (12 files)
 - [ ] Sync hooks (3 files)
 - [ ] All test files (9 files)
 
 ### Week 4 - Verification
+
 - [ ] Final typecheck
 - [ ] Integration testing
 - [ ] Documentation updates

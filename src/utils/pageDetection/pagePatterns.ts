@@ -3,7 +3,19 @@
  * Extracted from pageDetectionService.js to reduce complexity
  */
 
-export type PageType = "bills" | "debt" | "envelope" | "transaction" | "savings" | "analytics" | "settings" | "onboarding" | "dashboard" | "supplemental" | "paycheck" | "unknown";
+export type PageType =
+  | "bills"
+  | "debt"
+  | "envelope"
+  | "transaction"
+  | "savings"
+  | "analytics"
+  | "settings"
+  | "onboarding"
+  | "dashboard"
+  | "supplemental"
+  | "paycheck"
+  | "unknown";
 
 interface PagePattern {
   patterns: string[];

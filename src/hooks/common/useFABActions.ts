@@ -60,7 +60,8 @@ export const useRegisterFABActions = ({
   // Set visibility
   useEffect(() => {
     setVisibility(visible);
-  }, [visible]); // setVisibility is stable Zustand action, safe to omit from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]); // setVisibility is stable Zustand action
 };
 
 /**
@@ -76,7 +77,8 @@ export const useSetFABDefaults = (handlers = {}) => {
     Object.entries(handlers).forEach(([actionId, handler]) => {
       setDefaultActionHandler(actionId, handler);
     });
-  }, [handlers]); // setDefaultActionHandler is stable Zustand action, safe to omit from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handlers]); // setDefaultActionHandler is stable Zustand action
 };
 
 /**
@@ -92,7 +94,8 @@ export const useSyncFABScreen = (screenId) => {
     if (screenId) {
       setCurrentScreen(screenId);
     }
-  }, [screenId]); // setCurrentScreen is stable Zustand action, safe to omit from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setCurrentScreen is stable Zustand action
+  }, [screenId]);
 };
 
 export default useRegisterFABActions;

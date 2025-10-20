@@ -194,15 +194,20 @@ const runCorruptionDetectionAndRecovery = async (): Promise<TestResult[]> => {
 
     // Test 3: If corruption detected, attempt recovery
     const hasCorruption = results[1].status === "failed";
-    if (hasCorruption && typeof window !== "undefined" && typeof window.forceCloudDataReset === "function") {
+    if (
+      hasCorruption &&
+      typeof window !== "undefined" &&
+      typeof window.forceCloudDataReset === "function"
+    ) {
       logger.info("🚨 Corruption detected, attempting automatic recovery...");
-      results.push(...await performAutomaticRecovery());
+      results.push(...(await performAutomaticRecovery()));
     } else if (hasCorruption) {
       results.push({
         name: "Recovery Recommendation",
         description: "Corruption detected but auto-recovery not available",
         status: "failed",
-        details: "❌ Corruption detected but recovery function not available - manual recovery required",
+        details:
+          "❌ Corruption detected but recovery function not available - manual recovery required",
       });
     }
 
@@ -317,23 +322,26 @@ const processValidationResults = (
   corruptionCheck: TestResult[];
 } => {
   // Extract results with fallbacks
-  const flowValidation = results[0].status === 'fulfilled' ? results[0].value as unknown[] : [];
-  const edgeCases = results[1].status === 'fulfilled' ? results[1].value as unknown[] : [];
-  const corruptionCheck = results[2].status === 'fulfilled' ? results[2].value as TestResult[] : [];
+  const flowValidation = results[0].status === "fulfilled" ? (results[0].value as unknown[]) : [];
+  const edgeCases = results[1].status === "fulfilled" ? (results[1].value as unknown[]) : [];
+  const corruptionCheck =
+    results[2].status === "fulfilled" ? (results[2].value as TestResult[]) : [];
 
   // Log failures
-  const phaseNames = ['Flow Validation', 'Edge Case Testing', 'Corruption Detection'];
+  const phaseNames = ["Flow Validation", "Edge Case Testing", "Corruption Detection"];
   results.forEach((result, index) => {
-    if (result.status === 'rejected') {
+    if (result.status === "rejected") {
       logger.warn(`⚠️ ${phaseNames[index]} phase failed: ${(result.reason as Error).message}`);
     }
   });
 
   // Log success message
-  const successCount = results.filter(r => r.status === 'fulfilled').length;
-  logger.info(successCount === 3
-    ? "✅ Full development validation completed successfully"
-    : `✅ Basic validation still successful (${successCount}/3 phases completed)`);
+  const successCount = results.filter((r) => r.status === "fulfilled").length;
+  logger.info(
+    successCount === 3
+      ? "✅ Full development validation completed successfully"
+      : `✅ Basic validation still successful (${successCount}/3 phases completed)`
+  );
 
   return { flowValidation, edgeCases, corruptionCheck };
 };
@@ -367,10 +375,7 @@ const countTestResults = (
   return { passed, failed };
 };
 
-const calculateValidationSummary = (
-  allResults: ValidationResults,
-  startTime: number
-): void => {
+const calculateValidationSummary = (allResults: ValidationResults, startTime: number): void => {
   const duration = Date.now() - startTime;
 
   const breakdown = {
@@ -401,7 +406,9 @@ const generateValidationReport = (allResults: ValidationResults): void => {
   logger.info("🎯 MASTER SYNC VALIDATION COMPLETE");
   logger.info("=".repeat(60));
 
-  const passRate = Math.round((allResults.summary.totalPassed / allResults.summary.totalTests) * 100);
+  const passRate = Math.round(
+    (allResults.summary.totalPassed / allResults.summary.totalTests) * 100
+  );
 
   logger.info("📊 FINAL SUMMARY:", {
     duration: `${allResults.summary.duration}ms`,
@@ -415,10 +422,16 @@ const generateValidationReport = (allResults: ValidationResults): void => {
   // Detailed Breakdown
   const breakdown = allResults.summary.breakdown;
   logger.info("📋 DETAILED BREAKDOWN:");
-  logger.info(`🔧 Health Check: ${breakdown.healthCheck.passed}✅ ${breakdown.healthCheck.failed}❌`);
-  logger.info(`🔄 Flow Validation: ${breakdown.flowValidation.passed}✅ ${breakdown.flowValidation.failed}❌`);
+  logger.info(
+    `🔧 Health Check: ${breakdown.healthCheck.passed}✅ ${breakdown.healthCheck.failed}❌`
+  );
+  logger.info(
+    `🔄 Flow Validation: ${breakdown.flowValidation.passed}✅ ${breakdown.flowValidation.failed}❌`
+  );
   logger.info(`🧪 Edge Cases: ${breakdown.edgeCases.passed}✅ ${breakdown.edgeCases.failed}❌`);
-  logger.info(`🚨 Corruption Check: ${breakdown.corruptionCheck.passed}✅ ${breakdown.corruptionCheck.failed}❌`);
+  logger.info(
+    `🚨 Corruption Check: ${breakdown.corruptionCheck.passed}✅ ${breakdown.corruptionCheck.failed}❌`
+  );
 
   // Final Status
   if (allResults.summary.overallStatus === "ALL_SYSTEMS_GO") {
@@ -526,9 +539,9 @@ export const getQuickSyncStatus = async () => {
     }
 
     // Check 3: Window functions availability
-  const windowFunctions = ["runMasterSyncValidation", "forceCloudDataReset"].filter(
-    (fn) => typeof window !== "undefined" && typeof window[fn as keyof Window] === "function"
-  );
+    const windowFunctions = ["runMasterSyncValidation", "forceCloudDataReset"].filter(
+      (fn) => typeof window !== "undefined" && typeof window[fn as keyof Window] === "function"
+    );
     checks.push({
       name: "Window Functions",
       status: windowFunctions.length > 0 ? "✅ PASSED" : "❌ FAILED",

@@ -162,7 +162,11 @@ export const useKeyManagementOperations = () => {
 
   const handleImportError = useCallback((err) => {
     logger.error("Import failed:", err);
-    globalToast.showError("Import failed: " + (err.message || "Unknown error"), "Import Failed", 8000);
+    globalToast.showError(
+      "Import failed: " + (err.message || "Unknown error"),
+      "Import Failed",
+      8000
+    );
   }, []);
 
   const handleOperationError = useCallback((operation, err) => {

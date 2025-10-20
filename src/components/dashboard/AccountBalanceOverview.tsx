@@ -84,10 +84,9 @@ const AccountBalanceOverview = ({
         <div className={`rounded-lg p-6 ${diffStyles.bg}`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className={`font-medium ${diffStyles.text}`}>Difference</h3>
-            {React.createElement(
-              getIcon(isBalanced ? "CheckCircle" : "AlertTriangle"),
-              { className: `h-5 w-5 ${diffStyles.icon}` }
-            )}
+            {React.createElement(getIcon(isBalanced ? "CheckCircle" : "AlertTriangle"), {
+              className: `h-5 w-5 ${diffStyles.icon}`,
+            })}
           </div>
           <div className="space-y-3">
             <div

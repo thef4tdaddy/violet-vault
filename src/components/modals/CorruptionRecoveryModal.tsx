@@ -58,6 +58,7 @@ export const CorruptionRecoveryModal: React.FC<CorruptionRecoveryModalProps> = (
     ];
 
     keysToRemove.forEach((key) => {
+      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed for recovery during sync corruption
       localStorage.removeItem(key);
     });
 

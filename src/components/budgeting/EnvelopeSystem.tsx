@@ -20,10 +20,10 @@ const useEnvelopeSystem = () => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Keep Zustand for non-migrated operations - selective subscriptions
-  const unassignedCash = useBudgetStore(state => state.unassignedCash);
-  const setEnvelopes = useBudgetStore(state => state.setEnvelopes);
-  const setBiweeklyAllocation = useBudgetStore(state => state.setBiweeklyAllocation);
-  const setUnassignedCash = useBudgetStore(state => state.setUnassignedCash);
+  const unassignedCash = useBudgetStore((state) => state.unassignedCash);
+  const setEnvelopes = useBudgetStore((state) => state.setEnvelopes);
+  const setBiweeklyAllocation = useBudgetStore((state) => state.setBiweeklyAllocation);
+  const setUnassignedCash = useBudgetStore((state) => state.setUnassignedCash);
 
   const lastBillsRef = useRef(null);
   const isCalculatingRef = useRef(false);
@@ -125,7 +125,8 @@ const useEnvelopeSystem = () => {
       logger.debug("All bills removed, clearing biweekly allocations");
       lastBillsRef.current = null;
     }
-  }, [bills]); // updateBiweeklyAllocations is stable in Zustand, no need to include
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- updateBiweeklyAllocations is stable Zustand action
+  }, [bills]);
 
   // Envelope operations with TanStack integration
   const createEnvelope = useCallback(

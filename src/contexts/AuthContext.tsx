@@ -7,11 +7,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { initialAuthState, createContextValue } from "./authConstants";
-import type {
-  AuthContextValue,
-  AuthContextState,
-  SessionData,
-} from "./authConstants";
+import type { AuthContextValue, AuthContextState, SessionData } from "./authConstants";
 import type { UserData } from "../types/auth";
 import {
   initializeAuthFromStorage,
@@ -72,12 +68,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   // Create auth action callbacks with useCallback for optimization
-  const setAuthenticated = useCallback(
-    (userData: UserData, sessionData: SessionData = {}) => {
-      createSetAuthenticated(setAuthState)(userData, sessionData);
-    },
-    []
-  );
+  const setAuthenticated = useCallback((userData: UserData, sessionData: SessionData = {}) => {
+    createSetAuthenticated(setAuthState)(userData, sessionData);
+  }, []);
 
   const clearAuth = useCallback(() => {
     createClearAuth(setAuthState)();

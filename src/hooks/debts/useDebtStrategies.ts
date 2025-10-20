@@ -143,7 +143,10 @@ export const useDebtStrategies = (debts = []) => {
   const insights = useMemo(() => generateDebtInsights(activeDebts), [activeDebts]);
 
   // Format recommendation text
-  const recommendationText = useMemo(() => formatRecommendationText(recommendation), [recommendation]);
+  const recommendationText = useMemo(
+    () => formatRecommendationText(recommendation),
+    [recommendation]
+  );
 
   return {
     avalancheStrategy,

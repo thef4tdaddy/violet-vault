@@ -16,7 +16,7 @@ import logger from "../../utils/common/logger";
 // Helper to calculate monthly budget for an envelope
 const calculateMonthlyBudget = (envelope) => {
   const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
-  
+
   if (envelopeType === ENVELOPE_TYPES.BILL) {
     return envelope.biweeklyAllocation ? envelope.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 0;
   } else if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
@@ -24,7 +24,7 @@ const calculateMonthlyBudget = (envelope) => {
   } else if (envelopeType === ENVELOPE_TYPES.SAVINGS) {
     return envelope.biweeklyAllocation ? envelope.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 50;
   }
-  
+
   return 0;
 };
 
@@ -36,17 +36,17 @@ const calculateTotalBudget = (envelopes) => {
 // Helper to create proportional distributions
 const createProportionalDistributions = (envelopes, unassignedCash, totalBudget) => {
   const newDistributions = {};
-  
+
   envelopes.forEach((envelope) => {
     const monthlyBudget = calculateMonthlyBudget(envelope);
     const proportion = monthlyBudget / totalBudget;
     const amount = Math.floor(unassignedCash * proportion * 100) / 100;
-    
+
     if (amount > 0) {
       newDistributions[envelope.id] = amount;
     }
   });
-  
+
   return newDistributions;
 };
 
@@ -55,7 +55,7 @@ const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) =
   const envelopeRecommendations = billEnvelopes.map((envelope) => {
     const priority = calculateBillEnvelopePriority(envelope, bills);
     const recommendation = getRecommendedBillFunding(envelope, bills, unassignedCash);
-    
+
     return {
       envelope,
       priority: priority.priority,
@@ -65,13 +65,13 @@ const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) =
       isUrgent: recommendation.isUrgent,
     };
   });
-  
+
   // Sort by priority (highest first)
   envelopeRecommendations.sort((a, b) => b.priority - a.priority);
-  
+
   const newDistributions = {};
   let remainingCash = unassignedCash;
-  
+
   // First pass: Fund urgent/critical envelopes fully
   envelopeRecommendations.forEach(({ envelope, recommendedAmount, isUrgent }) => {
     if (isUrgent && remainingCash >= recommendedAmount) {
@@ -79,7 +79,7 @@ const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) =
       remainingCash -= recommendedAmount;
     }
   });
-  
+
   // Second pass: Fund other envelopes based on availability
   envelopeRecommendations.forEach(({ envelope, recommendedAmount, isUrgent }) => {
     if (!isUrgent && remainingCash > 0) {
@@ -90,7 +90,7 @@ const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) =
       }
     }
   });
-  
+
   return newDistributions;
 };
 
@@ -169,7 +169,11 @@ const useUnassignedCashDistribution = () => {
       return;
     }
 
-    const newDistributions = createProportionalDistributions(envelopes, unassignedCash, totalBudget);
+    const newDistributions = createProportionalDistributions(
+      envelopes,
+      unassignedCash,
+      totalBudget
+    );
     setDistributions(newDistributions);
   }, [envelopes, unassignedCash, distributeEqually]);
 

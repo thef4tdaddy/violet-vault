@@ -40,7 +40,10 @@ export const getStatusColor = (syncStatus: SyncStatus, isBackgroundSyncing: bool
 /**
  * Get background color for status indicator
  */
-export const getStatusBackgroundColor = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
+export const getStatusBackgroundColor = (
+  syncStatus: SyncStatus,
+  isBackgroundSyncing: boolean
+): string => {
   if (syncStatus.isLoading || isBackgroundSyncing) return "bg-blue-100";
 
   switch (syncStatus.status) {
@@ -80,7 +83,10 @@ export const getStatusText = (syncStatus: SyncStatus, isBackgroundSyncing: boole
 /**
  * Get status description for tooltip
  */
-export const getStatusDescription = (syncStatus: SyncStatus, isBackgroundSyncing: boolean): string => {
+export const getStatusDescription = (
+  syncStatus: SyncStatus,
+  isBackgroundSyncing: boolean
+): string => {
   if (syncStatus.isLoading) return "Checking sync health status...";
   if (isBackgroundSyncing) return "Background sync operation in progress...";
 

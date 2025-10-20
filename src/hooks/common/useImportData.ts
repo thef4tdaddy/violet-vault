@@ -22,15 +22,15 @@ const buildBaseMessage = (counts) =>
   `Import ${counts.envelopes} envelopes, ${counts.bills} bills, ${counts.debts} debts, ${counts.auditLog} audit entries, and ${counts.transactions} transactions?\n\nThis will replace your current data.`;
 
 const buildMismatchWarning = (importBudgetId, currentUser) => {
-  const backupId = importBudgetId?.substring(0, 12) || 'unknown';
-  const currentId = currentUser?.budgetId?.substring(0, 12) || 'unknown';
+  const backupId = importBudgetId?.substring(0, 12) || "unknown";
+  const currentId = currentUser?.budgetId?.substring(0, 12) || "unknown";
   return `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${backupId}...\nCurrent budgetId: ${currentId}...\n\nImport will re-encrypt data with your current session context.`;
 };
 
 const buildConfirmMessage = (validatedData, hasBudgetIdMismatch, importBudgetId, currentUser) => {
   const counts = getImportCounts(validatedData);
   const baseMessage = buildBaseMessage(counts);
-  
+
   if (hasBudgetIdMismatch) {
     return baseMessage + buildMismatchWarning(importBudgetId, currentUser);
   }
@@ -45,7 +45,12 @@ const handleConfirmation = async (
   importBudgetId,
   currentUser
 ) => {
-  const message = buildConfirmMessage(validatedData, hasBudgetIdMismatch, importBudgetId, currentUser);
+  const message = buildConfirmMessage(
+    validatedData,
+    hasBudgetIdMismatch,
+    importBudgetId,
+    currentUser
+  );
   const title = hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data";
 
   return confirm({

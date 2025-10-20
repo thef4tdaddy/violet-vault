@@ -2,12 +2,7 @@ import React from "react";
 import { getIcon } from "../../../../utils";
 import { Checkbox } from "@/components/ui";
 
-const SplitRemainderConfig = ({
-  ruleData,
-  envelopes,
-  toggleTargetEnvelope,
-  errors,
-}) => {
+const SplitRemainderConfig = ({ ruleData, envelopes, toggleTargetEnvelope, errors }) => {
   return (
     <>
       <div>

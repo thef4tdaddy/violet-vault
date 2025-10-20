@@ -42,7 +42,7 @@ const getScreenTitle = (): string => {
 const getVisibleModals = (): (string | null | undefined)[] => {
   const visibleModals: (string | null | undefined)[] = [];
   const modals = document.querySelectorAll('[role="dialog"], [class*="modal"], [class*="Modal"]');
-  
+
   modals.forEach((modal) => {
     if ((modal as HTMLElement).offsetParent !== null) {
       const modalTitle = modal.querySelector('h1, h2, h3, [class*="title"]');
@@ -51,7 +51,7 @@ const getVisibleModals = (): (string | null | undefined)[] => {
       }
     }
   });
-  
+
   return visibleModals;
 };
 
@@ -61,7 +61,7 @@ const getVisibleModals = (): (string | null | undefined)[] => {
 export const getCurrentPageContext = (): PageContext => {
   const path = window.location.pathname;
   const hash = window.location.hash;
-  
+
   const currentPage = detectPageFromPath(path);
   const screenTitle = getScreenTitle();
   const visibleModals = getVisibleModals();

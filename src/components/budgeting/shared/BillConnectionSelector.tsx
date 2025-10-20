@@ -121,11 +121,7 @@ const BillConnectionSelector = ({
                     Create a new bill that will be automatically connected to this envelope
                   </p>
                   {!disabled && (
-                    <Button
-                      onClick={onCreateBill}
-                      size="sm"
-                      className="mt-2"
-                    >
+                    <Button onClick={onCreateBill} size="sm" className="mt-2">
                       Create Bill
                     </Button>
                   )}
