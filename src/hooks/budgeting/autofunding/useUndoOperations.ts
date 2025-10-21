@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import useUiStore from "../../../stores/ui/uiStore";
+import { useUIStore } from "../../../stores/ui/uiStore";
 import logger from "../../../utils/common/logger";
 
 // Helper to create single target transfer
@@ -66,7 +66,7 @@ const createUndoRecord = (executionId, totalAmount) => ({
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
 export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUIStore((state) => state.budget);
   const [undoStack, setUndoStack] = useState(initialUndoStack);
 
   // Add execution to undo stack if it has successful transfers

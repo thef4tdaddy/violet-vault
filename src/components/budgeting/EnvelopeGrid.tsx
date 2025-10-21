@@ -11,7 +11,7 @@ import {
   filterEnvelopes,
   calculateEnvelopeTotals,
 } from "../../utils/budgeting";
-import { EnvelopeHeader } from "./envelope/EnvelopeHeader";
+import EnvelopeHeader from "./envelope/EnvelopeHeader";
 import EnvelopeSummary from "./envelope/EnvelopeSummary";
 import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";

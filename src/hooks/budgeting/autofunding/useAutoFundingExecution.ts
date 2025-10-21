@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules.ts";
-import useUiStore from "../../../stores/ui/uiStore";
+import { useUIStore } from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
@@ -11,7 +11,7 @@ import logger from "../../../utils/common/logger";
  * Extracted from useAutoFunding.js for Issue #506
  */
 export const useAutoFundingExecution = () => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUIStore((state) => state.budget);
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastExecution, setLastExecution] = useState(null);
 

@@ -1,6 +1,6 @@
-import useBugReport from "../../../hooks/common/useBugReport";
-import useToast from "../../../hooks/common/useToast";
-import logger from "../../../utils/common/logger";
+import useBugReportV2 from '../../../hooks/common/useBugReportV2';
+import useToast from '../../../hooks/common/useToast';
+import logger from '../../../utils/common/logger';
 
 interface BugReportHookReturn {
   isModalOpen: boolean;
@@ -99,7 +99,7 @@ export const useBugReportState = (): BugReportState => {
     setScreenshot,
     submitReport,
     captureScreenshot,
-  } = useBugReport() as BugReportHookReturn;
+  } = useBugReportV2() as BugReportHookReturn;
 
   const { addToast } = useToast() as ToastHook;
 
