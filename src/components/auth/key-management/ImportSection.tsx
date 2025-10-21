@@ -1,19 +1,12 @@
 import React from "react";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 import PasswordField from "./PasswordField";
-
-interface ImportResult {
-  success: boolean;
-  error?: string;
-  user?: string;
-}
 
 interface ImportSectionProps {
   importPassword: string;
   vaultPassword: string;
   showImportPassword: boolean;
   showVaultPassword: boolean;
-  importResult: ImportResult | null;
   loading: boolean;
   fileInputRef: React.RefObject<HTMLInputElement>;
   onUpdatePassword: (field: string, value: string) => void;
@@ -26,7 +19,6 @@ const ImportSection: React.FC<ImportSectionProps> = ({
   vaultPassword,
   showImportPassword,
   showVaultPassword,
-  importResult,
   loading,
   fileInputRef,
   onUpdatePassword,
@@ -82,43 +74,6 @@ const ImportSection: React.FC<ImportSectionProps> = ({
         />
         <p className="text-xs text-gray-500">Your current vault password to complete the import</p>
       </div>
-
-      {/* Import Result */}
-      {importResult && (
-        <div
-          className={`p-4 rounded-lg border ${
-            importResult.success ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
-          }`}
-        >
-          <div className="flex items-start">
-            {importResult.success
-              ? React.createElement(getIcon("CheckCircle"), {
-                  className: "h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0",
-                })
-              : React.createElement(getIcon("AlertTriangle"), {
-                  className: "h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0",
-                })}
-            <div>
-              <p
-                className={`text-sm font-medium ${
-                  importResult.success ? "text-green-800" : "text-red-800"
-                }`}
-              >
-                {importResult.success ? "Import Successful!" : "Import Failed"}
-              </p>
-              <p
-                className={`text-sm mt-1 ${
-                  importResult.success ? "text-green-700" : "text-red-700"
-                }`}
-              >
-                {importResult.success
-                  ? `Successfully imported key for user: ${importResult.user || "Unknown"}`
-                  : importResult.error || "An error occurred during import"}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
