@@ -144,7 +144,7 @@ const useFirebaseSync = ({
 
   // Update activity data from Firebase sync
   useEffect(() => {
-    if (!budget.getActiveUsers || !budget.getRecentActivity) return;
+    if (!budget || !budget.getActiveUsers || !budget.getRecentActivity) return;
 
     const updateActivityData = (): void => {
       try {
@@ -167,7 +167,7 @@ const useFirebaseSync = ({
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
+  }, [budget]);
 
   return {
     activeUsers,
