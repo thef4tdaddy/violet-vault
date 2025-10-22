@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
-import { shallow } from "zustand/react";
+import shallow from "zustand/shallow";
 
 /**
  * OnboardingProgress - Shows progress checklist for new users
