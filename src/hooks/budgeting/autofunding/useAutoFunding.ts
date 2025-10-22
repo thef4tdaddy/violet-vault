@@ -5,6 +5,7 @@ import { useAutoFundingData } from "./useAutoFundingData.ts";
 import { useAutoFundingHistory } from "./useAutoFundingHistory.ts";
 import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules.ts";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
+import { useShallow } from "zustand/react/shallow";
 import logger from "../../../utils/common/logger";
 
 /**
@@ -12,11 +13,13 @@ import logger from "../../../utils/common/logger";
  * Refactored from original useAutoFunding.js for Issue #506 - Logic ↔ UI separation
  */
 export const useAutoFunding = () => {
-  const budget = useBudgetStore((state) => ({
-    envelopes: state.envelopes,
-    unassignedCash: state.unassignedCash,
-    allTransactions: state.allTransactions,
-  }));
+  const budget = useBudgetStore(
+    useShallow((state) => ({
+      envelopes: state.envelopes,
+      unassignedCash: state.unassignedCash,
+      allTransactions: state.allTransactions,
+    }))
+  );
 
   // Initialize individual hooks
   const dataHook = useAutoFundingData();

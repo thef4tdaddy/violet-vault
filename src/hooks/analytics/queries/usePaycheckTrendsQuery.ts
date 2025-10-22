@@ -1,15 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/common/queryClient";
 import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useShallow } from "zustand/react/shallow";
 
 /**
  * Hook for paycheck trends analytics data fetching and calculations
  */
 export const usePaycheckTrendsQuery = () => {
   // Get data from Zustand store
-  const { paycheckHistory } = useBudgetStore((state) => ({
-    paycheckHistory: state.paycheckHistory,
-  }));
+  const { paycheckHistory } = useBudgetStore(
+    useShallow((state) => ({
+      paycheckHistory: state.paycheckHistory,
+    }))
+  );
 
   return useQuery({
     queryKey: queryKeys.paycheckPredictions(),

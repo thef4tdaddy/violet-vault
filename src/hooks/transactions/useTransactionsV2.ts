@@ -5,6 +5,7 @@
  */
 import { useEffect } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore.ts";
+import { useShallow } from "zustand/react/shallow";
 import { useTransactionData } from "./useTransactionData.ts";
 import { useTransactionOperations } from "./useTransactionOperations.ts";
 import logger from "../../utils/common/logger.ts";
@@ -36,9 +37,11 @@ const useTransactionsV2 = (options = {}) => {
   } = options;
 
   // Get UI state from Zustand (for legacy compatibility)
-  const budgetStore = useBudgetStore((state) => ({
-    updateTransactions: state.updateTransactions,
-  }));
+  const budgetStore = useBudgetStore(
+    useShallow((state) => ({
+      updateTransactions: state.updateTransactions,
+    }))
+  );
 
   // Data management hook
   const dataHook = useTransactionData({

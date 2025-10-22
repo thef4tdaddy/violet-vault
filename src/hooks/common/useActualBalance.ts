@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 
 /**
@@ -11,11 +12,13 @@ export const useActualBalance = () => {
     actualBalance,
     isActualBalanceManual,
     setActualBalance: setStoreBalance,
-  } = useBudgetStore((state) => ({
-    actualBalance: state.actualBalance,
-    isActualBalanceManual: state.isActualBalanceManual,
-    setActualBalance: state.setActualBalance,
-  }));
+  } = useBudgetStore(
+    useShallow((state) => ({
+      actualBalance: state.actualBalance,
+      isActualBalanceManual: state.isActualBalanceManual,
+      setActualBalance: state.setActualBalance,
+    }))
+  );
 
   /**
    * Updates the actual balance with validation and audit logging

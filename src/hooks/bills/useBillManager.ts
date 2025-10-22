@@ -10,6 +10,7 @@ import { useEnvelopes } from "../budgeting/useEnvelopes";
 import useBills from "./useBills";
 import { useBillOperations } from "./useBillOperations";
 import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useShallow } from "zustand/react/shallow";
 import { processRecurringBill } from "../../utils/bills/recurringBillUtils";
 import { generateBillSuggestions } from "../../utils/common/billDiscovery";
 import {
@@ -46,11 +47,13 @@ export const useBillManager = ({
   } = useBills();
 
   // Fallback to Zustand for backward compatibility
-  const budget = useBudgetStore((state) => ({
-    allTransactions: state.allTransactions,
-    envelopes: state.envelopes,
-    bills: state.bills,
-  }));
+  const budget = useBudgetStore(
+    useShallow((state) => ({
+      allTransactions: state.allTransactions,
+      envelopes: state.envelopes,
+      bills: state.bills,
+    }))
+  );
 
   // UI State Management
   const [selectedBills, setSelectedBills] = useState(new Set());

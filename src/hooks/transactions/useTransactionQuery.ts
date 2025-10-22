@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore.ts";
+import { useShallow } from "zustand/react/shallow";
 import { queryKeys } from "../../utils/common/queryClient.ts";
 import { budgetDb } from "../../db/budgetDb.ts";
 import logger from "../../utils/common/logger.ts";
@@ -19,10 +20,12 @@ export const useTransactionQuery = (options = {}) => {
 
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
   const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
-    useBudgetStore((state) => ({
-      transactions: state.transactions,
-      allTransactions: state.allTransactions,
-    }));
+    useBudgetStore(
+      useShallow((state) => ({
+        transactions: state.transactions,
+        allTransactions: state.allTransactions,
+      }))
+    );
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {

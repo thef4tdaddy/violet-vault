@@ -6,6 +6,7 @@ import { suggestEnvelope } from "../../utils/transactions/envelopeMatching";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useTransactions } from "../common/useTransactions";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
+import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 
 /**
@@ -24,11 +25,13 @@ export const useTransactionLedger = (currentUser) => {
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Keep Zustand for legacy operations not yet migrated
-  const budget = useBudgetStore((state) => ({
-    updateTransaction: state.updateTransaction,
-    setAllTransactions: state.setAllTransactions,
-    updateBill: state.updateBill,
-  }));
+  const budget = useBudgetStore(
+    useShallow((state) => ({
+      updateTransaction: state.updateTransaction,
+      setAllTransactions: state.setAllTransactions,
+      updateBill: state.updateBill,
+    }))
+  );
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // State management
