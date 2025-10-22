@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.11.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.10.0...violet-vault-v1.11.0) (2025-10-22)
+
+
+### Features
+
+* bring enhanced lighthouse workflow from develop to main ([edd9c5d](https://github.com/thef4tdaddy/violet-vault/commit/edd9c5db55a0b251a56b946f746acb6ecf0d7b4c))
+* enhance Lighthouse monitoring with multi-branch testing and issue automation ([9efc923](https://github.com/thef4tdaddy/violet-vault/commit/9efc923fe3e475d9669a3099b6c28b8d1741e7a7))
+* enhance main branch lighthouse workflow with comprehensive testing and archiving ([a3a099f](https://github.com/thef4tdaddy/violet-vault/commit/a3a099f2556e7f616a19d81c520a8deca70fa67e))
+
+
+### Bug Fixes
+
+* add aria-label to icon-only buttons for accessibility ([baf24ef](https://github.com/thef4tdaddy/violet-vault/commit/baf24ef59c9a6c2acf21f068368e223ae9bab29b))
+* add generate-dev-auth-token.js script to fix lighthouse workflow ([aa389a0](https://github.com/thef4tdaddy/violet-vault/commit/aa389a02b12787be3351f851ba093f4bf9dd9262))
+* configure Lighthouse to run from main but test develop branch ([b341117](https://github.com/thef4tdaddy/violet-vault/commit/b34111768a4c103fdac92e9ac9f84dd4b8111cfd))
+* enable Lighthouse monitoring on both develop and main branches ([7f01df3](https://github.com/thef4tdaddy/violet-vault/commit/7f01df343fed50e253b26ad63cd3ca341a1bcf62))
+* handle empty lighthouse-results in workflow ([846d373](https://github.com/thef4tdaddy/violet-vault/commit/846d3732ea622af85a1cde679c3a3c1d013d5e93))
+* migrate usePasswordRotation.js to prevent React Error [#185](https://github.com/thef4tdaddy/violet-vault/issues/185) ([7522624](https://github.com/thef4tdaddy/violet-vault/commit/7522624c7d38120f422b5febbc5479f74f1cf9c9))
+* resolve YAML syntax errors in Lighthouse workflow ([828c3ca](https://github.com/thef4tdaddy/violet-vault/commit/828c3ca2294a97928514b5bf835d52603e950e77))
+* simplify Lighthouse monitoring to develop branch only ([bc9c1b4](https://github.com/thef4tdaddy/violet-vault/commit/bc9c1b4bee720377d2d14189436ee1f6069453e4))
+* sync Lighthouse monitoring workflow with develop branch ([f61df10](https://github.com/thef4tdaddy/violet-vault/commit/f61df109f3f47c83e13085f6d8b944964d363ebb))
+
+
+### CI/CD
+
+* add automated labeling and dependabot configuration ([8e803aa](https://github.com/thef4tdaddy/violet-vault/commit/8e803aaf47da06cebbe668ff87d9eadd0d7a1b00))
+
 ## [1.10.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.9.0...violet-vault-v1.10.0) (2025-09-15)
 
 
