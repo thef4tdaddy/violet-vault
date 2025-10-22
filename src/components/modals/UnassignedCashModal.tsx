@@ -1,5 +1,5 @@
 import React, { memo, lazy, Suspense } from "react";
-import { shallow } from "zustand/react/shallow";
+import { shallow } from "zustand";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";

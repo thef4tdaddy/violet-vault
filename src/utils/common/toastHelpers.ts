@@ -4,7 +4,7 @@
  * Provides consistent toast notifications across the application
  */
 
-import { shallow } from "zustand/react/shallow";
+import { shallow } from "zustand";
 import { useToastStore } from "../../stores/ui/toastStore";
 
 /**
