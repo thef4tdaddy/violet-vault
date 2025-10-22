@@ -45,22 +45,23 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   // Get paycheck operations
   const { handleDeletePaycheck } = usePaycheckOperations();
 
+  // Safe destructuring with default empty object to prevent destructuring errors
   const {
-    _envelopes,
-    _bills,
-    savingsGoals,
-    supplementalAccounts,
-    _transactions,
-    addSavingsGoal,
-    updateSavingsGoal,
-    deleteSavingsGoal,
-    addSupplementalAccount,
-    updateSupplementalAccount,
-    deleteSupplementalAccount,
-    transferFromSupplementalAccount,
-    addEnvelope,
-    updateEnvelope,
-  } = budget;
+    _envelopes = [],
+    _bills = [],
+    savingsGoals = [],
+    supplementalAccounts = [],
+    _transactions = [],
+    addSavingsGoal = () => {},
+    updateSavingsGoal = () => {},
+    deleteSavingsGoal = () => {},
+    addSupplementalAccount = () => {},
+    updateSupplementalAccount = () => {},
+    deleteSupplementalAccount = () => {},
+    transferFromSupplementalAccount = () => {},
+    addEnvelope = () => {},
+    updateEnvelope = () => {},
+  } = budget || {};
 
   // safeTransactions already filtered by useLayoutData hook
 
