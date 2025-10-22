@@ -1,5 +1,4 @@
 import React, { memo, lazy, Suspense } from "react";
-import { shallow } from "zustand";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";
@@ -73,13 +72,8 @@ const EnvelopeItem = memo(
 );
 
 const UnassignedCashModal = () => {
-  const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudgetStore(
-    (state) => ({
-      isUnassignedCashModalOpen: state.isUnassignedCashModalOpen,
-      closeUnassignedCashModal: state.closeUnassignedCashModal,
-    }),
-    shallow
-  );
+  const isUnassignedCashModalOpen = useBudgetStore((state) => state.isUnassignedCashModalOpen);
+  const closeUnassignedCashModal = useBudgetStore((state) => state.closeUnassignedCashModal);
   const {
     // State (except modal state)
     distributions,

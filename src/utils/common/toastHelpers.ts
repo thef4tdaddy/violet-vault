@@ -4,7 +4,6 @@
  * Provides consistent toast notifications across the application
  */
 
-import { shallow } from "zustand";
 import { useToastStore } from "../../stores/ui/toastStore";
 
 /**
@@ -18,16 +17,11 @@ import { useToastStore } from "../../stores/ui/toastStore";
  * showErrorToast("Failed to save data", "Save Error");
  */
 export const useToastHelpers = () => {
-  const { showSuccess, showError, showWarning, showInfo, showPayday } = useToastStore(
-    (state) => ({
-      showSuccess: state.showSuccess,
-      showError: state.showError,
-      showWarning: state.showWarning,
-      showInfo: state.showInfo,
-      showPayday: state.showPayday,
-    }),
-    shallow
-  );
+  const showSuccess = useToastStore((state) => state.showSuccess);
+  const showError = useToastStore((state) => state.showError);
+  const showWarning = useToastStore((state) => state.showWarning);
+  const showInfo = useToastStore((state) => state.showInfo);
+  const showPayday = useToastStore((state) => state.showPayday);
 
   return {
     showSuccessToast: showSuccess,
