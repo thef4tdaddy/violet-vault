@@ -58,7 +58,7 @@ Generated: ${new Date().toLocaleDateString()}
       {/* Warning Header */}
       <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
         <div className="flex items-center space-x-2 text-red-800 mb-2">
-          {renderIcon("AlertTriangle", "w-5 h-5")}
+          {renderIcon("AlertTriangle", { className: "w-5 h-5" })}
           <h3 className="font-bold">CRITICAL: Save Your Share Code</h3>
         </div>
         <p className="text-red-700 text-sm">
@@ -89,7 +89,7 @@ Generated: ${new Date().toLocaleDateString()}
               onClick={handleCopy}
               className="flex items-center justify-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
-              {renderIcon(copied ? "Check" : "Copy", "w-4 h-4")}
+              {renderIcon(copied ? "Check" : "Copy", { className: "w-4 h-4" })}
               <span>{copied ? "Copied!" : "Copy Code"}</span>
             </Button>
 
@@ -98,7 +98,7 @@ Generated: ${new Date().toLocaleDateString()}
               onClick={handleDownload}
               className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              {renderIcon("Download", "w-4 h-4")}
+              {renderIcon("Download", { className: "w-4 h-4" })}
               <span>Save to File</span>
             </Button>
           </div>
@@ -124,7 +124,7 @@ Generated: ${new Date().toLocaleDateString()}
           disabled={isLoading}
           className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
         >
-          {renderIcon("ArrowLeft", "w-4 h-4 mr-2")}
+          {renderIcon("ArrowLeft", { className: "w-4 h-4 mr-2" })}
           Back
         </Button>
 
@@ -136,12 +136,12 @@ Generated: ${new Date().toLocaleDateString()}
         >
           {isLoading ? (
             <>
-              {renderIcon("Loader2", "w-4 h-4 mr-2 animate-spin")}
+              {renderIcon("Loader2", { className: "w-4 h-4 mr-2 animate-spin" })}
               Creating...
             </>
           ) : (
             <>
-              {renderIcon("Rocket", "w-4 h-4 mr-2")}
+              {renderIcon("Rocket", { className: "w-4 h-4 mr-2" })}
               Create My Budget
             </>
           )}
