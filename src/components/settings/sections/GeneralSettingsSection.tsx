@@ -13,9 +13,7 @@ const GeneralSettingsSection = ({
   onToggleCloudSync,
   onManualSync,
 }) => {
-  const { manualInstall } = useUiStore((state) => ({
-    manualInstall: state.manualInstall,
-  }));
+  const manualInstall = useUiStore((state) => state.manualInstall);
   const [pwaStatus, setPwaStatus] = useState({
     isInstalled: false,
     isInstallable: false,
