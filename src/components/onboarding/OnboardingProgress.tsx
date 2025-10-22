@@ -2,19 +2,23 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
+import { shallow } from "zustand/react";
 
 /**
  * OnboardingProgress - Shows progress checklist for new users
  */
 const OnboardingProgress = () => {
   const { isOnboarded, tutorialProgress, getProgress, preferences, setPreference } =
-    useOnboardingStore((state) => ({
-      isOnboarded: state.isOnboarded,
-      tutorialProgress: state.tutorialProgress,
-      getProgress: state.getProgress,
-      preferences: state.preferences,
-      setPreference: state.setPreference,
-    }));
+    useOnboardingStore(
+      (state) => ({
+        isOnboarded: state.isOnboarded,
+        tutorialProgress: state.tutorialProgress,
+        getProgress: state.getProgress,
+        preferences: state.preferences,
+        setPreference: state.setPreference,
+      }),
+      shallow
+    );
 
   const [isExpanded, setIsExpanded] = useState(!isOnboarded);
 
