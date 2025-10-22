@@ -29,35 +29,6 @@ const LockScreen = () => {
     }
   );
 
-  // Handle validation results
-  useEffect(() => {
-    if (passwordToValidate && validationResult !== undefined && !isValidating) {
-      if (validationResult?.isValid) {
-        // Password is correct, unlock the session
-        if (pendingConfirm) {
-          pendingConfirm.cancel();
-          setPendingConfirm(null);
-        }
-        unlockSession();
-        setPassword("");
-        setPasswordToValidate("");
-        setFailedAttempts(0);
-        setError("");
-        setIsUnlocking(false);
-      } else {
-        // Password is incorrect
-        handleIncorrectPassword();
-      }
-    }
-  }, [
-    validationResult,
-    isValidating,
-    passwordToValidate,
-    pendingConfirm,
-    unlockSession,
-    handleIncorrectPassword,
-  ]);
-
   // Handle incorrect password
   const handleIncorrectPassword = useCallback(async () => {
     setIsUnlocking(false);
@@ -111,6 +82,35 @@ const LockScreen = () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }, [confirm, logout, failedAttempts]);
+
+  // Handle validation results
+  useEffect(() => {
+    if (passwordToValidate && validationResult !== undefined && !isValidating) {
+      if (validationResult?.isValid) {
+        // Password is correct, unlock the session
+        if (pendingConfirm) {
+          pendingConfirm.cancel();
+          setPendingConfirm(null);
+        }
+        unlockSession();
+        setPassword("");
+        setPasswordToValidate("");
+        setFailedAttempts(0);
+        setError("");
+        setIsUnlocking(false);
+      } else {
+        // Password is incorrect
+        handleIncorrectPassword();
+      }
+    }
+  }, [
+    validationResult,
+    isValidating,
+    passwordToValidate,
+    pendingConfirm,
+    unlockSession,
+    handleIncorrectPassword,
+  ]);
 
   // Count recent failed attempts from security events
   useEffect(() => {
