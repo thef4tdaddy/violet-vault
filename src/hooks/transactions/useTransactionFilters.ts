@@ -18,6 +18,11 @@ export const useTransactionFilters = ({
   sortOrder,
 }) => {
   const filteredTransactions = useMemo(() => {
+    // Guard against undefined transactions
+    if (!transactions || !Array.isArray(transactions)) {
+      return [];
+    }
+
     return transactions
       .filter((transaction) => {
         return (
