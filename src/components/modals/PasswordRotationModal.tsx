@@ -33,6 +33,7 @@ const PasswordRotationModal = ({
             value={newPassword}
             onChange={(e) => onNewPasswordChange(e.target.value)}
             placeholder="New password"
+            autoComplete="new-password"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3"
             required
             autoFocus
@@ -43,6 +44,7 @@ const PasswordRotationModal = ({
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
             placeholder="Confirm password"
+            autoComplete="new-password"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-6"
             required
           />

@@ -26,6 +26,7 @@ const PasswordRotationModal = ({
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           placeholder="New password"
+          autoComplete="new-password"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3"
         />
         <input
@@ -33,6 +34,7 @@ const PasswordRotationModal = ({
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirm password"
+          autoComplete="new-password"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg"
         />
         <div className="flex gap-3 mt-6">

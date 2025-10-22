@@ -57,6 +57,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
             placeholder="Current password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
+            autoComplete="current-password"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
             required
           />
@@ -65,6 +66,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
             placeholder="New password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            autoComplete="new-password"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
             required
           />
@@ -73,6 +75,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
             placeholder="Confirm new password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
             required
           />

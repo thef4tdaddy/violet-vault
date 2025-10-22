@@ -246,6 +246,7 @@ const LockScreen = () => {
                     onKeyPress={handleKeyPress}
                     disabled={isUnlocking}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     className="w-full px-4 py-3 bg-white/90 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:bg-white focus:border-black focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                   />
                   <Button
