@@ -1,7 +1,7 @@
-import React from 'react';
-import { Button } from '@/components/ui';
-import { getIcon } from '@/utils';
-import { getButtonClasses, withHapticFeedback } from '@/utils/ui/touchFeedback';
+import React from "react";
+import { Button } from "@/components/ui";
+import { getIcon } from "@/utils";
+import { getButtonClasses, withHapticFeedback } from "@/utils/ui/touchFeedback";
 
 interface Envelope {
   id: string;
@@ -27,6 +27,11 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = ({
   onViewHistory,
   onToggleCollapse,
 }) => {
+  // Guard against undefined envelope
+  if (!envelope) {
+    return null;
+  }
+
   return (
     <div
       className="flex justify-between items-start mb-4"
