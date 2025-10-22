@@ -29,7 +29,8 @@ const LockScreen = () => {
     }
   );
 
-  // Handle incorrect password
+  // Memoize handleIncorrectPassword callback first, before any useEffect that references it
+  // This prevents temporal dead zone issues with the dependency array
   const handleIncorrectPassword = useCallback(async () => {
     setIsUnlocking(false);
 
