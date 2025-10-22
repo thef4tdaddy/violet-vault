@@ -603,6 +603,13 @@ class CloudSyncService {
     try {
       logger.info("🚀 Force pushing local data to Firebase...");
 
+      // Guard against undefined config during import
+      if (!this.config?.budgetId || !this.config?.encryptionKey) {
+        throw new Error(
+          "Cannot force push: missing budgetId or encryptionKey. Config may not be initialized."
+        );
+      }
+
       // Get local data from Dexie
       const localData = await this.fetchDexieData();
 
