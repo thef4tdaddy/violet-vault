@@ -4,6 +4,7 @@ import useBills from "../bills/useBills";
 import { useTransactions } from "./useTransactions";
 import { useActualBalance } from "../budgeting/useBudgetMetadata";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
+import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 
 /**
@@ -11,12 +12,12 @@ import logger from "../../utils/common/logger";
  */
 export const useOnboardingAutoComplete = () => {
   const { markStepComplete, isStepComplete, preferences, isOnboarded } = useOnboardingStore(
-    (state) => ({
+    useShallow((state) => ({
       markStepComplete: state.markStepComplete,
       isStepComplete: state.isStepComplete,
       preferences: state.preferences,
       isOnboarded: state.isOnboarded,
-    })
+    }))
   );
 
   const { envelopes = [] } = useEnvelopes();

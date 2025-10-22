@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
+import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 import { useTutorialSteps } from "./hooks/useTutorialSteps";
 import { useTutorialPositioning } from "./hooks/useTutorialPositioning";
@@ -11,11 +12,13 @@ import TutorialOverlay from "./components/TutorialOverlay";
  * OnboardingTutorial - Provides guided tours and contextual hints for new users
  */
 const OnboardingTutorial = ({ children }) => {
-  const { isOnboarded, getProgress, preferences } = useOnboardingStore((state) => ({
-    isOnboarded: state.isOnboarded,
-    getProgress: state.getProgress,
-    preferences: state.preferences,
-  }));
+  const { isOnboarded, getProgress, preferences } = useOnboardingStore(
+    useShallow((state) => ({
+      isOnboarded: state.isOnboarded,
+      getProgress: state.getProgress,
+      preferences: state.preferences,
+    }))
+  );
 
   const [showTutorial, setShowTutorial] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);

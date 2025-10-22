@@ -2,16 +2,19 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
+import { useShallow } from "zustand/react/shallow";
 
 /**
  * EmptyStateHints - Provides contextual hints and guidance for empty states
  */
 const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
-  const { shouldShowHint, markStepComplete, preferences } = useOnboardingStore((state) => ({
-    shouldShowHint: state.shouldShowHint,
-    markStepComplete: state.markStepComplete,
-    preferences: state.preferences,
-  }));
+  const { shouldShowHint, markStepComplete, preferences } = useOnboardingStore(
+    useShallow((state) => ({
+      shouldShowHint: state.shouldShowHint,
+      markStepComplete: state.markStepComplete,
+      preferences: state.preferences,
+    }))
+  );
 
   // Don't show hints if user has disabled them
   if (!preferences.showHints) {
