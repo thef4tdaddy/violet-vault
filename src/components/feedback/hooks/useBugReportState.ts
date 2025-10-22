@@ -1,4 +1,4 @@
-import useBugReportV2 from '../../../hooks/common/useBugReportV2';
+import useBugReport from '../../../hooks/common/useBugReport';
 import useToast from '../../../hooks/common/useToast';
 import logger from '../../../utils/common/logger';
 
@@ -99,7 +99,7 @@ export const useBugReportState = (): BugReportState => {
     setScreenshot,
     submitReport,
     captureScreenshot,
-  } = useBugReportV2() as BugReportHookReturn;
+  } = useBugReport() as BugReportHookReturn;
 
   const { addToast } = useToast() as ToastHook;
 
