@@ -1,4 +1,3 @@
-
 const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }) => {
   if (!isVisible) return null;
 

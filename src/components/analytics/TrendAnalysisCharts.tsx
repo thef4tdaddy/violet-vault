@@ -1,4 +1,3 @@
-
 import ForecastSummaryCard from "./trends/ForecastSummaryCard";
 import HistoricalTrendsChart from "./trends/HistoricalTrendsChart";
 import VelocityChart from "./trends/VelocityChart";

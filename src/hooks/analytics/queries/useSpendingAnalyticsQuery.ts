@@ -60,10 +60,7 @@ export const useSpendingAnalyticsQuery = (options: SpendingAnalyticsOptions = {}
       );
 
       // Filter out transfers if not included
-      const analysisTransactions = filterTransferTransactions(
-        periodTransactions,
-        includeTransfers
-      );
+      const analysisTransactions = filterTransferTransactions(periodTransactions, includeTransfers);
 
       // Basic calculations
       const summary = calculateFinancialSummary(analysisTransactions);

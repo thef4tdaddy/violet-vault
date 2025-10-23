@@ -1,20 +1,20 @@
 // src/components/layout/MainLayout.jsx
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
-import { useLayoutData } from "../../hooks/layout";
-import useDataManagement from "../../hooks/common/useDataManagement";
-import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
-import useNetworkStatus from "../../hooks/common/useNetworkStatus";
+import { useLayoutData } from "@/hooks/layout";
+import useDataManagement from "@/hooks/common/useDataManagement";
+import usePasswordRotation from "@/hooks/auth/usePasswordRotation";
+import useNetworkStatus from "@/hooks/common/useNetworkStatus";
 import { useFirebaseSync } from "@/hooks/sync/useFirebaseSync";
-import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
-import useDataInitialization from "../../hooks/common/useDataInitialization";
+import usePaydayPrediction from "@/hooks/budgeting/usePaydayPrediction";
+import useDataInitialization from "@/hooks/common/useDataInitialization";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
 import { ToastContainer } from "../ui/Toast";
 import { useToastStore } from "@/stores/ui/toastStore";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import { getVersionInfo } from "@/utils/common/version";
 import NavigationTabs from "./NavigationTabs";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
@@ -27,12 +27,12 @@ import SettingsDashboard from "../settings/SettingsDashboard";
 import OnboardingTutorial from "../onboarding/OnboardingTutorial";
 import OnboardingProgress from "../onboarding/OnboardingProgress";
 import { useOnboardingAutoComplete } from "@/hooks/common/useOnboardingAutoComplete";
-import useOnboardingStore from "../../stores/ui/onboardingStore";
+import useOnboardingStore from "@/stores/ui/onboardingStore";
 import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
 import PasswordRotationModal from "../auth/PasswordRotationModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
-// import useBugReportV2 from "../../hooks/common/useBugReportV2"; // Not needed - FAB disabled
+// import useBugReportV2 from "@/hooks/common/useBugReportV2"; // Not needed - FAB disabled
 import { pathToViewMap, viewToPathMap } from "./routeConfig";
 import BottomNavigationBar from "../mobile/BottomNavigationBar";
 
@@ -40,10 +40,6 @@ import BottomNavigationBar from "../mobile/BottomNavigationBar";
 
 const MainLayout = ({ firebaseSync }) => {
   // Removed noisy debug log - layout renders constantly
-
-  // Bug report functionality for FAB - only initialize if FAB is enabled
-  // Currently FAB is not used, so don't initialize bug report hook
-  const openBugReport = null;
 
   // Navigation hooks for post-login redirect
   const location = useLocation();
@@ -55,14 +51,9 @@ const MainLayout = ({ firebaseSync }) => {
     isUnlocked,
     user: currentUser,
     securityContext,
-    login: _login,
-    logout: _logout,
-    changePassword: _changePassword,
-    updateProfile: _updateProfile,
     shouldShowAuthGateway,
     _legacy: {
       isLocalOnlyMode,
-      _localOnlyUser,
       handleSetup,
       handleLogout,
       handleChangePassword,
@@ -70,9 +61,6 @@ const MainLayout = ({ firebaseSync }) => {
       _internal: { securityManager } = {},
     } = {},
   } = auth;
-
-  // Onboarding state - prevent security warning during tutorial
-  const _isOnboarded = useOnboardingStore((state) => state.isOnboarded);
 
   // Initialize data from Dexie to Zustand on app startup
   useDataInitialization(); // Return values not currently used
@@ -169,7 +157,6 @@ const MainLayout = ({ firebaseSync }) => {
         onUpdateProfile={handleUpdateProfile}
         isLocalOnlyMode={isLocalOnlyMode}
         securityManager={securityManager}
-        openBugReport={openBugReport}
       />
       <PasswordRotationModal
         isOpen={showRotationModal}
@@ -204,7 +191,6 @@ const MainContent = ({
   onUpdateProfile,
   isLocalOnlyMode = false,
   securityManager,
-  _openBugReport,
 }) => {
   const resetAllData = useBudgetStore((state) => state.resetAllData);
   // Get current route for view determination
@@ -223,8 +209,7 @@ const MainContent = ({
     return pathToViewMap[pathname] || "dashboard";
   };
 
-  // Not currently used but kept for future compatibility
-  const _activeView = getCurrentViewFromPath(location.pathname);
+  // Note: View is determined from URL path, no longer stored in state
 
   // Helper function for components that still need programmatic navigation
   const setActiveView = (view) => {

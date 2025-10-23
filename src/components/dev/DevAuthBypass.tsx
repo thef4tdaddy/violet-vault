@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useAuthenticationManager } from "../../hooks/auth";
-import logger from "../../utils/common/logger";
+import { useAuthenticationManager } from "@/hooks/auth";
+import logger from "@/utils/common/logger";
 
 /**
  * Development Authentication Bypass
@@ -17,7 +18,7 @@ const DevAuthBypass = () => {
   const auth = useAuthenticationManager();
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const token = searchParams.get("token") || "";
     const target = searchParams.get("target") || "/app/dashboard";
 
     // Only allow in development or staging environments

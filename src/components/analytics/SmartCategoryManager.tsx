@@ -1,7 +1,8 @@
-import { useSmartCategoryAnalysis } from "../../hooks/analytics/useSmartCategoryAnalysis";
-import { useSmartCategoryManager } from "../../hooks/analytics/useSmartCategoryManager";
-import { calculateCategoryStats, processSuggestions } from "../../utils/analytics/categoryHelpers";
-import logger from "../../utils/common/logger";
+import { useMemo } from "react";
+import { useSmartCategoryAnalysis } from "@/hooks/analytics/useSmartCategoryAnalysis";
+import { useSmartCategoryManager } from "@/hooks/analytics/useSmartCategoryManager";
+import { calculateCategoryStats, processSuggestions } from "@/utils/analytics/categoryHelpers";
+import logger from "@/utils/common/logger";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
 import CategoryNavigationTabs from "./CategoryNavigationTabs";
@@ -9,18 +10,27 @@ import CategorySuggestionsTab from "./CategorySuggestionsTab";
 import CategoryAnalysisTab from "./CategoryAnalysisTab";
 import CategoryAdvancedTab from "./CategoryAdvancedTab";
 
+interface SmartCategoryManagerProps {
+  transactions?: Array<Record<string, unknown>>;
+  bills?: Array<Record<string, unknown>>;
+  onAddCategory: (name: string, category: string) => void;
+  onRemoveCategory: (name: string, category: string) => void;
+  onApplyToTransactions: (suggestion: unknown, updates: unknown) => Promise<void>;
+  onApplyToBills: (suggestion: unknown, updates: unknown) => Promise<void>;
+  dateRange?: string;
+  className?: string;
+}
+
 const SmartCategoryManager = ({
   transactions = [],
   bills = [],
-  _currentCategories = [],
   onAddCategory,
   onRemoveCategory,
-  _onUpdateCategory,
   onApplyToTransactions,
   onApplyToBills,
   dateRange: initialDateRange = "6months",
   className = "",
-}) => {
+}: SmartCategoryManagerProps) => {
   const {
     activeTab,
     showSettings,

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils/icons";
+import { getIcon } from "@/utils/icons";
 
 const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categoryCount }) => {
   const tabs = [

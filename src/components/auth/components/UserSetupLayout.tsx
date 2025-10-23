@@ -1,4 +1,3 @@
-
 /**
  * User Setup Layout Component
  * Main layout structure with background pattern and container styling

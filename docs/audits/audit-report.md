@@ -13,16 +13,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 8 issues in `violet-vault/src/components/sharing/JoinBudgetModal.tsx`
 - 6 issues in `violet-vault/src/services/keys/keyManagementService.ts`
-- 6 issues in `violet-vault/src/components/layout/NavigationTabs.tsx`
-- 6 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
-- 5 issues in `violet-vault/src/components/layout/SummaryCards.tsx`
-- 4 issues in `violet-vault/src/components/ui/VirtualList.tsx`
-- 4 issues in `violet-vault/src/components/ui/VersionFooter.tsx`
-- 4 issues in `violet-vault/src/components/sharing/ShareCodeModal.tsx`
-- 4 issues in `violet-vault/src/components/onboarding/OnboardingTutorial.tsx`
-- 4 issues in `violet-vault/src/components/mobile/BottomNavigationBar.tsx`
 - 3 issues in `violet-vault/src/utils/budgeting/envelopeFormUtils.ts`
 - 3 issues in `violet-vault/src/hooks/bills/useBillForm.ts`
 - 2 issues in `violet-vault/src/utils/common/billDiscovery.ts`
@@ -33,10 +24,8 @@
 - 2 issues in `violet-vault/src/hooks/bills/useBillManager.ts`
 - 2 issues in `violet-vault/src/hooks/analytics/useReportExporter.ts`
 - 2 issues in `violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts`
-- 2 issues in `violet-vault/src/components/ui/Toast.tsx`
 - 2 issues in `violet-vault/src/components/ui/EditableBalance.tsx`
 - 2 issues in `violet-vault/src/components/transactions/TransactionFormFields.tsx`
-- 2 issues in `violet-vault/src/components/settings/sections/AccountSettingsSection.tsx`
 - 2 issues in `violet-vault/src/components/modals/UnassignedCashModal.tsx`
 - 2 issues in `violet-vault/src/components/mobile/SlideUpModal.tsx`
 - 2 issues in `violet-vault/src/components/layout/ViewRenderer.tsx`
@@ -44,7 +33,6 @@
 - 2 issues in `violet-vault/src/components/history/IntegrityStatusIndicator.tsx`
 - 2 issues in `violet-vault/src/components/debt/modals/DebtFormFields.tsx`
 - 2 issues in `violet-vault/src/components/bills/BillFormFields.tsx`
-- 2 issues in `violet-vault/src/components/bills/AddBillModal.tsx`
 - 2 issues in `violet-vault/src/components/analytics/SmartCategoryManager.tsx`
 - 1 issues in `violet-vault/src/utils/debts/debtStrategies.ts`
 - 1 issues in `violet-vault/src/utils/debts/debtFormValidation.ts`
@@ -63,7 +51,6 @@
 - 1 issues in `violet-vault/src/hooks/analytics/useAnalyticsData.ts`
 - 1 issues in `violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
 - 1 issues in `violet-vault/src/components/transactions/import/FileUploader.tsx`
-- 1 issues in `violet-vault/src/components/transactions/TransactionForm.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/DataManagementSection.tsx`
@@ -84,18 +71,17 @@
 - 1 issues in `violet-vault/src/components/bills/BillTable.tsx`
 - 1 issues in `violet-vault/src/components/bills/BillManager.tsx`
 - 1 issues in `violet-vault/src/components/automation/tabs/RulesTab.tsx`
+- 1 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
 - 1 issues in `violet-vault/src/components/automation/AutoFundingDashboard.tsx`
-- 1 issues in `violet-vault/src/components/auth/components/ShareCodeDisplay.tsx`
-- 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 57 | `no-undef` |
 | 41 | `max-lines-per-function` |
 | 19 | `complexity` |
 | 12 | `max-statements` |
 | 6 | `@typescript-eslint/no-explicit-any` |
+| 4 | `no-undef` |
 | 3 | `null` |
 | 1 | `max-depth` |
 | 1 | `@typescript-eslint/no-unused-vars` |
@@ -104,18 +90,9 @@
 ```
 violet-vault/src/components/analytics/SmartCategoryManager.tsx:47:26 - 1 - 'useMemo' is not defined. (no-undef)
 violet-vault/src/components/analytics/SmartCategoryManager.tsx:53:25 - 1 - 'useMemo' is not defined. (no-undef)
-violet-vault/src/components/auth/UserSetup.tsx:22:45 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/auth/components/ShareCodeDisplay.tsx:10:31 - 1 - 'useState' is not defined. (no-undef)
 violet-vault/src/components/automation/AutoFundingDashboard.tsx:14:30 - 1 - Arrow function has too many lines (187). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/automation/AutoFundingView.tsx:12:25 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/automation/AutoFundingView.tsx:19:49 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/automation/AutoFundingView.tsx:20:41 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/automation/AutoFundingView.tsx:21:37 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/automation/AutoFundingView.tsx:22:59 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/automation/AutoFundingView.tsx:23:41 - 1 - 'useState' is not defined. (no-undef)
+violet-vault/src/components/automation/AutoFundingView.tsx:12:25 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/tabs/RulesTab.tsx:6:18 - 1 - Arrow function has too many lines (206). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/bills/AddBillModal.tsx:76:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/bills/AddBillModal.tsx:96:3 - 1 - 'useEffect' is not defined. (no-undef)
 violet-vault/src/components/bills/BillFormFields.tsx:13:1 - 1 - Unused eslint-disable directive (no problems were reported from 'complexity'). (null)
 violet-vault/src/components/bills/BillFormFields.tsx:37:4 - 1 - Arrow function has a complexity of 27. Maximum allowed is 15. (complexity)
 violet-vault/src/components/bills/BillManager.tsx:24:21 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
@@ -137,67 +114,23 @@ violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:55 - 1 - Arro
 violet-vault/src/components/history/ObjectHistoryViewer.tsx:14:29 - 1 - Arrow function has too many lines (199). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/layout/MainLayout.tsx:189:21 - 1 - Arrow function has too many lines (181). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/layout/MainLayout.tsx:189:21 - 1 - Arrow function has too many statements (27). Maximum allowed is 25. (max-statements)
-violet-vault/src/components/layout/NavigationTabs.tsx:9:24 - 1 - 'memo' is not defined. (no-undef)
-violet-vault/src/components/layout/NavigationTabs.tsx:11:18 - 1 - 'useRef' is not defined. (no-undef)
-violet-vault/src/components/layout/NavigationTabs.tsx:12:23 - 1 - 'useRef' is not defined. (no-undef)
-violet-vault/src/components/layout/NavigationTabs.tsx:13:24 - 1 - 'useRef' is not defined. (no-undef)
-violet-vault/src/components/layout/NavigationTabs.tsx:16:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/layout/NavigationTabs.tsx:153:19 - 1 - 'memo' is not defined. (no-undef)
-violet-vault/src/components/layout/SummaryCards.tsx:10:29 - 1 - 'lazy' is not defined. (no-undef)
-violet-vault/src/components/layout/SummaryCards.tsx:151:8 - 1 - 'Suspense' is not defined. (no-undef)
-violet-vault/src/components/layout/SummaryCards.tsx:153:9 - 1 - 'Suspense' is not defined. (no-undef)
-violet-vault/src/components/layout/SummaryCards.tsx:158:21 - 1 - 'memo' is not defined. (no-undef)
-violet-vault/src/components/layout/SummaryCards.tsx:230:16 - 1 - 'memo' is not defined. (no-undef)
 violet-vault/src/components/layout/ViewRenderer.tsx:30:22 - 1 - Arrow function has too many lines (230). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/layout/ViewRenderer.tsx:30:94 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
-violet-vault/src/components/mobile/BottomNavigationBar.tsx:11:18 - 1 - 'useRef' is not defined. (no-undef)
-violet-vault/src/components/mobile/BottomNavigationBar.tsx:12:23 - 1 - 'useRef' is not defined. (no-undef)
-violet-vault/src/components/mobile/BottomNavigationBar.tsx:13:24 - 1 - 'useRef' is not defined. (no-undef)
-violet-vault/src/components/mobile/BottomNavigationBar.tsx:16:3 - 1 - 'useEffect' is not defined. (no-undef)
 violet-vault/src/components/mobile/SlideUpModal.tsx:27:22 - 1 - Arrow function has too many lines (158). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/mobile/SlideUpModal.tsx:36:4 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
 violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has too many lines (243). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/modals/UnassignedCashModal.tsx:74:32 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
 violet-vault/src/components/onboarding/EmptyStateHints.tsx:10:25 - 1 - Arrow function has too many lines (202). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/onboarding/OnboardingProgress.tsx:10:28 - 1 - Arrow function has too many lines (240). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/onboarding/OnboardingTutorial.tsx:22:43 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/onboarding/OnboardingTutorial.tsx:23:41 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/onboarding/OnboardingTutorial.tsx:41:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/onboarding/OnboardingTutorial.tsx:61:3 - 1 - 'useEffect' is not defined. (no-undef)
 violet-vault/src/components/pages/MainDashboard.tsx:26:19 - 1 - Arrow function has too many lines (153). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/sections/AccountSettingsSection.tsx:14:47 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/settings/sections/AccountSettingsSection.tsx:15:45 - 1 - 'useState' is not defined. (no-undef)
 violet-vault/src/components/settings/sections/DataManagementSection.tsx:26:69 - 1 - Arrow function has too many lines (183). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 1 - Arrow function has too many lines (235). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx:11:37 - 1 - Arrow function has too many lines (221). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:17:37 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:18:35 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:19:35 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:20:37 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:21:43 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:22:27 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:33:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/sharing/JoinBudgetModal.tsx:45:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/sharing/ShareCodeModal.tsx:15:37 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/ShareCodeModal.tsx:16:43 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/ShareCodeModal.tsx:17:31 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/sharing/ShareCodeModal.tsx:27:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/transactions/TransactionForm.tsx:29:3 - 1 - 'useEffect' is not defined. (no-undef)
 violet-vault/src/components/transactions/TransactionFormFields.tsx:11:1 - 1 - Unused eslint-disable directive (no problems were reported from 'complexity'). (null)
 violet-vault/src/components/transactions/TransactionFormFields.tsx:32:4 - 1 - Arrow function has a complexity of 32. Maximum allowed is 15. (complexity)
 violet-vault/src/components/transactions/import/FileUploader.tsx:5:45 - 1 - 'useState' is not defined. (no-undef)
 violet-vault/src/components/ui/EditableBalance.tsx:4:25 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/ui/EditableBalance.tsx:16:4 - 1 - Arrow function has a complexity of 19. Maximum allowed is 15. (complexity)
-violet-vault/src/components/ui/Toast.tsx:4:37 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/ui/Toast.tsx:6:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/ui/VersionFooter.tsx:10:41 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/ui/VersionFooter.tsx:11:55 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/ui/VersionFooter.tsx:12:37 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/ui/VersionFooter.tsx:14:3 - 1 - 'useEffect' is not defined. (no-undef)
-violet-vault/src/components/ui/VirtualList.tsx:2:21 - 1 - 'memo' is not defined. (no-undef)
-violet-vault/src/components/ui/VirtualList.tsx:11:39 - 1 - 'useState' is not defined. (no-undef)
-violet-vault/src/components/ui/VirtualList.tsx:13:26 - 1 - 'useMemo' is not defined. (no-undef)
-violet-vault/src/components/ui/VirtualList.tsx:26:26 - 1 - 'useMemo' is not defined. (no-undef)
 violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:18:33 - 1 - Arrow function has too many lines (205). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsData.ts:9:33 - 1 - Arrow function has too many lines (241). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts:17:40 - 1 - Arrow function has too many lines (193). Maximum allowed is 150. (max-lines-per-function)
@@ -330,7 +263,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 11 errors in `src/hooks/bills/useBills/billQueries.ts`
 - 11 errors in `src/hooks/analytics/useAnalyticsData.ts`
 - 11 errors in `src/components/budgeting/envelope/EnvelopeBudgetFields.tsx`
-- 11 errors in `src/components/automation/AutoFundingView.tsx`
 - 10 errors in `src/utils/transactions/operations.ts`
 - 10 errors in `src/utils/testing/storeTestUtils.ts`
 - 10 errors in `src/utils/sync/validation/__tests__/manifestValidator.test.ts`
@@ -343,7 +275,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 10 errors in `src/hooks/common/useEditLock.ts`
 - 10 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 10 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
-- 10 errors in `src/components/sharing/JoinBudgetModal.tsx`
 - 10 errors in `src/components/receipts/__tests__/ReceiptScanner.test.tsx`
 - 9 errors in `src/utils/transactions/fileParser.ts`
 - 9 errors in `src/utils/query/queryClientConfig.ts`
@@ -384,7 +315,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 7 errors in `src/db/budgetDb.ts`
 - 7 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 7 errors in `src/components/savings/DistributeModal.tsx`
-- 7 errors in `src/components/onboarding/OnboardingTutorial.tsx`
 - 7 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
 - 7 errors in `src/components/auth/__tests__/UserSetup.test.tsx`
 - 6 errors in `src/utils/budgeting/paydayPredictor.ts`
@@ -407,8 +337,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 6 errors in `src/components/sync/ManualSyncControls.tsx`
 - 6 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
 - 6 errors in `src/components/onboarding/OnboardingProgress.tsx`
-- 6 errors in `src/components/layout/SummaryCards.tsx`
-- 6 errors in `src/components/layout/NavigationTabs.tsx`
 - 6 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 6 errors in `src/components/bills/BillManager.tsx`
 - 5 errors in `src/utils/sync/syncHealthChecker.ts`
@@ -427,7 +355,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 5 errors in `src/hooks/auth/mutations/useProfileMutations.ts`
 - 5 errors in `src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts`
 - 5 errors in `src/hooks/auth/__tests__/useAuthQueries.test.ts`
-- 5 errors in `src/components/ui/VersionFooter.tsx`
 - 5 errors in `src/components/ui/StandardFilters.tsx`
 - 5 errors in `src/components/security/LockScreen.tsx`
 - 5 errors in `src/components/pages/MainDashboard.tsx`
@@ -443,13 +370,10 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 4 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 4 errors in `src/hooks/auth/__tests__/useSecurityManagerUI.test.ts`
 - 4 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
-- 4 errors in `src/components/ui/VirtualList.tsx`
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/sync/ActivityBanner.tsx`
-- 4 errors in `src/components/sharing/ShareCodeModal.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
 - 4 errors in `src/components/mobile/ResponsiveModal.tsx`
-- 4 errors in `src/components/mobile/BottomNavigationBar.tsx`
 - 4 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 3 errors in `src/utils/sync/syncHealthHelpers.ts`
 - 3 errors in `src/utils/sync/retryUtils.ts`
@@ -489,9 +413,7 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 3 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 3 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 3 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
-- 3 errors in `src/components/bills/AddBillModal.tsx`
 - 3 errors in `src/components/auth/UserIndicator.tsx`
-- 3 errors in `src/components/analytics/AnalyticsSummaryCards.tsx`
 - 2 errors in `src/utils/transactions/index.ts`
 - 2 errors in `src/utils/sync/__tests__/SyncMutex.test.ts`
 - 2 errors in `src/utils/services/editLockHelpers.ts`
@@ -520,11 +442,8 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 2 errors in `src/hooks/analytics/usePerformanceMonitor.ts`
 - 2 errors in `src/domain/schemas/utility.ts`
 - 2 errors in `src/domain/schemas/audit-log.ts`
-- 2 errors in `src/components/ui/Toast.tsx`
 - 2 errors in `src/components/transactions/import/FileUploader.tsx`
-- 2 errors in `src/components/transactions/TransactionForm.tsx`
 - 2 errors in `src/components/sync/SyncHealthDashboard.tsx`
-- 2 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 2 errors in `src/components/savings/SavingsGoalCard.tsx`
 - 2 errors in `src/components/pwa/ShareTargetHandler.tsx`
 - 2 errors in `src/components/dev/DevAuthBypass.tsx`
@@ -536,7 +455,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 2 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 2 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 2 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
-- 2 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 1 errors in `src/utils/validation/transactionValidation.ts`
 - 1 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 1 errors in `src/utils/sync/validation/__tests__/checksumUtils.test.ts`
@@ -615,8 +533,6 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
 - 1 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
-- 1 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
-- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/auth/ProfileSettings.tsx`
 - 1 errors in `src/components/accounts/form/AccountModalHeader.tsx`
 - 1 errors in `src/components/accounts/form/AccountColorAndSettings.tsx`
@@ -625,18 +541,17 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 2157 | `TS2339` |
-| 168 | `TS2345` |
-| 129 | `TS2554` |
+| 2148 | `TS2339` |
+| 166 | `TS2345` |
+| 125 | `TS2554` |
 | 110 | `TS2551` |
 | 106 | `TS2708` |
-| 103 | `TS6133` |
-| 99 | `TS2322` |
-| 58 | `TS2304` |
+| 101 | `TS6133` |
+| 97 | `TS2322` |
 | 32 | `TS2362` |
 | 31 | `TS2363` |
-| 22 | `TS2307` |
 | 21 | `TS2353` |
+| 21 | `TS2307` |
 | 17 | `TS2739` |
 | 16 | `TS2365` |
 | 9 | `TS2741` |
@@ -646,6 +561,7 @@ violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayo
 | 6 | `TS2740` |
 | 6 | `TS2613` |
 | 5 | `TS2448` |
+| 5 | `TS2304` |
 | 4 | `TS2349` |
 | 3 | `TS4104` |
 | 3 | `TS2614` |
@@ -666,11 +582,6 @@ src/components/accounts/AccountCard.tsx(7,3): error TS6133: '_daysUntilExpiratio
 src/components/accounts/form/AccountColorAndSettings.tsx(29,9): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/accounts/form/AccountModalHeader.tsx(10,3): error TS6133: '_lock' is declared but its value is never read.
-src/components/accounts/SupplementalAccounts.tsx(34,5): error TS2339: Property '_releaseLock' does not exist on type '{ showAddModal: boolean; editingAccount: any; showBalances: boolean; showTransferModal: boolean; transferringAccount: any; accountForm: { name: string; type: string; currentBalance: string; ... 4 more ...; isActive: boolean; }; ... 21 more ...; getAccountTypeInfo: (type: any) => { ...; }; }'.
-src/components/accounts/SupplementalAccounts.tsx(34,5): error TS6133: '_releaseLock' is declared but its value is never read.
-src/components/analytics/AnalyticsSummaryCards.tsx(9,11): error TS2339: Property 'totalExpenses' does not exist on type '{}'.
-src/components/analytics/AnalyticsSummaryCards.tsx(9,30): error TS2339: Property 'envelopeUtilization' does not exist on type '{}'.
-src/components/analytics/AnalyticsSummaryCards.tsx(9,55): error TS2339: Property 'savingsProgress' does not exist on type '{}'.
 src/components/analytics/CategoryAdvancedTab.tsx(45,17): error TS2322: Type 'unknown' is not assignable to type 'Key'.
 src/components/analytics/CategoryAdvancedTab.tsx(48,71): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
 src/components/analytics/SmartCategoryManager.tsx(15,3): error TS6133: '_currentCategories' is declared but its value is never read.
@@ -684,12 +595,10 @@ src/components/auth/__tests__/UserSetup.test.tsx(121,18): error TS2339: Property
 src/components/auth/__tests__/UserSetup.test.tsx(134,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
 src/components/auth/__tests__/UserSetup.test.tsx(148,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
 src/components/auth/__tests__/UserSetup.test.tsx(174,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
-src/components/auth/components/ShareCodeDisplay.tsx(10,31): error TS2304: Cannot find name 'useState'.
 src/components/auth/ProfileSettings.tsx(65,19): error TS2554: Expected 3 arguments, but got 2.
 src/components/auth/UserIndicator.tsx(7,31): error TS2339: Property 'currentUser' does not exist on type '{}'.
 src/components/auth/UserIndicator.tsx(7,44): error TS2339: Property 'onUserChange' does not exist on type '{}'.
 src/components/auth/UserIndicator.tsx(7,58): error TS2339: Property 'onUpdateProfile' does not exist on type '{}'.
-src/components/auth/UserSetup.tsx(22,45): error TS2304: Cannot find name 'useState'.
 src/components/automation/AutoFundingDashboard.tsx(99,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/components/automation/AutoFundingDashboard.tsx(100,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
@@ -699,27 +608,10 @@ src/components/automation/AutoFundingRuleBuilder.tsx(98,15): error TS2322: Type 
 src/components/automation/AutoFundingRuleBuilder.tsx(105,12): error TS2741: Property 'onStepChange' is missing in type '{ currentStep: any; }' but required in type '{ currentStep: any; onStepChange: any; }'.
 src/components/automation/AutoFundingRuleBuilder.tsx(166,46): error TS2339: Property 'name' does not exist on type '{}'.
 src/components/automation/AutoFundingRuleBuilder.tsx(169,46): error TS2339: Property 'type' does not exist on type '{}'.
-src/components/automation/AutoFundingView.tsx(19,49): error TS2304: Cannot find name 'useState'.
-src/components/automation/AutoFundingView.tsx(20,41): error TS2304: Cannot find name 'useState'.
-src/components/automation/AutoFundingView.tsx(21,37): error TS2304: Cannot find name 'useState'.
-src/components/automation/AutoFundingView.tsx(22,59): error TS2304: Cannot find name 'useState'.
-src/components/automation/AutoFundingView.tsx(23,41): error TS2304: Cannot find name 'useState'.
-src/components/automation/AutoFundingView.tsx(47,19): error TS2554: Expected 3 arguments, but got 2.
-src/components/automation/AutoFundingView.tsx(101,41): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: any; unassignedCash: any; transactions: any; }; }' is not assignable to parameter of type 'string'.
-src/components/automation/AutoFundingView.tsx(108,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
-  Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingView.tsx(109,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
-  Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingView.tsx(112,23): error TS2554: Expected 3 arguments, but got 2.
-src/components/automation/AutoFundingView.tsx(117,23): error TS2554: Expected 3 arguments, but got 2.
 src/components/automation/steps/config/SplitRemainderConfig.tsx(28,23): error TS2322: Type '{ checked: any; onCheckedChange: () => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/automation/steps/RuleConfigurationStep.tsx(37,11): error TS2322: Type '{ ruleData: any; updateConfig: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }' is not assignable to type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
   Property 'updateConfig' does not exist on type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
-src/components/bills/AddBillModal.tsx(76,3): error TS2304: Cannot find name 'useEffect'.
-src/components/bills/AddBillModal.tsx(96,3): error TS2304: Cannot find name 'useEffect'.
-src/components/bills/AddBillModal.tsx(168,9): error TS2322: Type '{ formData: BillFormData; updateField: (field: keyof BillFormData, value: string | boolean) => void; canEdit: boolean; editingBill: any; handleSubmit: (e: FormEvent<...>) => Promise<...>; ... 8 more ...; onDeleteClick: () => Promise<...>; }' is not assignable to type 'IntrinsicAttributes & { formData: any; updateField: any; canEdit: any; editingBill: any; handleSubmit: any; isSubmitting: any; onClose: any; suggestedIconName: any; ... 4 more ...; getNextDueDate: any; }'.
-  Property 'onDeleteClick' does not exist on type 'IntrinsicAttributes & { formData: any; updateField: any; canEdit: any; editingBill: any; handleSubmit: any; isSubmitting: any; onClose: any; suggestedIconName: any; ... 4 more ...; getNextDueDate: any; }'.
 src/components/bills/BillManager.tsx(78,5): error TS2353: Object literal may only specify known properties, and 'onUpdateBill' does not exist in type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
 src/components/bills/BillManager.tsx(111,35): error TS2339: Property 'currentEditor' does not exist on type '{ lock: any; isLocked: boolean; isOwnLock: boolean; isLoading: boolean; canEdit: boolean; lockedBy: any; expiresAt: any; acquireLock: () => Promise<{ success: boolean; reason: string; lockedBy: any; expiresAt: any; } | { ...; } | { ...; } | { ...; } | { ...; }>; releaseLock: () => Promise<...>; breakLock: () => Prom...'.
 src/components/bills/BillManager.tsx(174,11): error TS2322: Type '{ isOpen: true; onClose: () => void; editingBill: any; availableEnvelopes: any; onAddBill: UseMutateFunction<any, Error, void, { previousBills: unknown; }>; onUpdateBill: UseMutateFunction<...>; onDeleteBill: UseMutateFunction<...>; onError: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; onAddBill: any; onUpdateBill: any; onDeleteBill: any; onError: any; editingBill?: any; _forceMobileMode?: boolean; }'.
@@ -875,24 +767,12 @@ src/components/layout/MainLayout.tsx(207,3): error TS6133: '_openBugReport' is d
 src/components/layout/MainLayout.tsx(215,59): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
 src/components/layout/MainLayout.tsx(227,9): error TS6133: '_activeView' is declared but its value is never read.
 src/components/layout/MainLayout.tsx(282,5): error TS2554: Expected 1 arguments, but got 4.
-src/components/layout/MainLayout.tsx(306,25): error TS2322: Type '{ children: Element; setActiveView: (view: any) => void; }' is not assignable to type 'IntrinsicAttributes & { children: any; }'.
-  Property 'setActiveView' does not exist on type 'IntrinsicAttributes & { children: any; }'.
+src/components/layout/MainLayout.tsx(306,25): error TS2322: Type '{ children: Element; setActiveView: (view: any) => void; }' is not assignable to type 'IntrinsicAttributes & { children: ReactNode; }'.
+  Property 'setActiveView' does not exist on type 'IntrinsicAttributes & { children: ReactNode; }'.
 src/components/layout/MainLayout.tsx(311,15): error TS2322: Type '{ currentUser: any; onUserChange: any; onUpdateProfile: any; isLocalOnlyMode: boolean; onShowSettings: () => void; onShowDataSettings: () => void; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'currentUser' does not exist on type 'IntrinsicAttributes & object'.
 src/components/layout/MainLayout.tsx(396,13): error TS2322: Type '{ isOpen: true; onClose: () => void; initialSection: string; onExport: any; onImport: (event: any) => Promise<void>; onLogout: any; onResetEncryption: () => void; onSync: () => Promise<void>; ... 5 more ...; securityManager: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; onExport: any; onImport: any; onLogout: any; onResetEncryption: any; onSync: any; onChangePassword: any; currentUser: any; isLocalOnlyMode?: boolean; securityManager: any; initialSection?: string; }'.
   Property 'onUserChange' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; onExport: any; onImport: any; onLogout: any; onResetEncryption: any; onSync: any; onChangePassword: any; currentUser: any; isLocalOnlyMode?: boolean; securityManager: any; initialSection?: string; }'.
-src/components/layout/NavigationTabs.tsx(9,24): error TS2304: Cannot find name 'memo'.
-src/components/layout/NavigationTabs.tsx(11,18): error TS2304: Cannot find name 'useRef'.
-src/components/layout/NavigationTabs.tsx(12,23): error TS2304: Cannot find name 'useRef'.
-src/components/layout/NavigationTabs.tsx(13,24): error TS2304: Cannot find name 'useRef'.
-src/components/layout/NavigationTabs.tsx(16,3): error TS2304: Cannot find name 'useEffect'.
-src/components/layout/NavigationTabs.tsx(153,19): error TS2304: Cannot find name 'memo'.
-src/components/layout/SummaryCards.tsx(10,29): error TS2304: Cannot find name 'lazy'.
-src/components/layout/SummaryCards.tsx(88,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/components/layout/SummaryCards.tsx(151,8): error TS2304: Cannot find name 'Suspense'.
-src/components/layout/SummaryCards.tsx(153,9): error TS2304: Cannot find name 'Suspense'.
-src/components/layout/SummaryCards.tsx(158,21): error TS2304: Cannot find name 'memo'.
-src/components/layout/SummaryCards.tsx(230,16): error TS2304: Cannot find name 'memo'.
 src/components/layout/ViewRenderer.tsx(50,5): error TS6133: '_envelopes' is declared but its value is never read.
 src/components/layout/ViewRenderer.tsx(51,5): error TS6133: '_bills' is declared but its value is never read.
 src/components/layout/ViewRenderer.tsx(54,5): error TS6133: '_transactions' is declared but its value is never read.
@@ -909,10 +789,6 @@ src/components/layout/ViewRenderer.tsx(223,25): error TS2554: Expected 3 argumen
 src/components/layout/ViewRenderer.tsx(229,25): error TS2554: Expected 3 arguments, but got 2.
 src/components/layout/ViewRenderer.tsx(282,43): error TS2322: Type '{ message: string; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'message' does not exist on type 'IntrinsicAttributes & object'.
-src/components/mobile/BottomNavigationBar.tsx(11,18): error TS2304: Cannot find name 'useRef'.
-src/components/mobile/BottomNavigationBar.tsx(12,23): error TS2304: Cannot find name 'useRef'.
-src/components/mobile/BottomNavigationBar.tsx(13,24): error TS2304: Cannot find name 'useRef'.
-src/components/mobile/BottomNavigationBar.tsx(16,3): error TS2304: Cannot find name 'useEffect'.
 src/components/mobile/BottomNavItem.tsx(10,20): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
 src/components/mobile/ResponsiveModal.tsx(81,27): error TS2339: Property 'isOpen' does not exist on type '{}'.
 src/components/mobile/ResponsiveModal.tsx(84,25): error TS2339: Property 'isOpen' does not exist on type '{}'.
@@ -946,13 +822,6 @@ src/components/onboarding/OnboardingProgress.tsx(16,28): error TS2339: Property 
 src/components/onboarding/OnboardingProgress.tsx(17,28): error TS2339: Property 'preferences' does not exist on type 'unknown'.
 src/components/onboarding/OnboardingProgress.tsx(18,30): error TS2339: Property 'setPreference' does not exist on type 'unknown'.
 src/components/onboarding/OnboardingProgress.tsx(182,32): error TS2339: Property 'map' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(16,26): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(17,26): error TS2339: Property 'getProgress' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(18,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(22,43): error TS2304: Cannot find name 'useState'.
-src/components/onboarding/OnboardingTutorial.tsx(23,41): error TS2304: Cannot find name 'useState'.
-src/components/onboarding/OnboardingTutorial.tsx(41,3): error TS2304: Cannot find name 'useEffect'.
-src/components/onboarding/OnboardingTutorial.tsx(61,3): error TS2304: Cannot find name 'useEffect'.
 src/components/pages/MainDashboard.tsx(30,11): error TS2339: Property 'data' does not exist on type '{ savingsGoals: any[]; summary: { totalGoals: any; completedGoals: any; activeGoals: number; totalTargetAmount: any; totalCurrentAmount: any; totalRemainingAmount: number; overallProgressRate: number; urgentGoals: any; overdueGoals: any; totalMonthlyNeeded: number; }; ... 8 more ...; mutations: { ...; }; }'.
 src/components/pages/MainDashboard.tsx(32,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
 src/components/pages/MainDashboard.tsx(59,5): error TS2339: Property '_safeUnassignedCash' does not exist on type '{ totalEnvelopeBalance: any; totalSavingsBalance: any; safeUnassignedCash: number; totalVirtualBalance: any; difference: number; isBalanced: boolean; }'.
@@ -1017,26 +886,10 @@ src/components/settings/archiving/ArchivingPreviewResults.tsx(68,45): error TS23
 src/components/settings/archiving/ArchivingPreviewResults.tsx(68,55): error TS2339: Property 'count' does not exist on type 'unknown'.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(80,33): error TS2339: Property 'count' does not exist on type 'unknown'.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(84,43): error TS2339: Property 'amount' does not exist on type 'unknown'.
-src/components/settings/sections/AccountSettingsSection.tsx(14,47): error TS2304: Cannot find name 'useState'.
-src/components/settings/sections/AccountSettingsSection.tsx(15,45): error TS2304: Cannot find name 'useState'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(86,47): error TS2339: Property 'detectLocalDataDebug' does not exist on type 'Window & typeof globalThis'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(109,47): error TS2339: Property 'hasLocalDataDebug' does not exist on type 'Window & typeof globalThis'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(140,49): error TS2551: Property 'safeCloudDataReset' does not exist on type 'Window & typeof globalThis'. Did you mean 'forceCloudDataReset'?
 src/components/settings/TransactionArchiving.tsx(3,37): error TS2307: Cannot find module '../../hooks/transactions/useTransactionArchiving' or its corresponding type declarations.
-src/components/sharing/JoinBudgetModal.tsx(17,37): error TS2304: Cannot find name 'useState'.
-src/components/sharing/JoinBudgetModal.tsx(18,35): error TS2304: Cannot find name 'useState'.
-src/components/sharing/JoinBudgetModal.tsx(19,35): error TS2304: Cannot find name 'useState'.
-src/components/sharing/JoinBudgetModal.tsx(20,37): error TS2304: Cannot find name 'useState'.
-src/components/sharing/JoinBudgetModal.tsx(21,43): error TS2304: Cannot find name 'useState'.
-src/components/sharing/JoinBudgetModal.tsx(22,27): error TS2304: Cannot find name 'useState'.
-src/components/sharing/JoinBudgetModal.tsx(33,3): error TS2304: Cannot find name 'useEffect'.
-src/components/sharing/JoinBudgetModal.tsx(45,3): error TS2304: Cannot find name 'useEffect'.
-src/components/sharing/JoinBudgetModal.tsx(65,33): error TS2554: Expected 1 arguments, but got 6.
-src/components/sharing/JoinBudgetModal.tsx(68,9): error TS6133: '_handleProcessQRData' is declared but its value is never read.
-src/components/sharing/ShareCodeModal.tsx(15,37): error TS2304: Cannot find name 'useState'.
-src/components/sharing/ShareCodeModal.tsx(16,43): error TS2304: Cannot find name 'useState'.
-src/components/sharing/ShareCodeModal.tsx(17,31): error TS2304: Cannot find name 'useState'.
-src/components/sharing/ShareCodeModal.tsx(27,3): error TS2304: Cannot find name 'useEffect'.
 src/components/sync/ActivityBanner.tsx(41,39): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/sync/ActivityBanner.tsx(41,71): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/sync/ActivityBanner.tsx(128,39): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
@@ -1057,9 +910,6 @@ src/components/transactions/components/DeleteConfirmation.tsx(20,11): error TS23
 src/components/transactions/import/FileUploader.tsx(5,45): error TS2304: Cannot find name 'useState'.
 src/components/transactions/import/FileUploader.tsx(38,15): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
-src/components/transactions/TransactionForm.tsx(29,3): error TS2304: Cannot find name 'useEffect'.
-src/components/transactions/TransactionForm.tsx(89,15): error TS2322: Type '{ isLocked: boolean; isOwnLock: boolean; isLoading: boolean; lock: { userName: any; expiresAt: Date; isExpired: boolean; }; onBreakLock: () => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; } | { ...; }>; showDetails: true; }' is not assignable to type 'IntrinsicAttributes & { isLocked: any; isOwnLock: any; lock: any; onBreakLock: any; className?: string; showDetails?: boolean; }'.
-  Property 'isLoading' does not exist on type 'IntrinsicAttributes & { isLocked: any; isOwnLock: any; lock: any; onBreakLock: any; className?: string; showDetails?: boolean; }'.
 src/components/transactions/TransactionFormFields.tsx(247,11): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/transactions/TransactionLedger.tsx(4,32): error TS2614: Module '"../ui/StandardFilters"' has no exported member 'FilterConfig'. Did you mean to use 'import FilterConfig from "../ui/StandardFilters"' instead?
@@ -1093,17 +943,6 @@ src/components/ui/StandardFilters.tsx(64,17): error TS2339: Property 'search' do
 src/components/ui/StandardFilters.tsx(64,35): error TS2339: Property 'search' does not exist on type '{}'.
 src/components/ui/StandardFilters.tsx(107,28): error TS2339: Property 'search' does not exist on type '{}'.
 src/components/ui/StandardFilters.tsx(116,20): error TS2339: Property 'search' does not exist on type '{}'.
-src/components/ui/Toast.tsx(4,37): error TS2304: Cannot find name 'useState'.
-src/components/ui/Toast.tsx(6,3): error TS2304: Cannot find name 'useEffect'.
-src/components/ui/VersionFooter.tsx(1,69): error TS2307: Cannot find module '../../utils/version' or its corresponding type declarations.
-src/components/ui/VersionFooter.tsx(10,41): error TS2304: Cannot find name 'useState'.
-src/components/ui/VersionFooter.tsx(11,55): error TS2304: Cannot find name 'useState'.
-src/components/ui/VersionFooter.tsx(12,37): error TS2304: Cannot find name 'useState'.
-src/components/ui/VersionFooter.tsx(14,3): error TS2304: Cannot find name 'useEffect'.
-src/components/ui/VirtualList.tsx(2,21): error TS2304: Cannot find name 'memo'.
-src/components/ui/VirtualList.tsx(11,39): error TS2304: Cannot find name 'useState'.
-src/components/ui/VirtualList.tsx(13,26): error TS2304: Cannot find name 'useMemo'.
-src/components/ui/VirtualList.tsx(26,26): error TS2304: Cannot find name 'useMemo'.
 src/contexts/__tests__/AuthContext.test.tsx(3,32): error TS6133: 'beforeEach' is declared but its value is never read.
 src/contexts/__tests__/AuthContext.test.tsx(21,86): error TS2345: Argument of type '{ userName: string; }' is not assignable to parameter of type 'UserData'.
   Property 'userColor' is missing in type '{ userName: string; }' but required in type 'UserData'.

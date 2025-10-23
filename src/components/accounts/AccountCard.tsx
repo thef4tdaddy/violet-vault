@@ -4,7 +4,6 @@ import AccountCardDetails from "./shared/AccountCardDetails";
 const AccountCard = ({
   account,
   typeInfo,
-  _daysUntilExpiration,
   expirationStatus,
   showBalances,
   onEdit,

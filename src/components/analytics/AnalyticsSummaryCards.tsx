@@ -1,11 +1,17 @@
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 import PageSummaryCard from "../ui/PageSummaryCard";
+
+interface SummaryMetrics {
+  totalExpenses?: number;
+  envelopeUtilization?: number;
+  savingsProgress?: number;
+}
 
 /**
  * Analytics summary cards using standardized PageSummaryCard component
  * Displays key analytics metrics with consistent styling
  */
-const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
+const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: SummaryMetrics }) => {
   const { totalExpenses = 0, envelopeUtilization = 0, savingsProgress = 0 } = summaryMetrics;
 
   // Calculate average transaction size if we have expense data

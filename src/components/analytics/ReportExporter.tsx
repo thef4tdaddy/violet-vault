@@ -73,10 +73,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                 onFormatChange={setExportFormat}
                 disabled={isExporting}
               />
-              <ExportTemplates
-                onTemplateSelect={handleTemplateSelect}
-                disabled={isExporting}
-              />
+              <ExportTemplates onTemplateSelect={handleTemplateSelect} disabled={isExporting} />
             </div>
 
             {/* Export Options */}
@@ -98,10 +95,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
             {exportFormat.toUpperCase()} export selected
           </div>
 
-          <ExportProgressIndicator
-            isExporting={isExporting}
-            progress={exportProgress}
-          />
+          <ExportProgressIndicator isExporting={isExporting} progress={exportProgress} />
 
           <div className="flex gap-3">
             <Button

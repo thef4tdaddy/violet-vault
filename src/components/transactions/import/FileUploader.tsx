@@ -1,7 +1,15 @@
-import { renderIcon } from "../../../utils/icons";
+import { useState } from "react";
+import { renderIcon } from "@/utils/icons";
 import { Checkbox } from "@/components/ui";
 
-const FileUploader = ({ onFileUpload }) => {
+interface FileUploaderProps {
+  onFileUpload: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    options: { clearExisting: boolean }
+  ) => void;
+}
+
+const FileUploader = ({ onFileUpload }: FileUploaderProps) => {
   const [clearExisting, setClearExisting] = useState(false);
   return (
     <div className="space-y-6">

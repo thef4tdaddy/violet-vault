@@ -1,9 +1,14 @@
-import { useTouchFeedback } from "../../utils/ui/touchFeedback";
+import React from "react";
+import { useTouchFeedback } from "@/utils/ui/touchFeedback";
+
+interface TouchButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: React.ReactNode;
+  hapticType?: string;
+  touchType?: string;
+}
 
 /**
  * Enhanced button component wrapper with touch feedback
- * @param {Object} props - Props including onClick, children, hapticType, touchType, className
- * @returns {JSX.Element} Enhanced button with touch feedback
  */
 export const TouchButton = ({
   children,
@@ -13,7 +18,7 @@ export const TouchButton = ({
   className = "",
   disabled = false,
   ...props
-}) => {
+}: TouchButtonProps) => {
   const {
     onTouchStart,
     onClick: enhancedOnClick,
@@ -34,5 +39,3 @@ export const TouchButton = ({
     </button>
   );
 };
-
-export default TouchButton;

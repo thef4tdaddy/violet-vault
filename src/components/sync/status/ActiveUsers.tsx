@@ -1,5 +1,5 @@
-import React from 'react';
-import { renderIcon } from '../../../utils/icons';
+import React from "react";
+import { renderIcon } from "../../../utils/icons";
 
 interface User {
   id: string;
@@ -49,9 +49,7 @@ export const ActiveUsers: React.FC<ActiveUsersProps> = ({ otherActiveUsers }) =>
         {/* More users indicator */}
         {otherActiveUsers.length > 3 && (
           <div className="h-8 w-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
-            <span className="text-xs font-bold text-gray-600">
-              +{otherActiveUsers.length - 3}
-            </span>
+            <span className="text-xs font-bold text-gray-600">+{otherActiveUsers.length - 3}</span>
           </div>
         )}
       </div>

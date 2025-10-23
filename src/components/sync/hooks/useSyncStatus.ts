@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { useSyncHealthMonitor } from '@/hooks/sync/useSyncHealthMonitor';
+import { useMemo } from "react";
+import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
 
 interface User {
   id: string;
@@ -8,7 +8,15 @@ interface User {
 }
 
 interface SyncStatus {
-  status: 'syncing' | 'error' | 'offline' | 'synced' | 'blocked' | 'slow' | 'degraded' | 'unhealthy';
+  status:
+    | "syncing"
+    | "error"
+    | "offline"
+    | "synced"
+    | "blocked"
+    | "slow"
+    | "degraded"
+    | "unhealthy";
   color: string;
   message: string;
 }

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 /**
  * Hook for calculating financial performance metrics and monitoring

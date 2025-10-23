@@ -53,8 +53,6 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({
     syncStage,
   });
 
-
-
   /**
    * Render the appropriate status component based on current status
    */
@@ -128,8 +126,6 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({
           </div>
         )}
       </div>
-
-
 
       {/* GitHub Issue #576: Sync Health Dashboard Modal */}
       <SyncHealthDashboard

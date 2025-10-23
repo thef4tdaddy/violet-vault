@@ -1,5 +1,4 @@
-
-import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
+import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import SlideUpModal from "../mobile/SlideUpModal";
 import AccountModalHeader from "./form/AccountModalHeader";

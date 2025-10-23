@@ -84,9 +84,7 @@ describe("useAuthCompatibility", () => {
     it("should provide encryption key and salt state", () => {
       const { result } = renderHook(() => useAuthCompatibility());
 
-      expect(result.current.encryptionKey).toEqual(
-        new Uint8Array([1, 2, 3, 4])
-      );
+      expect(result.current.encryptionKey).toEqual(new Uint8Array([1, 2, 3, 4]));
       expect(result.current.salt).toEqual(new Uint8Array([5, 6, 7, 8]));
     });
   });
@@ -183,10 +181,7 @@ describe("useAuthCompatibility", () => {
 
       expect(typeof result.current.changePassword).toBe("function");
 
-      const changeResult = await result.current.changePassword(
-        "oldpass",
-        "newpass"
-      );
+      const changeResult = await result.current.changePassword("oldpass", "newpass");
       expect(changeResult).toBeDefined();
     });
 
@@ -201,9 +196,7 @@ describe("useAuthCompatibility", () => {
 
     it("should pass password change parameters to authManager", async () => {
       const { useAuthManager } = require("../useAuthManager");
-      const mockChangePassword = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      const mockChangePassword = vi.fn().mockResolvedValue({ success: true });
 
       useAuthManager.mockReturnValue({
         isUnlocked: false,
@@ -248,9 +241,7 @@ describe("useAuthCompatibility", () => {
 
     it("should pass profile update to authManager", async () => {
       const { useAuthManager } = require("../useAuthManager");
-      const mockUpdateProfile = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      const mockUpdateProfile = vi.fn().mockResolvedValue({ success: true });
 
       useAuthManager.mockReturnValue({
         isUnlocked: false,
@@ -321,9 +312,7 @@ describe("useAuthCompatibility", () => {
     });
 
     it("should log warning for setEncryption usage", () => {
-      const logger = require("../../utils/common/logger").default;
-
-      renderHook(() => useAuthCompatibility());
+      const { result } = renderHook(() => useAuthCompatibility());
 
       result.current.setEncryption({
         key: new Uint8Array([1, 2, 3, 4]),
@@ -336,22 +325,16 @@ describe("useAuthCompatibility", () => {
     it("should provide startBackgroundSyncAfterLogin method", async () => {
       const { result } = renderHook(() => useAuthCompatibility());
 
-      expect(typeof result.current.startBackgroundSyncAfterLogin).toBe(
-        "function"
-      );
+      expect(typeof result.current.startBackgroundSyncAfterLogin).toBe("function");
 
-      const syncResult = await result.current.startBackgroundSyncAfterLogin(
-        true
-      );
+      const syncResult = await result.current.startBackgroundSyncAfterLogin(true);
       expect(syncResult).toBeDefined();
     });
 
     it("should return resolved promise for startBackgroundSyncAfterLogin", async () => {
       const { result } = renderHook(() => useAuthCompatibility());
 
-      const syncResult = await result.current.startBackgroundSyncAfterLogin(
-        true
-      );
+      const syncResult = await result.current.startBackgroundSyncAfterLogin(true);
 
       // Should resolve successfully
       expect(syncResult).toBeDefined();
@@ -360,9 +343,7 @@ describe("useAuthCompatibility", () => {
 
   describe("Default Export", () => {
     it("should provide useAuth as alias for useAuthCompatibility", () => {
-      const { result: compatResult } = renderHook(() =>
-        useAuthCompatibility()
-      );
+      const { result: compatResult } = renderHook(() => useAuthCompatibility());
       const { result: aliasResult } = renderHook(() => useAuth());
 
       expect(aliasResult.current).toEqual(compatResult.current);
@@ -435,21 +416,12 @@ describe("useAuthCompatibility", () => {
       expect(() => result.current.logout()).not.toThrow();
       expect(() => result.current.updateUser({})).not.toThrow();
       expect(() => result.current.setLastActivity(Date.now())).not.toThrow();
-      expect(() => result.current.setEncryption({ key: null, salt: null }))
-        .not.toThrow();
+      expect(() => result.current.setEncryption({ key: null, salt: null })).not.toThrow();
 
-      await expect(
-        result.current.login("password")
-      ).resolves.toBeDefined();
-      await expect(
-        result.current.changePassword("old", "new")
-      ).resolves.toBeDefined();
-      await expect(
-        result.current.updateProfile({})
-      ).resolves.toBeDefined();
-      await expect(
-        result.current.validatePassword("password")
-      ).resolves.toBeDefined();
+      await expect(result.current.login("password")).resolves.toBeDefined();
+      await expect(result.current.changePassword("old", "new")).resolves.toBeDefined();
+      await expect(result.current.updateProfile({})).resolves.toBeDefined();
+      await expect(result.current.validatePassword("password")).resolves.toBeDefined();
     });
   });
 });

@@ -1,4 +1,4 @@
-import useSupplementalAccounts from "../../hooks/accounts/useSupplementalAccounts";
+import useSupplementalAccounts from "@/hooks/accounts/useSupplementalAccounts";
 import AccountsHeader from "./AccountsHeader";
 import ExpirationAlert from "./ExpirationAlert";
 import AccountsGrid from "./AccountsGrid";
@@ -31,7 +31,6 @@ const SupplementalAccounts = ({
     isOwnLock,
     canEdit,
     lock,
-    _releaseLock,
     breakLock,
     lockLoading,
     // Actions

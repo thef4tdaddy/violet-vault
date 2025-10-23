@@ -1,19 +1,18 @@
 // components/Dashboard.jsx
-import React from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import AccountBalanceOverview from "../dashboard/AccountBalanceOverview";
 import RecentTransactionsWidget from "../dashboard/RecentTransactionsWidget";
 import ReconcileTransactionModal from "../dashboard/ReconcileTransactionModal";
-import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
-import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
-import { useTransactions } from "../../hooks/common/useTransactions";
-import useBudgetData from "../../hooks/budgeting/useBudgetData";
+import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
+import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
+import { useTransactions } from "@/hooks/common/useTransactions";
+import useBudgetData from "@/hooks/budgeting/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 import PullToRefreshIndicator from "../mobile/PullToRefreshIndicator";
-import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
+import usePullToRefresh from "@/hooks/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useMainDashboardUI,
@@ -21,9 +20,13 @@ import {
   useTransactionReconciliation,
   usePaydayManager,
   useDashboardHelpers,
-} from "../../hooks/dashboard/useMainDashboard";
+} from "@/hooks/dashboard/useMainDashboard";
 
-const Dashboard = ({ setActiveView }) => {
+interface DashboardProps {
+  setActiveView: (view: string) => void;
+}
+
+const Dashboard = ({ setActiveView }: DashboardProps) => {
   // Enhanced TanStack Query integration with optimistic updates
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
@@ -53,14 +56,8 @@ const Dashboard = ({ setActiveView }) => {
   } = useMainDashboardUI();
 
   // Dashboard calculations
-  const {
-    totalEnvelopeBalance,
-    totalSavingsBalance,
-    _safeUnassignedCash,
-    totalVirtualBalance,
-    difference,
-    isBalanced,
-  } = useDashboardCalculations(envelopes, savingsGoals, unassignedCash, actualBalance);
+  const { totalEnvelopeBalance, totalSavingsBalance, totalVirtualBalance, difference, isBalanced } =
+    useDashboardCalculations(envelopes, savingsGoals, unassignedCash, actualBalance);
 
   // Transaction reconciliation logic
   const { handleReconcileTransaction, handleAutoReconcileDifference, getEnvelopeOptions } =
@@ -111,7 +108,7 @@ const Dashboard = ({ setActiveView }) => {
   };
 
   const onReconcileTransaction = () => {
-    const _success = handleReconcileTransaction(newTransaction, () => {
+    handleReconcileTransaction(newTransaction, () => {
       resetNewTransaction();
       closeReconcileModal();
     });
