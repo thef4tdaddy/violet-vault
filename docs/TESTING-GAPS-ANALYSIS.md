@@ -7,6 +7,7 @@
 ## Executive Summary
 
 The Violet Vault codebase has **good testing coverage in hooks (70%) and utilities (62%)**, but critical gaps exist in:
+
 - **Components**: 11% coverage (25+ untested component modules)
 - **State Management**: 0% coverage (all Zustand stores and React contexts)
 - **Services**: 50% coverage (3/8 directories untested)
@@ -21,6 +22,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
 ### ✅ Well-Tested Areas (70%+ Coverage)
 
 #### Hooks (33 test files - 70% of directories)
+
 - **Fully Tested Directories**:
   - transactions (9 test files)
   - analytics (5 test files)
@@ -36,6 +38,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
   - useSyncHealthIndicator, useSyncIntegration
 
 #### Utilities (33 test files - 62% of directories)
+
 - **Fully Tested**:
   - analytics (3 test files)
   - transactions (4 test files)
@@ -47,6 +50,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
 ### ⚠️ Partially Tested Areas (30-50% Coverage)
 
 #### Services (50% of directories - 9 test files)
+
 - **Tested**:
   - budgetDatabaseService (test file exists)
   - firebaseAuthService (test file exists)
@@ -62,6 +66,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
 ### 🔴 Critical Gaps (0-11% Coverage)
 
 #### Components (11% of directories - 3 test files)
+
 **Only 3 out of 28 component directories have tests:**
 
 - ✅ **Tested**:
@@ -100,6 +105,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
      - receipts (most components)
 
 #### State Management (0% coverage)
+
 - **Zustand Stores** (NOT TESTED):
   - authStore (auth state, session management)
   - uiStore (global UI state)
@@ -114,6 +120,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
   - Related context utilities and providers
 
 #### Hooks (6 directories with 0 tests):
+
 - accounts
 - mobile
 - notifications
@@ -122,6 +129,7 @@ The Violet Vault codebase has **good testing coverage in hooks (70%) and utiliti
 - ui
 
 #### Services (3 directories with 0 tests):
+
 - storageService
 - transactionService
 - exampleDataService
@@ -149,6 +157,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 ### 1. Component Testing Gaps (Most Critical)
 
 #### Pages & Layouts (4 directories)
+
 - [ ] DashboardPage
 - [ ] BudgetPage
 - [ ] AccountsPage
@@ -163,6 +172,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 **Impact**: Pages are entry points for user workflows. Missing tests here means untested user flows.
 
 #### Feature Components (8 directories, 50+ components)
+
 - [ ] Bills module (6+ components)
   - AddBillModal
   - BillDiscoveryModal
@@ -212,6 +222,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
   - NotificationItem
 
 #### UI Components (20+ components)
+
 - [ ] Form inputs (Text, Checkbox, Select, Radio, etc.)
 - [ ] Buttons (Button, IconButton, etc.)
 - [ ] Cards and Containers
@@ -220,6 +231,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 - [ ] Navigation components
 
 #### Modal Components (8+ modals)
+
 - [ ] AddBillModal
 - [ ] CorruptionRecoveryModal
 - [ ] UnassignedCashModal
@@ -229,6 +241,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 - [ ] etc.
 
 #### Other Components (15+ components)
+
 - [ ] PWA components (InstallPromptModal, OfflineStatusIndicator)
 - [ ] Sync status components
 - [ ] Onboarding components
@@ -238,6 +251,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 ### 2. State Management Testing Gaps (Critical)
 
 #### Zustand Stores (6 stores)
+
 - [ ] authStore
   - setAuthState
   - setSession
@@ -267,6 +281,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
   - Settings storage
 
 #### React Contexts (3+ contexts)
+
 - [ ] AuthContext
   - Provider implementation
   - Context value updates
@@ -279,6 +294,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 ### 3. Service Layer Gaps
 
 #### Untested Services (4 services)
+
 - [ ] storageService
   - Local storage operations
   - Session storage operations
@@ -361,6 +377,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 ## Recommended Approach
 
 ### Phase 1: Foundation (Week 1)
+
 1. Create tests for all Zustand stores
 2. Create tests for AuthContext
 3. Basic component test setup for 3-5 page components
@@ -368,6 +385,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 **Expected Impact**: +15% coverage, unlocks component testing strategy
 
 ### Phase 2: Core Features (Weeks 2-3)
+
 1. Add tests for Bills, Budgeting, Transactions components
 2. Add tests for Modal components
 3. Complete service layer tests
@@ -375,6 +393,7 @@ Contexts          | 3         | 0      | 0%       | 🔴 CRITICAL
 **Expected Impact**: +25% coverage, achieves 75% overall
 
 ### Phase 3: Polish (Week 4)
+
 1. Add tests for UI components
 2. Add tests for remaining hooks
 3. Improve component coverage to 40%+
