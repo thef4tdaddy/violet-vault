@@ -1,28 +1,31 @@
 import { useCallback } from "react";
+import { validateBillSafe } from "../../domain/schemas/bill.ts";
 
 /**
  * Hook for bill data validation operations
  * Extracted from useBillOperations.js to reduce complexity
+ * Now using Zod schemas for runtime validation (Issue #412)
  */
 export const useBillValidation = (envelopes = []) => {
   /**
-   * Validate bill data before operations
+   * Validate bill data before operations using Zod schema
+   * Additional envelope validation for data integrity
    */
   const validateBillData = useCallback(
     (bill) => {
+      // First validate with Zod schema
+      const zodResult = validateBillSafe(bill);
+
+      if (!zodResult.success) {
+        const errors = zodResult.error.errors.map((err) => {
+          const path = err.path.join(".");
+          return `${path}: ${err.message}`;
+        });
+        return { isValid: false, errors };
+      }
+
+      // Then add envelope-specific validation
       const errors = [];
-
-      if (!bill.id) {
-        errors.push("Bill ID is required");
-      }
-
-      if (!bill.amount || bill.amount <= 0) {
-        errors.push("Bill amount must be greater than 0");
-      }
-
-      if (bill.dueDate && isNaN(new Date(bill.dueDate).getTime())) {
-        errors.push("Invalid due date format");
-      }
 
       if (bill.envelopeId && !envelopes.find((env) => env.id === bill.envelopeId)) {
         errors.push("Assigned envelope does not exist");

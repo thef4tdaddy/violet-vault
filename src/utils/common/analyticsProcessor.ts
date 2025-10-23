@@ -1,24 +1,35 @@
 import logger from "../common/logger";
+import { validateTransactionSafe, validateEnvelopeSafe } from "../../domain/schemas/index.ts";
 
 /**
  * Analytics data processing utilities
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
+ * Now using Zod schemas for validation (Issue #412)
  */
 
-// Validation utilities
+/**
+ * Validate transaction using Zod schema
+ * Used as filter predicate for analytics data
+ */
 export const validateTransaction = (transaction) => {
-  return (
-    transaction &&
-    typeof transaction === "object" &&
-    typeof transaction.amount === "number" &&
-    transaction.date &&
-    !isNaN(new Date(transaction.date))
-  );
+  if (!transaction || typeof transaction !== "object") {
+    return false;
+  }
+  const result = validateTransactionSafe(transaction);
+  return result.success;
 };
 
+/**
+ * Validate envelope using Zod schema
+ * Used as filter predicate for analytics data
+ */
 export const validateEnvelope = (envelope) => {
-  return envelope && typeof envelope === "object" && envelope.id && envelope.name;
+  if (!envelope || typeof envelope !== "object") {
+    return false;
+  }
+  const result = validateEnvelopeSafe(envelope);
+  return result.success;
 };
 
 // Date utilities

@@ -1,6 +1,7 @@
 /**
  * Envelope form utilities for validation, calculations, and transformations
  * Handles form data processing for envelope creation and editing
+ * Now using Zod schemas for core validation (Issue #412)
  */
 
 import {
@@ -9,6 +10,7 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
+import { validateEnvelopeSafe } from "../../domain/schemas/envelope.ts";
 
 /**
  * Creates default envelope form data
@@ -32,7 +34,7 @@ export const createDefaultEnvelopeForm = () => ({
 });
 
 /**
- * Validates envelope form data
+ * Validates envelope form data using Zod schema + form-specific logic
  * @param {Object} formData - Form data to validate
  * @param {Array} existingEnvelopes - Existing envelopes for name uniqueness
  * @param {string} editingEnvelopeId - ID of envelope being edited (for name uniqueness)
@@ -45,13 +47,23 @@ export const validateEnvelopeForm = (
 ) => {
   const errors = {};
 
-  // Name validation
-  if (!formData.name?.trim()) {
-    errors.name = "Envelope name is required";
-  } else if (formData.name.trim().length > 50) {
-    errors.name = "Envelope name must be less than 50 characters";
-  } else {
-    // Check for duplicate names (excluding current envelope if editing)
+  // Use Zod schema for base validation
+  const zodResult = validateEnvelopeSafe(formData);
+
+  if (!zodResult.success) {
+    // Convert Zod errors to error object format
+    zodResult.error.errors.forEach((err) => {
+      const fieldName = err.path[0];
+      if (fieldName) {
+        errors[fieldName] = err.message;
+      }
+    });
+  }
+
+  // Additional form-specific validations beyond Zod schema
+
+  // Check for duplicate names (excluding current envelope if editing)
+  if (!errors.name && formData.name) {
     const nameExists = existingEnvelopes.some(
       (envelope) =>
         envelope.name.toLowerCase() === formData.name.trim().toLowerCase() &&
@@ -91,43 +103,25 @@ export const validateEnvelopeForm = (
     }
   }
 
-  // Current balance validation
-  if (
-    formData.currentBalance &&
-    (isNaN(formData.currentBalance) || parseFloat(formData.currentBalance) < 0)
-  ) {
-    errors.currentBalance = "Current balance must be a positive number";
-  }
-
-  // Category validation
-  if (!formData.category) {
-    errors.category = "Category is required";
-  } else {
+  // Category validation (beyond Zod)
+  if (!errors.category && formData.category) {
     const availableCategories = getEnvelopeCategories();
     if (!availableCategories.includes(formData.category)) {
       errors.category = "Invalid category selected";
     }
   }
 
-  // Priority validation
-  if (!["low", "medium", "high", "critical"].includes(formData.priority)) {
+  // Priority validation (beyond Zod)
+  if (formData.priority && !["low", "medium", "high", "critical"].includes(formData.priority)) {
     errors.priority = "Invalid priority selected";
   }
 
-  // Color validation
-  if (!formData.color || !/^#[0-9A-F]{6}$/i.test(formData.color)) {
-    errors.color = "Invalid color format";
-  }
-
-  // Frequency validation
-  const frequencyOptions = getFrequencyOptions();
-  if (!frequencyOptions.find((opt) => opt.value === formData.frequency)) {
-    errors.frequency = "Invalid frequency selected";
-  }
-
-  // Description length validation
-  if (formData.description && formData.description.length > 500) {
-    errors.description = "Description must be less than 500 characters";
+  // Frequency validation (beyond Zod)
+  if (formData.frequency) {
+    const frequencyOptions = getFrequencyOptions();
+    if (!frequencyOptions.find((opt) => opt.value === formData.frequency)) {
+      errors.frequency = "Invalid frequency selected";
+    }
   }
 
   return {

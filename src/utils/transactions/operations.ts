@@ -2,71 +2,38 @@
  * Transaction Operations Utilities
  * Pure functions for transaction data manipulation and preparation
  * Extracted from useTransactions.js for Issue #508
+ *
+ * Now using Zod schemas for runtime validation (Issue #412)
  */
 import logger from "../common/logger.ts";
+import { validateTransactionSafe } from "../../domain/schemas/transaction.ts";
 
 /**
- * Validate required fields
- */
-const validateRequiredFields = (transactionData, errors) => {
-  if (!transactionData.description?.trim()) {
-    errors.push("Description is required");
-  }
-
-  if (transactionData.amount === undefined || transactionData.amount === null) {
-    errors.push("Amount is required");
-  } else if (isNaN(transactionData.amount) || transactionData.amount === 0) {
-    errors.push("Amount must be a non-zero number");
-  }
-
-  if (!transactionData.date) {
-    errors.push("Date is required");
-  } else {
-    const date = new Date(transactionData.date);
-    if (isNaN(date.getTime())) {
-      errors.push("Date must be a valid date");
-    }
-  }
-};
-
-/**
- * Validate optional fields
- */
-const validateOptionalFields = (transactionData, errors) => {
-  if (transactionData.category && typeof transactionData.category !== "string") {
-    errors.push("Category must be a string");
-  }
-
-  if (transactionData.account && typeof transactionData.account !== "string") {
-    errors.push("Account must be a string");
-  }
-
-  if (transactionData.envelopeId && typeof transactionData.envelopeId !== "string") {
-    errors.push("Envelope ID must be a string");
-  }
-};
-
-/**
- * Validate transaction data
+ * Validate transaction data using Zod schema
+ * Converts Zod errors to legacy format for backward compatibility
+ *
  * @param {Object} transactionData - Transaction data to validate
  * @returns {Object} Validation result with isValid boolean and errors array
  */
 export const validateTransactionData = (transactionData) => {
-  const errors = [];
-
   try {
     if (!transactionData) {
-      errors.push("Transaction data is required");
+      return { isValid: false, errors: ["Transaction data is required"] };
+    }
+
+    // Use Zod schema for validation
+    const result = validateTransactionSafe(transactionData);
+
+    if (!result.success) {
+      // Convert Zod errors to user-friendly messages
+      const errors = result.error.errors.map((err) => {
+        const path = err.path.join(".");
+        return `${path}: ${err.message}`;
+      });
       return { isValid: false, errors };
     }
 
-    validateRequiredFields(transactionData, errors);
-    validateOptionalFields(transactionData, errors);
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+    return { isValid: true, errors: [] };
   } catch (error) {
     logger.error("Error validating transaction data", error);
     return {
