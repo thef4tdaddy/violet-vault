@@ -29,6 +29,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 ### ✅ PR Testing & Validation (4 workflows)
 
 #### 1. **ci.yml** - Main CI Pipeline
+
 - **Trigger**: Hourly schedule + PRs to main + manual
 - **Node Version**: 18
 - **Jobs**: Format → Lint → TypeCheck → Test → Build
@@ -39,6 +40,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
   - ❌ No build artifact storage
 
 #### 2. **ci-develop.yml** - Develop Branch CI
+
 - **Trigger**: Hourly schedule + PRs to develop + manual
 - **Node Version**: 18
 - **Jobs**: Identical to ci.yml (format, lint, test, build)
@@ -50,6 +52,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 **REDUNDANCY ALERT**: ci.yml and ci-develop.yml are identical except for branch names. Can be consolidated into one parameterized workflow.
 
 #### 3. **test.yml** - Test Suite
+
 - **Trigger**: Push to main/nightly + PRs to main/nightly
 - **Node Version**: 20 (differs from ci.yml which uses 18)
 - **Jobs**: Lint → TypeCheck → Test → Coverage → E2E tests
@@ -63,6 +66,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 **MAJOR ISSUE**: Three workflows doing nearly identical testing with different Node versions and triggers. Creates inconsistency in results.
 
 #### 4. **preview-deployment.yml** - PR Preview
+
 - **Trigger**: PRs to main and develop (non-draft)
 - **Node Version**: 18
 - **Jobs**: Checkout → Install → Lint → Build → Comment PR
@@ -76,11 +80,13 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 ### ✅ Branch Protection & Commit Validation (3 workflows)
 
 #### 5. **block-pr-not-from-develop.yml**
+
 - **Purpose**: Enforce develop → main PR flow
 - **Status**: ✅ Works as intended
 - **Issues**: None
 
 #### 6. **restrict-commits-on-develop.yml**
+
 - **Purpose**: Enforce commit type restrictions (fix:, docs:, style:, perf:, ci:, revert:)
 - **Status**: ✅ Works but overly strict
 - **Issues**:
@@ -89,6 +95,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
   - ⚠️ Installs gh CLI from scratch every run (slow)
 
 #### 7. **restrict-commits-on-main.yml**
+
 - **Purpose**: Enforce commit types on main (fix:, docs:, chore(main):, ci:, revert:)
 - **Status**: ✅ Works as intended
 - **Issues**:
@@ -102,6 +109,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 ### ⚠️ Quality Monitoring & Tracking (6 workflows)
 
 #### 8. **eslint-daily-monitor.yml** - ESLint Tracking
+
 - **Trigger**: Daily 9 AM UTC + push nightly/develop + manual
 - **Node Version**: 22
 - **Purpose**: Track ESLint violations daily
@@ -112,6 +120,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
   - ⚠️ Updates issue #214 with detailed metrics
 
 #### 9. **lint-warnings-tracker.yml** - Lint Warnings
+
 - **Trigger**: Hourly schedule + PRs to main/develop + manual
 - **Node Version**: 18
 - **Purpose**: Track warning count changes
@@ -125,6 +134,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 **MAJOR ISSUE**: Hourly runs create excessive GitHub notifications. Should be consolidated with daily monitor.
 
 #### 10. **type-errors-tracker.yml** - TypeScript Errors
+
 - **Trigger**: PRs/pushes to main/develop on src changes + manual
 - **Node Version**: 18
 - **Purpose**: Zero-tolerance for new TypeScript errors
@@ -135,6 +145,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
   - ✅ Properly blocks on regression
 
 #### 11. **typescript-daily-monitor.yml** - TS Daily Tracking
+
 - **Trigger**: Daily 9:30 AM UTC + push nightly/develop + manual
 - **Node Version**: 22
 - **Purpose**: Daily TypeScript error tracking
@@ -147,6 +158,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 **CONSOLIDATION OPPORTUNITY**: Merge daily TS monitor with type-errors-tracker, consolidate with daily ESLint monitor.
 
 #### 12. **sync-lint-tracker.yml** - Sync Lint Status
+
 - **Trigger**: PRs to main/develop on certain paths
 - **Purpose**: Sync lint-warnings.json
 - **Status**: ⚠️ Low visibility
@@ -155,20 +167,41 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 
 ### 🔍 Monitoring & Reporting (4 workflows)
 
-#### 13. **lighthouse-monitoring.yml**
-- **Purpose**: Performance monitoring
-- **Status**: ❌ **NOT FOUND** (workflow doesn't fully exist or minimal)
-- **Issues**: ❌ Missing critical performance monitoring
+#### 13. **lighthouse-monitoring.yml** - Performance Monitoring
+
+- **Trigger**: Every 2 hours on develop + manual (main disabled)
+- **Node Version**: 20
+- **Purpose**: Lighthouse performance auditing + unit tests
+- **Status**: ✅ **Implemented but limited**
+- **Features**:
+  - Runs Vitest suite first (with continue-on-error)
+  - Tests 6 pages: dashboard, envelopes, transactions, bills, savings, analytics
+  - Dev auth bypass for authenticated pages
+  - Stores reports in separate lighthouse-reports branch (7-day retention)
+  - Auto-creates issues for failures
+  - Comprehensive reporting with HTML + JSON outputs
+  - Archives old reports (>7 days)
+- **Issues**:
+  - ⚠️ **Only runs on develop** (main disabled - needs auth bypass setup)
+  - ⚠️ **Very complex workflow** (800+ lines)
+  - ⚠️ **Runs every 2 hours** (48 runs/day) - excessive frequency
+  - ⚠️ Doesn't block deployments (informational only)
+  - ⚠️ Node 20 (should be 22)
+  - ✅ Good reporting and archival system
+  - ✅ Handles test failures gracefully
 
 #### 14. **npm-audit.yml** - Security
+
 - **Purpose**: Security vulnerability scanning
 - **Status**: ❌ **NOT EXAMINED** (needs review)
 
 #### 15. **release-please.yml** - Automated Releases
+
 - **Purpose**: Semantic versioning + releases
 - **Status**: ❌ **NOT EXAMINED** (needs review)
 
 #### 16. **bundle-size.yml** - Bundle Monitoring
+
 - **Trigger**: PRs to main/nightly
 - **Node Version**: 22
 - **Purpose**: Monitor bundle size impact
@@ -184,18 +217,22 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 ### 🏷️ Automation & Labeling (3 workflows)
 
 #### 17. **issue-labeler.yml**
+
 - **Purpose**: Auto-label issues
 - **Status**: ❌ **NOT EXAMINED** (minimal impact)
 
 #### 18. **pr-labeler.yml**
+
 - **Purpose**: Auto-label PRs
 - **Status**: ❌ **NOT EXAMINED** (minimal impact)
 
 #### 19. **recurring-milestone-docs.yml**
+
 - **Purpose**: Maintain milestone documentation
 - **Status**: ❌ **NOT EXAMINED**
 
 #### 20. **update-audit-issue.yml**
+
 - **Purpose**: Update tracking issues
 - **Status**: ⚠️ **Unclear purpose**
 
@@ -206,6 +243,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 ### 🔴 CRITICAL ISSUES (High Priority)
 
 #### 1. **Test Workflow Fragmentation**
+
 - **Problem**: 3 overlapping test workflows (ci.yml, ci-develop.yml, test.yml)
 - **Impact**:
   - Inconsistent Node versions (18 vs 20)
@@ -215,6 +253,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 - **Recommendation**: **Consolidate to single parameterized workflow**
 
 #### 2. **Hourly Lint Tracking Creates Noise**
+
 - **Problem**: lint-warnings-tracker.yml runs every hour
 - **Impact**:
   - 24+ comments added daily to issue #568
@@ -224,6 +263,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 - **Recommendation**: **Reduce to daily runs, consolidate with eslint-daily-monitor.yml**
 
 #### 3. **Node Version Inconsistency**
+
 - **Problem**: Different workflows use Node 18, 20, or 22
 - **Impact**:
   - Inconsistent lint/type results
@@ -232,6 +272,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 - **Recommendation**: **Standardize on single Node version (recommend 22 LTS)**
 
 #### 4. **E2E Tests Not Blocking**
+
 - **Problem**: test.yml has `continue-on-error: true` for E2E
 - **Impact**:
   - Failed E2E tests don't block merges
@@ -240,6 +281,7 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 - **Recommendation**: **Remove continue-on-error, make E2E blocking after stabilization**
 
 #### 5. **Duplicate Commit Validation**
+
 - **Problem**: restrict-commits-on-develop.yml and restrict-commits-on-main.yml duplicate code
 - **Impact**:
   - Maintenance burden
@@ -252,16 +294,19 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 ### ⚠️ HIGH-PRIORITY ISSUES (Medium Priority)
 
 #### 6. **Missing Deployment Validation**
+
 - **Problem**: No workflow validates production deployment
 - **Impact**: Deployed code not tested in production config
 - **Recommendation**: **Add pre-deployment validation workflow**
 
 #### 7. **Duplicate TypeScript Tracking**
+
 - **Problem**: type-errors-tracker.yml + typescript-daily-monitor.yml
 - **Impact**: Conflicting data sources, confusion about current state
 - **Recommendation**: **Merge into single workflow with daily + PR triggers**
 
 #### 8. **Auto-commit Formatting Too Aggressive**
+
 - **Problem**: ci.yml and ci-develop.yml auto-commit formatting hourly
 - **Impact**:
   - Developers expect manual control over formatting
@@ -270,30 +315,35 @@ The GitHub Actions CI/CD system is **comprehensive but showing signs of redundan
 - **Recommendation**: **Change to daily or manual trigger only for auto-formatting**
 
 #### 9. **Preview Deployment Not Deployed**
+
 - **Problem**: preview-deployment.yml builds but doesn't deploy
 - **Impact**: Can't actually preview changes
 - **Recommendation**: **Deploy artifacts to actual preview URL (Vercel, Netlify, etc.)**
 
-#### 10. **Missing Performance Metrics**
-- **Problem**: lighthouse-monitoring.yml appears incomplete
-- **Impact**: No performance regression detection
-- **Recommendation**: **Implement comprehensive Lighthouse monitoring**
+#### 10. **Performance Monitoring Frequency Too High**
+
+- **Problem**: lighthouse-monitoring.yml runs every 2 hours (48 runs/day)
+- **Impact**: Excessive GitHub Actions usage, noise in reports, unnecessary cost
+- **Recommendation**: **Reduce frequency to 2-3 scheduled times daily (e.g., 6 AM, 2 PM, 10 PM UTC)**
 
 ---
 
 ### 📋 MEDIUM-PRIORITY ISSUES
 
 #### 11. **Complex Shell Scripts for Simple Tasks**
+
 - **Problem**: Bash-heavy scripts that could be JavaScript
 - **Impact**: Hard to maintain, error-prone
 - **Recommendation**: **Use actions/github-script for complex logic**
 
 #### 12. **Missing Notification Integration**
+
 - **Problem**: Only GitHub comments (no Slack/email)
 - **Impact**: Easy to miss important alerts
 - **Recommendation**: **Add Slack notification for threshold breaches**
 
 #### 13. **No Artifact Cleanup Policy**
+
 - **Problem**: Many workflows upload artifacts with 7-90 day retention
 - **Impact**: Disk space usage grows over time
 - **Recommendation**: **Implement retention policy, cleanup old artifacts**
@@ -336,6 +386,7 @@ Version | Workflows                              | Recommendation
 ### Current Workflow Load
 
 **Daily Runs (Estimated)**:
+
 - ci.yml: 24 runs/day (hourly schedule)
 - ci-develop.yml: 24 runs/day (hourly schedule)
 - lint-warnings-tracker.yml: 24 runs/day (hourly schedule)
@@ -348,6 +399,7 @@ Version | Workflows                              | Recommendation
 **Total: ~85-100 workflow runs per day**
 
 **Estimated Cost**:
+
 - Each workflow run: 2-5 minutes average
 - GitHub Actions: Free for public repos (unlimited), paid tiers for private
 - Build time per run: ~150-300 GB-minutes per day (if private)
@@ -356,6 +408,7 @@ Version | Workflows                              | Recommendation
 ### After Consolidation
 
 **Optimized Daily Runs**:
+
 - Single test workflow: 10-15 runs/day (PRs + main push)
 - Single lint monitor: 1-2 runs/day (scheduled)
 - Single type monitor: 1-2 runs/day (scheduled)
@@ -473,6 +526,7 @@ jobs:
 **Consolidate**: type-errors-tracker.yml + typescript-daily-monitor.yml
 
 **Result**:
+
 - Single daily lint monitor (9 AM UTC)
 - Single daily type monitor (9:30 AM UTC)
 - Single PR blocking for both (separate from scheduled monitors)
@@ -492,17 +546,17 @@ jobs:
 
 ## Workflow Status Summary
 
-| Category | Status | Action |
-|----------|--------|--------|
-| PR Testing | 🔴 CRITICAL | Consolidate 3 workflows |
-| Commit Validation | ⚠️ HIGH | Consolidate 2 workflows |
-| Lint Monitoring | 🔴 CRITICAL | Reduce frequency from hourly to daily |
-| Type Monitoring | ⚠️ HIGH | Consolidate 2 workflows |
-| Branch Protection | ✅ GOOD | No action needed |
-| Bundle Monitoring | ✅ GOOD | No action needed |
-| Preview Deploy | ⚠️ MEDIUM | Add actual deployment |
-| Performance | ❌ MISSING | Add Lighthouse monitoring |
-| Deployment | ❌ MISSING | Add validation workflow |
+| Category          | Status      | Action                                |
+| ----------------- | ----------- | ------------------------------------- |
+| PR Testing        | 🔴 CRITICAL | Consolidate 3 workflows               |
+| Commit Validation | ⚠️ HIGH     | Consolidate 2 workflows               |
+| Lint Monitoring   | 🔴 CRITICAL | Reduce frequency from hourly to daily |
+| Type Monitoring   | ⚠️ HIGH     | Consolidate 2 workflows               |
+| Branch Protection | ✅ GOOD     | No action needed                      |
+| Bundle Monitoring | ✅ GOOD     | No action needed                      |
+| Preview Deploy    | ⚠️ MEDIUM   | Add actual deployment                 |
+| Performance       | ❌ MISSING  | Add Lighthouse monitoring             |
+| Deployment        | ❌ MISSING  | Add validation workflow               |
 
 ---
 
