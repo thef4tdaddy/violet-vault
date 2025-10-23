@@ -1,4 +1,3 @@
-import React, { useRef, useEffect } from "react";
 import { useBottomNavigation } from "../../hooks/mobile/useBottomNavigation";
 import BottomNavItem from "./BottomNavItem";
 

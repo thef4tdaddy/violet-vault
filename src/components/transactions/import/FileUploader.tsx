@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { renderIcon } from "../../../utils/icons";
 import { Checkbox } from "@/components/ui";
 

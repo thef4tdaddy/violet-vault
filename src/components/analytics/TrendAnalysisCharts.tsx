@@ -1,4 +1,3 @@
-import React from "react";
 
 import ForecastSummaryCard from "./trends/ForecastSummaryCard";
 import HistoricalTrendsChart from "./trends/HistoricalTrendsChart";

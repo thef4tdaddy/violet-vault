@@ -1,4 +1,3 @@
-import React from "react";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 

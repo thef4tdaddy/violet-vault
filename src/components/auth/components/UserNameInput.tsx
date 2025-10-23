@@ -1,4 +1,3 @@
-import React from "react";
 
 /**
  * User Name Input Component

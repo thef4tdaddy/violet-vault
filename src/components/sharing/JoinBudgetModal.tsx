@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { renderIcon } from "../../utils";
 import { shareCodeUtils } from "../../utils/security/shareCodeUtils";

@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils/icons";
 
 const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {

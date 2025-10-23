@@ -1,4 +1,3 @@
-import React from "react";
 import { useTouchFeedback } from "../../utils/ui/touchFeedback";
 
 /**

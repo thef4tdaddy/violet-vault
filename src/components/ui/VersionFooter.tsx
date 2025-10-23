@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "../../utils/version";
 import logger from "../../utils/common/logger";
 

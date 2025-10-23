@@ -1,4 +1,3 @@
-import React, { memo, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getIcon } from "../../utils";
 import { getButtonClasses, hapticFeedback } from "../../utils/ui/touchFeedback";

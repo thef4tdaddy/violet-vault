@@ -1,4 +1,3 @@
-import React from "react";
 import AccountCardHeader from "./shared/AccountCardHeader";
 import AccountCardDetails from "./shared/AccountCardDetails";
 

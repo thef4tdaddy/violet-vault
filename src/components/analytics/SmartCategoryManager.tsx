@@ -1,4 +1,3 @@
-import React, { useMemo } from "react";
 import { useSmartCategoryAnalysis } from "../../hooks/analytics/useSmartCategoryAnalysis";
 import { useSmartCategoryManager } from "../../hooks/analytics/useSmartCategoryManager";
 import { calculateCategoryStats, processSuggestions } from "../../utils/analytics/categoryHelpers";

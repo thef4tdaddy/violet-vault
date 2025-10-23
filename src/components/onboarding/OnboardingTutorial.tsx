@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";

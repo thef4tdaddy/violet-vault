@@ -1,4 +1,3 @@
-import React from "react";
 
 /**
  * Progress bar component for debt card display

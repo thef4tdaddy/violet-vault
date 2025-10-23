@@ -1,5 +1,4 @@
 // src/components/layout/MainLayout.jsx
-import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useAuthManager } from "../../hooks/auth/useAuthManager";

@@ -1,4 +1,3 @@
-import React from "react";
 import { ACCOUNT_COLORS } from "../../../utils/accounts";
 import { Button, Checkbox } from "@/components/ui";
 

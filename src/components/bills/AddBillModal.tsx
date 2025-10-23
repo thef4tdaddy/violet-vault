@@ -5,7 +5,6 @@
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
  * Enhanced with mobile slide-up functionality for Issue #164
  */
-import React, { useEffect } from "react";
 import { useBillForm } from "../../hooks/bills/useBillForm";
 import useEditLock from "../../hooks/common/useEditLock";
 import { useConfirm } from "../../hooks/common/useConfirm";

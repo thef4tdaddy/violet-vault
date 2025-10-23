@@ -1,4 +1,3 @@
-import React from "react";
 import useSupplementalAccounts from "../../hooks/accounts/useSupplementalAccounts";
 import AccountsHeader from "./AccountsHeader";
 import ExpirationAlert from "./ExpirationAlert";

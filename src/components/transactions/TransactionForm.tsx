@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import useEditLock from "../../hooks/common/useEditLock";
 // eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use useEditLock hook instead

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import { useUserSetup } from "../../hooks/auth/useUserSetup";
 import UserSetupLayout from "./components/UserSetupLayout";
