@@ -1,11 +1,11 @@
 import { renderHook } from "@testing-library/react";
 import { useExportData } from "../useExportData";
-import { useAuth } from "../../../stores/auth/authStore";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useToastHelpers } from "../../../utils/common/toastHelpers";
 import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
 import { vi } from "vitest";
 
-vi.mock("../../../stores/auth/authStore");
+vi.mock("../../../contexts/AuthContext");
 vi.mock("../../../utils/common/toastHelpers");
 vi.mock("../../../db/budgetDb");
 

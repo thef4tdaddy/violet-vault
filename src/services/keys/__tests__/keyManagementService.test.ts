@@ -2,16 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { keyManagementService } from "../keyManagementService";
 
 // Mock dependencies
-vi.mock("../../../stores/auth/authStore", () => ({
-  useAuth: {
-    getState: vi.fn(() => ({
-      encryptionKey: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-      salt: new Uint8Array([9, 10, 11, 12, 13, 14, 15, 16]),
-      currentUser: "testuser",
-      budgetId: "test-budget-id",
-    })),
-  },
-}));
+// Note: keyManagementService is now parameter-driven and doesn't import auth store
+// Auth data is passed as parameters, so no mocking needed for auth
 
 vi.mock("../../../utils/security/encryption", () => ({
   encryptionUtils: {

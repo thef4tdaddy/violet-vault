@@ -1,18 +1,25 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "../../stores/auth/authStore.tsx";
+import { useAuth } from "../../contexts/AuthContext";
+import { useAuthManager } from "./useAuthManager";
 import { keyExportUtils } from "../../utils/security/keyExport";
 import logger from "../../utils/common/logger";
 
 /**
  * Hook for managing encryption key export/import operations
  * Provides secure methods to backup and restore encryption keys
+ *
+ * Migration from old Zustand authStore - Part of Epic #665
  */
 export const useKeyManagement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
 
-  const { encryptionKey, salt, budgetId, login } = useAuth();
+  // Use AuthContext for state + useAuthManager for operations
+  const authContext = useAuth();
+  const authManager = useAuthManager();
+  const { encryptionKey, salt, budgetId } = authContext;
+  const { login } = authManager;
 
   // Clear error state
   const clearError = useCallback(() => {

@@ -4,18 +4,22 @@ import logger from "../../utils/common/logger";
 /**
  * Key Management Service
  * Handles encryption key operations, import/export, and validation
+ *
+ * IMPORTANT: This service is now parameter-driven instead of using hooks.
+ * Pass auth data (encryptionKey, salt, currentUser, budgetId) from AuthContext
+ * to each method. This keeps the service layer separate from React hooks.
+ *
+ * Migration from old Zustand authStore - Part of Epic #665
  */
 class KeyManagementService {
   /**
    * Generate a cryptographic fingerprint for the current encryption key
+   * @param encryptionKey - The encryption key to fingerprint (from AuthContext)
    */
-  async getCurrentKeyFingerprint() {
+  async getCurrentKeyFingerprint(encryptionKey: CryptoKey | Uint8Array) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey } = useAuth.getState();
-
       if (!encryptionKey) {
-        throw new Error("No encryption key available");
+        throw new Error("Encryption key is required");
       }
 
       // Create a fingerprint using the key data
@@ -39,24 +43,28 @@ class KeyManagementService {
       return fingerprint;
     } catch (error) {
       logger.error("Failed to generate key fingerprint:", error);
-      throw new Error("Failed to generate key fingerprint: " + error.message);
+      throw new Error("Failed to generate key fingerprint: " + (error as Error).message);
     }
   }
 
   /**
    * Copy the current encryption key to clipboard with auto-clear
+   * @param encryptionKey - The encryption key (from AuthContext)
+   * @param salt - The salt value (from AuthContext)
+   * @param clearTimeoutSeconds - Seconds before auto-clearing clipboard
    */
-  async copyKeyToClipboard(clearTimeoutSeconds = 30) {
+  async copyKeyToClipboard(
+    encryptionKey: CryptoKey | Uint8Array,
+    salt: Uint8Array,
+    clearTimeoutSeconds = 30
+  ) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
-        throw new Error("No encryption key or salt available");
+        throw new Error("Encryption key and salt are required");
       }
 
       const keyData = {
-        key: Array.from(encryptionKey),
+        key: Array.from(encryptionKey as any),
         salt: Array.from(salt),
         timestamp: new Date().toISOString(),
         type: "unprotected",
@@ -83,24 +91,30 @@ class KeyManagementService {
       });
     } catch (error) {
       logger.error("Failed to copy key to clipboard:", error);
-      throw new Error("Failed to copy to clipboard: " + error.message);
+      throw new Error("Failed to copy to clipboard: " + (error as Error).message);
     }
   }
 
   /**
    * Download unprotected key file
+   * @param encryptionKey - The encryption key (from AuthContext)
+   * @param salt - The salt value (from AuthContext)
+   * @param currentUser - The current user (from AuthContext)
+   * @param budgetId - The budget ID (from AuthContext)
    */
-  async downloadKeyFile() {
+  async downloadKeyFile(
+    encryptionKey: CryptoKey | Uint8Array,
+    salt: Uint8Array,
+    currentUser?: string,
+    budgetId?: string
+  ) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt, currentUser, budgetId } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
-        throw new Error("No encryption key or salt available");
+        throw new Error("Encryption key and salt are required");
       }
 
       const keyData = {
-        key: Array.from(encryptionKey),
+        key: Array.from(encryptionKey as any),
         salt: Array.from(salt),
         user: currentUser,
         budgetId: budgetId,
@@ -125,20 +139,28 @@ class KeyManagementService {
       logger.debug("Unprotected key file downloaded");
     } catch (error) {
       logger.error("Failed to download key file:", error);
-      throw new Error("Failed to download key file: " + error.message);
+      throw new Error("Failed to download key file: " + (error as Error).message);
     }
   }
 
   /**
    * Download password-protected key file
+   * @param encryptionKey - The encryption key (from AuthContext)
+   * @param salt - The salt value (from AuthContext)
+   * @param exportPassword - Password to protect the export
+   * @param currentUser - The current user (from AuthContext)
+   * @param budgetId - The budget ID (from AuthContext)
    */
-  async downloadProtectedKeyFile(exportPassword) {
+  async downloadProtectedKeyFile(
+    encryptionKey: CryptoKey | Uint8Array,
+    salt: Uint8Array,
+    exportPassword: string,
+    currentUser?: string,
+    budgetId?: string
+  ) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt, currentUser, budgetId } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
-        throw new Error("No encryption key or salt available");
+        throw new Error("Encryption key and salt are required");
       }
 
       if (!exportPassword || exportPassword.length < 8) {
@@ -149,7 +171,7 @@ class KeyManagementService {
       const exportKeyData = await encryptionUtils.deriveKey(exportPassword);
 
       // Encrypt the main key and salt
-      const keyArray = Array.from(encryptionKey);
+      const keyArray = Array.from(encryptionKey as any);
       const saltArray = Array.from(salt);
       const dataToEncrypt = JSON.stringify({ key: keyArray, salt: saltArray });
 
@@ -181,24 +203,23 @@ class KeyManagementService {
       logger.debug("Protected key file downloaded");
     } catch (error) {
       logger.error("Failed to download protected key file:", error);
-      throw new Error("Failed to download protected key file: " + error.message);
+      throw new Error("Failed to download protected key file: " + (error as Error).message);
     }
   }
 
   /**
    * Generate QR code for key sharing
+   * @param encryptionKey - The encryption key (from AuthContext)
+   * @param salt - The salt value (from AuthContext)
    */
-  async generateQRCode() {
+  async generateQRCode(encryptionKey: CryptoKey | Uint8Array, salt: Uint8Array) {
     try {
-      const { useAuth } = await import("../../stores/auth/authStore");
-      const { encryptionKey, salt } = useAuth.getState();
-
       if (!encryptionKey || !salt) {
-        throw new Error("No encryption key or salt available");
+        throw new Error("Encryption key and salt are required");
       }
 
       const keyData = {
-        key: Array.from(encryptionKey),
+        key: Array.from(encryptionKey as any),
         salt: Array.from(salt),
         timestamp: new Date().toISOString(),
         type: "qr",
@@ -229,14 +250,14 @@ class KeyManagementService {
       return qrCodeUrl;
     } catch (error) {
       logger.error("Failed to generate QR code:", error);
-      throw new Error("Failed to generate QR code: " + error.message);
+      throw new Error("Failed to generate QR code: " + (error as Error).message);
     }
   }
 
   /**
    * Validate key file structure and format
    */
-  validateKeyFile(keyFileData) {
+  validateKeyFile(keyFileData: any) {
     try {
       if (!keyFileData || typeof keyFileData !== "object") {
         return { valid: false, error: "Invalid file format" };
@@ -268,16 +289,22 @@ class KeyManagementService {
       return { valid: true, type: keyFileData.type };
     } catch (error) {
       logger.error("Key file validation error:", error);
-      return { valid: false, error: "Validation failed: " + error.message };
+      return { valid: false, error: "Validation failed: " + (error as Error).message };
     }
   }
 
   /**
    * Import key file and perform login
+   * Note: The actual login is now handled by useAuthManager hook.
+   * This method just validates and processes the key data.
+   *
+   * @param keyFileData - The imported key file data
+   * @param importPassword - Password for protected key files
+   * @returns Processed key data ready for login
    */
-  async importAndLogin(keyFileData, importPassword, vaultPassword) {
+  async importKeyData(keyFileData: any, importPassword?: string) {
     try {
-      logger.debug("Starting key import and login process");
+      logger.debug("Starting key import process");
 
       let keyData, saltData;
 
@@ -306,30 +333,20 @@ class KeyManagementService {
         saltData = new Uint8Array(keyFileData.salt);
       }
 
-      // Prepare user data for login
-      const userData = {
+      // Return processed data for caller to use with auth system
+      const result = {
         encryptionKey: keyData,
         salt: saltData,
         currentUser: keyFileData.user || "imported-user",
         budgetId: keyFileData.budgetId || `imported-${Date.now()}`,
-      };
-
-      // Perform login with imported key
-      const { useAuth } = await import("../../stores/auth/authStore");
-      await useAuth.getState().login(vaultPassword, userData);
-
-      const result = {
-        success: true,
-        user: userData.currentUser,
-        budgetId: userData.budgetId,
         timestamp: keyFileData.timestamp || new Date().toISOString(),
       };
 
-      logger.debug("Key import and login completed successfully");
+      logger.debug("Key import data processed successfully");
       return result;
     } catch (error) {
-      logger.error("Key import and login failed:", error);
-      throw new Error("Import failed: " + error.message);
+      logger.error("Key import failed:", error);
+      throw new Error("Import failed: " + (error as Error).message);
     }
   }
 }

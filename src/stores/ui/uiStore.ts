@@ -168,7 +168,9 @@ const storeInitializer = (set, _get) => ({
   },
 
   // Start background sync service
-  async startBackgroundSync() {
+  // Note: Auth data should be passed as a parameter from components using AuthContext
+  // This method is kept for backward compatibility but should receive auth data externally
+  async startBackgroundSync(authData?: { isUnlocked: boolean; budgetId: string; encryptionKey: CryptoKey | Uint8Array; currentUser?: string }) {
     try {
       // Safe external store access (prevents React error #185)
       const state = useUiStore.getState();
@@ -177,15 +179,11 @@ const storeInitializer = (set, _get) => ({
         return;
       }
 
-      // Import auth store to get current user info
-      const { useAuth } = await import("../auth/authStore");
-      const authState = useAuth.getState();
-
-      if (!authState.isUnlocked || !authState.budgetId || !authState.encryptionKey) {
+      if (!authData || !authData.isUnlocked || !authData.budgetId || !authData.encryptionKey) {
         logger.warn("Cannot start background sync - missing auth data", {
-          isUnlocked: authState.isUnlocked,
-          hasBudgetId: !!authState.budgetId,
-          hasEncryptionKey: !!authState.encryptionKey,
+          isUnlocked: authData?.isUnlocked,
+          hasBudgetId: !!authData?.budgetId,
+          hasEncryptionKey: !!authData?.encryptionKey,
         });
         return;
       }
@@ -194,9 +192,9 @@ const storeInitializer = (set, _get) => ({
       const { cloudSyncService } = await import("../../services/cloudSyncService");
 
       const syncConfig = {
-        budgetId: authState.budgetId,
-        encryptionKey: authState.encryptionKey,
-        currentUser: authState.currentUser,
+        budgetId: authData.budgetId,
+        encryptionKey: authData.encryptionKey,
+        currentUser: authData.currentUser,
       };
 
       cloudSyncService.start(syncConfig);

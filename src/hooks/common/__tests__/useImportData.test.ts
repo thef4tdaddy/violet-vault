@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { useImportData } from "../useImportData";
-import { useAuth } from "../../../stores/auth/authStore";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useToastHelpers } from "../../../utils/common/toastHelpers";
 import { useConfirm } from "../useConfirm";
 import { readFileContent } from "../../../utils/dataManagement/fileUtils";
