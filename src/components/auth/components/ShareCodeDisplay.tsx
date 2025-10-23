@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Button } from "@/components/ui";
-import { renderIcon } from "../../../utils";
+import { renderIcon } from "@/utils";
 
 /**
  * Share Code Display Component
@@ -49,7 +50,7 @@ Generated: ${new Date().toLocaleDateString()}
 
   const displayCode = shareCode
     .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
   return (

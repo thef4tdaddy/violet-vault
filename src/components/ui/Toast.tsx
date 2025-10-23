@@ -1,4 +1,5 @@
-import { renderIcon } from "../../utils/icons";
+import { useState, useEffect } from "react";
+import { renderIcon } from "@/utils/icons";
 
 const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -99,15 +100,35 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
   );
 };
 
-const ToastContainer = ({ toasts, removeToast }) => {
+interface ToastItem {
+  id: string | number;
+  type?: string;
+  title?: string;
+  message?: string;
+  duration?: number;
+}
+
+const ToastContainer = ({
+  toasts,
+  removeToast,
+}: {
+  toasts: ToastItem[];
+  removeToast: (id: string | number) => void;
+}) => {
   return (
     <div className="fixed top-4 right-4 z-50 space-y-3">
       {toasts.map((toast) => (
-        <Toast key={toast.id} {...toast} onClose={() => removeToast(toast.id)} />
+        <Toast
+          key={toast.id}
+          type={toast.type}
+          title={toast.title}
+          message={toast.message}
+          duration={toast.duration}
+          onClose={() => removeToast(toast.id)}
+        />
       ))}
     </div>
   );
 };
 
 export { Toast, ToastContainer };
-export default Toast;

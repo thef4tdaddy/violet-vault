@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Button } from "@/components/ui";
-import { useUserSetup } from "../../hooks/auth/useUserSetup";
+import { useUserSetup } from "@/hooks/auth/useUserSetup";
 import UserSetupLayout from "./components/UserSetupLayout";
 import UserSetupHeader from "./components/UserSetupHeader";
 import PasswordInput from "./components/PasswordInput";
@@ -9,18 +10,23 @@ import ReturningUserActions from "./components/ReturningUserActions";
 import StepButtons from "./components/StepButtons";
 import ShareCodeDisplay from "./components/ShareCodeDisplay";
 import JoinBudgetModal from "../sharing/JoinBudgetModal";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
-import { renderIcon } from "../../utils";
-import logger from "../../utils/common/logger";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { renderIcon } from "@/utils";
+import logger from "@/utils/common/logger";
 
 /**
  * User Setup Component (Refactored)
  * Multi-step user onboarding and authentication flow
  * Reduced from 435 lines to ~120 lines with full UI/logic separation
  */
-const UserSetup = ({ onSetupComplete }) => {
+interface UserSetupProps {
+  onSetupComplete?: () => void;
+}
+
+const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const { joinBudget } = useAuthManager();
+  const authManager = useAuthManager();
+  const joinBudget = authManager.joinBudget as (data: unknown) => Promise<{ success: boolean }>;
 
   // Removed noisy debug log - component renders on every prop change/keystroke
 

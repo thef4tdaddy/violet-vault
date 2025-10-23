@@ -1,19 +1,17 @@
+import { useState } from "react";
 import { Button } from "@/components/ui";
-import { useConfirm } from "../../hooks/common/useConfirm";
-import { globalToast } from "../../stores/ui/toastStore";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
-import { useAutoFunding } from "../../hooks/budgeting/autofunding";
-import { TRIGGER_TYPES } from "../../utils/budgeting/autofunding";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import logger from "../../utils/common/logger";
+import { useAutoFunding } from "@/hooks/budgeting/autofunding";
+import { useBudgetStore } from "@/stores/ui/uiStore";
+import logger from "@/utils/common/logger";
 
 const AutoFundingView = () => {
   const confirm = useConfirm();
-  const envelopes = useBudgetStore((state) => state.envelopes);
-  const unassignedCash = useBudgetStore((state) => state.unassignedCash);
-  const allTransactions = useBudgetStore((state) => state.allTransactions);
+  const envelopes = useBudgetStore((state) => state.envelopes) as unknown[];
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
@@ -30,12 +28,15 @@ const AutoFundingView = () => {
     setShowRuleBuilder(true);
   };
 
-  const handleEditRule = (rule) => {
-    setEditingRule(rule);
-    setShowRuleBuilder(true);
+  const handleEditRule = (rule: unknown) => {
+    if (rule && typeof rule === "object") {
+      setEditingRule(rule);
+      setShowRuleBuilder(true);
+    }
   };
 
-  const handleSaveRule = async (ruleData) => {
+  const handleSaveRule = async (ruleData: unknown) => {
+    if (!ruleData || typeof ruleData !== "object") return;
     try {
       if (editingRule) {
         updateRule(editingRule.id, ruleData);
@@ -46,7 +47,8 @@ const AutoFundingView = () => {
       setEditingRule(null);
       globalToast.showSuccess(
         editingRule ? "Rule updated successfully!" : "Rule created successfully!",
-        "Success"
+        "Success",
+        5000
       );
     } catch (error) {
       logger.error("Failed to save rule", error);
@@ -54,7 +56,7 @@ const AutoFundingView = () => {
     }
   };
 
-  const handleDeleteRule = async (ruleId) => {
+  const handleDeleteRule = async (ruleId: string) => {
     const confirmed = await confirm({
       title: "Delete Auto-Funding Rule",
       message: "Are you sure you want to delete this rule? This action cannot be undone.",
@@ -74,7 +76,7 @@ const AutoFundingView = () => {
     }
   };
 
-  const handleToggleRule = (ruleId) => {
+  const handleToggleRule = (ruleId: string) => {
     try {
       toggleRule(ruleId);
     } catch (error) {
@@ -88,35 +90,26 @@ const AutoFundingView = () => {
 
     setIsExecuting(true);
     try {
-      const context = {
-        trigger: TRIGGER_TYPES.MANUAL,
-        currentDate: new Date().toISOString(),
-        data: {
-          envelopes: envelopes || [],
-          unassignedCash: unassignedCash || 0,
-          transactions: allTransactions || [],
-        },
-      };
+      const result = await executeRules();
 
-      const result = await executeRules(context, {
-        envelopes,
-        unassignedCash,
-        allTransactions,
-      });
-
-      if (result.success) {
-        const totalFunded = result.execution.totalFunded || 0;
-        const rulesExecuted = result.execution.rulesExecuted || 0;
+      if (result.success && "execution" in result) {
+        const resultWithExecution = result as {
+          execution: { totalFunded?: number; rulesExecuted?: number };
+        };
+        const totalFunded = resultWithExecution.execution?.totalFunded || 0;
+        const rulesExecuted = resultWithExecution.execution?.rulesExecuted || 0;
 
         if (totalFunded > 0) {
           globalToast.showSuccess(
             `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
-            "Auto-Funding Complete"
+            "Auto-Funding Complete",
+            5000
           );
         } else {
           globalToast.showWarning(
             "Rules executed but no funds were transferred. Check your rules and available balances.",
-            "No Funds Transferred"
+            "No Funds Transferred",
+            5000
           );
         }
       } else {

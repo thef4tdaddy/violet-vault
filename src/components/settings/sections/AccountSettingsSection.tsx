@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui";
-import { renderIcon } from "../../../utils";
+import { renderIcon } from "@/utils";
 import ShareCodeModal from "../../sharing/ShareCodeModal";
 import JoinBudgetModal from "../../sharing/JoinBudgetModal";
-import { useAuthManager } from "../../../hooks/auth/useAuthManager";
-import logger from "../../../utils/common/logger";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import logger from "@/utils/common/logger";
 
 const AccountSettingsSection = ({
   currentUser,
@@ -15,7 +16,8 @@ const AccountSettingsSection = ({
   const [showJoinModal, setShowJoinModal] = useState(false);
   const { joinBudget } = useAuthManager();
 
-  const handleJoinSuccess = async (joinData) => {
+  const handleJoinSuccess = async (joinData: unknown) => {
+    if (!joinData || typeof joinData !== "object") return;
     try {
       const result = await joinBudget(joinData);
       if (result.success) {

@@ -1,5 +1,6 @@
-import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "../../utils/version";
-import logger from "../../utils/common/logger";
+import { useState, useEffect } from "react";
+import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "@/utils/common/version";
+import logger from "@/utils/common/logger";
 
 /**
  * Version footer component with branch differentiation
@@ -23,11 +24,13 @@ const VersionFooter = () => {
         setIsLoadingMilestone(true);
         getVersionInfoAsync()
           .then((updatedInfo) => {
-            setVersionInfo(updatedInfo);
+            if (updatedInfo !== null && updatedInfo !== undefined) {
+              setVersionInfo(updatedInfo);
+            }
             setCacheInfo(getCacheStatus()); // Update cache status
             setIsLoadingMilestone(false);
           })
-          .catch((error) => {
+          .catch((error: unknown) => {
             logger.warn("Failed to fetch milestone info:", error);
             setIsLoadingMilestone(false);
           });
@@ -37,7 +40,9 @@ const VersionFooter = () => {
         );
         // Use cached version
         getVersionInfoAsync().then((updatedInfo) => {
-          setVersionInfo(updatedInfo);
+          if (updatedInfo !== null && updatedInfo !== undefined) {
+            setVersionInfo(updatedInfo);
+          }
         });
       }
     }
@@ -135,4 +140,4 @@ const VersionFooter = () => {
   );
 };
 
-export default VersionFooter;
+export { VersionFooter };

@@ -1,16 +1,17 @@
 // src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
+import { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import { useTransactions } from "../../hooks/common/useTransactions";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useTransactions } from "@/hooks/common/useTransactions";
 import useBills from "../../hooks/bills/useBills";
 import {
   calculateEnvelopeData,
   sortEnvelopes,
   filterEnvelopes,
   calculateEnvelopeTotals,
-} from "../../utils/budgeting";
-import { EnvelopeHeader } from "./envelope/EnvelopeHeader";
+} from "@/utils/budgeting";
+import { EnvelopeGridHeader } from "./envelope/EnvelopeGridHeader";
 import EnvelopeSummary from "./envelope/EnvelopeSummary";
 import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
@@ -159,7 +160,7 @@ const EnvelopeGridView = ({
 
     <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
 
-    <EnvelopeHeader
+    <EnvelopeGridHeader
       filterOptions={filterOptions}
       setFilterOptions={setFilterOptions}
       setShowCreateModal={setShowCreateModal}

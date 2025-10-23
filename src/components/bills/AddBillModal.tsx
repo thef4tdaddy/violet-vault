@@ -5,14 +5,13 @@
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
  * Enhanced with mobile slide-up functionality for Issue #164
  */
-import { useBillForm } from "../../hooks/bills/useBillForm";
-import useEditLock from "../../hooks/common/useEditLock";
-import { useConfirm } from "../../hooks/common/useConfirm";
-import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
+import { useEffect } from "react";
+import { useBillForm } from "@/hooks/bills/useBillForm";
+import useEditLock from "@/hooks/common/useEditLock";
+import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
-// eslint-disable-next-line no-restricted-imports -- Required for edit lock service initialization
-import { initializeEditLocks } from "../../services/editLockService";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
+import { initializeEditLocks } from "@/services/editLockService";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
@@ -33,7 +32,6 @@ const AddBillModal = ({
   const {
     // Form State
     formData,
-    deleteEnvelopeToo,
     isSubmitting,
 
     // Computed Values
@@ -43,12 +41,8 @@ const AddBillModal = ({
 
     // Actions
     handleSubmit,
-    handleDelete,
     updateField,
     resetForm,
-
-    // UI State Setters
-    setDeleteEnvelopeToo,
 
     // Utility Functions
     calculateBiweeklyAmount,
@@ -68,9 +62,6 @@ const AddBillModal = ({
     securityContext: { budgetId },
     user: currentUser,
   } = useAuthManager();
-
-  // Standardized confirmation modal
-  const confirm = useConfirm();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {
@@ -99,37 +90,6 @@ const AddBillModal = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resetForm is stable Zustand action
   }, [isOpen]);
-
-  // Custom delete handler using standardized confirm modal
-  const handleDeleteClick = async () => {
-    const deleteEnvelopeCheckbox = (
-      <div className="flex items-center mb-4">
-        <input
-          type="checkbox"
-          id="deleteEnvelope"
-          checked={deleteEnvelopeToo}
-          onChange={(e) => setDeleteEnvelopeToo(e.target.checked)}
-          className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-        />
-        <label htmlFor="deleteEnvelope" className="ml-2 text-sm text-gray-700">
-          Also delete associated envelope
-        </label>
-      </div>
-    );
-
-    const confirmed = await confirm({
-      title: "Delete Bill",
-      message: `Are you sure you want to delete "${editingBill?.name}"?`,
-      confirmLabel: "Delete Bill",
-      cancelLabel: "Cancel",
-      destructive: true,
-      children: deleteEnvelopeCheckbox,
-    });
-
-    if (confirmed) {
-      handleDelete();
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -165,7 +125,6 @@ const AddBillModal = ({
         calculateBiweeklyAmount={calculateBiweeklyAmount}
         calculateMonthlyAmount={calculateMonthlyAmount}
         getNextDueDate={getNextDueDate}
-        onDeleteClick={handleDeleteClick}
       />
     </>
   );

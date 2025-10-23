@@ -1,4 +1,5 @@
-import { useBottomNavigation } from "../../hooks/mobile/useBottomNavigation";
+import { useRef, useEffect } from "react";
+import { useBottomNavigation } from "@/hooks/mobile/useBottomNavigation";
 import BottomNavItem from "./BottomNavItem";
 
 /**

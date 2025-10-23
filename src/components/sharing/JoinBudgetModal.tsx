@@ -1,10 +1,11 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
-import { renderIcon } from "../../utils";
-import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
-import { useShareCodeValidation } from "../../hooks/sharing/useShareCodeValidation";
-import { useBudgetJoining } from "../../hooks/sharing/useBudgetJoining";
-import { useQRCodeProcessing } from "../../hooks/sharing/useQRCodeProcessing";
-import { generateRandomColor } from "../../utils/sharing/colorUtils";
+import { renderIcon } from "@/utils";
+import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
+import { useShareCodeValidation } from "@/hooks/sharing/useShareCodeValidation";
+import { useBudgetJoining } from "@/hooks/sharing/useBudgetJoining";
+import { useQRCodeProcessing } from "@/hooks/sharing/useQRCodeProcessing";
+import { generateRandomColor } from "@/utils/sharing/colorUtils";
 import ShareCodeStep from "./steps/ShareCodeStep";
 import UserSetupStep from "./steps/UserSetupStep";
 
@@ -27,7 +28,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
 
   const { isJoining, joinBudget } = useBudgetJoining();
 
-  const { processQRData, handleQRScan } = useQRCodeProcessing();
+  const { handleQRScan } = useQRCodeProcessing();
 
   // Check URL for share code on mount
   useEffect(() => {
@@ -62,11 +63,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
   };
 
   const handleJoinBudget = async () => {
-    await joinBudget(shareCode, password, userName, userColor, onJoinSuccess, onClose);
-  };
-
-  const _handleProcessQRData = (qrData) => {
-    return processQRData(qrData, setShareCode, creatorInfo, validateShareCode);
+    await joinBudget({ shareCode, password, userName, userColor, onJoinSuccess, onClose });
   };
 
   const handleGenerateRandomColor = () => {

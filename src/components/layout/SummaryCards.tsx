@@ -1,25 +1,39 @@
+import React, { lazy, Suspense, memo } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { usePrompt } from "../../hooks/common/usePrompt";
-import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
-import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
-import _logger from "../../utils/common/logger";
+import { getIcon } from "@/utils";
+import { useBudgetStore } from "@/stores/ui/uiStore";
+import { usePrompt } from "@/hooks/common/usePrompt";
+import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
+import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import {
   calculateEnvelopeData,
   calculateEnvelopeTotals,
-} from "../../utils/budgeting/envelopeCalculations";
+} from "@/utils/budgeting/envelopeCalculations";
+
+interface SummaryCardProps {
+  icon: React.ElementType;
+  label: string;
+  value: number;
+  color: string;
+  onClick?: () => void;
+  clickable: boolean;
+  isNegative: boolean;
+  subtitle?: string;
+  dataTour?: string;
+}
 
 /**
  * Summary cards component showing financial overview
  * Now uses TanStack Query hooks for data loading
  */
 const SummaryCards = () => {
-  const openUnassignedCashModal = useBudgetStore((state) => state.openUnassignedCashModal);
-  const { unassignedCash, isLoading: _unassignedCashLoading } = useUnassignedCash();
+  const openUnassignedCashModal = useBudgetStore(
+    (state) => state.openUnassignedCashModal
+  ) as () => void;
+  const { unassignedCash } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();
 
@@ -75,7 +89,7 @@ const SummaryCards = () => {
       defaultValue: actualBalance?.toString() || "0",
       inputType: "number",
       placeholder: "0.00",
-      validation: (value) => {
+      validation: (value: string) => {
         const num = parseFloat(value);
         if (isNaN(num)) {
           return { valid: false, error: "Please enter a valid number" };
@@ -85,7 +99,7 @@ const SummaryCards = () => {
     });
 
     if (newBalance !== null) {
-      updateActualBalance(parseFloat(newBalance), {
+      await updateActualBalance(parseFloat(newBalance as string), {
         isManual: true,
         author: "User",
       });
@@ -156,7 +170,17 @@ const SummaryCards = () => {
 };
 
 const SummaryCard = memo(
-  ({ icon: _Icon, label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
+  ({
+    icon: _Icon,
+    label,
+    value,
+    color,
+    onClick,
+    clickable,
+    isNegative,
+    subtitle,
+    dataTour,
+  }: SummaryCardProps) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",

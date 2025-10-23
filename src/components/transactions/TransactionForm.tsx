@@ -1,8 +1,8 @@
-import { globalToast } from "../../stores/ui/toastStore";
-import useEditLock from "../../hooks/common/useEditLock";
-// eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use useEditLock hook instead
-import { initializeEditLocks } from "../../services/editLockService";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
+import React, { useEffect } from "react";
+import { globalToast } from "@/stores/ui/toastStore";
+import useEditLock from "@/hooks/common/useEditLock";
+import { initializeEditLocks } from "@/services/editLockService";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
@@ -41,7 +41,7 @@ const TransactionForm = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!transactionForm.description.trim() || !transactionForm.amount) {
@@ -67,10 +67,10 @@ const TransactionForm = ({
     onSubmit();
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     // Release lock when closing
     if (editLock.isOwnLock) {
-      editLock.releaseLock();
+      await editLock.releaseLock();
     }
     onClose();
   };
@@ -86,7 +86,6 @@ const TransactionForm = ({
             <EditLockIndicator
               isLocked={editLock.isLocked && !editLock.canEdit}
               isOwnLock={editLock.isOwnLock}
-              isLoading={editLock.isLoading}
               lock={{
                 userName: editLock.lockedBy,
                 expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),

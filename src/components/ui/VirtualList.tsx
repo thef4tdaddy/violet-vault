@@ -1,3 +1,13 @@
+import React, { memo, useState, useMemo } from "react";
+
+interface VirtualListProps {
+  items: unknown[];
+  itemHeight?: number;
+  containerHeight?: number;
+  renderItem: (item: unknown, index: number) => React.ReactNode;
+  className?: string;
+  overscan?: number;
+}
 
 const VirtualList = memo(
   ({
@@ -7,7 +17,7 @@ const VirtualList = memo(
     renderItem,
     className = "",
     overscan = 5,
-  }) => {
+  }: VirtualListProps) => {
     const [scrollTop, setScrollTop] = useState(0);
 
     const visibleRange = useMemo(() => {
@@ -37,8 +47,8 @@ const VirtualList = memo(
 
     const totalHeight = items.length * itemHeight;
 
-    const handleScroll = (e) => {
-      setScrollTop(e.target.scrollTop);
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+      setScrollTop((e.target as HTMLDivElement).scrollTop);
     };
 
     return (
@@ -68,4 +78,4 @@ const VirtualList = memo(
   }
 );
 
-export default VirtualList;
+export { VirtualList };
