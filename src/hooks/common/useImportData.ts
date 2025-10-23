@@ -75,7 +75,7 @@ const buildImportResult = (validatedData) => ({
   },
 });
 
-const performImport = async (validatedData, showSuccessToast) => {
+const performImport = async (validatedData, showSuccessToast, authConfig) => {
   await backupCurrentData();
   await clearFirebaseData();
   await clearAllDexieData();
@@ -83,7 +83,8 @@ const performImport = async (validatedData, showSuccessToast) => {
 
   showSuccessToast("Local data imported! Now syncing to cloud...", "Import Complete");
 
-  await forcePushToCloud();
+  // Pass auth config to force push since sync service will be stopped during import
+  await forcePushToCloud(authConfig);
   showSuccessToast("Import complete! Data synced to cloud successfully.");
 
   await queryClient.invalidateQueries();
@@ -91,7 +92,7 @@ const performImport = async (validatedData, showSuccessToast) => {
 };
 
 export const useImportData = () => {
-  const { user: currentUser } = useAuthManager();
+  const { user: currentUser, budgetId, encryptionKey } = useAuthManager();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 
@@ -124,7 +125,15 @@ export const useImportData = () => {
           return;
         }
 
-        await performImport(validatedData, showSuccessToast);
+        // Build auth config to pass to force push
+        // This ensures the sync service has access to auth data after being stopped
+        const authConfig = {
+          budgetId,
+          encryptionKey,
+          currentUser,
+        };
+
+        await performImport(validatedData, showSuccessToast, authConfig);
 
         return buildImportResult(validatedData);
       } catch (error) {
@@ -133,7 +142,7 @@ export const useImportData = () => {
         throw error;
       }
     },
-    [currentUser, confirm, showErrorToast, showSuccessToast]
+    [currentUser, budgetId, encryptionKey, confirm, showErrorToast, showSuccessToast]
   );
 
   return { importData };

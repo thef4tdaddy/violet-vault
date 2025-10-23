@@ -20,7 +20,12 @@ export const clearFirebaseData = async () => {
   }
 };
 
-export const forcePushToCloud = async () => {
+/**
+ * Force push imported data to Firebase
+ * @param {Object} authConfig - Auth configuration containing budgetId, encryptionKey, and currentUser
+ * authConfig is needed because sync service is stopped before import
+ */
+export const forcePushToCloud = async (authConfig = null) => {
   try {
     logger.info("🛑 Stopping sync service before clean restart...");
     cloudSyncService.stop();
@@ -35,7 +40,8 @@ export const forcePushToCloud = async () => {
     }
 
     logger.info("🚀 Force pushing imported data to Firebase with clean slate...");
-    const result = await cloudSyncService.forcePushToCloud();
+    // Pass auth config to force push in case service was stopped
+    const result = await cloudSyncService.forcePushToCloud(authConfig);
 
     if (result.success) {
       logger.info("✅ Imported data successfully pushed to Firebase.");

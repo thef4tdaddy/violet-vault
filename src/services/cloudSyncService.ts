@@ -590,9 +590,10 @@ class CloudSyncService {
     };
   }
 
-  async forcePushToCloud() {
+  async forcePushToCloud(overrideConfig = null) {
     // Force push local data to Firebase without pulling from Firebase first
     // This is used after backup imports to ensure imported data overwrites cloud data
+    // overrideConfig allows passing auth data when service config is null (e.g., during import)
     if (this.isSyncing) {
       logger.warn("🟡 Sync in progress, skipping force push");
       return { success: false, error: "Sync already in progress" };
@@ -603,8 +604,11 @@ class CloudSyncService {
     try {
       logger.info("🚀 Force pushing local data to Firebase...");
 
+      // Use override config if provided (during import after service stop), otherwise use this.config
+      const config = overrideConfig || this.config;
+
       // Guard against undefined config during import
-      if (!this.config?.budgetId || !this.config?.encryptionKey) {
+      if (!config?.budgetId || !config?.encryptionKey) {
         throw new Error(
           "Cannot force push: missing budgetId or encryptionKey. Config may not be initialized."
         );
@@ -614,10 +618,10 @@ class CloudSyncService {
       const localData = await this.fetchDexieData();
 
       // Initialize chunked Firebase sync if not already done
-      await chunkedSyncService.initialize(this.config.budgetId, this.config.encryptionKey);
+      await chunkedSyncService.initialize(config.budgetId, config.encryptionKey);
 
       // Use chunked Firebase sync to save data (one-way)
-      const result = await chunkedSyncService.saveToCloud(localData, this.config.currentUser);
+      const result = await chunkedSyncService.saveToCloud(localData, config.currentUser);
 
       if (result.success) {
         logger.info("✅ Force push to Firebase completed successfully");
