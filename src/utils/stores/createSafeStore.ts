@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create, StoreApi, StateCreator } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools, PersistOptions } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -14,15 +14,22 @@ interface StoreOptions {
   version?: number;
 }
 
+type StoreAction = (
+  set: (fn: (state: Record<string, unknown>) => Record<string, unknown> | void) => void,
+  getState: () => Record<string, unknown>,
+  store: Record<string, unknown>,
+  ...args: unknown[]
+) => unknown;
+
 interface CreateSafeStoreConfig<T> {
   name: string;
   initialState: T;
-  actions?: Record<string, (...args: any[]) => any>;
+  actions?: Record<string, StoreAction>;
   options?: StoreOptions;
 }
 
 // Validation helpers
-const validateConfig = (name: string, initialState: any) => {
+const validateConfig = (name: string, initialState: Record<string, unknown>): void => {
   if (!name || typeof name !== "string") {
     throw new Error("Store name is required and must be a string");
   }
@@ -33,14 +40,14 @@ const validateConfig = (name: string, initialState: any) => {
 
 // Action wrapper utility
 const wrapActions = (
-  actions: Record<string, (...args: any[]) => any>,
+  actions: Record<string, StoreAction>,
   name: string,
-  set: any,
-  useStore: any,
-  store: any
-) => {
-  return Object.entries(actions).reduce((acc: any, [actionName, actionFn]) => {
-    acc[actionName] = (...args) => {
+  set: (fn: (state: Record<string, unknown>) => Record<string, unknown> | void) => void,
+  useStore: StoreApi<Record<string, unknown>>,
+  store: Record<string, unknown>
+): Record<string, unknown> => {
+  return Object.entries(actions).reduce<Record<string, unknown>>((acc, [actionName, actionFn]) => {
+    acc[actionName] = (...args: unknown[]) => {
       try {
         const getCurrentState = () => useStore.getState();
         const result = actionFn(set, getCurrentState, store, ...args);
@@ -62,23 +69,35 @@ const wrapActions = (
 };
 
 // Middleware stack builder
-const buildMiddlewareStack = (storeInitializer: any, options: any, name: string) => {
+interface MiddlewareOptions {
+  enablePersist: boolean;
+  persistedKeys: string[] | null;
+  enableImmer: boolean;
+  enableDevtools: boolean;
+  version: number;
+}
+
+const buildMiddlewareStack = (
+  storeInitializer: StateCreator<Record<string, unknown>>,
+  options: MiddlewareOptions,
+  name: string
+): StateCreator<Record<string, unknown>> => {
   const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } = options;
-  let middlewareStack: any = storeInitializer;
+  let middlewareStack: StateCreator<Record<string, unknown>> = storeInitializer;
 
   if (enableImmer) {
     middlewareStack = immer(middlewareStack);
   }
 
   if (enablePersist && !LOCAL_ONLY_MODE) {
-    const persistConfig: PersistOptions<any, any> = {
+    const persistConfig: PersistOptions<Record<string, unknown>> = {
       name: `violet-vault-${name}`,
       version,
-    } as PersistOptions<any, any>;
+    };
 
     if (persistedKeys && Array.isArray(persistedKeys)) {
-      persistConfig.partialize = (state: any) =>
-        persistedKeys.reduce((acc: any, key: string) => {
+      persistConfig.partialize = (state: Record<string, unknown>): Record<string, unknown> =>
+        persistedKeys.reduce<Record<string, unknown>>((acc, key: string) => {
           if (key in state) acc[key] = state[key];
           return acc;
         }, {});
@@ -102,7 +121,7 @@ export const createSafeStore = <T extends object>({
   initialState,
   actions = {},
   options = {},
-}: CreateSafeStoreConfig<T>) => {
+}: CreateSafeStoreConfig<T>): StoreApi<T & Record<string, unknown>> => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
@@ -111,12 +130,12 @@ export const createSafeStore = <T extends object>({
     version = 1,
   } = options;
 
-  validateConfig(name, initialState);
+  validateConfig(name, initialState as Record<string, unknown>);
 
-  let useStore: any;
+  let useStore: StoreApi<T & Record<string, unknown>>;
 
-  const storeInitializer = (set: any, _get: any) => {
-    const store: any = {
+  const storeInitializer: StateCreator<T & Record<string, unknown>> = (set, _get) => {
+    const store: T & Record<string, unknown> = {
       ...initialState,
       reset: () => {
         logger.info(`Resetting store ${name}`);
@@ -135,7 +154,7 @@ export const createSafeStore = <T extends object>({
 
     // Add wrapped actions
     Object.assign(store, wrapActions(actions, name, set, useStore, store));
-    return store;
+    return store as T & Record<string, unknown>;
   };
 
   const middlewareStack = buildMiddlewareStack(

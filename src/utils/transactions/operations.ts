@@ -8,11 +8,32 @@
 import logger from "../common/logger.ts";
 import { validateTransactionSafe } from "../../domain/schemas/transaction.ts";
 
+interface TransactionBase {
+  id?: string;
+  description: string;
+  amount: number;
+  date: string | Date;
+  category?: string;
+  account?: string;
+  envelopeId?: string | null;
+  type?: "income" | "expense" | "transfer";
+  isSplit?: boolean;
+  parentTransactionId?: string | null;
+  metadata?: Record<string, unknown>;
+}
+
+type Transaction = Required<Omit<TransactionBase, "metadata">> & { metadata: Record<string, unknown> };
+
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
 /**
  * Validate transaction data using Zod schema
  * Converts Zod errors to legacy format for backward compatibility
  */
-export const validateTransactionData = (transactionData: any): { isValid: boolean; errors: string[] } => {
+export const validateTransactionData = (transactionData: unknown): ValidationResult => {
   try {
     if (!transactionData) {
       return { isValid: false, errors: ["Transaction data is required"] };
@@ -43,7 +64,7 @@ export const validateTransactionData = (transactionData: any): { isValid: boolea
 /**
  * Prepare transaction data for database storage
  */
-export const prepareTransactionForStorage = (transactionData: any): any => {
+export const prepareTransactionForStorage = (transactionData: TransactionBase): Transaction => {
   try {
     const now = new Date().toISOString();
 
@@ -75,7 +96,7 @@ export const prepareTransactionForStorage = (transactionData: any): any => {
 /**
  * Calculate transaction type based on amount and metadata
  */
-export const determineTransactionType = (transaction: any): string => {
+export const determineTransactionType = (transaction: TransactionBase): "income" | "expense" | "transfer" => {
   try {
     if (!transaction) return "expense";
 
@@ -98,7 +119,7 @@ export const determineTransactionType = (transaction: any): string => {
 /**
  * Create transfer transaction pair
  */
-export const createTransferPair = (transferData: any): any[] => {
+export const createTransferPair = (transferData: TransactionBase & { fromAccount: string; toAccount: string; fromEnvelopeId?: string; toEnvelopeId?: string }): Transaction[] => {
   try {
     const validation = validateTransactionData({
       ...transferData,
@@ -162,10 +183,16 @@ export const createTransferPair = (transferData: any): any[] => {
   }
 };
 
+interface CategoryRule {
+  keywords: string[];
+  category: string;
+  name?: string;
+}
+
 /**
  * Categorize transaction based on description and rules
  */
-export const categorizeTransaction = (transaction: any, categoryRules: any[] = []): any => {
+export const categorizeTransaction = (transaction: TransactionBase, categoryRules: CategoryRule[] = []): TransactionBase => {
   try {
     if (!transaction || transaction.category) {
       return transaction; // Already has category
