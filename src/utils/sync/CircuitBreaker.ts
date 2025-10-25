@@ -226,5 +226,3 @@ export class CircuitBreaker {
     return Math.max(0, this.nextAttempt - Date.now());
   }
 }
-
-export default CircuitBreaker;
