@@ -3,13 +3,15 @@ import { Button } from "@/components/ui";
 import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
 import { getIcon } from "@/utils";
 
+interface ObjectHistoryViewerProps {
+  objectId: string;
+  objectType: string;
+  objectName: string;
+  onClose: () => void;
+}
+
 /**
  * ObjectHistoryViewer - Shows history for a specific envelope, transaction, etc.
- * @param {Object} props
- * @param {string} props.objectId - ID of the object to show history for
- * @param {string} props.objectType - Type of object (envelope, transaction, bill, etc.)
- * @param {string} props.objectName - Display name of the object
- * @param {function} props.onClose - Close callback
  */
 interface BudgetCommit {
   id?: string;
@@ -18,13 +20,8 @@ interface BudgetCommit {
   author?: string;
   timestamp?: string;
   changes?: Array<Record<string, unknown>>;
-}
-
-interface ObjectHistoryViewerProps {
-  objectId: string;
-  objectType: string;
-  objectName?: string;
-  onClose: () => void;
+  deviceFingerprint?: string;
+  parentHash?: string;
 }
 
 const ObjectHistoryViewer = ({

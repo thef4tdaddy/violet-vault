@@ -2,7 +2,48 @@ import { create } from "zustand";
 
 let toastId = 0;
 
-export const useToastStore = create((set, _get) => {
+/**
+ * Toast type
+ */
+type ToastType = "info" | "success" | "error" | "warning" | "payday";
+
+/**
+ * Toast object
+ */
+interface Toast {
+  id: number;
+  type: ToastType;
+  title?: string;
+  message: string;
+  duration: number;
+}
+
+/**
+ * Toast options for adding a toast
+ */
+interface AddToastOptions {
+  type?: ToastType;
+  title?: string;
+  message: string;
+  duration?: number;
+}
+
+/**
+ * Toast store state
+ */
+interface ToastState {
+  toasts: Toast[];
+  addToast: (options: AddToastOptions) => number;
+  removeToast: (id: number) => void;
+  clearAllToasts: () => void;
+  showSuccess: (message: string, title?: string, duration?: number) => number;
+  showError: (message: string, title?: string, duration?: number) => number;
+  showWarning: (message: string, title?: string, duration?: number) => number;
+  showInfo: (message: string, title?: string, duration?: number) => number;
+  showPayday: (message: string, title?: string, duration?: number) => number;
+}
+
+export const useToastStore = create<ToastState>((set, _get) => {
   const store = {
     toasts: [],
 
@@ -67,15 +108,15 @@ export const useToastStore = create((set, _get) => {
 
 // Global toast functions that can be called from anywhere
 export const globalToast = {
-  showSuccess: (message, title, duration) =>
+  showSuccess: (message: string, title?: string, duration?: number) =>
     useToastStore.getState().showSuccess(message, title, duration),
-  showError: (message, title, duration) =>
+  showError: (message: string, title?: string, duration?: number) =>
     useToastStore.getState().showError(message, title, duration),
-  showWarning: (message, title, duration) =>
+  showWarning: (message: string, title?: string, duration?: number) =>
     useToastStore.getState().showWarning(message, title, duration),
-  showInfo: (message, title, duration) =>
+  showInfo: (message: string, title?: string, duration?: number) =>
     useToastStore.getState().showInfo(message, title, duration),
-  showPayday: (message, title, duration) =>
+  showPayday: (message: string, title?: string, duration?: number) =>
     useToastStore.getState().showPayday(message, title, duration),
 };
 
