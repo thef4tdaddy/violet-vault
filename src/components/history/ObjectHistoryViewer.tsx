@@ -3,16 +3,18 @@ import { Button } from "@/components/ui";
 import { useBudgetCommits } from "../../hooks/budgeting/useBudgetHistoryQuery";
 import { getIcon } from "../../utils";
 
+interface ObjectHistoryViewerProps {
+  objectId: string;
+  objectType: string;
+  objectName: string;
+  onClose: () => void;
+}
+
 /**
  * ObjectHistoryViewer - Shows history for a specific envelope, transaction, etc.
- * @param {Object} props
- * @param {string} props.objectId - ID of the object to show history for
- * @param {string} props.objectType - Type of object (envelope, transaction, bill, etc.)
- * @param {string} props.objectName - Display name of the object
- * @param {function} props.onClose - Close callback
  */
-const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
-  const { data: allCommits = [], isLoading } = useBudgetCommits();
+const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: ObjectHistoryViewerProps) => {
+  const { commits: allCommits = [], isLoading } = useBudgetCommits();
 
   const [relevantHistory, setRelevantHistory] = useState([]);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
@@ -48,28 +50,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
     });
   };
 
-  const _getChangeIcon = (changeType) => {
-    switch (changeType) {
-      case "add":
-        return React.createElement(getIcon("Plus"), {
-          className: "h-3 w-3 text-green-600",
-        });
-      case "delete":
-        return React.createElement(getIcon("Minus"), {
-          className: "h-3 w-3 text-red-600",
-        });
-      case "modify":
-        return React.createElement(getIcon("Edit3"), {
-          className: "h-3 w-3 text-blue-600",
-        });
-      default:
-        return React.createElement(getIcon("GitCommit"), {
-          className: "h-3 w-3 text-gray-600",
-        });
-    }
-  };
-
-  const getAuthorColor = (author) => {
+  const getAuthorColor = (author: string) => {
     switch (author) {
       case "system":
         return "bg-gray-100 text-gray-700";
@@ -78,14 +59,6 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
       default:
         return "bg-purple-100 text-purple-700";
     }
-  };
-
-  const _formatChangeDescription = (change) => {
-    // Simple change description formatter
-    if (change.type === "add") return `Added ${objectType.toLowerCase()}`;
-    if (change.type === "delete") return `Deleted ${objectType.toLowerCase()}`;
-    if (change.type === "modify") return `Modified ${objectType.toLowerCase()}`;
-    return `Changed ${objectType.toLowerCase()}`;
   };
 
   return (

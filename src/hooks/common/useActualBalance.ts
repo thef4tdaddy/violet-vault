@@ -3,6 +3,18 @@ import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 
+interface UpdateBalanceOptions {
+  isManual?: boolean;
+  source?: string;
+}
+
+interface FormatBalanceOptions {
+  showCurrency?: boolean;
+  showSign?: boolean;
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
+}
+
 /**
  * Custom hook for managing actual balance operations
  * Handles business logic for balance updates, validations, and state management
@@ -13,7 +25,7 @@ export const useActualBalance = () => {
     isActualBalanceManual,
     setActualBalance: setStoreBalance,
   } = useBudgetStore(
-    useShallow((state) => ({
+    useShallow((state: any) => ({
       actualBalance: state.actualBalance,
       isActualBalanceManual: state.isActualBalanceManual,
       setActualBalance: state.setActualBalance,
@@ -23,12 +35,10 @@ export const useActualBalance = () => {
   /**
    * Updates the actual balance with validation and audit logging
    * @param {number} newBalance - The new balance value
-   * @param {Object} options - Configuration options
-   * @param {boolean} options.isManual - Whether this is a manual user input
-   * @param {string} options.source - Source of the balance update (manual, import, sync, etc.)
+   * @param {UpdateBalanceOptions} options - Configuration options
    */
   const updateActualBalance = useCallback(
-    (newBalance, options = {}) => {
+    (newBalance: number, options: UpdateBalanceOptions = {}) => {
       const { isManual = true, source = "manual" } = options;
 
       // Validate input
@@ -103,10 +113,10 @@ export const useActualBalance = () => {
   /**
    * Formats balance for display
    * @param {number} balance - Balance to format
-   * @param {Object} options - Formatting options
+   * @param {FormatBalanceOptions} options - Formatting options
    * @returns {string} Formatted balance string
    */
-  const formatBalance = useCallback((balance, options = {}) => {
+  const formatBalance = useCallback((balance: number, options: FormatBalanceOptions = {}) => {
     const {
       showCurrency = true,
       showSign = false,
