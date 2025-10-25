@@ -1,11 +1,9 @@
-import React from "react";
 import AccountCardHeader from "./shared/AccountCardHeader";
 import AccountCardDetails from "./shared/AccountCardDetails";
 
 const AccountCard = ({
   account,
   typeInfo,
-  _daysUntilExpiration,
   expirationStatus,
   showBalances,
   onEdit,

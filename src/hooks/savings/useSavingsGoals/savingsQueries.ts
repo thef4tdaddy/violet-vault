@@ -10,10 +10,17 @@ import {
   filterSavingsGoals,
 } from "../../../utils/savings/savingsCalculations";
 
+interface SavingsGoalsQueryOptions {
+  status?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  includeCompleted?: boolean;
+}
+
 /**
  * Core savings goals data fetching query function
  */
-export const useSavingsGoalsQueryFunction = (options = {}) => {
+export const useSavingsGoalsQueryFunction = (options: SavingsGoalsQueryOptions = {}) => {
   const {
     status = "all",
     sortBy = "targetDate",
@@ -65,7 +72,7 @@ export const useSavingsGoalsQueryFunction = (options = {}) => {
 /**
  * Main savings goals query hook
  */
-export const useSavingsGoalsQuery = (options = {}) => {
+export const useSavingsGoalsQuery = (options: SavingsGoalsQueryOptions = {}) => {
   const {
     status = "all",
     sortBy = "targetDate",
@@ -76,18 +83,13 @@ export const useSavingsGoalsQuery = (options = {}) => {
   const queryFunction = useSavingsGoalsQueryFunction(options);
 
   return useQuery({
-    queryKey: queryKeys.savingsGoalsList({
-      status,
-      sortBy,
-      sortOrder,
-      includeCompleted,
-    }),
+    queryKey: [...queryKeys.savingsGoalsList(), status, sortBy, sortOrder, includeCompleted],
     queryFn: queryFunction,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (previousData: any) => previousData,
     enabled: true,
   });
 };
@@ -95,7 +97,7 @@ export const useSavingsGoalsQuery = (options = {}) => {
 /**
  * Active savings goals query (non-completed goals for dashboard)
  */
-export const useActiveSavingsGoalsQuery = (savingsData = []) => {
+export const useActiveSavingsGoalsQuery = (savingsData: any[] = []) => {
   return useQuery({
     queryKey: queryKeys.activeSavingsGoals(),
     queryFn: async () => {
@@ -124,7 +126,7 @@ export const useSavingsGoalsQueryEvents = () => {
     const handleInvalidateAll = () => {
       logger.debug("Invalidating all savings goals queries");
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     };
 

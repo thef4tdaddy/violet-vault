@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * Extracted Items List Component
  * Displays receipt line items in a scrollable container

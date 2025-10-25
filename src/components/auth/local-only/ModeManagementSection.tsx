@@ -53,8 +53,7 @@ const ModeManagementSection: React.FC<ModeManagementSectionProps> = ({
                 <h5 className="font-medium text-gray-900">Clear All Data</h5>
               </div>
               <p className="text-sm text-gray-600 mt-1">
-                Permanently delete all envelopes, transactions, and settings. This cannot be
-                undone.
+                Permanently delete all envelopes, transactions, and settings. This cannot be undone.
               </p>
             </div>
             <Button

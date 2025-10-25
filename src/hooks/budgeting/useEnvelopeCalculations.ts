@@ -27,7 +27,11 @@ export const useEnvelopeCalculations = (envelopes = []) => {
   };
 
   // Repair corrupted envelopes
-  const repairCorruptedEnvelope = async (envelopeId: string, name: string, category: string = "utilities") => {
+  const repairCorruptedEnvelope = async (
+    envelopeId: string,
+    name: string,
+    category: string = "utilities"
+  ) => {
     logger.info("Repairing corrupted envelope", { envelopeId, name, category });
 
     const updates = {

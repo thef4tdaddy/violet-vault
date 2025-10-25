@@ -1,4 +1,3 @@
-import React from "react";
 import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
 import FixedAmountConfig from "./config/FixedAmountConfig";
 import PercentageConfig from "./config/PercentageConfig";

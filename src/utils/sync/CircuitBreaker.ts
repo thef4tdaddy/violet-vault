@@ -6,8 +6,49 @@ import logger from "../common/logger";
  *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
+
+type CircuitState = "CLOSED" | "OPEN" | "HALF_OPEN";
+
+interface CircuitBreakerOptions {
+  name?: string;
+  failureThreshold?: number;
+  timeout?: number;
+  monitoringPeriod?: number;
+}
+
+interface CircuitBreakerStatus {
+  state: CircuitState;
+  failures: number;
+  successCount: number;
+  totalRequests: number;
+  failureThreshold: number;
+  timeUntilRetry: number;
+  isHealthy: boolean;
+}
+
+class CircuitBreakerError extends Error {
+  code: string;
+
+  constructor(message: string, code: string) {
+    super(message);
+    this.code = code;
+    this.name = "CircuitBreakerError";
+  }
+}
+
 export class CircuitBreaker {
-  constructor(options = {}) {
+  name: string;
+  failureThreshold: number;
+  timeout: number;
+  monitoringPeriod: number;
+  state: CircuitState;
+  failures: number;
+  lastFailureTime: number | null;
+  nextAttempt: number | null;
+  successCount: number;
+  totalRequests: number;
+
+  constructor(options: CircuitBreakerOptions = {}) {
     this.name = options.name || "CircuitBreaker";
     this.failureThreshold = options.failureThreshold || 5;
     this.timeout = options.timeout || 60000; // 1 minute
@@ -24,7 +65,10 @@ export class CircuitBreaker {
   /**
    * Execute operation through circuit breaker
    */
-  async execute(operation, operationName = "unknown") {
+  async execute(
+    operation: () => Promise<unknown>,
+    operationName: string = "unknown"
+  ): Promise<unknown> {
     this.totalRequests++;
 
     if (this.state === "OPEN") {
@@ -36,7 +80,7 @@ export class CircuitBreaker {
       this._onSuccess(operationName);
       return result;
     } catch (error) {
-      this._onFailure(error, operationName);
+      this._onFailure(error as Error, operationName);
       throw error;
     }
   }
@@ -44,7 +88,7 @@ export class CircuitBreaker {
   /**
    * Get current circuit breaker status
    */
-  getStatus() {
+  getStatus(): CircuitBreakerStatus {
     return {
       state: this.state,
       failures: this.failures,
@@ -59,7 +103,7 @@ export class CircuitBreaker {
   /**
    * Force reset circuit breaker to CLOSED state
    */
-  reset() {
+  reset(): void {
     logger.info(`🔄 ${this.name}: Circuit breaker manually reset`);
     this._transitionToClosed();
   }
@@ -68,25 +112,27 @@ export class CircuitBreaker {
    * Handle operation execution when circuit is open
    * @private
    */
-  async _handleOpenCircuit(operationName) {
-    if (Date.now() >= this.nextAttempt) {
+  async _handleOpenCircuit(operationName: string): Promise<null> {
+    if (Date.now() >= (this.nextAttempt || 0)) {
       logger.debug(`🔍 ${this.name}: Attempting to half-open circuit for ${operationName}`);
       this._transitionToHalfOpen();
       return null; // Allow caller to retry
     }
 
-    const error = new Error(
-      `Circuit breaker is OPEN. Next attempt in ${this._getTimeUntilRetry()}ms`
+    throw new CircuitBreakerError(
+      `Circuit breaker is OPEN. Next attempt in ${this._getTimeUntilRetry()}ms`,
+      "CIRCUIT_BREAKER_OPEN"
     );
-    error.code = "CIRCUIT_BREAKER_OPEN";
-    throw error;
   }
 
   /**
    * Execute operation with monitoring
    * @private
    */
-  async _executeWithMonitoring(operation, operationName) {
+  async _executeWithMonitoring(
+    operation: () => Promise<unknown>,
+    operationName: string
+  ): Promise<unknown> {
     const startTime = Date.now();
 
     try {
@@ -101,7 +147,7 @@ export class CircuitBreaker {
    * Handle successful operation
    * @private
    */
-  _onSuccess(operationName) {
+  _onSuccess(operationName: string): void {
     this.successCount++;
 
     if (this.state === "HALF_OPEN") {
@@ -117,7 +163,7 @@ export class CircuitBreaker {
    * Handle failed operation
    * @private
    */
-  _onFailure(error, operationName) {
+  _onFailure(error: Error, operationName: string): void {
     this.failures++;
     this.lastFailureTime = Date.now();
 
@@ -138,7 +184,7 @@ export class CircuitBreaker {
    * Transition to CLOSED state
    * @private
    */
-  _transitionToClosed() {
+  _transitionToClosed(): void {
     this.state = "CLOSED";
     this.failures = 0;
     this.nextAttempt = null;
@@ -149,7 +195,7 @@ export class CircuitBreaker {
    * Transition to OPEN state
    * @private
    */
-  _transitionToOpen(operationName) {
+  _transitionToOpen(operationName: string): void {
     this.state = "OPEN";
     this.nextAttempt = Date.now() + this.timeout;
 
@@ -164,7 +210,7 @@ export class CircuitBreaker {
    * Transition to HALF_OPEN state
    * @private
    */
-  _transitionToHalfOpen() {
+  _transitionToHalfOpen(): void {
     this.state = "HALF_OPEN";
     logger.debug(`🟡 ${this.name}: Circuit transitioned to HALF_OPEN`);
   }
@@ -173,12 +219,10 @@ export class CircuitBreaker {
    * Calculate time until next retry attempt
    * @private
    */
-  _getTimeUntilRetry() {
+  _getTimeUntilRetry(): number {
     if (this.state !== "OPEN" || !this.nextAttempt) {
       return 0;
     }
     return Math.max(0, this.nextAttempt - Date.now());
   }
 }
-
-export default CircuitBreaker;

@@ -1,10 +1,19 @@
-import React from "react";
+import { createElement } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
-import { useDebtDetailModal } from "../../../hooks/debts/useDebtDetailModal";
+import { getIcon } from "@/utils";
+import { useDebtDetailModal } from "@/hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
 import QuickPaymentForm from "../ui/QuickPaymentForm";
+
+interface DebtDetailModalProps {
+  debt?: Record<string, unknown>;
+  isOpen: boolean;
+  onClose: () => void;
+  onDelete: (debtId: string) => Promise<void>;
+  onRecordPayment: (debtId: string, amount: number) => Promise<void>;
+  onEdit: (debt: Record<string, unknown>) => void;
+}
 
 /**
  * Modal for viewing and managing individual debt details
@@ -16,9 +25,8 @@ const DebtDetailModal = ({
   onClose,
   onDelete,
   onRecordPayment,
-  _onLinkToBill,
   onEdit,
-}) => {
+}: DebtDetailModalProps) => {
   const {
     showPaymentForm,
     paymentAmount,

@@ -39,12 +39,14 @@ interface EnvelopeAnalysis {
  */
 export const useBalanceAnalyticsQuery = () => {
   // Get data from Zustand store
-  const { envelopes, savingsGoals, unassignedCash, actualBalance } = useBudgetStore((state: StoreSelector) => ({
-    envelopes: state.envelopes,
-    savingsGoals: state.savingsGoals,
-    unassignedCash: state.unassignedCash,
-    actualBalance: state.actualBalance,
-  }));
+  const { envelopes, savingsGoals, unassignedCash, actualBalance } = useBudgetStore(
+    (state: StoreSelector) => ({
+      envelopes: state.envelopes,
+      savingsGoals: state.savingsGoals,
+      unassignedCash: state.unassignedCash,
+      actualBalance: state.actualBalance,
+    })
+  );
 
   return useQuery({
     queryKey: queryKeys.analyticsBalance(),
@@ -99,11 +101,16 @@ export const useBalanceAnalyticsQuery = () => {
         insights: {
           underfundedCount: underfundedEnvelopes.length,
           overfundedCount: overfundedEnvelopes.length,
-          totalFundingGap: underfundedEnvelopes.reduce((sum: number, env: EnvelopeAnalysis) => sum + env.fundingGap, 0),
+          totalFundingGap: underfundedEnvelopes.reduce(
+            (sum: number, env: EnvelopeAnalysis) => sum + env.fundingGap,
+            0
+          ),
           averageUtilization:
             envelopeAnalysis.length > 0
-              ? envelopeAnalysis.reduce((sum: number, env: EnvelopeAnalysis) => sum + env.utilizationRate, 0) /
-                envelopeAnalysis.length
+              ? envelopeAnalysis.reduce(
+                  (sum: number, env: EnvelopeAnalysis) => sum + env.utilizationRate,
+                  0
+                ) / envelopeAnalysis.length
               : 0,
           completedSavingsGoals: savingsAnalysis.filter((goal) => goal.isCompleted).length,
           totalSavingsTarget: savingsAnalysis.reduce(

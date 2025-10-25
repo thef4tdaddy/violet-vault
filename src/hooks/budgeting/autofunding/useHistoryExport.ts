@@ -1,14 +1,65 @@
 import { useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
+interface ExportOptions {
+  includeUndoStack?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+  format?: "json" | "csv";
+}
+
+interface ExportResult {
+  format: string;
+  content: string;
+  data?: unknown;
+  filename: string;
+}
+
 /**
  * Hook for managing auto-funding history import/export
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
 export const useHistoryExport = () => {
+  // Helper functions defined before usage
+  const generateFilename = useCallback((format: string): string => {
+    const dateStr = new Date().toISOString().split("T")[0];
+    return `auto-funding-history-${dateStr}.${format}`;
+  }, []);
+
+  const exportToCsv = useCallback(
+    (historyToExport: any[]): ExportResult => {
+      const csvHeaders = [
+        "Execution ID",
+        "Trigger",
+        "Executed At",
+        "Rules Executed",
+        "Total Funded",
+        "Success",
+      ].join(",");
+
+      const csvRows = historyToExport.map((execution) =>
+        [
+          execution.id,
+          execution.trigger,
+          execution.executedAt,
+          execution.rulesExecuted || 0,
+          execution.totalFunded || 0,
+          execution.success !== false ? "true" : "false",
+        ].join(",")
+      );
+
+      return {
+        format: "csv",
+        content: [csvHeaders, ...csvRows].join("\n"),
+        filename: generateFilename("csv"),
+      };
+    },
+    [generateFilename]
+  );
+
   // Export history data
   const exportHistory = useCallback(
-    (executionHistory, undoStack, options = {}) => {
+    (executionHistory: any[], undoStack: any[], options: ExportOptions = {}): ExportResult => {
       try {
         const { includeUndoStack = true, dateFrom, dateTo, format = "json" } = options;
 
@@ -56,42 +107,6 @@ export const useHistoryExport = () => {
     },
     [exportToCsv, generateFilename]
   );
-
-  const exportToCsv = useCallback(
-    (historyToExport) => {
-      const csvHeaders = [
-        "Execution ID",
-        "Trigger",
-        "Executed At",
-        "Rules Executed",
-        "Total Funded",
-        "Success",
-      ].join(",");
-
-      const csvRows = historyToExport.map((execution) =>
-        [
-          execution.id,
-          execution.trigger,
-          execution.executedAt,
-          execution.rulesExecuted || 0,
-          execution.totalFunded || 0,
-          execution.success !== false ? "true" : "false",
-        ].join(",")
-      );
-
-      return {
-        format: "csv",
-        content: [csvHeaders, ...csvRows].join("\n"),
-        filename: generateFilename("csv"),
-      };
-    },
-    [generateFilename]
-  );
-
-  const generateFilename = useCallback((format) => {
-    const dateStr = new Date().toISOString().split("T")[0];
-    return `auto-funding-history-${dateStr}.${format}`;
-  }, []);
 
   return {
     exportHistory,

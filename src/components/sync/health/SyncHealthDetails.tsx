@@ -1,13 +1,12 @@
-import React from "react";
 import { Button } from "@/components/ui";
-import { renderIcon } from "../../../utils/icons";
+import { renderIcon } from "@/utils";
 import {
   formatLastChecked,
   getStatusDescription,
   getActionButtonStyle,
   formatRecoveryResult,
   hasRecoveryActions,
-} from "../../../utils/common/syncHelpers";
+} from "@/utils/common/syncHelpers";
 
 /**
  * @typedef {Object} RecoveryResult

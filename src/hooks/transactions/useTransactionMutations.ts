@@ -3,11 +3,29 @@ import { queryKeys, optimisticHelpers } from "../../utils/common/queryClient.ts"
 import { budgetDb } from "../../db/budgetDb.ts";
 import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts";
 import logger from "../../utils/common/logger.ts";
+import type { Transaction } from "../../db/types.ts";
+
+interface TransactionInput {
+  date?: string;
+  amount?: number;
+  type?: "income" | "expense" | "transfer";
+  category?: string;
+  description?: string;
+  envelopeId?: string;
+  merchant?: string;
+  receiptUrl?: string;
+  [key: string]: unknown;
+}
+
+interface TransactionUpdateInput {
+  id: string;
+  updates: Partial<Transaction>;
+}
 
 // Helper to trigger sync for transaction changes
-const triggerTransactionSync = (changeType) => {
-  if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+const triggerTransactionSync = (changeType: string) => {
+  if (typeof window !== "undefined" && (window as any).cloudSyncService) {
+    (window as any).cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
   }
 };
 
@@ -18,15 +36,19 @@ export const useTransactionMutations = () => {
   // Add transaction mutation
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
-    mutationFn: async (transactionData) => {
-      const newTransaction = {
+    mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
+      const newTransaction: Transaction = {
         id: Date.now().toString(),
-        date: new Date().toISOString().split("T")[0],
-        type: "expense",
-        category: "other",
-        createdAt: new Date().toISOString(),
-        ...transactionData,
+        date: new Date(transactionData.date || new Date().toISOString().split("T")[0]),
+        type: transactionData.type || "expense",
+        category: transactionData.category || "other",
+        createdAt: Date.now(),
         amount: transactionData.amount || 0,
+        envelopeId: transactionData.envelopeId || "",
+        lastModified: Date.now(),
+        description: transactionData.description,
+        merchant: transactionData.merchant,
+        receiptUrl: transactionData.receiptUrl,
       };
 
       // Apply optimistic update and save to Dexie
@@ -60,11 +82,18 @@ export const useTransactionMutations = () => {
   // Reconcile transaction mutation (for balance reconciliation)
   const reconcileTransactionMutation = useMutation({
     mutationKey: ["transactions", "reconcile"],
-    mutationFn: async (transactionData) => {
-      const reconciledTransaction = {
-        ...transactionData,
+    mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
+      const reconciledTransaction: any = {
         id: Date.now().toString(),
+        date: new Date(transactionData.date || new Date().toISOString().split("T")[0]),
+        amount: transactionData.amount || 0,
+        envelopeId: transactionData.envelopeId || "",
+        category: transactionData.category || "other",
+        type: transactionData.type || "expense",
+        lastModified: Date.now(),
+        createdAt: Date.now(),
         reconciledAt: new Date().toISOString(),
+        description: transactionData.description,
       };
 
       // Apply optimistic update and save to Dexie
@@ -92,7 +121,7 @@ export const useTransactionMutations = () => {
   // Delete transaction mutation
   const deleteTransactionMutation = useMutation({
     mutationKey: ["transactions", "delete"],
-    mutationFn: async (transactionId) => {
+    mutationFn: async (transactionId: string): Promise<string> => {
       // Get transaction data before deleting (needed for balance updates)
       const transaction = await budgetDb.transactions.get(transactionId);
 
@@ -130,7 +159,7 @@ export const useTransactionMutations = () => {
   // Update transaction mutation
   const updateTransactionMutation = useMutation({
     mutationKey: ["transactions", "update"],
-    mutationFn: async ({ id, updates }) => {
+    mutationFn: async ({ id, updates }: TransactionUpdateInput): Promise<TransactionUpdateInput> => {
       const updatedTransaction = {
         ...updates,
         updatedAt: new Date().toISOString(),

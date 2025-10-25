@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui";
 import { hasMinimumExtractedData } from "../../../utils/receipts/receiptHelpers.tsx";
 
