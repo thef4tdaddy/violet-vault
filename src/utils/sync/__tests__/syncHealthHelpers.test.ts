@@ -148,8 +148,8 @@ describe("syncHealthHelpers", () => {
 
   describe("hasRecoveryActions", () => {
     it("should return true when recovery functions are available", () => {
-      global.window.runMasterSyncValidation = jest.fn();
-      global.window.forceCloudDataReset = jest.fn();
+      global.window.runMasterSyncValidation = vi.fn();
+      global.window.forceCloudDataReset = vi.fn();
 
       expect(hasRecoveryActions()).toBe(true);
 
@@ -163,7 +163,7 @@ describe("syncHealthHelpers", () => {
     });
 
     it("should return true when only one recovery function is available", () => {
-      global.window.runMasterSyncValidation = jest.fn();
+      global.window.runMasterSyncValidation = vi.fn();
 
       expect(hasRecoveryActions()).toBe(true);
 

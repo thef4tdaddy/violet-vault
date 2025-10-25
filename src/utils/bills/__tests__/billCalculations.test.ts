@@ -7,55 +7,20 @@ import {
   calculateBillTotals,
   filterBills,
 } from "../billCalculations";
+import { Bill } from "@/types/bills";
 
 // Mock logger
-jest.mock("../../common/logger", () => ({
+vi.mock("../../common/logger", () => ({
   default: {
-    warn: jest.fn(),
+    warn: vi.fn(),
   },
 }));
 
 describe("billCalculations", () => {
-  const mockBills = [
-    {
-      id: "1",
-      description: "Electricity Bill",
-      amount: 120.5,
-      dueDate: "2023-09-15",
-      isPaid: false,
-      provider: "Electric Co",
-    },
-    {
-      id: "2",
-      description: "Internet",
-      amount: 60.0,
-      dueDate: "2023-09-10",
-      isPaid: false,
-      provider: "ISP Provider",
-    },
-    {
-      id: "3",
-      description: "Water Bill",
-      amount: 45.75,
-      dueDate: "2023-08-30",
-      isPaid: true,
-      paidDate: "2023-08-28",
-      provider: "Water Co",
-    },
-    {
-      id: "4",
-      description: "Gas Bill",
-      amount: 85.25,
-      dueDate: "2023-09-05",
-      isPaid: false,
-      provider: "Gas Co",
-    },
-  ];
-
   const referenceDate = new Date("2023-09-08");
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("normalizeBillDate", () => {
@@ -239,9 +204,9 @@ describe("billCalculations", () => {
     });
 
     it("should normalize isPaid to boolean", () => {
-      const bill1 = { id: "1", dueDate: "2023-09-15", isPaid: "true" };
-      const bill2 = { id: "2", dueDate: "2023-09-15", isPaid: 1 };
-      const bill3 = { id: "3", dueDate: "2023-09-15" };
+      const bill1 = { id: "1", dueDate: "2023-09-15", isPaid: "true" } as unknown as Bill;
+      const bill2 = { id: "2", dueDate: "2023-09-15", isPaid: 1 } as unknown as Bill;
+      const bill3 = { id: "3", dueDate: "2023-09-15" } as Partial<Bill> as Bill;
 
       expect(processBillCalculations(bill1, referenceDate).isPaid).toBe(true);
       expect(processBillCalculations(bill2, referenceDate).isPaid).toBe(true);
@@ -322,12 +287,12 @@ describe("billCalculations", () => {
         { amount: 100 },
         { amount: 50 },
         { monthlyAmount: 25 }, // Should fallback to monthlyAmount
-      ],
+      ] as Partial<Bill>[] as Bill[],
       overdue: [
         { amount: 200 },
         { amount: -75 }, // Negative amounts should be abs()
-      ],
-      paid: [{ amount: 150 }, { amount: 80 }],
+      ] as Partial<Bill>[] as Bill[],
+      paid: [{ amount: 150 }, { amount: 80 }] as Partial<Bill>[] as Bill[],
       all: [
         { amount: 100 },
         { amount: 50 },
@@ -336,7 +301,7 @@ describe("billCalculations", () => {
         { amount: 75 },
         { amount: 150 },
         { amount: 80 },
-      ],
+      ] as Partial<Bill>[] as Bill[],
     };
 
     it("should calculate totals correctly", () => {
@@ -359,9 +324,11 @@ describe("billCalculations", () => {
 
     it("should handle missing categories", () => {
       const partialCategorized = {
-        upcoming: [{ amount: 100 }],
+        upcoming: [{ amount: 100 }] as Partial<Bill>[] as Bill[],
         // Missing overdue and paid categories
-        all: [{ amount: 100 }],
+        overdue: [] as Bill[],
+        paid: [] as Bill[],
+        all: [{ amount: 100 }] as Partial<Bill>[] as Bill[],
       };
 
       const totals = calculateBillTotals(partialCategorized);
@@ -380,10 +347,10 @@ describe("billCalculations", () => {
           {}, // No amount
           { amount: null },
           { monthlyAmount: 50 },
-        ],
-        overdue: [],
-        paid: [],
-        all: [{ amount: 100 }, {}, { amount: null }, { monthlyAmount: 50 }],
+        ] as Partial<Bill>[] as Bill[],
+        overdue: [] as Bill[],
+        paid: [] as Bill[],
+        all: [{ amount: 100 }, {}, { amount: null }, { monthlyAmount: 50 }] as Partial<Bill>[] as Bill[],
       };
 
       const totals = calculateBillTotals(billsWithNoAmount);
