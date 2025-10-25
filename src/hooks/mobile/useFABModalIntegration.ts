@@ -10,88 +10,48 @@ export const useFABModalIntegration = () => {
 
   // Dashboard FAB actions
   const handlePaycheckProcessor = useCallback(() => {
-    openModal("paycheck-processor", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Add Paycheck",
-    });
+    openModal("paycheck-processor");
   }, [openModal]);
 
   const handleQuickTransaction = useCallback(() => {
-    openModal("quick-transaction", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Add Transaction",
-    });
+    openModal("quick-transaction");
   }, [openModal]);
 
   // Envelopes FAB actions
   const handleCreateEnvelope = useCallback(() => {
-    openModal("create-envelope", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Create Envelope",
-    });
+    openModal("create-envelope");
   }, [openModal]);
 
   // Bills FAB actions
   const handleAddBill = useCallback(() => {
-    openModal("add-bill", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Add Bill",
-    });
+    openModal("add-bill");
   }, [openModal]);
 
   const handleBillDiscovery = useCallback(() => {
-    openModal("bill-discovery", {
-      type: "slide-up",
-      height: "full",
-      title: "Discover Bills",
-    });
+    openModal("bill-discovery");
   }, [openModal]);
 
   // Savings FAB actions
   const handleAddSavingsGoal = useCallback(() => {
-    openModal("add-savings-goal", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Add Savings Goal",
-    });
+    openModal("add-savings-goal");
   }, [openModal]);
 
   const handleDistributeSavings = useCallback(() => {
-    openModal("distribute-savings", {
-      type: "slide-up",
-      height: "half",
-      title: "Distribute Savings",
-    });
+    openModal("distribute-savings");
   }, [openModal]);
 
   // Transactions FAB actions
   const handleTransactionImport = useCallback(() => {
-    openModal("transaction-import", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Import Transactions",
-    });
+    openModal("transaction-import");
   }, [openModal]);
 
   const handleReceiptScan = useCallback(() => {
-    openModal("receipt-scan", {
-      type: "slide-up",
-      height: "full",
-      title: "Scan Receipt",
-    });
+    openModal("receipt-scan");
   }, [openModal]);
 
   // Debt FAB actions
   const handleAddDebt = useCallback(() => {
-    openModal("add-debt", {
-      type: "slide-up",
-      height: "three-quarters",
-      title: "Add Debt",
-    });
+    openModal("add-debt");
   }, [openModal]);
 
   return {

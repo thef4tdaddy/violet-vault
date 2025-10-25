@@ -70,10 +70,8 @@ export const createDefaultRule = () => ({
 
 /**
  * Validates a rule configuration
- * @param {Object} ruleConfig - Rule configuration to validate
- * @returns {Object} Validation result with isValid flag and errors
  */
-export const validateRule = (ruleConfig) => {
+export const validateRule = (ruleConfig: any): { isValid: boolean; errors: string[] } => {
   const errors = [];
 
   // Required fields validation
@@ -140,11 +138,8 @@ export const validateRule = (ruleConfig) => {
 
 /**
  * Calculates the funding amount for a rule based on context
- * @param {Object} rule - The rule to calculate for
- * @param {Object} context - Execution context with envelopes, unassigned cash, etc.
- * @returns {number} Amount to fund
  */
-export const calculateFundingAmount = (rule, context) => {
+export const calculateFundingAmount = (rule: any, context: any): number => {
   const { unassignedCash } = context.data;
 
   switch (rule.type) {
@@ -169,11 +164,8 @@ export const calculateFundingAmount = (rule, context) => {
 
 /**
  * Gets base amount for percentage calculations
- * @param {Object} rule - The rule configuration
- * @param {Object} context - Execution context
- * @returns {number} Base amount for percentage calculation
  */
-export const getBaseAmountForPercentage = (rule, context) => {
+export const getBaseAmountForPercentage = (rule: any, context: any): number => {
   const { envelopes, unassignedCash, newIncomeAmount } = context.data;
 
   switch (rule.config.sourceType) {
@@ -197,11 +189,8 @@ export const getBaseAmountForPercentage = (rule, context) => {
 
 /**
  * Calculates priority fill amount
- * @param {Object} rule - The rule configuration
- * @param {Object} context - Execution context
- * @returns {number} Amount needed for priority fill
  */
-export const calculatePriorityFillAmount = (rule, context) => {
+export const calculatePriorityFillAmount = (rule: any, context: any): number => {
   const { envelopes, unassignedCash } = context.data;
 
   if (!rule.config.targetId) return 0;
@@ -215,27 +204,29 @@ export const calculatePriorityFillAmount = (rule, context) => {
 
 /**
  * Sorts rules by priority (lower number = higher priority)
- * @param {Array} rules - Rules to sort
- * @returns {Array} Sorted rules
  */
-export const sortRulesByPriority = (rules) => {
+export const sortRulesByPriority = (rules: any[]): any[] => {
   return [...rules].sort((a, b) => {
     // First by priority (lower number = higher priority)
     const priorityDiff = (a.priority || 100) - (b.priority || 100);
     if (priorityDiff !== 0) return priorityDiff;
 
     // Then by creation date (older first)
-    return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+    return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
   });
 };
 
+interface RuleFilters {
+  enabled?: boolean;
+  type?: string;
+  trigger?: string;
+  search?: string;
+}
+
 /**
  * Filters rules based on various criteria
- * @param {Array} rules - Rules to filter
- * @param {Object} filters - Filter criteria
- * @returns {Array} Filtered rules
  */
-export const filterRules = (rules, filters = {}) => {
+export const filterRules = (rules: any[], filters: RuleFilters = {}): any[] => {
   let filtered = [...rules];
 
   if (filters.enabled !== undefined) {
@@ -264,10 +255,8 @@ export const filterRules = (rules, filters = {}) => {
 
 /**
  * Gets rule execution statistics
- * @param {Array} rules - Rules to analyze
- * @returns {Object} Statistics about the rules
  */
-export const getRuleStatistics = (rules) => {
+export const getRuleStatistics = (rules: any[]): any => {
   const stats = {
     total: rules.length,
     enabled: 0,
@@ -308,10 +297,8 @@ export const getRuleStatistics = (rules) => {
 
 /**
  * Creates a rule summary for display
- * @param {Object} rule - Rule to summarize
- * @returns {Object} Rule summary with formatted description
  */
-export const createRuleSummary = (rule) => {
+export const createRuleSummary = (rule: any): any => {
   const summary = {
     id: rule.id,
     name: rule.name,
