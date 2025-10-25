@@ -6,29 +6,48 @@
 import { budgetDb } from "../../db/budgetDb";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../common/logger";
+import type { Envelope, Transaction, Bill, Debt } from "../../db/types";
 
-export const validateAllSyncFlows = async () => {
+interface TestData {
+  envelope: Partial<Envelope>;
+  transaction: Partial<Transaction>;
+  bill: Partial<Bill>;
+  debt: Partial<Debt>;
+}
+
+interface ValidationResult {
+  flow: string;
+  status: string;
+  details?: string;
+  error?: string;
+}
+
+export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
   logger.info("🔄 VALIDATING ALL SYNC FLOWS...");
-  const results = [];
+  const results: ValidationResult[] = [];
 
   // Flow 1: Create → Sync → Validate
   try {
     logger.info("🧪 Testing complete data flow: Create → Sync → Validate");
 
-    const testData = {
+    const testData: TestData = {
       envelope: {
         id: "flow-test-env-" + Date.now(),
         name: "Flow Test Envelope",
         category: "Test",
-        allocatedAmount: 100,
+        currentBalance: 100,
         lastModified: Date.now(),
+        archived: false,
       },
       transaction: {
         id: "flow-test-txn-" + Date.now(),
         description: "Flow Test Transaction",
         amount: -25.5,
-        date: new Date().toISOString(),
+        date: new Date(),
         lastModified: Date.now(),
+        envelopeId: "",
+        category: "test",
+        type: "expense",
       },
       bill: {
         id: "flow-test-bill-" + Date.now(),
@@ -36,6 +55,9 @@ export const validateAllSyncFlows = async () => {
         amount: 75,
         dueDate: new Date(),
         lastModified: Date.now(),
+        category: "test",
+        isPaid: false,
+        isRecurring: false,
       },
       debt: {
         id: "flow-test-debt-" + Date.now(),
@@ -43,14 +65,17 @@ export const validateAllSyncFlows = async () => {
         creditor: "Test Bank",
         currentBalance: 1000,
         lastModified: Date.now(),
+        type: "other",
+        status: "active",
+        minimumPayment: 50,
       },
     };
 
     // Add test data
-    await budgetDb.envelopes.add(testData.envelope);
-    await budgetDb.transactions.add(testData.transaction);
-    await budgetDb.bills.add(testData.bill);
-    await budgetDb.debts.add(testData.debt);
+    await budgetDb.envelopes.add(testData.envelope as Envelope);
+    await budgetDb.transactions.add(testData.transaction as Transaction);
+    await budgetDb.bills.add(testData.bill as Bill);
+    await budgetDb.debts.add(testData.debt as Debt);
 
     // Update metadata
     await budgetDb.budget.put({
@@ -110,7 +135,7 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Complete Data Flow",
       status: "❌ FAILED",
-      error: error.message,
+      error: (error as Error).message,
     });
   }
 
@@ -122,6 +147,8 @@ export const validateAllSyncFlows = async () => {
       id: `bulk-env-${i}-${Date.now()}`,
       name: `Bulk Envelope ${i}`,
       lastModified: Date.now() + i,
+      category: "test",
+      archived: false,
     }));
 
     const bulkTransactions = Array.from({ length: 20 }, (_, i) => ({
@@ -129,11 +156,15 @@ export const validateAllSyncFlows = async () => {
       description: `Bulk Transaction ${i}`,
       amount: Math.random() * 100,
       lastModified: Date.now() + i,
+      date: new Date(),
+      envelopeId: "",
+      category: "test",
+      type: "expense" as const,
     }));
 
     // Add bulk data
-    await budgetDb.bulkUpsertEnvelopes(bulkEnvelopes);
-    await budgetDb.bulkUpsertTransactions(bulkTransactions);
+    await budgetDb.bulkUpsertEnvelopes(bulkEnvelopes as Envelope[]);
+    await budgetDb.bulkUpsertTransactions(bulkTransactions as Transaction[]);
 
     // Fetch and validate
     const syncData = await cloudSyncService.fetchDexieData();
@@ -168,7 +199,7 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Bulk Operations",
       status: "❌ FAILED",
-      error: error.message,
+      error: (error as Error).message,
     });
   }
 
@@ -234,7 +265,7 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Sync Direction Logic",
       status: "❌ FAILED",
-      error: error.message,
+      error: (error as Error).message,
     });
   }
 
@@ -280,7 +311,7 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Service Lifecycle",
       status: "❌ FAILED",
-      error: error.message,
+      error: (error as Error).message,
     });
   }
 
@@ -311,7 +342,7 @@ export const validateAllSyncFlows = async () => {
 
 // Expose to window
 if (typeof window !== "undefined") {
-  window.validateAllSyncFlows = validateAllSyncFlows;
+  (window as any).validateAllSyncFlows = validateAllSyncFlows;
 }
 
 export default validateAllSyncFlows;

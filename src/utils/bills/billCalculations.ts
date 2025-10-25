@@ -65,7 +65,7 @@ export const normalizeBillDate = (dateInput: string | Date): string => {
       // Handle MM/DD/YY, MM-DD-YY patterns (but not YYYY-MM-DD)
       dateStr = dateStr.replace(
         /^(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
-        (match, month, day, year) => {
+        (_match, month, day, year) => {
           const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
           return `${month}/${day}/${fullYear}`;
         }
@@ -137,7 +137,7 @@ export const calculateDaysUntilDue = (
     from.setUTCHours(0, 0, 0, 0);
     due.setUTCHours(0, 0, 0, 0);
 
-    return Math.ceil((due - from) / (1000 * 60 * 60 * 24));
+    return Math.ceil((due.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
   } catch (error) {
     logger.warn(`Invalid due date: ${dueDate}`, error);
     return null;
@@ -185,14 +185,17 @@ export const processBillCalculations = (bill: Bill, fromDate: Date = new Date())
  * @returns {Object} Categorized bills object with sorting applied
  */
 export const categorizeBills = (bills: Bill[]): CategorizedBills => {
-  const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
-  const overdueBills = bills.filter((b) => !b.isPaid && b.daysUntilDue < 0);
+  const upcomingBills = bills.filter((b) => !b.isPaid && (b.daysUntilDue ?? 0) >= 0);
+  const overdueBills = bills.filter((b) => !b.isPaid && (b.daysUntilDue ?? 0) < 0);
   const paidBills = bills.filter((b) => b.isPaid);
 
   return {
-    upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
-    overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
-    paid: paidBills.sort((a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)),
+    upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue ?? 999) - (b.daysUntilDue ?? 999)),
+    overdue: overdueBills.sort((a, b) => (a.daysUntilDue ?? 0) - (b.daysUntilDue ?? 0)),
+    paid: paidBills.sort(
+      (a, b) =>
+        new Date(b.paidDate || b.date || 0).getTime() - new Date(a.paidDate || a.date || 0).getTime()
+    ),
     all: bills,
   };
 };
@@ -260,16 +263,16 @@ export const filterBills = (bills: Bill[], filterOptions: FilterOptions = {}): B
   }
 
   if (filterOptions.amountMin !== undefined) {
-    const minAmount = parseFloat(filterOptions.amountMin);
+    const minAmount = parseFloat(String(filterOptions.amountMin));
     if (!isNaN(minAmount)) {
-      filtered = filtered.filter((bill) => Math.abs(bill.amount) >= minAmount);
+      filtered = filtered.filter((bill) => Math.abs(bill.amount ?? 0) >= minAmount);
     }
   }
 
   if (filterOptions.amountMax !== undefined) {
-    const maxAmount = parseFloat(filterOptions.amountMax);
+    const maxAmount = parseFloat(String(filterOptions.amountMax));
     if (!isNaN(maxAmount)) {
-      filtered = filtered.filter((bill) => Math.abs(bill.amount) <= maxAmount);
+      filtered = filtered.filter((bill) => Math.abs(bill.amount ?? 0) <= maxAmount);
     }
   }
 
