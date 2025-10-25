@@ -221,11 +221,14 @@ const MainContent = ({
   isLocalOnlyMode,
   securityManager,
 }: MainContentProps): ReactNode => {
-  const resetAllData = useBudgetStore((state) => state.resetAllData);
+  const resetAllData = useBudgetStore(
+    (state: Record<string, unknown>) =>
+      (state as Record<string, unknown>).resetAllData as () => void
+  );
   const navigate = useNavigate();
 
   // Onboarding state
-  const onboardingState = useOnboardingStore((state) => ({
+  const onboardingState = useOnboardingStore((state: Record<string, unknown>) => ({
     isOnboarded: (state as Record<string, unknown>)?.isOnboarded,
   }));
   const isOnboarded =
@@ -298,8 +301,12 @@ const MainContent = ({
   useOnboardingAutoComplete();
 
   // UI state
-  const isOnline = useBudgetStore((state) => state.isOnline);
-  const isSyncing = useBudgetStore((state) => state.isSyncing);
+  const isOnline = useBudgetStore(
+    (state: Record<string, unknown>) => (state as Record<string, unknown>).isOnline as boolean
+  );
+  const isSyncing = useBudgetStore(
+    (state: Record<string, unknown>) => (state as Record<string, unknown>).isSyncing as boolean
+  );
 
   // Payday prediction
   usePaydayPrediction(paycheckHistory, !!currentUser);
