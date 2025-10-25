@@ -28,7 +28,7 @@ export const useTransactionImport = (
     setFieldMapping,
     handleFileUpload,
     resetImport: resetFileUpload,
-  } = useTransactionFileUpload() as {
+  } = useTransactionFileUpload() as unknown as {
     importData: ImportData;
     importStep: number;
     setImportStep: (step: number) => void;

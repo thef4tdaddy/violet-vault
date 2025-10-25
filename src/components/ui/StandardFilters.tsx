@@ -57,7 +57,7 @@ const StandardFilters = ({
   };
 
   const clearAllFilters = () => {
-    const clearedFilters = {};
+    const clearedFilters: Record<string, string> = {};
     // Set search to empty string
     clearedFilters.search = "";
 

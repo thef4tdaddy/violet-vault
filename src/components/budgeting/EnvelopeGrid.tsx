@@ -53,13 +53,13 @@ const EnvelopeModals = ({
   handleCreateEnvelope,
   envelopes,
   budget,
-  unassignedCash,
+  unassignedCash: _unassignedCash,
   editingEnvelope,
   setEditingEnvelope,
   handleUpdateEnvelope,
   deleteEnvelope,
-  updateBill,
-  bills,
+  updateBill: _updateBill,
+  bills: _bills,
   historyEnvelope,
   setHistoryEnvelope,
   quickFundModal,
@@ -92,7 +92,7 @@ const EnvelopeModals = ({
         onCreateEnvelope={handleCreateEnvelope}
         onCreateBill={() => {}}
         existingEnvelopes={envelopes}
-        currentUser={budget.currentUser || { userName: "User", userColor: "#000000" }}
+        currentUser={(budget.currentUser as { userName: string; userColor: string } | undefined) || { userName: "User", userColor: "#000000" }}
       />
     )}
 
@@ -104,7 +104,7 @@ const EnvelopeModals = ({
         onUpdateEnvelope={handleUpdateEnvelope}
         onDeleteEnvelope={deleteEnvelope}
         existingEnvelopes={envelopes}
-        currentUser={budget.currentUser || { userName: "User", userColor: "#000000" }}
+        currentUser={(budget.currentUser as { userName: string; userColor: string } | undefined) || { userName: "User", userColor: "#000000" }}
       />
     )}
 
@@ -224,33 +224,32 @@ const EnvelopeGridView = ({
     <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
 
     <EnvelopeHeader
-      envelopes={envelopes}
       filterOptions={filterOptions}
-      onFilterChange={setFilterOptions}
-      onViewModeChange={setViewMode}
+      setFilterOptions={setFilterOptions}
+      setShowCreateModal={setShowCreateModal}
       viewMode={viewMode}
-      onCreateEnvelope={() => setShowCreateModal(true)}
+      setViewMode={setViewMode}
     />
 
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} />
-      {sortedEnvelopes.map((envelope) => (
+      {sortedEnvelopes.map((envelope: { id: string; [key: string]: unknown }) => (
         <EnvelopeItem
           key={envelope.id}
-          envelope={envelope}
+          envelope={envelope as never}
           onSelect={handleEnvelopeSelect}
           onEdit={handleEnvelopeEdit}
           onViewHistory={handleViewHistory}
           onQuickFund={handleQuickFund}
           isSelected={selectedEnvelopeId === envelope.id}
-          bills={bills}
+          bills={bills as never}
           unassignedCash={unassignedCash}
         />
       ))}
     </div>
 
     {sortedEnvelopes.length === 0 && (
-      <EmptyStateView filterOptions={filterOptions} setShowCreateModal={setShowCreateModal} />
+      <EmptyStateView filterOptions={filterOptions as { envelopeType: string; showEmpty: boolean }} setShowCreateModal={setShowCreateModal} />
     )}
 
     <EnvelopeModals
@@ -535,8 +534,8 @@ const UnifiedEnvelopeManager = ({
       editingEnvelope={uiState.editingEnvelope}
       setEditingEnvelope={uiState.setEditingEnvelope}
       handleUpdateEnvelope={uiState.handleUpdateEnvelope}
-      deleteEnvelope={deleteEnvelope}
-      updateBill={updateBill}
+      deleteEnvelope={(id: string) => Promise.resolve(deleteEnvelope(id))}
+      updateBill={(data: { id: string; updates: unknown }) => updateBill(data.updates as never)}
       historyEnvelope={uiState.historyEnvelope}
       setHistoryEnvelope={uiState.setHistoryEnvelope}
       quickFundModal={uiState.quickFundModal}

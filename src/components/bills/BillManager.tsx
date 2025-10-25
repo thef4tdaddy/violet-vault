@@ -24,9 +24,9 @@ import BillTable from "./BillTable";
 const BillManager = ({
   transactions: propTransactions = [],
   envelopes: propEnvelopes = [],
-  onUpdateBill,
-  onCreateRecurringBill,
-  onSearchNewBills,
+  onUpdateBill: _onUpdateBill,
+  onCreateRecurringBill: _onCreateRecurringBill,
+  onSearchNewBills: _onSearchNewBills,
   onError,
   className = "",
 }) => {
@@ -37,7 +37,7 @@ const BillManager = ({
     categorizedBills,
     filteredBills,
     totals,
-    envelopes,
+    envelopes: _envelopes,
 
     // UI State
     selectedBills,

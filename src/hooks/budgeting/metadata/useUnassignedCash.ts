@@ -77,9 +77,9 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
       return amount;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...queryKeys.budgetMetadata] });
-      queryClient.invalidateQueries({ queryKey: [...queryKeys.dashboard] });
-      queryClient.invalidateQueries({ queryKey: [...queryKeys.dashboardSummary] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
       logger.debug("TanStack Query: Unassigned cash updated successfully");
     },
     onError: (error) => {

@@ -115,7 +115,7 @@ export const useCloudSyncManager = () => {
         // Note: Auth data should come from the component level context
         logger.warn("Cloud sync toggle called - auth validation skipped due to hook context limitations");
 
-        cloudSyncService.start();
+        cloudSyncService.start({});
       } catch (error) {
         logger.error("Failed to start cloud sync:", error);
       }
@@ -142,7 +142,7 @@ export const useCloudSyncManager = () => {
         logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
         // Note: Auth data should come from the component level context
         // For now, just try to start sync - it will use existing auth if available
-        await cloudSyncService.start();
+        await cloudSyncService.start({});
       }
 
       const result = await cloudSyncService.forceSync();
@@ -218,7 +218,7 @@ export const useSettingsActions = () => {
       );
     } catch (error) {
       globalToast.showError(
-        "❌ Failed to create test history: " + error.message,
+        "❌ Failed to create test history: " + (error as Error).message,
         "Test Failed",
         8000
       );
