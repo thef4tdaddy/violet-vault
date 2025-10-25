@@ -4,6 +4,23 @@ import localStorageService from "../../../services/storage/localStorageService";
 
 const STORAGE_KEY = "violetVault_autoFunding";
 
+interface AutoFundingData {
+  rules?: any[];
+  executionHistory?: any[];
+  undoStack?: any[];
+  incomePatterns?: any[];
+  lastSaved?: string;
+  version?: string;
+  settings?: {
+    autoSave?: boolean;
+    autoBackup?: boolean;
+    maxHistoryEntries?: number;
+    maxUndoEntries?: number;
+  };
+  createdAt?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Hook for managing auto-funding data persistence and initialization
  * Extracted from useAutoFunding.js for Issue #506
@@ -15,11 +32,11 @@ export const useAutoFundingData = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Initialize data from localStorage
-  const initialize = useCallback(async () => {
+  const initialize = useCallback(async (): Promise<AutoFundingData | null> => {
     try {
       setIsLoading(true);
 
-      const data = localStorageService.getJSON(STORAGE_KEY);
+      const data = localStorageService.getJSON(STORAGE_KEY) as AutoFundingData | null;
 
       if (data) {
         logger.info("Auto-funding data loaded from localStorage", {
@@ -45,9 +62,9 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Save data to localStorage
-  const saveData = useCallback((data) => {
+  const saveData = useCallback((data: AutoFundingData): boolean => {
     try {
-      const dataToSave = {
+      const dataToSave: AutoFundingData = {
         ...data,
         lastSaved: new Date().toISOString(),
         version: "1.1", // Increment version for new extracted utilities format
@@ -70,9 +87,9 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Load data from localStorage
-  const loadData = useCallback(() => {
+  const loadData = useCallback((): AutoFundingData | null => {
     try {
-      const data = localStorageService.getJSON(STORAGE_KEY);
+      const data = localStorageService.getJSON(STORAGE_KEY) as AutoFundingData | null;
       if (!data) {
         return null;
       }
@@ -92,9 +109,9 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Export data for backup/sharing
-  const exportData = useCallback((data) => {
+  const exportData = useCallback((data: AutoFundingData): AutoFundingData => {
     try {
-      const exportData = {
+      const exportData: AutoFundingData = {
         ...data,
         exportedAt: new Date().toISOString(),
         version: "1.1",
@@ -114,7 +131,7 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Import data from backup/sharing
-  const importData = useCallback((importData) => {
+  const importData = useCallback((importData: AutoFundingData): AutoFundingData => {
     try {
       // Validate import data structure
       if (!importData || typeof importData !== "object") {
@@ -122,7 +139,7 @@ export const useAutoFundingData = () => {
       }
 
       // Handle different versions if needed
-      let data = { ...importData };
+      let data: AutoFundingData = { ...importData };
 
       if (!data.version || data.version < "1.1") {
         // Migrate older data formats if necessary
@@ -159,7 +176,7 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Clear all data
-  const clearData = useCallback(() => {
+  const clearData = useCallback((): AutoFundingData => {
     try {
       localStorageService.removeItem(STORAGE_KEY);
       setLastSaved(null);
@@ -180,9 +197,9 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Reset to default state
-  const resetToDefaults = useCallback(() => {
+  const resetToDefaults = useCallback((): AutoFundingData => {
     try {
-      const defaultData = {
+      const defaultData: AutoFundingData = {
         rules: [],
         executionHistory: [],
         undoStack: [],
@@ -252,9 +269,9 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Create data backup
-  const createBackup = useCallback((data, includeHistory = true) => {
+  const createBackup = useCallback((data: AutoFundingData, includeHistory = true) => {
     try {
-      const backup = {
+      const backup: AutoFundingData = {
         ...data,
         backupCreatedAt: new Date().toISOString(),
         backupVersion: "1.1",
@@ -297,7 +314,7 @@ export const useAutoFundingData = () => {
 
   // Auto-save functionality
   const enableAutoSave = useCallback(
-    (data, intervalMs = 30000) => {
+    (data: AutoFundingData, intervalMs = 30000) => {
       const autoSaveInterval = setInterval(() => {
         if (hasUnsavedChanges && data) {
           try {

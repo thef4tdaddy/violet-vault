@@ -5,11 +5,27 @@
 
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
 import logger from "../common/logger";
+import type { PaycheckHistory } from "../../db/types";
+
+// Extended interface for paycheck history with additional tracking fields
+interface PaycheckHistoryExtended extends PaycheckHistory {
+  unassignedCashBefore?: number;
+  unassignedCashAfter?: number;
+  envelopeAllocations?: Array<{
+    envelopeId: string;
+    amount: number;
+  }>;
+}
+
+interface EnvelopeAllocation {
+  envelopeId: string;
+  amount: number;
+}
 
 /**
  * Reverse envelope allocations for a deleted paycheck
  */
-export const reverseEnvelopeAllocations = async (envelopeAllocations) => {
+export const reverseEnvelopeAllocations = async (envelopeAllocations?: EnvelopeAllocation[]) => {
   if (!envelopeAllocations?.length) return;
 
   for (const allocation of envelopeAllocations) {
@@ -26,24 +42,24 @@ export const reverseEnvelopeAllocations = async (envelopeAllocations) => {
 /**
  * Delete paycheck and reverse its effects
  */
-export const deletePaycheck = async (paycheckId) => {
+export const deletePaycheck = async (paycheckId: string) => {
   logger.info("Starting paycheck deletion", { paycheckId });
 
   // Get paycheck record
-  const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId);
+  const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId) as PaycheckHistoryExtended | undefined;
   if (!paycheckRecord) {
     throw new Error("Paycheck record not found");
   }
 
   // Reverse the balance changes
   const currentMetadata = await getBudgetMetadata();
-  const currentActualBalance = currentMetadata?.actualBalance || 0;
-  const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+  const currentActualBalance: number = (currentMetadata?.actualBalance as number) || 0;
+  const currentUnassignedCash: number = (currentMetadata?.unassignedCash as number) || 0;
 
   // Calculate new balances by reversing the paycheck
   const newActualBalance = currentActualBalance - paycheckRecord.amount;
   const unassignedCashChange =
-    paycheckRecord.unassignedCashAfter - paycheckRecord.unassignedCashBefore;
+    (paycheckRecord.unassignedCashAfter || 0) - (paycheckRecord.unassignedCashBefore || 0);
   const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
   // Update budget metadata
@@ -60,8 +76,8 @@ export const deletePaycheck = async (paycheckId) => {
 
   logger.info("Paycheck deleted and effects reversed", {
     paycheckId,
-    actualBalanceChange: newActualBalance - currentActualBalance,
-    unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+    actualBalanceChange: (newActualBalance - currentActualBalance),
+    unassignedCashChange: (newUnassignedCash - currentUnassignedCash),
   });
 
   return { success: true, paycheckId };

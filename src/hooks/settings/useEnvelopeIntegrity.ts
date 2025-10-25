@@ -79,15 +79,18 @@ export const useEnvelopeIntegrity = () => {
   /**
    * Handle envelope selection
    */
-  const handleSelectEnvelope = useCallback((envelopeId: string): void => {
-    const newSelected = new Set(selectedEnvelopes);
-    if (newSelected.has(envelopeId)) {
-      newSelected.delete(envelopeId);
-    } else {
-      newSelected.add(envelopeId);
-    }
-    setSelectedEnvelopes(newSelected);
-  }, [selectedEnvelopes]);
+  const handleSelectEnvelope = useCallback(
+    (envelopeId: string): void => {
+      const newSelected = new Set(selectedEnvelopes);
+      if (newSelected.has(envelopeId)) {
+        newSelected.delete(envelopeId);
+      } else {
+        newSelected.add(envelopeId);
+      }
+      setSelectedEnvelopes(newSelected);
+    },
+    [selectedEnvelopes]
+  );
 
   /**
    * Handle select all/deselect all

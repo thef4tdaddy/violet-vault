@@ -1,4 +1,3 @@
-import React from "react";
 import { Select, TextInput, Checkbox } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";

@@ -79,7 +79,8 @@ export const useBugReportForm = (defaultSeverity = "medium") => {
   /**
    * Validate form data using utils/validation
    */
-  const validateForm = () => { // Validation logic is in utils/validation/bugReportValidation.ts
+  const validateForm = () => {
+    // Validation logic is in utils/validation/bugReportValidation.ts
     const validation = validateBugReportForm(title, description);
     return validation.isValid;
   };

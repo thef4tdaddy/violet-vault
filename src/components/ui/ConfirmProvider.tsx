@@ -1,4 +1,3 @@
-import React from "react";
 import ConfirmModal from "./ConfirmModal";
 import { useConfirmModal } from "../../hooks/common/useConfirm";
 

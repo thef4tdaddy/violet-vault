@@ -1,13 +1,28 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
-import { persist, devtools } from "zustand/middleware";
+import { persist, devtools, PersistOptions } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "../common/logger.ts";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
+interface StoreOptions {
+  persist?: boolean;
+  persistedKeys?: string[] | null;
+  immer?: boolean;
+  devtools?: boolean;
+  version?: number;
+}
+
+interface CreateSafeStoreConfig<T> {
+  name: string;
+  initialState: T;
+  actions?: Record<string, (...args: any[]) => any>;
+  options?: StoreOptions;
+}
+
 // Validation helpers
-const validateConfig = (name, initialState) => {
+const validateConfig = (name: string, initialState: any) => {
   if (!name || typeof name !== "string") {
     throw new Error("Store name is required and must be a string");
   }
@@ -17,8 +32,14 @@ const validateConfig = (name, initialState) => {
 };
 
 // Action wrapper utility
-const wrapActions = (actions, name, set, useStore, store) => {
-  return Object.entries(actions).reduce((acc, [actionName, actionFn]) => {
+const wrapActions = (
+  actions: Record<string, (...args: any[]) => any>,
+  name: string,
+  set: any,
+  useStore: any,
+  store: any
+) => {
+  return Object.entries(actions).reduce((acc: any, [actionName, actionFn]) => {
     acc[actionName] = (...args) => {
       try {
         const getCurrentState = () => useStore.getState();
@@ -41,20 +62,23 @@ const wrapActions = (actions, name, set, useStore, store) => {
 };
 
 // Middleware stack builder
-const buildMiddlewareStack = (storeInitializer, options, name) => {
+const buildMiddlewareStack = (storeInitializer: any, options: any, name: string) => {
   const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } = options;
-  let middlewareStack = storeInitializer;
+  let middlewareStack: any = storeInitializer;
 
   if (enableImmer) {
     middlewareStack = immer(middlewareStack);
   }
 
   if (enablePersist && !LOCAL_ONLY_MODE) {
-    const persistConfig = { name: `violet-vault-${name}`, version };
+    const persistConfig: PersistOptions<any, any> = {
+      name: `violet-vault-${name}`,
+      version,
+    } as PersistOptions<any, any>;
 
     if (persistedKeys && Array.isArray(persistedKeys)) {
-      persistConfig.partialize = (state) =>
-        persistedKeys.reduce((acc, key) => {
+      persistConfig.partialize = (state: any) =>
+        persistedKeys.reduce((acc: any, key: string) => {
           if (key in state) acc[key] = state[key];
           return acc;
         }, {});
@@ -73,7 +97,12 @@ const buildMiddlewareStack = (storeInitializer, options, name) => {
 /**
  * Creates a safe Zustand store with standard middleware and error handling
  */
-export const createSafeStore = ({ name, initialState, actions = {}, options = {} }) => {
+export const createSafeStore = <T extends object>({
+  name,
+  initialState,
+  actions = {},
+  options = {},
+}: CreateSafeStoreConfig<T>) => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
@@ -84,10 +113,10 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
 
   validateConfig(name, initialState);
 
-  let useStore;
+  let useStore: any;
 
-  const storeInitializer = (set, _get) => {
-    const store = {
+  const storeInitializer = (set: any, _get: any) => {
+    const store: any = {
       ...initialState,
       reset: () => {
         logger.info(`Resetting store ${name}`);
@@ -136,7 +165,7 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
 /**
  * Creates a persisted store with safe patterns
  */
-export const createPersistedStore = (config) => {
+export const createPersistedStore = <T extends object>(config: CreateSafeStoreConfig<T>) => {
   return createSafeStore({
     ...config,
     options: {
@@ -149,7 +178,7 @@ export const createPersistedStore = (config) => {
 /**
  * Creates an ephemeral (non-persisted) store
  */
-export const createEphemeralStore = (config) => {
+export const createEphemeralStore = <T extends object>(config: CreateSafeStoreConfig<T>) => {
   return createSafeStore({
     ...config,
     options: {

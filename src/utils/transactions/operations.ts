@@ -11,11 +11,8 @@ import { validateTransactionSafe } from "../../domain/schemas/transaction.ts";
 /**
  * Validate transaction data using Zod schema
  * Converts Zod errors to legacy format for backward compatibility
- *
- * @param {Object} transactionData - Transaction data to validate
- * @returns {Object} Validation result with isValid boolean and errors array
  */
-export const validateTransactionData = (transactionData) => {
+export const validateTransactionData = (transactionData: any): { isValid: boolean; errors: string[] } => {
   try {
     if (!transactionData) {
       return { isValid: false, errors: ["Transaction data is required"] };
@@ -26,7 +23,7 @@ export const validateTransactionData = (transactionData) => {
 
     if (!result.success) {
       // Convert Zod errors to user-friendly messages
-      const errors = result.error.errors.map((err) => {
+      const errors = result.error.issues.map((err) => {
         const path = err.path.join(".");
         return `${path}: ${err.message}`;
       });
@@ -45,10 +42,8 @@ export const validateTransactionData = (transactionData) => {
 
 /**
  * Prepare transaction data for database storage
- * @param {Object} transactionData - Raw transaction data
- * @returns {Object} Prepared transaction data
  */
-export const prepareTransactionForStorage = (transactionData) => {
+export const prepareTransactionForStorage = (transactionData: any): any => {
   try {
     const now = new Date().toISOString();
 
@@ -79,10 +74,8 @@ export const prepareTransactionForStorage = (transactionData) => {
 
 /**
  * Calculate transaction type based on amount and metadata
- * @param {Object} transaction - Transaction to analyze
- * @returns {string} Transaction type (income, expense, transfer)
  */
-export const determineTransactionType = (transaction) => {
+export const determineTransactionType = (transaction: any): string => {
   try {
     if (!transaction) return "expense";
 
@@ -104,15 +97,8 @@ export const determineTransactionType = (transaction) => {
 
 /**
  * Create transfer transaction pair
- * @param {Object} transferData - Transfer details
- * @param {string} transferData.fromAccount - Source account
- * @param {string} transferData.toAccount - Destination account
- * @param {number} transferData.amount - Transfer amount (positive)
- * @param {string} transferData.description - Transfer description
- * @param {string} transferData.date - Transfer date
- * @returns {Array} Array of two transactions (outgoing and incoming)
  */
-export const createTransferPair = (transferData) => {
+export const createTransferPair = (transferData: any): any[] => {
   try {
     const validation = validateTransactionData({
       ...transferData,
@@ -178,11 +164,8 @@ export const createTransferPair = (transferData) => {
 
 /**
  * Categorize transaction based on description and rules
- * @param {Object} transaction - Transaction to categorize
- * @param {Array} categoryRules - Array of categorization rules
- * @returns {Object} Transaction with suggested category
  */
-export const categorizeTransaction = (transaction, categoryRules = []) => {
+export const categorizeTransaction = (transaction: any, categoryRules: any[] = []): any => {
   try {
     if (!transaction || transaction.category) {
       return transaction; // Already has category
@@ -255,10 +238,10 @@ export const categorizeTransaction = (transaction, categoryRules = []) => {
 /**
  * Check if two transactions are duplicates based on criteria
  */
-const areDuplicateTransactions = (transaction, existing, options) => {
+const areDuplicateTransactions = (transaction: any, existing: any, options: any): boolean => {
   const { timeWindowMs, amountTolerance, checkDescription, checkAccount } = options;
 
-  const timeDiff = Math.abs(new Date(transaction.date) - new Date(existing.date));
+  const timeDiff = Math.abs(new Date(transaction.date).getTime() - new Date(existing.date).getTime());
   const amountDiff = Math.abs(transaction.amount - existing.amount);
   const sameDescription = !checkDescription || transaction.description === existing.description;
   const sameAccount = !checkAccount || transaction.account === existing.account;
@@ -285,13 +268,17 @@ const mergeDuplicateMetadata = (existing, transaction) => {
   });
 };
 
+interface MergeDuplicateOptions {
+  timeWindowMinutes?: number;
+  amountTolerance?: number;
+  checkDescription?: boolean;
+  checkAccount?: boolean;
+}
+
 /**
  * Merge duplicate transactions
- * @param {Array} transactions - Transactions to check for duplicates
- * @param {Object} options - Merge options
- * @returns {Array} Transactions with duplicates merged
  */
-export const mergeDuplicateTransactions = (transactions = [], options = {}) => {
+export const mergeDuplicateTransactions = (transactions: any[] = [], options: MergeDuplicateOptions = {}): any[] => {
   try {
     const {
       timeWindowMinutes = 5,
@@ -330,11 +317,8 @@ export const mergeDuplicateTransactions = (transactions = [], options = {}) => {
 
 /**
  * Calculate running balance for transactions
- * @param {Array} transactions - Sorted transactions (oldest first)
- * @param {number} startingBalance - Starting account balance
- * @returns {Array} Transactions with running balance added
  */
-export const calculateRunningBalance = (transactions = [], startingBalance = 0) => {
+export const calculateRunningBalance = (transactions: any[] = [], startingBalance: number = 0): any[] => {
   try {
     let runningBalance = startingBalance;
 
@@ -352,13 +336,16 @@ export const calculateRunningBalance = (transactions = [], startingBalance = 0) 
   }
 };
 
+interface FormatDisplayOptions {
+  currency?: string;
+  dateFormat?: string;
+  includeTime?: boolean;
+}
+
 /**
  * Format transaction for display
- * @param {Object} transaction - Transaction to format
- * @param {Object} options - Formatting options
- * @returns {Object} Formatted transaction
  */
-export const formatTransactionForDisplay = (transaction, options = {}) => {
+export const formatTransactionForDisplay = (transaction: any, options: FormatDisplayOptions = {}): any => {
   try {
     const { currency = "USD", dateFormat = "short", includeTime = false } = options;
 

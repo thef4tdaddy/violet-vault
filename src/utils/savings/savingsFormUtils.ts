@@ -164,7 +164,7 @@ export const validateSavingsGoalForm = (formData) => {
 /**
  * Process form data into savings goal object
  */
-export const processSavingsGoalFormData = (formData, editingGoal = null) => {
+export const processSavingsGoalFormData = (formData: any, editingGoal: any = null) => {
   const validation = validateSavingsGoalForm(formData);
   if (validation.length > 0) {
     throw new Error(`Validation failed: ${validation.join(", ")}`);
@@ -173,7 +173,7 @@ export const processSavingsGoalFormData = (formData, editingGoal = null) => {
   const targetAmount = parseFloat(formData.targetAmount);
   const currentAmount = parseFloat(formData.currentAmount) || 0;
 
-  const goalData = {
+  const goalData: any = {
     name: formData.name.trim(),
     targetAmount,
     currentAmount,
@@ -200,7 +200,11 @@ export const processSavingsGoalFormData = (formData, editingGoal = null) => {
 /**
  * Calculate suggested target date based on current savings rate
  */
-export const suggestTargetDate = (targetAmount, currentAmount, monthlySavings) => {
+export const suggestTargetDate = (
+  targetAmount: number,
+  currentAmount: number,
+  monthlySavings: number
+): string | null => {
   if (!monthlySavings || monthlySavings <= 0) return null;
 
   const remainingAmount = Math.max(0, targetAmount - currentAmount);
@@ -216,16 +220,16 @@ export const suggestTargetDate = (targetAmount, currentAmount, monthlySavings) =
  * Calculate distribution amounts for multiple goals
  */
 export const calculateGoalDistribution = (
-  goals,
-  totalAmount,
+  goals: any[],
+  totalAmount: number,
   distributionStrategy = "proportional"
-) => {
+): Record<string, number> => {
   if (!totalAmount || totalAmount <= 0) return {};
 
   const activeGoals = goals.filter((goal) => !goal.isCompleted);
   if (activeGoals.length === 0) return {};
 
-  const distribution = {};
+  const distribution: Record<string, number> = {};
 
   switch (distributionStrategy) {
     case "equal": {
@@ -304,9 +308,13 @@ export const calculateGoalDistribution = (
 /**
  * Validate distribution amounts
  */
-export const validateDistribution = (distribution, totalAmount, tolerance = 0.01) => {
+export const validateDistribution = (
+  distribution: Record<string, number>,
+  totalAmount: number,
+  tolerance = 0.01
+) => {
   const distributionTotal = Object.values(distribution).reduce((sum, amount) => {
-    return sum + (parseFloat(amount) || 0);
+    return sum + (parseFloat(String(amount)) || 0);
   }, 0);
 
   const difference = Math.abs(distributionTotal - totalAmount);
@@ -322,9 +330,9 @@ export const validateDistribution = (distribution, totalAmount, tolerance = 0.01
 /**
  * Format currency for display
  */
-export const formatCurrency = (amount, currency = "USD") => {
+export const formatCurrency = (amount: number | string, currency = "USD"): string => {
   if (typeof amount !== "number") {
-    amount = parseFloat(amount) || 0;
+    amount = parseFloat(String(amount)) || 0;
   }
 
   try {
@@ -343,9 +351,9 @@ export const formatCurrency = (amount, currency = "USD") => {
 /**
  * Format percentage for display
  */
-export const formatPercentage = (value, decimals = 1) => {
+export const formatPercentage = (value: number | string, decimals = 1): string => {
   if (typeof value !== "number") {
-    value = parseFloat(value) || 0;
+    value = parseFloat(String(value)) || 0;
   }
 
   return `${value.toFixed(decimals)}%`;
