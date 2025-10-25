@@ -10,7 +10,21 @@ import {
 import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
 import logger from "../../../utils/common/logger";
 
-export const useUnassignedCash = () => {
+interface SetUnassignedCashOptions {
+  author?: string;
+  source?: string;
+}
+
+interface UseUnassignedCashReturn {
+  unassignedCash: number;
+  isLoading: boolean;
+  error: Error | null;
+  isUpdating: boolean;
+  setUnassignedCash: (amount: number, options?: SetUnassignedCashOptions) => Promise<boolean>;
+  refetch: () => Promise<unknown>;
+}
+
+export const useUnassignedCash = (): UseUnassignedCashReturn => {
   const queryClient = useQueryClient();
 
   const {
@@ -30,10 +44,12 @@ export const useUnassignedCash = () => {
           "TanStack Query: No metadata found in useUnassignedCash, initializing with defaults"
         );
         const defaultMetadata = {
+          id: "metadata",
           unassignedCash: 0,
           actualBalance: 0,
           isActualBalanceManual: false,
           biweeklyAllocation: 0,
+          lastModified: Date.now(),
         };
 
         await setBudgetMetadata(defaultMetadata);
@@ -53,7 +69,7 @@ export const useUnassignedCash = () => {
   });
 
   const updateUnassignedCashMutation = useMutation({
-    mutationFn: async (amount) => {
+    mutationFn: async (amount: number) => {
       logger.debug("TanStack Query: Updating unassigned cash in Dexie", {
         amount,
       });
@@ -61,9 +77,9 @@ export const useUnassignedCash = () => {
       return amount;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.budgetMetadata] });
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.dashboard] });
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.dashboardSummary] });
       logger.debug("TanStack Query: Unassigned cash updated successfully");
     },
     onError: (error) => {
@@ -72,7 +88,7 @@ export const useUnassignedCash = () => {
   });
 
   const setUnassignedCash = useCallback(
-    async (amount, options = {}) => {
+    async (amount: number, options: SetUnassignedCashOptions = {}) => {
       if (typeof amount !== "number" || isNaN(amount)) {
         logger.warn("Invalid unassigned cash amount:", amount);
         return false;

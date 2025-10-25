@@ -2,16 +2,31 @@ import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 
+interface FilterConfig {
+  key: string;
+  type: "select";
+  options: Array<{ value: string; label: string }>;
+  defaultValue?: string;
+}
+
+interface FilterValues {
+  search?: string;
+  [key: string]: string | undefined;
+}
+
+interface StandardFiltersProps {
+  filters?: FilterValues;
+  onFilterChange: (key: string, value: string) => void;
+  filterConfigs?: FilterConfig[];
+  showClearButton?: boolean;
+  searchPlaceholder?: string;
+  size?: "sm" | "md";
+  className?: string;
+}
+
 /**
  * Standardized compact filtering component with glassmorphism styling
  * Consistent, space-efficient filtering across all pages with proper borders and labeling
- *
- * @param {Object} filters - Current filter values
- * @param {Function} onFilterChange - Callback for filter changes
- * @param {Array} filterConfigs - Array of filter configurations
- * @param {boolean} showClearButton - Show clear all filters button
- * @param {string} searchPlaceholder - Placeholder text for search
- * @param {string} size - 'sm' | 'md' for sizing
  */
 const StandardFilters = ({
   filters = {},
@@ -21,7 +36,7 @@ const StandardFilters = ({
   searchPlaceholder = "Search...",
   size = "md",
   className = "",
-}) => {
+}: StandardFiltersProps) => {
   const sizeConfig = {
     sm: {
       input: "px-2 py-1 text-sm",

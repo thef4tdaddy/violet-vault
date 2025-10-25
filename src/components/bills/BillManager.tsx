@@ -75,10 +75,6 @@ const BillManager = ({
   } = useBillManager({
     propTransactions,
     propEnvelopes,
-    onUpdateBill,
-    onCreateRecurringBill,
-    onSearchNewBills,
-    onError,
   });
 
   // UI logic hook
@@ -108,10 +104,12 @@ const BillManager = ({
     securityContext: { budgetId },
     user: currentUser,
   } = useAuthManager();
-  const { isLocked: isEditLocked, currentEditor } = useEditLock(
+  const { isLocked: isEditLocked, lockedBy } = useEditLock(
     `bills-${budgetId}`,
     currentUser?.userName || "User"
   );
+  
+  const currentEditor = lockedBy;
 
   // Loading state
   if (isLoading) {
@@ -171,7 +169,6 @@ const BillManager = ({
           isOpen={showAddBillModal}
           onClose={handleCloseModal}
           editingBill={editingBill}
-          availableEnvelopes={envelopes}
           onAddBill={addBill}
           onUpdateBill={updateBill}
           onDeleteBill={deleteBill}
@@ -186,7 +183,6 @@ const BillManager = ({
           selectedBills={Array.from(selectedBills)
             .map((id) => bills.find((b) => b.id === id))
             .filter(Boolean)}
-          availableEnvelopes={envelopes}
           onUpdateBills={handleBulkUpdate}
           onError={onError}
         />
@@ -199,8 +195,6 @@ const BillManager = ({
             setShowDiscoveryModal(false);
           }}
           discoveredBills={discoveredBills}
-          existingBills={bills}
-          availableEnvelopes={envelopes}
           onAddBills={handleAddDiscoveredBills}
           onError={onError}
         />
@@ -227,11 +221,10 @@ const BillManager = ({
 
       {historyBill && (
         <ObjectHistoryViewer
-          isOpen={!!historyBill}
           onClose={() => setHistoryBill(null)}
           objectId={historyBill.id}
           objectType="bill"
-          title={`Bill History: ${historyBill.name}`}
+          objectName={historyBill.name}
         />
       )}
     </div>

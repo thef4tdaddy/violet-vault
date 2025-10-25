@@ -31,7 +31,11 @@ export const useTransactionLedger = (currentUser) => {
       setAllTransactions: state.setAllTransactions,
       updateBill: state.updateBill,
     }))
-  );
+  ) as {
+    updateTransaction: (transaction: unknown) => void;
+    setAllTransactions: (transactions: unknown[]) => void;
+    updateBill: (bill: unknown) => void;
+  };
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // State management
@@ -71,7 +75,7 @@ export const useTransactionLedger = (currentUser) => {
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, handleBulkImport, budget);
+  } = useTransactionImport(currentUser, handleBulkImport);
 
   const filteredTransactions = useTransactionFilters(
     transactions,
@@ -108,7 +112,7 @@ export const useTransactionLedger = (currentUser) => {
       updateTransaction(transactionWithId);
       setEditingTransaction(null);
     } else {
-      addTransaction(newTransaction);
+      addTransaction(newTransaction as unknown);
     }
 
     setShowAddModal(false);

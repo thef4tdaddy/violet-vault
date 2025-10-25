@@ -16,7 +16,7 @@ export const useSettingsDashboardUI = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showEnvelopeChecker, setShowEnvelopeChecker] = useState(false);
 
-  const handleSectionChange = useCallback((sectionId) => {
+  const handleSectionChange = useCallback((sectionId: string) => {
     setActiveSection(sectionId);
   }, []);
 
@@ -112,10 +112,7 @@ export const useCloudSyncManager = () => {
       logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
         const { cloudSyncService } = await import("../../services/cloudSyncService");
-        // Get auth data from AuthContext instead of old Zustand store
-        const { useAuth } = await import("../../contexts/AuthContext");
-        // Note: useAuth is a hook and can only be called from components, not from event handlers
-        // This is a limitation - for now we'll skip auth validation in settings
+        // Note: Auth data should come from the component level context
         logger.warn("Cloud sync toggle called - auth validation skipped due to hook context limitations");
 
         cloudSyncService.start();
@@ -141,7 +138,7 @@ export const useCloudSyncManager = () => {
       logger.debug("🔄 Manual sync triggered from settings");
       const { cloudSyncService } = await import("../../services/cloudSyncService");
 
-      if (!cloudSyncService.isRunning) {
+      if (!(cloudSyncService as { isRunning?: boolean }).isRunning) {
         logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
         // Note: Auth data should come from the component level context
         // For now, just try to start sync - it will use existing auth if available
@@ -228,7 +225,7 @@ export const useSettingsActions = () => {
     }
   }, []);
 
-  const handleResetConfirmAction = useCallback((onClose, onResetEncryption) => {
+  const handleResetConfirmAction = useCallback((onClose: () => void, onResetEncryption: () => void) => {
     return () => {
       onClose();
       onResetEncryption();

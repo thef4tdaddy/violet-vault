@@ -47,14 +47,21 @@ async function runHealthChecksInternal(results) {
     logger.info("🧪 Testing timestamp handling...");
 
     // Add test data with mixed timestamps
-    const testEnvelope = {
+    const testEnvelope: {
+      id: string;
+      name: string;
+      lastModified: string;
+      createdAt: number;
+      category?: string;
+      archived?: boolean;
+    } = {
       id: "timestamp-test-" + Date.now(),
       name: "Timestamp Test",
       lastModified: "2024-01-01T12:00:00.000Z", // String timestamp
       createdAt: Date.now(), // Number timestamp
     };
 
-    await budgetDb.envelopes.add(testEnvelope);
+    await budgetDb.envelopes.add(testEnvelope as { id: string; name: string });
     // Skip cloud sync call that hangs - just check if service exists
     const syncData = cloudSyncService
       ? {
@@ -108,12 +115,12 @@ async function runHealthChecksInternal(results) {
       lastModified: Date.now(), // Now (newer)
     };
 
-    const syncResult = await Promise.race([
+    const syncResult = (await Promise.race([
       cloudSyncService.determineSyncDirection(mockDexieData, mockFirestoreData),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Sync direction determination timed out")), 10000)
       ),
-    ]);
+    ])) as { direction: string };
 
     if (syncResult.direction === "toFirestore") {
       results.tests.push({
@@ -271,10 +278,12 @@ async function runHealthChecksInternal(results) {
 
     const dataDetection = await detectLocalData();
 
+    const samplesFound = "samplesFound" in dataDetection ? dataDetection.samplesFound : { envelopes: false, transactions: false, bills: false };
+
     results.tests.push({
       name: "Comprehensive Data Detection",
       status: "✅ PASSED",
-      details: `Data detected: ${dataDetection.hasData}, Total items: ${dataDetection.totalItems}, Core data: ${JSON.stringify(dataDetection.details.samplesFound)}`,
+      details: `Data detected: ${dataDetection.hasData}, Total items: ${dataDetection.totalItems}, Core data: ${JSON.stringify(samplesFound)}`,
     });
     results.passed++;
   } catch (error) {
@@ -310,7 +319,7 @@ async function runHealthChecksInternal(results) {
 
 // Expose to window for immediate testing
 if (typeof window !== "undefined") {
-  window.runSyncHealthCheck = runImmediateSyncHealthCheck;
+  (window as { runSyncHealthCheck?: () => Promise<unknown> }).runSyncHealthCheck = runImmediateSyncHealthCheck;
 }
 
 export default runImmediateSyncHealthCheck;
