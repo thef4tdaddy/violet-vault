@@ -18,6 +18,7 @@ const DevAuthBypass = () => {
   const navigate = useNavigate();
   const { setAuthenticated } = useAuth();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const token = searchParams.get("token") || "";
     const target = searchParams.get("target") || "/app/dashboard";
