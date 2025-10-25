@@ -2,21 +2,21 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { useSyncHealthIndicator } from "../useSyncHealthIndicator";
 
 // Mock dependencies
-jest.mock("../../../utils/sync/masterSyncValidator", () => ({
-  getQuickSyncStatus: jest.fn(),
+vi.mock("../../../utils/sync/masterSyncValidator", () => ({
+  getQuickSyncStatus: vi.fn(),
 }));
 
-jest.mock("../../../services/cloudSyncService", () => ({
+vi.mock("../../../services/cloudSyncService", () => ({
   cloudSyncService: {
     isRunning: false,
     activeSyncPromise: null,
   },
 }));
 
-jest.mock("../../../utils/common/logger", () => ({
+vi.mock("../../../utils/common/logger", () => ({
   default: {
-    error: jest.fn(),
-    info: jest.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
   },
 }));
 
@@ -24,7 +24,7 @@ const { getQuickSyncStatus } = require("../../../utils/sync/masterSyncValidator"
 
 describe("useSyncHealthIndicator", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.useFakeTimers();
   });
 
@@ -143,7 +143,7 @@ describe("useSyncHealthIndicator", () => {
     };
 
     // Mock window.runMasterSyncValidation
-    global.window.runMasterSyncValidation = jest.fn().mockResolvedValue(mockResults);
+    global.window.runMasterSyncValidation = vi.fn().mockResolvedValue(mockResults);
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 
@@ -166,7 +166,7 @@ describe("useSyncHealthIndicator", () => {
       message: "Cloud data reset successfully",
     };
 
-    global.window.forceCloudDataReset = jest.fn().mockResolvedValue(mockResult);
+    global.window.forceCloudDataReset = vi.fn().mockResolvedValue(mockResult);
     getQuickSyncStatus.mockResolvedValue({
       isHealthy: true,
       status: "HEALTHY",

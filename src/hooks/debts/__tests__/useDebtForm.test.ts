@@ -177,7 +177,7 @@ describe("useDebtForm", () => {
 
   describe("Form submission", () => {
     test("should handle successful submission for new debt", async () => {
-      const mockOnSubmit = jest.fn().mockResolvedValue();
+      const mockOnSubmit = vi.fn().mockResolvedValue();
       const { result } = renderHook(() => useDebtForm(null, true));
 
       act(() => {
@@ -223,7 +223,7 @@ describe("useDebtForm", () => {
     });
 
     test("should handle successful submission for debt edit", async () => {
-      const mockOnSubmit = jest.fn().mockResolvedValue();
+      const mockOnSubmit = vi.fn().mockResolvedValue();
       const { result } = renderHook(() => useDebtForm(mockDebt, true));
 
       let submissionResult;
@@ -244,7 +244,7 @@ describe("useDebtForm", () => {
     });
 
     test("should handle submission error", async () => {
-      const mockOnSubmit = jest.fn().mockRejectedValue(new Error("Submission failed"));
+      const mockOnSubmit = vi.fn().mockRejectedValue(new Error("Submission failed"));
       const { result } = renderHook(() => useDebtForm(null, true));
 
       act(() => {
@@ -266,7 +266,7 @@ describe("useDebtForm", () => {
     });
 
     test("should not submit if validation fails", async () => {
-      const mockOnSubmit = jest.fn();
+      const mockOnSubmit = vi.fn();
       const { result } = renderHook(() => useDebtForm(null, true));
 
       // Don't set required fields
