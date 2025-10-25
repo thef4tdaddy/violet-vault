@@ -7,11 +7,122 @@ import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
 /**
+ * Paycheck form data interface
+ */
+interface PaycheckFormData {
+  amount: string | number;
+  payerName: string;
+  allocationMode: string;
+}
+
+/**
+ * Validation result interface
+ */
+interface ValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
+}
+
+/**
+ * Paycheck prediction interface
+ */
+interface PaycheckPrediction {
+  amount: number;
+  confidence: number;
+  sampleSize: number;
+  range: {
+    min: number;
+    max: number;
+  };
+}
+
+/**
+ * Historical paycheck record
+ */
+interface PaycheckRecord {
+  payerName: string;
+  amount: number;
+  processedAt?: string;
+}
+
+/**
+ * Envelope interface for allocations
+ */
+interface Envelope {
+  id: string;
+  name: string;
+  autoAllocate?: boolean;
+  envelopeType: string;
+  monthlyAmount?: number;
+  priority?: string;
+  currentBalance?: number;
+  biweeklyAllocation?: number;
+  category?: string;
+}
+
+/**
+ * Allocation result
+ */
+interface AllocationItem {
+  envelopeId: string;
+  envelopeName: string;
+  amount: number;
+  monthlyAmount: number;
+  envelopeType: string;
+  priority: string;
+}
+
+/**
+ * Allocation calculations result
+ */
+interface AllocationResult {
+  allocations: AllocationItem[];
+  totalAllocated: number;
+  remainingAmount: number;
+  allocationRate: number;
+}
+
+/**
+ * Paycheck transaction
+ */
+interface PaycheckTransaction {
+  id: number;
+  amount: number;
+  payerName: string;
+  allocationMode: string;
+  allocations: AllocationItem[];
+  totalAllocated: number;
+  remainingAmount: number;
+  processedBy: string;
+  processedAt: string;
+  date: string;
+}
+
+/**
+ * User info
+ */
+interface UserInfo {
+  userName?: string;
+}
+
+/**
+ * Paycheck statistics
+ */
+interface PaycheckStatistics {
+  count: number;
+  totalAmount: number;
+  averageAmount: number;
+  minAmount: number;
+  maxAmount: number;
+  lastPaycheckDate: string | null;
+}
+
+/**
  * Validates paycheck form data
  * @param {Object} formData - Paycheck form data
  * @returns {Object} Validation result
  */
-export const validatePaycheckForm = (formData) => {
+export const validatePaycheckForm = (formData: PaycheckFormData): ValidationResult => {
   const errors = {};
 
   // Amount validation
@@ -50,7 +161,10 @@ export const validatePaycheckForm = (formData) => {
  * @param {Array} paycheckHistory - Historical paycheck data
  * @returns {Object|null} Prediction with amount and confidence
  */
-export const getPayerPrediction = (payer, paycheckHistory = []) => {
+export const getPayerPrediction = (
+  payer: string,
+  paycheckHistory: PaycheckRecord[] = []
+): PaycheckPrediction | null => {
   const payerPaychecks = paycheckHistory
     .filter((p) => p.payerName === payer && p.amount > 0)
     .slice(0, 5) // Last 5 paychecks
@@ -84,7 +198,10 @@ export const getPayerPrediction = (payer, paycheckHistory = []) => {
  * @param {Array} tempPayers - Temporary payers from current session
  * @returns {Array} Sorted unique payer names
  */
-export const getUniquePayers = (paycheckHistory = [], tempPayers = []) => {
+export const getUniquePayers = (
+  paycheckHistory: PaycheckRecord[] = [],
+  tempPayers: string[] = []
+): string[] => {
   const payers = new Set();
 
   // Add payers from history
@@ -112,10 +229,10 @@ export const getUniquePayers = (paycheckHistory = [], tempPayers = []) => {
  * @returns {Object} Allocation calculations
  */
 export const calculateEnvelopeAllocations = (
-  paycheckAmount,
-  envelopes = [],
+  paycheckAmount: number,
+  envelopes: Envelope[] = [],
   allocationMode = "allocate"
-) => {
+): AllocationResult => {
   if (!paycheckAmount || paycheckAmount <= 0) {
     return {
       allocations: [],
@@ -215,7 +332,11 @@ export const calculateEnvelopeAllocations = (
  * @param {Object} currentUser - Current user info
  * @returns {Object} Paycheck transaction
  */
-export const createPaycheckTransaction = (formData, allocations, currentUser) => {
+export const createPaycheckTransaction = (
+  formData: PaycheckFormData,
+  allocations: AllocationResult,
+  currentUser: UserInfo | null
+): PaycheckTransaction => {
   return {
     id: Date.now(),
     amount: parseFloat(formData.amount),
@@ -236,7 +357,10 @@ export const createPaycheckTransaction = (formData, allocations, currentUser) =>
  * @param {number} paycheckAmount - Total paycheck amount
  * @returns {Object} Validation result
  */
-export const validateAllocations = (allocations, paycheckAmount) => {
+export const validateAllocations = (
+  allocations: AllocationItem[],
+  paycheckAmount: number
+): { isValid: boolean; message: string; overage?: number } => {
   const totalAllocated = allocations.reduce((sum, alloc) => sum + alloc.amount, 0);
 
   if (totalAllocated > paycheckAmount) {
@@ -265,7 +389,7 @@ export const validateAllocations = (allocations, paycheckAmount) => {
  * @param {number} amount - Amount to format
  * @returns {string} Formatted amount
  */
-export const formatPaycheckAmount = (amount) => {
+export const formatPaycheckAmount = (amount: number): string => {
   if (typeof amount !== "number" || isNaN(amount)) {
     return "$0.00";
   }
@@ -278,7 +402,10 @@ export const formatPaycheckAmount = (amount) => {
  * @param {string} payer - Optional payer filter
  * @returns {Object} Statistics
  */
-export const getPaycheckStatistics = (paycheckHistory = [], payer = null) => {
+export const getPaycheckStatistics = (
+  paycheckHistory: PaycheckRecord[] = [],
+  payer: string | null = null
+): PaycheckStatistics => {
   const filteredHistory = payer
     ? paycheckHistory.filter((p) => p.payerName === payer)
     : paycheckHistory;
