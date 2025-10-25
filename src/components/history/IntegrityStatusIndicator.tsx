@@ -11,12 +11,41 @@ import {
   SecurityReportDetails,
 } from "./IntegrityStatusIndicatorHelpers";
 
+interface IntegrityStatus {
+  valid: boolean;
+  message: string;
+  totalCommits?: number;
+  verifiedCommits?: number;
+  brokenAt?: number | null;
+}
+
+interface SecurityReport {
+  integrity: IntegrityStatus;
+  warnings: Array<{
+    title: string;
+    message: string;
+    recommendation: string;
+  }>;
+  recommendations: string[];
+  timestamp?: string;
+  riskLevel?: string;
+  overallStatus?: string;
+  summary?: string;
+  tamperDetection?: {
+    indicators: Array<{
+      severity: string;
+      description: string;
+    }>;
+    recommendations: string[];
+  };
+}
+
 const IntegrityStatusIndicator = ({ className = "" }) => {
-  const [integrityStatus, setIntegrityStatus] = useState({
+  const [integrityStatus, setIntegrityStatus] = useState<IntegrityStatus>({
     valid: true,
     message: "Budget history integrity verified",
   });
-  const [securityReport, setSecurityReport] = useState(null);
+  const [securityReport, setSecurityReport] = useState<SecurityReport | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 

@@ -1,8 +1,42 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
+// Type definitions for integrity status
+interface IntegrityStatus {
+  valid: boolean;
+  message: string;
+  totalCommits?: number;
+  verifiedCommits?: number;
+  brokenAt?: number | null;
+}
+
+interface SecurityIndicator {
+  severity: string;
+  description: string;
+}
+
+interface TamperDetection {
+  indicators: SecurityIndicator[];
+  recommendations: string[];
+}
+
+interface SecurityReport {
+  integrity: IntegrityStatus;
+  warnings: Array<{
+    title: string;
+    message: string;
+    recommendation: string;
+  }>;
+  recommendations: string[];
+  timestamp?: string;
+  riskLevel?: string;
+  overallStatus?: string;
+  summary?: string;
+  tamperDetection?: TamperDetection;
+}
+
 // Helper functions
-export const getStatusIcon = (integrityStatus: any) => {
+export const getStatusIcon = (integrityStatus: IntegrityStatus | null) => {
   if (!integrityStatus) {
     return React.createElement(getIcon("Shield"), {
       className: "h-5 w-5 text-gray-400",
@@ -20,13 +54,13 @@ export const getStatusIcon = (integrityStatus: any) => {
   });
 };
 
-export const getStatusColor = (integrityStatus: any) => {
+export const getStatusColor = (integrityStatus: IntegrityStatus | null) => {
   if (!integrityStatus) return "text-gray-500 bg-gray-100";
   if (integrityStatus.valid) return "text-green-700 bg-green-100 border-green-200";
   return "text-red-700 bg-red-100 border-red-200";
 };
 
-export const getSecurityStatusColor = (securityReport: any) => {
+export const getSecurityStatusColor = (securityReport: SecurityReport | null) => {
   if (!securityReport) return "bg-gray-100";
 
   switch (securityReport.riskLevel) {
@@ -49,7 +83,11 @@ export const getRiskLevelColor = (riskLevel: string) => {
 
 // Sub-components
 interface WarningsListProps {
-  warnings: any[];
+  warnings: Array<{
+    title: string;
+    message: string;
+    recommendation: string;
+  }>;
 }
 
 export const WarningsList = ({ warnings }: WarningsListProps) => {
@@ -77,7 +115,7 @@ export const WarningsList = ({ warnings }: WarningsListProps) => {
 };
 
 interface IntegrityDetailsProps {
-  integrityStatus: any;
+  integrityStatus: IntegrityStatus | null;
 }
 
 export const IntegrityDetails = ({ integrityStatus }: IntegrityDetailsProps) => {
@@ -122,8 +160,8 @@ export const IntegrityDetails = ({ integrityStatus }: IntegrityDetailsProps) => 
 };
 
 interface SecurityReportDetailsProps {
-  securityReport: any;
-  getSecurityStatusColor: (report: any) => string;
+  securityReport: SecurityReport | null;
+  getSecurityStatusColor: (report: SecurityReport | null) => string;
 }
 
 export const SecurityReportDetails = ({
@@ -166,7 +204,7 @@ export const SecurityReportDetails = ({
 };
 
 interface TamperIndicatorsProps {
-  indicators: any[];
+  indicators: SecurityIndicator[];
 }
 
 const TamperIndicators = ({ indicators }: TamperIndicatorsProps) => {

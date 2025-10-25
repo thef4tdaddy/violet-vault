@@ -5,15 +5,23 @@ import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
 import DebtSummaryCards from "./ui/DebtSummaryCards";
 import DebtList from "./ui/DebtList";
 import DebtFilters from "./ui/DebtFilters";
+import { DebtStats, DebtAccount } from "../../types/debt";
+
+interface FilterOptions {
+  type: string;
+  status: string;
+  sortBy: string;
+  sortOrder: string;
+}
 
 interface OverviewTabProps {
-  debtStats: any;
-  filteredDebts: any[];
-  filterOptions: any;
-  setFilterOptions: (options: any) => void;
+  debtStats: DebtStats;
+  filteredDebts: DebtAccount[];
+  filterOptions: FilterOptions;
+  setFilterOptions: (options: FilterOptions) => void;
   setShowUpcomingPaymentsModal: (show: boolean) => void;
-  handleDebtClick: (debt: any) => void;
-  handleRecordPayment: (debt: any, amount: number) => void;
+  handleDebtClick: (debt: DebtAccount) => void;
+  handleRecordPayment: (debt: DebtAccount, amount: number) => void;
   handleAddDebt: () => void;
 }
 
@@ -111,7 +119,7 @@ export const StrategiesTab = () => {
 };
 
 interface DashboardHeaderProps {
-  debtStats: any;
+  debtStats: DebtStats;
   handleAddDebt: () => void;
 }
 
