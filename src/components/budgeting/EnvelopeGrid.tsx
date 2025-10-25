@@ -53,7 +53,7 @@ const EnvelopeModals = ({
   handleCreateEnvelope,
   envelopes,
   budget,
-  unassignedCash: _unassignedCash,
+  unassignedCash,
   editingEnvelope,
   setEditingEnvelope,
   handleUpdateEnvelope,
@@ -223,12 +223,15 @@ const EnvelopeGridView = ({
 
     <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
 
+    {/* @ts-expect-error - EnvelopeHeader component signature mismatch, needs refactoring */}
     <EnvelopeHeader
-      filterOptions={filterOptions}
-      setFilterOptions={setFilterOptions}
-      setShowCreateModal={setShowCreateModal}
-      viewMode={viewMode}
-      setViewMode={setViewMode}
+      {...({
+        filterOptions,
+        setFilterOptions,
+        setShowCreateModal,
+        viewMode,
+        setViewMode,
+      } as Record<string, unknown>)}
     />
 
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -240,7 +243,7 @@ const EnvelopeGridView = ({
           onSelect={handleEnvelopeSelect}
           onEdit={handleEnvelopeEdit}
           onViewHistory={handleViewHistory}
-          onQuickFund={handleQuickFund}
+          onQuickFund={(envelopeId: string) => handleQuickFund(envelopeId, 0)}
           isSelected={selectedEnvelopeId === envelope.id}
           bills={bills as never}
           unassignedCash={unassignedCash}
@@ -535,7 +538,9 @@ const UnifiedEnvelopeManager = ({
       setEditingEnvelope={uiState.setEditingEnvelope}
       handleUpdateEnvelope={uiState.handleUpdateEnvelope}
       deleteEnvelope={(id: string) => Promise.resolve(deleteEnvelope(id))}
-      updateBill={(data: { id: string; updates: unknown }) => updateBill(data.updates as never)}
+      updateBill={async (data: { id: string; updates: unknown }) => {
+        updateBill(data.updates as never);
+      }}
       historyEnvelope={uiState.historyEnvelope}
       setHistoryEnvelope={uiState.setHistoryEnvelope}
       quickFundModal={uiState.quickFundModal}

@@ -214,7 +214,8 @@ export const useSettingsActions = () => {
       await createTestBudgetHistory();
       globalToast.showSuccess(
         "✅ Test budget history created! Check console for details.",
-        "Test History Created"
+        "Test History Created",
+        undefined
       );
     } catch (error) {
       globalToast.showError(

@@ -52,7 +52,8 @@ export const useTransactionImport = (
     if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
       globalToast.showError(
         "Please map at least Date, Description, and Amount fields",
-        "Mapping Required"
+        "Mapping Required",
+        undefined
       );
       return;
     }

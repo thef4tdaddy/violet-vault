@@ -33,7 +33,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
     error,
     refetch,
   } = useQuery({
-    queryKey: [...queryKeys.budgetMetadata, "unassignedCash"],
+    queryKey: queryKeys.unassignedCash(),
     queryFn: async () => {
       // Removed noisy debug log - query runs constantly
       let metadata = await getBudgetMetadata();
@@ -79,7 +79,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
       logger.debug("TanStack Query: Unassigned cash updated successfully");
     },
     onError: (error) => {

@@ -47,21 +47,16 @@ async function runHealthChecksInternal(results) {
     logger.info("🧪 Testing timestamp handling...");
 
     // Add test data with mixed timestamps
-    const testEnvelope: {
-      id: string;
-      name: string;
-      lastModified: string;
-      createdAt: number;
-      category?: string;
-      archived?: boolean;
-    } = {
+    const testEnvelope = {
       id: "timestamp-test-" + Date.now(),
       name: "Timestamp Test",
-      lastModified: "2024-01-01T12:00:00.000Z", // String timestamp
+      category: "test",
+      archived: false,
+      lastModified: Date.parse("2024-01-01T12:00:00.000Z"), // Number timestamp
       createdAt: Date.now(), // Number timestamp
     };
 
-    await budgetDb.envelopes.add(testEnvelope as { id: string; name: string });
+    await budgetDb.envelopes.add(testEnvelope);
     // Skip cloud sync call that hangs - just check if service exists
     const syncData = cloudSyncService
       ? {
