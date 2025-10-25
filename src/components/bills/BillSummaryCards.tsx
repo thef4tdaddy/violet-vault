@@ -1,11 +1,26 @@
 import { getIcon } from "../../utils";
 import PageSummaryCard from "../ui/PageSummaryCard";
 
+interface BillTotals {
+  total?: number;
+  totalCount?: number;
+  overdue?: number;
+  overdueCount?: number;
+  paid?: number;
+  paidCount?: number;
+  upcoming?: number;
+  upcomingCount?: number;
+}
+
+interface BillSummaryCardsProps {
+  totals?: BillTotals;
+}
+
 /**
  * Bill summary cards using standardized gradient design
  * Pure UI component that preserves exact visual appearance
  */
-const BillSummaryCards = ({ totals = {} }) => {
+const BillSummaryCards = ({ totals = {} }: BillSummaryCardsProps) => {
   const cards = [
     {
       key: "total-bills",

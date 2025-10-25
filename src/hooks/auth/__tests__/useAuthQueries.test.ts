@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useLoginMutation, useLogoutMutation, useChangePasswordMutation } from "../useAuthQueries";
 
@@ -10,7 +10,7 @@ import { useLoginMutation, useLogoutMutation, useChangePasswordMutation } from "
 
 // Mock TanStack Query
 vi.mock("@tanstack/react-query", () => ({
-  useMutation: vi.fn((options) => ({
+  useMutation: vi.fn((_options) => ({
     mutate: vi.fn(),
     mutateAsync: vi.fn(async () => ({ success: true })),
     isPending: false,
@@ -19,7 +19,7 @@ vi.mock("@tanstack/react-query", () => ({
     data: null,
     reset: vi.fn(),
   })),
-  useQuery: vi.fn((options) => ({
+  useQuery: vi.fn((_options) => ({
     data: null,
     isLoading: false,
     isError: false,

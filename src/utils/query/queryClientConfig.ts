@@ -16,7 +16,8 @@ export const createQueryClient = () => {
         gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime)
         retry: (failureCount, error) => {
           // Don't retry auth errors
-          if (error?.status === 401 || error?.status === 403) {
+          const errorWithStatus = error as any;
+          if (errorWithStatus?.status === 401 || errorWithStatus?.status === 403) {
             return false;
           }
           return failureCount < 3;
@@ -57,9 +58,9 @@ export const createQueryClient = () => {
         });
         // Error logging is handled by logger, no need for direct H usage
       },
-      onSuccess: (data, query) => {
+      onSuccess: (_data, query) => {
         // Optional: Track successful queries in development
-        if (process.env.NODE_ENV === "development") {
+        if (import.meta.env.DEV) {
           logger.debug("Query success", {
             queryKey: query.queryKey,
             source: "queryClient",
@@ -70,13 +71,13 @@ export const createQueryClient = () => {
 
     // Mutation cache with global handling and automatic invalidations
     mutationCache: new MutationCache({
-      onSuccess: (data, variables, context, mutation) => {
+      onSuccess: (_data, _variables, _context, mutation) => {
         // Get the query client instance
-        const mutationQueryClient = mutation.options.queryClient || queryClient;
+        const mutationQueryClient = queryClient;
 
         // Invalidate related queries based on mutation type
         if (mutation.options.mutationKey?.[0]) {
-          const entityType = mutation.options.mutationKey[0];
+          const entityType = mutation.options.mutationKey[0] as string;
 
           // Invalidate specific entity queries
           mutationQueryClient.invalidateQueries({ queryKey: [entityType] });
@@ -137,7 +138,7 @@ export const queryClientUtils = {
       totalQueries: queries.length,
       activeQueries: queries.filter((q) => q.isActive()).length,
       staleQueries: queries.filter((q) => q.isStale()).length,
-      fetchingQueries: queries.filter((q) => q.isFetching()).length,
+      fetchingQueries: queries.filter((q) => q.state.fetchStatus === "fetching").length,
       errorQueries: queries.filter((q) => q.state.error).length,
     };
   },

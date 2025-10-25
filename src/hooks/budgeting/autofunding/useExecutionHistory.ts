@@ -1,11 +1,18 @@
 import { useState, useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
+interface ExecutionFilters {
+  trigger?: string;
+  successful?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
 /**
  * Hook for managing auto-funding execution history
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
-export const useExecutionHistory = (initialHistory = []) => {
+export const useExecutionHistory = (initialHistory: any[] = []) => {
   const [executionHistory, setExecutionHistory] = useState(initialHistory);
 
   // Add execution to history
@@ -29,7 +36,7 @@ export const useExecutionHistory = (initialHistory = []) => {
 
   // Get filtered and limited history
   const getHistory = useCallback(
-    (limit = 10, filters = {}) => {
+    (limit = 10, filters: ExecutionFilters = {}) => {
       try {
         let filteredHistory = [...executionHistory];
 

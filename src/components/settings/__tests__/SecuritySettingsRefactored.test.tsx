@@ -3,8 +3,8 @@ import "@testing-library/jest-dom";
 import SecuritySettings from "../SecuritySettingsRefactored";
 
 // Mock the custom hook
-jest.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
-  useSecuritySettingsLogic: jest.fn(() => ({
+vi.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
+  useSecuritySettingsLogic: vi.fn(() => ({
     isLocked: false,
     securitySettings: {
       autoLockEnabled: true,
@@ -23,48 +23,48 @@ jest.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
     ],
     showEvents: false,
     showClearConfirm: false,
-    handleSettingChange: jest.fn(),
-    exportSecurityEvents: jest.fn(),
-    timeUntilAutoLock: jest.fn(() => "Active"),
-    toggleEventsDisplay: jest.fn(),
-    showClearConfirmDialog: jest.fn(),
-    hideClearConfirmDialog: jest.fn(),
-    confirmClearEvents: jest.fn(),
+    handleSettingChange: vi.fn(),
+    exportSecurityEvents: vi.fn(),
+    timeUntilAutoLock: vi.fn(() => "Active"),
+    toggleEventsDisplay: vi.fn(),
+    showClearConfirmDialog: vi.fn(),
+    hideClearConfirmDialog: vi.fn(),
+    confirmClearEvents: vi.fn(),
   })),
 }));
 
 // Mock all section components
-jest.mock("../sections/SecurityStatusSection", () => {
+vi.mock("../sections/SecurityStatusSection", () => {
   return function SecurityStatusSection() {
     return <div data-testid="security-status-section">Security Status Section</div>;
   };
 });
 
-jest.mock("../sections/AutoLockSettingsSection", () => {
+vi.mock("../sections/AutoLockSettingsSection", () => {
   return function AutoLockSettingsSection() {
     return <div data-testid="auto-lock-section">Auto Lock Section</div>;
   };
 });
 
-jest.mock("../sections/ClipboardSecuritySection", () => {
+vi.mock("../sections/ClipboardSecuritySection", () => {
   return function ClipboardSecuritySection() {
     return <div data-testid="clipboard-section">Clipboard Section</div>;
   };
 });
 
-jest.mock("../sections/SecurityLoggingSection", () => {
+vi.mock("../sections/SecurityLoggingSection", () => {
   return function SecurityLoggingSection() {
     return <div data-testid="logging-section">Logging Section</div>;
   };
 });
 
-jest.mock("../sections/SecurityActionsSection", () => {
+vi.mock("../sections/SecurityActionsSection", () => {
   return function SecurityActionsSection() {
     return <div data-testid="actions-section">Actions Section</div>;
   };
 });
 
-jest.mock("../modals/ClearConfirmationModal", () => {
+vi.mock("../modals/ClearConfirmationModal", () => {
   return function ClearConfirmationModal() {
     return <div data-testid="clear-modal">Clear Confirmation Modal</div>;
   };
@@ -73,15 +73,15 @@ jest.mock("../modals/ClearConfirmationModal", () => {
 describe("SecuritySettings (Refactored)", () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should not render when isOpen is false", () => {
-    render(<SecuritySettings isOpen={false} onClose={jest.fn()} />);
+    render(<SecuritySettings isOpen={false} onClose={vi.fn()} />);
     expect(screen.queryByText("SECURITY SETTINGS")).not.toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("SecuritySettings (Refactored)", () => {
   });
 
   it("should call onClose when close button is clicked", () => {
-    const mockOnClose = jest.fn();
+    const mockOnClose = vi.fn();
     render(<SecuritySettings isOpen={true} onClose={mockOnClose} />);
 
     const closeButton = screen.getByRole("button");

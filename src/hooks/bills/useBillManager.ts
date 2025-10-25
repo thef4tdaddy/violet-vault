@@ -21,9 +21,18 @@ import {
 } from "../../utils/bills/billCalculations";
 import logger from "../../utils/common/logger";
 
+interface UseBillManagerOptions {
+  propTransactions?: any[];
+  propEnvelopes?: any[];
+  onUpdateBill?: (bill: any) => void | Promise<void>;
+  onCreateRecurringBill?: (bill: any) => void | Promise<void>;
+  onSearchNewBills?: () => void | Promise<void>;
+  onError?: (error: string) => void;
+}
+
 /**
  * Custom hook for bill management business logic
- * @param {Object} options - Configuration options
+ * @param {UseBillManagerOptions} options - Configuration options
  * @returns {Object} Bill management state and actions
  */
 export const useBillManager = ({
@@ -33,22 +42,25 @@ export const useBillManager = ({
   onCreateRecurringBill,
   onSearchNewBills,
   onError,
-} = {}) => {
+}: UseBillManagerOptions = {}) => {
   // Data fetching hooks
-  const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { transactions: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
   const { envelopes: tanStackEnvelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const {
     bills: tanStackBills = [],
     addBill,
-    updateBill,
+    updateBill: updateBillFromHook,
     deleteBill,
     markBillPaid,
     isLoading: billsLoading,
   } = useBills();
 
+  // Type-safe wrapper for updateBill
+  const updateBillMutation = updateBillFromHook as any;
+
   // Fallback to Zustand for backward compatibility
   const budget = useBudgetStore(
-    useShallow((state) => ({
+    useShallow((state: any) => ({
       allTransactions: state.allTransactions,
       envelopes: state.envelopes,
       bills: state.bills,
@@ -121,8 +133,8 @@ export const useBillManager = ({
         if (onUpdateBill) {
           onUpdateBill(updatedBill);
         } else {
-          updateBill({
-            id: updatedBill.id,
+          updateBillMutation({
+            billId: updatedBill.id,
             updates: {
               isPaid: false,
               dueDate: updatedBill.dueDate,
@@ -137,7 +149,7 @@ export const useBillManager = ({
     });
 
     return processedBills;
-  }, [transactions, tanStackBills, budget.bills, onUpdateBill, updateBill]);
+  }, [transactions, tanStackBills, budget.bills, onUpdateBill, updateBillMutation]);
 
   // Categorize bills into upcoming, overdue, paid
   const categorizedBills = useMemo(() => {
@@ -159,7 +171,7 @@ export const useBillManager = ({
   const billOperations = useBillOperations({
     bills,
     envelopes,
-    updateBill,
+    updateBill: updateBillMutation,
     onUpdateBill,
     onError,
     budget,
@@ -266,7 +278,7 @@ export const useBillManager = ({
 
     // Raw bill CRUD from useBills
     addBill,
-    updateBill,
+    updateBill: updateBillMutation,
     deleteBill,
     markBillPaid,
   };

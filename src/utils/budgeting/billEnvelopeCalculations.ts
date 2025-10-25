@@ -6,10 +6,33 @@
 import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
+interface BillEnvelopeResult {
+  isValidBillEnvelope: boolean;
+  nextBillAmount: number;
+  remainingToFund: number;
+  daysUntilNextBill: number | null;
+  fundingProgress: number;
+  isFullyFunded: boolean;
+  nextBillDate: Date | null;
+  linkedBills: number;
+  upcomingBillsAmount?: number;
+  currentBalance?: number;
+  targetMonthlyAmount?: number;
+  biweeklyAllocation?: number;
+  nextBill?: {
+    id: string;
+    name: string;
+    amount: number;
+    dueDate: string;
+    category?: string;
+    frequency: string;
+  } | null;
+}
+
 /**
  * Get invalid bill envelope result
  */
-const getInvalidBillEnvelopeResult = () => ({
+const getInvalidBillEnvelopeResult = (): BillEnvelopeResult => ({
   isValidBillEnvelope: false,
   nextBillAmount: 0,
   remainingToFund: 0,
@@ -17,16 +40,16 @@ const getInvalidBillEnvelopeResult = () => ({
   fundingProgress: 0,
   isFullyFunded: false,
   nextBillDate: null,
-  linkedBills: [],
+  linkedBills: 0,
 });
 
 /**
  * Get the next upcoming bill from linked bills
  */
-const getNextUpcomingBill = (linkedBills) => {
+const getNextUpcomingBill = (linkedBills: any[]) => {
   const upcomingBills = linkedBills
     .filter((bill) => new Date(bill.dueDate) >= new Date())
-    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
   return upcomingBills[0] || null;
 };
@@ -67,9 +90,9 @@ const calculateUpcomingBillsAmount = (linkedBills) => {
  * Calculate how much is left to fulfill the next bill payment for a bill envelope
  * @param {Object} envelope - The bill envelope
  * @param {Array} bills - Array of bills linked to this envelope
- * @returns {Object} Calculation results
+ * @returns {BillEnvelopeResult} Calculation results
  */
-export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
+export const calculateBillEnvelopeNeeds = (envelope: any, bills: any[] = []): BillEnvelopeResult => {
   if (!envelope || envelope.envelopeType !== ENVELOPE_TYPES.BILL) {
     return getInvalidBillEnvelopeResult();
   }

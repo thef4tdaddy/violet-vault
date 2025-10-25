@@ -219,7 +219,7 @@ describe("useTransactionReconciliation", () => {
         amount: "",
         description: "Test",
         type: "expense",
-      });
+      }, undefined);
       expect(success).toBe(false);
     });
 
@@ -234,7 +234,7 @@ describe("useTransactionReconciliation", () => {
         amount: "100",
         description: "   ",
         type: "expense",
-      });
+      }, undefined);
       expect(success).toBe(false);
     });
   });

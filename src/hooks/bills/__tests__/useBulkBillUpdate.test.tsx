@@ -1,28 +1,27 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { Select } from "@/components/ui";
+import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useBulkBillUpdate } from "../useBulkBillUpdate";
 
 // Mock dependencies
-jest.mock("../useBillManager", () => ({
-  useBillManager: jest.fn(() => ({
-    updateBill: jest.fn(),
-    deleteBill: jest.fn(),
+vi.mock("../useBillManager", () => ({
+  useBillManager: vi.fn(() => ({
+    updateBill: vi.fn(),
+    deleteBill: vi.fn(),
     isLoading: false,
   })),
 }));
 
-jest.mock("../../../utils/common/logger", () => ({
+vi.mock("../../../utils/common/logger", () => ({
   default: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
-jest.mock("../../../utils/bills/bulkUpdateValidation", () => ({
-  validateBulkUpdateData: jest.fn(),
-  validateBulkOperation: jest.fn(),
+vi.mock("../../../utils/bills/bulkUpdateValidation", () => ({
+  validateBulkUpdateData: vi.fn(),
+  validateBulkOperation: vi.fn(),
 }));
 
 const { useBillManager } = require("../useBillManager");
@@ -69,11 +68,11 @@ describe("useBulkBillUpdate", () => {
     },
   ];
 
-  const mockUpdateBill = jest.fn();
-  const mockDeleteBill = jest.fn();
+  const mockUpdateBill = vi.fn();
+  const mockDeleteBill = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     useBillManager.mockReturnValue({
       updateBill: mockUpdateBill,

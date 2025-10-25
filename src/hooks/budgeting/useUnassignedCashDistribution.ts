@@ -110,7 +110,10 @@ const useUnassignedCashDistribution = () => {
 
   // Calculate total being distributed
   const totalDistributed = useMemo(() => {
-    return Object.values(distributions).reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
+    return Object.values(distributions).reduce((sum, amount) => {
+      const numAmount = parseFloat(String(amount)) || 0;
+      return sum + numAmount;
+    }, 0);
   }, [distributions]);
 
   // Calculate remaining unassigned cash
@@ -130,8 +133,8 @@ const useUnassignedCashDistribution = () => {
   }, []);
 
   // Update distribution amount for a specific envelope
-  const updateDistribution = useCallback((envelopeId, amount) => {
-    const numericAmount = parseFloat(amount) || 0;
+  const updateDistribution = useCallback((envelopeId: string, amount: string | number) => {
+    const numericAmount = parseFloat(String(amount)) || 0;
     setDistributions((prev) => ({
       ...prev,
       [envelopeId]: Math.max(0, numericAmount),
@@ -208,7 +211,7 @@ const useUnassignedCashDistribution = () => {
       const envelopeUpdates = [];
 
       Object.entries(distributions).forEach(([envelopeId, amount]) => {
-        const distributionAmount = parseFloat(amount) || 0;
+        const distributionAmount = parseFloat(String(amount)) || 0;
         if (distributionAmount > 0) {
           const envelope = envelopes.find((env) => env.id === envelopeId);
           if (envelope) {
@@ -230,9 +233,9 @@ const useUnassignedCashDistribution = () => {
           source: "distribution",
         });
 
-        queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
-        queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-        queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.envelopes] });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.dashboard] });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.dashboardSummary] });
       }
 
       // Reset distributions after successful application

@@ -145,7 +145,8 @@ describe("BaseMutex", () => {
       await mutex.acquire("first");
 
       const secondPromise = mutex.acquire("second");
-      const thirdPromise = mutex.acquire("third");
+      // Queue a third promise (will be cleared)
+      mutex.acquire("third");
 
       // Force clear queue
       mutex.queue.length = 0;

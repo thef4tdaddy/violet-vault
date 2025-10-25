@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { ReactNode } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { AuthProvider, useAuth } from "../AuthContext";
+import { UserData } from "@/types/auth";
 
 /**
  * Test suite for AuthContext
@@ -105,7 +106,7 @@ describe("AuthContext", () => {
             <button
               onClick={() =>
                 auth.setAuthenticated(
-                  { userName: "testuser" },
+                  { userName: "testuser", userColor: "#000000" } as UserData,
                   { encryptionKey, salt, sessionToken: "token123" }
                 )
               }
