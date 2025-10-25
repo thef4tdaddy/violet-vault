@@ -1,4 +1,3 @@
-import React from "react";
 import logoOnly from "../../../assets/icon-512x512.png";
 import { getStepTitle, getStepSubtitle } from "../../../utils/auth/userSetupHelpers.tsx";
 

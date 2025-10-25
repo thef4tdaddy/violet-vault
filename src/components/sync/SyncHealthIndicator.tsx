@@ -1,6 +1,5 @@
-import React from "react";
 import { Button } from "@/components/ui";
-import { useSyncHealthIndicator } from "../../hooks/sync/useSyncHealthIndicator";
+import { useSyncHealthIndicator } from "@/hooks/sync/useSyncHealthIndicator";
 
 /**
  * @typedef {Object} SyncHealthStatus
@@ -20,7 +19,11 @@ import { useSyncHealthIndicator } from "../../hooks/sync/useSyncHealthIndicator"
  * @param {Function} props.onOpenSettings - Callback to open sync settings/tools
  * @returns {React.ReactElement} Rendered health indicator button
  */
-const SyncHealthIndicator = ({ onOpenSettings }) => {
+interface SyncHealthIndicatorProps {
+  onOpenSettings: () => void;
+}
+
+const SyncHealthIndicator = ({ onOpenSettings }: SyncHealthIndicatorProps) => {
   const { syncStatus, isBackgroundSyncing } = useSyncHealthIndicator();
 
   /**

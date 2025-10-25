@@ -1,11 +1,16 @@
 import { renderHook, act } from "@testing-library/react";
 import { storeRegistry } from "../stores/storeRegistry.ts";
+import { expect } from "vitest";
 
 /**
  * Utility for testing Zustand stores
  */
 export class StoreTestHelper {
-  constructor(storeHook, storeName) {
+  storeHook: any;
+  storeName: string;
+  initialState: any;
+
+  constructor(storeHook: any, storeName: string) {
     this.storeHook = storeHook;
     this.storeName = storeName;
     this.initialState = null;
@@ -34,7 +39,7 @@ export class StoreTestHelper {
   /**
    * Execute action and return new state
    */
-  async executeAction(actionName, ...args) {
+  async executeAction(actionName: string, ...args: any[]): Promise<any> {
     const { result } = renderHook(() => this.storeHook());
 
     await act(async () => {
@@ -47,11 +52,13 @@ export class StoreTestHelper {
   /**
    * Assert state matches expected values
    */
-  assertState(expected) {
+  assertState(expected: Record<string, any>): void {
     const currentState = this.storeHook.getState();
 
     Object.entries(expected).forEach(([key, value]) => {
-      expect(currentState[key]).toEqual(value);
+      if (typeof expect !== 'undefined') {
+        expect(currentState[key]).toEqual(value);
+      }
     });
   }
 
@@ -66,7 +73,7 @@ export class StoreTestHelper {
 /**
  * Create a test helper for a store
  */
-export const createStoreTestHelper = (storeHook, storeName) => {
+export const createStoreTestHelper = (storeHook: any, storeName: string): StoreTestHelper => {
   return new StoreTestHelper(storeHook, storeName);
 };
 

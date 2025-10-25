@@ -1,5 +1,5 @@
-import React from "react";
-import { getIcon as getIconFromRegistry } from "../../utils/icons";
+import { createElement } from "react";
+import { getIcon as getIconFromRegistry } from "@/utils/icons";
 
 /**
  * Shared security alert component for consistent messaging across security interfaces
@@ -12,6 +12,16 @@ import { getIcon as getIconFromRegistry } from "../../utils/icons";
  * @param {Function} onDismiss - Handler for dismissing alert
  * @param {string} variant - 'standard' | 'fullscreen' for different contexts
  */
+interface SecurityAlertProps {
+  type?: "error" | "warning" | "success" | "info";
+  message: string;
+  icon?: React.ReactNode;
+  dismissible?: boolean;
+  onDismiss?: () => void;
+  variant?: "standard" | "fullscreen";
+  className?: string;
+}
+
 const SecurityAlert = ({
   type = "info",
   message,
@@ -20,7 +30,7 @@ const SecurityAlert = ({
   onDismiss,
   variant = "standard",
   className = "",
-}) => {
+}: SecurityAlertProps) => {
   // Icon mapping based on alert type
   const getIcon = () => {
     if (CustomIcon) return CustomIcon;
@@ -77,7 +87,6 @@ const SecurityAlert = ({
 
   const Icon = getIcon();
   const colors = getColorScheme();
-  const _isFullscreen = variant === "fullscreen";
 
   const containerClasses = `
     flex items-center gap-2 p-3 rounded-lg border-2 border-black
@@ -87,14 +96,14 @@ const SecurityAlert = ({
 
   return (
     <div className={containerClasses}>
-      {React.createElement(Icon, {
+      {createElement(Icon, {
         className: `h-4 w-4 flex-shrink-0 ${colors.icon}`,
       })}
       <span className="text-sm flex-1">{message}</span>
 
       {dismissible && onDismiss && (
         <button onClick={onDismiss} className={`ml-2 hover:opacity-75 ${colors.icon}`}>
-          {React.createElement(getIconFromRegistry("X"), {
+          {createElement(getIconFromRegistry("X"), {
             className: "h-3 w-3",
           })}
         </button>

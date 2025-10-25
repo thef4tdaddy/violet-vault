@@ -1,4 +1,3 @@
-import React from "react";
 import { useDebtModalLogic } from "../../../hooks/debts/useDebtModalLogic";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 import DebtModalHeader from "./DebtModalHeader";

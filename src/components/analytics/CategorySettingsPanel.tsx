@@ -1,5 +1,3 @@
-import React from "react";
-
 const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }) => {
   if (!isVisible) return null;
 

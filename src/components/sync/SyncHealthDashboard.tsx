@@ -3,12 +3,12 @@
  * GitHub Issue #576 Phase 3: Visual health monitoring and backup tools
  */
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
-import { renderIcon } from "../../utils/icons";
-import { useSyncHealthMonitor } from "../../hooks/sync/useSyncHealthMonitor";
-import { useExportData } from "../../hooks/common/useExportData";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
+import { renderIcon } from "@/utils/icons";
+import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
+import { useExportData } from "@/hooks/common/useExportData";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
 
 /**
  * @typedef {Object} HealthMetrics
@@ -37,7 +37,12 @@ import { useToastHelpers } from "../../utils/common/toastHelpers";
  * @param {Function} props.onClose - Callback to close the dashboard
  * @returns {React.ReactElement|null} Rendered dashboard modal or null if closed
  */
-const SyncHealthDashboard = ({ isOpen, onClose }) => {
+interface SyncHealthDashboardProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const { healthData, refreshHealthData } = useSyncHealthMonitor(isOpen && autoRefresh, 5000);
   const { exportBackup } = useExportData();

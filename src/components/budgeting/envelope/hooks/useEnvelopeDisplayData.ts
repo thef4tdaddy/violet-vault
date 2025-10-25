@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { getUtilizationColor } from '@/utils/budgeting';
-import { ENVELOPE_TYPES } from '@/constants/categories';
-import { getBillEnvelopeDisplayInfo } from '@/utils/budgeting/billEnvelopeCalculations';
+import { useMemo } from "react";
+import { getUtilizationColor } from "@/utils/budgeting";
+import { ENVELOPE_TYPES } from "@/constants/categories";
+import { getBillEnvelopeDisplayInfo } from "@/utils/budgeting/billEnvelopeCalculations";
 
 interface Envelope {
   id: string;
@@ -39,8 +39,6 @@ interface EnvelopeDisplayData {
   progressBarColor: string;
 }
 
-
-
 export const useEnvelopeDisplayData = (
   envelope: Envelope,
   bills: Bill[] = []
@@ -69,9 +67,14 @@ export const useEnvelopeDisplayData = (
           secondaryValue: `$${envelope.available.toFixed(2)}`,
           secondaryColor: envelope.available >= 0 ? "text-green-600" : "text-red-600",
         },
-        progressColor: envelope.utilizationRate > 1 ? "bg-red-500" :
-                      envelope.utilizationRate > 0.8 ? "bg-orange-500" :
-                      envelope.utilizationRate > 0.5 ? "bg-blue-500" : "bg-green-500",
+        progressColor:
+          envelope.utilizationRate > 1
+            ? "bg-red-500"
+            : envelope.utilizationRate > 0.8
+              ? "bg-orange-500"
+              : envelope.utilizationRate > 0.5
+                ? "bg-blue-500"
+                : "bg-green-500",
       };
     };
 
@@ -84,12 +87,20 @@ export const useEnvelopeDisplayData = (
         isOnTrack,
         isFullyFunded,
         isBehind,
-        colorClass: isFullyFunded ? "bg-green-100 text-green-800" :
-                   isOnTrack ? "bg-blue-100 text-blue-800" :
-                   isBehind ? "bg-red-100 text-red-800" : "bg-orange-100 text-orange-800",
-        progressColor: isFullyFunded ? "bg-green-500" :
-                      isOnTrack ? "bg-blue-500" :
-                      isBehind ? "bg-red-500" : "bg-orange-500",
+        colorClass: isFullyFunded
+          ? "bg-green-100 text-green-800"
+          : isOnTrack
+            ? "bg-blue-100 text-blue-800"
+            : isBehind
+              ? "bg-red-100 text-red-800"
+              : "bg-orange-100 text-orange-800",
+        progressColor: isFullyFunded
+          ? "bg-green-500"
+          : isOnTrack
+            ? "bg-blue-500"
+            : isBehind
+              ? "bg-red-500"
+              : "bg-orange-500",
       };
     };
 
@@ -100,15 +111,25 @@ export const useEnvelopeDisplayData = (
       status: ReturnType<typeof getBillStatusInfo>
     ) => ({
       currentBalance: `$${currentBalance.toFixed(2)}`,
-      secondaryLabel: status.isFullyFunded ? "Surplus" :
-                     status.isOnTrack ? "On Track" :
-                     status.isBehind ? "Behind" : "Still Need",
-      secondaryValue: status.isFullyFunded ? `$${(currentBalance - targetMonthlyAmount).toFixed(2)}` :
-                     status.isOnTrack && !status.isFullyFunded ? `$${remainingToFund.toFixed(2)}` :
-                     `$${Math.abs(remainingToFund).toFixed(2)}`,
-      secondaryColor: status.isFullyFunded ? "text-green-600" :
-                     status.isOnTrack ? "text-blue-600" :
-                     status.isBehind ? "text-red-600" : "text-orange-600",
+      secondaryLabel: status.isFullyFunded
+        ? "Surplus"
+        : status.isOnTrack
+          ? "On Track"
+          : status.isBehind
+            ? "Behind"
+            : "Still Need",
+      secondaryValue: status.isFullyFunded
+        ? `$${(currentBalance - targetMonthlyAmount).toFixed(2)}`
+        : status.isOnTrack && !status.isFullyFunded
+          ? `$${remainingToFund.toFixed(2)}`
+          : `$${Math.abs(remainingToFund).toFixed(2)}`,
+      secondaryColor: status.isFullyFunded
+        ? "text-green-600"
+        : status.isOnTrack
+          ? "text-blue-600"
+          : status.isBehind
+            ? "text-red-600"
+            : "text-orange-600",
     });
 
     const getBillEnvelopeData = () => {
@@ -121,12 +142,18 @@ export const useEnvelopeDisplayData = (
         targetMonthlyAmount: number;
         remainingToFund: number;
       };
-      const { displayText, currentBalance, targetMonthlyAmount, remainingToFund } = displayInfoTyped;
+      const { displayText, currentBalance, targetMonthlyAmount, remainingToFund } =
+        displayInfoTyped;
       const status = getBillStatusInfo(displayText);
 
       return {
         colorClass: status.colorClass,
-        financialSummary: getBillFinancialSummary(currentBalance, targetMonthlyAmount, remainingToFund, status),
+        financialSummary: getBillFinancialSummary(
+          currentBalance,
+          targetMonthlyAmount,
+          remainingToFund,
+          status
+        ),
         progressColor: status.progressColor,
       };
     };
@@ -139,14 +166,20 @@ export const useEnvelopeDisplayData = (
         secondaryValue: `$${envelope.available.toFixed(2)}`,
         secondaryColor: envelope.available >= 0 ? "text-green-600" : "text-red-600",
       },
-      progressColor: envelope.utilizationRate > 1 ? "bg-red-500" :
-                    envelope.utilizationRate > 0.8 ? "bg-orange-500" :
-                    envelope.utilizationRate > 0.5 ? "bg-blue-500" : "bg-green-500",
+      progressColor:
+        envelope.utilizationRate > 1
+          ? "bg-red-500"
+          : envelope.utilizationRate > 0.8
+            ? "bg-orange-500"
+            : envelope.utilizationRate > 0.5
+              ? "bg-blue-500"
+              : "bg-green-500",
     });
 
-    const envelopeData = envelope.envelopeType === ENVELOPE_TYPES.BILL
-      ? getBillEnvelopeData()
-      : getNonBillEnvelopeData();
+    const envelopeData =
+      envelope.envelopeType === ENVELOPE_TYPES.BILL
+        ? getBillEnvelopeData()
+        : getNonBillEnvelopeData();
 
     return {
       statusIcon: getStatusIcon(envelope.status),

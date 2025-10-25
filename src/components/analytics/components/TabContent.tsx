@@ -1,4 +1,3 @@
-import React from "react";
 import OverviewTab from "../tabs/OverviewTab";
 import TrendsTab from "../tabs/TrendsTab";
 import HealthTab from "../tabs/HealthTab";

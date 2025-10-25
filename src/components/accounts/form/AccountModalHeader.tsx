@@ -1,16 +1,24 @@
-import React from "react";
-import { getIcon } from "../../../utils";
-import { Button } from "../../../components/ui/buttons";
+import { createElement } from "react";
+import { getIcon } from "@/utils";
+import { Button } from "@/components/ui";
+
+interface AccountModalHeaderProps {
+  editingAccount?: Record<string, unknown> | null;
+  onClose: () => void;
+  isLocked: boolean;
+  isOwnLock: boolean;
+  breakLock: () => void;
+  lockLoading: boolean;
+}
 
 const AccountModalHeader = ({
   editingAccount,
   onClose,
   isLocked,
   isOwnLock,
-  _lock,
   breakLock,
   lockLoading,
-}) => (
+}: AccountModalHeaderProps) => (
   <div className="flex justify-between items-center mb-6">
     <div className="flex items-center gap-3 flex-1">
       <h3 className="font-black text-black text-base">
@@ -28,14 +36,14 @@ const AccountModalHeader = ({
           onClick={breakLock}
           className="bg-red-100 hover:bg-red-200 text-red-800 px-2 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
         >
-          {React.createElement(getIcon("Unlock"), {
+          {createElement(getIcon("Unlock"), {
             className: "h-3 w-3 mr-1",
           })}
           Break
         </Button>
       )}
       <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-        {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
+        {createElement(getIcon("X"), { className: "h-5 w-5" })}
       </Button>
     </div>
   </div>

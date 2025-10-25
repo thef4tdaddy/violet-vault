@@ -10,10 +10,27 @@ import localStorageService from "../../../services/storage/localStorageService";
  * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
  */
 
+interface LoginMutationVariables {
+  password: string;
+  userData?: any;
+}
+
+interface LoginResult {
+  success: boolean;
+  user?: any;
+  sessionData?: any;
+  isNewUser?: boolean;
+  error?: string;
+  data?: any;
+  suggestion?: string;
+  code?: string;
+  canCreateNew?: boolean;
+}
+
 /**
  * Helper function for new user setup path
  */
-const handleNewUserSetup = async (userData, password) => {
+const handleNewUserSetup = async (userData: any, password: string): Promise<LoginResult> => {
   logger.auth("New user setup path.", userData);
 
   const keyData = await encryptionUtils.deriveKey(password);
@@ -23,7 +40,7 @@ const handleNewUserSetup = async (userData, password) => {
   if (import.meta?.env?.MODE === "development") {
     const saltPreview =
       Array.from(newSalt.slice(0, 8))
-        .map((b) => b.toString(16).padStart(2, "0"))
+        .map((b: number) => b.toString(16).padStart(2, "0"))
         .join("") + "...";
     logger.auth("Key derived deterministically for cross-browser sync", {
       saltPreview,
@@ -68,7 +85,7 @@ const handleNewUserSetup = async (userData, password) => {
   const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
   localStorageService.setBudgetData({
     encryptedData: encrypted.data,
-    salt: Array.from(newSalt),
+    salt: Array.from(newSalt) as number[],
     iv: encrypted.iv,
   });
 
@@ -97,7 +114,7 @@ const handleNewUserSetup = async (userData, password) => {
 /**
  * Helper function for existing user login path
  */
-const handleExistingUserLogin = async (password) => {
+const handleExistingUserLogin = async (password: string): Promise<LoginResult> => {
   logger.auth("Existing user login path.");
   const savedData = localStorageService.getBudgetData();
   if (!savedData) {
@@ -168,14 +185,14 @@ const handleExistingUserLogin = async (password) => {
 export const useLoginMutation = () => {
   const { setAuthenticated, setError, setLoading } = useAuth();
 
-  return useMutation({
-    mutationFn: async ({ password, userData = null }) => {
+  return useMutation<LoginResult, Error, LoginMutationVariables>({
+    mutationFn: async ({ password, userData = null }: LoginMutationVariables): Promise<LoginResult> => {
       logger.auth("TanStack Login attempt started.", {
         hasPassword: !!password,
         hasUserData: !!userData,
       });
 
-      const timeoutPromise = new Promise((_, reject) =>
+      const timeoutPromise = new Promise<LoginResult>((_, reject) =>
         setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
       );
 
@@ -186,7 +203,7 @@ export const useLoginMutation = () => {
           } else {
             return await handleExistingUserLogin(password);
           }
-        } catch (error) {
+        } catch (error: any) {
           logger.error("Login failed.", error);
           if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
             return { success: false, error: "Invalid password." };
@@ -204,7 +221,7 @@ export const useLoginMutation = () => {
       setLoading(true);
       setError(null);
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result: LoginResult) => {
       if (result.success) {
         setAuthenticated(result.user, result.sessionData);
 
@@ -236,7 +253,7 @@ export const useLoginMutation = () => {
       }
       setLoading(false);
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Login mutation failed", error);
       setError(error.message || "Login failed");
       setLoading(false);

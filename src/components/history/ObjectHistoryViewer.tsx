@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import { Button } from "@/components/ui";
-import { useBudgetCommits } from "../../hooks/budgeting/useBudgetHistoryQuery";
-import { getIcon } from "../../utils";
+import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
+import { getIcon } from "@/utils";
 
 interface ObjectHistoryViewerProps {
   objectId: string;
@@ -13,11 +13,27 @@ interface ObjectHistoryViewerProps {
 /**
  * ObjectHistoryViewer - Shows history for a specific envelope, transaction, etc.
  */
-const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: ObjectHistoryViewerProps) => {
-  const { commits: allCommits = [], isLoading } = useBudgetCommits();
+interface BudgetCommit {
+  id?: string;
+  hash: string;
+  message: string;
+  author?: string;
+  timestamp?: string;
+  changes?: Array<Record<string, unknown>>;
+  deviceFingerprint?: string;
+  parentHash?: string;
+}
 
-  const [relevantHistory, setRelevantHistory] = useState([]);
-  const [expandedCommits, setExpandedCommits] = useState(new Set());
+const ObjectHistoryViewer = ({
+  objectId,
+  objectType,
+  objectName,
+  onClose,
+}: ObjectHistoryViewerProps) => {
+  const { data: allCommits = [], isLoading } = useBudgetCommits();
+
+  const [relevantHistory, setRelevantHistory] = useState<BudgetCommit[]>([]);
+  const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
 
   // Load history filtered for this specific object
   useEffect(() => {
@@ -38,7 +54,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
     setRelevantHistory(objectHistory.slice(0, 20)); // Limit to 20 most recent
   }, [allCommits, isLoading, objectId, objectType, objectName]);
 
-  const toggleCommitExpanded = (commitHash) => {
+  const toggleCommitExpanded = (commitHash: string) => {
     setExpandedCommits((prev) => {
       const next = new Set(prev);
       if (next.has(commitHash)) {
@@ -50,7 +66,29 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
     });
   };
 
-  const getAuthorColor = (author: string) => {
+  // getChangeIcon helper - shows icon based on change type
+  const _getChangeIcon = (changeType: string) => {
+    switch (changeType) {
+      case "add":
+        return createElement(getIcon("Plus"), {
+          className: "h-3 w-3 text-green-600",
+        });
+      case "delete":
+        return createElement(getIcon("Minus"), {
+          className: "h-3 w-3 text-red-600",
+        });
+      case "modify":
+        return createElement(getIcon("Edit3"), {
+          className: "h-3 w-3 text-blue-600",
+        });
+      default:
+        return createElement(getIcon("GitCommit"), {
+          className: "h-3 w-3 text-gray-600",
+        });
+    }
+  };
+
+  const getAuthorColor = (author?: string) => {
     switch (author) {
       case "system":
         return "bg-gray-100 text-gray-700";
@@ -61,6 +99,14 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
     }
   };
 
+  // formatChangeDescription helper - creates readable change text
+  const _formatChangeDescription = (change: Record<string, unknown>) => {
+    if (change.type === "add") return `Added ${objectType.toLowerCase()}`;
+    if (change.type === "delete") return `Deleted ${objectType.toLowerCase()}`;
+    if (change.type === "modify") return `Modified ${objectType.toLowerCase()}`;
+    return `Changed ${objectType.toLowerCase()}`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -69,7 +115,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                {React.createElement(getIcon("History"), {
+                {createElement(getIcon("History"), {
                   className: "h-5 w-5 mr-3 text-blue-600",
                 })}
                 {objectType} History: {objectName}
@@ -79,7 +125,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
               </p>
             </div>
             <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
-              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
+              {createElement(getIcon("X"), { className: "h-5 w-5" })}
             </Button>
           </div>
 
@@ -94,7 +140,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
           {/* No History */}
           {!isLoading && relevantHistory.length === 0 && (
             <div className="text-center py-8 text-gray-500">
-              {React.createElement(getIcon("History"), {
+              {createElement(getIcon("History"), {
                 className: "h-12 w-12 mx-auto mb-3 opacity-50",
               })}
               <p className="font-medium">No history found</p>
@@ -110,7 +156,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
             <div className="space-y-4">
               <div className="bg-blue-50 p-3 rounded-lg">
                 <div className="flex items-center">
-                  {React.createElement(getIcon("GitCommit"), {
+                  {createElement(getIcon("GitCommit"), {
                     className: "h-4 w-4 text-blue-600 mr-2",
                   })}
                   <div className="text-sm text-blue-800">
@@ -130,7 +176,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }: Obje
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          {React.createElement(getIcon("GitCommit"), {
+                          {createElement(getIcon("GitCommit"), {
                             className: "h-4 w-4 text-gray-600",
                           })}
                           <span className="font-mono text-sm text-gray-600">

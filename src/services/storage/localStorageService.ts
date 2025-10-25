@@ -114,14 +114,14 @@ class LocalStorageService {
   /**
    * Get budget data
    */
-  getBudgetData(): { encryptedData: string; salt: number[]; iv: string } | null {
+  getBudgetData(): { encryptedData: number[]; salt: number[]; iv: number[] } | null {
     return this.getJSON(this.KEYS.BUDGET_DATA);
   }
 
   /**
    * Set budget data
    */
-  setBudgetData(data: { encryptedData: string; salt: number[]; iv: string }): void {
+  setBudgetData(data: { encryptedData: number[]; salt: number[]; iv: number[] }): void {
     this.setJSON(this.KEYS.BUDGET_DATA, data);
   }
 
