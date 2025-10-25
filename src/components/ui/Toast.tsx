@@ -131,4 +131,4 @@ const ToastContainer = ({
   );
 };
 
-export { Toast, ToastContainer };
+export { Toast, ToastContainer, type ToastItem };
