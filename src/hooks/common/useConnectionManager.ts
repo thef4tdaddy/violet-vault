@@ -44,7 +44,7 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
     useConnectionData({ entityType, entityId, currentEntity, bills, envelopes, debts });
 
   // Connection operations with state management
-  const connectWithState = async (targetId) => {
+  const connectWithState = async (targetId: string) => {
     if (!targetId || !currentEntity) return { success: false };
 
     setIsConnecting(true);
@@ -57,8 +57,8 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         envelopes,
         bills,
         debts,
-        updateBill,
-        updateDebt,
+        updateBill: updateBill as unknown as (id: string, updates: unknown) => Promise<void>,
+        updateDebt: updateDebt as unknown as (params: { id: string; updates: unknown }) => Promise<void>,
       });
       if (result.success) setSelectedConnectionId("");
       return result;
@@ -76,15 +76,15 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         entityType,
         entityId,
         currentConnections,
-        updateBill,
-        updateDebt,
+        updateBill: updateBill as unknown as (id: string, updates: unknown) => Promise<void>,
+        updateDebt: updateDebt as unknown as (params: { id: string; updates: unknown }) => Promise<void>,
       });
     } finally {
       setIsConnecting(false);
     }
   };
 
-  const handleSelectionChange = async (targetId) => {
+  const handleSelectionChange = async (targetId: string) => {
     setSelectedConnectionId(targetId);
     if (entityType === "envelope" && targetId) {
       await handleAutoPopulate({
@@ -93,7 +93,7 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         billId: targetId,
         bills,
         currentEntity,
-        updateEnvelope,
+        updateEnvelope: updateEnvelope as unknown as (id: string, updates: unknown) => Promise<void>,
       });
     }
   };

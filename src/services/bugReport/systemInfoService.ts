@@ -4,34 +4,13 @@
  * Split into focused services for Issue #513
  */
 import logger from "../../utils/common/logger";
-import { BrowserInfoService } from "./browserInfoService";
-import { PerformanceInfoService } from "./performanceInfoService";
+import { BrowserInfoService, type BrowserInfo, type UrlInfo } from "./browserInfoService";
+import {
+  PerformanceInfoService,
+  type PerformanceInfo,
+  type NetworkInfo,
+} from "./performanceInfoService";
 import { ErrorTrackingService } from "./errorTrackingService";
-
-/**
- * Browser information
- */
-interface BrowserInfo {
-  name: string;
-  version: string;
-  [key: string]: unknown;
-}
-
-/**
- * URL information
- */
-interface UrlInfo {
-  href: string;
-  [key: string]: unknown;
-}
-
-/**
- * Performance information
- */
-interface PerformanceInfo {
-  available: boolean;
-  [key: string]: unknown;
-}
 
 /**
  * Storage information
@@ -41,14 +20,6 @@ interface StorageInfo {
     available: boolean;
     [key: string]: unknown;
   };
-  [key: string]: unknown;
-}
-
-/**
- * Network information
- */
-interface NetworkInfo {
-  onLine: boolean;
   [key: string]: unknown;
 }
 
@@ -92,9 +63,9 @@ export class SystemInfoService {
         viewport: BrowserInfoService.getViewportInfo(),
         url: BrowserInfoService.getUrlInfo(),
         performance: PerformanceInfoService.getPerformanceInfo(),
-        storage: await PerformanceInfoService.getStorageInfo(),
+        storage: (await PerformanceInfoService.getStorageInfo()) as unknown as StorageInfo,
         network: await PerformanceInfoService.getNetworkInfo(),
-        errors: ErrorTrackingService.getRecentErrors(),
+        errors: ErrorTrackingService.getRecentErrors() as unknown as ErrorInfo,
         userAgent: navigator.userAgent,
       };
 
@@ -112,12 +83,17 @@ export class SystemInfoService {
   static getFallbackSystemInfo(): SystemInfo {
     return {
       timestamp: new Date().toISOString(),
-      browser: { name: "Unknown", version: "Unknown" },
+      browser: {
+        name: "Unknown",
+        version: "Unknown",
+      } as BrowserInfo,
       viewport: { width: 0, height: 0 },
-      url: { href: window.location.href || "Unknown" },
-      performance: { available: false },
+      url: {
+        href: window.location.href || "Unknown",
+      } as UrlInfo,
+      performance: { available: false } as PerformanceInfo,
       storage: { localStorage: { available: false } },
-      network: { onLine: navigator.onLine || true },
+      network: { onLine: navigator.onLine || true } as NetworkInfo,
       errors: { recentErrors: [], consoleLogs: [] },
       userAgent: navigator.userAgent || "Unknown",
       fallback: true,

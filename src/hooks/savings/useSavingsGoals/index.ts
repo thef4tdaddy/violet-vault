@@ -11,10 +11,17 @@ import {
 import { calculateSavingsSummary } from "../../../utils/savings/savingsCalculations";
 import logger from "../../../utils/common/logger";
 
+interface UseSavingsGoalsOptions {
+  status?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  includeCompleted?: boolean;
+}
+
 /**
  * Main savings goals hook - combines queries, mutations, and calculations
  */
-const useSavingsGoals = (options = {}) => {
+const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
   const {
     status = "all",
     sortBy = "targetDate",
@@ -89,81 +96,115 @@ const useSavingsGoals = (options = {}) => {
   const helpers = useMemo(
     () => ({
       // Add a new savings goal
-      addGoal: async (goalData) => {
+      addGoal: async (goalData: unknown) => {
         logger.debug("Adding savings goal:", goalData);
-        return addSavingsGoalMutation.mutateAsync(goalData);
+        return new Promise((resolve, reject) => {
+          addSavingsGoalMutation.mutate(goalData, {
+            onSuccess: (data) => resolve(data),
+            onError: (error) => reject(error),
+          });
+        });
       },
 
       // Update existing goal
-      updateGoal: async (goalId, updates) => {
+      updateGoal: async (goalId: string, updates: unknown) => {
         logger.debug("Updating savings goal:", { goalId, updates });
-        return updateSavingsGoalMutation.mutateAsync({ goalId, updates });
+        return new Promise((resolve, reject) => {
+          updateSavingsGoalMutation.mutate(
+            { goalId, updates },
+            {
+              onSuccess: (data) => resolve(data),
+              onError: (error) => reject(error),
+            }
+          );
+        });
       },
 
       // Delete a goal
-      deleteGoal: async (goalId) => {
+      deleteGoal: async (goalId: string) => {
         logger.debug("Deleting savings goal:", goalId);
-        return deleteSavingsGoalMutation.mutateAsync(goalId);
+        return new Promise((resolve, reject) => {
+          deleteSavingsGoalMutation.mutate(goalId, {
+            onSuccess: (data) => resolve(data),
+            onError: (error) => reject(error),
+          });
+        });
       },
 
       // Add contribution to goal
-      addContribution: async (goalId, amount, description) => {
+      addContribution: async (goalId: string, amount: number, description: string) => {
         logger.debug("Adding contribution:", { goalId, amount, description });
-        return addContributionMutation.mutateAsync({
-          goalId,
-          amount,
-          description,
+        return new Promise((resolve, reject) => {
+          addContributionMutation.mutate(
+            {
+              goalId,
+              amount,
+              description,
+            },
+            {
+              onSuccess: (data) => resolve(data),
+              onError: (error) => reject(error),
+            }
+          );
         });
       },
 
       // Distribute funds across multiple goals
-      distributeFunds: async (distribution, description) => {
+      distributeFunds: async (distribution: unknown, description: string) => {
         logger.debug("Distributing funds:", { distribution, description });
-        return distributeFundsMutation.mutateAsync({
-          distribution,
-          description,
+        return new Promise((resolve, reject) => {
+          distributeFundsMutation.mutate(
+            {
+              distribution,
+              description,
+            },
+            {
+              onSuccess: (data) => resolve(data),
+              onError: (error) => reject(error),
+            }
+          );
         });
       },
 
       // Find goal by ID
-      getGoalById: (goalId) => {
+      getGoalById: (goalId: string) => {
         return savingsGoals.find((goal) => goal.id === goalId) || null;
       },
 
       // Get active goals only
       getActiveGoals: () => {
-        return savingsGoals.filter((goal) => !goal.isCompleted);
+        return savingsGoals.filter((goal: { isCompleted: boolean }) => !goal.isCompleted);
       },
 
       // Get completed goals only
       getCompletedGoals: () => {
-        return savingsGoals.filter((goal) => goal.isCompleted);
+        return savingsGoals.filter((goal: { isCompleted: boolean }) => goal.isCompleted);
       },
 
       // Get goals by urgency
       getUrgentGoals: () => {
-        return savingsGoals.filter((goal) => goal.urgency === "urgent");
+        return savingsGoals.filter((goal: { urgency: string }) => goal.urgency === "urgent");
       },
 
       // Get overdue goals
       getOverdueGoals: () => {
-        return savingsGoals.filter((goal) => goal.urgency === "overdue");
+        return savingsGoals.filter((goal: { urgency: string }) => goal.urgency === "overdue");
       },
 
       // Get goals by category
-      getGoalsByCategory: (category) => {
-        return savingsGoals.filter((goal) => goal.category === category);
+      getGoalsByCategory: (category: string) => {
+        return savingsGoals.filter((goal: { category: string }) => goal.category === category);
       },
 
       // Get goals by priority
-      getGoalsByPriority: (priority) => {
-        return savingsGoals.filter((goal) => goal.priority === priority);
+      getGoalsByPriority: (priority: string) => {
+        return savingsGoals.filter((goal: { priority: string }) => goal.priority === priority);
       },
 
       // Check if any goals need attention
       hasGoalsNeedingAttention: () => {
         return savingsGoals.some(
-          (goal) =>
+          (goal: { urgency: string }) =>
             goal.urgency === "urgent" || goal.urgency === "overdue" || goal.urgency === "behind"
         );
       },
