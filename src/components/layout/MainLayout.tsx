@@ -9,6 +9,10 @@ import useNetworkStatus from "@/hooks/common/useNetworkStatus";
 import { useFirebaseSync } from "@/hooks/sync/useFirebaseSync";
 import usePaydayPrediction from "@/hooks/budgeting/usePaydayPrediction";
 import useDataInitialization from "@/hooks/common/useDataInitialization";
+import { useMainLayoutHandlers } from "@/hooks/layout/useMainLayoutHandlers";
+import { useSecurityWarning } from "@/hooks/layout/useSecurityWarning";
+import { useCorruptionDetection } from "@/hooks/layout/useCorruptionDetection";
+import { useMainContentModals } from "@/hooks/layout/useMainContentModals";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
 import { ToastContainer, type ToastItem } from "../ui/Toast";
@@ -79,26 +83,10 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   // Auth state
   const auth = useAuthManager();
   const { isUnlocked, user: currentUser, securityContext } = auth;
-  const _legacy =
-    ((auth as unknown as Record<string, unknown>)?._legacy as Record<string, unknown>) || {};
-  const {
-    isLocalOnlyMode: rawIsLocalOnlyMode = false,
-    handleSetup,
-    handleLogout: rawHandleLogout,
-    handleChangePassword,
-  } = _legacy;
-  const _internal = (_legacy._internal as unknown as Record<string, unknown>) || {};
-  const securityManager = _internal.securityManager || {};
 
-  // Type guards for handler functions and values
-  const isLocalOnlyMode = typeof rawIsLocalOnlyMode === "boolean" ? rawIsLocalOnlyMode : false;
-  const handleLogout = (
-    typeof rawHandleLogout === "function" ? rawHandleLogout : () => {}
-  ) as () => void;
-  const handleSetupFn = (typeof handleSetup === "function" ? handleSetup : () => {}) as () => void;
-  const handleChangePasswordFn = (
-    typeof handleChangePassword === "function" ? handleChangePassword : async () => {}
-  ) as (old: string, newPwd: string) => Promise<void>;
+  // Extract handlers and security context
+  const { isLocalOnlyMode, handleLogout, handleSetup, handleChangePassword, securityManager } =
+    useMainLayoutHandlers(auth);
 
   // Data hooks
   useDataInitialization();
@@ -123,15 +111,8 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   const [syncConflicts, setSyncConflicts] = useState(null);
 
   // Toast notifications
-  const toastState = useToastStore((state) => ({
-    toasts: (state as Record<string, unknown>)?.toasts,
-    removeToast: (state as Record<string, unknown>)?.removeToast,
-  }));
-  const toasts = Array.isArray(toastState?.toasts) ? toastState.toasts : [];
-  const removeToast =
-    typeof toastState?.removeToast === "function"
-      ? (toastState.removeToast as (id: string) => void)
-      : () => {};
+  const toasts = useToastStore((state) => state.toasts);
+  const removeToast = useToastStore((state) => state.removeToast);
 
   // Log auth changes
   useEffect(() => {
@@ -153,7 +134,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     | (() => boolean)
     | undefined;
   if (shouldShowGateway?.() ?? !isAuthenticated(auth)) {
-    return <AuthGateway onSetupComplete={handleSetupFn} onLocalOnlyReady={() => {}} />;
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={() => {}} />;
   }
 
   // Log sync state
@@ -177,7 +158,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
         _onExport={exportData}
         _onImport={importData}
         onLogout={handleLogout}
-        onChangePassword={handleChangePasswordFn}
+        onChangePassword={handleChangePassword}
         onResetEncryption={resetEncryptionAndStartFresh}
         syncConflicts={syncConflicts}
         onResolveConflict={() => setSyncConflicts(null)}
@@ -246,42 +227,22 @@ const MainContent = ({
     navigate(path);
   };
 
-  // Modal states
-  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [settingsInitialSection] = useState("general");
-  const [showCorruptionModal, setShowCorruptionModal] = useState(false);
-  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
+  // Modal state management
+  const modals = useMainContentModals();
 
-  // Security warning effect
-  const isUnlockedAuth = (auth as Record<string, unknown>)?.isUnlocked;
+  // Security warning management - check localStorage for acknowledgment
+  const isUnlockedAuth = (auth as Record<string, unknown>)?.isUnlocked as boolean;
+  // eslint-disable-next-line no-restricted-syntax
+  const hasAcknowledgedSecurity = !!localStorage.getItem("localDataSecurityAcknowledged");
+  const { showSecurityWarning, setShowSecurityWarning } = useSecurityWarning({
+    isUnlocked: isUnlockedAuth,
+    currentUser,
+    isOnboarded,
+    hasAcknowledged: hasAcknowledgedSecurity,
+  });
 
-  useEffect(() => {
-    if (isUnlockedAuth && currentUser && isOnboarded) {
-      // eslint-disable-next-line no-restricted-syntax
-      const hasAcknowledged = localStorage.getItem("localDataSecurityAcknowledged");
-      if (!hasAcknowledged) {
-        const timer = setTimeout(() => {
-          setShowSecurityWarning(true);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [isUnlockedAuth, currentUser, isOnboarded]);
-
-  // Corruption detection effect
-  useEffect(() => {
-    const handleCorruptionDetected = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      logger.warn("🚨 Corruption modal triggered by sync service", customEvent.detail);
-      setShowCorruptionModal(true);
-    };
-
-    window.addEventListener("syncCorruptionDetected", handleCorruptionDetected);
-    return () => {
-      window.removeEventListener("syncCorruptionDetected", handleCorruptionDetected);
-    };
-  }, []);
+  // Corruption detection management
+  const { showCorruptionModal, setShowCorruptionModal } = useCorruptionDetection();
 
   // Firebase sync - use config object, not 4 separate args
   const userForSync = currentUser
@@ -363,15 +324,15 @@ const MainContent = ({
         </div>
 
         <SecuritySettings
-          isOpen={showSecuritySettings}
-          onClose={() => setShowSecuritySettings(false)}
+          isOpen={modals.security.isOpen}
+          onClose={() => modals.security.setOpen(false)}
         />
 
-        {showSettingsModal && (
+        {modals.settings.isOpen && (
           <SettingsDashboard
-            isOpen={showSettingsModal}
-            onClose={() => setShowSettingsModal(false)}
-            initialSection={settingsInitialSection}
+            isOpen={modals.settings.isOpen}
+            onClose={() => modals.settings.setOpen(false)}
+            initialSection={modals.settings.initialSection}
             onExport={_onExport}
             onImport={_onImport}
             onLogout={onLogout}
