@@ -24,6 +24,49 @@ const MODAL_HEIGHTS = {
   auto: "h-auto max-h-[90vh]",
 };
 
+const SWIPE_THRESHOLD = 100;
+const BACKDROP_OPACITY = 0.5;
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+// Apply drag transform to modal and backdrop
+function applyDragTransform(
+  modalRef: React.RefObject<HTMLDivElement>,
+  deltaY: number,
+  backdrop: boolean
+) {
+  if (!modalRef.current) return;
+
+  modalRef.current.style.transform = `translateY(${deltaY}px)`;
+
+  // Add slight opacity reduction as user drags
+  const opacity = Math.max(0.3, 1 - deltaY / 300);
+  if (backdrop) {
+    const backdropEl = modalRef.current.parentElement;
+    if (backdropEl) {
+      backdropEl.style.backgroundColor = `rgba(0, 0, 0, ${BACKDROP_OPACITY * opacity})`;
+    }
+  }
+}
+
+// Reset drag transform to original position
+function resetDragTransform(
+  modalRef: React.RefObject<HTMLDivElement>,
+  backdrop: boolean
+) {
+  if (!modalRef.current) return;
+
+  modalRef.current.style.transform = "translateY(0)";
+  if (backdrop) {
+    const backdropEl = modalRef.current.parentElement;
+    if (backdropEl) {
+      backdropEl.style.backgroundColor = `rgba(0, 0, 0, ${BACKDROP_OPACITY})`;
+    }
+  }
+}
+
 const SlideUpModal = ({
   isOpen = false,
   onClose,
@@ -48,12 +91,11 @@ const SlideUpModal = ({
 
   // Handle opening/closing animations
   useEffect(() => {
-    if (isOpen) {
-      setIsAnimating(true);
-      // Allow animation to complete
-      const timer = setTimeout(() => setIsAnimating(false), 300);
-      return () => clearTimeout(timer);
-    }
+    if (!isOpen) return;
+    
+    setIsAnimating(true);
+    const timer = setTimeout(() => setIsAnimating(false), 300);
+    return () => clearTimeout(timer);
   }, [isOpen]);
 
   // Keyboard handling
@@ -97,15 +139,7 @@ const SlideUpModal = ({
         deltaY,
       }));
 
-      // Apply transform for real-time feedback
-      modalRef.current.style.transform = `translateY(${deltaY}px)`;
-
-      // Add slight opacity reduction as user drags
-      const opacity = Math.max(0.3, 1 - deltaY / 300);
-      if (backdrop) {
-        const backdropEl = modalRef.current.parentElement;
-        backdropEl.style.backgroundColor = `rgba(0, 0, 0, ${0.5 * opacity})`;
-      }
+      applyDragTransform(modalRef, deltaY, backdrop);
     }
   };
 
@@ -114,16 +148,12 @@ const SlideUpModal = ({
 
     const { deltaY } = dragState;
 
-    // If dragged down more than 100px, close modal
-    if (deltaY > 100) {
+    // If dragged down more than threshold, close modal
+    if (deltaY > SWIPE_THRESHOLD) {
       onClose?.();
     } else {
       // Snap back to original position
-      modalRef.current.style.transform = "translateY(0)";
-      if (backdrop) {
-        const backdropEl = modalRef.current.parentElement;
-        backdropEl.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-      }
+      resetDragTransform(modalRef, backdrop);
     }
 
     setDragState({
@@ -140,6 +170,7 @@ const SlideUpModal = ({
     }
   };
 
+  // Early return if not open
   if (!isOpen) return null;
 
   return (
