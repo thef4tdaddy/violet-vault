@@ -72,18 +72,33 @@ interface MainContentProps {
 
 const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   const lastLogKeyRef = useRef<string | null>(null);
+
+  // Navigation hooks
   const navigate = useNavigate();
 
   // Auth state
   const auth = useAuthManager();
   const { isUnlocked, user: currentUser, securityContext } = auth;
+  const _legacy =
+    ((auth as unknown as Record<string, unknown>)?._legacy as Record<string, unknown>) || {};
   const {
-    isLocalOnlyMode,
-    handleLogout,
-    handleSetupFn,
-    handleChangePasswordFn,
-    securityManager,
-  } = extractAuthLegacyHandlers(auth);
+    isLocalOnlyMode: rawIsLocalOnlyMode = false,
+    handleSetup,
+    handleLogout: rawHandleLogout,
+    handleChangePassword,
+  } = _legacy;
+  const _internal = (_legacy._internal as unknown as Record<string, unknown>) || {};
+  const securityManager = _internal.securityManager || {};
+
+  // Type guards for handler functions and values
+  const isLocalOnlyMode = typeof rawIsLocalOnlyMode === "boolean" ? rawIsLocalOnlyMode : false;
+  const handleLogout = (
+    typeof rawHandleLogout === "function" ? rawHandleLogout : () => {}
+  ) as () => void;
+  const handleSetupFn = (typeof handleSetup === "function" ? handleSetup : () => {}) as () => void;
+  const handleChangePasswordFn = (
+    typeof handleChangePassword === "function" ? handleChangePassword : async () => {}
+  ) as (old: string, newPwd: string) => Promise<void>;
 
   // Data hooks
   useDataInitialization();
@@ -112,7 +127,11 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     toasts: (state as Record<string, unknown>)?.toasts,
     removeToast: (state as Record<string, unknown>)?.removeToast,
   }));
-  const { toasts, removeToast } = extractToastState(toastState);
+  const toasts = Array.isArray(toastState?.toasts) ? toastState.toasts : [];
+  const removeToast =
+    typeof toastState?.removeToast === "function"
+      ? (toastState.removeToast as (id: string) => void)
+      : () => {};
 
   // Log auth changes
   useEffect(() => {
@@ -129,8 +148,11 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     }
   }, [isUnlocked, currentUser, navigate]);
 
-  // Early return for auth gateway
-  if (shouldShowAuthGateway(auth)) {
+  // Handle auth gateway
+  const shouldShowGateway = (auth as unknown as Record<string, unknown>)?.shouldShowAuthGateway as
+    | (() => boolean)
+    | undefined;
+  if (shouldShowGateway?.() ?? !isAuthenticated(auth)) {
     return <AuthGateway onSetupComplete={handleSetupFn} onLocalOnlyReady={() => {}} />;
   }
 
@@ -213,7 +235,9 @@ const MainContent = ({
     typeof onboardingState?.isOnboarded === "boolean" ? onboardingState.isOnboarded : false;
 
   // Extract layout data
-  const { budget, totalBiweeklyNeed, paycheckHistory } = extractLayoutData(layoutData);
+  const budget = (layoutData as Record<string, unknown>)?.budget;
+  const totalBiweeklyNeed = (layoutData as Record<string, unknown>)?.totalBiweeklyNeed;
+  const paycheckHistory = (layoutData as Record<string, unknown>)?.paycheckHistory;
   const securityContext = (auth as Record<string, unknown>)?.securityContext;
 
   // Navigation helper
@@ -231,13 +255,41 @@ const MainContent = ({
 
   // Security warning effect
   const isUnlockedAuth = (auth as Record<string, unknown>)?.isUnlocked;
-  useSecurityWarningEffect(isUnlockedAuth, currentUser, isOnboarded, setShowSecurityWarning);
+
+  useEffect(() => {
+    if (isUnlockedAuth && currentUser && isOnboarded) {
+      // eslint-disable-next-line no-restricted-syntax
+      const hasAcknowledged = localStorage.getItem("localDataSecurityAcknowledged");
+      if (!hasAcknowledged) {
+        const timer = setTimeout(() => {
+          setShowSecurityWarning(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isUnlockedAuth, currentUser, isOnboarded]);
 
   // Corruption detection effect
-  useCorruptionDetectionEffect(setShowCorruptionModal);
+  useEffect(() => {
+    const handleCorruptionDetected = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      logger.warn("🚨 Corruption modal triggered by sync service", customEvent.detail);
+      setShowCorruptionModal(true);
+    };
 
-  // Firebase sync
-  const userForSync = getUserForSync(currentUser);
+    window.addEventListener("syncCorruptionDetected", handleCorruptionDetected);
+    return () => {
+      window.removeEventListener("syncCorruptionDetected", handleCorruptionDetected);
+    };
+  }, []);
+
+  // Firebase sync - use config object, not 4 separate args
+  const userForSync = currentUser
+    ? {
+        uid: ((currentUser as Record<string, unknown>)?.uid as string) || "unknown",
+        email: ((currentUser as Record<string, unknown>)?.email as string) || undefined,
+      }
+    : null;
   const { handleManualSync } = useFirebaseSync({
     firebaseSync,
     encryptionKey: (securityContext as Record<string, unknown>)?.encryptionKey as CryptoKey | null,
@@ -357,117 +409,6 @@ const MainContent = ({
 
 function isAuthenticated(auth: unknown): boolean {
   return (auth as Record<string, unknown>)?.isAuthenticated === true;
-}
-
-// Extract auth legacy handling to reduce complexity
-function extractAuthLegacyHandlers(auth: unknown) {
-  const _legacy =
-    ((auth as unknown as Record<string, unknown>)?._legacy as Record<string, unknown>) || {};
-  const {
-    isLocalOnlyMode: rawIsLocalOnlyMode = false,
-    handleSetup,
-    handleLogout: rawHandleLogout,
-    handleChangePassword,
-  } = _legacy;
-  const _internal = (_legacy._internal as unknown as Record<string, unknown>) || {};
-  const securityManager = _internal.securityManager || {};
-
-  // Type guards for handler functions and values
-  const isLocalOnlyMode = typeof rawIsLocalOnlyMode === "boolean" ? rawIsLocalOnlyMode : false;
-  const handleLogout = (
-    typeof rawHandleLogout === "function" ? rawHandleLogout : () => {}
-  ) as () => void;
-  const handleSetupFn = (typeof handleSetup === "function" ? handleSetup : () => {}) as () => void;
-  const handleChangePasswordFn = (
-    typeof handleChangePassword === "function" ? handleChangePassword : async () => {}
-  ) as (old: string, newPwd: string) => Promise<void>;
-
-  return {
-    isLocalOnlyMode,
-    handleLogout,
-    handleSetupFn,
-    handleChangePasswordFn,
-    securityManager,
-  };
-}
-
-// Extract toast state handling to reduce complexity
-function extractToastState(toastState: unknown) {
-  const toasts = Array.isArray((toastState as Record<string, unknown>)?.toasts)
-    ? (toastState as Record<string, unknown>).toasts
-    : [];
-  const removeToast =
-    typeof (toastState as Record<string, unknown>)?.removeToast === "function"
-      ? ((toastState as Record<string, unknown>).removeToast as (id: string) => void)
-      : () => {};
-  
-  return { toasts, removeToast };
-}
-
-// Check if auth gateway should be shown
-function shouldShowAuthGateway(auth: unknown): boolean {
-  const shouldShowGateway = (auth as unknown as Record<string, unknown>)?.shouldShowAuthGateway as
-    | (() => boolean)
-    | undefined;
-  return shouldShowGateway?.() ?? !isAuthenticated(auth);
-}
-
-// Extract user for sync to reduce complexity
-function getUserForSync(currentUser: unknown) {
-  if (!currentUser) return null;
-  
-  return {
-    uid: ((currentUser as Record<string, unknown>)?.uid as string) || "unknown",
-    email: ((currentUser as Record<string, unknown>)?.email as string) || undefined,
-  };
-}
-
-// Extract layout data properties
-function extractLayoutData(layoutData: unknown) {
-  return {
-    budget: (layoutData as Record<string, unknown>)?.budget,
-    totalBiweeklyNeed: (layoutData as Record<string, unknown>)?.totalBiweeklyNeed,
-    paycheckHistory: (layoutData as Record<string, unknown>)?.paycheckHistory,
-  };
-}
-
-// Hook to handle security warning effect
-function useSecurityWarningEffect(
-  isUnlockedAuth: unknown,
-  currentUser: unknown,
-  isOnboarded: boolean,
-  setShowSecurityWarning: (show: boolean) => void
-) {
-  useEffect(() => {
-    if (!isUnlockedAuth || !currentUser || !isOnboarded) return;
-
-    // eslint-disable-next-line no-restricted-syntax
-    const hasAcknowledged = localStorage.getItem("localDataSecurityAcknowledged");
-    if (hasAcknowledged) return;
-
-    const timer = setTimeout(() => {
-      setShowSecurityWarning(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isUnlockedAuth, currentUser, isOnboarded]);
-}
-
-// Hook to handle corruption detection effect
-function useCorruptionDetectionEffect(setShowCorruptionModal: (show: boolean) => void) {
-  useEffect(() => {
-    const handleCorruptionDetected = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      logger.warn("🚨 Corruption modal triggered by sync service", customEvent.detail);
-      setShowCorruptionModal(true);
-    };
-
-    window.addEventListener("syncCorruptionDetected", handleCorruptionDetected);
-    return () => {
-      window.removeEventListener("syncCorruptionDetected", handleCorruptionDetected);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 }
 
 export default MainLayout;
