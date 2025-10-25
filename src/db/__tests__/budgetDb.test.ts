@@ -1,9 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { budgetDb, queryHelpers, VioletVaultDB } from "../budgetDb";
-import logger from "../../utils/common/logger";
 
 // Mock logger to avoid console output during tests
 vi.mock("../../utils/common/logger", () => ({

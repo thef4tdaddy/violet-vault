@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * Progress bar component for displaying debt payoff progress
  * Pure UI component - receives progress data as props

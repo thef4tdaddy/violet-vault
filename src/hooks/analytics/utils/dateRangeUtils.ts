@@ -20,7 +20,9 @@ interface DateRangeOptions {
 /**
  * Get date range based on period type
  */
-export const getDateRange = (options: DateRangeOptions = {}): { startDate: Date; endDate: Date } => {
+export const getDateRange = (
+  options: DateRangeOptions = {}
+): { startDate: Date; endDate: Date } => {
   const { period = "thisMonth", customDateRange } = options;
   const today = new Date();
   let startDate: Date, endDate: Date;

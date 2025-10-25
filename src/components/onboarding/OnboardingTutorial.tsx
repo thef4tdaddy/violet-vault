@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from "react";
-import useOnboardingStore from "../../stores/ui/onboardingStore";
+import useOnboardingStore from "@/stores/ui/onboardingStore";
 import { useShallow } from "zustand/react/shallow";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import { useTutorialSteps } from "./hooks/useTutorialSteps";
 import { useTutorialPositioning } from "./hooks/useTutorialPositioning";
 import { useTutorialHighlight } from "./hooks/useTutorialHighlight";
 import { useTutorialControls } from "./hooks/useTutorialControls";
 import TutorialOverlay from "./components/TutorialOverlay";
 
+interface OnboardingState {
+  isOnboarded: boolean;
+  getProgress: () => { completed: number };
+  preferences: { showHints: boolean; tourCompleted: boolean };
+}
+
 /**
  * OnboardingTutorial - Provides guided tours and contextual hints for new users
  */
-const OnboardingTutorial = ({ children }) => {
+const OnboardingTutorial = ({ children }: { children: React.ReactNode }) => {
   const { isOnboarded, getProgress, preferences } = useOnboardingStore(
-    useShallow((state) => ({
-      isOnboarded: state.isOnboarded,
-      getProgress: state.getProgress,
-      preferences: state.preferences,
-    }))
+    useShallow(
+      (state): OnboardingState => ({
+        isOnboarded: (state as OnboardingState).isOnboarded,
+        getProgress: (state as OnboardingState).getProgress,
+        preferences: (state as OnboardingState).preferences,
+      })
+    )
   );
 
   const [showTutorial, setShowTutorial] = useState(false);
@@ -60,7 +68,7 @@ const OnboardingTutorial = ({ children }) => {
 
   // Handle escape key to close tutorial
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && showTutorial) {
         closeTutorial();
       }

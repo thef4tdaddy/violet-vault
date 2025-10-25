@@ -6,10 +6,7 @@ interface TrendsTabContentProps {
   timeFilter: string;
 }
 
-const TrendsTabContent: React.FC<TrendsTabContentProps> = ({
-  analyticsData,
-  timeFilter,
-}) => {
+const TrendsTabContent: React.FC<TrendsTabContentProps> = ({ analyticsData, timeFilter }) => {
   return (
     <div>
       <h2 className="font-black text-black text-base mb-4">

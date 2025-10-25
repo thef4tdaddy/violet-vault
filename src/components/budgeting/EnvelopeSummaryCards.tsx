@@ -1,12 +1,21 @@
-import React from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 import PageSummaryCard from "../ui/PageSummaryCard";
+
+interface EnvelopeTotals {
+  totalBalance: number;
+  totalUpcoming: number;
+  totalAllocated: number;
+  envelopeCount: number;
+  totalSpent: number;
+  totalBiweeklyNeed: number;
+  billsDueCount: number;
+}
 
 /**
  * Envelope summary cards using standardized PageSummaryCard component
  * Restored to original format matching user requirements
  */
-const EnvelopeSummaryCards = ({ totals = {}, _unassignedCash = 0 }) => {
+const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
   // Calculate balance after bills
   const balanceAfterBills = (totals.totalBalance || 0) - (totals.totalUpcoming || 0);
 

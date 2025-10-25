@@ -6,7 +6,72 @@ import logger from "../utils/common/logger";
  * Budget Database Service
  * Provides centralized database operations with caching and optimized queries
  */
+
+interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+interface GetEnvelopesOptions {
+  category?: string;
+  includeArchived?: boolean;
+  useCache?: boolean;
+}
+
+// Generic data type for flexible database operations
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DbData = any;
+
+interface GetTransactionsOptions {
+  dateRange?: DateRange;
+  envelopeId?: string;
+  category?: string;
+  type?: string;
+  limit?: number;
+  useCache?: boolean;
+}
+
+interface GetBillsOptions {
+  category?: string;
+  isPaid?: boolean;
+  daysAhead?: number;
+  includeOverdue?: boolean;
+}
+
+interface GetSavingsGoalsOptions {
+  category?: string;
+  isCompleted?: boolean;
+  priority?: string;
+}
+
+interface GetPaycheckHistoryOptions {
+  limit?: number;
+  dateRange?: DateRange;
+  source?: string;
+}
+
+interface GetAnalyticsDataOptions {
+  includeTransfers?: boolean;
+  useCache?: boolean;
+}
+
+interface BatchUpdateItem {
+  collection: string;
+  operation: "upsert" | "delete";
+  data: unknown;
+}
+
+interface ServiceStatus {
+  isInitialized: boolean;
+  cachePrefix: string;
+  defaultCacheTtl: number;
+}
+
 class BudgetDatabaseService {
+  db: typeof budgetDb;
+  cachePrefix: string;
+  defaultCacheTtl: number;
+
   constructor() {
     this.db = budgetDb;
     this.cachePrefix = "budget_db_";
@@ -16,7 +81,7 @@ class BudgetDatabaseService {
   /**
    * Initialize database service
    */
-  async initialize() {
+  async initialize(): Promise<boolean> {
     try {
       await this.db.open();
       logger.info("Budget database service initialized");
@@ -30,7 +95,7 @@ class BudgetDatabaseService {
   /**
    * Get database statistics
    */
-  async getStats() {
+  async getStats(): Promise<unknown> {
     try {
       return await this.db.getDatabaseStats();
     } catch (error) {
@@ -42,7 +107,7 @@ class BudgetDatabaseService {
   /**
    * Envelope operations with optimized queries
    */
-  async getEnvelopes(options = {}) {
+  async getEnvelopes(options: GetEnvelopesOptions = {}): Promise<unknown[]> {
     const { category, includeArchived = false, useCache = true } = options;
 
     try {
@@ -59,7 +124,7 @@ class BudgetDatabaseService {
           await this.db.setCachedValue(cacheKey, envelopes, this.defaultCacheTtl);
         }
 
-        return envelopes;
+        return (envelopes as unknown as unknown[]) || [];
       }
 
       return await this.db.getActiveEnvelopes();
@@ -69,7 +134,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveEnvelopes(envelopes) {
+  async saveEnvelopes(envelopes: DbData[]): Promise<void> {
     try {
       await this.db.bulkUpsertEnvelopes(envelopes);
       await this._invalidateEnvelopeCache();
@@ -83,7 +148,7 @@ class BudgetDatabaseService {
   /**
    * Transaction operations with date range optimization
    */
-  async getTransactions(options = {}) {
+  async getTransactions(options: GetTransactionsOptions = {}): Promise<unknown[]> {
     const { dateRange, envelopeId, category, type, limit = 100, useCache = false } = options;
 
     try {
@@ -96,7 +161,10 @@ class BudgetDatabaseService {
       }
 
       if (type) {
-        return await this.db.getTransactionsByType(type, dateRange);
+        return await this.db.getTransactionsByType(
+          type as "income" | "expense" | "transfer",
+          dateRange
+        );
       }
 
       if (dateRange) {
@@ -116,11 +184,11 @@ class BudgetDatabaseService {
           const startDate = new Date();
           startDate.setDate(startDate.getDate() - 30); // Last 30 days
           transactions = await this.db.getTransactionsByDateRange(startDate, new Date());
-          transactions = transactions.slice(0, limit);
+          transactions = (transactions as unknown[]).slice(0, limit);
           await this.db.setCachedValue(cacheKey, transactions, 60000);
         }
 
-        return transactions;
+        return (transactions as unknown as unknown[]) || [];
       }
 
       return [];
@@ -130,7 +198,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveTransactions(transactions) {
+  async saveTransactions(transactions: DbData[]): Promise<void> {
     try {
       await this.db.bulkUpsertTransactions(transactions);
       await this._invalidateTransactionCache();
@@ -144,7 +212,7 @@ class BudgetDatabaseService {
   /**
    * Bill operations with due date optimization
    */
-  async getBills(options = {}) {
+  async getBills(options: GetBillsOptions = {}): Promise<unknown[]> {
     const { category, isPaid, daysAhead = 30, includeOverdue = true } = options;
 
     try {
@@ -173,7 +241,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveBills(bills) {
+  async saveBills(bills: DbData[]): Promise<void> {
     try {
       await this.db.bulkUpsertBills(bills);
       logger.debug(`Saved ${bills.length} bills`);
@@ -186,8 +254,8 @@ class BudgetDatabaseService {
   /**
    * Savings Goals operations with status optimization
    */
-  async getSavingsGoals(options = {}) {
-    const { category, isCompleted, _isPaused, priority } = options;
+  async getSavingsGoals(options: GetSavingsGoalsOptions = {}): Promise<unknown[]> {
+    const { category, isCompleted, priority } = options;
 
     try {
       if (category) {
@@ -195,7 +263,7 @@ class BudgetDatabaseService {
       }
 
       if (priority) {
-        return await this.db.getSavingsGoalsByPriority(priority);
+        return await this.db.getSavingsGoalsByPriority(priority as "low" | "medium" | "high");
       }
 
       if (isCompleted === true) {
@@ -214,7 +282,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveSavingsGoals(goals) {
+  async saveSavingsGoals(goals: DbData[]): Promise<void> {
     try {
       await this.db.bulkUpsertSavingsGoals(goals);
       logger.debug(`Saved ${goals.length} savings goals`);
@@ -227,7 +295,7 @@ class BudgetDatabaseService {
   /**
    * Paycheck operations
    */
-  async getPaycheckHistory(options = {}) {
+  async getPaycheckHistory(options: GetPaycheckHistoryOptions = {}): Promise<unknown[]> {
     const { limit = 50, dateRange, source } = options;
 
     try {
@@ -246,7 +314,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async savePaychecks(paychecks) {
+  async savePaychecks(paychecks: DbData[]): Promise<void> {
     try {
       await this.db.bulkUpsertPaychecks(paychecks);
       logger.debug(`Saved ${paychecks.length} paychecks`);
@@ -259,7 +327,7 @@ class BudgetDatabaseService {
   /**
    * Debt operations
    */
-  async getDebts() {
+  async getDebts(): Promise<unknown[]> {
     try {
       return await this.db.debts.toArray();
     } catch (error) {
@@ -268,7 +336,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveDebts(debts) {
+  async saveDebts(debts: DbData[]): Promise<void> {
     try {
       await this.db.bulkUpsertDebts(debts);
       logger.debug(`Saved ${debts.length} debts`);
@@ -281,7 +349,7 @@ class BudgetDatabaseService {
   /**
    * Budget metadata operations
    */
-  async getBudgetMetadata() {
+  async getBudgetMetadata(): Promise<unknown> {
     try {
       const metadata = await this.db.budget.get("metadata");
       return metadata || null;
@@ -291,12 +359,12 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveBudgetMetadata(metadata) {
+  async saveBudgetMetadata(metadata: DbData): Promise<void> {
     try {
       await this.db.budget.put({
         id: "metadata",
         lastModified: Date.now(),
-        ...metadata,
+        ...(metadata as Record<string, unknown>),
       });
       logger.debug("Saved budget metadata");
     } catch (error) {
@@ -308,7 +376,7 @@ class BudgetDatabaseService {
   /**
    * Encrypted data operations
    */
-  async getEncryptedBudgetData() {
+  async getEncryptedBudgetData(): Promise<unknown> {
     try {
       return await this.db.budget.get("budgetData");
     } catch (error) {
@@ -317,13 +385,13 @@ class BudgetDatabaseService {
     }
   }
 
-  async saveEncryptedBudgetData(data) {
+  async saveEncryptedBudgetData(data: DbData): Promise<void> {
     try {
       await this.db.budget.put({
         id: "budgetData",
         lastModified: Date.now(),
-        version: data.version || 1,
-        ...data,
+        version: ((data as Record<string, unknown>)?.version as number) || 1,
+        ...(data as Record<string, unknown>),
       });
       logger.debug("Saved encrypted budget data");
     } catch (error) {
@@ -335,7 +403,10 @@ class BudgetDatabaseService {
   /**
    * Analytics and reporting
    */
-  async getAnalyticsData(dateRange, options = {}) {
+  async getAnalyticsData(
+    dateRange: DateRange,
+    options: GetAnalyticsDataOptions = {}
+  ): Promise<unknown> {
     const { includeTransfers = false, useCache = true } = options;
 
     try {
@@ -364,9 +435,9 @@ class BudgetDatabaseService {
   /**
    * Batch operations
    */
-  async batchUpdate(updates) {
+  async batchUpdate(updates: BatchUpdateItem[]): Promise<void> {
     try {
-      await this.db.batchUpdate(updates);
+      await this.db.batchUpdate(updates as DbData[]);
       await this._invalidateAllCaches();
       logger.debug(`Completed batch update with ${updates.length} operations`);
     } catch (error) {
@@ -378,7 +449,7 @@ class BudgetDatabaseService {
   /**
    * Database maintenance
    */
-  async optimize() {
+  async optimize(): Promise<void> {
     try {
       await this.db.optimizeDatabase();
       logger.info("Database optimization completed");
@@ -388,7 +459,7 @@ class BudgetDatabaseService {
     }
   }
 
-  async clearData() {
+  async clearData(): Promise<void> {
     try {
       await this.db.transaction(
         "rw",
@@ -428,22 +499,22 @@ class BudgetDatabaseService {
   /**
    * Cache management
    */
-  async _invalidateEnvelopeCache() {
+  private async _invalidateEnvelopeCache(): Promise<void> {
     await this.db.clearCacheCategory("envelopes");
   }
 
-  async _invalidateTransactionCache() {
+  private async _invalidateTransactionCache(): Promise<void> {
     await this.db.clearCacheCategory("transactions");
   }
 
-  async _invalidateAllCaches() {
+  private async _invalidateAllCaches(): Promise<void> {
     await this.db.cache.clear();
   }
 
   /**
    * Get service status
    */
-  getStatus() {
+  getStatus(): ServiceStatus {
     return {
       isInitialized: this.db.isOpen(),
       cachePrefix: this.cachePrefix,
@@ -454,7 +525,7 @@ class BudgetDatabaseService {
   /**
    * Cleanup resources
    */
-  async cleanup() {
+  async cleanup(): Promise<void> {
     try {
       await this.db.close();
       logger.info("Budget database service cleaned up");
@@ -465,4 +536,4 @@ class BudgetDatabaseService {
 }
 
 // Export singleton instance
-export default new BudgetDatabaseService();
+export const budgetDatabaseService = new BudgetDatabaseService();

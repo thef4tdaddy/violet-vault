@@ -13,82 +13,54 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 5 issues in `violet-vault/src/services/authService.ts`
-- 3 issues in `violet-vault/src/utils/sync/syncHealthChecker.ts`
-- 3 issues in `violet-vault/src/utils/sync/syncFlowValidator.ts`
+- 6 issues in `violet-vault/src/services/keys/keyManagementService.ts`
 - 3 issues in `violet-vault/src/utils/budgeting/envelopeFormUtils.ts`
 - 3 issues in `violet-vault/src/hooks/bills/useBillForm.ts`
-- 2 issues in `violet-vault/src/utils/pwa/patchNotesManager.ts`
 - 2 issues in `violet-vault/src/utils/common/billDiscovery.ts`
-- 2 issues in `violet-vault/src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/autofunding/rules.ts`
-- 2 issues in `violet-vault/src/services/bugReport/browserInfoService.ts`
 - 2 issues in `violet-vault/src/hooks/transactions/useTransactionQuery.ts`
 - 2 issues in `violet-vault/src/hooks/transactions/useTransactionLedger.ts`
-- 2 issues in `violet-vault/src/hooks/common/useBugReportV2.ts`
 - 2 issues in `violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts`
 - 2 issues in `violet-vault/src/hooks/bills/useBillManager.ts`
-- 2 issues in `violet-vault/src/hooks/auth/useUserSetup.ts`
 - 2 issues in `violet-vault/src/hooks/analytics/useReportExporter.ts`
 - 2 issues in `violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts`
 - 2 issues in `violet-vault/src/components/ui/EditableBalance.tsx`
-- 2 issues in `violet-vault/src/components/sync/SyncIndicator.tsx`
-- 2 issues in `violet-vault/src/components/sync/SyncHealthDashboard.tsx`
-- 2 issues in `violet-vault/src/components/sync/ActivityBanner.tsx`
-- 2 issues in `violet-vault/src/components/pwa/PatchNotesModal.tsx`
+- 2 issues in `violet-vault/src/components/transactions/TransactionFormFields.tsx`
 - 2 issues in `violet-vault/src/components/modals/UnassignedCashModal.tsx`
 - 2 issues in `violet-vault/src/components/mobile/SlideUpModal.tsx`
+- 2 issues in `violet-vault/src/components/layout/ViewRenderer.tsx`
 - 2 issues in `violet-vault/src/components/layout/MainLayout.tsx`
 - 2 issues in `violet-vault/src/components/history/IntegrityStatusIndicator.tsx`
-- 2 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx`
-- 1 issues in `violet-vault/src/utils/pwa/serviceWorkerDiagnostics.ts`
+- 2 issues in `violet-vault/src/components/debt/modals/DebtFormFields.tsx`
+- 2 issues in `violet-vault/src/components/bills/BillFormFields.tsx`
+- 2 issues in `violet-vault/src/components/analytics/SmartCategoryManager.tsx`
 - 1 issues in `violet-vault/src/utils/debts/debtStrategies.ts`
 - 1 issues in `violet-vault/src/utils/debts/debtFormValidation.ts`
 - 1 issues in `violet-vault/src/utils/common/transactionArchiving.ts`
 - 1 issues in `violet-vault/src/utils/bills/billCalculations.ts`
-- 1 issues in `violet-vault/src/services/types/firebaseServiceTypes.ts`
-- 1 issues in `violet-vault/src/services/bugReport/performanceInfoService.ts`
-- 1 issues in `violet-vault/src/services/bugReport/githubApiService.ts`
-- 1 issues in `violet-vault/src/services/bugReport/apiService.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionSplitter.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionOperations.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionData.ts`
+- 1 issues in `violet-vault/src/hooks/settings/useSettingsDashboard.ts`
 - 1 issues in `violet-vault/src/hooks/debts/useDebtManagement.ts`
 - 1 issues in `violet-vault/src/hooks/common/useExportData.ts`
-- 1 issues in `violet-vault/src/hooks/budgeting/useEnvelopes.ts`
-- 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingRules.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingData.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts`
-- 1 issues in `violet-vault/src/hooks/auth/useKeyManagement.ts`
 - 1 issues in `violet-vault/src/hooks/analytics/usePerformanceMonitor.ts`
 - 1 issues in `violet-vault/src/hooks/analytics/useAnalyticsData.ts`
-- 1 issues in `violet-vault/src/hooks/analytics/useAnalytics.ts`
 - 1 issues in `violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
-- 1 issues in `violet-vault/src/components/sync/health/SyncHealthDetails.tsx`
-- 1 issues in `violet-vault/src/components/sync/ManualSyncControls.tsx`
-- 1 issues in `violet-vault/src/components/sharing/steps/UserSetupStep.tsx`
-- 1 issues in `violet-vault/src/components/sharing/ShareCodeModal.tsx`
-- 1 issues in `violet-vault/src/components/settings/sections/SyncDebugToolsSection.tsx`
+- 1 issues in `violet-vault/src/components/transactions/import/FileUploader.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx`
 - 1 issues in `violet-vault/src/components/settings/sections/DataManagementSection.tsx`
-- 1 issues in `violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx`
-- 1 issues in `violet-vault/src/components/security/LockScreen.tsx`
-- 1 issues in `violet-vault/src/components/pwa/ShareTargetHandler.tsx`
-- 1 issues in `violet-vault/src/components/pwa/OfflineStatusIndicator.tsx`
 - 1 issues in `violet-vault/src/components/pages/MainDashboard.tsx`
 - 1 issues in `violet-vault/src/components/onboarding/OnboardingProgress.tsx`
 - 1 issues in `violet-vault/src/components/onboarding/EmptyStateHints.tsx`
-- 1 issues in `violet-vault/src/components/layout/ViewRenderer.tsx`
 - 1 issues in `violet-vault/src/components/history/ObjectHistoryViewer.tsx`
-- 1 issues in `violet-vault/src/components/feedback/BugReportButton.tsx`
+- 1 issues in `violet-vault/src/components/dev/DevAuthBypass.tsx`
 - 1 issues in `violet-vault/src/components/debt/modals/DebtDetailModal.tsx`
 - 1 issues in `violet-vault/src/components/debt/DebtDashboard.tsx`
-- 1 issues in `violet-vault/src/components/charts/TrendLineChart.tsx`
-- 1 issues in `violet-vault/src/components/charts/DistributionPieChart.tsx`
-- 1 issues in `violet-vault/src/components/charts/ComposedFinancialChart.tsx`
-- 1 issues in `violet-vault/src/components/charts/CategoryBarChart.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/PaydayPrediction.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx`
@@ -98,155 +70,111 @@
 - 1 issues in `violet-vault/src/components/bills/BulkBillUpdateModal.tsx`
 - 1 issues in `violet-vault/src/components/bills/BillTable.tsx`
 - 1 issues in `violet-vault/src/components/bills/BillManager.tsx`
-- 1 issues in `violet-vault/src/components/bills/BillDiscoveryModal.tsx`
 - 1 issues in `violet-vault/src/components/automation/tabs/RulesTab.tsx`
 - 1 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
 - 1 issues in `violet-vault/src/components/automation/AutoFundingDashboard.tsx`
-- 1 issues in `violet-vault/src/components/auth/LocalOnlySetup.tsx`
-- 1 issues in `violet-vault/src/components/auth/LocalOnlyModeSettings.tsx`
-- 1 issues in `violet-vault/src/components/auth/KeyManagementSettings.tsx`
-- 1 issues in `violet-vault/src/components/analytics/ReportExporter.tsx`
-- 1 issues in `violet-vault/src/components/analytics/AnalyticsDashboard.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 71 | `max-lines-per-function` |
-| 36 | `complexity` |
-| 21 | `max-statements` |
+| 41 | `max-lines-per-function` |
+| 19 | `complexity` |
+| 12 | `max-statements` |
+| 6 | `@typescript-eslint/no-explicit-any` |
+| 4 | `no-undef` |
+| 3 | `null` |
 | 1 | `max-depth` |
+| 1 | `@typescript-eslint/no-unused-vars` |
 
 ### Detailed Lint Report
 ```
-violet-vault/src/components/analytics/AnalyticsDashboard.tsx:24:28 - 1 - Arrow function has too many lines (239). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/analytics/ReportExporter.tsx:10:24 - 1 - Arrow function has too many lines (279). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/auth/KeyManagementSettings.tsx:21:69 - 1 - Arrow function has too many lines (232). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/auth/LocalOnlyModeSettings.tsx:21:69 - 1 - Arrow function has too many lines (369). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/auth/LocalOnlySetup.tsx:91:24 - 1 - Arrow function has too many lines (258). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:47:26 - 1 - 'useMemo' is not defined. (no-undef)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:53:25 - 1 - 'useMemo' is not defined. (no-undef)
 violet-vault/src/components/automation/AutoFundingDashboard.tsx:14:30 - 1 - Arrow function has too many lines (187). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/automation/AutoFundingView.tsx:13:25 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/automation/AutoFundingView.tsx:12:25 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/automation/tabs/RulesTab.tsx:6:18 - 1 - Arrow function has too many lines (206). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/bills/BillDiscoveryModal.tsx:7:28 - 1 - Arrow function has too many lines (313). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/bills/BillFormFields.tsx:13:1 - 1 - Unused eslint-disable directive (no problems were reported from 'complexity'). (null)
+violet-vault/src/components/bills/BillFormFields.tsx:37:4 - 1 - Arrow function has a complexity of 27. Maximum allowed is 15. (complexity)
 violet-vault/src/components/bills/BillManager.tsx:24:21 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/BillTable.tsx:9:19 - 1 - Arrow function has too many lines (165). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/BulkBillUpdateModal.tsx:12:29 - 1 - Arrow function has too many lines (167). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/bills/BulkUpdateEditor.tsx:73:30 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
+violet-vault/src/components/bills/BulkUpdateEditor.tsx:73:37 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/components/bills/SmartBillMatcher.tsx:6:26 - 1 - Arrow function has too many lines (180). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/bills/modals/BillDetailModal.tsx:14:25 - 1 - Arrow function has too many lines (251). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx:13:29 - 1 - Arrow function has too many lines (184). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:17:27 - 1 - Arrow function has too many lines (224). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/PaydayPrediction.tsx:6:26 - 1 - Arrow function has too many lines (171). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx:12:22 - 1 - Arrow function has too many lines (307). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/budgeting/envelope/EnvelopeItem.tsx:12:22 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
-violet-vault/src/components/charts/CategoryBarChart.tsx:39:26 - 1 - Arrow function has a complexity of 22. Maximum allowed is 15. (complexity)
-violet-vault/src/components/charts/ComposedFinancialChart.tsx:57:32 - 1 - Arrow function has a complexity of 18. Maximum allowed is 15. (complexity)
-violet-vault/src/components/charts/DistributionPieChart.tsx:44:30 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
-violet-vault/src/components/charts/TrendLineChart.tsx:21:24 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
 violet-vault/src/components/debt/DebtDashboard.tsx:18:23 - 1 - Arrow function has too many lines (174). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/debt/modals/DebtDetailModal.tsx:13:25 - 1 - Arrow function has too many lines (175). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/feedback/BugReportButton.tsx:43:35 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/debt/modals/DebtFormFields.tsx:10:1 - 1 - Unused eslint-disable directive (no problems were reported from 'complexity'). (null)
+violet-vault/src/components/debt/modals/DebtFormFields.tsx:29:4 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
+violet-vault/src/components/dev/DevAuthBypass.tsx:19:3 - 1 - 'useEffect' is not defined. (no-undef)
 violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:34 - 1 - Arrow function has too many lines (251). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:34 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
+violet-vault/src/components/history/IntegrityStatusIndicator.tsx:6:55 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
 violet-vault/src/components/history/ObjectHistoryViewer.tsx:14:29 - 1 - Arrow function has too many lines (199). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/layout/MainLayout.tsx:189:21 - 1 - Arrow function has too many lines (181). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/layout/MainLayout.tsx:189:21 - 1 - Arrow function has too many statements (27). Maximum allowed is 25. (max-statements)
 violet-vault/src/components/layout/ViewRenderer.tsx:30:22 - 1 - Arrow function has too many lines (230). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/layout/ViewRenderer.tsx:30:94 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/components/mobile/SlideUpModal.tsx:27:22 - 1 - Arrow function has too many lines (158). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/mobile/SlideUpModal.tsx:27:22 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
-violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has too many lines (245). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
-violet-vault/src/components/onboarding/EmptyStateHints.tsx:9:25 - 1 - Arrow function has too many lines (200). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/onboarding/OnboardingProgress.tsx:9:28 - 1 - Arrow function has too many lines (238). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/mobile/SlideUpModal.tsx:36:4 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
+violet-vault/src/components/modals/UnassignedCashModal.tsx:74:29 - 1 - Arrow function has too many lines (243). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/modals/UnassignedCashModal.tsx:74:32 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
+violet-vault/src/components/onboarding/EmptyStateHints.tsx:10:25 - 1 - Arrow function has too many lines (202). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/onboarding/OnboardingProgress.tsx:10:28 - 1 - Arrow function has too many lines (240). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/pages/MainDashboard.tsx:26:19 - 1 - Arrow function has too many lines (153). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pwa/OfflineStatusIndicator.tsx:13:32 - 1 - Arrow function has too many lines (224). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/pwa/PatchNotesModal.tsx:11:25 - 1 - Arrow function has a complexity of 25. Maximum allowed is 15. (complexity)
-violet-vault/src/components/pwa/ShareTargetHandler.tsx:11:28 - 1 - Arrow function has too many lines (194). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/security/LockScreen.tsx:11:20 - 1 - Arrow function has too many lines (260). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/EnvelopeIntegrityChecker.tsx:17:34 - 1 - Arrow function has too many lines (345). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/DataManagementSection.tsx:26:69 - 1 - Arrow function has too many lines (183). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 1 - Arrow function has too many lines (237). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/settings/sections/GeneralSettingsSection.tsx:8:32 - 1 - Arrow function has too many lines (235). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/settings/sections/NotificationSettingsSection.tsx:11:37 - 1 - Arrow function has too many lines (221). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/settings/sections/SyncDebugToolsSection.tsx:7:31 - 1 - Arrow function has too many lines (179). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sharing/ShareCodeModal.tsx:15:24 - 1 - Arrow function has too many lines (272). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sharing/steps/UserSetupStep.tsx:9:23 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sync/ActivityBanner.tsx:34:24 - 1 - Arrow function has too many lines (227). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sync/ActivityBanner.tsx:102:37 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
-violet-vault/src/components/sync/ManualSyncControls.tsx:26:35 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sync/SyncHealthDashboard.tsx:40:29 - 1 - Arrow function has too many lines (258). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sync/SyncHealthDashboard.tsx:40:29 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
-violet-vault/src/components/sync/SyncIndicator.tsx:37:23 - 1 - Arrow function has too many lines (278). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/sync/SyncIndicator.tsx:37:23 - 1 - Arrow function has a complexity of 46. Maximum allowed is 15. (complexity)
-violet-vault/src/components/sync/health/SyncHealthDetails.tsx:43:27 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
+violet-vault/src/components/transactions/TransactionFormFields.tsx:11:1 - 1 - Unused eslint-disable directive (no problems were reported from 'complexity'). (null)
+violet-vault/src/components/transactions/TransactionFormFields.tsx:32:4 - 1 - Arrow function has a complexity of 32. Maximum allowed is 15. (complexity)
+violet-vault/src/components/transactions/import/FileUploader.tsx:5:45 - 1 - 'useState' is not defined. (no-undef)
 violet-vault/src/components/ui/EditableBalance.tsx:4:25 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/components/ui/EditableBalance.tsx:4:25 - 1 - Arrow function has a complexity of 19. Maximum allowed is 15. (complexity)
+violet-vault/src/components/ui/EditableBalance.tsx:16:4 - 1 - Arrow function has a complexity of 19. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:18:33 - 1 - Arrow function has too many lines (205). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/analytics/useAnalytics.ts:10:22 - 1 - Arrow function has too many lines (353). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsData.ts:9:33 - 1 - Arrow function has too many lines (241). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts:17:40 - 1 - Arrow function has too many lines (193). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useAnalyticsIntegration.ts:120:5 - 1 - Async arrow function has too many statements (27). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/analytics/usePerformanceMonitor.ts:8:38 - 1 - Arrow function has too many lines (249). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useReportExporter.ts:11:34 - 1 - Arrow function has too many lines (299). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/analytics/useReportExporter.ts:26:5 - 1 - Async arrow function has too many statements (67). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/auth/useKeyManagement.ts:10:33 - 1 - Arrow function has too many lines (272). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/auth/useUserSetup.ts:12:29 - 1 - Arrow function has too many lines (269). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/auth/useUserSetup.ts:25:27 - 1 - Async arrow function has too many statements (26). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/bills/useBillForm.ts:30:28 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
+violet-vault/src/hooks/bills/useBillForm.ts:30:69 - 1 - Arrow function has a complexity of 21. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/bills/useBillForm.ts:69:28 - 1 - Arrow function has too many lines (227). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/bills/useBillForm.ts:202:5 - 1 - Async arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
-violet-vault/src/hooks/bills/useBillManager.ts:28:31 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/bills/useBillManager.ts:28:31 - 1 - Arrow function has too many statements (28). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts:14:31 - 1 - Arrow function has too many lines (274). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/bills/useBillForm.ts:202:47 - 1 - Async arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
+violet-vault/src/hooks/bills/useBillManager.ts:29:31 - 1 - Arrow function has too many lines (192). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/bills/useBillManager.ts:29:31 - 1 - Arrow function has too many statements (28). Maximum allowed is 25. (max-statements)
+violet-vault/src/hooks/budgeting/autofunding/useAutoFunding.ts:15:31 - 1 - Arrow function has too many lines (276). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingData.ts:11:35 - 1 - Arrow function has too many lines (259). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/budgeting/autofunding/useAutoFundingRules.ts:17:36 - 1 - Arrow function has too many lines (296). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts:76:17 - 1 - Async method 'mutationFn' has too many statements (30). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/budgeting/useBudgetData/mutations.ts:116:17 - 1 - Blocks are nested too deeply (6). Maximum allowed is 5. (max-depth)
-violet-vault/src/hooks/budgeting/useEnvelopes.ts:19:22 - 1 - Arrow function has too many lines (332). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/common/useBugReportV2.ts:67:24 - 1 - Arrow function has too many lines (293). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/common/useBugReportV2.ts:67:24 - 1 - Arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/common/useExportData.ts:21:31 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
+violet-vault/src/hooks/common/useExportData.ts:21:51 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/debts/useDebtManagement.ts:25:34 - 1 - Arrow function has too many lines (293). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/settings/useSettingsDashboard.ts:116:17 - 1 - 'useAuth' is assigned a value but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/transactions/useTransactionData.ts:21:28 - 1 - Arrow function has too many lines (202). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionLedger.ts:15:37 - 1 - Arrow function has too many lines (191). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionLedger.ts:15:37 - 1 - Arrow function has too many statements (33). Maximum allowed is 25. (max-statements)
+violet-vault/src/hooks/transactions/useTransactionLedger.ts:16:37 - 1 - Arrow function has too many lines (193). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/transactions/useTransactionLedger.ts:16:37 - 1 - Arrow function has too many statements (33). Maximum allowed is 25. (max-statements)
 violet-vault/src/hooks/transactions/useTransactionOperations.ts:30:34 - 1 - Arrow function has too many lines (278). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionQuery.ts:28:25 - 1 - Async arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
-violet-vault/src/hooks/transactions/useTransactionQuery.ts:28:25 - 1 - Async arrow function has a complexity of 18. Maximum allowed is 15. (complexity)
+violet-vault/src/hooks/transactions/useTransactionQuery.ts:31:25 - 1 - Async arrow function has too many statements (30). Maximum allowed is 25. (max-statements)
+violet-vault/src/hooks/transactions/useTransactionQuery.ts:31:34 - 1 - Async arrow function has a complexity of 18. Maximum allowed is 15. (complexity)
 violet-vault/src/hooks/transactions/useTransactionSplitter.ts:29:32 - 1 - Arrow function has too many lines (183). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionsV2.ts:17:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/services/authService.ts:39:33 - 1 - Async arrow function has too many statements (29). Maximum allowed is 25. (max-statements)
-violet-vault/src/services/authService.ts:124:22 - 1 - Async arrow function has too many lines (200). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/services/authService.ts:134:25 - 1 - Async arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/services/authService.ts:134:25 - 1 - Async arrow function has too many statements (66). Maximum allowed is 25. (max-statements)
-violet-vault/src/services/authService.ts:134:25 - 1 - Async arrow function has a complexity of 36. Maximum allowed is 15. (complexity)
-violet-vault/src/services/bugReport/apiService.ts:155:28 - 1 - Static method 'validateReportData' has a complexity of 19. Maximum allowed is 15. (complexity)
-violet-vault/src/services/bugReport/browserInfoService.ts:73:24 - 1 - Static method 'getBrowserInfo' has a complexity of 19. Maximum allowed is 15. (complexity)
-violet-vault/src/services/bugReport/browserInfoService.ts:169:25 - 1 - Static method 'getViewportInfo' has a complexity of 20. Maximum allowed is 15. (complexity)
-violet-vault/src/services/bugReport/githubApiService.ts:68:31 - 1 - Static method 'formatGitHubIssueBody' has a complexity of 17. Maximum allowed is 15. (complexity)
-violet-vault/src/services/bugReport/performanceInfoService.ts:115:28 - 1 - Static method 'getPerformanceInfo' has a complexity of 22. Maximum allowed is 15. (complexity)
-violet-vault/src/services/types/firebaseServiceTypes.ts:79:18 - 1 - Method 'categorizeError' has a complexity of 34. Maximum allowed is 15. (complexity)
+violet-vault/src/hooks/transactions/useTransactionsV2.ts:18:27 - 1 - Arrow function has too many lines (166). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/services/keys/keyManagementService.ts:67:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/keys/keyManagementService.ts:117:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/keys/keyManagementService.ts:174:52 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/keys/keyManagementService.ts:222:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/keys/keyManagementService.ts:260:32 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/keys/keyManagementService.ts:305:36 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/utils/bills/billCalculations.ts:47:34 - 1 - Arrow function has too many statements (26). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/budgeting/autofunding/rules.ts:76:29 - 1 - Arrow function has a complexity of 32. Maximum allowed is 15. (complexity)
-violet-vault/src/utils/budgeting/autofunding/rules.ts:314:34 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
-violet-vault/src/utils/budgeting/envelopeFormUtils.ts:41:37 - 1 - Arrow function has too many statements (36). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/budgeting/envelopeFormUtils.ts:41:37 - 1 - Arrow function has a complexity of 31. Maximum allowed is 15. (complexity)
-violet-vault/src/utils/budgeting/envelopeFormUtils.ts:238:40 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
-violet-vault/src/utils/budgeting/envelopeIntegrityChecker.ts:119:41 - 1 - Async arrow function has too many statements (37). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/budgeting/envelopeIntegrityChecker.ts:119:41 - 1 - Async arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
+violet-vault/src/utils/budgeting/autofunding/rules.ts:76:42 - 1 - Arrow function has a complexity of 32. Maximum allowed is 15. (complexity)
+violet-vault/src/utils/budgeting/autofunding/rules.ts:314:41 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
+violet-vault/src/utils/budgeting/envelopeFormUtils.ts:43:37 - 1 - Arrow function has too many statements (31). Maximum allowed is 25. (max-statements)
+violet-vault/src/utils/budgeting/envelopeFormUtils.ts:47:3 - 1 - Arrow function has a complexity of 27. Maximum allowed is 15. (complexity)
+violet-vault/src/utils/budgeting/envelopeFormUtils.ts:232:51 - 1 - Arrow function has a complexity of 20. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/common/billDiscovery.ts:131:33 - 1 - Arrow function has too many statements (27). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/common/billDiscovery.ts:131:33 - 1 - Arrow function has a complexity of 25. Maximum allowed is 15. (complexity)
+violet-vault/src/utils/common/billDiscovery.ts:131:58 - 1 - Arrow function has a complexity of 25. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/common/transactionArchiving.ts:141:26 - 1 - Arrow function has too many statements (28). Maximum allowed is 25. (max-statements)
 violet-vault/src/utils/debts/debtFormValidation.ts:72:8 - 1 - Function 'validateDebtFormData' has a complexity of 18. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/debts/debtStrategies.ts:33:1 - 1 - Function 'simulatePayoffStrategy' has too many statements (28). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/pwa/patchNotesManager.ts:105:22 - 1 - Method 'parseVersionContent' has too many statements (30). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/pwa/patchNotesManager.ts:105:22 - 1 - Method 'parseVersionContent' has a complexity of 28. Maximum allowed is 15. (complexity)
-violet-vault/src/utils/pwa/serviceWorkerDiagnostics.ts:44:23 - 1 - Async method 'getCacheHealth' has too many statements (29). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/sync/syncFlowValidator.ts:10:37 - 1 - Async arrow function has too many lines (249). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/utils/sync/syncFlowValidator.ts:10:37 - 1 - Async arrow function has too many statements (66). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/sync/syncFlowValidator.ts:10:37 - 1 - Async arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
-violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runHealthChecksInternal' has too many lines (238). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runHealthChecksInternal' has too many statements (84). Maximum allowed is 25. (max-statements)
-violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runHealthChecksInternal' has a complexity of 31. Maximum allowed is 15. (complexity)
 ```
 
 ## Typecheck Audit
@@ -258,8 +186,8 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 68 errors in `src/services/chunkedSyncService.ts`
 - 59 errors in `src/utils/sync/syncHealthMonitor.ts`
 - 56 errors in `src/utils/sync/CircuitBreaker.ts`
-- 52 errors in `src/services/cloudSyncService.ts`
 - 52 errors in `src/hooks/common/__tests__/useModalManager.test.ts`
+- 49 errors in `src/services/cloudSyncService.ts`
 - 48 errors in `src/utils/sync/SyncQueue.ts`
 - 48 errors in `src/hooks/analytics/__tests__/useSmartCategoryManager.test.tsx`
 - 47 errors in `src/services/__tests__/budgetHistoryService.test.ts`
@@ -268,35 +196,35 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 35 errors in `src/utils/sync/syncEdgeCaseTester.ts`
 - 33 errors in `src/utils/pwa/pwaManager.ts`
 - 32 errors in `src/utils/transactions/__tests__/splitting.test.ts`
-- 32 errors in `src/hooks/savings/useSavingsGoals/savingsMutations.ts`
-- 32 errors in `src/hooks/budgeting/useEnvelopes.ts`
-- 31 errors in `src/hooks/transactions/useTransactionOperations.ts`
 - 30 errors in `src/utils/pwa/backgroundSync.ts`
-- 29 errors in `src/utils/budgeting/envelopeFormUtils.ts`
+- 30 errors in `src/hooks/savings/useSavingsGoals/savingsMutations.ts`
 - 29 errors in `src/services/bugReport/__tests__/index.test.ts`
+- 29 errors in `src/hooks/transactions/useTransactionOperations.ts`
 - 29 errors in `src/hooks/transactions/__tests__/useTransactionLedger.test.tsx`
 - 27 errors in `src/utils/common/highlight.ts`
 - 26 errors in `src/utils/debts/__tests__/debtFormValidation.test.ts`
+- 26 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 26 errors in `src/services/__tests__/budgetDatabaseService.test.ts`
-- 25 errors in `src/utils/debug/syncDiagnostic.ts`
 - 25 errors in `src/services/bugReport/__tests__/systemInfoService.test.ts`
-- 24 errors in `src/hooks/bills/useBills/billMutations.ts`
-- 23 errors in `src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx`
+- 24 errors in `src/utils/debug/syncDiagnostic.ts`
 - 22 errors in `src/utils/query/__tests__/prefetchHelpers.test.ts`
 - 22 errors in `src/utils/pwa/patchNotesManager.ts`
-- 22 errors in `src/hooks/analytics/useAnalytics.ts`
+- 22 errors in `src/hooks/bills/useBills/billMutations.ts`
+- 22 errors in `src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx`
 - 21 errors in `src/utils/debug/dataDiagnostic.ts`
 - 21 errors in `src/utils/budgeting/__tests__/envelopeFormUtils.test.ts`
 - 21 errors in `src/stores/ui/fabStore.ts`
+- 21 errors in `src/services/keys/__tests__/keyManagementService.test.ts`
 - 21 errors in `src/hooks/budgeting/useBudgetHistoryQuery.ts`
 - 21 errors in `src/hooks/budgeting/metadata/useActualBalance.ts`
+- 21 errors in `src/hooks/auth/__tests__/useAuthManager.test.ts`
 - 20 errors in `src/utils/sync/SyncMutex.ts`
 - 20 errors in `src/utils/common/logger.ts`
 - 20 errors in `src/hooks/transactions/__tests__/useTransactionFilters.test.ts`
-- 20 errors in `src/components/layout/MainLayout.tsx`
 - 19 errors in `src/utils/budgeting/suggestionUtils.ts`
 - 19 errors in `src/hooks/common/useReceipts.ts`
 - 19 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
+- 19 errors in `src/components/layout/MainLayout.tsx`
 - 18 errors in `src/utils/analytics/transactionAnalyzer.ts`
 - 17 errors in `src/utils/stores/storeRegistry.ts`
 - 17 errors in `src/utils/accounts/accountHelpers.ts`
@@ -306,93 +234,89 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 15 errors in `src/utils/common/transactionArchiving.ts`
 - 15 errors in `src/hooks/sync/__tests__/useSyncHealthIndicator.test.ts`
 - 14 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
-- 14 errors in `src/utils/common/analyticsProcessor.ts`
 - 14 errors in `src/services/bugReport/__tests__/screenshotService.test.ts`
+- 14 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
+- 14 errors in `src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts`
 - 13 errors in `src/utils/common/toastHelpers.ts`
+- 13 errors in `src/utils/common/analyticsProcessor.ts`
 - 13 errors in `src/utils/budgeting/autofunding/__tests__/simulation.test.ts`
 - 13 errors in `src/utils/analytics/billAnalyzer.ts`
 - 13 errors in `src/services/bugReport/performanceInfoService.ts`
 - 13 errors in `src/services/__tests__/types/firebaseTypes.test.ts`
+- 13 errors in `src/hooks/transactions/useTransactionsV2.ts`
 - 13 errors in `src/hooks/transactions/useTransactionData.ts`
 - 12 errors in `src/utils/sync/RetryManager.ts`
 - 12 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 12 errors in `src/services/bugReport/index.ts`
 - 12 errors in `src/services/budgetHistoryService.ts`
-- 12 errors in `src/hooks/transactions/useTransactionsV2.ts`
+- 12 errors in `src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts`
 - 12 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 12 errors in `src/components/layout/ViewRenderer.tsx`
-- 12 errors in `src/components/layout/SummaryCards.tsx`
 - 11 errors in `src/utils/sync/autoBackupService.ts`
 - 11 errors in `src/utils/sync/__tests__/syncHealthHelpers.test.ts`
 - 11 errors in `src/utils/query/prefetchHelpers.ts`
 - 11 errors in `src/utils/pwa/offlineDataValidator.ts`
 - 11 errors in `src/utils/analytics/categoryHelpers.ts`
-- 11 errors in `src/main.tsx`
 - 11 errors in `src/hooks/transactions/__tests__/useTransactionMutations.test.ts`
 - 11 errors in `src/hooks/debts/useDebtManagement.ts`
 - 11 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
 - 11 errors in `src/hooks/bills/useBills/billQueries.ts`
 - 11 errors in `src/hooks/analytics/useAnalyticsData.ts`
-- 11 errors in `src/components/receipts/__tests__/ReceiptScanner.test.tsx`
 - 11 errors in `src/components/budgeting/envelope/EnvelopeBudgetFields.tsx`
+- 10 errors in `src/utils/transactions/operations.ts`
 - 10 errors in `src/utils/testing/storeTestUtils.ts`
 - 10 errors in `src/utils/sync/validation/__tests__/manifestValidator.test.ts`
 - 10 errors in `src/utils/budgeting/autofunding/rules.ts`
 - 10 errors in `src/utils/bills/__tests__/billCalculations.test.ts`
+- 10 errors in `src/main.tsx`
+- 10 errors in `src/hooks/transactions/useTransactionQuery.ts`
 - 10 errors in `src/hooks/savings/useSavingsGoals/savingsQueries.ts`
 - 10 errors in `src/hooks/mobile/useFABModalIntegration.ts`
 - 10 errors in `src/hooks/common/useEditLock.ts`
-- 10 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 10 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 10 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
-- 10 errors in `src/components/budgeting/EnvelopeSummaryCards.tsx`
-- 10 errors in `src/components/bills/BillSummaryCards.tsx`
-- 9 errors in `src/utils/transactions/operations.ts`
+- 10 errors in `src/components/receipts/__tests__/ReceiptScanner.test.tsx`
 - 9 errors in `src/utils/transactions/fileParser.ts`
 - 9 errors in `src/utils/query/queryClientConfig.ts`
-- 9 errors in `src/hooks/transactions/useTransactionMutations.ts`
 - 9 errors in `src/hooks/layout/__tests__/useLayoutData.test.ts`
+- 9 errors in `src/hooks/common/useActualBalance.ts`
+- 9 errors in `src/hooks/bills/useBillManager.ts`
 - 9 errors in `src/hooks/auth/__tests__/useAuthenticationManager.test.ts`
 - 9 errors in `src/hooks/analytics/__tests__/useTrendAnalysis.test.ts`
 - 9 errors in `src/components/debt/ui/DebtList.tsx`
+- 9 errors in `src/components/budgeting/EnvelopeSummaryCards.tsx`
+- 9 errors in `src/components/bills/BillSummaryCards.tsx`
 - 8 errors in `src/utils/transactions/filtering.ts`
 - 8 errors in `src/utils/transactions/__tests__/filtering.test.ts`
 - 8 errors in `src/utils/budgeting/billEnvelopeCalculations.ts`
-- 8 errors in `src/services/keys/keyManagementService.ts`
-- 8 errors in `src/services/keys/__tests__/keyManagementService.test.ts`
 - 8 errors in `src/services/bugReport/screenshotService.ts`
-- 8 errors in `src/hooks/transactions/useTransactionQuery.ts`
 - 8 errors in `src/hooks/security/__tests__/useSecuritySettingsLogic.test.ts`
 - 8 errors in `src/hooks/common/useConnectionManager/useConnectionData.ts`
 - 8 errors in `src/hooks/common/__tests__/useExportData.test.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 8 errors in `src/components/ui/Header.tsx`
 - 8 errors in `src/components/budgeting/envelope/EnvelopeBasicFields.tsx`
-- 8 errors in `src/components/auth/__tests__/UserSetup.test.tsx`
 - 7 errors in `src/utils/sync/validation/__tests__/encryptedDataValidator.test.ts`
 - 7 errors in `src/utils/sync/syncFlowValidator.ts`
 - 7 errors in `src/utils/stores/createSafeStore.ts`
 - 7 errors in `src/utils/savings/savingsFormUtils.ts`
 - 7 errors in `src/utils/budgeting/paycheckDeletion.ts`
-- 7 errors in `src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 7 errors in `src/utils/bills/billCalculations.ts`
 - 7 errors in `src/utils/auth/authFlowHelpers.ts`
 - 7 errors in `src/services/security/__tests__/securityService.test.ts`
+- 7 errors in `src/hooks/transactions/useTransactionMutations.ts`
 - 7 errors in `src/hooks/transactions/__tests__/useTransactionQuery.test.ts`
 - 7 errors in `src/hooks/savings/useSavingsGoalsActions.ts`
 - 7 errors in `src/hooks/savings/useSavingsGoals/index.ts`
-- 7 errors in `src/hooks/common/useBugReportV2.ts`
 - 7 errors in `src/hooks/budgeting/autofunding/useHistoryExport.ts`
 - 7 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
 - 7 errors in `src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts`
 - 7 errors in `src/hooks/bills/useBillManagerUI.ts`
 - 7 errors in `src/db/budgetDb.ts`
-- 7 errors in `src/components/ui/VirtualList.tsx`
+- 7 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 7 errors in `src/components/savings/DistributeModal.tsx`
-- 7 errors in `src/components/layout/NavigationTabs.tsx`
-- 7 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 7 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
-- 7 errors in `src/components/automation/AutoFundingView.tsx`
+- 7 errors in `src/components/auth/__tests__/UserSetup.test.tsx`
 - 6 errors in `src/utils/budgeting/paydayPredictor.ts`
 - 6 errors in `src/utils/budgeting/paycheckUtils.ts`
 - 6 errors in `src/utils/budgeting/autofunding/conditions.ts`
@@ -402,56 +326,55 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 6 errors in `src/services/bugReport/systemInfoService.ts`
 - 6 errors in `src/services/bugReport/githubApiService.ts`
 - 6 errors in `src/hooks/receipts/__tests__/useReceiptScanner.test.ts`
+- 6 errors in `src/hooks/common/useOnboardingAutoComplete.ts`
 - 6 errors in `src/hooks/common/useConnectionManager.ts`
-- 6 errors in `src/hooks/common/useActualBalance.ts`
 - 6 errors in `src/hooks/common/__tests__/useImportData.test.ts`
 - 6 errors in `src/hooks/budgeting/useUnassignedCashDistribution.ts`
 - 6 errors in `src/hooks/budgeting/metadata/useUnassignedCash.ts`
-- 6 errors in `src/hooks/bills/useBillManager.ts`
 - 6 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 6 errors in `src/hooks/auth/useAuthenticationManager.ts`
+- 6 errors in `src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts`
 - 6 errors in `src/components/sync/ManualSyncControls.tsx`
-- 6 errors in `src/components/security/LockScreen.tsx`
 - 6 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
 - 6 errors in `src/components/onboarding/OnboardingProgress.tsx`
+- 6 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 6 errors in `src/components/bills/BillManager.tsx`
 - 5 errors in `src/utils/sync/syncHealthChecker.ts`
 - 5 errors in `src/utils/common/performance.ts`
 - 5 errors in `src/services/__tests__/integration/syncIntegration.test.ts`
+- 5 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 5 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 5 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 5 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 5 errors in `src/hooks/settings/useTransactionArchiving.ts`
+- 5 errors in `src/hooks/settings/useSettingsDashboard.ts`
 - 5 errors in `src/hooks/common/usePrompt.ts`
-- 5 errors in `src/hooks/common/useOnboardingAutoComplete.ts`
 - 5 errors in `src/hooks/common/useConfirm.ts`
-- 5 errors in `src/hooks/common/useBugReportSubmission.ts`
 - 5 errors in `src/hooks/budgeting/metadata/useBudgetMetadataUtils.ts`
 - 5 errors in `src/hooks/budgeting/metadata/useBudgetMetadataQuery.ts`
 - 5 errors in `src/hooks/auth/mutations/useProfileMutations.ts`
+- 5 errors in `src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts`
+- 5 errors in `src/hooks/auth/__tests__/useAuthQueries.test.ts`
 - 5 errors in `src/components/ui/StandardFilters.tsx`
+- 5 errors in `src/components/security/LockScreen.tsx`
 - 5 errors in `src/components/pages/MainDashboard.tsx`
 - 5 errors in `src/components/history/IntegrityStatusIndicator.tsx`
 - 5 errors in `src/components/debt/ui/DebtFilters.tsx`
-- 5 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 5 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 4 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 4 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 4 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 4 errors in `src/utils/bills/billDetailUtils.ts`
 - 4 errors in `src/hooks/sync/useManualSync.ts`
-- 4 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 4 errors in `src/hooks/common/useTransactionArchiving.ts`
 - 4 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 4 errors in `src/hooks/auth/__tests__/useSecurityManagerUI.test.ts`
 - 4 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
+- 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/sync/ActivityBanner.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
-- 4 errors in `src/components/onboarding/OnboardingTutorial.tsx`
 - 4 errors in `src/components/mobile/ResponsiveModal.tsx`
-- 4 errors in `src/components/debt/modals/DebtFormFields.tsx`
-- 4 errors in `src/components/budgeting/EnvelopeSystem.tsx`
-- 4 errors in `src/components/analytics/AnalyticsSummaryCards.tsx`
+- 4 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 3 errors in `src/utils/sync/syncHealthHelpers.ts`
 - 3 errors in `src/utils/sync/retryUtils.ts`
 - 3 errors in `src/utils/sync/resilience/index.ts`
@@ -462,12 +385,15 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 3 errors in `src/utils/dataManagement/firebaseUtils.ts`
 - 3 errors in `src/utils/dataManagement/__tests__/firebaseUtils.test.ts`
 - 3 errors in `src/utils/common/__tests__/BaseMutex.test.ts`
+- 3 errors in `src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 3 errors in `src/utils/accounts/__tests__/accountValidation.test.ts`
 - 3 errors in `src/services/typedFirebaseSyncService.ts`
+- 3 errors in `src/services/keys/keyManagementService.ts`
 - 3 errors in `src/services/bugReport/contextAnalysisService.ts`
 - 3 errors in `src/services/authService.ts`
 - 3 errors in `src/hooks/transactions/useTransactionSplitter.ts`
 - 3 errors in `src/hooks/transactions/__tests__/useTransactionAnalytics.test.ts`
+- 3 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 3 errors in `src/hooks/settings/__tests__/useSettingsDashboard.test.ts`
 - 3 errors in `src/hooks/debts/useDebts.ts`
 - 3 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
@@ -477,22 +403,17 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 3 errors in `src/hooks/budgeting/metadata/useActualBalanceOperations.ts`
 - 3 errors in `src/hooks/auth/useUserSetup.ts`
 - 3 errors in `src/hooks/analytics/__tests__/useAnalyticsExport.test.ts`
+- 3 errors in `src/domain/schemas/paycheck-history.ts`
 - 3 errors in `src/db/__tests__/budgetDb.test.ts`
-- 3 errors in `src/components/transactions/TransactionLedger.tsx`
-- 3 errors in `src/components/sync/SyncIndicator.tsx`
-- 3 errors in `src/components/sharing/JoinBudgetModal.tsx`
+- 3 errors in `src/contexts/__tests__/AuthContext.test.tsx`
 - 3 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 3 errors in `src/components/onboarding/hooks/useTutorialControls.ts`
 - 3 errors in `src/components/onboarding/EmptyStateHints.tsx`
 - 3 errors in `src/components/history/ObjectHistoryViewer.tsx`
-- 3 errors in `src/components/feedback/BugReportButton.tsx`
-- 3 errors in `src/components/charts/ComposedFinancialChart.tsx`
-- 3 errors in `src/components/charts/CategoryBarChart.tsx`
+- 3 errors in `src/components/debt/modals/DebtFormFields.tsx`
+- 3 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 3 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 3 errors in `src/components/auth/UserIndicator.tsx`
-- 3 errors in `src/components/analytics/SmartCategoryManager.tsx`
-- 3 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
-- 3 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 2 errors in `src/utils/transactions/index.ts`
 - 2 errors in `src/utils/sync/__tests__/SyncMutex.test.ts`
 - 2 errors in `src/utils/services/editLockHelpers.ts`
@@ -504,8 +425,6 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 2 errors in `src/utils/accounts/accountValidation.ts`
 - 2 errors in `src/services/syncServiceInitializer.ts`
 - 2 errors in `src/services/bugReport/errorTrackingService.ts`
-- 2 errors in `src/hooks/transactions/useTransactionLedger.ts`
-- 2 errors in `src/hooks/settings/useSettingsDashboard.ts`
 - 2 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 2 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 2 errors in `src/hooks/dashboard/useMainDashboard.ts`
@@ -518,30 +437,24 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 2 errors in `src/hooks/budgeting/usePaycheckForm.ts`
 - 2 errors in `src/hooks/budgeting/useEnvelopeForm.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/index.ts`
-- 2 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
+- 2 errors in `src/hooks/auth/__tests__/useAuthCompatibility.test.ts`
 - 2 errors in `src/hooks/analytics/useReportExporter.ts`
 - 2 errors in `src/hooks/analytics/usePerformanceMonitor.ts`
-- 2 errors in `src/components/ui/VersionFooter.tsx`
+- 2 errors in `src/domain/schemas/utility.ts`
+- 2 errors in `src/domain/schemas/audit-log.ts`
 - 2 errors in `src/components/transactions/import/FileUploader.tsx`
-- 2 errors in `src/components/transactions/TransactionForm.tsx`
-- 2 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 2 errors in `src/components/sync/SyncHealthDashboard.tsx`
 - 2 errors in `src/components/savings/SavingsGoalCard.tsx`
 - 2 errors in `src/components/pwa/ShareTargetHandler.tsx`
-- 2 errors in `src/components/mobile/BottomNavItem.tsx`
 - 2 errors in `src/components/dev/DevAuthBypass.tsx`
 - 2 errors in `src/components/debt/ui/DebtSummaryWidget.tsx`
 - 2 errors in `src/components/debt/modals/DebtDetailModal.tsx`
-- 2 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 2 errors in `src/components/debt/DebtDashboard.tsx`
-- 2 errors in `src/components/charts/DistributionPieChart.tsx`
-- 2 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
+- 2 errors in `src/components/charts/ComposedFinancialChart.tsx`
+- 2 errors in `src/components/charts/CategoryBarChart.tsx`
 - 2 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
-- 2 errors in `src/components/bills/AddBillModal.tsx`
-- 2 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 2 errors in `src/components/automation/AutoFundingDashboard.tsx`
-- 2 errors in `src/components/accounts/form/AccountColorAndSettings.tsx`
-- 2 errors in `src/components/accounts/AccountCard.tsx`
+- 2 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
 - 1 errors in `src/utils/validation/transactionValidation.ts`
 - 1 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 1 errors in `src/utils/sync/validation/__tests__/checksumUtils.test.ts`
@@ -577,132 +490,87 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 - 1 errors in `src/hooks/common/useRouterPageDetection.ts`
 - 1 errors in `src/hooks/common/useImportData.ts`
 - 1 errors in `src/hooks/common/useActivityLogger.ts`
-- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingRules.ts`
+- 1 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
-- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
+- 1 errors in `src/hooks/bills/useBillValidation.ts`
 - 1 errors in `src/hooks/bills/useBillForm.ts`
 - 1 errors in `src/hooks/auth/useSecurityManagerUI.ts`
-- 1 errors in `src/hooks/auth/useKeyManagement.ts`
 - 1 errors in `src/hooks/auth/useAuthCompatibility.ts`
 - 1 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 1 errors in `src/hooks/auth/__tests__/useUserSetup.test.ts`
+- 1 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
 - 1 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
-- 1 errors in `src/components/ui/TouchButton.tsx`
-- 1 errors in `src/components/ui/Toast.tsx`
+- 1 errors in `src/domain/schemas/version-control.ts`
+- 1 errors in `src/domain/schemas/transaction.ts`
+- 1 errors in `src/domain/schemas/bill.ts`
+- 1 errors in `src/domain/schemas/backup.ts`
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
-- 1 errors in `src/components/ui/PromptProvider.tsx`
 - 1 errors in `src/components/ui/LoadingSpinner.tsx`
 - 1 errors in `src/components/ui/EditLockIndicator.tsx`
 - 1 errors in `src/components/ui/ConnectionDisplay.tsx`
-- 1 errors in `src/components/ui/ConfirmProvider.tsx`
-- 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
-- 1 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
-- 1 errors in `src/components/transactions/ledger/TransactionLedgerLoading.tsx`
-- 1 errors in `src/components/transactions/import/FieldMapper.tsx`
 - 1 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
-- 1 errors in `src/components/transactions/TransactionSummaryCards.tsx`
-- 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/transactions/TransactionFormFields.tsx`
 - 1 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
+- 1 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 1 errors in `src/components/sync/SyncStatusIndicators.tsx`
 - 1 errors in `src/components/sync/SyncHealthIndicator.tsx`
-- 1 errors in `src/components/sharing/steps/UserSetupStep.tsx`
-- 1 errors in `src/components/sharing/steps/ShareCodeStep.tsx`
-- 1 errors in `src/components/sharing/ShareCodeModal.tsx`
-- 1 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/savings/AddEditGoalModal.tsx`
-- 1 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
-- 1 errors in `src/components/receipts/components/ExtractedItemsList.tsx`
-- 1 errors in `src/components/receipts/components/ExtractedDataField.tsx`
-- 1 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 1 errors in `src/components/onboarding/hooks/useTutorialSteps.ts`
-- 1 errors in `src/components/modals/QuickFundForm.tsx`
-- 1 errors in `src/components/modals/PasswordRotationModal.tsx`
 - 1 errors in `src/components/modals/CorruptionRecoveryModal.tsx`
-- 1 errors in `src/components/mobile/BottomNavigationBar.tsx`
-- 1 errors in `src/components/layout/AppWrapper.tsx`
-- 1 errors in `src/components/layout/AppRoutes.tsx`
+- 1 errors in `src/components/mobile/BottomNavItem.tsx`
 - 1 errors in `src/components/history/BudgetHistoryViewer.tsx`
-- 1 errors in `src/components/debt/ui/QuickPaymentForm.tsx`
-- 1 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
-- 1 errors in `src/components/debt/ui/DebtProgressBar.tsx`
-- 1 errors in `src/components/debt/ui/DebtCardProgressBar.tsx`
+- 1 errors in `src/components/feedback/hooks/useBugReportState.ts`
+- 1 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 1 errors in `src/components/dashboard/AccountBalanceOverview.tsx`
-- 1 errors in `src/components/charts/TrendLineChart.tsx`
+- 1 errors in `src/components/charts/DistributionPieChart.tsx`
 - 1 errors in `src/components/budgeting/paycheck/PaycheckHistory.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
-- 1 errors in `src/components/budgeting/envelope/EnvelopeHeader.tsx`
-- 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
-- 1 errors in `src/components/bills/BillViewTabs.tsx`
 - 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
-- 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
-- 1 errors in `src/components/auth/components/UserSetupHeader.tsx`
-- 1 errors in `src/components/auth/components/UserNameInput.tsx`
-- 1 errors in `src/components/auth/components/StepButtons.tsx`
-- 1 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
-- 1 errors in `src/components/auth/components/ReturningUserActions.tsx`
-- 1 errors in `src/components/auth/components/ColorPicker.tsx`
-- 1 errors in `src/components/auth/UserSetup.tsx`
+- 1 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 1 errors in `src/components/auth/ProfileSettings.tsx`
-- 1 errors in `src/components/auth/PasswordRotationModal.tsx`
-- 1 errors in `src/components/analytics/trends/SeasonalPatternsSection.tsx`
-- 1 errors in `src/components/analytics/trends/CategoryTrendsSection.tsx`
-- 1 errors in `src/components/analytics/tabs/TrendsTab.tsx`
-- 1 errors in `src/components/analytics/tabs/OverviewTab.tsx`
-- 1 errors in `src/components/analytics/tabs/HealthTab.tsx`
-- 1 errors in `src/components/analytics/tabs/CategoriesTab.tsx`
-- 1 errors in `src/components/analytics/performance/PerformanceTabContent.tsx`
-- 1 errors in `src/components/analytics/performance/OverallScore.tsx`
-- 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
-- 1 errors in `src/components/analytics/components/TabContent.tsx`
-- 1 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
-- 1 errors in `src/components/analytics/ChartsAndAnalytics.tsx`
-- 1 errors in `src/components/analytics/CategorySettingsPanel.tsx`
-- 1 errors in `src/components/analytics/CategoryNavigationTabs.tsx`
-- 1 errors in `src/components/accounts/transfer/TransferFormFields.tsx`
 - 1 errors in `src/components/accounts/form/AccountModalHeader.tsx`
-- 1 errors in `src/components/accounts/form/AccountFormActions.tsx`
-- 1 errors in `src/components/accounts/form/AccountFinancialFields.tsx`
-- 1 errors in `src/components/accounts/AccountFormModal.tsx`
+- 1 errors in `src/components/accounts/form/AccountColorAndSettings.tsx`
+- 1 errors in `src/components/accounts/AccountCard.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 2200 | `TS2339` |
-| 178 | `TS6133` |
-| 154 | `TS2345` |
-| 118 | `TS2554` |
+| 2148 | `TS2339` |
+| 166 | `TS2345` |
+| 125 | `TS2554` |
+| 110 | `TS2551` |
 | 106 | `TS2708` |
-| 103 | `TS2551` |
-| 100 | `TS2322` |
-| 36 | `TS2362` |
-| 35 | `TS2363` |
-| 18 | `TS2353` |
+| 101 | `TS6133` |
+| 97 | `TS2322` |
+| 32 | `TS2362` |
+| 31 | `TS2363` |
+| 21 | `TS2353` |
+| 21 | `TS2307` |
 | 17 | `TS2739` |
-| 17 | `TS2307` |
-| 15 | `TS2365` |
-| 12 | `TS2769` |
-| 10 | `TS2698` |
+| 16 | `TS2365` |
 | 9 | `TS2741` |
 | 8 | `TS2305` |
-| 7 | `TS2613` |
+| 7 | `TS2698` |
+| 6 | `TS2769` |
 | 6 | `TS2740` |
-| 6 | `TS2614` |
-| 6 | `TS2448` |
+| 6 | `TS2613` |
+| 5 | `TS2448` |
+| 5 | `TS2304` |
 | 4 | `TS2349` |
 | 3 | `TS4104` |
+| 3 | `TS2614` |
 | 3 | `TS2538` |
+| 3 | `TS2352` |
 | 2 | `TS2794` |
 | 2 | `TS2717` |
 | 2 | `TS2419` |
-| 2 | `TS2352` |
 | 2 | `TS1117` |
-| 1 | `TS6196` |
 | 1 | `TS2724` |
 | 1 | `TS2719` |
 | 1 | `TS2456` |
@@ -710,64 +578,27 @@ violet-vault/src/utils/sync/syncHealthChecker.ts:25:1 - 1 - Async function 'runH
 
 ### Detailed Type Error Report
 ```
-src/components/accounts/AccountCard.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/accounts/AccountCard.tsx(8,3): error TS6133: '_daysUntilExpiration' is declared but its value is never read.
-src/components/accounts/AccountFormModal.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/accounts/form/AccountColorAndSettings.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/accounts/form/AccountColorAndSettings.tsx(30,9): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+src/components/accounts/AccountCard.tsx(7,3): error TS6133: '_daysUntilExpiration' is declared but its value is never read.
+src/components/accounts/form/AccountColorAndSettings.tsx(29,9): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
-src/components/accounts/form/AccountFinancialFields.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/accounts/form/AccountFormActions.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/accounts/form/AccountModalHeader.tsx(10,3): error TS6133: '_lock' is declared but its value is never read.
-src/components/accounts/SupplementalAccounts.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/accounts/SupplementalAccounts.tsx(35,5): error TS2339: Property '_releaseLock' does not exist on type '{ showAddModal: boolean; editingAccount: any; showBalances: boolean; showTransferModal: boolean; transferringAccount: any; accountForm: { name: string; type: string; currentBalance: string; ... 4 more ...; isActive: boolean; }; ... 21 more ...; getAccountTypeInfo: (type: any) => { ...; }; }'.
-src/components/accounts/SupplementalAccounts.tsx(35,5): error TS6133: '_releaseLock' is declared but its value is never read.
-src/components/accounts/transfer/TransferFormFields.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/AnalyticsSummaryCards.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/AnalyticsSummaryCards.tsx(10,11): error TS2339: Property 'totalExpenses' does not exist on type '{}'.
-src/components/analytics/AnalyticsSummaryCards.tsx(10,30): error TS2339: Property 'envelopeUtilization' does not exist on type '{}'.
-src/components/analytics/AnalyticsSummaryCards.tsx(10,55): error TS2339: Property 'savingsProgress' does not exist on type '{}'.
-src/components/analytics/CategoryAdvancedTab.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/CategoryAdvancedTab.tsx(46,17): error TS2322: Type 'unknown' is not assignable to type 'Key'.
-src/components/analytics/CategoryAdvancedTab.tsx(49,71): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/analytics/CategoryNavigationTabs.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/CategorySettingsPanel.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/ChartsAndAnalytics.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/components/TabContent.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/performance/MetricsGrid.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/performance/OverallScore.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/performance/PerformanceTabContent.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/SmartCategoryManager.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/SmartCategoryManager.tsx(16,3): error TS6133: '_currentCategories' is declared but its value is never read.
-src/components/analytics/SmartCategoryManager.tsx(19,3): error TS6133: '_onUpdateCategory' is declared but its value is never read.
-src/components/analytics/tabs/CategoriesTab.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/tabs/HealthTab.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/tabs/OverviewTab.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/tabs/TrendsTab.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/TrendAnalysisCharts.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/trends/CategoryTrendsSection.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/analytics/trends/SeasonalPatternsSection.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/__tests__/UserSetup.test.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/__tests__/UserSetup.test.tsx(2,1): error TS6133: 'Select' is declared but its value is never read.
-src/components/auth/__tests__/UserSetup.test.tsx(3,1): error TS6133: 'Button' is declared but its value is never read.
-src/components/auth/__tests__/UserSetup.test.tsx(101,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
-src/components/auth/__tests__/UserSetup.test.tsx(122,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
-src/components/auth/__tests__/UserSetup.test.tsx(135,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
-src/components/auth/__tests__/UserSetup.test.tsx(149,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
-src/components/auth/__tests__/UserSetup.test.tsx(175,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
-src/components/auth/components/ColorPicker.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/components/ReturningUserActions.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/components/ShareCodeDisplay.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/components/StepButtons.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/components/UserNameInput.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/components/UserSetupHeader.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/components/UserSetupLayout.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/auth/PasswordRotationModal.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/analytics/CategoryAdvancedTab.tsx(45,17): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/components/analytics/CategoryAdvancedTab.tsx(48,71): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/SmartCategoryManager.tsx(15,3): error TS6133: '_currentCategories' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(18,3): error TS6133: '_onUpdateCategory' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(47,26): error TS2304: Cannot find name 'useMemo'.
+src/components/analytics/SmartCategoryManager.tsx(53,25): error TS2304: Cannot find name 'useMemo'.
+src/components/auth/__tests__/UserSetup.test.tsx(1,1): error TS6133: 'Select' is declared but its value is never read.
+src/components/auth/__tests__/UserSetup.test.tsx(2,1): error TS6133: 'Button' is declared but its value is never read.
+src/components/auth/__tests__/UserSetup.test.tsx(100,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
+src/components/auth/__tests__/UserSetup.test.tsx(121,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
+src/components/auth/__tests__/UserSetup.test.tsx(134,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
+src/components/auth/__tests__/UserSetup.test.tsx(148,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
+src/components/auth/__tests__/UserSetup.test.tsx(174,18): error TS2339: Property 'mockReturnValue' does not exist on type '(onSetupComplete: any) => { step: number; masterPassword: string; userName: string; userColor: string; showPassword: boolean; isLoading: boolean; isReturningUser: boolean; shareCode: string; ... 12 more ...; handleWithTimeout: (asyncFn: any, timeoutMs?: number) => Promise<...>; }'.
 src/components/auth/ProfileSettings.tsx(65,19): error TS2554: Expected 3 arguments, but got 2.
 src/components/auth/UserIndicator.tsx(7,31): error TS2339: Property 'currentUser' does not exist on type '{}'.
 src/components/auth/UserIndicator.tsx(7,44): error TS2339: Property 'onUserChange' does not exist on type '{}'.
 src/components/auth/UserIndicator.tsx(7,58): error TS2339: Property 'onUpdateProfile' does not exist on type '{}'.
-src/components/auth/UserSetup.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/components/automation/AutoFundingDashboard.tsx(99,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/components/automation/AutoFundingDashboard.tsx(100,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
@@ -777,44 +608,29 @@ src/components/automation/AutoFundingRuleBuilder.tsx(98,15): error TS2322: Type 
 src/components/automation/AutoFundingRuleBuilder.tsx(105,12): error TS2741: Property 'onStepChange' is missing in type '{ currentStep: any; }' but required in type '{ currentStep: any; onStepChange: any; }'.
 src/components/automation/AutoFundingRuleBuilder.tsx(166,46): error TS2339: Property 'name' does not exist on type '{}'.
 src/components/automation/AutoFundingRuleBuilder.tsx(169,46): error TS2339: Property 'type' does not exist on type '{}'.
-src/components/automation/AutoFundingView.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/automation/AutoFundingView.tsx(48,19): error TS2554: Expected 3 arguments, but got 2.
-src/components/automation/AutoFundingView.tsx(102,41): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: any; unassignedCash: any; transactions: any; }; }' is not assignable to parameter of type 'string'.
-src/components/automation/AutoFundingView.tsx(109,36): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
-  Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingView.tsx(110,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
-  Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/components/automation/AutoFundingView.tsx(113,23): error TS2554: Expected 3 arguments, but got 2.
-src/components/automation/AutoFundingView.tsx(118,23): error TS2554: Expected 3 arguments, but got 2.
 src/components/automation/steps/config/SplitRemainderConfig.tsx(28,23): error TS2322: Type '{ checked: any; onCheckedChange: () => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
-src/components/automation/steps/RuleConfigurationStep.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/automation/steps/RuleConfigurationStep.tsx(38,11): error TS2322: Type '{ ruleData: any; updateConfig: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }' is not assignable to type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
+src/components/automation/steps/RuleConfigurationStep.tsx(37,11): error TS2322: Type '{ ruleData: any; updateConfig: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }' is not assignable to type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
   Property 'updateConfig' does not exist on type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
-src/components/bills/AddBillModal.tsx(8,8): error TS6133: 'React' is declared but its value is never read.
-src/components/bills/AddBillModal.tsx(169,9): error TS2322: Type '{ formData: BillFormData; updateField: (field: keyof BillFormData, value: string | boolean) => void; canEdit: boolean; editingBill: any; handleSubmit: (e: FormEvent<...>) => Promise<...>; ... 8 more ...; onDeleteClick: () => Promise<...>; }' is not assignable to type 'IntrinsicAttributes & { formData: any; updateField: any; canEdit: any; editingBill: any; handleSubmit: any; isSubmitting: any; onClose: any; suggestedIconName: any; ... 4 more ...; getNextDueDate: any; }'.
-  Property 'onDeleteClick' does not exist on type 'IntrinsicAttributes & { formData: any; updateField: any; canEdit: any; editingBill: any; handleSubmit: any; isSubmitting: any; onClose: any; suggestedIconName: any; ... 4 more ...; getNextDueDate: any; }'.
 src/components/bills/BillManager.tsx(78,5): error TS2353: Object literal may only specify known properties, and 'onUpdateBill' does not exist in type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
 src/components/bills/BillManager.tsx(111,35): error TS2339: Property 'currentEditor' does not exist on type '{ lock: any; isLocked: boolean; isOwnLock: boolean; isLoading: boolean; canEdit: boolean; lockedBy: any; expiresAt: any; acquireLock: () => Promise<{ success: boolean; reason: string; lockedBy: any; expiresAt: any; } | { ...; } | { ...; } | { ...; } | { ...; }>; releaseLock: () => Promise<...>; breakLock: () => Prom...'.
 src/components/bills/BillManager.tsx(174,11): error TS2322: Type '{ isOpen: true; onClose: () => void; editingBill: any; availableEnvelopes: any; onAddBill: UseMutateFunction<any, Error, void, { previousBills: unknown; }>; onUpdateBill: UseMutateFunction<...>; onDeleteBill: UseMutateFunction<...>; onError: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; onAddBill: any; onUpdateBill: any; onDeleteBill: any; onError: any; editingBill?: any; _forceMobileMode?: boolean; }'.
   Property 'availableEnvelopes' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; onAddBill: any; onUpdateBill: any; onDeleteBill: any; onError: any; editingBill?: any; _forceMobileMode?: boolean; }'.
 src/components/bills/BillManager.tsx(189,11): error TS2322: Type '{ isOpen: true; onClose: () => void; selectedBills: Bill[]; availableEnvelopes: any; onUpdateBills: (updatedBills: any) => Promise<void>; onError: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; selectedBills?: any[]; onUpdateBills: any; onError: any; }'.
   Property 'availableEnvelopes' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; selectedBills?: any[]; onUpdateBills: any; onError: any; }'.
-src/components/bills/BillManager.tsx(202,11): error TS2322: Type '{ isOpen: true; onClose: () => void; discoveredBills: any[]; existingBills: Bill[]; availableEnvelopes: any; onAddBills: (billsToAdd: any) => Promise<void>; onError: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; discoveredBills?: any[]; onAddBills: any; onError: any; availableEnvelopes?: any[]; }'.
-  Property 'existingBills' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; discoveredBills?: any[]; onAddBills: any; onError: any; availableEnvelopes?: any[]; }'.
+src/components/bills/BillManager.tsx(202,11): error TS2322: Type '{ isOpen: true; onClose: () => void; discoveredBills: any[]; existingBills: Bill[]; availableEnvelopes: any; onAddBills: (billsToAdd: any) => Promise<void>; onError: any; }' is not assignable to type 'IntrinsicAttributes & BillDiscoveryModalProps'.
+  Property 'existingBills' does not exist on type 'IntrinsicAttributes & BillDiscoveryModalProps'.
 src/components/bills/BillManager.tsx(230,11): error TS2322: Type '{ isOpen: boolean; onClose: () => void; objectId: any; objectType: string; title: string; }' is not assignable to type 'IntrinsicAttributes & { objectId: any; objectType: any; objectName: any; onClose: any; }'.
   Property 'isOpen' does not exist on type 'IntrinsicAttributes & { objectId: any; objectType: any; objectName: any; onClose: any; }'.
-src/components/bills/BillSummaryCards.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/bills/BillSummaryCards.tsx(15,26): error TS2339: Property 'total' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(17,26): error TS2339: Property 'totalCount' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(23,26): error TS2339: Property 'overdue' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(25,26): error TS2339: Property 'overdueCount' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(26,22): error TS2339: Property 'overdueCount' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(32,26): error TS2339: Property 'paid' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(34,26): error TS2339: Property 'paidCount' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(40,26): error TS2339: Property 'upcoming' does not exist on type '{}'.
-src/components/bills/BillSummaryCards.tsx(42,26): error TS2339: Property 'upcomingCount' does not exist on type '{}'.
-src/components/bills/BillViewTabs.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/bills/BillSummaryCards.tsx(14,26): error TS2339: Property 'total' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(16,26): error TS2339: Property 'totalCount' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(22,26): error TS2339: Property 'overdue' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(24,26): error TS2339: Property 'overdueCount' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(25,22): error TS2339: Property 'overdueCount' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(31,26): error TS2339: Property 'paid' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(33,26): error TS2339: Property 'paidCount' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(39,26): error TS2339: Property 'upcoming' does not exist on type '{}'.
+src/components/bills/BillSummaryCards.tsx(41,26): error TS2339: Property 'upcomingCount' does not exist on type '{}'.
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(182,41): error TS2339: Property 'envelope' does not exist on type '{}'.
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(182,51): error TS2339: Property 'bills' does not exist on type '{}'.
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(182,63): error TS2339: Property 'showDetails' does not exist on type '{}'.
@@ -828,7 +644,6 @@ src/components/budgeting/CreateEnvelopeModal.tsx(93,9): error TS2322: Type '{ fo
   Property 'disabled' does not exist on type 'IntrinsicAttributes & { formData: any; onUpdateField: any; errors?: {}; calculatedAmounts?: {}; canEdit?: boolean; }'.
 src/components/budgeting/CreateEnvelopeModal.tsx(108,36): error TS2339: Property 'billId' does not exist on type '{ name: string; monthlyAmount: string; currentBalance: string; category: string; color: string; frequency: string; description: string; priority: string; autoAllocate: boolean; icon: string; envelopeType: "variable"; monthlyBudget: string; biweeklyAllocation: string; targetAmount: string; }'.
 src/components/budgeting/EditEnvelopeModal.tsx(89,13): error TS2367: This comparison appears to be unintentional because the types '"variable"' and '"savings"' have no overlap.
-src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/budgeting/envelope/EnvelopeBasicFields.tsx(27,20): error TS2339: Property 'name' does not exist on type '{}'.
 src/components/budgeting/envelope/EnvelopeBasicFields.tsx(32,17): error TS2339: Property 'name' does not exist on type '{}'.
 src/components/budgeting/envelope/EnvelopeBasicFields.tsx(37,21): error TS2339: Property 'name' does not exist on type '{}'.
@@ -848,21 +663,12 @@ src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(124,25): error TS2339
 src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(130,10): error TS2741: Property 'hint' is missing in type '{ label: string; icon: string; value: any; onChange: (e: any) => any; error: any; canEdit: boolean; required: true; }' but required in type '{ label: any; value: any; onChange: any; error: any; canEdit: any; hint: any; icon: any; required: any; }'.
 src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(135,25): error TS2339: Property 'targetAmount' does not exist on type '{}'.
 src/components/budgeting/envelope/EnvelopeBudgetFields.tsx(145,25): error TS2339: Property 'frequency' does not exist on type '{}'.
-src/components/budgeting/envelope/EnvelopeHeader.tsx(85,15): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; className: string; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
-  Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(48,15): error TS2322: Type '{ objectType: string; objectId: any; objectName: any; showModal: boolean; }' is not assignable to type 'IntrinsicAttributes & { objectId: any; objectType: any; objectName: any; onClose: any; }'.
   Property 'showModal' does not exist on type 'IntrinsicAttributes & { objectId: any; objectType: any; objectName: any; onClose: any; }'.
-src/components/budgeting/envelope/EnvelopeItem.tsx(180,37): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/budgeting/envelope/EnvelopeItem.tsx(180,59): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/budgeting/envelope/EnvelopeItem.tsx(199,55): error TS2339: Property 'currentBalance' does not exist on type '{ priority: { priority: number; priorityLevel: string; reason: string; }; status: any; displayText: { primaryStatus: string; secondaryStatus: string; fundingProgress: string; }; isValidBillEnvelope: boolean; ... 6 more ...; linkedBills: any[]; } | { ...; }'.
-src/components/budgeting/envelope/EnvelopeItem.tsx(199,71): error TS2339: Property 'targetMonthlyAmount' does not exist on type '{ priority: { priority: number; priorityLevel: string; reason: string; }; status: any; displayText: { primaryStatus: string; secondaryStatus: string; fundingProgress: string; }; isValidBillEnvelope: boolean; ... 6 more ...; linkedBills: any[]; } | { ...; }'.
-src/components/budgeting/envelope/EnvelopeItem.tsx(265,25): error TS2339: Property 'nextBill' does not exist on type '{ priority: { priority: number; priorityLevel: string; reason: string; }; status: any; displayText: { primaryStatus: string; secondaryStatus: string; fundingProgress: string; }; isValidBillEnvelope: boolean; ... 6 more ...; linkedBills: any[]; } | { ...; }'.
 src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(38,63): error TS2339: Property 'balanceLabel' does not exist on type '{ primaryStatus: string; secondaryStatus: string; fundingProgress: string; } | { primaryStatus: string; secondaryStatus: string; fundingProgress: string; }'.
   Property 'balanceLabel' does not exist on type '{ primaryStatus: string; secondaryStatus: string; fundingProgress: string; }'.
-src/components/budgeting/envelope/EnvelopeSummary.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/budgeting/envelope/EnvelopeSummary.tsx(7,45): error TS2322: Type '{ totals: any; unassignedCash: number; }' is not assignable to type 'IntrinsicAttributes & { totals?: {}; _unassignedCash?: number; }'.
+src/components/budgeting/envelope/EnvelopeSummary.tsx(6,45): error TS2322: Type '{ totals: any; unassignedCash: number; }' is not assignable to type 'IntrinsicAttributes & { totals?: {}; _unassignedCash?: number; }'.
   Property 'unassignedCash' does not exist on type 'IntrinsicAttributes & { totals?: {}; _unassignedCash?: number; }'. Did you mean '_unassignedCash'?
-src/components/budgeting/EnvelopeGrid.tsx(2,8): error TS6133: 'React' is declared but its value is never read.
 src/components/budgeting/EnvelopeGrid.tsx(35,13): error TS2739: Type '{ type: string; onAction: () => any; }' is missing the following properties from type '{ type: any; onAction: any; customMessage: any; customActions: any; }': customMessage, customActions
 src/components/budgeting/EnvelopeGrid.tsx(74,9): error TS2322: Type '{ isOpen: any; onClose: () => any; onCreateEnvelope: any; existingEnvelopes: any; currentUser: any; unassignedCash: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen?: boolean; onClose: any; onCreateEnvelope: any; onCreateBill: any; existingEnvelopes?: any[]; allBills?: any[]; currentUser?: { userName: string; userColor: string; }; _forceMobileMode?: boolean; }'.
   Property 'unassignedCash' does not exist on type 'IntrinsicAttributes & { isOpen?: boolean; onClose: any; onCreateEnvelope: any; onCreateBill: any; existingEnvelopes?: any[]; allBills?: any[]; currentUser?: { userName: string; userColor: string; }; _forceMobileMode?: boolean; }'.
@@ -872,70 +678,47 @@ src/components/budgeting/EnvelopeGrid.tsx(154,7): error TS2322: Type '{ isPullin
   Property 'isPulling' does not exist on type 'IntrinsicAttributes & { isVisible: any; isRefreshing: any; pullProgress: any; pullRotation: any; isReady: any; }'.
 src/components/budgeting/EnvelopeGrid.tsx(192,6): error TS2740: Type '{}' is missing the following properties from type '{ showCreateModal: any; setShowCreateModal: any; handleCreateEnvelope: any; envelopes: any; budget: any; unassignedCash: any; editingEnvelope: any; setEditingEnvelope: any; handleUpdateEnvelope: any; ... 7 more ...; handleQuickFundConfirm: any; }': showCreateModal, setShowCreateModal, handleCreateEnvelope, envelopes, and 13 more.
 src/components/budgeting/EnvelopeGrid.tsx(298,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/budgeting/EnvelopeSummaryCards.tsx(9,46): error TS6133: '_unassignedCash' is declared but its value is never read.
-src/components/budgeting/EnvelopeSummaryCards.tsx(11,37): error TS2339: Property 'totalBalance' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(11,66): error TS2339: Property 'totalUpcoming' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(18,26): error TS2339: Property 'totalAllocated' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(20,26): error TS2339: Property 'envelopeCount' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(26,26): error TS2339: Property 'totalBalance' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(35,26): error TS2339: Property 'totalSpent' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(43,26): error TS2339: Property 'totalBiweeklyNeed' does not exist on type '{}'.
-src/components/budgeting/EnvelopeSummaryCards.tsx(45,26): error TS2339: Property 'billsDueCount' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(8,46): error TS6133: '_unassignedCash' is declared but its value is never read.
+src/components/budgeting/EnvelopeSummaryCards.tsx(10,37): error TS2339: Property 'totalBalance' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(10,66): error TS2339: Property 'totalUpcoming' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(17,26): error TS2339: Property 'totalAllocated' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(19,26): error TS2339: Property 'envelopeCount' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(25,26): error TS2339: Property 'totalBalance' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(34,26): error TS2339: Property 'totalSpent' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(42,26): error TS2339: Property 'totalBiweeklyNeed' does not exist on type '{}'.
+src/components/budgeting/EnvelopeSummaryCards.tsx(44,26): error TS2339: Property 'billsDueCount' does not exist on type '{}'.
 src/components/budgeting/EnvelopeSystem.tsx(5,10): error TS2614: Module '"../../hooks/bills/useBills"' has no exported member 'useBills'. Did you mean to use 'import useBills from "../../hooks/bills/useBills"' instead?
 src/components/budgeting/EnvelopeSystem.tsx(7,10): error TS2305: Module '"../../constants/categories"' has no exported member 'FREQUENCY_MULTIPLIERS'.
 src/components/budgeting/EnvelopeSystem.tsx(7,33): error TS2305: Module '"../../constants/categories"' has no exported member 'BIWEEKLY_MULTIPLIER'.
-src/components/budgeting/EnvelopeSystem.tsx(148,30): error TS2345: Argument of type '{ id: any; updates: any; }' is not assignable to parameter of type 'void'.
 src/components/budgeting/paycheck/PaycheckHistory.tsx(92,47): error TS2554: Expected 0 arguments, but got 1.
 src/components/budgeting/PaycheckProcessor.tsx(63,9): error TS2322: Type '{ paycheckHistory: any[]; onDeletePaycheck: (paycheck: any) => Promise<void>; deletingPaycheckId: any; }' is not assignable to type 'IntrinsicAttributes & { paycheckHistory?: any[]; paycheckStats: any; onSelectPaycheck?: () => void; }'.
   Property 'onDeletePaycheck' does not exist on type 'IntrinsicAttributes & { paycheckHistory?: any[]; paycheckStats: any; onSelectPaycheck?: () => void; }'. Did you mean 'onSelectPaycheck'?
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(36,7): error TS2322: Type '"secondary" | "ghost"' is not assignable to type 'ButtonVariant'.
   Type '"ghost"' is not assignable to type 'ButtonVariant'.
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(59,7): error TS2322: Type '"ghost"' is not assignable to type 'ButtonVariant'.
-src/components/charts/CategoryBarChart.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/charts/CategoryBarChart.tsx(93,12): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(props: Props): XAxis', gave the following error.
-    Type '{ fontSize: number; tickFormatter: (value: any) => string; type: string; stroke: any; dataKey?: undefined; } | { fontSize: number; tickFormatter: (value: any) => string; dataKey: string; stroke: any; type?: undefined; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<XAxis> & Pick<Readonly<Props>, "string" | "mode" | ... 283 more ... | "AxisComp"> & InexactPartial<...> & InexactPartial<...>'.
-      Type '{ fontSize: number; tickFormatter: (value: any) => string; type: string; stroke: any; dataKey?: undefined; }' is not assignable to type 'InexactPartial<Pick<Readonly<Props>, "type" | "orientation" | "hide" | "height" | "scale" | "xAxisId" | "mirror" | "padding" | "reversed" | "tickCount" | "allowDataOverflow" | "allowDuplicatedCategory" | "allowDecimals">>'.
-        Types of property 'type' are incompatible.
-          Type 'string' is not assignable to type '"number" | "category"'.
-  Overload 2 of 2, '(props: Props, context: any): XAxis', gave the following error.
-    Type '{ fontSize: number; tickFormatter: (value: any) => string; type: string; stroke: any; dataKey?: undefined; } | { fontSize: number; tickFormatter: (value: any) => string; dataKey: string; stroke: any; type?: undefined; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<XAxis> & Pick<Readonly<Props>, "string" | "mode" | ... 283 more ... | "AxisComp"> & InexactPartial<...> & InexactPartial<...>'.
-      Type '{ fontSize: number; tickFormatter: (value: any) => string; type: string; stroke: any; dataKey?: undefined; }' is not assignable to type 'InexactPartial<Pick<Readonly<Props>, "type" | "orientation" | "hide" | "height" | "scale" | "xAxisId" | "mirror" | "padding" | "reversed" | "tickCount" | "allowDataOverflow" | "allowDuplicatedCategory" | "allowDecimals">>'.
-        Types of property 'type' are incompatible.
-          Type 'string' is not assignable to type '"number" | "category"'.
-src/components/charts/CategoryBarChart.tsx(98,12): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(props: Props): YAxis', gave the following error.
-    Type '{ fontSize: number; tickFormatter: (value: any) => string; dataKey: string; type: string; stroke: any; width: number; } | { fontSize: number; tickFormatter: (value: any) => string; stroke: any; dataKey?: undefined; type?: undefined; width?: undefined; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<YAxis> & Pick<Readonly<Props>, never> & InexactPartial<...> & InexactPartial<...>'.
-      Type '{ fontSize: number; tickFormatter: (value: any) => string; dataKey: string; type: string; stroke: any; width: number; }' is not assignable to type 'InexactPartial<Pick<Readonly<Props>, "string" | "mode" | "id" | "version" | "r" | "x" | "fill" | "filter" | "values" | "style" | "alphabetic" | "hanging" | "ideographic" | "in" | ... 253 more ... | keyof YAxisProps>>'.
-        Types of property 'type' are incompatible.
-          Type 'string' is not assignable to type '"number" | "category"'.
-  Overload 2 of 2, '(props: Props, context: any): YAxis', gave the following error.
-    Type '{ fontSize: number; tickFormatter: (value: any) => string; dataKey: string; type: string; stroke: any; width: number; } | { fontSize: number; tickFormatter: (value: any) => string; stroke: any; dataKey?: undefined; type?: undefined; width?: undefined; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<YAxis> & Pick<Readonly<Props>, never> & InexactPartial<...> & InexactPartial<...>'.
-      Type '{ fontSize: number; tickFormatter: (value: any) => string; dataKey: string; type: string; stroke: any; width: number; }' is not assignable to type 'InexactPartial<Pick<Readonly<Props>, "string" | "mode" | "id" | "version" | "r" | "x" | "fill" | "filter" | "values" | "style" | "alphabetic" | "hanging" | "ideographic" | "in" | ... 253 more ... | keyof YAxisProps>>'.
-        Types of property 'type' are incompatible.
-          Type 'string' is not assignable to type '"number" | "category"'.
-src/components/charts/ComposedFinancialChart.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/charts/ComposedFinancialChart.tsx(183,11): error TS2739: Type '{ title: string; data: any; series: ({ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; })[]; }' is missing the following properties from type '{ [x: string]: any; title?: string; subtitle: any; data?: any[]; series?: any[]; height?: number; className?: string; loading?: boolean; error?: any; emptyMessage?: string; actions: any; showGrid?: boolean; showLegend?: boolean; formatTooltip: any; xAxisKey?: string; }': subtitle, actions, formatTooltip
-src/components/charts/ComposedFinancialChart.tsx(209,6): error TS2739: Type '{ title: string; data: any; series: { type: string; dataKey: string; name: string; fill: string; }[]; xAxisKey: string; }' is missing the following properties from type '{ [x: string]: any; title?: string; subtitle: any; data?: any[]; series?: any[]; height?: number; className?: string; loading?: boolean; error?: any; emptyMessage?: string; actions: any; showGrid?: boolean; showLegend?: boolean; formatTooltip: any; xAxisKey?: string; }': subtitle, actions, formatTooltip
-src/components/charts/DistributionPieChart.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/charts/DistributionPieChart.tsx(142,8): error TS2739: Type '{ title: any; subtitle: any; data: any[]; dataKey: string; nameKey: string; className: string; showLegend: false; outerRadius: number; }' is missing the following properties from type '{ [x: string]: any; title?: string; subtitle: any; data?: any[]; dataKey?: string; nameKey?: string; height?: number; className?: string; loading?: boolean; error?: any; emptyMessage?: string; actions: any; showLegend?: boolean; ... 5 more ...; maxItems?: number; }': actions, formatTooltip, labelFormatter
-src/components/charts/TrendLineChart.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/charts/CategoryBarChart.tsx(92,12): error TS2322: Type '{ fontSize: number; tickFormatter: (value: any) => string; type: string; stroke: any; dataKey?: undefined; } | { fontSize: number; tickFormatter: (value: any) => string; dataKey: string; stroke: any; type?: undefined; }' is not assignable to type 'IntrinsicAttributes & Omit<PresentationAttributesAdaptChildEvent<any, SVGElement>, "ref" | "scale"> & XAxisProps'.
+  Type '{ fontSize: number; tickFormatter: (value: any) => string; type: string; stroke: any; dataKey?: undefined; }' is not assignable to type 'XAxisProps'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type 'AxisDomainType'.
+src/components/charts/CategoryBarChart.tsx(97,12): error TS2322: Type '{ fontSize: number; tickFormatter: (value: any) => string; dataKey: string; type: string; stroke: any; width: number; } | { fontSize: number; tickFormatter: (value: any) => string; stroke: any; dataKey?: undefined; type?: undefined; width?: undefined; }' is not assignable to type 'IntrinsicAttributes & Omit<PresentationAttributesAdaptChildEvent<any, SVGElement>, "ref" | "scale"> & YAxisProps'.
+  Type '{ fontSize: number; tickFormatter: (value: any) => string; dataKey: string; type: string; stroke: any; width: number; }' is not assignable to type 'YAxisProps'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type 'AxisDomainType'.
+src/components/charts/ComposedFinancialChart.tsx(182,11): error TS2739: Type '{ title: string; data: any; series: ({ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; })[]; }' is missing the following properties from type '{ [x: string]: any; title?: string; subtitle: any; data?: any[]; series?: any[]; height?: number; className?: string; loading?: boolean; error?: any; emptyMessage?: string; actions: any; showGrid?: boolean; showLegend?: boolean; formatTooltip: any; xAxisKey?: string; }': subtitle, actions, formatTooltip
+src/components/charts/ComposedFinancialChart.tsx(208,6): error TS2739: Type '{ title: string; data: any; series: { type: string; dataKey: string; name: string; fill: string; }[]; xAxisKey: string; }' is missing the following properties from type '{ [x: string]: any; title?: string; subtitle: any; data?: any[]; series?: any[]; height?: number; className?: string; loading?: boolean; error?: any; emptyMessage?: string; actions: any; showGrid?: boolean; showLegend?: boolean; formatTooltip: any; xAxisKey?: string; }': subtitle, actions, formatTooltip
+src/components/charts/DistributionPieChart.tsx(141,8): error TS2739: Type '{ title: any; subtitle: any; data: any[]; dataKey: string; nameKey: string; className: string; showLegend: false; outerRadius: number; }' is missing the following properties from type '{ [x: string]: any; title?: string; subtitle: any; data?: any[]; dataKey?: string; nameKey?: string; height?: number; className?: string; loading?: boolean; error?: any; emptyMessage?: string; actions: any; showLegend?: boolean; ... 5 more ...; maxItems?: number; }': actions, formatTooltip, labelFormatter
 src/components/dashboard/AccountBalanceOverview.tsx(58,13): error TS2322: Type '{ value: any; onChange: any; title: string; subtitle: string; className: string; currencyClassName: string; subtitleClassName: string; }' is not assignable to type 'IntrinsicAttributes & { value: any; onChange: any; title?: string; subtitle?: string; className?: string; colorClass?: string; bgClass?: string; hoverClass?: string; isManuallySet?: boolean; confirmThreshold?: number; formatCurrency?: boolean; }'.
   Property 'currencyClassName' does not exist on type 'IntrinsicAttributes & { value: any; onChange: any; title?: string; subtitle?: string; className?: string; colorClass?: string; bgClass?: string; hoverClass?: string; isManuallySet?: boolean; confirmThreshold?: number; formatCurrency?: boolean; }'.
 src/components/debt/DebtDashboard.tsx(116,18): error TS2739: Type '{ filterOptions: { type: string; status: string; sortBy: string; sortOrder: string; }; setFilterOptions: Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>; }' is missing the following properties from type '{ filterOptions: any; setFilterOptions: any; debtTypes: any; debtsByType: any; }': debtTypes, debtsByType
 src/components/debt/DebtDashboard.tsx(187,10): error TS2741: Property '_onLinkToBill' is missing in type '{ debt: any; isOpen: boolean; onClose: () => void; onDelete: (debtId: any) => Promise<void>; onRecordPayment: (debtId: any, paymentData: any) => Promise<void>; onEdit: (debt: any) => void; }' but required in type '{ debt: any; isOpen: any; onClose: any; onDelete: any; onRecordPayment: any; _onLinkToBill: any; onEdit: any; }'.
-src/components/debt/modals/AddDebtModal.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/debt/modals/AddDebtModal.tsx(63,11): error TS2322: Type '{ formData: { name: string; creditor: string; type: "personal"; currentBalance: string; originalBalance: string; interestRate: string; minimumPayment: string; paymentFrequency: "monthly"; paymentDueDate: string; ... 5 more ...; newEnvelopeName: string; }; ... 12 more ...; debtMetrics: DebtMetrics; }' is not assignable to type 'IntrinsicAttributes & { formData: any; setFormData: any; errors: any; canEdit: any; isEditMode: any; isSubmitting: any; handleFormSubmit: any; onClose: any; bills: any; billsLoading: any; }'.
+src/components/debt/modals/AddDebtModal.tsx(62,11): error TS2322: Type '{ formData: { name: string; creditor: string; type: "personal"; currentBalance: string; originalBalance: string; interestRate: string; minimumPayment: string; paymentFrequency: "monthly"; paymentDueDate: string; ... 5 more ...; newEnvelopeName: string; }; ... 12 more ...; debtMetrics: DebtMetrics; }' is not assignable to type 'IntrinsicAttributes & { formData: any; setFormData: any; errors: any; canEdit: any; isEditMode: any; isSubmitting: any; handleFormSubmit: any; onClose: any; bills: any; billsLoading: any; }'.
   Property 'envelopes' does not exist on type 'IntrinsicAttributes & { formData: any; setFormData: any; errors: any; canEdit: any; isEditMode: any; isSubmitting: any; handleFormSubmit: any; onClose: any; bills: any; billsLoading: any; }'.
 src/components/debt/modals/DebtDetailModal.tsx(19,3): error TS6133: '_onLinkToBill' is declared but its value is never read.
 src/components/debt/modals/DebtDetailModal.tsx(36,32): error TS2554: Expected 1 arguments, but got 6.
-src/components/debt/modals/DebtFormFields.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/debt/modals/DebtFormFields.tsx(77,25): error TS2339: Property 'label' does not exist on type 'DebtTypeConfig'.
-src/components/debt/modals/DebtFormFields.tsx(218,34): error TS2339: Property 'map' does not exist on type '{ readonly WEEKLY: "weekly"; readonly BIWEEKLY: "biweekly"; readonly MONTHLY: "monthly"; readonly QUARTERLY: "quarterly"; readonly ANNUALLY: "annually"; }'.
-src/components/debt/modals/DebtFormFields.tsx(239,13): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+src/components/debt/modals/DebtFormFields.tsx(76,25): error TS2339: Property 'label' does not exist on type 'DebtTypeConfig'.
+src/components/debt/modals/DebtFormFields.tsx(217,34): error TS2339: Property 'map' does not exist on type '{ readonly WEEKLY: "weekly"; readonly BIWEEKLY: "biweekly"; readonly MONTHLY: "monthly"; readonly QUARTERLY: "quarterly"; readonly ANNUALLY: "annually"; }'.
+src/components/debt/modals/DebtFormFields.tsx(238,13): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
-src/components/debt/ui/DebtCardProgressBar.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/debt/ui/DebtFilters.tsx(70,51): error TS2538: Type 'unknown' cannot be used as an index type.
 src/components/debt/ui/DebtFilters.tsx(71,45): error TS2538: Type 'unknown' cannot be used as an index type.
 src/components/debt/ui/DebtFilters.tsx(73,29): error TS2322: Type 'unknown' is not assignable to type 'Key'.
@@ -951,16 +734,12 @@ src/components/debt/ui/DebtList.tsx(119,40): error TS2339: Property 'type' does 
 src/components/debt/ui/DebtList.tsx(126,40): error TS2339: Property 'value' does not exist on type '{}'.
 src/components/debt/ui/DebtList.tsx(137,28): error TS2339: Property 'hasRelationships' does not exist on type 'any[]'.
 src/components/debt/ui/DebtList.tsx(139,32): error TS2339: Property 'items' does not exist on type 'any[]'.
-src/components/debt/ui/DebtProgressBar.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/debt/ui/DebtSummaryCards.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/debt/ui/DebtSummaryWidget.tsx(12,22): error TS2339: Property '_debts' does not exist on type '{ debts: DebtAccount[]; debtStats: { totalDebt: number; totalMonthlyPayments: number; averageInterestRate: number; debtsByType: {}; totalInterestPaid: number; activeDebtCount: number; totalDebtCount: number; dueSoonAmount: number; dueSoonCount: number; }; ... 12 more ...; COMPOUND_FREQUENCIES: { ...; }; }'.
 src/components/debt/ui/DebtSummaryWidget.tsx(12,22): error TS6133: '_debts' is declared but its value is never read.
-src/components/debt/ui/QuickPaymentForm.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/dev/DevAuthBypass.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/dev/DevAuthBypass.tsx(63,12): error TS2339: Property 'setAuthState' does not exist on type '{ shouldShowAuthGateway: () => boolean; _internal: { authFlow: { isUnlocked: boolean; encryptionKey: CryptoKey; currentUser: UserData; budgetId: string; salt: Uint8Array<ArrayBufferLike>; handleSetup: (userDataOrPassword: any) => Promise<...>; handleLogout: () => void; handleChangePassword: (oldPass: any, newPass: a...'.
-src/components/feedback/BugReportButton.tsx(75,18): error TS2339: Property 'issueUrl' does not exist on type 'true'.
-src/components/feedback/BugReportButton.tsx(79,76): error TS2339: Property 'issueNumber' does not exist on type 'true'.
-src/components/feedback/BugReportButton.tsx(82,25): error TS2339: Property 'localFallback' does not exist on type 'true'.
+src/components/dev/DevAuthBypass.tsx(19,3): error TS2304: Cannot find name 'useEffect'.
+src/components/dev/DevAuthBypass.tsx(62,12): error TS2339: Property 'setAuthState' does not exist on type '{ shouldShowAuthGateway: () => boolean; _internal: { authFlow: { isUnlocked: boolean; encryptionKey: CryptoKey; currentUser: UserData; budgetId: string; salt: Uint8Array<ArrayBufferLike>; handleSetup: (userDataOrPassword: any) => Promise<...>; handleLogout: () => void; handleChangePassword: (oldPass: any, newPass: a...'.
+src/components/feedback/hooks/useBugReportState.ts(102,7): error TS2352: Conversion of type '{ screenshot: string; previewScreenshot: string; isSubmitting: boolean; submitError: string; submitResult: SubmitResult; diagnostics: unknown; openModal: () => Promise<void>; ... 29 more ...; isModalOpen: boolean; }' to type 'BugReportHookReturn' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'setScreenshot' is missing in type '{ screenshot: string; previewScreenshot: string; isSubmitting: boolean; submitError: string; submitResult: SubmitResult; diagnostics: unknown; openModal: () => Promise<void>; ... 29 more ...; isModalOpen: boolean; }' but required in type 'BugReportHookReturn'.
 src/components/history/BudgetHistoryViewer.tsx(72,43): error TS2322: Type 'string | Error' is not assignable to type 'ReactNode'.
   Type 'Error' is not assignable to type 'ReactNode'.
 src/components/history/IntegrityStatusIndicator.tsx(177,73): error TS2339: Property 'totalCommits' does not exist on type '{ valid: boolean; message: string; }'.
@@ -971,9 +750,6 @@ src/components/history/IntegrityStatusIndicator.tsx(189,49): error TS2339: Prope
 src/components/history/ObjectHistoryViewer.tsx(15,11): error TS2339: Property 'data' does not exist on type '{ commits: any; isLoading: boolean; isError: boolean; error: Error; createCommit: UseMutateFunction<any, Error, void, unknown>; createCommitAsync: UseMutateAsyncFunction<any, Error, void, unknown>; refetch: (options?: RefetchOptions) => Promise<...>; }'.
 src/components/history/ObjectHistoryViewer.tsx(51,9): error TS6133: '_getChangeIcon' is declared but its value is never read.
 src/components/history/ObjectHistoryViewer.tsx(83,9): error TS6133: '_formatChangeDescription' is declared but its value is never read.
-src/components/layout/AppRoutes.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/layout/AppWrapper.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/layout/MainLayout.tsx(2,8): error TS6133: 'React' is declared but its value is never read.
 src/components/layout/MainLayout.tsx(64,7): error TS2339: Property 'isLocalOnlyMode' does not exist on type '{ isUnlocked: boolean; currentUser: UserData; budgetId: string; encryptionKey: CryptoKey; salt: Uint8Array<ArrayBufferLike>; lastActivity: number; ... 11 more ...; handleUpdateProfile: (updatedProfile: any) => Promise<...>; } | {}'.
 src/components/layout/MainLayout.tsx(65,7): error TS2339: Property '_localOnlyUser' does not exist on type '{ isUnlocked: boolean; currentUser: UserData; budgetId: string; encryptionKey: CryptoKey; salt: Uint8Array<ArrayBufferLike>; lastActivity: number; ... 11 more ...; handleUpdateProfile: (updatedProfile: any) => Promise<...>; } | {}'.
 src/components/layout/MainLayout.tsx(65,7): error TS6133: '_localOnlyUser' is declared but its value is never read.
@@ -991,59 +767,34 @@ src/components/layout/MainLayout.tsx(207,3): error TS6133: '_openBugReport' is d
 src/components/layout/MainLayout.tsx(215,59): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
 src/components/layout/MainLayout.tsx(227,9): error TS6133: '_activeView' is declared but its value is never read.
 src/components/layout/MainLayout.tsx(282,5): error TS2554: Expected 1 arguments, but got 4.
-src/components/layout/MainLayout.tsx(306,25): error TS2322: Type '{ children: Element; setActiveView: (view: any) => void; }' is not assignable to type 'IntrinsicAttributes & { children: any; }'.
-  Property 'setActiveView' does not exist on type 'IntrinsicAttributes & { children: any; }'.
+src/components/layout/MainLayout.tsx(306,25): error TS2322: Type '{ children: Element; setActiveView: (view: any) => void; }' is not assignable to type 'IntrinsicAttributes & { children: ReactNode; }'.
+  Property 'setActiveView' does not exist on type 'IntrinsicAttributes & { children: ReactNode; }'.
 src/components/layout/MainLayout.tsx(311,15): error TS2322: Type '{ currentUser: any; onUserChange: any; onUpdateProfile: any; isLocalOnlyMode: boolean; onShowSettings: () => void; onShowDataSettings: () => void; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'currentUser' does not exist on type 'IntrinsicAttributes & object'.
 src/components/layout/MainLayout.tsx(396,13): error TS2322: Type '{ isOpen: true; onClose: () => void; initialSection: string; onExport: any; onImport: (event: any) => Promise<void>; onLogout: any; onResetEncryption: () => void; onSync: () => Promise<void>; ... 5 more ...; securityManager: any; }' is not assignable to type 'IntrinsicAttributes & { isOpen: any; onClose: any; onExport: any; onImport: any; onLogout: any; onResetEncryption: any; onSync: any; onChangePassword: any; currentUser: any; isLocalOnlyMode?: boolean; securityManager: any; initialSection?: string; }'.
   Property 'onUserChange' does not exist on type 'IntrinsicAttributes & { isOpen: any; onClose: any; onExport: any; onImport: any; onLogout: any; onResetEncryption: any; onSync: any; onChangePassword: any; currentUser: any; isLocalOnlyMode?: boolean; securityManager: any; initialSection?: string; }'.
-src/components/layout/NavigationTabs.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/layout/NavigationTabs.tsx(132,13): error TS2322: Type '{ key: string; active: boolean; to: string; icon: any; label: string; viewKey: string; }' is not assignable to type 'IntrinsicAttributes & object'.
-  Property 'active' does not exist on type 'IntrinsicAttributes & object'.
-src/components/layout/NavigationTabs.tsx(154,27): error TS2339: Property 'active' does not exist on type '{}'.
-src/components/layout/NavigationTabs.tsx(154,35): error TS2339: Property 'to' does not exist on type '{}'.
-src/components/layout/NavigationTabs.tsx(154,39): error TS2339: Property 'icon' does not exist on type '{}'.
-src/components/layout/NavigationTabs.tsx(154,52): error TS2339: Property 'label' does not exist on type '{}'.
-src/components/layout/NavigationTabs.tsx(154,59): error TS2339: Property 'viewKey' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/layout/SummaryCards.tsx(89,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/components/layout/SummaryCards.tsx(139,13): error TS2322: Type '{ key: string; icon: any; label: string; value: any; color: string; onClick: any; clickable: boolean; isNegative: boolean; subtitle: string; dataTour: string; }' is not assignable to type 'IntrinsicAttributes & object'.
-  Property 'icon' does not exist on type 'IntrinsicAttributes & object'.
-src/components/layout/SummaryCards.tsx(160,6): error TS2339: Property 'icon' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,19): error TS2339: Property 'label' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,26): error TS2339: Property 'value' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,33): error TS2339: Property 'color' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,40): error TS2339: Property 'onClick' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,49): error TS2339: Property 'clickable' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,60): error TS2339: Property 'isNegative' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,72): error TS2339: Property 'subtitle' does not exist on type '{}'.
-src/components/layout/SummaryCards.tsx(160,82): error TS2339: Property 'dataTour' does not exist on type '{}'.
-src/components/layout/ViewRenderer.tsx(49,5): error TS6133: '_envelopes' is declared but its value is never read.
-src/components/layout/ViewRenderer.tsx(50,5): error TS6133: '_bills' is declared but its value is never read.
-src/components/layout/ViewRenderer.tsx(53,5): error TS6133: '_transactions' is declared but its value is never read.
-src/components/layout/ViewRenderer.tsx(78,28): error TS2345: Argument of type '{ id: any; updates: any; }' is not assignable to parameter of type 'void'.
-src/components/layout/ViewRenderer.tsx(145,11): error TS2322: Type '{ transactions: any; envelopes: Envelope[]; onCreateEnvelope: any; onUpdateEnvelope: any; dateRange: string; minAmount: number; minTransactions: number; }' is not assignable to type 'IntrinsicAttributes & { transactions?: any[]; envelopes?: any[]; onCreateEnvelope: any; onUpdateEnvelope: any; onDismissSuggestion: any; dateRange?: string; showDismissed?: boolean; className?: string; }'.
+src/components/layout/ViewRenderer.tsx(50,5): error TS6133: '_envelopes' is declared but its value is never read.
+src/components/layout/ViewRenderer.tsx(51,5): error TS6133: '_bills' is declared but its value is never read.
+src/components/layout/ViewRenderer.tsx(54,5): error TS6133: '_transactions' is declared but its value is never read.
+src/components/layout/ViewRenderer.tsx(79,28): error TS2345: Argument of type '{ id: any; updates: any; }' is not assignable to parameter of type 'void'.
+src/components/layout/ViewRenderer.tsx(146,11): error TS2322: Type '{ transactions: any; envelopes: Envelope[]; onCreateEnvelope: any; onUpdateEnvelope: any; dateRange: string; minAmount: number; minTransactions: number; }' is not assignable to type 'IntrinsicAttributes & { transactions?: any[]; envelopes?: any[]; onCreateEnvelope: any; onUpdateEnvelope: any; onDismissSuggestion: any; dateRange?: string; showDismissed?: boolean; className?: string; }'.
   Property 'minAmount' does not exist on type 'IntrinsicAttributes & { transactions?: any[]; envelopes?: any[]; onCreateEnvelope: any; onUpdateEnvelope: any; onDismissSuggestion: any; dateRange?: string; showDismissed?: boolean; className?: string; }'.
-src/components/layout/ViewRenderer.tsx(148,10): error TS2741: Property 'unassignedCash' is missing in type '{ "data-tour": string; }' but required in type '{ envelopes?: any[]; transactions?: any[]; unassignedCash: any; className?: string; }'.
-src/components/layout/ViewRenderer.tsx(174,9): error TS2322: Type '{ biweeklyAllocation: any; envelopes: Envelope[]; paycheckHistory: PaycheckHistory[]; onProcessPaycheck: UseMutateFunction<{ id: string; date: Date; amount: any; mode: any; unassignedCashBefore: any; ... 4 more ...; notes: any; }, Error, void, unknown>; onDeletePaycheck: (paycheckId: any) => Promise<...>; currentUse...' is not assignable to type 'IntrinsicAttributes & { envelopes?: any[]; paycheckHistory?: any[]; onProcessPaycheck: any; onDeletePaycheck: any; currentUser: any; }'.
+src/components/layout/ViewRenderer.tsx(149,10): error TS2741: Property 'unassignedCash' is missing in type '{ "data-tour": string; }' but required in type '{ envelopes?: any[]; transactions?: any[]; unassignedCash: any; className?: string; }'.
+src/components/layout/ViewRenderer.tsx(175,9): error TS2322: Type '{ biweeklyAllocation: any; envelopes: Envelope[]; paycheckHistory: PaycheckHistory[]; onProcessPaycheck: UseMutateFunction<{ id: string; date: Date; amount: any; mode: any; unassignedCashBefore: any; ... 4 more ...; notes: any; }, Error, void, unknown>; onDeletePaycheck: (paycheckId: any) => Promise<...>; currentUse...' is not assignable to type 'IntrinsicAttributes & { envelopes?: any[]; paycheckHistory?: any[]; onProcessPaycheck: any; onDeletePaycheck: any; currentUser: any; }'.
   Property 'biweeklyAllocation' does not exist on type 'IntrinsicAttributes & { envelopes?: any[]; paycheckHistory?: any[]; onProcessPaycheck: any; onDeletePaycheck: any; currentUser: any; }'.
-src/components/layout/ViewRenderer.tsx(186,9): error TS2322: Type '{ transactions: any; envelopes: Envelope[]; onPayBill: (updatedBill: any) => void; onUpdateBill: (updatedBill: any) => void; onCreateRecurringBill: (newBill: any) => void; onSearchNewBills: () => Promise<...>; onError: (error: any) => void; }' is not assignable to type 'IntrinsicAttributes & { transactions?: any[]; envelopes?: any[]; onUpdateBill: any; onCreateRecurringBill: any; onSearchNewBills: any; onError: any; className?: string; }'.
+src/components/layout/ViewRenderer.tsx(187,9): error TS2322: Type '{ transactions: any; envelopes: Envelope[]; onPayBill: (updatedBill: any) => void; onUpdateBill: (updatedBill: any) => void; onCreateRecurringBill: (newBill: any) => void; onSearchNewBills: () => Promise<...>; onError: (error: any) => void; }' is not assignable to type 'IntrinsicAttributes & { transactions?: any[]; envelopes?: any[]; onUpdateBill: any; onCreateRecurringBill: any; onSearchNewBills: any; onError: any; className?: string; }'.
   Property 'onPayBill' does not exist on type 'IntrinsicAttributes & { transactions?: any[]; envelopes?: any[]; onUpdateBill: any; onCreateRecurringBill: any; onSearchNewBills: any; onError: any; className?: string; }'.
-src/components/layout/ViewRenderer.tsx(195,30): error TS2345: Argument of type '{ id: any; updates: any; }' is not assignable to parameter of type 'void'.
-src/components/layout/ViewRenderer.tsx(222,25): error TS2554: Expected 3 arguments, but got 2.
-src/components/layout/ViewRenderer.tsx(228,25): error TS2554: Expected 3 arguments, but got 2.
-src/components/layout/ViewRenderer.tsx(281,43): error TS2322: Type '{ message: string; }' is not assignable to type 'IntrinsicAttributes & object'.
+src/components/layout/ViewRenderer.tsx(196,30): error TS2345: Argument of type '{ id: any; updates: any; }' is not assignable to parameter of type 'void'.
+src/components/layout/ViewRenderer.tsx(223,25): error TS2554: Expected 3 arguments, but got 2.
+src/components/layout/ViewRenderer.tsx(229,25): error TS2554: Expected 3 arguments, but got 2.
+src/components/layout/ViewRenderer.tsx(282,43): error TS2322: Type '{ message: string; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'message' does not exist on type 'IntrinsicAttributes & object'.
-src/components/mobile/BottomNavigationBar.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/mobile/BottomNavItem.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/mobile/BottomNavItem.tsx(11,20): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/mobile/BottomNavItem.tsx(10,20): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
 src/components/mobile/ResponsiveModal.tsx(81,27): error TS2339: Property 'isOpen' does not exist on type '{}'.
 src/components/mobile/ResponsiveModal.tsx(84,25): error TS2339: Property 'isOpen' does not exist on type '{}'.
 src/components/mobile/ResponsiveModal.tsx(85,26): error TS2339: Property 'onClose' does not exist on type '{}'.
 src/components/mobile/ResponsiveModal.tsx(86,24): error TS2339: Property 'title' does not exist on type '{}'.
 src/components/modals/CorruptionRecoveryModal.tsx(176,6): error TS2741: Property 'onConfirm' is missing in type '{ children: ReactElement<unknown, string | JSXElementConstructor<any>>; isOpen: boolean; onCancel: () => void; }' but required in type '{ isOpen?: boolean; title?: string; message?: string; confirmLabel?: string; cancelLabel?: string; destructive?: boolean; isLoading?: boolean; icon?: any; onConfirm: any; onCancel: any; children: any; }'.
-src/components/modals/PasswordRotationModal.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/modals/QuickFundForm.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/modals/UnassignedCashModal.tsx(15,6): error TS2339: Property 'envelope' does not exist on type '{}'.
 src/components/modals/UnassignedCashModal.tsx(15,16): error TS2339: Property 'distributionAmount' does not exist on type '{}'.
 src/components/modals/UnassignedCashModal.tsx(15,36): error TS2339: Property 'updateDistribution' does not exist on type '{}'.
@@ -1051,58 +802,49 @@ src/components/modals/UnassignedCashModal.tsx(15,56): error TS2339: Property 'is
 src/components/modals/UnassignedCashModal.tsx(15,70): error TS2339: Property 'bills' does not exist on type '{}'.
 src/components/modals/UnassignedCashModal.tsx(65,40): error TS2322: Type '{ envelope: any; bills: any; showDetails: boolean; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'envelope' does not exist on type 'IntrinsicAttributes & object'.
-src/components/modals/UnassignedCashModal.tsx(107,28): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
-src/components/modals/UnassignedCashModal.tsx(108,29): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
-src/components/modals/UnassignedCashModal.tsx(150,36): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
-src/components/modals/UnassignedCashModal.tsx(256,19): error TS2322: Type '{ key: any; envelope: any; distributionAmount: any; updateDistribution: (envelopeId: any, amount: any) => void; isProcessing: boolean; bills: any[]; }' is not assignable to type 'IntrinsicAttributes & object'.
+src/components/modals/UnassignedCashModal.tsx(105,28): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
+src/components/modals/UnassignedCashModal.tsx(106,29): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
+src/components/modals/UnassignedCashModal.tsx(148,36): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/modals/UnassignedCashModal.tsx(254,19): error TS2322: Type '{ key: string; envelope: Envelope; distributionAmount: any; updateDistribution: (envelopeId: any, amount: any) => void; isProcessing: boolean; bills: any[]; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'envelope' does not exist on type 'IntrinsicAttributes & object'.
-src/components/modals/UnassignedCashModal.tsx(312,47): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
-src/components/modals/UnassignedCashModal.tsx(327,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/onboarding/EmptyStateHints.tsx(11,27): error TS2339: Property 'shouldShowHint' does not exist on type 'unknown'.
-src/components/onboarding/EmptyStateHints.tsx(12,29): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
-src/components/onboarding/EmptyStateHints.tsx(13,24): error TS2339: Property 'preferences' does not exist on type 'unknown'.
+src/components/modals/UnassignedCashModal.tsx(310,47): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/modals/UnassignedCashModal.tsx(325,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/onboarding/EmptyStateHints.tsx(13,29): error TS2339: Property 'shouldShowHint' does not exist on type 'unknown'.
+src/components/onboarding/EmptyStateHints.tsx(14,31): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
+src/components/onboarding/EmptyStateHints.tsx(15,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialControls.ts(15,63): error TS2339: Property 'endTutorialStep' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialControls.ts(16,64): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialControls.ts(17,61): error TS2339: Property 'setPreference' does not exist on type 'unknown'.
 src/components/onboarding/hooks/useTutorialSteps.ts(12,65): error TS2339: Property 'startTutorialStep' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(12,26): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(13,31): error TS2339: Property 'tutorialProgress' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(14,26): error TS2339: Property 'getProgress' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(15,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(16,28): error TS2339: Property 'setPreference' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingProgress.tsx(179,32): error TS2339: Property 'map' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/onboarding/OnboardingTutorial.tsx(15,24): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(16,24): error TS2339: Property 'getProgress' does not exist on type 'unknown'.
-src/components/onboarding/OnboardingTutorial.tsx(17,24): error TS2339: Property 'preferences' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(14,28): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(15,33): error TS2339: Property 'tutorialProgress' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(16,28): error TS2339: Property 'getProgress' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(17,28): error TS2339: Property 'preferences' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(18,30): error TS2339: Property 'setPreference' does not exist on type 'unknown'.
+src/components/onboarding/OnboardingProgress.tsx(182,32): error TS2339: Property 'map' does not exist on type 'unknown'.
 src/components/pages/MainDashboard.tsx(30,11): error TS2339: Property 'data' does not exist on type '{ savingsGoals: any[]; summary: { totalGoals: any; completedGoals: any; activeGoals: number; totalTargetAmount: any; totalCurrentAmount: any; totalRemainingAmount: number; overallProgressRate: number; urgentGoals: any; overdueGoals: any; totalMonthlyNeeded: number; }; ... 8 more ...; mutations: { ...; }; }'.
 src/components/pages/MainDashboard.tsx(32,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
 src/components/pages/MainDashboard.tsx(59,5): error TS2339: Property '_safeUnassignedCash' does not exist on type '{ totalEnvelopeBalance: any; totalSavingsBalance: any; safeUnassignedCash: number; totalVirtualBalance: any; difference: number; isBalanced: boolean; }'.
 src/components/pages/MainDashboard.tsx(59,5): error TS6133: '_safeUnassignedCash' is declared but its value is never read.
 src/components/pages/MainDashboard.tsx(114,11): error TS6133: '_success' is declared but its value is never read.
-src/components/pwa/OfflineStatusIndicator.tsx(76,18): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/pwa/OfflineStatusIndicator.tsx(199,23): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(199,55): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(208,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(219,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
-src/components/pwa/OfflineStatusIndicator.tsx(221,34): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(74,18): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/pwa/OfflineStatusIndicator.tsx(197,23): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(197,55): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(206,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(217,29): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
+src/components/pwa/OfflineStatusIndicator.tsx(219,34): error TS2339: Property 'pendingOperations' does not exist on type '{ pendingCount: number; isOnline: boolean; }'.
 src/components/pwa/ShareTargetHandler.tsx(40,14): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
 src/components/pwa/ShareTargetHandler.tsx(47,18): error TS2339: Property 'hasFiles' does not exist on type '{ title: string; text: string; url: string; timestamp: string; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(2,1): error TS6133: 'Button' is declared but its value is never read.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(3,37): error TS6133: 'waitFor' is declared but its value is never read.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(93,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(106,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(118,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(140,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(165,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(180,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(195,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/__tests__/ReceiptScanner.test.tsx(226,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
-src/components/receipts/components/ExtractedDataField.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/receipts/components/ExtractedItemsList.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/receipts/components/ReceiptActionButtons.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/receipts/ReceiptScanner.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(1,1): error TS6133: 'Button' is declared but its value is never read.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(2,37): error TS6133: 'waitFor' is declared but its value is never read.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(92,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(105,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(117,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(139,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(164,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(179,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(194,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
+src/components/receipts/__tests__/ReceiptScanner.test.tsx(225,23): error TS2339: Property 'mockReturnValue' does not exist on type '(onReceiptProcessed: any) => { isProcessing: boolean; uploadedImage: any; extractedData: any; error: any; showImagePreview: boolean; fileInputRef: RefObject<any>; cameraInputRef: RefObject<...>; ... 6 more ...; toggleImagePreview: () => void; }'.
 src/components/savings/AddEditGoalModal.tsx(184,9): error TS2322: Type 'string' is not assignable to type 'number'.
 src/components/savings/DistributeModal.tsx(20,12): error TS2365: Operator '+' cannot be applied to types 'unknown' and 'number'.
 src/components/savings/DistributeModal.tsx(20,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
@@ -1113,56 +855,46 @@ src/components/savings/DistributeModal.tsx(81,31): error TS2365: Operator '>' ca
 src/components/savings/DistributeModal.tsx(81,56): error TS2365: Operator '<=' cannot be applied to types 'unknown' and 'number'.
 src/components/savings/SavingsGoalCard.tsx(15,22): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/savings/SavingsGoalCard.tsx(15,31): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/security/LockScreen.tsx(35,29): error TS2339: Property 'isValid' does not exist on type 'unknown'.
-src/components/security/LockScreen.tsx(41,9): error TS2554: Expected 1 arguments, but got 0.
-src/components/security/LockScreen.tsx(58,5): error TS2448: Block-scoped variable 'handleIncorrectPassword' used before its declaration.
-src/components/security/LockScreen.tsx(167,9): error TS6133: '_handleReset' is declared but its value is never read.
-src/components/security/LockScreen.tsx(265,26): error TS2739: Type '{ type: string; message: string; variant: string; }' is missing the following properties from type '{ type?: string; message: any; icon: any; dismissible?: boolean; onDismiss: any; variant?: string; className?: string; }': icon, onDismiss
-src/components/security/LockScreen.tsx(269,18): error TS2739: Type '{ type: string; message: string; variant: string; }' is missing the following properties from type '{ type?: string; message: any; icon: any; dismissible?: boolean; onDismiss: any; variant?: string; className?: string; }': icon, onDismiss
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(2,1): error TS6133: 'Select' is declared but its value is never read.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(3,1): error TS6133: 'Button' is declared but its value is never read.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(6,30): error TS2307: Cannot find module '../SecuritySettingsRefactored' or its corresponding type declarations.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(9,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(10,29): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(29,26): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(30,27): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(31,24): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(32,26): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/security/LockScreen.tsx(90,29): error TS2339: Property 'isValid' does not exist on type 'unknown'.
+src/components/security/LockScreen.tsx(96,9): error TS2554: Expected 1 arguments, but got 0.
+src/components/security/LockScreen.tsx(168,9): error TS6133: '_handleReset' is declared but its value is never read.
+src/components/security/LockScreen.tsx(267,26): error TS2739: Type '{ type: string; message: string; variant: string; }' is missing the following properties from type '{ type?: string; message: any; icon: any; dismissible?: boolean; onDismiss: any; variant?: string; className?: string; }': icon, onDismiss
+src/components/security/LockScreen.tsx(271,18): error TS2739: Type '{ type: string; message: string; variant: string; }' is missing the following properties from type '{ type?: string; message: any; icon: any; dismissible?: boolean; onDismiss: any; variant?: string; className?: string; }': icon, onDismiss
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(1,1): error TS6133: 'Select' is declared but its value is never read.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(2,1): error TS6133: 'Button' is declared but its value is never read.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(5,30): error TS2307: Cannot find module '../SecuritySettingsRefactored' or its corresponding type declarations.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(8,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(9,29): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(28,26): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(29,27): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(30,24): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(31,26): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(32,29): error TS2708: Cannot use namespace 'jest' as a value.
 src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(33,29): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(34,29): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(35,25): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(40,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(46,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(52,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(58,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(64,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(70,1): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(79,14): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(83,5): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(87,54): error TS2708: Cannot use namespace 'jest' as a value.
-src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(103,25): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(34,25): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(39,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(45,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(51,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(57,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(63,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(69,1): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(78,14): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(82,5): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(86,54): error TS2708: Cannot use namespace 'jest' as a value.
+src/components/settings/__tests__/SecuritySettingsRefactored.test.tsx(102,25): error TS2708: Cannot use namespace 'jest' as a value.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(68,45): error TS2339: Property 'count' does not exist on type 'unknown'.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(68,55): error TS2339: Property 'count' does not exist on type 'unknown'.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(80,33): error TS2339: Property 'count' does not exist on type 'unknown'.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(84,43): error TS2339: Property 'amount' does not exist on type 'unknown'.
-src/components/settings/sections/AccountSettingsSection.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/components/settings/sections/SyncDebugToolsSection.tsx(86,47): error TS2339: Property 'detectLocalDataDebug' does not exist on type 'Window & typeof globalThis'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(109,47): error TS2339: Property 'hasLocalDataDebug' does not exist on type 'Window & typeof globalThis'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(140,49): error TS2551: Property 'safeCloudDataReset' does not exist on type 'Window & typeof globalThis'. Did you mean 'forceCloudDataReset'?
 src/components/settings/TransactionArchiving.tsx(3,37): error TS2307: Cannot find module '../../hooks/transactions/useTransactionArchiving' or its corresponding type declarations.
-src/components/sharing/JoinBudgetModal.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/sharing/JoinBudgetModal.tsx(66,33): error TS2554: Expected 1 arguments, but got 6.
-src/components/sharing/JoinBudgetModal.tsx(69,9): error TS6133: '_handleProcessQRData' is declared but its value is never read.
-src/components/sharing/ShareCodeModal.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/sharing/steps/ShareCodeStep.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/sharing/steps/UserSetupStep.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/sync/ActivityBanner.tsx(41,39): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/sync/ActivityBanner.tsx(41,71): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/sync/ActivityBanner.tsx(128,39): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/sync/ActivityBanner.tsx(128,45): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/sync/health/SyncHealthDetails.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/sync/health/SyncHealthDetails.tsx(140,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/sync/health/SyncHealthDetails.tsx(139,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
 src/components/sync/health/SyncStatusIndicator.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/sync/ManualSyncControls.tsx(2,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
 src/components/sync/ManualSyncControls.tsx(3,58): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
@@ -1173,29 +905,26 @@ src/components/sync/ManualSyncControls.tsx(93,18): error TS2362: The left-hand s
 src/components/sync/SyncHealthDashboard.tsx(6,8): error TS6133: 'React' is declared but its value is never read.
 src/components/sync/SyncHealthDashboard.tsx(43,11): error TS2339: Property 'exportBackup' does not exist on type '{ exportData: () => Promise<void>; }'.
 src/components/sync/SyncHealthIndicator.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/sync/SyncIndicator.tsx(3,8): error TS6133: 'React' is declared but its value is never read.
-src/components/sync/SyncIndicator.tsx(59,39): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/components/sync/SyncIndicator.tsx(59,45): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/sync/SyncStatusIndicators.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/transactions/components/DeleteConfirmation.tsx(20,11): error TS2322: Type 'string' is not assignable to type 'number'.
-src/components/transactions/import/FieldMapper.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/transactions/import/FileUploader.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/transactions/import/FileUploader.tsx(39,15): error TS2322: Type '{ checked: boolean; onCheckedChange: (checked: any) => void; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
+src/components/transactions/import/FileUploader.tsx(5,45): error TS2304: Cannot find name 'useState'.
+src/components/transactions/import/FileUploader.tsx(38,15): error TS2322: Type '{ checked: any; onCheckedChange: (checked: any) => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
-src/components/transactions/ledger/TransactionLedgerLoading.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/transactions/ledger/TransactionPagination.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/transactions/splitter/SplitterHeader.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/transactions/TransactionForm.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/transactions/TransactionForm.tsx(90,15): error TS2322: Type '{ isLocked: boolean; isOwnLock: boolean; isLoading: boolean; lock: { userName: any; expiresAt: Date; isExpired: boolean; }; onBreakLock: () => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; } | { ...; }>; showDetails: true; }' is not assignable to type 'IntrinsicAttributes & { isLocked: any; isOwnLock: any; lock: any; onBreakLock: any; className?: string; showDetails?: boolean; }'.
-  Property 'isLoading' does not exist on type 'IntrinsicAttributes & { isLocked: any; isOwnLock: any; lock: any; onBreakLock: any; className?: string; showDetails?: boolean; }'.
 src/components/transactions/TransactionFormFields.tsx(247,11): error TS2322: Type '{ id: string; checked: any; onCheckedChange: (checked: any) => any; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
   Property 'onCheckedChange' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
 src/components/transactions/TransactionLedger.tsx(4,32): error TS2614: Module '"../ui/StandardFilters"' has no exported member 'FilterConfig'. Did you mean to use 'import FilterConfig from "../ui/StandardFilters"' instead?
+src/components/transactions/TransactionLedger.tsx(127,9): error TS2322: Type 'Envelope[]' is not assignable to type 'import("violet-vault/src/types/finance").Envelope[]'.
+  Type 'Envelope' is not assignable to type 'import("violet-vault/src/types/finance").Envelope'.
+    Property 'currentBalance' is optional in type 'Envelope' but required in type 'Envelope'.
 src/components/transactions/TransactionLedger.tsx(148,9): error TS4104: The type 'readonly ["Housing", "Transportation", "Insurance", "Bills & Utilities", "Subscriptions", "Food & Dining", "Entertainment", "Shopping", "Health & Medical", "Personal Care", ... 7 more ..., "Other"]' is 'readonly' and cannot be assigned to the mutable type 'any[]'.
 src/components/transactions/TransactionLedger.tsx(175,9): error TS4104: The type 'readonly ["Housing", "Transportation", "Insurance", "Bills & Utilities", "Subscriptions", "Food & Dining", "Entertainment", "Shopping", "Health & Medical", "Personal Care", ... 7 more ..., "Other"]' is 'readonly' and cannot be assigned to the mutable type 'any[]'.
-src/components/transactions/TransactionSplitter.tsx(2,8): error TS2613: Module '"violet-vault/src/hooks/transactions/useTransactionSplitter"' has no default export. Did you mean to use 'import { useTransactionSplitter } from "/Users/thef4tdaddy/Git/violet-vault/src/hooks/transactions/useTransactionSplitter"' instead?
-src/components/transactions/TransactionSummaryCards.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/ui/ConfirmProvider.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/transactions/TransactionSplitter.tsx(31,38): error TS2339: Property 'saveSplitTransaction' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'.
+src/components/transactions/TransactionSplitter.tsx(94,43): error TS2551: Property 'updateSplitAllocation' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'. Did you mean 'splitAllocations'?
+src/components/transactions/TransactionSplitter.tsx(95,43): error TS2551: Property 'removeSplitAllocation' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'. Did you mean 'splitAllocations'?
+src/components/transactions/TransactionSplitter.tsx(96,40): error TS2551: Property 'addSplitAllocation' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'. Did you mean 'splitAllocations'?
+src/components/transactions/TransactionSplitter.tsx(97,42): error TS2339: Property 'performSmartSplit' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'.
+src/components/transactions/TransactionSplitter.tsx(98,43): error TS2339: Property 'autoBalanceRemaining' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'.
+src/components/transactions/TransactionSplitter.tsx(113,32): error TS2339: Property 'isSaving' does not exist on type '{ splitAllocations: any[]; isProcessing: boolean; errors: any[]; totals: SplitTotals; summary: { totalSplits: number; originalAmount: number; allocatedAmount: number; remainingAmount: number; isValid: boolean; isBalanced: boolean; validationErrors: string[]; canSubmit: boolean; }; ... 12 more ...; clearErrors: () =>...'.
 src/components/ui/ConnectionDisplay.tsx(220,4): error TS2741: Property 'onDisconnect' is missing in type '{ children: Element[]; title: any; icon: any; theme: any; }' but required in type '{ title?: string; icon: any; onDisconnect: any; children: any; isVisible?: boolean; className?: string; theme?: string; }'.
 src/components/ui/EditLockIndicator.tsx(13,54): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/components/ui/Header.tsx(10,5): error TS2339: Property 'currentUser' does not exist on type '{}'.
@@ -1208,24 +937,17 @@ src/components/ui/Header.tsx(51,19): error TS2322: Type '"high-quality"' is not 
 src/components/ui/Header.tsx(77,15): error TS2322: Type '{ currentUser: any; onUserChange: any; onUpdateProfile: any; }' is not assignable to type 'IntrinsicAttributes & object'.
   Property 'currentUser' does not exist on type 'IntrinsicAttributes & object'.
 src/components/ui/LoadingSpinner.tsx(4,32): error TS2339: Property 'message' does not exist on type '{}'.
-src/components/ui/PromptProvider.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
 src/components/ui/SecurityAlert.tsx(80,9): error TS6133: '_isFullscreen' is declared but its value is never read.
 src/components/ui/StandardFilters.tsx(47,20): error TS2339: Property 'search' does not exist on type '{}'.
 src/components/ui/StandardFilters.tsx(64,17): error TS2339: Property 'search' does not exist on type '{}'.
 src/components/ui/StandardFilters.tsx(64,35): error TS2339: Property 'search' does not exist on type '{}'.
 src/components/ui/StandardFilters.tsx(107,28): error TS2339: Property 'search' does not exist on type '{}'.
 src/components/ui/StandardFilters.tsx(116,20): error TS2339: Property 'search' does not exist on type '{}'.
-src/components/ui/Toast.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/ui/TouchButton.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/components/ui/VersionFooter.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/ui/VersionFooter.tsx(2,69): error TS2307: Cannot find module '../../utils/version' or its corresponding type declarations.
-src/components/ui/VirtualList.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/components/ui/VirtualList.tsx(5,5): error TS2339: Property 'items' does not exist on type '{}'.
-src/components/ui/VirtualList.tsx(6,5): error TS2339: Property 'itemHeight' does not exist on type '{}'.
-src/components/ui/VirtualList.tsx(7,5): error TS2339: Property 'containerHeight' does not exist on type '{}'.
-src/components/ui/VirtualList.tsx(8,5): error TS2339: Property 'renderItem' does not exist on type '{}'.
-src/components/ui/VirtualList.tsx(9,5): error TS2339: Property 'className' does not exist on type '{}'.
-src/components/ui/VirtualList.tsx(10,5): error TS2339: Property 'overscan' does not exist on type '{}'.
+src/contexts/__tests__/AuthContext.test.tsx(3,32): error TS6133: 'beforeEach' is declared but its value is never read.
+src/contexts/__tests__/AuthContext.test.tsx(21,86): error TS2345: Argument of type '{ userName: string; }' is not assignable to parameter of type 'UserData'.
+  Property 'userColor' is missing in type '{ userName: string; }' but required in type 'UserData'.
+src/contexts/__tests__/AuthContext.test.tsx(103,19): error TS2345: Argument of type '{ userName: string; }' is not assignable to parameter of type 'UserData'.
+  Property 'userColor' is missing in type '{ userName: string; }' but required in type 'UserData'.
 src/db/__tests__/budgetDb.test.ts(4,32): error TS6133: 'beforeEach' is declared but its value is never read.
 src/db/__tests__/budgetDb.test.ts(4,44): error TS6133: 'afterEach' is declared but its value is never read.
 src/db/__tests__/budgetDb.test.ts(6,1): error TS6133: 'logger' is declared but its value is never read.
@@ -1241,6 +963,17 @@ src/db/budgetDb.ts(409,47): error TS2345: Argument of type 'unknown' is not assi
   Type '{}' is missing the following properties from type 'PaycheckHistory': id, date, amount, source, lastModified
 src/db/budgetDb.ts(617,3): error TS2322: Type 'unknown' is not assignable to type 'number'.
 src/db/budgetDb.ts(622,3): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/domain/schemas/audit-log.ts(20,14): error TS2554: Expected 2-3 arguments, but got 1.
+src/domain/schemas/audit-log.ts(21,15): error TS2554: Expected 2-3 arguments, but got 1.
+src/domain/schemas/backup.ts(32,15): error TS2554: Expected 2-3 arguments, but got 1.
+src/domain/schemas/bill.ts(22,46): error TS2353: Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidUnion>; message?: string; }'.
+src/domain/schemas/paycheck-history.ts(15,43): error TS2353: Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidUnion>; message?: string; }'.
+src/domain/schemas/paycheck-history.ts(18,18): error TS2554: Expected 2-3 arguments, but got 1.
+src/domain/schemas/paycheck-history.ts(21,17): error TS2554: Expected 2-3 arguments, but got 1.
+src/domain/schemas/transaction.ts(21,43): error TS2353: Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidUnion>; message?: string; }'.
+src/domain/schemas/utility.ts(14,44): error TS2353: Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidUnion>; message?: string; }'.
+src/domain/schemas/utility.ts(15,42): error TS2353: Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidUnion>; message?: string; }'.
+src/domain/schemas/version-control.ts(20,14): error TS2554: Expected 2-3 arguments, but got 1.
 src/hooks/accounts/useSupplementalAccounts.ts(118,19): error TS2554: Expected 3 arguments, but got 2.
 src/hooks/analytics/__tests__/useAnalyticsExport.test.ts(5,1): error TS2739: Type '{ createObjectURL: Mock<() => string>; revokeObjectURL: Mock<Procedure>; }' is missing the following properties from type '{ new (url: string | URL, base?: string | URL): URL; prototype: URL; canParse(url: string | URL, base?: string | URL): boolean; createObjectURL(obj: Blob | MediaSource): string; parse(url: string | URL, base?: string | URL): URL; revokeObjectURL(url: string): void; }': prototype, canParse, parse
 src/hooks/analytics/__tests__/useAnalyticsExport.test.ts(20,3): error TS2322: Type 'Mock<() => { href: string; download: string; click: Mock<Procedure>; style: { visibility: string; }; }>' is not assignable to type '{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOptions): HTMLElement; }'.
@@ -1308,28 +1041,7 @@ src/hooks/analytics/__tests__/useTrendAnalysis.test.ts(98,71): error TS2339: Pro
 src/hooks/analytics/__tests__/useTrendAnalysis.test.ts(109,28): error TS2339: Property 'highestSpendingSeason' does not exist on type '{ type: string; title: string; description: string; action: string; }[]'.
 src/hooks/analytics/__tests__/useTrendAnalysis.test.ts(110,28): error TS2339: Property 'avgVelocity' does not exist on type '{ type: string; title: string; description: string; action: string; }[]'.
 src/hooks/analytics/__tests__/useTrendAnalysis.test.ts(111,28): error TS2339: Property 'hasHighGrowth' does not exist on type '{ type: string; title: string; description: string; action: string; }[]'.
-src/hooks/analytics/useAnalytics.ts(13,5): error TS2339: Property 'period' does not exist on type '{}'.
-src/hooks/analytics/useAnalytics.ts(14,5): error TS2339: Property 'customDateRange' does not exist on type '{}'.
-src/hooks/analytics/useAnalytics.ts(15,5): error TS2339: Property 'includeTransfers' does not exist on type '{}'.
-src/hooks/analytics/useAnalytics.ts(16,5): error TS2339: Property 'groupBy' does not exist on type '{}'.
-src/hooks/analytics/useAnalytics.ts(200,38): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(201,37): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(201,50): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(203,51): error TS2698: Spread types may only be created from object types.
-src/hooks/analytics/useAnalytics.ts(206,38): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(207,37): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(207,48): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(209,51): error TS2698: Spread types may only be created from object types.
-src/hooks/analytics/useAnalytics.ts(331,19): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(331,38): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(342,34): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(342,44): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/analytics/useAnalytics.ts(386,54): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(389,33): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(390,33): error TS2339: Property 'count' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(404,34): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(405,32): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/hooks/analytics/useAnalytics.ts(406,29): error TS2339: Property 'net' does not exist on type 'unknown'.
+src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(13,30): error TS2339: Property 'paycheckHistory' does not exist on type 'unknown'.
 src/hooks/analytics/useAnalyticsData.ts(26,45): error TS2345: Argument of type 'Date' is not assignable to parameter of type 'number'.
 src/hooks/analytics/useAnalyticsData.ts(109,61): error TS2339: Property 'month' does not exist on type 'unknown'.
 src/hooks/analytics/useAnalyticsData.ts(109,83): error TS2339: Property 'month' does not exist on type 'unknown'.
@@ -1351,6 +1063,8 @@ src/hooks/analytics/usePerformanceMonitor.ts(94,27): error TS6133: 'analytics' i
 src/hooks/analytics/useReportExporter.ts(256,42): error TS2345: Argument of type 'Element' is not assignable to parameter of type 'HTMLElement'.
   Type 'Element' is missing the following properties from type 'HTMLElement': accessKey, accessKeyLabel, autocapitalize, autocorrect, and 129 more.
 src/hooks/analytics/useReportExporter.ts(308,21): error TS2554: Expected 3 arguments, but got 2.
+src/hooks/auth/__tests__/useAuthCompatibility.test.ts(324,13): error TS6133: 'logger' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthCompatibility.test.ts(328,7): error TS2304: Cannot find name 'result'.
 src/hooks/auth/__tests__/useAuthenticationManager.test.ts(47,17): error TS2339: Property 'mockReturnValue' does not exist on type '() => { isUnlocked: boolean; encryptionKey: CryptoKey; currentUser: UserData; budgetId: string; salt: Uint8Array<ArrayBufferLike>; handleSetup: (userDataOrPassword: any) => Promise<...>; handleLogout: () => void; handleChangePassword: (oldPass: any, newPass: any) => Promise<...>; handleUpdateProfile: (updatedProfile...'.
 src/hooks/auth/__tests__/useAuthenticationManager.test.ts(59,24): error TS2339: Property 'mockReturnValue' does not exist on type '() => { isLocked: boolean; securitySettings: any; securityEvents: any; lockSession: () => void; unlockSession: (_password: any) => void; trackActivity: () => void; resetAutoLockTimer: () => void; updateSettings: (newSettings: any) => void; ... 6 more ...; cleanup: () => void; }'.
 src/hooks/auth/__tests__/useAuthenticationManager.test.ts(67,22): error TS2339: Property 'mockReturnValue' does not exist on type '() => { isLocalOnlyMode: boolean; localOnlyUser: any; isInitialized: boolean; loading: boolean; error: any; clearError: () => void; enterLocalOnlyMode: () => Promise<{ success: boolean; error: string; }>; ... 8 more ...; validateImportFile: () => { ...; }; }'.
@@ -1360,11 +1074,75 @@ src/hooks/auth/__tests__/useAuthenticationManager.test.ts(152,17): error TS2339:
 src/hooks/auth/__tests__/useAuthenticationManager.test.ts(169,22): error TS2339: Property 'mockReturnValue' does not exist on type '() => { isLocalOnlyMode: boolean; localOnlyUser: any; isInitialized: boolean; loading: boolean; error: any; clearError: () => void; enterLocalOnlyMode: () => Promise<{ success: boolean; error: string; }>; ... 8 more ...; validateImportFile: () => { ...; }; }'.
 src/hooks/auth/__tests__/useAuthenticationManager.test.ts(179,22): error TS2339: Property 'mockReturnValue' does not exist on type '() => { isLocalOnlyMode: boolean; localOnlyUser: any; isInitialized: boolean; loading: boolean; error: any; clearError: () => void; enterLocalOnlyMode: () => Promise<{ success: boolean; error: string; }>; ... 8 more ...; validateImportFile: () => { ...; }; }'.
 src/hooks/auth/__tests__/useAuthenticationManager.test.ts(189,24): error TS2339: Property 'mockReturnValue' does not exist on type '() => { isLocked: boolean; securitySettings: any; securityEvents: any; lockSession: () => void; unlockSession: (_password: any) => void; trackActivity: () => void; resetAutoLockTimer: () => void; updateSettings: (newSettings: any) => void; ... 6 more ...; cleanup: () => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(1,22): error TS6133: 'waitFor' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(55,32): error TS6133: 'mutation' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(56,37): error TS6133: 'mutation' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(57,33): error TS6133: 'mutation' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(58,41): error TS6133: 'mutation' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(58,51): error TS6133: 'context' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(59,40): error TS6133: 'mutation' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(60,38): error TS6133: 'context' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(61,41): error TS6133: 'context' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthManager.test.ts(99,27): error TS2339: Property 'joinBudgetWithShareCode' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(100,27): error TS2339: Property 'handleSetup' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(101,27): error TS2339: Property 'handleLogout' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(102,27): error TS2551: Property 'handleChangePassword' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'. Did you mean 'changePassword'?
+src/hooks/auth/__tests__/useAuthManager.test.ts(103,27): error TS2551: Property 'handleUpdateProfile' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'. Did you mean 'updateProfile'?
+src/hooks/auth/__tests__/useAuthManager.test.ts(122,34): error TS2339: Property 'handleSetup' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(123,34): error TS2339: Property 'handleLogout' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(158,29): error TS2339: Property 'handleSetup' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(159,29): error TS2339: Property 'handleLogout' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(160,29): error TS2551: Property 'handleChangePassword' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'. Did you mean 'changePassword'?
+src/hooks/auth/__tests__/useAuthManager.test.ts(161,29): error TS2339: Property 'joinBudgetWithShareCode' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'.
+src/hooks/auth/__tests__/useAuthManager.test.ts(168,29): error TS2551: Property 'setLastActivity' does not exist on type '{ login: (password: any, userData?: any) => Promise<any>; joinBudget: (joinData: any) => Promise<{ success: boolean; data: any; error?: undefined; } | { success: boolean; error: any; data?: undefined; }>; ... 26 more ...; setError: (error: string) => void; }'. Did you mean 'lastActivity'?
+src/hooks/auth/__tests__/useAuthQueries.test.ts(1,22): error TS6133: 'waitFor' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthQueries.test.ts(13,23): error TS6133: 'options' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthQueries.test.ts(22,20): error TS6133: 'options' is declared but its value is never read.
+src/hooks/auth/__tests__/useAuthQueries.test.ts(74,57): error TS2345: Argument of type '{ password: string; userData: { userName: string; }; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/__tests__/useAuthQueries.test.ts(113,58): error TS2345: Argument of type '{ oldPassword: string; newPassword: string; }' is not assignable to parameter of type 'void'.
 src/hooks/auth/__tests__/useSecurityManagerUI.test.ts(418,34): error TS2339: Property 'mockResolvedValueOnce' does not exist on type '() => Promise<string>'.
 src/hooks/auth/__tests__/useSecurityManagerUI.test.ts(447,35): error TS2339: Property 'mockRejectedValueOnce' does not exist on type '(data: string) => Promise<void>'.
 src/hooks/auth/__tests__/useSecurityManagerUI.test.ts(477,34): error TS2339: Property 'mockResolvedValueOnce' does not exist on type '() => Promise<string>'.
 src/hooks/auth/__tests__/useSecurityManagerUI.test.ts(488,35): error TS2339: Property 'mockClear' does not exist on type '(data: string) => Promise<void>'.
 src/hooks/auth/__tests__/useUserSetup.test.ts(36,27): error TS2339: Property 'mockClear' does not exist on type '(message: any, title: any, duration: any) => any'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(103,59): error TS2345: Argument of type '{ password: string; budgetId: string; shareCode: string; userInfo: { userName: string; userColor: string; }; sharedBy: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(105,23): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(106,23): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(107,23): error TS2339: Property 'sharedBudget' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(124,59): error TS2345: Argument of type '{ password: string; budgetId: string; shareCode: string; userInfo: { userName: string; userColor: string; }; sharedBy: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(127,23): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(144,59): error TS2345: Argument of type '{ password: string; budgetId: string; shareCode: string; userInfo: { userName: string; userColor: string; }; sharedBy: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(146,23): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(147,23): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(163,59): error TS2345: Argument of type '{ password: string; budgetId: string; shareCode: string; userInfo: { userName: string; }; sharedBy: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(183,59): error TS2345: Argument of type '{ password: string; budgetId: string; shareCode: string; userInfo: { userColor: string; }; sharedBy: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(185,23): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(186,23): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(190,11): error TS6133: 'joinData' is declared but its value is never read.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(112,60): error TS2345: Argument of type '{ password: string; userData: { userName: string; userColor: string; shareCode: string; }; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(117,24): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(118,24): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(119,24): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(131,60): error TS2345: Argument of type '{ password: string; userData: { userName: string; userColor: string; }; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(136,24): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(137,24): error TS2339: Property 'error' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(143,60): error TS2345: Argument of type '{ password: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(147,24): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(148,24): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(154,60): error TS2345: Argument of type '{ password: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useLoginMutations.test.ts(158,24): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts(90,61): error TS2345: Argument of type '{ oldPassword: string; newPassword: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts(103,40): error TS2345: Argument of type '{ oldPassword: string; newPassword: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts(115,40): error TS2345: Argument of type '{ oldPassword: string; newPassword: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts(127,61): error TS2345: Argument of type '{ oldPassword: string; newPassword: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/usePasswordMutations.test.ts(139,61): error TS2345: Argument of type '{ oldPassword: string; newPassword: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts(86,61): error TS2345: Argument of type '{ userName: string; userColor: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts(89,33): error TS2339: Property 'userName' does not exist on type 'void'.
+src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts(100,40): error TS2345: Argument of type '{ userName: string; userColor: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts(114,40): error TS2345: Argument of type '{ userName: string; userColor: string; }' is not assignable to parameter of type 'void'.
+src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts(123,40): error TS2345: Argument of type '{ updateUser: Mock<Procedure>; encryptionKey: null; salt: null; }' is not assignable to parameter of type 'AuthContextValue'.
+  Type '{ updateUser: Mock<Procedure>; encryptionKey: null; salt: null; }' is missing the following properties from type 'AuthContextValue': currentUser, hasCurrentUser, hasBudgetId, user, and 12 more.
+src/hooks/auth/mutations/__tests__/useProfileMutations.test.ts(136,61): error TS2345: Argument of type '{ userName: string; userColor: string; }' is not assignable to parameter of type 'void'.
 src/hooks/auth/mutations/useJoinBudgetMutation.ts(44,5): error TS2322: Type 'number[]' is not assignable to type 'string'.
 src/hooks/auth/mutations/useJoinBudgetMutation.ts(46,5): error TS2322: Type 'number[]' is not assignable to type 'string'.
 src/hooks/auth/mutations/useJoinBudgetMutation.ts(74,28): error TS2339: Property 'budgetId' does not exist on type 'void'.
@@ -1408,8 +1186,6 @@ src/hooks/auth/useAuthenticationManager.ts(91,32): error TS2339: Property 'lockA
 src/hooks/auth/useAuthenticationManager.ts(93,44): error TS2339: Property 'checkSecurityStatus' does not exist on type '{ isLocked: boolean; securitySettings: any; securityEvents: any; lockSession: () => void; unlockSession: (_password: any) => void; trackActivity: () => void; resetAutoLockTimer: () => void; updateSettings: (newSettings: any) => void; ... 6 more ...; cleanup: () => void; }'.
 src/hooks/auth/useAuthenticationManager.ts(100,23): error TS2339: Property 'lockApp' does not exist on type '{ isLocked: boolean; securitySettings: any; securityEvents: any; lockSession: () => void; unlockSession: (_password: any) => void; trackActivity: () => void; resetAutoLockTimer: () => void; updateSettings: (newSettings: any) => void; ... 6 more ...; cleanup: () => void; }'.
 src/hooks/auth/useAuthenticationManager.ts(102,23): error TS2339: Property 'checkSecurityStatus' does not exist on type '{ isLocked: boolean; securitySettings: any; securityEvents: any; lockSession: () => void; unlockSession: (_password: any) => void; trackActivity: () => void; resetAutoLockTimer: () => void; updateSettings: (newSettings: any) => void; ... 6 more ...; cleanup: () => void; }'.
-src/hooks/auth/useKeyManagement.ts(272,56): error TS2345: Argument of type '{ budgetId: any; importedSalt: any; }' is not assignable to parameter of type 'NewUserData'.
-  Property 'shareCode' is missing in type '{ budgetId: any; importedSalt: any; }' but required in type 'NewUserData'.
 src/hooks/auth/useKeyManagementUI.ts(112,19): error TS2554: Expected 3 arguments, but got 2.
 src/hooks/auth/useKeyManagementUI.ts(122,6): error TS6133: 'keyFileData' is declared but its value is never read.
 src/hooks/auth/useKeyManagementUI.ts(129,21): error TS2554: Expected 3 arguments, but got 2.
@@ -1521,12 +1297,15 @@ src/hooks/bills/__tests__/useBulkBillUpdate.test.tsx(433,41): error TS2554: Expe
 src/hooks/bills/__tests__/useBulkBillUpdate.test.tsx(438,22): error TS2339: Property 'selectAllBills' does not exist on type '{ changes: {}; showConfirmation: boolean; setShowConfirmation: Dispatch<SetStateAction<boolean>>; initializeChanges: () => void; updateChange: (billId: any, field: any, value: any) => void; applyBulkChange: (field: any, value: any) => void; resetChanges: () => void; }'.
 src/hooks/bills/__tests__/useBulkBillUpdate.test.tsx(441,27): error TS2339: Property 'selectedBills' does not exist on type '{ changes: {}; showConfirmation: boolean; setShowConfirmation: Dispatch<SetStateAction<boolean>>; initializeChanges: () => void; updateChange: (billId: any, field: any, value: any) => void; applyBulkChange: (field: any, value: any) => void; resetChanges: () => void; }'.
 src/hooks/bills/useBillForm.ts(328,5): error TS4104: The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
-src/hooks/bills/useBillManager.ts(31,3): error TS2339: Property 'onUpdateBill' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
-src/hooks/bills/useBillManager.ts(32,3): error TS2339: Property 'onCreateRecurringBill' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
-src/hooks/bills/useBillManager.ts(33,3): error TS2339: Property 'onSearchNewBills' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
-src/hooks/bills/useBillManager.ts(34,3): error TS2339: Property 'onError' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
-src/hooks/bills/useBillManager.ts(37,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
-src/hooks/bills/useBillManager.ts(121,22): error TS2345: Argument of type '{ id: any; updates: { isPaid: boolean; dueDate: any; paidDate: null; }; }' is not assignable to parameter of type 'void'.
+src/hooks/bills/useBillManager.ts(32,3): error TS2339: Property 'onUpdateBill' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
+src/hooks/bills/useBillManager.ts(33,3): error TS2339: Property 'onCreateRecurringBill' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
+src/hooks/bills/useBillManager.ts(34,3): error TS2339: Property 'onSearchNewBills' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
+src/hooks/bills/useBillManager.ts(35,3): error TS2339: Property 'onError' does not exist on type '{ propTransactions?: any[]; propEnvelopes?: any[]; }'.
+src/hooks/bills/useBillManager.ts(38,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
+src/hooks/bills/useBillManager.ts(52,30): error TS2339: Property 'allTransactions' does not exist on type 'unknown'.
+src/hooks/bills/useBillManager.ts(53,24): error TS2339: Property 'envelopes' does not exist on type 'unknown'.
+src/hooks/bills/useBillManager.ts(54,20): error TS2339: Property 'bills' does not exist on type 'unknown'.
+src/hooks/bills/useBillManager.ts(124,22): error TS2345: Argument of type '{ id: any; updates: { isPaid: boolean; dueDate: any; paidDate: null; }; }' is not assignable to parameter of type 'void'.
 src/hooks/bills/useBillManagerUI.ts(66,26): error TS2339: Property 'upcoming' does not exist on type '{}'.
 src/hooks/bills/useBillManagerUI.ts(73,26): error TS2339: Property 'overdue' does not exist on type '{}'.
 src/hooks/bills/useBillManagerUI.ts(77,55): error TS2339: Property 'paid' does not exist on type '{}'.
@@ -1534,8 +1313,6 @@ src/hooks/bills/useBillManagerUI.ts(156,13): error TS2339: Property 'overdue' do
 src/hooks/bills/useBillManagerUI.ts(156,26): error TS2339: Property 'upcoming' does not exist on type '{}'.
 src/hooks/bills/useBillManagerUI.ts(156,40): error TS2339: Property 'paid' does not exist on type '{}'.
 src/hooks/bills/useBillManagerUI.ts(156,50): error TS2339: Property 'total' does not exist on type '{}'.
-src/hooks/bills/useBills/billMutations.ts(9,47): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/hooks/bills/useBills/billMutations.ts(10,12): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/hooks/bills/useBills/billMutations.ts(58,27): error TS2554: Expected 3 arguments, but got 2.
 src/hooks/bills/useBills/billMutations.ts(85,9): error TS2698: Spread types may only be created from object types.
 src/hooks/bills/useBills/billMutations.ts(92,31): error TS2339: Property 'addBill' does not exist on type '{ updateEnvelope: (queryClient: any, envelopeId: any, updates: any) => Promise<void>; addEnvelope: (queryClient: any, newEnvelope: any) => Promise<void>; removeEnvelope: (queryClient: any, envelopeId: any) => Promise<...>; ... 7 more ...; createOptimisticMutation: (queryClient: any, { mutationKey, queryKey, updateFn...'.
@@ -1571,6 +1348,7 @@ src/hooks/bills/useBills/billQueries.ts(128,5): error TS2339: Property 'sortBy' 
 src/hooks/bills/useBills/billQueries.ts(129,5): error TS2339: Property 'sortOrder' does not exist on type '{}'.
 src/hooks/bills/useBills/billQueries.ts(190,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
 src/hooks/bills/useBills/index.ts(22,60): error TS2339: Property 'daysAhead' does not exist on type '{}'.
+src/hooks/bills/useBillValidation.ts(20,40): error TS2339: Property 'errors' does not exist on type 'ZodError<{ id: string; name: string; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; dueDate?: string | Date; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }>'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(92,36): error TS2339: Property 'name' does not exist on type '{}'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(99,71): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(102,72): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
@@ -1578,23 +1356,27 @@ src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(167,36): error TS2339: Pro
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(168,36): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(187,36): error TS2339: Property 'name' does not exist on type '{}'.
 src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts(193,34): error TS2554: Expected 1 arguments, but got 0.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(35,25): error TS2339: Property 'rules' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(36,45): error TS2339: Property 'rules' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(83,43): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(18,24): error TS2339: Property 'envelopes' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(19,29): error TS2339: Property 'unassignedCash' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(20,30): error TS2339: Property 'allTransactions' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(38,25): error TS2339: Property 'rules' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(39,45): error TS2339: Property 'rules' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(86,43): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(86,22): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(89,22): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(87,47): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(90,47): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(87,65): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(90,65): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'results' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(91,18): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(94,18): error TS2339: Property 'results' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'results' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(95,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(98,38): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(137,39): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(99,33): error TS2365: Operator '+' cannot be applied to types 'unknown' and '1'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(140,39): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(138,37): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(141,37): error TS2339: Property 'execution' does not exist on type '{ success: boolean; execution: { id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: any; results: any[]; remainingCash: any; initialCash: any; }; results: any[]; error?: undefined; executionId?: undefined; } | { ...; }'.
   Property 'execution' does not exist on type '{ success: boolean; error: any; }'.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(26,28): error TS2339: Property 'rules' does not exist on type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(27,30): error TS2339: Property 'executionHistory' does not exist on type 'unknown'.
@@ -1603,9 +1385,7 @@ src/hooks/budgeting/autofunding/useAutoFundingData.ts(33,26): error TS2339: Prop
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(80,25): error TS2339: Property 'lastSaved' does not exist on type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(83,26): error TS2339: Property 'rules' does not exist on type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(84,28): error TS2339: Property 'executionHistory' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(3,10): error TS2614: Module '"../../../stores/ui/uiStore"' has no exported member 'useUIStore'. Did you mean to use 'import useUIStore from "../../../stores/ui/uiStore"' instead?
 src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(31,18): error TS2339: Property 'clearUndoStack' does not exist on type '{ undoStack: any[]; addToUndoStack: (executionRecord: any, executionResults: any) => void; getUndoableExecutions: () => any[]; getUndoStatistics: () => { totalUndoable: number; totalAmount: any; oldestUndoable: any; newestUndoable: any; }; undoLastExecution: () => Promise<...>; undoExecution: (executionId: any) => P...'.
-src/hooks/budgeting/autofunding/useAutoFundingRules.ts(158,21): error TS2339: Property 'sort' does not exist on type '{}'.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(37,21): error TS2339: Property 'trigger' does not exist on type '{}'.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(39,58): error TS2339: Property 'trigger' does not exist on type '{}'.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(43,21): error TS2339: Property 'successful' does not exist on type '{}'.
@@ -1621,7 +1401,6 @@ src/hooks/budgeting/autofunding/useHistoryExport.ts(13,60): error TS2339: Proper
 src/hooks/budgeting/autofunding/useHistoryExport.ts(57,6): error TS2448: Block-scoped variable 'exportToCsv' used before its declaration.
 src/hooks/budgeting/autofunding/useHistoryExport.ts(57,19): error TS2448: Block-scoped variable 'generateFilename' used before its declaration.
 src/hooks/budgeting/autofunding/useHistoryExport.ts(88,6): error TS2448: Block-scoped variable 'generateFilename' used before its declaration.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(2,10): error TS2614: Module '"../../../stores/ui/uiStore"' has no exported member 'useUIStore'. Did you mean to use 'import useUIStore from "../../../stores/ui/uiStore"' instead?
 src/hooks/budgeting/autofunding/useUndoOperations.ts(130,30): error TS2448: Block-scoped variable 'undoExecution' used before its declaration.
 src/hooks/budgeting/metadata/useActualBalance.ts(32,5): error TS2739: Type '{ unassignedCash: number; actualBalance: number; isActualBalanceManual: boolean; biweeklyAllocation: number; }' is missing the following properties from type 'BudgetRecord': id, lastModified
 src/hooks/budgeting/metadata/useActualBalance.ts(75,26): error TS2339: Property 'balance' does not exist on type 'void'.
@@ -1733,39 +1512,6 @@ src/hooks/budgeting/useBudgetHistoryQuery.ts(206,24): error TS2322: Type '{}' is
 src/hooks/budgeting/useBudgetHistoryQuery.ts(207,38): error TS2551: Property 'getBudgetCommits' does not exist on type 'VioletVaultDB'. Did you mean 'budgetCommits'?
 src/hooks/budgeting/useEnvelopeForm.ts(52,22): error TS2538: Type 'any' cannot be used as an index type.
 src/hooks/budgeting/useEnvelopeForm.ts(143,19): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/budgeting/useEnvelopes.ts(10,47): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/hooks/budgeting/useEnvelopes.ts(11,12): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/hooks/budgeting/useEnvelopes.ts(21,11): error TS2339: Property 'category' does not exist on type '{}'.
-src/hooks/budgeting/useEnvelopes.ts(21,21): error TS2339: Property 'includeArchived' does not exist on type '{}'.
-src/hooks/budgeting/useEnvelopes.ts(21,46): error TS2339: Property 'sortBy' does not exist on type '{}'.
-src/hooks/budgeting/useEnvelopes.ts(21,63): error TS2339: Property 'sortOrder' does not exist on type '{}'.
-src/hooks/budgeting/useEnvelopes.ts(139,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
-src/hooks/budgeting/useEnvelopes.ts(163,9): error TS2698: Spread types may only be created from object types.
-src/hooks/budgeting/useEnvelopes.ts(166,24): error TS2339: Property 'envelopeType' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(167,52): error TS2339: Property 'category' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(171,31): error TS2554: Expected 2 arguments, but got 1.
-src/hooks/budgeting/useEnvelopes.ts(194,26): error TS2339: Property 'id' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(194,30): error TS2339: Property 'updates' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(219,31): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/budgeting/useEnvelopes.ts(244,26): error TS2339: Property 'envelopeId' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(244,38): error TS2339: Property 'deleteBillsToo' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(277,37): error TS2339: Property 'removeBill' does not exist on type '{ updateEnvelope: (queryClient: any, envelopeId: any, updates: any) => Promise<void>; addEnvelope: (queryClient: any, newEnvelope: any) => Promise<void>; removeEnvelope: (queryClient: any, envelopeId: any) => Promise<...>; ... 7 more ...; createOptimisticMutation: (queryClient: any, { mutationKey, queryKey, updateFn...'.
-src/hooks/budgeting/useEnvelopes.ts(293,37): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/budgeting/useEnvelopes.ts(299,31): error TS2554: Expected 2 arguments, but got 1.
-src/hooks/budgeting/useEnvelopes.ts(330,26): error TS2339: Property 'fromEnvelopeId' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(330,42): error TS2339: Property 'toEnvelopeId' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(330,56): error TS2339: Property 'amount' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(330,64): error TS2339: Property 'description' does not exist on type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(346,9): error TS2353: Object literal may only specify known properties, and 'updatedAt' does not exist in type 'UpdateSpec<Envelope> | ((obj: Envelope, ctx: { value: any; primKey: IndexableType; }) => boolean | void)'.
-src/hooks/budgeting/useEnvelopes.ts(351,9): error TS2353: Object literal may only specify known properties, and 'updatedAt' does not exist in type 'UpdateSpec<Envelope> | ((obj: Envelope, ctx: { value: any; primKey: IndexableType; }) => boolean | void)'.
-src/hooks/budgeting/useEnvelopes.ts(366,39): error TS2345: Argument of type '{ id: string; amount: any; description: any; type: string; fromEnvelopeId: any; toEnvelopeId: any; date: string; createdAt: string; }' is not assignable to parameter of type 'Transaction'.
-  Type '{ id: string; amount: any; description: any; type: string; fromEnvelopeId: any; toEnvelopeId: any; date: string; createdAt: string; }' is missing the following properties from type 'Transaction': envelopeId, category, lastModified
-src/hooks/budgeting/useEnvelopes.ts(369,31): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/budgeting/useEnvelopes.ts(373,31): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/budgeting/useEnvelopes.ts(377,31): error TS2554: Expected 2 arguments, but got 1.
-src/hooks/budgeting/useEnvelopes.ts(431,47): error TS2345: Argument of type '{ id: any; updates: { name: any; category: string; targetAmount: number; monthlyBudget: number; biweeklyAllocation: number; envelopeType: EnvelopeType; description: string; lastUpdate: string; }; }' is not assignable to parameter of type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(436,35): error TS2345: Argument of type '{ envelopeId: any; deleteBillsToo: boolean; }' is not assignable to parameter of type 'void'.
-src/hooks/budgeting/useEnvelopes.ts(440,47): error TS2345: Argument of type '{ envelopeId: any; deleteBillsToo: boolean; }' is not assignable to parameter of type 'void'.
 src/hooks/budgeting/usePaycheckForm.ts(93,19): error TS2554: Expected 3 arguments, but got 1.
 src/hooks/budgeting/usePaycheckForm.ts(96,19): error TS2554: Expected 3 arguments, but got 1.
 src/hooks/budgeting/usePaycheckHistory.ts(30,19): error TS2554: Expected 3 arguments, but got 1.
@@ -1781,20 +1527,20 @@ src/hooks/budgeting/useUnassignedCashDistribution.ts(118,29): error TS2363: The 
 src/hooks/budgeting/useUnassignedCashDistribution.ts(123,12): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
 src/hooks/budgeting/useUnassignedCashDistribution.ts(211,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
 src/hooks/budgeting/useUnassignedCashDistribution.ts(235,51): error TS2322: Type '() => string[]' is not assignable to type 'readonly unknown[]'.
-src/hooks/common/__tests__/useExportData.test.ts(14,13): error TS2339: Property 'mockReturnValue' does not exist on type 'UseBoundStore<StoreApi<AuthStore>>'.
+src/hooks/common/__tests__/useExportData.test.ts(14,13): error TS2339: Property 'mockReturnValue' does not exist on type '() => AuthContextValue'.
 src/hooks/common/__tests__/useExportData.test.ts(18,21): error TS2339: Property 'mockReturnValue' does not exist on type '() => { showSuccessToast: any; showErrorToast: any; showWarningToast: any; showInfoToast: any; showPaydayToast: any; }'.
 src/hooks/common/__tests__/useExportData.test.ts(23,32): error TS2339: Property 'mockResolvedValue' does not exist on type '{ (): PromiseExtended<Envelope[]>; <R>(thenShortcut: ThenShortcut<Envelope[], R>): PromiseExtended<R>; }'.
 src/hooks/common/__tests__/useExportData.test.ts(24,23): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<BudgetRecord>'.
-src/hooks/common/__tests__/useExportData.test.ts(36,13): error TS2339: Property 'mockReturnValue' does not exist on type 'UseBoundStore<StoreApi<AuthStore>>'.
+src/hooks/common/__tests__/useExportData.test.ts(36,13): error TS2339: Property 'mockReturnValue' does not exist on type '() => AuthContextValue'.
 src/hooks/common/__tests__/useExportData.test.ts(40,21): error TS2339: Property 'mockReturnValue' does not exist on type '() => { showSuccessToast: any; showErrorToast: any; showWarningToast: any; showInfoToast: any; showPaydayToast: any; }'.
 src/hooks/common/__tests__/useExportData.test.ts(45,32): error TS2339: Property 'mockResolvedValue' does not exist on type '{ (): PromiseExtended<Envelope[]>; <R>(thenShortcut: ThenShortcut<Envelope[], R>): PromiseExtended<R>; }'.
 src/hooks/common/__tests__/useExportData.test.ts(46,23): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<BudgetRecord>'.
-src/hooks/common/__tests__/useImportData.test.ts(26,13): error TS2339: Property 'mockReturnValue' does not exist on type 'UseBoundStore<StoreApi<AuthStore>>'.
+src/hooks/common/__tests__/useImportData.test.ts(26,13): error TS2339: Property 'mockReturnValue' does not exist on type '() => AuthContextValue'.
 src/hooks/common/__tests__/useImportData.test.ts(30,21): error TS2339: Property 'mockReturnValue' does not exist on type '() => { showSuccessToast: any; showErrorToast: any; showWarningToast: any; showInfoToast: any; showPaydayToast: any; }'.
 src/hooks/common/__tests__/useImportData.test.ts(34,16): error TS2339: Property 'mockReturnValue' does not exist on type '() => (config?: {}) => Promise<unknown>'.
 src/hooks/common/__tests__/useImportData.test.ts(35,21): error TS2339: Property 'mockResolvedValue' does not exist on type '(file: any) => Promise<unknown>'.
 src/hooks/common/__tests__/useImportData.test.ts(36,26): error TS2339: Property 'mockReturnValue' does not exist on type '(importedData: any, currentUser: any) => { validatedData: any; hasBudgetIdMismatch: boolean; importBudgetId: any; }'.
-src/hooks/common/__tests__/useImportData.test.ts(40,22): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<{ success: boolean; }>'.
+src/hooks/common/__tests__/useImportData.test.ts(40,22): error TS2339: Property 'mockResolvedValue' does not exist on type '(authConfig?: any) => Promise<{ success: boolean; }>'.
 src/hooks/common/__tests__/useModalManager.test.ts(8,27): error TS2551: Property 'openModals' does not exist on type '{ modals: {}; openModal: (modalName: any) => void; closeModal: (modalName: any) => void; toggleModal: (modalName: any) => void; closeAllModals: () => void; isModalOpen: (modalName: any) => boolean; getOpenModalsCount: () => number; }'. Did you mean 'openModal'?
 src/hooks/common/__tests__/useModalManager.test.ts(9,27): error TS2339: Property 'modalStack' does not exist on type '{ modals: {}; openModal: (modalName: any) => void; closeModal: (modalName: any) => void; toggleModal: (modalName: any) => void; closeAllModals: () => void; isModalOpen: (modalName: any) => boolean; getOpenModalsCount: () => number; }'.
 src/hooks/common/__tests__/useModalManager.test.ts(10,27): error TS2339: Property 'activeModal' does not exist on type '{ modals: {}; openModal: (modalName: any) => void; closeModal: (modalName: any) => void; toggleModal: (modalName: any) => void; closeAllModals: () => void; isModalOpen: (modalName: any) => boolean; getOpenModalsCount: () => number; }'.
@@ -1849,31 +1595,20 @@ src/hooks/common/__tests__/useModalManager.test.ts(331,27): error TS2339: Proper
 src/hooks/common/__tests__/useModalManager.test.ts(332,27): error TS2339: Property 'activeModal' does not exist on type '{ modals: {}; openModal: (modalName: any) => void; closeModal: (modalName: any) => void; toggleModal: (modalName: any) => void; closeAllModals: () => void; isModalOpen: (modalName: any) => boolean; getOpenModalsCount: () => number; }'.
 src/hooks/common/useActivityLogger.ts(16,37): error TS2345: Argument of type 'UserData' is not assignable to parameter of type 'ActivityUser'.
   Property 'id' is missing in type 'UserData' but required in type 'ActivityUser'.
-src/hooks/common/useActualBalance.ts(29,15): error TS2339: Property 'isManual' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(29,32): error TS2339: Property 'source' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(108,7): error TS2339: Property 'showCurrency' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(109,7): error TS2339: Property 'showSign' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(110,7): error TS2339: Property 'minimumFractionDigits' does not exist on type '{}'.
-src/hooks/common/useActualBalance.ts(111,7): error TS2339: Property 'maximumFractionDigits' does not exist on type '{}'.
-src/hooks/common/useBugReportSubmission.ts(20,20): error TS2339: Property 'getSessionMetadata' does not exist on type 'HighlightPublicInterface'.
-src/hooks/common/useBugReportSubmission.ts(21,57): error TS2339: Property 'getSessionMetadata' does not exist on type 'HighlightPublicInterface'.
-src/hooks/common/useBugReportSubmission.ts(29,20): error TS2339: Property 'getCurrentSessionURL' does not exist on type 'HighlightPublicInterface'.
-src/hooks/common/useBugReportSubmission.ts(30,40): error TS2339: Property 'getCurrentSessionURL' does not exist on type 'HighlightPublicInterface'.
-src/hooks/common/useBugReportSubmission.ts(72,63): error TS2345: Argument of type '{ title: any; description: any; screenshot: any; sessionUrl: any; systemInfo: Promise<SystemInfo>; contextInfo: PageContext; severity: string; labels: string[]; }' is not assignable to parameter of type 'BugReportData'.
-  Types of property 'severity' are incompatible.
-    Type 'string' is not assignable to type '"low" | "medium" | "high" | "critical"'.
-src/hooks/common/useBugReportV2.ts(33,11): error TS6196: '_BugReportSubmissionResult' is declared but never used.
-src/hooks/common/useBugReportV2.ts(231,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(232,23): error TS2339: Property 'url' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(233,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(234,36): error TS2339: Property 'screenshotStatus' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(238,32): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useBugReportV2.ts(239,28): error TS2339: Property 'primaryProvider' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
-src/hooks/common/useConfirm.ts(37,24): error TS2339: Property 'showConfirm' does not exist on type 'unknown'.
-src/hooks/common/useConfirm.ts(68,19): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
-src/hooks/common/useConfirm.ts(69,19): error TS2339: Property 'config' does not exist on type 'unknown'.
-src/hooks/common/useConfirm.ts(70,21): error TS2339: Property 'resolver' does not exist on type 'unknown'.
-src/hooks/common/useConfirm.ts(71,24): error TS2339: Property 'hideConfirm' does not exist on type 'unknown'.
+src/hooks/common/useActualBalance.ts(17,28): error TS2339: Property 'actualBalance' does not exist on type 'unknown'.
+src/hooks/common/useActualBalance.ts(18,36): error TS2339: Property 'isActualBalanceManual' does not exist on type 'unknown'.
+src/hooks/common/useActualBalance.ts(19,31): error TS2339: Property 'setActualBalance' does not exist on type 'unknown'.
+src/hooks/common/useActualBalance.ts(32,15): error TS2339: Property 'isManual' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(32,32): error TS2339: Property 'source' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(111,7): error TS2339: Property 'showCurrency' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(112,7): error TS2339: Property 'showSign' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(113,7): error TS2339: Property 'minimumFractionDigits' does not exist on type '{}'.
+src/hooks/common/useActualBalance.ts(114,7): error TS2339: Property 'maximumFractionDigits' does not exist on type '{}'.
+src/hooks/common/useConfirm.ts(36,56): error TS2339: Property 'showConfirm' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(65,51): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(66,51): error TS2339: Property 'config' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(67,53): error TS2339: Property 'resolver' does not exist on type 'unknown'.
+src/hooks/common/useConfirm.ts(68,56): error TS2339: Property 'hideConfirm' does not exist on type 'unknown'.
 src/hooks/common/useConnectionManager.ts(60,9): error TS2322: Type 'UseMutateFunction<any, Error, void, unknown>' is not assignable to type '(id: string, updates: Partial<Bill>) => Promise<void>'.
   Types of parameters 'variables' and 'id' are incompatible.
     Type 'string' is not assignable to type 'void'.
@@ -1887,9 +1622,9 @@ src/hooks/common/useConnectionManager.ts(79,9): error TS2322: Type 'UseMutateFun
     Type 'string' is not assignable to type 'void'.
 src/hooks/common/useConnectionManager.ts(80,9): error TS2322: Type 'UseMutateFunction<any, Error, { id: any; updates: any; author?: string; }, unknown>' is not assignable to type '(params: { id: string; updates: Partial<Debt>; }) => Promise<void>'.
   Type 'void' is not assignable to type 'Promise<void>'.
-src/hooks/common/useConnectionManager.ts(96,9): error TS2322: Type 'UseMutateFunction<{ id: any; updates: any; }, Error, void, unknown>' is not assignable to type '(id: string, updates: Partial<Envelope>) => Promise<void>'.
+src/hooks/common/useConnectionManager.ts(96,9): error TS2322: Type 'UseMutateFunction<{ id: string; updates: Record<string, unknown>; }, Error, UpdateEnvelopeData, unknown>' is not assignable to type '(id: string, updates: Partial<Envelope>) => Promise<void>'.
   Types of parameters 'variables' and 'id' are incompatible.
-    Type 'string' is not assignable to type 'void'.
+    Type 'string' is not assignable to type 'UpdateEnvelopeData'.
 src/hooks/common/useConnectionManager/useConnectionData.ts(30,30): error TS2339: Property 'envelopeId' does not exist on type 'Envelope | Bill | Debt'.
   Property 'envelopeId' does not exist on type 'Envelope'.
 src/hooks/common/useConnectionManager/useConnectionData.ts(31,60): error TS2339: Property 'envelopeId' does not exist on type 'Envelope | Bill | Debt'.
@@ -1924,17 +1659,18 @@ src/hooks/common/useEditLock.ts(77,56): error TS2363: The right-hand side of an 
 src/hooks/common/useEditLock.ts(81,30): error TS2339: Property 'lockedBy' does not exist on type '{ success: boolean; reason: string; lockedBy: any; expiresAt: any; } | { success: boolean; reason: string; lockDoc: any; error?: undefined; } | { success: boolean; reason: string; error: any; lockDoc?: undefined; } | { ...; } | { ...; }'.
   Property 'lockedBy' does not exist on type '{ success: boolean; reason: string; lockDoc: any; error?: undefined; }'.
 src/hooks/common/useEditLock.ts(182,90): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/common/useImportData.ts(107,41): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/hooks/common/useOnboardingAutoComplete.ts(15,31): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
-src/hooks/common/useOnboardingAutoComplete.ts(16,29): error TS2339: Property 'isStepComplete' does not exist on type 'unknown'.
-src/hooks/common/useOnboardingAutoComplete.ts(17,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
-src/hooks/common/useOnboardingAutoComplete.ts(18,26): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
-src/hooks/common/useOnboardingAutoComplete.ts(24,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
-src/hooks/common/usePrompt.ts(46,23): error TS2339: Property 'showPrompt' does not exist on type 'unknown'.
-src/hooks/common/usePrompt.ts(81,19): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
-src/hooks/common/usePrompt.ts(82,19): error TS2339: Property 'config' does not exist on type 'unknown'.
-src/hooks/common/usePrompt.ts(83,21): error TS2339: Property 'resolver' does not exist on type 'unknown'.
-src/hooks/common/usePrompt.ts(84,23): error TS2339: Property 'hidePrompt' does not exist on type 'unknown'.
+src/hooks/common/useImportData.ts(108,41): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/hooks/common/useOnboardingAutoComplete.ts(16,31): error TS2339: Property 'markStepComplete' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(17,29): error TS2339: Property 'isStepComplete' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(18,26): error TS2339: Property 'preferences' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(19,26): error TS2339: Property 'isOnboarded' does not exist on type 'unknown'.
+src/hooks/common/useOnboardingAutoComplete.ts(25,11): error TS2339: Property 'data' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
+src/hooks/common/useOnboardingAutoComplete.ts(71,13): error TS2339: Property 'source' does not exist on type 'Envelope'.
+src/hooks/common/usePrompt.ts(45,54): error TS2339: Property 'showPrompt' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(78,50): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(79,50): error TS2339: Property 'config' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(80,52): error TS2339: Property 'resolver' does not exist on type 'unknown'.
+src/hooks/common/usePrompt.ts(81,54): error TS2339: Property 'hidePrompt' does not exist on type 'unknown'.
 src/hooks/common/useReceipts.ts(13,59): error TS2339: Property 'receipts' does not exist on type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: {}) => {}[]; ... 44 more ...; syncActivity: () => string[]; }'.
 src/hooks/common/useReceipts.ts(14,59): error TS2339: Property 'receiptsList' does not exist on type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: {}) => {}[]; ... 44 more ...; syncActivity: () => string[]; }'.
 src/hooks/common/useReceipts.ts(33,39): error TS2339: Property 'receipts' does not exist on type 'VioletVaultDB'.
@@ -1984,7 +1720,7 @@ src/hooks/debts/__tests__/useDebtForm.test.ts(312,28): error TS2708: Cannot use 
 src/hooks/debts/useDebtDashboard.ts(18,5): error TS2339: Property '_linkDebtToBill' does not exist on type '{ debts: DebtAccount[]; debtStats: { totalDebt: number; totalMonthlyPayments: number; averageInterestRate: number; debtsByType: {}; totalInterestPaid: number; activeDebtCount: number; totalDebtCount: number; dueSoonAmount: number; dueSoonCount: number; }; ... 12 more ...; COMPOUND_FREQUENCIES: { ...; }; }'.
 src/hooks/debts/useDebtDashboard.ts(18,5): error TS6133: '_linkDebtToBill' is declared but its value is never read.
 src/hooks/debts/useDebtManagement.ts(28,23): error TS2339: Property 'createBill' does not exist on type '{ refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<any[], Error>>; invalidate: () => Promise<void>; ... 36 more ...; bills: any[]; }'.
-src/hooks/debts/useDebtManagement.ts(29,27): error TS2339: Property 'createEnvelope' does not exist on type '{ envelopes: any; totalBalance: any; totalTargetAmount: any; underfundedEnvelopes: any; overfundedEnvelopes: any; availableCategories: unknown[]; isLoading: false; isFetching: boolean; isError: boolean; ... 17 more ...; invalidate: () => Promise<...>; }'.
+src/hooks/debts/useDebtManagement.ts(29,27): error TS2339: Property 'createEnvelope' does not exist on type '{ envelopes: Envelope[]; totalBalance: any; totalTargetAmount: any; underfundedEnvelopes: any[]; overfundedEnvelopes: any[]; availableCategories: any[]; isLoading: boolean; isFetching: boolean; ... 18 more ...; invalidate: () => Promise<...>; }'.
 src/hooks/debts/useDebtManagement.ts(30,30): error TS2339: Property 'createTransaction' does not exist on type '{ isLoading: false; isFetching: boolean; isError: boolean; error: Error; addTransaction: UseMutateFunction<any, Error, void, unknown>; addTransactionAsync: UseMutateAsyncFunction<...>; ... 28 more ...; transactions: any; }'.
 src/hooks/debts/useDebtManagement.ts(54,16): error TS2339: Property 'envelopeId' does not exist on type 'Debt'.
 src/hooks/debts/useDebtManagement.ts(55,53): error TS2339: Property 'envelopeId' does not exist on type 'Debt'.
@@ -2034,8 +1770,6 @@ src/hooks/savings/useSavingsGoals/index.ts(22,5): error TS2339: Property 'includ
 src/hooks/savings/useSavingsGoals/index.ts(100,54): error TS2345: Argument of type '{ goalId: any; updates: any; }' is not assignable to parameter of type 'void'.
 src/hooks/savings/useSavingsGoals/index.ts(112,52): error TS2345: Argument of type '{ goalId: any; amount: any; description: any; }' is not assignable to parameter of type 'void'.
 src/hooks/savings/useSavingsGoals/index.ts(122,52): error TS2345: Argument of type '{ distribution: any; description: any; }' is not assignable to parameter of type 'void'.
-src/hooks/savings/useSavingsGoals/savingsMutations.ts(9,47): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/hooks/savings/useSavingsGoals/savingsMutations.ts(10,12): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/hooks/savings/useSavingsGoals/savingsMutations.ts(25,9): error TS2698: Spread types may only be created from object types.
 src/hooks/savings/useSavingsGoals/savingsMutations.ts(31,31): error TS2339: Property 'addSavingsGoal' does not exist on type '{ updateEnvelope: (queryClient: any, envelopeId: any, updates: any) => Promise<void>; addEnvelope: (queryClient: any, newEnvelope: any) => Promise<void>; removeEnvelope: (queryClient: any, envelopeId: any) => Promise<...>; ... 7 more ...; createOptimisticMutation: (queryClient: any, { mutationKey, queryKey, updateFn...'.
 src/hooks/savings/useSavingsGoals/savingsMutations.ts(51,49): error TS2322: Type '() => string[]' is not assignable to type 'readonly unknown[]'.
@@ -2097,8 +1831,11 @@ src/hooks/settings/__tests__/useSettingsDashboard.test.ts(151,32): error TS2339:
 src/hooks/settings/__tests__/useSettingsDashboard.test.ts(204,29): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<{ commit: { hash: string; timestamp: number; message: string; author: string; parentHash: any; encryptedSnapshot: string; deviceFingerprint: string; }; changes: ({ commitHash: string; entityType: string; ... 4 more ...; afterData: { ...; }; } | { ...; })[]; }>'.
 src/hooks/settings/__tests__/useSettingsDashboard.test.ts(224,29): error TS2339: Property 'mockRejectedValue' does not exist on type '() => Promise<{ commit: { hash: string; timestamp: number; message: string; author: string; parentHash: any; encryptedSnapshot: string; deviceFingerprint: string; }; changes: ({ commitHash: string; entityType: string; ... 4 more ...; afterData: { ...; }; } | { ...; })[]; }>'.
 src/hooks/settings/__tests__/useTransactionArchiving.test.ts(138,42): error TS2554: Expected 1 arguments, but got 0.
-src/hooks/settings/useSettingsDashboard.ts(147,29): error TS2339: Property 'isRunning' does not exist on type 'CloudSyncService'.
-src/hooks/settings/useSettingsDashboard.ts(230,19): error TS2554: Expected 3 arguments, but got 2.
+src/hooks/settings/useSettingsDashboard.ts(116,15): error TS6133: 'useAuth' is declared but its value is never read.
+src/hooks/settings/useSettingsDashboard.ts(121,26): error TS2554: Expected 1 arguments, but got 0.
+src/hooks/settings/useSettingsDashboard.ts(144,29): error TS2339: Property 'isRunning' does not exist on type 'CloudSyncService'.
+src/hooks/settings/useSettingsDashboard.ts(148,32): error TS2554: Expected 1 arguments, but got 0.
+src/hooks/settings/useSettingsDashboard.ts(218,19): error TS2554: Expected 3 arguments, but got 2.
 src/hooks/settings/useTransactionArchiving.ts(37,47): error TS2307: Cannot find module '../../utils/transactionArchiving' or its corresponding type declarations.
 src/hooks/settings/useTransactionArchiving.ts(118,13): error TS2339: Property 'onSuccess' does not exist on type '{}'.
 src/hooks/settings/useTransactionArchiving.ts(118,24): error TS2339: Property 'onError' does not exist on type '{}'.
@@ -2121,7 +1858,6 @@ src/hooks/sync/__tests__/useSyncHealthIndicator.test.ts(131,7): error TS2708: Ca
 src/hooks/sync/__tests__/useSyncHealthIndicator.test.ts(146,45): error TS2708: Cannot use namespace 'jest' as a value.
 src/hooks/sync/__tests__/useSyncHealthIndicator.test.ts(169,41): error TS2708: Cannot use namespace 'jest' as a value.
 src/hooks/sync/__tests__/useSyncHealthIndicator.test.ts(207,7): error TS2708: Cannot use namespace 'jest' as a value.
-src/hooks/sync/useFirebaseSync.ts(2,10): error TS2614: Module '"../../stores/ui/uiStore"' has no exported member 'useUIStore'. Did you mean to use 'import useUIStore from "../../stores/ui/uiStore"' instead?
 src/hooks/sync/useFirebaseSync.ts(108,9): error TS6133: '_handleManualSave' is declared but its value is never read.
 src/hooks/sync/useFirebaseSync.ts(113,28): error TS2339: Property 'success' does not exist on type 'unknown'.
 src/hooks/sync/useFirebaseSync.ts(132,28): error TS2339: Property 'success' does not exist on type 'unknown'.
@@ -2196,15 +1932,15 @@ src/hooks/transactions/__tests__/useTransactionLedger.test.tsx(195,23): error TS
 src/hooks/transactions/__tests__/useTransactionLedger.test.tsx(196,26): error TS2708: Cannot use namespace 'jest' as a value.
 src/hooks/transactions/__tests__/useTransactionMutations.test.ts(4,8): error TS2613: Module '"violet-vault/src/hooks/transactions/useTransactionMutations"' has no default export. Did you mean to use 'import { useTransactionMutations } from "/Users/thef4tdaddy/Git/violet-vault/src/hooks/transactions/useTransactionMutations"' instead?
 src/hooks/transactions/__tests__/useTransactionMutations.test.ts(41,20): error TS2339: Property 'mockReturnValue' does not exist on type '(queryClient?: QueryClient) => QueryClient'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(53,19): error TS2339: Property 'mockReturnValue' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(77,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(107,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(131,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(147,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(177,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(193,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(219,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
-src/hooks/transactions/__tests__/useTransactionMutations.test.ts(238,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TContext = unknown>(options: UseMutationOptions<TData, TError, TVariables, TContext>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(53,19): error TS2339: Property 'mockReturnValue' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(77,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(107,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(131,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(147,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(177,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(193,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(219,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
+src/hooks/transactions/__tests__/useTransactionMutations.test.ts(238,19): error TS2339: Property 'mockImplementation' does not exist on type '<TData = unknown, TError = Error, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient) => UseMutationResult<...>'.
 src/hooks/transactions/__tests__/useTransactionQuery.test.ts(4,8): error TS2613: Module '"violet-vault/src/hooks/transactions/useTransactionQuery"' has no default export. Did you mean to use 'import { useTransactionQuery } from "/Users/thef4tdaddy/Git/violet-vault/src/hooks/transactions/useTransactionQuery"' instead?
 src/hooks/transactions/__tests__/useTransactionQuery.test.ts(41,14): error TS2339: Property 'mockReturnValue' does not exist on type '{ <TQueryFnData = unknown, TError = Error, TData = TQueryFnData, TQueryKey extends QueryKey = readonly unknown[]>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<...>; <TQueryFnData = unknown, TError = Error, TData = TQueryFnData, TQueryKe...'.
 src/hooks/transactions/__tests__/useTransactionQuery.test.ts(65,14): error TS2339: Property 'mockReturnValue' does not exist on type '{ <TQueryFnData = unknown, TError = Error, TData = TQueryFnData, TQueryKey extends QueryKey = readonly unknown[]>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<...>; <TQueryFnData = unknown, TError = Error, TData = TQueryFnData, TQueryKe...'.
@@ -2238,10 +1974,11 @@ src/hooks/transactions/useTransactionImport.ts(29,45): error TS2339: Property 'd
 src/hooks/transactions/useTransactionImport.ts(29,74): error TS2339: Property 'amount' does not exist on type '{}'.
 src/hooks/transactions/useTransactionImport.ts(30,19): error TS2554: Expected 3 arguments, but got 2.
 src/hooks/transactions/useTransactionImport.ts(38,20): error TS2339: Property 'clearExisting' does not exist on type 'any[]'.
-src/hooks/transactions/useTransactionLedger.ts(75,5): error TS2554: Expected 1 arguments, but got 7.
-src/hooks/transactions/useTransactionLedger.ts(108,22): error TS2345: Argument of type '{ amount: number; createdBy: any; createdAt: string; importSource: string; date: string; description: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; id: number; }' is not assignable to parameter of type 'void'.
-src/hooks/transactions/useTransactionMutations.ts(9,47): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/hooks/transactions/useTransactionMutations.ts(10,12): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
+src/hooks/transactions/useTransactionLedger.ts(30,32): error TS2339: Property 'updateTransaction' does not exist on type 'unknown'.
+src/hooks/transactions/useTransactionLedger.ts(31,33): error TS2339: Property 'setAllTransactions' does not exist on type 'unknown'.
+src/hooks/transactions/useTransactionLedger.ts(32,25): error TS2339: Property 'updateBill' does not exist on type 'unknown'.
+src/hooks/transactions/useTransactionLedger.ts(78,5): error TS2554: Expected 1 arguments, but got 7.
+src/hooks/transactions/useTransactionLedger.ts(111,22): error TS2345: Argument of type '{ amount: number; createdBy: any; createdAt: string; importSource: string; date: string; description: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; id: number; }' is not assignable to parameter of type 'void'.
 src/hooks/transactions/useTransactionMutations.ts(28,9): error TS2698: Spread types may only be created from object types.
 src/hooks/transactions/useTransactionMutations.ts(29,33): error TS2339: Property 'amount' does not exist on type 'void'.
 src/hooks/transactions/useTransactionMutations.ts(65,9): error TS2698: Spread types may only be created from object types.
@@ -2253,8 +1990,6 @@ src/hooks/transactions/useTransactionMutations.ts(97,59): error TS2769: No overl
 src/hooks/transactions/useTransactionMutations.ts(103,42): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
 src/hooks/transactions/useTransactionMutations.ts(133,26): error TS2339: Property 'id' does not exist on type 'void'.
 src/hooks/transactions/useTransactionMutations.ts(133,30): error TS2339: Property 'updates' does not exist on type 'void'.
-src/hooks/transactions/useTransactionOperations.ts(20,47): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/hooks/transactions/useTransactionOperations.ts(21,12): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/hooks/transactions/useTransactionOperations.ts(32,11): error TS2339: Property 'categoryRules' does not exist on type '{}'.
 src/hooks/transactions/useTransactionOperations.ts(40,64): error TS2339: Property 'id' does not exist on type 'void'.
 src/hooks/transactions/useTransactionOperations.ts(55,37): error TS2551: Property 'addTransaction' does not exist on type 'VioletVaultDB'. Did you mean 'Transaction'?
@@ -2284,40 +2019,42 @@ src/hooks/transactions/useTransactionOperations.ts(310,38): error TS2339: Proper
 src/hooks/transactions/useTransactionOperations.ts(324,52): error TS2345: Argument of type '{ id: any; updates: any; }' is not assignable to parameter of type 'void'.
 src/hooks/transactions/useTransactionOperations.ts(338,51): error TS2345: Argument of type '{ originalTransaction: any; splitTransactions: any; }' is not assignable to parameter of type 'void'.
 src/hooks/transactions/useTransactionOperations.ts(355,48): error TS2345: Argument of type '{ operation: any; transactions: any; updates: any; }' is not assignable to parameter of type 'void'.
-src/hooks/transactions/useTransactionQuery.ts(11,5): error TS2339: Property 'dateRange' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(12,5): error TS2339: Property 'envelopeId' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(13,5): error TS2339: Property 'category' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(14,5): error TS2339: Property 'type' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(15,5): error TS2339: Property 'limit' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(16,5): error TS2339: Property 'sortBy' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(17,5): error TS2339: Property 'sortOrder' does not exist on type '{}'.
-src/hooks/transactions/useTransactionQuery.ts(162,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
+src/hooks/transactions/useTransactionQuery.ts(12,5): error TS2339: Property 'dateRange' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(13,5): error TS2339: Property 'envelopeId' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(14,5): error TS2339: Property 'category' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(15,5): error TS2339: Property 'type' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(16,5): error TS2339: Property 'limit' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(17,5): error TS2339: Property 'sortBy' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(18,5): error TS2339: Property 'sortOrder' does not exist on type '{}'.
+src/hooks/transactions/useTransactionQuery.ts(25,29): error TS2339: Property 'transactions' does not exist on type 'unknown'.
+src/hooks/transactions/useTransactionQuery.ts(26,32): error TS2339: Property 'allTransactions' does not exist on type 'unknown'.
+src/hooks/transactions/useTransactionQuery.ts(165,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
 src/hooks/transactions/useTransactionSplitter.ts(30,11): error TS2339: Property 'transaction' does not exist on type '{}'.
 src/hooks/transactions/useTransactionSplitter.ts(30,24): error TS2339: Property 'envelopes' does not exist on type '{}'.
 src/hooks/transactions/useTransactionSplitter.ts(30,40): error TS2339: Property 'onSplit' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(20,5): error TS2339: Property 'dateRange' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(21,5): error TS2339: Property 'envelopeId' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(22,5): error TS2339: Property 'category' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(23,5): error TS2339: Property 'type' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(24,5): error TS2339: Property 'searchQuery' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(25,5): error TS2339: Property 'sortBy' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(26,5): error TS2339: Property 'sortOrder' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(27,5): error TS2339: Property 'limit' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(30,5): error TS2339: Property 'categoryRules' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(33,5): error TS2339: Property 'enabled' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(34,5): error TS2339: Property 'staleTime' does not exist on type '{}'.
-src/hooks/transactions/useTransactionsV2.ts(35,5): error TS2339: Property 'refetchInterval' does not exist on type '{}'.
-src/main.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
-src/main.tsx(105,14): error TS2339: Property 'dataDiagnostic' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(106,14): error TS2339: Property 'syncDiagnostic' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(107,14): error TS2339: Property 'runSyncHealthCheck' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(108,14): error TS2339: Property 'runSyncEdgeCaseTests' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(109,14): error TS2339: Property 'validateAllSyncFlows' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(112,14): error TS2339: Property 'fixAutoAllocateUndefined' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(118,14): error TS2339: Property 'swDiagnostics' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(124,14): error TS2339: Property 'offlineReadiness' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(208,14): error TS2339: Property 'clearCloudDataOnly' does not exist on type 'Window & typeof globalThis'.
-src/main.tsx(226,14): error TS2339: Property 'testBugReportCapture' does not exist on type 'Window & typeof globalThis'.
+src/hooks/transactions/useTransactionsV2.ts(21,5): error TS2339: Property 'dateRange' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(22,5): error TS2339: Property 'envelopeId' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(23,5): error TS2339: Property 'category' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(24,5): error TS2339: Property 'type' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(25,5): error TS2339: Property 'searchQuery' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(26,5): error TS2339: Property 'sortBy' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(27,5): error TS2339: Property 'sortOrder' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(28,5): error TS2339: Property 'limit' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(31,5): error TS2339: Property 'categoryRules' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(34,5): error TS2339: Property 'enabled' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(35,5): error TS2339: Property 'staleTime' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(36,5): error TS2339: Property 'refetchInterval' does not exist on type '{}'.
+src/hooks/transactions/useTransactionsV2.ts(42,33): error TS2339: Property 'updateTransactions' does not exist on type 'unknown'.
+src/main.tsx(104,14): error TS2339: Property 'dataDiagnostic' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(105,14): error TS2339: Property 'syncDiagnostic' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(106,14): error TS2339: Property 'runSyncHealthCheck' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(107,14): error TS2339: Property 'runSyncEdgeCaseTests' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(108,14): error TS2339: Property 'validateAllSyncFlows' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(111,14): error TS2339: Property 'fixAutoAllocateUndefined' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(117,14): error TS2339: Property 'swDiagnostics' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(123,14): error TS2339: Property 'offlineReadiness' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(207,14): error TS2339: Property 'clearCloudDataOnly' does not exist on type 'Window & typeof globalThis'.
+src/main.tsx(225,14): error TS2339: Property 'testBugReportCapture' does not exist on type 'Window & typeof globalThis'.
 src/services/__tests__/budgetDatabaseService.test.ts(52,5): error TS1117: An object literal cannot have multiple properties with the same name.
 src/services/__tests__/budgetDatabaseService.test.ts(53,5): error TS1117: An object literal cannot have multiple properties with the same name.
 src/services/__tests__/budgetDatabaseService.test.ts(78,21): error TS2339: Property 'mockResolvedValue' does not exist on type '() => PromiseExtended<Dexie>'.
@@ -2785,16 +2522,13 @@ src/services/cloudSyncService.ts(560,25): error TS2339: Property 'config' does n
 src/services/cloudSyncService.ts(584,23): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
 src/services/cloudSyncService.ts(585,23): error TS2339: Property 'isRunning' does not exist on type 'CloudSyncService'.
 src/services/cloudSyncService.ts(589,25): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(596,14): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(601,10): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(610,48): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(610,70): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(613,75): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(625,12): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(635,16): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(635,38): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(637,20): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
-src/services/cloudSyncService.ts(662,10): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
+src/services/cloudSyncService.ts(597,14): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
+src/services/cloudSyncService.ts(602,10): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
+src/services/cloudSyncService.ts(608,45): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
+src/services/cloudSyncService.ts(636,12): error TS2339: Property 'isSyncing' does not exist on type 'CloudSyncService'.
+src/services/cloudSyncService.ts(646,16): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
+src/services/cloudSyncService.ts(646,38): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
+src/services/cloudSyncService.ts(648,20): error TS2339: Property 'config' does not exist on type 'CloudSyncService'.
 src/services/editLockService.ts(36,10): error TS2339: Property 'locks' does not exist on type 'EditLockService'.
 src/services/editLockService.ts(37,10): error TS2339: Property 'lockListeners' does not exist on type 'EditLockService'.
 src/services/editLockService.ts(38,10): error TS2339: Property 'heartbeatIntervals' does not exist on type 'EditLockService'.
@@ -2906,49 +2640,36 @@ src/services/firebaseSyncService.ts(342,25): error TS2339: Property 'activeUsers
 src/services/firebaseSyncService.ts(351,10): error TS2551: Property 'syncListeners' does not exist on type 'FirebaseSyncService'. Did you mean 'addSyncListener'?
 src/services/firebaseSyncService.ts(352,10): error TS2339: Property 'errorListeners' does not exist on type 'FirebaseSyncService'.
 src/services/firebaseSyncService.ts(353,10): error TS2339: Property 'syncQueue' does not exist on type 'FirebaseSyncService'.
-src/services/keys/__tests__/keyManagementService.test.ts(90,24): error TS2339: Property 'mockReturnValueOnce' does not exist on type '() => AuthStore'.
-src/services/keys/__tests__/keyManagementService.test.ts(118,37): error TS2339: Property 'mockRejectedValueOnce' does not exist on type '(data: string) => Promise<void>'.
-src/services/keys/__tests__/keyManagementService.test.ts(133,30): error TS2339: Property 'mockReturnValueOnce' does not exist on type '{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOptions): HTMLElement; }'.
-src/services/keys/__tests__/keyManagementService.test.ts(144,24): error TS2339: Property 'mockReturnValueOnce' does not exist on type '() => AuthStore'.
-src/services/keys/__tests__/keyManagementService.test.ts(162,30): error TS2339: Property 'mockReturnValueOnce' does not exist on type '{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOptions): HTMLElement; }'.
-src/services/keys/__tests__/keyManagementService.test.ts(188,24): error TS2339: Property 'mockReturnValueOnce' does not exist on type '() => AuthStore'.
-src/services/keys/__tests__/keyManagementService.test.ts(261,24): error TS2339: Property 'mockReturnValueOnce' does not exist on type '() => AuthStore'.
-src/services/keys/__tests__/keyManagementService.test.ts(282,24): error TS2339: Property 'mockReturnValueOnce' does not exist on type '() => AuthStore'.
-src/services/keys/keyManagementService.ts(25,64): error TS2769: No overload matches this call.
+src/services/keys/__tests__/keyManagementService.test.ts(73,54): error TS2554: Expected 1 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(81,40): error TS2307: Cannot find module '../../../stores/auth/authStore' or its corresponding type declarations.
+src/services/keys/__tests__/keyManagementService.test.ts(87,41): error TS2554: Expected 1 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(97,34): error TS2554: Expected 2-3 arguments, but got 1.
+src/services/keys/__tests__/keyManagementService.test.ts(110,37): error TS2339: Property 'mockRejectedValueOnce' does not exist on type '(data: string) => Promise<void>'.
+src/services/keys/__tests__/keyManagementService.test.ts(112,41): error TS2554: Expected 2-3 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(125,30): error TS2339: Property 'mockReturnValueOnce' does not exist on type '{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOptions): HTMLElement; }'.
+src/services/keys/__tests__/keyManagementService.test.ts(127,34): error TS2554: Expected 2-4 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(135,40): error TS2307: Cannot find module '../../../stores/auth/authStore' or its corresponding type declarations.
+src/services/keys/__tests__/keyManagementService.test.ts(141,41): error TS2554: Expected 2-4 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(154,30): error TS2339: Property 'mockReturnValueOnce' does not exist on type '{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOptions): HTMLElement; }'.
+src/services/keys/__tests__/keyManagementService.test.ts(156,34): error TS2554: Expected 3-5 arguments, but got 1.
+src/services/keys/__tests__/keyManagementService.test.ts(164,41): error TS2554: Expected 3-5 arguments, but got 1.
+src/services/keys/__tests__/keyManagementService.test.ts(172,48): error TS2554: Expected 2 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(179,40): error TS2307: Cannot find module '../../../stores/auth/authStore' or its corresponding type declarations.
+src/services/keys/__tests__/keyManagementService.test.ts(185,41): error TS2554: Expected 2 arguments, but got 0.
+src/services/keys/__tests__/keyManagementService.test.ts(251,40): error TS2307: Cannot find module '../../../stores/auth/authStore' or its corresponding type declarations.
+src/services/keys/__tests__/keyManagementService.test.ts(257,49): error TS2339: Property 'importAndLogin' does not exist on type 'KeyManagementService'.
+src/services/keys/__tests__/keyManagementService.test.ts(272,40): error TS2307: Cannot find module '../../../stores/auth/authStore' or its corresponding type declarations.
+src/services/keys/__tests__/keyManagementService.test.ts(278,49): error TS2339: Property 'importAndLogin' does not exist on type 'KeyManagementService'.
+src/services/keys/__tests__/keyManagementService.test.ts(297,30): error TS2339: Property 'importAndLogin' does not exist on type 'KeyManagementService'.
+src/services/keys/keyManagementService.ts(29,64): error TS2769: No overload matches this call.
   Overload 1 of 2, '(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer>', gave the following error.
-    Argument of type 'CryptoKey | Uint8Array<ArrayBuffer>' is not assignable to parameter of type 'BufferSource'.
+    Argument of type 'CryptoKey | Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BufferSource'.
       Type 'CryptoKey' is not assignable to type 'BufferSource'.
   Overload 2 of 2, '(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer>', gave the following error.
-    Argument of type 'CryptoKey | Uint8Array<ArrayBuffer>' is not assignable to parameter of type 'BufferSource'.
+    Argument of type 'CryptoKey | Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BufferSource'.
       Type 'CryptoKey' is not assignable to type 'BufferSource'.
-src/services/keys/keyManagementService.ts(59,25): error TS2769: No overload matches this call.
-  Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.
-  Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'ArrayLike<unknown>'.
-      Property 'length' is missing in type 'CryptoKey' but required in type 'ArrayLike<unknown>'.
-src/services/keys/keyManagementService.ts(103,25): error TS2769: No overload matches this call.
-  Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.
-  Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'ArrayLike<unknown>'.
-      Property 'length' is missing in type 'CryptoKey' but required in type 'ArrayLike<unknown>'.
-src/services/keys/keyManagementService.ts(152,35): error TS2769: No overload matches this call.
-  Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.
-  Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'ArrayLike<unknown>'.
-      Property 'length' is missing in type 'CryptoKey' but required in type 'ArrayLike<unknown>'.
-src/services/keys/keyManagementService.ts(201,25): error TS2769: No overload matches this call.
-  Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.
-  Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.
-    Argument of type 'CryptoKey' is not assignable to parameter of type 'ArrayLike<unknown>'.
-      Property 'length' is missing in type 'CryptoKey' but required in type 'ArrayLike<unknown>'.
-src/services/keys/keyManagementService.ts(292,11): error TS2554: Expected 1 arguments, but got 2.
-src/services/keys/keyManagementService.ts(296,53): error TS2554: Expected 3 arguments, but got 2.
-src/services/keys/keyManagementService.ts(319,53): error TS2345: Argument of type '{ encryptionKey: any; salt: any; currentUser: any; budgetId: any; }' is not assignable to parameter of type 'NewUserData'.
-  Property 'shareCode' is missing in type '{ encryptionKey: any; salt: any; currentUser: any; budgetId: any; }' but required in type 'NewUserData'.
+src/services/keys/keyManagementService.ts(319,11): error TS2554: Expected 1 arguments, but got 2.
+src/services/keys/keyManagementService.ts(323,53): error TS2554: Expected 3 arguments, but got 2.
 src/services/security/__tests__/securityService.test.ts(1,48): error TS6133: 'afterEach' is declared but its value is never read.
 src/services/security/__tests__/securityService.test.ts(176,11): error TS2339: Property 'self' does not exist on type '{ name: string; }'.
 src/services/security/__tests__/securityService.test.ts(215,34): error TS2339: Property 'ref' does not exist on type '{}'.
@@ -2997,7 +2718,7 @@ src/stores/ui/toastStore.ts(73,30): error TS2339: Property 'showError' does not 
 src/stores/ui/toastStore.ts(75,30): error TS2339: Property 'showWarning' does not exist on type 'unknown'.
 src/stores/ui/toastStore.ts(77,30): error TS2339: Property 'showInfo' does not exist on type 'unknown'.
 src/stores/ui/toastStore.ts(79,30): error TS2339: Property 'showPayday' does not exist on type 'unknown'.
-src/stores/ui/uiStore.ts(274,81): error TS2554: Expected 1 arguments, but got 2.
+src/stores/ui/uiStore.ts(272,81): error TS2554: Expected 1 arguments, but got 2.
 src/utils/accounts/__tests__/accountValidation.test.ts(210,13): error TS6133: 'expectedDays' is declared but its value is never read.
 src/utils/accounts/__tests__/accountValidation.test.ts(210,39): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/utils/accounts/__tests__/accountValidation.test.ts(210,52): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
@@ -3206,40 +2927,33 @@ src/utils/budgeting/envelopeCalculations.ts(40,14): error TS2362: The left-hand 
 src/utils/budgeting/envelopeCalculations.ts(40,22): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/utils/budgeting/envelopeCalculations.ts(107,21): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/utils/budgeting/envelopeCalculations.ts(107,53): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/utils/budgeting/envelopeFormUtils.ts(50,12): error TS2339: Property 'name' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(52,12): error TS2339: Property 'name' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(61,14): error TS2339: Property 'name' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(69,12): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(76,12): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(80,12): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(84,48): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
-src/utils/budgeting/envelopeFormUtils.ts(86,14): error TS2339: Property 'targetAmount' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(88,14): error TS2339: Property 'targetAmount' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(90,14): error TS2339: Property 'targetAmount' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(99,12): error TS2339: Property 'currentBalance' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(104,12): error TS2339: Property 'category' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(108,14): error TS2339: Property 'category' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(114,12): error TS2339: Property 'priority' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(119,12): error TS2339: Property 'color' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(125,12): error TS2339: Property 'frequency' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(130,12): error TS2339: Property 'description' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(150,50): error TS2554: Expected 2-3 arguments, but got 1.
-src/utils/budgeting/envelopeFormUtils.ts(156,48): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
-src/utils/budgeting/envelopeFormUtils.ts(194,11): error TS2339: Property 'editingId' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(194,22): error TS2339: Property 'createdBy' does not exist on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(223,14): error TS2339: Property 'id' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
-src/utils/budgeting/envelopeFormUtils.ts(224,14): error TS2339: Property 'createdAt' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
-src/utils/budgeting/envelopeFormUtils.ts(225,14): error TS2339: Property 'createdBy' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
-src/utils/budgeting/envelopeFormUtils.ts(227,14): error TS2339: Property 'id' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
-src/utils/budgeting/envelopeFormUtils.ts(265,48): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
-src/utils/budgeting/envelopeFormUtils.ts(336,46): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
-src/utils/budgeting/envelopeFormUtils.ts(337,32): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
-src/utils/budgeting/envelopeFormUtils.ts(345,34): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
+src/utils/budgeting/envelopeFormUtils.ts(55,21): error TS2339: Property 'errors' does not exist on type 'ZodError<{ id: string; name: string; category: string; archived: boolean; lastModified: number; createdAt?: number; currentBalance?: number; targetAmount?: number; description?: string; }>'.
+src/utils/budgeting/envelopeFormUtils.ts(66,15): error TS2339: Property 'name' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(73,14): error TS2339: Property 'name' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(81,12): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(88,12): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(92,12): error TS2339: Property 'monthlyAmount' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(96,48): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
+src/utils/budgeting/envelopeFormUtils.ts(98,14): error TS2339: Property 'targetAmount' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(100,14): error TS2339: Property 'targetAmount' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(102,14): error TS2339: Property 'targetAmount' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(107,15): error TS2339: Property 'category' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(110,14): error TS2339: Property 'category' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(116,12): error TS2339: Property 'priority' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(123,14): error TS2339: Property 'frequency' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(144,50): error TS2554: Expected 2-3 arguments, but got 1.
+src/utils/budgeting/envelopeFormUtils.ts(150,48): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
+src/utils/budgeting/envelopeFormUtils.ts(188,11): error TS2339: Property 'editingId' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(188,22): error TS2339: Property 'createdBy' does not exist on type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(217,14): error TS2339: Property 'id' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
+src/utils/budgeting/envelopeFormUtils.ts(218,14): error TS2339: Property 'createdAt' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
+src/utils/budgeting/envelopeFormUtils.ts(219,14): error TS2339: Property 'createdBy' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
+src/utils/budgeting/envelopeFormUtils.ts(221,14): error TS2339: Property 'id' does not exist on type '{ name: any; monthlyAmount: number; currentBalance: number; category: any; color: any; frequency: any; description: any; priority: any; autoAllocate: boolean; icon: any; envelopeType: any; targetAmount: number; ... 4 more ...; updatedBy: any; }'.
+src/utils/budgeting/envelopeFormUtils.ts(259,48): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
+src/utils/budgeting/envelopeFormUtils.ts(330,46): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
+src/utils/budgeting/envelopeFormUtils.ts(331,32): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
+src/utils/budgeting/envelopeFormUtils.ts(339,34): error TS2339: Property 'SINKING_FUND' does not exist on type '{ readonly BILL: "bill"; readonly VARIABLE: "variable"; readonly SAVINGS: "savings"; }'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(46,30): error TS2339: Property 'monthlyAmount' does not exist on type 'Envelope'.
-src/utils/budgeting/envelopeIntegrityChecker.ts(92,49): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/utils/budgeting/envelopeIntegrityChecker.ts(93,14): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/utils/budgeting/envelopeIntegrityChecker.ts(190,51): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/utils/budgeting/envelopeIntegrityChecker.ts(191,16): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(230,28): error TS2339: Property 'monthlyAmount' does not exist on type 'Envelope'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(236,15): error TS2339: Property 'monthlyAmount' does not exist on type 'Envelope'.
 src/utils/budgeting/paycheckDeletion.ts(44,28): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
@@ -3285,20 +2999,19 @@ src/utils/budgeting/suggestionUtils.ts(320,45): error TS2339: Property 'showDism
 src/utils/common/__tests__/BaseMutex.test.ts(15,27): error TS2339: Property 'name' does not exist on type 'BaseMutex'.
 src/utils/common/__tests__/BaseMutex.test.ts(16,27): error TS2339: Property 'locked' does not exist on type 'BaseMutex'.
 src/utils/common/__tests__/BaseMutex.test.ts(148,13): error TS6133: 'thirdPromise' is declared but its value is never read.
-src/utils/common/analyticsProcessor.ts(16,12): error TS2345: Argument of type 'Date' is not assignable to parameter of type 'number'.
-src/utils/common/analyticsProcessor.ts(28,41): error TS2345: Argument of type 'Date' is not assignable to parameter of type 'number'.
-src/utils/common/analyticsProcessor.ts(112,77): error TS2554: Expected 1-2 arguments, but got 3.
-src/utils/common/analyticsProcessor.ts(116,50): error TS2339: Property 'month' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(116,72): error TS2339: Property 'month' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(149,53): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(149,66): error TS2339: Property 'expenses' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(221,7): error TS2698: Spread types may only be created from object types.
-src/utils/common/analyticsProcessor.ts(222,41): error TS2339: Property 'amount' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(222,53): error TS2339: Property 'budget' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(223,40): error TS2339: Property 'budget' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(223,53): error TS2339: Property 'amount' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(275,50): error TS2339: Property 'income' does not exist on type 'unknown'.
-src/utils/common/analyticsProcessor.ts(284,50): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(39,41): error TS2345: Argument of type 'Date' is not assignable to parameter of type 'number'.
+src/utils/common/analyticsProcessor.ts(123,77): error TS2554: Expected 1-2 arguments, but got 3.
+src/utils/common/analyticsProcessor.ts(127,50): error TS2339: Property 'month' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(127,72): error TS2339: Property 'month' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(160,53): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(160,66): error TS2339: Property 'expenses' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(232,7): error TS2698: Spread types may only be created from object types.
+src/utils/common/analyticsProcessor.ts(233,41): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(233,53): error TS2339: Property 'budget' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(234,40): error TS2339: Property 'budget' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(234,53): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(286,50): error TS2339: Property 'income' does not exist on type 'unknown'.
+src/utils/common/analyticsProcessor.ts(295,50): error TS2339: Property 'expenses' does not exist on type 'unknown'.
 src/utils/common/BaseMutex.ts(12,10): error TS2339: Property 'name' does not exist on type 'BaseMutex'.
 src/utils/common/BaseMutex.ts(13,10): error TS2339: Property 'locked' does not exist on type 'BaseMutex'.
 src/utils/common/BaseMutex.ts(14,10): error TS2339: Property 'queue' does not exist on type 'BaseMutex'.
@@ -3433,19 +3146,19 @@ src/utils/common/testBudgetHistory.ts(47,40): error TS2345: Argument of type '({
       Types of property 'changeType' are incompatible.
         Type 'string' is not assignable to type '"create" | "update" | "delete"'.
 src/utils/common/testBudgetHistory.ts(66,36): error TS2551: Property 'getBudgetCommits' does not exist on type 'VioletVaultDB'. Did you mean 'budgetCommits'?
-src/utils/common/toastHelpers.ts(21,24): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(22,22): error TS2339: Property 'showError' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(23,24): error TS2339: Property 'showWarning' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(24,21): error TS2339: Property 'showInfo' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(25,23): error TS2339: Property 'showPayday' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(108,48): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(109,51): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(110,52): error TS2339: Property 'showError' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(113,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(114,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(115,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(118,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
-src/utils/common/toastHelpers.ts(120,30): error TS2339: Property 'showError' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(20,54): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(21,52): error TS2339: Property 'showError' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(22,54): error TS2339: Property 'showWarning' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(23,51): error TS2339: Property 'showInfo' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(24,53): error TS2339: Property 'showPayday' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(106,48): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(107,51): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(108,52): error TS2339: Property 'showError' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(111,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(112,49): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(113,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(116,47): error TS2339: Property 'showSuccess' does not exist on type 'unknown'.
+src/utils/common/toastHelpers.ts(118,30): error TS2339: Property 'showError' does not exist on type 'unknown'.
 src/utils/common/transactionArchiving.ts(35,10): error TS2339: Property 'config' does not exist on type 'TransactionArchiver'.
 src/utils/common/transactionArchiving.ts(36,10): error TS2339: Property 'stats' does not exist on type 'TransactionArchiver'.
 src/utils/common/transactionArchiving.ts(47,55): error TS2339: Property 'config' does not exist on type 'TransactionArchiver'.
@@ -3469,13 +3182,13 @@ src/utils/dataManagement/__tests__/dexieUtils.test.ts(7,25): error TS6133: 'mode
 src/utils/dataManagement/__tests__/dexieUtils.test.ts(7,31): error TS6133: 'tables' is declared but its value is never read.
 src/utils/dataManagement/__tests__/fileUtils.test.ts(26,63): error TS2740: Type '{ readAsText: Mock<Procedure>; onload: Mock<Procedure>; onerror: Mock<Procedure>; }' is missing the following properties from type 'FileReader': error, onabort, onloadend, onloadstart, and 13 more.
 src/utils/dataManagement/__tests__/firebaseUtils.test.ts(31,23): error TS2339: Property 'syncMetadata' does not exist on type 'VioletVaultDB'.
-src/utils/dataManagement/__tests__/firebaseUtils.test.ts(37,41): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; }>'.
-src/utils/dataManagement/__tests__/firebaseUtils.test.ts(45,41): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; }>'.
+src/utils/dataManagement/__tests__/firebaseUtils.test.ts(37,41): error TS2339: Property 'mockResolvedValue' does not exist on type '(overrideConfig?: any) => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; }>'.
+src/utils/dataManagement/__tests__/firebaseUtils.test.ts(45,41): error TS2339: Property 'mockResolvedValue' does not exist on type '(overrideConfig?: any) => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; }>'.
 src/utils/dataManagement/dexieUtils.ts(70,33): error TS2345: Argument of type '{ id: string; unassignedCash: any; biweeklyAllocation: any; actualBalance: any; isActualBalanceManual: any; supplementalAccounts: any; lastUpdated: string; }' is not assignable to parameter of type 'BudgetRecord'.
   Property 'lastModified' is missing in type '{ id: string; unassignedCash: any; biweeklyAllocation: any; actualBalance: any; isActualBalanceManual: any; supplementalAccounts: any; lastUpdated: string; }' but required in type 'BudgetRecord'.
 src/utils/dataManagement/firebaseUtils.ts(12,18): error TS2339: Property 'syncMetadata' does not exist on type 'VioletVaultDB'.
 src/utils/dataManagement/firebaseUtils.ts(13,22): error TS2339: Property 'syncMetadata' does not exist on type 'VioletVaultDB'.
-src/utils/dataManagement/firebaseUtils.ts(31,13): error TS2339: Property 'chunkedSyncService' does not exist on type 'typeof import("violet-vault/src/services/chunkedSyncService")'.
+src/utils/dataManagement/firebaseUtils.ts(36,13): error TS2339: Property 'chunkedSyncService' does not exist on type 'typeof import("violet-vault/src/services/chunkedSyncService")'.
 src/utils/debts/__tests__/debtFormValidation.test.ts(8,3): error TS2305: Module '"../debtFormValidation"' has no exported member 'formatDebtMetrics'.
 src/utils/debts/__tests__/debtFormValidation.test.ts(39,32): error TS2339: Property 'currentBalance' does not exist on type 'DebtFormData'.
 src/utils/debts/__tests__/debtFormValidation.test.ts(172,32): error TS2339: Property 'currentBalance' does not exist on type 'DebtFormData'.
@@ -3542,13 +3255,12 @@ src/utils/debug/syncDiagnostic.ts(72,16): error TS2339: Property 'budgetDb' does
 src/utils/debug/syncDiagnostic.ts(85,40): error TS2339: Property 'budgetDb' does not exist on type 'Window & typeof globalThis'.
 src/utils/debug/syncDiagnostic.ts(91,15): error TS2339: Property 'dataCounts' does not exist on type '{ timestamp: string; browser: string; url: string; errors: any[]; warnings: any[]; info: any[]; }'.
 src/utils/debug/syncDiagnostic.ts(96,54): error TS2365: Operator '+' cannot be applied to types 'unknown' and 'number'.
-src/utils/debug/syncDiagnostic.ts(113,16): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
 src/utils/debug/syncDiagnostic.ts(114,15): error TS2339: Property 'cloudSync' does not exist on type '{ timestamp: string; browser: string; url: string; errors: any[]; warnings: any[]; info: any[]; }'.
-src/utils/debug/syncDiagnostic.ts(115,27): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/utils/debug/syncDiagnostic.ts(116,26): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
-src/utils/debug/syncDiagnostic.ts(117,30): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
+src/utils/debug/syncDiagnostic.ts(115,44): error TS2339: Property 'isRunning' does not exist on type '{ triggerSyncForCriticalChange: (changeType: string) => void; }'.
+src/utils/debug/syncDiagnostic.ts(116,43): error TS2339: Property 'config' does not exist on type '{ triggerSyncForCriticalChange: (changeType: string) => void; }'.
+src/utils/debug/syncDiagnostic.ts(117,47): error TS2339: Property 'lastSyncTime' does not exist on type '{ triggerSyncForCriticalChange: (changeType: string) => void; }'.
 src/utils/debug/syncDiagnostic.ts(120,58): error TS2339: Property 'cloudSync' does not exist on type '{ timestamp: string; browser: string; url: string; errors: any[]; warnings: any[]; info: any[]; }'.
-src/utils/debug/syncDiagnostic.ts(122,19): error TS2339: Property 'cloudSyncService' does not exist on type 'Window & typeof globalThis'.
+src/utils/debug/syncDiagnostic.ts(122,36): error TS2339: Property 'isRunning' does not exist on type '{ triggerSyncForCriticalChange: (changeType: string) => void; }'.
 src/utils/debug/syncDiagnostic.ts(138,16): error TS2339: Property 'firebase' does not exist on type 'Window & typeof globalThis'.
 src/utils/debug/syncDiagnostic.ts(138,35): error TS2339: Property 'firebase' does not exist on type 'Window & typeof globalThis'.
 src/utils/debug/syncDiagnostic.ts(139,27): error TS2339: Property 'firebase' does not exist on type 'Window & typeof globalThis'.
@@ -4214,15 +3926,16 @@ src/utils/transactions/filtering.ts(202,7): error TS2339: Property 'sortOrder' d
 src/utils/transactions/filtering.ts(203,7): error TS2339: Property 'limit' does not exist on type '{}'.
 src/utils/transactions/index.ts(2,10): error TS2305: Module '"./envelopeMatching.ts"' has no exported member 'default'.
 src/utils/transactions/index.ts(3,10): error TS2305: Module '"./fileParser.ts"' has no exported member 'default'.
-src/utils/transactions/operations.ts(294,29): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/utils/transactions/operations.ts(294,58): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/utils/transactions/operations.ts(330,7): error TS2339: Property 'timeWindowMinutes' does not exist on type '{}'.
-src/utils/transactions/operations.ts(331,7): error TS2339: Property 'amountTolerance' does not exist on type '{}'.
-src/utils/transactions/operations.ts(332,7): error TS2339: Property 'checkDescription' does not exist on type '{}'.
-src/utils/transactions/operations.ts(333,7): error TS2339: Property 'checkAccount' does not exist on type '{}'.
-src/utils/transactions/operations.ts(396,13): error TS2339: Property 'currency' does not exist on type '{}'.
-src/utils/transactions/operations.ts(396,31): error TS2339: Property 'dateFormat' does not exist on type '{}'.
-src/utils/transactions/operations.ts(396,53): error TS2339: Property 'includeTime' does not exist on type '{}'.
+src/utils/transactions/operations.ts(29,35): error TS2339: Property 'errors' does not exist on type 'ZodError<{ id: string; amount: number; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; lastModified: number; date?: string | Date; createdAt?: number; description?: string; merchant?: string; receiptUrl?: string; }>'.
+src/utils/transactions/operations.ts(261,29): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/utils/transactions/operations.ts(261,58): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/utils/transactions/operations.ts(297,7): error TS2339: Property 'timeWindowMinutes' does not exist on type '{}'.
+src/utils/transactions/operations.ts(298,7): error TS2339: Property 'amountTolerance' does not exist on type '{}'.
+src/utils/transactions/operations.ts(299,7): error TS2339: Property 'checkDescription' does not exist on type '{}'.
+src/utils/transactions/operations.ts(300,7): error TS2339: Property 'checkAccount' does not exist on type '{}'.
+src/utils/transactions/operations.ts(363,13): error TS2339: Property 'currency' does not exist on type '{}'.
+src/utils/transactions/operations.ts(363,31): error TS2339: Property 'dateFormat' does not exist on type '{}'.
+src/utils/transactions/operations.ts(363,53): error TS2339: Property 'includeTime' does not exist on type '{}'.
 src/utils/validation/transactionValidation.ts(13,3): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
 ```
 

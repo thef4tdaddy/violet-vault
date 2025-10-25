@@ -1,11 +1,11 @@
 import React from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 import AccountCard from "./AccountCard";
 import {
   getAccountTypeInfo,
   calculateDaysUntilExpiration,
   getExpirationStatus,
-} from "../../utils/accounts";
+} from "@/utils/accounts";
 
 const AccountsGrid = ({ accounts, showBalances, onEdit, onDelete, onStartTransfer }) => {
   if (accounts.length === 0) {
@@ -21,14 +21,15 @@ const AccountsGrid = ({ accounts, showBalances, onEdit, onDelete, onStartTransfe
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {accounts.map((account) => {
-        const typeInfo = getAccountTypeInfo(account.type);
-        const daysUntilExpiration = calculateDaysUntilExpiration(account.expirationDate);
+      {accounts.map((account: unknown) => {
+        const acc = account as Record<string, unknown>;
+        const typeInfo = getAccountTypeInfo(acc.type);
+        const daysUntilExpiration = calculateDaysUntilExpiration(acc.expirationDate);
         const expirationStatus = getExpirationStatus(daysUntilExpiration);
 
         return (
           <AccountCard
-            key={account.id}
+            key={String(acc.id)}
             account={account}
             typeInfo={typeInfo}
             _daysUntilExpiration={daysUntilExpiration}

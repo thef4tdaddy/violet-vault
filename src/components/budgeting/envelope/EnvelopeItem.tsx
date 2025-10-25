@@ -66,13 +66,8 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
   });
 
   // Extract all display data logic
-  const {
-    statusIcon,
-    utilizationColorClass,
-    financialSummary,
-    showProgressBar,
-    progressBarColor,
-  } = useEnvelopeDisplayData(envelope, bills);
+  const { statusIcon, utilizationColorClass, financialSummary, showProgressBar, progressBarColor } =
+    useEnvelopeDisplayData(envelope, bills);
 
   return (
     <div

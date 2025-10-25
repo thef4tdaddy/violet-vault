@@ -1,6 +1,6 @@
 import React from "react";
-import { getIcon } from "../../utils";
-import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
+import { getIcon } from "@/utils";
+import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "../mobile/SlideUpModal";
 import TransferModalContent from "./TransferModalContent";
 import { Button } from "@/components/ui";

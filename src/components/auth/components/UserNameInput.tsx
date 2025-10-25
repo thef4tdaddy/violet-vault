@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * User Name Input Component
  * Name input field with proper labeling and validation

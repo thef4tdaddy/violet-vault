@@ -114,7 +114,7 @@ describe("useUpdateProfileMutation", () => {
     await result.current.mutateAsync?.(updatedProfile);
 
     // Verify mutation completed successfully
-    expect(result.current) .toBeDefined();
+    expect(result.current).toBeDefined();
   });
 
   it("should return error if not authenticated", async () => {

@@ -6,8 +6,48 @@ import logger from "../common/logger";
  *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
+
+interface SyncQueueOptions {
+  name?: string;
+  debounceMs?: number;
+  maxBatchSize?: number;
+  maxQueueAge?: number;
+}
+
+interface QueueItem<T = unknown> {
+  operation: (data: T) => Promise<unknown>;
+  data: T;
+  timestamp: number;
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}
+
+interface QueueStats {
+  enqueued: number;
+  processed: number;
+  failed: number;
+  superseded: number;
+  created: number;
+}
+
+interface FlushResult {
+  operationType: string;
+  success: boolean;
+  result?: unknown;
+  error?: unknown;
+}
+
 export class SyncQueue {
-  constructor(options = {}) {
+  name: string;
+  debounceMs: number;
+  maxBatchSize: number;
+  maxQueueAge: number;
+  queue: Map<string, QueueItem>;
+  timers: Map<string, ReturnType<typeof setTimeout>>;
+  processing: Set<string>;
+  stats: QueueStats;
+
+  constructor(options: SyncQueueOptions = {}) {
     this.name = options.name || "SyncQueue";
     this.debounceMs = options.debounceMs || 2000; // 2 seconds
     this.maxBatchSize = options.maxBatchSize || 10;
@@ -22,9 +62,13 @@ export class SyncQueue {
   /**
    * Enqueue operation with debouncing
    */
-  async enqueue(operationType, operation, data = {}) {
+  async enqueue<T = unknown>(
+    operationType: string,
+    operation: (data: T) => Promise<unknown>,
+    data: T = {} as T
+  ): Promise<unknown> {
     return new Promise((resolve, reject) => {
-      const queueItem = {
+      const queueItem: QueueItem<T> = {
         operation,
         data,
         timestamp: Date.now(),
@@ -45,9 +89,9 @@ export class SyncQueue {
   /**
    * Process all queued operations immediately
    */
-  async flush() {
+  async flush(): Promise<FlushResult[]> {
     const operations = Array.from(this.queue.keys());
-    const results = [];
+    const results: FlushResult[] = [];
 
     for (const operationType of operations) {
       try {
@@ -65,7 +109,11 @@ export class SyncQueue {
   /**
    * Get queue statistics
    */
-  getStats() {
+  getStats(): QueueStats & {
+    currentQueueSize: number;
+    processingCount: number;
+    oldestItem: number;
+  } {
     return {
       ...this.stats,
       currentQueueSize: this.queue.size,
@@ -77,7 +125,7 @@ export class SyncQueue {
   /**
    * Clear all pending operations
    */
-  clear() {
+  clear(): void {
     // Clear all timers
     for (const timerId of this.timers.values()) {
       clearTimeout(timerId);
@@ -97,11 +145,13 @@ export class SyncQueue {
    * Add item to queue with deduplication
    * @private
    */
-  _addToQueue(operationType, queueItem) {
+  private _addToQueue(operationType: string, queueItem: QueueItem): void {
     // Cancel previous operation of same type
     if (this.queue.has(operationType)) {
       const existing = this.queue.get(operationType);
-      existing.reject(new Error(`Superseded by newer ${operationType}`));
+      if (existing) {
+        existing.reject(new Error(`Superseded by newer ${operationType}`));
+      }
       this.stats.superseded++;
     }
 
@@ -113,15 +163,18 @@ export class SyncQueue {
    * Schedule debounced processing
    * @private
    */
-  _scheduleProcessing(operationType) {
+  private _scheduleProcessing(operationType: string): void {
     // Clear existing timer
     if (this.timers.has(operationType)) {
-      clearTimeout(this.timers.get(operationType));
+      const existingTimer = this.timers.get(operationType);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
     }
 
     // Schedule new timer
     const timerId = setTimeout(() => {
-      this._processOperation(operationType);
+      void this._processOperation(operationType);
     }, this.debounceMs);
 
     this.timers.set(operationType, timerId);
@@ -131,12 +184,16 @@ export class SyncQueue {
    * Process single operation from queue
    * @private
    */
-  async _processOperation(operationType) {
+  private async _processOperation(operationType: string): Promise<unknown> {
     if (!this.queue.has(operationType) || this.processing.has(operationType)) {
       return;
     }
 
     const item = this.queue.get(operationType);
+    if (!item) {
+      return;
+    }
+
     this.queue.delete(operationType);
     this.timers.delete(operationType);
     this.processing.add(operationType);
@@ -152,7 +209,7 @@ export class SyncQueue {
       return result;
     } catch (error) {
       logger.error(`❌ ${this.name}: Failed ${operationType}`, {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
       item.reject(error);
       this.stats.failed++;
@@ -166,7 +223,7 @@ export class SyncQueue {
    * Get age of oldest queued item
    * @private
    */
-  _getOldestItemAge() {
+  private _getOldestItemAge(): number {
     if (this.queue.size === 0) return 0;
 
     let oldest = Date.now();
@@ -181,7 +238,7 @@ export class SyncQueue {
    * Create initial statistics
    * @private
    */
-  _createStats() {
+  private _createStats(): QueueStats {
     return {
       enqueued: 0,
       processed: 0,
@@ -191,5 +248,3 @@ export class SyncQueue {
     };
   }
 }
-
-export default SyncQueue;

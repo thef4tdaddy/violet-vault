@@ -51,8 +51,8 @@ const ImportStep: React.FC<ImportStepProps> = ({
           <div className="text-sm text-blue-800">
             <p className="font-medium mb-1">Import Process</p>
             <p>
-              This will restore your envelopes, transactions, and settings from the backup
-              file. Your existing local data (if any) will be replaced.
+              This will restore your envelopes, transactions, and settings from the backup file.
+              Your existing local data (if any) will be replaced.
             </p>
           </div>
         </div>

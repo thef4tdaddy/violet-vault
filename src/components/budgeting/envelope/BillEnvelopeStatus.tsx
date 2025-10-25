@@ -1,6 +1,6 @@
-import React, { Suspense } from 'react';
-import { ENVELOPE_TYPES } from '../../../constants/categories';
-import { getBillEnvelopeDisplayInfo } from '../../../utils/budgeting/billEnvelopeCalculations';
+import React, { Suspense } from "react";
+import { ENVELOPE_TYPES } from "../../../constants/categories";
+import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
 
 interface Envelope {
   id: string;
@@ -19,19 +19,14 @@ interface BillEnvelopeStatusProps {
   bills: Bill[];
 }
 
-export const BillEnvelopeStatus: React.FC<BillEnvelopeStatusProps> = ({
-  envelope,
-  bills,
-}) => {
+export const BillEnvelopeStatus: React.FC<BillEnvelopeStatusProps> = ({ envelope, bills }) => {
   if (envelope.envelopeType !== ENVELOPE_TYPES.BILL || bills.length === 0) {
     return null;
   }
 
   return (
     <div className="mt-4 pt-3 border-t border-gray-200">
-      <Suspense
-        fallback={<div className="text-xs text-gray-500">Loading funding info...</div>}
-      >
+      <Suspense fallback={<div className="text-xs text-gray-500">Loading funding info...</div>}>
         {(() => {
           // Use the imported function
           const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);

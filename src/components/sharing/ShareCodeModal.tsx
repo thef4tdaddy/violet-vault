@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { QRCodeSVG } from "qrcode.react";
-import { renderIcon } from "../../utils";
-import { shareCodeManager } from "../../utils/auth/shareCodeManager";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
-import { useConfirm } from "../../hooks/common/useConfirm";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
-import logger from "../../utils/common/logger";
+import { renderIcon } from "@/utils";
+import { shareCodeManager } from "@/utils/auth/shareCodeManager";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
+import logger from "@/utils/common/logger";
 
 /**
  * Share Code Modal - Generate and display share codes with QR codes
@@ -17,11 +17,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const {
-    user: currentUser,
-    securityContext: { encryptionKey: _encryptionKey },
-    updateProfile,
-  } = useAuthManager();
+  const { user: currentUser, updateProfile } = useAuthManager();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 

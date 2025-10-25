@@ -45,15 +45,17 @@ interface BugReportSubmissionActions {
  * Includes Highlight.io integration and comprehensive error handling
  * Extracted from useBugReportV2.ts to reduce complexity
  */
-export const useBugReportSubmissionV2 = (options: {
-  providers?: Record<string, unknown>;
-  title?: string;
-  description?: string;
-  includeScreenshot?: boolean;
-  severity?: string;
-  labels?: string[];
-  screenshot?: string | null;
-} = {}) => {
+export const useBugReportSubmissionV2 = (
+  options: {
+    providers?: Record<string, unknown>;
+    title?: string;
+    description?: string;
+    includeScreenshot?: boolean;
+    severity?: string;
+    labels?: string[];
+    screenshot?: string | null;
+  } = {}
+) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
@@ -65,7 +67,8 @@ export const useBugReportSubmissionV2 = (options: {
    * Validate submission requirements using utils/validation
    */
   // eslint-disable-next-line no-architecture-violations/no-architecture-violations
-  const validateSubmission = (): boolean => { // Validation logic is in utils/validation/bugReportValidation.ts
+  const validateSubmission = (): boolean => {
+    // Validation logic is in utils/validation/bugReportValidation.ts
     const validation = validateBugReportSubmission(options.title, options.description);
     if (!validation.isValid && validation.error) {
       setSubmitError(validation.error);
@@ -115,9 +118,7 @@ export const useBugReportSubmissionV2 = (options: {
   /**
    * Handle failed submission
    */
-  const handleFailedSubmission = (result: {
-    error?: string;
-  }): boolean => {
+  const handleFailedSubmission = (result: { error?: string }): boolean => {
     const errorMessage = result.error || "Submission failed";
     logger.error("Bug report submission failed", errorMessage);
     setSubmitError(errorMessage);

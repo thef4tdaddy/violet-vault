@@ -1,6 +1,6 @@
 import React from "react";
-import { getIcon } from "../../utils";
-import { calculateDaysUntilExpiration } from "../../utils/accounts";
+import { getIcon } from "@/utils";
+import { calculateDaysUntilExpiration } from "@/utils/accounts";
 
 const ExpirationAlert = ({ expiringAccounts }) => {
   if (expiringAccounts.length === 0) return null;
