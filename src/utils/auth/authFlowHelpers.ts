@@ -4,10 +4,37 @@
  */
 import logger from "../common/logger";
 
+interface LoginResult {
+  success: boolean;
+  error?: string;
+  code?: string;
+  canCreateNew?: boolean;
+  suggestion?: string;
+}
+
+interface UserData {
+  budgetId?: string;
+  sharedBy?: string;
+  shareCode?: string;
+  userName?: string;
+  userColor?: string;
+}
+
+interface AuthError extends Error {
+  code?: string;
+  canCreateNew?: boolean;
+  suggestion?: string;
+}
+
+type LoginFunction = (password: string, userData: UserData | null) => Promise<LoginResult>;
+
 /**
  * Handle existing user login flow
  */
-export const handleExistingUserLogin = async (password, login) => {
+export const handleExistingUserLogin = async (
+  password: string,
+  login: LoginFunction
+): Promise<LoginResult> => {
   logger.auth("Existing user login - calling login with password only");
   const result = await login(password, null);
   logger.auth("Existing user login result", { success: !!result });
@@ -17,7 +44,7 @@ export const handleExistingUserLogin = async (password, login) => {
     return result;
   } else {
     logger.error("❌ Existing user login failed:", result.error);
-    const error = new Error(result.error);
+    const error = new Error(result.error) as AuthError;
     error.code = result.code;
     error.canCreateNew = result.canCreateNew;
     error.suggestion = result.suggestion;
@@ -28,7 +55,11 @@ export const handleExistingUserLogin = async (password, login) => {
 /**
  * Handle shared budget join flow
  */
-export const handleSharedBudgetJoin = async (password, userData, login) => {
+export const handleSharedBudgetJoin = async (
+  password: string,
+  userData: UserData,
+  login: LoginFunction
+): Promise<LoginResult> => {
   logger.auth("Shared budget join - using provided budgetId", {
     budgetId: userData.budgetId?.substring(0, 10) + "...",
     sharedBy: userData.sharedBy,
@@ -44,7 +75,7 @@ export const handleSharedBudgetJoin = async (password, userData, login) => {
     return result;
   } else {
     logger.error("❌ Shared budget join failed:", result.error);
-    const error = new Error(result.error);
+    const error = new Error(result.error) as AuthError;
     error.code = result.code;
     throw error;
   }
@@ -53,7 +84,7 @@ export const handleSharedBudgetJoin = async (password, userData, login) => {
 /**
  * Generate budget ID for new user
  */
-export const generateNewUserBudgetId = async (password, shareCode) => {
+export const generateNewUserBudgetId = async (password: string, shareCode: string): Promise<string> => {
   const { encryptionUtils } = await import("../security/encryption");
 
   if (!shareCode) {
@@ -74,10 +105,14 @@ export const generateNewUserBudgetId = async (password, shareCode) => {
 /**
  * Handle new user setup flow
  */
-export const handleNewUserSetup = async (password, userData, login) => {
-  const budgetId = await generateNewUserBudgetId(password, userData.shareCode);
+export const handleNewUserSetup = async (
+  password: string,
+  userData: UserData,
+  login: LoginFunction
+): Promise<LoginResult> => {
+  const budgetId = await generateNewUserBudgetId(password, userData.shareCode || "");
 
-  const userDataWithId = {
+  const userDataWithId: UserData = {
     ...userData,
     budgetId: budgetId,
   };
@@ -105,7 +140,7 @@ export const handleNewUserSetup = async (password, userData, login) => {
     return result;
   } else {
     logger.error("❌ Setup failed:", result.error);
-    const error = new Error(result.error);
+    const error = new Error(result.error) as AuthError;
     error.code = result.code;
     error.canCreateNew = result.canCreateNew;
     error.suggestion = result.suggestion;
