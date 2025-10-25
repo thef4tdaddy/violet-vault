@@ -9,12 +9,25 @@ interface UseEditLockOptions {
   showToasts?: boolean;
 }
 
+interface LockDocument {
+  userId?: string;
+  userName?: string;
+  expiresAt?: number;
+  [key: string]: unknown;
+}
+
+interface EditLockServiceUser {
+  id?: string;
+  budgetId?: string;
+  userName?: string;
+}
+
 /**
  * Hook for managing edit locks on budget items
  * Provides cross-browser edit conflict prevention
  */
 const useEditLock = (recordType: string, recordId: string, options: UseEditLockOptions = {}) => {
-  const [lock, setLock] = useState<any>(null);
+  const [lock, setLock] = useState<LockDocument | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isOwnLock, setIsOwnLock] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,10 +47,11 @@ const useEditLock = (recordType: string, recordId: string, options: UseEditLockO
       setLock(lockDoc);
       setIsLocked(!!lockDoc);
       // Check ownership directly from the lock document using same ID logic as service
+      const editLockServiceTyped = editLockService as unknown as { currentUser?: EditLockServiceUser };
       const currentUserId =
-        (editLockService as any).currentUser?.id ||
-        (editLockService as any).currentUser?.budgetId ||
-        `user_${(editLockService as any).currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
+        editLockServiceTyped.currentUser?.id ||
+        editLockServiceTyped.currentUser?.budgetId ||
+        `user_${editLockServiceTyped.currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
         "anonymous";
       setIsOwnLock(lockDoc && currentUserId && lockDoc.userId === currentUserId);
 
