@@ -26,18 +26,22 @@ export const useConnectionData = ({
     if (!currentEntity) return [];
 
     switch (entityType) {
-      case "bill":
-        return currentEntity.envelopeId
-          ? envelopes.filter((e) => e.id === currentEntity.envelopeId)
+      case "bill": {
+        const billEntity = currentEntity as Bill;
+        return billEntity.envelopeId
+          ? envelopes.filter((e) => e.id === billEntity.envelopeId)
           : [];
+      }
 
       case "envelope":
         return bills.filter((b) => b.envelopeId === entityId);
 
-      case "debt":
-        return currentEntity.envelopeId
-          ? envelopes.filter((e) => e.id === currentEntity.envelopeId)
+      case "debt": {
+        const debtEntity = currentEntity as Debt;
+        return debtEntity.envelopeId
+          ? envelopes.filter((e) => e.id === debtEntity.envelopeId)
           : [];
+      }
 
       default:
         return [];

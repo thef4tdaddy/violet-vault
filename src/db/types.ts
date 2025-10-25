@@ -20,6 +20,9 @@ export interface Envelope {
   currentBalance?: number;
   targetAmount?: number;
   description?: string;
+  // Connection properties
+  billId?: string;
+  debtId?: string;
 }
 
 export interface Transaction {
@@ -119,6 +122,7 @@ export interface Debt {
   interestRate?: number;
   dueDate?: Date;
   originalBalance?: number;
+  envelopeId?: string;
 }
 
 export interface BudgetCommit {

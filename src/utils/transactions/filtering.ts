@@ -184,13 +184,24 @@ export const sortTransactions = (transactions = [], sortBy = "date", sortOrder =
   }
 };
 
+interface ProcessTransactionsOptions {
+  dateRange?: { start?: string; end?: string };
+  envelopeId?: string;
+  category?: string;
+  type?: string;
+  searchQuery?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+}
+
 /**
  * Apply multiple filters and sorting to transactions
  * @param {Array} transactions - Transactions to process
- * @param {Object} options - Filter and sort options
+ * @param {ProcessTransactionsOptions} options - Filter and sort options
  * @returns {Array} Processed transactions
  */
-export const processTransactions = (transactions = [], options = {}) => {
+export const processTransactions = (transactions = [], options: ProcessTransactionsOptions = {}) => {
   try {
     const {
       dateRange,

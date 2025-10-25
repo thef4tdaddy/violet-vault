@@ -1,16 +1,71 @@
 // Firebase Sync Service - Core synchronization operations
 import { initializeApp } from "firebase/app";
+import type { FirebaseApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import type { Firestore } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import type { Auth } from "firebase/auth";
 import { encryptionUtils } from "../utils/security/encryption";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
 import logger from "../utils/common/logger";
+
+// Type definitions for sync operations
+type SyncListenerCallback = (event: string, data: unknown) => void;
+type ErrorListenerCallback = (error: Error) => void;
+
+interface SyncMetadata {
+  version?: string;
+  userAgent?: string;
+  [key: string]: unknown;
+}
+
+interface SyncStatus {
+  isOnline: boolean;
+  isInitialized: boolean;
+  queuedOperations: number;
+  lastSyncTimestamp: number | null;
+  activeUsers: number;
+}
+
+// Augment Window interface for development debugging
+declare global {
+  interface Window {
+    firebaseApp?: FirebaseApp;
+    firebaseDb?: Firestore;
+    firebaseAuth?: Auth;
+  }
+}
 
 /**
  * Core Firebase Sync Service
  * Handles basic Firebase operations, authentication, and simple data sync
  */
 class FirebaseSyncService {
+  // Firebase instances
+  app: FirebaseApp | null;
+  db: Firestore | null;
+  auth: Auth | null;
+
+  // Sync configuration
+  budgetId: string | null;
+  encryptionKey: CryptoKey | null;
+  unsubscribe: (() => void) | null;
+  lastSyncTimestamp: number | null;
+
+  // State management
+  isOnline: boolean;
+  syncQueue: Array<() => Promise<void>>;
+  retryAttempts: number;
+  maxRetryAttempts: number;
+  retryDelay: number;
+  activeUsers: Map<string, unknown>;
+  syncListeners: Set<SyncListenerCallback>;
+  errorListeners: Set<ErrorListenerCallback>;
+
+  // Activity tracking
+  recentActivity: unknown[];
+  maxActivityItems: number;
+
   constructor() {
     this.app = null;
     this.db = null;
@@ -41,7 +96,7 @@ class FirebaseSyncService {
   /**
    * Initialize Firebase app and services
    */
-  _initializeFirebase() {
+  private _initializeFirebase(): void {
     try {
       logger.info("🔥 Firebase: Starting initialization...", {
         projectId: firebaseConfig.projectId,
@@ -71,7 +126,7 @@ class FirebaseSyncService {
   /**
    * Check if running in development mode
    */
-  _isDevelopmentMode() {
+  private _isDevelopmentMode(): boolean {
     return (
       typeof window !== "undefined" &&
       (import.meta.env.MODE === "development" ||
@@ -83,7 +138,7 @@ class FirebaseSyncService {
   /**
    * Setup network monitoring
    */
-  _setupNetworkMonitoring() {
+  private _setupNetworkMonitoring(): void {
     if (typeof window !== "undefined") {
       window.addEventListener("online", () => {
         this.isOnline = true;
@@ -101,7 +156,7 @@ class FirebaseSyncService {
   /**
    * Ensure user is authenticated with Firebase
    */
-  async ensureAuthenticated() {
+  async ensureAuthenticated(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         unsubscribe();
@@ -137,7 +192,7 @@ class FirebaseSyncService {
   /**
    * Initialize sync with budget ID and encryption key
    */
-  initialize(budgetId, encryptionKey) {
+  initialize(budgetId: string, encryptionKey: CryptoKey): void {
     this.budgetId = budgetId;
     this.encryptionKey = encryptionKey;
     this.retryAttempts = 0;
@@ -152,7 +207,7 @@ class FirebaseSyncService {
   /**
    * Save data to Firebase with encryption
    */
-  async saveToCloud(data, metadata = {}) {
+  async saveToCloud(data: unknown, metadata: SyncMetadata = {}): Promise<boolean> {
     if (!this.budgetId || !this.encryptionKey) {
       throw new Error("Sync not initialized");
     }
@@ -161,7 +216,8 @@ class FirebaseSyncService {
       // Ensure authentication
       const isAuthenticated = await this.ensureAuthenticated();
       if (!isAuthenticated) {
-        throw new Error("Failed to authenticate");
+        logger.error("Failed to authenticate");
+        return false;
       }
 
       // Encrypt the data
@@ -195,7 +251,7 @@ class FirebaseSyncService {
   /**
    * Load data from Firebase with decryption
    */
-  async loadFromCloud() {
+  async loadFromCloud(): Promise<unknown> {
     if (!this.budgetId || !this.encryptionKey) {
       throw new Error("Sync not initialized");
     }
@@ -204,7 +260,8 @@ class FirebaseSyncService {
       // Ensure authentication
       const isAuthenticated = await this.ensureAuthenticated();
       if (!isAuthenticated) {
-        throw new Error("Failed to authenticate");
+        logger.error("Failed to authenticate");
+        return null;
       }
 
       // Load from Firebase
@@ -220,8 +277,9 @@ class FirebaseSyncService {
 
       // Decrypt the data
       const decryptedData = await encryptionUtils.decrypt(
-        cloudData.encryptedData,
-        this.encryptionKey
+        cloudData.encryptedData.data,
+        this.encryptionKey,
+        cloudData.encryptedData.iv
       );
 
       const parsedData = JSON.parse(decryptedData);
@@ -239,7 +297,7 @@ class FirebaseSyncService {
   /**
    * Setup real-time sync listener
    */
-  setupRealTimeSync(callback) {
+  setupRealTimeSync(callback: (data: unknown) => void): void {
     if (!this.budgetId) {
       throw new Error("Sync not initialized");
     }
@@ -265,7 +323,7 @@ class FirebaseSyncService {
   /**
    * Stop real-time sync
    */
-  stopRealTimeSync() {
+  stopRealTimeSync(): void {
     if (this.unsubscribe) {
       this.unsubscribe();
       this.unsubscribe = null;
@@ -276,21 +334,14 @@ class FirebaseSyncService {
   /**
    * Add sync event listener
    */
-  addSyncListener(callback) {
+  addSyncListener(callback: SyncListenerCallback): void {
     this.syncListeners.add(callback);
-  }
-
-  /**
-   * Remove sync event listener
-   */
-  removeSyncListener(callback) {
-    this.syncListeners.delete(callback);
   }
 
   /**
    * Notify all listeners of sync events
    */
-  _notifyListeners(event, data) {
+  private _notifyListeners(event: string, data: unknown): void {
     this.syncListeners.forEach((callback) => {
       try {
         callback(event, data);
@@ -303,7 +354,7 @@ class FirebaseSyncService {
   /**
    * Process queued operations when back online
    */
-  async _processQueuedOperations() {
+  private async _processQueuedOperations(): Promise<void> {
     if (!this.isOnline || this.syncQueue.length === 0) {
       return;
     }
@@ -321,19 +372,9 @@ class FirebaseSyncService {
   }
 
   /**
-   * Queue operation for later execution
-   */
-  _queueOperation(operation) {
-    if (this.syncQueue.length >= 50) {
-      this.syncQueue.shift(); // Remove oldest operation
-    }
-    this.syncQueue.push(operation);
-  }
-
-  /**
    * Get sync status
    */
-  getStatus() {
+  getStatus(): SyncStatus {
     return {
       isOnline: this.isOnline,
       isInitialized: !!(this.budgetId && this.encryptionKey),
@@ -346,7 +387,7 @@ class FirebaseSyncService {
   /**
    * Cleanup resources
    */
-  cleanup() {
+  cleanup(): void {
     this.stopRealTimeSync();
     this.syncListeners.clear();
     this.errorListeners.clear();
