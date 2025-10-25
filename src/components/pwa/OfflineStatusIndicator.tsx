@@ -7,18 +7,36 @@ import logger from "../../utils/common/logger";
 import { useConfirm } from "../../hooks/common/useConfirm";
 
 /**
+ * Pending operation interface
+ */
+interface PendingOperation {
+  id?: string | number;
+  type?: string;
+  retryCount?: number;
+}
+
+/**
+ * Sync status interface
+ */
+interface SyncStatus {
+  pendingCount: number;
+  isOnline: boolean;
+  pendingOperations?: PendingOperation[];
+}
+
+/**
  * Enhanced Offline Status Indicator
  * Shows connection status, pending sync operations, and offline capabilities
  */
-const OfflineStatusIndicator = () => {
+const OfflineStatusIndicator: React.FC = () => {
   const isOnline = useUiStore((state) => state.isOnline);
   const confirm = useConfirm();
-  const [syncStatus, setSyncStatus] = useState({
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     pendingCount: 0,
     isOnline: true,
   });
-  const [showDetails, setShowDetails] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState(null);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
   // Update sync status periodically
   useEffect(() => {
@@ -56,22 +74,22 @@ const OfflineStatusIndicator = () => {
     }
   }, [showDetails]);
 
-  const getStatusColor = () => {
+  const getStatusColor = (): string => {
     if (!isOnline) return "bg-red-500";
     if (syncStatus.pendingCount > 0) return "bg-yellow-500";
     return "bg-green-500";
   };
 
-  const getStatusText = () => {
+  const getStatusText = (): string => {
     if (!isOnline) return "Offline";
     if (syncStatus.pendingCount > 0) return `Syncing ${syncStatus.pendingCount}`;
     return "Online";
   };
 
-  const formatTime = (date) => {
+  const formatTime = (date: Date | null): string => {
     if (!date) return "Never";
     const now = new Date();
-    const diff = now - date;
+    const diff = now.getTime() - date.getTime();
 
     if (diff < 60000) return "Just now";
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
@@ -79,7 +97,7 @@ const OfflineStatusIndicator = () => {
     return date.toLocaleDateString();
   };
 
-  const handleToggleDetails = () => {
+  const handleToggleDetails = (): void => {
     setShowDetails(!showDetails);
   };
 

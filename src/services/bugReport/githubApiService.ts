@@ -5,13 +5,94 @@
  */
 import logger from "../../utils/common/logger";
 
+/**
+ * GitHub API success response
+ */
+interface GitHubAPISuccessResponse {
+  success: true;
+  issueNumber: number;
+  url: string;
+}
+
+/**
+ * GitHub API error response
+ */
+interface GitHubAPIErrorResponse {
+  success: false;
+  error: string;
+}
+
+/**
+ * GitHub API response union type
+ */
+type GitHubAPIResponse = GitHubAPISuccessResponse | GitHubAPIErrorResponse;
+
+/**
+ * Bug report data interface
+ */
+interface BugReportData {
+  title: string;
+  description?: string;
+  steps?: string;
+  expected?: string;
+  actual?: string;
+  labels?: string[];
+  severity?: string;
+  screenshot?: string;
+  sessionUrl?: string;
+  logs?: string[];
+  systemInfo?: {
+    appVersion?: string;
+    browser?: { name: string; version: string };
+    viewport?: { width: number; height: number };
+    userAgent?: string;
+    performance?: { memory?: { usedJSHeapSize: number } };
+    timestamp?: string;
+    errors?: {
+      recentErrors?: Array<{
+        type?: string;
+        message?: string;
+        stack?: string;
+        filename?: string;
+        lineno?: number;
+        timestamp?: string;
+      }>;
+      consoleLogs?: Array<{
+        level: string;
+        message: string;
+        timestamp: number;
+      }>;
+    };
+  };
+  contextInfo?: {
+    url?: string;
+    userLocation?: string;
+  };
+}
+
+/**
+ * Validation result
+ */
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  provider: string;
+}
+
 export class GitHubAPIService {
   /**
    * Submit bug report to GitHub Issues API
    * @param {Object} reportData - Bug report data
    * @returns {Promise<Object>} Submission result
    */
-  static async submitToGitHub(reportData) {
+  static async submitToGitHub(reportData: BugReportData): Promise<{
+    success: boolean;
+    issueNumber?: number;
+    url?: string;
+    error?: string;
+    provider: string;
+  }> {
     try {
       logger.debug("Submitting bug report to GitHub", {
         title: reportData.title,
@@ -65,7 +146,7 @@ export class GitHubAPIService {
    * @param {Object} reportData - Bug report data
    * @returns {string} Formatted issue body
    */
-  static formatGitHubIssueBody(reportData) {
+  static formatGitHubIssueBody(reportData: BugReportData): string {
     // Check if description contains multiple steps/todos for checklist formatting
     const description = reportData.description || "No description provided";
     const formattedDescription = this.formatDescriptionWithChecklists(description);
@@ -120,9 +201,6 @@ export class GitHubAPIService {
     if (reportData.screenshot) {
       // GitHub Issues can't display base64 data URLs directly
       // Instead, provide information about the screenshot
-      const _screenshotInfo = reportData.screenshot.includes("data:image")
-        ? "Screenshot captured (base64 data - view in bug report tool)"
-        : reportData.screenshot;
 
       sections.push(
         "## Screenshot",
@@ -160,7 +238,7 @@ export class GitHubAPIService {
    * @param {string} description - Original description
    * @returns {string} Formatted description with checklists
    */
-  static formatDescriptionWithChecklists(description) {
+  static formatDescriptionWithChecklists(description: string): string {
     if (!description) return "No description provided";
 
     // Check for patterns that suggest multiple items/steps
@@ -204,7 +282,7 @@ export class GitHubAPIService {
    * @param {Object} systemInfo - System information object
    * @returns {string} Formatted environment info
    */
-  static formatEnvironmentInfo(systemInfo) {
+  static formatEnvironmentInfo(systemInfo: BugReportData["systemInfo"]): string {
     const sections = [];
 
     // App version and environment
@@ -245,7 +323,7 @@ export class GitHubAPIService {
    * Detect current environment
    * @returns {string} Environment description
    */
-  static detectEnvironment() {
+  static detectEnvironment(): string {
     const hostname = window.location.hostname;
 
     if (hostname.includes("localhost") || hostname.includes("127.0.0.1")) {
@@ -262,7 +340,7 @@ export class GitHubAPIService {
    * @param {Object} errors - Error object from system info
    * @returns {string} Formatted error information
    */
-  static formatConsoleLogsForGitHub(errors) {
+  static formatConsoleLogsForGitHub(errors: BugReportData["systemInfo"]["errors"]): string {
     const sections = [];
 
     // Handle errors
@@ -325,7 +403,9 @@ export class GitHubAPIService {
    * @param {Object} payload - Issue payload
    * @returns {Promise<Object>} API response
    */
-  static async makeGitHubAPICall(payload) {
+  static async makeGitHubAPICall(
+    payload: { title: string; body: string; labels: string[] }
+  ): Promise<GitHubAPIResponse> {
     try {
       // This is a placeholder for actual GitHub API integration
       // In a real implementation, you would:
@@ -361,7 +441,7 @@ export class GitHubAPIService {
    * @param {Object} reportData - Report data to validate
    * @returns {Object} Validation result
    */
-  static validateReportData(reportData) {
+  static validateReportData(reportData: BugReportData): ValidationResult {
     const errors = [];
     const warnings = [];
 

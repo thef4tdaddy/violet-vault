@@ -7,12 +7,70 @@
 import { CONDITION_TYPES, TRIGGER_TYPES } from "./rules.ts";
 
 /**
+ * Envelope interface
+ */
+interface Envelope {
+  id: string;
+  currentBalance: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Condition interface
+ */
+interface Condition {
+  type: string;
+  envelopeId?: string;
+  value: number;
+  operator?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+/**
+ * Execution context
+ */
+interface ExecutionContext {
+  data: {
+    envelopes: Envelope[];
+    unassignedCash: number;
+    newIncomeAmount?: number;
+  };
+  currentDate: string;
+  trigger: string;
+}
+
+/**
+ * Rule configuration
+ */
+interface Rule {
+  enabled: boolean;
+  trigger: string;
+  type: string;
+  lastExecuted?: string;
+  config?: {
+    conditions?: Condition[];
+  };
+}
+
+/**
+ * Filter criteria for conditions
+ */
+interface FilterCriteria {
+  type?: string;
+  envelopeId?: string;
+}
+
+/**
  * Evaluates all conditions for a conditional rule
  * @param {Array} conditions - Array of condition objects to evaluate
  * @param {Object} context - Execution context with envelopes, unassigned cash, etc.
  * @returns {boolean} True if all conditions are met
  */
-export const evaluateConditions = (conditions, context) => {
+export const evaluateConditions = (
+  conditions: Condition[],
+  context: ExecutionContext
+): boolean => {
   if (!conditions || conditions.length === 0) {
     return true;
   }
@@ -56,7 +114,7 @@ export const evaluateConditions = (conditions, context) => {
  * @param {string} currentDate - Current date in ISO string format
  * @returns {boolean} True if current date is within range
  */
-export const evaluateDateRangeCondition = (condition, currentDate) => {
+export const evaluateDateRangeCondition = (condition: Condition, currentDate: string): boolean => {
   if (!condition.startDate || !condition.endDate) {
     return true;
   }
@@ -74,7 +132,10 @@ export const evaluateDateRangeCondition = (condition, currentDate) => {
  * @param {Object} context - Execution context
  * @returns {boolean} True if transaction amount meets condition
  */
-export const evaluateTransactionAmountCondition = (condition, context) => {
+export const evaluateTransactionAmountCondition = (
+  condition: Condition,
+  context: ExecutionContext
+): boolean => {
   const { newIncomeAmount } = context.data;
 
   if (newIncomeAmount === undefined) {
@@ -104,12 +165,16 @@ export const evaluateTransactionAmountCondition = (condition, context) => {
  * @param {string} currentDate - Current date in ISO string format
  * @returns {boolean} True if rule should execute based on schedule
  */
-export const checkSchedule = (trigger, lastExecuted, currentDate) => {
+export const checkSchedule = (
+  trigger: string,
+  lastExecuted: string | undefined,
+  currentDate: string
+): boolean => {
   if (!lastExecuted) return true;
 
   const lastExecutedDate = new Date(lastExecuted);
   const now = new Date(currentDate);
-  const daysDiff = (now - lastExecutedDate) / (1000 * 60 * 60 * 24);
+  const daysDiff = (now.getTime() - lastExecutedDate.getTime()) / (1000 * 60 * 60 * 24);
 
   switch (trigger) {
     case TRIGGER_TYPES.WEEKLY:
@@ -131,9 +196,9 @@ export const checkSchedule = (trigger, lastExecuted, currentDate) => {
  * @param {Date} now - Current date
  * @returns {boolean} True if payday condition is met
  */
-export const checkPaydaySchedule = (lastExecuted, now) => {
+export const checkPaydaySchedule = (lastExecuted: Date, now: Date): boolean => {
   // Basic payday logic - could be enhanced with more sophisticated detection
-  const daysDiff = (now - lastExecuted) / (1000 * 60 * 60 * 24);
+  const daysDiff = (now.getTime() - lastExecuted.getTime()) / (1000 * 60 * 60 * 24);
 
   // Assume bi-weekly payday pattern is most common
   return daysDiff >= 14;
@@ -145,7 +210,7 @@ export const checkPaydaySchedule = (lastExecuted, now) => {
  * @param {Object} context - Execution context
  * @returns {boolean} True if rule should execute
  */
-export const shouldRuleExecute = (rule, context) => {
+export const shouldRuleExecute = (rule: Rule, context: ExecutionContext): boolean => {
   if (!rule.enabled) {
     return false;
   }
@@ -182,7 +247,7 @@ export const shouldRuleExecute = (rule, context) => {
  * @param {string} type - Condition type
  * @returns {Object} Default condition configuration
  */
-export const createDefaultCondition = (type = CONDITION_TYPES.BALANCE_LESS_THAN) => ({
+export const createDefaultCondition = (type = CONDITION_TYPES.BALANCE_LESS_THAN): Condition => ({
   id: `condition_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
   type,
   envelopeId: null,
@@ -195,7 +260,7 @@ export const createDefaultCondition = (type = CONDITION_TYPES.BALANCE_LESS_THAN)
 /**
  * Validate balance-related condition
  */
-const validateBalanceCondition = (condition) => {
+const validateBalanceCondition = (condition: Condition): string | null => {
   if (condition.value === undefined || condition.value === null || condition.value < 0) {
     return "Balance conditions require a non-negative value";
   }
@@ -205,7 +270,7 @@ const validateBalanceCondition = (condition) => {
 /**
  * Validate date range condition
  */
-const validateDateRangeCondition = (condition) => {
+const validateDateRangeCondition = (condition: Condition): string | null => {
   if (!condition.startDate || !condition.endDate) {
     return "Date range conditions require both start and end dates";
   }
@@ -218,7 +283,7 @@ const validateDateRangeCondition = (condition) => {
 /**
  * Validate transaction amount condition
  */
-const validateTransactionAmountCondition = (condition) => {
+const validateTransactionAmountCondition = (condition: Condition): string[] => {
   const errors = [];
 
   if (condition.value === undefined || condition.value === null) {
@@ -245,7 +310,7 @@ const validateTransactionAmountCondition = (condition) => {
  * @param {Object} condition - Condition to validate
  * @returns {Object} Validation result with isValid flag and errors
  */
-export const validateCondition = (condition) => {
+export const validateCondition = (condition: Condition): { isValid: boolean; errors: string[] } => {
   const errors = [];
 
   if (!condition.type || !Object.values(CONDITION_TYPES).includes(condition.type)) {
@@ -286,7 +351,7 @@ export const validateCondition = (condition) => {
  * @param {Array} envelopes - Available envelopes for name lookup
  * @returns {string} Human-readable condition description
  */
-export const getConditionDescription = (condition, envelopes = []) => {
+export const getConditionDescription = (condition: Condition, envelopes: Envelope[] = []): string => {
   switch (condition.type) {
     case CONDITION_TYPES.BALANCE_LESS_THAN:
       if (condition.envelopeId) {
@@ -336,7 +401,10 @@ export const getConditionDescription = (condition, envelopes = []) => {
  * @param {Object} filters - Filter criteria
  * @returns {Array} Filtered conditions
  */
-export const filterConditions = (conditions, filters = {}) => {
+export const filterConditions = (
+  conditions: Condition[],
+  filters: FilterCriteria = {}
+): Condition[] => {
   let filtered = [...conditions];
 
   if (filters.type) {

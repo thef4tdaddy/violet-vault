@@ -3,25 +3,77 @@ import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
 /**
+ * Validation result
+ */
+interface ValidationResult {
+  valid: boolean;
+  error?: string;
+  type?: string;
+}
+
+/**
+ * Key management UI state
+ */
+interface KeyManagementUIState {
+  activeTab: string;
+  showAdvanced: boolean;
+  exportPassword: string;
+  importPassword: string;
+  vaultPassword: string;
+  showExportPassword: boolean;
+  showImportPassword: boolean;
+  showVaultPassword: boolean;
+  keyFingerprint: string;
+  copiedToClipboard: boolean;
+  importResult: unknown;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+}
+
+/**
+ * Key management operations
+ */
+interface KeyManagementOperations {
+  validateExportPassword: (password: string) => boolean;
+  validateImportRequirements: (
+    keyFileData: unknown,
+    importPassword: string,
+    vaultPassword: string,
+    validation: ValidationResult
+  ) => boolean;
+  handleFileRead: (file: File) => Promise<unknown>;
+  handleImportError: (err: Error) => void;
+  handleOperationError: (operation: string, err: Error) => void;
+}
+
+/**
  * Hook for managing Key Management Settings UI state
  * Extracts UI state management from KeyManagementSettings component
  */
-export const useKeyManagementUI = () => {
-  const [activeTab, setActiveTab] = useState("export"); // export, import
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [exportPassword, setExportPassword] = useState("");
-  const [importPassword, setImportPassword] = useState("");
-  const [vaultPassword, setVaultPassword] = useState("");
-  const [showExportPassword, setShowExportPassword] = useState(false);
-  const [showImportPassword, setShowImportPassword] = useState(false);
-  const [showVaultPassword, setShowVaultPassword] = useState(false);
-  const [keyFingerprint, setKeyFingerprint] = useState("");
-  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
-  const [importResult, setImportResult] = useState(null);
+export const useKeyManagementUI = (): KeyManagementUIState & {
+  handleTabChange: (tab: string) => void;
+  toggleAdvanced: () => void;
+  togglePasswordVisibility: (field: string) => void;
+  updatePassword: (field: string, value: string) => void;
+  resetState: () => void;
+  handleClipboardSuccess: () => void;
+  setKeyFingerprint: React.Dispatch<React.SetStateAction<string>>;
+  setImportResult: React.Dispatch<React.SetStateAction<unknown>>;
+} => {
+  const [activeTab, setActiveTab] = useState<string>("export"); // export, import
+  const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
+  const [exportPassword, setExportPassword] = useState<string>("");
+  const [importPassword, setImportPassword] = useState<string>("");
+  const [vaultPassword, setVaultPassword] = useState<string>("");
+  const [showExportPassword, setShowExportPassword] = useState<boolean>(false);
+  const [showImportPassword, setShowImportPassword] = useState<boolean>(false);
+  const [showVaultPassword, setShowVaultPassword] = useState<boolean>(false);
+  const [keyFingerprint, setKeyFingerprint] = useState<string>("");
+  const [copiedToClipboard, setCopiedToClipboard] = useState<boolean>(false);
+  const [importResult, setImportResult] = useState<unknown>(null);
 
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleTabChange = useCallback((tab) => {
+  const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab);
   }, []);
 
@@ -29,7 +81,7 @@ export const useKeyManagementUI = () => {
     setShowAdvanced((prev) => !prev);
   }, []);
 
-  const togglePasswordVisibility = useCallback((field) => {
+  const togglePasswordVisibility = useCallback((field: string) => {
     switch (field) {
       case "export":
         setShowExportPassword((prev) => !prev);
@@ -45,7 +97,7 @@ export const useKeyManagementUI = () => {
     }
   }, []);
 
-  const updatePassword = useCallback((field, value) => {
+  const updatePassword = useCallback((field: string, value: string) => {
     switch (field) {
       case "export":
         setExportPassword(value);
@@ -106,8 +158,8 @@ export const useKeyManagementUI = () => {
  * Hook for key management operations and validation
  * Extracts key operation logic from KeyManagementSettings component
  */
-export const useKeyManagementOperations = () => {
-  const validateExportPassword = useCallback((password) => {
+export const useKeyManagementOperations = (): KeyManagementOperations => {
+  const validateExportPassword = useCallback((password: string) => {
     if (!password || password.length < 8) {
       globalToast.showError(
         "Export password must be at least 8 characters long",
@@ -119,7 +171,7 @@ export const useKeyManagementOperations = () => {
   }, []);
 
   const validateImportRequirements = useCallback(
-    (keyFileData, importPassword, vaultPassword, validation) => {
+    (_keyFileData: unknown, importPassword: string, vaultPassword: string, validation: ValidationResult) => {
       if (!validation.valid) {
         globalToast.showError(`Invalid key file: ${validation.error}`, "Invalid Key File", 8000);
         return false;
@@ -146,7 +198,7 @@ export const useKeyManagementOperations = () => {
     []
   );
 
-  const handleFileRead = useCallback(async (file) => {
+  const handleFileRead = useCallback(async (file: File) => {
     try {
       const fileText = await file.text();
       return JSON.parse(fileText);
@@ -160,7 +212,7 @@ export const useKeyManagementOperations = () => {
     }
   }, []);
 
-  const handleImportError = useCallback((err) => {
+  const handleImportError = useCallback((err: Error) => {
     logger.error("Import failed:", err);
     globalToast.showError(
       "Import failed: " + (err.message || "Unknown error"),
@@ -169,7 +221,7 @@ export const useKeyManagementOperations = () => {
     );
   }, []);
 
-  const handleOperationError = useCallback((operation, err) => {
+  const handleOperationError = useCallback((operation: string, err: Error) => {
     logger.error(`${operation} failed:`, err);
     globalToast.showError(
       `${operation} failed: ${err.message || "Unknown error"}`,
