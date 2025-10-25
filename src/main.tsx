@@ -8,6 +8,23 @@ import { SystemInfoService } from "./services/bugReport/systemInfoService.ts";
 import logger from "./utils/common/logger.ts";
 import { initializeCrypto } from "./utils/security/cryptoCompat.ts";
 
+// Extend Window interface for debug tools
+declare global {
+  interface Window {
+    dataDiagnostic?: () => void;
+    syncDiagnostic?: () => void;
+    runSyncHealthCheck?: () => void;
+    runSyncEdgeCaseTests?: () => void;
+    validateAllSyncFlows?: () => void;
+    fixAutoAllocateUndefined?: () => void;
+    swDiagnostics?: () => Promise<any>;
+    offlineReadiness?: () => Promise<any>;
+    testBugReportCapture?: () => Promise<any>;
+    clearCloudDataOnly?: () => Promise<any>;
+  }
+}
+
+
 // Firebase sync services loaded conditionally to reduce initial bundle size
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
 if (typeof window !== "undefined") {

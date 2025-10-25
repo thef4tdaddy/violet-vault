@@ -3,12 +3,18 @@ import { editLockService } from "../../services/editLockService";
 import useToast from "./useToast";
 import logger from "../../utils/common/logger";
 
+interface UseEditLockOptions {
+  autoAcquire?: boolean;
+  autoRelease?: boolean;
+  showToasts?: boolean;
+}
+
 /**
  * Hook for managing edit locks on budget items
  * Provides cross-browser edit conflict prevention
  */
-const useEditLock = (recordType, recordId, options = {}) => {
-  const [lock, setLock] = useState(null);
+const useEditLock = (recordType: string, recordId: string, options: UseEditLockOptions = {}) => {
+  const [lock, setLock] = useState<any>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isOwnLock, setIsOwnLock] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,9 +35,9 @@ const useEditLock = (recordType, recordId, options = {}) => {
       setIsLocked(!!lockDoc);
       // Check ownership directly from the lock document using same ID logic as service
       const currentUserId =
-        editLockService.currentUser?.id ||
-        editLockService.currentUser?.budgetId ||
-        `user_${editLockService.currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
+        (editLockService as any).currentUser?.id ||
+        (editLockService as any).currentUser?.budgetId ||
+        `user_${(editLockService as any).currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
         "anonymous";
       setIsOwnLock(lockDoc && currentUserId && lockDoc.userId === currentUserId);
 
@@ -74,11 +80,13 @@ const useEditLock = (recordType, recordId, options = {}) => {
       logger.debug("🔒 Edit lock acquired via hook", { recordType, recordId });
     } else {
       if (result.reason === "locked_by_other" && showToasts) {
-        const timeLeft = Math.ceil((result.expiresAt - new Date()) / 1000);
+        const expiresAt = (result as any).expiresAt;
+        const timeLeft = expiresAt ? Math.ceil((new Date(expiresAt).getTime() - new Date().getTime()) / 1000) : 0;
+        const lockedBy = (result as any).lockedBy || "Another user";
         addToast({
           type: "warning",
           title: "Currently Being Edited",
-          message: `${result.lockedBy} is editing this ${recordType}. Lock expires in ${timeLeft}s.`,
+          message: `${lockedBy} is editing this ${recordType}. Lock expires in ${timeLeft}s.`,
           duration: 5000,
         });
       }
@@ -179,10 +187,10 @@ const useEditLock = (recordType, recordId, options = {}) => {
 
     // Computed values
     timeRemaining: lock?.expiresAt
-      ? Math.max(0, (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) - new Date())
+      ? Math.max(0, (lock.expiresAt.toDate ? lock.expiresAt.toDate().getTime() : new Date(lock.expiresAt).getTime()) - new Date().getTime())
       : 0,
     isExpired: lock?.expiresAt
-      ? (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) <= new Date()
+      ? (lock.expiresAt.toDate ? lock.expiresAt.toDate() : new Date(lock.expiresAt)) <= new Date()
       : false,
   };
 };
