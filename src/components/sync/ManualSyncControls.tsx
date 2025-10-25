@@ -1,29 +1,39 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useManualSync from "../../hooks/common/useManualSync";
 import logger from "../../utils/common/logger";
 
 /**
- * @typedef {Object} SyncResult
- * @property {boolean} success - Whether sync operation succeeded
- * @property {string} [message] - Success message
- * @property {string} [error] - Error message if failed
+ * Sync result interface
  */
+interface SyncResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+/**
+ * Sync status interface
+ */
+interface SyncStatus {
+  isServiceRunning: boolean;
+  serviceStatus?: unknown;
+}
+
+/**
+ * Manual sync controls component props
+ */
+interface ManualSyncControlsProps {
+  className?: string;
+}
 
 /**
  * Manual sync controls component for family budget collaboration
  * Allows explicit control over Dexie ↔ Firebase synchronization
  * Provides upload, download, and full bidirectional sync operations
- *
- * @param {Object} props - Component props
- * @param {string} [props.className=""] - Additional CSS classes for container
- * @returns {React.ReactElement} Rendered manual sync controls
  */
-export const ManualSyncControls = ({ className = "" }) => {
+export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ className = "" }) => {
   const {
     forceUploadSync,
     forceDownloadSync,
@@ -41,11 +51,10 @@ export const ManualSyncControls = ({ className = "" }) => {
 
   /**
    * Handle upload sync operation (Dexie → Firebase)
-   * @returns {Promise<void>}
    */
-  const handleUploadSync = async () => {
+  const handleUploadSync = async (): Promise<void> => {
     clearSyncError();
-    const result = await forceUploadSync();
+    const result: SyncResult = await forceUploadSync();
     if (result.success) {
       logger.info("✅ Upload sync completed:", result.message);
     } else {
@@ -55,11 +64,10 @@ export const ManualSyncControls = ({ className = "" }) => {
 
   /**
    * Handle download sync operation (Firebase → Dexie)
-   * @returns {Promise<void>}
    */
-  const handleDownloadSync = async () => {
+  const handleDownloadSync = async (): Promise<void> => {
     clearSyncError();
-    const result = await forceDownloadSync();
+    const result: SyncResult = await forceDownloadSync();
     if (result.success) {
       logger.info("✅ Download sync completed:", result.message);
     } else {
@@ -69,11 +77,10 @@ export const ManualSyncControls = ({ className = "" }) => {
 
   /**
    * Handle full bidirectional sync operation
-   * @returns {Promise<void>}
    */
-  const handleFullSync = async () => {
+  const handleFullSync = async (): Promise<void> => {
     clearSyncError();
-    const result = await forceFullSync();
+    const result: SyncResult = await forceFullSync();
     if (result.success) {
       logger.info("✅ Full sync completed:", result.message);
     } else {
@@ -83,14 +90,12 @@ export const ManualSyncControls = ({ className = "" }) => {
 
   /**
    * Format last sync timestamp into human-readable string
-   * @param {Date|null} time - Last sync timestamp
-   * @returns {string} Formatted time string
    */
-  const formatLastSyncTime = (time) => {
+  const formatLastSyncTime = (time: Date | null): string => {
     if (!time) return "Never";
 
     const now = new Date();
-    const diff = now - time;
+    const diff = now.getTime() - time.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
 
@@ -101,12 +106,18 @@ export const ManualSyncControls = ({ className = "" }) => {
   };
 
   return (
-    <Card className={`w-full max-w-2xl ${className}`}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div className={`w-full max-w-2xl border rounded-lg shadow-md ${className}`}>
+      <div className="p-4 border-b">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
           {React.createElement(getIcon("RefreshCw"), { className: "h-5 w-5" })}
           Manual Sync Controls
-          <Badge variant={syncStatus.isServiceRunning ? "success" : "destructive"}>
+          <span
+            className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
+              syncStatus.isServiceRunning
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
             {syncStatus.isServiceRunning ? (
               <>
                 {React.createElement(getIcon("Wifi"), {
@@ -122,19 +133,19 @@ export const ManualSyncControls = ({ className = "" }) => {
                 Disconnected
               </>
             )}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
+          </span>
+        </h3>
+      </div>
 
-      <CardContent className="space-y-4">
+      <div className="p-4 space-y-4">
         {/* Sync Error Alert */}
         {syncError && (
-          <Alert variant="destructive">
+          <div className="p-4 bg-red-50 border border-red-200 rounded flex items-start gap-2">
             {React.createElement(getIcon("AlertCircle"), {
-              className: "h-4 w-4",
+              className: "h-4 w-4 text-red-600 mt-0.5",
             })}
-            <AlertDescription>
-              {syncError}
+            <div className="flex-1">
+              <p className="text-sm text-red-800">{syncError}</p>
               <Button
                 variant="ghost"
                 size="sm"
@@ -143,23 +154,23 @@ export const ManualSyncControls = ({ className = "" }) => {
               >
                 Dismiss
               </Button>
-            </AlertDescription>
-          </Alert>
+            </div>
+          </div>
         )}
 
         {/* Sync Status Info */}
-        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-2">
             {React.createElement(getIcon("Clock"), { className: "h-4 w-4" })}
             <span className="text-sm">Last sync: {formatLastSyncTime(lastSyncTime)}</span>
           </div>
           {lastSyncTime && (
-            <Badge variant="outline">
+            <span className="inline-flex items-center px-2 py-1 text-xs font-medium border rounded bg-white">
               {React.createElement(getIcon("CheckCircle"), {
                 className: "h-3 w-3 mr-1",
               })}
               Synced
-            </Badge>
+            </span>
           )}
         </div>
 
@@ -234,15 +245,15 @@ export const ManualSyncControls = ({ className = "" }) => {
 
         {/* Service Status Details */}
         {syncStatus.serviceStatus && (
-          <details className="text-xs text-muted-foreground">
+          <details className="text-xs text-gray-500">
             <summary className="cursor-pointer">Advanced Status</summary>
-            <div className="mt-2 p-2 bg-muted rounded text-xs font-mono">
+            <div className="mt-2 p-2 bg-gray-50 rounded text-xs font-mono">
               <pre>{JSON.stringify(syncStatus.serviceStatus, null, 2)}</pre>
             </div>
           </details>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
