@@ -1,4 +1,5 @@
 // components/Dashboard.jsx
+import React from "react";
 import logger from "@/utils/common/logger";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import AccountBalanceOverview from "../dashboard/AccountBalanceOverview";
@@ -30,9 +31,9 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
   // Enhanced TanStack Query integration with optimistic updates
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
-  const { data: savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
+  const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
-  const { data: transactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { transactions = [], isLoading: transactionsLoading } = useTransactions();
 
   // Use TanStack Query for budget metadata
   const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();

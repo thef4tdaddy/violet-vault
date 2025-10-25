@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { renderIcon } from "@/utils/icons";
-import { Checkbox } from "@/components/ui";
+import Checkbox from "@/components/ui/forms/Checkbox";
 
 interface FileUploaderProps {
   onFileUpload: (
@@ -43,7 +43,7 @@ const FileUploader = ({ onFileUpload }: FileUploaderProps) => {
           <label className="flex items-center space-x-3 cursor-pointer">
             <Checkbox
               checked={clearExisting}
-              onCheckedChange={(checked) => setClearExisting(checked)}
+              onChange={(e) => setClearExisting(e.target.checked)}
             />
             <div className="flex items-center space-x-2">
               {renderIcon("Trash2", { className: "h-4 w-4 text-red-500" })}

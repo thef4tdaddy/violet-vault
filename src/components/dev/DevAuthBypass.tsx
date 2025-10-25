@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useAuthenticationManager } from "@/hooks/auth";
 import logger from "@/utils/common/logger";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserData } from "@/types/auth";
 
 /**
  * Development Authentication Bypass
@@ -15,7 +16,7 @@ import logger from "@/utils/common/logger";
 const DevAuthBypass = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const auth = useAuthenticationManager();
+  const { setAuthenticated } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get("token") || "";
@@ -50,22 +51,15 @@ const DevAuthBypass = () => {
     logger.info("Dev auth bypass: Authenticating with local user");
 
     // Create a temporary dev user for testing
-    const devUser = {
-      uid: "dev-lighthouse-user",
-      email: "lighthouse@dev.local",
-      displayName: "Lighthouse Test User",
-      isDevUser: true,
+    const devUser: UserData = {
+      userName: "Lighthouse",
+      userColor: "#0D47A1",
     };
 
     // Set auth state for testing
     try {
       // Trigger auth state change to unlock the app
-      auth.setAuthState({
-        currentUser: devUser,
-        isAuthenticated: true,
-        isUnlocked: true,
-        isLocalOnlyMode: true,
-      });
+      setAuthenticated(devUser);
 
       logger.info(`Dev auth bypass: Redirecting to ${target}`);
 
@@ -77,7 +71,7 @@ const DevAuthBypass = () => {
       logger.error("Dev auth bypass: Error setting auth state:", error);
       navigate("/");
     }
-  }, [searchParams, navigate, auth]);
+  }, [searchParams, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
