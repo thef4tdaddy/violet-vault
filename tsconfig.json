@@ -34,8 +34,7 @@
       "@/utils/*": ["./src/utils/*"],
       "@/stores/*": ["./src/stores/*"],
       "@/types/*": ["./src/types/*"]
-    },
-    "types": ["vitest/globals"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "build", "original-app"],

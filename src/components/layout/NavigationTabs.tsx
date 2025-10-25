@@ -1,7 +1,15 @@
-import React, { memo, useEffect, useRef } from "react";
+import React, { memo, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { getIcon } from "../../utils";
-import { getButtonClasses, hapticFeedback } from "../../utils/ui/touchFeedback";
+import { getIcon } from "@/utils";
+import { getButtonClasses, hapticFeedback } from "@/utils/ui/touchFeedback";
+
+interface NavButtonProps {
+  active: boolean;
+  to: string;
+  icon: React.ElementType;
+  label: string;
+  viewKey: string;
+}
 
 /**
  * Navigation tabs component for the main layout
@@ -151,7 +159,7 @@ const NavigationTabs = memo(() => {
   );
 });
 
-const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
+const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }: NavButtonProps) => (
   <Link
     to={to}
     aria-current={active ? "page" : undefined}

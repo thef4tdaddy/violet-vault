@@ -1,4 +1,3 @@
-import React from "react";
 import { renderConfidenceIndicator } from "../../../utils/receipts/receiptHelpers.tsx";
 
 /**

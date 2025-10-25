@@ -35,7 +35,10 @@ export const useUpdateEnvelope = () => {
       };
 
       // Create properly typed update object for Dexie
-      const dbUpdates: Partial<Pick<typeof existingEnvelope, 'name' | 'category' | 'lastModified'>> & Record<string, unknown> = {
+      const dbUpdates: Partial<
+        Pick<typeof existingEnvelope, "name" | "category" | "lastModified">
+      > &
+        Record<string, unknown> = {
         name: safeUpdates.name as string,
         category: safeUpdates.category as string,
         lastModified: Date.now(),

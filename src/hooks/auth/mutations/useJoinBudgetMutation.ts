@@ -5,10 +5,25 @@ import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
 import localStorageService from "../../../services/storage/localStorageService";
 
+interface JoinBudgetData {
+  budgetId: string;
+  password: string;
+  userInfo: any;
+  sharedBy: string;
+}
+
+interface JoinBudgetResult {
+  success: boolean;
+  user?: any;
+  sessionData?: any;
+  sharedBudget?: boolean;
+  error?: string;
+}
+
 /**
  * Helper function to process join budget operation
  */
-const processJoinBudget = async (joinData) => {
+const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetResult> => {
   const keyData = await encryptionUtils.deriveKey(joinData.password);
   const newSalt = keyData.salt;
   const key = keyData.key;
@@ -68,8 +83,8 @@ const processJoinBudget = async (joinData) => {
 export const useJoinBudgetMutation = () => {
   const { setAuthenticated, setError, setLoading } = useAuth();
 
-  return useMutation({
-    mutationFn: async (joinData) => {
+  return useMutation<JoinBudgetResult, Error, JoinBudgetData>({
+    mutationFn: async (joinData: JoinBudgetData): Promise<JoinBudgetResult> => {
       logger.auth("Join budget attempt started.", {
         budgetId: joinData.budgetId?.substring(0, 8) + "...",
         hasPassword: !!joinData.password,
@@ -77,7 +92,7 @@ export const useJoinBudgetMutation = () => {
         sharedBy: joinData.sharedBy,
       });
 
-      const timeoutPromise = new Promise((_, reject) =>
+      const timeoutPromise = new Promise<JoinBudgetResult>((_, reject) =>
         setTimeout(() => reject(new Error("Join timeout after 10 seconds")), 10000)
       );
 
@@ -99,7 +114,7 @@ export const useJoinBudgetMutation = () => {
       setLoading(true);
       setError(null);
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result: JoinBudgetResult) => {
       if (result.success) {
         setAuthenticated(result.user, result.sessionData);
 
@@ -122,7 +137,7 @@ export const useJoinBudgetMutation = () => {
       }
       setLoading(false);
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Join budget mutation failed", error);
       setError(error.message || "Failed to join budget");
       setLoading(false);

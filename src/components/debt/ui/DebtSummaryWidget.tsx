@@ -1,15 +1,18 @@
-import React from "react";
+import { createElement } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
-import { useDebtManagement } from "../../../hooks/debts/useDebtManagement";
-import _logger from "../../../utils/common/logger";
+import { getIcon } from "@/utils";
+import { useDebtManagement } from "@/hooks/debts/useDebtManagement";
 
 /**
  * Small debt summary widget for dashboard
  * Shows key debt metrics
  */
-const DebtSummaryWidget = ({ onNavigateToDebts }) => {
-  const { debtStats, _debts } = useDebtManagement();
+interface DebtSummaryWidgetProps {
+  onNavigateToDebts: () => void;
+}
+
+const DebtSummaryWidget = ({ onNavigateToDebts }: DebtSummaryWidgetProps) => {
+  const { debtStats } = useDebtManagement();
 
   // Removed noisy debug log - component renders frequently
 
@@ -25,7 +28,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-red-500 p-2 rounded-2xl">
-              {React.createElement(getIcon("TrendingDown"), {
+              {createElement(getIcon("TrendingDown"), {
                 className: "h-4 w-4 text-white",
               })}
             </div>

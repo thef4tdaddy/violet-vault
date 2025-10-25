@@ -1,4 +1,3 @@
-import React from "react";
 import PromptModal from "./PromptModal";
 import { usePromptModal } from "../../hooks/common/usePrompt";
 

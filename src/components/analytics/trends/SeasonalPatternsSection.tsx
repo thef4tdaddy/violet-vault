@@ -1,4 +1,3 @@
-import React from "react";
 import { formatCurrency } from "../../../utils/analytics/trendHelpers";
 
 const SeasonalPatternsSection = ({ seasonalPatterns }) => {

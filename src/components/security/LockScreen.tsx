@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui";
-import { useConfirm } from "../../hooks/common/useConfirm";
-import { getIcon } from "../../utils";
-import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
-import { usePasswordValidation } from "../../hooks/auth/queries/usePasswordValidation";
-import shieldLogo from "../../assets/logo-512x512.png";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import { getIcon } from "@/utils";
+import { useSecurityManager } from "@/hooks/auth/useSecurityManager";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { usePasswordValidation } from "@/hooks/auth/queries/usePasswordValidation";
+import shieldLogo from "@/assets/logo-512x512.png";
 import SecurityAlert from "../ui/SecurityAlert";
 
 const LockScreen = () => {
@@ -164,21 +164,6 @@ const LockScreen = () => {
   };
 
   if (!isLocked) return null;
-
-  const _handleReset = async () => {
-    const confirmed = await confirm({
-      title: "Reset Session",
-      message:
-        "Are you sure you want to reset and return to the login screen? This will end your current session.",
-      confirmLabel: "Reset Session",
-      cancelLabel: "Cancel",
-      destructive: true,
-    });
-
-    if (confirmed) {
-      logout();
-    }
-  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 z-[9999]">

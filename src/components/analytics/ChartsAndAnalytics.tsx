@@ -1,4 +1,3 @@
-import React from "react";
 import { useAnalyticsData } from "../../hooks/analytics/useAnalyticsData";
 import { useChartsAnalytics } from "../../hooks/analytics/useChartsAnalytics";
 import { useAnalyticsExport } from "../../hooks/analytics/useAnalyticsExport";

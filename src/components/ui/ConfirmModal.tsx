@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { getIcon } from "../../utils";
-import { useTouchFeedback } from "../../utils/ui/touchFeedback";
+import { getIcon } from "@/utils";
+import { useTouchFeedback } from "@/utils/ui/touchFeedback";
 
 /**
  * Get appropriate icon for modal type
  */
-const getModalIcon = (icon, destructive) => {
+const getModalIcon = (icon: unknown, destructive: boolean) => {
   if (icon) return icon;
   if (destructive) return getIcon("Trash2");
   return getIcon("AlertTriangle");
@@ -14,7 +14,7 @@ const getModalIcon = (icon, destructive) => {
 /**
  * Get color scheme for modal buttons
  */
-const getColorScheme = (destructive) => {
+const getColorScheme = (destructive: boolean) => {
   return destructive
     ? {
         iconBg: "bg-red-100",
@@ -33,7 +33,15 @@ const getColorScheme = (destructive) => {
 /**
  * Modal header component
  */
-const ModalHeader = ({ icon, destructive, title }) => {
+const ModalHeader = ({
+  icon,
+  destructive,
+  title,
+}: {
+  icon: unknown;
+  destructive: boolean;
+  title: string;
+}) => {
   const Icon = getModalIcon(icon, destructive);
   const colorScheme = getColorScheme(destructive);
 
@@ -111,6 +119,15 @@ const ModalActions = ({
   );
 };
 
+interface KeyboardHandlingProps {
+  isOpen: boolean;
+  isLoading: boolean;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+  cancelButtonRef: React.RefObject<HTMLButtonElement>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement>;
+}
+
 /**
  * Custom hook for keyboard handling
  */
@@ -121,11 +138,11 @@ const useKeyboardHandling = ({
   onConfirm,
   cancelButtonRef,
   confirmButtonRef,
-}) => {
+}: KeyboardHandlingProps) => {
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !isLoading) {
         onCancel?.();
       }

@@ -2,14 +2,13 @@
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
-import { getIcon } from "../../utils";
-import useActivityLogger from "../../hooks/common/useActivityLogger";
-// eslint-disable-next-line no-restricted-imports -- ENTITY_TYPES constant is needed for activity type filtering
-import { ENTITY_TYPES } from "../../services/activityLogger";
-import logger from "../../utils/common/logger";
-import { formatActivityDescription } from "../../utils/activity/activityFormatters";
-import { getActivityIconInfo } from "../../utils/activity/activityIcons";
-import { formatTimestamp } from "../../utils/activity/timeFormatters";
+import { getIcon } from "@/utils";
+import useActivityLogger from "@/hooks/common/useActivityLogger";
+import { ENTITY_TYPES } from "@/services/activityLogger";
+import logger from "@/utils/common/logger";
+import { formatActivityDescription } from "@/utils/activity/activityFormatters";
+import { getActivityIconInfo } from "@/utils/activity/activityIcons";
+import { formatTimestamp } from "@/utils/activity/timeFormatters";
 
 /**
  * Activity Feed Component - Level 1 Budget History UI
