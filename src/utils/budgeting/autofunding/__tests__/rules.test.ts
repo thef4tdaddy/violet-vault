@@ -7,7 +7,6 @@ import {
   RULE_TYPES,
   TRIGGER_TYPES,
   CONDITION_TYPES,
-  INCOME_DETECTION_TYPES,
   createDefaultRule,
   validateRule,
   calculateFundingAmount,

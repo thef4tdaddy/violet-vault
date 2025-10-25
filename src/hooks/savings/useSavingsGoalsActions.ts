@@ -21,16 +21,20 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
       if (goalId) {
         // Update existing goal
         await onUpdateGoal(goalId, goalData);
-        globalToast.success("Savings goal updated successfully!");
+        globalToast.showSuccess("Savings goal updated successfully!", "Success", 5000);
         setEditingGoal(null);
       } else {
         // Add new goal
         await onAddGoal(goalData);
-        globalToast.success("Savings goal added successfully!");
+        globalToast.showSuccess("Savings goal added successfully!", "Success", 5000);
         setShowAddForm(false);
       }
     } catch (error) {
-      globalToast.error(goalId ? "Failed to update savings goal" : "Failed to add savings goal");
+      globalToast.showError(
+        goalId ? "Failed to update savings goal" : "Failed to add savings goal",
+        "Error",
+        8000
+      );
       logger.error("Error saving goal:", error);
     }
   };
@@ -52,9 +56,9 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
     if (isConfirmed) {
       try {
         await onDeleteGoal(goal.id);
-        globalToast.success("Savings goal deleted successfully!");
+        globalToast.showSuccess("Savings goal deleted successfully!", "Success", 5000);
       } catch (error) {
-        globalToast.error("Failed to delete savings goal");
+        globalToast.showError("Failed to delete savings goal", "Error", 8000);
         logger.error("Error deleting goal:", error);
       }
     }
@@ -64,9 +68,9 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
   const handleDistribute = async (distribution) => {
     try {
       await onDistributeToGoals(distribution);
-      globalToast.success("Funds distributed successfully!");
+      globalToast.showSuccess("Funds distributed successfully!", "Success", 5000);
     } catch (error) {
-      globalToast.error("Failed to distribute funds");
+      globalToast.showError("Failed to distribute funds", "Error", 8000);
       logger.error("Error distributing funds:", error);
     }
   };

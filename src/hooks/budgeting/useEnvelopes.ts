@@ -26,7 +26,11 @@ const useEnvelopes = (options = {}) => {
   };
 
   // Repair corrupted envelopes (combines calculation + operation)
-  const repairCorruptedEnvelope = async (envelopeId: string, name: string, category: string = "utilities") => {
+  const repairCorruptedEnvelope = async (
+    envelopeId: string,
+    name: string,
+    category: string = "utilities"
+  ) => {
     const updates = await calculationsResult.repairCorruptedEnvelope(envelopeId, name, category);
     return operationsResult.updateEnvelopeAsync({ id: envelopeId, updates });
   };

@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * Sync status indicators component (offline indicator, syncing overlay)
  * Displays fixed-position overlays for sync and offline states
@@ -10,7 +8,12 @@ import React from "react";
  * @param {boolean} props.isSyncing - Whether a sync operation is in progress
  * @returns {React.ReactElement} Rendered status indicators (syncing overlay and/or offline indicator)
  */
-const SyncStatusIndicators = ({ isOnline, isSyncing }) => {
+interface SyncStatusIndicatorsProps {
+  isOnline: boolean;
+  isSyncing: boolean;
+}
+
+const SyncStatusIndicators = ({ isOnline, isSyncing }: SyncStatusIndicatorsProps) => {
   return (
     <>
       {/* Loading/Syncing Overlay */}

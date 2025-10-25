@@ -1,7 +1,7 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { Select } from "@/components/ui";
+import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSmartCategoryManager } from "../useSmartCategoryManager";
+import { vi } from "vitest";
 
 // Mock dependencies
 vi.mock("../../../services/smartCategoryService", () => ({

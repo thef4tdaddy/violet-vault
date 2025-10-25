@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from '../../../components/ui';
-import { renderIcon } from '../../../utils/icons';
+import React from "react";
+import { Button } from "../../../components/ui";
+import { renderIcon } from "../../../utils/icons";
 
 /**
  * Props for ErrorStatus component
@@ -46,9 +46,7 @@ export const ErrorStatus: React.FC<ErrorStatusProps> = ({
       {/* Error Details */}
       <div
         className={`mt-3 p-3 rounded-lg border ${
-          isBlockedError
-            ? "bg-orange-50 border-orange-200"
-            : "bg-rose-50 border-rose-200"
+          isBlockedError ? "bg-orange-50 border-orange-200" : "bg-rose-50 border-rose-200"
         }`}
       >
         <div className="flex items-start space-x-2">
@@ -58,18 +56,10 @@ export const ErrorStatus: React.FC<ErrorStatusProps> = ({
             }`,
           })}
           <div>
-            <div
-              className={`font-medium ${
-                isBlockedError ? "text-orange-800" : "text-rose-800"
-              }`}
-            >
+            <div className={`font-medium ${isBlockedError ? "text-orange-800" : "text-rose-800"}`}>
               {isBlockedError ? "Sync Blocked by Browser" : "Sync Error"}
             </div>
-            <div
-              className={`text-sm mt-1 ${
-                isBlockedError ? "text-orange-600" : "text-rose-600"
-              }`}
-            >
+            <div className={`text-sm mt-1 ${isBlockedError ? "text-orange-600" : "text-rose-600"}`}>
               {typeof syncError === "string" ? syncError : "Failed to sync with cloud"}
             </div>
 

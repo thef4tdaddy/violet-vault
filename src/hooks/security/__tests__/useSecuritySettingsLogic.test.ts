@@ -2,8 +2,8 @@ import { renderHook, act } from "@testing-library/react";
 import { useSecuritySettingsLogic } from "../useSecuritySettingsLogic";
 
 // Mock the useSecurityManager hook
-jest.mock("../../auth/useSecurityManager", () => ({
-  useSecurityManager: jest.fn(() => ({
+vi.mock("../../auth/useSecurityManager", () => ({
+  useSecurityManager: vi.fn(() => ({
     isLocked: false,
     securitySettings: {
       autoLockEnabled: true,
@@ -20,14 +20,14 @@ jest.mock("../../auth/useSecurityManager", () => ({
         timestamp: Date.now(),
       },
     ],
-    updateSettings: jest.fn(),
-    clearSecurityEvents: jest.fn(),
+    updateSettings: vi.fn(),
+    clearSecurityEvents: vi.fn(),
   })),
 }));
 
 describe("useSecuritySettingsLogic", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should initialize with correct default values", () => {
@@ -90,13 +90,13 @@ describe("useSecuritySettingsLogic", () => {
     const { result } = renderHook(() => useSecuritySettingsLogic());
 
     // Mock document.createElement and click
-    const mockClick = jest.fn();
-    const mockSetAttribute = jest.fn();
+    const mockClick = vi.fn();
+    const mockSetAttribute = vi.fn();
     const mockElement = {
       setAttribute: mockSetAttribute,
       click: mockClick,
     };
-    jest.spyOn(document, "createElement").mockReturnValue(mockElement);
+    vi.spyOn(document, "createElement").mockReturnValue(mockElement);
 
     act(() => {
       result.current.exportSecurityEvents();

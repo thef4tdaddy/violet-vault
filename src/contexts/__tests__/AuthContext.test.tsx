@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { ReactNode } from "react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { AuthProvider, useAuth } from "../AuthContext";
+import { UserData } from "@/types/auth";
 
 /**
  * Test suite for AuthContext
@@ -15,10 +16,15 @@ describe("AuthContext", () => {
     return (
       <div>
         <div data-testid="user">{auth.user?.userName || "No User"}</div>
-        <div data-testid="authenticated">{auth.isAuthenticated ? "Authenticated" : "Not Authenticated"}</div>
+        <div data-testid="authenticated">
+          {auth.isAuthenticated ? "Authenticated" : "Not Authenticated"}
+        </div>
         <div data-testid="unlocked">{auth.isUnlocked ? "Unlocked" : "Locked"}</div>
         <div data-testid="loading">{auth.isLoading ? "Loading" : "Not Loading"}</div>
-        <button data-testid="set-authenticated" onClick={() => auth.setAuthenticated({ userName: "testuser" })}>
+        <button
+          data-testid="set-authenticated"
+          onClick={() => auth.setAuthenticated({ userName: "testuser" })}
+        >
           Set Authenticated
         </button>
         <button data-testid="clear-auth" onClick={() => auth.clearAuth()}>
@@ -100,7 +106,7 @@ describe("AuthContext", () => {
             <button
               onClick={() =>
                 auth.setAuthenticated(
-                  { userName: "testuser" },
+                  { userName: "testuser", userColor: "#000000" } as UserData,
                   { encryptionKey, salt, sessionToken: "token123" }
                 )
               }
@@ -172,7 +178,9 @@ describe("AuthContext", () => {
               Update Activity
             </button>
             <div data-testid="has-activity">
-              {auth.lastActivity && auth.lastActivity >= beforeTime ? "Activity Tracked" : "No Activity"}
+              {auth.lastActivity && auth.lastActivity >= beforeTime
+                ? "Activity Tracked"
+                : "No Activity"}
             </div>
           </div>
         );

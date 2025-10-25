@@ -1,4 +1,3 @@
-import React from "react";
 import EnvelopeSummaryCards from "../EnvelopeSummaryCards";
 
 const EnvelopeSummary = ({ totals, unassignedCash = 0 }) => {

@@ -1,4 +1,3 @@
-import React from "react";
 import { DistributionPieChartWithDetails } from "../../charts";
 
 /**

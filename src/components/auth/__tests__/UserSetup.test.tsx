@@ -1,6 +1,3 @@
-import React from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
 import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserSetup from "../UserSetup";

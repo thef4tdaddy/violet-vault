@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface StepOneProps {
   title: string;
@@ -16,9 +16,7 @@ export const StepOne: React.FC<StepOneProps> = ({
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Title (Optional)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Title (Optional)</label>
         <input
           type="text"
           value={title}

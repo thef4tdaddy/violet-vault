@@ -3,56 +3,56 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useTransactionLedger } from "../useTransactionLedger";
 
 // Mock dependencies
-jest.mock("../../common/useTransactions", () => ({
-  useTransactions: jest.fn(() => ({
+vi.mock("../../common/useTransactions", () => ({
+  useTransactions: vi.fn(() => ({
     transactions: [],
-    addTransaction: jest.fn(),
-    deleteTransaction: jest.fn(),
+    addTransaction: vi.fn(),
+    deleteTransaction: vi.fn(),
     isLoading: false,
   })),
 }));
 
-jest.mock("../../budgeting/useEnvelopes", () => ({
-  useEnvelopes: jest.fn(() => ({
+vi.mock("../../budgeting/useEnvelopes", () => ({
+  useEnvelopes: vi.fn(() => ({
     envelopes: [],
     isLoading: false,
   })),
 }));
 
-jest.mock("../../../stores/ui/uiStore", () => ({
-  useBudgetStore: jest.fn(() => ({
-    updateTransaction: jest.fn(),
-    setAllTransactions: jest.fn(),
-    updateBill: jest.fn(),
+vi.mock("../../../stores/ui/uiStore", () => ({
+  useBudgetStore: vi.fn(() => ({
+    updateTransaction: vi.fn(),
+    setAllTransactions: vi.fn(),
+    updateBill: vi.fn(),
   })),
 }));
 
-jest.mock("../useTransactionForm", () => ({
-  useTransactionForm: jest.fn(() => ({
+vi.mock("../useTransactionForm", () => ({
+  useTransactionForm: vi.fn(() => ({
     transactionForm: {},
-    setTransactionForm: jest.fn(),
-    resetForm: jest.fn(),
-    populateForm: jest.fn(),
-    createTransaction: jest.fn(),
+    setTransactionForm: vi.fn(),
+    resetForm: vi.fn(),
+    populateForm: vi.fn(),
+    createTransaction: vi.fn(),
   })),
 }));
 
-jest.mock("../useTransactionImport", () => ({
-  useTransactionImport: jest.fn(() => ({
+vi.mock("../useTransactionImport", () => ({
+  useTransactionImport: vi.fn(() => ({
     importData: [],
     importStep: 1,
-    setImportStep: jest.fn(),
+    setImportStep: vi.fn(),
     fieldMapping: {},
-    setFieldMapping: jest.fn(),
+    setFieldMapping: vi.fn(),
     importProgress: 0,
-    handleFileUpload: jest.fn(),
-    handleImport: jest.fn(),
-    resetImport: jest.fn(),
+    handleFileUpload: vi.fn(),
+    handleImport: vi.fn(),
+    resetImport: vi.fn(),
   })),
 }));
 
-jest.mock("../useTransactionFilters", () => ({
-  useTransactionFilters: jest.fn(() => []),
+vi.mock("../useTransactionFilters", () => ({
+  useTransactionFilters: vi.fn(() => []),
 }));
 
 const createWrapper = () => {
@@ -69,7 +69,7 @@ describe("useTransactionLedger", () => {
   const mockCurrentUser = { userName: "TestUser", userColor: "#a855f7" };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should initialize with default state values", () => {
@@ -192,8 +192,8 @@ describe("useTransactionLedger", () => {
     // Mock loading state
     require("../../common/useTransactions").useTransactions.mockReturnValue({
       transactions: [],
-      addTransaction: jest.fn(),
-      deleteTransaction: jest.fn(),
+      addTransaction: vi.fn(),
+      deleteTransaction: vi.fn(),
       isLoading: true,
     });
 

@@ -12,9 +12,9 @@ import {
 } from "../filtering";
 
 // Mock logger
-jest.mock("../../common/logger.js", () => ({
+vi.mock("../../common/logger.js", () => ({
   default: {
-    error: jest.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -59,7 +59,7 @@ describe("filtering utilities", () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("filterByDateRange", () => {

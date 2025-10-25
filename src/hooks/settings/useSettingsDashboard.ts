@@ -116,7 +116,9 @@ export const useCloudSyncManager = () => {
         const { useAuth } = await import("../../contexts/AuthContext");
         // Note: useAuth is a hook and can only be called from components, not from event handlers
         // This is a limitation - for now we'll skip auth validation in settings
-        logger.warn("Cloud sync toggle called - auth validation skipped due to hook context limitations");
+        logger.warn(
+          "Cloud sync toggle called - auth validation skipped due to hook context limitations"
+        );
 
         cloudSyncService.start();
       } catch (error) {

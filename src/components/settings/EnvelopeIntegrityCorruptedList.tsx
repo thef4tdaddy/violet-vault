@@ -38,10 +38,7 @@ export const EnvelopeIntegrityCorruptedList: React.FC<EnvelopeIntegrityCorrupted
 
       <div className="space-y-3">
         {corruptedEnvelopes.map((envelope) => (
-          <div
-            key={envelope.id}
-            className="bg-white border border-yellow-300 rounded-lg p-3"
-          >
+          <div key={envelope.id} className="bg-white border border-yellow-300 rounded-lg p-3">
             <div className="flex items-start justify-between">
               <div className="flex items-start">
                 <input
@@ -51,9 +48,7 @@ export const EnvelopeIntegrityCorruptedList: React.FC<EnvelopeIntegrityCorrupted
                   className="mt-1 mr-3"
                 />
                 <div>
-                  <p className="font-medium text-gray-900">
-                    {envelope.name || "[MISSING NAME]"}
-                  </p>
+                  <p className="font-medium text-gray-900">{envelope.name || "[MISSING NAME]"}</p>
                   <p className="text-sm text-gray-600">
                     ID: {envelope.id} | Category: {envelope.category || "[MISSING]"}
                   </p>

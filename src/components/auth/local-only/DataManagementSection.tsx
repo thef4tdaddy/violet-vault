@@ -42,9 +42,7 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
             className: "h-6 w-6 text-blue-600 mb-2",
           })}
           <div className="font-medium text-gray-900">Import Data</div>
-          <div className="text-sm text-gray-600">
-            Restore data from a previous export file
-          </div>
+          <div className="text-sm text-gray-600">Restore data from a previous export file</div>
         </Button>
       </div>
     </div>
