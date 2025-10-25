@@ -75,7 +75,7 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
       return await handleDisconnect({
         entityType,
         entityId,
-        currentConnections,
+        currentConnections: currentConnections as never,
         updateBill: updateBill as unknown as (id: string, updates: unknown) => Promise<void>,
         updateDebt: updateDebt as unknown as (params: { id: string; updates: unknown }) => Promise<void>,
       });

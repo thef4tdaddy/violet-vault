@@ -73,7 +73,13 @@ const DistributeModal = ({
   const handleAutoDistribute = () => {
     const amount = parseFloat(totalToDistribute);
     if (!amount || amount <= 0) return;
-    setDistribution(calculateGoalDistribution(savingsGoals, amount, "proportional"));
+    const numericDistribution = calculateGoalDistribution(savingsGoals, amount, "proportional");
+    // Convert numeric distribution to string format for the state
+    const stringDistribution: Record<string, string> = {};
+    Object.entries(numericDistribution).forEach(([key, value]) => {
+      stringDistribution[key] = value.toString();
+    });
+    setDistribution(stringDistribution);
   };
 
   const handleDistribute = () => {

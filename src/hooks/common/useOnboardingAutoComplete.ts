@@ -4,33 +4,16 @@ import useBills from "../bills/useBills";
 import { useTransactions } from "./useTransactions";
 import { useActualBalance } from "../budgeting/useBudgetMetadata";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
-import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 
 /**
  * Hook that automatically detects user actions and marks onboarding steps as complete
  */
 export const useOnboardingAutoComplete = () => {
-  const onboardingState = useOnboardingStore(
-    useShallow((state) => ({
-      markStepComplete: state.markStepComplete,
-      isStepComplete: state.isStepComplete,
-      preferences: state.preferences,
-      isOnboarded: state.isOnboarded,
-    }))
-  );
-  
-  const {
-    markStepComplete,
-    isStepComplete,
-    preferences,
-    isOnboarded,
-  } = onboardingState as {
-    markStepComplete: (step: string) => void;
-    isStepComplete: (step: string) => boolean;
-    preferences: { showHints: boolean };
-    isOnboarded: boolean;
-  };
+  const markStepComplete = useOnboardingStore((state) => (state as { markStepComplete: (step: string) => void }).markStepComplete);
+  const isStepComplete = useOnboardingStore((state) => (state as { isStepComplete: (step: string) => boolean }).isStepComplete);
+  const preferences = useOnboardingStore((state) => (state as { preferences: { showHints: boolean } }).preferences);
+  const isOnboarded = useOnboardingStore((state) => (state as { isOnboarded: boolean }).isOnboarded);
 
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();

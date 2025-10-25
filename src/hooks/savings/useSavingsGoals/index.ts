@@ -98,72 +98,38 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
       // Add a new savings goal
       addGoal: async (goalData: unknown) => {
         logger.debug("Adding savings goal:", goalData);
-        return new Promise((resolve, reject) => {
-          addSavingsGoalMutation.mutate(goalData, {
-            onSuccess: (data) => resolve(data),
-            onError: (error) => reject(error),
-          });
-        });
+        return addSavingsGoalMutation.mutateAsync(goalData as never);
       },
 
       // Update existing goal
       updateGoal: async (goalId: string, updates: unknown) => {
         logger.debug("Updating savings goal:", { goalId, updates });
-        return new Promise((resolve, reject) => {
-          updateSavingsGoalMutation.mutate(
-            { goalId, updates },
-            {
-              onSuccess: (data) => resolve(data),
-              onError: (error) => reject(error),
-            }
-          );
-        });
+        return updateSavingsGoalMutation.mutateAsync({ goalId, updates } as never);
       },
 
       // Delete a goal
       deleteGoal: async (goalId: string) => {
         logger.debug("Deleting savings goal:", goalId);
-        return new Promise((resolve, reject) => {
-          deleteSavingsGoalMutation.mutate(goalId, {
-            onSuccess: (data) => resolve(data),
-            onError: (error) => reject(error),
-          });
-        });
+        return deleteSavingsGoalMutation.mutateAsync(goalId as never);
       },
 
       // Add contribution to goal
       addContribution: async (goalId: string, amount: number, description: string) => {
         logger.debug("Adding contribution:", { goalId, amount, description });
-        return new Promise((resolve, reject) => {
-          addContributionMutation.mutate(
-            {
-              goalId,
-              amount,
-              description,
-            },
-            {
-              onSuccess: (data) => resolve(data),
-              onError: (error) => reject(error),
-            }
-          );
-        });
+        return addContributionMutation.mutateAsync({
+          goalId,
+          amount,
+          description,
+        } as never);
       },
 
       // Distribute funds across multiple goals
       distributeFunds: async (distribution: unknown, description: string) => {
         logger.debug("Distributing funds:", { distribution, description });
-        return new Promise((resolve, reject) => {
-          distributeFundsMutation.mutate(
-            {
-              distribution,
-              description,
-            },
-            {
-              onSuccess: (data) => resolve(data),
-              onError: (error) => reject(error),
-            }
-          );
-        });
+        return distributeFundsMutation.mutateAsync({
+          distribution,
+          description,
+        } as never);
       },
 
       // Find goal by ID
