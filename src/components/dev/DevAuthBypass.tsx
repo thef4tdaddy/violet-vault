@@ -18,7 +18,6 @@ const DevAuthBypass = () => {
   const navigate = useNavigate();
   const { setAuthenticated } = useAuth();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const token = searchParams.get("token") || "";
     const target = searchParams.get("target") || "/app/dashboard";
@@ -72,6 +71,7 @@ const DevAuthBypass = () => {
       logger.error("Dev auth bypass: Error setting auth state:", error);
       navigate("/");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, navigate]);
 
   return (
