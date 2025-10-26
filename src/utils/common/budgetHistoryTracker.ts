@@ -344,7 +344,7 @@ export class BudgetHistoryTracker {
         created: Date.now(),
       };
 
-      await budgetDb.createBudgetTag(tag as any);
+      await budgetDb.createBudgetTag(tag as Record<string, unknown>);
 
       logger.info("Budget history tag created", {
         tagName,
@@ -368,7 +368,7 @@ export class BudgetHistoryTracker {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
-      await budgetDb.budgetBranches.where("isActive").equals(1 as any).modify({
+      await budgetDb.budgetBranches.where("isActive").equals(1 as number).modify({
         isActive: false,
       });
 

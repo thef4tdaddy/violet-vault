@@ -239,7 +239,7 @@ class ServiceWorkerDiagnostics {
         waiting: !!registration.waiting,
         active: !!registration.active,
         controlsPage: !!navigator.serviceWorker.controller,
-      } as any;
+      } as Record<string, unknown>;
 
       if (registration.active) {
         status.activeState = registration.active.state;
@@ -273,7 +273,14 @@ class ServiceWorkerDiagnostics {
       headers: { "Content-Type": "text/plain" },
     });
 
-    const results = {
+    const results: {
+      writeTime: number;
+      readTime: number;
+      deleteTime: number;
+      success: boolean;
+      totalTime?: number;
+      error?: string;
+    } = {
       writeTime: 0,
       readTime: 0,
       deleteTime: 0,
@@ -299,17 +306,17 @@ class ServiceWorkerDiagnostics {
       results.deleteTime = performance.now() - deleteStart;
 
       results.success = true;
-      (results as any).totalTime = results.writeTime + results.readTime + results.deleteTime;
+      results.totalTime = results.writeTime + results.readTime + results.deleteTime;
 
       logger.info("⚡ Cache performance test completed", {
         writeMs: Math.round(results.writeTime * 100) / 100,
         readMs: Math.round(results.readTime * 100) / 100,
         deleteMs: Math.round(results.deleteTime * 100) / 100,
-        totalMs: Math.round((results as any).totalTime * 100) / 100,
+        totalMs: Math.round(results.totalTime * 100) / 100,
       });
     } catch (error) {
       logger.error("❌ Cache performance test failed", error);
-      (results as any).error = (error as Error).message;
+      results.error = (error as Error).message;
     }
 
     return results;
@@ -370,7 +377,7 @@ const swDiagnostics = new ServiceWorkerDiagnostics();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as any).swDiagnostics = swDiagnostics;
+  (window as Record<string, unknown>).swDiagnostics = swDiagnostics;
 }
 
 export default swDiagnostics;

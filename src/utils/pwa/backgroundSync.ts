@@ -8,7 +8,7 @@ import logger from "../common/logger";
 class BackgroundSyncManager {
   syncQueue: string;
   isOnline: boolean;
-  pendingOperations: any[];
+  pendingOperations: Array<Record<string, unknown>>;
 
   constructor() {
     this.syncQueue = "violet-vault-sync-queue";
@@ -232,7 +232,7 @@ const backgroundSyncManager = new BackgroundSyncManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as any).backgroundSyncManager = backgroundSyncManager;
+  (window as Record<string, unknown>).backgroundSyncManager = backgroundSyncManager;
 }
 
 export default backgroundSyncManager;

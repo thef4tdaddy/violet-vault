@@ -10,10 +10,10 @@ const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
 class CloudSyncService {
   syncIntervalId: ReturnType<typeof setTimeout> | null;
   isSyncing: boolean;
-  config: any;
+  config: Record<string, unknown> | null;
   debounceTimer: ReturnType<typeof setTimeout> | null;
   isRunning: boolean;
-  syncQueue: Promise<any>;
+  syncQueue: Promise<unknown>;
 
   constructor() {
     this.syncIntervalId = null;
@@ -465,7 +465,7 @@ class CloudSyncService {
             supplementalAccounts: data.supplementalAccounts || [],
             lastUpdated: new Date().toISOString(),
             lastModified: Date.now(),
-          } as any);
+          } as Record<string, unknown>);
         }
       );
 

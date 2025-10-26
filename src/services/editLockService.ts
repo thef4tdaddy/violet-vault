@@ -32,10 +32,10 @@ const auth = getAuth(app);
  * Prevents concurrent editing conflicts by managing distributed locks in Firebase
  */
 class EditLockService {
-  locks: Map<string, any>;
-  lockListeners: Map<string, any>;
-  heartbeatIntervals: Map<string, any>;
-  currentUser: any;
+  locks: Map<string, Record<string, unknown>>;
+  lockListeners: Map<string, () => void>;
+  heartbeatIntervals: Map<string, ReturnType<typeof setInterval>>;
+  currentUser: { userName: string; userColor: string; userId?: string } | null;
   budgetId: string | null;
 
   constructor() {

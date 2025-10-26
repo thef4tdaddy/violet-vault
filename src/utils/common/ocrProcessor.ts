@@ -6,7 +6,7 @@ import logger from "../common/logger";
  * Uses Tesseract.js for client-side OCR processing
  */
 export class OCRProcessor {
-  worker: any;
+  worker: unknown;
   isInitialized: boolean;
 
   constructor() {

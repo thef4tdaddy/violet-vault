@@ -1,11 +1,20 @@
 import { H } from "highlight.run";
 import logger from "../common/logger.ts";
 
+interface ErrorMonitoringConfig {
+  projectId: string;
+  environment: string;
+  enabled: boolean;
+  errorSampleRate: number;
+  sessionSampleRate: number;
+  debug?: boolean;
+}
+
 /**
  * Get environment-aware configuration for Highlight.io
  * Implements proper environment separation to avoid quota mixing
  */
-const getErrorMonitoringConfig = () => {
+const getErrorMonitoringConfig = (): ErrorMonitoringConfig => {
   const env = import.meta.env.MODE;
   const isErrorReportingEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
 
@@ -49,7 +58,7 @@ export const initHighlight = () => {
   const config = getErrorMonitoringConfig();
 
   // Log configuration in development/staging
-  if ((config as any).debug) {
+  if (config.debug) {
     logger.debug("Initializing Highlight.io", {
       mode: import.meta.env.MODE,
       projectId: config.projectId.substring(0, 8) + "...", // Partial ID for security
@@ -61,7 +70,7 @@ export const initHighlight = () => {
 
   // Skip initialization if error reporting is disabled or invalid project ID
   if (!config.enabled) {
-    if ((config as any).debug) {
+    if (config.debug) {
       logger.debug("Highlight.io initialization skipped", {
         reason: "Error reporting disabled or invalid project ID",
         environment: config.environment,
@@ -82,7 +91,7 @@ export const initHighlight = () => {
       samplingStrategy: {
         sessionSamplingRate: config.sessionSampleRate,
         errorSamplingRate: config.errorSampleRate,
-      } as any,
+      } as Record<string, unknown>,
 
       networkRecording: {
         enabled: true,
@@ -101,13 +110,13 @@ export const initHighlight = () => {
       privacyOptions: {
         maskAllInputs: true, // Mask all input fields by default
         maskAllText: false, // Don't mask all text, just inputs
-      } as any,
+      } as Record<string, unknown>,
 
       // Environment-specific settings
-      debug: (config as any).debug,
+      debug: config.debug,
     });
 
-    if ((config as any).debug) {
+    if (config.debug) {
       logger.debug("Highlight.io initialized successfully", {
         environment: config.environment,
         sessionSamplingRate: config.sessionSampleRate,
@@ -176,7 +185,7 @@ const _setupConsoleCapture = () => {
  * Stores errors locally and retries periodically
  */
 class ErrorReportingFallback {
-  queue: any[];
+  queue: Array<Record<string, unknown>>;
   retryInterval: ReturnType<typeof setInterval> | null;
   maxQueueSize: number;
   retryIntervalMs: number;
@@ -265,7 +274,7 @@ const errorFallback = new ErrorReportingFallback();
  * Enhanced error capture with fallback support
  * Use this instead of H.consumeError for better reliability
  */
-export const captureError = (error: any, context: any = {}) => {
+export const captureError = (error: Error, context: Record<string, unknown> = {}) => {
   try {
     // Try Highlight.io first
     H.consumeError(error, context);

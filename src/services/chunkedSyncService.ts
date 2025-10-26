@@ -58,14 +58,17 @@ function bytesFromBase64(str) {
  */
 class ChunkedSyncService {
   budgetId: string | null;
-  encryptionKey: any;
+  encryptionKey: CryptoKey | null;
   maxChunkSize: number;
   maxArrayChunkSize: number;
   lastCorruptedDataClear: number | null;
   corruptedDataClearCooldown: number;
-  syncMutex: any;
-  decryptionFailures: Map<string, any>;
-  resilience: any;
+  syncMutex: { acquire: (name: string, timeout?: number) => Promise<void>; release: () => void };
+  decryptionFailures: Map<string, { count: number; lastFailure: number }>;
+  resilience: {
+    verifyDataIntegrity: (data: unknown) => boolean;
+    detectDataCorruption: (error: Error) => boolean;
+  };
 
   constructor() {
     this.budgetId = null;

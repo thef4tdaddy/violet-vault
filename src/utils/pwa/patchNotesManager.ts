@@ -294,7 +294,7 @@ const patchNotesManager = new PatchNotesManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as any).patchNotesManager = patchNotesManager;
+  (window as Record<string, unknown>).patchNotesManager = patchNotesManager;
 }
 
 export default patchNotesManager;
