@@ -32,7 +32,7 @@ jobs:
           cache: "npm"
 
       - name: "📦 Install dependencies"
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: "🧪 Run test suite"
         continue-on-error: true

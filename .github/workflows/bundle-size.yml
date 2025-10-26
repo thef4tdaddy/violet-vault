@@ -24,7 +24,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build PR bundle
         run: npm run build:nightly
@@ -83,7 +83,7 @@ jobs:
 
       - name: Install base dependencies
         if: github.event_name == 'pull_request'
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build base bundle
         if: github.event_name == 'pull_request'
