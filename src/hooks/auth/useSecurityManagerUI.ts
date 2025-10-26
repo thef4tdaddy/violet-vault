@@ -11,9 +11,14 @@ export const useSecurityManagerUI = () => {
   const [securitySettings, setSecuritySettings] = useState(() => securityService.loadSettings());
   const [securityEvents, setSecurityEvents] = useState(() => securityService.loadSecurityEvents());
 
-  const lastActivityRef = useRef(Date.now());
+  const lastActivityRef = useRef(null);
   const autoLockTimerRef = useRef(null);
   const clipboardTimerRef = useRef(null);
+
+  // Initialize lastActivityRef with current time on mount
+  useEffect(() => {
+    lastActivityRef.current = Date.now();
+  }, []);
 
   // Save settings to localStorage when changed
   useEffect(() => {

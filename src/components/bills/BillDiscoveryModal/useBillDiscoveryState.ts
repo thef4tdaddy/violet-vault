@@ -18,6 +18,7 @@ export const useBillDiscoveryState = (
           envelopeMap[bill.id] = bill.suggestedEnvelopeId;
         }
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBillEnvelopeMap(envelopeMap);
     }
   }, [isOpen, discoveredBills]);
