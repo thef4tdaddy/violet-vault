@@ -4,11 +4,12 @@
  * Created for Issue #508 - replaces the monolithic useTransactions.js
  */
 import { useEffect } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore.ts";
+import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
-import { useTransactionData } from "./useTransactionData.ts";
-import { useTransactionOperations } from "./useTransactionOperations.ts";
-import logger from "../../utils/common/logger.ts";
+import { useTransactionData } from "./useTransactionData";
+import { useTransactionOperations } from "./useTransactionOperations";
+import { createEnhancedOperations } from "./useTransactionsV2Helpers";
+import logger from "@/utils/common/logger";
 
 /**
  * Enhanced transactions hook with focused separation of concerns
@@ -76,94 +77,7 @@ const useTransactionsV2 = (options = {}) => {
   }, [dataHook.isSuccess, dataHook.allTransactions, budgetStore]);
 
   // Enhanced convenience methods that combine data + operations
-  const enhancedOperations = {
-    /**
-     * Add transaction with automatic data refresh
-     */
-    addTransactionWithRefresh: async (transactionData) => {
-      try {
-        const result = await operationsHook.addTransaction(transactionData);
-        await dataHook.refetch();
-        return result;
-      } catch (error) {
-        logger.error("Failed to add transaction with refresh", error);
-        throw error;
-      }
-    },
-
-    /**
-     * Update transaction with automatic data refresh
-     */
-    updateTransactionWithRefresh: async (id, updates) => {
-      try {
-        const result = await operationsHook.updateTransaction(id, updates);
-        await dataHook.refetch();
-        return result;
-      } catch (error) {
-        logger.error("Failed to update transaction with refresh", error);
-        throw error;
-      }
-    },
-
-    /**
-     * Delete transaction with automatic data refresh
-     */
-    deleteTransactionWithRefresh: async (transactionId) => {
-      try {
-        const result = await operationsHook.deleteTransaction(transactionId);
-        await dataHook.refetch();
-        return result;
-      } catch (error) {
-        logger.error("Failed to delete transaction with refresh", error);
-        throw error;
-      }
-    },
-
-    /**
-     * Split transaction with automatic data refresh
-     */
-    splitTransactionWithRefresh: async (originalTransaction, splitTransactions) => {
-      try {
-        const result = await operationsHook.splitTransaction(
-          originalTransaction,
-          splitTransactions
-        );
-        await dataHook.refetch();
-        return result;
-      } catch (error) {
-        logger.error("Failed to split transaction with refresh", error);
-        throw error;
-      }
-    },
-
-    /**
-     * Transfer funds with automatic data refresh
-     */
-    transferFundsWithRefresh: async (transferData) => {
-      try {
-        const result = await operationsHook.transferFunds(transferData);
-        await dataHook.refetch();
-        return result;
-      } catch (error) {
-        logger.error("Failed to transfer funds with refresh", error);
-        throw error;
-      }
-    },
-
-    /**
-     * Bulk operation with automatic data refresh
-     */
-    bulkOperationWithRefresh: async (operation, transactions, updates) => {
-      try {
-        const result = await operationsHook.bulkOperation(operation, transactions, updates);
-        await dataHook.refetch();
-        return result;
-      } catch (error) {
-        logger.error(`Failed to perform bulk ${operation} with refresh`, error);
-        throw error;
-      }
-    },
-  };
+  const enhancedOperations = createEnhancedOperations(operationsHook, dataHook);
 
   return {
     // === Data Hook Properties ===
