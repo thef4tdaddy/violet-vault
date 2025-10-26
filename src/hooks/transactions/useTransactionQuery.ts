@@ -5,6 +5,18 @@ import { useShallow } from "zustand/react/shallow";
 import { queryKeys } from "../../utils/common/queryClient.ts";
 import { budgetDb } from "../../db/budgetDb.ts";
 import logger from "../../utils/common/logger.ts";
+import type { Transaction } from "../../db/types.ts";
+import {
+  applyFilters,
+  applySorting,
+  applyLimit,
+  seedDexieFromZustand,
+} from "./helpers/transactionQueryHelpers.ts";
+
+interface BudgetStore {
+  transactions: Transaction[];
+  allTransactions: Transaction[];
+}
 
 interface UseTransactionQueryOptions {
   dateRange?: { start: Date; end: Date };
@@ -28,31 +40,24 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
     sortOrder = "desc",
   } = options;
 
-interface BudgetState {
-  transactions: unknown[];
-  allTransactions: unknown[];
-}
-
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
   const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
     useBudgetStore(
-      useShallow((state: BudgetState) => ({
+      useShallow((state: BudgetStore) => ({
         transactions: state.transactions,
         allTransactions: state.allTransactions,
       }))
     );
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
-  const queryFunction = async () => {
+  const queryFunction = async (): Promise<Transaction[]> => {
     logger.debug("TanStack Query: Fetching transactions from Dexie", {
       source: "useTransactionQuery",
     });
 
     try {
-      let transactions = [];
-
       // Always fetch from Dexie (single source of truth for local data)
-      transactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
+      let transactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
 
       logger.debug("TanStack Query: Loaded from Dexie", {
         count: transactions.length,
@@ -60,16 +65,12 @@ interface BudgetState {
       });
 
       // If Dexie is empty and we have Zustand data, seed Dexie
-      const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
-      if (transactions.length === 0 && zustandData && zustandData.length > 0) {
-        logger.debug("TanStack Query: Seeding Dexie from Zustand", {
-          zustandDataLength: zustandData.length,
-          source: "useTransactionQuery",
-        });
-        await budgetDb.bulkUpsertTransactions(zustandData);
-        transactions = [...zustandData];
-      }
+      transactions = await seedDexieFromZustand(
+        transactions,
+        zustandAllTransactions,
+        zustandTransactions,
+        budgetDb
+      );
 
       // Apply date range filtering if specified
       if (dateRange) {
@@ -81,54 +82,20 @@ interface BudgetState {
       }
 
       // Apply additional filters
-      let filteredTransactions = transactions;
-
-      if (envelopeId) {
-        filteredTransactions = filteredTransactions.filter((t) => t.envelopeId === envelopeId);
-      }
-
-      if (category) {
-        filteredTransactions = filteredTransactions.filter((t) => t.category === category);
-      }
-
-      if (type) {
-        if (type === "income") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount > 0);
-        } else if (type === "expense") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
-        } else if (type === "transfer") {
-          filteredTransactions = filteredTransactions.filter((t) => t.type === "transfer");
-        }
-      }
+      let filteredTransactions = applyFilters(transactions, {
+        envelopeId,
+        category,
+        type,
+      });
 
       // Apply sorting
-      filteredTransactions.sort((a, b) => {
-        let aVal = a[sortBy];
-        let bVal = b[sortBy];
-
-        // Handle date fields
-        if (sortBy === "date") {
-          aVal = new Date(aVal);
-          bVal = new Date(bVal);
-        }
-
-        // Handle numeric fields
-        if (sortBy === "amount") {
-          aVal = parseFloat(aVal) || 0;
-          bVal = parseFloat(bVal) || 0;
-        }
-
-        if (sortOrder === "desc") {
-          return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
-        } else {
-          return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-        }
+      filteredTransactions = applySorting(filteredTransactions, {
+        sortBy,
+        sortOrder,
       });
 
       // Apply limit
-      if (limit) {
-        filteredTransactions = filteredTransactions.slice(0, limit);
-      }
+      filteredTransactions = applyLimit(filteredTransactions, limit);
 
       return filteredTransactions;
     } catch (error) {
@@ -158,7 +125,7 @@ interface BudgetState {
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
     refetchOnMount: false, // Don't refetch if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
-    placeholderData: (previousData: unknown) => previousData, // Use previous data during refetch
+    placeholderData: (previousData: Transaction[] | undefined) => previousData, // Use previous data during refetch
     initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });

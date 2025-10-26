@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useTransactionFilters } from "./useTransactionFilters";
 import { useTransactionForm } from "./useTransactionForm";
 import { useTransactionImport } from "./useTransactionImport";
@@ -8,6 +8,8 @@ import { useTransactions } from "../common/useTransactions";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
 import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
+import { useLedgerState } from "./helpers/useLedgerState";
+import { useLedgerOperations } from "./helpers/useLedgerOperations";
 
 /**
  * Custom hook for TransactionLedger component
@@ -26,26 +28,16 @@ export const useTransactionLedger = (currentUser) => {
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore(
-    useShallow((state) => state)
-  ) as {
-    updateTransaction: (transaction: unknown) => void;
-    setAllTransactions: (transactions: unknown[]) => void;
-    updateBill: (bill: unknown) => void;
-  };
+    useShallow((state) => ({
+      updateTransaction: state.updateTransaction,
+      setAllTransactions: state.setAllTransactions,
+      updateBill: state.updateBill,
+    }))
+  );
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
-  // State management
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState(null);
-  const [splittingTransaction, setSplittingTransaction] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [envelopeFilter, setEnvelopeFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [currentPage, setCurrentPage] = useState(1);
+  // Use extracted state management hook
+  const ledgerState = useLedgerState();
 
   const pageSize = 10;
 
@@ -71,64 +63,72 @@ export const useTransactionLedger = (currentUser) => {
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, handleBulkImport);
+  } = useTransactionImport(currentUser, handleBulkImport, budget);
 
-  const filteredTransactions = useTransactionFilters({
+  const filteredTransactions = useTransactionFilters(
     transactions,
-    searchTerm,
-    dateFilter,
-    typeFilter,
-    envelopeFilter,
-    sortBy,
-    sortOrder,
-  });
+    ledgerState.searchTerm,
+    ledgerState.dateFilter,
+    ledgerState.typeFilter,
+    ledgerState.envelopeFilter,
+    ledgerState.sortBy,
+    ledgerState.sortOrder
+  );
 
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
 
   const paginatedTransactions = filteredTransactions.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    (ledgerState.currentPage - 1) * pageSize,
+    ledgerState.currentPage * pageSize
   );
 
   // Reset pagination when filters change
   useEffect(() => {
-    setCurrentPage(1);
-  }, [filteredTransactions.length]);
+    ledgerState.setCurrentPage(1);
+  }, [filteredTransactions.length, ledgerState]);
+
+  // Use extracted operations hook
+  const operations = useLedgerOperations(
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    updateBill,
+    envelopes
+  );
 
   // Event handlers
   const handleSubmitTransaction = () => {
     const newTransaction = createTransaction(currentUser);
 
-    if (editingTransaction) {
-      // Budget store updateTransaction expects the full transaction object with id
+    if (ledgerState.editingTransaction) {
       const transactionWithId = {
         ...newTransaction,
-        id: editingTransaction.id,
+        id: ledgerState.editingTransaction.id,
       };
       updateTransaction(transactionWithId);
-      setEditingTransaction(null);
+      ledgerState.setEditingTransaction(null);
     } else {
-      (addTransaction as (data: unknown) => void)(newTransaction);
+      addTransaction(newTransaction);
     }
 
-    setShowAddModal(false);
+    ledgerState.setShowAddModal(false);
     resetForm();
   };
 
   const startEdit = (transaction) => {
     populateForm(transaction);
-    setEditingTransaction(transaction);
-    setShowAddModal(true);
+    ledgerState.setEditingTransaction(transaction);
+    ledgerState.setShowAddModal(true);
   };
 
   const handleCloseModal = () => {
-    setShowAddModal(false);
-    setEditingTransaction(null);
+    ledgerState.setShowAddModal(false);
+    ledgerState.setEditingTransaction(null);
     resetForm();
   };
 
   const handleCloseImportModal = () => {
-    setShowImportModal(false);
+    ledgerState.setShowImportModal(false);
     resetImport();
   };
 
@@ -136,67 +136,11 @@ export const useTransactionLedger = (currentUser) => {
     return suggestEnvelope(description, envelopes);
   };
 
-  const handlePayBill = (billPayment) => {
-    // Update the bill to mark it as paid
-    const billEnvelope = envelopes.find((env) => env.id === billPayment.billId);
-    if (billEnvelope) {
-      const updatedBill = {
-        ...billEnvelope,
-        lastPaidDate: billPayment.paidDate,
-        lastPaidAmount: billPayment.amount,
-        currentBalance: Math.max(0, (billEnvelope.currentBalance || 0) - billPayment.amount),
-        isPaid: true,
-        paidThisPeriod: true,
-      };
-      updateBill(updatedBill);
-    }
-  };
-
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
-    try {
-      // Delete the original transaction
-      deleteTransaction(originalTransaction.id);
-
-      // Add each split transaction
-      for (const splitTransaction of splitTransactions) {
-        addTransaction(splitTransaction);
-      }
-
-      // Close the modal
-      setSplittingTransaction(null);
-    } catch (error) {
-      logger.error("Error splitting transaction:", error);
-    }
-  };
-
-  const handleFilterChange = (key, value) => {
-    switch (key) {
-      case "search":
-        setSearchTerm(value);
-        break;
-      case "dateFilter":
-        setDateFilter(value);
-        break;
-      case "typeFilter":
-        setTypeFilter(value);
-        break;
-      case "envelopeFilter":
-        setEnvelopeFilter(value);
-        break;
-      case "sortBy":
-        setSortBy(value);
-        break;
-      case "sortOrder":
-        setSortOrder(value);
-        break;
-    }
-  };
-
   const handlePagination = (direction) => {
     if (direction === "prev") {
-      setCurrentPage((p) => Math.max(1, p - 1));
+      ledgerState.setCurrentPage((p) => Math.max(1, p - 1));
     } else if (direction === "next") {
-      setCurrentPage((p) => Math.min(totalPages, p + 1));
+      ledgerState.setCurrentPage((p) => Math.min(totalPages, p + 1));
     }
   };
 
@@ -210,29 +154,14 @@ export const useTransactionLedger = (currentUser) => {
     // Loading states
     isLoading: transactionsLoading || envelopesLoading,
 
-    // Modal states
-    showAddModal,
-    setShowAddModal,
-    showImportModal,
-    setShowImportModal,
-    editingTransaction,
-    splittingTransaction,
-    setSplittingTransaction,
+    // Modal states - from ledgerState
+    ...ledgerState,
 
     // Form data
     transactionForm,
     setTransactionForm,
 
-    // Filter states
-    searchTerm,
-    dateFilter,
-    typeFilter,
-    envelopeFilter,
-    sortBy,
-    sortOrder,
-
     // Pagination
-    currentPage,
     totalPages,
 
     // Import states
@@ -249,9 +178,8 @@ export const useTransactionLedger = (currentUser) => {
     handleCloseModal,
     handleCloseImportModal,
     handleSuggestEnvelope,
-    handlePayBill,
-    handleSplitTransaction,
-    handleFilterChange,
+    handlePayBill: operations.handlePayBill,
+    handleSplitTransaction: operations.handleSplitTransaction,
     handlePagination,
     handleFileUpload,
     handleImport,

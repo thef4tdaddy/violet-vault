@@ -11,8 +11,6 @@ import {
   getBillIconOptions,
   getIconNameForStorage,
 } from "../../utils/common/billIcons";
-import { toMonthly } from "../../utils/common/frequencyCalculations";
-import { convertToBiweekly } from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";
 import type {
@@ -20,48 +18,16 @@ import type {
   BillFormData,
   BillFormOptions,
   BillFormHookReturn,
-  BillFrequency,
-  CalculationFrequency,
 } from "../../types/bills";
-
-/**
- * Get initial form data for a bill
- */
-const getInitialFormData = (bill: Bill | null = null): BillFormData => {
-  if (bill) {
-    return {
-      name: bill.name || bill.provider || "",
-      amount: bill.amount?.toString() || "",
-      frequency: bill.frequency || "monthly",
-      dueDate: bill.dueDate || "",
-      category: bill.category || "Bills",
-      color: bill.color || "#3B82F6",
-      notes: bill.notes || "",
-      createEnvelope: false,
-      selectedEnvelope: bill.envelopeId || "",
-      customFrequency: bill.customFrequency?.toString() || "",
-      iconName:
-        bill.iconName ||
-        getIconNameForStorage(
-          bill.icon ||
-            getBillIcon(bill.name || bill.provider || "", bill.notes || "", bill.category || "")
-        ),
-    };
-  }
-  return {
-    name: "",
-    amount: "",
-    frequency: "monthly",
-    dueDate: "",
-    category: "Bills",
-    color: "#3B82F6",
-    notes: "",
-    createEnvelope: false,
-    selectedEnvelope: "",
-    customFrequency: "",
-    iconName: "FileText",
-  };
-};
+import {
+  getInitialFormData,
+  calculateMonthlyAmountHelper,
+  calculateBiweeklyAmountHelper,
+  getNextDueDateHelper,
+  normalizeDateFormatHelper,
+  buildBillData,
+} from "./helpers/billFormHelpers";
+import { validateBillFormData } from "../../utils/validation/billFormValidation";
 
 /**
  * Custom hook for bill form management
@@ -115,94 +81,12 @@ export const useBillForm = ({
   // Available categories
   const categories = useMemo(() => getBillCategories(), []);
 
-  // Business Logic Functions
-  const calculateMonthlyAmount = useCallback(
-    (amount: string | number, frequency: BillFrequency, _customFrequency = 1): number => {
-      const numAmount = typeof amount === "string" ? parseFloat(amount) || 0 : amount;
-      // Handle 'once' frequency by treating it as monthly for calculation purposes
-      const calcFrequency: CalculationFrequency = frequency === "once" ? "monthly" : frequency;
-      return toMonthly(numAmount, calcFrequency);
-    },
-    []
-  );
-
-  const calculateBiweeklyAmount = useCallback(
-    (amount: string | number, frequency: BillFrequency, customFrequency = 1): number => {
-      const monthlyAmount = calculateMonthlyAmount(amount, frequency, customFrequency);
-      return convertToBiweekly(monthlyAmount);
-    },
-    [calculateMonthlyAmount]
-  );
-
-  const getNextDueDate = useCallback((frequency: BillFrequency, dueDate: string): string => {
-    if (!dueDate) return "";
-    const date = new Date(dueDate);
-    const now = new Date();
-
-    if (date <= now) {
-      switch (frequency) {
-        case "weekly":
-          date.setDate(date.getDate() + 7);
-          break;
-        case "biweekly":
-          date.setDate(date.getDate() + 14);
-          break;
-        case "monthly":
-          date.setMonth(date.getMonth() + 1);
-          break;
-        case "quarterly":
-          date.setMonth(date.getMonth() + 3);
-          break;
-        case "yearly":
-          date.setFullYear(date.getFullYear() + 1);
-          break;
-      }
-    }
-
-    return date.toISOString().split("T")[0];
-  }, []);
-
-  const normalizeDateFormat = useCallback((dateString: string): string => {
-    if (!dateString) return "";
-    try {
-      const dateMatch = dateString.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
-      if (dateMatch) {
-        const [, month, day, year] = dateMatch;
-        const fullYear = year.length === 2 ? `20${year}` : year;
-        return `${fullYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-      }
-      return dateString;
-    } catch (error) {
-      logger.warn("Date normalization failed:", { dateString, error: String(error) });
-      return dateString;
-    }
-  }, []);
-
-  // Form Validation
-  const validateForm = useCallback((): string[] => {
-    const errors: string[] = [];
-
-    if (!formData.name.trim()) {
-      errors.push("Bill name is required");
-    }
-
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      errors.push("Valid amount is required");
-    }
-
-    if (!formData.dueDate) {
-      errors.push("Due date is required");
-    }
-
-    return errors;
-  }, [formData]);
-
   // Form Submission
   const handleSubmit = useCallback(
     async (e: React.FormEvent): Promise<void> => {
       e.preventDefault();
 
-      const validationErrors = validateForm();
+      const validationErrors = validateBillFormData(formData);
       if (validationErrors.length > 0) {
         logger.warn("Form validation failed", { errors: validationErrors });
         onError?.(validationErrors.join(", "));
@@ -212,36 +96,9 @@ export const useBillForm = ({
       setIsSubmitting(true);
 
       try {
-        const normalizedDueDate = normalizeDateFormat(formData.dueDate);
-        const monthlyAmount = calculateMonthlyAmount(
-          formData.amount,
-          formData.frequency,
-          parseInt(formData.customFrequency) || 1
-        );
-        const biweeklyAmount = calculateBiweeklyAmount(
-          formData.amount,
-          formData.frequency,
-          parseInt(formData.customFrequency) || 1
-        );
-
         const billData: Bill = {
+          ...buildBillData(formData, editingBill, suggestedIconName),
           id: editingBill?.id || uuidv4(),
-          name: formData.name.trim(),
-          amount: parseFloat(formData.amount),
-          monthlyAmount,
-          biweeklyAmount,
-          frequency: formData.frequency,
-          customFrequency: parseInt(formData.customFrequency) || 1,
-          dueDate: normalizedDueDate,
-          nextDue: getNextDueDate(formData.frequency, normalizedDueDate),
-          category: formData.category,
-          color: formData.color,
-          notes: formData.notes,
-          iconName: formData.iconName || suggestedIconName,
-          envelopeId: formData.selectedEnvelope,
-          isPaid: editingBill?.isPaid || false,
-          createdAt: editingBill?.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         };
 
         logger.debug("Submitting bill data:", billData);
@@ -254,7 +111,6 @@ export const useBillForm = ({
           await onAddBill?.(billData);
         }
 
-        // Close modal on success
         onClose?.();
       } catch (error) {
         const errorObj = error instanceof Error ? error : new Error(String(error));
@@ -264,20 +120,7 @@ export const useBillForm = ({
         setIsSubmitting(false);
       }
     },
-    [
-      formData,
-      editingBill,
-      validateForm,
-      normalizeDateFormat,
-      calculateMonthlyAmount,
-      calculateBiweeklyAmount,
-      getNextDueDate,
-      suggestedIconName,
-      onAddBill,
-      onUpdateBill,
-      onClose,
-      onError,
-    ]
+    [formData, editingBill, suggestedIconName, onAddBill, onUpdateBill, onClose, onError]
   );
 
   // Delete Bill
@@ -328,7 +171,7 @@ export const useBillForm = ({
     categories,
 
     // Validation
-    validationErrors: validateForm(),
+    validationErrors: validateBillFormData(formData),
 
     // Actions
     handleSubmit,
@@ -342,9 +185,9 @@ export const useBillForm = ({
     setDeleteEnvelopeToo,
 
     // Utility Functions
-    calculateBiweeklyAmount,
-    calculateMonthlyAmount,
-    getNextDueDate,
-    normalizeDateFormat,
+    calculateBiweeklyAmount: calculateBiweeklyAmountHelper,
+    calculateMonthlyAmount: calculateMonthlyAmountHelper,
+    getNextDueDate: getNextDueDateHelper,
+    normalizeDateFormat: normalizeDateFormatHelper,
   };
 };
