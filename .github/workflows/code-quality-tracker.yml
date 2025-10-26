@@ -82,17 +82,16 @@ jobs:
             const eslintErrors = ${{ steps.eslint.outputs.errors }};
             const currentDate = new Date().toISOString().split('T')[0];
 
-            const commentBody = `## 📊 ESLint Tracking - ${currentDate}
+            const statusLine = eslintTotal === 0 ? '✅ No issues' : '⚠️ Issues detected';
+            const finalLine = eslintTotal === 0 ? '🎉 All ESLint checks pass!' : '❌ Code quality issues detected - review and fix before release';
 
-**Status**: ${eslintTotal === 0 ? '✅ No issues' : '⚠️ Issues detected'}
-
-- **Total Issues**: ${eslintTotal}
-  - Warnings: ${eslintWarnings}
-  - Errors: ${eslintErrors}
-
-${eslintTotal === 0 ? '🎉 All ESLint checks pass!' : '❌ Code quality issues detected - review and fix before release'}
-
-_Last updated: ${currentDate}_`;
+            const commentBody = '## 📊 ESLint Tracking - ' + currentDate + '\n\n' +
+              '**Status**: ' + statusLine + '\n\n' +
+              '- **Total Issues**: ' + eslintTotal + '\n' +
+              '  - Warnings: ' + eslintWarnings + '\n' +
+              '  - Errors: ' + eslintErrors + '\n\n' +
+              finalLine + '\n\n' +
+              '_Last updated: ' + currentDate + '_';
 
             try {
               await github.rest.issues.createComment({
@@ -114,15 +113,14 @@ _Last updated: ${currentDate}_`;
             const tsTotal = ${{ steps.typecheck.outputs.total }};
             const currentDate = new Date().toISOString().split('T')[0];
 
-            const commentBody = `## 📊 TypeScript Compilation Tracking - ${currentDate}
+            const statusLine = tsTotal === 0 ? '✅ No compilation errors' : '🔴 Compilation errors detected';
+            const finalLine = tsTotal === 0 ? '🎉 TypeScript compilation passes!' : '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release';
 
-**Status**: ${tsTotal === 0 ? '✅ No compilation errors' : '🔴 Compilation errors detected'}
-
-- **Total Errors**: ${tsTotal}
-
-${tsTotal === 0 ? '🎉 TypeScript compilation passes!' : '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release'}
-
-_Last updated: ${currentDate}_`;
+            const commentBody = '## 📊 TypeScript Compilation Tracking - ' + currentDate + '\n\n' +
+              '**Status**: ' + statusLine + '\n\n' +
+              '- **Total Errors**: ' + tsTotal + '\n\n' +
+              finalLine + '\n\n' +
+              '_Last updated: ' + currentDate + '_';
 
             try {
               await github.rest.issues.createComment({
