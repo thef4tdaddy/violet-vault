@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
@@ -8,6 +7,7 @@ import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import logger from "@/utils/common/logger";
+import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
 
 const AutoFundingView = () => {
   const confirm = useConfirm();
@@ -126,74 +126,32 @@ const AutoFundingView = () => {
   return (
     <>
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
+        <ViewHeader rules={rules} />
+
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Auto-Funding</h1>
-              <p className="text-gray-600 mt-1">
-                Automate your envelope funding with custom rules and triggers
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-                {rules.filter((r) => r.enabled).length} Active Rules
-              </span>
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
-                {rules.length} Total Rules
-              </span>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex space-x-8 mt-6 border-b border-gray-200">
-            <Button
-              onClick={() => setActiveTab("rules")}
-              className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === "rules"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Rules ({rules.length})
-            </Button>
-            <Button
-              onClick={() => setActiveTab("history")}
-              className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === "history"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              History ({displayHistory.length})
-            </Button>
-          </div>
+          <ViewTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            rules={rules}
+            displayHistory={displayHistory}
+          />
         </div>
 
-        {/* Content */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6">
-            {activeTab === "rules" && (
-              <RulesTab
-                rules={rules}
-                onCreateRule={handleCreateRule}
-                onEditRule={handleEditRule}
-                onDeleteRule={handleDeleteRule}
-                onToggleRule={handleToggleRule}
-                onExecuteRules={handleExecuteRules}
-                isExecuting={isExecuting}
-              />
-            )}
-
-            {activeTab === "history" && (
-              <HistoryTab
-                executionHistory={displayHistory}
-                showExecutionDetails={showExecutionDetails}
-                onToggleDetails={setShowExecutionDetails}
-              />
-            )}
-          </div>
-        </div>
+        <ViewContent
+          activeTab={activeTab}
+          rules={rules}
+          displayHistory={displayHistory}
+          showExecutionDetails={showExecutionDetails}
+          setShowExecutionDetails={setShowExecutionDetails}
+          handleCreateRule={handleCreateRule}
+          handleEditRule={handleEditRule}
+          handleDeleteRule={handleDeleteRule}
+          handleToggleRule={handleToggleRule}
+          handleExecuteRules={handleExecuteRules}
+          isExecuting={isExecuting}
+          RulesTabComponent={RulesTab}
+          HistoryTabComponent={HistoryTab}
+        />
       </div>
 
       {/* Rule Builder Modal */}
