@@ -1,6 +1,16 @@
 import { encryptionUtils } from "../../utils/security/encryption";
 import logger from "../../utils/common/logger";
 
+interface KeyFileData {
+  version?: string;
+  type?: 'protected' | 'unprotected';
+  key?: number[];
+  salt?: number[];
+  encryptedKey?: number[];
+  exportSalt?: number[];
+  [key: string]: unknown;
+}
+
 /**
  * Key Management Service
  * Handles encryption key operations, import/export, and validation
@@ -171,7 +181,7 @@ class KeyManagementService {
       const exportKeyData = await encryptionUtils.deriveKey(exportPassword);
 
       // Encrypt the main key and salt
-      const keyArray = Array.from(encryptionKey as any);
+      const keyArray = Array.from(encryptionKey as Uint8Array);
       const saltArray = Array.from(salt);
       const dataToEncrypt = JSON.stringify({ key: keyArray, salt: saltArray });
 
@@ -219,7 +229,7 @@ class KeyManagementService {
       }
 
       const keyData = {
-        key: Array.from(encryptionKey as any),
+        key: Array.from(encryptionKey as Uint8Array),
         salt: Array.from(salt),
         timestamp: new Date().toISOString(),
         type: "qr",
@@ -253,16 +263,6 @@ class KeyManagementService {
       throw new Error("Failed to generate QR code: " + (error as Error).message);
     }
   }
-
-interface KeyFileData {
-  version?: string;
-  type?: 'protected' | 'unprotected';
-  key?: number[];
-  salt?: number[];
-  encryptedKey?: number[];
-  exportSalt?: number[];
-  [key: string]: unknown;
-}
 
   /**
    * Validate key file structure and format

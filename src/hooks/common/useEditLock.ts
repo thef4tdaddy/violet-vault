@@ -94,9 +94,10 @@ const useEditLock = (recordType: string, recordId: string, options: UseEditLockO
       logger.debug("🔒 Edit lock acquired via hook", { recordType, recordId });
     } else {
       if (result.reason === "locked_by_other" && showToasts) {
-        const expiresAt = (result as any).expiresAt;
+        const resultWithDetails = result as { expiresAt?: string | number; lockedBy?: string };
+        const expiresAt = resultWithDetails.expiresAt;
         const timeLeft = expiresAt ? Math.ceil((new Date(expiresAt).getTime() - new Date().getTime()) / 1000) : 0;
-        const lockedBy = (result as any).lockedBy || "Another user";
+        const lockedBy = resultWithDetails.lockedBy || "Another user";
         addToast({
           type: "warning",
           title: "Currently Being Edited",

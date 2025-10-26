@@ -217,9 +217,11 @@ export const useLoginMutation = () => {
           } else {
             return await handleExistingUserLogin(password);
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           logger.error("Login failed.", error);
-          if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorName = error instanceof Error ? error.name : "";
+          if (errorName === "OperationError" || errorMessage.toLowerCase().includes("decrypt")) {
             return { success: false, error: "Invalid password." };
           }
           return {
