@@ -27,9 +27,9 @@ const BillManagerLoading = ({ className }) => (
 const BillManager = ({
   transactions: propTransactions = [],
   envelopes: propEnvelopes = [],
-  onUpdateBill,
-  onCreateRecurringBill,
-  onSearchNewBills,
+  onUpdateBill: _onUpdateBill,
+  onCreateRecurringBill: _onCreateRecurringBill,
+  onSearchNewBills: _onSearchNewBills,
   onError,
   className = "",
 }) => {
@@ -40,7 +40,7 @@ const BillManager = ({
     categorizedBills,
     filteredBills,
     totals,
-    envelopes,
+    envelopes: _envelopes,
 
     // UI State
     selectedBills,
@@ -78,10 +78,6 @@ const BillManager = ({
   } = useBillManager({
     propTransactions,
     propEnvelopes,
-    onUpdateBill,
-    onCreateRecurringBill,
-    onSearchNewBills,
-    onError,
   });
 
   // UI logic hook
@@ -111,10 +107,12 @@ const BillManager = ({
     securityContext: { budgetId },
     user: currentUser,
   } = useAuthManager();
-  const { isLocked: isEditLocked, currentEditor } = useEditLock(
+  const { isLocked: isEditLocked, lockedBy } = useEditLock(
     `bills-${budgetId}`,
     currentUser?.userName || "User"
   );
+  
+  const currentEditor = lockedBy;
 
   // Loading state
   if (isLoading) {

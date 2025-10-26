@@ -1,6 +1,16 @@
 import { encryptionUtils } from "../../utils/security/encryption";
 import logger from "../../utils/common/logger";
 
+interface KeyFileData {
+  version?: string;
+  type?: 'protected' | 'unprotected';
+  key?: number[];
+  salt?: number[];
+  encryptedKey?: number[];
+  exportSalt?: number[];
+  [key: string]: unknown;
+}
+
 /**
  * Key Management Service
  * Handles encryption key operations, import/export, and validation
@@ -64,7 +74,7 @@ class KeyManagementService {
       }
 
       const keyData = {
-        key: Array.from(encryptionKey as any),
+        key: Array.from(encryptionKey as Uint8Array),
         salt: Array.from(salt),
         timestamp: new Date().toISOString(),
         type: "unprotected",
@@ -114,7 +124,7 @@ class KeyManagementService {
       }
 
       const keyData = {
-        key: Array.from(encryptionKey as any),
+        key: Array.from(encryptionKey as Uint8Array),
         salt: Array.from(salt),
         user: currentUser,
         budgetId: budgetId,
@@ -171,7 +181,7 @@ class KeyManagementService {
       const exportKeyData = await encryptionUtils.deriveKey(exportPassword);
 
       // Encrypt the main key and salt
-      const keyArray = Array.from(encryptionKey as any);
+      const keyArray = Array.from(encryptionKey as Uint8Array);
       const saltArray = Array.from(salt);
       const dataToEncrypt = JSON.stringify({ key: keyArray, salt: saltArray });
 
@@ -219,7 +229,7 @@ class KeyManagementService {
       }
 
       const keyData = {
-        key: Array.from(encryptionKey as any),
+        key: Array.from(encryptionKey as Uint8Array),
         salt: Array.from(salt),
         timestamp: new Date().toISOString(),
         type: "qr",
@@ -257,7 +267,7 @@ class KeyManagementService {
   /**
    * Validate key file structure and format
    */
-  validateKeyFile(keyFileData: any) {
+  validateKeyFile(keyFileData: KeyFileData) {
     try {
       if (!keyFileData || typeof keyFileData !== "object") {
         return { valid: false, error: "Invalid file format" };
@@ -302,7 +312,7 @@ class KeyManagementService {
    * @param importPassword - Password for protected key files
    * @returns Processed key data ready for login
    */
-  async importKeyData(keyFileData: any, importPassword?: string) {
+  async importKeyData(keyFileData: KeyFileData, importPassword?: string) {
     try {
       logger.debug("Starting key import process");
 

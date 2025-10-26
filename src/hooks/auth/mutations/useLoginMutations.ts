@@ -12,16 +12,30 @@ import localStorageService from "../../../services/storage/localStorageService";
 
 interface LoginMutationVariables {
   password: string;
-  userData?: any;
+  userData?: Record<string, unknown>;
+}
+
+interface UserData {
+  id?: string;
+  email?: string;
+  budgetId?: string;
+  userName?: string;
+  [key: string]: unknown;
+}
+
+interface SessionData {
+  token?: string;
+  expiresAt?: string;
+  [key: string]: unknown;
 }
 
 interface LoginResult {
   success: boolean;
-  user?: any;
-  sessionData?: any;
+  user?: UserData;
+  sessionData?: SessionData;
   isNewUser?: boolean;
   error?: string;
-  data?: any;
+  data?: Record<string, unknown>;
   suggestion?: string;
   code?: string;
   canCreateNew?: boolean;
@@ -30,7 +44,7 @@ interface LoginResult {
 /**
  * Helper function for new user setup path
  */
-const handleNewUserSetup = async (userData: any, password: string): Promise<LoginResult> => {
+const handleNewUserSetup = async (userData: UserData, password: string): Promise<LoginResult> => {
   logger.auth("New user setup path.", userData);
 
   const keyData = await encryptionUtils.deriveKey(password);
@@ -203,9 +217,11 @@ export const useLoginMutation = () => {
           } else {
             return await handleExistingUserLogin(password);
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           logger.error("Login failed.", error);
-          if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorName = error instanceof Error ? error.name : "";
+          if (errorName === "OperationError" || errorMessage.toLowerCase().includes("decrypt")) {
             return { success: false, error: "Invalid password." };
           }
           return {
