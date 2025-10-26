@@ -214,11 +214,11 @@ export const processExecutionResults = (
  * Enhanced rule execution with history tracking
  */
 export const createExecuteRules = (
-  rulesHook: any,
-  executionHook: any,
-  historyHook: any,
-  dataHook: any
-) => async (trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
+  rulesHook: UseAutoFundingRulesReturn,
+  executionHook: UseAutoFundingExecutionReturn,
+  historyHook: UseAutoFundingHistoryReturn,
+  dataHook: UseAutoFundingDataReturn
+) => async (trigger = TRIGGER_TYPES.MANUAL, triggerData: Record<string, unknown> = {}) => {
   try {
     const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
     processExecutionResults(result, historyHook, rulesHook, dataHook);
@@ -232,7 +232,7 @@ export const createExecuteRules = (
 /**
  * Get current data for auto-save
  */
-export const getCurrentDataForSave = (rulesHook: any, historyHook: any) => ({
+export const getCurrentDataForSave = (rulesHook: UseAutoFundingRulesReturn, historyHook: UseAutoFundingHistoryReturn) => ({
   rules: rulesHook.rules,
   executionHistory: historyHook.executionHistory,
   undoStack: historyHook.undoStack,
@@ -242,8 +242,8 @@ export const getCurrentDataForSave = (rulesHook: any, historyHook: any) => ({
  * Initialize auto-funding system
  */
 export const initializeAutoFundingSystem = async (
-  dataHook: any,
-  rulesHook: any
+  dataHook: UseAutoFundingDataReturn,
+  rulesHook: UseAutoFundingRulesReturn
 ): Promise<void> => {
   try {
     const savedData = await dataHook.initialize();

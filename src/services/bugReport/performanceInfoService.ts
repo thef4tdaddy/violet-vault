@@ -6,6 +6,43 @@
 import logger from "../../utils/common/logger";
 
 /**
+ * Extended Navigator interface for non-standard browser APIs
+ */
+interface NavigatorWithConnection extends Navigator {
+  connection?: {
+    effectiveType?: string;
+    type?: string;
+    downlink?: number;
+    downlinkMax?: number;
+    rtt?: number;
+    saveData?: boolean;
+  };
+  mozConnection?: {
+    effectiveType?: string;
+    type?: string;
+    downlink?: number;
+    downlinkMax?: number;
+    rtt?: number;
+    saveData?: boolean;
+  };
+  webkitConnection?: {
+    effectiveType?: string;
+    type?: string;
+    downlink?: number;
+    downlinkMax?: number;
+    rtt?: number;
+    saveData?: boolean;
+  };
+}
+
+/**
+ * Extended StorageEstimate for usage details
+ */
+interface ExtendedStorageEstimate extends StorageEstimate {
+  usageDetails?: Record<string, number>;
+}
+
+/**
  * Performance timing information
  */
 interface PerformanceTiming {
@@ -278,12 +315,12 @@ export class PerformanceInfoService {
         return { available: false };
       }
 
-      const estimate = await navigator.storage.estimate();
+      const estimate = await navigator.storage.estimate() as ExtendedStorageEstimate;
       return {
         available: true,
         quota: estimate.quota,
         usage: estimate.usage,
-        usageDetails: (estimate as any).usageDetails,
+        usageDetails: estimate.usageDetails,
       };
     } catch (error) {
       return {
@@ -307,7 +344,8 @@ export class PerformanceInfoService {
       };
 
       // Network Information API (if available)
-      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+      const nav = navigator as NavigatorWithConnection;
+      const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
       if (connection) {
         networkInfo.effectiveType = connection.effectiveType;
         networkInfo.downlink = connection.downlink;
@@ -333,7 +371,8 @@ export class PerformanceInfoService {
    */
   static getConnectionInfo(): ConnectionInfo | null {
     try {
-      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+      const nav = navigator as NavigatorWithConnection;
+      const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
       if (!connection) return null;
 
       return {

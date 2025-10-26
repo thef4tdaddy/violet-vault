@@ -23,6 +23,7 @@ export interface RuleExecutionResult {
 export interface ExecutionDetails {
   id: string;
   executedAt: string;
+  timestamp?: string; // Alias for executedAt for compatibility with ExecutionHistoryEntry
   trigger: string;
   rulesExecuted: number;
   totalFunded: number;
@@ -42,6 +43,7 @@ export interface ExecutionResult {
 export interface ExecutionHistoryEntry {
   id: string;
   timestamp: string;
+  executedAt?: string; // Alias for timestamp for compatibility with ExecutionDetails
   trigger: string;
   rulesExecuted: number;
   totalFunded: number;

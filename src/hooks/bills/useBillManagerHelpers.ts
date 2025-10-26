@@ -6,14 +6,7 @@ import { processRecurringBill } from "@/utils/bills/recurringBillUtils";
 import { processBillCalculations, categorizeBills, calculateBillTotals, filterBills } from "@/utils/bills/billCalculations";
 import { generateBillSuggestions } from "@/utils/common/billDiscovery";
 import logger from "@/utils/common/logger";
-
-interface Bill {
-  id: string;
-  name: string;
-  amount: number;
-  dueDate: Date | string;
-  [key: string]: unknown;
-}
+import type { Bill, Envelope } from "@/types/bills";
 
 interface Transaction {
   id: string;
@@ -23,6 +16,43 @@ interface Transaction {
   type?: string;
   category?: string;
   [key: string]: unknown;
+}
+
+interface BillUpdateMutation {
+  billId: string;
+  updates: {
+    isPaid: boolean;
+    dueDate: Date | string;
+    paidDate: string | null;
+  };
+}
+
+interface CategorizedBills {
+  all: Bill[];
+  upcoming: Bill[];
+  overdue: Bill[];
+  paid: Bill[];
+  [key: string]: Bill[];
+}
+
+interface FilterOptions {
+  search: string;
+  urgency: string;
+  envelope: string;
+  amountMin: string;
+  amountMax: string;
+}
+
+interface UISetters {
+  setSelectedBills: (bills: Set<string>) => void;
+  setViewMode: (mode: string) => void;
+  setShowBillDetail: (bill: Bill | null) => void;
+  setShowAddBillModal: (show: boolean) => void;
+  setEditingBill: (bill: Bill | null) => void;
+  setShowBulkUpdateModal: (show: boolean) => void;
+  setShowDiscoveryModal: (show: boolean) => void;
+  setHistoryBill: (bill: Bill | null) => void;
+  setFilterOptions: (options: FilterOptions) => void;
 }
 
 /**
@@ -46,10 +76,10 @@ export const resolveTransactions = (
  * Resolve envelopes from multiple sources
  */
 export const resolveEnvelopes = (
-  propEnvelopes: any[],
-  tanStackEnvelopes: any[],
-  budgetEnvelopes: any[]
-): any[] => {
+  propEnvelopes: Envelope[],
+  tanStackEnvelopes: Envelope[],
+  budgetEnvelopes: Envelope[]
+): Envelope[] => {
   if (propEnvelopes && propEnvelopes.length) {
     return propEnvelopes;
   }
@@ -95,7 +125,7 @@ export const combineBills = (
 export const processBills = (
   combinedBills: Bill[],
   onUpdateBill: ((bill: Bill) => void) | undefined,
-  updateBillMutation: (updates: any) => Promise<void>
+  updateBillMutation: (updates: BillUpdateMutation) => Promise<void>
 ): Bill[] => {
   return combinedBills.map((bill) => {
     // Handle recurring bill logic using utility
@@ -132,9 +162,9 @@ export const categorizeBillsWithTotals = (bills: Bill[]) => {
  * Filter bills based on view mode and filter options
  */
 export const getFilteredBills = (
-  categorizedBills: any,
+  categorizedBills: CategorizedBills,
   viewMode: string,
-  filterOptions: any
+  filterOptions: FilterOptions
 ): Bill[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
   return filterBills(billsToFilter, filterOptions);
@@ -146,7 +176,7 @@ export const getFilteredBills = (
 export const discoverNewBills = async (
   transactions: Transaction[],
   bills: Bill[],
-  envelopes: any[],
+  envelopes: Envelope[],
   onSearchNewBills?: () => void | Promise<void>
 ): Promise<Bill[]> => {
   const suggestions = generateBillSuggestions(transactions, bills, envelopes);
@@ -197,7 +227,7 @@ export const createInitialUIState = () => ({
 /**
  * Create UI actions object
  */
-export const createUIActions = (setters: any) => ({
+export const createUIActions = (setters: UISetters) => ({
   setSelectedBills: setters.setSelectedBills,
   setViewMode: setters.setViewMode,
   setShowBillDetail: setters.setShowBillDetail,
@@ -215,7 +245,7 @@ export const createUIActions = (setters: any) => ({
 export const handleSearchNewBills = async (
   transactions: Transaction[],
   bills: Bill[],
-  envelopes: any[],
+  envelopes: Envelope[],
   onSearchNewBills: (() => void | Promise<void>) | undefined,
   onError: ((error: string) => void) | undefined,
   setIsSearching: (value: boolean) => void,
