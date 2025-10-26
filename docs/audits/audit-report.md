@@ -19,19 +19,513 @@
 - 7 issues in `violet-vault/src/services/bugReport/performanceInfoService.ts`
 - 6 issues in `violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
 - 4 issues in `violet-vault/src/services/chunkedSyncService.ts`
+- 3 issues in `violet-vault/src/hooks/debts/useDebtDetailModal.ts`
+- 2 issues in `violet-vault/src/hooks/debts/useDebtModalLogic.ts`
+- 2 issues in `violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx`
+- 2 issues in `violet-vault/src/components/layout/MainLayout.tsx`
+- 2 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
+- 2 issues in `violet-vault/src/components/accounts/AccountFormModal.tsx`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
+- 1 issues in `violet-vault/src/hooks/transactions/useTransactionTable.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionSplitter.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionOperations.ts`
+- 1 issues in `violet-vault/src/hooks/sync/useSyncHealthMonitor.ts`
+- 1 issues in `violet-vault/src/hooks/security/useSecurityAcknowledgment.ts`
+- 1 issues in `violet-vault/src/hooks/common/useEditLock.ts`
+- 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useUndoOperations.ts`
+- 1 issues in `violet-vault/src/hooks/bills/useBillDetail.ts`
+- 1 issues in `violet-vault/src/hooks/auth/useSecurityManagerUI.ts`
+- 1 issues in `violet-vault/src/components/ui/forms/Textarea.tsx`
+- 1 issues in `violet-vault/src/components/ui/forms/TextInput.tsx`
+- 1 issues in `violet-vault/src/components/ui/forms/Select.tsx`
+- 1 issues in `violet-vault/src/components/ui/forms/RadioGroup.tsx`
+- 1 issues in `violet-vault/src/components/ui/forms/Radio.tsx`
+- 1 issues in `violet-vault/src/components/ui/forms/Checkbox.tsx`
+- 1 issues in `violet-vault/src/components/ui/VersionFooter.tsx`
+- 1 issues in `violet-vault/src/components/ui/PromptModal.tsx`
+- 1 issues in `violet-vault/src/components/ui/EditableBalance.tsx`
+- 1 issues in `violet-vault/src/components/transactions/TransactionForm.tsx`
+- 1 issues in `violet-vault/src/components/sync/ActivityBanner.tsx`
+- 1 issues in `violet-vault/src/components/savings/DistributeModal.tsx`
+- 1 issues in `violet-vault/src/components/savings/AddEditGoalModal.tsx`
+- 1 issues in `violet-vault/src/components/modals/QuickFundModal.tsx`
+- 1 issues in `violet-vault/src/components/mobile/SlideUpModal.tsx`
+- 1 issues in `violet-vault/src/components/history/ObjectHistoryViewer.tsx`
+- 1 issues in `violet-vault/src/components/debt/modals/AddDebtModal.tsx`
+- 1 issues in `violet-vault/src/components/bills/BillDiscoveryModal/useBillDiscoveryState.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
 | 84 | `@typescript-eslint/no-explicit-any` |
+| 16 | `react-hooks/set-state-in-effect` |
+| 10 | `react-hooks/purity` |
+| 4 | `react-hooks/static-components` |
+| 4 | `react-hooks/preserve-manual-memoization` |
 | 3 | `max-lines-per-function` |
+| 2 | `react-hooks/refs` |
 | 2 | `max-params` |
+| 1 | `react-hooks/incompatible-library` |
+| 1 | `react-hooks/immutability` |
 
 ### Detailed Lint Report
 ```
+violet-vault/src/components/accounts/AccountFormModal.tsx:88:12 - 2 - Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+violet-vault/src/components/accounts/AccountFormModal.tsx:88:12
+  86 |       >
+  87 |         <div className="px-6 pb-6">
+> 88 |           <ModalContent />
+     |            ^^^^^^^^^^^^ This component is created during render
+  89 |         </div>
+  90 |       </SlideUpModal>
+  91 |     );
+
+violet-vault/src/components/accounts/AccountFormModal.tsx:31:24
+  29 |
+  30 |   // Extract modal content for reuse between mobile and desktop
+> 31 |   const ModalContent = () => (
+     |                        ^^^^^^^
+> 32 |     <>
+     | ^^^^^^
+> 33 |       {/* Edit Lock Warning */}
+     …
+     | ^^^^^^
+> 73 |     </>
+     | ^^^^^^
+> 74 |   );
+     | ^^^^ The component is created during render here
+  75 |
+  76 |   // Mobile slide-up modal
+  77 |   if (isMobile || _forceMobileMode) { (react-hooks/static-components)
+violet-vault/src/components/accounts/AccountFormModal.tsx:108:10 - 2 - Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+violet-vault/src/components/accounts/AccountFormModal.tsx:108:10
+  106 |         />
+  107 |
+> 108 |         <ModalContent />
+      |          ^^^^^^^^^^^^ This component is created during render
+  109 |       </div>
+  110 |     </div>
+  111 |   );
+
+violet-vault/src/components/accounts/AccountFormModal.tsx:31:24
+  29 |
+  30 |   // Extract modal content for reuse between mobile and desktop
+> 31 |   const ModalContent = () => (
+     |                        ^^^^^^^
+> 32 |     <>
+     | ^^^^^^
+> 33 |       {/* Edit Lock Warning */}
+     …
+     | ^^^^^^
+> 73 |     </>
+     | ^^^^^^
+> 74 |   );
+     | ^^^^ The component is created during render here
+  75 |
+  76 |   // Mobile slide-up modal
+  77 |   if (isMobile || _forceMobileMode) { (react-hooks/static-components)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:148:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:148:7
+  146 |   useEffect(() => {
+  147 |     if (editingRule) {
+> 148 |       setRuleData({ ...editingRule, config: { ...editingRule.config } });
+      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  149 |     }
+  150 |   }, [editingRule]);
+  151 | (react-hooks/set-state-in-effect)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:155:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:155:7
+  153 |   useEffect(() => {
+  154 |     if (!isOpen) {
+> 155 |       setStep(1);
+      |       ^^^^^^^ Avoid calling setState() directly within an effect
+  156 |       if (!editingRule) {
+  157 |         setRuleData(createDefaultRule());
+  158 |       } (react-hooks/set-state-in-effect)
+violet-vault/src/components/bills/BillDiscoveryModal/useBillDiscoveryState.ts:21:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/bills/BillDiscoveryModal/useBillDiscoveryState.ts:21:7
+  19 |         }
+  20 |       });
+> 21 |       setBillEnvelopeMap(envelopeMap);
+     |       ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |     }
+  23 |   }, [isOpen, discoveredBills]);
+  24 | (react-hooks/set-state-in-effect)
+violet-vault/src/components/debt/modals/AddDebtModal.tsx:44:37 - 2 - Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/debt/modals/AddDebtModal.tsx:44:37
+  42 |               lock={{
+  43 |                 userName: editLock.lockedBy,
+> 44 |                 expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
+     |                                     ^^^^^^^^^^ Cannot call impure function
+  45 |                 isExpired: editLock.isExpired,
+  46 |               }}
+  47 |               onBreakLock={editLock.breakLock} (react-hooks/purity)
+violet-vault/src/components/history/ObjectHistoryViewer.tsx:59:5 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/history/ObjectHistoryViewer.tsx:59:5
+  57 |     });
+  58 |
+> 59 |     setRelevantHistory(objectHistory.slice(0, 20)); // Limit to 20 most recent
+     |     ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  60 |   }, [allCommits, isLoading, objectId, objectType, objectName]);
+  61 |
+  62 |   const toggleCommitExpanded = (commitHash: string) => { (react-hooks/set-state-in-effect)
+violet-vault/src/components/layout/MainLayout.tsx:149:7 - 2 - Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+violet-vault/src/components/layout/MainLayout.tsx:149:7
+  147 |   // Log sync state
+  148 |   const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
+> 149 |   if (lastLogKeyRef.current !== logKey) {
+      |       ^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  150 |     logger.budgetSync("BudgetProvider state changed", {
+  151 |       hasEncryptionKey: !!securityContext?.encryptionKey,
+  152 |       hasCurrentUser: !!currentUser, (react-hooks/refs)
+violet-vault/src/components/layout/MainLayout.tsx:155:5 - 2 - Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+violet-vault/src/components/layout/MainLayout.tsx:155:5
+  153 |       hasBudgetId: !!securityContext?.budgetId,
+  154 |     });
+> 155 |     lastLogKeyRef.current = logKey;
+      |     ^^^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  156 |   }
+  157 |
+  158 |   return ( (react-hooks/refs)
+violet-vault/src/components/mobile/SlideUpModal.tsx:302:5 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/mobile/SlideUpModal.tsx:302:5
+  300 |     if (!isOpen) return;
+  301 |     
+> 302 |     setIsAnimating(true);
+      |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  303 |     const timer = setTimeout(() => setIsAnimating(false), 300);
+  304 |     return () => clearTimeout(timer);
+  305 |   }, [isOpen]); (react-hooks/set-state-in-effect)
+violet-vault/src/components/modals/QuickFundModal.tsx:23:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/modals/QuickFundModal.tsx:23:7
+  21 |   useEffect(() => {
+  22 |     if (isOpen) {
+> 23 |       setAmount(suggestedAmount || 0);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |     }
+  25 |   }, [isOpen, suggestedAmount]);
+  26 | (react-hooks/set-state-in-effect)
+violet-vault/src/components/savings/AddEditGoalModal.tsx:55:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/savings/AddEditGoalModal.tsx:55:7
+  53 |   useEffect(() => {
+  54 |     if (isOpen) {
+> 55 |       setFormData(editingGoal ? mapGoalToFormData(editingGoal) : getInitialFormData());
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  56 |     }
+  57 |   }, [isOpen, editingGoal]);
+  58 | (react-hooks/set-state-in-effect)
+violet-vault/src/components/savings/DistributeModal.tsx:69:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/savings/DistributeModal.tsx:69:7
+  67 |   useEffect(() => {
+  68 |     if (isOpen) {
+> 69 |       initializeDistribution();
+     |       ^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  70 |     }
+  71 |   }, [isOpen, initializeDistribution]);
+  72 | (react-hooks/set-state-in-effect)
+violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx:47:10 - 2 - Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx:47:10
+  45 |       <div className="space-y-1">
+  46 |         {/* Enable Auto-Lock Toggle */}
+> 47 |         <ToggleSwitch
+     |          ^^^^^^^^^^^^ This component is created during render
+  48 |           enabled={securitySettings.autoLockEnabled}
+  49 |           onChange={() => handleSettingChange("autoLockEnabled", !securitySettings.autoLockEnabled)}
+  50 |           label="Enable Auto-Lock"
+
+violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx:11:24
+   9 | const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
+  10 |   // Toggle switch component for consistency
+> 11 |   const ToggleSwitch = ({ enabled, onChange, label, description }) => (
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 12 |     <div className="flex items-center justify-between py-3">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 13 |       <div className="flex-1 mr-4">
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 31 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |   );
+     | ^^^^ The component is created during render here
+  33 |
+  34 |   return (
+  35 |     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl"> (react-hooks/static-components)
+violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx:86:10 - 2 - Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx:86:10
+  84 |
+  85 |         {/* Lock on Page Hide Toggle */}
+> 86 |         <ToggleSwitch
+     |          ^^^^^^^^^^^^ This component is created during render
+  87 |           enabled={securitySettings.lockOnPageHide}
+  88 |           onChange={() => handleSettingChange("lockOnPageHide", !securitySettings.lockOnPageHide)}
+  89 |           label="Lock on Page Hide"
+
+violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx:11:24
+   9 | const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
+  10 |   // Toggle switch component for consistency
+> 11 |   const ToggleSwitch = ({ enabled, onChange, label, description }) => (
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 12 |     <div className="flex items-center justify-between py-3">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 13 |       <div className="flex-1 mr-4">
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 31 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |   );
+     | ^^^^ The component is created during render here
+  33 |
+  34 |   return (
+  35 |     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl"> (react-hooks/static-components)
+violet-vault/src/components/sync/ActivityBanner.tsx:44:5 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/sync/ActivityBanner.tsx:44:5
+  42 |       .slice(0, 10);
+  43 |
+> 44 |     setDisplayedActivities(sortedActivities);
+     |     ^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  45 |   }, [recentActivity]);
+  46 |
+  47 |   /** (react-hooks/set-state-in-effect)
+violet-vault/src/components/transactions/TransactionForm.tsx:91:37 - 2 - Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/transactions/TransactionForm.tsx:91:37
+  89 |               lock={{
+  90 |                 userName: editLock.lockedBy,
+> 91 |                 expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
+     |                                     ^^^^^^^^^^ Cannot call impure function
+  92 |                 isExpired: editLock.isExpired,
+  93 |               }}
+  94 |               onBreakLock={editLock.breakLock} (react-hooks/purity)
+violet-vault/src/components/ui/EditableBalance.tsx:193:5 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/ui/EditableBalance.tsx:193:5
+  191 |
+  192 |   useEffect(() => {
+> 193 |     setEditValue(value?.toString() || "0");
+      |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  194 |   }, [value]);
+  195 |
+  196 |   useEffect(() => { (react-hooks/set-state-in-effect)
+violet-vault/src/components/ui/PromptModal.tsx:65:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/ui/PromptModal.tsx:65:7
+  63 |     // Reset input value when modal opens
+  64 |     if (isOpen) {
+> 65 |       setInputValue(defaultValue);
+     |       ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  66 |       setValidationError("");
+  67 |     }
+  68 |   }, [isOpen, defaultValue]); (react-hooks/set-state-in-effect)
+violet-vault/src/components/ui/VersionFooter.tsx:19:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/components/ui/VersionFooter.tsx:19:7
+  17 |     if (versionInfo.isDevelopment) {
+  18 |       const currentCache = getCacheStatus();
+> 19 |       setCacheInfo(currentCache);
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  20 |
+  21 |       // Only fetch if we don't have valid cached data
+  22 |       if (!currentCache.isValid) { (react-hooks/set-state-in-effect)
+violet-vault/src/components/ui/forms/Checkbox.tsx:31:42 - 2 - Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/ui/forms/Checkbox.tsx:31:42
+  29 | const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+  30 |   ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
+> 31 |     const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+     |                                          ^^^^^^^^^^^^^ Cannot call impure function
+  32 |
+  33 |     return (
+  34 |       <div className="w-full"> (react-hooks/purity)
+violet-vault/src/components/ui/forms/Radio.tsx:36:36 - 2 - Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/ui/forms/Radio.tsx:36:36
+  34 | const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
+  35 |   ({ label, error, helperText, description, className = "", id, disabled, ...props }, ref) => {
+> 36 |     const radioId = id || `radio-${Math.random().toString(36).substr(2, 9)}`;
+     |                                    ^^^^^^^^^^^^^ Cannot call impure function
+  37 |
+  38 |     // If description is provided, use grid layout (for RadioGroup with descriptions)
+  39 |     if (description) { (react-hooks/purity)
+violet-vault/src/components/ui/forms/RadioGroup.tsx:89:36 - 2 - Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/ui/forms/RadioGroup.tsx:89:36
+  87 |   ) => {
+  88 |     const hasDescriptions = options.some((opt) => opt.description);
+> 89 |     const groupId = `radio-group-${Math.random().toString(36).substr(2, 9)}`;
+     |                                    ^^^^^^^^^^^^^ Cannot call impure function
+  90 |
+  91 |     const handleChange = (optionValue: string) => {
+  92 |       onChange?.(optionValue); (react-hooks/purity)
+violet-vault/src/components/ui/forms/Select.tsx:49:38 - 2 - Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/ui/forms/Select.tsx:49:38
+  47 |     ref
+  48 |   ) => {
+> 49 |     const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+     |                                      ^^^^^^^^^^^^^ Cannot call impure function
+  50 |
+  51 |     return (
+  52 |       <div className="w-full"> (react-hooks/purity)
+violet-vault/src/components/ui/forms/TextInput.tsx:37:36 - 2 - Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/ui/forms/TextInput.tsx:37:36
+  35 | const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
+  36 |   ({ label, error, helperText, icon, className = "", id, disabled, ...props }, ref) => {
+> 37 |     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+     |                                    ^^^^^^^^^^^^^ Cannot call impure function
+  38 |
+  39 |     return (
+  40 |       <div className="w-full"> (react-hooks/purity)
+violet-vault/src/components/ui/forms/Textarea.tsx:34:42 - 2 - Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/components/ui/forms/Textarea.tsx:34:42
+  32 | const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  33 |   ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
+> 34 |     const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
+     |                                          ^^^^^^^^^^^^^ Cannot call impure function
+  35 |
+  36 |     return (
+  37 |       <div className="w-full"> (react-hooks/purity)
+violet-vault/src/hooks/auth/useSecurityManagerUI.ts:14:34 - 2 - Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/hooks/auth/useSecurityManagerUI.ts:14:34
+  12 |   const [securityEvents, setSecurityEvents] = useState(() => securityService.loadSecurityEvents());
+  13 |
+> 14 |   const lastActivityRef = useRef(Date.now());
+     |                                  ^^^^^^^^^^ Cannot call impure function
+  15 |   const autoLockTimerRef = useRef(null);
+  16 |   const clipboardTimerRef = useRef(null);
+  17 | (react-hooks/purity)
+violet-vault/src/hooks/bills/useBillDetail.ts:43:17 - 2 - Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+violet-vault/src/hooks/bills/useBillDetail.ts:43:17
+  41 |   const daysUntilDue = useMemo(() => {
+  42 |     if (!bill?.dueDate) return null;
+> 43 |     const now = Date.now();
+     |                 ^^^^^^^^^^ Cannot call impure function
+  44 |     const dueTime = bill.dueDate.getTime();
+  45 |     return Math.ceil((dueTime - now) / (1000 * 60 * 60 * 24));
+  46 |   }, [bill?.dueDate]); (react-hooks/purity)
 violet-vault/src/hooks/bills/useBillManagerHelpers.ts:49:18 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/bills/useBillManagerHelpers.ts:50:22 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/bills/useBillManagerHelpers.ts:51:20 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
@@ -101,14 +595,202 @@ violet-vault/src/hooks/budgeting/autofunding/useAutoFundingHelpers.ts:224:50 - 1
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingHelpers.ts:224:68 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingHelpers.ts:234:13 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/autofunding/useAutoFundingHelpers.ts:235:14 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/budgeting/autofunding/useUndoOperations.ts:130:30 - 2 - Error: Cannot access variable before it is declared
+
+`undoExecution` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+violet-vault/src/hooks/budgeting/autofunding/useUndoOperations.ts:130:30
+  128 |
+  129 |     return await undoExecution(undoableExecutions[0].executionId);
+> 130 |   }, [getUndoableExecutions, undoExecution]);
+      |                              ^^^^^^^^^^^^^ `undoExecution` accessed before it is declared
+  131 |
+  132 |   // Reverse a single transfer
+  133 |   const reverseTransfer = useCallback(
+
+violet-vault/src/hooks/budgeting/autofunding/useUndoOperations.ts:161:3
+  159 |
+  160 |   // Undo a specific execution by ID
+> 161 |   const undoExecution = useCallback(
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 162 |     async (executionId) => {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 163 |       const undoItem = undoStack.find((item) => item.executionId === executionId && item.canUndo);
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 214 |     [undoStack, addToHistory, reverseTransfer]
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 215 |   );
+      | ^^^^^ `undoExecution` is declared here
+  216 |
+  217 |   return {
+  218 |     undoStack, (react-hooks/immutability)
 violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts:12:19 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts:13:20 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts:36:71 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts:58:12 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts:81:82 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts:89:15 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/common/useEditLock.ts:121:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/hooks/common/useEditLock.ts:121:7
+  119 |   useEffect(() => {
+  120 |     if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
+> 121 |       acquireLock();
+      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  122 |     }
+  123 |   }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock, acquireLock]);
+  124 | (react-hooks/set-state-in-effect)
+violet-vault/src/hooks/debts/useDebtDetailModal.ts:24:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/hooks/debts/useDebtDetailModal.ts:24:7
+  22 |   useEffect(() => {
+  23 |     if (debt && isOpen) {
+> 24 |       setPaymentAmount(debt.minimumPayment?.toString() || "");
+     |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |     }
+  26 |   }, [debt, isOpen]);
+  27 | (react-hooks/set-state-in-effect)
+violet-vault/src/hooks/debts/useDebtDetailModal.ts:44:33 - 2 - Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `debt`, but the source dependencies were [debt?.payoffInfo]. Inferred less specific property than source.
+
+violet-vault/src/hooks/debts/useDebtDetailModal.ts:44:33
+  42 |
+  43 |   // Format payoff information
+> 44 |   const payoffDisplay = useMemo(() => {
+     |                                 ^^^^^^^
+> 45 |     if (!debt?.payoffInfo) return null;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |     };
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 58 |   }, [debt?.payoffInfo]);
+     | ^^^^ Could not preserve existing manual memoization
+  59 |
+  60 |   // Get recent payment history
+  61 |   const recentPayments = useMemo(() => { (react-hooks/preserve-manual-memoization)
+violet-vault/src/hooks/debts/useDebtDetailModal.ts:61:34 - 2 - Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `debt.paymentHistory`, but the source dependencies were [debt?.paymentHistory]. Inferred different dependency than source.
+
+violet-vault/src/hooks/debts/useDebtDetailModal.ts:61:34
+  59 |
+  60 |   // Get recent payment history
+> 61 |   const recentPayments = useMemo(() => {
+     |                                  ^^^^^^^
+> 62 |     if (!debt?.paymentHistory || debt.paymentHistory.length === 0) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 63 |       return [];
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |       }));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 77 |   }, [debt?.paymentHistory]);
+     | ^^^^ Could not preserve existing manual memoization
+  78 |
+  79 |   // Event handlers
+  80 |   const handleRecordPayment = (e) => { (react-hooks/preserve-manual-memoization)
+violet-vault/src/hooks/debts/useDebtModalLogic.ts:35:5 - 2 - Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `debt`, but the source dependencies were [debt?.id, bills]. Inferred less specific property than source.
+
+violet-vault/src/hooks/debts/useDebtModalLogic.ts:35:5
+  33 |   // Find connected bill and envelope for this debt
+  34 |   const connectedBill = useMemo(
+> 35 |     () => (debt?.id ? bills.find((bill) => bill.debtId === debt.id) : null),
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Could not preserve existing manual memoization
+  36 |     [debt?.id, bills]
+  37 |   );
+  38 | (react-hooks/preserve-manual-memoization)
+violet-vault/src/hooks/debts/useDebtModalLogic.ts:39:37 - 2 - Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `debt`, but the source dependencies were [connectedBill, debt?.envelopeId, envelopes]. Inferred less specific property than source.
+
+violet-vault/src/hooks/debts/useDebtModalLogic.ts:39:37
+  37 |   );
+  38 |
+> 39 |   const connectedEnvelope = useMemo(() => {
+     |                                     ^^^^^^^
+> 40 |     if (connectedBill) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |       return envelopes.find((env) => env.id === connectedBill.envelopeId);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |     if (debt?.envelopeId) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |       return envelopes.find((env) => env.id === debt.envelopeId);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |     return null;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |   }, [connectedBill, debt?.envelopeId, envelopes]);
+     | ^^^^ Could not preserve existing manual memoization
+  48 |
+  49 |   // Use the debt form hook
+  50 |   const debtFormHook = useDebtForm(debt, isOpen, connectedBill, connectedEnvelope); (react-hooks/preserve-manual-memoization)
+violet-vault/src/hooks/security/useSecurityAcknowledgment.ts:17:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/hooks/security/useSecurityAcknowledgment.ts:17:7
+  15 |     const acknowledged = localStorageService.getItem(ACKNOWLEDGMENT_KEY);
+  16 |     if (acknowledged) {
+> 17 |       setHasBeenAcknowledged(true);
+     |       ^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |     }
+  19 |   }, []);
+  20 | (react-hooks/set-state-in-effect)
+violet-vault/src/hooks/sync/useSyncHealthMonitor.ts:72:5 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+violet-vault/src/hooks/sync/useSyncHealthMonitor.ts:72:5
+  70 |   useEffect(() => {
+  71 |     // Initial load
+> 72 |     refreshHealthData();
+     |     ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  73 |
+  74 |     // Set up auto-refresh if enabled
+  75 |     if (autoRefresh) { (react-hooks/set-state-in-effect)
 violet-vault/src/hooks/transactions/useTransactionOperations.ts:24:34 - 1 - Arrow function has too many lines (161). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/transactions/useTransactionSplitter.ts:29:32 - 1 - Arrow function has too many lines (183). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/transactions/useTransactionTable.ts:13:26 - 1 - Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+violet-vault/src/hooks/transactions/useTransactionTable.ts:13:26
+  11 |
+  12 |   // Virtualization setup
+> 13 |   const rowVirtualizer = useVirtualizer({
+     |                          ^^^^^^^^^^^^^^ TanStack Virtual's `useVirtualizer()` API returns functions that cannot be memoized safely
+  14 |     count: transactions.length,
+  15 |     getScrollElement: () => parentRef.current,
+  16 |     estimateSize: () => 80, (react-hooks/incompatible-library)
 violet-vault/src/hooks/transactions/useTransactionsV2.ts:18:27 - 1 - Arrow function has too many lines (166). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/services/bugReport/performanceInfoService.ts:286:36 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/services/bugReport/performanceInfoService.ts:310:40 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
@@ -364,7 +1046,6 @@ violet-vault/src/services/chunkedSyncService.ts:871:16 - 1 - Unexpected any. Spe
 - 1 errors in `src/utils/pwa/patchNotesManager.ts`
 - 1 errors in `src/utils/debts/debtCalculations.ts`
 - 1 errors in `src/utils/dataManagement/dexieUtils.ts`
-- 1 errors in `src/utils/dataManagement/__tests__/fileUtils.test.ts`
 - 1 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 1 errors in `src/utils/common/billDiscovery.ts`
 - 1 errors in `src/utils/budgeting/paycheckProcessing.ts`
@@ -492,7 +1173,7 @@ violet-vault/src/services/chunkedSyncService.ts:871:16 - 1 - Unexpected any. Spe
 | 8 | `TS2305` |
 | 7 | `TS2708` |
 | 6 | `TS2769` |
-| 6 | `TS2740` |
+| 5 | `TS2740` |
 | 5 | `TS2698` |
 | 5 | `TS2613` |
 | 3 | `TS6196` |
@@ -1844,7 +2525,7 @@ src/services/bugReport/__tests__/index.test.ts(247,47): error TS2339: Property '
 src/services/bugReport/__tests__/index.test.ts(255,21): error TS2339: Property 'submissionId' does not exist on type '{ reportData: { title: any; hasScreenshot: boolean; systemInfo: SystemInfo; }; overallSuccess: boolean; error?: string; validationErrors?: string[]; attempts: number; results: unknown[]; success: boolean; }'.
 src/services/bugReport/__tests__/index.test.ts(319,43): error TS2339: Property 'mockResolvedValue' does not exist on type '(options?: {}) => Promise<any>'.
 src/services/bugReport/__tests__/index.test.ts(320,43): error TS2339: Property 'mockReturnValue' does not exist on type '(dataUrl: any) => { size: number; sizeKB: number; format: string; timestamp: string; }'.
-src/services/bugReport/__tests__/screenshotService.test.ts(123,62): error TS2345: Argument of type '(tagName: string) => {}' is not assignable to parameter of type 'NormalizedProcedure<{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOption...'.
+src/services/bugReport/__tests__/screenshotService.test.ts(123,62): error TS2345: Argument of type '(tagName: string) => {}' is not assignable to parameter of type '(tagName: string, options?: ElementCreationOptions) => HTMLElement'.
   Type '{}' is missing the following properties from type 'HTMLElement': accessKey, accessKeyLabel, autocapitalize, autocorrect, and 314 more.
 src/services/bugReport/__tests__/screenshotService.test.ts(129,7): error TS2419: Types of construct signatures are incompatible.
   Type 'new () => Image' is not assignable to type 'new (width?: number, height?: number) => HTMLImageElement'.
@@ -1866,7 +2547,7 @@ src/services/bugReport/__tests__/screenshotService.test.ts(213,72): error TS2345
   Type '{ sizeKB: number; }' is missing the following properties from type '{ size: number; sizeKB: number; format: string; timestamp: string; }': size, format, timestamp
 src/services/bugReport/__tests__/screenshotService.test.ts(232,72): error TS2345: Argument of type '{ sizeKB: number; }' is not assignable to parameter of type '{ size: number; sizeKB: number; format: string; timestamp: string; }'.
   Type '{ sizeKB: number; }' is missing the following properties from type '{ size: number; sizeKB: number; format: string; timestamp: string; }': size, format, timestamp
-src/services/bugReport/__tests__/screenshotService.test.ts(264,62): error TS2345: Argument of type '(tagName: string) => {}' is not assignable to parameter of type 'NormalizedProcedure<{ <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K]; <K extends keyof HTMLElementDeprecatedTagNameMap>(tagName: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K]; (tagName: string, options?: ElementCreationOption...'.
+src/services/bugReport/__tests__/screenshotService.test.ts(264,62): error TS2345: Argument of type '(tagName: string) => {}' is not assignable to parameter of type '(tagName: string, options?: ElementCreationOptions) => HTMLElement'.
   Type '{}' is missing the following properties from type 'HTMLElement': accessKey, accessKeyLabel, autocapitalize, autocorrect, and 314 more.
 src/services/bugReport/__tests__/systemInfoService.test.ts(25,38): error TS2339: Property 'getBrowserInfo' does not exist on type 'typeof SystemInfoService'.
 src/services/bugReport/__tests__/systemInfoService.test.ts(41,7): error TS2740: Type '{ userAgent: string; language: string; platform: string; }' is missing the following properties from type 'Navigator': clipboard, credentials, doNotTrack, geolocation, and 37 more.
@@ -2579,7 +3260,6 @@ src/utils/dataManagement/__tests__/backupUtils.test.ts(23,34): error TS2339: Pro
 src/utils/dataManagement/__tests__/backupUtils.test.ts(24,25): error TS2339: Property 'mockResolvedValue' does not exist on type '() => Promise<BudgetRecord>'.
 src/utils/dataManagement/__tests__/dexieUtils.test.ts(7,25): error TS6133: 'mode' is declared but its value is never read.
 src/utils/dataManagement/__tests__/dexieUtils.test.ts(7,31): error TS6133: 'tables' is declared but its value is never read.
-src/utils/dataManagement/__tests__/fileUtils.test.ts(26,63): error TS2740: Type '{ readAsText: Mock<Procedure>; onload: Mock<Procedure>; onerror: Mock<Procedure>; }' is missing the following properties from type 'FileReader': error, onabort, onloadend, onloadstart, and 13 more.
 src/utils/dataManagement/__tests__/firebaseUtils.test.ts(31,23): error TS2339: Property 'syncMetadata' does not exist on type 'VioletVaultDB'.
 src/utils/dataManagement/__tests__/firebaseUtils.test.ts(37,41): error TS2339: Property 'mockResolvedValue' does not exist on type '(overrideConfig?: any) => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; }>'.
 src/utils/dataManagement/__tests__/firebaseUtils.test.ts(45,41): error TS2339: Property 'mockResolvedValue' does not exist on type '(overrideConfig?: any) => Promise<{ success: boolean; error?: undefined; } | { success: boolean; error: any; }>'.

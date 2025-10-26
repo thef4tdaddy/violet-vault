@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createElement } from "react";
+import React, { useState, useMemo, createElement } from "react";
 import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
 import { getIcon } from "@/utils";
 import {
@@ -18,7 +18,7 @@ interface ObjectHistoryViewerProps {
 /**
  * ObjectHistoryViewer - Shows history for a specific envelope, transaction, etc.
  */
-interface BudgetCommit {
+interface _BudgetCommit {
   id?: string;
   hash: string;
   message: string;
@@ -37,15 +37,14 @@ const ObjectHistoryViewer = ({
 }: ObjectHistoryViewerProps) => {
   const { data: allCommits = [], isLoading } = useBudgetCommits();
 
-  const [relevantHistory, setRelevantHistory] = useState<BudgetCommit[]>([]);
   const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
 
-  // Load history filtered for this specific object
-  useEffect(() => {
-    if (!allCommits.length || isLoading) return;
+  // Compute history filtered for this specific object
+  const relevantHistory = useMemo((): _BudgetCommit[] => {
+    if (!allCommits.length || isLoading) return [];
 
     // Filter for commits that likely affected this specific object
-    const objectHistory = allCommits.filter((commit) => {
+    const objectHistory = allCommits.filter((commit): commit is _BudgetCommit => {
       // For now, include all commits as we need commit details to filter properly
       // This could be optimized later by adding object-specific tracking
       return (
@@ -56,7 +55,7 @@ const ObjectHistoryViewer = ({
       );
     });
 
-    setRelevantHistory(objectHistory.slice(0, 20)); // Limit to 20 most recent
+    return objectHistory.slice(0, 20); // Limit to 20 most recent
   }, [allCommits, isLoading, objectId, objectType, objectName]);
 
   const toggleCommitExpanded = (commitHash: string) => {
