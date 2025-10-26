@@ -5,17 +5,35 @@ import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
 import localStorageService from "../../../services/storage/localStorageService";
 
+interface UserInfo {
+  userName?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
 interface JoinBudgetData {
   budgetId: string;
   password: string;
-  userInfo: any;
+  userInfo: UserInfo;
   sharedBy: string;
+}
+
+interface UserData {
+  budgetId?: string;
+  userName?: string;
+  [key: string]: unknown;
+}
+
+interface SessionData {
+  token?: string;
+  expiresAt?: string;
+  [key: string]: unknown;
 }
 
 interface JoinBudgetResult {
   success: boolean;
-  user?: any;
-  sessionData?: any;
+  user?: UserData;
+  sessionData?: SessionData;
   sharedBudget?: boolean;
   error?: string;
 }

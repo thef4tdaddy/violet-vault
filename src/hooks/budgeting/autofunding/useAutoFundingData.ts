@@ -4,11 +4,36 @@ import localStorageService from "../../../services/storage/localStorageService";
 
 const STORAGE_KEY = "violetVault_autoFunding";
 
+interface AutoFundingRule {
+  id: string;
+  name: string;
+  type: string;
+  [key: string]: unknown;
+}
+
+interface ExecutionHistoryEntry {
+  id: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface UndoStackEntry {
+  action: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface IncomePattern {
+  amount: number;
+  frequency: string;
+  [key: string]: unknown;
+}
+
 interface AutoFundingData {
-  rules?: any[];
-  executionHistory?: any[];
-  undoStack?: any[];
-  incomePatterns?: any[];
+  rules?: AutoFundingRule[];
+  executionHistory?: ExecutionHistoryEntry[];
+  undoStack?: UndoStackEntry[];
+  incomePatterns?: IncomePattern[];
   lastSaved?: string;
   version?: string;
   settings?: {

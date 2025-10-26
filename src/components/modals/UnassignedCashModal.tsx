@@ -7,6 +7,210 @@ import { ENVELOPE_TYPES } from "../../constants/categories";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 
+// ============================================================================
+// Sub-Components
+// ============================================================================
+
+/**
+ * Header component for the modal
+ */
+interface ModalHeaderProps {
+  unassignedCash: number;
+  isProcessing: boolean;
+  closeUnassignedCashModal: () => void;
+}
+
+const ModalHeader = ({ unassignedCash, isProcessing, closeUnassignedCashModal }: ModalHeaderProps) => (
+  <div className="flex justify-between items-start mb-4 sm:mb-6">
+    <div className="flex-1">
+      <h3 className="text-lg font-semibold text-gray-900">
+        {unassignedCash < 0 ? "Address Budget Deficit" : "Distribute Unassigned Cash"}
+      </h3>
+      <p className="text-sm text-gray-600 mt-1">
+        {unassignedCash < 0 ? "Deficit:" : "Available:"}{" "}
+        <span
+          className={`font-medium ${unassignedCash < 0 ? "text-red-600" : "text-green-600"}`}
+        >
+          ${unassignedCash.toFixed(2)}
+        </span>
+        {unassignedCash < 0 && (
+          <span className="ml-2 text-xs text-red-500">
+            (You've spent more than available)
+          </span>
+        )}
+      </p>
+    </div>
+    <Button
+      onClick={closeUnassignedCashModal}
+      disabled={isProcessing}
+      className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
+    >
+      {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
+    </Button>
+  </div>
+);
+
+/**
+ * Status indicator component
+ */
+interface StatusIndicatorProps {
+  isOverDistributed: boolean;
+  hasDistributions: boolean;
+  unassignedCash: number;
+}
+
+const StatusIndicator = ({ isOverDistributed, hasDistributions, unassignedCash }: StatusIndicatorProps) => {
+  if (isOverDistributed) {
+    return (
+      <div className="flex items-center text-red-600">
+        {React.createElement(getIcon("AlertTriangle"), {
+          className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
+        })}
+        <span className="text-xs sm:text-sm font-medium">
+          {unassignedCash < 0 ? "Increasing" : "Over"}
+        </span>
+      </div>
+    );
+  }
+  
+  if (hasDistributions) {
+    return (
+      <div className="flex items-center text-green-600">
+        {React.createElement(getIcon("CheckCircle"), {
+          className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
+        })}
+        <span className="text-xs sm:text-sm font-medium">Ready</span>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="flex items-center text-gray-500">
+      {React.createElement(getIcon("DollarSign"), {
+        className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
+      })}
+      <span className="text-xs sm:text-sm font-medium">None</span>
+    </div>
+  );
+};
+
+/**
+ * Distribution summary component
+ */
+interface DistributionSummaryProps {
+  totalDistributed: number;
+  remainingCash: number;
+  isOverDistributed: boolean;
+  hasDistributions: boolean;
+  unassignedCash: number;
+}
+
+const DistributionSummary = ({
+  totalDistributed,
+  remainingCash,
+  isOverDistributed,
+  hasDistributions,
+  unassignedCash,
+}: DistributionSummaryProps) => (
+  <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+    <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
+      <div className="text-center">
+        <div className="text-xs sm:text-sm text-gray-600">Distributing</div>
+        <div
+          className={`text-lg sm:text-xl font-bold ${isOverDistributed ? "text-red-600" : "text-blue-600"}`}
+        >
+          ${totalDistributed.toFixed(2)}
+        </div>
+      </div>
+      <div className="text-center">
+        <div className="text-xs sm:text-sm text-gray-600">Remaining</div>
+        <div
+          className={`text-lg sm:text-xl font-bold ${remainingCash < 0 ? "text-red-600" : "text-green-600"}`}
+        >
+          ${remainingCash.toFixed(2)}
+        </div>
+      </div>
+      <div className="text-center">
+        <div className="text-xs sm:text-sm text-gray-600">Status</div>
+        <div className="flex items-center justify-center">
+          <StatusIndicator
+            isOverDistributed={isOverDistributed}
+            hasDistributions={hasDistributions}
+            unassignedCash={unassignedCash}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+/**
+ * Quick action buttons component
+ */
+interface QuickActionsProps {
+  distributeBillPriority: () => void;
+  distributeEqually: () => void;
+  distributeProportionally: () => void;
+  clearDistributions: () => void;
+  isProcessing: boolean;
+  hasDistributions: boolean;
+  envelopesLength: number;
+}
+
+const QuickActions = ({
+  distributeBillPriority,
+  distributeEqually,
+  distributeProportionally,
+  clearDistributions,
+  isProcessing,
+  hasDistributions,
+  envelopesLength,
+}: QuickActionsProps) => (
+  <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
+    <Button
+      onClick={distributeBillPriority}
+      disabled={isProcessing || envelopesLength === 0}
+      className="btn btn-primary border-2 border-black flex items-center text-sm disabled:opacity-50"
+      title="Smart distribution based on bill due dates and funding needs"
+    >
+      {React.createElement(getIcon("Receipt"), {
+        className: "h-4 w-4 mr-2",
+      })}
+      Smart Bills First
+    </Button>
+    <Button
+      onClick={distributeEqually}
+      disabled={isProcessing || envelopesLength === 0}
+      className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
+    >
+      {React.createElement(getIcon("Users"), {
+        className: "h-4 w-4 mr-2",
+      })}
+      Distribute Equally
+    </Button>
+    <Button
+      onClick={distributeProportionally}
+      disabled={isProcessing || envelopesLength === 0}
+      className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
+    >
+      {React.createElement(getIcon("Percent"), {
+        className: "h-4 w-4 mr-2",
+      })}
+      Distribute Proportionally
+    </Button>
+    <Button
+      onClick={clearDistributions}
+      disabled={isProcessing || !hasDistributions}
+      className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
+    >
+      {React.createElement(getIcon("RotateCcw"), {
+        className: "h-4 w-4 mr-2",
+      })}
+      Clear All
+    </Button>
+  </div>
+);
+
 /**
  * Modal for distributing unassigned cash to envelopes
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
@@ -109,129 +313,31 @@ const UnassignedCashModal = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
       <div className="bg-white rounded-xl sm:rounded-xl rounded-t-xl p-4 sm:p-6 w-full max-w-4xl h-full sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-start mb-4 sm:mb-6">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {unassignedCash < 0 ? "Address Budget Deficit" : "Distribute Unassigned Cash"}
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              {unassignedCash < 0 ? "Deficit:" : "Available:"}{" "}
-              <span
-                className={`font-medium ${unassignedCash < 0 ? "text-red-600" : "text-green-600"}`}
-              >
-                ${unassignedCash.toFixed(2)}
-              </span>
-              {unassignedCash < 0 && (
-                <span className="ml-2 text-xs text-red-500">
-                  (You've spent more than available)
-                </span>
-              )}
-            </p>
-          </div>
-          <Button
-            onClick={closeUnassignedCashModal}
-            disabled={isProcessing}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
-          >
-            {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-          </Button>
-        </div>
+        <ModalHeader
+          unassignedCash={unassignedCash}
+          isProcessing={isProcessing}
+          closeUnassignedCashModal={closeUnassignedCashModal}
+        />
 
         {/* Distribution Summary */}
-        <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
-            <div className="text-center">
-              <div className="text-xs sm:text-sm text-gray-600">Distributing</div>
-              <div
-                className={`text-lg sm:text-xl font-bold ${isOverDistributed ? "text-red-600" : "text-blue-600"}`}
-              >
-                ${totalDistributed.toFixed(2)}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-xs sm:text-sm text-gray-600">Remaining</div>
-              <div
-                className={`text-lg sm:text-xl font-bold ${remainingCash < 0 ? "text-red-600" : "text-green-600"}`}
-              >
-                ${remainingCash.toFixed(2)}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-xs sm:text-sm text-gray-600">Status</div>
-              <div className="flex items-center justify-center">
-                {isOverDistributed ? (
-                  <div className="flex items-center text-red-600">
-                    {React.createElement(getIcon("AlertTriangle"), {
-                      className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
-                    })}
-                    <span className="text-xs sm:text-sm font-medium">
-                      {unassignedCash < 0 ? "Increasing" : "Over"}
-                    </span>
-                  </div>
-                ) : hasDistributions ? (
-                  <div className="flex items-center text-green-600">
-                    {React.createElement(getIcon("CheckCircle"), {
-                      className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
-                    })}
-                    <span className="text-xs sm:text-sm font-medium">Ready</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center text-gray-500">
-                    {React.createElement(getIcon("DollarSign"), {
-                      className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
-                    })}
-                    <span className="text-xs sm:text-sm font-medium">None</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <DistributionSummary
+          totalDistributed={totalDistributed}
+          remainingCash={remainingCash}
+          isOverDistributed={isOverDistributed}
+          hasDistributions={hasDistributions}
+          unassignedCash={unassignedCash}
+        />
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
-          <Button
-            onClick={distributeBillPriority}
-            disabled={isProcessing || envelopes.length === 0}
-            className="btn btn-primary border-2 border-black flex items-center text-sm disabled:opacity-50"
-            title="Smart distribution based on bill due dates and funding needs"
-          >
-            {React.createElement(getIcon("Receipt"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Smart Bills First
-          </Button>
-          <Button
-            onClick={distributeEqually}
-            disabled={isProcessing || envelopes.length === 0}
-            className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
-          >
-            {React.createElement(getIcon("Users"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Distribute Equally
-          </Button>
-          <Button
-            onClick={distributeProportionally}
-            disabled={isProcessing || envelopes.length === 0}
-            className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
-          >
-            {React.createElement(getIcon("Percent"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Distribute Proportionally
-          </Button>
-          <Button
-            onClick={clearDistributions}
-            disabled={isProcessing || !hasDistributions}
-            className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
-          >
-            {React.createElement(getIcon("RotateCcw"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Clear All
-          </Button>
-        </div>
+        <QuickActions
+          distributeBillPriority={distributeBillPriority}
+          distributeEqually={distributeEqually}
+          distributeProportionally={distributeProportionally}
+          clearDistributions={clearDistributions}
+          isProcessing={isProcessing}
+          hasDistributions={hasDistributions}
+          envelopesLength={envelopes.length}
+        />
 
         {/* Envelope List */}
         <div className="flex-1 overflow-hidden">

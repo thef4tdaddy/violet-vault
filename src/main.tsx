@@ -17,10 +17,10 @@ declare global {
     runSyncEdgeCaseTests?: () => void;
     validateAllSyncFlows?: () => void;
     fixAutoAllocateUndefined?: () => void;
-    swDiagnostics?: () => Promise<any>;
-    offlineReadiness?: () => Promise<any>;
-    testBugReportCapture?: () => Promise<any>;
-    clearCloudDataOnly?: () => Promise<any>;
+    swDiagnostics?: () => Promise<unknown>;
+    offlineReadiness?: () => Promise<unknown>;
+    testBugReportCapture?: () => Promise<unknown>;
+    clearCloudDataOnly?: () => Promise<unknown>;
   }
 }
 

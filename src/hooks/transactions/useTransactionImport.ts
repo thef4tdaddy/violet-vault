@@ -3,7 +3,22 @@ import { useTransactionImportProcessing } from "./useTransactionImportProcessing
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
-export const useTransactionImport = (currentUser, onBulkImport, budget) => {
+interface FieldMapping {
+  date?: string;
+  description?: string;
+  amount?: string;
+  [key: string]: string | undefined;
+}
+
+interface ImportData {
+  clearExisting?: boolean;
+  [key: string]: unknown;
+}
+
+export const useTransactionImport = (
+  currentUser: unknown,
+  onBulkImport: (transactions: unknown[]) => void
+) => {
   // Use focused sub-hooks
   const {
     importData,
@@ -13,7 +28,15 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     setFieldMapping,
     handleFileUpload,
     resetImport: resetFileUpload,
-  } = useTransactionFileUpload();
+  } = useTransactionFileUpload() as unknown as {
+    importData: ImportData;
+    importStep: number;
+    setImportStep: (step: number) => void;
+    fieldMapping: FieldMapping;
+    setFieldMapping: (mapping: FieldMapping) => void;
+    handleFileUpload: (file: File) => Promise<void>;
+    resetImport: () => void;
+  };
 
   const {
     importProgress,
@@ -29,7 +52,8 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
       globalToast.showError(
         "Please map at least Date, Description, and Amount fields",
-        "Mapping Required"
+        "Mapping Required",
+        undefined
       );
       return;
     }
@@ -57,10 +81,10 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     onBulkImport(processedTransactions);
 
     // Process auto-funding for income transactions
-    const autoFundingPromises = [];
-    const incomeTransactions = processedTransactions.filter((t) => t.amount > 0);
+    const autoFundingPromises: unknown[] = [];
+    const incomeTransactions = processedTransactions.filter((t: { amount: number }) => t.amount > 0);
 
-    if (incomeTransactions.length > 0 && budget) {
+    if (incomeTransactions.length > 0) {
       logger.info("Processing auto-funding for imported income transactions", {
         incomeCount: incomeTransactions.length,
       });
