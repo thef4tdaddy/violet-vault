@@ -5,22 +5,16 @@
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import {
-  validateTransactionData,
-  prepareTransactionForStorage,
-  createTransferPair,
-  categorizeTransaction,
-} from "../../utils/transactions/operations.ts";
-import { budgetDb } from "../../db/budgetDb.ts";
 import { queryKeys } from "../../utils/common/queryClient.ts";
 import logger from "../../utils/common/logger.ts";
-
-// Helper to trigger sync for transaction changes
-const triggerTransactionSync = (changeType) => {
-  if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
-  }
-};
+import {
+  addTransactionToDB,
+  updateTransactionInDB,
+  deleteTransactionFromDB,
+  splitTransactionInDB,
+  transferFundsInDB,
+  bulkOperationOnTransactions,
+} from "./helpers/transactionOperationsHelpers.ts";
 
 /**
  * Hook for transaction CRUD operations
@@ -36,32 +30,10 @@ const useTransactionOperations = (options = {}) => {
    */
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
-    mutationFn: async (transactionData) => {
-      logger.debug("Adding transaction", { id: transactionData.id });
-
-      // Validate transaction data
-      const validation = validateTransactionData(transactionData);
-      if (!validation.isValid) {
-        throw new Error("Invalid transaction data: " + validation.errors.join(", "));
-      }
-
-      // Auto-categorize if no category provided
-      const categorized = categorizeTransaction(transactionData, categoryRules);
-
-      // Prepare for storage
-      const prepared = prepareTransactionForStorage(categorized);
-
-      // Save to database
-      const result = await budgetDb.addTransaction(prepared);
-      triggerTransactionSync("add");
-
-      return result;
-    },
+    mutationFn: async (transactionData) => addTransactionToDB(transactionData, categoryRules),
     onSuccess: (data) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-
       logger.info("Transaction added successfully", { id: data.id });
     },
     onError: (error) => {
@@ -74,38 +46,10 @@ const useTransactionOperations = (options = {}) => {
    */
   const updateTransactionMutation = useMutation({
     mutationKey: ["transactions", "update"],
-    mutationFn: async ({ id, updates }) => {
-      logger.debug("Updating transaction", { id, updates });
-
-      // Get current transaction
-      const current = await budgetDb.getTransaction(id);
-      if (!current) {
-        throw new Error(`Transaction not found: ${id}`);
-      }
-
-      // Prepare updated data
-      const updatedData = { ...current, ...updates };
-
-      // Validate updated data
-      const validation = validateTransactionData(updatedData);
-      if (!validation.isValid) {
-        throw new Error("Invalid transaction data: " + validation.errors.join(", "));
-      }
-
-      // Prepare for storage
-      const prepared = prepareTransactionForStorage(updatedData);
-
-      // Update in database
-      const result = await budgetDb.updateTransaction(id, prepared);
-      triggerTransactionSync("update");
-
-      return result;
-    },
+    mutationFn: async ({ id, updates }) => updateTransactionInDB(id, updates),
     onSuccess: (data, variables) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-
       logger.info("Transaction updated successfully", { id: variables.id });
     },
     onError: (error, variables) => {
@@ -118,20 +62,10 @@ const useTransactionOperations = (options = {}) => {
    */
   const deleteTransactionMutation = useMutation({
     mutationKey: ["transactions", "delete"],
-    mutationFn: async (transactionId) => {
-      logger.debug("Deleting transaction", { id: transactionId });
-
-      // Delete from database
-      await budgetDb.deleteTransaction(transactionId);
-      triggerTransactionSync("delete");
-
-      return { id: transactionId };
-    },
+    mutationFn: async (transactionId) => deleteTransactionFromDB(transactionId),
     onSuccess: (data) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-
       logger.info("Transaction deleted successfully", { id: data.id });
     },
     onError: (error, variables) => {
@@ -144,62 +78,11 @@ const useTransactionOperations = (options = {}) => {
    */
   const splitTransactionMutation = useMutation({
     mutationKey: ["transactions", "split"],
-    mutationFn: async ({ originalTransaction, splitTransactions }) => {
-      logger.debug("Splitting transaction", {
-        originalId: originalTransaction.id,
-        splitCount: splitTransactions.length,
-      });
-
-      // Validate all split transactions
-      for (const splitTxn of splitTransactions) {
-        const validation = validateTransactionData(splitTxn);
-        if (!validation.isValid) {
-          throw new Error(`Invalid split transaction data: ${validation.errors.join(", ")}`);
-        }
-      }
-
-      // Start transaction
-      const results = [];
-
-      try {
-        // Mark original transaction as split
-        const updatedOriginal = {
-          ...originalTransaction,
-          isSplit: true,
-          splitInto: splitTransactions.map((t) => t.id),
-          metadata: {
-            ...originalTransaction.metadata,
-            splitAt: new Date().toISOString(),
-            splitIntoTransactions: splitTransactions.length,
-          },
-        };
-
-        await budgetDb.updateTransaction(originalTransaction.id, updatedOriginal);
-
-        // Add all split transactions
-        for (const splitTxn of splitTransactions) {
-          const prepared = prepareTransactionForStorage(splitTxn);
-          const result = await budgetDb.addTransaction(prepared);
-          results.push(result);
-        }
-
-        triggerTransactionSync("split");
-
-        return {
-          originalTransaction: updatedOriginal,
-          splitTransactions: results,
-        };
-      } catch (error) {
-        // If anything fails, we should rollback, but for simplicity we'll just throw
-        logger.error("Transaction split failed", error);
-        throw error;
-      }
-    },
+    mutationFn: async ({ originalTransaction, splitTransactions }) =>
+      splitTransactionInDB(originalTransaction, splitTransactions),
     onSuccess: (data) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-
       logger.info("Transaction split successfully", {
         originalId: data.originalTransaction.id,
         splitCount: data.splitTransactions.length,
@@ -215,33 +98,10 @@ const useTransactionOperations = (options = {}) => {
    */
   const transferFundsMutation = useMutation({
     mutationKey: ["transactions", "transfer"],
-    mutationFn: async (transferData) => {
-      logger.debug("Creating transfer", transferData);
-
-      // Create transfer pair
-      const [outgoingTxn, incomingTxn] = createTransferPair(transferData);
-
-      // Add both transactions
-      const outgoingResult = await budgetDb.addTransaction(
-        prepareTransactionForStorage(outgoingTxn)
-      );
-      const incomingResult = await budgetDb.addTransaction(
-        prepareTransactionForStorage(incomingTxn)
-      );
-
-      triggerTransactionSync("transfer");
-
-      return {
-        outgoing: outgoingResult,
-        incoming: incomingResult,
-        transferId: outgoingTxn.metadata.transferId,
-      };
-    },
+    mutationFn: async (transferData) => transferFundsInDB(transferData),
     onSuccess: (data) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-
       logger.info("Transfer created successfully", {
         transferId: data.transferId,
         amount: data.outgoing.amount,
@@ -257,54 +117,12 @@ const useTransactionOperations = (options = {}) => {
    */
   const bulkOperationMutation = useMutation({
     mutationKey: ["transactions", "bulk"],
-    mutationFn: async ({ operation, transactions, updates = {} }) => {
-      logger.debug(`Bulk ${operation} operation`, {
-        count: transactions.length,
-      });
-
-      const results = [];
-
-      switch (operation) {
-        case "delete":
-          for (const txn of transactions) {
-            await budgetDb.deleteTransaction(txn.id);
-            results.push({ id: txn.id, operation: "deleted" });
-          }
-          break;
-
-        case "update":
-          for (const txn of transactions) {
-            const updatedData = { ...txn, ...updates };
-            const prepared = prepareTransactionForStorage(updatedData);
-            const result = await budgetDb.updateTransaction(txn.id, prepared);
-            results.push(result);
-          }
-          break;
-
-        case "categorize":
-          for (const txn of transactions) {
-            const categorized = categorizeTransaction({ ...txn, ...updates }, categoryRules);
-            const prepared = prepareTransactionForStorage(categorized);
-            const result = await budgetDb.updateTransaction(txn.id, prepared);
-            results.push(result);
-          }
-          break;
-
-        default:
-          throw new Error(`Unknown bulk operation: ${operation}`);
-      }
-
-      triggerTransactionSync(`bulk_${operation}`);
-      return results;
-    },
+    mutationFn: async ({ operation, transactions, updates = {} }) =>
+      bulkOperationOnTransactions(operation, transactions, updates, categoryRules),
     onSuccess: (data, variables) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-
-      logger.info(`Bulk ${variables.operation} completed`, {
-        count: data.length,
-      });
+      logger.info(`Bulk ${variables.operation} completed`, { count: data.length });
     },
     onError: (error, variables) => {
       logger.error(`Bulk ${variables.operation} failed`, error);

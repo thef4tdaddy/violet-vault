@@ -22,10 +22,17 @@ interface TransactionUpdateInput {
   updates: Partial<Transaction>;
 }
 
+interface WindowWithCloudSync extends Window {
+  cloudSyncService?: {
+    triggerSyncForCriticalChange: (changeType: string) => void;
+  };
+}
+
 // Helper to trigger sync for transaction changes
 const triggerTransactionSync = (changeType: string) => {
-  if (typeof window !== "undefined" && (window as any).cloudSyncService) {
-    (window as any).cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+  const windowObj = window as WindowWithCloudSync;
+  if (typeof window !== "undefined" && windowObj.cloudSyncService) {
+    windowObj.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
   }
 };
 
@@ -83,7 +90,7 @@ export const useTransactionMutations = () => {
   const reconcileTransactionMutation = useMutation({
     mutationKey: ["transactions", "reconcile"],
     mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
-      const reconciledTransaction: any = {
+      const reconciledTransaction: Transaction = {
         id: Date.now().toString(),
         date: new Date(transactionData.date || new Date().toISOString().split("T")[0]),
         amount: transactionData.amount || 0,
