@@ -10,6 +10,147 @@ import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
 import AllocationModeSelector from "./shared/AllocationModeSelector";
 import BillConnectionSelector from "./shared/BillConnectionSelector";
 
+// Constants
+const ENVELOPE_COLORS = [
+  "#ef4444", // red
+  "#f97316", // orange
+  "#eab308", // yellow
+  "#22c55e", // green
+  "#06b6d4", // cyan
+  "#3b82f6", // blue
+  "#8b5cf6", // violet
+  "#ec4899", // pink
+];
+
+// Color selector component
+const ColorSelector = ({ 
+  selectedColor, 
+  onColorChange, 
+  disabled 
+}: { 
+  selectedColor: string; 
+  onColorChange: (color: string) => void; 
+  disabled: boolean;
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Color</label>
+    <div className="grid grid-cols-8 gap-2">
+      {ENVELOPE_COLORS.map((color) => (
+        <Button
+          key={color}
+          type="button"
+          onClick={() => onColorChange(color)}
+          disabled={disabled}
+          className={`w-8 h-8 rounded-lg border-2 transition-all ${
+            selectedColor === color
+              ? "border-gray-800 scale-110"
+              : "border-gray-200 hover:border-gray-400"
+          }`}
+          style={{ backgroundColor: color }}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+// Modal actions component
+const ModalActions = ({ 
+  onClose, 
+  onSubmit, 
+  canSubmit, 
+  isLoading 
+}: { 
+  onClose: () => void;
+  onSubmit: () => void;
+  canSubmit: boolean;
+  isLoading: boolean;
+}) => (
+  <div className="flex justify-end gap-3 pt-4">
+    <Button
+      type="button"
+      onClick={onClose}
+      className="px-6 py-2 border-2 border-black text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
+    >
+      Cancel
+    </Button>
+    <Button
+      type="submit"
+      onClick={onSubmit}
+      disabled={!canSubmit || isLoading}
+      className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 transition-all"
+    >
+      {isLoading ? "Creating..." : "Create Envelope"}
+    </Button>
+  </div>
+);
+
+// Main modal content
+const ModalContentSection = ({
+  formData,
+  errors,
+  calculatedAmounts,
+  updateFormField,
+  isLoading,
+  allBills,
+  handleBillSelection,
+  onCreateBill,
+}: {
+  formData: unknown;
+  errors: unknown;
+  calculatedAmounts: unknown;
+  updateFormField: (field: string, value: unknown) => void;
+  isLoading: boolean;
+  allBills: unknown[];
+  handleBillSelection: (billId: string) => void;
+  onCreateBill?: () => void;
+}) => (
+  <div className="space-y-6">
+    <EnvelopeTypeSelector
+      selectedType={(formData as { envelopeType: string }).envelopeType}
+      onTypeChange={(type) => updateFormField("envelopeType", type)}
+      disabled={isLoading}
+    />
+
+    <EnvelopeBasicFields
+      formData={formData}
+      errors={errors}
+      onUpdateField={updateFormField}
+      disabled={isLoading}
+    />
+
+    <EnvelopeBudgetFields
+      formData={formData}
+      errors={errors}
+      calculatedAmounts={calculatedAmounts}
+      onUpdateField={updateFormField}
+      disabled={isLoading}
+      showBiweeklyPreview={true}
+    />
+
+    <AllocationModeSelector
+      autoAllocate={(formData as { autoAllocate: boolean }).autoAllocate}
+      onAutoAllocateChange={(value) => updateFormField("autoAllocate", value)}
+      disabled={isLoading}
+    />
+
+    {allBills.length > 0 && (
+      <BillConnectionSelector
+        allBills={allBills}
+        selectedBillId={(formData as { billId?: string }).billId}
+        onBillSelection={handleBillSelection}
+        onCreateBill={onCreateBill}
+        disabled={isLoading}
+      />
+    )}
+
+    <ColorSelector
+      selectedColor={(formData as { color: string }).color}
+      onColorChange={(color) => updateFormField("color", color)}
+      disabled={isLoading}
+    />
+  </div>
+);
+
 const CreateEnvelopeModal = ({
   isOpen = false,
   onClose,
@@ -18,39 +159,34 @@ const CreateEnvelopeModal = ({
   existingEnvelopes = [],
   allBills = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
-  _forceMobileMode = false, // Internal prop for testing
+  _forceMobileMode = false,
 }) => {
   const isMobile = useMobileDetection();
 
   const {
-    // Form state
     formData,
     errors,
     isLoading,
     canSubmit,
     calculatedAmounts,
-
-    // Form actions
     updateFormField,
     updateFormData,
     handleSubmit,
     handleClose,
   } = useEnvelopeForm({
-    envelope: null, // New envelope
+    envelope: null,
     existingEnvelopes,
     onSave: onCreateEnvelope,
     onClose,
     currentUser,
   });
 
-  // Handle bill selection and auto-populate envelope data
   const handleBillSelection = (billId) => {
     if (!billId) return;
 
     const selectedBill = allBills.find((bill) => bill.id === billId);
     if (!selectedBill) return;
 
-    // Auto-populate envelope fields from the selected bill
     const billData = {
       name: selectedBill.name || selectedBill.provider || "",
       category: selectedBill.category || "",
@@ -58,7 +194,7 @@ const CreateEnvelopeModal = ({
       frequency: selectedBill.frequency || formData.frequency,
       monthlyAmount: selectedBill.amount?.toString() || "",
       description: `Bill envelope for ${selectedBill.name || selectedBill.provider}`,
-      envelopeType: "BILL", // Set to bill type when bill is selected
+      envelopeType: "BILL",
     };
 
     updateFormData(billData);
@@ -66,101 +202,25 @@ const CreateEnvelopeModal = ({
 
   if (!isOpen) return null;
 
-  // Extract the modal content into a component for reuse
-  const ModalContent = () => (
-    <div className="space-y-6">
-      {/* Envelope Type Selection */}
-      <EnvelopeTypeSelector
-        selectedType={formData.envelopeType}
-        onTypeChange={(type) => updateFormField("envelopeType", type)}
-        disabled={isLoading}
-      />
-
-      {/* Basic Fields */}
-      <EnvelopeBasicFields
-        formData={formData}
-        errors={errors}
-        onUpdateField={updateFormField}
-        disabled={isLoading}
-      />
-
-      {/* Budget Fields */}
-      <EnvelopeBudgetFields
+  const content = (
+    <>
+      <ModalContentSection
         formData={formData}
         errors={errors}
         calculatedAmounts={calculatedAmounts}
-        onUpdateField={updateFormField}
-        disabled={isLoading}
-        showBiweeklyPreview={true}
+        updateFormField={updateFormField}
+        isLoading={isLoading}
+        allBills={allBills}
+        handleBillSelection={handleBillSelection}
+        onCreateBill={onCreateBill}
       />
-
-      {/* Allocation Mode */}
-      <AllocationModeSelector
-        autoAllocate={formData.autoAllocate}
-        onAutoAllocateChange={(value) => updateFormField("autoAllocate", value)}
-        disabled={isLoading}
+      <ModalActions
+        onClose={handleClose}
+        onSubmit={handleSubmit}
+        canSubmit={canSubmit}
+        isLoading={isLoading}
       />
-
-      {/* Bill Connection */}
-      {allBills.length > 0 && (
-        <BillConnectionSelector
-          allBills={allBills}
-          selectedBillId={formData.billId}
-          onBillSelection={handleBillSelection}
-          onCreateBill={onCreateBill}
-          disabled={isLoading}
-        />
-      )}
-
-      {/* Color Selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Color</label>
-        <div className="grid grid-cols-8 gap-2">
-          {[
-            "#ef4444", // red
-            "#f97316", // orange
-            "#eab308", // yellow
-            "#22c55e", // green
-            "#06b6d4", // cyan
-            "#3b82f6", // blue
-            "#8b5cf6", // violet
-            "#ec4899", // pink
-          ].map((color) => (
-            <Button
-              key={color}
-              type="button"
-              onClick={() => updateFormField("color", color)}
-              className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                formData.color === color
-                  ? "border-gray-800 scale-110"
-                  : "border-gray-200 hover:border-gray-400"
-              }`}
-              style={{ backgroundColor: color }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-3 pt-4">
-        <Button
-          type="button"
-          onClick={handleClose}
-          className="px-6 py-2 border-2 border-black text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
-        >
-          Cancel
-        </Button>
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!canSubmit || isLoading}
-          className="flex items-center px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 border-2 border-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-        >
-          {React.createElement(getIcon("Save"), { className: "h-4 w-4 mr-2" })}
-          {isLoading ? "Creating..." : "Create Envelope"}
-        </Button>
-      </div>
-    </div>
+    </>
   );
 
   // Mobile slide-up modal
@@ -174,9 +234,7 @@ const CreateEnvelopeModal = ({
         showHandle={true}
         backdrop={true}
       >
-        <div className="px-6 pb-6">
-          <ModalContent />
-        </div>
+        <div className="px-6 pb-6">{content}</div>
       </SlideUpModal>
     );
   }
@@ -185,14 +243,11 @@ const CreateEnvelopeModal = ({
   return (
     <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
-        {/* Header */}
         <div className="bg-gradient-to-r from-green-600 to-green-800 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="bg-white/20 p-2 rounded-xl mr-3">
-                {React.createElement(getIcon("Plus"), {
-                  className: "h-5 w-5 text-white",
-                })}
+                {React.createElement(getIcon("Plus"), { className: "h-5 w-5 text-white" })}
               </div>
               <div>
                 <h2 className="font-black text-white text-base">
@@ -212,7 +267,7 @@ const CreateEnvelopeModal = ({
 
         {/* Form Content */}
         <div className="flex-1 p-6 overflow-y-auto">
-          <ModalContent />
+          {content}
         </div>
       </div>
     </div>
