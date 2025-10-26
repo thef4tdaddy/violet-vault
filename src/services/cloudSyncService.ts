@@ -8,6 +8,13 @@ const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
 
 class CloudSyncService {
+  syncIntervalId: ReturnType<typeof setTimeout> | null;
+  isSyncing: boolean;
+  config: any;
+  debounceTimer: ReturnType<typeof setTimeout> | null;
+  isRunning: boolean;
+  syncQueue: Promise<any>;
+
   constructor() {
     this.syncIntervalId = null;
     this.isSyncing = false;
@@ -457,7 +464,8 @@ class CloudSyncService {
             actualBalance: data.actualBalance || 0,
             supplementalAccounts: data.supplementalAccounts || [],
             lastUpdated: new Date().toISOString(),
-          });
+            lastModified: Date.now(),
+          } as any);
         }
       );
 

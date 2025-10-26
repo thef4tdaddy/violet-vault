@@ -6,6 +6,9 @@ import logger from "../common/logger";
  */
 
 class ServiceWorkerDiagnostics {
+  isInitialized: boolean;
+  cacheNames: string[];
+
   constructor() {
     this.isInitialized = false;
     this.cacheNames = [
@@ -236,7 +239,7 @@ class ServiceWorkerDiagnostics {
         waiting: !!registration.waiting,
         active: !!registration.active,
         controlsPage: !!navigator.serviceWorker.controller,
-      };
+      } as any;
 
       if (registration.active) {
         status.activeState = registration.active.state;
@@ -296,17 +299,17 @@ class ServiceWorkerDiagnostics {
       results.deleteTime = performance.now() - deleteStart;
 
       results.success = true;
-      results.totalTime = results.writeTime + results.readTime + results.deleteTime;
+      (results as any).totalTime = results.writeTime + results.readTime + results.deleteTime;
 
       logger.info("⚡ Cache performance test completed", {
         writeMs: Math.round(results.writeTime * 100) / 100,
         readMs: Math.round(results.readTime * 100) / 100,
         deleteMs: Math.round(results.deleteTime * 100) / 100,
-        totalMs: Math.round(results.totalTime * 100) / 100,
+        totalMs: Math.round((results as any).totalTime * 100) / 100,
       });
     } catch (error) {
       logger.error("❌ Cache performance test failed", error);
-      results.error = error.message;
+      (results as any).error = (error as Error).message;
     }
 
     return results;
@@ -367,7 +370,7 @@ const swDiagnostics = new ServiceWorkerDiagnostics();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.swDiagnostics = swDiagnostics;
+  (window as any).swDiagnostics = swDiagnostics;
 }
 
 export default swDiagnostics;

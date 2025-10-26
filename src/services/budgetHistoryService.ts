@@ -9,6 +9,10 @@ import logger from "../utils/common/logger";
  * branching, tagging, and device fingerprinting for family collaboration
  */
 class BudgetHistoryService {
+  maxRecentCommits: number;
+  maxDevicesPerAuthor: number;
+  defaultAnalysisRange: number;
+
   constructor() {
     this.maxRecentCommits = 1000;
     this.maxDevicesPerAuthor = 3;
@@ -301,7 +305,8 @@ class BudgetHistoryService {
   async switchBranch(branchName) {
     try {
       // Deactivate current branch
-      await budgetDb.budgetBranches.where("isActive").equals(true).modify({
+      // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
+      await budgetDb.budgetBranches.where("isActive").equals(1 as any).modify({
         isActive: false,
       });
 

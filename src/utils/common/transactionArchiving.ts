@@ -31,6 +31,9 @@ export const ARCHIVE_CONFIG = {
  * Main archiving class that handles the complete archiving workflow
  */
 export class TransactionArchiver {
+  config: any;
+  stats: any;
+
   constructor(config = ARCHIVE_CONFIG) {
     this.config = { ...ARCHIVE_CONFIG, ...config };
     this.stats = {

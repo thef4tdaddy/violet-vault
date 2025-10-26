@@ -1,6 +1,7 @@
 import { budgetDb } from "../../db/budgetDb";
 import { encryptionUtils } from "../security/encryption";
 import logger from "../common/logger";
+import { formatCurrency } from "../accounts/accountHelpers";
 
 /**
  * Utility for automatically tracking budget changes for family collaboration
@@ -110,8 +111,8 @@ export class BudgetHistoryTracker {
   }) {
     const description =
       source === "distribution"
-        ? `Distributed ${encryptionUtils.formatCurrency(previousAmount - newAmount)} to envelopes`
-        : `Updated unassigned cash from ${encryptionUtils.formatCurrency(previousAmount)} to ${encryptionUtils.formatCurrency(newAmount)}`;
+        ? `Distributed ${formatCurrency(previousAmount - newAmount)} to envelopes`
+        : `Updated unassigned cash from ${formatCurrency(previousAmount)} to ${formatCurrency(newAmount)}`;
 
     return await this.createHistoryCommit({
       entityType: "unassignedCash",
@@ -134,7 +135,7 @@ export class BudgetHistoryTracker {
     author = "Unknown User",
   }) {
     const source = isManual ? "manual entry" : "automatic calculation";
-    const description = `Updated actual balance via ${source} from ${encryptionUtils.formatCurrency(previousBalance)} to ${encryptionUtils.formatCurrency(newBalance)}`;
+    const description = `Updated actual balance via ${source} from ${formatCurrency(previousBalance)} to ${formatCurrency(newBalance)}`;
 
     return await this.createHistoryCommit({
       entityType: "actualBalance",
@@ -161,11 +162,11 @@ export class BudgetHistoryTracker {
 
     switch (changeType) {
       case "add":
-        description = `Added new debt: ${newData.name} (${encryptionUtils.formatCurrency(newData.currentBalance)})`;
+        description = `Added new debt: ${newData.name} (${formatCurrency(newData.currentBalance)})`;
         break;
       case "modify":
         if (previousData.currentBalance !== newData.currentBalance) {
-          description = `Updated ${newData.name} balance from ${encryptionUtils.formatCurrency(previousData.currentBalance)} to ${encryptionUtils.formatCurrency(newData.currentBalance)}`;
+          description = `Updated ${newData.name} balance from ${formatCurrency(previousData.currentBalance)} to ${formatCurrency(newData.currentBalance)}`;
         } else {
           description = `Updated debt: ${newData.name}`;
         }
@@ -343,7 +344,7 @@ export class BudgetHistoryTracker {
         created: Date.now(),
       };
 
-      await budgetDb.createBudgetTag(tag);
+      await budgetDb.createBudgetTag(tag as any);
 
       logger.info("Budget history tag created", {
         tagName,
@@ -366,7 +367,8 @@ export class BudgetHistoryTracker {
   static async switchBranch(branchName) {
     try {
       // Deactivate current branch
-      await budgetDb.budgetBranches.where("isActive").equals(true).modify({
+      // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
+      await budgetDb.budgetBranches.where("isActive").equals(1 as any).modify({
         isActive: false,
       });
 
@@ -554,16 +556,6 @@ export class BudgetHistoryTracker {
       return null;
     }
   }
-}
-
-// Helper function to add currency formatting to encryptionUtils if not present
-if (!encryptionUtils.formatCurrency) {
-  encryptionUtils.formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount || 0);
-  };
 }
 
 export default BudgetHistoryTracker;

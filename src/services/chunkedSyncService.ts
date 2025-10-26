@@ -57,6 +57,16 @@ function bytesFromBase64(str) {
  * Handles synchronization of large datasets by breaking them into smaller chunks
  */
 class ChunkedSyncService {
+  budgetId: string | null;
+  encryptionKey: any;
+  maxChunkSize: number;
+  maxArrayChunkSize: number;
+  lastCorruptedDataClear: number | null;
+  corruptedDataClearCooldown: number;
+  syncMutex: any;
+  decryptionFailures: Map<string, any>;
+  resilience: any;
+
   constructor() {
     this.budgetId = null;
     this.encryptionKey = null;
@@ -113,7 +123,7 @@ class ChunkedSyncService {
    */
   safeStringify(data) {
     try {
-      return JSON.stringify(data, (key, value) => {
+      return JSON.stringify(data, (_key, value) => {
         if (value === undefined) return null;
         if (typeof value === "function") return "[Function]";
         if (value instanceof Date) return value.toISOString();
@@ -217,7 +227,7 @@ class ChunkedSyncService {
         totalChunks: 0,
         totalSize: 0,
         ...metadata,
-      },
+      } as any,
       validation: {
         manifestChecksum: "", // Will be calculated after chunk processing
         minChunkSize: 16, // Minimum encrypted chunk size
@@ -641,7 +651,7 @@ class ChunkedSyncService {
 
           // Reassemble chunked arrays
           for (const [key, value] of Object.entries(reconstructedData)) {
-            if (value && typeof value === "object" && value._chunked) {
+            if (value && typeof value === "object" && (value as any)._chunked) {
               // Find all chunks for this key
               const keyChunks = Object.entries(chunks)
                 .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
@@ -851,11 +861,11 @@ class ChunkedSyncService {
    */
   triggerCorruptionRecovery() {
     // Don't spam the user - only show once per session
-    if (window.corruptionModalShown) {
+    if ((window as any).corruptionModalShown) {
       return;
     }
 
-    window.corruptionModalShown = true;
+    (window as any).corruptionModalShown = true;
 
     // Emit custom event for UI components to listen to
     const event = new CustomEvent("syncCorruptionDetected", {

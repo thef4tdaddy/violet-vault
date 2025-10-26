@@ -2,6 +2,10 @@
 let H = null;
 
 class Logger {
+  isDevelopment: boolean;
+  isDevSite: boolean;
+  debugThrottles: Map<string, number>;
+
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
     this.isDevSite = this.getIsDevSite();
@@ -48,7 +52,7 @@ class Logger {
     // Show debug logs only in development or on dev.* sites
     if (this.isDevelopment || this.isDevSite) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
-      const consoleLog = window.originalConsoleLog || console.log;
+      const consoleLog = (window as any).originalConsoleLog || console.log;
       consoleLog(
         `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
         data
@@ -86,7 +90,7 @@ class Logger {
   info(message, data = {}) {
     // Show info logs only in development or on dev.* sites
     if (this.isDevelopment || this.isDevSite) {
-      const consoleLog = window.originalConsoleLog || console.log;
+      const consoleLog = (window as any).originalConsoleLog || console.log;
       consoleLog(`ℹ️ ${message}`, data);
     }
 
@@ -155,7 +159,7 @@ class Logger {
   // - Internal state changes
   production(message, data = {}) {
     // Always show production logs in console with distinctive styling
-    const consoleLog = window.originalConsoleLog || console.log;
+    const consoleLog = (window as any).originalConsoleLog || console.log;
     consoleLog(`🟢 [PROD] ${message}`, data);
 
     try {
@@ -204,9 +208,9 @@ class Logger {
     }
   }
 
-  auth(message, data = {}) {
+  auth(message, data: any = {}) {
     // Filter sensitive data
-    const sanitizedData = { ...data };
+    const sanitizedData = { ...data } as any;
     delete sanitizedData.password;
     delete sanitizedData.encryptionKey;
     delete sanitizedData.token;
@@ -275,8 +279,8 @@ export const logger = new Logger();
 
 // Make logger available globally for testing
 if (typeof window !== "undefined") {
-  window.logger = logger;
-  window.testHighlight = () => logger.testHighlight();
+  (window as any).logger = logger;
+  (window as any).testHighlight = () => logger.testHighlight();
 }
 
 export default logger;

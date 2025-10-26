@@ -7,6 +7,10 @@ import { checkForVersionUpdate } from "../common/version";
  */
 
 class PWAManager {
+  registration: ServiceWorkerRegistration | null;
+  uiStore: any;
+  isInitialized: boolean;
+
   constructor() {
     this.registration = null;
     this.uiStore = null;
@@ -268,7 +272,7 @@ const pwaManager = new PWAManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.pwaManager = pwaManager;
+  (window as any).pwaManager = pwaManager;
 }
 
 export default pwaManager;
