@@ -243,12 +243,24 @@ export const sortAccounts = (accounts, sortBy = "name") => {
 };
 
 /**
+ * Options for filtering accounts
+ */
+interface FilterAccountsOptions {
+  activeOnly?: boolean;
+  type?: string;
+  minBalance?: number;
+  expiringSoon?: boolean;
+  expirationDays?: number;
+  search?: string;
+}
+
+/**
  * Filters accounts by various criteria
  * @param {Array} accounts - Array of accounts
  * @param {Object} filters - Filter criteria
  * @returns {Array} Filtered accounts
  */
-export const filterAccounts = (accounts, filters = {}) => {
+export const filterAccounts = (accounts, filters: FilterAccountsOptions = {}) => {
   if (!Array.isArray(accounts)) return [];
 
   let filteredAccounts = [...accounts];

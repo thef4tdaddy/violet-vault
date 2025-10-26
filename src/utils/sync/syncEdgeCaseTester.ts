@@ -7,7 +7,17 @@ import { budgetDb } from "../../db/budgetDb";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../common/logger";
 
+interface TestResult {
+  test: string;
+  status: "passed" | "failed";
+  details?: string;
+  error?: string;
+}
+
 class SyncEdgeCaseTester {
+  private testResults: TestResult[];
+  private cloudSyncService: typeof cloudSyncService;
+
   constructor() {
     this.testResults = [];
     this.cloudSyncService = cloudSyncService;

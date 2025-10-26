@@ -1,6 +1,14 @@
 import { BaseMutex } from "../common/BaseMutex";
 import logger from "../common/logger";
 
+interface SyncMetrics {
+  operationsCompleted: number;
+  totalLockTime: number;
+  averageLockTime: number;
+  maxLockTime: number;
+  lastOperationTime: string | null;
+}
+
 /**
  * Sync-specific mutex for preventing concurrent sync operations
  * Prevents race conditions and data corruption during cloud sync
@@ -8,6 +16,8 @@ import logger from "../common/logger";
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements
  */
 export class SyncMutex extends BaseMutex {
+  private syncMetrics: SyncMetrics;
+
   constructor(name = "SyncMutex") {
     super(name);
     this.syncMetrics = {

@@ -4,6 +4,41 @@
  */
 import logger from "@/utils/common/logger";
 
+interface DiagnosticResults {
+  timestamp: string;
+  browser: string;
+  url: string;
+  errors: string[];
+  warnings: string[];
+  info: string[];
+  indexedDB?: {
+    version: number;
+    stores: string[];
+  };
+  budgetMetadata?: {
+    exists: boolean;
+    unassignedCash: number | string;
+    actualBalance: number | string;
+    lastModified: number | string;
+  };
+  dataCounts?: Record<string, number | string>;
+  cloudSync?: {
+    isRunning: boolean;
+    config: boolean;
+    lastSyncTime: string | null;
+  };
+  firebaseAuth?: {
+    isSignedIn: boolean;
+    userId: string | null;
+    email: string | null;
+    isAnonymous: boolean | null;
+  };
+  network?: {
+    online: boolean;
+    connection: any;
+  };
+}
+
 export const runSyncDiagnostic = async () => {
   logger.info("🔍 VioletVault Sync Diagnostic Tool");
   logger.info("=".repeat(50));
