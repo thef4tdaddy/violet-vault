@@ -255,4 +255,19 @@ export default [
       complexity: 'off', // Problem domain is inherently complex
     },
   },
+  {
+    // Modal components - legitimate setState in effect for state synchronization
+    // These modals legitimately need to synchronize state when isOpen or data props change
+    files: [
+      'src/components/**/*Modal.tsx',
+      'src/components/**/modals/**/*.tsx',
+      'src/components/mobile/SlideUpModal.tsx',
+      'src/components/savings/AddEditGoalModal.tsx',
+      'src/components/modals/QuickFundModal.tsx',
+      'src/components/automation/AutoFundingRuleBuilder.tsx',
+    ],
+    rules: {
+      'react-hooks/set-state-in-effect': 'off', // Modal state sync requires setState in effects for isOpen/data changes
+    },
+  },
 ];

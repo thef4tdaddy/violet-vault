@@ -143,18 +143,16 @@ const AutoFundingRuleBuilder = ({
   const [errors, setErrors] = useState({});
 
   // Initialize with editing rule data or reset when modal closes
+  // Synchronize modal state when open/close status or editing rule changes
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (!isOpen) {
-      // Batch state updates when closing
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // Batch state updates when closing to synchronize modal state
       setStep(1);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRuleData(editingRule ? { ...editingRule, config: { ...editingRule.config } } : createDefaultRule());
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setErrors({});
     } else if (editingRule) {
       // Initialize with editing rule when opening with existing data
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRuleData({ ...editingRule, config: { ...editingRule.config } });
     }
   }, [isOpen, editingRule]);
