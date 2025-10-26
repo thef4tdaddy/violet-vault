@@ -201,7 +201,17 @@ export const handleBillConnectionsForDebt = async (options: BillConnectionOption
 /**
  * Build debt with payment history
  */
-export const buildDebtWithPayment = (debt: Debt, amount: number, paymentDate: string, interestPortion: number, principalPortion: number): Debt => {
+export const buildDebtWithPayment = (
+  debt: Debt, 
+  paymentInfo: {
+    amount: number;
+    paymentDate: string;
+    interestPortion: number;
+    principalPortion: number;
+    notes?: string;
+  }
+): Debt => {
+  const { amount, paymentDate, interestPortion, principalPortion, notes } = paymentInfo;
   const newBalance = Math.max(0, debt.currentBalance - principalPortion);
   const updatedDebt: Debt = {
     ...debt,
@@ -221,7 +231,7 @@ export const buildDebtWithPayment = (debt: Debt, amount: number, paymentDate: st
     interestPortion,
     principalPortion,
     balanceAfter: newBalance,
-    notes: "",
+    notes: notes || "",
   });
 
   return updatedDebt;
@@ -268,13 +278,13 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
     const interestPortion = calculateInterestPortion(debt, amount);
     const principalPortion = amount - interestPortion;
 
-    const updatedDebt = buildDebtWithPayment(
-      debt,
+    const updatedDebt = buildDebtWithPayment(debt, {
       amount,
       paymentDate,
       interestPortion,
-      principalPortion
-    );
+      principalPortion,
+      notes,
+    });
 
     await updateDebtData({ id: debt.id, updates: updatedDebt });
 

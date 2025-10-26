@@ -129,9 +129,31 @@ export const getEmptyStats = () => ({
 });
 
 /**
+ * Database interface for fetching transactions
+ */
+interface BudgetDb {
+  transactions: {
+    orderBy: (field: string) => {
+      reverse: () => {
+        toArray: () => Promise<unknown[]>;
+      };
+    };
+  };
+}
+
+/**
+ * Logger interface
+ */
+interface Logger {
+  debug: (msg: string, data?: unknown) => void;
+  warn: (msg: string) => void;
+  error: (msg: string, error: unknown) => void;
+}
+
+/**
  * Fetch transactions from database
  */
-export const fetchTransactionsFromDb = async (budgetDb: { transactions: { orderBy: (field: string) => { reverse: () => { toArray: () => Promise<unknown[]> } } } }, logger: { debug: (msg: string, data?: unknown) => void; warn: (msg: string) => void; error: (msg: string, error: unknown) => void }) => {
+export const fetchTransactionsFromDb = async (budgetDb: BudgetDb, logger: Logger) => {
   logger.debug("Fetching transactions from database");
 
   try {
