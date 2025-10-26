@@ -72,7 +72,7 @@ jobs:
           echo "total=$TS_ERRORS" >> $GITHUB_OUTPUT
           echo "📊 TypeScript Results: ${TS_ERRORS} compilation errors"
 
-      - name: Update Issue #568 (ESLint Tracking)
+      - name: Update Issue #748 (ESLint Tracking)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         uses: actions/github-script@v7
         with:
@@ -82,27 +82,54 @@ jobs:
             const eslintErrors = ${{ steps.eslint.outputs.errors }};
             const currentDate = new Date().toISOString().split('T')[0];
 
-            const statusLine = eslintTotal === 0 ? '✅ No issues' : '⚠️ Issues detected';
-            const finalLine = eslintTotal === 0 ? '🎉 All ESLint checks pass!' : '❌ Code quality issues detected - review and fix before release';
-
-            const commentBody = '## 📊 ESLint Tracking - ' + currentDate + '\n\n' +
-              '**Status**: ' + statusLine + '\n\n' +
-              '- **Total Issues**: ' + eslintTotal + '\n' +
-              '  - Warnings: ' + eslintWarnings + '\n' +
-              '  - Errors: ' + eslintErrors + '\n\n' +
-              finalLine + '\n\n' +
-              '_Last updated: ' + currentDate + '_';
+            // Update issue body with latest metrics
+            const bodyUpdate = '| **Total Violations** | **' + eslintTotal + '** | ' + (eslintTotal === 0 ? '✅' : '⚠️') + ' |\n' +
+              '| **Errors** | ' + eslintErrors + ' | ' + (eslintErrors === 0 ? '✅' : '❌') + ' |\n' +
+              '| **Warnings** | ' + eslintWarnings + ' | ' + (eslintWarnings === 0 ? '✅' : '⚠️') + ' |\n' +
+              '| **Last Updated** | ' + currentDate + ' | - |';
 
             try {
-              await github.rest.issues.createComment({
+              const issue = await github.rest.issues.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: 568,
-                body: commentBody
+                issue_number: 748
               });
-              console.log('✅ Successfully updated Issue #568 (ESLint Tracking)');
+
+              // Update the body with new metrics in the status table
+              let newBody = issue.data.body.replace(
+                /\| \*\*Total Violations\*\* \| \*\*\d+\*\* \| .* \|\n\| \*\*Errors\*\* \| \d+ \| .* \|\n\| \*\*Warnings\*\* \| \d+ \| .* \|\n\| \*\*Last Updated\*\* \| [^|]+ \| - \|/,
+                bodyUpdate
+              );
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 748,
+                body: newBody
+              });
+
+              console.log('✅ Successfully updated Issue #748 (ESLint Tracking)');
+
+              // Only post comment if there are violations
+              if (eslintTotal > 0) {
+                const commentBody = '## ⚠️ ESLint Issues Detected - ' + currentDate + '\n\n' +
+                  '**Status**: Issues found\n\n' +
+                  '- **Total Issues**: ' + eslintTotal + '\n' +
+                  '  - Warnings: ' + eslintWarnings + '\n' +
+                  '  - Errors: ' + eslintErrors + '\n\n' +
+                  '❌ Code quality issues detected - review and fix before release\n\n' +
+                  '_Checked: ' + currentDate + '_';
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: 748,
+                  body: commentBody
+                });
+                console.log('✅ Posted issue comment for violations');
+              }
             } catch (error) {
-              console.log('❌ Failed to update issue #568:', error.message);
+              console.log('❌ Failed to update issue #748:', error.message);
             }
 
       - name: Update Issue #806 (TypeScript Tracking)
@@ -113,25 +140,27 @@ jobs:
             const tsTotal = ${{ steps.typecheck.outputs.total }};
             const currentDate = new Date().toISOString().split('T')[0];
 
-            const statusLine = tsTotal === 0 ? '✅ No compilation errors' : '🔴 Compilation errors detected';
-            const finalLine = tsTotal === 0 ? '🎉 TypeScript compilation passes!' : '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release';
+            // Only post comment if there are errors
+            if (tsTotal > 0) {
+              const commentBody = '## 🔴 TypeScript Errors Detected - ' + currentDate + '\n\n' +
+                '**Status**: Compilation errors found\n\n' +
+                '- **Total Errors**: ' + tsTotal + '\n\n' +
+                '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release\n\n' +
+                '_Checked: ' + currentDate + '_';
 
-            const commentBody = '## 📊 TypeScript Compilation Tracking - ' + currentDate + '\n\n' +
-              '**Status**: ' + statusLine + '\n\n' +
-              '- **Total Errors**: ' + tsTotal + '\n\n' +
-              finalLine + '\n\n' +
-              '_Last updated: ' + currentDate + '_';
-
-            try {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: 806,
-                body: commentBody
-              });
-              console.log('✅ Successfully updated Issue #806 (TypeScript Tracking)');
-            } catch (error) {
-              console.log('❌ Failed to update issue #806:', error.message);
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: 806,
+                  body: commentBody
+                });
+                console.log('✅ Posted issue comment for TypeScript errors');
+              } catch (error) {
+                console.log('❌ Failed to post comment on issue #806:', error.message);
+              }
+            } else {
+              console.log('✅ TypeScript check passed - no comment posted');
             }
 
       - name: Create summary comment on PR
