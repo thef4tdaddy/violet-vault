@@ -6,7 +6,7 @@
 import {
   formatAccountData,
   generateAccountId,
-} from "../../../utils/accounts/accountHelpers";
+} from "@/utils/accounts/accountHelpers";
 
 interface AccountForm {
   name: string;
@@ -29,17 +29,32 @@ interface EditingAccount {
 }
 
 /**
+ * Options for saving an account
+ */
+export interface SaveAccountOptions {
+  accountForm: AccountForm;
+  editingAccount: EditingAccount | null;
+  isOwnLock: boolean;
+  currentUser: CurrentUser;
+  onUpdateAccount: (id: string, data: unknown) => void;
+  onAddAccount: (data: unknown) => void;
+  releaseLock: () => void;
+}
+
+/**
  * Save account (add or update) - validation should be done by caller
  */
-export const saveAccount = (
-  accountForm: AccountForm,
-  editingAccount: EditingAccount | null,
-  isOwnLock: boolean,
-  currentUser: CurrentUser,
-  onUpdateAccount: (id: string, data: unknown) => void,
-  onAddAccount: (data: unknown) => void,
-  releaseLock: () => void
-): void => {
+export const saveAccount = (options: SaveAccountOptions): void => {
+  const {
+    accountForm,
+    editingAccount,
+    isOwnLock,
+    currentUser,
+    onUpdateAccount,
+    onAddAccount,
+    releaseLock,
+  } = options;
+
   const accountData = formatAccountData(accountForm, currentUser);
 
   if (editingAccount) {
