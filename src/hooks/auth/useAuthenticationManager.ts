@@ -149,9 +149,7 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
       authFlow.handleLogout,
       authFlow.handleChangePassword,
       authFlow.handleUpdateProfile,
-      securityManager.lockSession,
-      securityManager.unlockSession,
-      securityManager.trackActivity,
+      securityManager,
     ]
   );
 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
 import { useAuthManager } from "../auth/useAuthManager";
 import { useConfirm } from "../common/useConfirm";
 import useEditLock from "../common/useEditLock";
@@ -9,11 +8,23 @@ import {
   validateTransferForm,
   calculateAccountTotals,
 } from "../../utils/accounts/accountValidation";
+import { getAccountTypeInfo } from "../../utils/accounts/accountHelpers";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
-  getAccountTypeInfo,
-  formatAccountData,
-  generateAccountId,
-} from "../../utils/accounts/accountHelpers";
+  getEmptyAccountForm,
+  getEmptyTransferForm,
+  populateFormFromAccount,
+  createTransferFormForAccount,
+} from "./utils/accountFormUtils";
+import { saveAccount, executeTransfer } from "./utils/accountOperationsUtils";
+import {
+  handleAccountSaveSuccess,
+  handleModalCloseWithLock,
+  handleAccountDelete,
+  handleTransferSuccess,
+  startAccountEdit,
+  startAccountTransfer,
+} from "./utils/accountHandlersUtils";
 
 const useSupplementalAccounts = ({
   supplementalAccounts = [],
@@ -32,22 +43,8 @@ const useSupplementalAccounts = ({
   const [transferringAccount, setTransferringAccount] = useState(null);
 
   // Form State
-  const [accountForm, setAccountForm] = useState({
-    name: "",
-    type: "FSA",
-    currentBalance: "",
-    annualContribution: "",
-    expirationDate: "",
-    description: "",
-    color: "#06b6d4",
-    isActive: true,
-  });
-
-  const [transferForm, setTransferForm] = useState({
-    envelopeId: "",
-    amount: "",
-    description: "",
-  });
+  const [accountForm, setAccountForm] = useState(getEmptyAccountForm());
+  const [transferForm, setTransferForm] = useState(getEmptyTransferForm());
 
   // Auth and Locking
   const {
@@ -80,29 +77,11 @@ const useSupplementalAccounts = ({
 
   // Form Management
   const resetForm = () => {
-    setAccountForm({
-      name: "",
-      type: "FSA",
-      currentBalance: "",
-      annualContribution: "",
-      expirationDate: "",
-      description: "",
-      color: "#06b6d4",
-      isActive: true,
-    });
+    setAccountForm(getEmptyAccountForm());
   };
 
   const populateFormForEdit = (account) => {
-    setAccountForm({
-      name: account.name,
-      type: account.type,
-      currentBalance: account.currentBalance.toString(),
-      annualContribution: account.annualContribution?.toString() || "",
-      expirationDate: account.expirationDate || "",
-      description: account.description || "",
-      color: account.color,
-      isActive: account.isActive,
-    });
+    setAccountForm(populateFormFromAccount(account));
   };
 
   // CRUD Operations
@@ -122,67 +101,46 @@ const useSupplementalAccounts = ({
       return;
     }
 
-    const accountData = formatAccountData(accountForm, currentUser);
+    saveAccount(
+      accountForm,
+      editingAccount,
+      isOwnLock,
+      currentUser,
+      onUpdateAccount,
+      onAddAccount,
+      releaseLock
+    );
 
-    if (editingAccount) {
-      onUpdateAccount(editingAccount.id, {
-        ...accountData,
-        id: editingAccount.id,
-      });
-      if (isOwnLock) {
-        releaseLock();
-      }
-      setEditingAccount(null);
-    } else {
-      const newAccount = {
-        ...accountData,
-        id: generateAccountId(),
-      };
-      onAddAccount(newAccount);
-    }
-
-    setShowAddModal(false);
-    resetForm();
+    handleAccountSaveSuccess(setShowAddModal, setEditingAccount, resetForm);
   };
 
   const startEdit = (account) => {
-    populateFormForEdit(account);
-    setEditingAccount(account);
-    setShowAddModal(true);
+    startAccountEdit(account, populateFormForEdit, setEditingAccount, setShowAddModal);
   };
 
   const handleCloseModal = () => {
-    if (isOwnLock) {
-      releaseLock();
-    }
-    setEditingAccount(null);
-    setShowAddModal(false);
-    resetForm();
+    handleModalCloseWithLock(
+      isOwnLock,
+      releaseLock,
+      setEditingAccount,
+      setShowAddModal,
+      resetForm
+    );
   };
 
   const handleDelete = async (accountId) => {
-    const confirmed = await confirm({
-      title: "Delete Account",
-      message: "Are you sure you want to delete this account?",
-      confirmLabel: "Delete Account",
-      cancelLabel: "Cancel",
-      destructive: true,
-    });
-
-    if (confirmed) {
-      onDeleteAccount(accountId);
-    }
+    await handleAccountDelete(accountId, confirm, onDeleteAccount);
   };
 
   // Transfer Operations
   const startTransfer = (account) => {
-    setTransferringAccount(account);
-    setTransferForm({
-      envelopeId: "",
-      amount: "",
-      description: `Transfer from ${account.name}`,
-    });
-    setShowTransferModal(true);
+    startAccountTransfer(
+      account,
+      setTransferringAccount,
+      setTransferForm,
+      setShowTransferModal,
+      createTransferFormForAccount
+    );
   };
 
   const handleTransfer = () => {
@@ -192,23 +150,12 @@ const useSupplementalAccounts = ({
       return;
     }
 
-    const amount = parseFloat(transferForm.amount);
-    onTransferToEnvelope(
-      transferringAccount.id,
-      transferForm.envelopeId,
-      amount,
-      transferForm.description
-    );
-
-    setShowTransferModal(false);
-    setTransferringAccount(null);
-    setTransferForm({ envelopeId: "", amount: "", description: "" });
+    executeTransfer(transferForm, transferringAccount, onTransferToEnvelope);
+    handleTransferSuccess(setShowTransferModal, setTransferringAccount, setTransferForm);
   };
 
   const handleCloseTransferModal = () => {
-    setShowTransferModal(false);
-    setTransferringAccount(null);
-    setTransferForm({ envelopeId: "", amount: "", description: "" });
+    handleTransferSuccess(setShowTransferModal, setTransferringAccount, setTransferForm);
   };
 
   // UI Actions
