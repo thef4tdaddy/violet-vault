@@ -4,25 +4,26 @@ import useBills from "../bills/useBills";
 import { useTransactions } from "./useTransactions";
 import { useActualBalance } from "../budgeting/useBudgetMetadata";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
-import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 
 /**
  * Hook that automatically detects user actions and marks onboarding steps as complete
  */
 export const useOnboardingAutoComplete = () => {
-  const { markStepComplete, isStepComplete, preferences, isOnboarded } = useOnboardingStore(
-    useShallow((state) => ({
-      markStepComplete: state.markStepComplete,
-      isStepComplete: state.isStepComplete,
-      preferences: state.preferences,
-      isOnboarded: state.isOnboarded,
-    }))
-  );
+  const markStepComplete = useOnboardingStore((state) => (state as { markStepComplete: (step: string) => void }).markStepComplete);
+  const isStepComplete = useOnboardingStore((state) => (state as { isStepComplete: (step: string) => boolean }).isStepComplete);
+  const preferences = useOnboardingStore((state) => (state as { preferences: { showHints: boolean } }).preferences);
+  const isOnboarded = useOnboardingStore((state) => (state as { isOnboarded: boolean }).isOnboarded);
 
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();
-  const { data: transactions = [] } = useTransactions();
+  const transactionsResult = useTransactions();
+  const transactions = (transactionsResult?.transactions || []) as Array<{
+    amount?: number;
+    description?: string;
+    type?: string;
+    category?: string;
+  }>;
   const { actualBalance } = useActualBalance();
 
   // Skip if user has disabled hints or is already onboarded
@@ -62,7 +63,7 @@ export const useOnboardingAutoComplete = () => {
     if (!shouldAutoComplete) return;
 
     // Filter out system-generated envelopes (those created automatically during setup)
-    const userCreatedEnvelopes = envelopes.filter((env) => {
+    const userCreatedEnvelopes = envelopes.filter((env: { name: string; source?: string }) => {
       // Skip envelopes that look like system defaults
       return (
         env.name !== "Emergency Fund" &&
@@ -75,7 +76,7 @@ export const useOnboardingAutoComplete = () => {
     if (userCreatedEnvelopes.length > 0 && !isStepComplete("firstEnvelope")) {
       logger.info(
         "🎯 Auto-completing firstEnvelope step - user envelope created:",
-        userCreatedEnvelopes[0].name
+        (userCreatedEnvelopes[0] as { name: string }).name
       );
       markStepComplete("firstEnvelope");
     }
@@ -86,7 +87,7 @@ export const useOnboardingAutoComplete = () => {
     if (!shouldAutoComplete) return;
 
     if (bills.length > 0 && !isStepComplete("firstBills")) {
-      logger.info("🎯 Auto-completing firstBills step - bill added:", bills[0].description);
+      logger.info("🎯 Auto-completing firstBills step - bill added:", (bills[0] as { description?: string }).description);
       markStepComplete("firstBills");
     }
   }, [bills, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -135,12 +136,12 @@ export const useOnboardingAutoComplete = () => {
   useEffect(() => {
     if (!shouldAutoComplete) return;
 
-    const linkedBills = bills.filter((bill) => bill.envelopeId);
+    const linkedBills = bills.filter((bill: { envelopeId?: string }) => bill.envelopeId);
 
     if (linkedBills.length > 0 && !isStepComplete("linkedEnvelopes")) {
       logger.info(
         "🎯 Auto-completing linkedEnvelopes step - bill linked to envelope:",
-        linkedBills[0].description
+        (linkedBills[0] as { description?: string }).description
       );
       markStepComplete("linkedEnvelopes");
     }
@@ -150,12 +151,12 @@ export const useOnboardingAutoComplete = () => {
   useEffect(() => {
     if (!shouldAutoComplete) return;
 
-    const fundedEnvelopes = envelopes.filter((env) => env.currentBalance > 0);
+    const fundedEnvelopes = envelopes.filter((env: { currentBalance?: number }) => (env.currentBalance || 0) > 0);
 
     if (fundedEnvelopes.length > 0 && !isStepComplete("firstAllocation")) {
       logger.info(
         "🎯 Auto-completing firstAllocation step - envelope funded:",
-        fundedEnvelopes[0].name
+        (fundedEnvelopes[0] as { name?: string }).name
       );
       markStepComplete("firstAllocation");
     }

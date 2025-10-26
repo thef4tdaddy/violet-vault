@@ -9,6 +9,21 @@ import SplitAllocationsSection from "./splitter/SplitAllocationsSection";
 import SplitTotals from "./splitter/SplitTotals";
 import SplitActions from "./splitter/SplitActions";
 
+interface TransactionSplitterProps {
+  isOpen: boolean;
+  transaction: {
+    id: string;
+    amount: number;
+    description?: string;
+    date?: Date;
+  } | null;
+  onClose?: () => void;
+  onSave?: (allocations: unknown[]) => void;
+  envelopes?: unknown[];
+  availableCategories?: unknown[];
+  className?: string;
+}
+
 const TransactionSplitter = ({
   isOpen,
   transaction,
@@ -17,7 +32,7 @@ const TransactionSplitter = ({
   envelopes = [],
   availableCategories = [],
   className = "",
-}) => {
+}: TransactionSplitterProps) => {
   const splitter = useTransactionSplitter({
     transaction,
     envelopes,
@@ -28,7 +43,7 @@ const TransactionSplitter = ({
   // Handle saving with validation
   const handleSave = async () => {
     try {
-      const success = await splitter.saveSplitTransaction();
+      const success = await splitter.submitSplit();
       if (success) {
         onSave?.(splitter.splitAllocations);
         onClose?.();
@@ -91,11 +106,11 @@ const TransactionSplitter = ({
                   splitAllocations={splitter.splitAllocations}
                   availableCategories={categoryOptions}
                   envelopes={envelopes}
-                  onUpdateSplit={splitter.updateSplitAllocation}
-                  onRemoveSplit={splitter.removeSplitAllocation}
-                  onAddSplit={splitter.addSplitAllocation}
-                  onSmartSplit={splitter.performSmartSplit}
-                  onAutoBalance={splitter.autoBalanceRemaining}
+                  onUpdateSplit={splitter.updateSplit}
+                  onRemoveSplit={splitter.removeSplit}
+                  onAddSplit={splitter.addSplit}
+                  onSmartSplit={splitter.distributeEvenly}
+                  onAutoBalance={splitter.autoBalance}
                   canAutoBalance={!totals.isValid && totals.remaining !== 0}
                 />
               </div>
@@ -110,7 +125,7 @@ const TransactionSplitter = ({
           <SplitActions
             totals={totals}
             hasUnsavedChanges={splitter.hasUnsavedChanges}
-            isSaving={splitter.isSaving}
+            isSaving={splitter.isProcessing}
             onSave={handleSave}
             onCancel={handleCancel}
           />

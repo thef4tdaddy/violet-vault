@@ -1,8 +1,8 @@
 // Query Integration Tests - Real TanStack Query Testing
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
-import { budgetDb } from "../../../../db/budgetDb";
-import budgetDatabaseService from "../../../../services/budgetDatabaseService";
+import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys, queryKeyUtils } from "../../queryKeys";
 import { prefetchHelpers } from "../../prefetchHelpers";
 import { optimisticHelpers } from "../../optimisticHelpers";
