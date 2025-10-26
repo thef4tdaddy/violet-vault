@@ -18,7 +18,17 @@ const getDaysUntilColor = (days) => {
 };
 
 // Status header component
-const StatusHeader = ({ status, displayText, priority, iconName }) => (
+const StatusHeader = ({
+  status,
+  displayText,
+  priority,
+  iconName,
+}: {
+  status: { textColor: string };
+  displayText: { primaryStatus: string };
+  priority: { priorityLevel: string };
+  iconName: string;
+}) => (
   <div className="flex items-center justify-between mb-2">
     <div className="flex items-center space-x-2">
       {React.createElement(getIcon(iconName), {
@@ -35,7 +45,7 @@ const StatusHeader = ({ status, displayText, priority, iconName }) => (
 );
 
 // Progress bar component
-const ProgressBar = ({ fundingProgress }) => (
+const ProgressBar = ({ fundingProgress }: { fundingProgress: number }) => (
   <div className="mb-2">
     <div className="flex justify-between text-xs text-gray-600 mb-1">
       <span>Funding Progress</span>
@@ -51,7 +61,13 @@ const ProgressBar = ({ fundingProgress }) => (
 );
 
 // Next bill info component
-const NextBillInfo = ({ nextBill, daysUntilNextBill }) => (
+const NextBillInfo = ({
+  nextBill,
+  daysUntilNextBill,
+}: {
+  nextBill: { name: string; amount: number };
+  daysUntilNextBill: number | null;
+}) => (
   <div className="text-sm text-gray-600 mb-1">
     <span className="font-medium">Next Bill:</span> {nextBill.name} - ${nextBill.amount.toFixed(2)}
     {daysUntilNextBill !== null && (
@@ -63,7 +79,17 @@ const NextBillInfo = ({ nextBill, daysUntilNextBill }) => (
 );
 
 // Simplified status display
-const StatusDisplay = ({ targetMonthlyAmount, nextBill, remainingToFund, currentBalance }) => (
+const StatusDisplay = ({
+  targetMonthlyAmount,
+  nextBill,
+  remainingToFund,
+  currentBalance,
+}: {
+  targetMonthlyAmount: number;
+  nextBill?: { amount: number; frequency?: string };
+  remainingToFund: number;
+  currentBalance: number;
+}) => (
   <div className="text-xs">
     <div className="text-gray-500">
       {targetMonthlyAmount > 0 && nextBill && (
@@ -89,6 +115,14 @@ const DetailedInfo = ({
   daysUntilNextBill,
   currentBalance,
   priority,
+}: {
+  displayInfo: { linkedBills?: number };
+  upcomingBillsAmount: number;
+  remainingToFund: number;
+  targetMonthlyAmount: number;
+  daysUntilNextBill: number | null;
+  currentBalance: number;
+  priority: { reason?: string };
 }) => (
   <div className="mt-3 pt-2 border-t border-gray-200">
     <div className="grid grid-cols-2 gap-2 text-xs mb-2">
@@ -134,6 +168,11 @@ const FundingRecommendations = ({
   daysUntilNextBill,
   targetMonthlyAmount,
   currentBalance,
+}: {
+  remainingToFund: number;
+  daysUntilNextBill: number | null;
+  targetMonthlyAmount: number;
+  currentBalance: number;
 }) => (
   <div className="bg-blue-50 p-2 rounded text-xs">
     <div className="flex items-center space-x-1 mb-1">
@@ -160,7 +199,13 @@ const FundingRecommendations = ({
 );
 
 // Well funded alert component
-const WellFundedAlert = ({ currentBalance, targetMonthlyAmount }) => (
+const WellFundedAlert = ({
+  currentBalance,
+  targetMonthlyAmount,
+}: {
+  currentBalance: number;
+  targetMonthlyAmount: number;
+}) => (
   <div className="bg-green-50 p-2 rounded text-xs">
     <div className="flex items-center space-x-1 mb-1">
       {React.createElement(getIcon("CheckCircle"), {
@@ -179,7 +224,12 @@ const WellFundedAlert = ({ currentBalance, targetMonthlyAmount }) => (
  * Component to display bill envelope funding information
  * Shows remaining amount needed for next bill payment and funding progress
  */
-const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = false }) => {
+const BillEnvelopeFundingInfo = memo(
+  ({ envelope, bills = [], showDetails = false }: {
+    envelope: { id: string; name?: string; currentBalance?: number; [key: string]: unknown };
+    bills?: unknown[];
+    showDetails?: boolean;
+  }) => {
   const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
 
   if (!displayInfo) {
@@ -198,7 +248,20 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
     priority,
     status,
     displayText,
-  } = displayInfo;
+  } = displayInfo as {
+    nextBill?: { name: string; amount: number; frequency?: string };
+    remainingToFund: number;
+    daysUntilNextBill: number | null;
+    fundingProgress: number;
+    isFullyFunded: boolean;
+    currentBalance: number;
+    targetMonthlyAmount: number;
+    upcomingBillsAmount: number;
+    priority: { priorityLevel: string; reason?: string };
+    status: { bgColor: string; textColor: string; color: string; icon?: string };
+    displayText: { primaryStatus: string; secondaryStatus?: string; fundingProgress?: string };
+    linkedBills?: number;
+  };
 
   const iconName = status.icon || "DollarSign";
 
@@ -224,7 +287,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
 
       {showDetails && (
         <DetailedInfo
-          displayInfo={displayInfo}
+          displayInfo={displayInfo as unknown as { linkedBills?: number }}
           upcomingBillsAmount={upcomingBillsAmount}
           remainingToFund={remainingToFund}
           targetMonthlyAmount={targetMonthlyAmount}
@@ -235,7 +298,8 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
       )}
     </div>
   );
-});
+  }
+);
 
 BillEnvelopeFundingInfo.displayName = "BillEnvelopeFundingInfo";
 

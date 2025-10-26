@@ -7,6 +7,19 @@
 import { useCallback, useMemo } from "react";
 import { getIconByName } from "../../utils/common/billIcons";
 
+interface CategorizedBills {
+  upcoming?: unknown[];
+  overdue?: unknown[];
+  paid?: unknown[];
+}
+
+interface BillTotals {
+  overdue?: number;
+  upcoming?: number;
+  paid?: number;
+  total?: number;
+}
+
 // Urgency color mapping
 const URGENCY_COLORS = {
   overdue: "text-red-600 bg-red-50",
@@ -49,13 +62,22 @@ const formatDaysDisplay = (daysUntilDue) => {
  */
 export const useBillManagerUI = ({
   bills = [],
-  categorizedBills = {},
+  categorizedBills = {} as CategorizedBills,
   filteredBills = [],
   selectedBills,
   setSelectedBills,
   setShowAddBillModal,
   setEditingBill,
   setHistoryBill,
+}: {
+  bills?: unknown[];
+  categorizedBills?: CategorizedBills;
+  filteredBills?: unknown[];
+  selectedBills: Set<string>;
+  setSelectedBills: (bills: Set<string>) => void;
+  setShowAddBillModal: (show: boolean) => void;
+  setEditingBill: (bill: unknown) => void;
+  setHistoryBill: (bill: unknown) => void;
 }) => {
   // View modes configuration with business logic
   const viewModes = useMemo(
@@ -82,7 +104,7 @@ export const useBillManagerUI = ({
 
   // Bill selection logic
   const toggleBillSelection = useCallback(
-    (billId) => {
+    (billId: string) => {
       const newSelection = new Set(selectedBills);
       if (newSelection.has(billId)) {
         newSelection.delete(billId);
@@ -95,7 +117,9 @@ export const useBillManagerUI = ({
   );
 
   const selectAllBills = useCallback(() => {
-    const allBillIds = new Set(filteredBills.map((bill) => bill.id));
+    const allBillIds = new Set(
+      filteredBills.map((bill: { id: string }) => bill.id)
+    );
     setSelectedBills(allBillIds);
   }, [filteredBills, setSelectedBills]);
 
@@ -110,7 +134,7 @@ export const useBillManagerUI = ({
   }, [setEditingBill, setShowAddBillModal]);
 
   const handleEditBill = useCallback(
-    (bill) => {
+    (bill: unknown) => {
       setEditingBill(bill);
       setShowAddBillModal(true);
     },
@@ -123,19 +147,19 @@ export const useBillManagerUI = ({
   }, [setShowAddBillModal, setEditingBill]);
 
   const handleViewHistory = useCallback(
-    (bill) => {
+    (bill: unknown) => {
       setHistoryBill(bill);
     },
     [setHistoryBill]
   );
 
   // Bill display logic
-  const getBillIcon = useCallback((bill) => {
+  const getBillIcon = useCallback((bill: { iconName?: string }) => {
     return getIconByName(bill.iconName) || "FileText";
   }, []);
 
-  const getUrgencyColors = useCallback((urgency) => {
-    return URGENCY_COLORS[urgency] || URGENCY_COLORS.normal;
+  const getUrgencyColors = useCallback((urgency: string) => {
+    return URGENCY_COLORS[urgency as keyof typeof URGENCY_COLORS] || URGENCY_COLORS.normal;
   }, []);
 
   // Selection state helpers
@@ -152,7 +176,7 @@ export const useBillManagerUI = ({
   }, [selectedBills, filteredBills]);
 
   // Summary card configuration factory
-  const getSummaryCards = useCallback((totals = {}) => {
+  const getSummaryCards = useCallback((totals: BillTotals = {}) => {
     const { overdue = 0, upcoming = 0, paid = 0, total = 0 } = totals;
 
     return [
@@ -165,7 +189,15 @@ export const useBillManagerUI = ({
 
   // Bill row display logic
   const getBillDisplayData = useCallback(
-    (bill) => {
+    (bill: {
+      id: string;
+      iconName?: string;
+      urgency: string;
+      dueDate?: Date;
+      daysUntilDue: number | null;
+      isPaid: boolean;
+      amount: number;
+    }) => {
       const Icon = getBillIcon(bill);
       const urgencyColors = getUrgencyColors(bill.urgency);
       const isSelected = selectedBills.has(bill.id);
