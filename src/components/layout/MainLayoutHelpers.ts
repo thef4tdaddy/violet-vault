@@ -55,7 +55,7 @@ export const hasSecurityAcknowledgement = (): boolean => {
   try {
     // eslint-disable-next-line no-restricted-syntax
     return !!localStorage.getItem("localDataSecurityAcknowledged");
-  } catch (error) {
+  } catch {
     // Handle environments where localStorage is not available
     return false;
   }
