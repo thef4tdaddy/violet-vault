@@ -1,10 +1,10 @@
 // Sync Integration Tests - Real End-to-End Testing
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { budgetDb } from "../../../db/budgetDb";
-import budgetDatabaseService from "../../budgetDatabaseService";
-import firebaseSyncService from "../../firebaseSyncService";
-import chunkedSyncService from "../../chunkedSyncService";
-import { encryptionUtils } from "../../../utils/security/encryption";
+import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import firebaseSyncService from "@/services/firebaseSyncService";
+import chunkedSyncService from "@/services/chunkedSyncService";
+import { encryptionUtils } from "@/utils/security/encryption";
 
 // Test configuration
 const TEST_TIMEOUT = 30000; // 30 seconds for real operations

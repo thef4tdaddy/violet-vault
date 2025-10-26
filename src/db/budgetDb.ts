@@ -398,15 +398,15 @@ export class VioletVaultDB extends Dexie {
         const promises = updates.map((update) => {
           switch (update.type) {
             case "envelope":
-              return this.envelopes.put(update.data);
+              return this.envelopes.put(update.data as Envelope);
             case "transaction":
-              return this.transactions.put(update.data);
+              return this.transactions.put(update.data as Transaction);
             case "bill":
-              return this.bills.put(update.data);
+              return this.bills.put(update.data as Bill);
             case "savingsGoal":
-              return this.savingsGoals.put(update.data);
+              return this.savingsGoals.put(update.data as SavingsGoal);
             case "paycheck":
-              return this.paycheckHistory.put(update.data);
+              return this.paycheckHistory.put(update.data as PaycheckHistory);
             default:
               return Promise.resolve();
           }
@@ -614,12 +614,16 @@ export const setActualBalance = async (balance: number): Promise<void> => {
 
 export const getUnassignedCash = async (): Promise<number> => {
   const metadata = await getBudgetMetadata();
-  return (metadata as BudgetRecord)?.unassignedCash || 0;
+  return (typeof (metadata as BudgetRecord)?.unassignedCash === 'number' 
+    ? (metadata as BudgetRecord)?.unassignedCash 
+    : 0) as number;
 };
 
 export const getActualBalance = async (): Promise<number> => {
   const metadata = await getBudgetMetadata();
-  return (metadata as BudgetRecord)?.actualBalance || 0;
+  return (typeof (metadata as BudgetRecord)?.actualBalance === 'number'
+    ? (metadata as BudgetRecord)?.actualBalance
+    : 0) as number;
 };
 
 export const clearData = async (): Promise<void> => {
