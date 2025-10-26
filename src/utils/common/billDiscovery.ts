@@ -5,6 +5,26 @@
 
 import { getBillIcon } from "./billIcons.ts";
 
+interface Transaction {
+  date: string;
+  amount: number;
+  description: string;
+  [key: string]: unknown;
+}
+
+interface BillPattern {
+  keywords: string[];
+  category: string;
+  recurring: boolean;
+  confidence: number;
+  patternName?: string;
+  matchedKeywords?: string[];
+  iconName?: string;
+}
+
+// Constants
+const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
+
 /**
  * Common bill patterns and their characteristics
  */
@@ -126,40 +146,44 @@ const normalizeTransactionDescription = (description) => {
 };
 
 /**
- * Analyze a group of similar transactions to determine bill characteristics
+ * Calculate transaction intervals in days
  */
-const analyzeTransactionGroup = (transactions, groupKey) => {
-  if (transactions.length < 2) return null;
-
-  // Calculate transaction frequency
-  const dates = transactions.map((t) => new Date(t.date)).sort((a, b) => a - b);
-
+const calculateTransactionIntervals = (dates: Date[]): number[] => {
   const intervals = [];
   for (let i = 1; i < dates.length; i++) {
-    const daysDiff = Math.abs(dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
+    const daysDiff = Math.abs(dates[i].getTime() - dates[i - 1].getTime()) / MILLISECONDS_PER_DAY;
     intervals.push(daysDiff);
   }
+  return intervals;
+};
 
-  const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
-
-  // Determine if it's truly recurring (monthly, weekly, etc.)
-  const isMonthlyRecurring = avgInterval >= 25 && avgInterval <= 35;
-  const isWeeklyRecurring = avgInterval >= 6 && avgInterval <= 8;
-  const isBiWeeklyRecurring = avgInterval >= 13 && avgInterval <= 15;
-
-  if (!isMonthlyRecurring && !isWeeklyRecurring && !isBiWeeklyRecurring) {
-    return null; // Not a regular recurring pattern
+/**
+ * Determine frequency type based on average interval
+ */
+const determineFrequencyType = (
+  avgInterval: number
+): { frequency: string; isRecurring: boolean } => {
+  if (avgInterval >= 25 && avgInterval <= 35) {
+    return { frequency: "monthly", isRecurring: true };
   }
+  if (avgInterval >= 6 && avgInterval <= 8) {
+    return { frequency: "weekly", isRecurring: true };
+  }
+  if (avgInterval >= 13 && avgInterval <= 15) {
+    return { frequency: "biweekly", isRecurring: true };
+  }
+  return { frequency: "monthly", isRecurring: false };
+};
 
-  // Calculate average amount
-  const amounts = transactions.map((t) => Math.abs(t.amount));
-  const avgAmount = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
-  const amountVariation = Math.max(...amounts) - Math.min(...amounts);
-
-  // Pattern matching for bill type
-  const detectedPattern = detectBillPattern(groupKey);
-
-  // Calculate confidence score
+/**
+ * Calculate confidence score for bill detection
+ */
+const calculateConfidenceScore = (
+  detectedPattern: BillPattern | null,
+  amountVariation: number,
+  avgAmount: number,
+  transactionCount: number
+): number => {
   let confidence = 0.5; // Base confidence for recurring pattern
 
   // Boost confidence for recognized bill patterns
@@ -167,7 +191,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
     confidence = Math.max(confidence, detectedPattern.confidence);
   }
 
-  // Boost confidence for consistent amounts (utilities vary, subscriptions don't)
+  // Boost confidence for consistent amounts
   if (amountVariation < avgAmount * 0.1) {
     confidence += 0.2; // Very consistent amounts (subscriptions)
   } else if (amountVariation < avgAmount * 0.3) {
@@ -175,14 +199,40 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
   }
 
   // Boost confidence for more transaction history
-  if (transactions.length >= 6) confidence += 0.15;
-  else if (transactions.length >= 4) confidence += 0.1;
-  else if (transactions.length >= 3) confidence += 0.05;
+  if (transactionCount >= 6) confidence += 0.15;
+  else if (transactionCount >= 4) confidence += 0.1;
+  else if (transactionCount >= 3) confidence += 0.05;
 
-  // Predict next due date
-  const lastTransaction = dates[dates.length - 1];
-  const nextDueDate = new Date(lastTransaction);
-  nextDueDate.setDate(nextDueDate.getDate() + Math.round(avgInterval));
+  return confidence;
+};
+
+/**
+ * Create bill suggestion object
+ */
+const createBillSuggestion = (options: {
+  groupKey: string;
+  avgAmount: number;
+  nextDueDate: Date;
+  detectedPattern: BillPattern | null;
+  frequency: string;
+  confidence: number;
+  transactions: Transaction[];
+  amounts: number[];
+  avgInterval: number;
+  lastTransaction: Date;
+}) => {
+  const {
+    groupKey,
+    avgAmount,
+    nextDueDate,
+    detectedPattern,
+    frequency,
+    confidence,
+    transactions,
+    amounts,
+    avgInterval,
+    lastTransaction,
+  } = options;
 
   return {
     id: `discovered_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -191,7 +241,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
     amount: Math.round(avgAmount * 100) / 100,
     dueDate: nextDueDate.toISOString().split("T")[0],
     category: detectedPattern?.category || "Bills & Utilities",
-    frequency: isMonthlyRecurring ? "monthly" : isWeeklyRecurring ? "weekly" : "biweekly",
+    frequency,
     confidence,
     source: "auto_discovery",
     discoveryData: {
@@ -213,6 +263,56 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
       discoveryMethod: "transaction_analysis",
     },
   };
+};
+
+/**
+ * Analyze a group of similar transactions to determine bill characteristics
+ */
+const analyzeTransactionGroup = (transactions, groupKey) => {
+  if (transactions.length < 2) return null;
+
+  // Calculate transaction frequency
+  const dates = transactions.map((t) => new Date(t.date)).sort((a, b) => a.getTime() - b.getTime());
+  const intervals = calculateTransactionIntervals(dates);
+  const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+
+  // Determine if it's truly recurring
+  const { frequency, isRecurring } = determineFrequencyType(avgInterval);
+  if (!isRecurring) return null;
+
+  // Calculate average amount
+  const amounts = transactions.map((t) => Math.abs(t.amount));
+  const avgAmount = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
+  const amountVariation = Math.max(...amounts) - Math.min(...amounts);
+
+  // Pattern matching for bill type
+  const detectedPattern = detectBillPattern(groupKey);
+
+  // Calculate confidence score
+  const confidence = calculateConfidenceScore(
+    detectedPattern,
+    amountVariation,
+    avgAmount,
+    transactions.length
+  );
+
+  // Predict next due date
+  const lastTransaction = dates[dates.length - 1];
+  const nextDueDate = new Date(lastTransaction);
+  nextDueDate.setDate(nextDueDate.getDate() + Math.round(avgInterval));
+
+  return createBillSuggestion({
+    groupKey,
+    avgAmount,
+    nextDueDate,
+    detectedPattern,
+    frequency,
+    confidence,
+    transactions,
+    amounts,
+    avgInterval,
+    lastTransaction,
+  });
 };
 
 /**

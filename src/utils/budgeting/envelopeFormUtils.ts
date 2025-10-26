@@ -40,18 +40,12 @@ export const createDefaultEnvelopeForm = () => ({
  * @param {string} editingEnvelopeId - ID of envelope being edited (for name uniqueness)
  * @returns {Object} Validation result with errors object
  */
-export const validateEnvelopeForm = (
-  formData,
-  existingEnvelopes = [],
-  editingEnvelopeId = null
-) => {
+/**
+ * Convert Zod errors to error object format
+ */
+const convertZodErrors = (zodResult) => {
   const errors = {};
-
-  // Use Zod schema for base validation
-  const zodResult = validateEnvelopeSafe(formData);
-
   if (!zodResult.success) {
-    // Convert Zod errors to error object format
     zodResult.error.errors.forEach((err) => {
       const fieldName = err.path[0];
       if (fieldName) {
@@ -59,10 +53,13 @@ export const validateEnvelopeForm = (
       }
     });
   }
+  return errors;
+};
 
-  // Additional form-specific validations beyond Zod schema
-
-  // Check for duplicate names (excluding current envelope if editing)
+/**
+ * Check for duplicate envelope names
+ */
+const validateUniqueName = (formData, existingEnvelopes, editingEnvelopeId, errors) => {
   if (!errors.name && formData.name) {
     const nameExists = existingEnvelopes.some(
       (envelope) =>
@@ -73,37 +70,53 @@ export const validateEnvelopeForm = (
       errors.name = "An envelope with this name already exists";
     }
   }
+};
 
-  // Amount validations based on envelope type
+/**
+ * Validate monthly amount field
+ */
+const validateMonthlyAmount = (formData, errors) => {
   const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
 
   if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
     errors.monthlyAmount = "Monthly amount is required for this envelope type";
+    return;
   }
 
-  if (
-    formData.monthlyAmount &&
-    (isNaN(formData.monthlyAmount) || parseFloat(formData.monthlyAmount) < 0)
-  ) {
+  if (!formData.monthlyAmount) return;
+
+  const amount = parseFloat(formData.monthlyAmount);
+  if (isNaN(amount) || amount < 0) {
     errors.monthlyAmount = "Monthly amount must be a positive number";
-  }
-
-  if (formData.monthlyAmount && parseFloat(formData.monthlyAmount) > 100000) {
+  } else if (amount > 100000) {
     errors.monthlyAmount = "Monthly amount cannot exceed $100,000";
   }
+};
 
-  // Target amount validation for sinking funds
-  if (formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND) {
-    if (!formData.targetAmount) {
-      errors.targetAmount = "Target amount is required for sinking funds";
-    } else if (isNaN(formData.targetAmount) || parseFloat(formData.targetAmount) <= 0) {
-      errors.targetAmount = "Target amount must be a positive number";
-    } else if (parseFloat(formData.targetAmount) > 1000000) {
-      errors.targetAmount = "Target amount cannot exceed $1,000,000";
-    }
+/**
+ * Validate target amount for sinking funds
+ */
+const validateTargetAmount = (formData, errors) => {
+  if (formData.envelopeType !== ENVELOPE_TYPES.SINKING_FUND) return;
+
+  if (!formData.targetAmount) {
+    errors.targetAmount = "Target amount is required for sinking funds";
+    return;
   }
 
-  // Category validation (beyond Zod)
+  const amount = parseFloat(formData.targetAmount);
+  if (isNaN(amount) || amount <= 0) {
+    errors.targetAmount = "Target amount must be a positive number";
+  } else if (amount > 1000000) {
+    errors.targetAmount = "Target amount cannot exceed $1,000,000";
+  }
+};
+
+/**
+ * Validate category, priority, and frequency fields
+ */
+const validateAdditionalFields = (formData, errors) => {
+  // Category validation
   if (!errors.category && formData.category) {
     const availableCategories = getEnvelopeCategories();
     if (!availableCategories.includes(formData.category)) {
@@ -111,18 +124,41 @@ export const validateEnvelopeForm = (
     }
   }
 
-  // Priority validation (beyond Zod)
+  // Priority validation
   if (formData.priority && !["low", "medium", "high", "critical"].includes(formData.priority)) {
     errors.priority = "Invalid priority selected";
   }
 
-  // Frequency validation (beyond Zod)
+  // Frequency validation
   if (formData.frequency) {
     const frequencyOptions = getFrequencyOptions();
     if (!frequencyOptions.find((opt) => opt.value === formData.frequency)) {
       errors.frequency = "Invalid frequency selected";
     }
   }
+};
+
+/**
+ * Validates envelope form data using Zod schema + form-specific logic
+ * @param {Object} formData - Form data to validate
+ * @param {Array} existingEnvelopes - Existing envelopes for name uniqueness
+ * @param {string} editingEnvelopeId - ID of envelope being edited (for name uniqueness)
+ * @returns {Object} Validation result with errors object
+ */
+export const validateEnvelopeForm = (
+  formData,
+  existingEnvelopes = [],
+  editingEnvelopeId = null
+) => {
+  // Use Zod schema for base validation
+  const zodResult = validateEnvelopeSafe(formData);
+  const errors = convertZodErrors(zodResult);
+
+  // Additional form-specific validations beyond Zod schema
+  validateUniqueName(formData, existingEnvelopes, editingEnvelopeId, errors);
+  validateMonthlyAmount(formData, errors);
+  validateTargetAmount(formData, errors);
+  validateAdditionalFields(formData, errors);
 
   return {
     isValid: Object.keys(errors).length === 0,
@@ -225,6 +261,20 @@ export const transformFormToEnvelope = (formData, options = {}) => {
 };
 
 /**
+ * Get field with default value
+ */
+const getFieldOrDefault = (value: unknown, defaultValue: string | boolean): string | boolean => {
+  return value ?? defaultValue;
+};
+
+/**
+ * Convert number to string or return empty string
+ */
+const toStringOrEmpty = (value: number | undefined | null): string => {
+  return value?.toString() || "";
+};
+
+/**
  * Transforms envelope object to form data
  * @param {Object} envelope - Envelope object
  * @returns {Object} Form data
@@ -233,20 +283,20 @@ export const transformEnvelopeToForm = (envelope) => {
   if (!envelope) return createDefaultEnvelopeForm();
 
   return {
-    name: envelope.name || "",
-    monthlyAmount: envelope.monthlyAmount?.toString() || "",
-    currentBalance: envelope.currentBalance?.toString() || "",
-    category: envelope.category || "",
-    color: envelope.color || "#a855f7",
-    frequency: envelope.frequency || "monthly",
-    description: envelope.description || "",
-    priority: envelope.priority || "medium",
+    name: getFieldOrDefault(envelope.name, ""),
+    monthlyAmount: toStringOrEmpty(envelope.monthlyAmount),
+    currentBalance: toStringOrEmpty(envelope.currentBalance),
+    category: getFieldOrDefault(envelope.category, ""),
+    color: getFieldOrDefault(envelope.color, "#a855f7"),
+    frequency: getFieldOrDefault(envelope.frequency, "monthly"),
+    description: getFieldOrDefault(envelope.description, ""),
+    priority: getFieldOrDefault(envelope.priority, "medium"),
     autoAllocate: envelope.autoAllocate !== false, // Default to true
-    icon: envelope.icon || "Target",
-    envelopeType: envelope.envelopeType || ENVELOPE_TYPES.VARIABLE,
-    monthlyBudget: envelope.monthlyBudget?.toString() || "",
-    biweeklyAllocation: envelope.biweeklyAllocation?.toString() || "",
-    targetAmount: envelope.targetAmount?.toString() || "",
+    icon: getFieldOrDefault(envelope.icon, "Target"),
+    envelopeType: getFieldOrDefault(envelope.envelopeType, ENVELOPE_TYPES.VARIABLE),
+    monthlyBudget: toStringOrEmpty(envelope.monthlyBudget),
+    biweeklyAllocation: toStringOrEmpty(envelope.biweeklyAllocation),
+    targetAmount: toStringOrEmpty(envelope.targetAmount),
   };
 };
 
