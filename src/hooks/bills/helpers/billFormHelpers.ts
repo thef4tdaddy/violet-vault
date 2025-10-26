@@ -12,41 +12,65 @@ import {
 import logger from "../../../utils/common/logger";
 
 /**
+ * Get the name for a bill from available fields
+ */
+const getBillName = (bill: Bill): string => {
+  return bill.name || bill.provider || "";
+};
+
+/**
+ * Resolve icon name for a bill
+ */
+const resolveIconName = (bill: Bill): string => {
+  if (bill.iconName) {
+    return bill.iconName;
+  }
+  
+  const billName = getBillName(bill);
+  const notes = bill.notes || "";
+  const category = bill.category || "";
+  const icon = bill.icon || getBillIcon(billName, notes, category);
+  
+  return getIconNameForStorage(icon);
+};
+
+/**
+ * Get default form data structure
+ */
+const getDefaultFormData = (): BillFormData => ({
+  name: "",
+  amount: "",
+  frequency: "monthly",
+  dueDate: "",
+  category: "Bills",
+  color: "#3B82F6",
+  notes: "",
+  createEnvelope: false,
+  selectedEnvelope: "",
+  customFrequency: "",
+  iconName: "FileText",
+});
+
+/**
  * Get initial form data for a bill
  */
 export const getInitialFormData = (bill: Bill | null = null): BillFormData => {
-  if (bill) {
-    return {
-      name: bill.name || bill.provider || "",
-      amount: bill.amount?.toString() || "",
-      frequency: bill.frequency || "monthly",
-      dueDate: bill.dueDate || "",
-      category: bill.category || "Bills",
-      color: bill.color || "#3B82F6",
-      notes: bill.notes || "",
-      createEnvelope: false,
-      selectedEnvelope: bill.envelopeId || "",
-      customFrequency: bill.customFrequency?.toString() || "",
-      iconName:
-        bill.iconName ||
-        getIconNameForStorage(
-          bill.icon ||
-            getBillIcon(bill.name || bill.provider || "", bill.notes || "", bill.category || "")
-        ),
-    };
+  if (!bill) {
+    return getDefaultFormData();
   }
+
   return {
-    name: "",
-    amount: "",
-    frequency: "monthly",
-    dueDate: "",
-    category: "Bills",
-    color: "#3B82F6",
-    notes: "",
+    name: getBillName(bill),
+    amount: bill.amount?.toString() || "",
+    frequency: bill.frequency || "monthly",
+    dueDate: bill.dueDate || "",
+    category: bill.category || "Bills",
+    color: bill.color || "#3B82F6",
+    notes: bill.notes || "",
     createEnvelope: false,
-    selectedEnvelope: "",
-    customFrequency: "",
-    iconName: "FileText",
+    selectedEnvelope: bill.envelopeId || "",
+    customFrequency: bill.customFrequency?.toString() || "",
+    iconName: resolveIconName(bill),
   };
 };
 export const calculateMonthlyAmountHelper = (
