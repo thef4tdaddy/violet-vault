@@ -284,6 +284,7 @@ export default [
     // Time calculations are fundamental to their purpose and cannot be made pure
     files: [
       'src/hooks/bills/useBillDetail.ts', // Calculates days until due - requires current time
+      'src/components/transactions/TransactionForm.tsx', // Lock expiration calculation in useMemo
     ],
     rules: {
       'react-hooks/purity': 'off', // Time-dependent calculations must call Date.now()

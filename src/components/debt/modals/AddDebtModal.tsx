@@ -35,7 +35,6 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   });
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLockData({
       userName: editLock.lockedBy,
       expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
