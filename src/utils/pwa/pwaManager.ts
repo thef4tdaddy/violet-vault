@@ -8,7 +8,7 @@ import { checkForVersionUpdate } from "../common/version";
 
 class PWAManager {
   registration: ServiceWorkerRegistration | null;
-  uiStore: any;
+  uiStore: { setUpdateAvailable: (available: boolean) => void } | null;
   isInitialized: boolean;
 
   constructor() {
@@ -272,7 +272,7 @@ const pwaManager = new PWAManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as any).pwaManager = pwaManager;
+  (window as Record<string, unknown>).pwaManager = pwaManager;
 }
 
 export default pwaManager;

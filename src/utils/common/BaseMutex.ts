@@ -10,7 +10,7 @@ import logger from "./logger";
 export class BaseMutex {
   name: string;
   locked: boolean;
-  queue: any[];
+  queue: Array<{ resolve: () => void; operationName: string }>;
   currentOperation: string | null;
   lockStartTime: number | null;
 

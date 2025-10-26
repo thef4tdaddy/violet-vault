@@ -31,8 +31,13 @@ export const ARCHIVE_CONFIG = {
  * Main archiving class that handles the complete archiving workflow
  */
 export class TransactionArchiver {
-  config: any;
-  stats: any;
+  config: typeof ARCHIVE_CONFIG;
+  stats: {
+    processed: number;
+    archived: number;
+    aggregated: number;
+    errors: number;
+  };
 
   constructor(config = ARCHIVE_CONFIG) {
     this.config = { ...ARCHIVE_CONFIG, ...config };

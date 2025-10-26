@@ -4,6 +4,12 @@
  * Extracted from useTransactions.js for Issue #508
  */
 import logger from "../common/logger.ts";
+import type { Transaction } from "../../types/finance";
+
+interface DateRange {
+  start?: string;
+  end?: string;
+}
 
 /**
  * Filter transactions by date range
@@ -11,7 +17,7 @@ import logger from "../common/logger.ts";
  * @param {Object} dateRange - Date range object with start and end dates
  * @returns {Array} Filtered transactions
  */
-export const filterByDateRange = (transactions: any[] = [], dateRange?: any) => {
+export const filterByDateRange = (transactions: Transaction[] = [], dateRange?: DateRange) => {
   if (!dateRange || (!dateRange.start && !dateRange.end)) {
     return transactions;
   }
@@ -42,7 +48,7 @@ export const filterByDateRange = (transactions: any[] = [], dateRange?: any) => 
  * @param {string} envelopeId - Envelope ID to filter by
  * @returns {Array} Filtered transactions
  */
-export const filterByEnvelope = (transactions: any[] = [], envelopeId?: any) => {
+export const filterByEnvelope = (transactions: Transaction[] = [], envelopeId?: string | number) => {
   if (!envelopeId) return transactions;
 
   try {
@@ -59,7 +65,7 @@ export const filterByEnvelope = (transactions: any[] = [], envelopeId?: any) => 
  * @param {string} category - Category to filter by
  * @returns {Array} Filtered transactions
  */
-export const filterByCategory = (transactions: any[] = [], category?: any) => {
+export const filterByCategory = (transactions: Transaction[] = [], category?: string) => {
   if (!category) return transactions;
 
   try {
@@ -78,7 +84,7 @@ export const filterByCategory = (transactions: any[] = [], category?: any) => {
  * @param {string} type - Transaction type to filter by
  * @returns {Array} Filtered transactions
  */
-export const filterByType = (transactions: any[] = [], type?: any) => {
+export const filterByType = (transactions: Transaction[] = [], type?: string) => {
   if (!type) return transactions;
 
   try {
@@ -106,7 +112,7 @@ export const filterByType = (transactions: any[] = [], type?: any) => {
  * @param {string} searchQuery - Search query string
  * @returns {Array} Filtered transactions
  */
-export const filterBySearch = (transactions: any[] = [], searchQuery?: any) => {
+export const filterBySearch = (transactions: Transaction[] = [], searchQuery?: string) => {
   if (!searchQuery || !searchQuery.trim()) return transactions;
 
   try {
@@ -134,7 +140,7 @@ export const filterBySearch = (transactions: any[] = [], searchQuery?: any) => {
 /**
  * Get sortable value from transaction based on field
  */
-const getSortValue = (transaction: any, sortBy: any) => {
+const getSortValue = (transaction: Transaction, sortBy: string): string | number | Date => {
   switch (sortBy) {
     case "date":
       return new Date(transaction.date);
@@ -154,7 +160,7 @@ const getSortValue = (transaction: any, sortBy: any) => {
 /**
  * Compare two values for sorting
  */
-const compareValues = (aValue: any, bValue: any, sortOrder: any) => {
+const compareValues = (aValue: string | number | Date, bValue: string | number | Date, sortOrder: string) => {
   if (aValue < bValue) {
     return sortOrder === "asc" ? -1 : 1;
   }
@@ -171,7 +177,7 @@ const compareValues = (aValue: any, bValue: any, sortOrder: any) => {
  * @param {string} sortOrder - Sort order (asc or desc)
  * @returns {Array} Sorted transactions
  */
-export const sortTransactions = (transactions: any[] = [], sortBy: any = "date", sortOrder: any = "desc") => {
+export const sortTransactions = (transactions: Transaction[] = [], sortBy: string = "date", sortOrder: string = "desc") => {
   try {
     return [...transactions].sort((a, b) => {
       const aValue = getSortValue(a, sortBy);
@@ -201,7 +207,7 @@ interface ProcessTransactionsOptions {
  * @param {ProcessTransactionsOptions} options - Filter and sort options
  * @returns {Array} Processed transactions
  */
-export const processTransactions = (transactions: any[] = [], options: ProcessTransactionsOptions = {}) => {
+export const processTransactions = (transactions: Transaction[] = [], options: ProcessTransactionsOptions = {}) => {
   try {
     const {
       dateRange,
@@ -258,7 +264,7 @@ export const processTransactions = (transactions: any[] = [], options: ProcessTr
  * @param {string} groupBy - Grouping period (day, week, month, year)
  * @returns {Object} Grouped transactions
  */
-export const groupTransactionsByDate = (transactions: any[] = [], groupBy: any = "month") => {
+export const groupTransactionsByDate = (transactions: Transaction[] = [], groupBy: string = "month") => {
   try {
     const groups = {};
 
@@ -305,7 +311,7 @@ export const groupTransactionsByDate = (transactions: any[] = [], groupBy: any =
  * @param {Array} transactions - Transactions to group
  * @returns {Object} Grouped transactions by category
  */
-export const groupTransactionsByCategory = (transactions: any[] = []) => {
+export const groupTransactionsByCategory = (transactions: Transaction[] = []) => {
   try {
     const groups = {};
 
@@ -331,7 +337,7 @@ export const groupTransactionsByCategory = (transactions: any[] = []) => {
  * @param {Array} transactions - Transactions to analyze
  * @returns {Object} Transaction statistics
  */
-export const calculateTransactionStats = (transactions: any[] = []) => {
+export const calculateTransactionStats = (transactions: Transaction[] = []) => {
   try {
     const stats = {
       total: transactions.length,

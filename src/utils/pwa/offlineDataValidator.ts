@@ -6,6 +6,25 @@ import logger from "../common/logger";
  * Ensures critical budget data is available offline via Dexie
  */
 
+interface TableDataInfo {
+  count: number;
+  available: boolean;
+}
+
+interface ValidationResults {
+  isReady: boolean;
+  hasData: boolean;
+  criticalDataAvailable: Record<string, TableDataInfo>;
+  recommendations: Array<{
+    type: string;
+    message: string;
+    action: string;
+  }>;
+  lastValidated: string;
+  totalRecords: number;
+  error?: string;
+}
+
 class OfflineDataValidator {
   criticalTables: string[];
 
@@ -23,8 +42,8 @@ class OfflineDataValidator {
   /**
    * Validate that all critical data is available offline
    */
-  async validateOfflineReadiness() {
-    const results = {
+  async validateOfflineReadiness(): Promise<ValidationResults> {
+    const results: ValidationResults = {
       isReady: false,
       hasData: false,
       criticalDataAvailable: {},
@@ -48,8 +67,8 @@ class OfflineDataValidator {
       results.hasData = results.totalRecords > 0;
 
       // Specific validations
-      const envelopeCount = (results.criticalDataAvailable as any).envelopes?.count || 0;
-      const transactionCount = (results.criticalDataAvailable as any).transactions?.count || 0;
+      const envelopeCount = results.criticalDataAvailable.envelopes?.count || 0;
+      const transactionCount = results.criticalDataAvailable.transactions?.count || 0;
 
       // Generate recommendations
       if (envelopeCount === 0) {
@@ -89,7 +108,7 @@ class OfflineDataValidator {
       return results;
     } catch (error) {
       logger.error("❌ Offline data validation failed", error);
-      (results as any).error = (error as Error).message;
+      results.error = (error as Error).message;
       return results;
     }
   }
@@ -130,7 +149,7 @@ class OfflineDataValidator {
         description: tx.description,
         amount: tx.amount,
         date: tx.date,
-        envelope: (tx as any).envelope,
+        envelope: (tx as Record<string, unknown>).envelope,
       }));
     } catch (error) {
       logger.warn("Failed to get recent transactions preview:", error);
@@ -147,8 +166,8 @@ class OfflineDataValidator {
 
       return {
         totalEnvelopes: envelopes.length,
-        totalAllocated: envelopes.reduce((sum, env) => sum + ((env as any).allocated || 0), 0),
-        totalSpent: envelopes.reduce((sum, env) => sum + ((env as any).spent || 0), 0),
+        totalAllocated: envelopes.reduce((sum, env) => sum + ((env as Record<string, unknown>).allocated as number || 0), 0),
+        totalSpent: envelopes.reduce((sum, env) => sum + ((env as Record<string, unknown>).spent as number || 0), 0),
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
     } catch (error) {
@@ -166,7 +185,13 @@ class OfflineDataValidator {
    * Test offline data access performance
    */
   async testOfflinePerformance() {
-    const results = {
+    const results: {
+      envelopeLoadTime: number;
+      transactionLoadTime: number;
+      totalTime: number;
+      success: boolean;
+      error?: string;
+    } = {
       envelopeLoadTime: 0,
       transactionLoadTime: 0,
       totalTime: 0,
@@ -194,7 +219,7 @@ class OfflineDataValidator {
       });
     } catch (error) {
       logger.error("❌ Offline performance test failed", error);
-      (results as any).error = (error as Error).message;
+      results.error = (error as Error).message;
     }
 
     return results;
@@ -237,7 +262,14 @@ class OfflineDataValidator {
    * Pre-cache critical data for offline use
    */
   async preCacheCriticalData() {
-    const results = {
+    const results: {
+      envelopesCached: boolean;
+      transactionsCached: boolean;
+      billsCached: boolean;
+      success: boolean;
+      cacheTime: number;
+      error?: string;
+    } = {
       envelopesCached: false,
       transactionsCached: false,
       billsCached: false,
@@ -269,7 +301,7 @@ class OfflineDataValidator {
       });
     } catch (error) {
       logger.error("❌ Failed to pre-cache critical data", error);
-      (results as any).error = (error as Error).message;
+      results.error = (error as Error).message;
     }
 
     return results;
@@ -281,7 +313,7 @@ const offlineDataValidator = new OfflineDataValidator();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as any).offlineDataValidator = offlineDataValidator;
+  (window as Record<string, unknown>).offlineDataValidator = offlineDataValidator;
 }
 
 export default offlineDataValidator;

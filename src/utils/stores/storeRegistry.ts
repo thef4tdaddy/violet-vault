@@ -4,7 +4,7 @@ import logger from "../common/logger.ts";
  * Global store registry for development and debugging
  */
 class StoreRegistry {
-  stores: Map<string, any>;
+  stores: Map<string, { store: unknown; metadata: Record<string, unknown> }>;
   initialized: boolean;
 
   constructor() {
@@ -33,10 +33,11 @@ class StoreRegistry {
 
     // Make available globally in development
     if (import.meta.env.DEV) {
-      if (!(window as any).__VIOLET_VAULT_STORES__) {
-        (window as any).__VIOLET_VAULT_STORES__ = {};
+      const globalWindow = window as Record<string, unknown>;
+      if (!globalWindow.__VIOLET_VAULT_STORES__) {
+        globalWindow.__VIOLET_VAULT_STORES__ = {};
       }
-      (window as any).__VIOLET_VAULT_STORES__[name] = store;
+      (globalWindow.__VIOLET_VAULT_STORES__ as Record<string, unknown>)[name] = store;
     }
   }
 

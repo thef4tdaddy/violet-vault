@@ -3,17 +3,19 @@
  * Provides mocks for Firebase, Dexie, and other external dependencies
  */
 import { vi } from "vitest";
+import type { Transaction, Envelope } from "../types/finance";
+import type { Bill } from "../types/bills";
 
 /**
  * Mock Dexie database for testing
  */
 export const createMockDexie = () => {
   const mockData = {
-    transactions: [] as any[],
-    bills: [] as any[],
-    envelopes: [] as any[],
-    accounts: [] as any[],
-    savingsGoals: [] as any[],
+    transactions: [] as Transaction[],
+    bills: [] as Bill[],
+    envelopes: [] as Envelope[],
+    accounts: [] as Record<string, unknown>[],
+    savingsGoals: [] as Record<string, unknown>[],
   };
 
   return {
@@ -24,11 +26,11 @@ export const createMockDexie = () => {
           toArray: vi.fn(async () => mockData.transactions),
         })),
       })),
-      add: vi.fn(async (item: any) => {
+      add: vi.fn(async (item: Transaction) => {
         mockData.transactions.push(item);
         return item.id;
       }),
-      put: vi.fn(async (item: any) => {
+      put: vi.fn(async (item: Transaction) => {
         const index = mockData.transactions.findIndex((t) => t.id === item.id);
         if (index >= 0) {
           mockData.transactions[index] = item;
@@ -37,7 +39,7 @@ export const createMockDexie = () => {
         }
         return item.id;
       }),
-      update: vi.fn(async (id: string, updates: any) => {
+      update: vi.fn(async (id: string, updates: Partial<Transaction>) => {
         const index = mockData.transactions.findIndex((t) => t.id === id);
         if (index >= 0) {
           mockData.transactions[index] = { ...mockData.transactions[index], ...updates };
@@ -57,11 +59,11 @@ export const createMockDexie = () => {
     },
     bills: {
       toArray: vi.fn(async () => mockData.bills),
-      add: vi.fn(async (item: any) => {
+      add: vi.fn(async (item: Bill) => {
         mockData.bills.push(item);
         return item.id;
       }),
-      put: vi.fn(async (item: any) => {
+      put: vi.fn(async (item: Bill) => {
         const index = mockData.bills.findIndex((b) => b.id === item.id);
         if (index >= 0) {
           mockData.bills[index] = item;
@@ -70,7 +72,7 @@ export const createMockDexie = () => {
         }
         return item.id;
       }),
-      update: vi.fn(async (id: string, updates: any) => {
+      update: vi.fn(async (id: string, updates: Partial<Bill>) => {
         const index = mockData.bills.findIndex((b) => b.id === id);
         if (index >= 0) {
           mockData.bills[index] = { ...mockData.bills[index], ...updates };
@@ -90,11 +92,11 @@ export const createMockDexie = () => {
     },
     envelopes: {
       toArray: vi.fn(async () => mockData.envelopes),
-      add: vi.fn(async (item: any) => {
+      add: vi.fn(async (item: Envelope) => {
         mockData.envelopes.push(item);
         return item.id;
       }),
-      put: vi.fn(async (item: any) => {
+      put: vi.fn(async (item: Envelope) => {
         const index = mockData.envelopes.findIndex((e) => e.id === item.id);
         if (index >= 0) {
           mockData.envelopes[index] = item;
@@ -103,7 +105,7 @@ export const createMockDexie = () => {
         }
         return item.id;
       }),
-      update: vi.fn(async (id: string, updates: any) => {
+      update: vi.fn(async (id: string, updates: Partial<Envelope>) => {
         const index = mockData.envelopes.findIndex((e) => e.id === id);
         if (index >= 0) {
           mockData.envelopes[index] = { ...mockData.envelopes[index], ...updates };
@@ -146,13 +148,13 @@ export const createMockDexie = () => {
  */
 export const createMockOptimisticHelpers = () => {
   return {
-    addTransaction: vi.fn(async (transaction: any) => transaction),
-    updateTransaction: vi.fn(async (id: string, updates: any) => ({ id, ...updates })),
+    addTransaction: vi.fn(async (transaction: Transaction) => transaction),
+    updateTransaction: vi.fn(async (id: string, updates: Partial<Transaction>) => ({ id, ...updates })),
     deleteTransaction: vi.fn(async (id: string) => id),
-    addBill: vi.fn(async (bill: any) => bill),
-    updateBill: vi.fn(async (id: string, updates: any) => ({ id, ...updates })),
+    addBill: vi.fn(async (bill: Bill) => bill),
+    updateBill: vi.fn(async (id: string, updates: Partial<Bill>) => ({ id, ...updates })),
     deleteBill: vi.fn(async (id: string) => id),
-    updateEnvelope: vi.fn(async (id: string, updates: any) => ({ id, ...updates })),
+    updateEnvelope: vi.fn(async (id: string, updates: Partial<Envelope>) => ({ id, ...updates })),
   };
 };
 
