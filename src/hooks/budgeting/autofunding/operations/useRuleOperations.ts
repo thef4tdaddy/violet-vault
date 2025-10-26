@@ -23,32 +23,35 @@ interface UseRuleOperationsProps {
  */
 export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) => {
   // Add new rule
-  const addRule = useCallback((ruleConfig: Partial<Rule>) => {
-    try {
-      const validation = validateRule(ruleConfig);
-      if (!validation.isValid) {
-        throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
+  const addRule = useCallback(
+    (ruleConfig: Partial<Rule>) => {
+      try {
+        const validation = validateRule(ruleConfig);
+        if (!validation.isValid) {
+          throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
+        }
+
+        const newRule: Rule = {
+          ...createDefaultRule(),
+          ...ruleConfig,
+        } as Rule;
+
+        setRules((prevRules) => [...prevRules, newRule]);
+
+        logger.info("Auto-funding rule added", {
+          ruleId: newRule.id,
+          name: newRule.name,
+          type: newRule.type,
+        });
+
+        return newRule;
+      } catch (error) {
+        logger.error("Failed to add auto-funding rule", error);
+        throw error;
       }
-
-      const newRule: Rule = {
-        ...createDefaultRule(),
-        ...ruleConfig,
-      } as Rule;
-
-      setRules((prevRules) => [...prevRules, newRule]);
-
-      logger.info("Auto-funding rule added", {
-        ruleId: newRule.id,
-        name: newRule.name,
-        type: newRule.type,
-      });
-
-      return newRule;
-    } catch (error) {
-      logger.error("Failed to add auto-funding rule", error);
-      throw error;
-    }
-  }, [setRules]);
+    },
+    [setRules]
+  );
 
   // Update existing rule
   const updateRule = useCallback(
@@ -91,24 +94,27 @@ export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) =
   );
 
   // Delete rule
-  const deleteRule = useCallback((ruleId: string) => {
-    try {
-      setRules((prevRules) => {
-        const ruleExists = prevRules.some((rule) => rule.id === ruleId);
-        if (!ruleExists) {
-          return prevRules;
-        }
+  const deleteRule = useCallback(
+    (ruleId: string) => {
+      try {
+        setRules((prevRules) => {
+          const ruleExists = prevRules.some((rule) => rule.id === ruleId);
+          if (!ruleExists) {
+            return prevRules;
+          }
 
-        return prevRules.filter((rule) => rule.id !== ruleId);
-      });
+          return prevRules.filter((rule) => rule.id !== ruleId);
+        });
 
-      logger.info("Auto-funding rule deleted", { ruleId });
-      return true;
-    } catch (error) {
-      logger.error("Failed to delete auto-funding rule", error);
-      throw error;
-    }
-  }, [setRules]);
+        logger.info("Auto-funding rule deleted", { ruleId });
+        return true;
+      } catch (error) {
+        logger.error("Failed to delete auto-funding rule", error);
+        throw error;
+      }
+    },
+    [setRules]
+  );
 
   // Duplicate rule
   const duplicateRule = useCallback(

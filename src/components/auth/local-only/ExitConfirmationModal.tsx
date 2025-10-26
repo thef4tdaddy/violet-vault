@@ -21,8 +21,8 @@ const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
       <div className="bg-white rounded-xl p-6 w-full max-w-md">
         <h4 className="text-lg font-semibold text-gray-900 mb-4">Switch to Standard Mode?</h4>
         <p className="text-sm text-gray-600 mb-6">
-          This will enable password protection and cloud sync features. Your local data will
-          be preserved and you can set up encryption.
+          This will enable password protection and cloud sync features. Your local data will be
+          preserved and you can set up encryption.
         </p>
         <div className="flex gap-3">
           <Button

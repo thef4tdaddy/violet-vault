@@ -5,7 +5,67 @@
 
 import logger from "../common/logger";
 
+interface SyncMetrics {
+  totalAttempts: number;
+  successfulSyncs: number;
+  failedSyncs: number;
+  averageSyncTime: number;
+  lastSyncTime: number | null;
+  errorRate: number;
+  consecutiveFailures: number;
+  sessionStartTime: number;
+}
+
+interface SyncAttempt {
+  id: string;
+  type: string;
+  startTime: number;
+  stage: string;
+  progress?: unknown;
+  lastUpdate?: number;
+}
+
+interface SyncError {
+  message: string;
+  name: string;
+  code?: string;
+}
+
+interface CompletedSync extends SyncAttempt {
+  endTime: number;
+  duration: number;
+  success: true;
+  metadata: unknown;
+}
+
+interface FailedSync extends SyncAttempt {
+  endTime: number;
+  duration: number;
+  success: false;
+  error: SyncError;
+  metadata: unknown;
+}
+
+interface HealthThresholds {
+  errorRate: number;
+  consecutiveFailures: number;
+  avgSyncTime: number;
+}
+
+interface HealthStatus {
+  status: "healthy" | "degraded" | "unhealthy" | "slow";
+  issues: string[];
+  metrics: SyncMetrics;
+  recentSyncs: (CompletedSync | FailedSync)[];
+}
+
 class SyncHealthMonitor {
+  metrics: SyncMetrics;
+  recentSyncs: (CompletedSync | FailedSync)[];
+  maxRecentSyncs: number;
+  healthThresholds: HealthThresholds;
+  currentSync: SyncAttempt | null;
+
   constructor() {
     this.metrics = {
       totalAttempts: 0,
@@ -26,14 +86,16 @@ class SyncHealthMonitor {
       consecutiveFailures: 3,
       avgSyncTime: 10000, // 10 seconds
     };
+
+    this.currentSync = null;
   }
 
   /**
    * Record start of sync operation
    */
-  recordSyncStart(syncType = "unknown") {
+  recordSyncStart(syncType: string = "unknown"): string {
     const syncId = `sync_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    const attempt = {
+    const attempt: SyncAttempt = {
       id: syncId,
       type: syncType,
       startTime: Date.now(),
@@ -55,7 +117,7 @@ class SyncHealthMonitor {
   /**
    * Update sync progress
    */
-  updateSyncProgress(syncId, stage, progress = null) {
+  updateSyncProgress(syncId: string, stage: string, progress: unknown = null): void {
     if (!this.currentSync || this.currentSync.id !== syncId) {
       return;
     }
@@ -74,7 +136,7 @@ class SyncHealthMonitor {
   /**
    * Record successful sync completion
    */
-  recordSyncSuccess(syncId, metadata = {}) {
+  recordSyncSuccess(syncId: string, metadata: unknown = {}): void {
     if (!this.currentSync || this.currentSync.id !== syncId) {
       return;
     }
@@ -82,7 +144,7 @@ class SyncHealthMonitor {
     const endTime = Date.now();
     const duration = endTime - this.currentSync.startTime;
 
-    const completedSync = {
+    const completedSync: CompletedSync = {
       ...this.currentSync,
       endTime,
       duration,
@@ -105,7 +167,7 @@ class SyncHealthMonitor {
   /**
    * Record sync failure
    */
-  recordSyncFailure(syncId, error, metadata = {}) {
+  recordSyncFailure(syncId: string, error: Error, metadata: unknown = {}): void {
     if (!this.currentSync || this.currentSync.id !== syncId) {
       // Handle orphaned failures
       this.metrics.failedSyncs++;
@@ -116,7 +178,7 @@ class SyncHealthMonitor {
     const endTime = Date.now();
     const duration = endTime - this.currentSync.startTime;
 
-    const failedSync = {
+    const failedSync: FailedSync = {
       ...this.currentSync,
       endTime,
       duration,
@@ -124,7 +186,7 @@ class SyncHealthMonitor {
       error: {
         message: error.message,
         name: error.name,
-        code: error.code,
+        code: (error as unknown as Record<string, unknown>).code as string | undefined,
       },
       metadata,
     };
@@ -146,7 +208,7 @@ class SyncHealthMonitor {
   /**
    * Add sync to recent history
    */
-  addToRecentSyncs(syncRecord) {
+  private addToRecentSyncs(syncRecord: CompletedSync | FailedSync): void {
     this.recentSyncs.unshift(syncRecord);
     if (this.recentSyncs.length > this.maxRecentSyncs) {
       this.recentSyncs = this.recentSyncs.slice(0, this.maxRecentSyncs);
@@ -156,7 +218,7 @@ class SyncHealthMonitor {
   /**
    * Update overall metrics
    */
-  updateMetrics(syncRecord) {
+  private updateMetrics(syncRecord: CompletedSync | FailedSync): void {
     if (syncRecord.success) {
       this.metrics.successfulSyncs++;
       this.metrics.consecutiveFailures = 0;
@@ -181,7 +243,7 @@ class SyncHealthMonitor {
   /**
    * Get current success rate
    */
-  getSuccessRate() {
+  private getSuccessRate(): number {
     const total = this.metrics.successfulSyncs + this.metrics.failedSyncs;
     return total > 0 ? this.metrics.successfulSyncs / total : 1;
   }
@@ -189,7 +251,7 @@ class SyncHealthMonitor {
   /**
    * Get current error rate
    */
-  getErrorRate() {
+  private getErrorRate(): number {
     const total = this.metrics.successfulSyncs + this.metrics.failedSyncs;
     return total > 0 ? this.metrics.failedSyncs / total : 0;
   }
@@ -197,13 +259,13 @@ class SyncHealthMonitor {
   /**
    * Get sync health status
    */
-  getHealthStatus() {
+  getHealthStatus(): HealthStatus {
     const errorRate = this.getErrorRate();
     const avgTime = this.metrics.averageSyncTime;
     const consecutiveFailures = this.metrics.consecutiveFailures;
 
-    let status = "healthy";
-    const issues = [];
+    let status: "healthy" | "degraded" | "unhealthy" | "slow" = "healthy";
+    const issues: string[] = [];
 
     if (errorRate > this.healthThresholds.errorRate) {
       status = "degraded";
@@ -231,9 +293,9 @@ class SyncHealthMonitor {
   /**
    * Get sync performance recommendations
    */
-  getRecommendations() {
+  getRecommendations(): string[] {
     const health = this.getHealthStatus();
-    const recommendations = [];
+    const recommendations: string[] = [];
 
     if (health.status === "unhealthy") {
       recommendations.push("Consider clearing local data and re-syncing");
@@ -254,7 +316,7 @@ class SyncHealthMonitor {
   /**
    * Reset metrics (for testing or fresh start)
    */
-  resetMetrics() {
+  resetMetrics(): void {
     this.metrics = {
       totalAttempts: 0,
       successfulSyncs: 0,
@@ -274,5 +336,3 @@ class SyncHealthMonitor {
 
 // Global instance
 export const syncHealthMonitor = new SyncHealthMonitor();
-
-export default syncHealthMonitor;

@@ -1,10 +1,24 @@
 import React from "react";
-import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
-import { useDebtDetailModal } from "../../../hooks/debts/useDebtDetailModal";
+import { useDebtDetailModal } from "@/hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
 import QuickPaymentForm from "../ui/QuickPaymentForm";
+import {
+  ModalHeader,
+  MainStats,
+  PayoffProjection,
+  RecentPayments,
+  ModalActions,
+} from "./DebtDetailModalComponents";
+
+interface DebtDetailModalProps {
+  debt?: Record<string, unknown>;
+  isOpen: boolean;
+  onClose: () => void;
+  onDelete: (debtId: string) => Promise<void>;
+  onRecordPayment: (debtId: string, amount: number) => Promise<void>;
+  onEdit: (debt: Record<string, unknown>) => void;
+}
 
 /**
  * Modal for viewing and managing individual debt details
@@ -16,9 +30,8 @@ const DebtDetailModal = ({
   onClose,
   onDelete,
   onRecordPayment,
-  _onLinkToBill,
   onEdit,
-}) => {
+}: DebtDetailModalProps) => {
   const {
     showPaymentForm,
     paymentAmount,
@@ -40,87 +53,10 @@ const DebtDetailModal = ({
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h3 className="text-xl font-semibold text-gray-900">{debt.name}</h3>
-            <p className="text-gray-600">
-              {debt.creditor} • {debt.type}
-            </p>
-          </div>
-          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </Button>
-        </div>
-
-        {/* Main Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-red-50 rounded-xl p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-red-600 font-medium">Current Balance</p>
-                <p className="text-2xl font-bold text-red-700">
-                  ${debt.currentBalance?.toFixed(2) || "0.00"}
-                </p>
-              </div>
-              {React.createElement(getIcon("TrendingDown"), {
-                className: "h-8 w-8 text-red-500",
-              })}
-            </div>
-          </div>
-
-          <div className="bg-orange-50 rounded-xl p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-orange-600 font-medium">Monthly Payment</p>
-                <p className="text-2xl font-bold text-orange-700">
-                  ${debt.minimumPayment?.toFixed(2) || "0.00"}
-                </p>
-              </div>
-              {React.createElement(getIcon("Calendar"), {
-                className: "h-8 w-8 text-orange-500",
-              })}
-            </div>
-          </div>
-
-          <div className="bg-purple-50 rounded-xl p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-purple-600 font-medium">Interest Rate</p>
-                <p className="text-2xl font-bold text-purple-700">
-                  {debt.interestRate?.toFixed(2) || "0.00"}%
-                </p>
-              </div>
-              {React.createElement(getIcon("DollarSign"), {
-                className: "h-8 w-8 text-purple-500",
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Progress */}
+        <ModalHeader debt={debt} onClose={onClose} />
+        <MainStats debt={debt} />
         <DebtProgressBar progressData={progressData} />
-
-        {/* Payoff Information */}
-        {payoffDisplay && (
-          <div className="bg-blue-50 rounded-xl p-4 mb-6">
-            <h4 className="font-medium text-blue-900 mb-3">Payoff Projection</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="text-blue-600">Expected Payoff</p>
-                <p className="font-semibold text-blue-900">{payoffDisplay.expectedPayoff}</p>
-              </div>
-              <div>
-                <p className="text-blue-600">Total Interest</p>
-                <p className="font-semibold text-blue-900">${payoffDisplay.totalInterest}</p>
-              </div>
-              <div>
-                <p className="text-blue-600">Payoff Date</p>
-                <p className="font-semibold text-blue-900">{payoffDisplay.payoffDate}</p>
-              </div>
-            </div>
-          </div>
-        )}
+        <PayoffProjection payoffDisplay={payoffDisplay} />
 
         {/* Universal Connection Manager for Debts */}
         <UniversalConnectionManager
@@ -130,29 +66,7 @@ const DebtDetailModal = ({
           theme="purple"
         />
 
-        {/* Payment History */}
-        {hasRecentPayments && (
-          <div className="mb-6">
-            <h4 className="font-medium text-gray-900 mb-3">Recent Payments</h4>
-            <div className="space-y-2 max-h-32 overflow-y-auto">
-              {recentPayments.map((payment) => (
-                <div
-                  key={payment.id}
-                  className="flex justify-between items-center bg-gray-50 rounded-lg p-2"
-                >
-                  <div>
-                    <p className="text-sm font-medium">${payment.formattedAmount}</p>
-                    <p className="text-xs text-gray-600">{payment.displayDate}</p>
-                  </div>
-                  <div className="text-right text-xs text-gray-600">
-                    {payment.principalDisplay && <p>Principal: ${payment.principalDisplay}</p>}
-                    {payment.interestDisplay && <p>Interest: ${payment.interestDisplay}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {hasRecentPayments && <RecentPayments recentPayments={recentPayments} />}
 
         {/* Quick Payment */}
         <QuickPaymentForm
@@ -165,33 +79,7 @@ const DebtDetailModal = ({
           isActiveDebt={isActiveDebt}
         />
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50"
-          >
-            Close
-          </Button>
-          <Button
-            onClick={handleEdit}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
-          >
-            {React.createElement(getIcon("Edit"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Edit Debt
-          </Button>
-          <Button
-            onClick={handleDelete}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center justify-center"
-          >
-            {React.createElement(getIcon("Trash2"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Delete
-          </Button>
-        </div>
+        <ModalActions onClose={onClose} onEdit={handleEdit} onDelete={handleDelete} />
       </div>
     </div>
   );

@@ -29,7 +29,6 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
   // Auto-scan when modal opens
   useEffect(() => {
     if (isOpen) {
-
       scanForCorruptedEnvelopes();
     }
   }, [isOpen, scanForCorruptedEnvelopes]);

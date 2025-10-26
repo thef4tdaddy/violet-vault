@@ -7,22 +7,39 @@ import {
   calculateGoalDistribution,
 } from "../../utils/savings/savingsFormUtils";
 
-const createEmptyDistribution = (goals) => {
-  const distribution = {};
+interface SavingsGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  priority: string;
+  color?: string;
+}
+
+interface DistributeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onDistribute: (distribution: Record<string, number>) => void;
+  savingsGoals?: SavingsGoal[];
+  unassignedCash?: number;
+}
+
+const createEmptyDistribution = (goals: SavingsGoal[]) => {
+  const distribution: Record<string, string> = {};
   goals.forEach((goal) => {
     distribution[goal.id] = "";
   });
   return distribution;
 };
 
-const calculateTotal = (distribution) => {
+const calculateTotal = (distribution: Record<string, string>) => {
   return Object.values(distribution).reduce((sum, amount) => {
     return sum + (parseFloat(amount) || 0);
   }, 0);
 };
 
-const filterValidDistribution = (distribution) => {
-  const valid = {};
+const filterValidDistribution = (distribution: Record<string, string>) => {
+  const valid: Record<string, number> = {};
   Object.entries(distribution).forEach(([goalId, amount]) => {
     const parsedAmount = parseFloat(amount);
     if (parsedAmount > 0) {
@@ -38,8 +55,8 @@ const DistributeModal = ({
   onDistribute,
   savingsGoals = [],
   unassignedCash = 0,
-}) => {
-  const [distribution, setDistribution] = useState({});
+}: DistributeModalProps) => {
+  const [distribution, setDistribution] = useState<Record<string, string>>({});
   const [totalToDistribute, setTotalToDistribute] = useState("");
 
   const initializeDistribution = useCallback(() => {
@@ -56,7 +73,13 @@ const DistributeModal = ({
   const handleAutoDistribute = () => {
     const amount = parseFloat(totalToDistribute);
     if (!amount || amount <= 0) return;
-    setDistribution(calculateGoalDistribution(savingsGoals, amount, "proportional"));
+    const numericDistribution = calculateGoalDistribution(savingsGoals, amount, "proportional");
+    // Convert numeric distribution to string format for the state
+    const stringDistribution: Record<string, string> = {};
+    Object.entries(numericDistribution).forEach(([key, value]) => {
+      stringDistribution[key] = value.toString();
+    });
+    setDistribution(stringDistribution);
   };
 
   const handleDistribute = () => {
@@ -80,7 +103,7 @@ const DistributeModal = ({
   const distributionTotal = calculateTotal(distribution);
   const isValidDistribution = distributionTotal > 0 && distributionTotal <= unassignedCash;
 
-  const updateGoalAmount = (goalId, value) => {
+  const updateGoalAmount = (goalId: string, value: string) => {
     setDistribution({ ...distribution, [goalId]: value });
   };
 
@@ -112,7 +135,7 @@ const DistributeModal = ({
   );
 };
 
-const ModalHeader = ({ onClose }) => (
+const ModalHeader = ({ onClose }: { onClose: () => void }) => (
   <div className="flex justify-between items-center mb-6">
     <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
     <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -121,7 +144,7 @@ const ModalHeader = ({ onClose }) => (
   </div>
 );
 
-const AvailableCash = ({ amount }) => (
+const AvailableCash = ({ amount }: { amount: number }) => (
   <div className="mb-6 p-4 bg-green-50 rounded-lg">
     <div className="flex items-center justify-between">
       <span className="font-medium text-green-800">Available Unassigned Cash:</span>
@@ -135,6 +158,11 @@ const DistributionControls = ({
   setTotalToDistribute,
   onAutoDistribute,
   unassignedCash,
+}: {
+  totalToDistribute: string;
+  setTotalToDistribute: (value: string) => void;
+  onAutoDistribute: () => void;
+  unassignedCash: number;
 }) => (
   <div className="space-y-4 mb-6">
     <div className="flex gap-3">
@@ -165,7 +193,17 @@ const DistributionControls = ({
   </div>
 );
 
-const GoalsList = ({ goals, distribution, updateGoalAmount, unassignedCash }) => (
+const GoalsList = ({
+  goals,
+  distribution,
+  updateGoalAmount,
+  unassignedCash,
+}: {
+  goals: SavingsGoal[];
+  distribution: Record<string, string>;
+  updateGoalAmount: (goalId: string, value: string) => void;
+  unassignedCash: number;
+}) => (
   <div className="space-y-4 mb-6">
     {goals.map((goal) => (
       <GoalDistributionItem
@@ -179,7 +217,17 @@ const GoalsList = ({ goals, distribution, updateGoalAmount, unassignedCash }) =>
   </div>
 );
 
-const GoalDistributionItem = ({ goal, amount, onAmountChange, unassignedCash }) => {
+const GoalDistributionItem = ({
+  goal,
+  amount,
+  onAmountChange,
+  unassignedCash,
+}: {
+  goal: SavingsGoal;
+  amount: string;
+  onAmountChange: (value: string) => void;
+  unassignedCash: number;
+}) => {
   const remaining = goal.targetAmount - goal.currentAmount;
   const priority = SAVINGS_PRIORITIES.find((p) => p.value === goal.priority);
 
@@ -215,7 +263,7 @@ const GoalDistributionItem = ({ goal, amount, onAmountChange, unassignedCash }) 
   );
 };
 
-const DistributionSummary = ({ total, unassignedCash }) => (
+const DistributionSummary = ({ total, unassignedCash }: { total: number; unassignedCash: number }) => (
   <div className="border-t pt-4 mb-6">
     <div className="flex justify-between items-center">
       <span className="font-medium">Total to Distribute:</span>
@@ -232,7 +280,7 @@ const DistributionSummary = ({ total, unassignedCash }) => (
   </div>
 );
 
-const ActionButtons = ({ onCancel, onDistribute, isValid }) => (
+const ActionButtons = ({ onCancel, onDistribute, isValid }: { onCancel: () => void; onDistribute: () => void; isValid: boolean }) => (
   <div className="flex justify-end space-x-3">
     <Button
       onClick={onCancel}

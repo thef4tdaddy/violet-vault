@@ -170,7 +170,12 @@ const storeInitializer = (set, _get) => ({
   // Start background sync service
   // Note: Auth data should be passed as a parameter from components using AuthContext
   // This method is kept for backward compatibility but should receive auth data externally
-  async startBackgroundSync(authData?: { isUnlocked: boolean; budgetId: string; encryptionKey: CryptoKey | Uint8Array; currentUser?: string }) {
+  async startBackgroundSync(authData?: {
+    isUnlocked: boolean;
+    budgetId: string;
+    encryptionKey: CryptoKey | Uint8Array;
+    currentUser?: string;
+  }) {
     try {
       // Safe external store access (prevents React error #185)
       const state = useUiStore.getState();

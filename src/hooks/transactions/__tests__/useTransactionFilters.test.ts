@@ -2,12 +2,12 @@ import { renderHook, act } from "@testing-library/react";
 import { useTransactionFilters } from "../useTransactionFilters";
 
 // Mock dependencies
-jest.mock("../../../utils/transactions/filterHelpers", () => ({
-  applyDateFilter: jest.fn(),
-  applyTypeFilter: jest.fn(),
-  applyEnvelopeFilter: jest.fn(),
-  applySearchFilter: jest.fn(),
-  applySorting: jest.fn(),
+vi.mock("../../../utils/transactions/filterHelpers", () => ({
+  applyDateFilter: vi.fn(),
+  applyTypeFilter: vi.fn(),
+  applyEnvelopeFilter: vi.fn(),
+  applySearchFilter: vi.fn(),
+  applySorting: vi.fn(),
 }));
 
 const {
@@ -56,7 +56,7 @@ describe("useTransactionFilters", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup default mock implementations
     applyDateFilter.mockImplementation((transactions) => transactions);

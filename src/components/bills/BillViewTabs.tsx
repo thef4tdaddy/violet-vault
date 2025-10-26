@@ -1,4 +1,3 @@
-import React from "react";
 import StandardTabs from "../ui/StandardTabs";
 import StandardFilters from "../ui/StandardFilters";
 

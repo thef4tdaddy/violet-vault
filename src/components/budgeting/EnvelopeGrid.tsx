@@ -2,16 +2,16 @@
 import { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import { useTransactions } from "../../hooks/common/useTransactions";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useTransactions } from "@/hooks/common/useTransactions";
 import useBills from "../../hooks/bills/useBills";
 import {
   calculateEnvelopeData,
   sortEnvelopes,
   filterEnvelopes,
   calculateEnvelopeTotals,
-} from "../../utils/budgeting";
-import { EnvelopeHeader } from "./envelope/EnvelopeHeader";
+} from "@/utils/budgeting";
+import { EnvelopeGridHeader } from "./envelope/EnvelopeGridHeader";
 import EnvelopeSummary from "./envelope/EnvelopeSummary";
 import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
@@ -223,15 +223,12 @@ const EnvelopeGridView = ({
 
     <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
 
-    {/* @ts-expect-error - EnvelopeHeader component signature mismatch, needs refactoring */}
-    <EnvelopeHeader
-      {...({
-        filterOptions,
-        setFilterOptions,
-        setShowCreateModal,
-        viewMode,
-        setViewMode,
-      } as Record<string, unknown>)}
+    <EnvelopeGridHeader
+      filterOptions={filterOptions}
+      setFilterOptions={setFilterOptions}
+      setShowCreateModal={setShowCreateModal}
+      viewMode={viewMode}
+      setViewMode={setViewMode}
     />
 
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

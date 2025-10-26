@@ -1,13 +1,35 @@
-import { create } from "zustand";
+import { create, StoreApi, StateCreator } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
-import { persist, devtools } from "zustand/middleware";
+import { persist, devtools, PersistOptions } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "../common/logger.ts";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
+interface StoreOptions {
+  persist?: boolean;
+  persistedKeys?: string[] | null;
+  immer?: boolean;
+  devtools?: boolean;
+  version?: number;
+}
+
+type StoreAction = (
+  set: (fn: (state: Record<string, unknown>) => Record<string, unknown> | void) => void,
+  getState: () => Record<string, unknown>,
+  store: Record<string, unknown>,
+  ...args: unknown[]
+) => unknown;
+
+interface CreateSafeStoreConfig<T> {
+  name: string;
+  initialState: T;
+  actions?: Record<string, StoreAction>;
+  options?: StoreOptions;
+}
+
 // Validation helpers
-const validateConfig = (name, initialState) => {
+const validateConfig = (name: string, initialState: Record<string, unknown>): void => {
   if (!name || typeof name !== "string") {
     throw new Error("Store name is required and must be a string");
   }
@@ -17,9 +39,15 @@ const validateConfig = (name, initialState) => {
 };
 
 // Action wrapper utility
-const wrapActions = (actions, name, set, useStore, store) => {
-  return Object.entries(actions).reduce((acc, [actionName, actionFn]) => {
-    acc[actionName] = (...args) => {
+const wrapActions = (
+  actions: Record<string, StoreAction>,
+  name: string,
+  set: (fn: (state: Record<string, unknown>) => Record<string, unknown> | void) => void,
+  useStore: StoreApi<Record<string, unknown>>,
+  store: Record<string, unknown>
+): Record<string, unknown> => {
+  return Object.entries(actions).reduce<Record<string, unknown>>((acc, [actionName, actionFn]) => {
+    acc[actionName] = (...args: unknown[]) => {
       try {
         const getCurrentState = () => useStore.getState();
         const result = actionFn(set, getCurrentState, store, ...args);
@@ -41,20 +69,35 @@ const wrapActions = (actions, name, set, useStore, store) => {
 };
 
 // Middleware stack builder
-const buildMiddlewareStack = (storeInitializer, options, name) => {
+interface MiddlewareOptions {
+  enablePersist: boolean;
+  persistedKeys: string[] | null;
+  enableImmer: boolean;
+  enableDevtools: boolean;
+  version: number;
+}
+
+const buildMiddlewareStack = (
+  storeInitializer: StateCreator<Record<string, unknown>>,
+  options: MiddlewareOptions,
+  name: string
+): StateCreator<Record<string, unknown>> => {
   const { enablePersist, persistedKeys, enableImmer, enableDevtools, version } = options;
-  let middlewareStack = storeInitializer;
+  let middlewareStack: StateCreator<Record<string, unknown>> = storeInitializer;
 
   if (enableImmer) {
     middlewareStack = immer(middlewareStack);
   }
 
   if (enablePersist && !LOCAL_ONLY_MODE) {
-    const persistConfig = { name: `violet-vault-${name}`, version };
+    const persistConfig: PersistOptions<Record<string, unknown>> = {
+      name: `violet-vault-${name}`,
+      version,
+    };
 
     if (persistedKeys && Array.isArray(persistedKeys)) {
-      persistConfig.partialize = (state) =>
-        persistedKeys.reduce((acc, key) => {
+      persistConfig.partialize = (state: Record<string, unknown>): Record<string, unknown> =>
+        persistedKeys.reduce<Record<string, unknown>>((acc, key: string) => {
           if (key in state) acc[key] = state[key];
           return acc;
         }, {});
@@ -73,7 +116,12 @@ const buildMiddlewareStack = (storeInitializer, options, name) => {
 /**
  * Creates a safe Zustand store with standard middleware and error handling
  */
-export const createSafeStore = ({ name, initialState, actions = {}, options = {} }) => {
+export const createSafeStore = <T extends object>({
+  name,
+  initialState,
+  actions = {},
+  options = {},
+}: CreateSafeStoreConfig<T>): StoreApi<T & Record<string, unknown>> => {
   const {
     persist: enablePersist = false,
     persistedKeys = null,
@@ -82,12 +130,12 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
     version = 1,
   } = options;
 
-  validateConfig(name, initialState);
+  validateConfig(name, initialState as Record<string, unknown>);
 
-  let useStore;
+  let useStore: StoreApi<T & Record<string, unknown>>;
 
-  const storeInitializer = (set, _get) => {
-    const store = {
+  const storeInitializer: StateCreator<T & Record<string, unknown>> = (set, _get) => {
+    const store: T & Record<string, unknown> = {
       ...initialState,
       reset: () => {
         logger.info(`Resetting store ${name}`);
@@ -106,7 +154,7 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
 
     // Add wrapped actions
     Object.assign(store, wrapActions(actions, name, set, useStore, store));
-    return store;
+    return store as T & Record<string, unknown>;
   };
 
   const middlewareStack = buildMiddlewareStack(
@@ -136,7 +184,7 @@ export const createSafeStore = ({ name, initialState, actions = {}, options = {}
 /**
  * Creates a persisted store with safe patterns
  */
-export const createPersistedStore = (config) => {
+export const createPersistedStore = <T extends object>(config: CreateSafeStoreConfig<T>) => {
   return createSafeStore({
     ...config,
     options: {
@@ -149,7 +197,7 @@ export const createPersistedStore = (config) => {
 /**
  * Creates an ephemeral (non-persisted) store
  */
-export const createEphemeralStore = (config) => {
+export const createEphemeralStore = <T extends object>(config: CreateSafeStoreConfig<T>) => {
   return createSafeStore({
     ...config,
     options: {

@@ -1,4 +1,3 @@
-import React from "react";
 import { getPerformanceMessage } from "../../../utils/performanceUtils";
 
 /**

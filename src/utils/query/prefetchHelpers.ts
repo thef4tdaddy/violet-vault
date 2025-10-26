@@ -1,8 +1,8 @@
 // Prefetch Helpers - Utilities for pre-loading data with Dexie fallback
-import { budgetDb } from "../../db/budgetDb";
-import budgetDatabaseService from "../../services/budgetDatabaseService";
+import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
 
 /**
  * Enhanced prefetch utilities with Dexie fallback for offline support.

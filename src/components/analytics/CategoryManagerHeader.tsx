@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 
 const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }) => {
   return (

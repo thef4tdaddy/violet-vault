@@ -22,7 +22,12 @@ export const useTransferFunds = () => {
 
   return useMutation({
     mutationKey: ["envelopes", "transfer"],
-    mutationFn: async ({ fromEnvelopeId, toEnvelopeId, amount, description }: TransferFundsData) => {
+    mutationFn: async ({
+      fromEnvelopeId,
+      toEnvelopeId,
+      amount,
+      description,
+    }: TransferFundsData) => {
       // Get current envelopes from Dexie for transfer calculation
       const fromEnvelope = await budgetDb.envelopes.get(fromEnvelopeId);
       const toEnvelope = await budgetDb.envelopes.get(toEnvelopeId);

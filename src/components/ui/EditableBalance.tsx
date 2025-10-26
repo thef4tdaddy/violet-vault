@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 
 const EditableBalance = ({
   value,

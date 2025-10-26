@@ -1,4 +1,3 @@
-import React from "react";
 import PerformanceOverviewTab from "./PerformanceOverviewTab";
 import PerformanceAlertsTab from "./PerformanceAlertsTab";
 import PerformanceRecommendationsTab from "./PerformanceRecommendationsTab";

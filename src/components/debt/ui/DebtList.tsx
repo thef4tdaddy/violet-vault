@@ -1,14 +1,28 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
-// import { useDebtCard } from "../../../hooks/debts/useDebtCard";
+import { getIcon } from "@/utils";
+// import { useDebtCard } from "@/hooks/debts/useDebtCard";
 import DebtCardProgressBar from "./DebtCardProgressBar";
+
+interface Debt {
+  id: string;
+  name: string;
+  creditor: string;
+  type: string;
+  [key: string]: unknown;
+}
+
+interface DebtListProps {
+  debts: Debt[];
+  onDebtClick: (debt: Debt) => void;
+  onRecordPayment: (debt: Debt, amount: number) => void;
+}
 
 /**
  * List of debts with summary information
  * Pure UI component for displaying debt cards
  */
-const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
+const DebtList = ({ debts, onDebtClick, onRecordPayment }: DebtListProps) => {
   return (
     <div className="divide-y divide-gray-100">
       {debts.map((debt) => (
@@ -23,7 +37,12 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
   );
 };
 
-const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
+interface DebtCardProps {
+  debt: Debt;
+  onClick: () => void;
+}
+
+const DebtCard = ({ debt, onClick }: DebtCardProps) => {
   const {
     config,
     IconComponent,

@@ -1,10 +1,47 @@
 import logger from "../../utils/common/logger";
 
 /**
+ * Security settings interface
+ */
+interface SecuritySettings {
+  autoLockEnabled: boolean;
+  autoLockTimeout: number;
+  clipboardClearTimeout: number;
+  securityLoggingEnabled: boolean;
+  lockOnPageHide: boolean;
+}
+
+/**
+ * Security event interface
+ */
+interface SecurityEvent {
+  id: string;
+  timestamp: string;
+  type: string;
+  description: string;
+  metadata: Record<string, unknown>;
+}
+
+/**
+ * Security statistics
+ */
+interface SecurityStats {
+  total: number;
+  today: number;
+  thisWeek: number;
+  byType: Record<string, number>;
+}
+
+/**
  * Security Service
  * Handles security event logging, serialization, and storage
  */
 class SecurityService {
+  private storageKeys: {
+    events: string;
+    settings: string;
+  };
+
   constructor() {
     this.storageKeys = {
       events: "violetVault_securityEvents",
@@ -15,7 +52,7 @@ class SecurityService {
   /**
    * Default security settings
    */
-  getDefaultSettings() {
+  getDefaultSettings(): SecuritySettings {
     return {
       autoLockEnabled: true,
       autoLockTimeout: 15, // minutes
@@ -28,7 +65,7 @@ class SecurityService {
   /**
    * Load security settings from localStorage
    */
-  loadSettings() {
+  loadSettings(): SecuritySettings {
     try {
       const saved = localStorage.getItem(this.storageKeys.settings);
       return saved ? JSON.parse(saved) : this.getDefaultSettings();
@@ -41,7 +78,7 @@ class SecurityService {
   /**
    * Save security settings to localStorage
    */
-  saveSettings(settings) {
+  saveSettings(settings: SecuritySettings): void {
     try {
       localStorage.setItem(this.storageKeys.settings, JSON.stringify(settings));
     } catch (error) {
@@ -52,7 +89,7 @@ class SecurityService {
   /**
    * Load security events from localStorage
    */
-  loadSecurityEvents() {
+  loadSecurityEvents(): SecurityEvent[] {
     try {
       const saved = localStorage.getItem(this.storageKeys.events);
       return saved ? JSON.parse(saved) : [];
@@ -65,7 +102,7 @@ class SecurityService {
   /**
    * Save security events to localStorage
    */
-  saveSecurityEvents(events) {
+  saveSecurityEvents(events: SecurityEvent[]): void {
     try {
       // Limit to last 100 events to prevent storage bloat
       const limitedEvents = events.slice(-100);
@@ -78,7 +115,7 @@ class SecurityService {
   /**
    * Safely serialize an object, avoiding circular references
    */
-  safeSerialize(obj, maxDepth = 3, currentDepth = 0) {
+  safeSerialize(obj: unknown, maxDepth = 3, currentDepth = 0): unknown {
     if (currentDepth >= maxDepth) return "[Max Depth Reached]";
 
     if (obj === null || obj === undefined) return obj;
@@ -92,7 +129,7 @@ class SecurityService {
     }
 
     if (typeof obj === "object") {
-      const safeObj = {};
+      const safeObj: Record<string, unknown> = {};
       let keyCount = 0;
 
       for (const [key, value] of Object.entries(obj)) {
@@ -115,7 +152,7 @@ class SecurityService {
   /**
    * Create a security event with safe serialization
    */
-  createSecurityEvent(event) {
+  createSecurityEvent(event: Partial<SecurityEvent> & { type: string; description: string }): SecurityEvent {
     try {
       // Safely extract only the primitive values from event to avoid circular references
       const safeEvent = {
@@ -124,7 +161,7 @@ class SecurityService {
       };
 
       // Create base metadata
-      const safeMetadata = {
+      const safeMetadata: Record<string, unknown> = {
         userAgent: navigator.userAgent,
         timestamp: Date.now(),
         url: window.location.href,
@@ -132,7 +169,7 @@ class SecurityService {
 
       // Safely add event metadata
       if (event.metadata && typeof event.metadata === "object") {
-        const serializedMetadata = this.safeSerialize(event.metadata);
+        const serializedMetadata = this.safeSerialize(event.metadata) as Record<string, unknown>;
         Object.assign(safeMetadata, serializedMetadata);
       }
 
@@ -164,7 +201,10 @@ class SecurityService {
   /**
    * Log a security event
    */
-  logSecurityEvent(event, settings) {
+  logSecurityEvent(
+    event: Partial<SecurityEvent> & { type: string; description: string },
+    settings: SecuritySettings | null
+  ): void {
     if (!settings?.securityLoggingEnabled) return;
 
     try {
@@ -185,7 +225,7 @@ class SecurityService {
   /**
    * Clear all security events
    */
-  clearSecurityEvents() {
+  clearSecurityEvents(): void {
     try {
       localStorage.removeItem(this.storageKeys.events);
       logger.debug("Security events cleared");
@@ -197,7 +237,7 @@ class SecurityService {
   /**
    * Get recent security events
    */
-  getRecentSecurityEvents(limit = 50) {
+  getRecentSecurityEvents(limit = 50): SecurityEvent[] {
     try {
       const events = this.loadSecurityEvents();
       return events.slice(-limit).reverse(); // Most recent first
@@ -210,7 +250,7 @@ class SecurityService {
   /**
    * Filter security events by type
    */
-  getSecurityEventsByType(type, limit = 50) {
+  getSecurityEventsByType(type: string, limit = 50): SecurityEvent[] {
     try {
       const events = this.loadSecurityEvents();
       return events
@@ -226,7 +266,7 @@ class SecurityService {
   /**
    * Get security statistics
    */
-  getSecurityStats() {
+  getSecurityStats(): SecurityStats {
     try {
       const events = this.loadSecurityEvents();
       const stats = {

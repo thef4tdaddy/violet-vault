@@ -1,21 +1,24 @@
-// src/components/layout/MainLayout.jsx
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
-import { useLayoutData } from "../../hooks/layout";
-import useDataManagement from "../../hooks/common/useDataManagement";
-import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
-import useNetworkStatus from "../../hooks/common/useNetworkStatus";
-import { useFirebaseSync } from "../../hooks/sync/useFirebaseSync";
-import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
-import useDataInitialization from "../../hooks/common/useDataInitialization";
+import { useState, useEffect, useRef, ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useLayoutData } from "@/hooks/layout";
+import useDataManagement from "@/hooks/common/useDataManagement";
+import usePasswordRotation from "@/hooks/auth/usePasswordRotation";
+import useNetworkStatus from "@/hooks/common/useNetworkStatus";
+import { useFirebaseSync } from "@/hooks/sync/useFirebaseSync";
+import usePaydayPrediction from "@/hooks/budgeting/usePaydayPrediction";
+import useDataInitialization from "@/hooks/common/useDataInitialization";
+import { useMainLayoutHandlers } from "@/hooks/layout/useMainLayoutHandlers";
+import { useSecurityWarning } from "@/hooks/layout/useSecurityWarning";
+import { useCorruptionDetection } from "@/hooks/layout/useCorruptionDetection";
+import { useMainContentModals } from "@/hooks/layout/useMainContentModals";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
-import { ToastContainer } from "../ui/Toast";
-import { useToastStore } from "../../stores/ui/toastStore";
-import logger from "../../utils/common/logger";
-import { getVersionInfo } from "../../utils/common/version";
+import { ToastContainer, type ToastItem } from "../ui/Toast";
+import { useToastStore } from "@/stores/ui/toastStore";
+import logger from "@/utils/common/logger";
+import { getVersionInfo } from "@/utils/common/version";
 import NavigationTabs from "./NavigationTabs";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
@@ -26,62 +29,71 @@ import SecuritySettings from "../settings/SecuritySettings";
 import SettingsDashboard from "../settings/SettingsDashboard";
 import OnboardingTutorial from "../onboarding/OnboardingTutorial";
 import OnboardingProgress from "../onboarding/OnboardingProgress";
-import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoComplete";
-import useOnboardingStore from "../../stores/ui/onboardingStore";
+import { useOnboardingAutoComplete } from "@/hooks/common/useOnboardingAutoComplete";
+import useOnboardingStore from "@/stores/ui/onboardingStore";
 import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
 import PasswordRotationModal from "../auth/PasswordRotationModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
-// import useBugReportV2 from "../../hooks/common/useBugReportV2"; // Not needed - FAB disabled
-import { pathToViewMap, viewToPathMap } from "./routeConfig";
+import { viewToPathMap } from "./routeConfig";
 import BottomNavigationBar from "../mobile/BottomNavigationBar";
 
-// Heavy components now lazy loaded in ViewRenderer
+// ============================================================================
+// Type Definitions
+// ============================================================================
 
-const MainLayout = ({ firebaseSync }) => {
-  // Removed noisy debug log - layout renders constantly
+interface FirebaseSyncService {
+  start: (config: unknown) => void;
+  forceSync: () => Promise<unknown>;
+  isRunning: boolean;
+}
 
-  // Bug report functionality for FAB - only initialize if FAB is enabled
-  // Currently FAB is not used, so don't initialize bug report hook
-  const openBugReport = null;
+interface MainLayoutProps {
+  firebaseSync: FirebaseSyncService;
+}
 
-  // Navigation hooks for post-login redirect
-  const location = useLocation();
+interface MainContentProps {
+  currentUser: unknown;
+  auth: unknown;
+  layoutData: unknown;
+  _onExport: () => void;
+  _onImport: (file: File) => Promise<void>;
+  onLogout: () => void;
+  onResetEncryption: () => void;
+  onChangePassword: (oldPassword: string, newPassword: string) => Promise<void>;
+  firebaseSync: FirebaseSyncService;
+  syncConflicts: unknown;
+  onResolveConflict: () => void;
+  setSyncConflicts: (conflicts: unknown) => void;
+  rotationDue: boolean;
+  isLocalOnlyMode: boolean;
+  securityManager: unknown;
+}
+
+// ============================================================================
+// Main Layout Component
+// ============================================================================
+
+const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
+  const lastLogKeyRef = useRef<string | null>(null);
+
+  // Navigation hooks
   const navigate = useNavigate();
 
-  // Consolidated authentication manager
+  // Auth state
   const auth = useAuthManager();
-  const {
-    isUnlocked,
-    user: currentUser,
-    securityContext,
-    login: _login,
-    logout: _logout,
-    changePassword: _changePassword,
-    updateProfile: _updateProfile,
-    shouldShowAuthGateway,
-    _legacy: {
-      isLocalOnlyMode,
-      _localOnlyUser,
-      handleSetup,
-      handleLogout,
-      handleChangePassword,
-      handleUpdateProfile,
-      _internal: { securityManager } = {},
-    } = {},
-  } = auth;
+  const { isUnlocked, user: currentUser, securityContext } = auth;
 
-  // Onboarding state - prevent security warning during tutorial
-  const _isOnboarded = useOnboardingStore((state) => state.isOnboarded);
+  // Extract handlers and security context
+  const { isLocalOnlyMode, handleLogout, handleSetup, handleChangePassword, securityManager } =
+    useMainLayoutHandlers(auth);
 
-  // Initialize data from Dexie to Zustand on app startup
-  useDataInitialization(); // Return values not currently used
-
-  // Use centralized layout data hook
+  // Data hooks
+  useDataInitialization();
   const layoutData = useLayoutData();
-
   const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
+  // Password rotation
   const {
     rotationDue,
     showRotationModal,
@@ -92,84 +104,69 @@ const MainLayout = ({ firebaseSync }) => {
     handleRotationPasswordChange,
   } = usePasswordRotation();
 
-  // Network status detection
+  // Network detection
   useNetworkStatus();
 
+  // Sync conflicts state
   const [syncConflicts, setSyncConflicts] = useState(null);
 
-  // Toast notifications from Zustand store - using shallow selector to prevent infinite loops
+  // Toast notifications
   const toasts = useToastStore((state) => state.toasts);
   const removeToast = useToastStore((state) => state.removeToast);
 
-  // Log auth state changes only (not on every render)
+  // Log auth changes
   useEffect(() => {
     logger.auth("Auth hook values", {
       isUnlocked,
       hasCurrentUser: !!currentUser,
-      hasBudgetId: !!securityContext.budgetId,
     });
-  }, [isUnlocked, currentUser, securityContext.budgetId]);
+  }, [isUnlocked, currentUser]);
 
-  // Conflict resolution function
-  const resolveConflict = () => {
-    setSyncConflicts(null);
-  };
-
-  // Handle local-only mode or standard authentication
-  const handleLocalOnlyReady = (localUser) => {
-    logger.debug("Local-only mode ready with user", { userId: localUser.id });
-    // Local-only mode doesn't need further setup, let MainLayout render
-  };
-
-  // Navigation effect - redirect to dashboard after successful authentication
+  // Redirect to dashboard after login
   useEffect(() => {
-    if (isUnlocked && currentUser && location.pathname === "/") {
-      logger.auth("User logged in but on landing page, redirecting to dashboard");
+    if (isUnlocked && currentUser) {
       navigate("/app/dashboard");
     }
-  }, [isUnlocked, currentUser, location.pathname, navigate]);
+  }, [isUnlocked, currentUser, navigate]);
 
-  // Use centralized auth gateway check
-  if (shouldShowAuthGateway()) {
-    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
+  // Handle auth gateway
+  const shouldShowGateway = (auth as unknown as Record<string, unknown>)?.shouldShowAuthGateway as
+    | (() => boolean)
+    | undefined;
+  if (shouldShowGateway?.() ?? !isAuthenticated(auth)) {
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={() => {}} />;
   }
 
-  // Log budget sync state only on significant changes to reduce console spam
-  const logKey = `${!!securityContext.encryptionKey}-${!!currentUser}-${!!securityContext.budgetId}`;
-  if (!MainLayout._lastLogKey || MainLayout._lastLogKey !== logKey) {
+  // Log sync state
+  const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
+  if (lastLogKeyRef.current !== logKey) {
     logger.budgetSync("BudgetProvider state changed", {
-      hasEncryptionKey: !!securityContext.encryptionKey,
+      hasEncryptionKey: !!securityContext?.encryptionKey,
       hasCurrentUser: !!currentUser,
-      hasBudgetId: !!securityContext.budgetId,
-      budgetId: securityContext.budgetId?.slice(0, 10) + "...",
+      hasBudgetId: !!securityContext?.budgetId,
     });
-    MainLayout._lastLogKey = logKey;
+    lastLogKeyRef.current = logKey;
   }
 
   return (
     <>
-      {/* Security Lock Screen - renders on top of everything when locked */}
       <LockScreen />
-
       <MainContent
         currentUser={currentUser}
         auth={auth}
         layoutData={layoutData}
-        onUserChange={handleLogout}
-        onExport={exportData}
-        onImport={importData}
+        _onExport={exportData}
+        _onImport={importData}
         onLogout={handleLogout}
         onChangePassword={handleChangePassword}
         onResetEncryption={resetEncryptionAndStartFresh}
         syncConflicts={syncConflicts}
-        onResolveConflict={resolveConflict}
+        onResolveConflict={() => setSyncConflicts(null)}
         setSyncConflicts={setSyncConflicts}
         firebaseSync={firebaseSync}
         rotationDue={rotationDue}
-        onUpdateProfile={handleUpdateProfile}
         isLocalOnlyMode={isLocalOnlyMode}
         securityManager={securityManager}
-        openBugReport={openBugReport}
       />
       <PasswordRotationModal
         isOpen={showRotationModal}
@@ -179,20 +176,21 @@ const MainLayout = ({ firebaseSync }) => {
         setConfirmPassword={setConfirmPassword}
         onSubmit={handleRotationPasswordChange}
       />
-
-      {/* Toast Container */}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      <ToastContainer toasts={toasts as ToastItem[]} removeToast={removeToast} />
     </>
   );
 };
+
+// ============================================================================
+// Main Content Component
+// ============================================================================
 
 const MainContent = ({
   currentUser,
   auth,
   layoutData,
-  onUserChange,
-  onExport,
-  onImport,
+  _onExport,
+  _onImport,
   onLogout,
   onResetEncryption,
   onChangePassword,
@@ -201,137 +199,97 @@ const MainContent = ({
   onResolveConflict,
   setSyncConflicts,
   rotationDue,
-  onUpdateProfile,
-  isLocalOnlyMode = false,
+  isLocalOnlyMode,
   securityManager,
-  _openBugReport,
-}) => {
-  const resetAllData = useBudgetStore((state) => state.resetAllData);
-  // Get current route for view determination
-  const location = useLocation();
+}: MainContentProps): ReactNode => {
+  const resetAllData = useBudgetStore(
+    (state: Record<string, unknown>) =>
+      (state as Record<string, unknown>).resetAllData as () => void
+  );
   const navigate = useNavigate();
 
-  // Onboarding state - prevent security warning during tutorial
-  const isOnboarded = useOnboardingStore((state) => state.isOnboarded);
+  // Onboarding state
+  const onboardingState = useOnboardingStore((state: Record<string, unknown>) => ({
+    isOnboarded: (state as Record<string, unknown>)?.isOnboarded,
+  }));
+  const isOnboarded =
+    typeof onboardingState?.isOnboarded === "boolean" ? onboardingState.isOnboarded : false;
 
-  // Extract data from shared hooks
-  const { securityContext } = auth;
-  const { budget, totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } = layoutData;
+  // Extract layout data
+  const budget = (layoutData as Record<string, unknown>)?.budget;
+  const totalBiweeklyNeed = (layoutData as Record<string, unknown>)?.totalBiweeklyNeed;
+  const paycheckHistory = (layoutData as Record<string, unknown>)?.paycheckHistory;
+  const securityContext = (auth as Record<string, unknown>)?.securityContext;
 
-  // Helper function to get current view from URL
-  const getCurrentViewFromPath = (pathname) => {
-    return pathToViewMap[pathname] || "dashboard";
-  };
-
-  // Not currently used but kept for future compatibility
-  const _activeView = getCurrentViewFromPath(location.pathname);
-
-  // Helper function for components that still need programmatic navigation
-  const setActiveView = (view) => {
+  // Navigation helper
+  const setActiveView = (view: string): void => {
     const path = viewToPathMap[view] || "/";
     navigate(path);
   };
-  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [settingsInitialSection, setSettingsInitialSection] = useState("general");
-  const [showCorruptionModal, setShowCorruptionModal] = useState(false);
-  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
-  // Functions to open settings to specific sections
-  const openSettings = (section = "general") => {
-    setSettingsInitialSection(section);
-    setShowSettingsModal(true);
-  };
+  // Modal state management
+  const modals = useMainContentModals();
 
-  const openGeneralSettings = () => openSettings("general");
-  const openDataSettings = () => openSettings("data");
+  // Security warning management - check localStorage for acknowledgment
+  const isUnlockedAuth = (auth as Record<string, unknown>)?.isUnlocked as boolean;
+  // eslint-disable-next-line no-restricted-syntax
+  const hasAcknowledgedSecurity = !!localStorage.getItem("localDataSecurityAcknowledged");
+  const { showSecurityWarning, setShowSecurityWarning } = useSecurityWarning({
+    isUnlocked: isUnlockedAuth,
+    currentUser,
+    isOnboarded,
+    hasAcknowledged: hasAcknowledgedSecurity,
+  });
 
-  // Show security warning for authenticated users who haven't acknowledged it
-  // But don't show during onboarding tutorial to avoid conflicts
-  useEffect(() => {
-    if (auth.isUnlocked && auth.user && isOnboarded) {
-      // eslint-disable-next-line no-restricted-syntax -- Pre-existing, checking security warning acknowledgment
-      const hasAcknowledged = localStorage.getItem("localDataSecurityAcknowledged");
-      if (!hasAcknowledged) {
-        // Small delay to let the UI settle after login
-        const timer = setTimeout(() => {
-          setShowSecurityWarning(true);
-        }, 1000);
-        return () => clearTimeout(timer);
+  // Corruption detection management
+  const { showCorruptionModal, setShowCorruptionModal } = useCorruptionDetection();
+
+  // Firebase sync - use config object, not 4 separate args
+  const userForSync = currentUser
+    ? {
+        uid: ((currentUser as Record<string, unknown>)?.uid as string) || "unknown",
+        email: ((currentUser as Record<string, unknown>)?.email as string) || undefined,
       }
-    }
-  }, [auth.isUnlocked, auth.user, isOnboarded]);
-
-  // Listen for corruption detection events
-  useEffect(() => {
-    const handleCorruptionDetected = (event) => {
-      logger.warn("🚨 Corruption modal triggered by sync service", event.detail);
-      setShowCorruptionModal(true);
-    };
-
-    window.addEventListener("syncCorruptionDetected", handleCorruptionDetected);
-
-    return () => {
-      window.removeEventListener("syncCorruptionDetected", handleCorruptionDetected);
-    };
-  }, []);
-
-  // Custom hooks for MainContent business logic
-  const { handleManualSync } = useFirebaseSync(
+    : null;
+  const { handleManualSync } = useFirebaseSync({
     firebaseSync,
-    securityContext.encryptionKey,
-    securityContext.budgetId,
-    currentUser
-  );
+    encryptionKey: (securityContext as Record<string, unknown>)?.encryptionKey as CryptoKey | null,
+    budgetId: (securityContext as Record<string, unknown>)?.budgetId as string | null,
+    currentUser: userForSync,
+  });
 
-  // Auto-complete onboarding steps based on user actions
+  // Auto-complete onboarding
   useOnboardingAutoComplete();
 
-  // Handle backup import through data management hook
-  const handleImport = async (event) => {
-    await onImport(event);
-  };
+  // UI state
+  const isOnline = useBudgetStore(
+    (state: Record<string, unknown>) => (state as Record<string, unknown>).isOnline as boolean
+  );
+  const isSyncing = useBudgetStore(
+    (state: Record<string, unknown>) => (state as Record<string, unknown>).isSyncing as boolean
+  );
 
-  // Handle change password - delegate to parent component
-  const handleChangePassword = onChangePassword;
-
-  // Get UI state from Zustand
-  const isOnline = useBudgetStore((state) => state.isOnline);
-  const isSyncing = useBudgetStore((state) => state.isSyncing);
-
-  // Payday prediction notifications using TanStack Query data
-  usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
+  // Payday prediction
+  usePaydayPrediction(paycheckHistory, !!currentUser);
 
   return (
-    <OnboardingTutorial setActiveView={setActiveView}>
+    <OnboardingTutorial>
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
         <div className="max-w-7xl mx-auto relative">
           <div className="relative z-50">
-            <Header
-              currentUser={currentUser}
-              onUserChange={onUserChange}
-              onUpdateProfile={onUpdateProfile}
-              isLocalOnlyMode={isLocalOnlyMode}
-              onShowSettings={openGeneralSettings}
-              onShowDataSettings={openDataSettings}
-            />
+            <Header />
           </div>
+
           {rotationDue && (
             <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
               Your password is over 90 days old. Please change it.
             </div>
           )}
 
-          {/* Navigation Tabs */}
           <NavigationTabs />
-
-          {/* Onboarding Progress */}
           <OnboardingProgress />
-
-          {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
           <SummaryCards />
 
-          {/* Main Content - Using extracted AppRoutes component */}
           <AppRoutes
             budget={budget}
             currentUser={currentUser}
@@ -346,13 +304,9 @@ const MainContent = ({
             onDismiss={() => setSyncConflicts(null)}
           />
 
-          {/* Bug Report Button */}
           <BugReportButton />
-
-          {/* Bottom Navigation Bar - Mobile Only */}
           <BottomNavigationBar />
 
-          {/* Version Footer */}
           <div className="mt-8 text-center">
             <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
               <p className="text-sm text-gray-600">
@@ -369,44 +323,36 @@ const MainContent = ({
           </div>
         </div>
 
-        {/* Security Settings Modal */}
         <SecuritySettings
-          isOpen={showSecuritySettings}
-          onClose={() => setShowSecuritySettings(false)}
+          isOpen={modals.security.isOpen}
+          onClose={() => modals.security.setOpen(false)}
         />
 
-        {/* Settings Dashboard Modal */}
-        {showSettingsModal && (
+        {modals.settings.isOpen && (
           <SettingsDashboard
-            isOpen={showSettingsModal}
-            onClose={() => setShowSettingsModal(false)}
-            initialSection={settingsInitialSection}
-            onExport={onExport}
-            onImport={handleImport}
+            isOpen={modals.settings.isOpen}
+            onClose={() => modals.settings.setOpen(false)}
+            initialSection={modals.settings.initialSection}
+            onExport={_onExport}
+            onImport={_onImport}
             onLogout={onLogout}
             onResetEncryption={() => {
-              // Reset the budget context data first
               resetAllData();
-              // Then call the original reset function (clears localStorage and calls logout)
               onResetEncryption();
             }}
             onSync={handleManualSync}
-            onChangePassword={handleChangePassword}
+            onChangePassword={onChangePassword}
             currentUser={currentUser}
-            onUserChange={onUserChange}
-            onUpdateProfile={onUpdateProfile}
             isLocalOnlyMode={isLocalOnlyMode}
             securityManager={securityManager}
           />
         )}
 
-        {/* Corruption Recovery Modal */}
         <CorruptionRecoveryModal
           isOpen={showCorruptionModal}
           onClose={() => setShowCorruptionModal(false)}
         />
 
-        {/* Local Data Security Warning */}
         {showSecurityWarning && (
           <LocalDataSecurityWarning
             onClose={() => setShowSecurityWarning(false)}
@@ -418,6 +364,12 @@ const MainContent = ({
   );
 };
 
-// SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function isAuthenticated(auth: unknown): boolean {
+  return (auth as Record<string, unknown>)?.isAuthenticated === true;
+}
 
 export default MainLayout;
