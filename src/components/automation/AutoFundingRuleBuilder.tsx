@@ -144,7 +144,6 @@ const AutoFundingRuleBuilder = ({
 
   // Initialize with editing rule data or reset when modal closes
   // Synchronize modal state when open/close status or editing rule changes
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (!isOpen) {
       // Batch state updates when closing to synchronize modal state
