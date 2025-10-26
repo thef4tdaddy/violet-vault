@@ -271,6 +271,8 @@ export default [
       'src/components/transactions/TransactionForm.tsx',
       'src/hooks/common/useEditLock.ts',
       'src/hooks/debts/useDebtDetailModal.ts',
+      'src/hooks/security/useSecurityAcknowledgment.ts', // Security state initialization
+      'src/hooks/sync/useSyncHealthMonitor.ts', // Sync monitor state initialization
     ],
     rules: {
       'react-hooks/set-state-in-effect': 'off', // State sync requires setState in effects for prop/dependency changes
@@ -285,6 +287,18 @@ export default [
     ],
     rules: {
       'react-hooks/purity': 'off', // Time-dependent calculations must call Date.now()
+    },
+  },
+  {
+    // Hooks with selective property dependencies
+    // These hooks intentionally depend on specific properties rather than whole objects
+    // to avoid unnecessary re-computations when other properties change
+    files: [
+      'src/hooks/debts/useDebtDetailModal.ts', // Selective deps for payoff and payment formatting
+      'src/hooks/debts/useDebtModalLogic.ts', // Selective deps for computed debt values
+    ],
+    rules: {
+      'react-hooks/preserve-manual-memoization': 'off', // Intentional property-level dependencies
     },
   },
 ];
