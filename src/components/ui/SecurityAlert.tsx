@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import React, { createElement } from "react";
 import { getIcon as getIconFromRegistry } from "@/utils/icons";
 
 /**

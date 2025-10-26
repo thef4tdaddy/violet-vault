@@ -89,15 +89,22 @@ export const useSavingsGoalsQuery = (options: SavingsGoalsQueryOptions = {}) => 
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    placeholderData: (previousData: any) => previousData,
+    placeholderData: (previousData: unknown) => previousData,
     enabled: true,
   });
 };
 
+interface SavingsGoal {
+  id: string;
+  name: string;
+  isCompleted?: boolean;
+  [key: string]: unknown;
+}
+
 /**
  * Active savings goals query (non-completed goals for dashboard)
  */
-export const useActiveSavingsGoalsQuery = (savingsData: any[] = []) => {
+export const useActiveSavingsGoalsQuery = (savingsData: SavingsGoal[] = []) => {
   return useQuery({
     queryKey: queryKeys.activeSavingsGoals(),
     queryFn: async () => {

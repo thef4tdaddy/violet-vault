@@ -8,6 +8,11 @@ import {
   _filterTransactionsByDateRange,
 } from "../../utils/common/analyticsProcessor";
 import logger from "../../utils/common/logger";
+import {
+  generateRecommendationsFromMetrics,
+  calculatePerformanceMetrics,
+} from "./utils/integrationUtils";
+import { generateAnalyticsAlerts } from "./utils/analyticsAlertsUtils";
 
 /**
  * Comprehensive analytics integration hook
@@ -65,55 +70,10 @@ export const useAnalyticsIntegration = ({
   }, [analyticsData]);
 
   // Alert system
-  const alerts = useMemo(() => {
-    if (!enableAlerts) return [];
-
-    const alertList = [];
-
-    // Budget alerts
-    const overBudgetEnvelopes = analyticsData.envelopeHealth.filter((env) => env.healthScore < 20);
-    if (overBudgetEnvelopes.length > 0) {
-      alertList.push({
-        type: "warning",
-        category: "budget",
-        title: "Budget Exceeded",
-        message: `${overBudgetEnvelopes.length} envelope(s) are critically low`,
-        severity: "high",
-        data: overBudgetEnvelopes,
-      });
-    }
-
-    // Spending pattern alerts
-    const unusualSpending = analyticsData.categoryBreakdown.find(
-      (cat) => cat.amount > enhancedMetrics.avgMonthlyExpenses * 0.5
-    );
-    if (unusualSpending) {
-      alertList.push({
-        type: "info",
-        category: "spending",
-        title: "High Category Spending",
-        message: `Unusual spending detected in ${unusualSpending.name}`,
-        severity: "medium",
-        data: unusualSpending,
-      });
-    }
-
-    // Savings rate alerts
-    if (enhancedMetrics.savingsRate < 5) {
-      alertList.push({
-        type: "warning",
-        category: "savings",
-        title: "Low Savings Rate",
-        message: "Consider reducing expenses or increasing income",
-        severity: enhancedMetrics.savingsRate < 0 ? "high" : "medium",
-      });
-    }
-
-    return alertList.sort((a, b) => {
-      const severityOrder = { high: 3, medium: 2, low: 1 };
-      return severityOrder[b.severity] - severityOrder[a.severity];
-    });
-  }, [analyticsData, enhancedMetrics, enableAlerts]);
+  const alerts = useMemo(
+    () => generateAnalyticsAlerts(analyticsData, enhancedMetrics, enableAlerts),
+    [analyticsData, enhancedMetrics, enableAlerts]
+  );
 
   // Export functionality
   const exportData = useCallback(
@@ -122,54 +82,43 @@ export const useAnalyticsIntegration = ({
         throw new Error("Export functionality is disabled");
       }
 
-      try {
-        logger.info("Starting analytics export", { format, options });
+      logger.info("Starting analytics export", { format, options });
 
-        const exportPayload = {
-          ...analyticsData,
-          enhancedMetrics,
-          alerts,
-          timeFilter,
-          exportOptions: options,
-        };
+      const exportPayload = {
+        ...analyticsData,
+        enhancedMetrics,
+        alerts,
+        timeFilter,
+        exportOptions: options,
+      };
 
-        const processedData = prepareDataForExport(exportPayload, format);
+      const processedData = prepareDataForExport(exportPayload, format);
+      const timestamp = new Date().toISOString().split("T")[0];
+      const filename = `VioletVault_Analytics_${timeFilter}_${timestamp}`;
 
-        // Generate filename
-        const timestamp = new Date().toISOString().split("T")[0];
-        const filename = `VioletVault_Analytics_${timeFilter}_${timestamp}`;
+      if (format === "csv") {
+        const csvContent = processedData
+          .map((row) => row.map((field) => `"${field}"`).join(","))
+          .join("\n");
 
-        if (format === "csv") {
-          // Convert to CSV and download
-          const csvContent = processedData
-            .map((row) => row.map((field) => `"${field}"`).join(","))
-            .join("\n");
-
-          const blob = new Blob([csvContent], {
-            type: "text/csv;charset=utf-8;",
-          });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = `${filename}.csv`;
-          link.click();
-          URL.revokeObjectURL(link.href);
-        } else if (format === "json") {
-          // Export as JSON
-          const jsonContent = JSON.stringify(processedData, null, 2);
-          const blob = new Blob([jsonContent], { type: "application/json" });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = `${filename}.json`;
-          link.click();
-          URL.revokeObjectURL(link.href);
-        }
-
-        logger.info("Analytics export completed successfully");
-        return { success: true, filename };
-      } catch (error) {
-        logger.error("Analytics export failed", error);
-        throw error;
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${filename}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      } else if (format === "json") {
+        const jsonContent = JSON.stringify(processedData, null, 2);
+        const blob = new Blob([jsonContent], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${filename}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
       }
+
+      logger.info("Analytics export completed successfully");
+      return { success: true, filename };
     },
     [analyticsData, enhancedMetrics, alerts, timeFilter, enableExport]
   );
@@ -177,71 +126,19 @@ export const useAnalyticsIntegration = ({
   // Data refresh utility
   const refreshData = useCallback((newTimeFilter) => {
     logger.debug("Refreshing analytics data", { newTimeFilter });
-    // This would trigger a re-render with new time filter
-    // In a real implementation, this might trigger data fetching
   }, []);
 
   // Recommendation engine
-  const recommendations = useMemo(() => {
-    const recs = [];
-
-    // Budget recommendations
-    if (enhancedMetrics.budgetAdherence < 70) {
-      recs.push({
-        type: "budget",
-        priority: "high",
-        title: "Review Budget Allocations",
-        description: "Several envelopes are consistently over budget",
-        action: "Consider increasing budgets for frequently overspent categories",
-      });
-    }
-
-    // Savings recommendations
-    if (enhancedMetrics.savingsRate < 15) {
-      recs.push({
-        type: "savings",
-        priority: "medium",
-        title: "Increase Savings Rate",
-        description: "Current savings rate is below recommended 15-20%",
-        action: "Look for opportunities to reduce expenses or increase income",
-      });
-    }
-
-    // Diversification recommendations
-    if (enhancedMetrics.diversityScore < 50) {
-      recs.push({
-        type: "organization",
-        priority: "low",
-        title: "Improve Expense Categorization",
-        description: "Consider using more specific expense categories",
-        action: "Break down large categories into more specific ones",
-      });
-    }
-
-    return recs.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority] - priorityOrder[a.priority];
-    });
-  }, [enhancedMetrics]);
+  const recommendations = useMemo(
+    () => generateRecommendationsFromMetrics(enhancedMetrics),
+    [enhancedMetrics]
+  );
 
   // Performance metrics for monitoring
-  const performance = useMemo(() => {
-    const dataPoints = {
-      transactions: analyticsData.filteredTransactions.length,
-      envelopes: analyticsData.envelopeHealth.length,
-      categories: analyticsData.categoryBreakdown.length,
-      monthsOfData: analyticsData.monthlyTrends.length,
-    };
-
-    const processingTime = performance.now(); // Would measure actual processing time
-
-    return {
-      ...dataPoints,
-      processingTime,
-      dataQuality: dataPoints.transactions > 0 ? "good" : "insufficient",
-      lastUpdated: new Date().toISOString(),
-    };
-  }, [analyticsData]);
+  const performance = useMemo(
+    () => calculatePerformanceMetrics(analyticsData),
+    [analyticsData]
+  );
 
   return {
     // Core analytics data

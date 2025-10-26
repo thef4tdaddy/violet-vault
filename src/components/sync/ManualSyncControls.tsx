@@ -14,14 +14,6 @@ interface SyncResult {
 }
 
 /**
- * Sync status interface
- */
-interface SyncStatus {
-  isServiceRunning: boolean;
-  serviceStatus?: unknown;
-}
-
-/**
  * Manual sync controls component props
  */
 interface ManualSyncControlsProps {

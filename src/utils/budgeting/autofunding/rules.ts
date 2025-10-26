@@ -4,6 +4,73 @@
  * Extracted from autoFundingEngine.js for Issue #506
  */
 
+// TypeScript interfaces for auto-funding rules
+export interface RuleConfig {
+  sourceType: 'unassigned' | 'envelope' | 'income';
+  sourceId: string | null;
+  targetType: 'envelope' | 'multiple';
+  targetId: string | null;
+  targetIds: string[];
+  amount: number;
+  percentage: number;
+  conditions: RuleCondition[];
+  scheduleConfig: Record<string, unknown>;
+}
+
+export interface RuleCondition {
+  type: string;
+  value: unknown;
+}
+
+export interface AutoFundingRule {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  trigger: string;
+  priority: number;
+  enabled: boolean;
+  createdAt: string;
+  lastExecuted: string | null;
+  executionCount: number;
+  config: RuleConfig;
+}
+
+export interface AutoFundingContext {
+  data: {
+    unassignedCash: number;
+    newIncomeAmount?: number;
+    envelopes: EnvelopeData[];
+  };
+}
+
+export interface EnvelopeData {
+  id: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+}
+
+export interface RuleStatistics {
+  total: number;
+  enabled: number;
+  disabled: number;
+  byType: Record<string, number>;
+  byTrigger: Record<string, number>;
+  totalExecutions: number;
+  lastExecuted: string | null;
+}
+
+export interface RuleSummary {
+  id: string;
+  name: string;
+  enabled: boolean;
+  priority: number;
+  type: string;
+  trigger: string;
+  description: string;
+  targetDescription: string;
+}
+
 // Rule Types
 export const RULE_TYPES = {
   FIXED_AMOUNT: "fixed_amount", // "Move $200 to Rent"
@@ -71,8 +138,8 @@ export const createDefaultRule = () => ({
 /**
  * Validates a rule configuration
  */
-export const validateRule = (ruleConfig: any): { isValid: boolean; errors: string[] } => {
-  const errors = [];
+export const validateRule = (ruleConfig: Partial<AutoFundingRule>): { isValid: boolean; errors: string[] } => {
+  const errors: string[] = [];
 
   // Required fields validation
   if (!ruleConfig.name?.trim()) {
@@ -139,7 +206,7 @@ export const validateRule = (ruleConfig: any): { isValid: boolean; errors: strin
 /**
  * Calculates the funding amount for a rule based on context
  */
-export const calculateFundingAmount = (rule: any, context: any): number => {
+export const calculateFundingAmount = (rule: AutoFundingRule, context: AutoFundingContext): number => {
   const { unassignedCash } = context.data;
 
   switch (rule.type) {
@@ -165,7 +232,7 @@ export const calculateFundingAmount = (rule: any, context: any): number => {
 /**
  * Gets base amount for percentage calculations
  */
-export const getBaseAmountForPercentage = (rule: any, context: any): number => {
+export const getBaseAmountForPercentage = (rule: AutoFundingRule, context: AutoFundingContext): number => {
   const { envelopes, unassignedCash, newIncomeAmount } = context.data;
 
   switch (rule.config.sourceType) {
@@ -190,7 +257,7 @@ export const getBaseAmountForPercentage = (rule: any, context: any): number => {
 /**
  * Calculates priority fill amount
  */
-export const calculatePriorityFillAmount = (rule: any, context: any): number => {
+export const calculatePriorityFillAmount = (rule: AutoFundingRule, context: AutoFundingContext): number => {
   const { envelopes, unassignedCash } = context.data;
 
   if (!rule.config.targetId) return 0;
@@ -205,7 +272,7 @@ export const calculatePriorityFillAmount = (rule: any, context: any): number => 
 /**
  * Sorts rules by priority (lower number = higher priority)
  */
-export const sortRulesByPriority = (rules: any[]): any[] => {
+export const sortRulesByPriority = (rules: AutoFundingRule[]): AutoFundingRule[] => {
   return [...rules].sort((a, b) => {
     // First by priority (lower number = higher priority)
     const priorityDiff = (a.priority || 100) - (b.priority || 100);
@@ -226,7 +293,7 @@ interface RuleFilters {
 /**
  * Filters rules based on various criteria
  */
-export const filterRules = (rules: any[], filters: RuleFilters = {}): any[] => {
+export const filterRules = (rules: AutoFundingRule[], filters: RuleFilters = {}): AutoFundingRule[] => {
   let filtered = [...rules];
 
   if (filters.enabled !== undefined) {
@@ -256,8 +323,8 @@ export const filterRules = (rules: any[], filters: RuleFilters = {}): any[] => {
 /**
  * Gets rule execution statistics
  */
-export const getRuleStatistics = (rules: any[]): any => {
-  const stats = {
+export const getRuleStatistics = (rules: AutoFundingRule[]): RuleStatistics => {
+  const stats: RuleStatistics = {
     total: rules.length,
     enabled: 0,
     disabled: 0,
@@ -298,8 +365,8 @@ export const getRuleStatistics = (rules: any[]): any => {
 /**
  * Creates a rule summary for display
  */
-export const createRuleSummary = (rule: any): any => {
-  const summary = {
+export const createRuleSummary = (rule: AutoFundingRule): RuleSummary => {
+  const summary: RuleSummary = {
     id: rule.id,
     name: rule.name,
     enabled: rule.enabled,

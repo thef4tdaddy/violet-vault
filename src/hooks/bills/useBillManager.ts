@@ -21,11 +21,32 @@ import {
 } from "../../utils/bills/billCalculations";
 import logger from "../../utils/common/logger";
 
+interface Bill {
+  id: string;
+  name: string;
+  amount: number;
+  dueDate: Date | string;
+  [key: string]: unknown;
+}
+
+interface Envelope {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+interface Transaction {
+  id: string;
+  date: Date | string;
+  amount: number;
+  [key: string]: unknown;
+}
+
 interface UseBillManagerOptions {
-  propTransactions?: any[];
-  propEnvelopes?: any[];
-  onUpdateBill?: (bill: any) => void | Promise<void>;
-  onCreateRecurringBill?: (bill: any) => void | Promise<void>;
+  propTransactions?: Transaction[];
+  propEnvelopes?: Envelope[];
+  onUpdateBill?: (bill: Bill) => void | Promise<void>;
+  onCreateRecurringBill?: (bill: Bill) => void | Promise<void>;
   onSearchNewBills?: () => void | Promise<void>;
   onError?: (error: string) => void;
 }
@@ -56,11 +77,17 @@ export const useBillManager = ({
   } = useBills();
 
   // Type-safe wrapper for updateBill
-  const updateBillMutation = updateBillFromHook as any;
+  const updateBillMutation = updateBillFromHook as (bill: Bill) => Promise<void>;
 
   // Fallback to Zustand for backward compatibility
+  interface BudgetState {
+    allTransactions: Transaction[];
+    envelopes: Envelope[];
+    bills: Bill[];
+  }
+  
   const budget = useBudgetStore(
-    useShallow((state: any) => ({
+    useShallow((state: BudgetState) => ({
       allTransactions: state.allTransactions,
       envelopes: state.envelopes,
       bills: state.bills,

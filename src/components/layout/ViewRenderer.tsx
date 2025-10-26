@@ -33,6 +33,130 @@ interface ViewRendererProps {
   setActiveView: (view: string) => void;
 }
 
+// ============================================================================
+// Helper Components
+// ============================================================================
+
+interface EnvelopeViewProps {
+  envelopes: Array<Record<string, unknown>>;
+  safeTransactions: Array<Record<string, unknown>>;
+  unassignedCash: number;
+  addEnvelope: () => void;
+  updateEnvelope: () => void;
+  setActiveView: (view: string) => void;
+}
+
+const EnvelopeView = ({
+  envelopes,
+  safeTransactions,
+  unassignedCash,
+  addEnvelope,
+  updateEnvelope,
+  setActiveView,
+}: EnvelopeViewProps) => (
+  <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+    {/* Header */}
+    <div className="flex justify-between items-center">
+      <div>
+        <h2 className="font-black text-black text-base flex items-center">
+          <div className="relative mr-4">
+            <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
+            <div className="relative bg-purple-500 p-3 rounded-2xl">
+              {createElement(getIcon("Wallet"), {
+                className: "h-6 w-6 text-white",
+              })}
+            </div>
+          </div>
+          <span className="text-lg">E</span>NVELOPE <span className="text-lg">M</span>ANAGEMENT
+        </h2>
+        <p className="text-purple-900 mt-1">
+          Organize and track your budget allocations • {envelopes?.length || 0} envelopes
+        </p>
+      </div>
+
+      <div className="flex flex-row gap-3">
+        <Button
+          onClick={() => setActiveView("automation")}
+          className="btn btn-secondary border-2 border-black flex items-center"
+          title="Manage automatic envelope funding rules"
+        >
+          {createElement(getIcon("Settings"), {
+            className: "h-4 w-4 mr-2",
+          })}
+          Auto-Funding
+        </Button>
+      </div>
+    </div>
+
+    <SmartEnvelopeSuggestions
+      transactions={safeTransactions}
+      envelopes={envelopes}
+      onCreateEnvelope={addEnvelope}
+      onUpdateEnvelope={updateEnvelope}
+      onDismissSuggestion={() => {}}
+      dateRange="6months"
+    />
+    <EnvelopeGrid unassignedCash={unassignedCash} data-tour="envelope-grid" />
+  </div>
+);
+
+const DebtDisabledView = () => (
+  <div className="p-8 text-center bg-white rounded-xl border border-gray-200">
+    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+      Debt Dashboard Temporarily Disabled
+    </h2>
+    <p className="text-gray-600 mb-4">
+      The debt dashboard is currently disabled for debugging the temporal dead zone error.
+    </p>
+    <p className="text-sm text-gray-500">
+      Debug configuration can be adjusted in src/utils/debtDebugConfig.js
+    </p>
+  </div>
+);
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+// Extract budget operations to reduce complexity
+function extractBudgetOperations(budget: Record<string, unknown> | undefined) {
+  const {
+    savingsGoals = [],
+    supplementalAccounts = [],
+    addSavingsGoal = () => {},
+    updateSavingsGoal = () => {},
+    deleteSavingsGoal = () => {},
+    addSupplementalAccount = () => {},
+    updateSupplementalAccount = () => {},
+    deleteSupplementalAccount = () => {},
+    transferFromSupplementalAccount = () => {},
+    addEnvelope = () => {},
+    updateEnvelope = () => {},
+  } = budget || {};
+
+  return {
+    savingsGoals,
+    supplementalAccounts,
+    addSavingsGoal,
+    updateSavingsGoal,
+    deleteSavingsGoal,
+    addSupplementalAccount,
+    updateSupplementalAccount,
+    deleteSupplementalAccount,
+    transferFromSupplementalAccount,
+    addEnvelope,
+    updateEnvelope,
+  };
+}
+
+// Provide default user if not supplied
+function getDefaultUser(currentUser: Record<string, unknown> | undefined) {
+  return (currentUser || { userName: "", userColor: "" }) as Record<string, unknown> & {
+    userName: string;
+    userColor: string;
+  };
+}
+
 const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRendererProps) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
@@ -51,28 +175,11 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
   // Get paycheck operations
   const { handleDeletePaycheck } = usePaycheckOperations();
 
-  // Safe destructuring with default empty object to prevent destructuring errors
-  const {
-    savingsGoals = [],
-    supplementalAccounts = [],
-    addSavingsGoal = () => {},
-    updateSavingsGoal = () => {},
-    deleteSavingsGoal = () => {},
-    addSupplementalAccount = () => {},
-    updateSupplementalAccount = () => {},
-    deleteSupplementalAccount = () => {},
-    transferFromSupplementalAccount = () => {},
-    addEnvelope = () => {},
-    updateEnvelope = () => {},
-  } = budget || {};
+  // Extract budget operations
+  const budgetOps = extractBudgetOperations(budget);
 
   // Provide default user if not supplied
-  const user = (currentUser || { userName: "", userColor: "" }) as Record<string, unknown> & {
-    userName: string;
-    userColor: string;
-  };
-
-  // safeTransactions already filtered by useLayoutData hook
+  const user = getDefaultUser(currentUser);
 
   // Stable callback for bill updates
   const handleUpdateBill = useCallback((updatedBill: Record<string, unknown>) => {
@@ -106,68 +213,32 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
   const views: Record<string, ReactNode> = {
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
-      <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="font-black text-black text-base flex items-center">
-              <div className="relative mr-4">
-                <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
-                <div className="relative bg-purple-500 p-3 rounded-2xl">
-                  {createElement(getIcon("Wallet"), {
-                    className: "h-6 w-6 text-white",
-                  })}
-                </div>
-              </div>
-              <span className="text-lg">E</span>NVELOPE <span className="text-lg">M</span>ANAGEMENT
-            </h2>
-            <p className="text-purple-900 mt-1">
-              Organize and track your budget allocations • {envelopes?.length || 0} envelopes
-            </p>
-          </div>
-
-          <div className="flex flex-row gap-3">
-            <Button
-              onClick={() => setActiveView("automation")}
-              className="btn btn-secondary border-2 border-black flex items-center"
-              title="Manage automatic envelope funding rules"
-            >
-              {createElement(getIcon("Settings"), {
-                className: "h-4 w-4 mr-2",
-              })}
-              Auto-Funding
-            </Button>
-          </div>
-        </div>
-
-        <SmartEnvelopeSuggestions
-          transactions={safeTransactions}
-          envelopes={envelopes}
-          onCreateEnvelope={addEnvelope}
-          onUpdateEnvelope={updateEnvelope}
-          onDismissSuggestion={() => {}}
-          dateRange="6months"
-        />
-        <EnvelopeGrid unassignedCash={unassignedCash} data-tour="envelope-grid" />
-      </div>
+      <EnvelopeView
+        envelopes={envelopes}
+        safeTransactions={safeTransactions}
+        unassignedCash={unassignedCash}
+        addEnvelope={budgetOps.addEnvelope}
+        updateEnvelope={budgetOps.updateEnvelope}
+        setActiveView={setActiveView}
+      />
     ),
     savings: (
       <SavingsGoals
-        savingsGoals={savingsGoals as Array<Record<string, unknown>>}
+        savingsGoals={budgetOps.savingsGoals as Array<Record<string, unknown>>}
         unassignedCash={unassignedCash}
-        onAddGoal={addSavingsGoal}
-        onUpdateGoal={updateSavingsGoal}
-        onDeleteGoal={deleteSavingsGoal}
+        onAddGoal={budgetOps.addSavingsGoal}
+        onUpdateGoal={budgetOps.updateSavingsGoal}
+        onDeleteGoal={budgetOps.deleteSavingsGoal}
         onDistributeToGoals={() => {}}
       />
     ),
     supplemental: (
       <SupplementalAccounts
-        supplementalAccounts={supplementalAccounts as Array<Record<string, unknown>>}
-        onAddAccount={addSupplementalAccount}
-        onUpdateAccount={updateSupplementalAccount}
-        onDeleteAccount={deleteSupplementalAccount}
-        onTransferToEnvelope={transferFromSupplementalAccount}
+        supplementalAccounts={budgetOps.supplementalAccounts as Array<Record<string, unknown>>}
+        onAddAccount={budgetOps.addSupplementalAccount}
+        onUpdateAccount={budgetOps.updateSupplementalAccount}
+        onDeleteAccount={budgetOps.deleteSupplementalAccount}
+        onTransferToEnvelope={budgetOps.transferFromSupplementalAccount}
         envelopes={envelopes}
         currentUser={user}
       />
@@ -208,17 +279,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         <DebtDashboard />
       </Suspense>
     ) : (
-      <div className="p-8 text-center bg-white rounded-xl border border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Debt Dashboard Temporarily Disabled
-        </h2>
-        <p className="text-gray-600 mb-4">
-          The debt dashboard is currently disabled for debugging the temporal dead zone error.
-        </p>
-        <p className="text-sm text-gray-500">
-          Debug configuration can be adjusted in src/utils/debtDebugConfig.js
-        </p>
-      </div>
+      <DebtDisabledView />
     ),
     automation: (
       <Suspense fallback={<LoadingSpinner />}>
