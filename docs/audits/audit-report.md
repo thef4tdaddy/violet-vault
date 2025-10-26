@@ -20,10 +20,10 @@
 - 6 issues in `violet-vault/src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
 - 4 issues in `violet-vault/src/services/chunkedSyncService.ts`
 - 3 issues in `violet-vault/src/hooks/debts/useDebtDetailModal.ts`
+- 3 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
 - 2 issues in `violet-vault/src/hooks/debts/useDebtModalLogic.ts`
 - 2 issues in `violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx`
 - 2 issues in `violet-vault/src/components/layout/MainLayout.tsx`
-- 2 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
 - 2 issues in `violet-vault/src/components/accounts/AccountFormModal.tsx`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionTable.ts`
@@ -50,18 +50,17 @@
 - 1 issues in `violet-vault/src/components/savings/AddEditGoalModal.tsx`
 - 1 issues in `violet-vault/src/components/modals/QuickFundModal.tsx`
 - 1 issues in `violet-vault/src/components/mobile/SlideUpModal.tsx`
-- 1 issues in `violet-vault/src/components/history/ObjectHistoryViewer.tsx`
 - 1 issues in `violet-vault/src/components/debt/modals/AddDebtModal.tsx`
-- 1 issues in `violet-vault/src/components/bills/BillDiscoveryModal/useBillDiscoveryState.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
 | 84 | `@typescript-eslint/no-explicit-any` |
-| 16 | `react-hooks/set-state-in-effect` |
+| 12 | `react-hooks/set-state-in-effect` |
 | 10 | `react-hooks/purity` |
 | 4 | `react-hooks/static-components` |
 | 4 | `react-hooks/preserve-manual-memoization` |
+| 3 | `null` |
 | 3 | `max-lines-per-function` |
 | 2 | `react-hooks/refs` |
 | 2 | `max-params` |
@@ -130,54 +129,9 @@ violet-vault/src/components/accounts/AccountFormModal.tsx:31:24
   75 |
   76 |   // Mobile slide-up modal
   77 |   if (isMobile || _forceMobileMode) { (react-hooks/static-components)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:148:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:148:7
-  146 |   useEffect(() => {
-  147 |     if (editingRule) {
-> 148 |       setRuleData({ ...editingRule, config: { ...editingRule.config } });
-      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  149 |     }
-  150 |   }, [editingRule]);
-  151 | (react-hooks/set-state-in-effect)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:155:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:155:7
-  153 |   useEffect(() => {
-  154 |     if (!isOpen) {
-> 155 |       setStep(1);
-      |       ^^^^^^^ Avoid calling setState() directly within an effect
-  156 |       if (!editingRule) {
-  157 |         setRuleData(createDefaultRule());
-  158 |       } (react-hooks/set-state-in-effect)
-violet-vault/src/components/bills/BillDiscoveryModal/useBillDiscoveryState.ts:21:7 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-violet-vault/src/components/bills/BillDiscoveryModal/useBillDiscoveryState.ts:21:7
-  19 |         }
-  20 |       });
-> 21 |       setBillEnvelopeMap(envelopeMap);
-     |       ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  22 |     }
-  23 |   }, [isOpen, discoveredBills]);
-  24 | (react-hooks/set-state-in-effect)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:151:7 - 1 - Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect'). (null)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:153:7 - 1 - Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect'). (null)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:157:7 - 1 - Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect'). (null)
 violet-vault/src/components/debt/modals/AddDebtModal.tsx:44:37 - 2 - Error: Cannot call impure function during render
 
 `Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
@@ -190,22 +144,6 @@ violet-vault/src/components/debt/modals/AddDebtModal.tsx:44:37
   45 |                 isExpired: editLock.isExpired,
   46 |               }}
   47 |               onBreakLock={editLock.breakLock} (react-hooks/purity)
-violet-vault/src/components/history/ObjectHistoryViewer.tsx:59:5 - 2 - Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-violet-vault/src/components/history/ObjectHistoryViewer.tsx:59:5
-  57 |     });
-  58 |
-> 59 |     setRelevantHistory(objectHistory.slice(0, 20)); // Limit to 20 most recent
-     |     ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  60 |   }, [allCommits, isLoading, objectId, objectType, objectName]);
-  61 |
-  62 |   const toggleCommitExpanded = (commitHash: string) => { (react-hooks/set-state-in-effect)
 violet-vault/src/components/layout/MainLayout.tsx:149:7 - 2 - Error: Cannot access refs during render
 
 React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
@@ -1213,12 +1151,12 @@ src/components/automation/AutoFundingDashboard.tsx(97,63): error TS2554: Expecte
 src/components/automation/AutoFundingRuleBuilder.tsx(28,13): error TS2322: Type '"success"' is not assignable to type 'ButtonColor'.
 src/components/automation/AutoFundingRuleBuilder.tsx(98,15): error TS2322: Type '"ghost"' is not assignable to type 'ButtonVariant'.
 src/components/automation/AutoFundingRuleBuilder.tsx(105,12): error TS2741: Property 'onStepChange' is missing in type '{ currentStep: any; }' but required in type '{ currentStep: any; onStepChange: any; }'.
-src/components/automation/AutoFundingRuleBuilder.tsx(166,46): error TS2339: Property 'name' does not exist on type '{}'.
-src/components/automation/AutoFundingRuleBuilder.tsx(169,46): error TS2339: Property 'type' does not exist on type '{}'.
-src/components/automation/AutoFundingRuleBuilder.tsx(198,37): error TS2345: Argument of type '{ id: string; name: string; description: string; type: string; trigger: string; priority: number; enabled: boolean; createdAt: string; lastExecuted: any; executionCount: number; config: { sourceType: string; ... 7 more ...; scheduleConfig: {}; }; }' is not assignable to parameter of type 'Partial<AutoFundingRule>'.
+src/components/automation/AutoFundingRuleBuilder.tsx(165,46): error TS2339: Property 'name' does not exist on type '{}'.
+src/components/automation/AutoFundingRuleBuilder.tsx(168,46): error TS2339: Property 'type' does not exist on type '{}'.
+src/components/automation/AutoFundingRuleBuilder.tsx(197,37): error TS2345: Argument of type '{ id: string; name: string; description: string; type: string; trigger: string; priority: number; enabled: boolean; createdAt: string; lastExecuted: any; executionCount: number; config: { sourceType: string; ... 7 more ...; scheduleConfig: {}; }; }' is not assignable to parameter of type 'Partial<AutoFundingRule>'.
   The types of 'config.sourceType' are incompatible between these types.
     Type 'string' is not assignable to type '"envelope" | "income" | "unassigned"'.
-src/components/automation/AutoFundingRuleBuilder.tsx(214,37): error TS2345: Argument of type '{ id: string; name: string; description: string; type: string; trigger: string; priority: number; enabled: boolean; createdAt: string; lastExecuted: any; executionCount: number; config: { sourceType: string; ... 7 more ...; scheduleConfig: {}; }; }' is not assignable to parameter of type 'Partial<AutoFundingRule>'.
+src/components/automation/AutoFundingRuleBuilder.tsx(213,37): error TS2345: Argument of type '{ id: string; name: string; description: string; type: string; trigger: string; priority: number; enabled: boolean; createdAt: string; lastExecuted: any; executionCount: number; config: { sourceType: string; ... 7 more ...; scheduleConfig: {}; }; }' is not assignable to parameter of type 'Partial<AutoFundingRule>'.
   The types of 'config.sourceType' are incompatible between these types.
     Type 'string' is not assignable to type '"envelope" | "income" | "unassigned"'.
 src/components/automation/steps/config/SplitRemainderConfig.tsx(28,23): error TS2322: Type '{ checked: any; onCheckedChange: () => any; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLInputElement>'.
