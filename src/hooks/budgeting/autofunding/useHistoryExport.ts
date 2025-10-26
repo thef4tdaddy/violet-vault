@@ -1,6 +1,22 @@
 import { useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
+interface HistoryExecution {
+  id: string;
+  trigger: string;
+  executedAt: string;
+  rulesExecuted?: number;
+  totalFunded?: number;
+  success?: boolean;
+  [key: string]: unknown;
+}
+
+interface UndoStackEntry {
+  action: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
 interface ExportOptions {
   includeUndoStack?: boolean;
   dateFrom?: string;
@@ -27,7 +43,7 @@ export const useHistoryExport = () => {
   }, []);
 
   const exportToCsv = useCallback(
-    (historyToExport: any[]): ExportResult => {
+    (historyToExport: HistoryExecution[]): ExportResult => {
       const csvHeaders = [
         "Execution ID",
         "Trigger",
@@ -59,7 +75,7 @@ export const useHistoryExport = () => {
 
   // Export history data
   const exportHistory = useCallback(
-    (executionHistory: any[], undoStack: any[], options: ExportOptions = {}): ExportResult => {
+    (executionHistory: HistoryExecution[], undoStack: UndoStackEntry[], options: ExportOptions = {}): ExportResult => {
       try {
         const { includeUndoStack = true, dateFrom, dateTo, format = "json" } = options;
 

@@ -50,7 +50,9 @@ async function runHealthChecksInternal(results) {
     const testEnvelope = {
       id: "timestamp-test-" + Date.now(),
       name: "Timestamp Test",
-      lastModified: "2024-01-01T12:00:00.000Z", // String timestamp
+      category: "test",
+      archived: false,
+      lastModified: Date.parse("2024-01-01T12:00:00.000Z"), // Number timestamp
       createdAt: Date.now(), // Number timestamp
     };
 
@@ -108,12 +110,12 @@ async function runHealthChecksInternal(results) {
       lastModified: Date.now(), // Now (newer)
     };
 
-    const syncResult = await Promise.race([
+    const syncResult = (await Promise.race([
       cloudSyncService.determineSyncDirection(mockDexieData, mockFirestoreData),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Sync direction determination timed out")), 10000)
       ),
-    ]);
+    ])) as { direction: string };
 
     if (syncResult.direction === "toFirestore") {
       results.tests.push({
@@ -271,10 +273,12 @@ async function runHealthChecksInternal(results) {
 
     const dataDetection = await detectLocalData();
 
+    const samplesFound = "samplesFound" in dataDetection ? dataDetection.samplesFound : { envelopes: false, transactions: false, bills: false };
+
     results.tests.push({
       name: "Comprehensive Data Detection",
       status: "✅ PASSED",
-      details: `Data detected: ${dataDetection.hasData}, Total items: ${dataDetection.totalItems}, Core data: ${JSON.stringify(dataDetection.details.samplesFound)}`,
+      details: `Data detected: ${dataDetection.hasData}, Total items: ${dataDetection.totalItems}, Core data: ${JSON.stringify(samplesFound)}`,
     });
     results.passed++;
   } catch (error) {
@@ -310,7 +314,7 @@ async function runHealthChecksInternal(results) {
 
 // Expose to window for immediate testing
 if (typeof window !== "undefined") {
-  window.runSyncHealthCheck = runImmediateSyncHealthCheck;
+  (window as { runSyncHealthCheck?: () => Promise<unknown> }).runSyncHealthCheck = runImmediateSyncHealthCheck;
 }
 
 export default runImmediateSyncHealthCheck;

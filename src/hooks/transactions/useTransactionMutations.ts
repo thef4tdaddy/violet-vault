@@ -24,8 +24,11 @@ interface TransactionUpdateInput {
 
 // Helper to trigger sync for transaction changes
 const triggerTransactionSync = (changeType: string) => {
-  if (typeof window !== "undefined" && (window as any).cloudSyncService) {
-    (window as any).cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+  if (typeof window !== "undefined") {
+    const windowWithSync = window as Window & { cloudSyncService?: { triggerSyncForCriticalChange: (change: string) => void } };
+    if (windowWithSync.cloudSyncService) {
+      windowWithSync.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+    }
   }
 };
 
@@ -83,7 +86,7 @@ export const useTransactionMutations = () => {
   const reconcileTransactionMutation = useMutation({
     mutationKey: ["transactions", "reconcile"],
     mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
-      const reconciledTransaction: any = {
+      const reconciledTransaction: Transaction = {
         id: Date.now().toString(),
         date: new Date(transactionData.date || new Date().toISOString().split("T")[0]),
         amount: transactionData.amount || 0,
@@ -94,7 +97,7 @@ export const useTransactionMutations = () => {
         createdAt: Date.now(),
         reconciledAt: new Date().toISOString(),
         description: transactionData.description,
-      };
+      } as Transaction;
 
       // Apply optimistic update and save to Dexie
       await optimisticHelpers.addTransaction(queryClient, reconciledTransaction);

@@ -161,19 +161,46 @@ export const validateSavingsGoalForm = (formData) => {
   return errors;
 };
 
+interface SavingsGoalFormData {
+  name: string;
+  targetAmount: string | number;
+  currentAmount: string | number;
+  targetDate?: string | null;
+  category: string;
+  color: string;
+  description?: string;
+  priority: string;
+}
+
+interface SavingsGoalData {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string | null;
+  category: string;
+  color: string;
+  description: string;
+  priority: string;
+  createdAt: string;
+  updatedAt: string;
+  isCompleted?: boolean;
+}
+
 /**
  * Process form data into savings goal object
  */
-export const processSavingsGoalFormData = (formData: any, editingGoal: any = null) => {
+export const processSavingsGoalFormData = (formData: SavingsGoalFormData, editingGoal: SavingsGoalData | null = null): SavingsGoalData => {
   const validation = validateSavingsGoalForm(formData);
   if (validation.length > 0) {
     throw new Error(`Validation failed: ${validation.join(", ")}`);
   }
 
-  const targetAmount = parseFloat(formData.targetAmount);
-  const currentAmount = parseFloat(formData.currentAmount) || 0;
+  const targetAmount = parseFloat(formData.targetAmount.toString());
+  const currentAmount = parseFloat(formData.currentAmount.toString()) || 0;
 
-  const goalData: any = {
+  const goalData: SavingsGoalData = {
+    id: editingGoal?.id || `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: formData.name.trim(),
     targetAmount,
     currentAmount,
@@ -182,17 +209,9 @@ export const processSavingsGoalFormData = (formData: any, editingGoal: any = nul
     color: formData.color,
     description: formData.description?.trim() || "",
     priority: formData.priority,
+    createdAt: editingGoal?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-
-  // Add creation data for new goals
-  if (!editingGoal) {
-    goalData.createdAt = new Date().toISOString();
-    goalData.id = `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  } else {
-    goalData.id = editingGoal.id;
-    goalData.createdAt = editingGoal.createdAt;
-  }
 
   return goalData;
 };
@@ -220,7 +239,7 @@ export const suggestTargetDate = (
  * Calculate distribution amounts for multiple goals
  */
 export const calculateGoalDistribution = (
-  goals: any[],
+  goals: SavingsGoalData[],
   totalAmount: number,
   distributionStrategy = "proportional"
 ): Record<string, number> => {

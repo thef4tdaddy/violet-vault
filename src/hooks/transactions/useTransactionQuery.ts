@@ -28,10 +28,15 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
     sortOrder = "desc",
   } = options;
 
+interface BudgetState {
+  transactions: unknown[];
+  allTransactions: unknown[];
+}
+
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
   const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
     useBudgetStore(
-      useShallow((state: any) => ({
+      useShallow((state: BudgetState) => ({
         transactions: state.transactions,
         allTransactions: state.allTransactions,
       }))
@@ -153,7 +158,7 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
     refetchOnMount: false, // Don't refetch if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
-    placeholderData: (previousData: any) => previousData, // Use previous data during refetch
+    placeholderData: (previousData: unknown) => previousData, // Use previous data during refetch
     initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
