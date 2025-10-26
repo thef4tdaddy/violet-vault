@@ -1,10 +1,10 @@
 # 🚨 Test & Lighthouse Failure Report
 
-**Date:** 2025-10-26 20:22:36 UTC
+**Date:** 2025-10-26 22:19:55 UTC
 **Branch:** main
 **Target URL:** https://dev.f4tdaddy.com
 **Node.js Version:** v20.19.5
-**Workflow Run:** [18823224880](https://github.com/thef4tdaddy/violet-vault/actions/runs/18823224880)
+**Workflow Run:** [18824511695](https://github.com/thef4tdaddy/violet-vault/actions/runs/18824511695)
 
 ## 🧪 Test Results Summary
 - **Total Tests:** 6
@@ -22,7 +22,7 @@
 
 
 ### ❌ Failed Lighthouse Pages
-/transactions /bills 
+/envelopes /analytics 
 
 ## 🔍 Possible Causes
 
