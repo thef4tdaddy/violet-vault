@@ -27,74 +27,108 @@ export const DEBT_STRATEGIES = getDebtStrategies();
 
 // Helper functions (placed before usage to avoid temporal dead zone issues)
 
+interface WorkingDebt extends DebtAccount {
+  remainingBalance: number;
+}
+
+/**
+ * Calculate interest and principal for a debt payment
+ */
+function calculateDebtPayment(
+  debt: WorkingDebt,
+  availableExtra: number
+): {
+  principalPayment: number;
+  interestPayment: number;
+  totalPayment: number;
+  extraUsed: number;
+} {
+  const monthlyInterestRate = debt.interestRate / 100 / 12;
+  const interestPayment = debt.remainingBalance * monthlyInterestRate;
+  let principalPayment = Math.max(0, debt.minimumPayment - interestPayment);
+
+  // Add extra payment if available
+  const extraForThisDebt = Math.min(availableExtra, debt.remainingBalance - principalPayment);
+  principalPayment += extraForThisDebt;
+
+  // Ensure we don't overpay
+  principalPayment = Math.min(principalPayment, debt.remainingBalance);
+  const totalPayment = principalPayment + interestPayment;
+
+  return {
+    principalPayment,
+    interestPayment,
+    totalPayment,
+    extraUsed: extraForThisDebt,
+  };
+}
+
+/**
+ * Process a single month of debt payments
+ */
+function processMonthlyPayments(
+  workingDebts: WorkingDebt[],
+  extraPayment: number,
+  month: number,
+  debtPayoffOrder: string[]
+): { monthData: StrategyMonth; totalInterest: number } {
+  const monthData: StrategyMonth = {
+    month,
+    totalPayment: 0,
+    debts: [],
+  };
+
+  let availableExtra = extraPayment;
+  let monthInterest = 0;
+
+  for (const debt of workingDebts) {
+    if (debt.remainingBalance <= 0) continue;
+
+    const payment = calculateDebtPayment(debt, availableExtra);
+    availableExtra -= payment.extraUsed;
+
+    debt.remainingBalance -= payment.principalPayment;
+    monthInterest += payment.interestPayment;
+
+    monthData.debts.push({
+      debtId: debt.id,
+      payment: payment.totalPayment,
+      principal: payment.principalPayment,
+      interest: payment.interestPayment,
+      remainingBalance: debt.remainingBalance,
+    });
+
+    monthData.totalPayment += payment.totalPayment;
+
+    // Track when debt is paid off
+    if (debt.remainingBalance <= 0 && !debtPayoffOrder.includes(debt.id)) {
+      debtPayoffOrder.push(debt.id);
+    }
+  }
+
+  return { monthData, totalInterest: monthInterest };
+}
+
 /**
  * Simulate month-by-month debt payoff
  */
 function simulatePayoffStrategy(debts: DebtAccount[], extraPayment: number): DebtStrategyResult {
-  // Create working copies of debts
-  const workingDebts = debts.map((debt) => ({
+  const workingDebts: WorkingDebt[] = debts.map((debt) => ({
     ...debt,
     remainingBalance: debt.balance,
   }));
 
   const monthlyBreakdown: StrategyMonth[] = [];
-  let month = 0;
-  let totalInterest = 0;
   const debtPayoffOrder: string[] = [];
+  let totalInterest = 0;
+  let month = 0;
+  const MAX_MONTHS = 600; // 50 year limit
 
-  while (workingDebts.some((debt) => debt.remainingBalance > 0) && month < 600) {
-    // 50 year limit
+  while (workingDebts.some((debt) => debt.remainingBalance > 0) && month < MAX_MONTHS) {
     month++;
-    const monthData: StrategyMonth = {
-      month,
-      totalPayment: 0,
-      debts: [],
-    };
-
-    // Calculate minimum payments for all debts
-    let availableExtra = extraPayment;
-
-    for (const debt of workingDebts) {
-      if (debt.remainingBalance <= 0) continue;
-
-      // Calculate monthly interest
-      const monthlyInterestRate = debt.interestRate / 100 / 12;
-      const interestPayment = debt.remainingBalance * monthlyInterestRate;
-
-      // Minimum payment (at least covers interest)
-      let principalPayment = Math.max(0, debt.minimumPayment - interestPayment);
-
-      // Add extra payment to first debt with balance (strategy-specific order)
-      if (availableExtra > 0) {
-        const extraForThisDebt = Math.min(availableExtra, debt.remainingBalance - principalPayment);
-        principalPayment += extraForThisDebt;
-        availableExtra -= extraForThisDebt;
-      }
-
-      // Ensure we don't overpay
-      principalPayment = Math.min(principalPayment, debt.remainingBalance);
-      const totalPayment = principalPayment + interestPayment;
-
-      debt.remainingBalance -= principalPayment;
-      totalInterest += interestPayment;
-
-      monthData.debts.push({
-        debtId: debt.id,
-        payment: totalPayment,
-        principal: principalPayment,
-        interest: interestPayment,
-        remainingBalance: debt.remainingBalance,
-      });
-
-      monthData.totalPayment += totalPayment;
-
-      // Track when debt is paid off
-      if (debt.remainingBalance <= 0 && !debtPayoffOrder.includes(debt.id)) {
-        debtPayoffOrder.push(debt.id);
-      }
-    }
-
-    monthlyBreakdown.push(monthData);
+    const result = processMonthlyPayments(workingDebts, extraPayment, month, debtPayoffOrder);
+    totalInterest += result.totalInterest;
+    monthlyBreakdown.push(result.monthData);
   }
 
   return {

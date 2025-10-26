@@ -83,19 +83,12 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
   const interestRate = parseNumericField(formData.interestRate) ?? 0;
   const minimumPayment = parseNumericField(formData.minimumPayment) ?? -1;
 
-  // Validate balances
-  if (currentBalance < 0) {
-    errors.balance = "Valid current balance is required";
-  }
-  if (originalBalance !== null && originalBalance < 0) {
-    errors.originalBalance = "Original balance must be positive";
-  }
-  if (formData.interestRate && (interestRate < 0 || interestRate > 100)) {
-    errors.interestRate = "Interest rate must be between 0 and 100";
-  }
-  if (minimumPayment < 0) {
-    errors.minimumPayment = "Valid minimum payment is required";
-  }
+  // Validate numeric fields
+  validateNumericFields(
+    { currentBalance, originalBalance, interestRate, minimumPayment },
+    formData,
+    errors
+  );
 
   // Add warnings
   addPaymentRatioWarnings(currentBalance, minimumPayment, warnings);
@@ -121,6 +114,31 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
     } as DebtFormData,
   };
 }
+
+// Helper to validate numeric fields
+const validateNumericFields = (
+  fields: {
+    currentBalance: number;
+    originalBalance: number | null;
+    interestRate: number;
+    minimumPayment: number;
+  },
+  formData: Record<string, unknown>,
+  errors: DebtFormErrors
+) => {
+  if (fields.currentBalance < 0) {
+    errors.balance = "Valid current balance is required";
+  }
+  if (fields.originalBalance !== null && fields.originalBalance < 0) {
+    errors.originalBalance = "Original balance must be positive";
+  }
+  if (formData.interestRate && (fields.interestRate < 0 || fields.interestRate > 100)) {
+    errors.interestRate = "Interest rate must be between 0 and 100";
+  }
+  if (fields.minimumPayment < 0) {
+    errors.minimumPayment = "Valid minimum payment is required";
+  }
+};
 
 // Helper functions to reduce complexity
 const isValidNumber = (value: unknown): boolean => {

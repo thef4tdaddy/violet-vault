@@ -22,13 +22,17 @@ interface TransactionUpdateInput {
   updates: Partial<Transaction>;
 }
 
+interface WindowWithCloudSync extends Window {
+  cloudSyncService?: {
+    triggerSyncForCriticalChange: (changeType: string) => void;
+  };
+}
+
 // Helper to trigger sync for transaction changes
 const triggerTransactionSync = (changeType: string) => {
-  if (typeof window !== "undefined") {
-    const windowWithSync = window as Window & { cloudSyncService?: { triggerSyncForCriticalChange: (change: string) => void } };
-    if (windowWithSync.cloudSyncService) {
-      windowWithSync.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
-    }
+  const windowObj = window as WindowWithCloudSync;
+  if (typeof window !== "undefined" && windowObj.cloudSyncService) {
+    windowObj.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
   }
 };
 
@@ -97,7 +101,7 @@ export const useTransactionMutations = () => {
         createdAt: Date.now(),
         reconciledAt: new Date().toISOString(),
         description: transactionData.description,
-      } as Transaction;
+      };
 
       // Apply optimistic update and save to Dexie
       await optimisticHelpers.addTransaction(queryClient, reconciledTransaction);

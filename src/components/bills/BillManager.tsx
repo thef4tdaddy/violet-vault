@@ -1,6 +1,5 @@
 /**
-import { Select } from "@/components/ui";
- * BillManager Component - Refactored for Issue #152
+ * BillManager Component - Refactored for Issue #152 & #835
  *
  * UI-only component using useBillManager hook for business logic
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
@@ -9,17 +8,21 @@ import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
 import { useAuthManager } from "../../hooks/auth/useAuthManager";
-import AddBillModal from "./AddBillModal";
-import BulkBillUpdateModal from "./BulkBillUpdateModal";
-import logger from "../../utils/common/logger";
-import BillDiscoveryModal from "./BillDiscoveryModal";
-import BillDetailModal from "./modals/BillDetailModal";
-import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-
 import BillManagerHeader from "./BillManagerHeader";
 import BillSummaryCards from "./BillSummaryCards";
 import BillViewTabs from "./BillViewTabs";
 import BillTable from "./BillTable";
+import BillManagerModals from "./BillManagerModals";
+
+// Loading component
+const BillManagerLoading = ({ className }) => (
+  <div className={`animate-pulse ${className}`}>
+    <div className="space-y-4">
+      <div className="h-12 bg-gray-200 rounded"></div>
+      <div className="h-64 bg-gray-200 rounded"></div>
+    </div>
+  </div>
+);
 
 const BillManager = ({
   transactions: propTransactions = [],
@@ -113,14 +116,7 @@ const BillManager = ({
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className={`animate-pulse ${className}`}>
-        <div className="space-y-4">
-          <div className="h-12 bg-gray-200 rounded"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
+    return <BillManagerLoading className={className} />;
   }
 
   return (
@@ -164,69 +160,31 @@ const BillManager = ({
       />
 
       {/* Modals */}
-      {showAddBillModal && (
-        <AddBillModal
-          isOpen={showAddBillModal}
-          onClose={handleCloseModal}
-          editingBill={editingBill}
-          onAddBill={addBill}
-          onUpdateBill={updateBill}
-          onDeleteBill={deleteBill}
-          onError={onError}
-        />
-      )}
-
-      {showBulkUpdateModal && (
-        <BulkBillUpdateModal
-          isOpen={showBulkUpdateModal}
-          onClose={() => setShowBulkUpdateModal(false)}
-          selectedBills={Array.from(selectedBills)
-            .map((id) => bills.find((b) => b.id === id))
-            .filter(Boolean)}
-          onUpdateBills={handleBulkUpdate}
-          onError={onError}
-        />
-      )}
-
-      {showDiscoveryModal && (
-        <BillDiscoveryModal
-          isOpen={showDiscoveryModal}
-          onClose={() => {
-            setShowDiscoveryModal(false);
-          }}
-          discoveredBills={discoveredBills}
-          onAddBills={handleAddDiscoveredBills}
-          onError={onError}
-        />
-      )}
-
-      {showBillDetail && (
-        <BillDetailModal
-          bill={showBillDetail}
-          isOpen={!!showBillDetail}
-          onClose={() => setShowBillDetail(null)}
-          onDelete={deleteBill}
-          onMarkPaid={billOperations.handlePayBill}
-          onEdit={(bill) => {
-            setShowBillDetail(null);
-            handleEditBill(bill);
-          }}
-          onCreateRecurring={(bill) => {
-            // Handle making a one-time bill recurring
-            // TODO: Implement recurring bill functionality
-            logger.warn("Recurring bill creation not yet implemented:", bill.name);
-          }}
-        />
-      )}
-
-      {historyBill && (
-        <ObjectHistoryViewer
-          onClose={() => setHistoryBill(null)}
-          objectId={historyBill.id}
-          objectType="bill"
-          objectName={historyBill.name}
-        />
-      )}
+      <BillManagerModals
+        showAddBillModal={showAddBillModal}
+        showBulkUpdateModal={showBulkUpdateModal}
+        showDiscoveryModal={showDiscoveryModal}
+        showBillDetail={showBillDetail}
+        historyBill={historyBill}
+        editingBill={editingBill}
+        bills={bills}
+        envelopes={envelopes}
+        selectedBills={selectedBills}
+        discoveredBills={discoveredBills}
+        handleCloseModal={handleCloseModal}
+        setShowBulkUpdateModal={setShowBulkUpdateModal}
+        setShowDiscoveryModal={setShowDiscoveryModal}
+        setShowBillDetail={setShowBillDetail}
+        setHistoryBill={setHistoryBill}
+        handleEditBill={handleEditBill}
+        addBill={addBill}
+        updateBill={updateBill}
+        deleteBill={deleteBill}
+        handleBulkUpdate={handleBulkUpdate}
+        handleAddDiscoveredBills={handleAddDiscoveredBills}
+        billOperations={billOperations}
+        onError={onError}
+      />
     </div>
   );
 };
