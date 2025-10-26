@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useEnvelopes } from "../budgeting/useEnvelopes";
-import useBills from "../bills/useBills";
+import { useEffect, useState, useMemo } from "react";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import useBills from "@/hooks/bills/useBills";
 import { useTransactions } from "./useTransactions";
-import { useActualBalance } from "../budgeting/useBudgetMetadata";
-import useOnboardingStore from "../../stores/ui/onboardingStore";
-import logger from "../../utils/common/logger";
+import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
+import useOnboardingStore from "@/stores/ui/onboardingStore";
+import logger from "@/utils/common/logger";
 
 /**
  * Hook that automatically detects user actions and marks onboarding steps as complete
@@ -18,12 +18,17 @@ export const useOnboardingAutoComplete = () => {
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();
   const transactionsResult = useTransactions();
-  const transactions = (transactionsResult?.transactions || []) as Array<{
-    amount?: number;
-    description?: string;
-    type?: string;
-    category?: string;
-  }>;
+  
+  // Wrap transactions initialization in useMemo to fix exhaustive-deps warning
+  const transactions = useMemo(() => {
+    return (transactionsResult?.transactions || []) as Array<{
+      amount?: number;
+      description?: string;
+      type?: string;
+      category?: string;
+    }>;
+  }, [transactionsResult?.transactions]);
+  
   const { actualBalance } = useActualBalance();
 
   // Skip if user has disabled hints or is already onboarded

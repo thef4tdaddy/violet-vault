@@ -2,8 +2,8 @@
  * Helper functions for transaction query operations
  * Extracted to reduce complexity in useTransactionQuery
  */
-import type { Transaction } from "../../../db/types";
-import logger from "../../../utils/common/logger.ts";
+import type { Transaction } from "@/db/types";
+import logger from "@/utils/common/logger";
 
 interface FilterOptions {
   envelopeId?: string;
@@ -15,6 +15,42 @@ interface SortOptions {
   sortBy: string;
   sortOrder: 'asc' | 'desc';
 }
+
+/**
+ * Compare two date values
+ */
+const compareDates = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): number => {
+  const aDate = new Date(aVal as Date | string);
+  const bDate = new Date(bVal as Date | string);
+  
+  if (sortOrder === "desc") {
+    return bDate > aDate ? 1 : bDate < aDate ? -1 : 0;
+  }
+  return aDate > bDate ? 1 : aDate < bDate ? -1 : 0;
+};
+
+/**
+ * Compare two numeric values
+ */
+const compareNumbers = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): number => {
+  const aNum = typeof aVal === "number" ? aVal : parseFloat(String(aVal)) || 0;
+  const bNum = typeof bVal === "number" ? bVal : parseFloat(String(bVal)) || 0;
+  
+  if (sortOrder === "desc") {
+    return bNum > aNum ? 1 : bNum < aNum ? -1 : 0;
+  }
+  return aNum > bNum ? 1 : aNum < bNum ? -1 : 0;
+};
+
+/**
+ * Compare two string values
+ */
+const compareStrings = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): number => {
+  if (sortOrder === "desc") {
+    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+  }
+  return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+};
 
 /**
  * Apply filters to transactions
@@ -62,28 +98,16 @@ export const applySorting = (
 
     // Handle date fields
     if (options.sortBy === "date") {
-      const aDate = new Date(aVal as Date | string);
-      const bDate = new Date(bVal as Date | string);
-      return options.sortOrder === "desc"
-        ? (bDate > aDate ? 1 : bDate < aDate ? -1 : 0)
-        : (aDate > bDate ? 1 : aDate < bDate ? -1 : 0);
+      return compareDates(aVal, bVal, options.sortOrder);
     }
 
     // Handle numeric fields
     if (options.sortBy === "amount") {
-      const aNum = typeof aVal === "number" ? aVal : parseFloat(String(aVal)) || 0;
-      const bNum = typeof bVal === "number" ? bVal : parseFloat(String(bVal)) || 0;
-      return options.sortOrder === "desc"
-        ? (bNum > aNum ? 1 : bNum < aNum ? -1 : 0)
-        : (aNum > bNum ? 1 : aNum < bNum ? -1 : 0);
+      return compareNumbers(aVal, bVal, options.sortOrder);
     }
 
     // Handle string fields
-    if (options.sortOrder === "desc") {
-      return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
-    } else {
-      return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-    }
+    return compareStrings(aVal, bVal, options.sortOrder);
   });
 
   return sorted;
