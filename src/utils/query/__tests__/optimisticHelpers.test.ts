@@ -1,8 +1,8 @@
 // Optimistic Helpers Tests
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { optimisticHelpers } from "../optimisticHelpers";
-import { budgetDb } from "../../../db/budgetDb";
-import budgetDatabaseService from "../../../services/budgetDatabaseService";
+import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
 
 // Mock dependencies

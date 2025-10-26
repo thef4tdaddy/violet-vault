@@ -3,12 +3,25 @@
  * Analyzes paycheck history to predict future payday dates
  */
 
+interface PaycheckEntry {
+  date: Date | string;
+  [key: string]: unknown;
+}
+
+interface PaydayPrediction {
+  nextPayday: Date | null;
+  confidence: number;
+  pattern: string | null;
+  intervalDays?: number;
+  message: string;
+}
+
 /**
  * Calculate the most common interval between paychecks
  * @param {Array} paycheckHistory - Array of paycheck objects with date field
  * @returns {Object} Prediction data including next payday and confidence
  */
-export const predictNextPayday = (paycheckHistory) => {
+export const predictNextPayday = (paycheckHistory: PaycheckEntry[]): PaydayPrediction => {
   if (!paycheckHistory || paycheckHistory.length < 2) {
     return {
       nextPayday: null,
@@ -21,19 +34,19 @@ export const predictNextPayday = (paycheckHistory) => {
   // Sort paychecks by date (most recent first)
   const sortedPaychecks = paycheckHistory
     .slice()
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // Calculate intervals between consecutive paychecks
-  const intervals = [];
+  const intervals: number[] = [];
   for (let i = 0; i < sortedPaychecks.length - 1; i++) {
     const current = new Date(sortedPaychecks[i].date);
     const previous = new Date(sortedPaychecks[i + 1].date);
-    const diffInDays = Math.round((current - previous) / (1000 * 60 * 60 * 24));
+    const diffInDays = Math.round((current.getTime() - previous.getTime()) / (1000 * 60 * 60 * 24));
     intervals.push(diffInDays);
   }
 
   // Find the most common interval
-  const intervalCounts = {};
+  const intervalCounts: Record<number, number> = {};
   intervals.forEach((interval) => {
     // Group similar intervals (±1 day tolerance)
     const key = Math.round(interval / 7) * 7; // Round to nearest week
@@ -42,10 +55,10 @@ export const predictNextPayday = (paycheckHistory) => {
 
   // Get the most frequent interval
   const mostCommonInterval = Object.keys(intervalCounts).reduce((a, b) =>
-    intervalCounts[a] > intervalCounts[b] ? a : b
+    intervalCounts[Number(a)] > intervalCounts[Number(b)] ? a : b
   );
 
-  const intervalFrequency = intervalCounts[mostCommonInterval];
+  const intervalFrequency = intervalCounts[Number(mostCommonInterval)];
   const confidence = Math.min((intervalFrequency / intervals.length) * 100, 95);
 
   // Predict next payday
@@ -54,7 +67,7 @@ export const predictNextPayday = (paycheckHistory) => {
   nextPayday.setDate(lastPaycheck.getDate() + parseInt(mostCommonInterval));
 
   // Determine pattern type
-  let pattern;
+  let pattern: string;
   const commonInterval = parseInt(mostCommonInterval);
   if (commonInterval >= 13 && commonInterval <= 15) {
     pattern = "biweekly";
@@ -86,7 +99,7 @@ export const predictNextPayday = (paycheckHistory) => {
  * @param {Date} today - Today's date (optional, defaults to new Date())
  * @returns {boolean} True if today is a predicted payday
  */
-export const isPaydayToday = (prediction, today = new Date()) => {
+export const isPaydayToday = (prediction: PaydayPrediction, today: Date = new Date()): boolean => {
   if (!prediction.nextPayday) return false;
 
   const todayStr = today.toDateString();
@@ -101,12 +114,15 @@ export const isPaydayToday = (prediction, today = new Date()) => {
  * @param {Date} today - Today's date (optional, defaults to new Date())
  * @returns {Object} Information about recent payday
  */
-export const checkRecentPayday = (prediction, today = new Date()) => {
+export const checkRecentPayday = (
+  prediction: PaydayPrediction,
+  today: Date = new Date()
+): { occurred: boolean; daysAgo: number; wasToday?: boolean; wasYesterday?: boolean } => {
   if (!prediction.nextPayday) {
     return { occurred: false, daysAgo: 0 };
   }
 
-  const diffTime = today - prediction.nextPayday;
+  const diffTime = today.getTime() - prediction.nextPayday.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   // Check if payday was in the last 2 days (including today)
@@ -126,10 +142,13 @@ export const checkRecentPayday = (prediction, today = new Date()) => {
  * @param {Date} today - Today's date (optional, defaults to new Date())
  * @returns {number} Days until next payday (negative if past due)
  */
-export const getDaysUntilPayday = (prediction, today = new Date()) => {
+export const getDaysUntilPayday = (
+  prediction: PaydayPrediction,
+  today: Date = new Date()
+): number | null => {
   if (!prediction.nextPayday) return null;
 
-  const diffTime = prediction.nextPayday - today;
+  const diffTime = prediction.nextPayday.getTime() - today.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
@@ -139,17 +158,39 @@ export const getDaysUntilPayday = (prediction, today = new Date()) => {
  * @param {Date} today - Today's date (optional, defaults to new Date())
  * @returns {Object} Funding recommendations
  */
-export const getPaydayRecommendations = (prediction, today = new Date()) => {
+export const getPaydayRecommendations = (
+  prediction: PaydayPrediction,
+  today: Date = new Date()
+): {
+  showRecommendations: boolean;
+  actions: Array<{
+    type: string;
+    priority: string;
+    title: string;
+    description: string;
+    actionText: string;
+    color: string;
+  }>;
+  daysUntil?: number | null;
+  confidence?: number;
+} => {
   const daysUntil = getDaysUntilPayday(prediction, today);
 
-  if (!prediction.nextPayday || daysUntil < 0 || daysUntil > 7) {
+  if (!prediction.nextPayday || daysUntil === null || daysUntil < 0 || daysUntil > 7) {
     return {
       showRecommendations: false,
       actions: [],
     };
   }
 
-  const actions = [];
+  const actions: Array<{
+    type: string;
+    priority: string;
+    title: string;
+    description: string;
+    actionText: string;
+    color: string;
+  }> = [];
 
   if (daysUntil === 0) {
     actions.push({
@@ -202,7 +243,14 @@ export const getPaydayRecommendations = (prediction, today = new Date()) => {
  * @param {Object} prediction - Prediction object from predictNextPayday
  * @returns {Object} Formatted display information
  */
-export const formatPaydayPrediction = (prediction) => {
+export const formatPaydayPrediction = (
+  prediction: PaydayPrediction
+): {
+  displayText: string;
+  shortText: string;
+  confidence: number;
+  pattern?: string | null;
+} => {
   if (!prediction.nextPayday) {
     return {
       displayText: "Unable to predict next payday",
@@ -214,8 +262,8 @@ export const formatPaydayPrediction = (prediction) => {
   const daysUntil = getDaysUntilPayday(prediction);
   const date = prediction.nextPayday.toLocaleDateString();
 
-  let displayText;
-  let shortText;
+  let displayText: string;
+  let shortText: string;
 
   if (daysUntil === 0) {
     displayText = `Payday predicted for today (${date})`;
@@ -223,15 +271,18 @@ export const formatPaydayPrediction = (prediction) => {
   } else if (daysUntil === 1) {
     displayText = `Payday predicted for tomorrow (${date})`;
     shortText = "Tomorrow";
-  } else if (daysUntil > 0 && daysUntil <= 7) {
+  } else if (daysUntil !== null && daysUntil > 0 && daysUntil <= 7) {
     displayText = `Payday predicted in ${daysUntil} days (${date})`;
     shortText = `${daysUntil} days`;
-  } else if (daysUntil > 0) {
+  } else if (daysUntil !== null && daysUntil > 0) {
     displayText = `Next payday predicted for ${date}`;
     shortText = date;
-  } else {
+  } else if (daysUntil !== null) {
     displayText = `Predicted payday was ${Math.abs(daysUntil)} days ago (${date})`;
     shortText = `${Math.abs(daysUntil)} days ago`;
+  } else {
+    displayText = `Next payday predicted for ${date}`;
+    shortText = date;
   }
 
   return {

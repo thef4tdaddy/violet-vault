@@ -16,7 +16,7 @@ export const useSettingsDashboardUI = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showEnvelopeChecker, setShowEnvelopeChecker] = useState(false);
 
-  const handleSectionChange = useCallback((sectionId) => {
+  const handleSectionChange = useCallback((sectionId: string) => {
     setActiveSection(sectionId);
   }, []);
 
@@ -112,13 +112,14 @@ export const useCloudSyncManager = () => {
       logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
         const { cloudSyncService } = await import("../../services/cloudSyncService");
-        // Note: Auth validation is skipped here because useAuth is a hook
-        // and can only be called from components, not from event handlers
+        // Get auth data from AuthContext instead of old Zustand store
+        // Note: useAuth is a hook and can only be called from components, not from event handlers
+        // This is a limitation - for now we'll skip auth validation in settings
         logger.warn(
           "Cloud sync toggle called - auth validation skipped due to hook context limitations"
         );
 
-        cloudSyncService.start();
+        cloudSyncService.start({});
       } catch (error) {
         logger.error("Failed to start cloud sync:", error);
       }
@@ -141,11 +142,11 @@ export const useCloudSyncManager = () => {
       logger.debug("🔄 Manual sync triggered from settings");
       const { cloudSyncService } = await import("../../services/cloudSyncService");
 
-      if (!cloudSyncService.isRunning) {
+      if (!(cloudSyncService as { isRunning?: boolean }).isRunning) {
         logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
         // Note: Auth data should come from the component level context
         // For now, just try to start sync - it will use existing auth if available
-        await cloudSyncService.start();
+        await cloudSyncService.start({});
       }
 
       const result = await cloudSyncService.forceSync();
@@ -217,18 +218,19 @@ export const useSettingsActions = () => {
       await createTestBudgetHistory();
       globalToast.showSuccess(
         "✅ Test budget history created! Check console for details.",
-        "Test History Created"
+        "Test History Created",
+        undefined
       );
     } catch (error) {
       globalToast.showError(
-        "❌ Failed to create test history: " + error.message,
+        "❌ Failed to create test history: " + (error as Error).message,
         "Test Failed",
         8000
       );
     }
   }, []);
 
-  const handleResetConfirmAction = useCallback((onClose, onResetEncryption) => {
+  const handleResetConfirmAction = useCallback((onClose: () => void, onResetEncryption: () => void) => {
     return () => {
       onClose();
       onResetEncryption();

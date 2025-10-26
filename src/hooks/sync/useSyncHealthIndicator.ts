@@ -3,24 +3,19 @@ import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
 
-// Extend window interface for global validation functions
-declare global {
-  interface Window {
-    runMasterSyncValidation?: () => Promise<ValidationResults>;
-    forceCloudDataReset?: () => Promise<RecoveryResult>;
-  }
+/**
+ * Validation summary structure
+ */
+interface ValidationSummary {
+  overallStatus: string;
+  totalFailed: number;
 }
 
 /**
  * Full validation results structure
  */
 interface ValidationResults {
-  summary: {
-    overallStatus: string;
-    totalFailed: number;
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
+  summary: ValidationSummary;
 }
 
 /**
@@ -92,8 +87,8 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = (): void => {
-      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
-      setIsBackgroundSyncing(isRunning);
+      const isRunning = (cloudSyncService as { isRunning?: boolean; activeSyncPromise?: unknown }).isRunning && (cloudSyncService as { activeSyncPromise?: unknown }).activeSyncPromise;
+      setIsBackgroundSyncing(!!isRunning);
     };
 
     // Check immediately
@@ -131,10 +126,10 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
 
   const runFullValidation = async (): Promise<void> => {
     logger.info("🚀 Sync Health UI: Full validation button clicked");
-    if (typeof window !== "undefined" && window.runMasterSyncValidation) {
+    if (typeof window !== "undefined" && (window as { runMasterSyncValidation?: () => Promise<ValidationResults> }).runMasterSyncValidation) {
       logger.info("🚀 Running full sync validation from UI...");
       try {
-        const results = await window.runMasterSyncValidation();
+        const results = await (window as { runMasterSyncValidation: () => Promise<ValidationResults> }).runMasterSyncValidation();
         logger.info("✅ Sync Health: Full validation completed", results.summary);
         // Update status based on results
         setSyncStatus({
@@ -156,13 +151,13 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
 
   const resetCloudData = async (): Promise<void> => {
     logger.info("🧹 Sync Health UI: Reset cloud data button clicked");
-    if (typeof window !== "undefined" && window.forceCloudDataReset) {
+    if (typeof window !== "undefined" && (window as { forceCloudDataReset?: () => Promise<RecoveryResult> }).forceCloudDataReset) {
       setIsRecovering(true);
       setRecoveryResult(null);
 
       try {
         logger.info("🧹 Resetting cloud data from UI...");
-        const result = await window.forceCloudDataReset();
+        const result = await (window as { forceCloudDataReset: () => Promise<RecoveryResult> }).forceCloudDataReset();
         logger.info("✅ Sync Health: Cloud data reset completed", result);
 
         setRecoveryResult(result);
