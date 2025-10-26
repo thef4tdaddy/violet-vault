@@ -4,6 +4,46 @@ import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import { useShallow } from "zustand/react/shallow";
 
+interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  completed: boolean;
+  category: string;
+}
+
+interface TutorialProgress {
+  accountSetup: boolean;
+  firstBankBalance: boolean;
+  firstDebts: boolean;
+  firstBills: boolean;
+  firstPaycheck: boolean;
+  firstEnvelope: boolean;
+  linkedEnvelopes: boolean;
+  firstAllocation: boolean;
+  firstTransaction: boolean;
+  syncExplained: boolean;
+}
+
+interface OnboardingPreferences {
+  showHints: boolean;
+  tourCompleted: boolean;
+}
+
+interface OnboardingProgress {
+  completed: number;
+  total: number;
+  percentage: number;
+}
+
+interface OnboardingStoreState {
+  isOnboarded: boolean;
+  tutorialProgress: TutorialProgress;
+  getProgress: () => OnboardingProgress;
+  preferences: OnboardingPreferences;
+  setPreference: (key: keyof OnboardingPreferences, value: boolean) => void;
+}
+
 /**
  * OnboardingProgress - Shows progress checklist for new users
  */
@@ -11,11 +51,11 @@ const OnboardingProgress = () => {
   const { isOnboarded, tutorialProgress, getProgress, preferences, setPreference } =
     useOnboardingStore(
       useShallow((state) => ({
-        isOnboarded: state.isOnboarded,
-        tutorialProgress: state.tutorialProgress,
-        getProgress: state.getProgress,
-        preferences: state.preferences,
-        setPreference: state.setPreference,
+        isOnboarded: (state as OnboardingStoreState).isOnboarded,
+        tutorialProgress: (state as OnboardingStoreState).tutorialProgress,
+        getProgress: (state as OnboardingStoreState).getProgress,
+        preferences: (state as OnboardingStoreState).preferences,
+        setPreference: (state as OnboardingStoreState).setPreference,
       }))
     );
 
@@ -28,7 +68,7 @@ const OnboardingProgress = () => {
 
   const progress = getProgress();
 
-  const steps = [
+  const steps: OnboardingStep[] = [
     {
       id: "accountSetup",
       title: "Account Setup",
@@ -167,7 +207,7 @@ const OnboardingProgress = () => {
           <div className="space-y-4">
             {/* Group steps by category */}
             {Object.entries(
-              steps.reduce((groups, step) => {
+              steps.reduce<Record<string, OnboardingStep[]>>((groups, step) => {
                 const category = step.category || "Other";
                 if (!groups[category]) groups[category] = [];
                 groups[category].push(step);

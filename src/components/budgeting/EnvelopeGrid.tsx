@@ -28,11 +28,14 @@ const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
 // Empty state component
-const EmptyStateView = ({ filterOptions, setShowCreateModal }) => {
+const EmptyStateView = ({ filterOptions, setShowCreateModal }: {
+  filterOptions: { envelopeType: string; showEmpty: boolean };
+  setShowCreateModal: (show: boolean) => void;
+}) => {
   const isAllFilters = filterOptions.envelopeType === "all" && filterOptions.showEmpty;
 
   if (isAllFilters) {
-    return <EmptyStateHints type="envelopes" onAction={() => setShowCreateModal(true)} />;
+    return <EmptyStateHints type="envelopes" onAction={() => setShowCreateModal(true)} customMessage={undefined} customActions={undefined} />;
   }
 
   return (
@@ -55,13 +58,31 @@ const EnvelopeModals = ({
   setEditingEnvelope,
   handleUpdateEnvelope,
   deleteEnvelope,
-  updateBill,
-  bills,
+  updateBill: _updateBill,
+  bills: _bills,
   historyEnvelope,
   setHistoryEnvelope,
   quickFundModal,
   closeQuickFundModal,
   handleQuickFundConfirm,
+}: {
+  showCreateModal: boolean;
+  setShowCreateModal: (show: boolean) => void;
+  handleCreateEnvelope: (data: unknown) => Promise<void>;
+  envelopes: unknown[];
+  budget: { currentUser: unknown; updateBill: (bill: unknown) => void };
+  unassignedCash: number;
+  editingEnvelope: unknown;
+  setEditingEnvelope: (env: unknown) => void;
+  handleUpdateEnvelope: (data: unknown) => Promise<void>;
+  deleteEnvelope: (id: string) => Promise<void>;
+  updateBill: (data: { id: string; updates: unknown }) => Promise<void>;
+  bills: unknown[];
+  historyEnvelope: unknown;
+  setHistoryEnvelope: (env: unknown) => void;
+  quickFundModal: { isOpen: boolean; envelope: unknown; suggestedAmount: number };
+  closeQuickFundModal: () => void;
+  handleQuickFundConfirm: (id: string, amount: number) => Promise<void>;
 }) => (
   <Suspense fallback={<div>Loading...</div>}>
     {showCreateModal && (
@@ -69,9 +90,9 @@ const EnvelopeModals = ({
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreateEnvelope={handleCreateEnvelope}
+        onCreateBill={() => {}}
         existingEnvelopes={envelopes}
-        currentUser={budget.currentUser}
-        unassignedCash={unassignedCash}
+        currentUser={(budget.currentUser as { userName: string; userColor: string } | undefined) || { userName: "User", userColor: "#000000" }}
       />
     )}
 
@@ -82,17 +103,8 @@ const EnvelopeModals = ({
         envelope={editingEnvelope}
         onUpdateEnvelope={handleUpdateEnvelope}
         onDeleteEnvelope={deleteEnvelope}
-        onUpdateBill={(bill) => {
-          try {
-            updateBill({ id: bill.id, updates: bill });
-          } catch (error) {
-            logger.warn("TanStack updateBill failed, using Zustand fallback", error);
-            budget.updateBill(bill);
-          }
-        }}
         existingEnvelopes={envelopes}
-        allBills={bills}
-        currentUser={budget.currentUser}
+        currentUser={(budget.currentUser as { userName: string; userColor: string } | undefined) || { userName: "User", userColor: "#000000" }}
       />
     )}
 
@@ -142,7 +154,58 @@ const EnvelopeGridView = ({
   handleQuickFund,
   selectedEnvelopeId,
   bills,
-  ...modalProps
+  showCreateModal,
+  handleCreateEnvelope,
+  envelopes,
+  budget,
+  editingEnvelope,
+  setEditingEnvelope,
+  handleUpdateEnvelope,
+  deleteEnvelope,
+  updateBill,
+  historyEnvelope,
+  setHistoryEnvelope,
+  quickFundModal,
+  closeQuickFundModal,
+  handleQuickFundConfirm,
+}: {
+  containerRef: React.RefObject<HTMLDivElement>;
+  touchHandlers: Record<string, unknown>;
+  pullStyles: React.CSSProperties;
+  className: string;
+  isPulling: boolean;
+  isRefreshing: boolean;
+  pullProgress: number;
+  isReady: boolean;
+  pullRotation: number;
+  totals: unknown;
+  unassignedCash: number;
+  filterOptions: unknown;
+  setFilterOptions: (opts: unknown) => void;
+  setShowCreateModal: (show: boolean) => void;
+  viewMode: string;
+  setViewMode: (mode: string) => void;
+  handleViewHistory: (env: unknown) => void;
+  sortedEnvelopes: unknown[];
+  handleEnvelopeSelect: (id: string) => void;
+  handleEnvelopeEdit: (env: unknown) => void;
+  handleQuickFund: (id: string, amount: number) => void;
+  selectedEnvelopeId: string | null;
+  bills: unknown[];
+  showCreateModal: boolean;
+  handleCreateEnvelope: (data: unknown) => Promise<void>;
+  envelopes: unknown[];
+  budget: { currentUser: unknown; updateBill: (bill: unknown) => void };
+  editingEnvelope: unknown;
+  setEditingEnvelope: (env: unknown) => void;
+  handleUpdateEnvelope: (data: unknown) => Promise<void>;
+  deleteEnvelope: (id: string) => Promise<void>;
+  updateBill: (data: { id: string; updates: unknown }) => Promise<void>;
+  historyEnvelope: unknown;
+  setHistoryEnvelope: (env: unknown) => void;
+  quickFundModal: { isOpen: boolean; envelope: unknown; suggestedAmount: number };
+  closeQuickFundModal: () => void;
+  handleQuickFundConfirm: (id: string, amount: number) => Promise<void>;
 }) => (
   <div
     ref={containerRef}
@@ -151,7 +214,7 @@ const EnvelopeGridView = ({
     style={pullStyles}
   >
     <PullToRefreshIndicator
-      isPulling={isPulling}
+      isVisible={isPulling}
       isRefreshing={isRefreshing}
       pullProgress={pullProgress}
       isReady={isReady}
@@ -170,26 +233,44 @@ const EnvelopeGridView = ({
 
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} />
-      {sortedEnvelopes.map((envelope) => (
+      {sortedEnvelopes.map((envelope: { id: string; [key: string]: unknown }) => (
         <EnvelopeItem
           key={envelope.id}
-          envelope={envelope}
+          envelope={envelope as never}
           onSelect={handleEnvelopeSelect}
           onEdit={handleEnvelopeEdit}
           onViewHistory={handleViewHistory}
-          onQuickFund={handleQuickFund}
+          onQuickFund={(envelopeId: string) => handleQuickFund(envelopeId, 0)}
           isSelected={selectedEnvelopeId === envelope.id}
-          bills={bills}
+          bills={bills as never}
           unassignedCash={unassignedCash}
         />
       ))}
     </div>
 
     {sortedEnvelopes.length === 0 && (
-      <EmptyStateView filterOptions={filterOptions} setShowCreateModal={setShowCreateModal} />
+      <EmptyStateView filterOptions={filterOptions as { envelopeType: string; showEmpty: boolean }} setShowCreateModal={setShowCreateModal} />
     )}
 
-    <EnvelopeModals {...modalProps} />
+    <EnvelopeModals
+      showCreateModal={showCreateModal}
+      setShowCreateModal={setShowCreateModal}
+      handleCreateEnvelope={handleCreateEnvelope}
+      envelopes={envelopes}
+      budget={budget}
+      unassignedCash={unassignedCash}
+      editingEnvelope={editingEnvelope}
+      setEditingEnvelope={setEditingEnvelope}
+      handleUpdateEnvelope={handleUpdateEnvelope}
+      deleteEnvelope={deleteEnvelope}
+      updateBill={updateBill}
+      bills={bills}
+      historyEnvelope={historyEnvelope}
+      setHistoryEnvelope={setHistoryEnvelope}
+      quickFundModal={quickFundModal}
+      closeQuickFundModal={closeQuickFundModal}
+      handleQuickFundConfirm={handleQuickFundConfirm}
+    />
   </div>
 );
 
@@ -295,7 +376,7 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
     isLoading: envelopesLoading,
   } = useEnvelopes();
 
-  const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { transactions: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
   const { bills: tanStackBills = [], updateBill, isLoading: billsLoading } = useBills();
   const { unassignedCash: tanStackUnassignedCash } = useUnassignedCash();
   // Selective subscriptions - only subscribe to specific properties needed
@@ -453,8 +534,10 @@ const UnifiedEnvelopeManager = ({
       editingEnvelope={uiState.editingEnvelope}
       setEditingEnvelope={uiState.setEditingEnvelope}
       handleUpdateEnvelope={uiState.handleUpdateEnvelope}
-      deleteEnvelope={deleteEnvelope}
-      updateBill={updateBill}
+      deleteEnvelope={(id: string) => Promise.resolve(deleteEnvelope(id))}
+      updateBill={async (data: { id: string; updates: unknown }) => {
+        updateBill(data.updates as never);
+      }}
       historyEnvelope={uiState.historyEnvelope}
       setHistoryEnvelope={uiState.setHistoryEnvelope}
       quickFundModal={uiState.quickFundModal}

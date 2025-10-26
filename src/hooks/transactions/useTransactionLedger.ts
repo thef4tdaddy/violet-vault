@@ -26,12 +26,12 @@ export const useTransactionLedger = (currentUser) => {
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore(
-    useShallow((state) => ({
-      updateTransaction: state.updateTransaction,
-      setAllTransactions: state.setAllTransactions,
-      updateBill: state.updateBill,
-    }))
-  );
+    useShallow((state) => state)
+  ) as {
+    updateTransaction: (transaction: unknown) => void;
+    setAllTransactions: (transactions: unknown[]) => void;
+    updateBill: (bill: unknown) => void;
+  };
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // State management
@@ -71,17 +71,17 @@ export const useTransactionLedger = (currentUser) => {
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, handleBulkImport, budget);
+  } = useTransactionImport(currentUser, handleBulkImport);
 
-  const filteredTransactions = useTransactionFilters(
+  const filteredTransactions = useTransactionFilters({
     transactions,
     searchTerm,
     dateFilter,
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
-  );
+    sortOrder,
+  });
 
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
 
@@ -108,7 +108,7 @@ export const useTransactionLedger = (currentUser) => {
       updateTransaction(transactionWithId);
       setEditingTransaction(null);
     } else {
-      addTransaction(newTransaction);
+      (addTransaction as (data: unknown) => void)(newTransaction);
     }
 
     setShowAddModal(false);
