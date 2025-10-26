@@ -1,13 +1,14 @@
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import SupplementalAccounts from "../SupplementalAccounts";
 import userEvent from "@testing-library/user-event";
+import useSupplementalAccountsOriginal from "@/hooks/accounts/useSupplementalAccounts";
 
 // Mock the custom hook
 vi.mock("@/hooks/accounts/useSupplementalAccounts", () => ({
   default: vi.fn(() => ({
     showAddModal: false,
-    editingAccount: null,
+    editingGoal: null,
     showBalances: true,
     showTransferModal: false,
     transferringAccount: null,
@@ -35,9 +36,12 @@ vi.mock("@/hooks/accounts/useSupplementalAccounts", () => ({
   })),
 }));
 
+// Type cast the mocked hook  
+const useSupplementalAccounts = useSupplementalAccountsOriginal as unknown as Mock;
+
 // Mock child components
 vi.mock("../AccountsHeader", () => ({
-  default: ({ totalValue, showBalances, onToggleBalances, onAddAccount }) => (
+  default: ({ totalValue, showBalances: _showBalances, onToggleBalances, onAddAccount }) => (
     <div data-testid="accounts-header">
       <span>Total: ${totalValue}</span>
       <button onClick={onToggleBalances}>Toggle Balances</button>
@@ -134,10 +138,6 @@ describe("SupplementalAccounts", () => {
     });
 
     it("should show expiration alert when accounts are expiring", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
-
       useSupplementalAccounts.mockReturnValue({
         ...useSupplementalAccounts(),
         expiringAccounts: [{ id: "1", name: "Account 1" }],
@@ -149,10 +149,6 @@ describe("SupplementalAccounts", () => {
     });
 
     it("should not show expiration alert when no accounts are expiring", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
-
       useSupplementalAccounts.mockReturnValue({
         ...useSupplementalAccounts(),
         expiringAccounts: [],
@@ -166,9 +162,6 @@ describe("SupplementalAccounts", () => {
 
   describe("User Interactions", () => {
     it("should call openAddForm when Add Account button is clicked", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
       const mockOpenAddForm = vi.fn();
 
       useSupplementalAccounts.mockReturnValue({
@@ -185,9 +178,6 @@ describe("SupplementalAccounts", () => {
     });
 
     it("should call toggleBalanceVisibility when Toggle Balances button is clicked", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
       const mockToggleBalances = vi.fn();
 
       useSupplementalAccounts.mockReturnValue({
@@ -206,10 +196,6 @@ describe("SupplementalAccounts", () => {
 
   describe("Modal States", () => {
     it("should show AccountFormModal when showAddModal is true", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
-
       useSupplementalAccounts.mockReturnValue({
         ...useSupplementalAccounts(),
         showAddModal: true,
@@ -221,10 +207,6 @@ describe("SupplementalAccounts", () => {
     });
 
     it("should show TransferModal when showTransferModal is true", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
-
       useSupplementalAccounts.mockReturnValue({
         ...useSupplementalAccounts(),
         showTransferModal: true,
@@ -258,10 +240,6 @@ describe("SupplementalAccounts", () => {
 
   describe("Balance Visibility", () => {
     it("should show balances when showBalances is true", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
-
       useSupplementalAccounts.mockReturnValue({
         ...useSupplementalAccounts(),
         showBalances: true,
@@ -275,10 +253,6 @@ describe("SupplementalAccounts", () => {
     });
 
     it("should hide balances when showBalances is false", async () => {
-      const useSupplementalAccounts = (
-        await import("@/hooks/accounts/useSupplementalAccounts")
-      ).default;
-
       useSupplementalAccounts.mockReturnValue({
         ...useSupplementalAccounts(),
         showBalances: false,

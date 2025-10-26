@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import SavingsGoals from "../SavingsGoals";
 import userEvent from "@testing-library/user-event";
+import useSavingsGoalsActionsOriginal from "../../../hooks/savings/useSavingsGoalsActions";
 
 // Mock the custom hook
 vi.mock("../../../hooks/savings/useSavingsGoalsActions", () => ({
@@ -18,6 +19,9 @@ vi.mock("../../../hooks/savings/useSavingsGoalsActions", () => ({
     isAddEditModalOpen: false,
   })),
 }));
+
+// Type cast the mocked hook
+const useSavingsGoalsActions = useSavingsGoalsActionsOriginal as unknown as Mock;
 
 // Mock child components
 vi.mock("../SavingsSummaryCard", () => ({
@@ -171,9 +175,6 @@ describe("SavingsGoals", () => {
 
   describe("User Interactions", () => {
     it("should call openAddForm when Add Goal button is clicked", async () => {
-      const useSavingsGoalsActions = (
-        await import("../../../hooks/savings/useSavingsGoalsActions")
-      ).default;
       const mockOpenAddForm = vi.fn();
 
       useSavingsGoalsActions.mockReturnValue({
@@ -198,9 +199,6 @@ describe("SavingsGoals", () => {
     });
 
     it("should call openDistributeModal when Distribute Cash button is clicked", async () => {
-      const useSavingsGoalsActions = (
-        await import("../../../hooks/savings/useSavingsGoalsActions")
-      ).default;
       const mockOpenDistributeModal = vi.fn();
 
       useSavingsGoalsActions.mockReturnValue({
@@ -235,10 +233,6 @@ describe("SavingsGoals", () => {
 
   describe("Modal States", () => {
     it("should show AddEditModal when isAddEditModalOpen is true", async () => {
-      const useSavingsGoalsActions = (
-        await import("../../../hooks/savings/useSavingsGoalsActions")
-      ).default;
-
       useSavingsGoalsActions.mockReturnValue({
         showDistributeModal: false,
         editingGoal: null,
@@ -258,10 +252,6 @@ describe("SavingsGoals", () => {
     });
 
     it("should show DistributeModal when showDistributeModal is true", async () => {
-      const useSavingsGoalsActions = (
-        await import("../../../hooks/savings/useSavingsGoalsActions")
-      ).default;
-
       useSavingsGoalsActions.mockReturnValue({
         showDistributeModal: true,
         editingGoal: null,
@@ -304,10 +294,6 @@ describe("SavingsGoals", () => {
 
   describe("Props Passing", () => {
     it("should pass correct props to useSavingsGoalsActions hook", async () => {
-      const useSavingsGoalsActions = (
-        await import("../../../hooks/savings/useSavingsGoalsActions")
-      ).default;
-
       render(<SavingsGoals {...defaultProps} />);
 
       expect(useSavingsGoalsActions).toHaveBeenCalledWith({
