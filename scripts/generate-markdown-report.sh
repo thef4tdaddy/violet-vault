@@ -17,8 +17,9 @@ if [ ! -f "$LINT_INPUT" ] || [ ! -f "$TYPECHECK_INPUT" ]; then
 fi
 
 # --- Extract Metrics ---
-# Count total lint issues
-LINT_TOTAL=$(grep -E "^\s+[0-9]+ " "$LINT_INPUT" | awk '{sum+=$1} END {print sum}')
+# Count total lint issues (only from Issue Count by Category section, excluding fully-excluded rules)
+# Excludes react-hooks/* rules which are all handled by exclusions config
+LINT_TOTAL=$(sed -n '/--- Issue Count by Category (ESLint Rule) ---/,/--- Detailed Lint Report ---/p' "$LINT_INPUT" | grep -E "^\s+[0-9]+" | grep -v "react-hooks/" | awk '{sum+=$1} END {print sum}')
 
 # Count total typecheck errors
 TYPECHECK_TOTAL=$(grep -c "error TS" "$TYPECHECK_INPUT")
