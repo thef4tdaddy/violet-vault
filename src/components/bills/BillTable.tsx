@@ -1,6 +1,9 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
+import BillTableHeader from "./BillTableHeader";
+import BillTableEmptyState from "./BillTableEmptyState";
+import BillTableBulkActions from "./BillTableBulkActions";
 
 /**
  * Bill table with bulk actions and selection
@@ -22,66 +25,20 @@ const BillTable = ({
   return (
     <>
       {/* Bulk Actions */}
-      {selectionState.hasSelection && (
-        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-          <span className="text-sm text-blue-700">
-            {selectionState.selectedCount} bill
-            {selectionState.selectedCount > 1 ? "s" : ""} selected
-          </span>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setShowBulkUpdateModal(true)}
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-            >
-              Bulk Update
-            </Button>
-            <Button
-              onClick={clearSelection}
-              className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
-            >
-              Clear
-            </Button>
-          </div>
-        </div>
-      )}
+      <BillTableBulkActions
+        selectionState={selectionState}
+        setShowBulkUpdateModal={setShowBulkUpdateModal}
+        clearSelection={clearSelection}
+      />
 
       {/* Bills Table */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden border-2 border-black">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 border-b-2 border-black">
-            <tr>
-              <th className="px-6 py-3 text-center">
-                <Button
-                  onClick={selectionState.isAllSelected ? clearSelection : selectAllBills}
-                  className="flex items-center justify-center w-6 h-6 mx-auto hover:bg-gray-200 rounded transition-colors"
-                  title={selectionState.isAllSelected ? "Deselect all bills" : "Select all bills"}
-                >
-                  {selectionState.isAllSelected
-                    ? React.createElement(getIcon("CheckSquare"), {
-                        className: "h-5 w-5 text-blue-600",
-                      })
-                    : React.createElement(getIcon("Square"), {
-                        className: "h-5 w-5 text-gray-400",
-                      })}
-                </Button>
-              </th>
-              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
-                <span className="text-lg">B</span>ILL
-              </th>
-              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
-                <span className="text-lg">A</span>MOUNT
-              </th>
-              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
-                <span className="text-lg">D</span>UE <span className="text-lg">D</span>ATE
-              </th>
-              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
-                <span className="text-lg">S</span>TATUS
-              </th>
-              <th className="px-6 py-3 text-right text-base font-black text-black tracking-wider">
-                <span className="text-lg">A</span>CTIONS
-              </th>
-            </tr>
-          </thead>
+          <BillTableHeader
+            selectionState={selectionState}
+            clearSelection={clearSelection}
+            selectAllBills={selectAllBills}
+          />
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredBills.map((bill) => {
               const displayData = getBillDisplayData(bill);
@@ -151,24 +108,11 @@ const BillTable = ({
         </table>
 
         {filteredBills.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            {React.createElement(getIcon("FileText"), {
-              className: "mx-auto h-12 w-12 text-gray-400",
-            })}
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No bills found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {viewMode === "all"
-                ? "Get started by adding a new bill."
-                : "Try switching to a different view or adjusting filters."}
-            </p>
-            <div className="mt-4 text-xs text-gray-400 font-mono">
-              DEBUG: Bills={filteredBills.length}, Categorized=
-              {JSON.stringify(
-                Object.keys(categorizedBills).map((k) => `${k}:${categorizedBills[k]?.length || 0}`)
-              )}
-              , ViewMode={viewMode}
-            </div>
-          </div>
+          <BillTableEmptyState
+            viewMode={viewMode}
+            filteredBills={filteredBills}
+            categorizedBills={categorizedBills}
+          />
         )}
       </div>
     </>
