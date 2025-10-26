@@ -5,12 +5,42 @@
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
 
+interface PaycheckRecord {
+  amount: number;
+  unassignedCashAfter: number;
+  unassignedCashBefore: number;
+  envelopeAllocations?: EnvelopeAllocation[];
+  [key: string]: unknown;
+}
+
+interface BudgetMetadata {
+  actualBalance?: number;
+  unassignedCash?: number;
+  [key: string]: unknown;
+}
+
+interface EnvelopeAllocation {
+  envelopeId: string;
+  amount: number;
+  [key: string]: unknown;
+}
+
+interface TransactionDeletionResult {
+  success: boolean;
+  transactionId: string;
+  deletedPaycheck?: string | boolean;
+}
+
+interface PaycheckDeletionResult {
+  deletedPaycheck: string | boolean;
+}
+
 /**
  * Reverse paycheck balance changes
  */
 export const reversePaycheckBalances = async (
-  paycheckRecord: any,
-  currentMetadata: any
+  paycheckRecord: PaycheckRecord,
+  currentMetadata: BudgetMetadata
 ): Promise<void> => {
   const currentActualBalance = currentMetadata?.actualBalance || 0;
   const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
@@ -33,7 +63,7 @@ export const reversePaycheckBalances = async (
 /**
  * Reverse envelope allocations
  */
-export const reverseEnvelopeAllocations = async (envelopeAllocations: any[]): Promise<void> => {
+export const reverseEnvelopeAllocations = async (envelopeAllocations: EnvelopeAllocation[]): Promise<void> => {
   if (!envelopeAllocations || envelopeAllocations.length === 0) {
     return;
   }
@@ -55,7 +85,7 @@ export const reverseEnvelopeAllocations = async (envelopeAllocations: any[]): Pr
 export const deleteAssociatedPaycheck = async (
   paycheckId: string,
   transactionId: string
-): Promise<any> => {
+): Promise<PaycheckDeletionResult> => {
   const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId);
   
   if (!paycheckRecord) {
@@ -78,7 +108,7 @@ export const deleteAssociatedPaycheck = async (
 /**
  * Process transaction deletion with paycheck handling
  */
-export const processTransactionDeletion = async (transactionId: string): Promise<any> => {
+export const processTransactionDeletion = async (transactionId: string): Promise<TransactionDeletionResult> => {
   logger.info("Starting transaction deletion", { transactionId });
 
   const transaction = await budgetDb.transactions.get(transactionId);
@@ -86,7 +116,7 @@ export const processTransactionDeletion = async (transactionId: string): Promise
     throw new Error("Transaction not found");
   }
 
-  let result: any = { success: true, transactionId };
+  let result: TransactionDeletionResult = { success: true, transactionId };
 
   if (transaction.paycheckId) {
     logger.info("Transaction is linked to paycheck, deleting paycheck too", {

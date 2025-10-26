@@ -74,7 +74,7 @@ const addSections = (config: PDFSectionConfig): number => {
     pdf,
     yPosition,
     margin,
-    pageHeight,
+    pageHeight: _pageHeight,
     checkPageBreak,
     analyticsData,
     balanceData,

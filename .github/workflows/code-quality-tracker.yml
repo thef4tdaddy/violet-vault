@@ -1,0 +1,168 @@
+name: Code Quality Tracker
+
+# Unified workflow to track both ESLint and TypeScript compilation issues
+on:
+  # Daily tracking at 9 AM UTC
+  schedule:
+    - cron: "0 9 * * *" # Daily at 9 AM UTC
+
+  # Keep PR checks for validation
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "*.js"
+      - "*.jsx"
+      - "*.ts"
+      - "*.tsx"
+
+  # Manual trigger option
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  track-code-quality:
+    runs-on: ubuntu-latest
+    name: Track ESLint and TypeScript Issues
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint and capture warnings
+        id: eslint
+        run: |
+          npx eslint --config configs/linting/eslint.config.js . --ext .js,.jsx,.ts,.tsx --format json > eslint-output.json 2>/dev/null || true
+
+          # Count warnings
+          WARNINGS=$(jq '[.[] | .messages[] | select(.severity == 1)] | length' eslint-output.json 2>/dev/null || echo 0)
+          ERRORS=$(jq '[.[] | .messages[] | select(.severity == 2)] | length' eslint-output.json 2>/dev/null || echo 0)
+          TOTAL=$((WARNINGS + ERRORS))
+
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+
+          echo "📊 ESLint Results: ${TOTAL} issues (${WARNINGS} warnings, ${ERRORS} errors)"
+
+      - name: Run TypeScript compiler and capture errors
+        id: typecheck
+        run: |
+          npm run typecheck 2>&1 | tee typecheck-output.txt || true
+
+          # Count TypeScript errors
+          TS_ERRORS=$(grep -c "error TS" typecheck-output.txt 2>/dev/null || echo 0)
+
+          echo "total=$TS_ERRORS" >> $GITHUB_OUTPUT
+          echo "📊 TypeScript Results: ${TS_ERRORS} compilation errors"
+
+      - name: Update Issue #568 (ESLint Tracking)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const eslintTotal = ${{ steps.eslint.outputs.total }};
+            const eslintWarnings = ${{ steps.eslint.outputs.warnings }};
+            const eslintErrors = ${{ steps.eslint.outputs.errors }};
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const statusLine = eslintTotal === 0 ? '✅ No issues' : '⚠️ Issues detected';
+            const finalLine = eslintTotal === 0 ? '🎉 All ESLint checks pass!' : '❌ Code quality issues detected - review and fix before release';
+
+            const commentBody = '## 📊 ESLint Tracking - ' + currentDate + '\n\n' +
+              '**Status**: ' + statusLine + '\n\n' +
+              '- **Total Issues**: ' + eslintTotal + '\n' +
+              '  - Warnings: ' + eslintWarnings + '\n' +
+              '  - Errors: ' + eslintErrors + '\n\n' +
+              finalLine + '\n\n' +
+              '_Last updated: ' + currentDate + '_';
+
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 568,
+                body: commentBody
+              });
+              console.log('✅ Successfully updated Issue #568 (ESLint Tracking)');
+            } catch (error) {
+              console.log('❌ Failed to update issue #568:', error.message);
+            }
+
+      - name: Update Issue #806 (TypeScript Tracking)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tsTotal = ${{ steps.typecheck.outputs.total }};
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const statusLine = tsTotal === 0 ? '✅ No compilation errors' : '🔴 Compilation errors detected';
+            const finalLine = tsTotal === 0 ? '🎉 TypeScript compilation passes!' : '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release';
+
+            const commentBody = '## 📊 TypeScript Compilation Tracking - ' + currentDate + '\n\n' +
+              '**Status**: ' + statusLine + '\n\n' +
+              '- **Total Errors**: ' + tsTotal + '\n\n' +
+              finalLine + '\n\n' +
+              '_Last updated: ' + currentDate + '_';
+
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 806,
+                body: commentBody
+              });
+              console.log('✅ Successfully updated Issue #806 (TypeScript Tracking)');
+            } catch (error) {
+              console.log('❌ Failed to update issue #806:', error.message);
+            }
+
+      - name: Create summary comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const eslintTotal = ${{ steps.eslint.outputs.total }};
+            const tsTotal = ${{ steps.typecheck.outputs.total }};
+
+            let statusEmoji = '✅';
+            let statusText = 'All checks pass';
+
+            if (eslintTotal > 0 || tsTotal > 0) {
+              statusEmoji = '⚠️';
+              statusText = 'Code quality issues detected';
+            }
+
+            const mergeStatus = eslintTotal === 0 && tsTotal === 0 ? '✅ Ready to merge' : '⚠️ Please review and fix issues before merging';
+            const commentBody = '## ' + statusEmoji + ' Code Quality Check\n\n' +
+              '**ESLint**: ' + eslintTotal + ' issues\n' +
+              '**TypeScript**: ' + tsTotal + ' compilation errors\n\n' +
+              mergeStatus;
+
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            } catch (error) {
+              console.log('Could not create PR comment:', error.message);
+            }

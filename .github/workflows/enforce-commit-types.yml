@@ -1,10 +1,10 @@
-name: Enforce Commit Types on Develop Branch
+name: Enforce Commit Types
 
 on:
   push:
-    branches: [develop]
+    branches: [main, develop]
   pull_request:
-    branches: [develop]
+    branches: [main, develop]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
           sudo apt update
           sudo apt install gh -y
 
-      - name: Validate commit types (fix/docs/style/perf/ci/revert only)
+      - name: Validate commit types
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -33,13 +33,24 @@ jobs:
             exit 0
           fi
 
-          ALLOWED="^(fix|docs|style|perf|ci|revert):"
+          # Determine allowed commit types based on branch
+          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref }}" == "refs/heads/main" ]]; then
+            ALLOWED="^(fix|docs|chore\(main\)|ci|revert):"
+            BRANCH_NAME="main"
+            ALLOWED_TYPES="fix:, docs:, chore(main):, ci:, revert:"
+          else
+            ALLOWED="^(fix|docs|style|perf|ci|revert):"
+            BRANCH_NAME="develop"
+            ALLOWED_TYPES="fix:, docs:, style:, perf:, ci:, revert:"
+          fi
+
           PR_NUMBER=${{ github.event.pull_request.number }}
           REPO=${{ github.repository }}
 
           # Debug information
           echo "🔍 Debug Info:"
-          echo "  - PR Number: $PR_NUMBER" 
+          echo "  - Branch: $BRANCH_NAME"
+          echo "  - PR Number: $PR_NUMBER"
           echo "  - Repository: $REPO"
           echo "  - Actor: ${{ github.actor }}"
           echo "  - Event: ${{ github.event_name }}"
@@ -74,13 +85,17 @@ jobs:
             if [ -z "$msg" ]; then
               continue
             fi
-            
+
             echo "🔎 Checking commit: '$msg'"
             if ! echo "$msg" | grep -Eq "$ALLOWED"; then
               echo "❌ Disallowed commit message:"
               echo "   \"$msg\""
-              echo "🔒 Only fix:, docs:, style:, perf:, ci:, and revert: commit types are allowed on develop."
-              echo "💡 feat: commits should come via PR from feature branches to enforce proper review process."
+              echo "🔒 Only $ALLOWED_TYPES and revert: commit types are allowed on $BRANCH_NAME."
+              if [ "$BRANCH_NAME" == "develop" ]; then
+                echo "💡 feat: commits should come via PR from feature branches to enforce proper review process."
+              else
+                echo "💡 Please open a PR to develop instead for feature, style, or other changes."
+              fi
               echo "👉 Please adjust your commit message or target a different branch."
               DISALLOWED=1
             else
@@ -94,4 +109,4 @@ jobs:
           fi
 
       - name: Success
-        run: echo "✅ All commits use allowed types for develop branch."
+        run: echo "✅ All commits use allowed types for ${{ github.base_ref || github.ref_name }} branch."

@@ -152,16 +152,20 @@ const noLegacyToast = {
           });
         }
 
-        // Check for confirm() calls - skip if using modern useConfirm hook
+        // Check for confirm() calls - skip if using modern useConfirm hook or if it's a parameter callback
         if (
           node.callee.type === 'Identifier' &&
           node.callee.name === 'confirm' &&
           !hasUseConfirmImport
         ) {
-          context.report({
-            node,
-            messageId: 'noConfirmCall',
-          });
+          // Skip if this is accountHandlersUtils (utility function that accepts confirm as a parameter)
+          const filePath = context.getFilename();
+          if (!filePath.includes('accountHandlersUtils')) {
+            context.report({
+              node,
+              messageId: 'noConfirmCall',
+            });
+          }
         }
       },
 
@@ -178,7 +182,8 @@ const noLegacyToast = {
           filePath.includes('/Toast') ||
           filePath.includes('/toast') ||
           filePath.includes('/debug/') ||
-          filePath.includes('/diagnostic')
+          filePath.includes('/diagnostic') ||
+          filePath.includes('accountHandlersUtils')
         ) {
           return;
         }

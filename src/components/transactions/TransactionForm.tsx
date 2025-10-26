@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
 import useEditLock from "@/hooks/common/useEditLock";
 import { initializeEditLocks } from "@/services/editLockService";
@@ -38,6 +38,16 @@ const TransactionForm = ({
     autoRelease: true,
     showToasts: true,
   });
+
+  // Memoize lock data to avoid calling Date.now() during render
+  const lockData = useMemo(
+    () => ({
+      userName: editLock.lockedBy,
+      expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
+      isExpired: editLock.isExpired,
+    }),
+    [editLock.lockedBy, editLock.timeRemaining, editLock.isExpired]
+  );
 
   if (!isOpen) return null;
 
@@ -86,11 +96,7 @@ const TransactionForm = ({
             <EditLockIndicator
               isLocked={editLock.isLocked && !editLock.canEdit}
               isOwnLock={editLock.isOwnLock}
-              lock={{
-                userName: editLock.lockedBy,
-                expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
-                isExpired: editLock.isExpired,
-              }}
+              lock={lockData}
               onBreakLock={editLock.breakLock}
               showDetails={true}
             />

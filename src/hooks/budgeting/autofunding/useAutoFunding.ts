@@ -55,14 +55,16 @@ export const useAutoFunding = () => {
     dataHook.isInitialized,
     dataHook.hasUnsavedChanges,
     dataHook,
-    rulesHook.rules,
-    historyHook.executionHistory,
-    historyHook.undoStack,
+    rulesHook,
+    historyHook,
   ]);
 
   // Enhanced rule execution with history tracking
   const executeRules = useCallback(
-    createExecuteRules(rulesHook, executionHook, historyHook, dataHook),
+    (shouldAutoAllocate?: boolean) => {
+      const executeFunction = createExecuteRules(rulesHook, executionHook, historyHook, dataHook);
+      return executeFunction(shouldAutoAllocate);
+    },
     [rulesHook, executionHook, historyHook, dataHook]
   );
 
@@ -124,7 +126,7 @@ export const useAutoFunding = () => {
   // Export all data with current state
   const exportData = useCallback(() => {
     return exportCurrentData(rulesHook, historyHook, dataHook);
-  }, [rulesHook.rules, historyHook, dataHook]);
+  }, [rulesHook, historyHook, dataHook]);
 
   // Import data and update all hooks
   const importData = useCallback(

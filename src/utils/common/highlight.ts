@@ -133,7 +133,6 @@ export const initHighlight = () => {
   // setupConsoleCapture();
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _setupConsoleCapture = () => {
   // Disabled function - eslint-disable comments removed
   // const originalConsoleError = console.error;
