@@ -19,15 +19,6 @@ interface ValidationResults {
 }
 
 /**
- * Recovery result structure
- */
-interface RecoveryResult {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
-/**
  * Sync status structure
  */
 interface SyncStatus {

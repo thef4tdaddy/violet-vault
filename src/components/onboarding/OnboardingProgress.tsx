@@ -30,7 +30,7 @@ interface OnboardingPreferences {
   tourCompleted: boolean;
 }
 
-interface OnboardingProgress {
+interface OnboardingProgressData {
   completed: number;
   total: number;
   percentage: number;
@@ -39,7 +39,7 @@ interface OnboardingProgress {
 interface OnboardingStoreState {
   isOnboarded: boolean;
   tutorialProgress: TutorialProgress;
-  getProgress: () => OnboardingProgress;
+  getProgress: () => OnboardingProgressData;
   preferences: OnboardingPreferences;
   setPreference: (key: keyof OnboardingPreferences, value: boolean) => void;
 }
