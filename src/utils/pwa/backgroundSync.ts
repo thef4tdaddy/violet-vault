@@ -6,6 +6,10 @@ import logger from "../common/logger";
  */
 
 class BackgroundSyncManager {
+  syncQueue: string;
+  isOnline: boolean;
+  pendingOperations: any[];
+
   constructor() {
     this.syncQueue = "violet-vault-sync-queue";
     this.isOnline = navigator.onLine;
@@ -228,7 +232,7 @@ const backgroundSyncManager = new BackgroundSyncManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.backgroundSyncManager = backgroundSyncManager;
+  (window as any).backgroundSyncManager = backgroundSyncManager;
 }
 
 export default backgroundSyncManager;

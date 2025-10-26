@@ -7,6 +7,8 @@ import logger from "../common/logger";
  */
 
 class OfflineDataValidator {
+  criticalTables: string[];
+
   constructor() {
     this.criticalTables = [
       "envelopes",
@@ -46,8 +48,8 @@ class OfflineDataValidator {
       results.hasData = results.totalRecords > 0;
 
       // Specific validations
-      const envelopeCount = results.criticalDataAvailable.envelopes?.count || 0;
-      const transactionCount = results.criticalDataAvailable.transactions?.count || 0;
+      const envelopeCount = (results.criticalDataAvailable as any).envelopes?.count || 0;
+      const transactionCount = (results.criticalDataAvailable as any).transactions?.count || 0;
 
       // Generate recommendations
       if (envelopeCount === 0) {
@@ -87,7 +89,7 @@ class OfflineDataValidator {
       return results;
     } catch (error) {
       logger.error("❌ Offline data validation failed", error);
-      results.error = error.message;
+      (results as any).error = (error as Error).message;
       return results;
     }
   }
@@ -128,7 +130,7 @@ class OfflineDataValidator {
         description: tx.description,
         amount: tx.amount,
         date: tx.date,
-        envelope: tx.envelope,
+        envelope: (tx as any).envelope,
       }));
     } catch (error) {
       logger.warn("Failed to get recent transactions preview:", error);
@@ -145,8 +147,8 @@ class OfflineDataValidator {
 
       return {
         totalEnvelopes: envelopes.length,
-        totalAllocated: envelopes.reduce((sum, env) => sum + (env.allocated || 0), 0),
-        totalSpent: envelopes.reduce((sum, env) => sum + (env.spent || 0), 0),
+        totalAllocated: envelopes.reduce((sum, env) => sum + ((env as any).allocated || 0), 0),
+        totalSpent: envelopes.reduce((sum, env) => sum + ((env as any).spent || 0), 0),
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
     } catch (error) {
@@ -192,7 +194,7 @@ class OfflineDataValidator {
       });
     } catch (error) {
       logger.error("❌ Offline performance test failed", error);
-      results.error = error.message;
+      (results as any).error = (error as Error).message;
     }
 
     return results;
@@ -267,7 +269,7 @@ class OfflineDataValidator {
       });
     } catch (error) {
       logger.error("❌ Failed to pre-cache critical data", error);
-      results.error = error.message;
+      (results as any).error = (error as Error).message;
     }
 
     return results;
@@ -279,7 +281,7 @@ const offlineDataValidator = new OfflineDataValidator();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.offlineDataValidator = offlineDataValidator;
+  (window as any).offlineDataValidator = offlineDataValidator;
 }
 
 export default offlineDataValidator;

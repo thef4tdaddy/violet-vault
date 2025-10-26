@@ -283,7 +283,7 @@ export class PerformanceInfoService {
         available: true,
         quota: estimate.quota,
         usage: estimate.usage,
-        usageDetails: estimate.usageDetails,
+        usageDetails: (estimate as any).usageDetails,
       };
     } catch (error) {
       return {
@@ -298,7 +298,7 @@ export class PerformanceInfoService {
    */
   static async getNetworkInfo(): Promise<NetworkInfo> {
     try {
-      const networkInfo = {
+      const networkInfo: NetworkInfo = {
         onLine: navigator.onLine,
         connection: this.getConnectionInfo(),
         effectiveType: null,
@@ -307,13 +307,7 @@ export class PerformanceInfoService {
       };
 
       // Network Information API (if available)
-      const connection =
-        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown })
-          .connection ||
-        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown })
-          .mozConnection ||
-        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown })
-          .webkitConnection;
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
       if (connection) {
         networkInfo.effectiveType = connection.effectiveType;
         networkInfo.downlink = connection.downlink;
@@ -339,13 +333,7 @@ export class PerformanceInfoService {
    */
   static getConnectionInfo(): ConnectionInfo | null {
     try {
-      const connection =
-        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown })
-          .connection ||
-        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown })
-          .mozConnection ||
-        (navigator as { connection?: unknown; mozConnection?: unknown; webkitConnection?: unknown })
-          .webkitConnection;
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
       if (!connection) return null;
 
       return {
