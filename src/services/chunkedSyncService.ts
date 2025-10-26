@@ -19,7 +19,7 @@ import {
   validateManifest as _validateManifest,
   generateChecksum,
 } from "../utils/sync/validation";
-import { createSyncResilience } from "../utils/sync/resilience";
+import { createSyncResilience, RetryManager, CircuitBreaker, SyncQueue } from "../utils/sync/resilience";
 
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
@@ -63,12 +63,9 @@ class ChunkedSyncService {
   maxArrayChunkSize: number;
   lastCorruptedDataClear: number | null;
   corruptedDataClearCooldown: number;
-  syncMutex: { acquire: (name: string, timeout?: number) => Promise<void>; release: () => void };
+  syncMutex: SyncMutex;
   decryptionFailures: Map<string, { count: number; lastFailure: number }>;
-  resilience: {
-    verifyDataIntegrity: (data: unknown) => boolean;
-    detectDataCorruption: (error: Error) => boolean;
-  };
+  resilience: ReturnType<typeof createSyncResilience>;
 
   constructor() {
     this.budgetId = null;
@@ -554,15 +551,19 @@ class ChunkedSyncService {
               this.decryptionFailures = new Map();
             }
 
-            const lastFailure = this.decryptionFailures.get(errorSignature);
+            const failureRecord = this.decryptionFailures.get(errorSignature);
             const backoffTime = 5 * 60 * 1000; // 5 minutes
 
-            if (lastFailure && now - lastFailure < backoffTime) {
+            if (failureRecord && now - failureRecord.lastFailure < backoffTime) {
               logger.info("🔇 Skipping repeated decryption attempt (in backoff period)");
               return null; // Skip without logging noise
             }
 
-            this.decryptionFailures.set(errorSignature, now);
+            const newFailureRecord = {
+              count: failureRecord ? failureRecord.count + 1 : 1,
+              lastFailure: now,
+            };
+            this.decryptionFailures.set(errorSignature, newFailureRecord);
 
             // Check if we should trigger corruption recovery modal
             this.checkForCorruptionPattern();
@@ -837,8 +838,8 @@ class ChunkedSyncService {
     let recentFailures = 0;
     let hasDataTooSmallError = false;
 
-    for (const [errorSignature, timestamp] of this.decryptionFailures) {
-      if (timestamp > recentThreshold) {
+    for (const [errorSignature, failureRecord] of this.decryptionFailures) {
+      if (failureRecord.lastFailure > recentThreshold) {
         recentFailures++;
         if (errorSignature.includes("The provided data is too small")) {
           hasDataTooSmallError = true;
