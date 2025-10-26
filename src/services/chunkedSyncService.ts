@@ -229,7 +229,7 @@ class ChunkedSyncService {
         totalChunks: 0,
         totalSize: 0,
         ...metadata,
-      } as any,
+      } as Record<string, unknown>,
       validation: {
         manifestChecksum: "", // Will be calculated after chunk processing
         minChunkSize: 16, // Minimum encrypted chunk size
@@ -657,7 +657,7 @@ class ChunkedSyncService {
 
           // Reassemble chunked arrays
           for (const [key, value] of Object.entries(reconstructedData)) {
-            if (value && typeof value === "object" && (value as any)._chunked) {
+            if (value && typeof value === "object" && (value as Record<string, unknown>)._chunked) {
               // Find all chunks for this key
               const keyChunks = Object.entries(chunks)
                 .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
