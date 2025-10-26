@@ -4,6 +4,146 @@ import { getIcon } from "../../../utils";
 import { useFirebaseMessaging } from "../../../hooks/notifications/useFirebaseMessaging";
 import logger from "../../../utils/common/logger";
 
+// Permission status UI component
+const PermissionStatusUI = ({ permissionStatus }) => {
+  if (!permissionStatus) return null;
+  const { granted, denied, isSupported: supported } = permissionStatus;
+
+  if (!supported) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="flex items-start space-x-3">
+          {React.createElement(getIcon("AlertTriangle"), {
+            className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5",
+          })}
+          <div>
+            <p className="font-medium text-yellow-800">Not Supported</p>
+            <p className="text-sm text-yellow-700 mt-1">
+              Push notifications are not supported in your current browser.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (granted) {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="flex items-start space-x-3">
+          {React.createElement(getIcon("CheckCircle"), {
+            className: "w-5 h-5 text-green-600 flex-shrink-0 mt-0.5",
+          })}
+          <div className="flex-1">
+            <p className="font-medium text-green-800">Notifications Enabled</p>
+            <p className="text-sm text-green-700 mt-1">
+              You'll receive push notifications for important updates.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (denied) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="flex items-start space-x-3">
+          {React.createElement(getIcon("XCircle"), {
+            className: "w-5 h-5 text-red-600 flex-shrink-0 mt-0.5",
+          })}
+          <div>
+            <p className="font-medium text-red-800">Notifications Blocked</p>
+            <p className="text-sm text-red-700 mt-1">
+              Update your browser settings to enable notifications.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="flex items-start space-x-3">
+        {React.createElement(getIcon("Bell"), {
+          className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5",
+        })}
+        <div>
+          <p className="font-medium text-blue-800">Enable Notifications</p>
+          <p className="text-sm text-blue-700 mt-1">
+            Get notified about budget updates and bill reminders.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Notification action buttons component
+const NotificationActions = ({
+  isSupported,
+  hasToken,
+  canRequestPermission,
+  isLoading,
+  isTestingMessage,
+  onEnable,
+  onDisable,
+  onTest,
+}) => {
+  if (!isSupported) return null;
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      {!hasToken && canRequestPermission && (
+        <Button
+          onClick={onEnable}
+          disabled={isLoading}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+        >
+          {isLoading
+            ? React.createElement(getIcon("Loader"), {
+                className: "w-4 h-4 animate-spin",
+              })
+            : React.createElement(getIcon("Bell"), {
+                className: "w-4 h-4",
+              })}
+          <span>Enable Notifications</span>
+        </Button>
+      )}
+
+      {hasToken && (
+        <>
+          <Button
+            onClick={onDisable}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-gray-700 flex items-center space-x-2"
+          >
+            {React.createElement(getIcon("BellOff"), {
+              className: "w-4 h-4",
+            })}
+            <span>Disable Notifications</span>
+          </Button>
+
+          <Button
+            onClick={onTest}
+            disabled={isTestingMessage}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+          >
+            {isTestingMessage
+              ? React.createElement(getIcon("Loader"), {
+                  className: "w-4 h-4 animate-spin",
+                })
+              : React.createElement(getIcon("Send"), {
+                  className: "w-4 h-4",
+                })}
+            <span>Test Message</span>
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
+
 /**
  * Notification Settings Section
  * Manages push notification preferences and FCM token
@@ -62,81 +202,6 @@ const NotificationSettingsSection = () => {
     }
   };
 
-  const getPermissionStatusUI = () => {
-    if (!permissionStatus) return null;
-    const { granted, denied, isSupported: supported } = permissionStatus;
-
-    if (!supported) {
-      return (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
-            {React.createElement(getIcon("AlertTriangle"), {
-              className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5",
-            })}
-            <div>
-              <p className="font-medium text-yellow-800">Not Supported</p>
-              <p className="text-sm text-yellow-700 mt-1">
-                Push notifications are not supported in your current browser.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (granted) {
-      return (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
-            {React.createElement(getIcon("CheckCircle"), {
-              className: "w-5 h-5 text-green-600 flex-shrink-0 mt-0.5",
-            })}
-            <div className="flex-1">
-              <p className="font-medium text-green-800">Notifications Enabled</p>
-              <p className="text-sm text-green-700 mt-1">
-                You'll receive push notifications for important updates.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (denied) {
-      return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
-            {React.createElement(getIcon("XCircle"), {
-              className: "w-5 h-5 text-red-600 flex-shrink-0 mt-0.5",
-            })}
-            <div>
-              <p className="font-medium text-red-800">Notifications Blocked</p>
-              <p className="text-sm text-red-700 mt-1">
-                Update your browser settings to enable notifications.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          {React.createElement(getIcon("Bell"), {
-            className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5",
-          })}
-          <div>
-            <p className="font-medium text-blue-800">Enable Notifications</p>
-            <p className="text-sm text-blue-700 mt-1">
-              Get notified about budget updates and bill reminders.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -159,57 +224,18 @@ const NotificationSettingsSection = () => {
         </div>
       )}
 
-      {getPermissionStatusUI()}
+      <PermissionStatusUI permissionStatus={permissionStatus} />
 
-      {isSupported && (
-        <div className="flex flex-wrap gap-3">
-          {!hasToken && canRequestPermission && (
-            <Button
-              onClick={handleEnableNotifications}
-              disabled={isLoading}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-            >
-              {isLoading
-                ? React.createElement(getIcon("Loader"), {
-                    className: "w-4 h-4 animate-spin",
-                  })
-                : React.createElement(getIcon("Bell"), {
-                    className: "w-4 h-4",
-                  })}
-              <span>Enable Notifications</span>
-            </Button>
-          )}
-
-          {hasToken && (
-            <>
-              <Button
-                onClick={handleDisableNotifications}
-                className="bg-gray-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-gray-700 flex items-center space-x-2"
-              >
-                {React.createElement(getIcon("BellOff"), {
-                  className: "w-4 h-4",
-                })}
-                <span>Disable Notifications</span>
-              </Button>
-
-              <Button
-                onClick={handleTestMessage}
-                disabled={isTestingMessage}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
-              >
-                {isTestingMessage
-                  ? React.createElement(getIcon("Loader"), {
-                      className: "w-4 h-4 animate-spin",
-                    })
-                  : React.createElement(getIcon("Send"), {
-                      className: "w-4 h-4",
-                    })}
-                <span>Test Message</span>
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+      <NotificationActions
+        isSupported={isSupported}
+        hasToken={hasToken}
+        canRequestPermission={canRequestPermission}
+        isLoading={isLoading}
+        isTestingMessage={isTestingMessage}
+        onEnable={handleEnableNotifications}
+        onDisable={handleDisableNotifications}
+        onTest={handleTestMessage}
+      />
 
       {hasToken && (
         <div className="bg-white rounded-lg border-2 border-black p-4">
