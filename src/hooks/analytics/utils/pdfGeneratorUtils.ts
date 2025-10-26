@@ -52,19 +52,36 @@ const initializePDF = (
 };
 
 /**
+ * Configuration for PDF section generation
+ */
+export interface PDFSectionConfig {
+  pdf: PDFDocument;
+  yPosition: number;
+  margin: number;
+  pageHeight: number;
+  checkPageBreak: (height?: number) => void;
+  analyticsData: unknown;
+  balanceData: unknown;
+  exportOptions: ExportOptions;
+  setExportProgress: (progress: number) => void;
+}
+
+/**
  * Add sections to PDF based on options
  */
-const addSections = (
-  pdf: PDFDocument,
-  yPosition: number,
-  margin: number,
-  pageHeight: number,
-  checkPageBreak: (height?: number) => void,
-  analyticsData: unknown,
-  balanceData: unknown,
-  exportOptions: ExportOptions,
-  setExportProgress: (progress: number) => void
-): number => {
+const addSections = (config: PDFSectionConfig): number => {
+  const {
+    pdf,
+    yPosition,
+    margin,
+    pageHeight,
+    checkPageBreak,
+    analyticsData,
+    balanceData,
+    exportOptions,
+    setExportProgress,
+  } = config;
+
   let y = yPosition;
 
   if (exportOptions.includeSummary) {
@@ -119,7 +136,7 @@ export const generatePDFReport = async (
 
   setExportProgress(20);
 
-  yPosition = addSections(
+  yPosition = addSections({
     pdf,
     yPosition,
     margin,
@@ -128,8 +145,8 @@ export const generatePDFReport = async (
     analyticsData,
     balanceData,
     exportOptions,
-    setExportProgress
-  );
+    setExportProgress,
+  });
 
   setExportProgress(90);
 

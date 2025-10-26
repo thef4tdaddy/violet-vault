@@ -13,30 +13,37 @@ import { useMainLayoutHandlers } from "@/hooks/layout/useMainLayoutHandlers";
 import { useSecurityWarning } from "@/hooks/layout/useSecurityWarning";
 import { useCorruptionDetection } from "@/hooks/layout/useCorruptionDetection";
 import { useMainContentModals } from "@/hooks/layout/useMainContentModals";
-import AuthGateway from "../auth/AuthGateway";
-import Header from "../ui/Header";
-import { ToastContainer, type ToastItem } from "../ui/Toast";
+import AuthGateway from "@/components/auth/AuthGateway";
+import Header from "@/components/ui/Header";
+import { ToastContainer, type ToastItem } from "@/components/ui/Toast";
 import { useToastStore } from "@/stores/ui/toastStore";
 import logger from "@/utils/common/logger";
 import { getVersionInfo } from "@/utils/common/version";
 import NavigationTabs from "./NavigationTabs";
-import SyncStatusIndicators from "../sync/SyncStatusIndicators";
-import ConflictResolutionModal from "../sync/ConflictResolutionModal";
+import SyncStatusIndicators from "@/components/sync/SyncStatusIndicators";
+import ConflictResolutionModal from "@/components/sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
-import BugReportButton from "../feedback/BugReportButton";
-import LockScreen from "../security/LockScreen";
-import SecuritySettings from "../settings/SecuritySettings";
-import SettingsDashboard from "../settings/SettingsDashboard";
-import OnboardingTutorial from "../onboarding/OnboardingTutorial";
-import OnboardingProgress from "../onboarding/OnboardingProgress";
+import BugReportButton from "@/components/feedback/BugReportButton";
+import LockScreen from "@/components/security/LockScreen";
+import SecuritySettings from "@/components/settings/SecuritySettings";
+import SettingsDashboard from "@/components/settings/SettingsDashboard";
+import OnboardingTutorial from "@/components/onboarding/OnboardingTutorial";
+import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
 import { useOnboardingAutoComplete } from "@/hooks/common/useOnboardingAutoComplete";
 import useOnboardingStore from "@/stores/ui/onboardingStore";
-import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
-import PasswordRotationModal from "../auth/PasswordRotationModal";
-import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
+import { CorruptionRecoveryModal } from "@/components/modals/CorruptionRecoveryModal";
+import PasswordRotationModal from "@/components/auth/PasswordRotationModal";
+import LocalDataSecurityWarning from "@/components/security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
 import { viewToPathMap } from "./routeConfig";
-import BottomNavigationBar from "../mobile/BottomNavigationBar";
+import BottomNavigationBar from "@/components/mobile/BottomNavigationBar";
+import {
+  getUserForSync,
+  extractLayoutData,
+  extractAuthData,
+  extractOnboardingState,
+  hasSecurityAcknowledgement,
+} from "./MainLayoutHelpers";
 
 // ============================================================================
 // Type Definitions
@@ -212,14 +219,13 @@ const MainContent = ({
   const onboardingState = useOnboardingStore((state: Record<string, unknown>) => ({
     isOnboarded: (state as Record<string, unknown>)?.isOnboarded,
   }));
-  const isOnboarded =
-    typeof onboardingState?.isOnboarded === "boolean" ? onboardingState.isOnboarded : false;
+  const isOnboarded = extractOnboardingState(onboardingState);
 
-  // Extract layout data
-  const budget = (layoutData as Record<string, unknown>)?.budget;
-  const totalBiweeklyNeed = (layoutData as Record<string, unknown>)?.totalBiweeklyNeed;
-  const paycheckHistory = (layoutData as Record<string, unknown>)?.paycheckHistory;
-  const securityContext = (auth as Record<string, unknown>)?.securityContext;
+  // Extract layout data using helper
+  const { budget, totalBiweeklyNeed, paycheckHistory } = extractLayoutData(layoutData);
+
+  // Extract auth data using helper
+  const { securityContext, isUnlocked: isUnlockedAuth } = extractAuthData(auth);
 
   // Navigation helper
   const setActiveView = (view: string): void => {
@@ -230,27 +236,19 @@ const MainContent = ({
   // Modal state management
   const modals = useMainContentModals();
 
-  // Security warning management - check localStorage for acknowledgment
-  const isUnlockedAuth = (auth as Record<string, unknown>)?.isUnlocked as boolean;
-  // eslint-disable-next-line no-restricted-syntax
-  const hasAcknowledgedSecurity = !!localStorage.getItem("localDataSecurityAcknowledged");
+  // Security warning management using helper
   const { showSecurityWarning, setShowSecurityWarning } = useSecurityWarning({
     isUnlocked: isUnlockedAuth,
     currentUser,
     isOnboarded,
-    hasAcknowledged: hasAcknowledgedSecurity,
+    hasAcknowledged: hasSecurityAcknowledgement(),
   });
 
   // Corruption detection management
   const { showCorruptionModal, setShowCorruptionModal } = useCorruptionDetection();
 
-  // Firebase sync - use config object, not 4 separate args
-  const userForSync = currentUser
-    ? {
-        uid: ((currentUser as Record<string, unknown>)?.uid as string) || "unknown",
-        email: ((currentUser as Record<string, unknown>)?.email as string) || undefined,
-      }
-    : null;
+  // Firebase sync - use helper to extract user
+  const userForSync = getUserForSync(currentUser);
   const { handleManualSync } = useFirebaseSync({
     firebaseSync,
     encryptionKey: (securityContext as Record<string, unknown>)?.encryptionKey as CryptoKey | null,
