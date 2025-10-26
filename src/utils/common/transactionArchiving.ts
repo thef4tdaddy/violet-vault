@@ -133,6 +133,95 @@ export class TransactionArchiver {
   }
 
   /**
+   * Get period key from date based on period type
+   */
+  private getPeriodKey(date: Date, periodType: string): string {
+    switch (periodType) {
+      case "month":
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      case "quarter": {
+        const quarter = Math.ceil((date.getMonth() + 1) / 3);
+        return `${date.getFullYear()}-Q${quarter}`;
+      }
+      case "year":
+        return `${date.getFullYear()}`;
+      default:
+        return date.toISOString().split("T")[0];
+    }
+  }
+
+  /**
+   * Create initial group data structure
+   */
+  private createGroupData(transaction: {
+    date: string;
+    category?: string;
+    [key: string]: unknown;
+  }, periodKey: string, periodType: string) {
+    return {
+      period: periodKey,
+      category: transaction.category || "uncategorized",
+      periodType,
+      totalAmount: 0,
+      totalTransactions: 0,
+      incomeAmount: 0,
+      expenseAmount: 0,
+      transferAmount: 0,
+      envelopes: new Set(),
+      dateRange: {
+        start: transaction.date,
+        end: transaction.date,
+      },
+    };
+  }
+
+  /**
+   * Update group with transaction data
+   */
+  private updateGroupWithTransaction(
+    group: {
+      totalAmount: number;
+      totalTransactions: number;
+      envelopes: Set<string>;
+      incomeAmount: number;
+      expenseAmount: number;
+      transferAmount: number;
+      dateRange: { start: string; end: string };
+    },
+    transaction: {
+      amount?: number;
+      envelopeId?: string;
+      type?: string;
+      date: string;
+      [key: string]: unknown;
+    }
+  ) {
+    group.totalAmount += transaction.amount || 0;
+    group.totalTransactions++;
+    group.envelopes.add(transaction.envelopeId);
+
+    // Categorize by transaction type
+    const amount = transaction.amount || 0;
+    if (amount > 0) {
+      group.incomeAmount += amount;
+    } else if (amount < 0) {
+      group.expenseAmount += Math.abs(amount);
+    }
+
+    if (transaction.type === "transfer") {
+      group.transferAmount += Math.abs(amount);
+    }
+
+    // Update date range
+    if (transaction.date < group.dateRange.start) {
+      group.dateRange.start = transaction.date;
+    }
+    if (transaction.date > group.dateRange.end) {
+      group.dateRange.end = transaction.date;
+    }
+  }
+
+  /**
    * Aggregate transactions by time period
    */
   aggregateByPeriod(transactions, periodType) {
@@ -140,71 +229,14 @@ export class TransactionArchiver {
 
     transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
-      let periodKey;
-
-      switch (periodType) {
-        case "month": {
-          periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-          break;
-        }
-        case "quarter": {
-          const quarter = Math.ceil((date.getMonth() + 1) / 3);
-          periodKey = `${date.getFullYear()}-Q${quarter}`;
-          break;
-        }
-        case "year": {
-          periodKey = `${date.getFullYear()}`;
-          break;
-        }
-        default: {
-          periodKey = transaction.date;
-        }
-      }
-
+      const periodKey = this.getPeriodKey(date, periodType);
       const key = `${periodKey}_${transaction.category || "uncategorized"}`;
 
       if (!groups.has(key)) {
-        groups.set(key, {
-          period: periodKey,
-          category: transaction.category || "uncategorized",
-          periodType,
-          totalAmount: 0,
-          totalTransactions: 0,
-          incomeAmount: 0,
-          expenseAmount: 0,
-          transferAmount: 0,
-          envelopes: new Set(),
-          dateRange: {
-            start: transaction.date,
-            end: transaction.date,
-          },
-        });
+        groups.set(key, this.createGroupData(transaction, periodKey, periodType));
       }
 
-      const group = groups.get(key);
-      group.totalAmount += transaction.amount || 0;
-      group.totalTransactions++;
-      group.envelopes.add(transaction.envelopeId);
-
-      // Categorize by transaction type
-      const amount = transaction.amount || 0;
-      if (amount > 0) {
-        group.incomeAmount += amount;
-      } else if (amount < 0) {
-        group.expenseAmount += Math.abs(amount);
-      }
-
-      if (transaction.type === "transfer") {
-        group.transferAmount += Math.abs(amount);
-      }
-
-      // Update date range
-      if (transaction.date < group.dateRange.start) {
-        group.dateRange.start = transaction.date;
-      }
-      if (transaction.date > group.dateRange.end) {
-        group.dateRange.end = transaction.date;
-      }
+      this.updateGroupWithTransaction(groups.get(key), transaction);
     });
 
     // Convert Sets to Arrays for storage
