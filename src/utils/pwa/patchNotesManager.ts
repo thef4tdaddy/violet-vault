@@ -6,6 +6,10 @@ import logger from "../common/logger";
  */
 
 class PatchNotesManager {
+  changelogCache: string | null;
+  cacheTimestamp: number | null;
+  cacheTTL: number;
+
   constructor() {
     this.changelogCache = null;
     this.cacheTimestamp = null;
@@ -290,7 +294,7 @@ const patchNotesManager = new PatchNotesManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.patchNotesManager = patchNotesManager;
+  (window as any).patchNotesManager = patchNotesManager;
 }
 
 export default patchNotesManager;

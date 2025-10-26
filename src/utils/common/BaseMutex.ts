@@ -8,6 +8,12 @@ import logger from "./logger";
  * Potentially reusable for GitHub Issue #454 - Edit Locking System
  */
 export class BaseMutex {
+  name: string;
+  locked: boolean;
+  queue: any[];
+  currentOperation: string | null;
+  lockStartTime: number | null;
+
   constructor(name = "BaseMutex") {
     this.name = name;
     this.locked = false;
@@ -21,7 +27,7 @@ export class BaseMutex {
    */
   async acquire(operationName = "unknown", timeoutMs = 60000) {
     return Promise.race([
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         if (this.locked) {
           logger.debug(`🔒 ${this.name}: ${operationName} queued`, {
             currentOperation: this.currentOperation,

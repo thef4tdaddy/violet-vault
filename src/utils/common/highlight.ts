@@ -49,7 +49,7 @@ export const initHighlight = () => {
   const config = getErrorMonitoringConfig();
 
   // Log configuration in development/staging
-  if (config.debug) {
+  if ((config as any).debug) {
     logger.debug("Initializing Highlight.io", {
       mode: import.meta.env.MODE,
       projectId: config.projectId.substring(0, 8) + "...", // Partial ID for security
@@ -61,7 +61,7 @@ export const initHighlight = () => {
 
   // Skip initialization if error reporting is disabled or invalid project ID
   if (!config.enabled) {
-    if (config.debug) {
+    if ((config as any).debug) {
       logger.debug("Highlight.io initialization skipped", {
         reason: "Error reporting disabled or invalid project ID",
         environment: config.environment,
@@ -79,8 +79,10 @@ export const initHighlight = () => {
       // Session replay configuration
       sessionShortcut: false, // Don't show session replay shortcut in UI
       inlineImages: false, // Don't inline images for privacy
-      sessionSamplingRate: config.sessionSampleRate,
-      errorSamplingRate: config.errorSampleRate,
+      samplingStrategy: {
+        sessionSamplingRate: config.sessionSampleRate,
+        errorSamplingRate: config.errorSampleRate,
+      } as any,
 
       networkRecording: {
         enabled: true,
@@ -96,14 +98,16 @@ export const initHighlight = () => {
       },
 
       // Privacy settings for financial app
-      maskAllInputs: true, // Mask all input fields by default
-      maskAllText: false, // Don't mask all text, just inputs
+      privacyOptions: {
+        maskAllInputs: true, // Mask all input fields by default
+        maskAllText: false, // Don't mask all text, just inputs
+      } as any,
 
       // Environment-specific settings
-      debug: config.debug,
+      debug: (config as any).debug,
     });
 
-    if (config.debug) {
+    if ((config as any).debug) {
       logger.debug("Highlight.io initialized successfully", {
         environment: config.environment,
         sessionSamplingRate: config.sessionSampleRate,
@@ -120,6 +124,7 @@ export const initHighlight = () => {
   // setupConsoleCapture();
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _setupConsoleCapture = () => {
   // Disabled function - eslint-disable comments removed
   // const originalConsoleError = console.error;
@@ -171,6 +176,11 @@ const _setupConsoleCapture = () => {
  * Stores errors locally and retries periodically
  */
 class ErrorReportingFallback {
+  queue: any[];
+  retryInterval: ReturnType<typeof setInterval> | null;
+  maxQueueSize: number;
+  retryIntervalMs: number;
+
   constructor() {
     this.queue = [];
     this.retryInterval = null;
@@ -255,7 +265,7 @@ const errorFallback = new ErrorReportingFallback();
  * Enhanced error capture with fallback support
  * Use this instead of H.consumeError for better reliability
  */
-export const captureError = (error, context = {}) => {
+export const captureError = (error: any, context: any = {}) => {
   try {
     // Try Highlight.io first
     H.consumeError(error, context);

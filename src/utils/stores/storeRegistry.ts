@@ -4,6 +4,9 @@ import logger from "../common/logger.ts";
  * Global store registry for development and debugging
  */
 class StoreRegistry {
+  stores: Map<string, any>;
+  initialized: boolean;
+
   constructor() {
     this.stores = new Map();
     this.initialized = false;
@@ -30,10 +33,10 @@ class StoreRegistry {
 
     // Make available globally in development
     if (import.meta.env.DEV) {
-      if (!window.__VIOLET_VAULT_STORES__) {
-        window.__VIOLET_VAULT_STORES__ = {};
+      if (!(window as any).__VIOLET_VAULT_STORES__) {
+        (window as any).__VIOLET_VAULT_STORES__ = {};
       }
-      window.__VIOLET_VAULT_STORES__[name] = store;
+      (window as any).__VIOLET_VAULT_STORES__[name] = store;
     }
   }
 
