@@ -5,18 +5,19 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import {
-  initializeSplitsFromTransaction,
-  calculateSplitTotals,
-  validateSplitAllocations,
-  autoBalanceSplits,
-  splitEvenly,
   addNewSplit,
   updateSplitField,
   removeSplit,
-  prepareSplitTransactions,
-  getSplitSummary,
-} from "../../utils/transactions/splitting";
-import logger from "../../utils/common/logger.ts";
+  autoBalanceSplits,
+  splitEvenly,
+} from "@/utils/transactions/splitting";
+import {
+  initializeSplitsHandler,
+  validateSplitsHandler,
+  submitSplitHandler,
+  calculateSplitComputedProperties,
+} from "./useTransactionSplitterHelpers";
+import logger from "@/utils/common/logger";
 
 /**
  * Hook for managing transaction splitting functionality
@@ -38,25 +39,7 @@ const useTransactionSplitter = (options = {}) => {
    * Initialize splits when transaction changes
    */
   const initializeSplits = useCallback(() => {
-    try {
-      if (!transaction) {
-        setSplitAllocations([]);
-        return;
-      }
-
-      logger.debug("Initializing transaction splits", {
-        transactionId: transaction.id,
-        amount: transaction.amount,
-        hasMetadata: !!transaction.metadata?.items,
-      });
-
-      const initialSplits = initializeSplitsFromTransaction(transaction, envelopes);
-      setSplitAllocations(initialSplits);
-      setErrors([]);
-    } catch (error) {
-      logger.error("Failed to initialize splits", error);
-      setErrors(["Failed to initialize splits: " + error.message]);
-    }
+    initializeSplitsHandler(transaction, envelopes, setSplitAllocations, setErrors);
   }, [transaction, envelopes]);
 
   // Initialize splits when transaction changes
