@@ -42,14 +42,20 @@ export const resolveTransactions = (
   return budgetTransactions || [];
 };
 
+interface Envelope {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
 /**
  * Resolve envelopes from multiple sources
  */
 export const resolveEnvelopes = (
-  propEnvelopes: any[],
-  tanStackEnvelopes: any[],
-  budgetEnvelopes: any[]
-): any[] => {
+  propEnvelopes: Envelope[],
+  tanStackEnvelopes: Envelope[],
+  budgetEnvelopes: Envelope[]
+): Envelope[] => {
   if (propEnvelopes && propEnvelopes.length) {
     return propEnvelopes;
   }
@@ -95,7 +101,7 @@ export const combineBills = (
 export const processBills = (
   combinedBills: Bill[],
   onUpdateBill: ((bill: Bill) => void) | undefined,
-  updateBillMutation: (updates: any) => Promise<void>
+  updateBillMutation: (updates: { billId: string; updates: Record<string, unknown> }) => Promise<void>
 ): Bill[] => {
   return combinedBills.map((bill) => {
     // Handle recurring bill logic using utility
@@ -128,13 +134,30 @@ export const categorizeBillsWithTotals = (bills: Bill[]) => {
   return { categorizedBills, totals };
 };
 
+interface CategorizedBills {
+  all: Bill[];
+  upcoming: Bill[];
+  overdue: Bill[];
+  paid: Bill[];
+  [key: string]: Bill[];
+}
+
+interface FilterOptions {
+  search?: string;
+  urgency?: string;
+  envelope?: string;
+  amountMin?: string;
+  amountMax?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Filter bills based on view mode and filter options
  */
 export const getFilteredBills = (
-  categorizedBills: any,
+  categorizedBills: CategorizedBills,
   viewMode: string,
-  filterOptions: any
+  filterOptions: FilterOptions
 ): Bill[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
   return filterBills(billsToFilter, filterOptions);
@@ -146,7 +169,7 @@ export const getFilteredBills = (
 export const discoverNewBills = async (
   transactions: Transaction[],
   bills: Bill[],
-  envelopes: any[],
+  envelopes: Envelope[],
   onSearchNewBills?: () => void | Promise<void>
 ): Promise<Bill[]> => {
   const suggestions = generateBillSuggestions(transactions, bills, envelopes);
@@ -194,10 +217,22 @@ export const createInitialUIState = () => ({
   },
 });
 
+interface UISetters {
+  setSelectedBills: (bills: Set<string>) => void;
+  setViewMode: (mode: string) => void;
+  setShowBillDetail: (bill: Bill | null) => void;
+  setShowAddBillModal: (show: boolean) => void;
+  setEditingBill: (bill: Bill | null) => void;
+  setShowBulkUpdateModal: (show: boolean) => void;
+  setShowDiscoveryModal: (show: boolean) => void;
+  setHistoryBill: (bill: Bill | null) => void;
+  setFilterOptions: (options: FilterOptions) => void;
+}
+
 /**
  * Create UI actions object
  */
-export const createUIActions = (setters: any) => ({
+export const createUIActions = (setters: UISetters) => ({
   setSelectedBills: setters.setSelectedBills,
   setViewMode: setters.setViewMode,
   setShowBillDetail: setters.setShowBillDetail,
@@ -213,25 +248,34 @@ export const createUIActions = (setters: any) => ({
  * Handle search new bills action with state management
  */
 export const handleSearchNewBills = async (
-  transactions: Transaction[],
-  bills: Bill[],
-  envelopes: any[],
-  onSearchNewBills: (() => void | Promise<void>) | undefined,
-  onError: ((error: string) => void) | undefined,
-  setIsSearching: (value: boolean) => void,
-  setDiscoveredBills: (bills: Bill[]) => void,
-  setShowDiscoveryModal: (show: boolean) => void
+  params: {
+    transactions: Transaction[];
+    bills: Bill[];
+    envelopes: Envelope[];
+    onSearchNewBills?: () => void | Promise<void>;
+    onError?: (error: string) => void;
+  },
+  callbacks: {
+    setIsSearching: (value: boolean) => void;
+    setDiscoveredBills: (bills: Bill[]) => void;
+    setShowDiscoveryModal: (show: boolean) => void;
+  }
 ): Promise<void> => {
-  setIsSearching(true);
+  callbacks.setIsSearching(true);
   try {
-    const suggestions = await discoverNewBills(transactions, bills, envelopes, onSearchNewBills);
-    setDiscoveredBills(suggestions);
-    setShowDiscoveryModal(true);
+    const suggestions = await discoverNewBills(
+      params.transactions,
+      params.bills,
+      params.envelopes,
+      params.onSearchNewBills
+    );
+    callbacks.setDiscoveredBills(suggestions);
+    callbacks.setShowDiscoveryModal(true);
   } catch (error) {
     logger.error("Error discovering bills:", error);
-    onError?.(error.message || "Failed to discover new bills");
+    params.onError?.((error as Error).message || "Failed to discover new bills");
   } finally {
-    setIsSearching(false);
+    callbacks.setIsSearching(false);
   }
 };
 
@@ -239,19 +283,23 @@ export const handleSearchNewBills = async (
  * Handle adding discovered bills with state management
  */
 export const handleAddDiscoveredBillsAction = async (
-  billsToAdd: Bill[],
-  onCreateRecurringBill: ((bill: Bill) => void | Promise<void>) | undefined,
-  addBill: (bill: Bill) => Promise<void>,
-  onError: ((error: string) => void) | undefined,
-  setShowDiscoveryModal: (show: boolean) => void,
-  setDiscoveredBills: (bills: Bill[]) => void
+  params: {
+    billsToAdd: Bill[];
+    onCreateRecurringBill?: (bill: Bill) => void | Promise<void>;
+    addBill: (bill: Bill) => Promise<void>;
+    onError?: (error: string) => void;
+  },
+  callbacks: {
+    setShowDiscoveryModal: (show: boolean) => void;
+    setDiscoveredBills: (bills: Bill[]) => void;
+  }
 ): Promise<void> => {
   try {
-    await addDiscoveredBills(billsToAdd, onCreateRecurringBill, addBill);
-    setShowDiscoveryModal(false);
-    setDiscoveredBills([]);
+    await addDiscoveredBills(params.billsToAdd, params.onCreateRecurringBill, params.addBill);
+    callbacks.setShowDiscoveryModal(false);
+    callbacks.setDiscoveredBills([]);
   } catch (error) {
     logger.error("Error adding discovered bills:", error);
-    onError?.(error.message || "Failed to add discovered bills");
+    params.onError?.((error as Error).message || "Failed to add discovered bills");
   }
 };

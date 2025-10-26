@@ -9,6 +9,8 @@ import {
   writeBatch,
   query,
   where,
+  DocumentSnapshot,
+  QuerySnapshot,
 } from "firebase/firestore";
 import { encryptionUtils } from "../utils/security/encryption";
 import firebaseSyncService from "./firebaseSyncService";
@@ -24,7 +26,7 @@ import { createSyncResilience } from "../utils/sync/resilience";
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
  */
-function base64FromBytes(bytes) {
+function base64FromBytes(bytes: Uint8Array | ArrayBuffer): string {
   const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   const CHUNK_SIZE = 0x8000; // 32k chars per chunk keeps call stacks safe
   let binary = "";
@@ -35,7 +37,7 @@ function base64FromBytes(bytes) {
   return btoa(binary);
 }
 
-function bytesFromBase64(str) {
+function bytesFromBase64(str: string): Uint8Array {
   if (!str || typeof str !== "string") {
     throw new Error(`Invalid base64 string: ${typeof str}`);
   }
@@ -63,12 +65,9 @@ class ChunkedSyncService {
   maxArrayChunkSize: number;
   lastCorruptedDataClear: number | null;
   corruptedDataClearCooldown: number;
-  syncMutex: { acquire: (name: string, timeout?: number) => Promise<void>; release: () => void };
+  syncMutex: SyncMutex;
   decryptionFailures: Map<string, { count: number; lastFailure: number }>;
-  resilience: {
-    verifyDataIntegrity: (data: unknown) => boolean;
-    detectDataCorruption: (error: Error) => boolean;
-  };
+  resilience: ReturnType<typeof createSyncResilience>;
 
   constructor() {
     this.budgetId = null;
@@ -230,7 +229,7 @@ class ChunkedSyncService {
         totalChunks: 0,
         totalSize: 0,
         ...metadata,
-      } as any,
+      } as Record<string, unknown>,
       validation: {
         manifestChecksum: "", // Will be calculated after chunk processing
         minChunkSize: 16, // Minimum encrypted chunk size
@@ -492,17 +491,17 @@ class ChunkedSyncService {
         logger.info("Starting chunked load from cloud");
 
         // Load main document with resilience
-        const mainDoc = await this.resilience.execute(
+        const mainDoc = (await this.resilience.execute(
           () => getDoc(doc(db, "budgets", this.budgetId)),
           "loadMainDocument",
           "loadMainDocument"
-        );
+        )) as DocumentSnapshot;
         if (!mainDoc.exists()) {
           logger.info("No cloud data found");
           return null;
         }
 
-        const mainData = mainDoc.data();
+        const mainData = mainDoc.data() as Record<string, unknown>;
         const reconstructedData = { ...mainData };
 
         // Remove internal metadata
@@ -554,15 +553,19 @@ class ChunkedSyncService {
               this.decryptionFailures = new Map();
             }
 
-            const lastFailure = this.decryptionFailures.get(errorSignature);
+            const failureRecord = this.decryptionFailures.get(errorSignature);
             const backoffTime = 5 * 60 * 1000; // 5 minutes
 
-            if (lastFailure && now - lastFailure < backoffTime) {
+            if (failureRecord && now - failureRecord.lastFailure < backoffTime) {
               logger.info("🔇 Skipping repeated decryption attempt (in backoff period)");
               return null; // Skip without logging noise
             }
 
-            this.decryptionFailures.set(errorSignature, now);
+            const newFailureRecord = {
+              count: failureRecord ? failureRecord.count + 1 : 1,
+              lastFailure: now,
+            };
+            this.decryptionFailures.set(errorSignature, newFailureRecord);
 
             // Check if we should trigger corruption recovery modal
             this.checkForCorruptionPattern();
@@ -596,12 +599,12 @@ class ChunkedSyncService {
             where("budgetId", "==", this.budgetId)
           );
 
-          const chunksSnapshot = await this.resilience.execute(
+          const chunksSnapshot = (await this.resilience.execute(
             () => getDocs(chunksQuery),
             "loadChunks",
             "loadChunks"
-          );
-          const chunks = {};
+          )) as QuerySnapshot;
+          const chunks: Record<string, unknown> = {};
 
           // Decrypt all chunks with individual error handling
           for (const chunkDoc of chunksSnapshot.docs) {
@@ -654,7 +657,7 @@ class ChunkedSyncService {
 
           // Reassemble chunked arrays
           for (const [key, value] of Object.entries(reconstructedData)) {
-            if (value && typeof value === "object" && (value as any)._chunked) {
+            if (value && typeof value === "object" && (value as Record<string, unknown>)._chunked) {
               // Find all chunks for this key
               const keyChunks = Object.entries(chunks)
                 .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
@@ -837,8 +840,8 @@ class ChunkedSyncService {
     let recentFailures = 0;
     let hasDataTooSmallError = false;
 
-    for (const [errorSignature, timestamp] of this.decryptionFailures) {
-      if (timestamp > recentThreshold) {
+    for (const [errorSignature, failureRecord] of this.decryptionFailures) {
+      if (failureRecord.lastFailure > recentThreshold) {
         recentFailures++;
         if (errorSignature.includes("The provided data is too small")) {
           hasDataTooSmallError = true;
