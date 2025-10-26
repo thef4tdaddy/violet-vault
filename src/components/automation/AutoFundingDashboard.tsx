@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui";
-import { useConfirm } from "../../hooks/common/useConfirm";
-import { globalToast } from "../../stores/ui/toastStore";
-import { getIcon } from "../../utils";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
-import { TRIGGER_TYPES } from "../../utils/budgeting/autofunding";
-import { useAutoFunding } from "../../hooks/budgeting/autofunding";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import logger from "../../utils/common/logger";
+import { TRIGGER_TYPES } from "@/utils/budgeting/autofunding";
+import { useAutoFunding } from "@/hooks/budgeting/autofunding";
+import { useBudgetStore } from "@/stores/ui/uiStore";
+import logger from "@/utils/common/logger";
+import {
+  DashboardHeader,
+  DashboardTabs,
+  DashboardContent,
+} from "./AutoFundingDashboardComponents";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const envelopes = useBudgetStore((state) => state.envelopes);
@@ -26,8 +29,6 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
   // Get execution history
   const executionHistory = getHistory(20);
-
-  // No need to load rules and history manually - handled by the hook
 
   const handleCreateRule = () => {
     setEditingRule(null);
@@ -130,77 +131,32 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
           <div className="flex flex-col h-full">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-semibold text-gray-900">Auto-Funding Dashboard</h2>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                      {rules.filter((r) => r.enabled).length} Active
-                    </span>
-                    <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
-                      {rules.length} Total
-                    </span>
-                  </div>
-                </div>
-                <Button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  {React.createElement(getIcon("X"), {
-                    className: "h-5 w-5",
-                  })}
-                </Button>
-              </div>
+            <DashboardHeader rules={rules} onClose={onClose} />
 
-              {/* Tabs */}
-              <div className="flex space-x-8 mt-6">
-                <Button
-                  onClick={() => setActiveTab("rules")}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === "rules"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Rules ({rules.length})
-                </Button>
-                <Button
-                  onClick={() => setActiveTab("history")}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === "history"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  History ({executionHistory.length})
-                </Button>
-              </div>
+            <div className="px-6">
+              <DashboardTabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                rules={rules}
+                executionHistory={executionHistory}
+              />
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {activeTab === "rules" && (
-                <RulesTab
-                  rules={rules}
-                  onCreateRule={handleCreateRule}
-                  onEditRule={handleEditRule}
-                  onDeleteRule={handleDeleteRule}
-                  onToggleRule={handleToggleRule}
-                  onExecuteRules={handleExecuteRules}
-                  isExecuting={isExecuting}
-                />
-              )}
-
-              {activeTab === "history" && (
-                <HistoryTab
-                  executionHistory={executionHistory}
-                  showExecutionDetails={showExecutionDetails}
-                  onToggleDetails={setShowExecutionDetails}
-                />
-              )}
-            </div>
+            <DashboardContent
+              activeTab={activeTab}
+              rules={rules}
+              executionHistory={executionHistory}
+              showExecutionDetails={showExecutionDetails}
+              setShowExecutionDetails={setShowExecutionDetails}
+              handleCreateRule={handleCreateRule}
+              handleEditRule={handleEditRule}
+              handleDeleteRule={handleDeleteRule}
+              handleToggleRule={handleToggleRule}
+              handleExecuteRules={handleExecuteRules}
+              isExecuting={isExecuting}
+              RulesTabComponent={RulesTab}
+              HistoryTabComponent={HistoryTab}
+            />
           </div>
         </div>
       </div>
