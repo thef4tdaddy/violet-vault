@@ -24,7 +24,6 @@
 - 2 issues in `violet-vault/src/hooks/debts/useDebtModalLogic.ts`
 - 2 issues in `violet-vault/src/components/settings/sections/AutoLockSettingsSection.tsx`
 - 2 issues in `violet-vault/src/components/layout/MainLayout.tsx`
-- 2 issues in `violet-vault/src/components/accounts/AccountFormModal.tsx`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionsV2.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionTable.ts`
 - 1 issues in `violet-vault/src/hooks/transactions/useTransactionSplitter.ts`
@@ -35,12 +34,6 @@
 - 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 1 issues in `violet-vault/src/hooks/bills/useBillDetail.ts`
 - 1 issues in `violet-vault/src/hooks/auth/useSecurityManagerUI.ts`
-- 1 issues in `violet-vault/src/components/ui/forms/Textarea.tsx`
-- 1 issues in `violet-vault/src/components/ui/forms/TextInput.tsx`
-- 1 issues in `violet-vault/src/components/ui/forms/Select.tsx`
-- 1 issues in `violet-vault/src/components/ui/forms/RadioGroup.tsx`
-- 1 issues in `violet-vault/src/components/ui/forms/Radio.tsx`
-- 1 issues in `violet-vault/src/components/ui/forms/Checkbox.tsx`
 - 1 issues in `violet-vault/src/components/ui/VersionFooter.tsx`
 - 1 issues in `violet-vault/src/components/ui/PromptModal.tsx`
 - 1 issues in `violet-vault/src/components/ui/EditableBalance.tsx`
@@ -57,11 +50,11 @@
 |---|---|
 | 84 | `@typescript-eslint/no-explicit-any` |
 | 12 | `react-hooks/set-state-in-effect` |
-| 10 | `react-hooks/purity` |
-| 4 | `react-hooks/static-components` |
+| 4 | `react-hooks/purity` |
 | 4 | `react-hooks/preserve-manual-memoization` |
 | 3 | `null` |
 | 3 | `max-lines-per-function` |
+| 2 | `react-hooks/static-components` |
 | 2 | `react-hooks/refs` |
 | 2 | `max-params` |
 | 1 | `react-hooks/incompatible-library` |
@@ -69,66 +62,6 @@
 
 ### Detailed Lint Report
 ```
-violet-vault/src/components/accounts/AccountFormModal.tsx:88:12 - 2 - Error: Cannot create components during render
-
-Components created during render will reset their state each time they are created. Declare components outside of render.
-
-violet-vault/src/components/accounts/AccountFormModal.tsx:88:12
-  86 |       >
-  87 |         <div className="px-6 pb-6">
-> 88 |           <ModalContent />
-     |            ^^^^^^^^^^^^ This component is created during render
-  89 |         </div>
-  90 |       </SlideUpModal>
-  91 |     );
-
-violet-vault/src/components/accounts/AccountFormModal.tsx:31:24
-  29 |
-  30 |   // Extract modal content for reuse between mobile and desktop
-> 31 |   const ModalContent = () => (
-     |                        ^^^^^^^
-> 32 |     <>
-     | ^^^^^^
-> 33 |       {/* Edit Lock Warning */}
-     …
-     | ^^^^^^
-> 73 |     </>
-     | ^^^^^^
-> 74 |   );
-     | ^^^^ The component is created during render here
-  75 |
-  76 |   // Mobile slide-up modal
-  77 |   if (isMobile || _forceMobileMode) { (react-hooks/static-components)
-violet-vault/src/components/accounts/AccountFormModal.tsx:108:10 - 2 - Error: Cannot create components during render
-
-Components created during render will reset their state each time they are created. Declare components outside of render.
-
-violet-vault/src/components/accounts/AccountFormModal.tsx:108:10
-  106 |         />
-  107 |
-> 108 |         <ModalContent />
-      |          ^^^^^^^^^^^^ This component is created during render
-  109 |       </div>
-  110 |     </div>
-  111 |   );
-
-violet-vault/src/components/accounts/AccountFormModal.tsx:31:24
-  29 |
-  30 |   // Extract modal content for reuse between mobile and desktop
-> 31 |   const ModalContent = () => (
-     |                        ^^^^^^^
-> 32 |     <>
-     | ^^^^^^
-> 33 |       {/* Edit Lock Warning */}
-     …
-     | ^^^^^^
-> 73 |     </>
-     | ^^^^^^
-> 74 |   );
-     | ^^^^ The component is created during render here
-  75 |
-  76 |   // Mobile slide-up modal
-  77 |   if (isMobile || _forceMobileMode) { (react-hooks/static-components)
 violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:151:7 - 1 - Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect'). (null)
 violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:153:7 - 1 - Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect'). (null)
 violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:157:7 - 1 - Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect'). (null)
@@ -368,78 +301,6 @@ violet-vault/src/components/ui/VersionFooter.tsx:19:7
   20 |
   21 |       // Only fetch if we don't have valid cached data
   22 |       if (!currentCache.isValid) { (react-hooks/set-state-in-effect)
-violet-vault/src/components/ui/forms/Checkbox.tsx:31:42 - 2 - Error: Cannot call impure function during render
-
-`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
-
-violet-vault/src/components/ui/forms/Checkbox.tsx:31:42
-  29 | const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  30 |   ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
-> 31 |     const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
-     |                                          ^^^^^^^^^^^^^ Cannot call impure function
-  32 |
-  33 |     return (
-  34 |       <div className="w-full"> (react-hooks/purity)
-violet-vault/src/components/ui/forms/Radio.tsx:36:36 - 2 - Error: Cannot call impure function during render
-
-`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
-
-violet-vault/src/components/ui/forms/Radio.tsx:36:36
-  34 | const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
-  35 |   ({ label, error, helperText, description, className = "", id, disabled, ...props }, ref) => {
-> 36 |     const radioId = id || `radio-${Math.random().toString(36).substr(2, 9)}`;
-     |                                    ^^^^^^^^^^^^^ Cannot call impure function
-  37 |
-  38 |     // If description is provided, use grid layout (for RadioGroup with descriptions)
-  39 |     if (description) { (react-hooks/purity)
-violet-vault/src/components/ui/forms/RadioGroup.tsx:89:36 - 2 - Error: Cannot call impure function during render
-
-`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
-
-violet-vault/src/components/ui/forms/RadioGroup.tsx:89:36
-  87 |   ) => {
-  88 |     const hasDescriptions = options.some((opt) => opt.description);
-> 89 |     const groupId = `radio-group-${Math.random().toString(36).substr(2, 9)}`;
-     |                                    ^^^^^^^^^^^^^ Cannot call impure function
-  90 |
-  91 |     const handleChange = (optionValue: string) => {
-  92 |       onChange?.(optionValue); (react-hooks/purity)
-violet-vault/src/components/ui/forms/Select.tsx:49:38 - 2 - Error: Cannot call impure function during render
-
-`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
-
-violet-vault/src/components/ui/forms/Select.tsx:49:38
-  47 |     ref
-  48 |   ) => {
-> 49 |     const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
-     |                                      ^^^^^^^^^^^^^ Cannot call impure function
-  50 |
-  51 |     return (
-  52 |       <div className="w-full"> (react-hooks/purity)
-violet-vault/src/components/ui/forms/TextInput.tsx:37:36 - 2 - Error: Cannot call impure function during render
-
-`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
-
-violet-vault/src/components/ui/forms/TextInput.tsx:37:36
-  35 | const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
-  36 |   ({ label, error, helperText, icon, className = "", id, disabled, ...props }, ref) => {
-> 37 |     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
-     |                                    ^^^^^^^^^^^^^ Cannot call impure function
-  38 |
-  39 |     return (
-  40 |       <div className="w-full"> (react-hooks/purity)
-violet-vault/src/components/ui/forms/Textarea.tsx:34:42 - 2 - Error: Cannot call impure function during render
-
-`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
-
-violet-vault/src/components/ui/forms/Textarea.tsx:34:42
-  32 | const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  33 |   ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
-> 34 |     const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
-     |                                          ^^^^^^^^^^^^^ Cannot call impure function
-  35 |
-  36 |     return (
-  37 |       <div className="w-full"> (react-hooks/purity)
 violet-vault/src/hooks/auth/useSecurityManagerUI.ts:14:34 - 2 - Error: Cannot call impure function during render
 
 `Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
@@ -1130,7 +991,7 @@ violet-vault/src/services/chunkedSyncService.ts:871:16 - 1 - Unexpected any. Spe
 
 ### Detailed Type Error Report
 ```
-src/components/accounts/AccountFormModal.tsx(103,11): error TS2322: Type '{ editingAccount: any; onClose: any; isLocked: any; isOwnLock: any; _lock: any; breakLock: any; lockLoading: any; }' is not assignable to type 'IntrinsicAttributes & AccountModalHeaderProps'.
+src/components/accounts/AccountFormModal.tsx(127,11): error TS2322: Type '{ editingAccount: any; onClose: any; isLocked: any; isOwnLock: any; _lock: any; breakLock: any; lockLoading: any; }' is not assignable to type 'IntrinsicAttributes & AccountModalHeaderProps'.
   Property '_lock' does not exist on type 'IntrinsicAttributes & AccountModalHeaderProps'.
 src/components/accounts/AccountsGrid.tsx(35,13): error TS2322: Type '{ key: string; account: unknown; typeInfo: { value: string; label: string; icon: string; }; _daysUntilExpiration: number; expirationStatus: { text: string; color: string; }; showBalances: any; onEdit: any; onDelete: any; onStartTransfer: any; }' is not assignable to type 'IntrinsicAttributes & { account: any; typeInfo: any; expirationStatus: any; showBalances: any; onEdit: any; onDelete: any; onStartTransfer: any; }'.
   Property '_daysUntilExpiration' does not exist on type 'IntrinsicAttributes & { account: any; typeInfo: any; expirationStatus: any; showBalances: any; onEdit: any; onDelete: any; onStartTransfer: any; }'.
