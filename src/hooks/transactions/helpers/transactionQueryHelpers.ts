@@ -56,21 +56,29 @@ export const applySorting = (
   const sorted = [...transactions];
   
   sorted.sort((a, b) => {
-    let aVal = a[options.sortBy];
-    let bVal = b[options.sortBy];
+    // Safely access the property with proper typing
+    const aVal = a[options.sortBy as keyof Transaction];
+    const bVal = b[options.sortBy as keyof Transaction];
 
     // Handle date fields
     if (options.sortBy === "date") {
-      aVal = new Date(aVal);
-      bVal = new Date(bVal);
+      const aDate = new Date(aVal as Date | string);
+      const bDate = new Date(bVal as Date | string);
+      return options.sortOrder === "desc"
+        ? (bDate > aDate ? 1 : bDate < aDate ? -1 : 0)
+        : (aDate > bDate ? 1 : aDate < bDate ? -1 : 0);
     }
 
     // Handle numeric fields
     if (options.sortBy === "amount") {
-      aVal = parseFloat(aVal as string) || 0;
-      bVal = parseFloat(bVal as string) || 0;
+      const aNum = typeof aVal === "number" ? aVal : parseFloat(String(aVal)) || 0;
+      const bNum = typeof bVal === "number" ? bVal : parseFloat(String(bVal)) || 0;
+      return options.sortOrder === "desc"
+        ? (bNum > aNum ? 1 : bNum < aNum ? -1 : 0)
+        : (aNum > bNum ? 1 : aNum < bNum ? -1 : 0);
     }
 
+    // Handle string fields
     if (options.sortOrder === "desc") {
       return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
     } else {

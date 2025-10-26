@@ -6,15 +6,63 @@ import logger from "../../../utils/common/logger.ts";
 import { convertPaymentFrequency } from "../../../utils/debts/debtCalculations";
 import { DEBT_STATUS } from "../../../constants/debts";
 
+interface DebtData {
+  name: string;
+  minimumPayment: number;
+  paymentDueDate: string;
+  paymentFrequency: string;
+}
+
+interface CreatedDebt {
+  id: string;
+}
+
+interface Envelope {
+  id: string;
+}
+
+interface Bill {
+  id: string;
+}
+
+interface ConnectionData {
+  paymentMethod?: string;
+  createBill?: boolean;
+  existingBillId?: string;
+  newEnvelopeName?: string;
+}
+
+interface BillConnectionOptions {
+  connectionData: ConnectionData | null;
+  cleanDebtData: DebtData;
+  createdDebt: CreatedDebt;
+  createEnvelope: (data: { 
+    name: string; 
+    targetAmount: number; 
+    currentBalance: number; 
+    category: string 
+  }) => Promise<Envelope>;
+  createBill: (data: {
+    name: string;
+    amount: number;
+    dueDate: string;
+    frequency: string;
+    envelopeId: string;
+    debtId: string;
+    isActive: boolean;
+  }) => Promise<Bill>;
+  updateBill: (id: string, data: { debtId: string }) => Promise<void>;
+}
+
 /**
  * Create envelope and bill for new debt
  */
 export const createEnvelopeAndBillForDebt = async (
-  cleanDebtData,
-  createdDebt,
+  cleanDebtData: DebtData,
+  createdDebt: CreatedDebt,
   newEnvelopeName: string,
-  createEnvelope,
-  createBill
+  createEnvelope: BillConnectionOptions["createEnvelope"],
+  createBill: BillConnectionOptions["createBill"]
 ) => {
   const envelopeName = newEnvelopeName || `${cleanDebtData.name} Payment`;
 
@@ -41,14 +89,7 @@ export const createEnvelopeAndBillForDebt = async (
 /**
  * Handle bill connections for debt
  */
-export const handleBillConnectionsForDebt = async (options: {
-  connectionData: unknown;
-  cleanDebtData: unknown;
-  createdDebt: unknown;
-  createEnvelope: (data: unknown) => Promise<unknown>;
-  createBill: (data: unknown) => Promise<unknown>;
-  updateBill: (id: string, data: unknown) => Promise<unknown>;
-}) => {
+export const handleBillConnectionsForDebt = async (options: BillConnectionOptions) => {
   const {
     connectionData,
     cleanDebtData,
@@ -60,28 +101,19 @@ export const handleBillConnectionsForDebt = async (options: {
 
   if (!connectionData) return;
 
-  const {
-    paymentMethod,
-    createBill: shouldCreateBill,
-    existingBillId,
-    newEnvelopeName,
-  } = connectionData as {
-    paymentMethod?: string;
-    createBill?: boolean;
-    existingBillId?: string;
-    newEnvelopeName?: string;
-  };
+  const { paymentMethod, createBill: shouldCreateBill, existingBillId, newEnvelopeName } =
+    connectionData;
 
   if (paymentMethod === "create_new" && shouldCreateBill) {
     await createEnvelopeAndBillForDebt(
       cleanDebtData,
       createdDebt,
-      newEnvelopeName,
+      newEnvelopeName || "",
       createEnvelope,
       createBill
     );
   } else if (paymentMethod === "connect_existing_bill" && existingBillId) {
-    await updateBill(existingBillId, { debtId: (createdDebt as { id: string }).id });
+    await updateBill(existingBillId, { debtId: createdDebt.id });
     logger.info("Connected debt to existing bill");
   }
 };
