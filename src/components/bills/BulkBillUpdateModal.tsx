@@ -8,6 +8,8 @@ import {
 } from "../../utils/bills/billUpdateHelpers";
 import BulkUpdateConfirmModal from "./modals/BulkUpdateConfirmModal";
 import BulkUpdateEditor from "./BulkUpdateEditor";
+import BulkUpdateModeSelector from "./BulkUpdateModeSelector";
+import BulkUpdateSummary from "./BulkUpdateSummary";
 
 const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBills, onError }) => {
   const [updateMode, setUpdateMode] = useState("amounts");
@@ -85,47 +87,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
               </div>
 
               {/* Update Mode Selector */}
-              <div className="flex gap-2 mb-6">
-                <Button
-                  onClick={() => setUpdateMode("amounts")}
-                  className={`px-4 py-2 rounded-lg flex items-center border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
-                    updateMode === "amounts"
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                      : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
-                  }`}
-                >
-                  {React.createElement(getIcon("DollarSign"), {
-                    className: "h-4 w-4 mr-2",
-                  })}
-                  Amounts Only
-                </Button>
-                <Button
-                  onClick={() => setUpdateMode("dates")}
-                  className={`px-4 py-2 rounded-lg flex items-center border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
-                    updateMode === "dates"
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                      : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
-                  }`}
-                >
-                  {React.createElement(getIcon("Calendar"), {
-                    className: "h-4 w-4 mr-2",
-                  })}
-                  Due Dates Only
-                </Button>
-                <Button
-                  onClick={() => setUpdateMode("both")}
-                  className={`px-4 py-2 rounded-lg flex items-center border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
-                    updateMode === "both"
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                      : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
-                  }`}
-                >
-                  {React.createElement(getIcon("Edit3"), {
-                    className: "h-4 w-4 mr-2",
-                  })}
-                  Both
-                </Button>
-              </div>
+              <BulkUpdateModeSelector updateMode={updateMode} setUpdateMode={setUpdateMode} />
 
               <BulkUpdateEditor
                 selectedBills={selectedBills}
@@ -137,51 +99,11 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
               />
 
               {/* Summary and Actions */}
-              <div className="mt-6 pt-4 border-t-2 border-black">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-purple-800">
-                    {summary.hasChanges ? (
-                      <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-orange-200">
-                        {React.createElement(getIcon("AlertTriangle"), {
-                          className: "h-4 w-4 text-orange-600",
-                        })}
-                        <span className="font-bold">
-                          {summary.changedBills} bills have changes
-                          {summary.totalAmountChange !== 0 && (
-                            <span className="ml-2 text-purple-900">
-                              (Net: {summary.totalAmountChange > 0 ? "+" : ""}$
-                              {summary.totalAmountChange.toFixed(2)})
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200">
-                        {React.createElement(getIcon("Clock"), {
-                          className: "h-4 w-4 text-gray-500",
-                        })}
-                        <span className="font-medium text-gray-600">No changes made yet</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={onClose}
-                      className="px-4 py-2 text-gray-800 bg-gray-200/80 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={!summary.hasChanges}
-                      className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black"
-                    >
-                      Update {summary.changedBills} Bills
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <BulkUpdateSummary
+                summary={summary}
+                onClose={onClose}
+                handleSubmit={handleSubmit}
+              />
             </div>
           </div>
         </div>
