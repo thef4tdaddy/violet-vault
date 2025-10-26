@@ -265,7 +265,7 @@ export const categorizeTransaction = (transaction: TransactionBase, categoryRule
 /**
  * Check if two transactions are duplicates based on criteria
  */
-const areDuplicateTransactions = (transaction: any, existing: any, options: any): boolean => {
+const areDuplicateTransactions = (transaction: TransactionBase, existing: TransactionBase, options: DuplicateCheckOptions): boolean => {
   const { timeWindowMs, amountTolerance, checkDescription, checkAccount } = options;
 
   const timeDiff = Math.abs(new Date(transaction.date).getTime() - new Date(existing.date).getTime());
@@ -281,14 +281,14 @@ const areDuplicateTransactions = (transaction: any, existing: any, options: any)
 /**
  * Merge duplicate transaction metadata
  */
-const mergeDuplicateMetadata = (existing, transaction) => {
+const mergeDuplicateMetadata = (existing: TransactionBase, transaction: TransactionBase): void => {
   existing.metadata = {
     ...existing.metadata,
-    duplicates: existing.metadata.duplicates || [],
+    duplicates: (existing.metadata?.duplicates as Array<{ id?: string; originalDate: string | Date; mergedAt: string }>) || [],
     mergedAt: new Date().toISOString(),
   };
 
-  existing.metadata.duplicates.push({
+  (existing.metadata.duplicates as Array<{ id?: string; originalDate: string | Date; mergedAt: string }>).push({
     id: transaction.id,
     originalDate: transaction.date,
     mergedAt: new Date().toISOString(),
@@ -302,10 +302,21 @@ interface MergeDuplicateOptions {
   checkAccount?: boolean;
 }
 
+interface DuplicateCheckOptions {
+  timeWindowMs: number;
+  amountTolerance: number;
+  checkDescription: boolean;
+  checkAccount: boolean;
+}
+
+interface TransactionWithRunningBalance extends TransactionBase {
+  runningBalance?: number;
+}
+
 /**
  * Merge duplicate transactions
  */
-export const mergeDuplicateTransactions = (transactions: any[] = [], options: MergeDuplicateOptions = {}): any[] => {
+export const mergeDuplicateTransactions = (transactions: TransactionBase[] = [], options: MergeDuplicateOptions = {}): TransactionBase[] => {
   try {
     const {
       timeWindowMinutes = 5,
@@ -345,7 +356,7 @@ export const mergeDuplicateTransactions = (transactions: any[] = [], options: Me
 /**
  * Calculate running balance for transactions
  */
-export const calculateRunningBalance = (transactions: any[] = [], startingBalance: number = 0): any[] => {
+export const calculateRunningBalance = (transactions: TransactionBase[] = [], startingBalance: number = 0): TransactionWithRunningBalance[] => {
   try {
     let runningBalance = startingBalance;
 
@@ -369,10 +380,17 @@ interface FormatDisplayOptions {
   includeTime?: boolean;
 }
 
+interface FormattedTransaction extends TransactionBase {
+  formattedAmount?: string;
+  amountDisplay?: string;
+  formattedDate?: string;
+  formattedTime?: string;
+}
+
 /**
  * Format transaction for display
  */
-export const formatTransactionForDisplay = (transaction: any, options: FormatDisplayOptions = {}): any => {
+export const formatTransactionForDisplay = (transaction: TransactionBase, options: FormatDisplayOptions = {}): FormattedTransaction => {
   try {
     const { currency = "USD", dateFormat = "short", includeTime = false } = options;
 

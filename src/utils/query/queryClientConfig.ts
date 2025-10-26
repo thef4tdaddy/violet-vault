@@ -16,7 +16,7 @@ export const createQueryClient = () => {
         gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime)
         retry: (failureCount, error) => {
           // Don't retry auth errors
-          const errorWithStatus = error as any;
+          const errorWithStatus = error as { status?: number };
           if (errorWithStatus?.status === 401 || errorWithStatus?.status === 403) {
             return false;
           }

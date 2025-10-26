@@ -15,6 +15,12 @@ interface FormatBalanceOptions {
   maximumFractionDigits?: number;
 }
 
+interface BudgetState {
+  actualBalance: number;
+  isActualBalanceManual: boolean;
+  setActualBalance: (balance: number) => void;
+}
+
 /**
  * Custom hook for managing actual balance operations
  * Handles business logic for balance updates, validations, and state management
@@ -25,7 +31,7 @@ export const useActualBalance = () => {
     isActualBalanceManual,
     setActualBalance: setStoreBalance,
   } = useBudgetStore(
-    useShallow((state: any) => ({
+    useShallow((state: BudgetState) => ({
       actualBalance: state.actualBalance,
       isActualBalanceManual: state.isActualBalanceManual,
       setActualBalance: state.setActualBalance,
