@@ -1,8 +1,8 @@
 // Prefetch Helpers Tests
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { prefetchHelpers } from "../prefetchHelpers";
-import { budgetDb } from "../../../db/budgetDb";
-import budgetDatabaseService from "../../../services/budgetDatabaseService";
+import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
 
 // Mock dependencies

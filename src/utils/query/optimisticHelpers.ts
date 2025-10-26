@@ -1,9 +1,9 @@
 // Optimistic Update Helpers - TanStack Query optimistic updates with Dexie persistence
-import { budgetDb } from "../../db/budgetDb";
-import budgetDatabaseService from "../../services/budgetDatabaseService";
+import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
-import logger from "../common/logger";
-import { cloudSyncService } from "../../services/cloudSyncService";
+import logger from "@/utils/common/logger";
+import { cloudSyncService } from "@/services/cloudSyncService";
 
 /**
  * Enhanced optimistic update helpers with Dexie persistence for offline support.
