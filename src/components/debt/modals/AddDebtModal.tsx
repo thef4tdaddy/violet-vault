@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useDebtModalLogic } from "../../../hooks/debts/useDebtModalLogic";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 import DebtModalHeader from "./DebtModalHeader";
@@ -26,6 +27,21 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
     handleClose,
   } = useDebtModalLogic(debt, isOpen, onSubmit, onClose);
 
+  // Compute lock data with current timestamp in effect to avoid impure function in render
+  const [lockData, setLockData] = useState({
+    userName: "",
+    expiresAt: new Date(),
+    isExpired: false,
+  });
+
+  useEffect(() => {
+    setLockData({
+      userName: editLock.lockedBy,
+      expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
+      isExpired: editLock.isExpired,
+    });
+  }, [editLock.lockedBy, editLock.timeRemaining, editLock.isExpired]);
+
   if (!isOpen) return null;
 
   return (
@@ -39,11 +55,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             <EditLockIndicator
               isLocked={editLock.shouldShowEditLockWarning}
               isOwnLock={editLock.shouldShowOwnLockIndicator}
-              lock={{
-                userName: editLock.lockedBy,
-                expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
-                isExpired: editLock.isExpired,
-              }}
+              lock={lockData}
               onBreakLock={editLock.breakLock}
               showDetails={true}
             />

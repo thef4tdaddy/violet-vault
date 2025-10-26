@@ -5,16 +5,14 @@
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { queryKeys } from "../../utils/common/queryClient.ts";
-import logger from "../../utils/common/logger.ts";
 import {
-  addTransactionToDB,
-  updateTransactionInDB,
-  deleteTransactionFromDB,
-  splitTransactionInDB,
-  transferFundsInDB,
-  bulkOperationOnTransactions,
-} from "./helpers/transactionOperationsHelpers.ts";
+  createAddTransactionMutationConfig,
+  createUpdateTransactionMutationConfig,
+  createDeleteTransactionMutationConfig,
+  createSplitTransactionMutationConfig,
+  createTransferFundsMutationConfig,
+  createBulkOperationMutationConfig,
+} from "./useTransactionOperationsHelpers";
 
 /**
  * Hook for transaction CRUD operations
@@ -25,109 +23,23 @@ const useTransactionOperations = (options = {}) => {
   const queryClient = useQueryClient();
   const { categoryRules = [] } = options;
 
-  /**
-   * Add transaction mutation
-   */
-  const addTransactionMutation = useMutation({
-    mutationKey: ["transactions", "add"],
-    mutationFn: async (transactionData) => addTransactionToDB(transactionData, categoryRules),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-      logger.info("Transaction added successfully", { id: data.id });
-    },
-    onError: (error) => {
-      logger.error("Failed to add transaction", error);
-    },
-  });
-
-  /**
-   * Update transaction mutation
-   */
-  const updateTransactionMutation = useMutation({
-    mutationKey: ["transactions", "update"],
-    mutationFn: async ({ id, updates }) => updateTransactionInDB(id, updates),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-      logger.info("Transaction updated successfully", { id: variables.id });
-    },
-    onError: (error, variables) => {
-      logger.error("Failed to update transaction", { error, id: variables.id });
-    },
-  });
-
-  /**
-   * Delete transaction mutation
-   */
-  const deleteTransactionMutation = useMutation({
-    mutationKey: ["transactions", "delete"],
-    mutationFn: async (transactionId) => deleteTransactionFromDB(transactionId),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-      logger.info("Transaction deleted successfully", { id: data.id });
-    },
-    onError: (error, variables) => {
-      logger.error("Failed to delete transaction", { error, id: variables });
-    },
-  });
-
-  /**
-   * Split transaction mutation
-   */
-  const splitTransactionMutation = useMutation({
-    mutationKey: ["transactions", "split"],
-    mutationFn: async ({ originalTransaction, splitTransactions }) =>
-      splitTransactionInDB(originalTransaction, splitTransactions),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-      logger.info("Transaction split successfully", {
-        originalId: data.originalTransaction.id,
-        splitCount: data.splitTransactions.length,
-      });
-    },
-    onError: (error) => {
-      logger.error("Failed to split transaction", error);
-    },
-  });
-
-  /**
-   * Transfer funds mutation
-   */
-  const transferFundsMutation = useMutation({
-    mutationKey: ["transactions", "transfer"],
-    mutationFn: async (transferData) => transferFundsInDB(transferData),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-      logger.info("Transfer created successfully", {
-        transferId: data.transferId,
-        amount: data.outgoing.amount,
-      });
-    },
-    onError: (error) => {
-      logger.error("Failed to create transfer", error);
-    },
-  });
-
-  /**
-   * Bulk operations mutation
-   */
-  const bulkOperationMutation = useMutation({
-    mutationKey: ["transactions", "bulk"],
-    mutationFn: async ({ operation, transactions, updates = {} }) =>
-      bulkOperationOnTransactions(operation, transactions, updates, categoryRules),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-      logger.info(`Bulk ${variables.operation} completed`, { count: data.length });
-    },
-    onError: (error, variables) => {
-      logger.error(`Bulk ${variables.operation} failed`, error);
-    },
-  });
+  // Create mutation configurations
+  const addTransactionMutation = useMutation(
+    createAddTransactionMutationConfig(queryClient, categoryRules)
+  );
+  const updateTransactionMutation = useMutation(
+    createUpdateTransactionMutationConfig(queryClient)
+  );
+  const deleteTransactionMutation = useMutation(
+    createDeleteTransactionMutationConfig(queryClient)
+  );
+  const splitTransactionMutation = useMutation(
+    createSplitTransactionMutationConfig(queryClient)
+  );
+  const transferFundsMutation = useMutation(createTransferFundsMutationConfig(queryClient));
+  const bulkOperationMutation = useMutation(
+    createBulkOperationMutationConfig(queryClient, categoryRules)
+  );
 
   // Convenience methods
   const addTransaction = useCallback(

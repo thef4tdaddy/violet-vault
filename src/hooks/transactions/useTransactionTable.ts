@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 /**
@@ -9,11 +9,14 @@ export const useTransactionTable = (transactions = []) => {
   const [deletingTransaction, setDeletingTransaction] = useState(null);
   const parentRef = useRef(null);
 
+  // Memoize estimateSize for virtualizer compatibility
+  const estimateSize = useCallback(() => 80, []);
+
   // Virtualization setup
   const rowVirtualizer = useVirtualizer({
     count: transactions.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 80,
+    estimateSize,
     overscan: 10,
   });
 

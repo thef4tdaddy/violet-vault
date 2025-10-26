@@ -101,34 +101,6 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
     }
   }, []);
 
-  // Get undoable executions
-  const getUndoableExecutions = useCallback(() => {
-    return undoStack.filter((item) => item.canUndo);
-  }, [undoStack]);
-
-  // Get undo statistics
-  const getUndoStatistics = useCallback(() => {
-    const undoableItems = getUndoableExecutions();
-
-    return {
-      totalUndoable: undoableItems.length,
-      totalAmount: undoableItems.reduce((sum, item) => sum + item.totalAmount, 0),
-      oldestUndoable:
-        undoableItems.length > 0 ? undoableItems[undoableItems.length - 1].executedAt : null,
-      newestUndoable: undoableItems.length > 0 ? undoableItems[0].executedAt : null,
-    };
-  }, [getUndoableExecutions]);
-
-  // Undo the most recent execution
-  const undoLastExecution = useCallback(async () => {
-    const undoableExecutions = getUndoableExecutions();
-    if (undoableExecutions.length === 0) {
-      throw new Error("No undoable executions available");
-    }
-
-    return await undoExecution(undoableExecutions[0].executionId);
-  }, [getUndoableExecutions, undoExecution]);
-
   // Reverse a single transfer
   const reverseTransfer = useCallback(
     async (transfer) => {
@@ -213,6 +185,34 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
     },
     [undoStack, addToHistory, reverseTransfer]
   );
+
+  // Get undoable executions
+  const getUndoableExecutions = useCallback(() => {
+    return undoStack.filter((item) => item.canUndo);
+  }, [undoStack]);
+
+  // Get undo statistics
+  const getUndoStatistics = useCallback(() => {
+    const undoableItems = getUndoableExecutions();
+
+    return {
+      totalUndoable: undoableItems.length,
+      totalAmount: undoableItems.reduce((sum, item) => sum + item.totalAmount, 0),
+      oldestUndoable:
+        undoableItems.length > 0 ? undoableItems[undoableItems.length - 1].executedAt : null,
+      newestUndoable: undoableItems.length > 0 ? undoableItems[0].executedAt : null,
+    };
+  }, [getUndoableExecutions]);
+
+  // Undo the most recent execution
+  const undoLastExecution = useCallback(async () => {
+    const undoableExecutions = getUndoableExecutions();
+    if (undoableExecutions.length === 0) {
+      throw new Error("No undoable executions available");
+    }
+
+    return await undoExecution(undoableExecutions[0].executionId);
+  }, [getUndoableExecutions, undoExecution]);
 
   return {
     undoStack,

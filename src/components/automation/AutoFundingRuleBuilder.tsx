@@ -142,21 +142,17 @@ const AutoFundingRuleBuilder = ({
   const [_validationErrors, _setValidationErrors] = useState([]);
   const [errors, setErrors] = useState({});
 
-  // Initialize with editing rule data
-  useEffect(() => {
-    if (editingRule) {
-      setRuleData({ ...editingRule, config: { ...editingRule.config } });
-    }
-  }, [editingRule]);
-
-  // Reset form when modal opens/closes
+  // Initialize with editing rule data or reset when modal closes
+  // Synchronize modal state when open/close status or editing rule changes
   useEffect(() => {
     if (!isOpen) {
+      // Batch state updates when closing to synchronize modal state
       setStep(1);
-      if (!editingRule) {
-        setRuleData(createDefaultRule());
-      }
+      setRuleData(editingRule ? { ...editingRule, config: { ...editingRule.config } } : createDefaultRule());
       setErrors({});
+    } else if (editingRule) {
+      // Initialize with editing rule when opening with existing data
+      setRuleData({ ...editingRule, config: { ...editingRule.config } });
     }
   }, [isOpen, editingRule]);
 
