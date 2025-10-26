@@ -10,7 +10,11 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dev-dist
 *.local
+
+# ESLint cache
+.eslintcache
 
 # Editor directories and files - keep essential VS Code configs for team consistency
 .vscode/*
@@ -31,3 +35,18 @@ dist-ssr
 .env*.local
 CLAUDE.local.md
 .env.development
+
+# Build and lint artifacts
+tsc-output.txt
+eslint-output.txt
+eslint_output.txt
+eslint_current.txt
+js-version/
+docs/audits/lint-results.json
+docs/audits/sorted-lint-report.txt
+docs/audits/typecheck-results.txt
+docs/audits/sorted-typecheck-report.txt
+.audit-metrics.json
+
+# Test coverage
+coverage/
