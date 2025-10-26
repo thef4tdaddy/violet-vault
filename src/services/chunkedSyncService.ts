@@ -12,6 +12,11 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from "firebase/firestore";
+import type {
+  IChunkedSyncService,
+  ChunkedSyncStats,
+  CloudSyncConfig,
+} from "../types/firebase";
 import { encryptionUtils } from "../utils/security/encryption";
 import firebaseSyncService from "./firebaseSyncService";
 import logger from "../utils/common/logger";
@@ -22,6 +27,26 @@ import {
   generateChecksum,
 } from "../utils/sync/validation";
 import { createSyncResilience } from "../utils/sync/resilience";
+
+// Type for encrypted chunk data structure
+interface EncryptedChunkData {
+  encryptedData: { data: string };
+  iv: { data: string };
+}
+
+// Type for manifest metadata
+interface ManifestMetadata {
+  totalChunks: number;
+  totalSize: number;
+  [key: string]: unknown;
+}
+
+// Declare Window interface for corruptionModalShown
+declare global {
+  interface Window {
+    corruptionModalShown?: boolean;
+  }
+}
 
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
@@ -58,9 +83,9 @@ function bytesFromBase64(str: string): Uint8Array {
  * Chunked Firebase Sync Service
  * Handles synchronization of large datasets by breaking them into smaller chunks
  */
-class ChunkedSyncService {
+class ChunkedSyncService implements IChunkedSyncService {
   budgetId: string | null;
-  encryptionKey: CryptoKey | null;
+  encryptionKey: CryptoKey | string | null;
   maxChunkSize: number;
   maxArrayChunkSize: number;
   lastCorruptedDataClear: number | null;
@@ -93,7 +118,7 @@ class ChunkedSyncService {
   /**
    * Initialize chunked sync
    */
-  async initialize(budgetId, encryptionKey) {
+  async initialize(budgetId: string, encryptionKey: string): Promise<void> {
     // GitHub Issue #578: Add validation for initialization parameters
     if (!budgetId || !encryptionKey) {
       throw new Error(
@@ -272,7 +297,10 @@ class ChunkedSyncService {
   /**
    * Save large dataset to cloud using chunking
    */
-  async saveToCloud(data, currentUser) {
+  async saveToCloud(
+    data: unknown,
+    currentUser: CloudSyncConfig["currentUser"]
+  ): Promise<boolean> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
@@ -478,7 +506,7 @@ class ChunkedSyncService {
   /**
    * Load large dataset from cloud with chunk reassembly
    */
-  async loadFromCloud() {
+  async loadFromCloud(): Promise<unknown> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
@@ -739,7 +767,7 @@ class ChunkedSyncService {
   /**
    * Clear corrupted cloud data and reset to clean state
    */
-  async clearCorruptedData() {
+  async clearCorruptedData(): Promise<void> {
     if (!this.budgetId) {
       throw new Error("Budget ID not set");
     }
@@ -802,28 +830,11 @@ class ChunkedSyncService {
   /**
    * Get sync statistics including resilience metrics
    */
-  getStats() {
-    const baseStats = {
+  getStats(): ChunkedSyncStats {
+    return {
       maxChunkSize: this.maxChunkSize,
       maxArrayChunkSize: this.maxArrayChunkSize,
       isInitialized: !!(this.budgetId && this.encryptionKey),
-    };
-
-    // Add Phase 2 resilience metrics
-    const resilienceStatus = this.resilience?.getStatus();
-
-    return {
-      ...baseStats,
-      resilience: resilienceStatus,
-      phase1: {
-        mutexEnabled: !!this.syncMutex,
-        validationEnabled: true,
-      },
-      phase2: {
-        retryEnabled: !!resilienceStatus?.retry,
-        circuitBreakerEnabled: !!resilienceStatus?.circuit,
-        queueEnabled: !!resilienceStatus?.queue,
-      },
     };
   }
 
@@ -867,11 +878,11 @@ class ChunkedSyncService {
    */
   triggerCorruptionRecovery() {
     // Don't spam the user - only show once per session
-    if ((window as any).corruptionModalShown) {
+    if (window.corruptionModalShown) {
       return;
     }
 
-    (window as any).corruptionModalShown = true;
+    window.corruptionModalShown = true;
 
     // Emit custom event for UI components to listen to
     const event = new CustomEvent("syncCorruptionDetected", {
