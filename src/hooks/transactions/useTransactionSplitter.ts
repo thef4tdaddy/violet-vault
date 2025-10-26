@@ -11,7 +11,7 @@ import {
   removeSplitHandler,
   autoBalanceHandler,
   distributeEvenlyHandler,
-  validateSplitsHandler,
+  checkSplitsHandler,
   submitSplitHandler,
   calculateSplitComputedProperties,
 } from "./useTransactionSplitterHelpers";
@@ -90,7 +90,7 @@ const useTransactionSplitter = (options = {}) => {
    * Validate current splits
    */
   const validateSplits = useCallback(() => {
-    return validateSplitsHandler(splitAllocations, transaction, setErrors);
+    return checkSplitsHandler(splitAllocations, transaction, setErrors);
   }, [splitAllocations, transaction]);
 
   /**

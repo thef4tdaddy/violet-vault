@@ -187,10 +187,10 @@ export const distributeEvenlyHandler = (
 };
 
 /**
- * Validate splits and return validation status
+ * Check splits and return validation status
  * Wrapper for the utility function validateSplitAllocations
  */
-export const validateSplitsHandler = (
+export const checkSplitsHandler = (
   splitAllocations: unknown[],
   transaction: unknown,
   setErrors: (errors: string[]) => void
