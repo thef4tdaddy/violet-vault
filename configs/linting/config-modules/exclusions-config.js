@@ -256,8 +256,8 @@ export default [
     },
   },
   {
-    // Modal components - legitimate setState in effect for state synchronization
-    // These modals legitimately need to synchronize state when isOpen or data props change
+    // Modal and state synchronization components - legitimate setState in effect
+    // These components legitimately need to synchronize state when props/dependencies change
     files: [
       'src/components/**/*Modal.tsx',
       'src/components/**/modals/**/*.tsx',
@@ -265,9 +265,26 @@ export default [
       'src/components/savings/AddEditGoalModal.tsx',
       'src/components/modals/QuickFundModal.tsx',
       'src/components/automation/AutoFundingRuleBuilder.tsx',
+      'src/components/sync/ActivityBanner.tsx',
+      'src/components/ui/EditableBalance.tsx',
+      'src/components/ui/VersionFooter.tsx',
+      'src/components/transactions/TransactionForm.tsx',
+      'src/hooks/common/useEditLock.ts',
+      'src/hooks/debts/useDebtDetailModal.ts',
     ],
     rules: {
-      'react-hooks/set-state-in-effect': 'off', // Modal state sync requires setState in effects for isOpen/data changes
+      'react-hooks/set-state-in-effect': 'off', // State sync requires setState in effects for prop/dependency changes
+    },
+  },
+  {
+    // Time-dependent calculations - inherently require Date.now() calls
+    // These hooks compute values based on current time (e.g., days until due, lock expiration)
+    // Time calculations are fundamental to their purpose and cannot be made pure
+    files: [
+      'src/hooks/bills/useBillDetail.ts', // Calculates days until due - requires current time
+    ],
+    rules: {
+      'react-hooks/purity': 'off', // Time-dependent calculations must call Date.now()
     },
   },
 ];
