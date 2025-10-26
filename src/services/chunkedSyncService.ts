@@ -9,6 +9,8 @@ import {
   writeBatch,
   query,
   where,
+  DocumentSnapshot,
+  QuerySnapshot,
 } from "firebase/firestore";
 import { encryptionUtils } from "../utils/security/encryption";
 import firebaseSyncService from "./firebaseSyncService";
@@ -19,12 +21,12 @@ import {
   validateManifest as _validateManifest,
   generateChecksum,
 } from "../utils/sync/validation";
-import { createSyncResilience, RetryManager, CircuitBreaker, SyncQueue } from "../utils/sync/resilience";
+import { createSyncResilience } from "../utils/sync/resilience";
 
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
  */
-function base64FromBytes(bytes) {
+function base64FromBytes(bytes: Uint8Array | ArrayBuffer): string {
   const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   const CHUNK_SIZE = 0x8000; // 32k chars per chunk keeps call stacks safe
   let binary = "";
@@ -35,7 +37,7 @@ function base64FromBytes(bytes) {
   return btoa(binary);
 }
 
-function bytesFromBase64(str) {
+function bytesFromBase64(str: string): Uint8Array {
   if (!str || typeof str !== "string") {
     throw new Error(`Invalid base64 string: ${typeof str}`);
   }
@@ -489,17 +491,17 @@ class ChunkedSyncService {
         logger.info("Starting chunked load from cloud");
 
         // Load main document with resilience
-        const mainDoc = await this.resilience.execute(
+        const mainDoc = (await this.resilience.execute(
           () => getDoc(doc(db, "budgets", this.budgetId)),
           "loadMainDocument",
           "loadMainDocument"
-        );
+        )) as DocumentSnapshot;
         if (!mainDoc.exists()) {
           logger.info("No cloud data found");
           return null;
         }
 
-        const mainData = mainDoc.data();
+        const mainData = mainDoc.data() as Record<string, unknown>;
         const reconstructedData = { ...mainData };
 
         // Remove internal metadata
@@ -597,12 +599,12 @@ class ChunkedSyncService {
             where("budgetId", "==", this.budgetId)
           );
 
-          const chunksSnapshot = await this.resilience.execute(
+          const chunksSnapshot = (await this.resilience.execute(
             () => getDocs(chunksQuery),
             "loadChunks",
             "loadChunks"
-          );
-          const chunks = {};
+          )) as QuerySnapshot;
+          const chunks: Record<string, unknown> = {};
 
           // Decrypt all chunks with individual error handling
           for (const chunkDoc of chunksSnapshot.docs) {
