@@ -1,4 +1,6 @@
 import { budgetDb } from "../db/budgetDb";
+import type { BudgetRecord } from "../db/types";
+import type { CloudSyncConfig } from "../types/firebase";
 import logger from "../utils/common/logger";
 import chunkedSyncService from "./chunkedSyncService";
 import { autoBackupService } from "../utils/sync/autoBackupService";
@@ -7,10 +9,25 @@ import { syncHealthMonitor } from "../utils/sync/syncHealthMonitor";
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
 
+/**
+ * Configuration interface for cloud sync service
+ */
+interface SyncConfig {
+  budgetId?: string;
+  encryptionKey?: string | CryptoKey;
+  currentUser?: {
+    readonly uid?: string;
+    readonly userName?: string;
+    readonly joinedVia?: string;
+    readonly sharedBy?: string;
+  };
+  clearAllData?: () => Promise<void>;
+}
+
 class CloudSyncService {
   syncIntervalId: ReturnType<typeof setTimeout> | null;
   isSyncing: boolean;
-  config: Record<string, unknown> | null;
+  config: SyncConfig | null;
   debounceTimer: ReturnType<typeof setTimeout> | null;
   isRunning: boolean;
   syncQueue: Promise<unknown>;
@@ -109,7 +126,10 @@ class CloudSyncService {
 
       // Initialize chunked Firebase sync if not already done
       syncHealthMonitor.updateSyncProgress(syncId, "initializing");
-      await chunkedSyncService.initialize(this.config.budgetId, this.config.encryptionKey);
+      await chunkedSyncService.initialize(
+        this.config.budgetId as string,
+        this.config.encryptionKey as string
+      );
 
       // Fetch data from Dexie for sync
       syncHealthMonitor.updateSyncProgress(syncId, "fetching_local_data");
@@ -145,7 +165,7 @@ class CloudSyncService {
           logger.warn("🔑 Decryption failed during sync - treating as no cloud data", {
             errorMessage: error.message,
             errorName: error.name,
-            budgetId: this.config?.budgetId?.substring(0, 8) + "...",
+            budgetId: (this.config?.budgetId as string | undefined)?.substring(0, 8) + "...",
             timestamp: new Date().toISOString(),
           });
 
@@ -207,7 +227,10 @@ class CloudSyncService {
         }
       } else {
         // Upload from Dexie to Firebase (default behavior)
-        result = await chunkedSyncService.saveToCloud(localData, this.config.currentUser);
+        result = await chunkedSyncService.saveToCloud(
+          localData,
+          this.config.currentUser as CloudSyncConfig["currentUser"]
+        );
       }
 
       if (result.success) {
@@ -342,7 +365,7 @@ class CloudSyncService {
     try {
       const activityData = {
         lastActive: new Date().toISOString(),
-        userName: this.config.currentUser.userName,
+        userName: this.config.currentUser?.userName,
         // Add more metadata if needed
       };
       // This would be a call to a Firebase function or Firestore directly
@@ -465,7 +488,7 @@ class CloudSyncService {
             supplementalAccounts: data.supplementalAccounts || [],
             lastUpdated: new Date().toISOString(),
             lastModified: Date.now(),
-          } as Record<string, unknown>);
+          } as BudgetRecord);
         }
       );
 
@@ -626,16 +649,24 @@ class CloudSyncService {
       const localData = await this.fetchDexieData();
 
       // Initialize chunked Firebase sync if not already done
-      await chunkedSyncService.initialize(config.budgetId, config.encryptionKey);
+      await chunkedSyncService.initialize(
+        config.budgetId as string,
+        config.encryptionKey as string
+      );
 
       // Use chunked Firebase sync to save data (one-way)
-      const result = await chunkedSyncService.saveToCloud(localData, config.currentUser);
+      const result = (await chunkedSyncService.saveToCloud(
+        localData,
+        config.currentUser
+      )) as unknown as {
+        success: boolean;
+      };
 
       if (result.success) {
         logger.info("✅ Force push to Firebase completed successfully");
         return { success: true };
       } else {
-        throw new Error(result.error || "Failed to push data to Firebase");
+        throw new Error("Failed to push data to Firebase");
       }
     } catch (error) {
       logger.error("❌ Force push to Firebase failed:", error);

@@ -297,7 +297,10 @@ class ChunkedSyncService implements IChunkedSyncService {
   /**
    * Save large dataset to cloud using chunking
    */
-  async saveToCloud(data: unknown, currentUser: CloudSyncConfig["currentUser"]): Promise<boolean> {
+  async saveToCloud(
+    data: unknown,
+    currentUser: CloudSyncConfig["currentUser"]
+  ): Promise<{ success: boolean }> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
