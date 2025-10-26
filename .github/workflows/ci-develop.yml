@@ -1,11 +1,8 @@
 name: CI - Develop Branch
 
 on:
-  # Run hourly for automated formatting and linting
-  schedule:
-    - cron: "0 * * * *" # Every hour at minute 0
-
-  # Keep PR checks for essential validation (without auto-formatting)
+  # Run on PRs only for essential validation (without auto-formatting)
+  # Removed hourly schedule to prevent auto-commit conflicts with local development
   pull_request:
     branches: [develop]
 
