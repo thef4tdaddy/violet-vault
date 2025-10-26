@@ -301,4 +301,15 @@ export default [
       'react-hooks/preserve-manual-memoization': 'off', // Intentional property-level dependencies
     },
   },
+  {
+    // TanStack Virtual incompatibility - useVirtualizer API limitation
+    // TanStack Virtual's useVirtualizer returns functions that cannot be memoized
+    // This is a known limitation of the library, not a design issue
+    files: [
+      'src/hooks/transactions/useTransactionTable.ts', // Uses TanStack Virtual
+    ],
+    rules: {
+      'react-hooks/incompatible-library': 'off', // TanStack Virtual API limitation
+    },
+  },
 ];
