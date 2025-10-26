@@ -4,13 +4,24 @@
  */
 import logger from "@/utils/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
+import type { AutoFundingData, UndoStackEntry } from "./types";
 
 const STORAGE_KEY = "violetVault_autoFunding";
 
 /**
+ * Storage usage result
+ */
+interface StorageUsage {
+  currentSize: number;
+  usedSpace: number;
+  availableSpace: number;
+  healthScore: number;
+}
+
+/**
  * Check import data structure
  */
-export const checkImportData = (importData: any): void => {
+export const checkImportData = (importData: unknown): void => {
   if (!importData || typeof importData !== "object") {
     throw new Error("Invalid import data format");
   }
@@ -19,7 +30,7 @@ export const checkImportData = (importData: any): void => {
 /**
  * Migrate older data formats if necessary
  */
-export const migrateDataIfNeeded = (data: any): any => {
+export const migrateDataIfNeeded = (data: AutoFundingData): AutoFundingData => {
   if (!data.version || data.version < "1.1") {
     logger.warn("Importing older data format", { version: data.version });
   }
@@ -29,7 +40,7 @@ export const migrateDataIfNeeded = (data: any): any => {
 /**
  * Ensure required fields exist in data
  */
-export const ensureRequiredFields = (data: any): any => {
+export const ensureRequiredFields = (data: AutoFundingData): AutoFundingData => {
   if (!Array.isArray(data.rules)) {
     data.rules = [];
   }
@@ -45,8 +56,8 @@ export const ensureRequiredFields = (data: any): any => {
 /**
  * Create backup data structure
  */
-export const createBackupData = (data: any, includeHistory: boolean): any => {
-  const backup: any = {
+export const createBackupData = (data: AutoFundingData, includeHistory: boolean): AutoFundingData => {
+  const backup: AutoFundingData = {
     ...data,
     backupCreatedAt: new Date().toISOString(),
     backupVersion: "1.1",
@@ -87,7 +98,7 @@ export const testStorageAvailability = (): boolean => {
 /**
  * Calculate storage usage
  */
-export const calculateStorageUsage = (): any => {
+export const calculateStorageUsage = (): StorageUsage => {
   try {
     const currentData = localStorageService.getItem(STORAGE_KEY);
     const currentSize = currentData ? new Blob([currentData]).size : 0;
@@ -118,8 +129,8 @@ export const calculateStorageUsage = (): any => {
 /**
  * Export data for backup/sharing
  */
-export const exportDataHelper = (data: any): any => {
-  const exportData: any = {
+export const exportDataHelper = (data: AutoFundingData): AutoFundingData => {
+  const exportData: AutoFundingData = {
     ...data,
     exportedAt: new Date().toISOString(),
     version: "1.1",
@@ -137,7 +148,7 @@ export const exportDataHelper = (data: any): any => {
 /**
  * Clear all data from localStorage
  */
-export const clearDataHelper = (): any => {
+export const clearDataHelper = (): AutoFundingData => {
   localStorageService.removeItem(STORAGE_KEY);
   logger.info("Auto-funding data cleared from localStorage");
 
@@ -155,17 +166,17 @@ export const clearDataHelper = (): any => {
 export const initializeFromStorage = async (
   setIsLoading: (val: boolean) => void,
   setIsInitialized: (val: boolean) => void,
-  setLastSaved: (val: any) => void
-): Promise<any | null> => {
+  setLastSaved: (val: string | null) => void
+): Promise<AutoFundingData | null> => {
   try {
     setIsLoading(true);
-    const data = localStorageService.getJSON(STORAGE_KEY) as any | null;
+    const data = localStorageService.getJSON(STORAGE_KEY) as AutoFundingData | null;
 
     if (data) {
       logger.info("Auto-funding data loaded from localStorage", {
         rulesCount: data.rules?.length || 0,
         historyCount: data.executionHistory?.length || 0,
-        undoableCount: data.undoStack?.filter((item: any) => item.canUndo).length || 0,
+        undoableCount: data.undoStack?.filter((item: UndoStackEntry) => item.canUndo).length || 0,
       });
     }
 
@@ -186,12 +197,12 @@ export const initializeFromStorage = async (
  * Save data to localStorage
  */
 export const saveToStorage = (
-  data: any,
-  setLastSaved: (val: any) => void,
+  data: AutoFundingData,
+  setLastSaved: (val: string | null) => void,
   setHasUnsavedChanges: (val: boolean) => void
 ): boolean => {
   try {
-    const dataToSave: any = {
+    const dataToSave: AutoFundingData = {
       ...data,
       lastSaved: new Date().toISOString(),
       version: "1.1",
@@ -216,9 +227,9 @@ export const saveToStorage = (
 /**
  * Load data from localStorage
  */
-export const loadFromStorage = (setLastSaved: (val: any) => void): any | null => {
+export const loadFromStorage = (setLastSaved: (val: string | null) => void): AutoFundingData | null => {
   try {
-    const data = localStorageService.getJSON(STORAGE_KEY) as any | null;
+    const data = localStorageService.getJSON(STORAGE_KEY) as AutoFundingData | null;
     if (!data) {
       return null;
     }
@@ -240,8 +251,8 @@ export const loadFromStorage = (setLastSaved: (val: any) => void): any | null =>
 /**
  * Reset to default state
  */
-export const resetToDefaultsHelper = (): any => {
-  const defaultData: any = {
+export const resetToDefaultsHelper = (): AutoFundingData => {
+  const defaultData: AutoFundingData = {
     rules: [],
     executionHistory: [],
     undoStack: [],
