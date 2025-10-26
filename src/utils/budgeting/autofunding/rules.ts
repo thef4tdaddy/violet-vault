@@ -68,13 +68,43 @@ export const createDefaultRule = () => ({
   },
 });
 
-/**
- * Validates a rule configuration
- */
-export const validateRule = (ruleConfig: any): { isValid: boolean; errors: string[] } => {
-  const errors = [];
+// Type definitions
+interface RuleConfig {
+  id?: string;
+  name?: string;
+  description?: string;
+  type?: string;
+  trigger?: string;
+  priority?: number;
+  enabled?: boolean;
+  createdAt?: string;
+  lastExecuted?: string | null;
+  executionCount?: number;
+  config?: {
+    sourceType?: string;
+    sourceId?: string | null;
+    targetType?: string;
+    targetId?: string | null;
+    targetIds?: string[];
+    amount?: number;
+    percentage?: number;
+    conditions?: unknown[];
+    scheduleConfig?: Record<string, unknown>;
+  };
+}
 
-  // Required fields validation
+interface RuleContext {
+  data: {
+    envelopes: Array<{ id: string; currentBalance?: number; monthlyAmount?: number }>;
+    unassignedCash: number;
+    newIncomeAmount?: number;
+  };
+}
+
+/**
+ * Validate required fields
+ */
+const validateRequiredFields = (ruleConfig: RuleConfig, errors: string[]) => {
   if (!ruleConfig.name?.trim()) {
     errors.push("Rule name is required");
   }
@@ -86,39 +116,72 @@ export const validateRule = (ruleConfig: any): { isValid: boolean; errors: strin
   if (!ruleConfig.trigger || !Object.values(TRIGGER_TYPES).includes(ruleConfig.trigger)) {
     errors.push("Valid trigger type is required");
   }
+};
 
-  // Type-specific validation
+/**
+ * Validate fixed amount rule
+ */
+const validateFixedAmount = (ruleConfig: RuleConfig, errors: string[]) => {
+  if (!ruleConfig.config?.amount || ruleConfig.config.amount <= 0) {
+    errors.push("Fixed amount rules require a positive amount");
+  }
+};
+
+/**
+ * Validate percentage rule
+ */
+const validatePercentage = (ruleConfig: RuleConfig, errors: string[]) => {
+  if (
+    !ruleConfig.config?.percentage ||
+    ruleConfig.config.percentage <= 0 ||
+    ruleConfig.config.percentage > 100
+  ) {
+    errors.push("Percentage rules require a percentage between 0 and 100");
+  }
+};
+
+/**
+ * Validate conditional rule
+ */
+const validateConditional = (ruleConfig: RuleConfig, errors: string[]) => {
+  if (!ruleConfig.config?.conditions || ruleConfig.config.conditions.length === 0) {
+    errors.push("Conditional rules require at least one condition");
+  }
+};
+
+/**
+ * Validate priority fill rule
+ */
+const validatePriorityFill = (ruleConfig: RuleConfig, errors: string[]) => {
+  if (!ruleConfig.config?.targetId) {
+    errors.push("Priority fill rules require a target envelope");
+  }
+};
+
+/**
+ * Validate type-specific requirements
+ */
+const validateTypeSpecificFields = (ruleConfig: RuleConfig, errors: string[]) => {
   switch (ruleConfig.type) {
     case RULE_TYPES.FIXED_AMOUNT:
-      if (!ruleConfig.config?.amount || ruleConfig.config.amount <= 0) {
-        errors.push("Fixed amount rules require a positive amount");
-      }
+      validateFixedAmount(ruleConfig, errors);
       break;
-
     case RULE_TYPES.PERCENTAGE:
-      if (
-        !ruleConfig.config?.percentage ||
-        ruleConfig.config.percentage <= 0 ||
-        ruleConfig.config.percentage > 100
-      ) {
-        errors.push("Percentage rules require a percentage between 0 and 100");
-      }
+      validatePercentage(ruleConfig, errors);
       break;
-
     case RULE_TYPES.CONDITIONAL:
-      if (!ruleConfig.config?.conditions || ruleConfig.config.conditions.length === 0) {
-        errors.push("Conditional rules require at least one condition");
-      }
+      validateConditional(ruleConfig, errors);
       break;
-
     case RULE_TYPES.PRIORITY_FILL:
-      if (!ruleConfig.config?.targetId) {
-        errors.push("Priority fill rules require a target envelope");
-      }
+      validatePriorityFill(ruleConfig, errors);
       break;
   }
+};
 
-  // Target validation
+/**
+ * Validate target configuration
+ */
+const validateTargetFields = (ruleConfig: RuleConfig, errors: string[]) => {
   if (ruleConfig.config?.targetType === "envelope" && !ruleConfig.config?.targetId) {
     errors.push("Single envelope rules require a target envelope");
   }
@@ -129,6 +192,17 @@ export const validateRule = (ruleConfig: any): { isValid: boolean; errors: strin
   ) {
     errors.push("Multiple envelope rules require at least one target envelope");
   }
+};
+
+/**
+ * Validates a rule configuration
+ */
+export const validateRule = (ruleConfig: RuleConfig): { isValid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+
+  validateRequiredFields(ruleConfig, errors);
+  validateTypeSpecificFields(ruleConfig, errors);
+  validateTargetFields(ruleConfig, errors);
 
   return {
     isValid: errors.length === 0,
@@ -139,16 +213,16 @@ export const validateRule = (ruleConfig: any): { isValid: boolean; errors: strin
 /**
  * Calculates the funding amount for a rule based on context
  */
-export const calculateFundingAmount = (rule: any, context: any): number => {
+export const calculateFundingAmount = (rule: RuleConfig, context: RuleContext): number => {
   const { unassignedCash } = context.data;
 
   switch (rule.type) {
     case RULE_TYPES.FIXED_AMOUNT:
-      return Math.min(rule.config.amount, unassignedCash);
+      return Math.min(rule.config?.amount || 0, unassignedCash);
 
     case RULE_TYPES.PERCENTAGE: {
       const baseAmount = getBaseAmountForPercentage(rule, context);
-      return Math.round(((baseAmount * rule.config.percentage) / 100) * 100) / 100;
+      return Math.round(((baseAmount * (rule.config?.percentage || 0)) / 100) * 100) / 100;
     }
 
     case RULE_TYPES.PRIORITY_FILL:
@@ -165,16 +239,16 @@ export const calculateFundingAmount = (rule: any, context: any): number => {
 /**
  * Gets base amount for percentage calculations
  */
-export const getBaseAmountForPercentage = (rule: any, context: any): number => {
+export const getBaseAmountForPercentage = (rule: RuleConfig, context: RuleContext): number => {
   const { envelopes, unassignedCash, newIncomeAmount } = context.data;
 
-  switch (rule.config.sourceType) {
+  switch (rule.config?.sourceType) {
     case "unassigned":
       return unassignedCash;
 
     case "envelope":
-      if (rule.config.sourceId) {
-        const envelope = envelopes.find((e) => e.id === rule.config.sourceId);
+      if (rule.config?.sourceId) {
+        const envelope = envelopes.find((e) => e.id === rule.config?.sourceId);
         return envelope?.currentBalance || 0;
       }
       return 0;
@@ -190,12 +264,12 @@ export const getBaseAmountForPercentage = (rule: any, context: any): number => {
 /**
  * Calculates priority fill amount
  */
-export const calculatePriorityFillAmount = (rule: any, context: any): number => {
+export const calculatePriorityFillAmount = (rule: RuleConfig, context: RuleContext): number => {
   const { envelopes, unassignedCash } = context.data;
 
-  if (!rule.config.targetId) return 0;
+  if (!rule.config?.targetId) return 0;
 
-  const targetEnvelope = envelopes.find((e) => e.id === rule.config.targetId);
+  const targetEnvelope = envelopes.find((e) => e.id === rule.config?.targetId);
   if (!targetEnvelope) return 0;
 
   const needed = (targetEnvelope.monthlyAmount || 0) - (targetEnvelope.currentBalance || 0);
@@ -205,7 +279,7 @@ export const calculatePriorityFillAmount = (rule: any, context: any): number => 
 /**
  * Sorts rules by priority (lower number = higher priority)
  */
-export const sortRulesByPriority = (rules: any[]): any[] => {
+export const sortRulesByPriority = (rules: RuleConfig[]): RuleConfig[] => {
   return [...rules].sort((a, b) => {
     // First by priority (lower number = higher priority)
     const priorityDiff = (a.priority || 100) - (b.priority || 100);
@@ -223,10 +297,20 @@ interface RuleFilters {
   search?: string;
 }
 
+interface RuleStatistics {
+  total: number;
+  enabled: number;
+  disabled: number;
+  byType: Record<string, number>;
+  byTrigger: Record<string, number>;
+  totalExecutions: number;
+  lastExecuted: string | null;
+}
+
 /**
  * Filters rules based on various criteria
  */
-export const filterRules = (rules: any[], filters: RuleFilters = {}): any[] => {
+export const filterRules = (rules: RuleConfig[], filters: RuleFilters = {}): RuleConfig[] => {
   let filtered = [...rules];
 
   if (filters.enabled !== undefined) {
@@ -256,8 +340,8 @@ export const filterRules = (rules: any[], filters: RuleFilters = {}): any[] => {
 /**
  * Gets rule execution statistics
  */
-export const getRuleStatistics = (rules: any[]): any => {
-  const stats = {
+export const getRuleStatistics = (rules: RuleConfig[]): RuleStatistics => {
+  const stats: RuleStatistics = {
     total: rules.length,
     enabled: 0,
     disabled: 0,
@@ -295,54 +379,63 @@ export const getRuleStatistics = (rules: any[]): any => {
   return stats;
 };
 
+interface RuleSummary {
+  id: string;
+  name: string;
+  enabled: boolean;
+  priority: number;
+  type: string;
+  trigger: string;
+  description: string;
+  targetDescription: string;
+}
+
+/**
+ * Get description for rule type
+ */
+const getRuleDescription = (rule: RuleConfig): string => {
+  switch (rule.type) {
+    case RULE_TYPES.FIXED_AMOUNT:
+      return `Move $${rule.config?.amount || 0}`;
+    case RULE_TYPES.PERCENTAGE:
+      return `Move ${rule.config?.percentage || 0}%`;
+    case RULE_TYPES.PRIORITY_FILL:
+      return "Fill to monthly amount";
+    case RULE_TYPES.SPLIT_REMAINDER:
+      return "Split remaining funds";
+    case RULE_TYPES.CONDITIONAL:
+      return `If ${rule.config?.conditions?.length || 0} condition(s) met`;
+    default:
+      return rule.type || "";
+  }
+};
+
+/**
+ * Get target description for rule
+ */
+const getTargetDescription = (rule: RuleConfig): string => {
+  if (rule.config?.targetType === "envelope") {
+    return "to envelope";
+  }
+  if (rule.config?.targetType === "multiple") {
+    const count = rule.config?.targetIds?.length || 0;
+    return `to ${count} envelope${count !== 1 ? "s" : ""}`;
+  }
+  return "";
+};
+
 /**
  * Creates a rule summary for display
  */
-export const createRuleSummary = (rule: any): any => {
-  const summary = {
-    id: rule.id,
-    name: rule.name,
-    enabled: rule.enabled,
+export const createRuleSummary = (rule: RuleConfig): RuleSummary => {
+  return {
+    id: rule.id || "",
+    name: rule.name || "",
+    enabled: rule.enabled || false,
     priority: rule.priority || 100,
-    type: rule.type,
-    trigger: rule.trigger,
-    description: "",
-    targetDescription: "",
+    type: rule.type || "",
+    trigger: rule.trigger || "",
+    description: getRuleDescription(rule),
+    targetDescription: getTargetDescription(rule),
   };
-
-  // Create human-readable description
-  switch (rule.type) {
-    case RULE_TYPES.FIXED_AMOUNT:
-      summary.description = `Move $${rule.config.amount || 0}`;
-      break;
-
-    case RULE_TYPES.PERCENTAGE:
-      summary.description = `Move ${rule.config.percentage || 0}%`;
-      break;
-
-    case RULE_TYPES.PRIORITY_FILL:
-      summary.description = "Fill to monthly amount";
-      break;
-
-    case RULE_TYPES.SPLIT_REMAINDER:
-      summary.description = "Split remaining funds";
-      break;
-
-    case RULE_TYPES.CONDITIONAL:
-      summary.description = `If ${rule.config.conditions?.length || 0} condition(s) met`;
-      break;
-
-    default:
-      summary.description = rule.type;
-  }
-
-  // Add target description
-  if (rule.config.targetType === "envelope") {
-    summary.targetDescription = "to envelope";
-  } else if (rule.config.targetType === "multiple") {
-    const count = rule.config.targetIds?.length || 0;
-    summary.targetDescription = `to ${count} envelope${count !== 1 ? "s" : ""}`;
-  }
-
-  return summary;
 };

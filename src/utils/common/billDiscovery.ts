@@ -126,60 +126,68 @@ const normalizeTransactionDescription = (description) => {
 };
 
 /**
+ * Calculate frequency from intervals
+ */
+const determineFrequency = (avgInterval: number): string | null => {
+  const isMonthly = avgInterval >= 25 && avgInterval <= 35;
+  const isWeekly = avgInterval >= 6 && avgInterval <= 8;
+  const isBiWeekly = avgInterval >= 13 && avgInterval <= 15;
+
+  if (isMonthly) return "monthly";
+  if (isWeekly) return "weekly";
+  if (isBiWeekly) return "biweekly";
+  return null;
+};
+
+/**
+ * Calculate confidence score for bill pattern
+ */
+const calculateConfidence = (
+  detectedPattern,
+  amountVariation: number,
+  avgAmount: number,
+  transactionCount: number
+): number => {
+  let confidence = detectedPattern?.confidence || 0.5;
+
+  // Boost for consistent amounts
+  if (amountVariation < avgAmount * 0.1) {
+    confidence += 0.2;
+  } else if (amountVariation < avgAmount * 0.3) {
+    confidence += 0.1;
+  }
+
+  // Boost for transaction history
+  if (transactionCount >= 6) confidence += 0.15;
+  else if (transactionCount >= 4) confidence += 0.1;
+  else if (transactionCount >= 3) confidence += 0.05;
+
+  return confidence;
+};
+
+/**
  * Analyze a group of similar transactions to determine bill characteristics
  */
 const analyzeTransactionGroup = (transactions, groupKey) => {
   if (transactions.length < 2) return null;
 
-  // Calculate transaction frequency
   const dates = transactions.map((t) => new Date(t.date)).sort((a, b) => a - b);
-
   const intervals = [];
   for (let i = 1; i < dates.length; i++) {
-    const daysDiff = Math.abs(dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
-    intervals.push(daysDiff);
+    intervals.push(Math.abs(dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24));
   }
 
   const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+  const frequency = determineFrequency(avgInterval);
 
-  // Determine if it's truly recurring (monthly, weekly, etc.)
-  const isMonthlyRecurring = avgInterval >= 25 && avgInterval <= 35;
-  const isWeeklyRecurring = avgInterval >= 6 && avgInterval <= 8;
-  const isBiWeeklyRecurring = avgInterval >= 13 && avgInterval <= 15;
+  if (!frequency) return null;
 
-  if (!isMonthlyRecurring && !isWeeklyRecurring && !isBiWeeklyRecurring) {
-    return null; // Not a regular recurring pattern
-  }
-
-  // Calculate average amount
   const amounts = transactions.map((t) => Math.abs(t.amount));
   const avgAmount = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
   const amountVariation = Math.max(...amounts) - Math.min(...amounts);
-
-  // Pattern matching for bill type
   const detectedPattern = detectBillPattern(groupKey);
+  const confidence = calculateConfidence(detectedPattern, amountVariation, avgAmount, transactions.length);
 
-  // Calculate confidence score
-  let confidence = 0.5; // Base confidence for recurring pattern
-
-  // Boost confidence for recognized bill patterns
-  if (detectedPattern) {
-    confidence = Math.max(confidence, detectedPattern.confidence);
-  }
-
-  // Boost confidence for consistent amounts (utilities vary, subscriptions don't)
-  if (amountVariation < avgAmount * 0.1) {
-    confidence += 0.2; // Very consistent amounts (subscriptions)
-  } else if (amountVariation < avgAmount * 0.3) {
-    confidence += 0.1; // Moderately consistent (utilities)
-  }
-
-  // Boost confidence for more transaction history
-  if (transactions.length >= 6) confidence += 0.15;
-  else if (transactions.length >= 4) confidence += 0.1;
-  else if (transactions.length >= 3) confidence += 0.05;
-
-  // Predict next due date
   const lastTransaction = dates[dates.length - 1];
   const nextDueDate = new Date(lastTransaction);
   nextDueDate.setDate(nextDueDate.getDate() + Math.round(avgInterval));
@@ -191,7 +199,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
     amount: Math.round(avgAmount * 100) / 100,
     dueDate: nextDueDate.toISOString().split("T")[0],
     category: detectedPattern?.category || "Bills & Utilities",
-    frequency: isMonthlyRecurring ? "monthly" : isWeeklyRecurring ? "weekly" : "biweekly",
+    frequency,
     confidence,
     source: "auto_discovery",
     discoveryData: {

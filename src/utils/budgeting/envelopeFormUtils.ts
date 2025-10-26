@@ -34,6 +34,102 @@ export const createDefaultEnvelopeForm = () => ({
 });
 
 /**
+ * Convert Zod errors to error object format
+ */
+const convertZodErrors = (zodResult) => {
+  const errors = {};
+  if (!zodResult.success) {
+    zodResult.error.errors.forEach((err) => {
+      const fieldName = err.path[0];
+      if (fieldName) {
+        errors[fieldName] = err.message;
+      }
+    });
+  }
+  return errors;
+};
+
+/**
+ * Validate envelope name uniqueness
+ */
+const validateNameUniqueness = (formData, existingEnvelopes, editingEnvelopeId, errors) => {
+  if (!errors.name && formData.name) {
+    const nameExists = existingEnvelopes.some(
+      (envelope) =>
+        envelope.name.toLowerCase() === formData.name.trim().toLowerCase() &&
+        envelope.id !== editingEnvelopeId
+    );
+    if (nameExists) {
+      errors.name = "An envelope with this name already exists";
+    }
+  }
+};
+
+/**
+ * Validate monthly amount field
+ */
+const validateMonthlyAmount = (formData, errors) => {
+  const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
+
+  if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
+    errors.monthlyAmount = "Monthly amount is required for this envelope type";
+  }
+
+  if (formData.monthlyAmount) {
+    const amount = parseFloat(formData.monthlyAmount);
+    if (isNaN(amount) || amount < 0) {
+      errors.monthlyAmount = "Monthly amount must be a positive number";
+    } else if (amount > 100000) {
+      errors.monthlyAmount = "Monthly amount cannot exceed $100,000";
+    }
+  }
+};
+
+/**
+ * Validate target amount for sinking funds
+ */
+const validateTargetAmount = (formData, errors) => {
+  if (formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND) {
+    if (!formData.targetAmount) {
+      errors.targetAmount = "Target amount is required for sinking funds";
+    } else {
+      const amount = parseFloat(formData.targetAmount);
+      if (isNaN(amount) || amount <= 0) {
+        errors.targetAmount = "Target amount must be a positive number";
+      } else if (amount > 1000000) {
+        errors.targetAmount = "Target amount cannot exceed $1,000,000";
+      }
+    }
+  }
+};
+
+/**
+ * Validate category, priority, and frequency
+ */
+const validateSelectFields = (formData, errors) => {
+  // Category validation
+  if (!errors.category && formData.category) {
+    const availableCategories = getEnvelopeCategories();
+    if (!availableCategories.includes(formData.category)) {
+      errors.category = "Invalid category selected";
+    }
+  }
+
+  // Priority validation
+  if (formData.priority && !["low", "medium", "high", "critical"].includes(formData.priority)) {
+    errors.priority = "Invalid priority selected";
+  }
+
+  // Frequency validation
+  if (formData.frequency) {
+    const frequencyOptions = getFrequencyOptions();
+    if (!frequencyOptions.find((opt) => opt.value === formData.frequency)) {
+      errors.frequency = "Invalid frequency selected";
+    }
+  }
+};
+
+/**
  * Validates envelope form data using Zod schema + form-specific logic
  * @param {Object} formData - Form data to validate
  * @param {Array} existingEnvelopes - Existing envelopes for name uniqueness
@@ -45,84 +141,13 @@ export const validateEnvelopeForm = (
   existingEnvelopes = [],
   editingEnvelopeId = null
 ) => {
-  const errors = {};
-
-  // Use Zod schema for base validation
   const zodResult = validateEnvelopeSafe(formData);
+  const errors = convertZodErrors(zodResult);
 
-  if (!zodResult.success) {
-    // Convert Zod errors to error object format
-    zodResult.error.errors.forEach((err) => {
-      const fieldName = err.path[0];
-      if (fieldName) {
-        errors[fieldName] = err.message;
-      }
-    });
-  }
-
-  // Additional form-specific validations beyond Zod schema
-
-  // Check for duplicate names (excluding current envelope if editing)
-  if (!errors.name && formData.name) {
-    const nameExists = existingEnvelopes.some(
-      (envelope) =>
-        envelope.name.toLowerCase() === formData.name.trim().toLowerCase() &&
-        envelope.id !== editingEnvelopeId
-    );
-    if (nameExists) {
-      errors.name = "An envelope with this name already exists";
-    }
-  }
-
-  // Amount validations based on envelope type
-  const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
-
-  if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
-    errors.monthlyAmount = "Monthly amount is required for this envelope type";
-  }
-
-  if (
-    formData.monthlyAmount &&
-    (isNaN(formData.monthlyAmount) || parseFloat(formData.monthlyAmount) < 0)
-  ) {
-    errors.monthlyAmount = "Monthly amount must be a positive number";
-  }
-
-  if (formData.monthlyAmount && parseFloat(formData.monthlyAmount) > 100000) {
-    errors.monthlyAmount = "Monthly amount cannot exceed $100,000";
-  }
-
-  // Target amount validation for sinking funds
-  if (formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND) {
-    if (!formData.targetAmount) {
-      errors.targetAmount = "Target amount is required for sinking funds";
-    } else if (isNaN(formData.targetAmount) || parseFloat(formData.targetAmount) <= 0) {
-      errors.targetAmount = "Target amount must be a positive number";
-    } else if (parseFloat(formData.targetAmount) > 1000000) {
-      errors.targetAmount = "Target amount cannot exceed $1,000,000";
-    }
-  }
-
-  // Category validation (beyond Zod)
-  if (!errors.category && formData.category) {
-    const availableCategories = getEnvelopeCategories();
-    if (!availableCategories.includes(formData.category)) {
-      errors.category = "Invalid category selected";
-    }
-  }
-
-  // Priority validation (beyond Zod)
-  if (formData.priority && !["low", "medium", "high", "critical"].includes(formData.priority)) {
-    errors.priority = "Invalid priority selected";
-  }
-
-  // Frequency validation (beyond Zod)
-  if (formData.frequency) {
-    const frequencyOptions = getFrequencyOptions();
-    if (!frequencyOptions.find((opt) => opt.value === formData.frequency)) {
-      errors.frequency = "Invalid frequency selected";
-    }
-  }
+  validateNameUniqueness(formData, existingEnvelopes, editingEnvelopeId, errors);
+  validateMonthlyAmount(formData, errors);
+  validateTargetAmount(formData, errors);
+  validateSelectFields(formData, errors);
 
   return {
     isValid: Object.keys(errors).length === 0,
@@ -225,6 +250,16 @@ export const transformFormToEnvelope = (formData, options = {}) => {
 };
 
 /**
+ * Get default value with fallback
+ */
+const getDefaultValue = (value, defaultValue) => value || defaultValue;
+
+/**
+ * Convert number to string or empty string
+ */
+const numberToString = (value) => value?.toString() || "";
+
+/**
  * Transforms envelope object to form data
  * @param {Object} envelope - Envelope object
  * @returns {Object} Form data
@@ -233,20 +268,20 @@ export const transformEnvelopeToForm = (envelope) => {
   if (!envelope) return createDefaultEnvelopeForm();
 
   return {
-    name: envelope.name || "",
-    monthlyAmount: envelope.monthlyAmount?.toString() || "",
-    currentBalance: envelope.currentBalance?.toString() || "",
-    category: envelope.category || "",
-    color: envelope.color || "#a855f7",
-    frequency: envelope.frequency || "monthly",
-    description: envelope.description || "",
-    priority: envelope.priority || "medium",
-    autoAllocate: envelope.autoAllocate !== false, // Default to true
-    icon: envelope.icon || "Target",
-    envelopeType: envelope.envelopeType || ENVELOPE_TYPES.VARIABLE,
-    monthlyBudget: envelope.monthlyBudget?.toString() || "",
-    biweeklyAllocation: envelope.biweeklyAllocation?.toString() || "",
-    targetAmount: envelope.targetAmount?.toString() || "",
+    name: getDefaultValue(envelope.name, ""),
+    monthlyAmount: numberToString(envelope.monthlyAmount),
+    currentBalance: numberToString(envelope.currentBalance),
+    category: getDefaultValue(envelope.category, ""),
+    color: getDefaultValue(envelope.color, "#a855f7"),
+    frequency: getDefaultValue(envelope.frequency, "monthly"),
+    description: getDefaultValue(envelope.description, ""),
+    priority: getDefaultValue(envelope.priority, "medium"),
+    autoAllocate: envelope.autoAllocate !== false,
+    icon: getDefaultValue(envelope.icon, "Target"),
+    envelopeType: getDefaultValue(envelope.envelopeType, ENVELOPE_TYPES.VARIABLE),
+    monthlyBudget: numberToString(envelope.monthlyBudget),
+    biweeklyAllocation: numberToString(envelope.biweeklyAllocation),
+    targetAmount: numberToString(envelope.targetAmount),
   };
 };
 

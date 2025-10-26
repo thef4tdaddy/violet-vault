@@ -133,6 +133,72 @@ export class TransactionArchiver {
   }
 
   /**
+   * Calculate period key for transaction
+   */
+  private getPeriodKey(date: Date, periodType: string): string {
+    switch (periodType) {
+      case "month":
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      case "quarter": {
+        const quarter = Math.ceil((date.getMonth() + 1) / 3);
+        return `${date.getFullYear()}-Q${quarter}`;
+      }
+      case "year":
+        return `${date.getFullYear()}`;
+      default:
+        return "";
+    }
+  }
+
+  /**
+   * Initialize a new transaction group
+   */
+  private createTransactionGroup(periodKey: string, periodType: string, transaction) {
+    return {
+      period: periodKey,
+      category: transaction.category || "uncategorized",
+      periodType,
+      totalAmount: 0,
+      totalTransactions: 0,
+      incomeAmount: 0,
+      expenseAmount: 0,
+      transferAmount: 0,
+      envelopes: new Set(),
+      dateRange: {
+        start: transaction.date,
+        end: transaction.date,
+      },
+    };
+  }
+
+  /**
+   * Update transaction group with new transaction
+   */
+  private updateTransactionGroup(group, transaction) {
+    const amount = transaction.amount || 0;
+    group.totalAmount += amount;
+    group.totalTransactions++;
+    group.envelopes.add(transaction.envelopeId);
+
+    if (amount > 0) {
+      group.incomeAmount += amount;
+    } else if (amount < 0) {
+      group.expenseAmount += Math.abs(amount);
+    }
+
+    if (transaction.type === "transfer") {
+      group.transferAmount += Math.abs(amount);
+    }
+
+    if (transaction.date < group.dateRange.start) {
+      group.dateRange.start = transaction.date;
+    }
+    if (transaction.date > group.dateRange.end) {
+      group.dateRange.end = transaction.date;
+    }
+  }
+
+  /**
    * Aggregate transactions by time period
    */
   aggregateByPeriod(transactions, periodType) {
@@ -140,74 +206,16 @@ export class TransactionArchiver {
 
     transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
-      let periodKey;
-
-      switch (periodType) {
-        case "month": {
-          periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-          break;
-        }
-        case "quarter": {
-          const quarter = Math.ceil((date.getMonth() + 1) / 3);
-          periodKey = `${date.getFullYear()}-Q${quarter}`;
-          break;
-        }
-        case "year": {
-          periodKey = `${date.getFullYear()}`;
-          break;
-        }
-        default: {
-          periodKey = transaction.date;
-        }
-      }
-
+      const periodKey = this.getPeriodKey(date, periodType) || transaction.date;
       const key = `${periodKey}_${transaction.category || "uncategorized"}`;
 
       if (!groups.has(key)) {
-        groups.set(key, {
-          period: periodKey,
-          category: transaction.category || "uncategorized",
-          periodType,
-          totalAmount: 0,
-          totalTransactions: 0,
-          incomeAmount: 0,
-          expenseAmount: 0,
-          transferAmount: 0,
-          envelopes: new Set(),
-          dateRange: {
-            start: transaction.date,
-            end: transaction.date,
-          },
-        });
+        groups.set(key, this.createTransactionGroup(periodKey, periodType, transaction));
       }
 
-      const group = groups.get(key);
-      group.totalAmount += transaction.amount || 0;
-      group.totalTransactions++;
-      group.envelopes.add(transaction.envelopeId);
-
-      // Categorize by transaction type
-      const amount = transaction.amount || 0;
-      if (amount > 0) {
-        group.incomeAmount += amount;
-      } else if (amount < 0) {
-        group.expenseAmount += Math.abs(amount);
-      }
-
-      if (transaction.type === "transfer") {
-        group.transferAmount += Math.abs(amount);
-      }
-
-      // Update date range
-      if (transaction.date < group.dateRange.start) {
-        group.dateRange.start = transaction.date;
-      }
-      if (transaction.date > group.dateRange.end) {
-        group.dateRange.end = transaction.date;
-      }
+      this.updateTransactionGroup(groups.get(key), transaction);
     });
 
-    // Convert Sets to Arrays for storage
     return Array.from(groups.values()).map((group) => ({
       ...group,
       envelopes: Array.from(group.envelopes),
@@ -301,12 +309,39 @@ export class TransactionArchiver {
   }
 
   /**
+   * Calculate period cutoff dates
+   */
+  private calculatePeriodDates(periods, referenceDate: Date) {
+    return periods.map((period) => {
+      const date = new Date(
+        referenceDate.getFullYear(),
+        referenceDate.getMonth() - period.months,
+        referenceDate.getDate()
+      );
+      return { ...period, cutoffDate: date.toISOString().split("T")[0] };
+    });
+  }
+
+  /**
+   * Build recommendation object from period counts
+   */
+  private buildRecommendation(bestRecommendation) {
+    return {
+      canArchive: bestRecommendation.count > 0,
+      potentialSavings: bestRecommendation.count,
+      suggestedPeriod: bestRecommendation.months,
+      suggestedAction:
+        bestRecommendation.count > 0
+          ? `Archive ${bestRecommendation.count} transactions older than ${bestRecommendation.name}`
+          : "No archiving needed at this time",
+    };
+  }
+
+  /**
    * Get archiving statistics and recommendations
    */
   async getArchivingInfo(customPeriods = null) {
     const now = new Date();
-
-    // Default periods if none specified
     const periods = customPeriods || [
       { name: "1 month", months: 1 },
       { name: "3 months", months: 3 },
@@ -315,16 +350,7 @@ export class TransactionArchiver {
       { name: "2 years", months: 24 },
     ];
 
-    // Calculate dates for each period
-    const periodDates = periods.map((period) => {
-      const date = new Date(now.getFullYear(), now.getMonth() - period.months, now.getDate());
-      return {
-        ...period,
-        cutoffDate: date.toISOString().split("T")[0],
-      };
-    });
-
-    // Get counts for each period
+    const periodDates = this.calculatePeriodDates(periods, now);
     const totalTransactions = await budgetDb.transactions.count();
     const periodCounts = await Promise.all(
       periodDates.map(async (period) => ({
@@ -334,13 +360,11 @@ export class TransactionArchiver {
     );
 
     const archives = await budgetDb.cache.where("category").equals("transaction_archive").count();
-
     const analyticsAggregations = await budgetDb.cache
       .where("category")
       .equals("analytics_archive")
       .count();
 
-    // Find the best recommendation based on transaction volume
     const bestRecommendation =
       periodCounts.find((p) => p.count > 50) || periodCounts[periodCounts.length - 1];
 
@@ -348,7 +372,6 @@ export class TransactionArchiver {
       current: {
         totalTransactions,
         periodBreakdown: periodCounts,
-        // Keep backward compatibility
         oldTransactions: periodCounts.find((p) => p.months === 12)?.count || 0,
         veryOldTransactions: periodCounts.find((p) => p.months === 24)?.count || 0,
       },
@@ -356,15 +379,7 @@ export class TransactionArchiver {
         archiveCount: archives,
         analyticsCount: analyticsAggregations,
       },
-      recommendations: {
-        canArchive: bestRecommendation.count > 0,
-        potentialSavings: bestRecommendation.count,
-        suggestedPeriod: bestRecommendation.months,
-        suggestedAction:
-          bestRecommendation.count > 0
-            ? `Archive ${bestRecommendation.count} transactions older than ${bestRecommendation.name}`
-            : "No archiving needed at this time",
-      },
+      recommendations: this.buildRecommendation(bestRecommendation),
     };
   }
 

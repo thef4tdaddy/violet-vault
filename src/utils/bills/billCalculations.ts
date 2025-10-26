@@ -40,6 +40,33 @@ interface CategorizedBills {
 }
 
 /**
+ * Format a Date object as YYYY-MM-DD
+ */
+const formatDateAsYYYYMMDD = (date: Date): string => {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Parse a date string into a Date object
+ */
+const parseDateString = (dateStr: string): Date | null => {
+  if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    // Already in YYYY-MM-DD format - use UTC to avoid timezone issues
+    const parts = dateStr.split("-");
+    return new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+  }
+  if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
+    // MM/DD/YYYY or MM-DD-YYYY format
+    const parts = dateStr.split(/[/-]/);
+    return new Date(Date.UTC(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1])));
+  }
+  return new Date(dateStr);
+};
+
+/**
  * Normalize date strings to YYYY-MM-DD format
  * @param {string|Date} dateInput - Raw date input
  * @returns {string} Normalized date string in YYYY-MM-DD format, or empty string if invalid
@@ -48,22 +75,19 @@ export const normalizeBillDate = (dateInput: string | Date): string => {
   if (!dateInput) return "";
 
   try {
-    let dateStr = dateInput;
-
     // Handle Date object
     if (dateInput instanceof Date) {
       return dateInput.toISOString().split("T")[0];
     }
 
     // Handle ISO date strings
-    if (typeof dateStr === "string" && dateStr.includes("T")) {
-      return dateStr.split("T")[0];
+    if (typeof dateInput === "string" && dateInput.includes("T")) {
+      return dateInput.split("T")[0];
     }
 
     // Handle various date formats and convert 2-digit years to 4-digit
-    if (typeof dateStr === "string") {
-      // Handle MM/DD/YY, MM-DD-YY patterns (but not YYYY-MM-DD)
-      dateStr = dateStr.replace(
+    if (typeof dateInput === "string") {
+      const dateStr = dateInput.replace(
         /^(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
         (_match, month, day, year) => {
           const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
@@ -71,35 +95,13 @@ export const normalizeBillDate = (dateInput: string | Date): string => {
         }
       );
 
-      // Parse different formats
-      let parsedDate;
-      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // Already in YYYY-MM-DD format - use UTC to avoid timezone issues
-        const parts = dateStr.split("-");
-        parsedDate = new Date(
-          Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
-        );
-      } else if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
-        // MM/DD/YYYY or MM-DD-YYYY format
-        const parts = dateStr.split(/[/-]/);
-        parsedDate = new Date(
-          Date.UTC(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]))
-        );
-      } else {
-        // Try direct parsing
-        parsedDate = new Date(dateStr);
-      }
-
-      if (isNaN(parsedDate.getTime())) {
+      const parsedDate = parseDateString(dateStr);
+      if (!parsedDate || isNaN(parsedDate.getTime())) {
         logger.warn(`Invalid date format: ${dateInput}`);
         return "";
       }
 
-      // Format as YYYY-MM-DD
-      const year = parsedDate.getUTCFullYear();
-      const month = String(parsedDate.getUTCMonth() + 1).padStart(2, "0");
-      const day = String(parsedDate.getUTCDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      return formatDateAsYYYYMMDD(parsedDate);
     }
 
     return "";

@@ -3,6 +3,41 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
 
+// Helper functions moved outside component
+const getConfidenceColor = (confidence: number) => {
+  if (confidence >= 80) return "emerald";
+  if (confidence >= 60) return "amber";
+  return "gray";
+};
+
+const getUrgencyStyle = (daysUntil: number) => {
+  if (daysUntil === 0) return "bg-purple-50 border-purple-200";
+  if (daysUntil === 1) return "bg-emerald-50 border-emerald-200";
+  if (daysUntil >= 2 && daysUntil <= 3) return "bg-amber-50 border-amber-200";
+  return "bg-gray-50 border-gray-200";
+};
+
+const getPaydayIcon = (daysUntil: number) => {
+  if (daysUntil === 0) {
+    return React.createElement(getIcon("Calendar"), {
+      className: "h-5 w-5 text-purple-600",
+    });
+  }
+  if (daysUntil === 1) {
+    return React.createElement(getIcon("TrendingUp"), {
+      className: "h-5 w-5 text-emerald-600",
+    });
+  }
+  if (daysUntil >= 2 && daysUntil <= 7) {
+    return React.createElement(getIcon("Clock"), {
+      className: "h-5 w-5 text-amber-600",
+    });
+  }
+  return React.createElement(getIcon("Calendar"), {
+    className: "h-5 w-5 text-gray-600",
+  });
+};
+
 const PaydayPrediction = ({
   prediction,
   className = "",
@@ -15,49 +50,14 @@ const PaydayPrediction = ({
 
   const formattedPrediction = formatPaydayPrediction(prediction);
   const daysUntil = getDaysUntilPayday(prediction);
-
-  // Determine if we should show proactive suggestions
   const showProactiveSuggestions = daysUntil <= 3 && daysUntil >= 0;
-
-  // Determine the style based on confidence and time until payday
-  const getConfidenceColor = () => {
-    if (prediction.confidence >= 80) return "emerald";
-    if (prediction.confidence >= 60) return "amber";
-    return "gray";
-  };
-
-  const getUrgencyStyle = () => {
-    if (daysUntil === 0) return "bg-purple-50 border-purple-200";
-    if (daysUntil === 1) return "bg-emerald-50 border-emerald-200";
-    if (daysUntil >= 2 && daysUntil <= 3) return "bg-amber-50 border-amber-200";
-    return "bg-gray-50 border-gray-200";
-  };
-
-  const getPaydayIcon = () => {
-    if (daysUntil === 0)
-      return React.createElement(getIcon("Calendar"), {
-        className: "h-5 w-5 text-purple-600",
-      });
-    if (daysUntil === 1)
-      return React.createElement(getIcon("TrendingUp"), {
-        className: "h-5 w-5 text-emerald-600",
-      });
-    if (daysUntil >= 2 && daysUntil <= 7)
-      return React.createElement(getIcon("Clock"), {
-        className: "h-5 w-5 text-amber-600",
-      });
-    return React.createElement(getIcon("Calendar"), {
-      className: "h-5 w-5 text-gray-600",
-    });
-  };
-
-  const confidenceColor = getConfidenceColor();
+  const confidenceColor = getConfidenceColor(prediction.confidence);
 
   return (
-    <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle()} ${className}`}>
+    <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle(daysUntil)} ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 mt-0.5">{getPaydayIcon()}</div>
+          <div className="flex-shrink-0 mt-0.5">{getPaydayIcon(daysUntil)}</div>
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-gray-900 text-sm">Next Payday Prediction</h4>
             <p className="text-sm text-gray-700 mt-1">{formattedPrediction.displayText}</p>
