@@ -127,3 +127,26 @@ export const getEmptyStats = () => ({
   accounts: {},
   dateRange: { earliest: null, latest: null },
 });
+
+/**
+ * Fetch transactions from database
+ */
+export const fetchTransactionsFromDb = async (budgetDb: { transactions: { orderBy: (field: string) => { reverse: () => { toArray: () => Promise<unknown[]> } } } }, logger: { debug: (msg: string, data?: unknown) => void; warn: (msg: string) => void; error: (msg: string, error: unknown) => void }) => {
+  logger.debug("Fetching transactions from database");
+
+  try {
+    // Get all transactions from database
+    const allTransactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
+
+    if (!Array.isArray(allTransactions)) {
+      logger.warn("No transactions returned from database");
+      return [];
+    }
+
+    logger.debug(`Retrieved ${allTransactions.length} transactions from database`);
+    return allTransactions;
+  } catch (error) {
+    logger.error("Error fetching transactions", error);
+    throw error;
+  }
+};

@@ -1,24 +1,27 @@
 import { useMemo } from "react";
 import { useDebts } from "./useDebts";
-import useBills from "../bills/useBills";
-import useEnvelopes from "../budgeting/useEnvelopes";
-import useTransactions from "../common/useTransactions";
+import useBills from "@/hooks/bills/useBills";
+import useEnvelopes from "@/hooks/budgeting/useEnvelopes";
+import useTransactions from "@/hooks/common/useTransactions";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
   PAYMENT_FREQUENCIES,
   COMPOUND_FREQUENCIES,
   calculateDebtStats,
-} from "../../constants/debts";
+} from "@/constants/debts";
 import {
-  calculateInterestPortion,
-  enrichDebt,
   getUpcomingPayments,
-} from "../../utils/debts/debtCalculations";
-import logger from "../../utils/common/logger.ts";
+} from "@/utils/debts/debtCalculations";
+import logger from "@/utils/common/logger";
 import {
-  handleBillConnectionsForDebt,
-  buildDebtWithPayment,
+  enrichDebtsWithRelations,
+  createDebtOperation,
+  recordPaymentOperation,
+  linkDebtToBillOperation,
+  syncDebtDueDatesOperation,
+  updateDebtOperation,
+  deleteDebtOperation,
 } from "./helpers/debtManagementHelpers";
 
 /**
@@ -39,67 +42,7 @@ export const useDebtManagement = () => {
 
   // Enrich debts with related data and calculations FIRST
   const enrichedDebts = useMemo(() => {
-    if (!debts?.length) return [];
-
-    logger.debug("🔧 Enriching debts:", {
-      rawDebtsCount: debts.length,
-      billsCount: bills.length,
-      envelopesCount: envelopes.length,
-      transactionsCount: transactions.length,
-      sampleDebt: debts[0],
-    });
-
-    const enriched = debts.map((debt, index) => {
-      // Find related bill and envelope
-      const relatedBill = bills.find((bill) => bill.debtId === debt.id);
-      const relatedEnvelope = relatedBill
-        ? envelopes.find((env) => env.id === relatedBill.envelopeId)
-        : debt.envelopeId
-          ? envelopes.find((env) => env.id === debt.envelopeId)
-          : null;
-
-      // Find related transactions
-      const relatedTransactions = transactions.filter(
-        (transaction) => transaction.debtId === debt.id
-      );
-
-      // Enrich the debt with calculated properties
-      const enrichedDebt = enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
-
-      // Log first debt enrichment details
-      if (index === 0) {
-        logger.debug("🔧 First debt enrichment details:", {
-          originalDebt: {
-            id: debt.id,
-            name: debt.name,
-            currentBalance: debt.currentBalance,
-            minimumPayment: debt.minimumPayment,
-            interestRate: debt.interestRate,
-          },
-          enrichedDebt: {
-            id: enrichedDebt.id,
-            name: enrichedDebt.name,
-            status: enrichedDebt.status,
-            currentBalance: enrichedDebt.currentBalance,
-            minimumPayment: enrichedDebt.minimumPayment,
-            interestRate: enrichedDebt.interestRate,
-            payoffInfo: enrichedDebt.payoffInfo,
-            nextPaymentDate: enrichedDebt.nextPaymentDate,
-          },
-          relatedBill,
-          relatedEnvelope,
-          relatedTransactionsCount: relatedTransactions.length,
-        });
-      }
-
-      return enrichedDebt;
-    });
-
-    logger.debug("🔧 Debt enrichment complete:", {
-      enrichedCount: enriched.length,
-    });
-
-    return enriched;
+    return enrichDebtsWithRelations(debts, bills, envelopes, transactions);
   }, [debts, bills, envelopes, transactions]);
 
   // Calculate debt statistics using enriched debts
@@ -150,159 +93,67 @@ export const useDebtManagement = () => {
 
   // Create a new debt with optional bill and envelope integration
   const createDebt = async (debtData) => {
-    try {
-      logger.info("Creating debt with data:", debtData);
-
-      const { connectionData, ...cleanDebtData } = debtData;
-      const createdDebt = await createDebtData(cleanDebtData);
-      logger.info("Debt created:", createdDebt);
-
-      await handleBillConnectionsForDebt({
-        connectionData,
-        cleanDebtData,
-        createdDebt,
-        createEnvelope,
-        createBill,
-        updateBill,
-      });
-
-      return createdDebt;
-    } catch (error) {
-      logger.error("Error creating debt:", error);
-      throw error;
-    }
+    return createDebtOperation(debtData, {
+      connectionData: debtData.connectionData,
+      createEnvelope,
+      createBill,
+      updateBill,
+      createDebtData,
+    });
   };
 
   // Record a debt payment
   const recordPayment = async (debtId, paymentData) => {
-    try {
-      const debt = debts.find((d) => d.id === debtId);
-      if (!debt) throw new Error("Debt not found");
+    const debt = debts.find((d) => d.id === debtId);
+    if (!debt) throw new Error("Debt not found");
 
-      const { amount, paymentDate, notes } = paymentData;
-
-      const interestPortion = calculateInterestPortion(debt, amount);
-      const principalPortion = amount - interestPortion;
-
-      const updatedDebt = buildDebtWithPayment(
-        debt,
-        amount,
-        paymentDate,
-        interestPortion,
-        principalPortion
-      );
-
-      await updateDebtData({ id: debtId, updates: updatedDebt });
-
-      await createTransaction({
-        amount: -amount,
-        description: `${debt.name} Payment`,
-        category: "Debt Payment",
-        debtId,
-        date: paymentDate,
-        notes: notes || "",
-      });
-
-      logger.info("Debt payment recorded successfully");
-      return updatedDebt;
-    } catch (error) {
-      logger.error("Error recording debt payment:", error);
-      throw error;
-    }
+    return recordPaymentOperation({
+      debt,
+      paymentData,
+      updateDebtData,
+      createTransaction,
+    });
   };
 
   // Link debt to an existing bill
   const linkDebtToBill = async (debtId, billId) => {
-    try {
-      const debt = debts.find((d) => d.id === debtId);
-      const bill = bills.find((b) => b.id === billId);
-
-      if (!debt || !bill) {
-        throw new Error("Debt or bill not found");
-      }
-
-      // Update the bill to reference the debt
-      await updateBill(billId, {
-        debtId: debtId,
-        amount: debt.minimumPayment, // Sync amount with debt
-      });
-
-      // Update debt with payment due date from bill
-      await updateDebtData({
-        id: debtId,
-        updates: {
-          paymentDueDate: bill.dueDate,
-          envelopeId: bill.envelopeId, // Use bill's envelope
-        },
-      });
-
-      logger.info("Debt linked to bill successfully");
-    } catch (error) {
-      logger.error("Error linking debt to bill:", error);
-      throw error;
-    }
+    return linkDebtToBillOperation({
+      debtId,
+      billId,
+      debts,
+      bills,
+      updateBill,
+      updateDebtData,
+    });
   };
 
   // Sync debt due dates with linked bills
   const syncDebtDueDates = async () => {
-    try {
-      const syncPromises = debts.map(async (debt) => {
-        const linkedBill = bills.find((bill) => bill.debtId === debt.id);
-        if (linkedBill && debt.paymentDueDate !== linkedBill.dueDate) {
-          await updateDebtData({
-            id: debt.id,
-            updates: {
-              paymentDueDate: linkedBill.dueDate,
-              minimumPayment: linkedBill.amount,
-            },
-          });
-        }
-      });
-
-      await Promise.all(syncPromises);
-      logger.info("Debt due dates synced with bills");
-    } catch (error) {
-      logger.error("Error syncing debt due dates:", error);
-    }
+    return syncDebtDueDatesOperation({
+      debts,
+      bills,
+      updateDebtData,
+    });
   };
 
   // Update a debt with proper parameter formatting
   const updateDebt = async (debtId, updates, author = "Unknown User") => {
-    try {
-      if (!debtId) {
-        throw new Error("Debt ID is required for update");
-      }
-
-      logger.debug("Updating debt:", { debtId, updates, author });
-
-      return await updateDebtData({
-        id: debtId,
-        updates,
-        author,
-      });
-    } catch (error) {
-      logger.error("Error updating debt:", error);
-      throw error;
-    }
+    return updateDebtOperation({
+      debtId,
+      updates,
+      author,
+      updateDebtData,
+    });
   };
 
   // Delete a debt and its related connections
   const deleteDebt = async (debtId) => {
-    try {
-      // Find and delete related bill
-      const relatedBill = bills.find((bill) => bill.debtId === debtId);
-      if (relatedBill) {
-        await deleteBill(relatedBill.id);
-        logger.info("Deleted related bill for debt");
-      }
-
-      // Delete the debt
-      await deleteDebtData({ id: debtId });
-      logger.info("Debt deleted successfully");
-    } catch (error) {
-      logger.error("Error deleting debt:", error);
-      throw error;
-    }
+    return deleteDebtOperation({
+      debtId,
+      bills,
+      deleteBill,
+      deleteDebtData,
+    });
   };
 
   // Get upcoming payments

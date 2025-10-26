@@ -5,14 +5,15 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { budgetDb } from "../../db/budgetDb.ts";
-import { queryKeys } from "../../utils/common/queryClient.ts";
+import { budgetDb } from "@/db/budgetDb";
+import { queryKeys } from "@/utils/common/queryClient";
 import {
   processTransactions,
   calculateTransactionStats,
-} from "../../utils/transactions/filtering.ts";
-import logger from "../../utils/common/logger.ts";
+} from "@/utils/transactions/filtering";
+import logger from "@/utils/common/logger";
 import {
+  fetchTransactionsFromDb,
   getRecentTransactions,
   getIncomeTransactions,
   getExpenseTransactions,
@@ -24,7 +25,7 @@ import {
   filterByCategory,
   searchTransactionsHelper,
   getEmptyStats,
-} from "./helpers/transactionDataHelpers.ts";
+} from "./helpers/transactionDataHelpers";
 
 /**
  * Hook for querying and filtering transaction data
@@ -65,29 +66,7 @@ const useTransactionData = (options = {}) => {
       sortOrder,
       limit,
     }),
-    queryFn: async () => {
-      logger.debug("Fetching transactions from database", {
-        filters: { dateRange, envelopeId, category, type, searchQuery },
-        sort: { sortBy, sortOrder },
-        limit,
-      });
-
-      try {
-        // Get all transactions from database
-        const allTransactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
-
-        if (!Array.isArray(allTransactions)) {
-          logger.warn("No transactions returned from database");
-          return [];
-        }
-
-        logger.debug(`Retrieved ${allTransactions.length} transactions from database`);
-        return allTransactions;
-      } catch (error) {
-        logger.error("Error fetching transactions", error);
-        throw error;
-      }
-    },
+    queryFn: () => fetchTransactionsFromDb(budgetDb, logger),
     enabled,
     staleTime,
     refetchInterval,
