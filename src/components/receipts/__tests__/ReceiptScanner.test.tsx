@@ -1,10 +1,13 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import ReceiptScanner from "../ReceiptScanner";
-import { useReceiptScanner } from "../../../hooks/receipts/useReceiptScanner";
+import { useReceiptScanner as useReceiptScannerOriginal } from "../../../hooks/receipts/useReceiptScanner";
 
 // Mock the custom hook
 vi.mock("../../../hooks/receipts/useReceiptScanner");
+
+// Type cast the mocked hook
+const useReceiptScanner = useReceiptScannerOriginal as unknown as Mock;
 
 // Mock child components to focus on main component behavior
 vi.mock("../components/ReceiptScannerHeader", () => ({

@@ -1,10 +1,13 @@
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import UserSetup from "../UserSetup";
-import { useUserSetup } from "../../../hooks/auth/useUserSetup";
+import { useUserSetup as useUserSetupOriginal } from "../../../hooks/auth/useUserSetup";
 
 // Mock the custom hook
 vi.mock("../../../hooks/auth/useUserSetup");
+
+// Type cast the mocked hook
+const useUserSetup = useUserSetupOriginal as unknown as Mock;
 
 // Mock child components
 vi.mock("../components/UserSetupHeader", () => ({

@@ -25,6 +25,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": false,
 
+    /* Test types */
+    "types": ["vitest/globals"],
+
     /* Path mapping for imports */
     "baseUrl": ".",
     "paths": {
