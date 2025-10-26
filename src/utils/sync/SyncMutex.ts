@@ -16,7 +16,7 @@ interface SyncMetrics {
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements
  */
 export class SyncMutex extends BaseMutex {
-  private syncMetrics: SyncMetrics;
+  syncMetrics: SyncMetrics;
 
   constructor(name = "SyncMutex") {
     super(name);
@@ -47,6 +47,7 @@ export class SyncMutex extends BaseMutex {
     const baseStatus = this.getStatus();
     return {
       ...baseStatus,
+      queueSize: baseStatus.queueLength,
       metrics: { ...this.syncMetrics },
     };
   }
@@ -60,7 +61,10 @@ export class SyncMutex extends BaseMutex {
       metrics: this.syncMetrics,
     });
 
-    super.release();
+    // Manually unlock and clear state
+    this.locked = false;
+    this.currentOperation = null;
+    this.lockStartTime = null;
 
     // Clear queue and resolve all pending operations
     while (this.queue.length > 0) {

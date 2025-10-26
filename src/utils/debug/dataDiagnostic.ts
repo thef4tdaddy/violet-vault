@@ -4,11 +4,43 @@
  */
 import logger from "@/utils/common/logger";
 
+// Extend window type for diagnostic tools
+declare global {
+  interface Window {
+    budgetDb?: any;
+    runDataDiagnostic?: () => Promise<any>;
+    cleanupCorruptedPaychecks?: (confirmCallback?: ConfirmCallback | null) => Promise<any>;
+    inspectPaycheckRecords?: () => Promise<any>;
+  }
+}
+
+interface DataDiagnosticResults {
+  timestamp: string;
+  browser: string;
+  url: string;
+  data: {
+    metadata?: {
+      exists: boolean;
+      record: any;
+      unassignedCash: number | string;
+      actualBalance: number | string;
+      lastModified: number | string;
+      created?: boolean;
+    };
+    tableCounts?: Record<string, { count: number; sample: any } | { error: string }>;
+    budgetTable?: {
+      totalRecords: number;
+      records: any[];
+    };
+  };
+  errors: string[];
+}
+
 export const runDataDiagnostic = async () => {
   logger.info("🔍 VioletVault Data Diagnostic Tool");
   logger.info("=".repeat(50));
 
-  const results = {
+  const results: DataDiagnosticResults = {
     timestamp: new Date().toISOString(),
     browser: navigator.userAgent,
     url: window.location.href,
@@ -111,7 +143,7 @@ export const runDataDiagnostic = async () => {
   }
 
   logger.info("\n💾 Full diagnostic results:");
-  logger.info(results);
+  logger.info(JSON.stringify(results, null, 2));
 
   return results;
 };
@@ -133,7 +165,7 @@ export const inspectPaycheckRecords = async () => {
 
     allPaychecks.forEach((paycheck, index) => {
       logger.info(`\n📋 Paycheck Record #${index + 1}:`);
-      logger.info({
+      logger.info("Paycheck details:", {
         id: paycheck.id,
         idType: typeof paycheck.id,
         idValid: !!(paycheck.id && typeof paycheck.id === "string" && paycheck.id !== ""),
@@ -157,7 +189,17 @@ export const inspectPaycheckRecords = async () => {
   }
 };
 
-export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
+interface ConfirmDialogOptions {
+  title: string;
+  message: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  destructive: boolean;
+}
+
+type ConfirmCallback = (options: ConfirmDialogOptions) => Promise<boolean>;
+
+export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback | null = null) => {
   logger.info("🧹 VioletVault Paycheck Cleanup Tool");
   logger.info("=".repeat(50));
 

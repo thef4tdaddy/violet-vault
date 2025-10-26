@@ -103,7 +103,7 @@ class SyncEdgeCaseTester {
       createdAt: null,
     };
 
-    await budgetDb.envelopes.add(testEnvelope);
+    await budgetDb.envelopes.add(testEnvelope as any);
 
     try {
       const syncData = await cloudSyncService.fetchDexieData();
@@ -135,7 +135,7 @@ class SyncEdgeCaseTester {
 
     try {
       for (const item of testData) {
-        await budgetDb.envelopes.add({ name: "Test", ...item });
+        await budgetDb.envelopes.add({ name: "Test", ...item } as any);
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
@@ -201,14 +201,14 @@ class SyncEdgeCaseTester {
     };
 
     try {
-      await budgetDb.envelopes.add(duplicateEnvelope);
+      await budgetDb.envelopes.add(duplicateEnvelope as any);
 
       // Try to add duplicate
       try {
         await budgetDb.envelopes.add({
           ...duplicateEnvelope,
           name: "Duplicate",
-        });
+        } as any);
 
         this.testResults.push({
           test: "testDuplicateIds",
@@ -265,7 +265,7 @@ class SyncEdgeCaseTester {
 
     try {
       for (const item of testItems) {
-        await budgetDb.bills.add({ name: "Test", ...item });
+        await budgetDb.bills.add({ name: "Test", ...item } as any);
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
@@ -296,7 +296,7 @@ class SyncEdgeCaseTester {
     };
 
     try {
-      await budgetDb.debts.add(testData);
+      await budgetDb.debts.add(testData as any);
 
       const syncData = await cloudSyncService.fetchDexieData();
       const passed = syncData.debts.length >= 1 && !isNaN(syncData.lastModified);
@@ -317,19 +317,19 @@ class SyncEdgeCaseTester {
   async testCircularReferences() {
     logger.info("🧪 Testing circular reference handling...");
 
-    const testObj = { id: "circular-test", name: "Test" };
+    const testObj: any = { id: "circular-test", name: "Test" };
     testObj.self = testObj; // Create circular reference
 
     try {
       // Add the object with circular reference to Dexie (this should work)
-      await budgetDb.envelopes.add(testObj);
+      await budgetDb.envelopes.add(testObj as any);
 
       // Test that sync system can handle the circular reference with safeStringify
       const data = await this.cloudSyncService.fetchDexieData();
 
       // Try to JSON stringify the data - this tests the safeStringify method
       const seen = new WeakSet();
-      JSON.stringify(data, (key, val) => {
+      JSON.stringify(data, (_key, val) => {
         if (val != null && typeof val === "object") {
           if (seen.has(val)) {
             return "[Circular Reference]";
@@ -377,11 +377,11 @@ class SyncEdgeCaseTester {
     };
 
     try {
-      await budgetDb.transactions.add(testData);
+      await budgetDb.transactions.add(testData as any);
 
       const syncData = await cloudSyncService.fetchDexieData();
       const foundItem = syncData.transactions.find((t) => t.id === "unicode-test");
-      const passed = foundItem && foundItem.name === testData.name;
+      const passed = foundItem && (foundItem as any).name === testData.name;
 
       this.testResults.push({
         test: "testUnicodeAndSpecialChars",

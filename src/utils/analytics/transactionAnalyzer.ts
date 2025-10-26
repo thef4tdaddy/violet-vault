@@ -55,8 +55,8 @@ export const analyzeUncategorizedTransactions = (transactions, settings: Analysi
 
       // Find suggested category from merchant patterns
       let suggestedCategory = "General";
-      for (const [category, patterns] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
-        if (patterns.some((p) => pattern.merchant.includes(p.toLowerCase()))) {
+      for (const [category, regexPattern] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
+        if (regexPattern.test(pattern.merchant)) {
           suggestedCategory = category;
           break;
         }

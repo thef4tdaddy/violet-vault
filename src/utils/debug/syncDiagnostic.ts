@@ -4,7 +4,17 @@
  */
 import logger from "@/utils/common/logger";
 
-interface DiagnosticResults {
+// Extend window type for diagnostic tools
+declare global {
+  interface Window {
+    budgetDb?: any;
+    runSyncDiagnostic?: () => Promise<DiagnosticResults>;
+    syncEdgeCaseTester?: any;
+    runSyncEdgeCaseTests?: () => Promise<any>;
+  }
+}
+
+export interface DiagnosticResults {
   timestamp: string;
   browser: string;
   url: string;
@@ -39,11 +49,11 @@ interface DiagnosticResults {
   };
 }
 
-export const runSyncDiagnostic = async () => {
+export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   logger.info("🔍 VioletVault Sync Diagnostic Tool");
   logger.info("=".repeat(50));
 
-  const results = {
+  const results: DiagnosticResults = {
     timestamp: new Date().toISOString(),
     browser: navigator.userAgent,
     url: window.location.href,
@@ -63,7 +73,7 @@ export const runSyncDiagnostic = async () => {
         version: db.version,
         stores: storeNames,
       };
-      logger.info("✅ IndexedDB stores:", storeNames);
+      logger.info("✅ IndexedDB stores:", { stores: storeNames });
     };
     dbRequest.onerror = (error) => {
       results.errors.push("IndexedDB connection failed: " + error);
@@ -127,7 +137,7 @@ export const runSyncDiagnostic = async () => {
       logger.info("📊 Data counts:", counts);
 
       // Flag empty databases
-      const totalRecords = Object.values(counts).reduce(
+      const totalRecords = Object.values(counts).reduce<number>(
         (sum, count) => (typeof count === "number" ? sum + count : sum),
         0
       );
@@ -146,15 +156,16 @@ export const runSyncDiagnostic = async () => {
   logger.info("☁️ Checking Cloud Sync Service...");
   try {
     if (window.cloudSyncService) {
+      const cloudSyncService = window.cloudSyncService as any;
       results.cloudSync = {
-        isRunning: window.cloudSyncService.isRunning,
-        config: !!window.cloudSyncService.config,
-        lastSyncTime: window.cloudSyncService.lastSyncTime,
+        isRunning: cloudSyncService.isRunning,
+        config: !!cloudSyncService.config,
+        lastSyncTime: cloudSyncService.lastSyncTime,
       };
 
       logger.info("✅ Cloud sync service found:", results.cloudSync);
 
-      if (!window.cloudSyncService.isRunning) {
+      if (!cloudSyncService.isRunning) {
         results.warnings.push("Cloud sync service not running");
         logger.warn("⚠️ Cloud sync service not running");
       }
@@ -170,8 +181,9 @@ export const runSyncDiagnostic = async () => {
   // Check 5: Firebase Auth
   logger.info("🔐 Checking Firebase Auth...");
   try {
-    if (window.firebase && window.firebase.auth) {
-      const user = window.firebase.auth().currentUser;
+    const firebaseAuth = (window as any).firebaseAuth;
+    if (firebaseAuth) {
+      const user = firebaseAuth.currentUser;
       results.firebaseAuth = {
         isSignedIn: !!user,
         userId: user?.uid || null,
@@ -200,12 +212,13 @@ export const runSyncDiagnostic = async () => {
 
   // Check 6: Network Status
   logger.info("🌐 Checking Network...");
+  const connection = (navigator as any).connection;
   results.network = {
     online: navigator.onLine,
-    connection: navigator.connection
+    connection: connection
       ? {
-          effectiveType: navigator.connection.effectiveType,
-          downlink: navigator.connection.downlink,
+          effectiveType: connection.effectiveType,
+          downlink: connection.downlink,
         }
       : "not available",
   };
@@ -235,7 +248,7 @@ export const runSyncDiagnostic = async () => {
   }
 
   logger.info("\n💾 Full diagnostic results:");
-  logger.info(results);
+  logger.info(JSON.stringify(results, null, 2));
 
   return results;
 };
