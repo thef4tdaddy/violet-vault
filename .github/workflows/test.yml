@@ -12,16 +12,8 @@ env:
 
 jobs:
   test:
-    name: Test Suite - ${{ matrix.branch }}
+    name: Test Suite
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [main, develop, nightly]
-      fail-fast: false
-    if: |
-      (github.event_name == 'push' && contains(github.ref, matrix.branch)) ||
-      (github.event_name == 'pull_request' && contains(github.base_ref, matrix.branch)) ||
-      github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout code
@@ -46,7 +38,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-coverage-${{ matrix.branch }}
+          name: test-coverage
           path: coverage/
           retention-days: 7
 
@@ -62,7 +54,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-test-results-${{ matrix.branch }}
+          name: e2e-test-results
           path: test-results/
           retention-days: 7
 
@@ -82,11 +74,11 @@ jobs:
           echo "Build completed successfully"
 
       - name: Upload coverage reports to Codecov
-        if: matrix.branch == 'main'
+        if: github.ref == 'refs/heads/main'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: unittests
-          name: codecov-${{ matrix.branch }}
+          name: codecov
           fail_ci_if_error: false
