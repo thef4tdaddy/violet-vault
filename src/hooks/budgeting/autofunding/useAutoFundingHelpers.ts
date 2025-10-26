@@ -4,11 +4,22 @@
  */
 import { TRIGGER_TYPES } from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
+import type { Transaction } from "@/types/finance";
+import type {
+  UseAutoFundingRulesReturn,
+  UseAutoFundingHistoryReturn,
+  UseAutoFundingDataReturn,
+  UseAutoFundingExecutionReturn,
+  BudgetContext,
+  ExecutionResult,
+  ExecutionDetails,
+  RuleExecutionResult,
+} from "./types";
 
 /**
  * Check if a transaction looks like income
  */
-export const isLikelyIncome = (transaction: any): boolean => {
+export const isLikelyIncome = (transaction: Transaction): boolean => {
   return transaction.amount > 0 && transaction.amount >= 100;
 };
 
@@ -16,9 +27,9 @@ export const isLikelyIncome = (transaction: any): boolean => {
  * Handle income detection trigger
  */
 export const handleIncomeDetection = async (
-  transaction: any,
-  rulesHook: any,
-  executeRules: (trigger: string, data: any) => Promise<any>
+  transaction: Transaction,
+  rulesHook: UseAutoFundingRulesReturn,
+  executeRules: (trigger: string, data: Record<string, unknown>) => Promise<ExecutionResult>
 ): Promise<void> => {
   const incomeRules = rulesHook.getRulesByTrigger(TRIGGER_TYPES.INCOME_DETECTED);
 
@@ -52,8 +63,8 @@ export const getScheduledTriggers = () => [
  * Check and execute scheduled rules
  */
 export const checkScheduledRules = async (
-  rulesHook: any,
-  budget: any,
+  rulesHook: UseAutoFundingRulesReturn,
+  budget: BudgetContext,
   executeRules: (trigger: string) => Promise<void>
 ): Promise<void> => {
   const now = new Date();
@@ -91,11 +102,11 @@ export const checkScheduledRules = async (
  * Get comprehensive statistics
  */
 export const getStatistics = (
-  rulesHook: any,
-  historyHook: any,
-  budget: any,
-  dataHook: any,
-  executionHook: any
+  rulesHook: UseAutoFundingRulesReturn,
+  historyHook: UseAutoFundingHistoryReturn,
+  budget: BudgetContext,
+  dataHook: UseAutoFundingDataReturn,
+  executionHook: UseAutoFundingExecutionReturn
 ) => {
   try {
     const ruleStats = rulesHook.getRulesStatistics();
@@ -130,9 +141,9 @@ export const getStatistics = (
  * Export current data state
  */
 export const exportCurrentData = (
-  rulesHook: any,
-  historyHook: any,
-  dataHook: any
+  rulesHook: UseAutoFundingRulesReturn,
+  historyHook: UseAutoFundingHistoryReturn,
+  dataHook: UseAutoFundingDataReturn
 ) => {
   try {
     const currentData = {
@@ -152,9 +163,9 @@ export const exportCurrentData = (
  * Import and update data
  */
 export const importAndUpdateData = (
-  importData: any,
-  dataHook: any,
-  rulesHook: any
+  importData: Record<string, unknown>,
+  dataHook: UseAutoFundingDataReturn,
+  rulesHook: UseAutoFundingRulesReturn
 ) => {
   try {
     const data = dataHook.importData(importData);
@@ -174,10 +185,10 @@ export const importAndUpdateData = (
  * Process execution results and update state
  */
 export const processExecutionResults = (
-  result: any,
-  historyHook: any,
-  rulesHook: any,
-  dataHook: any
+  result: ExecutionResult,
+  historyHook: UseAutoFundingHistoryReturn,
+  rulesHook: UseAutoFundingRulesReturn,
+  dataHook: UseAutoFundingDataReturn
 ): void => {
   if (result.success) {
     historyHook.addToHistory(result.execution);
@@ -187,8 +198,8 @@ export const processExecutionResults = (
     }
 
     result.results
-      .filter((r: any) => r.success)
-      .forEach((ruleResult: any) => {
+      .filter((r: RuleExecutionResult) => r.success)
+      .forEach((ruleResult: RuleExecutionResult) => {
         rulesHook.updateRule(ruleResult.ruleId, {
           lastExecuted: result.execution.executedAt,
           executionCount: (rulesHook.getRuleById(ruleResult.ruleId)?.executionCount || 0) + 1,
