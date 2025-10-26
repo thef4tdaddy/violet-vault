@@ -4,6 +4,22 @@ import { getIcon } from "@/utils";
 import ReceiptButton from "../receipts/ReceiptButton";
 import logger from "../../utils/common/logger";
 
+interface TransactionBasicFieldsProps {
+  transactionForm: {
+    date: string;
+    type: string;
+    description?: string;
+    amount?: string;
+    category?: string;
+    envelopeId?: string;
+    notes?: string;
+    reconciled?: boolean;
+  };
+  setTransactionForm: (form: Record<string, unknown>) => void;
+  canEdit: boolean;
+  editingTransaction: unknown;
+}
+
 /**
  * Date and Type selector for TransactionFormFields
  * Extracted to reduce complexity
@@ -13,7 +29,7 @@ export const TransactionBasicFields = ({
   setTransactionForm,
   canEdit,
   editingTransaction,
-}) => {
+}: TransactionBasicFieldsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
@@ -84,6 +100,18 @@ export const TransactionBasicFields = ({
   );
 };
 
+interface TransactionDetailsFieldsProps {
+  transactionForm: {
+    description: string;
+    amount: string;
+    category: string;
+  };
+  setTransactionForm: (form: Record<string, unknown>) => void;
+  canEdit: boolean;
+  editingTransaction: unknown;
+  categories: string[];
+}
+
 /**
  * Description, Amount, and Category fields for TransactionFormFields
  * Extracted to reduce complexity
@@ -94,7 +122,7 @@ export const TransactionDetailsFields = ({
   canEdit,
   editingTransaction,
   categories,
-}) => {
+}: TransactionDetailsFieldsProps) => {
   return (
     <>
       <div>
@@ -161,6 +189,24 @@ export const TransactionDetailsFields = ({
   );
 };
 
+interface Envelope {
+  id: string;
+  name: string;
+  envelopeType?: string;
+}
+
+interface TransactionEnvelopeSelectorProps {
+  transactionForm: {
+    envelopeId: string;
+    description: string;
+  };
+  setTransactionForm: (form: Record<string, unknown>) => void;
+  canEdit: boolean;
+  editingTransaction: unknown;
+  envelopes: Envelope[];
+  suggestEnvelope?: (description: string) => { id: string; name: string } | null;
+}
+
 /**
  * Envelope selector with bill payment info and suggestions
  * Extracted to reduce complexity
@@ -172,7 +218,7 @@ export const TransactionEnvelopeSelector = ({
   editingTransaction,
   envelopes,
   suggestEnvelope,
-}) => {
+}: TransactionEnvelopeSelectorProps) => {
   const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
   const isBillEnvelope = selectedEnvelope && selectedEnvelope.envelopeType === "bill";
   const suggested = transactionForm.description && suggestEnvelope ? suggestEnvelope(transactionForm.description) : null;
@@ -233,6 +279,16 @@ export const TransactionEnvelopeSelector = ({
   );
 };
 
+interface TransactionNotesAndReconciledProps {
+  transactionForm: {
+    notes: string;
+    reconciled: boolean;
+  };
+  setTransactionForm: (form: Record<string, unknown>) => void;
+  canEdit: boolean;
+  editingTransaction: unknown;
+}
+
 /**
  * Notes textarea and reconciled checkbox
  * Extracted to reduce complexity
@@ -242,7 +298,7 @@ export const TransactionNotesAndReconciled = ({
   setTransactionForm,
   canEdit,
   editingTransaction,
-}) => {
+}: TransactionNotesAndReconciledProps) => {
   return (
     <>
       <div>
@@ -281,11 +337,16 @@ export const TransactionNotesAndReconciled = ({
   );
 };
 
+interface TransactionReceiptSectionProps {
+  editingTransaction: unknown;
+  onClose: () => void;
+}
+
 /**
  * Receipt scanner section for new transactions
  * Extracted to reduce complexity
  */
-export const TransactionReceiptSection = ({ editingTransaction, onClose }) => {
+export const TransactionReceiptSection = ({ editingTransaction, onClose }: TransactionReceiptSectionProps) => {
   if (editingTransaction) return null;
 
   return (
@@ -309,6 +370,13 @@ export const TransactionReceiptSection = ({ editingTransaction, onClose }) => {
   );
 };
 
+interface TransactionFormActionsProps {
+  editingTransaction: unknown;
+  canEdit: boolean;
+  lockedBy?: string;
+  onClose: () => void;
+}
+
 /**
  * Form action buttons for TransactionFormFields
  * Extracted to reduce complexity
@@ -318,7 +386,7 @@ export const TransactionFormActions = ({
   canEdit,
   lockedBy,
   onClose,
-}) => {
+}: TransactionFormActionsProps) => {
   return (
     <div className="flex flex-col sm:flex-row gap-3 mt-6">
       <Button
