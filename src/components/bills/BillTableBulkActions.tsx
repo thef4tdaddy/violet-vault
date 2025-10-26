@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
 
 /**
  * Bulk actions bar for BillTable
