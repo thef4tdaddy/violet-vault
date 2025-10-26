@@ -167,7 +167,7 @@ describe("authUtils", () => {
         userColor: "#0000FF",
       };
 
-      setAuthenticatedFn(userData);
+      setAuthenticatedFn(userData, {});
 
       const updaterFn = mockSetAuthState.mock.calls[0][0];
       const result = updaterFn(initialAuthState);
@@ -184,6 +184,7 @@ describe("authUtils", () => {
 
       const userData: UserData = {
         userName: "testuser",
+        userColor: "#CCCCCC",
       };
 
       setAuthenticatedFn(userData, {});
@@ -379,8 +380,6 @@ describe("authUtils", () => {
       const updaterFn1 = mockSetAuthState.mock.calls[0][0];
       const result1 = updaterFn1(state1);
 
-      // Small delay
-      const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       vi.useFakeTimers();
       vi.advanceTimersByTime(10);
 
@@ -478,7 +477,7 @@ describe("authUtils", () => {
       let currentState = initialAuthState;
 
       // Authenticate
-      setAuthenticatedFn({ userName: "user1" });
+      setAuthenticatedFn({ userName: "user1", userColor: "#AAAAAA" });
       const authenticatedState = mockSetAuthState.mock.calls[0][0](currentState);
 
       // Update user
@@ -504,7 +503,7 @@ describe("authUtils", () => {
         user: null,
       };
 
-      updateUserFn({ userName: "newname" });
+      updateUserFn({ userName: "newname", userColor: "#888888" });
 
       const updaterFn = mockSetAuthState.mock.calls[0][0];
       const result = updaterFn(stateWithNullUser);
@@ -512,6 +511,7 @@ describe("authUtils", () => {
       // When user is null, the spread should create a new object
       expect(result.user).toEqual({
         userName: "newname",
+        userColor: "#888888",
       });
     });
   });
