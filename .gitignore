@@ -46,3 +46,6 @@ docs/audits/lint-results.json
 docs/audits/sorted-lint-report.txt
 docs/audits/typecheck-results.txt
 docs/audits/sorted-typecheck-report.txt
+
+# Test coverage
+coverage/
