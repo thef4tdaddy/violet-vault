@@ -50,7 +50,8 @@ jobs:
 
       - name: Run E2E tests
         run: npm run test:e2e
-        continue-on-error: true
+        # E2E tests are now blocking - failures prevent merge (Issue #805)
+        continue-on-error: false
 
       - name: Upload E2E test results
         if: always()
