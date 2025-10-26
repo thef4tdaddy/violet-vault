@@ -12,11 +12,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from "firebase/firestore";
-import type {
-  IChunkedSyncService,
-  ChunkedSyncStats,
-  CloudSyncConfig,
-} from "../types/firebase";
+import type { IChunkedSyncService, ChunkedSyncStats, CloudSyncConfig } from "../types/firebase";
 import { encryptionUtils } from "../utils/security/encryption";
 import firebaseSyncService from "./firebaseSyncService";
 import logger from "../utils/common/logger";
@@ -27,12 +23,6 @@ import {
   generateChecksum,
 } from "../utils/sync/validation";
 import { createSyncResilience } from "../utils/sync/resilience";
-
-// Type for encrypted chunk data structure
-interface EncryptedChunkData {
-  encryptedData: { data: string };
-  iv: { data: string };
-}
 
 // Type for manifest metadata
 interface ManifestMetadata {
@@ -51,8 +41,17 @@ declare global {
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
  */
-function base64FromBytes(bytes: Uint8Array | ArrayBuffer): string {
-  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+function base64FromBytes(bytes: Uint8Array | ArrayBuffer | number[]): string {
+  let u8: Uint8Array;
+  if (bytes instanceof Uint8Array) {
+    u8 = bytes;
+  } else if (bytes instanceof ArrayBuffer) {
+    u8 = new Uint8Array(bytes);
+  } else if (Array.isArray(bytes)) {
+    u8 = new Uint8Array(bytes);
+  } else {
+    throw new Error(`Unexpected bytes type: ${typeof bytes}`);
+  }
   const CHUNK_SIZE = 0x8000; // 32k chars per chunk keeps call stacks safe
   let binary = "";
   for (let i = 0; i < u8.length; i += CHUNK_SIZE) {
@@ -263,7 +262,7 @@ class ChunkedSyncService implements IChunkedSyncService {
     };
 
     for (const [chunkId, data] of Object.entries(chunkMap)) {
-      const size = this.calculateSize(data);
+      const size = await this.calculateSize(data);
       const dataString = this.safeStringify(data);
       const checksum = await generateChecksum(dataString);
 
@@ -273,8 +272,9 @@ class ChunkedSyncService implements IChunkedSyncService {
         type: Array.isArray(data) ? "array" : "object",
         checksum, // GitHub Issue #576: Add chunk checksum for validation
       };
-      manifest.metadata.totalSize += size;
-      manifest.metadata.totalChunks++;
+      const metadata = manifest.metadata as ManifestMetadata;
+      metadata.totalSize += size;
+      metadata.totalChunks++;
     }
 
     // Generate manifest checksum for integrity validation
@@ -297,10 +297,7 @@ class ChunkedSyncService implements IChunkedSyncService {
   /**
    * Save large dataset to cloud using chunking
    */
-  async saveToCloud(
-    data: unknown,
-    currentUser: CloudSyncConfig["currentUser"]
-  ): Promise<boolean> {
+  async saveToCloud(data: unknown, currentUser: CloudSyncConfig["currentUser"]): Promise<boolean> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
@@ -310,7 +307,13 @@ class ChunkedSyncService implements IChunkedSyncService {
       const startTime = Date.now();
 
       // Warn if currentUser is undefined - check for budgetId (primary), uid (Firebase), or id (local user)
-      if (!currentUser?.budgetId && !currentUser?.uid && !currentUser?.id) {
+      const userObj = currentUser as {
+        budgetId?: string;
+        id?: string;
+        uid?: string;
+        userName?: string;
+      };
+      if (!userObj?.budgetId && !userObj?.uid && !userObj?.id) {
         logger.warn("saveToCloud called with undefined currentUser identifier, using 'anonymous'", {
           currentUser,
           hasCurrentUser: !!currentUser,
@@ -329,7 +332,7 @@ class ChunkedSyncService implements IChunkedSyncService {
       try {
         logger.info("🚀 [CHUNKED SYNC] Starting chunked save to cloud", {
           dataSize: this.calculateSize(data),
-          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+          userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
         });
 
         // Identify large arrays to chunk
@@ -355,7 +358,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Create manifest
         const manifest = await this.createManifest(chunkMap, {
-          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+          userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
           userAgent: navigator.userAgent,
           originalKeys: Object.keys(data),
         });
@@ -391,7 +394,7 @@ class ChunkedSyncService implements IChunkedSyncService {
           _metadata: {
             version: "2.0",
             lastSync: Date.now(),
-            userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+            userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
             chunkedKeys: Object.keys(data).filter(
               (key) => Array.isArray(data[key]) && data[key].length > 100
             ),
@@ -541,15 +544,14 @@ class ChunkedSyncService implements IChunkedSyncService {
           let manifest;
           try {
             // Validate manifest data before decryption
-            if (
-              !mainData._manifest?.encryptedData?.data ||
-              !mainData._manifest?.encryptedData?.iv
-            ) {
+            const manifestData = mainData._manifest as Record<string, unknown>;
+            const encryptedData = manifestData.encryptedData as Record<string, unknown> | undefined;
+            if (!encryptedData?.data || !encryptedData?.iv) {
               throw new Error("Missing encrypted manifest data structure");
             }
 
-            const encryptedDataBytes = bytesFromBase64(mainData._manifest.encryptedData.data);
-            const ivBytes = bytesFromBase64(mainData._manifest.encryptedData.iv);
+            const encryptedDataBytes = bytesFromBase64(encryptedData.data as string);
+            const ivBytes = bytesFromBase64(encryptedData.iv as string);
 
             // Check if data is too small (common corruption indicator)
             if (encryptedDataBytes.length < 16 || ivBytes.length < 12) {
@@ -801,7 +803,6 @@ class ChunkedSyncService implements IChunkedSyncService {
       });
 
       logger.info("✅ Corrupted cloud data cleared successfully");
-      return true;
     } catch (error) {
       logger.error("❌ Failed to clear corrupted cloud data", error);
       throw error;
