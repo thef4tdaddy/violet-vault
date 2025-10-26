@@ -1,4 +1,4 @@
-import { renderHook, waitFor, act } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import useSupplementalAccounts from "../useSupplementalAccounts";
 
@@ -69,13 +69,13 @@ vi.mock("../utils/accountHandlersUtils", () => ({
     resetForm();
   }),
   handleModalCloseWithLock: vi.fn(
-    (isOwnLock, releaseLock, setEditingAccount, setShowAddModal, resetForm) => {
+    (_isOwnLock, _releaseLock, setEditingAccount, setShowAddModal, resetForm) => {
       setShowAddModal(false);
       setEditingAccount(null);
       resetForm();
     }
   ),
-  handleAccountDelete: vi.fn(async (accountId, confirm, onDeleteAccount) => {
+  handleAccountDelete: vi.fn(async (accountId, _confirm, onDeleteAccount) => {
     await onDeleteAccount(accountId);
   }),
   handleTransferSuccess: vi.fn((setShowTransferModal, setTransferringAccount, setTransferForm) => {
