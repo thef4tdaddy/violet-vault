@@ -150,12 +150,11 @@ jobs:
               statusText = 'Code quality issues detected';
             }
 
-            const commentBody = `## ${statusEmoji} Code Quality Check
-
-**ESLint**: ${eslintTotal} issues
-**TypeScript**: ${tsTotal} compilation errors
-
-${eslintTotal === 0 && tsTotal === 0 ? '✅ Ready to merge' : '⚠️ Please review and fix issues before merging'}`;
+            const mergeStatus = eslintTotal === 0 && tsTotal === 0 ? '✅ Ready to merge' : '⚠️ Please review and fix issues before merging';
+            const commentBody = '## ' + statusEmoji + ' Code Quality Check\n\n' +
+              '**ESLint**: ' + eslintTotal + ' issues\n' +
+              '**TypeScript**: ' + tsTotal + ' compilation errors\n\n' +
+              mergeStatus;
 
             try {
               await github.rest.issues.createComment({
