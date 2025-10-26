@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { getIcon } from "@/utils";
 
 // Format number as currency
-const formatNumber = (num, formatCurrency) => {
+const formatNumber = (num: number | undefined, formatCurrency: boolean): string => {
   if (!formatCurrency) return num?.toFixed(2) || "0.00";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -10,8 +10,18 @@ const formatNumber = (num, formatCurrency) => {
   }).format(num || 0);
 };
 
+interface ConfirmationViewProps {
+  value: number;
+  pendingValue: number;
+  bgClass: string;
+  className: string;
+  formatCurrency: boolean;
+  onConfirm: (value: number) => void;
+  onCancel: () => void;
+}
+
 // Confirmation view for large balance changes
-const ConfirmationView = ({ value, pendingValue, bgClass, className, formatCurrency, onConfirm, onCancel }) => {
+const ConfirmationView: React.FC<ConfirmationViewProps> = ({ value, pendingValue, bgClass, className, formatCurrency, onConfirm, onCancel }) => {
   const currentValue = parseFloat(value) || 0;
   const changeAmount = pendingValue - currentValue;
   const isIncrease = changeAmount > 0;
@@ -60,8 +70,21 @@ const ConfirmationView = ({ value, pendingValue, bgClass, className, formatCurre
   );
 };
 
+interface EditViewProps {
+  title: string;
+  isManuallySet: boolean;
+  editValue: string;
+  bgClass: string;
+  className: string;
+  inputRef: React.RefObject<HTMLInputElement>;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}
+
 // Edit mode view
-const EditView = ({ title, isManuallySet, editValue, bgClass, className, inputRef, onInputChange, onKeyPress, onSave, onCancel }) => (
+const EditView: React.FC<EditViewProps> = ({ title, isManuallySet, editValue, bgClass, className, inputRef, onInputChange, onKeyPress, onSave, onCancel }) => (
   <div className={`${bgClass} rounded-lg p-6 ${className}`}>
     <div className="flex items-center justify-between mb-4">
       <h3 className="font-medium text-gray-700">
@@ -106,8 +129,21 @@ const EditView = ({ title, isManuallySet, editValue, bgClass, className, inputRe
   </div>
 );
 
+interface DisplayViewProps {
+  title: string;
+  isManuallySet: boolean;
+  value: number;
+  subtitle: string;
+  bgClass: string;
+  hoverClass: string;
+  className: string;
+  colorClass: string;
+  formatCurrency: boolean;
+  onClick: () => void;
+}
+
 // Display mode view
-const DisplayView = ({ title, isManuallySet, value, subtitle, bgClass, hoverClass, className, colorClass, formatCurrency, onClick }) => (
+const DisplayView: React.FC<DisplayViewProps> = ({ title, isManuallySet, value, subtitle, bgClass, hoverClass, className, colorClass, formatCurrency, onClick }) => (
   <div
     className={`${bgClass} rounded-lg p-6 cursor-pointer transition-colors ${hoverClass} group ${className}`}
     onClick={onClick}

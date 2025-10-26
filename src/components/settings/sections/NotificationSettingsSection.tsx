@@ -4,8 +4,18 @@ import { getIcon } from "../../../utils";
 import { useFirebaseMessaging } from "../../../hooks/notifications/useFirebaseMessaging";
 import logger from "../../../utils/common/logger";
 
+interface PermissionStatus {
+  granted: boolean;
+  denied: boolean;
+  isSupported: boolean;
+}
+
+interface PermissionStatusUIProps {
+  permissionStatus: PermissionStatus | null;
+}
+
 // Permission status UI component
-const PermissionStatusUI = ({ permissionStatus }) => {
+const PermissionStatusUI: React.FC<PermissionStatusUIProps> = ({ permissionStatus }) => {
   if (!permissionStatus) return null;
   const { granted, denied, isSupported: supported } = permissionStatus;
 
@@ -80,8 +90,19 @@ const PermissionStatusUI = ({ permissionStatus }) => {
   );
 };
 
+interface NotificationActionsProps {
+  isSupported: boolean;
+  hasToken: boolean;
+  canRequestPermission: boolean;
+  isLoading: boolean;
+  isTestingMessage: boolean;
+  onEnable: () => void;
+  onDisable: () => void;
+  onTest: () => void;
+}
+
 // Notification action buttons component
-const NotificationActions = ({
+const NotificationActions: React.FC<NotificationActionsProps> = ({
   isSupported,
   hasToken,
   canRequestPermission,

@@ -68,8 +68,21 @@ const ONBOARDING_STEPS = [
   },
 ];
 
+interface StepData {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  completed?: boolean;
+}
+
+interface StepItemProps {
+  step: StepData;
+  completed: boolean;
+}
+
 // Component to render a single step
-const StepItem = ({ step, completed }) => (
+const StepItem: React.FC<StepItemProps> = ({ step, completed }) => (
   <div
     className={`flex items-start space-x-3 p-3 rounded-lg transition-all ${
       completed
@@ -114,8 +127,14 @@ const StepItem = ({ step, completed }) => (
   </div>
 );
 
+interface StepCategoryProps {
+  category: string;
+  steps: StepData[];
+  tutorialProgress: Record<string, boolean>;
+}
+
 // Component to render grouped steps by category
-const StepCategory = ({ category, steps, tutorialProgress }) => (
+const StepCategory: React.FC<StepCategoryProps> = ({ category, steps, tutorialProgress }) => (
   <div className="space-y-2">
     <h4 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide">
       {category}

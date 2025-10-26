@@ -23,8 +23,12 @@ const isDevelopmentMode = () => {
   );
 };
 
+interface SyncHealthToolsProps {
+  confirm: (options: { title: string; message: string; confirmText: string; cancelText: string }) => Promise<boolean>;
+}
+
 // Sync health tools component
-const SyncHealthTools = ({ confirm }) => {
+const SyncHealthTools: React.FC<SyncHealthToolsProps> = ({ confirm }) => {
   const isDev = isDevelopmentMode();
 
   const handleQuickSyncStatus = async () => {
