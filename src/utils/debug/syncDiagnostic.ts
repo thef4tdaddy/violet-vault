@@ -3,6 +3,17 @@
  * Usage: Copy and paste this into browser developer console
  */
 import logger from "@/utils/common/logger";
+import type { VioletVaultDB } from "@/db/budgetDb";
+
+// Extend Window interface for diagnostic tools
+declare global {
+  interface Window {
+    budgetDb: VioletVaultDB;
+    cloudSyncService: any;
+    firebase: any;
+    runSyncDiagnostic: typeof runSyncDiagnostic;
+  }
+}
 
 export const runSyncDiagnostic = async () => {
   logger.info("🔍 VioletVault Sync Diagnostic Tool");

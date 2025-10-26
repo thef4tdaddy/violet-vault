@@ -6,8 +6,19 @@
 import { budgetDb } from "../../db/budgetDb";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../common/logger";
+import type { Envelope } from "../../db/types";
+
+interface TestResult {
+  test: string;
+  status: "passed" | "failed";
+  details?: string;
+  error?: string;
+}
 
 class SyncEdgeCaseTester {
+  testResults: TestResult[];
+  cloudSyncService: typeof cloudSyncService;
+
   constructor() {
     this.testResults = [];
     this.cloudSyncService = cloudSyncService;
@@ -86,14 +97,16 @@ class SyncEdgeCaseTester {
     logger.info("🧪 Testing corrupted timestamp handling...");
 
     // Add records with various corrupted timestamps
-    const testEnvelope = {
+    const testEnvelope: Partial<Envelope> = {
       id: "test-corrupted-timestamps",
       name: "Test Envelope",
-      lastModified: "not-a-date",
+      category: "Test",
+      archived: false,
+      lastModified: "not-a-date" as any,
       createdAt: null,
     };
 
-    await budgetDb.envelopes.add(testEnvelope);
+    await budgetDb.envelopes.add(testEnvelope as Envelope);
 
     try {
       const syncData = await cloudSyncService.fetchDexieData();
@@ -116,16 +129,16 @@ class SyncEdgeCaseTester {
   async testMixedDataTypes() {
     logger.info("🧪 Testing mixed data types in timestamps...");
 
-    const testData = [
-      { id: "string-timestamp", lastModified: "2024-01-01T00:00:00.000Z" },
-      { id: "number-timestamp", lastModified: Date.now() },
-      { id: "missing-timestamp", name: "No timestamp" },
-      { id: "zero-timestamp", lastModified: 0 },
+    const testData: Partial<Envelope>[] = [
+      { id: "string-timestamp", name: "Test", category: "Test", archived: false, lastModified: "2024-01-01T00:00:00.000Z" as any },
+      { id: "number-timestamp", name: "Test", category: "Test", archived: false, lastModified: Date.now() },
+      { id: "missing-timestamp", name: "No timestamp", category: "Test", archived: false },
+      { id: "zero-timestamp", name: "Test", category: "Test", archived: false, lastModified: 0 },
     ];
 
     try {
       for (const item of testData) {
-        await budgetDb.envelopes.add({ name: "Test", ...item });
+        await budgetDb.envelopes.add(item as Envelope);
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
@@ -184,21 +197,23 @@ class SyncEdgeCaseTester {
   async testDuplicateIds() {
     logger.info("🧪 Testing duplicate ID handling...");
 
-    const duplicateEnvelope = {
+    const duplicateEnvelope: Partial<Envelope> = {
       id: "duplicate-test",
       name: "Original",
+      category: "Test",
+      archived: false,
       lastModified: Date.now(),
     };
 
     try {
-      await budgetDb.envelopes.add(duplicateEnvelope);
+      await budgetDb.envelopes.add(duplicateEnvelope as Envelope);
 
       // Try to add duplicate
       try {
         await budgetDb.envelopes.add({
           ...duplicateEnvelope,
           name: "Duplicate",
-        });
+        } as Envelope);
 
         this.testResults.push({
           test: "testDuplicateIds",
@@ -307,12 +322,18 @@ class SyncEdgeCaseTester {
   async testCircularReferences() {
     logger.info("🧪 Testing circular reference handling...");
 
-    const testObj = { id: "circular-test", name: "Test" };
+    const testObj: any = { 
+      id: "circular-test", 
+      name: "Test",
+      category: "Test",
+      archived: false,
+      lastModified: Date.now()
+    };
     testObj.self = testObj; // Create circular reference
 
     try {
       // Add the object with circular reference to Dexie (this should work)
-      await budgetDb.envelopes.add(testObj);
+      await budgetDb.envelopes.add(testObj as Envelope);
 
       // Test that sync system can handle the circular reference with safeStringify
       const data = await this.cloudSyncService.fetchDexieData();
