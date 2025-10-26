@@ -12,7 +12,6 @@ import type {
   UseAutoFundingExecutionReturn,
   BudgetContext,
   ExecutionResult,
-  ExecutionDetails,
   RuleExecutionResult,
 } from "./types";
 

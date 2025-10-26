@@ -37,8 +37,11 @@ interface NavigatorWithConnection extends Navigator {
 
 /**
  * Extended StorageEstimate for usage details
+ * Note: StorageEstimate is a browser API type from lib.dom.d.ts
  */
-interface ExtendedStorageEstimate extends StorageEstimate {
+interface ExtendedStorageEstimate {
+  quota?: number;
+  usage?: number;
   usageDetails?: Record<string, number>;
 }
 

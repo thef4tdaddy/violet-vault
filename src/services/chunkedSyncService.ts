@@ -22,6 +22,15 @@ import {
 import { createSyncResilience } from "../utils/sync/resilience";
 
 /**
+ * Extended Window interface for corruption tracking
+ */
+interface WindowWithCorruptionTracking extends Window {
+  corruptionModalShown?: boolean;
+}
+
+declare const window: WindowWithCorruptionTracking;
+
+/**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
  */
 function base64FromBytes(bytes) {
@@ -225,12 +234,17 @@ class ChunkedSyncService {
     const manifest = {
       version: "2.0",
       timestamp: Date.now(),
-      chunks: {},
+      chunks: {} as Record<string, {
+        size: number;
+        itemCount: number;
+        type: string;
+        checksum: string;
+      }>,
       metadata: {
         totalChunks: 0,
         totalSize: 0,
         ...metadata,
-      } as any,
+      } as Record<string, unknown>,
       validation: {
         manifestChecksum: "", // Will be calculated after chunk processing
         minChunkSize: 16, // Minimum encrypted chunk size
@@ -654,7 +668,7 @@ class ChunkedSyncService {
 
           // Reassemble chunked arrays
           for (const [key, value] of Object.entries(reconstructedData)) {
-            if (value && typeof value === "object" && (value as any)._chunked) {
+            if (value && typeof value === "object" && "_chunked" in value && (value as Record<string, unknown>)._chunked) {
               // Find all chunks for this key
               const keyChunks = Object.entries(chunks)
                 .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
@@ -864,11 +878,11 @@ class ChunkedSyncService {
    */
   triggerCorruptionRecovery() {
     // Don't spam the user - only show once per session
-    if ((window as any).corruptionModalShown) {
+    if (window.corruptionModalShown) {
       return;
     }
 
-    (window as any).corruptionModalShown = true;
+    window.corruptionModalShown = true;
 
     // Emit custom event for UI components to listen to
     const event = new CustomEvent("syncCorruptionDetected", {
