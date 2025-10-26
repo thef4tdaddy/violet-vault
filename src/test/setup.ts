@@ -1,18 +1,14 @@
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
+import { indexedDB } from "fake-indexeddb";
 /// <reference types="../vite-env.d.ts" />
 
 // Type declarations for browser APIs
 type BufferSource = ArrayBufferView | ArrayBuffer;
 
-// Mock modules that require browser APIs
-const mockIndexedDB = {
-  open: vi.fn(),
-  deleteDatabase: vi.fn(),
-};
-
+// Mock IndexedDB using fake-indexeddb for full API support
 Object.defineProperty(global, "indexedDB", {
-  value: mockIndexedDB,
+  value: indexedDB,
   writable: true,
 });
 
