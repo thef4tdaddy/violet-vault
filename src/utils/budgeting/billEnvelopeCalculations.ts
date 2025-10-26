@@ -43,10 +43,28 @@ const getInvalidBillEnvelopeResult = (): BillEnvelopeResult => ({
   linkedBills: 0,
 });
 
+interface Bill {
+  id: string;
+  dueDate: string | Date;
+  amount?: number;
+  estimatedAmount?: number;
+  envelopeId?: string;
+  isPaid?: boolean;
+  [key: string]: unknown;
+}
+
+interface Envelope {
+  id: string;
+  envelopeType?: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Get the next upcoming bill from linked bills
  */
-const getNextUpcomingBill = (linkedBills: any[]) => {
+const getNextUpcomingBill = (linkedBills: Bill[]): Bill | null => {
   const upcomingBills = linkedBills
     .filter((bill) => new Date(bill.dueDate) >= new Date())
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
@@ -92,7 +110,7 @@ const calculateUpcomingBillsAmount = (linkedBills) => {
  * @param {Array} bills - Array of bills linked to this envelope
  * @returns {BillEnvelopeResult} Calculation results
  */
-export const calculateBillEnvelopeNeeds = (envelope: any, bills: any[] = []): BillEnvelopeResult => {
+export const calculateBillEnvelopeNeeds = (envelope: Envelope, bills: Bill[] = []): BillEnvelopeResult => {
   if (!envelope || envelope.envelopeType !== ENVELOPE_TYPES.BILL) {
     return getInvalidBillEnvelopeResult();
   }

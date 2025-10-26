@@ -2,15 +2,21 @@ import { renderHook, act } from "@testing-library/react";
 import { storeRegistry } from "../stores/storeRegistry.ts";
 import { expect } from "vitest";
 
+// Generic type for Zustand store hooks
+type StoreHook<T = unknown> = {
+  (): T;
+  getState: () => T;
+};
+
 /**
  * Utility for testing Zustand stores
  */
-export class StoreTestHelper {
-  storeHook: any;
+export class StoreTestHelper<T = unknown> {
+  storeHook: StoreHook<T>;
   storeName: string;
-  initialState: any;
+  initialState: T | null;
 
-  constructor(storeHook: any, storeName: string) {
+  constructor(storeHook: StoreHook<T>, storeName: string) {
     this.storeHook = storeHook;
     this.storeName = storeName;
     this.initialState = null;
@@ -39,7 +45,7 @@ export class StoreTestHelper {
   /**
    * Execute action and return new state
    */
-  async executeAction(actionName: string, ...args: any[]): Promise<any> {
+  async executeAction(actionName: string, ...args: unknown[]): Promise<T> {
     const { result } = renderHook(() => this.storeHook());
 
     await act(async () => {
@@ -52,7 +58,7 @@ export class StoreTestHelper {
   /**
    * Assert state matches expected values
    */
-  assertState(expected: Record<string, any>): void {
+  assertState(expected: Record<string, unknown>): void {
     const currentState = this.storeHook.getState();
 
     Object.entries(expected).forEach(([key, value]) => {
@@ -73,7 +79,7 @@ export class StoreTestHelper {
 /**
  * Create a test helper for a store
  */
-export const createStoreTestHelper = (storeHook: any, storeName: string): StoreTestHelper => {
+export const createStoreTestHelper = <T = unknown>(storeHook: StoreHook<T>, storeName: string): StoreTestHelper<T> => {
   return new StoreTestHelper(storeHook, storeName);
 };
 
