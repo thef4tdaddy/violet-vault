@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useAuthManager } from "../auth/useAuthManager";
-import { useConfirm } from "../common/useConfirm";
-import useEditLock from "../common/useEditLock";
-import { initializeEditLocks } from "../../services/editLockService";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import useEditLock from "@/hooks/common/useEditLock";
+import { initializeEditLocks } from "@/services/editLockService";
 import {
   validateAccountForm,
   validateTransferForm,
   calculateAccountTotals,
-} from "../../utils/accounts/accountValidation";
-import { getAccountTypeInfo } from "../../utils/accounts/accountHelpers";
-import { globalToast } from "../../stores/ui/toastStore";
+} from "@/utils/accounts/accountValidation";
+import { getAccountTypeInfo } from "@/utils/accounts/accountHelpers";
+import { globalToast } from "@/stores/ui/toastStore";
 import {
   getEmptyAccountForm,
   getEmptyTransferForm,
@@ -101,15 +101,15 @@ const useSupplementalAccounts = ({
       return;
     }
 
-    saveAccount(
+    saveAccount({
       accountForm,
       editingAccount,
       isOwnLock,
       currentUser,
       onUpdateAccount,
       onAddAccount,
-      releaseLock
-    );
+      releaseLock,
+    });
 
     handleAccountSaveSuccess(setShowAddModal, setEditingAccount, resetForm);
   };
