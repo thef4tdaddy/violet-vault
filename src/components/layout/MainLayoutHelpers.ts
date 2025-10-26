@@ -9,9 +9,10 @@
 export const getUserForSync = (currentUser: unknown) => {
   if (!currentUser) return null;
 
+  const userRecord = currentUser as Record<string, unknown>;
   return {
-    uid: ((currentUser as Record<string, unknown>)?.uid as string) || "unknown",
-    email: ((currentUser as Record<string, unknown>)?.email as string) || undefined,
+    uid: (userRecord?.uid as string) || "unknown",
+    email: (userRecord?.email as string) || undefined,
   };
 };
 
@@ -48,8 +49,14 @@ export const extractOnboardingState = (state: unknown) => {
 
 /**
  * Check if security has been acknowledged
+ * Note: localStorage access is restricted in this codebase but needed here for security acknowledgement
  */
 export const hasSecurityAcknowledgement = (): boolean => {
-  // eslint-disable-next-line no-restricted-syntax
-  return !!localStorage.getItem("localDataSecurityAcknowledged");
+  try {
+    // eslint-disable-next-line no-restricted-syntax
+    return !!localStorage.getItem("localDataSecurityAcknowledged");
+  } catch (error) {
+    // Handle environments where localStorage is not available
+    return false;
+  }
 };
