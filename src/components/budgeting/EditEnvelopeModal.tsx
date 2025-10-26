@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
-import useEnvelopeEdit from "../../hooks/budgeting/useEnvelopeEdit";
-import logger from "../../utils/common/logger";
-import { useMobileDetection } from "../../hooks/ui/useMobileDetection";
+import useEnvelopeEdit from "@/hooks/budgeting/useEnvelopeEdit";
+import logger from "@/utils/common/logger";
+import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
-import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
-import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
-import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
-import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
-import { getIcon } from "../../utils";
 import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
-import SlideUpModal from "../mobile/SlideUpModal";
-import { ENVELOPE_TYPES } from "../../constants/categories";
+import SlideUpModal from "@/components/mobile/SlideUpModal";
+import { ModalContent } from "./EditEnvelopeModalComponents";
 
 const EditEnvelopeModal = ({
   isOpen = false,
@@ -77,133 +70,6 @@ const EditEnvelopeModal = ({
 
   const isUnassignedCash = envelope.id === "unassigned";
 
-  // Extract modal content for reuse between mobile and desktop
-  const ModalContent = () => (
-    <div className="space-y-6">
-      {/* Envelope Type Selection */}
-      {!isUnassignedCash && (
-        <EnvelopeTypeSelector
-          selectedType={formData.envelopeType}
-          onTypeChange={(type) => updateFormField("envelopeType", type)}
-          excludeTypes={
-            formData.envelopeType === ENVELOPE_TYPES.SAVINGS ? [] : [ENVELOPE_TYPES.SAVINGS]
-          }
-          disabled={!canEdit}
-        />
-      )}
-
-      {/* Basic Information */}
-      <EnvelopeBasicFields
-        formData={formData}
-        onUpdateField={updateFormField}
-        errors={errors}
-        canEdit={canEdit}
-      />
-
-      {/* Bill Connection */}
-      {canEdit && envelope?.id && (
-        <UniversalConnectionManager
-          entityType="envelope"
-          entityId={envelope.id}
-          canEdit={canEdit}
-          theme="purple"
-        />
-      )}
-
-      {/* Budget Settings */}
-      {!isUnassignedCash && (
-        <EnvelopeBudgetFields
-          formData={formData}
-          onUpdateField={updateFormField}
-          errors={errors}
-          calculatedAmounts={calculatedAmounts}
-          canEdit={canEdit}
-        />
-      )}
-
-      {/* Additional Settings */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-gray-900">Additional Settings</h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Priority */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-            <Select
-              value={formData.priority || "medium"}
-              onChange={(e) => updateFormField("priority", e.target.value)}
-              disabled={!canEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-              }`}
-            >
-              <option value="low">Low Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="high">High Priority</option>
-              <option value="critical">Critical</option>
-            </Select>
-          </div>
-
-          {/* Auto Allocate */}
-          <div className="flex items-center pt-8">
-            <input
-              type="checkbox"
-              id="autoAllocate"
-              checked={formData.autoAllocate !== false}
-              onChange={(e) => updateFormField("autoAllocate", e.target.checked)}
-              disabled={!canEdit}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:cursor-not-allowed"
-            />
-            <label htmlFor="autoAllocate" className="ml-2 block text-sm text-gray-900">
-              Auto-allocate funds
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-between pt-4">
-        {/* Delete Button */}
-        <div>
-          {canDelete && !isUnassignedCash && (
-            <Button
-              type="button"
-              onClick={handleDeleteClick}
-              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition-colors"
-            >
-              {React.createElement(getIcon("Trash2"), {
-                className: "h-4 w-4 mr-2",
-              })}
-              Delete Envelope
-            </Button>
-          )}
-        </div>
-
-        {/* Save/Cancel Buttons */}
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            onClick={handleClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 transition-colors"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!canSubmit || isLoading}
-            className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {React.createElement(getIcon("Save"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            {isLoading ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-
   // Mobile slide-up modal
   if (isMobile || _forceMobileMode) {
     return (
@@ -217,7 +83,21 @@ const EditEnvelopeModal = ({
           backdrop={true}
         >
           <div className="px-6 pb-6">
-            <ModalContent />
+            <ModalContent
+              formData={formData}
+              errors={errors}
+              calculatedAmounts={calculatedAmounts}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              canSubmit={canSubmit}
+              isLoading={isLoading}
+              isUnassignedCash={isUnassignedCash}
+              envelopeId={envelope?.id}
+              onUpdateField={updateFormField}
+              onDelete={handleDeleteClick}
+              onCancel={handleClose}
+              onSubmit={handleSubmit}
+            />
           </div>
         </SlideUpModal>
 
@@ -251,7 +131,21 @@ const EditEnvelopeModal = ({
 
           {/* Form Content */}
           <div className="flex-1 p-6 overflow-y-auto">
-            <ModalContent />
+            <ModalContent
+              formData={formData}
+              errors={errors}
+              calculatedAmounts={calculatedAmounts}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              canSubmit={canSubmit}
+              isLoading={isLoading}
+              isUnassignedCash={isUnassignedCash}
+              envelopeId={envelope?.id}
+              onUpdateField={updateFormField}
+              onDelete={handleDeleteClick}
+              onCancel={handleClose}
+              onSubmit={handleSubmit}
+            />
           </div>
         </div>
       </div>
