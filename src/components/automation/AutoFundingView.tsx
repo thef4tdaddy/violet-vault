@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
@@ -8,8 +9,11 @@ import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import logger from "@/utils/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
+import { Button } from "@/components/ui";
+import { getIcon } from "@/utils";
 
 const AutoFundingView = () => {
+  const navigate = useNavigate();
   const confirm = useConfirm();
   const envelopes = useBudgetStore((state) => state.envelopes) as unknown[];
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
@@ -126,6 +130,16 @@ const AutoFundingView = () => {
   return (
     <>
       <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            onClick={() => navigate("/app/envelopes")}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg border-2 border-black font-medium"
+            title="Back to Envelopes"
+          >
+            {React.createElement(getIcon("ArrowLeft"), { className: "h-4 w-4" })}
+            Back to Envelopes
+          </Button>
+        </div>
         <ViewHeader rules={rules} />
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
