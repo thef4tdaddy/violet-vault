@@ -32,12 +32,12 @@ const AccountBalanceOverview = ({
 
   return (
     <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
-      <h2 className="font-black text-black text-base mb-6 flex items-center">
+      <h2 className="font-black text-black text-xl mb-6 flex items-center">
         {React.createElement(getIcon("CreditCard"), {
-          className: "h-5 w-5 mr-2 text-blue-600",
+          className: "h-6 w-6 mr-3 text-blue-600",
         })}
-        <span className="text-lg">C</span>HECKING <span className="text-lg">A</span>CCOUNT{" "}
-        <span className="text-lg">D</span>ASHBOARD
+        <span className="text-2xl mr-1">V</span>iolet <span className="text-2xl mr-1">V</span>ault{" "}
+        <span className="text-2xl mr-1">A</span>pp <span className="text-2xl">D</span>ashboard
       </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

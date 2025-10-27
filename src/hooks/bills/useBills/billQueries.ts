@@ -1,9 +1,10 @@
 // Bill Query Functions - Data fetching and filtering logic
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
-import { queryKeys } from "../../../utils/common/queryClient.ts";
-import { budgetDb } from "../../../db/budgetDb.ts";
-import logger from "../../../utils/common/logger.ts";
+import { queryKeys } from "@/utils/common/queryClient";
+import { budgetDb } from "@/db/budgetDb";
+import logger from "@/utils/common/logger";
+import type { Bill } from "@/db/types";
 
 /**
  * Bill query options interface
@@ -17,15 +18,10 @@ interface BillQueryOptions {
 }
 
 /**
- * Bill interface
+ * Bill interface with extended properties
  */
-interface Bill {
-  id: string;
-  dueDate: string;
-  isPaid: boolean;
-  category?: string;
-  lastPaid?: string;
-  amount?: number;
+interface BillExtended extends Bill {
+  lastPaid?: string | number | Date;
   estimatedAmount?: number;
   [key: string]: unknown;
 }
@@ -99,23 +95,25 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
 
     // Apply sorting
     filteredBills.sort((a, b) => {
-      let aVal: string | number | Date = a[sortBy as keyof Bill] as string | number;
-      let bVal: string | number | Date = b[sortBy as keyof Bill] as string | number;
+      const billA = a as BillExtended;
+      const billB = b as BillExtended;
+      let aVal: string | number | Date = billA[sortBy as keyof BillExtended] as string | number | Date;
+      let bVal: string | number | Date = billB[sortBy as keyof BillExtended] as string | number | Date;
 
       // Handle date fields
       if (sortBy === "dueDate" || sortBy === "lastPaid") {
-        aVal = new Date(aVal);
-        bVal = new Date(bVal);
+        aVal = new Date(String(aVal));
+        bVal = new Date(String(bVal));
       }
 
       // Handle numeric fields
       if (sortBy === "amount" || sortBy === "estimatedAmount") {
-        aVal = parseFloat(aVal) || 0;
-        bVal = parseFloat(bVal) || 0;
+        aVal = parseFloat(String(aVal)) || 0;
+        bVal = parseFloat(String(bVal)) || 0;
       }
 
       // Handle string fields
-      if (typeof aVal === "string") {
+      if (typeof aVal === "string" && typeof bVal === "string") {
         aVal = aVal.toLowerCase();
         bVal = bVal.toLowerCase();
       }
@@ -181,7 +179,7 @@ export const useBillsQuery = (options: BillQueryOptions = {}) => {
 export const useUpcomingBillsQuery = (daysAhead = 30, billsData: Bill[] = []) => {
   return useQuery({
     queryKey: queryKeys.upcomingBills(daysAhead),
-    queryFn: async () => {
+    queryFn: async (): Promise<Bill[]> => {
       const bills = billsData || [];
       const today = new Date();
       const futureDate = new Date();
