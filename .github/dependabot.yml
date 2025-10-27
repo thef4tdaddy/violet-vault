@@ -1,18 +1,20 @@
 version: 2
 updates:
-  # NPM Dependencies
+  # NPM Dependencies - Regular updates to develop
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    target-branch: "main"
+    target-branch: "develop"
+    pull-request-branch-name:
+      separator: "/"
     assignees:
       - "thef4tdaddy"
     labels:
       - "dependencies"
-      - "autorelease: pending"
+      - "dependabot"
     open-pull-requests-limit: 5
     allow:
       - dependency-type: "all"
@@ -143,21 +145,38 @@ updates:
           - "pako"
           - "qrcode*"
 
-  # GitHub Actions
+  # GitHub Actions - Regular updates to develop
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    target-branch: "main"
+    target-branch: "develop"
     assignees:
       - "thef4tdaddy"
     labels:
       - "dependencies"
       - "ci"
-      - "autorelease: pending"
+      - "dependabot"
     open-pull-requests-limit: 3
     commit-message:
       prefix: "ci"
+      include: "scope"
+
+  # Security updates - Critical vulnerabilities to main only
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+    assignees:
+      - "thef4tdaddy"
+    labels:
+      - "security"
+      - "critical"
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "security"
+      prefix-development: "security(dev)"
       include: "scope"
