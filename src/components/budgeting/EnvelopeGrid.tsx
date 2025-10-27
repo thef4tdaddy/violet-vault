@@ -22,35 +22,6 @@ const EnvelopeEditModal = lazy(() => import("./EditEnvelopeModal"));
 const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"));
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
-// Empty state component
-const EmptyStateView = ({
-  filterOptions,
-  setShowCreateModal,
-}: {
-  filterOptions: { envelopeType: string; showEmpty: boolean };
-  setShowCreateModal: (show: boolean) => void;
-}) => {
-  const isAllFilters = filterOptions.envelopeType === "all" && filterOptions.showEmpty;
-
-  if (isAllFilters) {
-    return (
-      <EmptyStateHints
-        type="envelopes"
-        onAction={() => setShowCreateModal(true)}
-        customMessage={undefined}
-        customActions={undefined}
-      />
-    );
-  }
-
-  return (
-    <div className="text-center py-12">
-      <div className="text-gray-500 text-lg">No envelopes found</div>
-      <p className="text-gray-400 mt-2">Try adjusting your filters</p>
-    </div>
-  );
-};
-
 // Modals container component
 const EnvelopeModals = ({
   showCreateModal,
