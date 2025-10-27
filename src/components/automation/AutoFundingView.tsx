@@ -12,7 +12,7 @@ import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 
-const AutoFundingView = () => {
+function AutoFundingView() {
   const navigate = useNavigate();
   const confirm = useConfirm();
   const envelopes = useBudgetStore((state) => state.envelopes) as unknown[];
@@ -181,6 +181,6 @@ const AutoFundingView = () => {
       />
     </>
   );
-};
+}
 
 export default AutoFundingView;

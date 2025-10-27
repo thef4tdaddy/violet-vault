@@ -11,7 +11,7 @@ interface FormatBalanceOptions {
 }
 
 export const useBudgetMetadataUtils = () => {
-  const { metadata, actualBalance, isActualBalanceManual } = useBudgetMetadataQuery();
+  const { actualBalance, isActualBalanceManual } = useBudgetMetadataQuery();
   const { mutation: updateMetadataMutation } = useBudgetMetadataMutation();
 
   const setBiweeklyAllocation = useCallback(

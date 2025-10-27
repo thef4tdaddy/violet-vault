@@ -61,7 +61,7 @@ const formatDaysDisplay = (daysUntilDue) => {
  * @param {Object} options - Configuration options
  * @returns {Object} UI logic state and actions
  */
-export const useBillManagerUI = ({
+export function useBillManagerUI({
   bills = [],
   categorizedBills = {} as CategorizedBills,
   filteredBills = [],
@@ -79,7 +79,7 @@ export const useBillManagerUI = ({
   setShowAddBillModal: (show: boolean) => void;
   setEditingBill: (bill: unknown) => void;
   setHistoryBill: (bill: unknown) => void;
-}) => {
+}) {
   // View modes configuration with business logic
   const viewModes = useMemo(
     () => [
@@ -245,4 +245,4 @@ export const useBillManagerUI = ({
     getUrgencyColors,
     getBillDisplayData,
   };
-};
+}
