@@ -71,7 +71,7 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
     const prepared = {
       id: transactionData.id || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       description: (transactionData.description || "").trim(),
-      amount: Number(transactionData.amount) || 0,
+      amount: typeof transactionData.amount === "number" ? transactionData.amount : parseFloat(String(transactionData.amount)) || 0,
       date: new Date(transactionData.date).toISOString(),
       category: (transactionData.category || "").trim(),
       account: (transactionData.account || "").trim() || "default",
@@ -89,7 +89,7 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
     return prepared;
   } catch (error) {
     logger.error("Error preparing transaction for storage", error);
-    throw new Error("Failed to prepare transaction data: " + error.message);
+    throw new Error("Failed to prepare transaction data: " + (error as Error).message);
   }
 };
 
@@ -389,6 +389,11 @@ interface FormattedTransaction extends TransactionBase {
   amountDisplay?: string;
   formattedDate?: string;
   formattedTime?: string;
+  isIncome?: boolean;
+  isExpense?: boolean;
+  isTransfer?: boolean;
+  categoryDisplay?: string;
+  accountDisplay?: string;
 }
 
 /**
@@ -398,7 +403,7 @@ export const formatTransactionForDisplay = (transaction: TransactionBase, option
   try {
     const { currency = "USD", dateFormat = "short", includeTime = false } = options;
 
-    const formatted: Record<string, unknown> = { ...transaction };
+    const formatted = { ...transaction };
 
     // Format amount
     formatted.formattedAmount = new Intl.NumberFormat("en-US", {
@@ -431,7 +436,7 @@ export const formatTransactionForDisplay = (transaction: TransactionBase, option
     formatted.categoryDisplay = transaction.category || "Uncategorized";
     formatted.accountDisplay = transaction.account || "Default";
 
-    return formatted as unknown as FormattedTransaction;
+    return formatted;
   } catch (error) {
     logger.error("Error formatting transaction for display", error);
     return transaction;

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { securityService } from "../securityService";
 
 // Mock localStorage
@@ -86,7 +86,7 @@ describe("securityService", () => {
 
   describe("saveSettings", () => {
     it("should save settings to localStorage", () => {
-      const settings = { autoLockEnabled: false } as any;
+      const settings = { autoLockEnabled: false };
 
       securityService.saveSettings(settings);
 
@@ -101,7 +101,7 @@ describe("securityService", () => {
         throw new Error("Storage full");
       });
 
-      expect(() => securityService.saveSettings({} as any)).not.toThrow();
+      expect(() => securityService.saveSettings({})).not.toThrow();
     });
   });
 
@@ -129,7 +129,7 @@ describe("securityService", () => {
       const events = Array.from({ length: 150 }, (_, i) => ({
         id: `event-${i}`,
         type: "TEST",
-      })) as any[];
+      }));
 
       securityService.saveSecurityEvents(events);
 
@@ -166,16 +166,16 @@ describe("securityService", () => {
 
     it("should respect max depth", () => {
       const deepObj = { level1: { level2: { level3: { level4: "deep" } } } };
-      const result = securityService.safeSerialize(deepObj, 2) as any;
+      const result = securityService.safeSerialize(deepObj, 2);
 
       expect(result.level1.level2).toBe("[Max Depth Reached]");
     });
 
     it("should handle circular references", () => {
-      const obj: any = { name: "test" };
+      const obj = { name: "test" };
       obj.self = obj;
 
-      const result = securityService.safeSerialize(obj) as any;
+      const result = securityService.safeSerialize(obj);
 
       expect(result.name).toBe("test");
       expect(result.self).toBe("[Max Depth Reached]");
@@ -207,14 +207,14 @@ describe("securityService", () => {
     });
 
     it("should handle malformed events gracefully", () => {
-      const badEvent: any = {
+      const badEvent = {
         type: 123, // Invalid type
         description: null,
         metadata: { circular: {} },
       };
       badEvent.metadata.circular.ref = badEvent.metadata.circular;
 
-      const result = securityService.createSecurityEvent(badEvent as any);
+      const result = securityService.createSecurityEvent(badEvent);
 
       expect(result.type).toBe("UNKNOWN");
       expect(result.description).toBe("Security event");
@@ -222,28 +222,28 @@ describe("securityService", () => {
     });
 
     it("should create minimal event on serialization failure", () => {
-      const stringifySpy = vi.spyOn(JSON, "stringify").mockImplementationOnce(() => {
+      vi.spyOn(JSON, "stringify").mockImplementationOnce(() => {
         throw new Error("Serialization error");
       });
 
       const event = { type: "TEST", description: "Test event" };
-      const result = securityService.createSecurityEvent(event as any);
+      const result = securityService.createSecurityEvent(event);
 
       expect(result.type).toBe("TEST");
       expect(result.metadata.error).toBe("Serialization failed");
 
-      stringifySpy.mockRestore();
+      JSON.stringify.mockRestore();
     });
   });
 
   describe("logSecurityEvent", () => {
     it("should log event when logging enabled", () => {
-      const settings = { securityLoggingEnabled: true } as any;
+      const settings = { securityLoggingEnabled: true };
       const event = { type: "TEST", description: "Test event" };
 
       localStorageMock.getItem.mockReturnValue("[]");
 
-      securityService.logSecurityEvent(event as any, settings);
+      securityService.logSecurityEvent(event, settings);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "violetVault_securityEvents",
@@ -252,10 +252,10 @@ describe("securityService", () => {
     });
 
     it("should not log when logging disabled", () => {
-      const settings = { securityLoggingEnabled: false } as any;
+      const settings = { securityLoggingEnabled: false };
       const event = { type: "TEST", description: "Test event" };
 
-      securityService.logSecurityEvent(event as any, settings);
+      securityService.logSecurityEvent(event, settings);
 
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });

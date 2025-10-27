@@ -1,4 +1,5 @@
 // Prefetch Helpers - Utilities for pre-loading data with Dexie fallback
+import { QueryClient } from "@tanstack/react-query";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
@@ -7,28 +8,21 @@ import logger from "@/utils/common/logger";
 interface EnvelopeFilters {
   category?: string;
   includeArchived?: boolean;
-  useCache?: boolean;
 }
 
-interface TransactionFilters {
+interface TransactionOptions {
   limit?: number;
-  envelopeId?: string;
-  startDate?: Date;
-  endDate?: Date;
-  useCache?: boolean;
 }
 
-interface BillFilters {
+interface BillOptions {
   category?: string;
   isPaid?: boolean;
   daysAhead?: number;
-  useCache?: boolean;
 }
 
-interface SavingsGoalFilters {
+interface GoalOptions {
   isCompleted?: boolean;
   category?: string;
-  useCache?: boolean;
 }
 
 /**
@@ -39,7 +33,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch envelopes with optional filtering
    */
-  prefetchEnvelopes: async (queryClient: any, filters: EnvelopeFilters = {}) => {
+  prefetchEnvelopes: async (queryClient: QueryClient, filters: EnvelopeFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.envelopesList(filters),
@@ -71,7 +65,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch envelopes", {
-        error: error.message,
+        error: (error as Error).message,
         filters,
         source: "prefetchHelpers",
       });
@@ -82,7 +76,11 @@ export const prefetchHelpers = {
   /**
    * Prefetch transactions for date range
    */
-  prefetchTransactions: async (queryClient: any, dateRange?: { start: Date; end: Date }, options: TransactionFilters = {}) => {
+  prefetchTransactions: async (
+    queryClient: QueryClient,
+    dateRange: { start: string; end: string },
+    options: TransactionOptions = {}
+  ) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
@@ -111,7 +109,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch transactions", {
-        error: error.message,
+        error: (error as Error).message,
         dateRange,
         source: "prefetchHelpers",
       });
@@ -122,7 +120,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch bills with filtering options
    */
-  prefetchBills: async (queryClient: any, options: BillFilters = {}) => {
+  prefetchBills: async (queryClient: QueryClient, options: BillOptions = {}) => {
     try {
       const { category, isPaid, daysAhead = 30 } = options;
 
@@ -146,7 +144,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch bills", {
-        error: error.message,
+        error: (error as Error).message,
         options,
         source: "prefetchHelpers",
       });
@@ -157,7 +155,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch savings goals
    */
-  prefetchSavingsGoals: async (queryClient: any, options: SavingsGoalFilters = {}) => {
+  prefetchSavingsGoals: async (queryClient: QueryClient, options: GoalOptions = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.savingsGoalsList(),
@@ -178,7 +176,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch savings goals", {
-        error: error.message,
+        error: (error as Error).message,
         options,
         source: "prefetchHelpers",
       });
@@ -189,7 +187,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch dashboard summary data
    */
-  prefetchDashboard: async (queryClient: any) => {
+  prefetchDashboard: async (queryClient: QueryClient) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.dashboardSummary(),
@@ -216,11 +214,11 @@ export const prefetchHelpers = {
 
           const dashboardData = {
             totalEnvelopes: envelopes.length,
-            activeEnvelopes: envelopes.filter((e: any) => !e.archived).length,
+            activeEnvelopes: envelopes.filter((e) => !e.archived).length,
             recentTransactionCount: recentTransactions.length,
             upcomingBillsCount: upcomingBills.length,
-            unassignedCash: (metadata as any)?.unassignedCash || 0,
-            actualBalance: (metadata as any)?.actualBalance || 0,
+            unassignedCash: metadata?.unassignedCash || 0,
+            actualBalance: metadata?.actualBalance || 0,
             lastUpdated: Date.now(),
           };
 
@@ -237,7 +235,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch dashboard", {
-        error: error.message,
+        error: (error as Error).message,
         source: "prefetchHelpers",
       });
       return null;
@@ -247,7 +245,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch analytics data for a period
    */
-  prefetchAnalytics: async (queryClient: any, period: string = "month") => {
+  prefetchAnalytics: async (queryClient, period = "month") => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.analyticsReport("spending", { period }),
@@ -285,7 +283,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch analytics", {
-        error: error.message,
+        error: (error as Error).message,
         period,
         source: "prefetchHelpers",
       });
@@ -296,7 +294,7 @@ export const prefetchHelpers = {
   /**
    * Batch prefetch common dashboard queries
    */
-  prefetchDashboardBundle: async (queryClient: any) => {
+  prefetchDashboardBundle: async (queryClient) => {
     try {
       const prefetchPromises = [
         prefetchHelpers.prefetchDashboard(queryClient),
@@ -371,7 +369,7 @@ export const prefetchHelpers = {
     } catch (error) {
       logger.warn("Smart prefetch failed", {
         currentRoute,
-        error: error.message,
+        error: (error as Error).message,
       });
     }
   },
