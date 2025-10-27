@@ -3,13 +3,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient";
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
+import type { SavingsGoal } from "../../../db/types";
 
 // Helper to trigger sync for savings goal changes
-const triggerSavingsGoalSync = (changeType) => {
+const triggerSavingsGoalSync = (changeType: string) => {
   if (typeof window !== "undefined" && window.cloudSyncService) {
     window.cloudSyncService.triggerSyncForCriticalChange(`savings_goal_${changeType}`);
   }
 };
+
+// Type for new goal data (without id, createdAt, lastModified which are auto-generated)
+type NewSavingsGoalData = Omit<SavingsGoal, "id" | "createdAt" | "lastModified">;
 
 /**
  * Add savings goal mutation hook
@@ -19,12 +23,12 @@ export const useAddSavingsGoalMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "add"],
-    mutationFn: async (goalData) => {
-      const newGoal = {
+    mutationFn: async (goalData: NewSavingsGoalData) => {
+      const newGoal: SavingsGoal = {
         id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         ...goalData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: Date.now(),
+        lastModified: Date.now(),
       };
 
       // Apply optimistic update first
@@ -48,7 +52,7 @@ export const useAddSavingsGoalMutation = () => {
     onSuccess: () => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
       // Trigger cloud sync
@@ -72,17 +76,17 @@ export const useUpdateSavingsGoalMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "update"],
-    mutationFn: async ({ goalId, updates }) => {
+    mutationFn: async ({ goalId, updates }: { goalId: string; updates: Partial<SavingsGoal> }) => {
       const existingGoal = await budgetDb.savingsGoals.get(goalId);
       if (!existingGoal) {
         throw new Error(`Savings goal with ID ${goalId} not found`);
       }
 
-      const updatedGoal = {
+      const updatedGoal: SavingsGoal = {
         ...existingGoal,
         ...updates,
         id: goalId, // Ensure ID stays the same
-        updatedAt: new Date().toISOString(),
+        lastModified: Date.now(),
       };
 
       // Apply optimistic update
@@ -97,7 +101,7 @@ export const useUpdateSavingsGoalMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
       triggerSavingsGoalSync("update");
@@ -116,7 +120,7 @@ export const useDeleteSavingsGoalMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "delete"],
-    mutationFn: async (goalId) => {
+    mutationFn: async (goalId: string) => {
       // Apply optimistic update
       await optimisticHelpers.deleteSavingsGoal(goalId);
 
@@ -129,7 +133,7 @@ export const useDeleteSavingsGoalMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
       triggerSavingsGoalSync("delete");
@@ -148,28 +152,23 @@ export const useAddContributionMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "contribute"],
-    mutationFn: async ({ goalId, amount, description }) => {
+    mutationFn: async ({ goalId, amount, description }: { goalId: string; amount: string | number; description?: string }) => {
       const goal = await budgetDb.savingsGoals.get(goalId);
       if (!goal) {
         throw new Error(`Savings goal with ID ${goalId} not found`);
       }
 
-      const contributionAmount = parseFloat(amount);
+      const contributionAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
       if (isNaN(contributionAmount) || contributionAmount <= 0) {
         throw new Error("Invalid contribution amount");
       }
 
       const updatedCurrentAmount = (goal.currentAmount || 0) + contributionAmount;
 
-      const updatedGoal = {
+      const updatedGoal: SavingsGoal = {
         ...goal,
         currentAmount: updatedCurrentAmount,
-        updatedAt: new Date().toISOString(),
-        lastContribution: {
-          amount: contributionAmount,
-          date: new Date().toISOString(),
-          description: description || "Manual contribution",
-        },
+        lastModified: Date.now(),
       };
 
       // Apply optimistic update
@@ -181,21 +180,19 @@ export const useAddContributionMutation = () => {
       // Create transaction record for the contribution
       const contributionTransaction = {
         id: `${goalId}_contribution_${Date.now()}`,
-        date: new Date().toISOString().split("T")[0],
+        date: new Date().toISOString().split("T")[0] as unknown as Date,
         description: `Contribution to ${goal.name}${description ? `: ${description}` : ""}`,
         amount: -Math.abs(contributionAmount), // Negative for expense
         envelopeId: "unassigned", // Could be linked to specific envelope later
         category: "Savings",
-        type: "expense",
-        source: "savings_contribution",
-        savingsGoalId: goalId,
-        notes: `Savings contribution for ${goal.name}`,
-        createdAt: new Date().toISOString(),
+        type: "expense" as const,
+        lastModified: Date.now(),
+        createdAt: Date.now(),
       };
 
       // Add transaction to Dexie
       await budgetDb.transactions.put(contributionTransaction);
-      await optimisticHelpers.addTransaction(contributionTransaction);
+      await optimisticHelpers.addTransaction(queryClient, contributionTransaction);
 
       logger.debug("💰 Added contribution to savings goal", {
         goalId,
@@ -208,7 +205,7 @@ export const useAddContributionMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
@@ -228,10 +225,10 @@ export const useDistributeFundsMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "distribute"],
-    mutationFn: async ({ distribution, description = "Fund distribution" }) => {
+    mutationFn: async ({ distribution, description = "Fund distribution" }: { distribution: Record<string, string | number>; description?: string }) => {
       const results = [];
       const totalAmount = Object.values(distribution).reduce(
-        (sum, amount) => sum + (parseFloat(amount) || 0),
+        (sum, amount) => sum + (typeof amount === 'string' ? parseFloat(amount) : amount) || 0,
         0
       );
 
@@ -241,7 +238,7 @@ export const useDistributeFundsMutation = () => {
 
       // Process each goal in the distribution
       for (const [goalId, amount] of Object.entries(distribution)) {
-        const contributionAmount = parseFloat(amount);
+        const contributionAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
         if (contributionAmount <= 0) continue;
 
         const goal = await budgetDb.savingsGoals.get(goalId);
@@ -252,15 +249,10 @@ export const useDistributeFundsMutation = () => {
 
         const updatedCurrentAmount = (goal.currentAmount || 0) + contributionAmount;
 
-        const updatedGoal = {
+        const updatedGoal: SavingsGoal = {
           ...goal,
           currentAmount: updatedCurrentAmount,
-          updatedAt: new Date().toISOString(),
-          lastContribution: {
-            amount: contributionAmount,
-            date: new Date().toISOString(),
-            description,
-          },
+          lastModified: Date.now(),
         };
 
         // Apply optimistic update
@@ -272,20 +264,18 @@ export const useDistributeFundsMutation = () => {
         // Create transaction record
         const contributionTransaction = {
           id: `${goalId}_distribution_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-          date: new Date().toISOString().split("T")[0],
+          date: new Date().toISOString().split("T")[0] as unknown as Date,
           description: `Distribution to ${goal.name}${description !== "Fund distribution" ? `: ${description}` : ""}`,
           amount: -Math.abs(contributionAmount),
           envelopeId: "unassigned",
           category: "Savings",
-          type: "expense",
-          source: "savings_distribution",
-          savingsGoalId: goalId,
-          notes: `Distributed savings for ${goal.name}`,
-          createdAt: new Date().toISOString(),
+          type: "expense" as const,
+          lastModified: Date.now(),
+          createdAt: Date.now(),
         };
 
         await budgetDb.transactions.put(contributionTransaction);
-        await optimisticHelpers.addTransaction(contributionTransaction);
+        await optimisticHelpers.addTransaction(queryClient, contributionTransaction);
 
         results.push({
           goalId,
@@ -310,7 +300,7 @@ export const useDistributeFundsMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
