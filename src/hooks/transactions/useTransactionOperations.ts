@@ -3,8 +3,9 @@
  * Focused hook for CRUD operations on transactions
  * Created for Issue #508 - extracted from useTransactions.js
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import type { Transaction } from "@/types/finance";
 import {
   createAddTransactionMutationConfig,
   createUpdateTransactionMutationConfig,
@@ -14,12 +15,20 @@ import {
   createBulkOperationMutationConfig,
 } from "./useTransactionOperationsHelpers";
 
+interface UseTransactionOperationsOptions {
+  categoryRules?: Array<{
+    pattern: string;
+    category: string;
+    envelopeId?: string | number;
+  }>;
+}
+
 /**
  * Hook for transaction CRUD operations
- * @param {Object} options - Hook options
- * @returns {Object} Transaction operations and state
+ * @param options - Hook options
+ * @returns Transaction operations and state
  */
-const useTransactionOperations = (options = {}) => {
+const useTransactionOperations = (options: UseTransactionOperationsOptions = {}) => {
   const queryClient = useQueryClient();
   const { categoryRules = [] } = options;
 
@@ -43,28 +52,28 @@ const useTransactionOperations = (options = {}) => {
 
   // Convenience methods
   const addTransaction = useCallback(
-    (transactionData) => {
+    (transactionData: Partial<Transaction>) => {
       return addTransactionMutation.mutateAsync(transactionData);
     },
     [addTransactionMutation]
   );
 
   const updateTransaction = useCallback(
-    (id, updates) => {
+    (id: string | number, updates: Partial<Transaction>) => {
       return updateTransactionMutation.mutateAsync({ id, updates });
     },
     [updateTransactionMutation]
   );
 
   const deleteTransaction = useCallback(
-    (transactionId) => {
+    (transactionId: string | number) => {
       return deleteTransactionMutation.mutateAsync(transactionId);
     },
     [deleteTransactionMutation]
   );
 
   const splitTransaction = useCallback(
-    (originalTransaction, splitTransactions) => {
+    (originalTransaction: Transaction, splitTransactions: Partial<Transaction>[]) => {
       return splitTransactionMutation.mutateAsync({
         originalTransaction,
         splitTransactions,
@@ -74,14 +83,24 @@ const useTransactionOperations = (options = {}) => {
   );
 
   const transferFunds = useCallback(
-    (transferData) => {
+    (transferData: {
+      fromEnvelopeId: string | number;
+      toEnvelopeId: string | number;
+      amount: number;
+      date: string;
+      description?: string;
+    }) => {
       return transferFundsMutation.mutateAsync(transferData);
     },
     [transferFundsMutation]
   );
 
   const bulkOperation = useCallback(
-    (operation, transactions, updates) => {
+    (
+      operation: "delete" | "update" | "categorize",
+      transactions: Transaction[],
+      updates?: Partial<Transaction>
+    ) => {
       return bulkOperationMutation.mutateAsync({
         operation,
         transactions,

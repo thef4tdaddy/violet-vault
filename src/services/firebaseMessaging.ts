@@ -130,7 +130,7 @@ class FirebaseMessagingService {
     try {
       // Check current permission status
       const permission = Notification.permission;
-      logger.debug("Current notification permission:", permission);
+      logger.debug("Current notification permission:", { permission });
 
       if (permission === "denied") {
         logger.warn("Notification permission was denied by user");
@@ -140,7 +140,7 @@ class FirebaseMessagingService {
       // Request permission if not already granted
       if (permission !== "granted") {
         const result = await Notification.requestPermission();
-        logger.info("Notification permission request result:", result);
+        logger.info("Notification permission request result:", { result });
 
         if (result !== "granted") {
           logger.warn("User denied notification permission");
@@ -156,7 +156,7 @@ class FirebaseMessagingService {
       return {
         success: false,
         reason: "error",
-        error: error.message,
+        error: (error as Error).message,
         token: null,
       };
     }
@@ -176,7 +176,7 @@ class FirebaseMessagingService {
 
       if (token) {
         logger.info("📱 FCM registration token generated successfully");
-        logger.debug("FCM Token (first 20 chars):", token.substring(0, 20) + "...");
+        logger.debug("FCM Token (first 20 chars):", { tokenPreview: token.substring(0, 20) + "..." });
         this.currentToken = token;
 
         // Store token in localStorage for debugging and backup
@@ -243,7 +243,7 @@ class FirebaseMessagingService {
     }
 
     onMessage(this.messaging, (payload: MessagePayload) => {
-      logger.info("📨 Received foreground message", payload);
+      logger.info("📨 Received foreground message", { payload });
 
       // Extract notification data
       const { notification, data } = payload;
