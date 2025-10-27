@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../utils/transactions/fileParser";
+import type { ParsedRow } from "../../utils/transactions/fileParser";
 import { globalToast } from "../../stores/ui/toastStore";
 
 interface ImportData {
@@ -20,7 +21,10 @@ export const useTransactionFileUpload = () => {
   const [importStep, setImportStep] = useState(1);
   const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, options: FileUploadOptions = {}) => {
+  const handleFileUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    options: FileUploadOptions = {}
+  ) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -51,7 +55,9 @@ export const useTransactionFileUpload = () => {
           clearExisting: options.clearExisting || false,
         });
         setImportStep(2);
-        setFieldMapping(autoDetectFieldMapping(parsedData as unknown as ParsedRow[]) as Record<string, string>);
+        setFieldMapping(
+          autoDetectFieldMapping(parsedData as unknown as ParsedRow[]) as Record<string, string>
+        );
       } catch (error) {
         globalToast.showError("Error parsing file: " + error.message, "Parse Error", 8000);
       }
