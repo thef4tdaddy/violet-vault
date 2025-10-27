@@ -16,7 +16,9 @@ import {
   filterRules,
   getRuleStatistics,
   createRuleSummary,
-} from "../rules.js";
+  type AutoFundingRule,
+  type AutoFundingContext,
+} from "../rules";
 
 describe("autoFundingRules", () => {
   describe("constants", () => {
@@ -82,7 +84,7 @@ describe("autoFundingRules", () => {
         },
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(true);
       expect(result.errors).toEqual([]);
     });
@@ -94,7 +96,7 @@ describe("autoFundingRules", () => {
         config: { amount: 100 },
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Rule name is required");
     });
@@ -106,7 +108,7 @@ describe("autoFundingRules", () => {
         trigger: TRIGGER_TYPES.MANUAL,
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Valid rule type is required");
     });
@@ -119,7 +121,7 @@ describe("autoFundingRules", () => {
         config: { amount: 0 },
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Fixed amount rules require a positive amount");
     });
@@ -132,7 +134,7 @@ describe("autoFundingRules", () => {
         config: { percentage: 150 }, // Invalid: over 100%
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Percentage rules require a percentage between 0 and 100");
     });
@@ -145,7 +147,7 @@ describe("autoFundingRules", () => {
         config: { conditions: [] },
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Conditional rules require at least one condition");
     });
@@ -162,14 +164,14 @@ describe("autoFundingRules", () => {
         },
       };
 
-      const result = validateRule(rule);
+      const result = validateRule(rule as Partial<AutoFundingRule>);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Single envelope rules require a target envelope");
     });
   });
 
   describe("calculateFundingAmount", () => {
-    const mockContext = {
+    const mockContext: AutoFundingContext = {
       data: {
         envelopes: [
           { id: "env1", currentBalance: 200, monthlyAmount: 500 },
@@ -186,7 +188,7 @@ describe("autoFundingRules", () => {
         config: { amount: 300 },
       };
 
-      const result = calculateFundingAmount(rule, mockContext);
+      const result = calculateFundingAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(300);
     });
 
@@ -196,7 +198,7 @@ describe("autoFundingRules", () => {
         config: { amount: 1500 }, // More than available
       };
 
-      const result = calculateFundingAmount(rule, mockContext);
+      const result = calculateFundingAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(1000); // Limited to unassigned cash
     });
 
@@ -206,7 +208,7 @@ describe("autoFundingRules", () => {
         config: { percentage: 20, sourceType: "unassigned" },
       };
 
-      const result = calculateFundingAmount(rule, mockContext);
+      const result = calculateFundingAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(200); // 20% of 1000
     });
 
@@ -216,7 +218,7 @@ describe("autoFundingRules", () => {
         config: { targetId: "env1" },
       };
 
-      const result = calculateFundingAmount(rule, mockContext);
+      const result = calculateFundingAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(300); // 500 needed - 200 current = 300 needed
     });
 
@@ -226,13 +228,13 @@ describe("autoFundingRules", () => {
         config: { targetIds: ["env1", "env2", "env3"] }, // 3 targets
       };
 
-      const result = calculateFundingAmount(rule, mockContext);
+      const result = calculateFundingAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(1000); // Returns total unassigned cash for splitting
     });
   });
 
   describe("getBaseAmountForPercentage", () => {
-    const mockContext = {
+    const mockContext: AutoFundingContext = {
       data: {
         envelopes: [{ id: "env1", currentBalance: 500 }],
         unassignedCash: 1000,
@@ -242,19 +244,19 @@ describe("autoFundingRules", () => {
 
     it("should return unassigned cash for unassigned source", () => {
       const rule = { config: { sourceType: "unassigned" } };
-      const result = getBaseAmountForPercentage(rule, mockContext);
+      const result = getBaseAmountForPercentage(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(1000);
     });
 
     it("should return envelope balance for envelope source", () => {
       const rule = { config: { sourceType: "envelope", sourceId: "env1" } };
-      const result = getBaseAmountForPercentage(rule, mockContext);
+      const result = getBaseAmountForPercentage(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(500);
     });
 
     it("should return income amount for income source", () => {
       const rule = { config: { sourceType: "income" } };
-      const result = getBaseAmountForPercentage(rule, mockContext);
+      const result = getBaseAmountForPercentage(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(2000);
     });
 
@@ -262,13 +264,13 @@ describe("autoFundingRules", () => {
       const rule = {
         config: { sourceType: "envelope", sourceId: "nonexistent" },
       };
-      const result = getBaseAmountForPercentage(rule, mockContext);
+      const result = getBaseAmountForPercentage(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(0);
     });
   });
 
   describe("calculatePriorityFillAmount", () => {
-    const mockContext = {
+    const mockContext: AutoFundingContext = {
       data: {
         envelopes: [
           { id: "env1", currentBalance: 200, monthlyAmount: 500 },
@@ -280,18 +282,18 @@ describe("autoFundingRules", () => {
 
     it("should calculate amount needed to reach monthly target", () => {
       const rule = { config: { targetId: "env1" } };
-      const result = calculatePriorityFillAmount(rule, mockContext);
+      const result = calculatePriorityFillAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(300); // 500 - 200 = 300 needed
     });
 
     it("should return 0 for overfunded envelope", () => {
       const rule = { config: { targetId: "env2" } };
-      const result = calculatePriorityFillAmount(rule, mockContext);
+      const result = calculatePriorityFillAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(0); // Already above monthly amount
     });
 
     it("should limit to available unassigned cash", () => {
-      const limitedContext = {
+      const limitedContext: AutoFundingContext = {
         data: {
           envelopes: [{ id: "env1", currentBalance: 0, monthlyAmount: 2000 }],
           unassignedCash: 500, // Less than needed
@@ -299,13 +301,13 @@ describe("autoFundingRules", () => {
       };
 
       const rule = { config: { targetId: "env1" } };
-      const result = calculatePriorityFillAmount(rule, limitedContext);
+      const result = calculatePriorityFillAmount(rule as unknown as AutoFundingRule, limitedContext);
       expect(result).toBe(500); // Limited to available cash
     });
 
     it("should return 0 for non-existent envelope", () => {
       const rule = { config: { targetId: "nonexistent" } };
-      const result = calculatePriorityFillAmount(rule, mockContext);
+      const result = calculatePriorityFillAmount(rule as unknown as AutoFundingRule, mockContext);
       expect(result).toBe(0);
     });
   });
@@ -316,7 +318,7 @@ describe("autoFundingRules", () => {
         { id: "rule1", priority: 50 },
         { id: "rule2", priority: 10 },
         { id: "rule3", priority: 100 },
-      ];
+      ] as unknown as AutoFundingRule[];
 
       const sorted = sortRulesByPriority(rules);
       expect(sorted.map((r) => r.id)).toEqual(["rule2", "rule1", "rule3"]);
@@ -327,7 +329,7 @@ describe("autoFundingRules", () => {
         { id: "rule1", priority: 50, createdAt: "2024-01-02T00:00:00Z" },
         { id: "rule2", priority: 50, createdAt: "2024-01-01T00:00:00Z" },
         { id: "rule3", priority: 50, createdAt: "2024-01-03T00:00:00Z" },
-      ];
+      ] as unknown as AutoFundingRule[];
 
       const sorted = sortRulesByPriority(rules);
       expect(sorted.map((r) => r.id)).toEqual(["rule2", "rule1", "rule3"]);
@@ -338,7 +340,7 @@ describe("autoFundingRules", () => {
         { id: "rule1", priority: 50 },
         { id: "rule2" }, // Missing priority
         { id: "rule3", priority: 200 },
-      ];
+      ] as unknown as AutoFundingRule[];
 
       const sorted = sortRulesByPriority(rules);
       expect(sorted.map((r) => r.id)).toEqual(["rule1", "rule2", "rule3"]);
@@ -368,7 +370,7 @@ describe("autoFundingRules", () => {
         type: RULE_TYPES.CONDITIONAL,
         trigger: TRIGGER_TYPES.MANUAL,
       },
-    ];
+    ] as unknown as AutoFundingRule[];
 
     it("should filter by enabled status", () => {
       const result = filterRules(mockRules, { enabled: true });
@@ -431,7 +433,7 @@ describe("autoFundingRules", () => {
         trigger: TRIGGER_TYPES.MANUAL,
         executionCount: 3,
       },
-    ];
+    ] as unknown as AutoFundingRule[];
 
     it("should calculate overall statistics", () => {
       const stats = getRuleStatistics(mockRules);
@@ -478,7 +480,7 @@ describe("autoFundingRules", () => {
         type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
         config: { amount: 500, targetType: "envelope" },
-      };
+      } as unknown as AutoFundingRule;
 
       const summary = createRuleSummary(rule);
 
@@ -498,7 +500,7 @@ describe("autoFundingRules", () => {
           targetType: "multiple",
           targetIds: ["env1", "env2"],
         },
-      };
+      } as unknown as AutoFundingRule;
 
       const summary = createRuleSummary(rule);
 
@@ -513,7 +515,7 @@ describe("autoFundingRules", () => {
         type: RULE_TYPES.PRIORITY_FILL,
         trigger: TRIGGER_TYPES.MANUAL,
         config: { targetType: "envelope" },
-      };
+      } as unknown as AutoFundingRule;
 
       const summary = createRuleSummary(rule);
       expect(summary.description).toBe("Fill to monthly amount");
@@ -531,7 +533,7 @@ describe("autoFundingRules", () => {
             { type: CONDITION_TYPES.UNASSIGNED_ABOVE, value: 500 },
           ],
         },
-      };
+      } as unknown as AutoFundingRule;
 
       const summary = createRuleSummary(rule);
       expect(summary.description).toBe("If 2 condition(s) met");
@@ -544,7 +546,7 @@ describe("autoFundingRules", () => {
         type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
         config: { amount: 100 },
-      };
+      } as unknown as AutoFundingRule;
 
       const summary = createRuleSummary(rule);
       expect(summary.priority).toBe(100); // Default priority
