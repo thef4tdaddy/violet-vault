@@ -1,16 +1,19 @@
-import { useState } from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
-import { globalToast } from "@/stores/ui/toastStore";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
+import { globalToast } from "@/stores/ui/toastStore";
 import logger from "@/utils/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
+import { Button } from "@/components/ui";
+import { getIcon } from "@/utils";
+import { useAutoFundingHandlers } from "./useAutoFundingHandlers";
 
-const AutoFundingView = () => {
-  const confirm = useConfirm();
+function AutoFundingView() {
+  const navigate = useNavigate();
   const envelopes = useBudgetStore((state) => state.envelopes) as unknown[];
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
@@ -23,67 +26,14 @@ const AutoFundingView = () => {
   // Get execution history
   const displayHistory = getHistory(20);
 
-  const handleCreateRule = () => {
-    setEditingRule(null);
-    setShowRuleBuilder(true);
-  };
-
-  const handleEditRule = (rule: unknown) => {
-    if (rule && typeof rule === "object") {
-      setEditingRule(rule);
-      setShowRuleBuilder(true);
-    }
-  };
-
-  const handleSaveRule = async (ruleData: unknown) => {
-    if (!ruleData || typeof ruleData !== "object") return;
-    try {
-      if (editingRule) {
-        updateRule(editingRule.id, ruleData);
-      } else {
-        addRule(ruleData);
-      }
-      setShowRuleBuilder(false);
-      setEditingRule(null);
-      globalToast.showSuccess(
-        editingRule ? "Rule updated successfully!" : "Rule created successfully!",
-        "Success",
-        5000
-      );
-    } catch (error) {
-      logger.error("Failed to save rule", error);
-      globalToast.showError("Failed to save rule: " + error.message, "Save Failed", 8000);
-    }
-  };
-
-  const handleDeleteRule = async (ruleId: string) => {
-    const confirmed = await confirm({
-      title: "Delete Auto-Funding Rule",
-      message: "Are you sure you want to delete this rule? This action cannot be undone.",
-      confirmLabel: "Delete Rule",
-      cancelLabel: "Cancel",
-      destructive: true,
+  // Get handlers from custom hook
+  const { handleCreateRule, handleEditRule, handleSaveRule, handleDeleteRule, handleToggleRule } =
+    useAutoFundingHandlers({
+      editingRule,
+      setEditingRule,
+      setShowRuleBuilder,
+      ruleActions: { updateRule, addRule, deleteRule, toggleRule },
     });
-
-    if (confirmed) {
-      try {
-        deleteRule(ruleId);
-        globalToast.showSuccess("Rule deleted successfully!", "Success", 5000);
-      } catch (error) {
-        logger.error("Failed to delete rule", error);
-        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed", 8000);
-      }
-    }
-  };
-
-  const handleToggleRule = (ruleId: string) => {
-    try {
-      toggleRule(ruleId);
-    } catch (error) {
-      logger.error("Failed to toggle rule", error);
-      globalToast.showError("Failed to toggle rule: " + error.message, "Toggle Failed", 8000);
-    }
-  };
 
   const handleExecuteRules = async () => {
     if (isExecuting) return;
@@ -126,6 +76,16 @@ const AutoFundingView = () => {
   return (
     <>
       <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            onClick={() => navigate("/app/envelopes")}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg border-2 border-black font-medium"
+            title="Back to Envelopes"
+          >
+            {React.createElement(getIcon("ArrowLeft"), { className: "h-4 w-4" })}
+            Back to Envelopes
+          </Button>
+        </div>
         <ViewHeader rules={rules} />
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -167,6 +127,6 @@ const AutoFundingView = () => {
       />
     </>
   );
-};
+}
 
 export default AutoFundingView;

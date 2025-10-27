@@ -20,7 +20,11 @@ interface ModalHeaderProps {
   closeUnassignedCashModal: () => void;
 }
 
-const ModalHeader = ({ unassignedCash, isProcessing, closeUnassignedCashModal }: ModalHeaderProps) => (
+const ModalHeader = ({
+  unassignedCash,
+  isProcessing,
+  closeUnassignedCashModal,
+}: ModalHeaderProps) => (
   <div className="flex justify-between items-start mb-4 sm:mb-6">
     <div className="flex-1">
       <h3 className="text-lg font-semibold text-gray-900">
@@ -28,22 +32,19 @@ const ModalHeader = ({ unassignedCash, isProcessing, closeUnassignedCashModal }:
       </h3>
       <p className="text-sm text-gray-600 mt-1">
         {unassignedCash < 0 ? "Deficit:" : "Available:"}{" "}
-        <span
-          className={`font-medium ${unassignedCash < 0 ? "text-red-600" : "text-green-600"}`}
-        >
+        <span className={`font-medium ${unassignedCash < 0 ? "text-red-600" : "text-green-600"}`}>
           ${unassignedCash.toFixed(2)}
         </span>
         {unassignedCash < 0 && (
-          <span className="ml-2 text-xs text-red-500">
-            (You've spent more than available)
-          </span>
+          <span className="ml-2 text-xs text-red-500">(You've spent more than available)</span>
         )}
       </p>
     </div>
     <Button
       onClick={closeUnassignedCashModal}
       disabled={isProcessing}
-      className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
+      className="text-gray-500 hover:text-gray-900 disabled:opacity-50 p-2 ml-4 flex-shrink-0 hover:bg-gray-100 rounded transition-colors"
+      type="button"
     >
       {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
     </Button>
@@ -59,7 +60,11 @@ interface StatusIndicatorProps {
   unassignedCash: number;
 }
 
-const StatusIndicator = ({ isOverDistributed, hasDistributions, unassignedCash }: StatusIndicatorProps) => {
+const StatusIndicator = ({
+  isOverDistributed,
+  hasDistributions,
+  unassignedCash,
+}: StatusIndicatorProps) => {
   if (isOverDistributed) {
     return (
       <div className="flex items-center text-red-600">
@@ -72,7 +77,7 @@ const StatusIndicator = ({ isOverDistributed, hasDistributions, unassignedCash }
       </div>
     );
   }
-  
+
   if (hasDistributions) {
     return (
       <div className="flex items-center text-green-600">
@@ -83,7 +88,7 @@ const StatusIndicator = ({ isOverDistributed, hasDistributions, unassignedCash }
       </div>
     );
   }
-  
+
   return (
     <div className="flex items-center text-gray-500">
       {React.createElement(getIcon("DollarSign"), {
@@ -236,7 +241,13 @@ interface EnvelopeItemProps {
 }
 
 const EnvelopeItem = memo(
-  ({ envelope, distributionAmount, updateDistribution, isProcessing, bills = [] }: EnvelopeItemProps) => {
+  ({
+    envelope,
+    distributionAmount,
+    updateDistribution,
+    isProcessing,
+    bills = [],
+  }: EnvelopeItemProps) => {
     const newBalance = (envelope.currentBalance || 0) + distributionAmount;
     const isBillEnvelope = envelope.envelopeType === ENVELOPE_TYPES.BILL;
 
@@ -330,8 +341,8 @@ const UnassignedCashModal = () => {
   const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-      <div className="bg-white rounded-xl sm:rounded-xl rounded-t-xl p-4 sm:p-6 w-full max-w-4xl h-full sm:max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl sm:rounded-xl rounded-t-xl p-4 sm:p-6 w-full max-w-4xl h-full sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-black z-50">
         {/* Header */}
         <ModalHeader
           unassignedCash={unassignedCash}
@@ -394,14 +405,16 @@ const UnassignedCashModal = () => {
             <h4 className="font-medium text-gray-900 mb-3">Distribution Preview</h4>
             <div className="bg-blue-50 rounded-lg p-3 max-h-32 overflow-y-auto">
               <div className="space-y-1">
-                {preview.map((envelope: { id: string; name: string; distributionAmount: number }) => (
-                  <div key={envelope.id} className="flex justify-between text-sm">
-                    <span className="text-gray-700">{envelope.name}</span>
-                    <span className="text-blue-600 font-medium">
-                      +${envelope.distributionAmount.toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                {preview.map(
+                  (envelope: { id: string; name: string; distributionAmount: number }) => (
+                    <div key={envelope.id} className="flex justify-between text-sm">
+                      <span className="text-gray-700">{envelope.name}</span>
+                      <span className="text-blue-600 font-medium">
+                        +${envelope.distributionAmount.toFixed(2)}
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
