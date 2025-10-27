@@ -2,7 +2,8 @@
  * Helper functions for useTransactionData hook
  * Extracted to reduce hook complexity
  */
-import type { Transaction } from "../../../db/types";
+import type { Transaction } from "@/types/finance";
+import type { Transaction as DbTransaction } from "@/db/types";
 
 /**
  * Filter transactions by date range
@@ -135,7 +136,7 @@ interface BudgetDb {
   transactions: {
     orderBy: (field: string) => {
       reverse: () => {
-        toArray: () => Promise<unknown[]>;
+        toArray: () => Promise<DbTransaction[]>;
       };
     };
   };
@@ -151,9 +152,26 @@ interface Logger {
 }
 
 /**
+ * Convert database transaction to application transaction type
+ */
+const dbTransactionToAppTransaction = (dbTxn: DbTransaction): Transaction => {
+  return {
+    id: dbTxn.id,
+    date: dbTxn.date instanceof Date ? dbTxn.date.toISOString().split('T')[0] : String(dbTxn.date),
+    description: dbTxn.description || dbTxn.merchant || "",
+    amount: dbTxn.amount,
+    category: dbTxn.category,
+    envelopeId: dbTxn.envelopeId,
+    type: dbTxn.type,
+    createdAt: dbTxn.createdAt ? String(dbTxn.createdAt) : undefined,
+    receiptUrl: dbTxn.receiptUrl,
+  };
+};
+
+/**
  * Fetch transactions from database
  */
-export const fetchTransactionsFromDb = async (budgetDb: BudgetDb, logger: Logger) => {
+export const fetchTransactionsFromDb = async (budgetDb: BudgetDb, logger: Logger): Promise<Transaction[]> => {
   logger.debug("Fetching transactions from database");
 
   try {
@@ -166,7 +184,7 @@ export const fetchTransactionsFromDb = async (budgetDb: BudgetDb, logger: Logger
     }
 
     logger.debug(`Retrieved ${allTransactions.length} transactions from database`);
-    return allTransactions;
+    return allTransactions.map(dbTransactionToAppTransaction);
   } catch (error) {
     logger.error("Error fetching transactions", error);
     throw error;
