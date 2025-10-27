@@ -11,6 +11,15 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
+// Type definition for valid validation result
+type ValidResult = { 
+  isValid: true; 
+  errors: unknown[]; 
+  warnings: unknown[]; 
+  chunkCount: number; 
+  manifestSize: number;
+};
+
 describe("manifestValidator", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -32,8 +41,8 @@ describe("manifestValidator", () => {
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
       if (result.isValid) {
-        expect(result.chunkCount).toBe(2);
-        expect(result.manifestSize).toBeGreaterThan(0);
+        expect((result as ValidResult).chunkCount).toBe(2);
+        expect((result as ValidResult).manifestSize).toBeGreaterThan(0);
       }
     });
 
@@ -219,7 +228,7 @@ describe("manifestValidator", () => {
 
       expect(result.isValid).toBe(true);
       if (result.isValid) {
-        expect(result.chunkCount).toBe(0);
+        expect((result as ValidResult).chunkCount).toBe(0);
       }
     });
 
@@ -238,7 +247,7 @@ describe("manifestValidator", () => {
 
       expect(result.isValid).toBe(true);
       if (result.isValid) {
-        expect(result.chunkCount).toBe(3);
+        expect((result as ValidResult).chunkCount).toBe(3);
       }
     });
   });
@@ -269,8 +278,8 @@ describe("manifestValidator", () => {
 
       expect(result.isValid).toBe(true);
       if (result.isValid) {
-        expect(result.manifestSize).toBeGreaterThan(0);
-        expect(typeof result.manifestSize).toBe("number");
+        expect((result as ValidResult).manifestSize).toBeGreaterThan(0);
+        expect(typeof (result as ValidResult).manifestSize).toBe("number");
       }
     });
 
@@ -298,7 +307,7 @@ describe("manifestValidator", () => {
 
       expect(result.isValid).toBe(true);
       if (result.isValid) {
-        expect(result.chunkCount).toBe(2);
+        expect((result as ValidResult).chunkCount).toBe(2);
       }
     });
   });
