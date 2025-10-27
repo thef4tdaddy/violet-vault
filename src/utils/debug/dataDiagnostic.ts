@@ -80,8 +80,8 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
     results.data.metadata = {
       exists: !!metadata,
       record: metadata || null,
-      unassignedCash: metadata?.unassignedCash || "missing",
-      actualBalance: metadata?.actualBalance || "missing",
+      unassignedCash: (metadata?.unassignedCash as string | number) || "missing",
+      actualBalance: (metadata?.actualBalance as string | number) || "missing",
       lastModified: metadata?.lastModified || "missing",
     };
 
@@ -138,7 +138,7 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
     const budgetRecords = await window.budgetDb.budget.toArray();
     results.data.budgetTable = {
       totalRecords: budgetRecords.length,
-      records: budgetRecords,
+      records: budgetRecords as unknown as Record<string, unknown>[],
     };
 
     logger.info("📋 Budget table records:", budgetRecords);
@@ -278,7 +278,7 @@ export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback
             confirmLabel: "Delete Records",
             cancelLabel: "Cancel",
             destructive: true,
-          })
+          } as unknown as Record<string, unknown>)
         : /* eslint-disable-next-line no-restricted-syntax -- diagnostic tool for browser console */
           window.confirm(
             `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`

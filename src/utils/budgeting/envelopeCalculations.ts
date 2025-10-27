@@ -37,7 +37,7 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
       // Sort by due date (earliest first)
       const dateA = a.dueDate ? new Date(a.dueDate) : new Date("9999-12-31");
       const dateB = b.dueDate ? new Date(b.dueDate) : new Date("9999-12-31");
-      return dateA - dateB;
+      return dateA.getTime() - dateB.getTime();
     });
 
     const upcomingBills = unpaidBills.filter((t) => t.dueDate && new Date(t.dueDate) > new Date());
@@ -104,7 +104,7 @@ export const calculateUtilizationRate = (envelope, billsAndTransactions, balance
       if (allEnvelopeBills.length > 0) {
         // Use the most recent bill amount as reference
         const mostRecentBill = allEnvelopeBills.sort(
-          (a, b) => new Date(b.date || b.dueDate) - new Date(a.date || a.dueDate)
+          (a, b) => new Date(b.date || b.dueDate).getTime() - new Date(a.date || a.dueDate).getTime()
         )[0];
         nextBillAmount = Math.abs(mostRecentBill.amount);
       } else {

@@ -37,7 +37,7 @@ interface EnvelopeFormData {
  * Envelope interface
  */
 interface Envelope {
-  id: string | number;
+  id: string;
   name: string;
   monthlyAmount?: number;
   currentBalance?: number;
@@ -63,7 +63,7 @@ interface Envelope {
  * Transform options interface
  */
 interface TransformOptions {
-  editingId?: string | number;
+  editingId?: string;
   createdBy?: string;
 }
 
@@ -169,7 +169,7 @@ const validateMonthlyAmount = (
 
   if (!formData.monthlyAmount) return;
 
-  const amount = parseFloat(formData.monthlyAmount);
+  const amount = parseFloat(String(formData.monthlyAmount));
   if (isNaN(amount) || amount < 0) {
     errors.monthlyAmount = "Monthly amount must be a positive number";
   } else if (amount > 100000) {
@@ -315,6 +315,7 @@ export const transformFormToEnvelope = (
   const amounts = calculateEnvelopeAmounts(formData);
 
   const envelope: Envelope = {
+    id: editingId || `envelope_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: formData.name.trim(),
     monthlyAmount: amounts.monthlyAmount,
     currentBalance: amounts.currentBalance,
@@ -338,13 +339,10 @@ export const transformFormToEnvelope = (
     updatedBy: createdBy,
   };
 
-  // Add ID and creation info for new envelopes
+  // Add creation info for new envelopes (ID already set above)
   if (!editingId) {
-    envelope.id = Date.now();
     envelope.createdAt = new Date().toISOString();
     envelope.createdBy = createdBy;
-  } else {
-    envelope.id = editingId;
   }
 
   return envelope;
