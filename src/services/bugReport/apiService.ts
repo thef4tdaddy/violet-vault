@@ -44,7 +44,7 @@ export interface BugReportData {
 /**
  * Validation result structure
  */
-interface ValidationResult {
+export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
@@ -53,7 +53,7 @@ interface ValidationResult {
 /**
  * Submission result structure
  */
-interface SubmissionResult {
+export interface SubmissionResult {
   success: boolean;
   error?: string;
   validationErrors?: string[];
@@ -63,26 +63,37 @@ interface SubmissionResult {
 /**
  * Fallback submission result
  */
-interface FallbackSubmissionResult {
+export interface FallbackSubmissionResult {
   overallSuccess: boolean;
   error?: string;
   validationErrors?: string[];
   attempts: number;
   results: unknown[];
+  success: boolean;
+  submissionId?: string;
+  primaryProvider?: string;
+  screenshotStatus?: {
+    captured: boolean;
+    size: number;
+    uploaded: boolean;
+    reason?: string;
+  };
 }
 
 /**
  * Provider configuration
  */
-interface ProviderConfig {
+export interface ProviderConfig {
   type: "github" | "webhook" | "email" | "console";
   config?: Record<string, unknown>;
+  url?: string;
+  primary?: boolean;
 }
 
 /**
  * Supported provider information
  */
-interface SupportedProvider {
+export interface SupportedProvider {
   type: string;
   name: string;
   description: string;
@@ -138,6 +149,7 @@ export class BugReportAPIService {
     if (!validation.isValid) {
       logger.error("Invalid report data for submission", validation);
       return {
+        success: false,
         overallSuccess: false,
         error: "Invalid report data",
         validationErrors: validation.errors,
