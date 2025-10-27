@@ -115,7 +115,7 @@ export class BugReportAPIService {
       };
     }
 
-    return GitHubAPIService.submitToGitHub(reportData);
+    return GitHubAPIService.submitToGitHub(reportData as never);
   }
 
   /**
@@ -158,7 +158,7 @@ export class BugReportAPIService {
       };
     }
 
-    return ReportSubmissionService.submitWithFallbacks(reportData, providers);
+    return ReportSubmissionService.submitWithFallbacks(reportData as never, providers);
   }
 
   /**

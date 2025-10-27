@@ -1,24 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "../../../utils/common/queryClient";
-import { getBudgetMetadata, setBudgetMetadata } from "../../../db/budgetDb";
-import logger from "../../../utils/common/logger";
+import { queryKeys } from "@/utils/common/queryClient";
+import { getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
+import logger from "@/utils/common/logger";
+
+interface BudgetMetadata {
+  unassignedCash?: number;
+  actualBalance?: number;
+  isActualBalanceManual?: boolean;
+  biweeklyAllocation?: number;
+  [key: string]: unknown;
+}
 
 export const useBudgetMetadataQuery = () => {
   const {
-    data: metadata = {},
+    data: metadata = {} as BudgetMetadata,
     isLoading,
     error,
     refetch,
   } = useQuery({
     queryKey: queryKeys.budgetMetadata,
-    queryFn: async () => {
+    queryFn: async (): Promise<BudgetMetadata> => {
       logger.debug("TanStack Query: Fetching budget metadata from Dexie");
       let result = await getBudgetMetadata();
 
       // Initialize metadata record if it doesn't exist (new users or clean installs)
       if (!result) {
         logger.debug("TanStack Query: No metadata found, initializing with defaults");
-        const defaultMetadata = {
+        const defaultMetadata: BudgetMetadata = {
           unassignedCash: 0,
           actualBalance: 0,
           isActualBalanceManual: false,
@@ -38,7 +46,7 @@ export const useBudgetMetadataQuery = () => {
         wasInitialized: !result,
       });
 
-      return result || {};
+      return result as BudgetMetadata;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
