@@ -157,8 +157,10 @@ const useEditLock = (recordType: string, recordId: string, options: UseEditLockO
   const breakLock = useCallback(async () => {
     if (!lock || isOwnLock) return { success: false };
 
-    // Check if lock is expired
-    if (lock.expiresAt?.toDate() > new Date()) {
+    // Check if lock is expired - handle both number and Timestamp types
+    const expiresAt = lock.expiresAt;
+    const expiresDate = typeof expiresAt === "number" ? new Date(expiresAt) : expiresAt;
+    if (expiresDate && expiresDate > new Date()) {
       if (showToasts) {
         addToast({
           type: "warning",
@@ -193,7 +195,11 @@ const useEditLock = (recordType: string, recordId: string, options: UseEditLockO
     isLoading,
     canEdit: !isLocked || isOwnLock,
     lockedBy: lock?.userName,
-    expiresAt: lock?.expiresAt?.toDate(),
+    expiresAt: lock?.expiresAt
+      ? typeof lock.expiresAt === "number"
+        ? new Date(lock.expiresAt)
+        : new Date(lock.expiresAt)
+      : undefined,
 
     // Actions
     acquireLock,
@@ -202,10 +208,17 @@ const useEditLock = (recordType: string, recordId: string, options: UseEditLockO
 
     // Computed values
     timeRemaining: lock?.expiresAt
-      ? Math.max(0, (lock.expiresAt.toDate ? lock.expiresAt.toDate().getTime() : new Date(lock.expiresAt).getTime()) - new Date().getTime())
+      ? Math.max(
+          0,
+          (typeof lock.expiresAt === "number"
+            ? lock.expiresAt
+            : new Date(lock.expiresAt).getTime()) - new Date().getTime()
+        )
       : 0,
     isExpired: lock?.expiresAt
-      ? (lock.expiresAt.toDate ? lock.expiresAt.toDate() : new Date(lock.expiresAt)) <= new Date()
+      ? (typeof lock.expiresAt === "number"
+          ? new Date(lock.expiresAt)
+          : new Date(lock.expiresAt)) <= new Date()
       : false,
   };
 };

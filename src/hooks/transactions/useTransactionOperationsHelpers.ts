@@ -17,7 +17,7 @@ export const createAddTransactionMutationConfig = (
     mutationKey: ["transactions", "add"],
     mutationFn: async (transactionData: unknown) => {
       const { addTransactionToDB } = await import("./helpers/transactionOperationsHelpers");
-      return addTransactionToDB(transactionData, categoryRules);
+      return addTransactionToDB(transactionData as Record<string, unknown>, categoryRules);
     },
     onSuccess: (data: { id: string }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
@@ -38,9 +38,9 @@ export const createUpdateTransactionMutationConfig = (queryClient: QueryClient) 
     mutationKey: ["transactions", "update"],
     mutationFn: async ({ id, updates }: { id: string; updates: unknown }) => {
       const { updateTransactionInDB } = await import("./helpers/transactionOperationsHelpers");
-      return updateTransactionInDB(id, updates);
+      return updateTransactionInDB(id, updates as Record<string, unknown>);
     },
-    onSuccess: (data: unknown, variables: { id: string }) => {
+    onSuccess: (_data: unknown, variables: { id: string }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
       logger.info("Transaction updated successfully", { id: variables.id });
@@ -86,7 +86,7 @@ export const createSplitTransactionMutationConfig = (queryClient: QueryClient) =
       splitTransactions: unknown[];
     }) => {
       const { splitTransactionInDB } = await import("./helpers/transactionOperationsHelpers");
-      return splitTransactionInDB(originalTransaction, splitTransactions);
+      return splitTransactionInDB(originalTransaction as Record<string, unknown>, splitTransactions);
     },
     onSuccess: (data: { originalTransaction: { id: string }; splitTransactions: unknown[] }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
@@ -110,7 +110,7 @@ export const createTransferFundsMutationConfig = (queryClient: QueryClient) => {
     mutationKey: ["transactions", "transfer"],
     mutationFn: async (transferData: unknown) => {
       const { transferFundsInDB } = await import("./helpers/transactionOperationsHelpers");
-      return transferFundsInDB(transferData);
+      return transferFundsInDB(transferData as Record<string, unknown>);
     },
     onSuccess: (data: { transferId: string; outgoing: { amount: number } }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
@@ -147,7 +147,7 @@ export const createBulkOperationMutationConfig = (
       const { bulkOperationOnTransactions } = await import(
         "./helpers/transactionOperationsHelpers"
       );
-      return bulkOperationOnTransactions(operation, transactions, updates, categoryRules);
+      return bulkOperationOnTransactions(operation, transactions as Record<string, unknown>[], updates, categoryRules);
     },
     onSuccess: (data: unknown[], variables: { operation: string }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });

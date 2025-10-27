@@ -8,7 +8,7 @@ import { Envelope, Bill, Debt } from "../../../db/types";
 interface ConnectionDataParams {
   entityType: "bill" | "envelope" | "debt";
   entityId: string;
-  currentEntity: Envelope | Bill | Debt;
+  currentEntity: Envelope | Bill | Debt | null;
   bills: Bill[];
   envelopes: Envelope[];
   debts?: Debt[];
