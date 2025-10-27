@@ -3,11 +3,27 @@
  * Handles calculations, statistics, and data transformations
  */
 
+interface CategoryStat {
+  name: string;
+  type: string;
+  transactionCount: number;
+  totalAmount: number;
+  avgAmount: number;
+  lastUsed: Date | null;
+  frequency: number;
+}
+
+interface TransactionForStats {
+  category?: string;
+  amount: number;
+  date: string;
+}
+
 /**
  * Calculate category statistics from filtered transactions
  */
-export const calculateCategoryStats = (filteredTransactions) => {
-  const stats = {};
+export const calculateCategoryStats = (filteredTransactions: TransactionForStats[]): CategoryStat[] => {
+  const stats: Record<string, CategoryStat> = {};
 
   // Transaction category stats
   filteredTransactions.forEach((transaction) => {
@@ -40,7 +56,7 @@ export const calculateCategoryStats = (filteredTransactions) => {
 
       // Calculate frequency (transactions per month)
       if (stat.lastUsed) {
-        const monthsAgo = (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
+        const monthsAgo = (new Date().getTime() - stat.lastUsed.getTime()) / (1000 * 60 * 60 * 24 * 30);
         stat.frequency = stat.transactionCount / Math.max(1, monthsAgo);
       }
     }
@@ -49,15 +65,26 @@ export const calculateCategoryStats = (filteredTransactions) => {
   return Object.values(stats).sort((a, b) => b.totalAmount - a.totalAmount);
 };
 
+interface Suggestion {
+  id: string;
+  priority: "high" | "medium" | "low";
+  impact: number;
+  category: string;
+  data?: {
+    totalAmount?: number;
+    transactionCount?: number;
+  };
+}
+
 /**
  * Combine and filter suggestions based on dismissed list
  */
 export const processSuggestions = (
-  transactionAnalysis,
-  billAnalysis,
-  dismissedSuggestions,
+  transactionAnalysis: Suggestion[],
+  billAnalysis: Suggestion[],
+  dismissedSuggestions: Set<string>,
   maxResults = 12
-) => {
+): Suggestion[] => {
   return [...transactionAnalysis, ...billAnalysis]
     .filter((s) => !dismissedSuggestions.has(s.id))
     .sort((a, b) => {
@@ -73,7 +100,11 @@ export const processSuggestions = (
 /**
  * Apply suggestion to appropriate data source
  */
-export const applySuggestionToData = async (suggestion, onApplyToTransactions, onApplyToBills) => {
+export const applySuggestionToData = async (
+  suggestion: Suggestion,
+  onApplyToTransactions?: (suggestion: Suggestion) => Promise<void>,
+  onApplyToBills?: (suggestion: Suggestion) => Promise<void>
+): Promise<boolean> => {
   try {
     if (suggestion.category === "transactions" && onApplyToTransactions) {
       await onApplyToTransactions(suggestion);
@@ -89,7 +120,7 @@ export const applySuggestionToData = async (suggestion, onApplyToTransactions, o
 /**
  * Format currency for display
  */
-export const formatCurrency = (amount) => {
+export const formatCurrency = (amount: number | null | undefined): string => {
   if (amount == null || isNaN(amount)) return "$0.00";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -100,7 +131,7 @@ export const formatCurrency = (amount) => {
 /**
  * Format frequency as readable text
  */
-export const formatFrequency = (frequency) => {
+export const formatFrequency = (frequency: number): string => {
   if (frequency >= 1) {
     return `${frequency.toFixed(1)}/month`;
   } else if (frequency >= 0.1) {
@@ -113,7 +144,7 @@ export const formatFrequency = (frequency) => {
 /**
  * Get frequency category for styling
  */
-export const getFrequencyCategory = (frequency) => {
+export const getFrequencyCategory = (frequency: number): string => {
   if (frequency > 2) return "high";
   if (frequency < 0.5) return "low";
   return "medium";
@@ -122,7 +153,7 @@ export const getFrequencyCategory = (frequency) => {
 /**
  * Calculate suggestion impact score
  */
-export const calculateSuggestionImpact = (suggestion) => {
+export const calculateSuggestionImpact = (suggestion: Suggestion): number => {
   let impact = 0;
 
   if (suggestion.data?.totalAmount) {
@@ -134,7 +165,7 @@ export const calculateSuggestionImpact = (suggestion) => {
   }
 
   // Priority multiplier
-  const priorityMultiplier = { high: 3, medium: 2, low: 1 };
+  const priorityMultiplier: Record<string, number> = { high: 3, medium: 2, low: 1 };
   impact *= priorityMultiplier[suggestion.priority] || 1;
 
   return Math.round(impact * 10) / 10;
@@ -143,7 +174,7 @@ export const calculateSuggestionImpact = (suggestion) => {
 /**
  * Validate category name
  */
-export const validateCategoryName = (name) => {
+export const validateCategoryName = (name: string) => {
   const errors = [];
 
   if (!name || name.trim() === "") {
@@ -169,7 +200,7 @@ export const validateCategoryName = (name) => {
 /**
  * Generate category suggestion ID
  */
-export const generateSuggestionId = (action, categoryName, type) => {
+export const generateSuggestionId = (action: string, categoryName: string, type: string): string => {
   const timestamp = Date.now();
   return `${action}_${categoryName.toLowerCase().replace(/\s+/g, "_")}_${type}_${timestamp}`;
 };
