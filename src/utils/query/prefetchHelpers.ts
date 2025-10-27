@@ -1,4 +1,5 @@
 // Prefetch Helpers - Utilities for pre-loading data with Dexie fallback
+import { QueryClient } from "@tanstack/react-query";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
@@ -32,7 +33,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch envelopes with optional filtering
    */
-  prefetchEnvelopes: async (queryClient: any, filters: EnvelopeFilters = {}) => {
+  prefetchEnvelopes: async (queryClient: QueryClient, filters: EnvelopeFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.envelopesList(filters),
@@ -75,7 +76,11 @@ export const prefetchHelpers = {
   /**
    * Prefetch transactions for date range
    */
-  prefetchTransactions: async (queryClient: any, dateRange: { start: string; end: string }, options: TransactionOptions = {}) => {
+  prefetchTransactions: async (
+    queryClient: QueryClient,
+    dateRange: { start: string; end: string },
+    options: TransactionOptions = {}
+  ) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
@@ -115,7 +120,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch bills with filtering options
    */
-  prefetchBills: async (queryClient: any, options: BillOptions = {}) => {
+  prefetchBills: async (queryClient: QueryClient, options: BillOptions = {}) => {
     try {
       const { category, isPaid, daysAhead = 30 } = options;
 
@@ -150,7 +155,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch savings goals
    */
-  prefetchSavingsGoals: async (queryClient: any, options: GoalOptions = {}) => {
+  prefetchSavingsGoals: async (queryClient: QueryClient, options: GoalOptions = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.savingsGoalsList(),
@@ -182,7 +187,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch dashboard summary data
    */
-  prefetchDashboard: async (queryClient: any) => {
+  prefetchDashboard: async (queryClient: QueryClient) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.dashboardSummary(),

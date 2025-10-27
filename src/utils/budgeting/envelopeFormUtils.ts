@@ -156,7 +156,10 @@ const validateUniqueName = (
 /**
  * Validate monthly amount field
  */
-const validateMonthlyAmount = (formData: EnvelopeFormData, errors: Record<string, string>): void => {
+const validateMonthlyAmount = (
+  formData: EnvelopeFormData,
+  errors: Record<string, string>
+): void => {
   const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
 
   if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
@@ -196,7 +199,10 @@ const validateTargetAmount = (formData: EnvelopeFormData, errors: Record<string,
 /**
  * Validate category, priority, and frequency fields
  */
-const validateAdditionalFields = (formData: EnvelopeFormData, errors: Record<string, string>): void => {
+const validateAdditionalFields = (
+  formData: EnvelopeFormData,
+  errors: Record<string, string>
+): void => {
   // Category validation
   if (!errors.category && formData.category) {
     const availableCategories = getEnvelopeCategories();
