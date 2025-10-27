@@ -64,7 +64,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch envelopes", {
-        error: error.message,
+        error: (error as Error).message,
         filters,
         source: "prefetchHelpers",
       });
@@ -75,7 +75,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch transactions for date range
    */
-  prefetchTransactions: async (queryClient, dateRange, options = {}) => {
+  prefetchTransactions: async (queryClient: any, dateRange: { start: string; end: string }, options: TransactionOptions = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
@@ -104,7 +104,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch transactions", {
-        error: error.message,
+        error: (error as Error).message,
         dateRange,
         source: "prefetchHelpers",
       });
@@ -115,7 +115,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch bills with filtering options
    */
-  prefetchBills: async (queryClient, options = {}) => {
+  prefetchBills: async (queryClient: any, options: BillOptions = {}) => {
     try {
       const { category, isPaid, daysAhead = 30 } = options;
 
@@ -139,7 +139,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch bills", {
-        error: error.message,
+        error: (error as Error).message,
         options,
         source: "prefetchHelpers",
       });
@@ -150,7 +150,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch savings goals
    */
-  prefetchSavingsGoals: async (queryClient, options = {}) => {
+  prefetchSavingsGoals: async (queryClient: any, options: GoalOptions = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.savingsGoalsList(),
@@ -171,7 +171,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch savings goals", {
-        error: error.message,
+        error: (error as Error).message,
         options,
         source: "prefetchHelpers",
       });
@@ -182,7 +182,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch dashboard summary data
    */
-  prefetchDashboard: async (queryClient) => {
+  prefetchDashboard: async (queryClient: any) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.dashboardSummary(),
@@ -230,7 +230,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch dashboard", {
-        error: error.message,
+        error: (error as Error).message,
         source: "prefetchHelpers",
       });
       return null;
@@ -278,7 +278,7 @@ export const prefetchHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to prefetch analytics", {
-        error: error.message,
+        error: (error as Error).message,
         period,
         source: "prefetchHelpers",
       });
@@ -364,7 +364,7 @@ export const prefetchHelpers = {
     } catch (error) {
       logger.warn("Smart prefetch failed", {
         currentRoute,
-        error: error.message,
+        error: (error as Error).message,
       });
     }
   },
