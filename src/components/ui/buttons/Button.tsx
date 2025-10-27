@@ -1,7 +1,7 @@
 import React from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "destructive" | "icon";
-export type ButtonColor = "red" | "orange" | "purple" | "blue" | "green" | "gradient";
+export type ButtonVariant = "primary" | "secondary" | "destructive" | "icon" | "ghost" | "outline" | "default";
+export type ButtonColor = "red" | "orange" | "purple" | "blue" | "green" | "gradient" | "success";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -33,12 +33,14 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  * - secondary: Cancel/alternative action (gray border)
  * - destructive: Delete/destructive action (red)
  * - icon: Icon-only button (square or circular)
+ * - ghost: Transparent button with hover effect
  *
  * Usage:
  * <Button variant="primary" color="red" icon={DeleteIcon}>Delete</Button>
  * <Button variant="secondary" size="sm">Cancel</Button>
  * <Button variant="destructive">Remove</Button>
  * <Button variant="icon" floating icon={PlusIcon} />
+ * <Button variant="ghost">Close</Button>
  */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -71,6 +73,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       purple: "bg-purple-600 hover:bg-purple-700 text-white",
       blue: "bg-blue-500 hover:bg-blue-600 text-white",
       green: "bg-green-600 hover:bg-green-700 text-white",
+      success: "bg-green-600 hover:bg-green-700 text-white",
       gradient:
         "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white",
     };
@@ -85,6 +88,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300 border-2 border-black",
       destructive: "bg-red-600 hover:bg-red-700 text-white",
       icon: "p-3 bg-transparent hover:bg-gray-100 text-gray-700 border-0",
+      ghost: "bg-transparent hover:bg-gray-100 text-gray-700 border-0",
+      outline: "bg-transparent hover:bg-gray-50 text-gray-700 border-2 border-gray-300",
+      default: "bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300",
     };
 
     // Floating button styles (circular icon button)
