@@ -71,7 +71,7 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
     const prepared = {
       id: transactionData.id || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       description: (transactionData.description || "").trim(),
-      amount: parseFloat(transactionData.amount) || 0,
+      amount: Number(transactionData.amount) || 0,
       date: new Date(transactionData.date).toISOString(),
       category: (transactionData.category || "").trim(),
       account: (transactionData.account || "").trim() || "default",
@@ -134,15 +134,17 @@ export const createTransferPair = (transferData: TransactionBase & { fromAccount
     const now = new Date().toISOString();
     const amount = Math.abs(transferData.amount);
 
-    const outgoingTransaction = {
+    const outgoingTransaction: Transaction = {
       id: `${transferId}_out`,
       description: transferData.description || `Transfer to ${transferData.toAccount}`,
       amount: -amount, // Negative for outgoing
       date: new Date(transferData.date).toISOString(),
       category: "Transfer",
       account: transferData.fromAccount,
-      type: "transfer",
+      type: "transfer" as const,
       envelopeId: transferData.fromEnvelopeId || null,
+      isSplit: false,
+      parentTransactionId: null,
       metadata: {
         isTransfer: true,
         transferId,
@@ -155,15 +157,17 @@ export const createTransferPair = (transferData: TransactionBase & { fromAccount
       },
     };
 
-    const incomingTransaction = {
+    const incomingTransaction: Transaction = {
       id: `${transferId}_in`,
       description: transferData.description || `Transfer from ${transferData.fromAccount}`,
       amount: amount, // Positive for incoming
       date: new Date(transferData.date).toISOString(),
       category: "Transfer",
       account: transferData.toAccount,
-      type: "transfer",
+      type: "transfer" as const,
       envelopeId: transferData.toEnvelopeId || null,
+      isSplit: false,
+      parentTransactionId: null,
       metadata: {
         isTransfer: true,
         transferId,
@@ -394,7 +398,7 @@ export const formatTransactionForDisplay = (transaction: TransactionBase, option
   try {
     const { currency = "USD", dateFormat = "short", includeTime = false } = options;
 
-    const formatted = { ...transaction };
+    const formatted: Record<string, unknown> = { ...transaction };
 
     // Format amount
     formatted.formattedAmount = new Intl.NumberFormat("en-US", {
@@ -427,7 +431,7 @@ export const formatTransactionForDisplay = (transaction: TransactionBase, option
     formatted.categoryDisplay = transaction.category || "Uncategorized";
     formatted.accountDisplay = transaction.account || "Default";
 
-    return formatted;
+    return formatted as unknown as FormattedTransaction;
   } catch (error) {
     logger.error("Error formatting transaction for display", error);
     return transaction;

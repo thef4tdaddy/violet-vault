@@ -4,6 +4,33 @@ import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
 
+interface EnvelopeFilters {
+  category?: string;
+  includeArchived?: boolean;
+  useCache?: boolean;
+}
+
+interface TransactionFilters {
+  limit?: number;
+  envelopeId?: string;
+  startDate?: Date;
+  endDate?: Date;
+  useCache?: boolean;
+}
+
+interface BillFilters {
+  category?: string;
+  isPaid?: boolean;
+  daysAhead?: number;
+  useCache?: boolean;
+}
+
+interface SavingsGoalFilters {
+  isCompleted?: boolean;
+  category?: string;
+  useCache?: boolean;
+}
+
 /**
  * Enhanced prefetch utilities with Dexie fallback for offline support.
  * These helpers intelligently use cached data when available.
@@ -12,7 +39,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch envelopes with optional filtering
    */
-  prefetchEnvelopes: async (queryClient, filters = {}) => {
+  prefetchEnvelopes: async (queryClient: any, filters: EnvelopeFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.envelopesList(filters),
@@ -55,7 +82,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch transactions for date range
    */
-  prefetchTransactions: async (queryClient, dateRange, options = {}) => {
+  prefetchTransactions: async (queryClient: any, dateRange?: { start: Date; end: Date }, options: TransactionFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
@@ -95,7 +122,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch bills with filtering options
    */
-  prefetchBills: async (queryClient, options = {}) => {
+  prefetchBills: async (queryClient: any, options: BillFilters = {}) => {
     try {
       const { category, isPaid, daysAhead = 30 } = options;
 
@@ -130,7 +157,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch savings goals
    */
-  prefetchSavingsGoals: async (queryClient, options = {}) => {
+  prefetchSavingsGoals: async (queryClient: any, options: SavingsGoalFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.savingsGoalsList(),
@@ -162,7 +189,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch dashboard summary data
    */
-  prefetchDashboard: async (queryClient) => {
+  prefetchDashboard: async (queryClient: any) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.dashboardSummary(),
@@ -189,11 +216,11 @@ export const prefetchHelpers = {
 
           const dashboardData = {
             totalEnvelopes: envelopes.length,
-            activeEnvelopes: envelopes.filter((e) => !e.archived).length,
+            activeEnvelopes: envelopes.filter((e: any) => !e.archived).length,
             recentTransactionCount: recentTransactions.length,
             upcomingBillsCount: upcomingBills.length,
-            unassignedCash: metadata?.unassignedCash || 0,
-            actualBalance: metadata?.actualBalance || 0,
+            unassignedCash: (metadata as any)?.unassignedCash || 0,
+            actualBalance: (metadata as any)?.actualBalance || 0,
             lastUpdated: Date.now(),
           };
 
@@ -220,7 +247,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch analytics data for a period
    */
-  prefetchAnalytics: async (queryClient, period = "month") => {
+  prefetchAnalytics: async (queryClient: any, period: string = "month") => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.analyticsReport("spending", { period }),
@@ -269,7 +296,7 @@ export const prefetchHelpers = {
   /**
    * Batch prefetch common dashboard queries
    */
-  prefetchDashboardBundle: async (queryClient) => {
+  prefetchDashboardBundle: async (queryClient: any) => {
     try {
       const prefetchPromises = [
         prefetchHelpers.prefetchDashboard(queryClient),

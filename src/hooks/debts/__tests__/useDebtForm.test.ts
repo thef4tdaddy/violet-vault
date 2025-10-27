@@ -177,7 +177,7 @@ describe("useDebtForm", () => {
 
   describe("Form submission", () => {
     test("should handle successful submission for new debt", async () => {
-      const mockOnSubmit = vi.fn().mockResolvedValue();
+      const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
       const { result } = renderHook(() => useDebtForm(null, true));
 
       act(() => {
@@ -223,7 +223,7 @@ describe("useDebtForm", () => {
     });
 
     test("should handle successful submission for debt edit", async () => {
-      const mockOnSubmit = vi.fn().mockResolvedValue();
+      const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
       const { result } = renderHook(() => useDebtForm(mockDebt, true));
 
       let submissionResult;
@@ -309,7 +309,7 @@ describe("useDebtForm", () => {
 
   describe("Loading states", () => {
     test("should handle submitting state", async () => {
-      const mockOnSubmit = jest
+      const mockOnSubmit = vi
         .fn()
         .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
       const { result } = renderHook(() => useDebtForm(null, true));

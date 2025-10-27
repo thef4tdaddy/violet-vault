@@ -8,6 +8,16 @@ import { DEBT_TYPES, PAYMENT_FREQUENCIES } from "../../constants/debts";
 import logger from "../../utils/common/logger";
 import { validateDebtFormFields } from "../../utils/debts/debtFormValidation";
 
+interface FormErrors {
+  name?: string;
+  creditor?: string;
+  currentBalance?: string;
+  originalBalance?: string;
+  interestRate?: string;
+  minimumPayment?: string;
+  [key: string]: string | undefined;
+}
+
 const initialFormState = {
   name: "",
   creditor: "",
@@ -80,7 +90,7 @@ export const useDebtForm = (
 ) => {
   const isEditMode = !!debt;
   const [formData, setFormData] = useState(initialFormState);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Update form data when debt prop changes

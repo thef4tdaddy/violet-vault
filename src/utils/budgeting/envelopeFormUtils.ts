@@ -223,7 +223,7 @@ export const calculateEnvelopeAmounts = (formData: EnvelopeFormData): {
   const currentBalance = parseFloat(String(formData.currentBalance)) || 0;
 
   // Calculate biweekly allocation
-  const biweeklyAllocation = monthlyAmount > 0 ? toBiweekly(monthlyAmount) : 0;
+  const biweeklyAllocation = monthlyAmount > 0 ? toBiweekly(monthlyAmount, 'monthly') : 0;
 
   // Calculate monthly budget (may differ from monthlyAmount based on type)
   let monthlyBudget = monthlyAmount;
@@ -306,13 +306,6 @@ export const transformFormToEnvelope = (formData: EnvelopeFormData, options: { e
   }
 
   return envelope;
-};
-
-/**
- * Get field with default value
- */
-const getFieldOrDefault = (value: unknown, defaultValue: string | boolean): string | boolean => {
-  return value ?? defaultValue;
 };
 
 /**
@@ -445,7 +438,7 @@ export const validateEnvelopeTypeChange = (newType: string, envelope: Record<str
     envelope.envelopeType === ENVELOPE_TYPES.SINKING_FUND &&
     newType !== ENVELOPE_TYPES.SINKING_FUND
   ) {
-    if (envelope.targetAmount > 0) {
+    if (Number(envelope.targetAmount) > 0) {
       warnings.push("Changing from sinking fund will remove target amount tracking");
     }
   }
