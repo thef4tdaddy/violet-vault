@@ -26,10 +26,10 @@ const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editing
       <Checkbox
         id="isActive"
         checked={accountForm.isActive}
-        onCheckedChange={(checked) =>
+        onChange={(e) =>
           setAccountForm({
             ...accountForm,
-            isActive: checked,
+            isActive: e.target.checked,
           })
         }
         disabled={editingAccount && !canEdit}

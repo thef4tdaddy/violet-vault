@@ -5,14 +5,14 @@ import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
 
 // Get section title based on envelope type
-const getSectionTitle = (envelopeType) => {
+const getSectionTitle = (envelopeType: string) => {
   if (envelopeType === ENVELOPE_TYPES.BILL) return "Bill Payment Settings";
-  if (envelopeType === ENVELOPE_TYPES.SINKING_FUND) return "Sinking Fund Settings";
+  if (envelopeType === ENVELOPE_TYPES.SAVINGS) return "Savings Goal Settings";
   return "Variable Budget Settings";
 };
 
 // Build input classes
-const getInputClasses = (hasError, canEdit) => {
+const getInputClasses = (hasError: boolean, canEdit: boolean) => {
   const baseClasses =
     "w-full pl-8 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all";
   const errorClasses = hasError ? "border-red-300 bg-red-50" : "border-gray-300";
@@ -21,7 +21,7 @@ const getInputClasses = (hasError, canEdit) => {
 };
 
 // Error message component
-const ErrorMessage = ({ error }) => {
+const ErrorMessage = ({ error }: { error?: string }) => {
   if (!error) return null;
 
   return (
@@ -35,7 +35,25 @@ const ErrorMessage = ({ error }) => {
 };
 
 // Currency input field component
-const CurrencyInput = ({ label, value, onChange, error, canEdit, hint, icon, required }) => (
+const CurrencyInput = ({ 
+  label, 
+  value, 
+  onChange, 
+  error, 
+  canEdit, 
+  hint, 
+  icon, 
+  required 
+}: {
+  label: string;
+  value: unknown;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+  canEdit: boolean;
+  hint?: string | null;
+  icon?: string;
+  required?: boolean;
+}) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">
       {icon && React.createElement(getIcon(icon), { className: "h-4 w-4 inline mr-1" })}
@@ -63,7 +81,17 @@ const CurrencyInput = ({ label, value, onChange, error, canEdit, hint, icon, req
 );
 
 // Frequency selector component
-const FrequencySelector = ({ value, onChange, error, canEdit }) => {
+const FrequencySelector = ({ 
+  value, 
+  onChange, 
+  error, 
+  canEdit 
+}: {
+  value: unknown;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  error?: string;
+  canEdit: boolean;
+}) => {
   const frequencies = getFrequencyOptions();
 
   return (
@@ -89,9 +117,15 @@ const EnvelopeBudgetFields = ({
   errors = {},
   calculatedAmounts = {},
   canEdit = true,
+}: {
+  formData: Record<string, unknown>;
+  onUpdateField: (field: string, value: unknown) => void;
+  errors?: Record<string, string>;
+  calculatedAmounts?: Record<string, number>;
+  canEdit?: boolean;
 }) => {
   const isBillEnvelope = formData.envelopeType === ENVELOPE_TYPES.BILL;
-  const isSinkingFund = formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND;
+  const isSavingsGoal = formData.envelopeType === ENVELOPE_TYPES.SAVINGS;
 
   return (
     <div className="space-y-4">
@@ -111,9 +145,9 @@ const EnvelopeBudgetFields = ({
           canEdit={canEdit}
           required
           hint={
-            calculatedAmounts.biweeklyAllocation > 0
+            calculatedAmounts?.biweeklyAllocation && calculatedAmounts.biweeklyAllocation > 0
               ? `Biweekly: $${calculatedAmounts.biweeklyAllocation.toFixed(2)}`
-              : null
+              : undefined
           }
         />
 
@@ -126,7 +160,7 @@ const EnvelopeBudgetFields = ({
         />
       </div>
 
-      {isSinkingFund && (
+      {isSavingsGoal && (
         <CurrencyInput
           label="Target Amount"
           icon="Target"
