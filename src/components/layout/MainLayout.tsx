@@ -41,7 +41,6 @@ import {
   getUserForSync,
   extractLayoutData,
   extractAuthData,
-  extractOnboardingState,
   hasSecurityAcknowledgement,
 } from "./MainLayoutHelpers";
 
@@ -218,10 +217,9 @@ const MainContent = ({
   const navigate = useNavigate();
 
   // Onboarding state
-  const onboardingState = useOnboardingStore((state: Record<string, unknown>) => ({
-    isOnboarded: (state as Record<string, unknown>)?.isOnboarded,
-  }));
-  const isOnboarded = extractOnboardingState(onboardingState);
+  const isOnboarded = useOnboardingStore(
+    (state: Record<string, unknown>) => (state as Record<string, unknown>)?.isOnboarded as boolean
+  );
 
   // Extract layout data using helper
   const { budget, totalBiweeklyNeed, paycheckHistory } = extractLayoutData(layoutData);
