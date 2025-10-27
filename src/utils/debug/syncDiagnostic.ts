@@ -3,12 +3,83 @@
  * Usage: Copy and paste this into browser developer console
  */
 import logger from "@/utils/common/logger";
+import type { VioletVaultDB } from "@/db/budgetDb";
 
-export const runSyncDiagnostic = async () => {
+interface CloudSyncServiceType {
+  isRunning: boolean;
+  config?: unknown;
+  lastSyncTime: string | null;
+  triggerSyncForCriticalChange: (changeType: string) => void;
+}
+
+interface NetworkConnection {
+  effectiveType?: string;
+  downlink?: number;
+}
+
+interface SyncEdgeCaseTesterType {
+  runAllTests: () => Promise<unknown>;
+}
+
+interface FirebaseAuthType {
+  currentUser: {
+    uid: string;
+    email: string | null;
+    isAnonymous: boolean;
+  } | null;
+}
+
+// Extend window type for diagnostic tools
+declare global {
+  interface Window {
+    budgetDb?: VioletVaultDB;
+    cloudSyncService?: CloudSyncServiceType;
+    runSyncDiagnostic?: () => Promise<DiagnosticResults>;
+    syncEdgeCaseTester?: SyncEdgeCaseTesterType;
+    runSyncEdgeCaseTests?: () => Promise<unknown>;
+  }
+}
+
+export interface DiagnosticResults {
+  timestamp: string;
+  browser: string;
+  url: string;
+  errors: string[];
+  warnings: string[];
+  info: string[];
+  indexedDB?: {
+    version: number;
+    stores: string[];
+  };
+  budgetMetadata?: {
+    exists: boolean;
+    unassignedCash: number | string;
+    actualBalance: number | string;
+    lastModified: number | string;
+  };
+  dataCounts?: Record<string, number | string>;
+  cloudSync?: {
+    isRunning: boolean;
+    config: boolean;
+    lastSyncTime: string | null;
+  };
+  firebaseAuth?: {
+    isSignedIn: boolean;
+    userId: string | null;
+    email: string | null;
+    isAnonymous: boolean | null;
+  };
+  network?: {
+    online: boolean;
+    connection: NetworkConnection | string;
+  };
+}
+
+export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   logger.info("🔍 VioletVault Sync Diagnostic Tool");
   logger.info("=".repeat(50));
 
-  const results = {
+  const results: DiagnosticResults = {
     timestamp: new Date().toISOString(),
     browser: navigator.userAgent,
     url: window.location.href,
@@ -28,7 +99,7 @@ export const runSyncDiagnostic = async () => {
         version: db.version,
         stores: storeNames,
       };
-      logger.info("✅ IndexedDB stores:", storeNames);
+      logger.info("✅ IndexedDB stores:", { stores: storeNames });
     };
     dbRequest.onerror = (error) => {
       results.errors.push("IndexedDB connection failed: " + error);
@@ -92,7 +163,7 @@ export const runSyncDiagnostic = async () => {
       logger.info("📊 Data counts:", counts);
 
       // Flag empty databases
-      const totalRecords = Object.values(counts).reduce(
+      const totalRecords = Object.values(counts).reduce<number>(
         (sum, count) => (typeof count === "number" ? sum + count : sum),
         0
       );
@@ -111,15 +182,16 @@ export const runSyncDiagnostic = async () => {
   logger.info("☁️ Checking Cloud Sync Service...");
   try {
     if (window.cloudSyncService) {
+      const cloudSyncService = window.cloudSyncService;
       results.cloudSync = {
-        isRunning: window.cloudSyncService.isRunning,
-        config: !!window.cloudSyncService.config,
-        lastSyncTime: window.cloudSyncService.lastSyncTime,
+        isRunning: cloudSyncService.isRunning,
+        config: !!cloudSyncService.config,
+        lastSyncTime: cloudSyncService.lastSyncTime,
       };
 
       logger.info("✅ Cloud sync service found:", results.cloudSync);
 
-      if (!window.cloudSyncService.isRunning) {
+      if (!cloudSyncService.isRunning) {
         results.warnings.push("Cloud sync service not running");
         logger.warn("⚠️ Cloud sync service not running");
       }
@@ -135,8 +207,9 @@ export const runSyncDiagnostic = async () => {
   // Check 5: Firebase Auth
   logger.info("🔐 Checking Firebase Auth...");
   try {
-    if (window.firebase && window.firebase.auth) {
-      const user = window.firebase.auth().currentUser;
+    const firebaseAuth = (window as Window & { firebaseAuth?: FirebaseAuthType }).firebaseAuth;
+    if (firebaseAuth) {
+      const user = firebaseAuth.currentUser;
       results.firebaseAuth = {
         isSignedIn: !!user,
         userId: user?.uid || null,
@@ -165,12 +238,13 @@ export const runSyncDiagnostic = async () => {
 
   // Check 6: Network Status
   logger.info("🌐 Checking Network...");
+  const connection = (navigator as Navigator & { connection?: NetworkConnection }).connection;
   results.network = {
     online: navigator.onLine,
-    connection: navigator.connection
+    connection: connection
       ? {
-          effectiveType: navigator.connection.effectiveType,
-          downlink: navigator.connection.downlink,
+          effectiveType: connection.effectiveType,
+          downlink: connection.downlink,
         }
       : "not available",
   };
@@ -200,7 +274,7 @@ export const runSyncDiagnostic = async () => {
   }
 
   logger.info("\n💾 Full diagnostic results:");
-  logger.info(results);
+  logger.info(JSON.stringify(results, null, 2));
 
   return results;
 };

@@ -1,6 +1,6 @@
 import React, { useId } from "react";
 
-export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   /** Label text */
   label?: string;
   /** Error message */
@@ -9,6 +9,10 @@ export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElemen
   helperText?: string;
   /** Custom className */
   className?: string;
+  /** onChange handler (standard HTML input event) */
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  /** onCheckedChange handler (boolean value) */
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 /**
@@ -27,9 +31,20 @@ export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElemen
  * />
  */
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ label, error, helperText, className = "", id, disabled, ...props }, ref) => {
+  ({ label, error, helperText, className = "", id, disabled, onChange, onCheckedChange, ...props }, ref) => {
     const generatedId = useId();
     const checkboxId = id || `checkbox-${generatedId}`;
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      // Call standard onChange if provided
+      if (onChange) {
+        onChange(event);
+      }
+      // Call onCheckedChange with boolean value if provided
+      if (onCheckedChange) {
+        onCheckedChange(event.target.checked);
+      }
+    };
 
     return (
       <div className="w-full">
@@ -39,6 +54,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             type="checkbox"
             id={checkboxId}
             disabled={disabled}
+            onChange={handleChange}
             className={`w-4 h-4 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
             {...props}
           />

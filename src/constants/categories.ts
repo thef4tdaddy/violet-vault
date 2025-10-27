@@ -67,6 +67,7 @@ export const ENVELOPE_TYPES = {
   BILL: "bill",
   VARIABLE: "variable",
   SAVINGS: "savings",
+  SINKING_FUND: "sinking_fund",
 } as const;
 
 export type EnvelopeType = (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES];
@@ -121,6 +122,17 @@ export const ENVELOPE_TYPE_CONFIG: Record<EnvelopeType, EnvelopeTypeConfig> = {
     icon: "Target",
     fundingMethod: "target", // Uses targetAmount
     displayFormat: "Target: ${amount}",
+  },
+  [ENVELOPE_TYPES.SINKING_FUND]: {
+    name: "Sinking Fund Envelope",
+    description: "Save for specific goals with target amounts and dates",
+    color: "teal",
+    borderColor: "border-teal-500",
+    bgColor: "bg-teal-50",
+    textColor: "text-teal-700",
+    icon: "Wallet",
+    fundingMethod: "target", // Uses targetAmount with deadline
+    displayFormat: "Goal: ${amount}",
   },
 };
 
