@@ -136,23 +136,25 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     }
   }, [isUnlocked, currentUser, navigate]);
 
+  // Log sync state changes
+  const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
+  useEffect(() => {
+    if (lastLogKeyRef.current !== logKey) {
+      logger.budgetSync("BudgetProvider state changed", {
+        hasEncryptionKey: !!securityContext?.encryptionKey,
+        hasCurrentUser: !!currentUser,
+        hasBudgetId: !!securityContext?.budgetId,
+      });
+      lastLogKeyRef.current = logKey;
+    }
+  }, [logKey, securityContext?.encryptionKey, currentUser, securityContext?.budgetId]);
+
   // Handle auth gateway
   const shouldShowGateway = (auth as unknown as Record<string, unknown>)?.shouldShowAuthGateway as
     | (() => boolean)
     | undefined;
   if (shouldShowGateway?.() ?? !isAuthenticated(auth)) {
     return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={() => {}} />;
-  }
-
-  // Log sync state
-  const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
-  if (lastLogKeyRef.current !== logKey) {
-    logger.budgetSync("BudgetProvider state changed", {
-      hasEncryptionKey: !!securityContext?.encryptionKey,
-      hasCurrentUser: !!currentUser,
-      hasBudgetId: !!securityContext?.budgetId,
-    });
-    lastLogKeyRef.current = logKey;
   }
 
   return (

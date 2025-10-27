@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 export interface RadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Label text */
@@ -33,7 +33,8 @@ export interface RadioProps extends React.InputHTMLAttributes<HTMLInputElement> 
  */
 const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
   ({ label, error, helperText, description, className = "", id, disabled, ...props }, ref) => {
-    const radioId = id || `radio-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId();
+    const radioId = id || `radio-${generatedId}`;
 
     // If description is provided, use grid layout (for RadioGroup with descriptions)
     if (description) {

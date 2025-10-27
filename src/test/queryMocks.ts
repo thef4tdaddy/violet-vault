@@ -7,6 +7,12 @@ import type { Transaction, Envelope } from "../types/finance";
 import type { Bill } from "../types/bills";
 
 /**
+ * Type helper for window event listeners
+ * Using generic object type since EventListener/EventListenerObject are DOM builtins
+ */
+type EventListenerOrEventListenerObject = ((evt: Event) => void) | { handleEvent(object: Event): void };
+
+/**
  * Mock Dexie database for testing
  */
 export const createMockDexie = () => {
@@ -187,23 +193,27 @@ export const setupGlobalMocks = () => {
   });
 
   // Mock window events
-  const eventListeners = new Map<string, Set<EventListener>>();
-  
+  const eventListeners = new Map<string, Set<EventListenerOrEventListenerObject>>();
+
   const originalAddEventListener = window.addEventListener;
   const originalRemoveEventListener = window.removeEventListener;
   const originalDispatchEvent = window.dispatchEvent;
 
-  window.addEventListener = vi.fn((event: string, listener: EventListener) => {
-    if (!eventListeners.has(event)) {
+  window.addEventListener = vi.fn((event: string, listener: EventListenerOrEventListenerObject | null) => {
+    if (listener && !eventListeners.has(event)) {
       eventListeners.set(event, new Set());
     }
-    eventListeners.get(event)!.add(listener);
-    return originalAddEventListener.call(window, event, listener);
+    if (listener) {
+      eventListeners.get(event)!.add(listener);
+    }
+    return originalAddEventListener.call(window, event, listener as EventListenerOrEventListenerObject);
   });
 
-  window.removeEventListener = vi.fn((event: string, listener: EventListener) => {
-    eventListeners.get(event)?.delete(listener);
-    return originalRemoveEventListener.call(window, event, listener);
+  window.removeEventListener = vi.fn((event: string, listener: EventListenerOrEventListenerObject | null) => {
+    if (listener) {
+      eventListeners.get(event)?.delete(listener);
+    }
+    return originalRemoveEventListener.call(window, event, listener as EventListenerOrEventListenerObject);
   });
 
   window.dispatchEvent = vi.fn((event: Event) => {

@@ -3,33 +3,36 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
 
 /**
+ * Toggle switch component for consistency
+ */
+const ToggleSwitch = ({ enabled, onChange, label, description }) => (
+  <div className="flex items-center justify-between py-3">
+    <div className="flex-1 mr-4">
+      <label className="text-sm font-black text-purple-800 uppercase tracking-wide">
+        {label}
+      </label>
+      <p className="text-xs text-purple-700 mt-1 font-medium">{description}</p>
+    </div>
+    <Button
+      onClick={onChange}
+      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
+        enabled ? "bg-gradient-to-r from-blue-500 to-purple-600" : "bg-gray-300"
+      }`}
+    >
+      <span
+        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 border border-gray-300 ${
+          enabled ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </Button>
+  </div>
+);
+
+/**
  * Auto-lock settings section with toggle switches and timeout slider
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
 const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
-  // Toggle switch component for consistency
-  const ToggleSwitch = ({ enabled, onChange, label, description }) => (
-    <div className="flex items-center justify-between py-3">
-      <div className="flex-1 mr-4">
-        <label className="text-sm font-black text-purple-800 uppercase tracking-wide">
-          {label}
-        </label>
-        <p className="text-xs text-purple-700 mt-1 font-medium">{description}</p>
-      </div>
-      <Button
-        onClick={onChange}
-        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
-          enabled ? "bg-gradient-to-r from-blue-500 to-purple-600" : "bg-gray-300"
-        }`}
-      >
-        <span
-          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 border border-gray-300 ${
-            enabled ? "translate-x-6" : "translate-x-1"
-          }`}
-        />
-      </Button>
-    </div>
-  );
 
   return (
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl">

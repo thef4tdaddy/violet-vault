@@ -87,14 +87,19 @@ jobs:
               }
             }
 
-            // Check priority
+            // Check priority - ONLY ONE priority label allowed
+            let foundPriority = false;
             for (const [label, keywords] of Object.entries(priorityKeywords)) {
-              if (keywords.some(keyword => titleAndBody.includes(keyword)) && existingLabelNames.includes(label)) {
-                toLabel.push(label);
-                break; // Only one priority
-              } else if (keywords.some(keyword => titleAndBody.includes(keyword))) {
-                missing.push(label);
-                break;
+              if (keywords.some(keyword => titleAndBody.includes(keyword))) {
+                if (!foundPriority) {
+                  if (existingLabelNames.includes(label)) {
+                    toLabel.push(label);
+                  } else {
+                    missing.push(label);
+                  }
+                  foundPriority = true;
+                }
+                break; // Stop after checking first matching priority
               }
             }
 
