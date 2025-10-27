@@ -3,7 +3,7 @@
  * @description Tests for Firebase service type safety and error handling
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { typedFirebaseSyncService } from "../../typedFirebaseSyncService";
 import { typedChunkedSyncService } from "../../typedChunkedSyncService";
 import {
@@ -69,7 +69,7 @@ describe("TypedFirebaseSyncService", () => {
       }).toThrow("budgetId and encryptionKey cannot be empty");
 
       expect(() => {
-        typedFirebaseSyncService.initialize(123, "valid-key");
+        typedFirebaseSyncService.initialize(123 as unknown as string, "valid-key");
       }).toThrow("budgetId and encryptionKey must be strings");
     });
 
@@ -91,7 +91,7 @@ describe("TypedFirebaseSyncService", () => {
   describe("Authentication", () => {
     it("should handle authentication with type safety", async () => {
       const mockFirebaseService = await import("../../firebaseSyncService");
-      mockFirebaseService.default.ensureAuthenticated.mockResolvedValue(true);
+      (mockFirebaseService.default.ensureAuthenticated as Mock).mockResolvedValue(true);
 
       const result = await typedFirebaseSyncService.ensureAuthenticated();
       expect(result).toBe(true);
@@ -99,7 +99,7 @@ describe("TypedFirebaseSyncService", () => {
 
     it("should handle authentication failure", async () => {
       const mockFirebaseService = await import("../../firebaseSyncService");
-      mockFirebaseService.default.ensureAuthenticated.mockResolvedValue(false);
+      (mockFirebaseService.default.ensureAuthenticated as Mock).mockResolvedValue(false);
 
       const result = await typedFirebaseSyncService.ensureAuthenticated();
       expect(result).toBe(false);
@@ -107,7 +107,7 @@ describe("TypedFirebaseSyncService", () => {
 
     it("should handle authentication errors", async () => {
       const mockFirebaseService = await import("../../firebaseSyncService");
-      mockFirebaseService.default.ensureAuthenticated.mockRejectedValue(
+      (mockFirebaseService.default.ensureAuthenticated as Mock).mockRejectedValue(
         new Error("Authentication failed")
       );
 
@@ -119,7 +119,7 @@ describe("TypedFirebaseSyncService", () => {
   describe("Data Operations", () => {
     it("should save data with type safety", async () => {
       const mockFirebaseService = await import("../../firebaseSyncService");
-      mockFirebaseService.default.saveToCloud.mockResolvedValue(true);
+      (mockFirebaseService.default.saveToCloud as Mock).mockResolvedValue(true);
 
       const testData = { test: "data", number: 123 };
       const result = await typedFirebaseSyncService.saveToCloud(testData);
@@ -138,7 +138,7 @@ describe("TypedFirebaseSyncService", () => {
 
     it("should validate metadata format", async () => {
       const testData = { test: "data" };
-      const invalidMetadata = { version: 123 }; // should be string
+      const invalidMetadata = { version: 123 as unknown as string }; // should be string
 
       const result = await typedFirebaseSyncService.saveToCloud(testData, invalidMetadata);
 
@@ -149,7 +149,7 @@ describe("TypedFirebaseSyncService", () => {
     it("should load data with type safety", async () => {
       const mockFirebaseService = await import("../../firebaseSyncService");
       const testData = { transactions: [], envelopes: [] };
-      mockFirebaseService.default.loadFromCloud.mockResolvedValue(testData);
+      (mockFirebaseService.default.loadFromCloud as Mock).mockResolvedValue(testData);
 
       const result = await typedFirebaseSyncService.loadFromCloud();
 
@@ -159,7 +159,7 @@ describe("TypedFirebaseSyncService", () => {
 
     it("should handle null load result", async () => {
       const mockFirebaseService = await import("../../firebaseSyncService");
-      mockFirebaseService.default.loadFromCloud.mockResolvedValue(null);
+      (mockFirebaseService.default.loadFromCloud as Mock).mockResolvedValue(null);
 
       const result = await typedFirebaseSyncService.loadFromCloud();
 
@@ -172,7 +172,7 @@ describe("TypedFirebaseSyncService", () => {
     it("should return valid status structure", () => {
       const mockFirebaseService = vi.mocked(require("../../firebaseSyncService").default);
 
-      mockFirebaseService.getStatus.mockReturnValue({
+      (mockFirebaseService.getStatus as Mock).mockReturnValue({
         isOnline: true,
         isInitialized: true,
         queuedOperations: 5,
@@ -194,7 +194,7 @@ describe("TypedFirebaseSyncService", () => {
     it("should handle invalid status structure", () => {
       const mockFirebaseService = vi.mocked(require("../../firebaseSyncService").default);
 
-      mockFirebaseService.getStatus.mockReturnValue({ invalid: "status" });
+      (mockFirebaseService.getStatus as Mock).mockReturnValue({ invalid: "status" } as unknown as ReturnType<typeof mockFirebaseService.getStatus>);
 
       const status = typedFirebaseSyncService.getStatus();
 
@@ -231,8 +231,8 @@ describe("TypedChunkedSyncService", () => {
 
     it("should initialize with valid parameters", async () => {
       const mockChunkedService = await import("../../chunkedSyncService");
-      mockChunkedService.default.initialize.mockResolvedValue();
-      mockChunkedService.default.getStats.mockReturnValue({
+      (mockChunkedService.default.initialize as Mock).mockResolvedValue();
+      (mockChunkedService.default.getStats as Mock).mockReturnValue({
         maxChunkSize: 900000,
         maxArrayChunkSize: 5000,
         isInitialized: true,
@@ -258,7 +258,7 @@ describe("TypedChunkedSyncService", () => {
   describe("Data Operations", () => {
     it("should validate user information for save operations", async () => {
       const testData = { test: "data" };
-      const invalidUser = { uid: "" }; // missing userName and empty uid
+      const invalidUser = { uid: "" } as unknown as { readonly uid: string; readonly userName: string }; // missing userName and empty uid
 
       const result = await typedChunkedSyncService.saveToCloud(testData, invalidUser);
 
@@ -268,7 +268,7 @@ describe("TypedChunkedSyncService", () => {
 
     it("should save data with valid user", async () => {
       const mockChunkedService = await import("../../chunkedSyncService");
-      mockChunkedService.default.saveToCloud.mockResolvedValue(true);
+      (mockChunkedService.default.saveToCloud as Mock).mockResolvedValue(true);
 
       const testData = { transactions: [], envelopes: [] };
       const validUser = { uid: "user123", userName: "Test User" };
@@ -310,7 +310,7 @@ describe("TypedChunkedSyncService", () => {
     it("should generate valid chunk IDs", () => {
       const mockChunkedService = vi.mocked(require("../../chunkedSyncService").default);
 
-      mockChunkedService.generateChunkId.mockReturnValue("transactions_chunk_001");
+      (mockChunkedService.generateChunkId as Mock).mockReturnValue("transactions_chunk_001");
 
       const chunkId = typedChunkedSyncService.generateChunkId("transactions", 1);
       expect(chunkId).toBe("transactions_chunk_001");
@@ -321,7 +321,7 @@ describe("TypedChunkedSyncService", () => {
     it("should return valid stats", () => {
       const mockChunkedService = vi.mocked(require("../../chunkedSyncService").default);
 
-      mockChunkedService.getStats.mockReturnValue({
+      (mockChunkedService.getStats as Mock).mockReturnValue({
         maxChunkSize: 900000,
         maxArrayChunkSize: 5000,
         isInitialized: true,

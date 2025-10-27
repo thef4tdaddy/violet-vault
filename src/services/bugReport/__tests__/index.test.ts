@@ -87,7 +87,13 @@ describe("BugReportService", () => {
         name: "test",
         version: "1.0",
         engine: "test",
-        os: "test"
+        platform: "test",
+        language: "en",
+        languages: ["en"] as readonly string[],
+        cookieEnabled: true,
+        onLine: true,
+        hardwareConcurrency: 4,
+        permissions: { notifications: "default", geolocation: "default" }
       },
       viewport: { width: 1920, height: 1080 },
       url: {
@@ -96,12 +102,21 @@ describe("BugReportService", () => {
         hostname: "test.com",
         pathname: "/test",
         search: "",
-        hash: ""
+        hash: "",
+        host: "test.com",
+        port: "",
+        origin: "http://test.com"
       },
       performance: {
-        timing: {},
+        timing: {
+          navigationStart: 0,
+          domContentLoaded: 100,
+          loadComplete: 200,
+          domInteractive: 50
+        },
         memory: null,
-        navigation: null
+        navigation: null,
+        available: true
       },
       storage: {
         localStorage: { available: true }
@@ -110,7 +125,9 @@ describe("BugReportService", () => {
         effectiveType: "4g",
         downlink: 10,
         rtt: 50,
-        saveData: false
+        saveData: false,
+        onLine: true,
+        connection: null
       },
       errors: {
         recentErrors: [],
@@ -125,9 +142,8 @@ describe("BugReportService", () => {
         pathname: "/test",
         search: "",
         hash: "",
-        searchParams: new URLSearchParams(),
+        searchParams: Object.fromEntries(new URLSearchParams()),
         segments: ["test"],
-        params: {},
         query: {},
         isRoot: false,
         isNested: false
@@ -261,7 +277,13 @@ describe("BugReportService", () => {
           version: "Unknown",
           userAgent: "test",
           engine: "test",
-          os: "test"
+          platform: "Unknown",
+          language: "en",
+          languages: ["en"] as readonly string[],
+          cookieEnabled: false,
+          onLine: false,
+          hardwareConcurrency: 0,
+          permissions: { notifications: "default", geolocation: "default" }
         },
         viewport: { width: 0, height: 0 },
         url: {
@@ -270,11 +292,31 @@ describe("BugReportService", () => {
           hostname: "",
           pathname: "",
           search: "",
-          hash: ""
+          hash: "",
+          host: "",
+          port: "",
+          origin: ""
         },
-        performance: { timing: {}, memory: null, navigation: null },
+        performance: { 
+          timing: {
+            navigationStart: 0,
+            domContentLoaded: 0,
+            loadComplete: 0,
+            domInteractive: 0
+          }, 
+          memory: null, 
+          navigation: null,
+          available: false
+        },
         storage: { localStorage: { available: false } },
-        network: { onLine: true, effectiveType: "4g", downlink: 10, rtt: 50, saveData: false },
+        network: { 
+          onLine: true, 
+          effectiveType: "4g", 
+          downlink: 10, 
+          rtt: 50, 
+          saveData: false,
+          connection: null
+        },
         errors: { recentErrors: [], consoleLogs: [] },
         userAgent: "Unknown",
         fallback: true,
@@ -285,9 +327,8 @@ describe("BugReportService", () => {
           pathname: "/",
           search: "",
           hash: "",
-          searchParams: new URLSearchParams(),
+          searchParams: {},
           segments: [],
-          params: {},
           query: {},
           isRoot: true,
           isNested: false
@@ -319,8 +360,8 @@ describe("BugReportService", () => {
       const options = { includeScreenshot: false };
       const data = await BugReportService.collectAllData(options);
 
-      expect(data.systemInfo.fallback).toBe(true);
-      expect(data.contextInfo.fallback).toBe(true);
+      expect((data.systemInfo as { fallback?: boolean }).fallback).toBe(true);
+      expect((data.contextInfo as { fallback?: boolean }).fallback).toBe(true);
       expect(data.collectionError).toBe("Collection failed");
     });
   });
@@ -382,6 +423,8 @@ describe("BugReportService", () => {
       mockedBugReportAPIService.submitWithFallbacks.mockResolvedValue({
         success: true,
         submissionId: "quick-123",
+        timestamp: new Date().toISOString(),
+        fallbackUsed: false
       });
 
       const result = await BugReportService.quickReport("Quick bug description");

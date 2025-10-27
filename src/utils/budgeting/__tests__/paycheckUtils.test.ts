@@ -258,7 +258,10 @@ describe("paycheckUtils", () => {
 
   describe("validateAllocations", () => {
     it("should validate correct allocations", () => {
-      const allocations = [{ amount: 400 }, { amount: 300 }];
+      const allocations = [
+        { envelopeId: "1", envelopeName: "Groceries", amount: 400, monthlyAmount: 400, envelopeType: "expense", priority: "high" },
+        { envelopeId: "2", envelopeName: "Rent", amount: 300, monthlyAmount: 300, envelopeType: "expense", priority: "high" }
+      ];
 
       const result = validateAllocations(allocations, 1000);
 
@@ -267,7 +270,10 @@ describe("paycheckUtils", () => {
     });
 
     it("should detect overage", () => {
-      const allocations = [{ amount: 600 }, { amount: 500 }];
+      const allocations = [
+        { envelopeId: "1", envelopeName: "Groceries", amount: 600, monthlyAmount: 600, envelopeType: "expense", priority: "high" },
+        { envelopeId: "2", envelopeName: "Rent", amount: 500, monthlyAmount: 500, envelopeType: "expense", priority: "high" }
+      ];
 
       const result = validateAllocations(allocations, 1000);
 
@@ -277,7 +283,9 @@ describe("paycheckUtils", () => {
     });
 
     it("should detect negative allocations", () => {
-      const allocations = [{ amount: -100 }];
+      const allocations = [
+        { envelopeId: "1", envelopeName: "Groceries", amount: -100, monthlyAmount: -100, envelopeType: "expense", priority: "high" }
+      ];
 
       const result = validateAllocations(allocations, 1000);
 
@@ -293,8 +301,8 @@ describe("paycheckUtils", () => {
     });
 
     it("should handle invalid inputs", () => {
-      expect(formatPaycheckAmount("invalid")).toBe("$0.00");
-      expect(formatPaycheckAmount(null)).toBe("$0.00");
+      expect(formatPaycheckAmount("invalid" as unknown as number)).toBe("$0.00");
+      expect(formatPaycheckAmount(null as unknown as number)).toBe("$0.00");
       expect(formatPaycheckAmount(NaN)).toBe("$0.00");
     });
   });
