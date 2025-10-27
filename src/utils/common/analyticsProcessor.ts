@@ -1,5 +1,5 @@
-import logger from "../common/logger";
-import { validateTransactionSafe, validateEnvelopeSafe } from "../../domain/schemas/index.ts";
+import logger from "@/utils/common/logger";
+import { validateTransactionSafe, validateEnvelopeSafe } from "@/domain/schemas/index.ts";
 
 /**
  * Analytics data processing utilities
@@ -8,11 +8,42 @@ import { validateTransactionSafe, validateEnvelopeSafe } from "../../domain/sche
  * Now using Zod schemas for validation (Issue #412)
  */
 
+// Type definitions
+interface MonthlyGroupData {
+  month: string;
+  income: number;
+  expenses: number;
+  net: number;
+  transactionCount: number;
+  transactions: unknown[];
+}
+
+interface CategoryGroupData {
+  name: string;
+  income: number;
+  expenses: number;
+  net: number;
+  count: number;
+  transactions: unknown[];
+}
+
+interface EnvelopeSpendingData {
+  name: string;
+  envelopeId: string;
+  amount: number;
+  count: number;
+  budget: number;
+  color: string;
+  transactions: unknown[];
+  utilizationRate?: number;
+  remainingBudget?: number;
+}
+
 /**
  * Validate transaction using Zod schema
  * Used as filter predicate for analytics data
  */
-export const validateTransaction = (transaction) => {
+export const validateTransaction = (transaction: unknown): boolean => {
   if (!transaction || typeof transaction !== "object") {
     return false;
   }
@@ -24,7 +55,7 @@ export const validateTransaction = (transaction) => {
  * Validate envelope using Zod schema
  * Used as filter predicate for analytics data
  */
-export const validateEnvelope = (envelope) => {
+export const validateEnvelope = (envelope: unknown): boolean => {
   if (!envelope || typeof envelope !== "object") {
     return false;
   }
@@ -33,10 +64,10 @@ export const validateEnvelope = (envelope) => {
 };
 
 // Date utilities
-export const isValidDate = (dateString) => {
+export const isValidDate = (dateString: string | Date | undefined | null): boolean => {
   if (!dateString) return false;
   const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date) && date.getFullYear() > 1900;
+  return date instanceof Date && !isNaN(date.getTime()) && date.getFullYear() > 1900;
 };
 
 export const getDateRangeFilter = (timeFilter) => {
