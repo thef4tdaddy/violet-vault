@@ -223,21 +223,51 @@ export function validateDebtFormFields(formData: Record<string, unknown>): Recor
   return errors;
 }
 
+// Helper to calculate payoff metrics with interest
+function calculatePayoffMetrics(
+  currentBalance: number,
+  minimumPayment: number,
+  monthlyInterestRate: number
+): { payoffTimeMonths: number; totalInterestPaid: number; isPaymentSufficient: boolean } {
+  if (monthlyInterestRate === 0) {
+    return {
+      payoffTimeMonths: currentBalance / minimumPayment,
+      totalInterestPaid: 0,
+      isPaymentSufficient: true,
+    };
+  }
+
+  if (minimumPayment <= currentBalance * monthlyInterestRate) {
+    return {
+      payoffTimeMonths: 999,
+      totalInterestPaid: currentBalance * 10,
+      isPaymentSufficient: false,
+    };
+  }
+
+  const payoffTimeMonths =
+    -Math.log(1 - (currentBalance * monthlyInterestRate) / minimumPayment) /
+    Math.log(1 + monthlyInterestRate);
+
+  return {
+    payoffTimeMonths,
+    totalInterestPaid: minimumPayment * payoffTimeMonths - currentBalance,
+    isPaymentSufficient: true,
+  };
+}
+
 /**
  * Calculate debt metrics for display and analysis
  * Supports both 'balance' and 'currentBalance' properties for compatibility
  */
-export function calculateDebtMetrics(
-  debtData: {
-    balance?: number;
-    currentBalance?: number;
-    originalBalance?: number;
-    interestRate?: number;
-    minimumPayment?: number;
-    paymentFrequency?: string;
-  }
-): DebtMetrics | null {
-  // Support both balance and currentBalance properties
+export function calculateDebtMetrics(debtData: {
+  balance?: number;
+  currentBalance?: number;
+  originalBalance?: number;
+  interestRate?: number;
+  minimumPayment?: number;
+  paymentFrequency?: string;
+}): DebtMetrics | null {
   const currentBalance = debtData.currentBalance ?? debtData.balance ?? 0;
   const originalBalance = debtData.originalBalance ?? currentBalance;
   const interestRate = debtData.interestRate ?? 0;
@@ -247,41 +277,15 @@ export function calculateDebtMetrics(
     return null;
   }
 
-  // Calculate total paid (difference between original and current balance)
-  const totalPaid = Math.max(0, originalBalance - currentBalance);
-
-  // Calculate payment to balance ratio
-  const paymentToBalanceRatio = minimumPayment / currentBalance;
-
-  // Convert annual interest rate to monthly
   const monthlyInterestRate = interestRate / 100 / 12;
+  const { payoffTimeMonths, totalInterestPaid, isPaymentSufficient } = calculatePayoffMetrics(
+    currentBalance,
+    minimumPayment,
+    monthlyInterestRate
+  );
 
-  // Calculate payoff time using amortization formula
-  let payoffTimeMonths = 0;
-  let totalInterestPaid = 0;
-  let isPaymentSufficient = true;
-
-  if (monthlyInterestRate === 0) {
-    // No interest case
-    payoffTimeMonths = currentBalance / minimumPayment;
-    totalInterestPaid = 0;
-    isPaymentSufficient = true;
-  } else {
-    // With interest - use standard loan amortization
-    if (minimumPayment <= currentBalance * monthlyInterestRate) {
-      // Payment doesn't cover interest - never pays off
-      payoffTimeMonths = 999; // Cap at 999 months for UI purposes
-      totalInterestPaid = currentBalance * 10; // Rough estimate
-      isPaymentSufficient = false;
-    } else {
-      payoffTimeMonths =
-        -Math.log(1 - (currentBalance * monthlyInterestRate) / minimumPayment) /
-        Math.log(1 + monthlyInterestRate);
-      totalInterestPaid = minimumPayment * payoffTimeMonths - currentBalance;
-      isPaymentSufficient = true;
-    }
-  }
-
+  const totalPaid = Math.max(0, originalBalance - currentBalance);
+  const paymentToBalanceRatio = minimumPayment / currentBalance;
   const totalAmountPaid = currentBalance + totalInterestPaid;
   const payoffDate = new Date();
   payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(payoffTimeMonths));

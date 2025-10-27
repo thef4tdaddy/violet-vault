@@ -22,15 +22,11 @@ interface DebtListProps {
  * List of debts with summary information
  * Pure UI component for displaying debt cards
  */
-const DebtList = ({ debts, onDebtClick, onRecordPayment }: DebtListProps) => {
+const DebtList = ({ debts, onDebtClick, _onRecordPayment }: DebtListProps) => {
   return (
     <div className="divide-y divide-gray-100">
       {debts.map((debt) => (
-        <DebtCard
-          key={debt.id}
-          debt={debt}
-          onClick={() => onDebtClick(debt)}
-        />
+        <DebtCard key={debt.id} debt={debt} onClick={() => onDebtClick(debt)} />
       ))}
     </div>
   );
@@ -40,6 +36,54 @@ interface DebtCardProps {
   debt: Debt;
   onClick: () => void;
 }
+
+interface FinancialDetailsProps {
+  currentBalance: number;
+  paymentDisplay: string;
+  interestRate: number;
+  nextPaymentInfo: { label: string; hasIcon: boolean; type: string; value: string };
+}
+
+const FinancialDetails = ({
+  currentBalance,
+  paymentDisplay,
+  interestRate,
+  nextPaymentInfo,
+}: FinancialDetailsProps) => (
+  <div className="mt-3 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div>
+      <p className="text-xs text-gray-500">Current Balance</p>
+      <p className="text-base md:text-lg font-bold text-red-600">${currentBalance}</p>
+    </div>
+    <div>
+      <p className="text-xs text-gray-500">Payment</p>
+      <p className="text-base md:text-lg font-semibold text-gray-900">
+        {paymentDisplay || "$0.00"}
+      </p>
+    </div>
+    <div>
+      <p className="text-xs text-gray-500">Interest Rate</p>
+      <p className="text-base md:text-lg font-semibold text-purple-600">{interestRate || 0}%</p>
+    </div>
+    <div>
+      <p className="text-xs text-gray-500">{nextPaymentInfo.label || "Next Payment"}</p>
+      <p className="text-sm md:text-base font-semibold text-gray-900">
+        {nextPaymentInfo.hasIcon && (
+          <span className="flex items-center">
+            {nextPaymentInfo.type === "next_payment"
+              ? React.createElement(getIcon("Calendar"), {
+                  className: "h-3 w-3 mr-1",
+                })
+              : React.createElement(getIcon("Clock"), {
+                  className: "h-3 w-3 mr-1",
+                })}
+            {nextPaymentInfo.value || "N/A"}
+          </span>
+        )}
+      </p>
+    </div>
+  </div>
+);
 
 const DebtCard = ({ debt, onClick }: DebtCardProps) => {
   const {
@@ -55,19 +99,6 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     handleRecordPayment,
     currentBalance,
     interestRate,
-  }: {
-    config: { bgColor: string; textColor: string; name: string };
-    IconComponent: string;
-    statusStyle: string;
-    statusText: string;
-    progressData: { percentage: number };
-    paymentInfo: { display: string };
-    nextPaymentInfo: { label: string; hasIcon: boolean; type: string; value: string };
-    relationships: { hasRelationships: boolean; items: Array<{ icon: string; label: string; name: string; className: string }> };
-    canQuickPay: boolean;
-    handleRecordPayment: () => void;
-    currentBalance: number;
-    interestRate: number;
   } = {
     config: { bgColor: "bg-gray-50", textColor: "text-gray-600", name: "Standard" },
     IconComponent: "Clock",
@@ -81,7 +112,7 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     handleRecordPayment: () => {},
     currentBalance: Number(debt?.currentBalance) || 0,
     interestRate: Number(debt?.interestRate) || 0,
-  }; // useDebtCard(debt, onRecordPayment) is commented out
+  };
 
   return (
     <div
@@ -90,7 +121,6 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center flex-1 min-w-0">
-          {/* Icon and Type */}
           <div className="flex-shrink-0">
             <div className={`p-3 rounded-2xl ${config.bgColor}`}>
               {React.createElement(getIcon(IconComponent), {
@@ -99,7 +129,6 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
             </div>
           </div>
 
-          {/* Debt Info */}
           <div className="ml-4 flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -110,61 +139,20 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
                   {debt.creditor} • {config.name}
                 </p>
               </div>
-
-              {/* Status Badge */}
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyle}`}>
                 {statusText}
               </span>
             </div>
 
-            {/* Financial Details */}
-            <div className="mt-3 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Current Balance */}
-              <div>
-                <p className="text-xs text-gray-500">Current Balance</p>
-                <p className="text-base md:text-lg font-bold text-red-600">${currentBalance}</p>
-              </div>
+            <FinancialDetails
+              currentBalance={currentBalance}
+              paymentDisplay={paymentInfo.display}
+              interestRate={interestRate}
+              nextPaymentInfo={nextPaymentInfo}
+            />
 
-              {/* Payment */}
-              <div>
-                <p className="text-xs text-gray-500">Payment</p>
-                <p className="text-base md:text-lg font-semibold text-gray-900">
-                  {paymentInfo.display || "$0.00"}
-                </p>
-              </div>
-
-              {/* Interest Rate */}
-              <div>
-                <p className="text-xs text-gray-500">Interest Rate</p>
-                <p className="text-base md:text-lg font-semibold text-purple-600">
-                  {interestRate || 0}%
-                </p>
-              </div>
-
-              {/* Next Payment / Payoff Info */}
-              <div>
-                <p className="text-xs text-gray-500">{nextPaymentInfo.label || "Next Payment"}</p>
-                <p className="text-sm md:text-base font-semibold text-gray-900">
-                  {nextPaymentInfo.hasIcon && (
-                    <span className="flex items-center">
-                      {nextPaymentInfo.type === "next_payment"
-                        ? React.createElement(getIcon("Calendar"), {
-                            className: "h-3 w-3 mr-1",
-                          })
-                        : React.createElement(getIcon("Clock"), {
-                            className: "h-3 w-3 mr-1",
-                          })}
-                      {nextPaymentInfo.value || "N/A"}
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
             <DebtCardProgressBar progressData={progressData} />
 
-            {/* Relationships */}
             {relationships.hasRelationships && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {relationships.items.map((item, index) => (
@@ -182,7 +170,6 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
           </div>
         </div>
 
-        {/* Action Button */}
         <div className="ml-2 md:ml-4 flex items-center space-x-1 md:space-x-2 flex-shrink-0">
           {canQuickPay && (
             <Button

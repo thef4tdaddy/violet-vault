@@ -4,10 +4,10 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 9 | +8 |
-| TypeScript Errors | 1470 | -178 |
+| ESLint Issues | 8 | +6 |
+| TypeScript Errors | 1369 | -109 |
 
-*Last updated: 2025-10-27 17:11:09 UTC*
+*Last updated: 2025-10-27 18:00:56 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -22,29 +22,29 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 5 issues in `violet-vault/src/utils/query/prefetchHelpers.ts`
-- 2 issues in `violet-vault/src/utils/budgeting/envelopeFormUtils.ts`
+- 5 issues in `violet-vault/src/hooks/bills/useBills/billMutations.ts`
+- 1 issues in `violet-vault/src/utils/debts/debtFormValidation.ts`
 - 1 issues in `violet-vault/src/components/debt/ui/DebtList.tsx`
 - 1 issues in `violet-vault/src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 5 | `@typescript-eslint/no-explicit-any` |
-| 2 | `no-redeclare` |
+| 4 | `@typescript-eslint/no-explicit-any` |
 | 2 | `@typescript-eslint/no-unused-vars` |
+| 1 | `max-statements` |
+| 1 | `max-params` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/budgeting/SmartEnvelopeSuggestions.tsx:32:27 - 1 - 'showSettings' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/components/debt/ui/DebtList.tsx:25:41 - 1 - 'onRecordPayment' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
-violet-vault/src/utils/budgeting/envelopeFormUtils.ts:351:10 - 2 - 'getFieldOrDefault' is already defined. (no-redeclare)
-violet-vault/src/utils/budgeting/envelopeFormUtils.ts:352:10 - 2 - 'getFieldOrDefault' is already defined. (no-redeclare)
-violet-vault/src/utils/query/prefetchHelpers.ts:35:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/utils/query/prefetchHelpers.ts:78:45 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/utils/query/prefetchHelpers.ts:118:38 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/utils/query/prefetchHelpers.ts:153:45 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/utils/query/prefetchHelpers.ts:185:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/bills/useBills/billMutations.ts:9:51 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/bills/useBills/billMutations.ts:10:16 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/bills/useBills/billMutations.ts:45:3 - 1 - Async arrow function has too many parameters (6). Maximum allowed is 5. (max-params)
+violet-vault/src/hooks/bills/useBills/billMutations.ts:250:61 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/bills/useBills/billMutations.ts:251:81 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/utils/debts/debtFormValidation.ts:230:8 - 1 - Function 'calculateDebtMetrics' has too many statements (29). Maximum allowed is 25. (max-statements)
 ```
 
 ## Typecheck Audit
@@ -54,23 +54,18 @@ violet-vault/src/utils/query/prefetchHelpers.ts:185:42 - 1 - Unexpected any. Spe
 - 46 errors in `src/hooks/analytics/__tests__/useSmartCategoryManager.test.tsx`
 - 36 errors in `src/utils/budgeting/autofunding/__tests__/rules.test.ts`
 - 34 errors in `src/utils/budgeting/autofunding/__tests__/conditions.test.ts`
-- 26 errors in `src/utils/debts/__tests__/debtFormValidation.test.ts`
+- 32 errors in `src/utils/query/__tests__/prefetchHelpers.test.ts`
 - 26 errors in `src/services/__tests__/integration/syncIntegration.test.ts`
 - 26 errors in `src/services/__tests__/budgetDatabaseService.test.ts`
-- 25 errors in `src/stores/ui/__tests__/fabStore.test.ts`
 - 25 errors in `src/services/bugReport/__tests__/systemInfoService.test.ts`
-- 24 errors in `src/utils/query/__tests__/prefetchHelpers.test.ts`
 - 24 errors in `src/services/keys/__tests__/keyManagementService.test.ts`
 - 23 errors in `src/hooks/transactions/useTransactionData.ts`
 - 22 errors in `src/utils/transactions/__tests__/operations.test.ts`
 - 22 errors in `src/utils/budgeting/__tests__/envelopeFormUtils.test.ts`
 - 22 errors in `src/hooks/transactions/__tests__/useTransactionUtils.test.ts`
-- 22 errors in `src/hooks/bills/useBills/billMutations.ts`
-- 21 errors in `src/stores/ui/fabStore.ts`
 - 20 errors in `src/hooks/auth/__tests__/useAuthManager.test.ts`
 - 19 errors in `src/utils/budgeting/suggestionUtils.ts`
 - 19 errors in `src/services/__tests__/budgetHistoryService.test.ts`
-- 19 errors in `src/hooks/bills/useBills/__tests__/billMutations.test.ts`
 - 17 errors in `src/hooks/transactions/helpers/transactionOperationsHelpers.ts`
 - 14 errors in `src/services/bugReport/__tests__/screenshotService.test.ts`
 - 13 errors in `src/utils/common/analyticsProcessor.ts`
@@ -146,6 +141,7 @@ violet-vault/src/utils/query/prefetchHelpers.ts:185:42 - 1 - Unexpected any. Spe
 - 4 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 4 errors in `src/hooks/common/useTransactionArchiving.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
+- 4 errors in `src/hooks/bills/useBills/billMutations.ts`
 - 4 errors in `src/hooks/auth/__tests__/useSecurityManagerUI.test.ts`
 - 4 errors in `src/hooks/auth/__tests__/useKeyManagementUI.test.ts`
 - 4 errors in `src/contexts/__tests__/AuthContext.test.tsx`
@@ -295,7 +291,6 @@ violet-vault/src/utils/query/prefetchHelpers.ts:185:42 - 1 - Unexpected any. Spe
 - 1 errors in `src/hooks/notifications/__tests__/useFirebaseMessaging.test.ts`
 - 1 errors in `src/hooks/mobile/__tests__/useSlideUpModal.test.ts`
 - 1 errors in `src/hooks/layout/useLayoutData.ts`
-- 1 errors in `src/hooks/debts/useDebtModalLogic.ts`
 - 1 errors in `src/hooks/debts/__tests__/useDebtForm.test.ts`
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 1 errors in `src/hooks/common/useRouterPageDetection.ts`
@@ -313,6 +308,7 @@ violet-vault/src/utils/query/prefetchHelpers.ts:185:42 - 1 - Unexpected any. Spe
 - 1 errors in `src/hooks/budgeting/autofunding/queries/useExecutableRules.ts`
 - 1 errors in `src/hooks/budgeting/__tests__/useEnvelopesQuery.test.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
+- 1 errors in `src/hooks/bills/useBills/__tests__/billMutations.test.ts`
 - 1 errors in `src/hooks/bills/useBillValidation.ts`
 - 1 errors in `src/hooks/auth/useSecurityManagerUI.ts`
 - 1 errors in `src/hooks/auth/useAuthenticationManager.ts`
@@ -377,28 +373,28 @@ violet-vault/src/utils/query/prefetchHelpers.ts:185:42 - 1 - Unexpected any. Spe
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 676 | `TS2339` |
-| 356 | `TS2345` |
-| 112 | `TS2322` |
-| 65 | `TS6133` |
-| 57 | `TS2554` |
-| 29 | `TS2353` |
-| 22 | `TS2551` |
+| 611 | `TS2339` |
+| 339 | `TS2345` |
+| 104 | `TS2322` |
+| 64 | `TS6133` |
+| 53 | `TS2554` |
+| 28 | `TS2353` |
 | 22 | `TS2352` |
+| 19 | `TS2551` |
 | 18 | `TS2739` |
 | 13 | `TS2307` |
 | 12 | `TS2363` |
 | 11 | `TS2362` |
 | 9 | `TS2741` |
-| 9 | `TS2305` |
+| 8 | `TS2305` |
 | 7 | `TS2769` |
 | 7 | `TS2708` |
 | 5 | `TS2740` |
 | 5 | `TS2613` |
-| 4 | `TS2698` |
 | 4 | `TS2365` |
 | 3 | `TS6196` |
 | 3 | `TS4104` |
+| 3 | `TS2698` |
 | 3 | `TS2538` |
 | 2 | `TS2719` |
 | 2 | `TS2717` |
@@ -799,9 +795,9 @@ src/hooks/auth/useSecurityManagerUI.ts(181,85): error TS2554: Expected 1-2 argum
 src/hooks/bills/useBillForm.ts(104,47): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'Record<string, unknown>'.
   Index signature for type 'string' is missing in type 'Bill'.
 src/hooks/bills/useBillForm.ts(171,5): error TS4104: The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
-src/hooks/bills/useBillManager.ts(83,30): error TS2352: Conversion of type 'UseMutateFunction<any, Error, void, unknown>' to type '(bill: Bill) => Promise<void>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/hooks/bills/useBillManager.ts(83,30): error TS2352: Conversion of type 'UseMutateFunction<{ id: string; updatedAt: string; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; ... 4 more ...; paymentMethod?: string; }, Error, { ...; }, unknown>' to type '(bill: Bill) => Promise<void>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Types of parameters 'variables' and 'bill' are incompatible.
-    Type 'Bill' is not comparable to type 'void'.
+    Type 'Bill' is missing the following properties from type '{ billId: string; updates: Record<string, unknown>; }': billId, updates
 src/hooks/bills/useBillManager.ts(121,72): error TS2345: Argument of type 'import("violet-vault/src/db/types").Transaction[]' is not assignable to parameter of type 'Transaction[]'.
   Type 'import("violet-vault/src/db/types").Transaction' is not assignable to type 'Transaction'.
     Index signature for type 'string' is missing in type 'Transaction'.
@@ -834,50 +830,15 @@ src/hooks/bills/useBillManagerHelpers.ts(163,3): error TS2719: Type 'Bill[]' is 
   Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
     Property 'name' is optional in type 'Bill' but required in type 'Bill'.
 src/hooks/bills/useBills/__tests__/billMutations.test.ts(6,22): error TS6133: 'waitFor' is declared but its value is never read.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(93,42): error TS2345: Argument of type '{ name: string; provider: string; amount: number; dueDate: string; category: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(116,42): error TS2345: Argument of type '{ id: string; name: string; provider: string; amount: number; dueDate: string; category: string; isPaid: boolean; createdAt: string; updatedAt: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(133,42): error TS2345: Argument of type '{ id: string; name: string; provider: string; amount: number; dueDate: string; category: string; isPaid: boolean; createdAt: string; updatedAt: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(154,49): error TS2345: Argument of type '{ id: string; name: string; provider: string; amount: number; dueDate: string; category: string; isPaid: boolean; createdAt: string; updatedAt: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(174,42): error TS2345: Argument of type '{ billId: string; updates: { name: string; amount: number; }; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(198,38): error TS2345: Argument of type '{ billId: string; updates: { name: string; }; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(212,42): error TS2345: Argument of type '{ billId: string; updates: { name: string; }; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(233,42): error TS2345: Argument of type '{ billId: string; updates: { name: string; }; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(255,42): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(270,42): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(284,42): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(311,42): error TS2345: Argument of type '{ billId: string; paidAmount: number; paidDate: string; envelopeId: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(350,42): error TS2345: Argument of type '{ billId: string; paidAmount: number; envelopeId: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(368,42): error TS2345: Argument of type '{ billId: string; paidAmount: number; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(390,42): error TS2345: Argument of type '{ billId: string; paidAmount: number; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(413,38): error TS2345: Argument of type '{ billId: string; paidAmount: number; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(442,42): error TS2345: Argument of type '{ id: string; name: string; provider: string; amount: number; dueDate: string; category: string; isPaid: boolean; createdAt: string; updatedAt: string; }' is not assignable to parameter of type 'void'.
-src/hooks/bills/useBills/__tests__/billMutations.test.ts(461,44): error TS2345: Argument of type '{ id: string; name: string; provider: string; amount: number; dueDate: string; category: string; isPaid: boolean; createdAt: string; updatedAt: string; }' is not assignable to parameter of type 'void'.
 src/hooks/bills/useBills/__tests__/billQueries.test.ts(11,3): error TS6133: 'expectQuerySuccess' is declared but its value is never read.
 src/hooks/bills/useBills/__tests__/billQueries.test.ts(12,3): error TS6133: 'expectQueryData' is declared but its value is never read.
 src/hooks/bills/useBills/__tests__/billQueries.test.ts(15,1): error TS6133: 'queryKeys' is declared but its value is never read.
-src/hooks/bills/useBills/billMutations.ts(58,27): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/bills/useBills/billMutations.ts(85,9): error TS2698: Spread types may only be created from object types.
-src/hooks/bills/useBills/billMutations.ts(92,31): error TS2339: Property 'addBill' does not exist on type '{ updateEnvelope: (queryClient: any, envelopeId: any, updates: any) => Promise<void>; addEnvelope: (queryClient: any, newEnvelope: any) => Promise<void>; removeEnvelope: (queryClient: any, envelopeId: any) => Promise<...>; ... 10 more ...; createOptimisticMutation: (queryClient: any, { mutationKey, queryKey, updateF...'.
-src/hooks/bills/useBills/billMutations.ts(112,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
-src/hooks/bills/useBills/billMutations.ts(119,22): error TS6133: 'billData' is declared but its value is never read.
-src/hooks/bills/useBills/billMutations.ts(137,26): error TS2339: Property 'billId' does not exist on type 'void'.
-src/hooks/bills/useBills/billMutations.ts(137,34): error TS2339: Property 'updates' does not exist on type 'void'.
-src/hooks/bills/useBills/billMutations.ts(151,31): error TS2554: Expected 3 arguments, but got 2.
-src/hooks/bills/useBills/billMutations.ts(162,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
-src/hooks/bills/useBills/billMutations.ts(184,31): error TS2339: Property 'deleteBill' does not exist on type '{ updateEnvelope: (queryClient: any, envelopeId: any, updates: any) => Promise<void>; addEnvelope: (queryClient: any, newEnvelope: any) => Promise<void>; removeEnvelope: (queryClient: any, envelopeId: any) => Promise<...>; ... 10 more ...; createOptimisticMutation: (queryClient: any, { mutationKey, queryKey, updateF...'.
-src/hooks/bills/useBills/billMutations.ts(187,35): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
-src/hooks/bills/useBills/billMutations.ts(189,39): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Record<string, unknown>'.
-src/hooks/bills/useBills/billMutations.ts(195,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
-src/hooks/bills/useBills/billMutations.ts(215,26): error TS2339: Property 'billId' does not exist on type 'void'.
-src/hooks/bills/useBills/billMutations.ts(215,34): error TS2339: Property 'paidAmount' does not exist on type 'void'.
-src/hooks/bills/useBills/billMutations.ts(215,46): error TS2339: Property 'paidDate' does not exist on type 'void'.
-src/hooks/bills/useBills/billMutations.ts(215,56): error TS2339: Property 'envelopeId' does not exist on type 'void'.
-src/hooks/bills/useBills/billMutations.ts(232,31): error TS2554: Expected 3 arguments, but got 2.
+src/hooks/bills/useBills/billMutations.ts(99,32): error TS2345: Argument of type '{ createdAt: string; updatedAt: string; isPaid: boolean; id: string; }' is not assignable to parameter of type 'Bill'.
+  Type '{ createdAt: string; updatedAt: string; isPaid: boolean; id: string; }' is missing the following properties from type 'Bill': name, dueDate, amount, category, and 2 more.
+src/hooks/bills/useBills/billMutations.ts(187,39): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/hooks/bills/useBills/billMutations.ts(237,9): error TS2353: Object literal may only specify known properties, and 'updatedAt' does not exist in type 'UpdateSpec<Bill> | ((obj: Bill, ctx: { value: any; primKey: IndexableType; }) => boolean | void)'.
-src/hooks/bills/useBills/billMutations.ts(250,39): error TS2345: Argument of type '{ id: string; date: any; description: any; amount: number; envelopeId: any; category: any; type: string; source: string; billId: any; notes: string; createdAt: string; }' is not assignable to parameter of type 'Transaction'.
-  Property 'lastModified' is missing in type '{ id: string; date: any; description: any; amount: number; envelopeId: any; category: any; type: string; source: string; billId: any; notes: string; createdAt: string; }' but required in type 'Transaction'.
-src/hooks/bills/useBills/billMutations.ts(251,31): error TS2554: Expected 2 arguments, but got 1.
-src/hooks/bills/useBills/billMutations.ts(268,49): error TS2322: Type '(filters?: {}) => {}[]' is not assignable to type 'readonly unknown[]'.
+src/hooks/bills/useBills/billMutations.ts(242,9): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'Bill'.
 src/hooks/bills/useBills/billQueries.ts(52,7): error TS2322: Type 'import("violet-vault/src/db/types").Bill[]' is not assignable to type 'Bill[]'.
   Type 'import("violet-vault/src/db/types").Bill' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
@@ -1124,16 +1085,14 @@ src/hooks/debts/useDebtManagement.ts(36,30): error TS2339: Property 'createTrans
 src/hooks/debts/useDebtManagement.ts(45,62): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type '{ debtId?: string; }[]'.
   Type 'Transaction' has no properties in common with type '{ debtId?: string; }'.
 src/hooks/debts/useDebtManagement.ts(70,43): error TS2339: Property 'currentBalance' does not exist on type 'DebtAccount'.
-src/hooks/debts/useDebtManagement.ts(100,7): error TS2322: Type 'UseMutateFunction<any, Error, void, unknown>' is not assignable to type '(id: string, data: { debtId: string; }) => Promise<void>'.
+src/hooks/debts/useDebtManagement.ts(100,7): error TS2322: Type 'UseMutateFunction<{ id: string; updatedAt: string; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; ... 4 more ...; paymentMethod?: string; }, Error, { ...; }, unknown>' is not assignable to type '(id: string, data: { debtId: string; }) => Promise<void>'.
   Types of parameters 'variables' and 'id' are incompatible.
-    Type 'string' is not assignable to type 'void'.
-src/hooks/debts/useDebtManagement.ts(125,7): error TS2322: Type 'UseMutateFunction<any, Error, void, unknown>' is not assignable to type '(id: string, data: { debtId: string; amount: number; }) => Promise<void>'.
+    Type 'string' is not assignable to type '{ billId: string; updates: Record<string, unknown>; }'.
+src/hooks/debts/useDebtManagement.ts(125,7): error TS2322: Type 'UseMutateFunction<{ id: string; updatedAt: string; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; ... 4 more ...; paymentMethod?: string; }, Error, { ...; }, unknown>' is not assignable to type '(id: string, data: { debtId: string; amount: number; }) => Promise<void>'.
   Types of parameters 'variables' and 'id' are incompatible.
-    Type 'string' is not assignable to type 'void'.
-src/hooks/debts/useDebtManagement.ts(154,7): error TS2322: Type 'UseMutateFunction<void, Error, void, unknown>' is not assignable to type '(id: string) => Promise<void>'.
-  Types of parameters 'variables' and 'id' are incompatible.
-    Type 'string' is not assignable to type 'void'.
-src/hooks/debts/useDebtModalLogic.ts(64,9): error TS2353: Object literal may only specify known properties, and 'currentBalance' does not exist in type 'DebtFormData'.
+    Type 'string' is not assignable to type '{ billId: string; updates: Record<string, unknown>; }'.
+src/hooks/debts/useDebtManagement.ts(154,7): error TS2322: Type 'UseMutateFunction<string, Error, string, unknown>' is not assignable to type '(id: string) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
 src/hooks/debts/useDebts.ts(98,31): error TS2339: Property 'paymentHistory' does not exist on type 'Debt'.
 src/hooks/debts/useDebts.ts(110,7): error TS2353: Object literal may only specify known properties, and 'paymentHistory' does not exist in type 'UpdateSpec<Debt> | ((obj: Debt, ctx: { value: any; primKey: IndexableType; }) => boolean | void)'.
 src/hooks/debts/useDebts.ts(132,49): error TS2322: Type '() => string[]' is not assignable to type 'readonly unknown[]'.
@@ -1667,52 +1626,6 @@ src/services/transactions/__tests__/transactionSplitterService.test.ts(2,44): er
 src/services/typedChunkedSyncService.ts(150,19): error TS2352: Conversion of type 'ChunkedSyncStats' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Index signature for type 'string' is missing in type 'ChunkedSyncStats'.
 src/services/typedFirebaseSyncService.ts(63,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'CryptoKey'.
-src/stores/ui/__tests__/fabStore.test.ts(8,29): error TS2322: Type 'unknown' is not assignable to type 'object'.
-src/stores/ui/__tests__/fabStore.test.ts(9,27): error TS2339: Property 'isVisible' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(14,30): error TS2322: Type 'unknown' is not assignable to type 'object'.
-src/stores/ui/__tests__/fabStore.test.ts(15,27): error TS2339: Property 'isExpanded' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(20,33): error TS2322: Type 'unknown' is not assignable to type 'object'.
-src/stores/ui/__tests__/fabStore.test.ts(21,27): error TS2339: Property 'currentScreen' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(26,20): error TS2339: Property 'primaryActions' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(31,20): error TS2339: Property 'secondaryActions' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(36,43): error TS2322: Type 'unknown' is not assignable to type 'object'.
-src/stores/ui/__tests__/fabStore.test.ts(37,27): error TS2339: Property 'defaultSecondaryActions' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(44,27): error TS2339: Property 'setCurrentScreen' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(49,27): error TS2339: Property 'setVisibility' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(54,27): error TS2339: Property 'setExpanded' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(59,27): error TS2339: Property 'toggleExpanded' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(64,27): error TS2339: Property 'registerPrimaryAction' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(69,27): error TS2339: Property 'unregisterPrimaryAction' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(74,27): error TS2339: Property 'registerSecondaryAction' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(79,27): error TS2339: Property 'unregisterSecondaryAction' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(84,27): error TS2339: Property 'setDefaultActionHandler' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(89,27): error TS2339: Property 'clearScreenActions' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(96,27): error TS2339: Property 'getDebugInfo' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(101,31): error TS2339: Property 'getDebugInfo' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(113,31): error TS2339: Property 'getDebugInfo' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(129,27): error TS2339: Property 'setCurrentScreen' does not exist on type 'unknown'.
-src/stores/ui/__tests__/fabStore.test.ts(134,27): error TS2339: Property 'toggleExpanded' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(44,16): error TS2339: Property 'action' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(193,36): error TS2339: Property 'currentScreen' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(194,32): error TS2339: Property 'isVisible' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(195,33): error TS2339: Property 'isExpanded' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(196,42): error TS2339: Property 'primaryActions' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(197,44): error TS2339: Property 'secondaryActions' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(198,63): error TS2339: Property 'defaultSecondaryActions' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(199,26): error TS2339: Property 'action' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(223,54): error TS2339: Property 'currentScreen' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(224,50): error TS2339: Property 'isVisible' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(225,51): error TS2339: Property 'isExpanded' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(244,57): error TS2339: Property 'setCurrentScreen' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(245,54): error TS2339: Property 'setVisibility' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(246,52): error TS2339: Property 'setExpanded' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(247,55): error TS2339: Property 'toggleExpanded' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(248,62): error TS2339: Property 'registerPrimaryAction' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(249,64): error TS2339: Property 'unregisterPrimaryAction' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(250,64): error TS2339: Property 'registerSecondaryAction' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(251,66): error TS2339: Property 'unregisterSecondaryAction' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(252,64): error TS2339: Property 'setDefaultActionHandler' does not exist on type 'unknown'.
-src/stores/ui/fabStore.ts(253,59): error TS2339: Property 'clearScreenActions' does not exist on type 'unknown'.
 src/stores/ui/toastStore.ts(46,49): error TS2345: Argument of type '(set: { (partial: ToastState | Partial<ToastState> | ((state: ToastState) => ToastState | Partial<ToastState>), replace?: false): void; (state: ToastState | ((state: ToastState) => ToastState), replace: true): void; }, _get: () => ToastState) => { ...; }' is not assignable to parameter of type 'StateCreator<ToastState, [], []>'.
   Type '(set: { (partial: ToastState | Partial<ToastState> | ((state: ToastState) => ToastState | Partial<ToastState>), replace?: false): void; (state: ToastState | ((state: ToastState) => ToastState), replace: true): void; }, _get: () => ToastState) => { ...; }' is not assignable to type '(setState: { (partial: ToastState | Partial<ToastState> | ((state: ToastState) => ToastState | Partial<ToastState>), replace?: false): void; (state: ToastState | ((state: ToastState) => ToastState), replace: true): void; }, getState: () => ToastState, store: StoreApi<...>) => ToastState'.
     Call signature return types '{ toasts: any[]; addToast: ({ type, title, message, duration }: { type?: string; title: any; message: any; duration?: number; }) => number; removeToast: (id: any) => void; clearAllToasts: () => void; showSuccess: (message: any, title?: string, duration?: number) => number; showError: (message: any, title?: string, d...' and 'ToastState' are incompatible.
@@ -2045,15 +1958,15 @@ src/utils/budgeting/envelopeCalculations.ts(40,14): error TS2362: The left-hand 
 src/utils/budgeting/envelopeCalculations.ts(40,22): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/utils/budgeting/envelopeCalculations.ts(107,21): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/utils/budgeting/envelopeCalculations.ts(107,53): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/utils/budgeting/envelopeFormUtils.ts(169,29): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/utils/budgeting/envelopeFormUtils.ts(172,29): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
   Type 'number' is not assignable to type 'string'.
-src/utils/budgeting/envelopeFormUtils.ts(188,29): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/utils/budgeting/envelopeFormUtils.ts(191,29): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
   Type 'number' is not assignable to type 'string'.
-src/utils/budgeting/envelopeFormUtils.ts(236,35): error TS2345: Argument of type 'ZodSafeParseResult<{ id: string; name: string; category: string; archived: boolean; lastModified: number; createdAt?: number; currentBalance?: number; targetAmount?: number; description?: string; }>' is not assignable to parameter of type 'ZodResult'.
+src/utils/budgeting/envelopeFormUtils.ts(242,35): error TS2345: Argument of type 'ZodSafeParseResult<{ id: string; name: string; category: string; archived: boolean; lastModified: number; createdAt?: number; currentBalance?: number; targetAmount?: number; description?: string; }>' is not assignable to parameter of type 'ZodResult'.
   Type 'ZodSafeParseError<{ id: string; name: string; category: string; archived: boolean; lastModified: number; createdAt?: number; currentBalance?: number; targetAmount?: number; description?: string; }>' is not assignable to type 'ZodResult'.
     Types of property 'error' are incompatible.
       Property 'errors' is missing in type 'ZodError<{ id: string; name: string; category: string; archived: boolean; lastModified: number; createdAt?: number; currentBalance?: number; targetAmount?: number; description?: string; }>' but required in type '{ errors: { path: (string | number)[]; message: string; }[]; }'.
-src/utils/budgeting/envelopeFormUtils.ts(311,9): error TS2741: Property 'id' is missing in type '{ name: string; monthlyAmount: number; currentBalance: number; category: string; color: string; frequency: string; description: string; priority: string; autoAllocate: boolean; icon: string; envelopeType: string; ... 5 more ...; updatedBy: string; }' but required in type 'Envelope'.
+src/utils/budgeting/envelopeFormUtils.ts(317,9): error TS2741: Property 'id' is missing in type '{ name: string; monthlyAmount: number; currentBalance: number; category: string; color: string; frequency: string; description: string; priority: string; autoAllocate: boolean; icon: string; envelopeType: string; ... 5 more ...; updatedBy: string; }' but required in type 'Envelope'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(46,30): error TS2339: Property 'monthlyAmount' does not exist on type 'Envelope'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(230,28): error TS2339: Property 'monthlyAmount' does not exist on type 'Envelope'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(236,15): error TS2339: Property 'monthlyAmount' does not exist on type 'Envelope'.
@@ -2159,43 +2072,10 @@ src/utils/dataManagement/dexieUtils.ts(70,33): error TS2345: Argument of type '{
   Property 'lastModified' is missing in type '{ id: string; unassignedCash: any; biweeklyAllocation: any; actualBalance: any; isActualBalanceManual: any; supplementalAccounts: any; lastUpdated: string; }' but required in type 'BudgetRecord'.
 src/utils/dataManagement/firebaseUtils.ts(12,18): error TS2339: Property 'syncMetadata' does not exist on type 'VioletVaultDB'.
 src/utils/dataManagement/firebaseUtils.ts(13,22): error TS2339: Property 'syncMetadata' does not exist on type 'VioletVaultDB'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(8,3): error TS2305: Module '"../debtFormValidation"' has no exported member 'formatDebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(39,32): error TS2339: Property 'currentBalance' does not exist on type 'DebtFormData'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(172,32): error TS2339: Property 'currentBalance' does not exist on type 'DebtFormData'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(173,32): error TS2339: Property 'originalBalance' does not exist on type 'DebtFormData'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(188,32): error TS2339: Property 'originalBalance' does not exist on type 'DebtFormData'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(204,44): error TS2345: Argument of type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, type, and 2 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(207,22): error TS2339: Property 'totalPaid' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(208,22): error TS2339: Property 'paymentToBalanceRatio' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(209,22): error TS2339: Property 'monthsToPayoff' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(210,22): error TS2551: Property 'totalInterest' does not exist on type 'DebtMetrics'. Did you mean 'totalInterestPaid'?
-src/utils/debts/__tests__/debtFormValidation.test.ts(211,22): error TS2339: Property 'isPaymentSufficient' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(224,44): error TS2345: Argument of type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, type, and 2 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(226,22): error TS2339: Property 'monthsToPayoff' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(227,22): error TS2551: Property 'totalInterest' does not exist on type 'DebtMetrics'. Did you mean 'totalInterestPaid'?
-src/utils/debts/__tests__/debtFormValidation.test.ts(228,22): error TS2339: Property 'isPaymentSufficient' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(241,44): error TS2345: Argument of type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, type, and 2 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(243,22): error TS2339: Property 'isPaymentSufficient' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(244,22): error TS2339: Property 'monthsToPayoff' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(245,22): error TS2551: Property 'totalInterest' does not exist on type 'DebtMetrics'. Did you mean 'totalInterestPaid'?
-src/utils/debts/__tests__/debtFormValidation.test.ts(259,44): error TS2345: Argument of type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, type, and 2 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(262,22): error TS2339: Property 'monthsToPayoff' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(274,44): error TS2345: Argument of type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; paymentFrequency: string; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, type, and 2 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(277,22): error TS2339: Property 'monthsToPayoff' does not exist on type 'DebtMetrics'.
-src/utils/debts/__tests__/debtFormValidation.test.ts(288,44): error TS2345: Argument of type '{ currentBalance: number; minimumPayment: number; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; minimumPayment: number; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, interestRate, and 4 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(302,44): error TS2345: Argument of type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; }' is not assignable to parameter of type 'DebtFormData'.
-  Type '{ currentBalance: number; originalBalance: number; interestRate: number; minimumPayment: number; }' is missing the following properties from type 'DebtFormData': name, creditor, balance, type, and 3 more.
-src/utils/debts/__tests__/debtFormValidation.test.ts(305,22): error TS2339: Property 'monthsToPayoff' does not exist on type 'DebtMetrics'.
 src/utils/debts/debtCalculations.ts(89,5): error TS2739: Type '{ monthsToPayoff: any; totalInterest: number; payoffDate: string; }' is missing the following properties from type 'PayoffProjection': totalMonths, monthlyBreakdown
-src/utils/debts/debtFormValidation.ts(103,28): error TS2339: Property 'trim' does not exist on type 'unknown'.
-src/utils/debts/debtFormValidation.ts(104,36): error TS2339: Property 'trim' does not exist on type 'unknown'.
-src/utils/debts/debtFormValidation.ts(112,30): error TS2339: Property 'trim' does not exist on type 'unknown'.
+src/utils/debts/debtFormValidation.ts(108,28): error TS2339: Property 'trim' does not exist on type 'unknown'.
+src/utils/debts/debtFormValidation.ts(109,36): error TS2339: Property 'trim' does not exist on type 'unknown'.
+src/utils/debts/debtFormValidation.ts(119,30): error TS2339: Property 'trim' does not exist on type 'unknown'.
 src/utils/debug/dataDiagnostic.ts(83,7): error TS2322: Type 'unknown' is not assignable to type 'string | number'.
 src/utils/debug/dataDiagnostic.ts(84,7): error TS2322: Type 'unknown' is not assignable to type 'string | number'.
 src/utils/debug/dataDiagnostic.ts(144,45): error TS2345: Argument of type 'BudgetRecord[]' is not assignable to parameter of type 'Record<string, unknown>'.
@@ -2304,18 +2184,26 @@ src/utils/query/__tests__/prefetchHelpers.test.ts(243,31): error TS2339: Propert
 src/utils/query/__tests__/prefetchHelpers.test.ts(273,46): error TS2339: Property 'mockResolvedValue' does not exist on type '(dateRange: DateRange, options?: GetAnalyticsDataOptions) => Promise<unknown>'.
 src/utils/query/__tests__/prefetchHelpers.test.ts(289,46): error TS2339: Property 'mockResolvedValue' does not exist on type '(dateRange: DateRange, options?: GetAnalyticsDataOptions) => Promise<unknown>'.
 src/utils/query/__tests__/prefetchHelpers.test.ts(310,13): error TS6133: 'mockResults' is declared but its value is never read.
+src/utils/query/__tests__/prefetchHelpers.test.ts(318,72): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(319,72): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(320,68): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(321,75): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(346,72): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(347,72): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(348,68): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
+src/utils/query/__tests__/prefetchHelpers.test.ts(365,75): error TS2345: Argument of type 'string' is not assignable to parameter of type 'void'.
 src/utils/query/__tests__/queryKeys.test.ts(197,42): error TS2339: Property 'unknown' does not exist on type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: {}) => {}[]; ... 48 more ...; syncActivity: () => string[]; }'.
-src/utils/query/prefetchHelpers.ts(85,13): error TS2322: Type '{ start: string; end: string; }' is not assignable to type 'DateRange'.
+src/utils/query/prefetchHelpers.ts(90,13): error TS2322: Type '{ start: string; end: string; }' is not assignable to type 'DateRange'.
   Types of property 'start' are incompatible.
     Type 'string' is not assignable to type 'Date'.
-src/utils/query/prefetchHelpers.ts(95,68): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Date'.
-src/utils/query/prefetchHelpers.ts(212,57): error TS2339: Property 'archived' does not exist on type 'unknown'.
-src/utils/query/prefetchHelpers.ts(215,39): error TS2339: Property 'unassignedCash' does not exist on type 'unknown'.
-src/utils/query/prefetchHelpers.ts(216,38): error TS2339: Property 'actualBalance' does not exist on type 'unknown'.
-src/utils/query/prefetchHelpers.ts(306,13): error TS2322: Type 'Date' is not assignable to type 'string'.
-src/utils/query/prefetchHelpers.ts(307,13): error TS2322: Type 'Date' is not assignable to type 'string'.
-src/utils/query/prefetchHelpers.ts(344,11): error TS2322: Type 'Date' is not assignable to type 'string'.
-src/utils/query/prefetchHelpers.ts(345,11): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/utils/query/prefetchHelpers.ts(100,68): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Date'.
+src/utils/query/prefetchHelpers.ts(217,57): error TS2339: Property 'archived' does not exist on type 'unknown'.
+src/utils/query/prefetchHelpers.ts(220,39): error TS2339: Property 'unassignedCash' does not exist on type 'unknown'.
+src/utils/query/prefetchHelpers.ts(221,38): error TS2339: Property 'actualBalance' does not exist on type 'unknown'.
+src/utils/query/prefetchHelpers.ts(311,13): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/utils/query/prefetchHelpers.ts(312,13): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/utils/query/prefetchHelpers.ts(349,11): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/utils/query/prefetchHelpers.ts(350,11): error TS2322: Type 'Date' is not assignable to type 'string'.
 src/utils/receipts/receiptHelpers.tsx(201,43): error TS6133: 'field' is declared but its value is never read.
 src/utils/savings/savingsCalculations.ts(43,70): error TS2554: Expected 1-2 arguments, but got 3.
 src/utils/savings/savingsCalculations.ts(262,11): error TS2339: Property 'status' does not exist on type '{}'.

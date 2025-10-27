@@ -29,14 +29,9 @@ const SuggestionBadge = ({ count, hasSuggestions }) => {
 };
 
 // Settings button component
-const SettingsButton = ({ showSettings, onClick }) => {
+const SettingsButton = ({ _showSettings, onClick }) => {
   return (
-    <Button
-      onClick={onClick}
-      variant="icon"
-      size="sm"
-      title="Settings"
-    >
+    <Button onClick={onClick} variant="icon" size="sm" title="Settings">
       {React.createElement(getIcon("Settings"), {
         className: "h-4 w-4",
       })}

@@ -4,10 +4,19 @@ import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient"
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 
+interface CloudSyncService {
+  triggerSyncForCriticalChange(change: string): void;
+}
+
+interface WindowWithCloudSync extends Window {
+  cloudSyncService?: CloudSyncService;
+}
+
 // Helper to trigger sync for bill changes
 const triggerBillSync = (changeType: string) => {
-  if (typeof window !== "undefined" && (window as any).cloudSyncService) {
-    (window as any).cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
+  const windowWithSync = window as unknown as WindowWithCloudSync;
+  if (typeof windowWithSync !== "undefined" && windowWithSync.cloudSyncService) {
+    windowWithSync.cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
   }
 };
 
@@ -34,15 +43,24 @@ const createPaymentTransaction = (
   };
 };
 
+interface PaymentUpdateParams {
+  queryClient: ReturnType<typeof useQueryClient>;
+  envelopeId: string;
+  paidAmount: number;
+  paymentDate: string;
+  billId: string;
+  transactionId: string;
+}
+
 // Helper to update envelope balance after payment
-const updateEnvelopeForPayment = async (
-  queryClient: ReturnType<typeof useQueryClient>,
-  envelopeId: string,
-  paidAmount: number,
-  paymentDate: string,
-  billId: string,
-  transactionId: string
-) => {
+const updateEnvelopeForPayment = async ({
+  queryClient,
+  envelopeId,
+  paidAmount,
+  paymentDate,
+  billId,
+  transactionId,
+}: PaymentUpdateParams) => {
   const envelope = await budgetDb.envelopes.get(envelopeId);
   if (!envelope) return;
 
@@ -113,14 +131,20 @@ export const useAddBillMutation = () => {
     onSuccess: () => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
+      queryClient.invalidateQueries({
+        queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
       // Trigger cloud sync
       triggerBillSync("add");
     },
-    onError: (error: Error, _billData: Record<string, unknown>, context: { previousBills?: unknown } | undefined) => {
+    onError: (
+      error: Error,
+      _billData: Record<string, unknown>,
+      context: { previousBills?: unknown } | undefined
+    ) => {
       logger.error("Failed to add bill:", error);
       // Rollback optimistic update if needed
       if (context?.previousBills) {
@@ -138,7 +162,13 @@ export const useUpdateBillMutation = () => {
 
   return useMutation({
     mutationKey: ["bills", "update"],
-    mutationFn: async ({ billId, updates }: { billId: string; updates: Record<string, unknown> }) => {
+    mutationFn: async ({
+      billId,
+      updates,
+    }: {
+      billId: string;
+      updates: Record<string, unknown>;
+    }) => {
       const existingBill = await budgetDb.bills.get(billId);
       if (!existingBill) {
         throw new Error(`Bill with ID ${billId} not found`);
@@ -160,7 +190,9 @@ export const useUpdateBillMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
+      queryClient.invalidateQueries({
+        queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
@@ -190,7 +222,9 @@ export const useDeleteBillMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
+      queryClient.invalidateQueries({
+        queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
@@ -210,7 +244,12 @@ export const useMarkBillPaidMutation = () => {
 
   return useMutation({
     mutationKey: ["bills", "markPaid"],
-    mutationFn: async ({ billId, paidAmount, paidDate, envelopeId }: {
+    mutationFn: async ({
+      billId,
+      paidAmount,
+      paidDate,
+      envelopeId,
+    }: {
       billId: string;
       paidAmount: number;
       paidDate?: string;
@@ -247,8 +286,9 @@ export const useMarkBillPaidMutation = () => {
       );
 
       // Add transaction to Dexie
-      await budgetDb.transactions.put(paymentTransaction as any);
-      await optimisticHelpers.addTransaction(queryClient, paymentTransaction as any);
+      const transactionRecord = paymentTransaction as unknown as Record<string, unknown>;
+      await budgetDb.transactions.put(transactionRecord);
+      await optimisticHelpers.addTransaction(queryClient, transactionRecord);
 
       // If bill is linked to envelope, update envelope balance
       if (envelopeId && paidAmount) {
@@ -266,7 +306,9 @@ export const useMarkBillPaidMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
+      queryClient.invalidateQueries({
+        queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
