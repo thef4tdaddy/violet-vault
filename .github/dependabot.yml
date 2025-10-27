@@ -8,6 +8,8 @@ updates:
       day: "monday"
       time: "06:00"
     target-branch: "develop"
+    pull-request-branch-name:
+      separator: "/"
     assignees:
       - "thef4tdaddy"
     labels:
