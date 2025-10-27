@@ -11,14 +11,18 @@ import logger from "../../utils/common/logger";
  * This replaces the Zustand-based budget history implementation
  */
 
-export const useBudgetCommits = (options = {}) => {
+export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
   const queryClient = useQueryClient();
 
   const commitsQuery = useQuery({
     queryKey: queryKeys.budgetCommits(options),
     queryFn: async () => {
       try {
-        const commits = await budgetDb.getBudgetCommits(options);
+        // Query budget commits table directly
+        const commits = await budgetDb.budgetCommits
+          .orderBy("timestamp")
+          .reverse()
+          .toArray();
         return commits || [];
       } catch (error) {
         logger.warn("Failed to fetch budget commits:", error);
@@ -32,21 +36,33 @@ export const useBudgetCommits = (options = {}) => {
 
   const createCommitMutation = useMutation({
     mutationKey: ["budgetCommits", "create"],
-    mutationFn: async (commitData) => {
+    mutationFn: async (commitData: {
+      password: string;
+      snapshot: unknown;
+      changes?: Array<Partial<import("../../db/types").BudgetChange>>;
+      message?: string;
+      author?: string;
+      parentHash?: string;
+    }) => {
       // Generate hash and encrypt snapshot
       const hash = encryptionUtils.generateHash(JSON.stringify(commitData));
-      const encryptionKey = await encryptionUtils.deriveKeyFromPassword(commitData.password);
-      const encryptedSnapshot = await encryptionUtils.encrypt(commitData.snapshot, encryptionKey);
+      const encryptionKey = await encryptionUtils.deriveKey(commitData.password);
+      const encryptedSnapshot = await encryptionUtils.encrypt(
+        JSON.stringify(commitData.snapshot),
+        encryptionKey
+      );
 
       const commit = {
-        ...commitData,
         hash,
-        encryptedSnapshot: encryptedSnapshot.data,
-        encryptedSnapshotIv: encryptedSnapshot.iv,
+        message: commitData.message || "",
+        author: commitData.author || "Unknown",
+        parentHash: commitData.parentHash || null,
+        deviceFingerprint: "",
+        encryptedSnapshot: encryptedSnapshot.encrypted,
         timestamp: Date.now(),
       };
 
-      await budgetDb.createBudgetCommit(commit);
+      await budgetDb.budgetCommits.put(commit);
 
       // Also create changes if provided
       if (commitData.changes && commitData.changes.length > 0) {
@@ -54,7 +70,7 @@ export const useBudgetCommits = (options = {}) => {
           ...change,
           commitHash: hash,
         }));
-        await budgetDb.createBudgetChanges(changes);
+        await budgetDb.createBudgetChanges(changes as import("../../db/types").BudgetChange[]);
       }
 
       return commit;
@@ -76,7 +92,7 @@ export const useBudgetCommits = (options = {}) => {
   };
 };
 
-export const useBudgetCommitDetails = (commitHash) => {
+export const useBudgetCommitDetails = (commitHash: string) => {
   return useQuery({
     queryKey: queryKeys.budgetCommit(commitHash),
     queryFn: async () => {
@@ -84,8 +100,8 @@ export const useBudgetCommitDetails = (commitHash) => {
 
       try {
         const [commit, changes] = await Promise.all([
-          budgetDb.getBudgetCommit(commitHash),
-          budgetDb.getBudgetChanges(commitHash),
+          budgetDb.budgetCommits.get(commitHash),
+          budgetDb.budgetChanges.where("commitHash").equals(commitHash).toArray(),
         ]);
 
         return { commit, changes };
@@ -104,8 +120,12 @@ export const useBudgetHistoryStats = () => {
     queryKey: queryKeys.budgetHistoryStats(),
     queryFn: async () => {
       try {
-        const commitCount = await budgetDb.getBudgetCommitCount();
-        const commits = await budgetDb.getBudgetCommits({ limit: 1 });
+        const commitCount = await budgetDb.budgetCommits.count();
+        const commits = await budgetDb.budgetCommits
+          .orderBy("timestamp")
+          .reverse()
+          .limit(1)
+          .toArray();
         const lastCommit = commits[0];
 
         return {
@@ -133,19 +153,19 @@ export const useBudgetHistoryOperations = () => {
 
   const restoreMutation = useMutation({
     mutationKey: ["budgetHistory", "restore"],
-    mutationFn: async ({ commitHash, password }) => {
-      const commit = await budgetDb.getBudgetCommit(commitHash);
+    mutationFn: async ({ commitHash, password }: { commitHash: string; password: string }) => {
+      const commit = await budgetDb.budgetCommits.get(commitHash);
       if (!commit) {
         throw new Error("Commit not found");
       }
 
       // Decrypt and restore the snapshot
-      const encryptionKey = await encryptionUtils.deriveKeyFromPassword(password);
-      const snapshot = await encryptionUtils.decrypt(
+      const encryptionKey = await encryptionUtils.deriveKey(password);
+      const decrypted = await encryptionUtils.decrypt(
         commit.encryptedSnapshot,
-        encryptionKey,
-        commit.encryptedSnapshotIv
+        encryptionKey
       );
+      const snapshot = JSON.parse(decrypted);
 
       // Restore all data to the snapshot state using Dexie
       await budgetDb.transaction(
@@ -193,7 +213,8 @@ export const useBudgetHistoryOperations = () => {
   const clearHistoryMutation = useMutation({
     mutationKey: ["budgetHistory", "clear"],
     mutationFn: async () => {
-      await budgetDb.clearBudgetHistory();
+      await budgetDb.budgetCommits.clear();
+      await budgetDb.budgetChanges.clear();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetCommits() });
@@ -203,8 +224,11 @@ export const useBudgetHistoryOperations = () => {
 
   const exportHistoryMutation = useMutation({
     mutationKey: ["budgetHistory", "export"],
-    mutationFn: async (options = {}) => {
-      const commits = await budgetDb.getBudgetCommits(options);
+    mutationFn: async (options: Record<string, unknown> = {}) => {
+      const commits = await budgetDb.budgetCommits
+        .orderBy("timestamp")
+        .reverse()
+        .toArray();
       const exportData = {
         version: "1.0",
         exportDate: new Date().toISOString(),
