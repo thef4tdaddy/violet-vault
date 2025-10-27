@@ -65,7 +65,7 @@ const DebtFormFields = ({
           </div>
           <Checkbox
             checked={formData.shouldCreateBill}
-            onCheckedChange={(checked) => setFormData({ shouldCreateBill: checked })}
+            onChange={(e) => setFormData({ shouldCreateBill: e.target.checked })}
             disabled={!canEdit}
           />
         </div>

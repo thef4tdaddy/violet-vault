@@ -33,7 +33,7 @@ const SettingsButton = ({ showSettings, onClick }) => {
   return (
     <Button
       onClick={onClick}
-      variant={showSettings ? "secondary" : "ghost"}
+      variant="icon"
       size="sm"
       title="Settings"
     >
@@ -56,7 +56,7 @@ const SuggestionsHeader = ({
   <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
     <Button
       onClick={toggleCollapse}
-      variant="ghost"
+      variant="icon"
       className={`flex items-center font-semibold text-gray-900 hover:text-gray-700 transition-colors group p-0 h-auto ${
         isCollapsed ? "text-base" : "text-lg"
       }`}

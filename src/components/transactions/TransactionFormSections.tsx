@@ -321,10 +321,10 @@ export const TransactionNotesAndReconciled = ({
         <Checkbox
           id="reconciled"
           checked={transactionForm.reconciled}
-          onCheckedChange={(checked) =>
+          onChange={(e) =>
             setTransactionForm({
               ...transactionForm,
-              reconciled: checked,
+              reconciled: e.target.checked,
             })
           }
           disabled={editingTransaction && !canEdit}

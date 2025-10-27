@@ -25,7 +25,7 @@ const SplitRemainderConfig = ({ ruleData, envelopes, toggleTargetEnvelope, error
                   <div className="flex items-center gap-3">
                     <Checkbox
                       checked={isSelected}
-                      onCheckedChange={() => toggleTargetEnvelope(envelope.id)}
+                      onChange={() => toggleTargetEnvelope(envelope.id)}
                     />
                     <div>
                       <p className="font-medium text-gray-900">{envelope.name}</p>
