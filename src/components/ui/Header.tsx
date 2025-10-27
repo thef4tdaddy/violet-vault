@@ -5,6 +5,15 @@ import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
 import SyncHealthIndicator from "../sync/SyncHealthIndicator";
 
+interface HeaderProps {
+  currentUser: unknown;
+  onUserChange: (user: unknown) => void;
+  onUpdateProfile: (profile: unknown) => void;
+  isLocalOnlyMode?: boolean;
+  onShowSettings: () => void;
+  onShowDataSettings: () => void;
+}
+
 const Header = memo(
   ({
     currentUser,
@@ -13,7 +22,7 @@ const Header = memo(
     isLocalOnlyMode = false,
     onShowSettings,
     onShowDataSettings,
-  }) => {
+  }: HeaderProps) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
@@ -48,7 +57,7 @@ const Header = memo(
                 loading="lazy"
                 className="h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 2xl:h-96 w-auto max-w-full object-contain"
                 style={{
-                  imageRendering: "high-quality",
+                  imageRendering: "crisp-edges" as const,
                 }}
               />
             </div>
@@ -74,9 +83,11 @@ const Header = memo(
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-4 pt-2 pb-4 px-2 sm:px-4">
             <UserIndicator
-              currentUser={currentUser}
-              onUserChange={onUserChange}
-              onUpdateProfile={onUpdateProfile}
+              {...({
+                currentUser,
+                onUserChange,
+                onUpdateProfile,
+              } as React.ComponentProps<typeof UserIndicator>)}
             />
 
             <div className="flex gap-2 sm:gap-3 items-center justify-center flex-wrap">

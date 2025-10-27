@@ -33,9 +33,6 @@ export class ScreenshotService {
     const { compress = true } = options;
 
     try {
-      // Check if we're on mobile - use simpler approach
-      const _isMobile = this.detectMobileDevice();
-
       let screenshot = null;
 
       // Try modern native screenshot API first (requires user interaction)
@@ -103,7 +100,7 @@ export class ScreenshotService {
     video.play();
 
     // Wait for video to be ready
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       video.onloadedmetadata = () => resolve();
     });
 
@@ -146,7 +143,7 @@ export class ScreenshotService {
       scale: 0.8,
     });
 
-    const canvas = await Promise.race([screenshotPromise, timeoutPromise]);
+    const canvas = (await Promise.race([screenshotPromise, timeoutPromise])) as HTMLCanvasElement;
     const screenshotDataUrl = canvas.toDataURL("image/png", 0.8);
 
     logger.info("html2canvas screenshot captured successfully");
@@ -241,7 +238,15 @@ export class ScreenshotService {
    * @param {string} options.format - Output format ('jpeg' or 'webp', default: 'jpeg')
    * @returns {Promise<string>} Compressed screenshot data URL
    */
-  static async compressScreenshot(dataUrl, options = {}) {
+  static async compressScreenshot(
+    dataUrl: string,
+    options: {
+      quality?: number;
+      maxWidth?: number;
+      maxHeight?: number;
+      format?: string;
+    } = {}
+  ): Promise<string> {
     try {
       const { quality = 0.7, maxWidth = 1920, maxHeight = 1080, format = "jpeg" } = options;
 

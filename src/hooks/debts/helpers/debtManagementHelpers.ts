@@ -5,6 +5,7 @@
 import logger from "@/utils/common/logger";
 import { convertPaymentFrequency, calculateInterestPortion, enrichDebt } from "@/utils/debts/debtCalculations";
 import { DEBT_STATUS } from "@/constants/debts";
+import type { PaymentFrequency, DebtAccount } from "@/types/debt";
 
 interface DebtData {
   name: string;
@@ -40,6 +41,8 @@ interface Debt {
   interestRate?: number;
   status?: string;
   envelopeId?: string;
+  lastPaymentDate?: string;
+  lastPaymentAmount?: number;
   paymentHistory?: Array<{
     date: string;
     amount: number;
@@ -157,7 +160,7 @@ export const createEnvelopeAndBillForDebt = async (
     name: `${cleanDebtData.name} Payment`,
     amount: cleanDebtData.minimumPayment,
     dueDate: cleanDebtData.paymentDueDate,
-    frequency: convertPaymentFrequency(cleanDebtData.paymentFrequency),
+    frequency: convertPaymentFrequency(cleanDebtData.paymentFrequency as PaymentFrequency),
     envelopeId: newEnvelope.id,
     debtId: createdDebt.id,
     isActive: true,
@@ -244,11 +247,11 @@ export const createDebtOperation = async (debtData: DebtData & { connectionData?
   const { connectionData, createEnvelope, createBill, updateBill, createDebtData } = options;
   
   try {
-    logger.info("Creating debt with data:", debtData);
+    logger.info("Creating debt with data", { debtData: debtData as unknown as Record<string, unknown> });
 
     const { connectionData: _, ...cleanDebtData } = debtData;
     const createdDebt = await createDebtData(cleanDebtData);
-    logger.info("Debt created:", createdDebt);
+    logger.info("Debt created", { createdDebt: createdDebt as unknown as Record<string, unknown> });
 
     await handleBillConnectionsForDebt({
       connectionData: connectionData || null,
@@ -449,7 +452,7 @@ export const enrichDebtsWithRelations = (
     );
 
     // Enrich the debt with calculated properties
-    const enrichedDebt = enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
+    const enrichedDebt = enrichDebt(debt as unknown as DebtAccount, relatedBill, relatedEnvelope, relatedTransactions);
 
     // Log first debt enrichment details
     if (index === 0) {
@@ -465,7 +468,7 @@ export const enrichDebtsWithRelations = (
           id: enrichedDebt.id,
           name: enrichedDebt.name,
           status: enrichedDebt.status,
-          currentBalance: enrichedDebt.currentBalance,
+          currentBalance: (enrichedDebt as unknown as { currentBalance?: number }).currentBalance ?? enrichedDebt.balance,
           minimumPayment: enrichedDebt.minimumPayment,
           interestRate: enrichedDebt.interestRate,
           payoffInfo: enrichedDebt.payoffInfo,
