@@ -87,6 +87,10 @@ vi.mock("../../utils/security/encryption", () => ({
   },
 }));
 
+// Type the mocked functions using vi.mocked()
+const mockedEncryptionUtils = vi.mocked(encryptionUtils);
+const mockedBudgetDb = vi.mocked(budgetDb);
+
 describe("BudgetHistoryService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -108,10 +112,10 @@ describe("BudgetHistoryService", () => {
       const mockHash = "abc123456789";
       const mockFingerprint = "device123";
 
-      encryptionUtils.generateDeviceFingerprint.mockReturnValue(mockFingerprint);
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateDeviceFingerprint.mockReturnValue(mockFingerprint);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const commitOptions = {
         entityType: "unassignedCash",
@@ -130,7 +134,7 @@ describe("BudgetHistoryService", () => {
       expect(result.commit.author).toBe("Test User");
       expect(result.changes).toHaveLength(1);
 
-      expect(budgetDb.createBudgetCommit).toHaveBeenCalledWith(
+      expect(mockedBudgetDb.createBudgetCommit).toHaveBeenCalledWith(
         expect.objectContaining({
           hash: mockHash,
           author: "Test User",
@@ -139,7 +143,7 @@ describe("BudgetHistoryService", () => {
         })
       );
 
-      expect(budgetDb.createBudgetChanges).toHaveBeenCalledWith([
+      expect(mockedBudgetDb.createBudgetChanges).toHaveBeenCalledWith([
         expect.objectContaining({
           commitHash: mockHash,
           entityType: "unassignedCash",
@@ -151,7 +155,7 @@ describe("BudgetHistoryService", () => {
 
     it("should handle commit creation errors", async () => {
       const error = new Error("Database error");
-      budgetDb.createBudgetCommit.mockRejectedValue(error);
+      mockedBudgetDb.createBudgetCommit.mockRejectedValue(error);
 
       const commitOptions = {
         entityType: "unassignedCash",
@@ -170,9 +174,9 @@ describe("BudgetHistoryService", () => {
   describe("trackUnassignedCashChange", () => {
     it("should track unassigned cash changes", async () => {
       const mockHash = "hash123";
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const options = {
         previousAmount: 1000,
@@ -190,9 +194,9 @@ describe("BudgetHistoryService", () => {
 
     it("should handle distribution source correctly", async () => {
       const mockHash = "hash123";
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const options = {
         previousAmount: 1500,
@@ -211,9 +215,9 @@ describe("BudgetHistoryService", () => {
   describe("trackActualBalanceChange", () => {
     it("should track actual balance changes", async () => {
       const mockHash = "hash123";
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const options = {
         previousBalance: 5000,
@@ -234,9 +238,9 @@ describe("BudgetHistoryService", () => {
   describe("trackDebtChange", () => {
     it("should track debt addition", async () => {
       const mockHash = "hash123";
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const options = {
         debtId: "debt1",
@@ -255,9 +259,9 @@ describe("BudgetHistoryService", () => {
 
     it("should track debt modification", async () => {
       const mockHash = "hash123";
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const options = {
         debtId: "debt1",
@@ -274,9 +278,9 @@ describe("BudgetHistoryService", () => {
 
     it("should track debt deletion", async () => {
       const mockHash = "hash123";
-      encryptionUtils.generateHash.mockReturnValue(mockHash);
-      budgetDb.createBudgetCommit.mockResolvedValue(true);
-      budgetDb.createBudgetChanges.mockResolvedValue(true);
+      mockedEncryptionUtils.generateHash.mockReturnValue(mockHash);
+      mockedBudgetDb.createBudgetCommit.mockResolvedValue("mock-hash");
+      mockedBudgetDb.createBudgetChanges.mockResolvedValue(1);
 
       const options = {
         debtId: "debt1",
@@ -309,17 +313,17 @@ describe("BudgetHistoryService", () => {
         })),
       };
 
-      budgetDb.budgetChanges.where.mockReturnValue(mockQuery);
+      mockedBudgetDb.budgetChanges.where.mockReturnValue(mockQuery);
 
       const result = await budgetHistoryService.getRecentChanges("unassignedCash", 10);
 
       expect(result).toEqual(mockChanges);
-      expect(budgetDb.budgetChanges.where).toHaveBeenCalledWith("entityType");
+      expect(mockedBudgetDb.budgetChanges.where).toHaveBeenCalledWith("entityType");
       expect(mockQuery.equals).toHaveBeenCalledWith("unassignedCash");
     });
 
     it("should handle query errors gracefully", async () => {
-      budgetDb.budgetChanges.where.mockImplementation(() => {
+      mockedBudgetDb.budgetChanges.where.mockImplementation(() => {
         throw new Error("Query failed");
       });
 
@@ -333,19 +337,19 @@ describe("BudgetHistoryService", () => {
     it("should create a new branch", async () => {
       const mockCommit = { hash: "commit123" };
 
-      budgetDb.budgetBranches.where.mockReturnValue({
+      mockedBudgetDb.budgetBranches.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue(null), // No existing branch
         })),
       });
 
-      budgetDb.budgetCommits.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue(mockCommit), // Commit exists
         })),
       });
 
-      budgetDb.createBudgetBranch.mockResolvedValue(true);
+      mockedBudgetDb.createBudgetBranch.mockResolvedValue(true);
 
       const options = {
         fromCommitHash: "commit123",
@@ -359,11 +363,11 @@ describe("BudgetHistoryService", () => {
       expect(result.name).toBe("feature-branch");
       expect(result.sourceCommitHash).toBe("commit123");
       expect(result.author).toBe("Test User");
-      expect(budgetDb.createBudgetBranch).toHaveBeenCalled();
+      expect(mockedBudgetDb.createBudgetBranch).toHaveBeenCalled();
     });
 
     it("should reject duplicate branch names", async () => {
-      budgetDb.budgetBranches.where.mockReturnValue({
+      mockedBudgetDb.budgetBranches.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue({ name: "existing-branch" }),
         })),
@@ -381,13 +385,13 @@ describe("BudgetHistoryService", () => {
     });
 
     it("should reject invalid source commit", async () => {
-      budgetDb.budgetBranches.where.mockReturnValue({
+      mockedBudgetDb.budgetBranches.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue(null), // No existing branch
         })),
       });
 
-      budgetDb.budgetCommits.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue(null), // Commit doesn't exist
         })),
@@ -409,19 +413,19 @@ describe("BudgetHistoryService", () => {
     it("should create a new tag", async () => {
       const mockCommit = { hash: "commit123" };
 
-      budgetDb.budgetTags.where.mockReturnValue({
+      mockedBudgetDb.budgetTags.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue(null), // No existing tag
         })),
       });
 
-      budgetDb.budgetCommits.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.where.mockReturnValue({
         equals: vi.fn(() => ({
           first: vi.fn().mockResolvedValue(mockCommit), // Commit exists
         })),
       });
 
-      budgetDb.createBudgetTag.mockResolvedValue(true);
+      mockedBudgetDb.createBudgetTag.mockResolvedValue(true);
 
       const options = {
         commitHash: "commit123",
@@ -436,13 +440,13 @@ describe("BudgetHistoryService", () => {
       expect(result.name).toBe("v1.0.0");
       expect(result.commitHash).toBe("commit123");
       expect(result.tagType).toBe("release");
-      expect(budgetDb.createBudgetTag).toHaveBeenCalled();
+      expect(mockedBudgetDb.createBudgetTag).toHaveBeenCalled();
     });
   });
 
   describe("verifyDeviceConsistency", () => {
     it("should return true for first commit from author", async () => {
-      budgetDb.budgetCommits.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.where.mockReturnValue({
         equals: vi.fn(() => ({
           reverse: vi.fn(() => ({
             limit: vi.fn(() => ({
@@ -466,7 +470,7 @@ describe("BudgetHistoryService", () => {
         { deviceFingerprint: "fingerprint123" },
       ];
 
-      budgetDb.budgetCommits.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.where.mockReturnValue({
         equals: vi.fn(() => ({
           reverse: vi.fn(() => ({
             limit: vi.fn(() => ({
@@ -490,7 +494,7 @@ describe("BudgetHistoryService", () => {
         { deviceFingerprint: "fingerprint2" },
       ];
 
-      budgetDb.budgetCommits.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.where.mockReturnValue({
         equals: vi.fn(() => ({
           reverse: vi.fn(() => ({
             limit: vi.fn(() => ({
@@ -514,20 +518,20 @@ describe("BudgetHistoryService", () => {
       const maxCommits = budgetHistoryService.maxRecentCommits;
       const totalCommits = maxCommits + 100;
 
-      budgetDb.budgetCommits.count.mockResolvedValue(totalCommits);
+      mockedBudgetDb.budgetCommits.count.mockResolvedValue(totalCommits);
 
       const oldCommits = Array.from({ length: 100 }, (_, i) => ({
         hash: `old-hash-${i}`,
       }));
 
-      budgetDb.budgetCommits.orderBy.mockReturnValue({
+      mockedBudgetDb.budgetCommits.orderBy.mockReturnValue({
         limit: vi.fn(() => ({
           toArray: vi.fn().mockResolvedValue(oldCommits),
         })),
       });
 
-      budgetDb.budgetCommits.bulkDelete.mockResolvedValue(true);
-      budgetDb.budgetChanges.where.mockReturnValue({
+      mockedBudgetDb.budgetCommits.bulkDelete.mockResolvedValue(true);
+      mockedBudgetDb.budgetChanges.where.mockReturnValue({
         anyOf: vi.fn(() => ({
           delete: vi.fn().mockResolvedValue(true),
         })),
@@ -535,16 +539,16 @@ describe("BudgetHistoryService", () => {
 
       await budgetHistoryService.cleanup();
 
-      expect(budgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(oldCommits.map((c) => c.hash));
+      expect(mockedBudgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(oldCommits.map((c) => c.hash));
     });
 
     it("should not cleanup when within limits", async () => {
       const maxCommits = budgetHistoryService.maxRecentCommits;
-      budgetDb.budgetCommits.count.mockResolvedValue(maxCommits - 100);
+      mockedBudgetDb.budgetCommits.count.mockResolvedValue(maxCommits - 100);
 
       await budgetHistoryService.cleanup();
 
-      expect(budgetDb.budgetCommits.bulkDelete).not.toHaveBeenCalled();
+      expect(mockedBudgetDb.budgetCommits.bulkDelete).not.toHaveBeenCalled();
     });
   });
 
