@@ -24,6 +24,9 @@ interface TestExpectedHookReturn {
   getSuggestionStats?: () => unknown;
   isDataLoading?: boolean;
   trainModel?: () => Promise<unknown>;
+  checkModelAccuracy?: () => Promise<unknown>;
+  analyzeCategoryPatterns?: () => Promise<unknown>;
+  clearSuggestions?: () => void;
   [key: string]: unknown;
 }
 
