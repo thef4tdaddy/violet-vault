@@ -33,10 +33,10 @@ export const validateEnvelope = (envelope) => {
 };
 
 // Date utilities
-export const isValidDate = (dateString: string | null | undefined): boolean => {
+export const isValidDate = (dateString) => {
   if (!dateString) return false;
   const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date.getTime()) && date.getFullYear() > 1900;
+  return date instanceof Date && !isNaN(date) && date.getFullYear() > 1900;
 };
 
 export const getDateRangeFilter = (timeFilter) => {
@@ -120,11 +120,11 @@ export const groupTransactionsByMonth = (transactions) => {
       grouped[monthKey].transactionCount++;
       grouped[monthKey].transactions.push(transaction);
     } catch (error) {
-      logger.warn("Error processing transaction in grouping:", error);
+      logger.warn("Error processing transaction in grouping:", transaction, error);
     }
   });
 
-  return Object.values(grouped).sort((a: any, b: any) => a.month.localeCompare(b.month));
+  return Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
 };
 
 export const groupTransactionsByCategory = (transactions) => {
@@ -157,7 +157,7 @@ export const groupTransactionsByCategory = (transactions) => {
     categories[category].transactions.push(transaction);
   });
 
-  return Object.values(categories).sort((a: any, b: any) => b.expenses - a.expenses);
+  return Object.values(categories).sort((a, b) => b.expenses - a.expenses);
 };
 
 export const groupTransactionsByWeekday = (transactions) => {
@@ -228,12 +228,12 @@ export const analyzeEnvelopeSpending = (transactions, envelopes) => {
 
   // Calculate utilization rates
   return Object.values(spending)
-    .map((env: any) => ({
+    .map((env) => ({
       ...env,
       utilizationRate: safeDivision(env.amount, env.budget, 0) * 100,
       remainingBudget: Math.max(0, env.budget - env.amount),
     }))
-    .sort((a: any, b: any) => b.amount - a.amount);
+    .sort((a, b) => b.amount - a.amount);
 };
 
 export const analyzeEnvelopeHealth = (envelopes) => {
@@ -283,7 +283,7 @@ export const _calculateFinancialMetrics = (transactions, envelopes) => {
   const avgMonthlyIncome =
     monthlyData.length > 0
       ? safeDivision(
-          monthlyData.reduce((sum, m: any) => sum + m.income, 0),
+          monthlyData.reduce((sum, m) => sum + m.income, 0),
           monthlyData.length,
           0
         )
@@ -292,7 +292,7 @@ export const _calculateFinancialMetrics = (transactions, envelopes) => {
   const avgMonthlyExpenses =
     monthlyData.length > 0
       ? safeDivision(
-          monthlyData.reduce((sum, m: any) => sum + m.expenses, 0),
+          monthlyData.reduce((sum, m) => sum + m.expenses, 0),
           monthlyData.length,
           0
         )

@@ -12,10 +12,35 @@ import {
 import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
 import { validateEnvelopeSafe } from "../../domain/schemas/envelope.ts";
 
+/**
+ * Form data interface
+ */
 interface EnvelopeFormData {
-  name?: string;
-  monthlyAmount?: string | number;
-  currentBalance?: string | number;
+  name: string;
+  monthlyAmount: string | number;
+  currentBalance: string | number;
+  category: string;
+  color: string;
+  frequency: string;
+  description?: string;
+  priority: string;
+  autoAllocate: boolean;
+  icon: string;
+  envelopeType: string;
+  monthlyBudget?: string | number;
+  biweeklyAllocation?: string | number;
+  targetAmount?: string | number;
+  [key: string]: unknown;
+}
+
+/**
+ * Envelope interface
+ */
+interface Envelope {
+  id: string | number;
+  name: string;
+  monthlyAmount?: number;
+  currentBalance?: number;
   category?: string;
   color?: string;
   frequency?: string;
@@ -24,32 +49,50 @@ interface EnvelopeFormData {
   autoAllocate?: boolean;
   icon?: string;
   envelopeType?: string;
-  monthlyBudget?: string | number;
-  biweeklyAllocation?: string | number;
-  targetAmount?: string | number;
+  monthlyBudget?: number;
+  biweeklyAllocation?: number;
+  targetAmount?: number;
+  createdAt?: string;
+  createdBy?: string;
+  lastUpdated?: string;
+  updatedBy?: string;
   [key: string]: unknown;
 }
 
-interface ValidationErrors {
-  [key: string]: string;
+/**
+ * Transform options interface
+ */
+interface TransformOptions {
+  editingId?: string | number;
+  createdBy?: string;
 }
 
+/**
+ * Validation result interface
+ */
 interface ValidationResult {
   isValid: boolean;
-  errors: ValidationErrors;
+  errors: Record<string, string>;
 }
 
-interface ExistingEnvelope {
-  id: string;
-  name: string;
-  [key: string]: unknown;
+/**
+ * Zod result interface
+ */
+interface ZodResult {
+  success: boolean;
+  error?: {
+    errors: Array<{
+      path: Array<string | number>;
+      message: string;
+    }>;
+  };
 }
 
 /**
  * Creates default envelope form data
  * @returns {Object} Default form data structure
  */
-export const createDefaultEnvelopeForm = () => ({
+export const createDefaultEnvelopeForm = (): EnvelopeFormData => ({
   name: "",
   monthlyAmount: "",
   currentBalance: "",
@@ -76,18 +119,15 @@ export const createDefaultEnvelopeForm = () => ({
 /**
  * Convert Zod errors to error object format
  */
-const convertZodErrors = (zodResult: unknown): ValidationErrors => {
-  const errors: ValidationErrors = {};
-  if (zodResult && typeof zodResult === 'object' && 'success' in zodResult) {
-    const result = zodResult as { success: boolean; error?: { errors: Array<{ path: Array<string | number>; message: string }> } };
-    if (!result.success && result.error) {
-      result.error.errors.forEach((err) => {
-        const fieldName = err.path[0];
-        if (fieldName && typeof fieldName === 'string') {
-          errors[fieldName] = err.message;
-        }
-      });
-    }
+const convertZodErrors = (zodResult: ZodResult): Record<string, string> => {
+  const errors = {};
+  if (!zodResult.success) {
+    zodResult.error.errors.forEach((err) => {
+      const fieldName = err.path[0];
+      if (fieldName) {
+        errors[fieldName] = err.message;
+      }
+    });
   }
   return errors;
 };
@@ -95,7 +135,12 @@ const convertZodErrors = (zodResult: unknown): ValidationErrors => {
 /**
  * Check for duplicate envelope names
  */
-const validateUniqueName = (formData: EnvelopeFormData, existingEnvelopes: ExistingEnvelope[], editingEnvelopeId: string | null, errors: ValidationErrors): void => {
+const validateUniqueName = (
+  formData: EnvelopeFormData,
+  existingEnvelopes: Envelope[],
+  editingEnvelopeId: string | number | null,
+  errors: Record<string, string>
+): void => {
   if (!errors.name && formData.name) {
     const nameExists = existingEnvelopes.some(
       (envelope) =>
@@ -111,7 +156,10 @@ const validateUniqueName = (formData: EnvelopeFormData, existingEnvelopes: Exist
 /**
  * Validate monthly amount field
  */
-const validateMonthlyAmount = (formData: EnvelopeFormData, errors: ValidationErrors): void => {
+const validateMonthlyAmount = (
+  formData: EnvelopeFormData,
+  errors: Record<string, string>
+): void => {
   const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
 
   if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
@@ -121,7 +169,7 @@ const validateMonthlyAmount = (formData: EnvelopeFormData, errors: ValidationErr
 
   if (!formData.monthlyAmount) return;
 
-  const amount = parseFloat(String(formData.monthlyAmount));
+  const amount = parseFloat(formData.monthlyAmount);
   if (isNaN(amount) || amount < 0) {
     errors.monthlyAmount = "Monthly amount must be a positive number";
   } else if (amount > 100000) {
@@ -132,7 +180,7 @@ const validateMonthlyAmount = (formData: EnvelopeFormData, errors: ValidationErr
 /**
  * Validate target amount for sinking funds
  */
-const validateTargetAmount = (formData: EnvelopeFormData, errors: ValidationErrors): void => {
+const validateTargetAmount = (formData: EnvelopeFormData, errors: Record<string, string>): void => {
   if (formData.envelopeType !== ENVELOPE_TYPES.SINKING_FUND) return;
 
   if (!formData.targetAmount) {
@@ -140,7 +188,7 @@ const validateTargetAmount = (formData: EnvelopeFormData, errors: ValidationErro
     return;
   }
 
-  const amount = parseFloat(String(formData.targetAmount));
+  const amount = parseFloat(formData.targetAmount);
   if (isNaN(amount) || amount <= 0) {
     errors.targetAmount = "Target amount must be a positive number";
   } else if (amount > 1000000) {
@@ -151,7 +199,10 @@ const validateTargetAmount = (formData: EnvelopeFormData, errors: ValidationErro
 /**
  * Validate category, priority, and frequency fields
  */
-const validateAdditionalFields = (formData: EnvelopeFormData, errors: ValidationErrors): void => {
+const validateAdditionalFields = (
+  formData: EnvelopeFormData,
+  errors: Record<string, string>
+): void => {
   // Category validation
   if (!errors.category && formData.category) {
     const availableCategories = getEnvelopeCategories();
@@ -176,15 +227,15 @@ const validateAdditionalFields = (formData: EnvelopeFormData, errors: Validation
 
 /**
  * Validates envelope form data using Zod schema + form-specific logic
- * @param formData - Form data to validate
- * @param existingEnvelopes - Existing envelopes for name uniqueness
- * @param editingEnvelopeId - ID of envelope being edited (for name uniqueness)
- * @returns Validation result with errors object
+ * @param {Object} formData - Form data to validate
+ * @param {Array} existingEnvelopes - Existing envelopes for name uniqueness
+ * @param {string} editingEnvelopeId - ID of envelope being edited (for name uniqueness)
+ * @returns {Object} Validation result with errors object
  */
 export const validateEnvelopeForm = (
   formData: EnvelopeFormData,
-  existingEnvelopes: ExistingEnvelope[] = [],
-  editingEnvelopeId: string | null = null
+  existingEnvelopes: Envelope[] = [],
+  editingEnvelopeId: string | number | null = null
 ): ValidationResult => {
   // Use Zod schema for base validation
   const zodResult = validateEnvelopeSafe(formData);
@@ -204,26 +255,16 @@ export const validateEnvelopeForm = (
 
 /**
  * Calculates derived amounts based on form data
- * @param formData - Form data
- * @returns Calculated amounts
+ * @param {Object} formData - Form data
+ * @returns {Object} Calculated amounts
  */
-export const calculateEnvelopeAmounts = (formData: EnvelopeFormData): {
-  monthlyAmount: number;
-  biweeklyAllocation: number;
-  monthlyBudget: number;
-  annualizedAmount: number;
-  targetAmount: number;
-  currentBalance: number;
-  annualAmount: number;
-  weeklyAmount: number;
-  frequencyMultiplier: number;
-} => {
+export const calculateEnvelopeAmounts = (formData: EnvelopeFormData) => {
   const monthlyAmount = parseFloat(String(formData.monthlyAmount)) || 0;
   const targetAmount = parseFloat(String(formData.targetAmount)) || 0;
   const currentBalance = parseFloat(String(formData.currentBalance)) || 0;
 
   // Calculate biweekly allocation
-  const biweeklyAllocation = monthlyAmount > 0 ? toBiweekly(monthlyAmount, 'monthly') : 0;
+  const biweeklyAllocation = monthlyAmount > 0 ? toBiweekly(monthlyAmount, "monthly") : 0;
 
   // Calculate monthly budget (may differ from monthlyAmount based on type)
   let monthlyBudget = monthlyAmount;
@@ -246,7 +287,6 @@ export const calculateEnvelopeAmounts = (formData: EnvelopeFormData): {
     }[formData.frequency] || 12;
 
   const annualAmount = monthlyAmount * 12;
-  const annualizedAmount = annualAmount; // Alias for backward compatibility
   const weeklyAmount = monthlyAmount / (52 / 12);
 
   return {
@@ -256,7 +296,6 @@ export const calculateEnvelopeAmounts = (formData: EnvelopeFormData): {
     targetAmount,
     currentBalance,
     annualAmount,
-    annualizedAmount,
     weeklyAmount,
     frequencyMultiplier,
   };
@@ -264,16 +303,19 @@ export const calculateEnvelopeAmounts = (formData: EnvelopeFormData): {
 
 /**
  * Transforms form data into envelope object
- * @param formData - Form data
- * @param options - Additional options (editingId, createdBy, etc.)
- * @returns Envelope object ready for save
+ * @param {Object} formData - Form data
+ * @param {Object} options - Additional options (editingId, createdBy, etc.)
+ * @returns {Object} Envelope object ready for save
  */
-export const transformFormToEnvelope = (formData: EnvelopeFormData, options: { editingId?: string; createdBy?: string; updatedBy?: string } = {}): Record<string, unknown> => {
+export const transformFormToEnvelope = (
+  formData: EnvelopeFormData,
+  options: TransformOptions = {}
+): Envelope => {
   const { editingId, createdBy = "Unknown User" } = options;
   const amounts = calculateEnvelopeAmounts(formData);
 
-  const envelope: Record<string, unknown> = {
-    name: (formData.name || "").trim(),
+  const envelope: Envelope = {
+    name: formData.name.trim(),
     monthlyAmount: amounts.monthlyAmount,
     currentBalance: amounts.currentBalance,
     category: formData.category,
@@ -309,38 +351,44 @@ export const transformFormToEnvelope = (formData: EnvelopeFormData, options: { e
 };
 
 /**
+ * Get field with default value
+ */
+function getFieldOrDefault(value: unknown, defaultValue: string): string;
+function getFieldOrDefault(value: unknown, defaultValue: boolean): boolean;
+function getFieldOrDefault(value: unknown, defaultValue: string | boolean): string | boolean {
+  if (value === null || value === undefined) {
+    return defaultValue;
+  }
+  return value as string | boolean;
+}
+
+/**
  * Convert number to string or return empty string
  */
-const toStringOrEmpty = (value: unknown): string => {
-  if (typeof value === 'number') {
-    return value.toString();
-  }
-  if (typeof value === 'string') {
-    return value;
-  }
-  return "";
+const toStringOrEmpty = (value: number | undefined | null): string => {
+  return value?.toString() || "";
 };
 
 /**
  * Transforms envelope object to form data
- * @param envelope - Envelope object
- * @returns Form data
+ * @param {Object} envelope - Envelope object
+ * @returns {Object} Form data
  */
-export const transformEnvelopeToForm = (envelope: Record<string, unknown> | null): EnvelopeFormData => {
+export const transformEnvelopeToForm = (envelope: Envelope | null): EnvelopeFormData => {
   if (!envelope) return createDefaultEnvelopeForm();
 
   return {
-    name: String(envelope.name || ""),
+    name: getFieldOrDefault(envelope.name, ""),
     monthlyAmount: toStringOrEmpty(envelope.monthlyAmount),
     currentBalance: toStringOrEmpty(envelope.currentBalance),
-    category: String(envelope.category || ""),
-    color: String(envelope.color || "#a855f7"),
-    frequency: String(envelope.frequency || "monthly"),
-    description: String(envelope.description || ""),
-    priority: String(envelope.priority || "medium"),
+    category: getFieldOrDefault(envelope.category, ""),
+    color: getFieldOrDefault(envelope.color, "#a855f7"),
+    frequency: getFieldOrDefault(envelope.frequency, "monthly"),
+    description: getFieldOrDefault(envelope.description, ""),
+    priority: getFieldOrDefault(envelope.priority, "medium"),
     autoAllocate: envelope.autoAllocate !== false, // Default to true
-    icon: String(envelope.icon || "Target"),
-    envelopeType: String(envelope.envelopeType || ENVELOPE_TYPES.VARIABLE),
+    icon: getFieldOrDefault(envelope.icon, "Target"),
+    envelopeType: getFieldOrDefault(envelope.envelopeType, ENVELOPE_TYPES.VARIABLE),
     monthlyBudget: toStringOrEmpty(envelope.monthlyBudget),
     biweeklyAllocation: toStringOrEmpty(envelope.biweeklyAllocation),
     targetAmount: toStringOrEmpty(envelope.targetAmount),
@@ -349,25 +397,16 @@ export const transformEnvelopeToForm = (envelope: Record<string, unknown> | null
 
 /**
  * Calculates envelope progress for sinking funds
- * @param envelope - Envelope object
- * @returns Progress information
+ * @param {Object} envelope - Envelope object
+ * @returns {Object} Progress information
  */
-export const calculateEnvelopeProgress = (envelope: Record<string, unknown>): {
-  percentage: number;
-  progressPercentage: number;
-  remaining: number;
-  remainingAmount: number;
-  isComplete: boolean;
-  monthsRemaining: number | null;
-  currentBalance: number;
-  targetAmount: number;
-} | null => {
+export const calculateEnvelopeProgress = (envelope: Envelope) => {
   if (envelope.envelopeType !== ENVELOPE_TYPES.SINKING_FUND) {
     return null;
   }
 
-  const currentBalance = Number(envelope.currentBalance) || 0;
-  const targetAmount = Number(envelope.targetAmount) || 0;
+  const currentBalance = envelope.currentBalance || 0;
+  const targetAmount = envelope.targetAmount || 0;
 
   if (targetAmount <= 0) return null;
 
@@ -377,14 +416,12 @@ export const calculateEnvelopeProgress = (envelope: Record<string, unknown>): {
 
   // Estimate completion time based on monthly allocation
   let monthsRemaining = null;
-  if (!isComplete && Number(envelope.monthlyAmount) > 0) {
-    monthsRemaining = Math.ceil(remainingAmount / Number(envelope.monthlyAmount));
+  if (!isComplete && envelope.monthlyAmount > 0) {
+    monthsRemaining = Math.ceil(remainingAmount / envelope.monthlyAmount);
   }
 
   return {
-    percentage: progressPercentage, // Alias for backward compatibility
     progressPercentage,
-    remaining: remainingAmount, // Alias for backward compatibility
     remainingAmount,
     isComplete,
     monthsRemaining,
@@ -423,13 +460,13 @@ export const getColorOptions = () => [
 
 /**
  * Validates envelope type compatibility with existing data
- * @param newType - New envelope type
- * @param envelope - Existing envelope data
- * @returns Compatibility result
+ * @param {string} newType - New envelope type
+ * @param {Object} envelope - Existing envelope data
+ * @returns {Object} Compatibility result
  */
-export const validateEnvelopeTypeChange = (newType: string, envelope: Record<string, unknown> | null): { isValid: boolean; warnings: string[]; errors: string[] } => {
-  const warnings: string[] = [];
-  const errors: string[] = [];
+export const validateEnvelopeTypeChange = (newType: string, envelope: Envelope | null) => {
+  const warnings = [];
+  const errors = [];
 
   if (!envelope) return { isValid: true, warnings, errors };
 
@@ -438,7 +475,7 @@ export const validateEnvelopeTypeChange = (newType: string, envelope: Record<str
     envelope.envelopeType === ENVELOPE_TYPES.SINKING_FUND &&
     newType !== ENVELOPE_TYPES.SINKING_FUND
   ) {
-    if (Number(envelope.targetAmount) > 0) {
+    if (envelope.targetAmount > 0) {
       warnings.push("Changing from sinking fund will remove target amount tracking");
     }
   }
