@@ -4,6 +4,26 @@ import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
 
+interface EnvelopeFilters {
+  category?: string;
+  includeArchived?: boolean;
+}
+
+interface TransactionOptions {
+  limit?: number;
+}
+
+interface BillOptions {
+  category?: string;
+  isPaid?: boolean;
+  daysAhead?: number;
+}
+
+interface GoalOptions {
+  isCompleted?: boolean;
+  category?: string;
+}
+
 /**
  * Enhanced prefetch utilities with Dexie fallback for offline support.
  * These helpers intelligently use cached data when available.
@@ -12,7 +32,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch envelopes with optional filtering
    */
-  prefetchEnvelopes: async (queryClient, filters = {}) => {
+  prefetchEnvelopes: async (queryClient: any, filters: EnvelopeFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.envelopesList(filters),

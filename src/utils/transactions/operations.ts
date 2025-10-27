@@ -71,7 +71,7 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
     const prepared = {
       id: transactionData.id || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       description: (transactionData.description || "").trim(),
-      amount: parseFloat(transactionData.amount) || 0,
+      amount: typeof transactionData.amount === "number" ? transactionData.amount : parseFloat(String(transactionData.amount)) || 0,
       date: new Date(transactionData.date).toISOString(),
       category: (transactionData.category || "").trim(),
       account: (transactionData.account || "").trim() || "default",
@@ -89,7 +89,7 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
     return prepared;
   } catch (error) {
     logger.error("Error preparing transaction for storage", error);
-    throw new Error("Failed to prepare transaction data: " + error.message);
+    throw new Error("Failed to prepare transaction data: " + (error as Error).message);
   }
 };
 
@@ -134,15 +134,17 @@ export const createTransferPair = (transferData: TransactionBase & { fromAccount
     const now = new Date().toISOString();
     const amount = Math.abs(transferData.amount);
 
-    const outgoingTransaction = {
+    const outgoingTransaction: Transaction = {
       id: `${transferId}_out`,
       description: transferData.description || `Transfer to ${transferData.toAccount}`,
       amount: -amount, // Negative for outgoing
       date: new Date(transferData.date).toISOString(),
       category: "Transfer",
       account: transferData.fromAccount,
-      type: "transfer",
+      type: "transfer" as const,
       envelopeId: transferData.fromEnvelopeId || null,
+      isSplit: false,
+      parentTransactionId: null,
       metadata: {
         isTransfer: true,
         transferId,
@@ -155,15 +157,17 @@ export const createTransferPair = (transferData: TransactionBase & { fromAccount
       },
     };
 
-    const incomingTransaction = {
+    const incomingTransaction: Transaction = {
       id: `${transferId}_in`,
       description: transferData.description || `Transfer from ${transferData.fromAccount}`,
       amount: amount, // Positive for incoming
       date: new Date(transferData.date).toISOString(),
       category: "Transfer",
       account: transferData.toAccount,
-      type: "transfer",
+      type: "transfer" as const,
       envelopeId: transferData.toEnvelopeId || null,
+      isSplit: false,
+      parentTransactionId: null,
       metadata: {
         isTransfer: true,
         transferId,
@@ -385,6 +389,11 @@ interface FormattedTransaction extends TransactionBase {
   amountDisplay?: string;
   formattedDate?: string;
   formattedTime?: string;
+  isIncome?: boolean;
+  isExpense?: boolean;
+  isTransfer?: boolean;
+  categoryDisplay?: string;
+  accountDisplay?: string;
 }
 
 /**
