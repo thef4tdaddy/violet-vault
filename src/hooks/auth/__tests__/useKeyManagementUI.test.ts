@@ -265,7 +265,7 @@ describe("useKeyManagementOperations", () => {
         text: vi.fn(() => Promise.resolve('{"type":"unprotected","key":[1,2,3]}')),
       };
 
-      const data = await result.current.handleFileRead(mockFile);
+      const data = await result.current.handleFileRead(mockFile as any);
 
       expect(data).toEqual({
         type: "unprotected",
@@ -281,7 +281,7 @@ describe("useKeyManagementOperations", () => {
         text: vi.fn(() => Promise.reject(new Error("File read error"))),
       };
 
-      await expect(result.current.handleFileRead(mockFile)).rejects.toThrow("File read error");
+      await expect(result.current.handleFileRead(mockFile as any)).rejects.toThrow("File read error");
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Failed to read key file. Please check the file format.",
         "File Read Error"
@@ -296,7 +296,7 @@ describe("useKeyManagementOperations", () => {
         text: vi.fn(() => Promise.resolve("invalid-json")),
       };
 
-      await expect(result.current.handleFileRead(mockFile)).rejects.toThrow();
+      await expect(result.current.handleFileRead(mockFile as any)).rejects.toThrow();
       expect(globalToast.showError).toHaveBeenCalled();
     });
   });
@@ -322,7 +322,7 @@ describe("useKeyManagementOperations", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
       const { globalToast } = require("../../../stores/ui/toastStore");
 
-      const error = {};
+      const error = {} as Error;
 
       result.current.handleImportError(error);
 

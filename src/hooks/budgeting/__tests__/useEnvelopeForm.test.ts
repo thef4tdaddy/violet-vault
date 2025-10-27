@@ -89,7 +89,7 @@ describe("useEnvelopeForm", () => {
         result.current.updateFormField("name", "Valid Name");
       });
 
-      expect(result.current.errors.name).toBeUndefined();
+      expect((result.current.errors as Record<string, string | undefined>).name).toBeUndefined();
     });
 
     it("should handle envelope type changes", () => {
@@ -164,8 +164,8 @@ describe("useEnvelopeForm", () => {
       });
 
       expect(isValid).toBe(false);
-      expect(result.current.errors.name).toBeDefined();
-      expect(result.current.errors.monthlyAmount).toBeDefined();
+      expect((result.current.errors as any).name).toBeDefined();
+      expect((result.current.errors as any).monthlyAmount).toBeDefined();
     });
 
     it("should check for duplicate names", () => {
@@ -184,13 +184,13 @@ describe("useEnvelopeForm", () => {
       });
 
       expect(isValid).toBe(false);
-      expect(result.current.errors.name).toContain("already exists");
+      expect((result.current.errors as any).name).toContain("already exists");
     });
   });
 
   describe("Form submission", () => {
     it("should handle successful submission", async () => {
-      const mockOnSave = vi.fn().mockResolvedValue();
+      const mockOnSave = vi.fn().mockResolvedValue(undefined);
       const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }));
 
       // Set valid form data
@@ -199,7 +199,7 @@ describe("useEnvelopeForm", () => {
           name: "Test Envelope",
           category: "Food",
           monthlyAmount: "100",
-        });
+        } as any);
       });
 
       let success;

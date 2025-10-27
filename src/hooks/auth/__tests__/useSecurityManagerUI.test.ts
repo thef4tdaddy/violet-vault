@@ -415,7 +415,7 @@ describe("useClipboardSecurity", () => {
   });
 
   it("should auto-clear clipboard after timeout", async () => {
-    navigator.clipboard.readText.mockResolvedValueOnce("secret text");
+    (navigator.clipboard.readText as any).mockResolvedValueOnce("secret text");
 
     const { result } = renderHook(() =>
       useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
@@ -444,7 +444,7 @@ describe("useClipboardSecurity", () => {
   });
 
   it("should handle clipboard copy errors", async () => {
-    navigator.clipboard.writeText.mockRejectedValueOnce(new Error("Clipboard error"));
+    (navigator.clipboard.writeText as any).mockRejectedValueOnce(new Error("Clipboard error"));
 
     const { result } = renderHook(() =>
       useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
@@ -474,7 +474,7 @@ describe("useClipboardSecurity", () => {
   });
 
   it("should not clear clipboard if content changed", async () => {
-    navigator.clipboard.readText.mockResolvedValueOnce("different text"); // Different from what was copied
+    (navigator.clipboard.readText as any).mockResolvedValueOnce("different text"); // Different from what was copied
 
     const { result } = renderHook(() =>
       useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
@@ -485,7 +485,7 @@ describe("useClipboardSecurity", () => {
     });
 
     // Reset the call count
-    navigator.clipboard.writeText.mockClear();
+    (navigator.clipboard.writeText as any).mockClear();
 
     // Fast-forward past the timeout
     act(() => {

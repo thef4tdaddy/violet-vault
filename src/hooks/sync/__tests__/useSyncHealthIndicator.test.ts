@@ -1,5 +1,6 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useSyncHealthIndicator } from "../useSyncHealthIndicator";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Mock dependencies
 vi.mock("../../../utils/sync/masterSyncValidator", () => ({
@@ -25,12 +26,12 @@ const { getQuickSyncStatus } = require("../../../utils/sync/masterSyncValidator"
 describe("useSyncHealthIndicator", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   it("should initialize with loading state", () => {
@@ -59,7 +60,7 @@ describe("useSyncHealthIndicator", () => {
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 
-    await waitFor(() => {
+    await vi.waitFor(() => {
       expect(result.current.syncStatus.isLoading).toBe(false);
     });
 
@@ -75,7 +76,7 @@ describe("useSyncHealthIndicator", () => {
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 
-    await waitFor(() => {
+    await vi.waitFor(() => {
       expect(result.current.syncStatus.isLoading).toBe(false);
     });
 
@@ -116,7 +117,7 @@ describe("useSyncHealthIndicator", () => {
 
     // Fast-forward the interval
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(result.current.isBackgroundSyncing).toBe(true);
@@ -128,7 +129,7 @@ describe("useSyncHealthIndicator", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(result.current.isBackgroundSyncing).toBe(false);
@@ -183,7 +184,7 @@ describe("useSyncHealthIndicator", () => {
     expect(global.window.forceCloudDataReset).toHaveBeenCalled();
 
     // Should refresh health status after reset
-    await waitFor(() => {
+    await vi.waitFor(() => {
       expect(getQuickSyncStatus).toHaveBeenCalledTimes(2); // Once on mount, once after reset
     });
 
@@ -204,7 +205,7 @@ describe("useSyncHealthIndicator", () => {
 
     // Fast-forward 2 minutes (120000ms)
     act(() => {
-      jest.advanceTimersByTime(120000);
+      vi.advanceTimersByTime(120000);
     });
 
     // Should check again after interval

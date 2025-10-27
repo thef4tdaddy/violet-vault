@@ -9,11 +9,8 @@ import type {
   Transaction,
   Bill,
   SavingsGoal,
-  PaycheckHistory,
-  Debt,
   BudgetCommit,
   BudgetChange,
-  CacheEntry,
 } from "../types";
 
 // Mock logger to avoid console output during tests
@@ -713,7 +710,7 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
         // Query using compound index [category+archived]
         const envelopes = await testDb.envelopes
           .where("[category+archived]")
-          .equals(["Needs", false])
+          .equals(["Needs", false] as any)
           .toArray();
         expect(Array.isArray(envelopes)).toBe(true);
       } catch (error) {

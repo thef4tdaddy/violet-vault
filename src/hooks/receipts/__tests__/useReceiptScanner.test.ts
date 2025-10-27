@@ -14,10 +14,9 @@ describe("useReceiptScanner", () => {
   beforeEach(() => {
     mockFile = new File(["receipt content"], "receipt.jpg", {
       type: "image/jpeg",
-      size: 1024,
-    });
+    } as any);
     mockOnReceiptProcessed.mockClear();
-    processReceiptImage.mockClear();
+    (processReceiptImage as any).mockClear();
 
     // Mock URL.createObjectURL
     global.URL.createObjectURL = vi.fn(() => "mock-url");
@@ -56,8 +55,7 @@ describe("useReceiptScanner", () => {
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
     const largeFile = new File(["large content"], "large.jpg", {
       type: "image/jpeg",
-      size: 11 * 1024 * 1024, // 11MB
-    });
+    } as FilePropertyBag);
 
     await act(async () => {
       await result.current.handleFileUpload(largeFile);
@@ -76,7 +74,7 @@ describe("useReceiptScanner", () => {
       confidence: { merchant: "high", total: "high" },
     };
 
-    processReceiptImage.mockResolvedValue(mockResult);
+    (processReceiptImage as any).mockResolvedValue(mockResult);
 
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 
@@ -96,7 +94,7 @@ describe("useReceiptScanner", () => {
   });
 
   it("should handle OCR processing errors", async () => {
-    processReceiptImage.mockRejectedValue(new Error("OCR failed"));
+    (processReceiptImage as any).mockRejectedValue(new Error("OCR failed"));
 
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 
@@ -113,7 +111,7 @@ describe("useReceiptScanner", () => {
 
   it("should handle drag and drop", async () => {
     const mockResult = { merchant: "Store", total: 10.0 };
-    processReceiptImage.mockResolvedValue(mockResult);
+    (processReceiptImage as any).mockResolvedValue(mockResult);
 
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 

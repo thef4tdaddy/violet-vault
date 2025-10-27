@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useQuery } from "@tanstack/react-query";
-import useTransactionQuery from "../useTransactionQuery";
+import { useTransactionQuery } from "../useTransactionQuery";
 
 // Mock dependencies
 vi.mock("@tanstack/react-query", () => ({
@@ -38,7 +38,7 @@ describe("useTransactionQuery", () => {
       refetch: vi.fn(),
     };
 
-    useQuery.mockReturnValue(mockQueryResult);
+    (useQuery as any).mockReturnValue(mockQueryResult);
 
     const { result } = renderHook(() => useTransactionQuery());
 
@@ -62,7 +62,7 @@ describe("useTransactionQuery", () => {
       refetch: vi.fn(),
     };
 
-    useQuery.mockReturnValue(mockQueryResult);
+    (useQuery as any).mockReturnValue(mockQueryResult);
 
     const { result } = renderHook(() => useTransactionQuery());
 
@@ -79,7 +79,7 @@ describe("useTransactionQuery", () => {
       refetch: vi.fn(),
     };
 
-    useQuery.mockReturnValue(mockQueryResult);
+    (useQuery as any).mockReturnValue(mockQueryResult);
 
     const { result } = renderHook(() => useTransactionQuery());
 
@@ -97,7 +97,7 @@ describe("useTransactionQuery", () => {
       refetch: mockRefetch,
     };
 
-    useQuery.mockReturnValue(mockQueryResult);
+    (useQuery as any).mockReturnValue(mockQueryResult);
 
     const { result } = renderHook(() => useTransactionQuery());
 
@@ -112,7 +112,7 @@ describe("useTransactionQuery", () => {
       refetch: vi.fn(),
     };
 
-    useQuery.mockReturnValue(mockQueryResult);
+    (useQuery as any).mockReturnValue(mockQueryResult);
 
     const { result } = renderHook(() => useTransactionQuery());
 
@@ -128,7 +128,7 @@ describe("useTransactionQuery", () => {
       refetch: vi.fn(),
     };
 
-    useQuery.mockReturnValue(mockQueryResult);
+    (useQuery as any).mockReturnValue(mockQueryResult);
 
     const { result } = renderHook(() => useTransactionQuery());
 

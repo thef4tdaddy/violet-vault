@@ -23,21 +23,21 @@ vi.mock("../../../utils/common/queryClient");
 
 describe("useImportData", () => {
   it("should import data successfully", async () => {
-    useAuth.mockReturnValue({
+    (useAuth as any).mockReturnValue({
       currentUser: { userName: "testuser", budgetId: "123" },
     });
     const showSuccessToast = vi.fn();
-    useToastHelpers.mockReturnValue({
+    (useToastHelpers as any).mockReturnValue({
       showSuccessToast,
       showErrorToast: vi.fn(),
     });
-    useConfirm.mockReturnValue(vi.fn().mockResolvedValue(true));
-    readFileContent.mockResolvedValue(JSON.stringify({ envelopes: [] }));
-    validateImportedData.mockReturnValue({
+    (useConfirm as any).mockReturnValue(vi.fn().mockResolvedValue(true));
+    (readFileContent as any).mockResolvedValue(JSON.stringify({ envelopes: [] }));
+    (validateImportedData as any).mockReturnValue({
       validatedData: { envelopes: [] },
       hasBudgetIdMismatch: false,
     });
-    forcePushToCloud.mockResolvedValue({ success: true });
+    (forcePushToCloud as any).mockResolvedValue({ success: true });
 
     const { result } = renderHook(() => useImportData());
     const event = { target: { files: [new Blob()] } };
