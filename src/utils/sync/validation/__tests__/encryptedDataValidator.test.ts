@@ -3,13 +3,22 @@ import { validateEncryptedData } from "../encryptedDataValidator";
 import { VALIDATION_CONSTANTS } from "../constants";
 
 // Mock logger
-vi.mock("../../common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
   },
 }));
+
+// Type definition for valid validation result
+type ValidResult = { 
+  isValid: true; 
+  errors: unknown[]; 
+  warnings: unknown[]; 
+  dataLength: number; 
+  ivLength: number;
+};
 
 describe("encryptedDataValidator", () => {
   beforeEach(() => {
@@ -28,8 +37,8 @@ describe("encryptedDataValidator", () => {
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
       expect(result.warnings).toHaveLength(0);
-      expect(result.dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
-      expect(result.ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
+      expect((result as ValidResult).dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect((result as ValidResult).ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
     });
 
     it("should reject null/undefined data", () => {
@@ -152,8 +161,8 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
-      expect(result.dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
-      expect(result.ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
+      expect((result as ValidResult).dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect((result as ValidResult).ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
     });
 
     it("should handle exactly maximum sizes", () => {
@@ -171,7 +180,7 @@ describe("encryptedDataValidator", () => {
 
   describe("logging integration", () => {
     it("should log validation failures", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("@/utils/common/logger");
 
       const invalidData = {
         data: "too-short",
@@ -191,7 +200,7 @@ describe("encryptedDataValidator", () => {
     });
 
     it("should log validation warnings", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("@/utils/common/logger");
 
       const largeData = {
         data: "a".repeat(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE + 1),
@@ -210,7 +219,7 @@ describe("encryptedDataValidator", () => {
     });
 
     it("should log successful validation", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("@/utils/common/logger");
 
       const validData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
