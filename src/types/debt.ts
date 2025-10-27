@@ -168,6 +168,8 @@ export interface DebtFormData {
   name: string;
   creditor: string;
   balance: number;
+  currentBalance?: number; // Alias for balance to support legacy usage
+  originalBalance?: number;
   interestRate: number;
   minimumPayment: number;
   type: DebtType;
@@ -182,6 +184,8 @@ export interface DebtFormErrors {
   name?: string;
   creditor?: string;
   balance?: string;
+  currentBalance?: string; // Alias for balance
+  originalBalance?: string;
   interestRate?: string;
   minimumPayment?: string;
   type?: string;

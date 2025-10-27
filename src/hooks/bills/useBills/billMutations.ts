@@ -5,22 +5,28 @@ import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 
 // Helper to trigger sync for bill changes
-const triggerBillSync = (changeType) => {
-  if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
+const triggerBillSync = (changeType: string) => {
+  if (typeof window !== "undefined" && (window as any).cloudSyncService) {
+    (window as any).cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
   }
 };
 
 // Helper to create payment transaction record
-const createPaymentTransaction = (bill, billId, paidAmount, paymentDate, envelopeId) => {
+const createPaymentTransaction = (
+  bill: Record<string, unknown>,
+  billId: string,
+  paidAmount: number,
+  paymentDate: string,
+  envelopeId?: string
+) => {
   return {
     id: `${billId}_payment_${Date.now()}`,
     date: paymentDate,
-    description: bill.provider || bill.description || bill.name || "Bill Payment",
+    description: (bill.provider || bill.description || bill.name || "Bill Payment") as string,
     amount: -Math.abs(paidAmount), // Negative for expense
     envelopeId: envelopeId || "unassigned",
-    category: bill.category || "Bills & Utilities",
-    type: "expense",
+    category: (bill.category || "Bills & Utilities") as string,
+    type: "expense" as const,
     source: "bill_payment",
     billId: billId,
     notes: `Payment for ${bill.provider || bill.description || bill.name}`,
@@ -30,11 +36,12 @@ const createPaymentTransaction = (bill, billId, paidAmount, paymentDate, envelop
 
 // Helper to update envelope balance after payment
 const updateEnvelopeForPayment = async (
-  envelopeId,
-  paidAmount,
-  paymentDate,
-  billId,
-  transactionId
+  queryClient: ReturnType<typeof useQueryClient>,
+  envelopeId: string,
+  paidAmount: number,
+  paymentDate: string,
+  billId: string,
+  transactionId: string
 ) => {
   const envelope = await budgetDb.envelopes.get(envelopeId);
   if (!envelope) return;
@@ -55,7 +62,7 @@ const updateEnvelopeForPayment = async (
   };
 
   await budgetDb.envelopes.update(envelopeId, envelopeUpdate);
-  await optimisticHelpers.updateEnvelope(envelopeId, {
+  await optimisticHelpers.updateEnvelope(queryClient, envelopeId, {
     currentBalance: newBalance,
   });
 
@@ -76,7 +83,7 @@ export const useAddBillMutation = () => {
 
   return useMutation({
     mutationKey: ["bills", "add"],
-    mutationFn: async (billData) => {
+    mutationFn: async (billData: Record<string, unknown>) => {
       // Generate unique ID with better collision resistance
       const uniqueId = `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -88,10 +95,7 @@ export const useAddBillMutation = () => {
         isPaid: false, // Default to unpaid
       };
 
-      // Apply optimistic update first
-      await optimisticHelpers.addBill(newBill);
-
-      // Then persist to Dexie
+      // Persist to Dexie (optimistic update handled by React Query)
       await budgetDb.bills.add(newBill);
 
       logger.debug("✅ Added bill:", newBill);
@@ -109,14 +113,14 @@ export const useAddBillMutation = () => {
     onSuccess: () => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
+      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
       // Trigger cloud sync
       triggerBillSync("add");
     },
-    onError: (error, billData, context) => {
+    onError: (error: Error, _billData: Record<string, unknown>, context: { previousBills?: unknown } | undefined) => {
       logger.error("Failed to add bill:", error);
       // Rollback optimistic update if needed
       if (context?.previousBills) {
@@ -134,7 +138,7 @@ export const useUpdateBillMutation = () => {
 
   return useMutation({
     mutationKey: ["bills", "update"],
-    mutationFn: async ({ billId, updates }) => {
+    mutationFn: async ({ billId, updates }: { billId: string; updates: Record<string, unknown> }) => {
       const existingBill = await budgetDb.bills.get(billId);
       if (!existingBill) {
         throw new Error(`Bill with ID ${billId} not found`);
@@ -147,10 +151,7 @@ export const useUpdateBillMutation = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      // Apply optimistic update
-      await optimisticHelpers.updateBill(billId, updatedBill);
-
-      // Update in Dexie
+      // Update in Dexie (optimistic update handled by React Query)
       await budgetDb.bills.update(billId, updatedBill);
 
       logger.debug("✅ Updated bill:", updatedBill);
@@ -159,13 +160,13 @@ export const useUpdateBillMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
+      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
       triggerBillSync("update");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Failed to update bill:", error);
     },
   });
@@ -179,11 +180,8 @@ export const useDeleteBillMutation = () => {
 
   return useMutation({
     mutationKey: ["bills", "delete"],
-    mutationFn: async (billId) => {
-      // Apply optimistic update
-      await optimisticHelpers.deleteBill(billId);
-
-      // Delete from Dexie
+    mutationFn: async (billId: string) => {
+      // Delete from Dexie (optimistic update handled by React Query)
       await budgetDb.bills.delete(billId);
 
       logger.debug("✅ Deleted bill:", billId);
@@ -192,13 +190,13 @@ export const useDeleteBillMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
+      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
       triggerBillSync("delete");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Failed to delete bill:", error);
     },
   });
@@ -212,7 +210,12 @@ export const useMarkBillPaidMutation = () => {
 
   return useMutation({
     mutationKey: ["bills", "markPaid"],
-    mutationFn: async ({ billId, paidAmount, paidDate, envelopeId }) => {
+    mutationFn: async ({ billId, paidAmount, paidDate, envelopeId }: {
+      billId: string;
+      paidAmount: number;
+      paidDate?: string;
+      envelopeId?: string;
+    }) => {
       const bill = await budgetDb.bills.get(billId);
       if (!bill) {
         throw new Error(`Bill with ID ${billId} not found`);
@@ -228,10 +231,7 @@ export const useMarkBillPaidMutation = () => {
         lastPaid: new Date().toISOString(),
       };
 
-      // Apply optimistic update
-      await optimisticHelpers.updateBill(billId, paidData);
-
-      // Apply to Dexie directly
+      // Apply to Dexie directly (optimistic update handled by React Query)
       await budgetDb.bills.update(billId, {
         ...paidData,
         updatedAt: new Date().toISOString(),
@@ -247,12 +247,13 @@ export const useMarkBillPaidMutation = () => {
       );
 
       // Add transaction to Dexie
-      await budgetDb.transactions.put(paymentTransaction);
-      await optimisticHelpers.addTransaction(paymentTransaction);
+      await budgetDb.transactions.put(paymentTransaction as any);
+      await optimisticHelpers.addTransaction(queryClient, paymentTransaction as any);
 
       // If bill is linked to envelope, update envelope balance
       if (envelopeId && paidAmount) {
         await updateEnvelopeForPayment(
+          queryClient,
           envelopeId,
           paidAmount,
           paymentDate,
@@ -265,14 +266,14 @@ export const useMarkBillPaidMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
+      queryClient.invalidateQueries({ queryKey: (queryKeys.billsList as unknown as () => unknown[])() });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
       triggerBillSync("mark_paid");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Failed to mark bill as paid:", error);
     },
   });
