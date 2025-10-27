@@ -215,8 +215,28 @@ const QuickActions = ({
  * Modal for distributing unassigned cash to envelopes
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
+interface EnvelopeItemProps {
+  envelope: {
+    id: string;
+    name: string;
+    currentBalance?: number;
+    monthlyBudget?: number;
+    monthlyAmount?: number;
+    color: string;
+    envelopeType: string;
+  };
+  distributionAmount: number;
+  updateDistribution: (envelopeId: string, amount: string | number) => void;
+  isProcessing: boolean;
+  bills?: Array<{
+    id: string;
+    name: string;
+    [key: string]: unknown;
+  }>;
+}
+
 const EnvelopeItem = memo(
-  ({ envelope, distributionAmount, updateDistribution, isProcessing, bills = [] }) => {
+  ({ envelope, distributionAmount, updateDistribution, isProcessing, bills = [] }: EnvelopeItemProps) => {
     const newBalance = (envelope.currentBalance || 0) + distributionAmount;
     const isBillEnvelope = envelope.envelopeType === ENVELOPE_TYPES.BILL;
 
@@ -306,8 +326,8 @@ const UnassignedCashModal = () => {
   if (!isUnassignedCashModalOpen) return null;
 
   const preview = getDistributionPreview();
-  const hasDistributions = totalDistributed > 0;
-  const isOverDistributed = totalDistributed > unassignedCash;
+  const hasDistributions = Number(totalDistributed) > 0;
+  const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
@@ -321,11 +341,11 @@ const UnassignedCashModal = () => {
 
         {/* Distribution Summary */}
         <DistributionSummary
-          totalDistributed={totalDistributed}
-          remainingCash={remainingCash}
+          totalDistributed={Number(totalDistributed)}
+          remainingCash={Number(remainingCash)}
           isOverDistributed={isOverDistributed}
           hasDistributions={hasDistributions}
-          unassignedCash={unassignedCash}
+          unassignedCash={Number(unassignedCash)}
         />
 
         {/* Quick Actions */}
@@ -374,7 +394,7 @@ const UnassignedCashModal = () => {
             <h4 className="font-medium text-gray-900 mb-3">Distribution Preview</h4>
             <div className="bg-blue-50 rounded-lg p-3 max-h-32 overflow-y-auto">
               <div className="space-y-1">
-                {preview.map((envelope) => (
+                {preview.map((envelope: { id: string; name: string; distributionAmount: number }) => (
                   <div key={envelope.id} className="flex justify-between text-sm">
                     <span className="text-gray-700">{envelope.name}</span>
                     <span className="text-blue-600 font-medium">
@@ -413,7 +433,7 @@ const UnassignedCashModal = () => {
                 {React.createElement(getIcon("CheckCircle"), {
                   className: "h-4 w-4 mr-2",
                 })}
-                Distribute ${totalDistributed.toFixed(2)}
+                Distribute ${Number(totalDistributed).toFixed(2)}
               </>
             )}
           </Button>
@@ -428,7 +448,7 @@ const UnassignedCashModal = () => {
               })}
               <span className="text-sm">
                 Distribution exceeds available cash by $
-                {(totalDistributed - unassignedCash).toFixed(2)}
+                {(Number(totalDistributed) - Number(unassignedCash)).toFixed(2)}
               </span>
             </div>
           </div>
