@@ -3,7 +3,22 @@ import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { getEnvelopeCategories } from "../../../constants/categories";
 
-const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = true }) => {
+interface EnvelopeBasicFieldsProps {
+  formData: {
+    name?: string;
+    category?: string;
+    description?: string;
+  };
+  onUpdateField: (field: string, value: string) => void;
+  errors?: {
+    name?: string;
+    category?: string;
+    description?: string;
+  };
+  canEdit?: boolean;
+}
+
+const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = true }: EnvelopeBasicFieldsProps) => {
   const categories = getEnvelopeCategories();
 
   return (
