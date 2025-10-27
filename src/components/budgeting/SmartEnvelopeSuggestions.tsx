@@ -165,14 +165,16 @@ const SmartEnvelopeSuggestions = ({
     showDismissed,
   });
 
-  const containerPadding = isCollapsed ? "p-3" : "p-6";
+  // Auto-collapse when no suggestions available
+  const effectiveIsCollapsed = hasSuggestions ? isCollapsed : true;
+  const containerPadding = effectiveIsCollapsed ? "p-3" : "p-6";
 
   return (
     <div
       className={`glassmorphism rounded-xl transition-all duration-200 ${containerPadding} ${className}`}
     >
       <SuggestionsHeader
-        isCollapsed={isCollapsed}
+        isCollapsed={effectiveIsCollapsed}
         toggleCollapse={toggleCollapse}
         hasSuggestions={hasSuggestions}
         suggestions={suggestions}
@@ -180,7 +182,7 @@ const SmartEnvelopeSuggestions = ({
         toggleSettings={toggleSettings}
       />
 
-      {isCollapsed ? (
+      {effectiveIsCollapsed ? (
         <CollapsedView suggestions={suggestions} />
       ) : (
         <ExpandedView
