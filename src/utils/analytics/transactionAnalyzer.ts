@@ -5,10 +5,23 @@
 import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
 
+interface MerchantPattern {
+  merchant: string;
+  transactions: any[];
+  totalAmount: number;
+  avgAmount: number;
+}
+
+interface AnalysisSettings {
+  minTransactionCount: number;
+  minAmount: number;
+  unusedCategoryThreshold?: number;
+}
+
 /**
  * Analyze uncategorized transactions and suggest categories
  */
-export const analyzeUncategorizedTransactions = (transactions, settings) => {
+export const analyzeUncategorizedTransactions = (transactions: any[], settings: AnalysisSettings) => {
   const suggestions = [];
   const { minTransactionCount, minAmount } = settings;
 
@@ -17,7 +30,7 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
     (t) => !t.category || t.category === "Uncategorized" || t.category === ""
   );
 
-  const merchantPatterns = {};
+  const merchantPatterns: Record<string, MerchantPattern> = {};
   uncategorizedTransactions.forEach((transaction) => {
     const merchant = extractMerchantName(transaction.description);
 
@@ -42,8 +55,8 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
 
       // Find suggested category from merchant patterns
       let suggestedCategory = "General";
-      for (const [category, patterns] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
-        if (patterns.some((p) => pattern.merchant.includes(p.toLowerCase()))) {
+      for (const [category, patternRegex] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
+        if (patternRegex.test(pattern.merchant.toLowerCase())) {
           suggestedCategory = category;
           break;
         }
@@ -76,7 +89,7 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
 /**
  * Analyze unused categories and suggest removal
  */
-export const analyzeUnusedCategories = (transactions, filteredTransactions, settings) => {
+export const analyzeUnusedCategories = (transactions: any[], filteredTransactions: any[], settings: AnalysisSettings) => {
   const suggestions = [];
   const { unusedCategoryThreshold } = settings;
 
