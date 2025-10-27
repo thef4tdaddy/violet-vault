@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
-import { createDefaultRule, validateRule } from "../../utils/budgeting/autofunding";
+import { createDefaultRule, validateRule, type AutoFundingRule } from "../../utils/budgeting/autofunding";
 import { Button } from "@/components/ui";
 import RuleTypeStep from "./steps/RuleTypeStep";
 import TriggerScheduleStep from "./steps/TriggerScheduleStep";
@@ -25,7 +25,7 @@ const ModalFooter = ({ step, prevStep, onClose, nextStep, handleSave, editingRul
           <Button
             onClick={handleSave}
             variant="primary"
-            color="success"
+            color="green"
             className="flex items-center gap-2"
           >
             {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
@@ -75,6 +75,7 @@ const RuleBuilderModal = ({
   editingRule,
   onClose,
   step,
+  setStep,
   ruleData,
   updateRuleData,
   updateConfig,
@@ -95,14 +96,14 @@ const RuleBuilderModal = ({
             </h3>
             <Button
               onClick={onClose}
-              variant="ghost"
+              variant="icon"
               size="sm"
               className="text-gray-400 hover:text-gray-600 p-1"
             >
               {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
             </Button>
           </div>
-          <StepNavigation currentStep={step} />
+          <StepNavigation currentStep={step} onStepChange={setStep} />
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
@@ -140,7 +141,7 @@ const AutoFundingRuleBuilder = ({
   const [step, setStep] = useState(1);
   const [ruleData, setRuleData] = useState(() => createDefaultRule());
   const [_validationErrors, _setValidationErrors] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   // Initialize with editing rule data or reset when modal closes
   // Synchronize modal state when open/close status or editing rule changes
@@ -191,8 +192,8 @@ const AutoFundingRuleBuilder = ({
 
   const validateCurrentStep = () => {
     // Step validation logic extracted to keep component small
-    const validation = validateRule(ruleData);
-    setErrors(validation.isValid ? {} : { general: validation.errors });
+    const validation = validateRule(ruleData as Partial<AutoFundingRule>);
+    setErrors(validation.isValid ? {} : { general: validation.errors.join(', ') });
     return validation.isValid;
   };
 
@@ -207,7 +208,7 @@ const AutoFundingRuleBuilder = ({
   };
 
   const handleSave = () => {
-    const validation = validateRule(ruleData);
+    const validation = validateRule(ruleData as Partial<AutoFundingRule>);
     if (!validation.isValid) {
       _setValidationErrors(validation.errors);
       return;
@@ -227,6 +228,7 @@ const AutoFundingRuleBuilder = ({
       editingRule={editingRule}
       onClose={onClose}
       step={step}
+      setStep={setStep}
       ruleData={ruleData}
       updateRuleData={updateRuleData}
       updateConfig={updateConfig}

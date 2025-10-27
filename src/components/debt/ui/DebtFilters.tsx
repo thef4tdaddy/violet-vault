@@ -113,7 +113,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
                 <Checkbox
                   id="showPaidOff"
                   checked={filterOptions.showPaidOff}
-                  onCheckedChange={(checked) => handleFilterChange("showPaidOff", checked)}
+                  onChange={(e) => handleFilterChange("showPaidOff", e.target.checked)}
                 />
                 <label htmlFor="showPaidOff" className="text-sm text-gray-700 cursor-pointer">
                   Show Paid Off
