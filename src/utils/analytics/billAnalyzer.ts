@@ -4,12 +4,36 @@
  */
 import { suggestBillCategory } from "./categoryPatterns";
 
+interface Bill {
+  name: string;
+  category?: string;
+  amount?: number;
+  [key: string]: unknown;
+}
+
+interface BillCategorySuggestion {
+  id: string;
+  type: string;
+  priority: string;
+  category: string;
+  title: string;
+  description: string;
+  reasoning: string;
+  suggestedCategory: string;
+  affectedTransactions: number;
+  estimatedImpact: string;
+}
+
+interface AnalysisSettings {
+  minAmount?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Analyze bill categorization gaps and suggest improvements
  */
-export const analyzeBillCategorization = (bills, settings) => {
-  const suggestions = [];
-  const { _minAmount } = settings;
+export const analyzeBillCategorization = (bills: Bill[], settings: AnalysisSettings): BillCategorySuggestion[] => {
+  const suggestions: BillCategorySuggestion[] = [];
 
   // Group bills by category
   const billsByCategory = {};
@@ -45,8 +69,9 @@ export const analyzeBillCategorization = (bills, settings) => {
 
     // Create suggestions for each bill type with multiple bills
     Object.entries(billTypePatterns).forEach(([categoryType, billsInType]) => {
-      if (billsInType.length >= 2) {
-        const totalAmount = billsInType.reduce((sum, bill) => sum + (bill.amount || 0), 0);
+      const typedBills = billsInType as Bill[];
+      if (typedBills.length >= 2) {
+        const totalAmount = typedBills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
         suggestions.push({
           id: `bill_category_${categoryType}`,
@@ -54,10 +79,10 @@ export const analyzeBillCategorization = (bills, settings) => {
           priority: totalAmount > 100 ? "high" : "medium",
           category: "bill",
           title: `Add "${categoryType}" Bill Category`,
-          description: `${billsInType.length} bills need this category`,
-          reasoning: `Bills: ${billsInType.map((b) => b.name).join(", ")}`,
+          description: `${typedBills.length} bills need this category`,
+          reasoning: `Bills: ${typedBills.map((b) => b.name).join(", ")}`,
           suggestedCategory: categoryType,
-          affectedTransactions: billsInType.length,
+          affectedTransactions: typedBills.length,
           impact: totalAmount,
           action: "add_bill_category",
           data: {
