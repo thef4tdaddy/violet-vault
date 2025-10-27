@@ -83,9 +83,11 @@ const Header = memo(
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-4 pt-2 pb-4 px-2 sm:px-4">
             <UserIndicator
-              currentUser={currentUser}
-              onUserChange={onUserChange}
-              onUpdateProfile={onUpdateProfile}
+              {...({
+                currentUser,
+                onUserChange,
+                onUpdateProfile,
+              } as React.ComponentProps<typeof UserIndicator>)}
             />
 
             <div className="flex gap-2 sm:gap-3 items-center justify-center flex-wrap">

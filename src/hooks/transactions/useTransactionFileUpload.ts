@@ -51,7 +51,7 @@ export const useTransactionFileUpload = () => {
           clearExisting: options.clearExisting || false,
         });
         setImportStep(2);
-        setFieldMapping(autoDetectFieldMapping(parsedData));
+        setFieldMapping(autoDetectFieldMapping(parsedData as unknown as ParsedRow[]) as Record<string, string>);
       } catch (error) {
         globalToast.showError("Error parsing file: " + error.message, "Parse Error", 8000);
       }
