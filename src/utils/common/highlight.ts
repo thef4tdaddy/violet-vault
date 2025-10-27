@@ -106,15 +106,9 @@ export const initHighlight = () => {
         ],
       },
 
-      // Privacy settings for financial app
-      privacyOptions: {
-        maskAllInputs: true, // Mask all input fields by default
-        maskAllText: false, // Don't mask all text, just inputs
-      } as Record<string, unknown>,
-
       // Environment-specific settings
       debug: config.debug,
-    });
+    } as Record<string, unknown>);
 
     if (config.debug) {
       logger.debug("Highlight.io initialized successfully", {
@@ -130,11 +124,14 @@ export const initHighlight = () => {
   }
 
   // Setup console capture for enhanced error tracking (commented out to avoid conflicts)
-  // setupConsoleCapture();
+  // _setupConsoleCapture();
 };
 
-const _setupConsoleCapture = () => {
-  // Disabled function - eslint-disable comments removed
+// Disabled function to avoid unused declaration error
+function _setupConsoleCapture(): void {
+  // Disabled function - console capture commented out
+  // to avoid conflicts with other error tracking
+  return;
   // const originalConsoleError = console.error;
   // const originalConsoleWarn = console.warn;
 
@@ -196,7 +193,7 @@ class ErrorReportingFallback {
     this.retryIntervalMs = 30000; // 30 seconds
   }
 
-  addError(error, context = {}) {
+  addError(error: Error, context: Record<string, unknown> = {}): void {
     if (this.queue.length >= this.maxQueueSize) {
       this.queue.shift(); // Remove oldest error
     }
@@ -223,15 +220,17 @@ class ErrorReportingFallback {
     logger.error("Error captured (Highlight.io fallback)", error, context);
   }
 
-  startRetryMechanism() {
+  startRetryMechanism(): void {
     this.retryInterval = setInterval(() => {
       this.attemptFlush();
     }, this.retryIntervalMs);
   }
 
-  async attemptFlush() {
+  async attemptFlush(): Promise<void> {
     if (this.queue.length === 0) {
-      clearInterval(this.retryInterval);
+      if (this.retryInterval) {
+        clearInterval(this.retryInterval);
+      }
       this.retryInterval = null;
       return;
     }
@@ -240,11 +239,12 @@ class ErrorReportingFallback {
       // Try to reinitialize Highlight.io
       const config = getErrorMonitoringConfig();
       if (config.enabled) {
-        H.init(config.projectId, { environment: config.environment });
+        H.init(config.projectId, { environment: config.environment } as Record<string, unknown>);
 
         // Send queued errors
         for (const errorData of this.queue) {
-          H.consumeError(new Error(errorData.error.message), errorData.context);
+          const errorMessage = (errorData.error as { message?: string })?.message ?? "Unknown error";
+          H.consumeError(new Error(errorMessage), errorData.context as Record<string, unknown>);
         }
 
         this.queue = [];
@@ -257,11 +257,11 @@ class ErrorReportingFallback {
     }
   }
 
-  getQueuedErrors() {
+  getQueuedErrors(): Array<Record<string, unknown>> {
     return [...this.queue];
   }
 
-  clearQueue() {
+  clearQueue(): void {
     this.queue = [];
   }
 }
@@ -299,7 +299,7 @@ export const getErrorReportingStatus = () => {
 };
 
 // User identification for session tracking
-export const identifyUser = (email, userData = {}) => {
+export const identifyUser = (email: string, userData: Record<string, unknown> = {}): void => {
   H.identify(email, {
     ...userData,
     app: "violet-vault",

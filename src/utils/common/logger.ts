@@ -109,7 +109,7 @@ class Logger {
   }
 
   // Warning-level logging
-  warn(message, data = {}) {
+  warn(message: string, data: Record<string, unknown> = {}): void {
     console.warn(`⚠️ ${message}`, data);
 
     const h = this.initH();
@@ -123,7 +123,7 @@ class Logger {
   }
 
   // Error-level logging
-  error(message, error = null, data = {}) {
+  error(message: string, error: unknown = null, data: Record<string, unknown> = {}): void {
     console.error(`❌ ${message}`, error, data);
 
     const h = this.initH();
@@ -177,7 +177,7 @@ class Logger {
   }
 
   // Specific methods for common debugging scenarios
-  budgetSync(message, data = {}) {
+  budgetSync(message: string, data: Record<string, unknown> = {}): void {
     // Only log budget sync in development mode to reduce production noise
     if (this.isDevelopment) {
       console.log(`💰 [BUDGET-SYNC] ${message}`, data);
@@ -221,7 +221,7 @@ class Logger {
     });
   }
 
-  firebase(message, data = {}) {
+  firebase(message: string, data: Record<string, unknown> = {}): void {
     this.debug(`[FIREBASE] ${message}`, {
       ...data,
       category: "firebase",
@@ -229,7 +229,7 @@ class Logger {
   }
 
   // Performance logging
-  performance(operation, duration, data = {}) {
+  performance(operation: string, duration: number, data: Record<string, unknown> = {}): void {
     this.info(`[PERFORMANCE] ${operation} completed in ${duration}ms`, {
       duration,
       operation,
@@ -238,7 +238,7 @@ class Logger {
   }
 
   // User action logging
-  userAction(action, data = {}) {
+  userAction(action: string, data: Record<string, unknown> = {}): void {
     this.info(`[USER-ACTION] ${action}`, {
       action,
       ...data,
@@ -246,7 +246,7 @@ class Logger {
   }
 
   // Test Highlight.io connectivity
-  testHighlight() {
+  testHighlight(): void {
     console.log("🧪 Testing Highlight.io connectivity...");
 
     // Send a test event
@@ -264,7 +264,7 @@ class Logger {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
       if (h && h.consumeError) {
-        h.consumeError(error, {
+        h.consumeError(error as Error, {
           metadata: { test: true, source: "logger" },
           tags: { category: "test" },
         });

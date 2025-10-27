@@ -33,7 +33,12 @@ interface FirebaseAuthType {
 declare global {
   interface Window {
     budgetDb?: VioletVaultDB;
-    cloudSyncService?: CloudSyncServiceType;
+    cloudSyncService?: {
+      isRunning: boolean;
+      config?: unknown;
+      lastSyncTime: string | null;
+      triggerSyncForCriticalChange: (changeType: string) => void;
+    };
     runSyncDiagnostic?: () => Promise<DiagnosticResults>;
     syncEdgeCaseTester?: SyncEdgeCaseTesterType;
     runSyncEdgeCaseTests?: () => Promise<unknown>;
@@ -117,9 +122,9 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       const metadata = await window.budgetDb.budget.get("metadata");
       results.budgetMetadata = {
         exists: !!metadata,
-        unassignedCash: metadata?.unassignedCash || "missing",
-        actualBalance: metadata?.actualBalance || "missing",
-        lastModified: metadata?.lastModified || "missing",
+        unassignedCash: (metadata?.unassignedCash ?? "missing") as string | number,
+        actualBalance: (metadata?.actualBalance ?? "missing") as string | number,
+        lastModified: (metadata?.lastModified ?? "missing") as string | number,
       };
 
       if (metadata) {

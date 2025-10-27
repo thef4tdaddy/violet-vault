@@ -58,7 +58,7 @@ export const useOnboardingAutoComplete = () => {
       actualBalance !== undefined &&
       !isStepComplete("firstBankBalance")
     ) {
-      logger.info("🎯 Auto-completing firstBankBalance step - actual balance set:", actualBalance);
+      logger.info("🎯 Auto-completing firstBankBalance step - actual balance set", { actualBalance });
       markStepComplete("firstBankBalance");
     }
   }, [actualBalance, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -79,9 +79,10 @@ export const useOnboardingAutoComplete = () => {
     });
 
     if (userCreatedEnvelopes.length > 0 && !isStepComplete("firstEnvelope")) {
+      const firstEnvelope = userCreatedEnvelopes[0] as { name: string };
       logger.info(
-        "🎯 Auto-completing firstEnvelope step - user envelope created:",
-        (userCreatedEnvelopes[0] as { name: string }).name
+        "🎯 Auto-completing firstEnvelope step - user envelope created",
+        { name: firstEnvelope.name }
       );
       markStepComplete("firstEnvelope");
     }
@@ -92,7 +93,8 @@ export const useOnboardingAutoComplete = () => {
     if (!shouldAutoComplete) return;
 
     if (bills.length > 0 && !isStepComplete("firstBills")) {
-      logger.info("🎯 Auto-completing firstBills step - bill added:", (bills[0] as { description?: string }).description);
+      const firstBill = bills[0] as { description?: string };
+      logger.info("🎯 Auto-completing firstBills step - bill added", { description: firstBill.description });
       markStepComplete("firstBills");
     }
   }, [bills, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -107,8 +109,8 @@ export const useOnboardingAutoComplete = () => {
 
     if (expenseTransactions.length > 0 && !isStepComplete("firstTransaction")) {
       logger.info(
-        "🎯 Auto-completing firstTransaction step - expense recorded:",
-        expenseTransactions[0].description
+        "🎯 Auto-completing firstTransaction step - expense recorded",
+        { description: expenseTransactions[0].description }
       );
       markStepComplete("firstTransaction");
     }
@@ -130,8 +132,8 @@ export const useOnboardingAutoComplete = () => {
 
     if (incomeTransactions.length > 0 && !isStepComplete("firstPaycheck")) {
       logger.info(
-        "🎯 Auto-completing firstPaycheck step - income recorded:",
-        incomeTransactions[0].description
+        "🎯 Auto-completing firstPaycheck step - income recorded",
+        { description: incomeTransactions[0].description }
       );
       markStepComplete("firstPaycheck");
     }
@@ -144,9 +146,10 @@ export const useOnboardingAutoComplete = () => {
     const linkedBills = bills.filter((bill: { envelopeId?: string }) => bill.envelopeId);
 
     if (linkedBills.length > 0 && !isStepComplete("linkedEnvelopes")) {
+      const firstLinked = linkedBills[0] as { description?: string };
       logger.info(
-        "🎯 Auto-completing linkedEnvelopes step - bill linked to envelope:",
-        (linkedBills[0] as { description?: string }).description
+        "🎯 Auto-completing linkedEnvelopes step - bill linked to envelope",
+        { description: firstLinked.description }
       );
       markStepComplete("linkedEnvelopes");
     }
@@ -159,9 +162,10 @@ export const useOnboardingAutoComplete = () => {
     const fundedEnvelopes = envelopes.filter((env: { currentBalance?: number }) => (env.currentBalance || 0) > 0);
 
     if (fundedEnvelopes.length > 0 && !isStepComplete("firstAllocation")) {
+      const firstFunded = fundedEnvelopes[0] as { name?: string };
       logger.info(
-        "🎯 Auto-completing firstAllocation step - envelope funded:",
-        (fundedEnvelopes[0] as { name?: string }).name
+        "🎯 Auto-completing firstAllocation step - envelope funded",
+        { name: firstFunded.name }
       );
       markStepComplete("firstAllocation");
     }

@@ -6,6 +6,7 @@ import { useConnectionConfig } from "./useConnectionManager/useConnectionConfig"
 import { useConnectionOperations } from "./useConnectionManager/useConnectionOperations";
 import { useConnectionData } from "./useConnectionManager/useConnectionData";
 import { useAutoPopulate } from "./useConnectionManager/useAutoPopulate";
+import type { Envelope, Bill, Debt } from "@/db/types";
 
 type EntityType = "bill" | "envelope" | "debt";
 
@@ -41,7 +42,14 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
 
   // Get connection data using extracted hook
   const { currentConnections, availableOptions, hasConnections, hasAvailableOptions } =
-    useConnectionData({ entityType, entityId, currentEntity, bills, envelopes, debts });
+    useConnectionData({ 
+      entityType, 
+      entityId, 
+      currentEntity: currentEntity as Envelope | Bill | Debt | null, 
+      bills: bills as unknown as Bill[], 
+      envelopes, 
+      debts: debts as unknown as Debt[] 
+    });
 
   // Connection operations with state management
   const connectWithState = async (targetId: string) => {
@@ -53,10 +61,10 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         entityType,
         entityId,
         targetId,
-        currentEntity,
+        currentEntity: currentEntity as Envelope | Bill | Debt,
         envelopes,
-        bills,
-        debts,
+        bills: bills as unknown as Bill[],
+        debts: debts as unknown as Debt[],
         updateBill: updateBill as unknown as (id: string, updates: unknown) => Promise<void>,
         updateDebt: updateDebt as unknown as (params: { id: string; updates: unknown }) => Promise<void>,
       });
@@ -91,8 +99,8 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         entityType,
         entityId,
         billId: targetId,
-        bills,
-        currentEntity,
+        bills: bills as unknown as Bill[],
+        currentEntity: currentEntity as Envelope | Bill | Debt,
         updateEnvelope: updateEnvelope as unknown as (id: string, updates: unknown) => Promise<void>,
       });
     }

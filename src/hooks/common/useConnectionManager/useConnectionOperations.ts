@@ -87,7 +87,7 @@ export const useConnectionOperations = () => {
       entityType,
       entityId,
       targetId,
-      currentEntity: currentEntity.name || currentEntity.provider,
+      currentEntity: (currentEntity as { name?: string; provider?: string }).name || (currentEntity as { provider?: string }).provider,
     });
 
     try {
