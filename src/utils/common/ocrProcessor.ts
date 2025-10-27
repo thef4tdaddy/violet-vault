@@ -1,12 +1,51 @@
 // Tesseract.js loaded dynamically to reduce main bundle size
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
+
+interface TesseractWorker {
+  loadLanguage(lang: string): Promise<void>;
+  initialize(lang: string): Promise<void>;
+  setParameters(params: Record<string, unknown>): Promise<void>;
+  recognize(image: File | Blob | string): Promise<{
+    data: {
+      text: string;
+      confidence: number;
+      words: unknown[];
+      lines: unknown[];
+    };
+  }>;
+  terminate(): Promise<void>;
+}
+
+interface OCRResult {
+  text: string;
+  confidence: number;
+  words: unknown[];
+  lines: unknown[];
+  processingTime: number;
+}
+
+interface ReceiptData {
+  total: string | null;
+  merchant: string | null;
+  date: string | null;
+  time: string | null;
+  tax: string | null;
+  subtotal: string | null;
+  items: Array<{ description: string; amount: number; rawLine: string }>;
+  confidence: Record<string, string>;
+}
+
+interface ExtendedReceiptData extends ReceiptData {
+  rawText: string;
+  processingTime: number;
+}
 
 /**
  * OCR Processing utility for receipt and document scanning
  * Uses Tesseract.js for client-side OCR processing
  */
 export class OCRProcessor {
-  worker: unknown;
+  worker: TesseractWorker | null;
   isInitialized: boolean;
 
   constructor() {
@@ -17,14 +56,14 @@ export class OCRProcessor {
   /**
    * Initialize the OCR worker
    */
-  async initialize() {
+  async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
     try {
       logger.info("🔍 Initializing OCR worker...");
       // Dynamic import to avoid adding tesseract.js to main bundle
       const Tesseract = (await import("tesseract.js")).default;
-      this.worker = await Tesseract.createWorker();
+      this.worker = (await Tesseract.createWorker()) as unknown as TesseractWorker;
 
       await this.worker.loadLanguage("eng");
       await this.worker.initialize("eng");
@@ -46,12 +85,16 @@ export class OCRProcessor {
 
   /**
    * Process an image and extract text
-   * @param {File|Blob|string} imageSource - Image file, blob, or data URL
-   * @returns {Promise<Object>} OCR result with text and confidence
+   * @param imageSource - Image file, blob, or data URL
+   * @returns OCR result with text and confidence
    */
-  async processImage(imageSource) {
+  async processImage(imageSource: File | Blob | string): Promise<OCRResult> {
     if (!this.isInitialized) {
       await this.initialize();
+    }
+
+    if (!this.worker) {
+      throw new Error("OCR worker not initialized");
     }
 
     try {
@@ -82,10 +125,10 @@ export class OCRProcessor {
 
   /**
    * Process a receipt image and extract structured data
-   * @param {File|Blob|string} imageSource - Receipt image
-   * @returns {Promise<Object>} Extracted receipt data
+   * @param imageSource - Receipt image
+   * @returns Extracted receipt data
    */
-  async processReceipt(imageSource) {
+  async processReceipt(imageSource: File | Blob | string): Promise<ExtendedReceiptData> {
     const ocrResult = await this.processImage(imageSource);
     const extractedData = this.extractReceiptData(ocrResult.text);
 
@@ -99,10 +142,10 @@ export class OCRProcessor {
 
   /**
    * Extract structured data from receipt text using pattern matching
-   * @param {string} text - Raw OCR text
-   * @returns {Object} Structured receipt data
+   * @param text - Raw OCR text
+   * @returns Structured receipt data
    */
-  extractReceiptData(text) {
+  extractReceiptData(text: string): ReceiptData {
     const patterns = {
       // Total amount patterns
       total: [
@@ -133,7 +176,7 @@ export class OCRProcessor {
       subtotal: [/sub\s*total:?\s*\$?(\d+\.\d{2})/i, /subtotal:?\s*\$?(\d+\.\d{2})/i],
     };
 
-    const extracted = {
+    const extracted: ReceiptData = {
       total: null,
       merchant: null,
       date: null,
@@ -149,13 +192,13 @@ export class OCRProcessor {
       for (const pattern of fieldPatterns) {
         const match = text.match(pattern);
         if (match) {
-          extracted[field] = match[1]?.trim();
+          (extracted as Record<string, string | null>)[field] = match[1]?.trim() ?? null;
           extracted.confidence[field] = "high";
           break; // Use first match
         }
       }
 
-      if (!extracted[field]) {
+      if (!(extracted as Record<string, string | null>)[field]) {
         extracted.confidence[field] = "none";
       }
     }
@@ -171,12 +214,12 @@ export class OCRProcessor {
 
   /**
    * Extract line items from receipt text
-   * @param {string} text - Raw OCR text
-   * @returns {Array} Array of line items
+   * @param text - Raw OCR text
+   * @returns Array of line items
    */
-  extractLineItems(text) {
+  extractLineItems(text: string): Array<{ description: string; amount: number; rawLine: string }> {
     const lines = text.split("\n");
-    const items = [];
+    const items: Array<{ description: string; amount: number; rawLine: string }> = [];
 
     const itemPattern = /(.+?)\s+\$?(\d+\.\d{2})$/;
 
@@ -202,15 +245,17 @@ export class OCRProcessor {
 
   /**
    * Clean and validate extracted data
-   * @param {Object} data - Extracted data to clean
+   * @param data - Extracted data to clean
    */
-  cleanExtractedData(data) {
+  cleanExtractedData(data: ReceiptData): void {
     // Clean total amount
     if (data.total) {
-      data.total = parseFloat(data.total.replace(/[^0-9.]/g, ""));
-      if (isNaN(data.total) || data.total <= 0) {
+      const cleanedTotal = parseFloat(data.total.replace(/[^0-9.]/g, ""));
+      if (isNaN(cleanedTotal) || cleanedTotal <= 0) {
         data.total = null;
         data.confidence.total = "none";
+      } else {
+        data.total = cleanedTotal.toString();
       }
     }
 
@@ -244,12 +289,14 @@ export class OCRProcessor {
     }
 
     // Clean tax and subtotal
-    ["tax", "subtotal"].forEach((field) => {
+    (["tax", "subtotal"] as const).forEach((field) => {
       if (data[field]) {
-        data[field] = parseFloat(data[field].replace(/[^0-9.]/g, ""));
-        if (isNaN(data[field]) || data[field] < 0) {
+        const cleanedValue = parseFloat((data[field] as string).replace(/[^0-9.]/g, ""));
+        if (isNaN(cleanedValue) || cleanedValue < 0) {
           data[field] = null;
           data.confidence[field] = "none";
+        } else {
+          data[field] = cleanedValue.toString();
         }
       }
     });
@@ -257,9 +304,9 @@ export class OCRProcessor {
 
   /**
    * Get processing statistics and accuracy metrics
-   * @returns {Object} OCR processor stats
+   * @returns OCR processor stats
    */
-  getStats() {
+  getStats(): { isInitialized: boolean; workerStatus: string } {
     return {
       isInitialized: this.isInitialized,
       workerStatus: this.worker ? "ready" : "not_initialized",
@@ -270,7 +317,7 @@ export class OCRProcessor {
   /**
    * Cleanup the OCR worker
    */
-  async cleanup() {
+  async cleanup(): Promise<void> {
     if (this.worker) {
       try {
         await this.worker.terminate();
@@ -288,12 +335,12 @@ export class OCRProcessor {
 export const ocrProcessor = new OCRProcessor();
 
 // Utility function for quick receipt processing
-export const processReceiptImage = async (imageSource) => {
+export const processReceiptImage = async (imageSource: File | Blob | string): Promise<ExtendedReceiptData> => {
   return await ocrProcessor.processReceipt(imageSource);
 };
 
 // Utility function to preload OCR worker (call on app init)
-export const preloadOCR = async () => {
+export const preloadOCR = async (): Promise<void> => {
   try {
     await ocrProcessor.initialize();
     logger.info("🔍 OCR preloaded successfully");

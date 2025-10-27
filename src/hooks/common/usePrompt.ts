@@ -2,17 +2,39 @@ import { useState, useCallback } from "react";
 import { create } from "zustand";
 import logger from "../../utils/common/logger";
 
+interface PromptConfig {
+  title?: string;
+  message?: string;
+  placeholder?: string;
+  defaultValue?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  inputType?: string;
+  isRequired?: boolean;
+  validation?: ((value: string) => { valid: boolean; error?: string }) | null;
+  icon?: string | null;
+  onConfirm?: (value: string) => Promise<string | void> | string | void;
+}
+
+interface PromptStore {
+  isOpen: boolean;
+  config: PromptConfig;
+  resolver: ((value: string | null) => void) | null;
+  showPrompt: (config: PromptConfig, resolver: (value: string | null) => void) => void;
+  hidePrompt: () => void;
+}
+
 /**
  * Zustand store for managing prompt modal state
  * Part of Epic #501 - Replace Browser Dialogs with Modals & Standardize Notifications to Toasts
  * Addresses Issue #504 - Replace Prompts with PromptModal
  */
-const usePromptStore = create((set) => ({
+const usePromptStore = create<PromptStore>((set) => ({
   isOpen: false,
   config: {},
   resolver: null,
 
-  showPrompt: (config, resolver) => set({ isOpen: true, config, resolver }),
+  showPrompt: (config: PromptConfig, resolver: (value: string | null) => void) => set({ isOpen: true, config, resolver }),
 
   hidePrompt: () => set({ isOpen: false, config: {}, resolver: null }),
 }));
@@ -45,9 +67,9 @@ export const usePrompt = () => {
   const showPrompt = usePromptStore((state) => state.showPrompt);
 
   const prompt = useCallback(
-    (config = {}) => {
+    (config: PromptConfig = {}): Promise<string | null> => {
       return new Promise((resolve) => {
-        const finalConfig = {
+        const finalConfig: PromptConfig = {
           title: "Enter Value",
           message: "Please enter a value:",
           placeholder: "",
