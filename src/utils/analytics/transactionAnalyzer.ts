@@ -4,10 +4,11 @@
  */
 import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
+import type { Transaction } from "../../db/types";
 
 interface MerchantPattern {
   merchant: string;
-  transactions: any[];
+  transactions: Transaction[];
   totalAmount: number;
   avgAmount: number;
 }

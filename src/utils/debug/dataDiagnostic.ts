@@ -3,15 +3,31 @@
  * Usage: Copy and paste this into browser console to check data state
  */
 import logger from "@/utils/common/logger";
+import type { VioletVaultDB } from "@/db/budgetDb";
+import type { BudgetRecord } from "@/db/types";
 
 // Extend window type for diagnostic tools
 declare global {
   interface Window {
-    budgetDb?: any;
-    runDataDiagnostic?: () => Promise<any>;
-    cleanupCorruptedPaychecks?: (confirmCallback?: ConfirmCallback | null) => Promise<any>;
-    inspectPaycheckRecords?: () => Promise<any>;
+    budgetDb?: VioletVaultDB;
+    runDataDiagnostic?: () => Promise<DataDiagnosticResults>;
+    cleanupCorruptedPaychecks?: (confirmCallback?: ConfirmCallback | null) => Promise<CleanupResult>;
+    inspectPaycheckRecords?: () => Promise<InspectionResult>;
   }
+}
+
+interface CleanupResult {
+  success: boolean;
+  deleted?: number;
+  remaining?: number;
+  error?: string;
+}
+
+interface InspectionResult {
+  success: boolean;
+  total?: number;
+  records?: unknown[];
+  error?: string;
 }
 
 interface DataDiagnosticResults {
@@ -21,22 +37,22 @@ interface DataDiagnosticResults {
   data: {
     metadata?: {
       exists: boolean;
-      record: any;
+      record: BudgetRecord | null;
       unassignedCash: number | string;
       actualBalance: number | string;
       lastModified: number | string;
       created?: boolean;
     };
-    tableCounts?: Record<string, { count: number; sample: any } | { error: string }>;
+    tableCounts?: Record<string, { count: number; sample: unknown } | { error: string }>;
     budgetTable?: {
       totalRecords: number;
-      records: any[];
+      records: BudgetRecord[];
     };
   };
   errors: string[];
 }
 
-export const runDataDiagnostic = async () => {
+export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
   logger.info("🔍 VioletVault Data Diagnostic Tool");
   logger.info("=".repeat(50));
 
@@ -150,7 +166,7 @@ export const runDataDiagnostic = async () => {
 
 // Paycheck Data Cleanup Utility
 // Detailed Paycheck Inspection Tool
-export const inspectPaycheckRecords = async () => {
+export const inspectPaycheckRecords = async (): Promise<InspectionResult> => {
   logger.info("🔍 VioletVault Paycheck Inspection Tool");
   logger.info("=".repeat(50));
 
@@ -199,7 +215,7 @@ interface ConfirmDialogOptions {
 
 type ConfirmCallback = (options: ConfirmDialogOptions) => Promise<boolean>;
 
-export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback | null = null) => {
+export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback | null = null): Promise<CleanupResult> => {
   logger.info("🧹 VioletVault Paycheck Cleanup Tool");
   logger.info("=".repeat(50));
 

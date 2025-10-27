@@ -6,6 +6,7 @@
 import { budgetDb } from "../../db/budgetDb";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../common/logger";
+import type { Envelope, Bill, Debt, Transaction } from "../../db/types";
 
 interface TestResult {
   test: string;
@@ -96,14 +97,14 @@ class SyncEdgeCaseTester {
     logger.info("🧪 Testing corrupted timestamp handling...");
 
     // Add records with various corrupted timestamps
-    const testEnvelope = {
+    const testEnvelope: Partial<Envelope> & { id: string } = {
       id: "test-corrupted-timestamps",
       name: "Test Envelope",
-      lastModified: "not-a-date",
-      createdAt: null,
+      lastModified: "not-a-date" as unknown as number,
+      createdAt: null as unknown as number,
     };
 
-    await budgetDb.envelopes.add(testEnvelope as any);
+    await budgetDb.envelopes.add(testEnvelope as Envelope);
 
     try {
       const syncData = await cloudSyncService.fetchDexieData();
@@ -135,7 +136,7 @@ class SyncEdgeCaseTester {
 
     try {
       for (const item of testData) {
-        await budgetDb.envelopes.add({ name: "Test", ...item } as any);
+        await budgetDb.envelopes.add({ name: "Test", ...item } as Partial<Envelope> as Envelope);
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
@@ -201,14 +202,14 @@ class SyncEdgeCaseTester {
     };
 
     try {
-      await budgetDb.envelopes.add(duplicateEnvelope as any);
+      await budgetDb.envelopes.add(duplicateEnvelope as Partial<Envelope> as Envelope);
 
       // Try to add duplicate
       try {
         await budgetDb.envelopes.add({
           ...duplicateEnvelope,
           name: "Duplicate",
-        } as any);
+        } as Partial<Envelope> as Envelope);
 
         this.testResults.push({
           test: "testDuplicateIds",
@@ -265,7 +266,7 @@ class SyncEdgeCaseTester {
 
     try {
       for (const item of testItems) {
-        await budgetDb.bills.add({ name: "Test", ...item } as any);
+        await budgetDb.bills.add({ name: "Test", ...item } as Partial<Bill> as Bill);
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
@@ -296,7 +297,7 @@ class SyncEdgeCaseTester {
     };
 
     try {
-      await budgetDb.debts.add(testData as any);
+      await budgetDb.debts.add(testData as Partial<Debt> as Debt);
 
       const syncData = await cloudSyncService.fetchDexieData();
       const passed = syncData.debts.length >= 1 && !isNaN(syncData.lastModified);
@@ -317,12 +318,12 @@ class SyncEdgeCaseTester {
   async testCircularReferences() {
     logger.info("🧪 Testing circular reference handling...");
 
-    const testObj: any = { id: "circular-test", name: "Test" };
+    const testObj: Partial<Envelope> & { id: string; self?: unknown } = { id: "circular-test", name: "Test" };
     testObj.self = testObj; // Create circular reference
 
     try {
       // Add the object with circular reference to Dexie (this should work)
-      await budgetDb.envelopes.add(testObj as any);
+      await budgetDb.envelopes.add(testObj as Envelope);
 
       // Test that sync system can handle the circular reference with safeStringify
       const data = await this.cloudSyncService.fetchDexieData();
@@ -377,11 +378,12 @@ class SyncEdgeCaseTester {
     };
 
     try {
-      await budgetDb.transactions.add(testData as any);
+      await budgetDb.transactions.add(testData as Partial<Transaction> as Transaction);
 
       const syncData = await cloudSyncService.fetchDexieData();
       const foundItem = syncData.transactions.find((t) => t.id === "unicode-test");
-      const passed = foundItem && (foundItem as any).name === testData.name;
+      // Check if name property exists (it's not in Transaction type but test data has it)
+      const passed = foundItem && (foundItem as Transaction & { name?: string }).name === testData.name;
 
       this.testResults.push({
         test: "testUnicodeAndSpecialChars",

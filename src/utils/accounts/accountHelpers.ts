@@ -221,10 +221,10 @@ export const calculateAccountUtilization = (currentBalance, annualContribution) 
  * @param {string} sortBy - Sort criteria
  * @returns {Array} Sorted accounts
  */
-export const sortAccounts = (accounts, sortBy = "name") => {
+export const sortAccounts = (accounts: Account[], sortBy = "name"): Account[] => {
   if (!Array.isArray(accounts)) return [];
 
-  const sortFunctions: Record<string, (a: any, b: any) => number> = {
+  const sortFunctions: Record<string, (a: Account, b: Account) => number> = {
     name: (a, b) => a.name.localeCompare(b.name),
     balance: (a, b) => b.currentBalance - a.currentBalance,
     type: (a, b) => a.type.localeCompare(b.type),
@@ -239,6 +239,19 @@ export const sortAccounts = (accounts, sortBy = "name") => {
 
   return [...accounts].sort(sortFunctions[sortBy] || sortFunctions.name);
 };
+
+/**
+ * Account type used for sorting and filtering
+ */
+interface Account {
+  name: string;
+  type: string;
+  currentBalance: number;
+  expirationDate?: string | null;
+  lastUpdated: string;
+  description?: string | null;
+  isActive: boolean;
+}
 
 /**
  * Options for filtering accounts
@@ -258,7 +271,7 @@ interface FilterAccountsOptions {
  * @param {Object} filters - Filter criteria
  * @returns {Array} Filtered accounts
  */
-export const filterAccounts = (accounts, filters: FilterAccountsOptions = {}) => {
+export const filterAccounts = (accounts: Account[], filters: FilterAccountsOptions = {}): Account[] => {
   if (!Array.isArray(accounts)) return [];
 
   let filteredAccounts = [...accounts];

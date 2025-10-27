@@ -3,14 +3,40 @@
  * Usage: Copy and paste this into browser developer console
  */
 import logger from "@/utils/common/logger";
+import type { VioletVaultDB } from "@/db/budgetDb";
+
+interface CloudSyncServiceType {
+  isRunning: boolean;
+  config?: unknown;
+  lastSyncTime: string | null;
+  triggerSyncForCriticalChange: (changeType: string) => void;
+}
+
+interface NetworkConnection {
+  effectiveType?: string;
+  downlink?: number;
+}
+
+interface SyncEdgeCaseTesterType {
+  runAllTests: () => Promise<unknown>;
+}
+
+interface FirebaseAuthType {
+  currentUser: {
+    uid: string;
+    email: string | null;
+    isAnonymous: boolean;
+  } | null;
+}
 
 // Extend window type for diagnostic tools
 declare global {
   interface Window {
-    budgetDb?: any;
+    budgetDb?: VioletVaultDB;
+    cloudSyncService?: CloudSyncServiceType;
     runSyncDiagnostic?: () => Promise<DiagnosticResults>;
-    syncEdgeCaseTester?: any;
-    runSyncEdgeCaseTests?: () => Promise<any>;
+    syncEdgeCaseTester?: SyncEdgeCaseTesterType;
+    runSyncEdgeCaseTests?: () => Promise<unknown>;
   }
 }
 
@@ -45,7 +71,7 @@ export interface DiagnosticResults {
   };
   network?: {
     online: boolean;
-    connection: any;
+    connection: NetworkConnection | string;
   };
 }
 
@@ -156,7 +182,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   logger.info("☁️ Checking Cloud Sync Service...");
   try {
     if (window.cloudSyncService) {
-      const cloudSyncService = window.cloudSyncService as any;
+      const cloudSyncService = window.cloudSyncService;
       results.cloudSync = {
         isRunning: cloudSyncService.isRunning,
         config: !!cloudSyncService.config,
@@ -181,7 +207,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 5: Firebase Auth
   logger.info("🔐 Checking Firebase Auth...");
   try {
-    const firebaseAuth = (window as any).firebaseAuth;
+    const firebaseAuth = (window as Window & { firebaseAuth?: FirebaseAuthType }).firebaseAuth;
     if (firebaseAuth) {
       const user = firebaseAuth.currentUser;
       results.firebaseAuth = {
@@ -212,7 +238,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
 
   // Check 6: Network Status
   logger.info("🌐 Checking Network...");
-  const connection = (navigator as any).connection;
+  const connection = (navigator as Navigator & { connection?: NetworkConnection }).connection;
   results.network = {
     online: navigator.onLine,
     connection: connection
