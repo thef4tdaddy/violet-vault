@@ -164,19 +164,3 @@ updates:
       prefix: "ci"
       include: "scope"
 
-  # Security updates - Critical vulnerabilities to main only
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    target-branch: "main"
-    assignees:
-      - "thef4tdaddy"
-    labels:
-      - "security"
-      - "critical"
-    open-pull-requests-limit: 2
-    commit-message:
-      prefix: "security"
-      prefix-development: "security(dev)"
-      include: "scope"
