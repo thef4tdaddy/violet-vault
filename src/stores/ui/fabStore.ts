@@ -4,10 +4,55 @@ import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "@/utils/common/logger";
 
+// Type definitions for FAB store
+interface FABAction {
+  id: string;
+  icon: string;
+  label: string;
+  color: string;
+  action: (() => void) | null;
+}
+
+interface DefaultSecondaryActions {
+  [key: string]: FABAction;
+}
+
+interface FABState {
+  // Core state
+  isVisible: boolean;
+  isExpanded: boolean;
+  currentScreen: string;
+
+  // Actions registry
+  primaryActions: Map<string, FABAction>;
+  secondaryActions: Map<string, FABAction>;
+  defaultSecondaryActions: DefaultSecondaryActions;
+
+  // Actions
+  setCurrentScreen: (screenId: string) => void;
+  setVisibility: (visible: boolean) => void;
+  setExpanded: (expanded: boolean) => void;
+  toggleExpanded: () => void;
+  registerPrimaryAction: (screenId: string, action: FABAction) => void;
+  unregisterPrimaryAction: (screenId: string) => void;
+  registerSecondaryAction: (action: FABAction) => void;
+  unregisterSecondaryAction: (actionId: string) => void;
+  setDefaultActionHandler: (actionId: string, handler: () => void) => void;
+  clearScreenActions: (screenId: string) => void;
+  getDebugInfo: () => {
+    currentScreen: string;
+    isVisible: boolean;
+    isExpanded: boolean;
+    primaryActionsCount: number;
+    secondaryActionsCount: number;
+    defaultActionsWithHandlers: number;
+  };
+}
+
 /**
  * Default secondary actions that are always available
  */
-const getDefaultSecondaryActions = () => ({
+const getDefaultSecondaryActions = (): DefaultSecondaryActions => ({
   "bug-report": {
     id: "bug-report",
     icon: "Bug",
@@ -27,7 +72,7 @@ const getDefaultSecondaryActions = () => ({
 /**
  * Get current primary action for screen
  */
-const getCurrentPrimaryAction = (state) => {
+const getCurrentPrimaryAction = (state: FABState): FABAction | null => {
   const { currentScreen, primaryActions } = state;
   return primaryActions.get(currentScreen) || null;
 };
@@ -35,9 +80,9 @@ const getCurrentPrimaryAction = (state) => {
 /**
  * Get all secondary actions (default + custom)
  */
-const getAllSecondaryActions = (state) => {
+const getAllSecondaryActions = (state: FABState): FABAction[] => {
   const { secondaryActions, defaultSecondaryActions } = state;
-  const actions = [];
+  const actions: FABAction[] = [];
 
   // Add default actions that have handlers
   Object.values(defaultSecondaryActions).forEach((action) => {
@@ -57,15 +102,18 @@ const getAllSecondaryActions = (state) => {
 /**
  * Create store actions object
  */
-const createStoreActions = (set, _get) => ({
-  setCurrentScreen: (screenId) => {
+const createStoreActions = (
+  set: (fn: (state: FABState) => void) => void,
+  _get: () => FABState
+) => ({
+  setCurrentScreen: (screenId: string) => {
     set((state) => {
       state.currentScreen = screenId;
       state.isExpanded = false;
     });
   },
 
-  setVisibility: (visible) => {
+  setVisibility: (visible: boolean) => {
     set((state) => {
       state.isVisible = visible;
       if (!visible) {
@@ -74,7 +122,7 @@ const createStoreActions = (set, _get) => ({
     });
   },
 
-  setExpanded: (expanded) => {
+  setExpanded: (expanded: boolean) => {
     set((state) => {
       state.isExpanded = expanded;
     });
@@ -90,8 +138,11 @@ const createStoreActions = (set, _get) => ({
 /**
  * Create action management methods
  */
-const createActionManagement = (set, _get) => ({
-  registerPrimaryAction: (screenId, action) => {
+const createActionManagement = (
+  set: (fn: (state: FABState) => void) => void,
+  _get: () => FABState
+) => ({
+  registerPrimaryAction: (screenId: string, action: FABAction) => {
     set((state) => {
       state.primaryActions.set(screenId, action);
     });
@@ -100,14 +151,14 @@ const createActionManagement = (set, _get) => ({
     });
   },
 
-  unregisterPrimaryAction: (screenId) => {
+  unregisterPrimaryAction: (screenId: string) => {
     set((state) => {
       state.primaryActions.delete(screenId);
     });
     logger.debug(`FAB: Unregistered primary action for ${screenId}`);
   },
 
-  registerSecondaryAction: (action) => {
+  registerSecondaryAction: (action: FABAction) => {
     if (!action.id) {
       logger.warn("FAB: Secondary action must have an id", action);
       return;
@@ -121,14 +172,14 @@ const createActionManagement = (set, _get) => ({
     });
   },
 
-  unregisterSecondaryAction: (actionId) => {
+  unregisterSecondaryAction: (actionId: string) => {
     set((state) => {
       state.secondaryActions.delete(actionId);
     });
     logger.debug(`FAB: Unregistered secondary action ${actionId}`);
   },
 
-  setDefaultActionHandler: (actionId, handler) => {
+  setDefaultActionHandler: (actionId: string, handler: () => void) => {
     set((state) => {
       if (state.defaultSecondaryActions[actionId]) {
         state.defaultSecondaryActions[actionId].action = handler;
@@ -136,7 +187,7 @@ const createActionManagement = (set, _get) => ({
     });
   },
 
-  clearScreenActions: (screenId) => {
+  clearScreenActions: (screenId: string) => {
     set((state) => {
       state.primaryActions.delete(screenId);
     });
@@ -147,7 +198,7 @@ const createActionManagement = (set, _get) => ({
 /**
  * Check if FAB should be shown
  */
-const getShouldShowFAB = (state) => {
+const getShouldShowFAB = (state: FABState): boolean => {
   const { isVisible } = state;
   const primaryAction = getCurrentPrimaryAction(state);
   const secondaryActions = getAllSecondaryActions(state);
@@ -159,12 +210,12 @@ const getShouldShowFAB = (state) => {
  * FAB Store - Manages floating action button state using Zustand
  * Provides global state management for FAB actions and visibility
  */
-export const useFABStore = create(
+export const useFABStore = create<FABState>()(
   subscribeWithSelector(
     devtools(
       immer((set, get) => {
-        const storeActions = createStoreActions(set, get);
-        const actionManagement = createActionManagement(set, get);
+        const storeActions = createStoreActions(set as (fn: (state: FABState) => void) => void, get);
+        const actionManagement = createActionManagement(set as (fn: (state: FABState) => void) => void, get);
 
         return {
           // Core state
@@ -173,8 +224,8 @@ export const useFABStore = create(
           currentScreen: "dashboard",
 
           // Actions registry
-          primaryActions: new Map(),
-          secondaryActions: new Map(),
+          primaryActions: new Map<string, FABAction>(),
+          secondaryActions: new Map<string, FABAction>(),
 
           // Default secondary actions
           defaultSecondaryActions: getDefaultSecondaryActions(),
@@ -195,7 +246,7 @@ export const useFABStore = create(
               isExpanded: state.isExpanded,
               primaryActionsCount: state.primaryActions.size,
               secondaryActionsCount: state.secondaryActions.size,
-              defaultActionsWithHandlers: Object.values(state.defaultSecondaryActions).filter(
+              defaultActionsWithHandlers: (Object.values(state.defaultSecondaryActions) as FABAction[]).filter(
                 (a) => a.action !== null
               ).length,
             };
