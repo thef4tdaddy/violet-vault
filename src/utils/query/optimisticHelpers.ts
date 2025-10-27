@@ -272,6 +272,89 @@ export const optimisticHelpers = {
   },
 
   /**
+   * Add new savings goal optimistically
+   */
+  addSavingsGoal: async (newGoal) => {
+    try {
+      const goalWithTimestamp = {
+        ...newGoal,
+        createdAt: Date.now(),
+        lastModified: Date.now(),
+      };
+
+      // Add to database
+      await budgetDb.savingsGoals.add(goalWithTimestamp);
+
+      logger.debug("Optimistic savings goal addition completed", {
+        goalId: newGoal.id,
+      });
+
+      // GitHub Issue #576: Trigger change-based sync after data modification
+      if (cloudSyncService?.isRunning) {
+        cloudSyncService.scheduleSync("normal");
+      }
+    } catch (error) {
+      logger.warn("Failed to persist optimistic savings goal addition", {
+        error: error.message,
+        goalId: newGoal.id,
+        source: "optimisticHelpers",
+      });
+    }
+  },
+
+  /**
+   * Update savings goal optimistically
+   */
+  updateSavingsGoal: async (goalId, updatedGoal) => {
+    try {
+      // Update database
+      await budgetDb.savingsGoals.update(goalId, {
+        ...updatedGoal,
+        lastModified: Date.now(),
+      });
+
+      logger.debug("Optimistic savings goal update completed", {
+        goalId,
+        updates: updatedGoal,
+      });
+
+      // GitHub Issue #576: Trigger change-based sync after data modification
+      if (cloudSyncService?.isRunning) {
+        cloudSyncService.scheduleSync("normal");
+      }
+    } catch (error) {
+      logger.warn("Failed to persist optimistic savings goal update", {
+        error: error.message,
+        goalId,
+        source: "optimisticHelpers",
+      });
+    }
+  },
+
+  /**
+   * Delete savings goal optimistically
+   */
+  deleteSavingsGoal: async (goalId) => {
+    try {
+      // Remove from database
+      await budgetDb.savingsGoals.delete(goalId);
+
+      logger.debug("Optimistic savings goal removal completed", { goalId });
+
+      // GitHub Issue #576: Trigger change-based sync after data modification
+      if (cloudSyncService?.isRunning) {
+        cloudSyncService.scheduleSync("normal");
+      }
+    } catch (error) {
+      logger.warn("Failed to persist optimistic savings goal removal", {
+        error: error.message,
+        goalId,
+        source: "optimisticHelpers",
+      });
+    }
+  },
+
+  /**
    * Update budget metadata optimistically
    */
   updateBudgetMetadata: async (queryClient, updates) => {

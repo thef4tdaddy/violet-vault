@@ -11,12 +11,27 @@ import { useTransactionOperations } from "./useTransactionOperations";
 import { createEnhancedOperations } from "./useTransactionsV2Helpers";
 import logger from "@/utils/common/logger";
 
+interface UseTransactionsV2Options {
+  dateRange?: { start: string; end: string };
+  envelopeId?: string;
+  category?: string;
+  type?: string;
+  searchQuery?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  limit?: number;
+  categoryRules?: Array<unknown>;
+  enabled?: boolean;
+  staleTime?: number;
+  refetchInterval?: number | null;
+}
+
 /**
  * Enhanced transactions hook with focused separation of concerns
- * @param {Object} options - Hook options
- * @returns {Object} Complete transaction management interface
+ * @param options - Hook options
+ * @returns Complete transaction management interface
  */
-const useTransactionsV2 = (options = {}) => {
+const useTransactionsV2 = (options: UseTransactionsV2Options = {}) => {
   const {
     // Data query options
     dateRange,
@@ -164,4 +179,5 @@ const useTransactionsV2 = (options = {}) => {
   };
 };
 
+export { useTransactionsV2 };
 export default useTransactionsV2;
