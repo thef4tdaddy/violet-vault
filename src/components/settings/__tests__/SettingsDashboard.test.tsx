@@ -49,7 +49,9 @@ vi.mock("@/hooks/settings/useSettingsDashboard", () => ({
 
 vi.mock("@/hooks/settings/useSettingsSectionRenderer", () => ({
   default: vi.fn(() => ({
-    renderSection: vi.fn(() => <div data-testid="section-content">Section Content</div>),
+    renderSectionContent: vi.fn((section) => (
+      <div data-testid="section-content">Section: {section}</div>
+    )),
   })),
 }));
 
