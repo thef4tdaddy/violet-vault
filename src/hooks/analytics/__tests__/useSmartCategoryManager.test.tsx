@@ -15,14 +15,15 @@ interface TestExpectedHookReturn {
   analyzeSuggestions?: (...args: unknown[]) => Promise<unknown>;
   setSuggestions?: (suggestions: unknown[]) => void;
   toggleSuggestionSelection?: (id: string) => void;
-  selectHighConfidenceSuggestions?: () => void;
+  selectHighConfidenceSuggestions?: (threshold?: number) => void;
   applySelectedSuggestions?: () => Promise<unknown>;
   dismissSuggestion?: (id: string) => void;
   applySuggestion?: (suggestion: unknown, onApply?: unknown) => Promise<unknown>;
-  getFilteredSuggestions?: (tab: string) => unknown[];
+  getFilteredSuggestions?: (threshold: number) => unknown[];
   setSelectedSuggestions?: (suggestions: unknown[]) => void;
   getSuggestionStats?: () => unknown;
   isDataLoading?: boolean;
+  trainModel?: () => Promise<unknown>;
   [key: string]: unknown;
 }
 
