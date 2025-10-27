@@ -1,5 +1,5 @@
 // Savings Goal Form Utilities - Constants and validation for savings goals
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
 
 // Savings goal categories
 export const SAVINGS_CATEGORIES = [
@@ -185,6 +185,8 @@ interface SavingsGoalData {
   createdAt: string;
   updatedAt: string;
   isCompleted?: boolean;
+  monthlyNeeded?: number;
+  remainingAmount?: number;
 }
 
 /**
