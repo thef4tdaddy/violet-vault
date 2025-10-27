@@ -13,10 +13,86 @@ import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations
 import { validateEnvelopeSafe } from "../../domain/schemas/envelope.ts";
 
 /**
+ * Form data interface
+ */
+interface EnvelopeFormData {
+  name: string;
+  monthlyAmount: string | number;
+  currentBalance: string | number;
+  category: string;
+  color: string;
+  frequency: string;
+  description?: string;
+  priority: string;
+  autoAllocate: boolean;
+  icon: string;
+  envelopeType: string;
+  monthlyBudget?: string | number;
+  biweeklyAllocation?: string | number;
+  targetAmount?: string | number;
+  [key: string]: unknown;
+}
+
+/**
+ * Envelope interface
+ */
+interface Envelope {
+  id: string | number;
+  name: string;
+  monthlyAmount?: number;
+  currentBalance?: number;
+  category?: string;
+  color?: string;
+  frequency?: string;
+  description?: string;
+  priority?: string;
+  autoAllocate?: boolean;
+  icon?: string;
+  envelopeType?: string;
+  monthlyBudget?: number;
+  biweeklyAllocation?: number;
+  targetAmount?: number;
+  createdAt?: string;
+  createdBy?: string;
+  lastUpdated?: string;
+  updatedBy?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Transform options interface
+ */
+interface TransformOptions {
+  editingId?: string | number;
+  createdBy?: string;
+}
+
+/**
+ * Validation result interface
+ */
+interface ValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
+}
+
+/**
+ * Zod result interface
+ */
+interface ZodResult {
+  success: boolean;
+  error?: {
+    errors: Array<{
+      path: Array<string | number>;
+      message: string;
+    }>;
+  };
+}
+
+/**
  * Creates default envelope form data
  * @returns {Object} Default form data structure
  */
-export const createDefaultEnvelopeForm = () => ({
+export const createDefaultEnvelopeForm = (): EnvelopeFormData => ({
   name: "",
   monthlyAmount: "",
   currentBalance: "",
@@ -43,7 +119,7 @@ export const createDefaultEnvelopeForm = () => ({
 /**
  * Convert Zod errors to error object format
  */
-const convertZodErrors = (zodResult) => {
+const convertZodErrors = (zodResult: ZodResult): Record<string, string> => {
   const errors = {};
   if (!zodResult.success) {
     zodResult.error.errors.forEach((err) => {
@@ -59,7 +135,12 @@ const convertZodErrors = (zodResult) => {
 /**
  * Check for duplicate envelope names
  */
-const validateUniqueName = (formData, existingEnvelopes, editingEnvelopeId, errors) => {
+const validateUniqueName = (
+  formData: EnvelopeFormData,
+  existingEnvelopes: Envelope[],
+  editingEnvelopeId: string | number | null,
+  errors: Record<string, string>
+): void => {
   if (!errors.name && formData.name) {
     const nameExists = existingEnvelopes.some(
       (envelope) =>
@@ -75,7 +156,7 @@ const validateUniqueName = (formData, existingEnvelopes, editingEnvelopeId, erro
 /**
  * Validate monthly amount field
  */
-const validateMonthlyAmount = (formData, errors) => {
+const validateMonthlyAmount = (formData: EnvelopeFormData, errors: Record<string, string>): void => {
   const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
 
   if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
@@ -96,7 +177,7 @@ const validateMonthlyAmount = (formData, errors) => {
 /**
  * Validate target amount for sinking funds
  */
-const validateTargetAmount = (formData, errors) => {
+const validateTargetAmount = (formData: EnvelopeFormData, errors: Record<string, string>): void => {
   if (formData.envelopeType !== ENVELOPE_TYPES.SINKING_FUND) return;
 
   if (!formData.targetAmount) {
@@ -115,7 +196,7 @@ const validateTargetAmount = (formData, errors) => {
 /**
  * Validate category, priority, and frequency fields
  */
-const validateAdditionalFields = (formData, errors) => {
+const validateAdditionalFields = (formData: EnvelopeFormData, errors: Record<string, string>): void => {
   // Category validation
   if (!errors.category && formData.category) {
     const availableCategories = getEnvelopeCategories();
@@ -146,10 +227,10 @@ const validateAdditionalFields = (formData, errors) => {
  * @returns {Object} Validation result with errors object
  */
 export const validateEnvelopeForm = (
-  formData,
-  existingEnvelopes = [],
-  editingEnvelopeId = null
-) => {
+  formData: EnvelopeFormData,
+  existingEnvelopes: Envelope[] = [],
+  editingEnvelopeId: string | number | null = null
+): ValidationResult => {
   // Use Zod schema for base validation
   const zodResult = validateEnvelopeSafe(formData);
   const errors = convertZodErrors(zodResult);
@@ -171,13 +252,13 @@ export const validateEnvelopeForm = (
  * @param {Object} formData - Form data
  * @returns {Object} Calculated amounts
  */
-export const calculateEnvelopeAmounts = (formData) => {
-  const monthlyAmount = parseFloat(formData.monthlyAmount) || 0;
-  const targetAmount = parseFloat(formData.targetAmount) || 0;
-  const currentBalance = parseFloat(formData.currentBalance) || 0;
+export const calculateEnvelopeAmounts = (formData: EnvelopeFormData) => {
+  const monthlyAmount = parseFloat(String(formData.monthlyAmount)) || 0;
+  const targetAmount = parseFloat(String(formData.targetAmount)) || 0;
+  const currentBalance = parseFloat(String(formData.currentBalance)) || 0;
 
   // Calculate biweekly allocation
-  const biweeklyAllocation = monthlyAmount > 0 ? toBiweekly(monthlyAmount) : 0;
+  const biweeklyAllocation = monthlyAmount > 0 ? toBiweekly(monthlyAmount, "monthly") : 0;
 
   // Calculate monthly budget (may differ from monthlyAmount based on type)
   let monthlyBudget = monthlyAmount;
@@ -220,11 +301,14 @@ export const calculateEnvelopeAmounts = (formData) => {
  * @param {Object} options - Additional options (editingId, createdBy, etc.)
  * @returns {Object} Envelope object ready for save
  */
-export const transformFormToEnvelope = (formData, options = {}) => {
+export const transformFormToEnvelope = (
+  formData: EnvelopeFormData,
+  options: TransformOptions = {}
+): Envelope => {
   const { editingId, createdBy = "Unknown User" } = options;
   const amounts = calculateEnvelopeAmounts(formData);
 
-  const envelope = {
+  const envelope: Envelope = {
     name: formData.name.trim(),
     monthlyAmount: amounts.monthlyAmount,
     currentBalance: amounts.currentBalance,
@@ -263,9 +347,14 @@ export const transformFormToEnvelope = (formData, options = {}) => {
 /**
  * Get field with default value
  */
-const getFieldOrDefault = (value: unknown, defaultValue: string | boolean): string | boolean => {
-  return value ?? defaultValue;
-};
+function getFieldOrDefault(value: unknown, defaultValue: string): string;
+function getFieldOrDefault(value: unknown, defaultValue: boolean): boolean;
+function getFieldOrDefault(value: unknown, defaultValue: string | boolean): string | boolean {
+  if (value === null || value === undefined) {
+    return defaultValue;
+  }
+  return value as string | boolean;
+}
 
 /**
  * Convert number to string or return empty string
@@ -279,7 +368,7 @@ const toStringOrEmpty = (value: number | undefined | null): string => {
  * @param {Object} envelope - Envelope object
  * @returns {Object} Form data
  */
-export const transformEnvelopeToForm = (envelope) => {
+export const transformEnvelopeToForm = (envelope: Envelope | null): EnvelopeFormData => {
   if (!envelope) return createDefaultEnvelopeForm();
 
   return {
@@ -305,7 +394,7 @@ export const transformEnvelopeToForm = (envelope) => {
  * @param {Object} envelope - Envelope object
  * @returns {Object} Progress information
  */
-export const calculateEnvelopeProgress = (envelope) => {
+export const calculateEnvelopeProgress = (envelope: Envelope) => {
   if (envelope.envelopeType !== ENVELOPE_TYPES.SINKING_FUND) {
     return null;
   }
@@ -369,7 +458,7 @@ export const getColorOptions = () => [
  * @param {Object} envelope - Existing envelope data
  * @returns {Object} Compatibility result
  */
-export const validateEnvelopeTypeChange = (newType, envelope) => {
+export const validateEnvelopeTypeChange = (newType: string, envelope: Envelope | null) => {
   const warnings = [];
   const errors = [];
 

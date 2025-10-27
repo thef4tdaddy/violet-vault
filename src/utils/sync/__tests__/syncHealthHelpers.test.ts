@@ -14,7 +14,7 @@ import {
 describe("syncHealthHelpers", () => {
   describe("getStatusColor", () => {
     it("should return blue for loading states", () => {
-      expect(getStatusColor({ isLoading: true }, false)).toBe("text-blue-500");
+      expect(getStatusColor({ status: "HEALTHY", isLoading: true }, false)).toBe("text-blue-500");
       expect(getStatusColor({ status: "HEALTHY" }, true)).toBe("text-blue-500");
     });
 
@@ -29,7 +29,7 @@ describe("syncHealthHelpers", () => {
 
   describe("getStatusBackgroundColor", () => {
     it("should return blue background for loading states", () => {
-      expect(getStatusBackgroundColor({ isLoading: true }, false)).toBe("bg-blue-100");
+      expect(getStatusBackgroundColor({ status: "HEALTHY", isLoading: true }, false)).toBe("bg-blue-100");
       expect(getStatusBackgroundColor({ status: "HEALTHY" }, true)).toBe("bg-blue-100");
     });
 
@@ -44,7 +44,7 @@ describe("syncHealthHelpers", () => {
 
   describe("getStatusText", () => {
     it("should return appropriate text for loading and syncing states", () => {
-      expect(getStatusText({ isLoading: true }, false)).toBe("Checking...");
+      expect(getStatusText({ status: "HEALTHY", isLoading: true }, false)).toBe("Checking...");
       expect(getStatusText({ status: "HEALTHY" }, true)).toBe("Syncing...");
     });
 
@@ -60,7 +60,7 @@ describe("syncHealthHelpers", () => {
 
   describe("getStatusDescription", () => {
     it("should return appropriate descriptions for loading and syncing states", () => {
-      expect(getStatusDescription({ isLoading: true }, false)).toBe(
+      expect(getStatusDescription({ status: "HEALTHY", isLoading: true }, false)).toBe(
         "Checking sync health status..."
       );
       expect(getStatusDescription({ status: "HEALTHY" }, true)).toBe(
@@ -222,30 +222,31 @@ describe("syncHealthHelpers", () => {
   describe("getActionButtonStyle", () => {
     const baseStyle =
       "px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold";
+    const mockSyncStatus = { status: "HEALTHY" };
 
     it("should return validate button style", () => {
-      const style = getActionButtonStyle("validate");
+      const style = getActionButtonStyle("validate", mockSyncStatus);
       expect(style).toBe(
         `${baseStyle} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700`
       );
     });
 
     it("should return reset button style", () => {
-      const style = getActionButtonStyle("reset");
+      const style = getActionButtonStyle("reset", mockSyncStatus);
       expect(style).toBe(
         `${baseStyle} bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600`
       );
     });
 
     it("should return refresh button style", () => {
-      const style = getActionButtonStyle("refresh");
+      const style = getActionButtonStyle("refresh", mockSyncStatus);
       expect(style).toBe(
         `${baseStyle} bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700`
       );
     });
 
     it("should return default button style for unknown types", () => {
-      const style = getActionButtonStyle("unknown");
+      const style = getActionButtonStyle("unknown", mockSyncStatus);
       expect(style).toBe(
         `${baseStyle} bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80`
       );
