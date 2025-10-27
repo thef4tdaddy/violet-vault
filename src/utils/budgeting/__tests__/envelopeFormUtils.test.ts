@@ -10,7 +10,17 @@ import {
   getColorOptions,
   validateEnvelopeTypeChange,
 } from "../envelopeFormUtils";
-import { ENVELOPE_TYPES } from "../../../constants/categories";
+import { ENVELOPE_TYPES } from "@/constants/categories";
+
+interface ValidationErrors {
+  name?: string;
+  category?: string;
+  monthlyAmount?: string;
+  targetAmount?: string;
+  priority?: string;
+  color?: string;
+  [key: string]: string | undefined;
+}
 
 describe("envelopeFormUtils", () => {
   describe("createDefaultEnvelopeForm", () => {
@@ -62,7 +72,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.name).toBe("Envelope name is required");
+      expect((result.errors as ValidationErrors).name).toBe("Envelope name is required");
     });
 
     it("should validate name length", () => {
@@ -70,7 +80,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.name).toBe("Envelope name must be less than 50 characters");
+      expect((result.errors as ValidationErrors).name).toBe("Envelope name must be less than 50 characters");
     });
 
     it("should detect duplicate names", () => {
@@ -79,7 +89,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData, existingEnvelopes);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.name).toBe("An envelope with this name already exists");
+      expect((result.errors as ValidationErrors).name).toBe("An envelope with this name already exists");
     });
 
     it("should allow same name when editing existing envelope", () => {
@@ -88,7 +98,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData, existingEnvelopes, "1");
 
       expect(result.isValid).toBe(true);
-      expect(result.errors.name).toBeUndefined();
+      expect((result.errors as ValidationErrors).name).toBeUndefined();
     });
 
     it("should validate monthly amount format", () => {
@@ -96,7 +106,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.monthlyAmount).toBe("Monthly amount must be a positive number");
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe("Monthly amount must be a positive number");
     });
 
     it("should validate monthly amount maximum", () => {
@@ -104,7 +114,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.monthlyAmount).toBe("Monthly amount cannot exceed $100,000");
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe("Monthly amount cannot exceed $100,000");
     });
 
     it("should require target amount for sinking funds", () => {
@@ -116,7 +126,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.targetAmount).toBe("Target amount is required for sinking funds");
+      expect((result.errors as ValidationErrors).targetAmount).toBe("Target amount is required for sinking funds");
     });
 
     it("should validate target amount format", () => {
@@ -128,7 +138,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.targetAmount).toBe("Target amount must be a positive number");
+      expect((result.errors as ValidationErrors).targetAmount).toBe("Target amount must be a positive number");
     });
 
     it("should require category", () => {
@@ -136,7 +146,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.category).toBe("Category is required");
+      expect((result.errors as ValidationErrors).category).toBe("Category is required");
     });
 
     it("should validate priority options", () => {
@@ -144,7 +154,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.priority).toBe("Invalid priority selected");
+      expect((result.errors as ValidationErrors).priority).toBe("Invalid priority selected");
     });
 
     it("should validate color format", () => {
@@ -152,7 +162,7 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.color).toBe("Invalid color format");
+      expect((result.errors as ValidationErrors).color).toBe("Invalid color format");
     });
   });
 
@@ -200,7 +210,7 @@ describe("envelopeFormUtils", () => {
 
     it("should transform form data to envelope object", () => {
       const options = { createdBy: "Test User" };
-      const result = transformFormToEnvelope(validFormData, options);
+      const result = transformFormToEnvelope(validFormData, options) as Record<string, unknown>;
 
       expect(result).toMatchObject({
         name: "Test Envelope",
@@ -225,7 +235,7 @@ describe("envelopeFormUtils", () => {
 
     it("should handle editing existing envelope", () => {
       const options = { editingId: "123", createdBy: "Test User" };
-      const result = transformFormToEnvelope(validFormData, options);
+      const result = transformFormToEnvelope(validFormData, options) as Record<string, unknown>;
 
       expect(result.id).toBe("123");
       expect(result.createdAt).toBeUndefined();
