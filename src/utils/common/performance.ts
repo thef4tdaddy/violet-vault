@@ -1,9 +1,23 @@
 // Performance monitoring utilities
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
+
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface ExtendedPerformance extends Performance {
+  memory?: PerformanceMemory;
+}
+
+interface WindowWithVitePreload extends Window {
+  __vitePreload?: (id: string, importer?: string) => Promise<unknown>;
+}
 
 export const performanceMonitor = {
   // Track component render times
-  measureRender(componentName, fn) {
+  measureRender<T>(componentName: string, fn: () => T): T {
     if (process.env.NODE_ENV === "development") {
       const start = performance.now();
       const result = fn();
@@ -15,9 +29,9 @@ export const performanceMonitor = {
   },
 
   // Debounce function for performance
-  debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
+  debounce<T extends (...args: unknown[]) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
+    let timeout: ReturnType<typeof setTimeout>;
+    return function executedFunction(...args: Parameters<T>) {
       const later = () => {
         clearTimeout(timeout);
         func(...args);
@@ -28,9 +42,9 @@ export const performanceMonitor = {
   },
 
   // Throttle function for performance
-  throttle(func, limit) {
-    let inThrottle;
-    return function (...args) {
+  throttle<T extends (...args: unknown[]) => void>(func: T, limit: number): (...args: Parameters<T>) => void {
+    let inThrottle: boolean;
+    return function (this: unknown, ...args: Parameters<T>) {
       if (!inThrottle) {
         func.apply(this, args);
         inThrottle = true;
@@ -40,19 +54,21 @@ export const performanceMonitor = {
   },
 
   // Memory usage monitoring
-  logMemoryUsage() {
+  logMemoryUsage(): void {
     if (process.env.NODE_ENV === "development" && "memory" in performance) {
-      const memInfo = performance.memory;
-      logger.debug("Memory Usage", {
-        used: `${Math.round(memInfo.usedJSHeapSize / 1048576)}MB`,
-        total: `${Math.round(memInfo.totalJSHeapSize / 1048576)}MB`,
-        limit: `${Math.round(memInfo.jsHeapSizeLimit / 1048576)}MB`,
-      });
+      const memInfo = (performance as ExtendedPerformance).memory;
+      if (memInfo) {
+        logger.debug("Memory Usage", {
+          used: `${Math.round(memInfo.usedJSHeapSize / 1048576)}MB`,
+          total: `${Math.round(memInfo.totalJSHeapSize / 1048576)}MB`,
+          limit: `${Math.round(memInfo.jsHeapSizeLimit / 1048576)}MB`,
+        });
+      }
     }
   },
 
   // Measure async operations
-  async measureAsync(operationName, asyncFn) {
+  async measureAsync<T>(operationName: string, asyncFn: () => Promise<T>): Promise<T> {
     if (process.env.NODE_ENV === "development") {
       const start = performance.now();
       const result = await asyncFn();
@@ -64,14 +80,15 @@ export const performanceMonitor = {
   },
 
   // Bundle size reporter (development only)
-  reportBundleSize() {
+  reportBundleSize(): void {
     if (process.env.NODE_ENV === "development") {
       // This will help track when components are loaded
-      const loadedChunks = new Set();
-      const originalImport = window.__vitePreload;
+      const loadedChunks = new Set<string>();
+      const windowWithVite = window as WindowWithVitePreload;
+      const originalImport = windowWithVite.__vitePreload;
 
       if (originalImport) {
-        window.__vitePreload = (id, importer) => {
+        windowWithVite.__vitePreload = (id: string, importer?: string) => {
           if (!loadedChunks.has(id)) {
             logger.debug(`Loading chunk: ${id}`);
             loadedChunks.add(id);
@@ -84,8 +101,8 @@ export const performanceMonitor = {
 };
 
 // React hook for performance monitoring
-export const usePerformanceMonitor = (componentName) => {
-  const measureRender = (fn) => performanceMonitor.measureRender(componentName, fn);
+export const usePerformanceMonitor = (componentName: string) => {
+  const measureRender = <T>(fn: () => T) => performanceMonitor.measureRender(componentName, fn);
 
   return {
     measureRender,
