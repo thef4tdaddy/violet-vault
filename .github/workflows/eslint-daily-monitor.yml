@@ -8,6 +8,10 @@ on:
     - cron: "0 9 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+
 env:
   NODE_VERSION: "22"
   TRACKING_ISSUE: "214"

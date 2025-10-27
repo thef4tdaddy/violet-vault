@@ -15,6 +15,10 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   sync-workflow:
     runs-on: ubuntu-latest
