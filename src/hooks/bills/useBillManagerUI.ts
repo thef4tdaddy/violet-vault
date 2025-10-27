@@ -24,24 +24,6 @@ const createViewMode = (id, label, count, icon, color) => ({
   color,
 });
 
-// Helper to create summary card configuration
-const createSummaryCard = (label, value, color, bg, priority) => ({
-  label,
-  value,
-  color,
-  bg,
-  priority,
-});
-
-// Helper to format days display
-const formatDaysDisplay = (daysUntilDue) => {
-  if (daysUntilDue === null) return null;
-  if (daysUntilDue < 0) {
-    return `${Math.abs(daysUntilDue)} days overdue`;
-  }
-  return `${daysUntilDue} days left`;
-};
-
 /**
  * Custom hook for BillManager UI logic
  * @param {Object} options - Configuration options
