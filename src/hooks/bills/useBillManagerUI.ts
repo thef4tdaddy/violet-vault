@@ -6,6 +6,7 @@
  */
 import { useCallback, useMemo } from "react";
 import { getIconByName } from "../../utils/common/billIcons";
+import { getIcon } from "../../utils";
 
 interface CategorizedBills {
   upcoming?: unknown[];
@@ -86,18 +87,24 @@ export const useBillManagerUI = ({
         "upcoming",
         "Upcoming",
         categorizedBills.upcoming?.length || 0,
-        "Calendar",
+        getIcon("Calendar"),
         "blue"
       ),
       createViewMode(
         "overdue",
         "Overdue",
         categorizedBills.overdue?.length || 0,
-        "AlertTriangle",
+        getIcon("AlertTriangle"),
         "red"
       ),
-      createViewMode("paid", "Paid", categorizedBills.paid?.length || 0, "CheckCircle", "green"),
-      createViewMode("all", "All Bills", bills?.length || 0, "FileText", "gray"),
+      createViewMode(
+        "paid",
+        "Paid",
+        categorizedBills.paid?.length || 0,
+        getIcon("CheckCircle"),
+        "green"
+      ),
+      createViewMode("all", "All Bills", bills?.length || 0, getIcon("FileText"), "gray"),
     ],
     [categorizedBills, bills]
   );
@@ -117,9 +124,7 @@ export const useBillManagerUI = ({
   );
 
   const selectAllBills = useCallback(() => {
-    const allBillIds = new Set(
-      filteredBills.map((bill: { id: string }) => bill.id)
-    );
+    const allBillIds = new Set(filteredBills.map((bill: { id: string }) => bill.id));
     setSelectedBills(allBillIds);
   }, [filteredBills, setSelectedBills]);
 

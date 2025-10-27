@@ -27,12 +27,31 @@ import {
   getEmptyStats,
 } from "./helpers/transactionDataHelpers";
 
+interface UseTransactionDataOptions {
+  // Filter options
+  dateRange?: { start?: string; end?: string };
+  envelopeId?: string;
+  category?: string;
+  type?: string; // 'income' | 'expense' | 'transfer'
+  searchQuery?: string;
+
+  // Sort options
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+
+  // Query options
+  enabled?: boolean;
+  staleTime?: number;
+  refetchInterval?: number | null;
+}
+
 /**
  * Hook for querying and filtering transaction data
  * @param {Object} options - Query and filter options
  * @returns {Object} Query state and processed transactions
  */
-const useTransactionData = (options = {}) => {
+const useTransactionData = (options: UseTransactionDataOptions = {}) => {
   const {
     // Filter options
     dateRange,

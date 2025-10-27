@@ -104,7 +104,7 @@ export const billNeedsAttention = (bill) => {
   if (bill.status === "paid") return false;
   if (!bill.dueDate) return false;
 
-  const daysUntilDue = Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+  const daysUntilDue = Math.ceil((new Date(bill.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   return daysUntilDue < 0 || (daysUntilDue <= 3 && daysUntilDue >= 0);
 };
 
@@ -117,7 +117,7 @@ export const getBillUrgencyScore = (bill) => {
   if (bill.status === "paid") return 0;
   if (!bill.dueDate) return 1;
 
-  const daysUntilDue = Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+  const daysUntilDue = Math.ceil((new Date(bill.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
   if (daysUntilDue < 0) return 100 + Math.abs(daysUntilDue); // Overdue bills get highest priority
   if (daysUntilDue <= 3) return 50 + (3 - daysUntilDue); // Due soon bills

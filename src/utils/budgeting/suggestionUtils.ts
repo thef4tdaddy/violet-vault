@@ -46,15 +46,58 @@ export const MERCHANT_PATTERNS = {
   Fitness: /gym|fitness|planet|la.*fitness|crossfit/i,
 };
 
+// Type definitions
+interface Transaction {
+  amount: number;
+  envelopeId?: string | number;
+  category?: string;
+  description?: string;
+  date: string;
+}
+
+interface CategoryData {
+  category: string;
+  amount: number;
+  count: number;
+  transactions: Transaction[];
+}
+
+interface MerchantData {
+  amount: number;
+  count: number;
+  transactions: Transaction[];
+}
+
+interface Envelope {
+  id: string | number;
+  name: string;
+  category?: string;
+  monthlyAmount?: number;
+  currentBalance?: number;
+}
+
+interface AnalysisSettings {
+  minAmount: number;
+  minTransactions: number;
+  overspendingThreshold?: number;
+  overfundingThreshold?: number;
+  bufferPercentage: number;
+}
+
+interface GenerateSuggestionsOptions {
+  dismissedSuggestions?: Set<string>;
+  showDismissed?: boolean;
+}
+
 /**
  * Filters transactions by date range
  * @param {Array} transactions - All transactions
  * @param {string|number} dateRange - Range identifier (7, 30, 90, etc.)
  * @returns {Array} Filtered transactions
  */
-export const filterTransactionsByDateRange = (transactions, dateRange) => {
+export const filterTransactionsByDateRange = (transactions: Transaction[], dateRange: string | number): Transaction[] => {
   const now = new Date();
-  const ranges = {
+  const ranges: Record<string | number, Date> = {
     7: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
     30: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
     90: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000),
@@ -70,12 +113,12 @@ export const filterTransactionsByDateRange = (transactions, dateRange) => {
  * @param {Array} transactions - Filtered transactions
  * @returns {number} Number of months represented in data
  */
-export const calculateMonthsOfData = (transactions) => {
+export const calculateMonthsOfData = (transactions: Transaction[]): number => {
   if (transactions.length === 0) return 1;
 
   const dates = transactions.map((t) => new Date(t.date));
-  const earliest = new Date(Math.min(...dates));
-  const latest = new Date(Math.max(...dates));
+  const earliest = new Date(Math.min(...dates.map(d => d.getTime())));
+  const latest = new Date(Math.max(...dates.map(d => d.getTime())));
 
   const monthsDiff =
     (latest.getFullYear() - earliest.getFullYear()) * 12 +
@@ -92,7 +135,12 @@ export const calculateMonthsOfData = (transactions) => {
  * @param {Object} settings - Analysis settings
  * @returns {Array} Array of suggestions
  */
-export const analyzeUnassignedTransactions = (transactions, monthsOfData, settings) => {
+export const analyzeUnassignedTransactions = (
+  transactions: Transaction[],
+  monthsOfData: number,
+  settings: AnalysisSettings
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any[] => {
   const suggestions = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
@@ -102,7 +150,7 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
   );
 
   // Group by category
-  const unassignedByCategory = {};
+  const unassignedByCategory: Record<string, CategoryData> = {};
   unassignedTransactions.forEach((transaction) => {
     const category = transaction.category || "Uncategorized";
     if (!unassignedByCategory[category]) {
@@ -155,7 +203,13 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
  * @param {Object} settings - Analysis settings
  * @returns {Array} Array of merchant pattern suggestions
  */
-export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, settings) => {
+export const analyzeMerchantPatterns = (
+  transactions: Transaction[],
+  envelopes: Envelope[],
+  monthsOfData: number,
+  settings: AnalysisSettings
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any[] => {
   const suggestions = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
@@ -164,9 +218,9 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
     (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === "")
   );
 
-  const merchantSpending = {};
+  const merchantSpending: Record<string, MerchantData> = {};
   unassignedTransactions.forEach((transaction) => {
-    const desc = transaction.description.toLowerCase();
+    const desc = (transaction.description || "").toLowerCase();
 
     Object.entries(MERCHANT_PATTERNS).forEach(([category, regex]) => {
       if (regex.test(desc)) {
@@ -232,9 +286,15 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
  * @param {Object} settings - Analysis settings
  * @returns {Array} Array of optimization suggestions
  */
-export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfData, settings) => {
+export const analyzeEnvelopeOptimization = (
+  transactions: Transaction[],
+  envelopes: Envelope[],
+  monthsOfData: number,
+  settings: AnalysisSettings
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any[] => {
   const suggestions = [];
-  const { overspendingThreshold, overfundingThreshold, bufferPercentage } = settings;
+  const { overspendingThreshold = 1.2, overfundingThreshold = 3.0, bufferPercentage } = settings;
 
   envelopes.forEach((envelope) => {
     const envelopeTransactions = transactions.filter(
@@ -311,12 +371,13 @@ export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfDat
  * @returns {Array} Sorted array of all suggestions
  */
 export const generateAllSuggestions = (
-  transactions,
-  envelopes,
-  settings,
-  dateRange,
-  options = {}
-) => {
+  transactions: Transaction[],
+  envelopes: Envelope[],
+  settings: AnalysisSettings,
+  dateRange: string | number,
+  options: GenerateSuggestionsOptions = {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any[] => {
   const { dismissedSuggestions = new Set(), showDismissed = false } = options;
   const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
   const monthsOfData = calculateMonthsOfData(filteredTransactions);

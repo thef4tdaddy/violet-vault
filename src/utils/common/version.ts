@@ -7,7 +7,13 @@ export const APP_NAME = packageJson.name;
 
 // Enhanced cache for release-please version data with localStorage persistence
 // Optimized for Saturday releases - cache expires Sunday to catch new release PRs
-let versionCache = {
+interface VersionCache {
+  data: string | null;
+  timestamp: number | null;
+  ttl: number;
+}
+
+let versionCache: VersionCache = {
   data: null,
   timestamp: null,
   ttl: 7 * 24 * 60 * 60 * 1000, // 7 days cache (releases updated Saturdays)
@@ -44,11 +50,12 @@ const initializeCache = () => {
 };
 
 // Save cache to localStorage
-const saveCache = (data) => {
+const saveCache = (data: string) => {
   try {
     versionCache = {
       data,
       timestamp: Date.now(),
+      ttl: 7 * 24 * 60 * 60 * 1000,
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
     logger.debug("Cached version data", { version: data });
@@ -127,10 +134,10 @@ const getActualCommitTimestamp = () => {
   if (gitCommitDate && gitCommitDate !== "undefined") {
     // Only log once to prevent console spam (Issue #560)
     if (!hasLoggedGitDate) {
-      logger.debug("✅ Using git commit date:", gitCommitDate);
+      logger.debug("✅ Using git commit date:", gitCommitDate as unknown as Record<string, unknown>);
       hasLoggedGitDate = true;
     }
-    const commitDate = new Date(gitCommitDate);
+    const commitDate = new Date(gitCommitDate as string);
 
     // Note: Year correction removed - we're now in 2025
     // Previously corrected 2025 → 2024 for system clock issues
@@ -141,8 +148,8 @@ const getActualCommitTimestamp = () => {
   // Priority 2: Try git author date as alternative
   const gitAuthorDate = import.meta.env.VITE_GIT_AUTHOR_DATE;
   if (gitAuthorDate && gitAuthorDate !== "undefined") {
-    logger.debug("✅ Using git author date:", gitAuthorDate);
-    const authorDate = new Date(gitAuthorDate);
+    logger.debug("✅ Using git author date:", gitAuthorDate as unknown as Record<string, unknown>);
+    const authorDate = new Date(gitAuthorDate as string);
 
     // Note: Year correction removed - we're now in 2025
     // Previously corrected 2025 → 2024 for system clock issues
@@ -496,7 +503,7 @@ export const markVersionAsSeen = () => {
 };
 
 // Development utility for testing version transitions
-export const simulateVersionTransition = (newTargetVersion) => {
+export const simulateVersionTransition = (newTargetVersion: string) => {
   logger.debug("Simulating version transition", {
     targetVersion: newTargetVersion,
   });
@@ -507,6 +514,7 @@ export const simulateVersionTransition = (newTargetVersion) => {
     versionCache = {
       data: newTargetVersion,
       timestamp: Date.now(),
+      ttl: 7 * 24 * 60 * 60 * 1000,
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
     logger.debug("Cached new target version", { version: newTargetVersion });
