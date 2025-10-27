@@ -127,13 +127,13 @@ export const formatCurrency = (amount, showDecimals = true) => {
  * @param {Object} options - Formatting options
  * @returns {string} Formatted date string
  */
-export const formatDate = (dateString, options = {}) => {
+export const formatDate = (dateString: string, options: Intl.DateTimeFormatOptions = {}) => {
   if (!dateString) return "";
 
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return "Invalid Date";
 
-  const defaultOptions = {
+  const defaultOptions: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -185,11 +185,9 @@ export const isValidAccountColor = (color) => {
  * @param {string} type - Account type
  * @returns {string} Icon component name
  */
-export const getAccountIconName = (type) => {
-  const _typeInfo = getAccountTypeInfo(type);
-
+export const getAccountIconName = (type: string) => {
   // Map account types to Lucide icon names
-  const iconMap = {
+  const iconMap: Record<string, string> = {
     FSA: "Heart",
     HSA: "Shield",
     "Dependent Care FSA": "Baby",
@@ -223,10 +221,10 @@ export const calculateAccountUtilization = (currentBalance, annualContribution) 
  * @param {string} sortBy - Sort criteria
  * @returns {Array} Sorted accounts
  */
-export const sortAccounts = (accounts, sortBy = "name") => {
+export const sortAccounts = (accounts: Account[], sortBy = "name"): Account[] => {
   if (!Array.isArray(accounts)) return [];
 
-  const sortFunctions = {
+  const sortFunctions: Record<string, (a: Account, b: Account) => number> = {
     name: (a, b) => a.name.localeCompare(b.name),
     balance: (a, b) => b.currentBalance - a.currentBalance,
     type: (a, b) => a.type.localeCompare(b.type),
@@ -234,13 +232,38 @@ export const sortAccounts = (accounts, sortBy = "name") => {
       if (!a.expirationDate && !b.expirationDate) return 0;
       if (!a.expirationDate) return 1;
       if (!b.expirationDate) return -1;
-      return new Date(a.expirationDate) - new Date(b.expirationDate);
+      return new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime();
     },
-    lastUpdated: (a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated),
+    lastUpdated: (a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
   };
 
   return [...accounts].sort(sortFunctions[sortBy] || sortFunctions.name);
 };
+
+/**
+ * Account type used for sorting and filtering
+ */
+interface Account {
+  name: string;
+  type: string;
+  currentBalance: number;
+  expirationDate?: string | null;
+  lastUpdated: string;
+  description?: string | null;
+  isActive: boolean;
+}
+
+/**
+ * Options for filtering accounts
+ */
+interface FilterAccountsOptions {
+  activeOnly?: boolean;
+  type?: string;
+  minBalance?: number;
+  expiringSoon?: boolean;
+  expirationDays?: number;
+  search?: string;
+}
 
 /**
  * Filters accounts by various criteria
@@ -248,7 +271,7 @@ export const sortAccounts = (accounts, sortBy = "name") => {
  * @param {Object} filters - Filter criteria
  * @returns {Array} Filtered accounts
  */
-export const filterAccounts = (accounts, filters = {}) => {
+export const filterAccounts = (accounts: Account[], filters: FilterAccountsOptions = {}): Account[] => {
   if (!Array.isArray(accounts)) return [];
 
   let filteredAccounts = [...accounts];
@@ -294,7 +317,7 @@ export const filterAccounts = (accounts, filters = {}) => {
 };
 
 // Helper function for expiration calculation (imported from validation)
-const calculateDaysUntilExpiration = (expirationDate) => {
+const calculateDaysUntilExpiration = (expirationDate: string): number | null => {
   if (!expirationDate) return null;
 
   const today = new Date();
@@ -303,7 +326,7 @@ const calculateDaysUntilExpiration = (expirationDate) => {
   today.setHours(0, 0, 0, 0);
   expiry.setHours(0, 0, 0, 0);
 
-  const diffTime = expiry - today;
+  const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return diffDays;

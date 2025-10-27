@@ -139,7 +139,7 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
             <div className="flex-1">
               <p className="text-sm text-red-800">{syncError}</p>
               <Button
-                variant="ghost"
+                variant="icon"
                 size="sm"
                 className="ml-2 h-auto p-1"
                 onClick={clearSyncError}
@@ -172,7 +172,7 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
           <Button
             onClick={handleUploadSync}
             disabled={isSyncInProgress || !syncStatus.isServiceRunning}
-            variant="outline"
+            variant="secondary"
             className="flex items-center gap-2"
           >
             {isUploadingSyncInProgress
@@ -189,7 +189,7 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
           <Button
             onClick={handleDownloadSync}
             disabled={isSyncInProgress || !syncStatus.isServiceRunning}
-            variant="outline"
+            variant="secondary"
             className="flex items-center gap-2"
           >
             {isDownloadingSyncInProgress
@@ -206,7 +206,7 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
           <Button
             onClick={handleFullSync}
             disabled={isSyncInProgress || !syncStatus.isServiceRunning}
-            variant="default"
+            variant="primary"
             className="flex items-center gap-2"
           >
             {isSyncInProgress

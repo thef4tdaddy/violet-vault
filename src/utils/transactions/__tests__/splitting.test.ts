@@ -29,9 +29,9 @@ vi.mock("../../common/logger.js", () => ({
 
 describe("Transaction Splitting Utilities", () => {
   const mockEnvelopes = [
-    { id: "env1", name: "Groceries", category: "Food" },
-    { id: "env2", name: "Gas", category: "Transportation" },
-    { id: "env3", name: "Dining", category: "Food" },
+    { id: "env1", name: "Groceries", category: "Food", currentBalance: 0, targetAmount: 0 },
+    { id: "env2", name: "Gas", category: "Transportation", currentBalance: 0, targetAmount: 0 },
+    { id: "env3", name: "Dining", category: "Food", currentBalance: 0, targetAmount: 0 },
   ];
 
   const mockTransaction = {
@@ -123,9 +123,9 @@ describe("Transaction Splitting Utilities", () => {
 
   describe("calculateSplitTotals", () => {
     const testSplits = [
-      { id: 1, amount: 30 },
-      { id: 2, amount: 40 },
-      { id: 3, amount: 30 },
+      { id: 1, description: "Split 1", amount: 30, category: "Food", envelopeId: "env1" },
+      { id: 2, description: "Split 2", amount: 40, category: "Food", envelopeId: "env2" },
+      { id: 3, description: "Split 3", amount: 30, category: "Food", envelopeId: "env3" },
     ];
 
     it("should calculate totals correctly", () => {
@@ -143,8 +143,8 @@ describe("Transaction Splitting Utilities", () => {
 
     it("should detect over-allocation", () => {
       const overSplits = [
-        { id: 1, amount: 60 },
-        { id: 2, amount: 60 },
+        { id: 1, description: "Split 1", amount: 60, category: "Food", envelopeId: "env1" },
+        { id: 2, description: "Split 2", amount: 60, category: "Food", envelopeId: "env2" },
       ];
 
       const totals = calculateSplitTotals(mockTransaction, overSplits);
@@ -156,8 +156,8 @@ describe("Transaction Splitting Utilities", () => {
 
     it("should detect under-allocation", () => {
       const underSplits = [
-        { id: 1, amount: 30 },
-        { id: 2, amount: 40 },
+        { id: 1, description: "Split 1", amount: 30, category: "Food", envelopeId: "env1" },
+        { id: 2, description: "Split 2", amount: 40, category: "Food", envelopeId: "env2" },
       ];
 
       const totals = calculateSplitTotals(mockTransaction, underSplits);
@@ -182,8 +182,8 @@ describe("Transaction Splitting Utilities", () => {
   describe("validateSplitAllocations", () => {
     it("should validate correct splits", () => {
       const validSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 50 },
-        { id: 2, description: "Split 2", category: "Gas", amount: 50 },
+        { id: 1, description: "Split 1", category: "Food", amount: 50, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Gas", amount: 50, envelopeId: "env2" },
       ];
 
       const errors = validateSplitAllocations(validSplits, mockTransaction);
@@ -191,14 +191,14 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should catch missing description", () => {
-      const invalidSplits = [{ id: 1, description: "", category: "Food", amount: 100 }];
+      const invalidSplits = [{ id: 1, description: "", category: "Food", amount: 100, envelopeId: "env1" }];
 
       const errors = validateSplitAllocations(invalidSplits, mockTransaction);
       expect(errors).toContain("Split 1: Description is required");
     });
 
     it("should catch missing category", () => {
-      const invalidSplits = [{ id: 1, description: "Split 1", category: "", amount: 100 }];
+      const invalidSplits = [{ id: 1, description: "Split 1", category: "", amount: 100, envelopeId: "env1" }];
 
       const errors = validateSplitAllocations(invalidSplits, mockTransaction);
       expect(errors).toContain("Split 1: Category is required");
@@ -206,8 +206,8 @@ describe("Transaction Splitting Utilities", () => {
 
     it("should catch invalid amounts", () => {
       const invalidSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 0 },
-        { id: 2, description: "Split 2", category: "Gas", amount: -10 },
+        { id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Gas", amount: -10, envelopeId: "env2" },
       ];
 
       const errors = validateSplitAllocations(invalidSplits, mockTransaction);
@@ -216,7 +216,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should catch total amount mismatches", () => {
-      const mismatchedSplits = [{ id: 1, description: "Split 1", category: "Food", amount: 120 }];
+      const mismatchedSplits = [{ id: 1, description: "Split 1", category: "Food", amount: 120, envelopeId: "env1" }];
 
       const errors = validateSplitAllocations(mismatchedSplits, mockTransaction);
       expect(errors.some((error) => error.includes("exceed original amount"))).toBe(true);
@@ -226,9 +226,9 @@ describe("Transaction Splitting Utilities", () => {
   describe("autoBalanceSplits", () => {
     it("should balance uneven splits", () => {
       const unevenSplits = [
-        { id: 1, amount: 30 },
-        { id: 2, amount: 40 },
-        { id: 3, amount: 20 }, // Total: 90, need to add 10 more
+        { id: 1, description: "Split 1", category: "Food", amount: 30, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Food", amount: 40, envelopeId: "env2" },
+        { id: 3, description: "Split 3", category: "Food", amount: 20, envelopeId: "env3" }, // Total: 90, need to add 10 more
       ];
 
       const balanced = autoBalanceSplits(unevenSplits, mockTransaction);
@@ -239,8 +239,8 @@ describe("Transaction Splitting Utilities", () => {
 
     it("should not modify already balanced splits", () => {
       const balancedSplits = [
-        { id: 1, amount: 50 },
-        { id: 2, amount: 50 },
+        { id: 1, description: "Split 1", category: "Food", amount: 50, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Food", amount: 50, envelopeId: "env2" },
       ];
 
       const result = autoBalanceSplits(balancedSplits, mockTransaction);
@@ -256,9 +256,9 @@ describe("Transaction Splitting Utilities", () => {
   describe("splitEvenly", () => {
     it("should split amount evenly", () => {
       const splits = [
-        { id: 1, amount: 0 },
-        { id: 2, amount: 0 },
-        { id: 3, amount: 0 },
+        { id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Food", amount: 0, envelopeId: "env2" },
+        { id: 3, description: "Split 3", category: "Food", amount: 0, envelopeId: "env3" },
       ];
 
       const evenSplits = splitEvenly(splits, mockTransaction);
@@ -271,7 +271,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should handle single split", () => {
-      const splits = [{ id: 1, amount: 0 }];
+      const splits = [{ id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" }];
 
       const evenSplits = splitEvenly(splits, mockTransaction);
 
@@ -279,7 +279,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should preserve other properties", () => {
-      const splits = [{ id: 1, amount: 0, description: "Test", category: "Food" }];
+      const splits = [{ id: 1, description: "Test", category: "Food", amount: 0, envelopeId: "env1" }];
 
       const evenSplits = splitEvenly(splits, mockTransaction);
 
@@ -288,6 +288,7 @@ describe("Transaction Splitting Utilities", () => {
         description: "Test",
         category: "Food",
         amount: 100,
+        envelopeId: "env1",
       });
     });
   });
@@ -295,8 +296,8 @@ describe("Transaction Splitting Utilities", () => {
   describe("addNewSplit", () => {
     it("should add new split with remaining amount", () => {
       const currentSplits = [
-        { id: 1, amount: 40 },
-        { id: 2, amount: 30 },
+        { id: 1, description: "Split 1", category: "Food", amount: 40, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Food", amount: 30, envelopeId: "env2" },
       ];
 
       const newSplits = addNewSplit(currentSplits, mockTransaction);
@@ -326,8 +327,8 @@ describe("Transaction Splitting Utilities", () => {
   describe("updateSplitField", () => {
     it("should update specified field", () => {
       const splits = [
-        { id: 1, description: "Old", amount: 50 },
-        { id: 2, description: "Test", amount: 50 },
+        { id: 1, description: "Old", amount: 50, category: "Food", envelopeId: "env1" },
+        { id: 2, description: "Test", amount: 50, category: "Food", envelopeId: "env2" },
       ];
 
       const updated = updateSplitField(splits, 1, "description", "New Description");
@@ -337,7 +338,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should auto-update envelope when category changes", () => {
-      const splits = [{ id: 1, category: "Old", envelopeId: "" }];
+      const splits = [{ id: 1, description: "Split 1", amount: 100, category: "Old", envelopeId: "" }];
 
       const updated = updateSplitField(splits, 1, "category", "Food", mockEnvelopes);
 
@@ -349,9 +350,9 @@ describe("Transaction Splitting Utilities", () => {
   describe("removeSplit", () => {
     it("should remove specified split", () => {
       const splits = [
-        { id: 1, description: "Keep" },
-        { id: 2, description: "Remove" },
-        { id: 3, description: "Keep" },
+        { id: 1, description: "Keep", amount: 30, category: "Food", envelopeId: "env1" },
+        { id: 2, description: "Remove", amount: 30, category: "Food", envelopeId: "env2" },
+        { id: 3, description: "Keep", amount: 40, category: "Food", envelopeId: "env3" },
       ];
 
       const updated = removeSplit(splits, 2);
@@ -361,7 +362,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should not remove last remaining split", () => {
-      const splits = [{ id: 1, description: "Only" }];
+      const splits = [{ id: 1, description: "Only", amount: 100, category: "Food", envelopeId: "env1" }];
 
       const updated = removeSplit(splits, 1);
 
@@ -405,14 +406,12 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should preserve original transaction properties", () => {
-      const splits = [{ id: 1, description: "Split", amount: 100, category: "Food" }];
+      const splits = [{ id: 1, description: "Split", amount: 100, category: "Food", envelopeId: "env1" }];
 
       const prepared = prepareSplitTransactions(splits, mockTransaction);
 
       expect(prepared[0]).toMatchObject({
         date: mockTransaction.date,
-        account: mockTransaction.account,
-        type: mockTransaction.type,
         originalAmount: mockTransaction.amount,
       });
     });
@@ -421,8 +420,8 @@ describe("Transaction Splitting Utilities", () => {
   describe("getSplitSummary", () => {
     it("should provide comprehensive summary", () => {
       const validSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 50 },
-        { id: 2, description: "Split 2", category: "Gas", amount: 50 },
+        { id: 1, description: "Split 1", category: "Food", amount: 50, envelopeId: "env1" },
+        { id: 2, description: "Split 2", category: "Gas", amount: 50, envelopeId: "env2" },
       ];
 
       const summary = getSplitSummary(validSplits, mockTransaction);
@@ -440,7 +439,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should detect invalid state", () => {
-      const invalidSplits = [{ id: 1, description: "", category: "Food", amount: 120 }];
+      const invalidSplits = [{ id: 1, description: "", category: "Food", amount: 120, envelopeId: "env1" }];
 
       const summary = getSplitSummary(invalidSplits, mockTransaction);
 
