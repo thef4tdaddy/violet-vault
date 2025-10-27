@@ -1,6 +1,14 @@
 import { BaseMutex } from "../common/BaseMutex";
 import logger from "../common/logger";
 
+interface SyncMetrics {
+  operationsCompleted: number;
+  totalLockTime: number;
+  averageLockTime: number;
+  maxLockTime: number;
+  lastOperationTime: string | null;
+}
+
 /**
  * Sync-specific mutex for preventing concurrent sync operations
  * Prevents race conditions and data corruption during cloud sync
@@ -8,6 +16,8 @@ import logger from "../common/logger";
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements
  */
 export class SyncMutex extends BaseMutex {
+  syncMetrics: SyncMetrics;
+
   constructor(name = "SyncMutex") {
     super(name);
     this.syncMetrics = {
@@ -37,6 +47,7 @@ export class SyncMutex extends BaseMutex {
     const baseStatus = this.getStatus();
     return {
       ...baseStatus,
+      queueSize: baseStatus.queueLength,
       metrics: { ...this.syncMetrics },
     };
   }
@@ -50,7 +61,10 @@ export class SyncMutex extends BaseMutex {
       metrics: this.syncMetrics,
     });
 
-    super.release();
+    // Manually unlock and clear state
+    this.locked = false;
+    this.currentOperation = null;
+    this.lockStartTime = null;
 
     // Clear queue and resolve all pending operations
     while (this.queue.length > 0) {

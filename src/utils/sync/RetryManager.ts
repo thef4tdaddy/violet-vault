@@ -10,6 +10,9 @@ import { createRetryMetrics, updateRetryMetrics, formatMetrics } from "./retryMe
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 export class RetryManager {
+  private name: string;
+  private retryMetrics: ReturnType<typeof createRetryMetrics>;
+
   constructor(name = "RetryManager") {
     this.name = name;
     this.retryMetrics = createRetryMetrics();
@@ -130,7 +133,7 @@ export class RetryManager {
     const delay = calculateRetryDelay(attempt, config);
     logger.debug(`⏳ ${this.name}: Waiting ${delay}ms before retry ${attempt + 1}`);
 
-    await delay(delay);
+    await new Promise((resolve) => setTimeout(resolve, delay));
     return true;
   }
 }
