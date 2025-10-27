@@ -3,6 +3,7 @@
  * Extracted to reduce function complexity (Issue #761 - Batch 5)
  */
 import logger from "@/utils/common/logger";
+import type { Transaction, Envelope, SplitAllocation } from "@/types/finance";
 import {
   initializeSplitsFromTransaction,
   validateSplitAllocations,
@@ -20,9 +21,9 @@ import {
  * Initialize splits from a transaction
  */
 export const initializeSplitsHandler = (
-  transaction: unknown,
-  envelopes: unknown[],
-  setSplitAllocations: (splits: unknown[]) => void,
+  transaction: Transaction,
+  envelopes: Envelope[],
+  setSplitAllocations: (splits: SplitAllocation[]) => void,
   setErrors: (errors: string[]) => void
 ) => {
   try {
@@ -32,9 +33,9 @@ export const initializeSplitsHandler = (
     }
 
     logger.debug("Initializing transaction splits", {
-      transactionId: (transaction as { id?: string }).id,
-      amount: (transaction as { amount?: number }).amount,
-      hasMetadata: !!(transaction as { metadata?: { items?: unknown } }).metadata?.items,
+      transactionId: transaction.id,
+      amount: transaction.amount,
+      hasMetadata: !!transaction.metadata?.items,
     });
 
     const initialSplits = initializeSplitsFromTransaction(transaction, envelopes);
@@ -50,14 +51,14 @@ export const initializeSplitsHandler = (
  * Add a new split allocation
  */
 export const addSplitHandler = (
-  transaction: unknown,
-  setSplitAllocations: (fn: (current: unknown[]) => unknown[]) => void,
+  transaction: Transaction,
+  setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (fn: (prev: string[]) => string[]) => void
 ) => {
   try {
     setSplitAllocations((current) => {
       const newSplits = addNewSplit(current, transaction, {
-        category: (transaction as { category?: string }).category || "",
+        category: transaction.category || "",
       });
 
       logger.debug("Added new split", {
@@ -81,10 +82,10 @@ export const updateSplitHandler = (
     splitId: string;
     field: string;
     value: unknown;
-    envelopes: unknown[];
+    envelopes: Envelope[];
     errorsLength: number;
   },
-  setSplitAllocations: (fn: (current: unknown[]) => unknown[]) => void,
+  setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (fn: (prev: string[]) => string[]) => void
 ) => {
   try {
@@ -109,7 +110,7 @@ export const updateSplitHandler = (
  */
 export const removeSplitHandler = (
   splitId: string,
-  setSplitAllocations: (fn: (current: unknown[]) => unknown[]) => void,
+  setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (fn: (prev: string[]) => string[]) => void
 ) => {
   try {
@@ -133,8 +134,8 @@ export const removeSplitHandler = (
  * Auto-balance splits to equal total
  */
 export const autoBalanceHandler = (
-  transaction: unknown,
-  setSplitAllocations: (fn: (current: unknown[]) => unknown[]) => void,
+  transaction: Transaction,
+  setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (errors: string[]) => void
 ) => {
   try {
@@ -142,11 +143,8 @@ export const autoBalanceHandler = (
       const balanced = autoBalanceSplits(current, transaction);
 
       logger.debug("Auto-balanced splits", {
-        originalTotal: current.reduce((sum: number, s: { amount: number }) => sum + s.amount, 0),
-        balancedTotal: balanced.reduce(
-          (sum: number, s: { amount: number }) => sum + s.amount,
-          0
-        ),
+        originalTotal: current.reduce((sum, s) => sum + s.amount, 0),
+        balancedTotal: balanced.reduce((sum, s) => sum + s.amount, 0),
       });
 
       return balanced;
@@ -163,8 +161,8 @@ export const autoBalanceHandler = (
  * Split amount evenly across all allocations
  */
 export const distributeEvenlyHandler = (
-  transaction: unknown,
-  setSplitAllocations: (fn: (current: unknown[]) => unknown[]) => void,
+  transaction: Transaction,
+  setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (errors: string[]) => void
 ) => {
   try {
@@ -191,8 +189,8 @@ export const distributeEvenlyHandler = (
  * Wrapper for the utility function validateSplitAllocations
  */
 export const checkSplitsHandler = (
-  splitAllocations: unknown[],
-  transaction: unknown,
+  splitAllocations: SplitAllocation[],
+  transaction: Transaction,
   setErrors: (errors: string[]) => void
 ): boolean => {
   try {
@@ -213,10 +211,10 @@ export const checkSplitsHandler = (
 export const submitSplitHandler = async (
   params: {
     isProcessing: boolean;
-    splitAllocations: unknown[];
-    transaction: unknown;
+    splitAllocations: SplitAllocation[];
+    transaction: Transaction;
     validateSplits: () => boolean;
-    onSplit?: (splitTransactions: unknown[], transaction: unknown) => Promise<void>;
+    onSplit?: (splitTransactions: Transaction[], transaction: Transaction) => Promise<void>;
   },
   setIsProcessing?: (processing: boolean) => void,
   setErrors?: (fn: (prev: string[]) => string[]) => void
@@ -237,12 +235,9 @@ export const submitSplitHandler = async (
     const splitTransactions = prepareSplitTransactions(params.splitAllocations, params.transaction);
 
     logger.info("Submitting transaction split", {
-      originalTransactionId: (params.transaction as { id?: string }).id,
+      originalTransactionId: params.transaction.id,
       splitCount: splitTransactions.length,
-      totalAmount: splitTransactions.reduce(
-        (sum: number, t: { amount: number }) => sum + Math.abs(t.amount),
-        0
-      ),
+      totalAmount: splitTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0),
     });
 
     // Call the onSplit callback if provided
@@ -264,8 +259,8 @@ export const submitSplitHandler = async (
  * Calculate computed properties for splits
  */
 export const calculateSplitComputedProperties = (
-  splitAllocations: unknown[],
-  transaction: unknown,
+  splitAllocations: SplitAllocation[],
+  transaction: Transaction,
   errors: string[],
   isProcessing: boolean
 ) => {
