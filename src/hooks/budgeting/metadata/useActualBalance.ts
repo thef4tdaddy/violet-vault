@@ -39,7 +39,12 @@ const fetchBalanceData = async () => {
 };
 
 // Helper to track balance change
-const trackBalanceChange = async (previousBalance, newBalance, isManual, author) => {
+const trackBalanceChange = async (
+  previousBalance: number,
+  newBalance: number,
+  isManual: boolean,
+  author: string
+) => {
   await BudgetHistoryTracker.trackActualBalanceChange({
     previousBalance,
     newBalance,
@@ -56,15 +61,20 @@ const trackBalanceChange = async (previousBalance, newBalance, isManual, author)
   });
 };
 
+interface BalanceData {
+  actualBalance: number;
+  isActualBalanceManual: boolean;
+}
+
 export const useActualBalance = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: balanceData = {},
+    data: balanceData = { actualBalance: 0, isActualBalanceManual: false },
     isLoading,
     error,
     refetch,
-  } = useQuery({
+  } = useQuery<BalanceData>({
     queryKey: [...queryKeys.budgetMetadata, "actualBalance"],
     queryFn: fetchBalanceData,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -72,7 +82,7 @@ export const useActualBalance = () => {
   });
 
   const updateActualBalanceMutation = useMutation({
-    mutationFn: async ({ balance, isManual = true }) => {
+    mutationFn: async ({ balance, isManual = true }: { balance: number; isManual?: boolean }) => {
       logger.debug("TanStack Query: Updating actual balance in Dexie", {
         balance,
         isManual,
@@ -90,7 +100,7 @@ export const useActualBalance = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
       logger.debug("TanStack Query: Actual balance updated successfully");
     },
     onError: (error) => {
@@ -99,7 +109,7 @@ export const useActualBalance = () => {
   });
 
   const updateActualBalance = useCallback(
-    async (newBalance, options = {}) => {
+    async (newBalance: number, options: { isManual?: boolean; author?: string } = {}) => {
       const { isManual = true, author = "Unknown User" } = options;
 
       if (!validateBalance(newBalance)) {
@@ -134,33 +144,44 @@ export const useActualBalance = () => {
   );
 
   const shouldConfirmChange = useCallback(
-    (newBalance, threshold = 500) => {
+    (newBalance: number, threshold = 500) => {
       const changeAmount = Math.abs(newBalance - (balanceData.actualBalance || 0));
       return changeAmount >= threshold;
     },
     [balanceData.actualBalance]
   );
 
-  const formatBalance = useCallback((balance, options = {}) => {
-    const {
-      showCurrency = true,
-      showSign = false,
-      minimumFractionDigits = 2,
-      maximumFractionDigits = 2,
-    } = options;
+  const formatBalance = useCallback(
+    (
+      balance: number,
+      options: {
+        showCurrency?: boolean;
+        showSign?: boolean;
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+      } = {}
+    ) => {
+      const {
+        showCurrency = true,
+        showSign = false,
+        minimumFractionDigits = 2,
+        maximumFractionDigits = 2,
+      } = options;
 
-    const formatter = new Intl.NumberFormat("en-US", {
-      style: showCurrency ? "currency" : "decimal",
-      currency: "USD",
-      minimumFractionDigits,
-      maximumFractionDigits,
-      signDisplay: showSign ? "always" : "auto",
-    });
+      const formatter = new Intl.NumberFormat("en-US", {
+        style: showCurrency ? "currency" : "decimal",
+        currency: "USD",
+        minimumFractionDigits,
+        maximumFractionDigits,
+        signDisplay: showSign ? "always" : "auto",
+      });
 
-    return formatter.format(balance || 0);
-  }, []);
+      return formatter.format(balance || 0);
+    },
+    []
+  );
 
-  const validateBalanceInput = useCallback((inputValue) => {
+  const validateBalanceInput = useCallback((inputValue: string) => {
     // Allow empty string, numbers, decimal point, and negative sign
     const isValidFormat = inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue);
 
