@@ -19,7 +19,7 @@ interface DataDetectionDetails {
   paychecks: number;
   cache: number;
   lastOptimized: number;
-  error?: string;
+  error?: unknown;
 }
 
 interface DataDetectionResult {
@@ -44,7 +44,7 @@ interface SafeCloudDataResetResult {
 declare global {
   interface Window {
     safeCloudDataReset: () => Promise<SafeCloudDataResetResult>;
-    forceCloudDataReset?: () => void;
+    forceCloudDataReset?: () => Promise<{ success: boolean; message?: string; error?: string }>;
     detectLocalDataDebug: () => Promise<DataDetectionResult>;
     hasLocalDataDebug: () => Promise<boolean>;
   }

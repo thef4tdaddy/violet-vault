@@ -5,7 +5,7 @@
 import logger from "@/utils/common/logger";
 import type { VioletVaultDB } from "@/db/budgetDb";
 
-interface _CloudSyncServiceType {
+interface CloudSyncServiceType {
   isRunning: boolean;
   config?: unknown;
   lastSyncTime: string | null;
@@ -30,19 +30,12 @@ interface FirebaseAuthType {
 }
 
 // Extend window type for diagnostic tools
-declare global {
-  interface Window {
-    budgetDb?: VioletVaultDB;
-    cloudSyncService?: {
-      isRunning: boolean;
-      config?: unknown;
-      lastSyncTime: string | null;
-      triggerSyncForCriticalChange: (changeType: string) => void;
-    };
-    runSyncDiagnostic?: () => Promise<DiagnosticResults>;
-    syncEdgeCaseTester?: SyncEdgeCaseTesterType;
-    runSyncEdgeCaseTests?: () => Promise<unknown>;
-  }
+interface WindowWithDiagnostics extends Window {
+  budgetDb?: VioletVaultDB;
+  cloudSyncService?: CloudSyncServiceType;
+  runSyncDiagnostic?: () => Promise<DiagnosticResults>;
+  syncEdgeCaseTester?: SyncEdgeCaseTesterType;
+  runSyncEdgeCaseTests?: () => Promise<unknown>;
 }
 
 export interface DiagnosticResults {
@@ -118,8 +111,9 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 2: Budget Metadata
   logger.info("💰 Checking Budget Metadata...");
   try {
-    if (window.budgetDb) {
-      const metadata = await window.budgetDb.budget.get("metadata");
+    const windowObj = window as WindowWithDiagnostics;
+    if (windowObj.budgetDb) {
+      const metadata = await windowObj.budgetDb.budget.get("metadata");
       results.budgetMetadata = {
         exists: !!metadata,
         unassignedCash: (metadata?.unassignedCash ?? "missing") as string | number,
@@ -145,7 +139,8 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 3: Data Counts
   logger.info("📊 Checking Data Counts...");
   try {
-    if (window.budgetDb) {
+    const windowObj = window as WindowWithDiagnostics;
+    if (windowObj.budgetDb) {
       const counts = {};
       const tables = [
         "envelopes",
@@ -158,7 +153,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
 
       for (const table of tables) {
         try {
-          counts[table] = await window.budgetDb[table].count();
+          counts[table] = await windowObj.budgetDb[table].count();
         } catch (err) {
           counts[table] = "error: " + err.message;
         }
@@ -186,8 +181,9 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 4: Cloud Sync Service
   logger.info("☁️ Checking Cloud Sync Service...");
   try {
-    if (window.cloudSyncService) {
-      const cloudSyncService = window.cloudSyncService;
+    const windowObj = window as WindowWithDiagnostics;
+    if (windowObj.cloudSyncService) {
+      const cloudSyncService = windowObj.cloudSyncService;
       results.cloudSync = {
         isRunning: cloudSyncService.isRunning,
         config: !!cloudSyncService.config,
@@ -271,7 +267,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   }
 
   if (results.warnings.length > 0) {
-    logger.warn("⚠️ WARNINGS:", results.warnings);
+    logger.warn("⚠️ WARNINGS:", results.warnings as unknown as Record<string, unknown>);
   }
 
   if (results.errors.length === 0 && results.warnings.length === 0) {
@@ -286,7 +282,8 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
 
 // Auto-run if in browser console
 if (typeof window !== "undefined") {
-  window.runSyncDiagnostic = runSyncDiagnostic;
+  const windowObj = window as WindowWithDiagnostics;
+  windowObj.runSyncDiagnostic = runSyncDiagnostic;
   // Sync diagnostic tool available via sync health dropdown
   // Console command: runSyncDiagnostic()
 }
