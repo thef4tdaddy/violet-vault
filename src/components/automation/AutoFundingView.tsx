@@ -5,6 +5,8 @@ import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
+import { globalToast } from "@/stores/ui/toastStore";
+import logger from "@/utils/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
