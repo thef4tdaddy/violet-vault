@@ -15,7 +15,7 @@ class StoreRegistry {
   /**
    * Register a store in the global registry
    */
-  register(name, store, metadata = {}) {
+  register(name: string, store: unknown, metadata: Record<string, unknown> = {}): void {
     if (this.stores.has(name)) {
       logger.warn(`Store ${name} already registered, overwriting`);
     }
@@ -44,7 +44,7 @@ class StoreRegistry {
   /**
    * Get a registered store
    */
-  get(name) {
+  get(name: string): unknown {
     const entry = this.stores.get(name);
     return entry ? entry.store : null;
   }
@@ -52,7 +52,7 @@ class StoreRegistry {
   /**
    * Get all registered stores
    */
-  getAll() {
+  getAll(): Array<{ name: string; store: unknown; metadata: Record<string, unknown> }> {
     return Array.from(this.stores.entries()).map(([name, { store, metadata }]) => ({
       name,
       store,
@@ -63,7 +63,7 @@ class StoreRegistry {
   /**
    * Get store metadata
    */
-  getMetadata(name) {
+  getMetadata(name: string): Record<string, unknown> | null {
     const entry = this.stores.get(name);
     return entry ? entry.metadata : null;
   }
@@ -71,10 +71,11 @@ class StoreRegistry {
   /**
    * Reset all stores (for testing)
    */
-  resetAll() {
+  resetAll(): void {
     this.stores.forEach(({ store }, name) => {
-      if (store.getState && typeof store.getState().reset === "function") {
-        store.getState().reset();
+      const storeWithReset = store as { getState?: () => { reset?: () => void } };
+      if (storeWithReset.getState && typeof storeWithReset.getState().reset === "function") {
+        storeWithReset.getState().reset?.();
         logger.debug(`Reset store: ${name}`);
       }
     });
@@ -83,12 +84,13 @@ class StoreRegistry {
   /**
    * Get debug information for all stores
    */
-  getDebugInfo() {
-    const info = {};
+  getDebugInfo(): Record<string, unknown> {
+    const info: Record<string, unknown> = {};
 
     this.stores.forEach(({ store, metadata }, name) => {
       try {
-        const state = store.getState();
+        const storeWithState = store as { getState: () => Record<string, unknown> & { reset?: () => void; getDebugInfo?: () => unknown } };
+        const state = storeWithState.getState();
         info[name] = {
           metadata,
           stateKeys: Object.keys(state),
@@ -99,7 +101,7 @@ class StoreRegistry {
       } catch (error) {
         info[name] = {
           metadata,
-          error: error.message,
+          error: (error as Error).message,
         };
       }
     });
@@ -110,14 +112,21 @@ class StoreRegistry {
   /**
    * Initialize global debugging helpers
    */
-  initializeDevHelpers() {
+  initializeDevHelpers(): void {
     if (this.initialized || !import.meta.env.DEV) return;
 
     // Global debugging functions
-    window.__VIOLET_VAULT_DEBUG__ = {
+    (window as Window & {
+      __VIOLET_VAULT_DEBUG__?: {
+        stores: () => Record<string, unknown>;
+        resetAll: () => void;
+        getStore: (name: string) => unknown;
+        listStores: () => string[];
+      };
+    }).__VIOLET_VAULT_DEBUG__ = {
       stores: () => this.getDebugInfo(),
       resetAll: () => this.resetAll(),
-      getStore: (name) => this.get(name),
+      getStore: (name: string) => this.get(name),
       listStores: () => Array.from(this.stores.keys()),
     };
 

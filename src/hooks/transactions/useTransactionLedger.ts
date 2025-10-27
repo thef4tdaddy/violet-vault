@@ -15,7 +15,7 @@ import { useLedgerOperations } from "./helpers/useLedgerOperations";
  * Custom hook for TransactionLedger component
  * Handles all state management, data processing, and business logic
  */
-export const useTransactionLedger = (currentUser) => {
+export const useTransactionLedger = (currentUser: unknown) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
   const {
     transactions = [],

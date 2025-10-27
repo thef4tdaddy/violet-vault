@@ -2,16 +2,25 @@ import { useState } from "react";
 import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../utils/transactions/fileParser";
 import { globalToast } from "../../stores/ui/toastStore";
 
+interface ImportData {
+  data?: unknown[];
+  clearExisting?: boolean;
+}
+
+interface FileUploadOptions {
+  clearExisting?: boolean;
+}
+
 /**
  * Hook for handling transaction file upload and parsing
  * Extracted from useTransactionImport.js for better maintainability
  */
 export const useTransactionFileUpload = () => {
-  const [importData, setImportData] = useState([]);
+  const [importData, setImportData] = useState<ImportData>({});
   const [importStep, setImportStep] = useState(1);
-  const [fieldMapping, setFieldMapping] = useState({});
+  const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
 
-  const handleFileUpload = (event, options = {}) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, options: FileUploadOptions = {}) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -20,8 +29,8 @@ export const useTransactionFileUpload = () => {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const content = e.target.result;
-      let parsedData = [];
+      const content = e.target?.result as string;
+      let parsedData: unknown[] = [];
 
       try {
         if (file.name.toLowerCase().endsWith(".csv")) {
@@ -54,7 +63,7 @@ export const useTransactionFileUpload = () => {
 
   const resetImport = () => {
     setImportStep(1);
-    setImportData([]);
+    setImportData({});
     setFieldMapping({});
   };
 
