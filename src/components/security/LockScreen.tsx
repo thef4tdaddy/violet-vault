@@ -20,6 +20,7 @@ const LockScreen = () => {
   const [pendingConfirm, setPendingConfirm] = useState(null);
   const [passwordToValidate, setPasswordToValidate] = useState("");
   const passwordInputRef = useRef(null);
+  const processedValidationRef = useRef(null);
 
   // Password validation query
   const { data: validationResult, isLoading: isValidating } = usePasswordValidation(
@@ -33,6 +34,10 @@ const LockScreen = () => {
   // This prevents temporal dead zone issues with the dependency array
   const handleIncorrectPassword = useCallback(async () => {
     setIsUnlocking(false);
+    setError("Invalid password");
+    setFailedAttempts((prev) => prev + 1);
+    setPassword("");
+    setPasswordToValidate("");
 
     // Enhanced error message for wrong password
     const confirmPromise = new Promise((resolve) => {
@@ -72,21 +77,17 @@ const LockScreen = () => {
       window.location.reload();
       return;
     }
-
-    setError("Invalid password");
-    setFailedAttempts((prev) => prev + 1);
-    setPassword("");
-    setPasswordToValidate("");
-
-    // Add delay after failed attempts
-    if (failedAttempts >= 3) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    }
-  }, [confirm, logout, failedAttempts]);
+  }, [confirm, logout]);
 
   // Handle validation results
   useEffect(() => {
     if (passwordToValidate && validationResult !== undefined && !isValidating) {
+      // Prevent processing the same validation result multiple times
+      if (processedValidationRef.current === validationResult) {
+        return;
+      }
+      processedValidationRef.current = validationResult;
+
       if (validationResult?.isValid) {
         // Password is correct, unlock the session
         if (pendingConfirm) {
@@ -104,14 +105,8 @@ const LockScreen = () => {
         handleIncorrectPassword();
       }
     }
-  }, [
-    validationResult,
-    isValidating,
-    passwordToValidate,
-    pendingConfirm,
-    unlockSession,
-    handleIncorrectPassword,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingConfirm intentionally excluded to prevent infinite loop from state updates
+  }, [validationResult, isValidating, passwordToValidate, unlockSession, handleIncorrectPassword]);
 
   // Count recent failed attempts from security events
   useEffect(() => {
