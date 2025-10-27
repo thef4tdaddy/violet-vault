@@ -2,17 +2,35 @@ import { useState, useCallback } from "react";
 import { create } from "zustand";
 import logger from "../../utils/common/logger";
 
+interface ConfirmConfig {
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  destructive?: boolean;
+  icon?: string | null;
+  onConfirm?: () => Promise<void> | void;
+}
+
+interface ConfirmStore {
+  isOpen: boolean;
+  config: ConfirmConfig;
+  resolver: ((value: boolean) => void) | null;
+  showConfirm: (config: ConfirmConfig, resolver: (value: boolean) => void) => void;
+  hideConfirm: () => void;
+}
+
 /**
  * Zustand store for managing confirm modal state
  * Part of Epic #501 - Replace Browser Dialogs with Modals & Standardize Notifications to Toasts
  * Addresses Issue #502 - Replace Confirms with ConfirmModal
  */
-const useConfirmStore = create((set) => ({
+const useConfirmStore = create<ConfirmStore>((set) => ({
   isOpen: false,
   config: {},
   resolver: null,
 
-  showConfirm: (config, resolver) => set({ isOpen: true, config, resolver }),
+  showConfirm: (config: ConfirmConfig, resolver: (value: boolean) => void) => set({ isOpen: true, config, resolver }),
 
   hideConfirm: () => set({ isOpen: false, config: {}, resolver: null }),
 }));
@@ -36,9 +54,9 @@ export const useConfirm = () => {
   const showConfirm = useConfirmStore((state) => state.showConfirm);
 
   const confirm = useCallback(
-    (config = {}) => {
+    (config: ConfirmConfig = {}): Promise<boolean> => {
       return new Promise((resolve) => {
-        const finalConfig = {
+        const finalConfig: ConfirmConfig = {
           title: "Confirm Action",
           message: "Are you sure you want to continue?",
           confirmLabel: "Confirm",
