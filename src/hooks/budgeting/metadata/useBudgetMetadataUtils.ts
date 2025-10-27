@@ -1,14 +1,21 @@
 import { useCallback } from "react";
 import { useBudgetMetadataQuery } from "./useBudgetMetadataQuery";
 import { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
-import logger from "../../../utils/common/logger";
+import logger from "@/utils/common/logger";
+
+interface FormatBalanceOptions {
+  showCurrency?: boolean;
+  showSign?: boolean;
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
+}
 
 export const useBudgetMetadataUtils = () => {
   const { metadata, actualBalance, isActualBalanceManual } = useBudgetMetadataQuery();
   const { mutation: updateMetadataMutation } = useBudgetMetadataMutation();
 
   const setBiweeklyAllocation = useCallback(
-    async (amount) => {
+    async (amount: number) => {
       if (typeof amount !== "number" || isNaN(amount)) {
         logger.warn("Invalid biweekly allocation:", amount);
         return false;
@@ -16,7 +23,6 @@ export const useBudgetMetadataUtils = () => {
 
       try {
         await updateMetadataMutation.mutateAsync({
-          ...metadata,
           biweeklyAllocation: amount,
         });
         return true;
@@ -25,11 +31,11 @@ export const useBudgetMetadataUtils = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation]
+    [updateMetadataMutation]
   );
 
   const getBalanceDifference = useCallback(
-    (calculatedBalance) => {
+    (calculatedBalance: number) => {
       if (!isActualBalanceManual || !calculatedBalance) return 0;
       return actualBalance - calculatedBalance;
     },
@@ -37,14 +43,14 @@ export const useBudgetMetadataUtils = () => {
   );
 
   const shouldConfirmChange = useCallback(
-    (newBalance, threshold = 500) => {
+    (newBalance: number, threshold = 500) => {
       const changeAmount = Math.abs(newBalance - actualBalance);
       return changeAmount >= threshold;
     },
     [actualBalance]
   );
 
-  const formatBalance = useCallback((balance, options = {}) => {
+  const formatBalance = useCallback((balance: number, options: FormatBalanceOptions = {}) => {
     const {
       showCurrency = true,
       showSign = false,
@@ -63,7 +69,7 @@ export const useBudgetMetadataUtils = () => {
     return formatter.format(balance || 0);
   }, []);
 
-  const validateBalanceInput = useCallback((inputValue) => {
+  const validateBalanceInput = useCallback((inputValue: string) => {
     // Allow empty string, numbers, decimal point, and negative sign
     const isValidFormat = inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue);
 

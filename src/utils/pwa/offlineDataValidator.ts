@@ -149,7 +149,7 @@ class OfflineDataValidator {
         description: tx.description,
         amount: tx.amount,
         date: tx.date,
-        envelope: (tx as Record<string, unknown>).envelope,
+        envelope: (tx as unknown as Record<string, unknown>).envelope,
       }));
     } catch (error) {
       logger.warn("Failed to get recent transactions preview:", error);
@@ -166,8 +166,8 @@ class OfflineDataValidator {
 
       return {
         totalEnvelopes: envelopes.length,
-        totalAllocated: envelopes.reduce((sum, env) => sum + ((env as Record<string, unknown>).allocated as number || 0), 0),
-        totalSpent: envelopes.reduce((sum, env) => sum + ((env as Record<string, unknown>).spent as number || 0), 0),
+        totalAllocated: envelopes.reduce((sum, env) => sum + ((env as unknown as Record<string, unknown>).allocated as number || 0), 0),
+        totalSpent: envelopes.reduce((sum, env) => sum + ((env as unknown as Record<string, unknown>).spent as number || 0), 0),
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
     } catch (error) {
@@ -313,7 +313,7 @@ const offlineDataValidator = new OfflineDataValidator();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as Record<string, unknown>).offlineDataValidator = offlineDataValidator;
+  (window as unknown as Record<string, unknown>).offlineDataValidator = offlineDataValidator;
 }
 
 export default offlineDataValidator;

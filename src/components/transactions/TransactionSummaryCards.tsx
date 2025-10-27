@@ -1,4 +1,5 @@
 import PageSummaryCard from "../ui/PageSummaryCard";
+import { getIcon } from "../../utils";
 
 /**
  * Transaction summary cards using standardized PageSummaryCard component
@@ -20,7 +21,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
   const cards = [
     {
       key: "monthly-spend",
-      icon: "TrendingDown",
+      icon: getIcon("TrendingDown"),
       label: "Monthly Spend",
       value: `$${totalExpenses.toFixed(2)}`,
       color: "blue",
@@ -28,7 +29,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
     },
     {
       key: "income",
-      icon: "TrendingUp",
+      icon: getIcon("TrendingUp"),
       label: "Income",
       value: `$${totalIncome.toFixed(2)}`,
       color: "green",
@@ -36,7 +37,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
     },
     {
       key: "net-flow",
-      icon: "BarChart",
+      icon: getIcon("BarChart"),
       label: "Net Flow",
       value: `${netCashFlow >= 0 ? "+" : ""}$${netCashFlow.toFixed(2)}`,
       color: netCashFlow >= 0 ? "purple" : "amber",
@@ -45,7 +46,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
     },
     {
       key: "transaction-count",
-      icon: "Hash",
+      icon: getIcon("Hash"),
       label: "Transactions",
       value: transactionCount.toString(),
       color: "gray",
