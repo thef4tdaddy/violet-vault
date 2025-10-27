@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import { useLayoutData } from "@/hooks/layout";
@@ -85,6 +85,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
 
   // Navigation hooks
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Auth state
   const auth = useAuthManager();
@@ -128,12 +129,12 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     });
   }, [isUnlocked, currentUser]);
 
-  // Redirect to dashboard after login
+  // Redirect to dashboard only if user just logged in and isn't on an app route yet
   useEffect(() => {
-    if (isUnlocked && currentUser) {
+    if (isUnlocked && currentUser && !location.pathname.startsWith("/app")) {
       navigate("/app/dashboard");
     }
-  }, [isUnlocked, currentUser, navigate]);
+  }, [isUnlocked, currentUser, location.pathname, navigate]);
 
   // Log sync state changes
   const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
