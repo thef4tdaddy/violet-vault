@@ -10,6 +10,10 @@ on:
 env:
   NODE_VERSION: "22"
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   test:
     name: Test Suite
