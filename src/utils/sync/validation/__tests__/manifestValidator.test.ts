@@ -3,7 +3,7 @@ import { validateManifest } from "../manifestValidator";
 import { VALIDATION_CONSTANTS } from "../constants";
 
 // Mock logger
-vi.mock("../../common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -31,8 +31,10 @@ describe("manifestValidator", () => {
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
-      expect(result.chunkCount).toBe(2);
-      expect(result.manifestSize).toBeGreaterThan(0);
+      if (result.isValid) {
+        expect(result.chunkCount).toBe(2);
+        expect(result.manifestSize).toBeGreaterThan(0);
+      }
     });
 
     it("should reject null/undefined manifest", () => {
@@ -216,7 +218,9 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "empty-chunks");
 
       expect(result.isValid).toBe(true);
-      expect(result.chunkCount).toBe(0);
+      if (result.isValid) {
+        expect(result.chunkCount).toBe(0);
+      }
     });
 
     it("should count chunks correctly", () => {
@@ -233,7 +237,9 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "chunk-count");
 
       expect(result.isValid).toBe(true);
-      expect(result.chunkCount).toBe(3);
+      if (result.isValid) {
+        expect(result.chunkCount).toBe(3);
+      }
     });
   });
 
@@ -262,8 +268,10 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "size-test");
 
       expect(result.isValid).toBe(true);
-      expect(result.manifestSize).toBeGreaterThan(0);
-      expect(typeof result.manifestSize).toBe("number");
+      if (result.isValid) {
+        expect(result.manifestSize).toBeGreaterThan(0);
+        expect(typeof result.manifestSize).toBe("number");
+      }
     });
 
     it("should handle complex nested chunks", () => {
@@ -289,7 +297,9 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "complex-chunks");
 
       expect(result.isValid).toBe(true);
-      expect(result.chunkCount).toBe(2);
+      if (result.isValid) {
+        expect(result.chunkCount).toBe(2);
+      }
     });
   });
 
@@ -325,7 +335,7 @@ describe("manifestValidator", () => {
 
   describe("logging integration", () => {
     it("should log validation failures", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("@/utils/common/logger");
 
       const invalidManifest = {
         version: 123, // Wrong type
@@ -344,7 +354,7 @@ describe("manifestValidator", () => {
     });
 
     it("should log validation warnings", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("@/utils/common/logger");
 
       const futureTime = Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
       const manifest = {
@@ -365,7 +375,7 @@ describe("manifestValidator", () => {
     });
 
     it("should log successful validation", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("@/utils/common/logger");
 
       const validManifest = {
         version: "2.0",
