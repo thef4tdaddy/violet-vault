@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { budgetDb } from "@/db/budgetDb";
 import { queryKeys } from "@/utils/common/queryClient";
+import type { Transaction } from "@/db/types";
 import {
   processTransactions,
   calculateTransactionStats,
@@ -27,12 +28,31 @@ import {
   getEmptyStats,
 } from "./helpers/transactionDataHelpers";
 
+interface UseTransactionDataOptions {
+  // Filter options
+  dateRange?: { start?: string; end?: string };
+  envelopeId?: string;
+  category?: string;
+  type?: "income" | "expense" | "transfer";
+  searchQuery?: string;
+
+  // Sort options
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  limit?: number;
+
+  // Query options
+  enabled?: boolean;
+  staleTime?: number;
+  refetchInterval?: number | null;
+}
+
 /**
  * Hook for querying and filtering transaction data
- * @param {Object} options - Query and filter options
- * @returns {Object} Query state and processed transactions
+ * @param options - Query and filter options
+ * @returns Query state and processed transactions
  */
-const useTransactionData = (options = {}) => {
+const useTransactionData = (options: UseTransactionDataOptions = {}) => {
   const {
     // Filter options
     dateRange,
@@ -79,7 +99,7 @@ const useTransactionData = (options = {}) => {
     if (!transactionsQuery.data) return [];
 
     try {
-      const processed = processTransactions(transactionsQuery.data, {
+      const processed = processTransactions(transactionsQuery.data as Transaction[] as any, {
         dateRange,
         envelopeId,
         category,
@@ -91,10 +111,10 @@ const useTransactionData = (options = {}) => {
       });
 
       logger.debug(`Processed ${processed.length} transactions after filtering`);
-      return processed;
+      return processed as unknown as Transaction[];
     } catch (error) {
       logger.error("Error processing transactions", error);
-      return transactionsQuery.data || [];
+      return (transactionsQuery.data as Transaction[]) || [];
     }
   }, [
     transactionsQuery.data,
@@ -115,13 +135,13 @@ const useTransactionData = (options = {}) => {
     if (!processedTransactions.length) return getEmptyStats();
 
     try {
-      return calculateTransactionStats(processedTransactions);
+      return calculateTransactionStats(processedTransactions as any);
     } catch (error) {
       logger.error("Error calculating transaction statistics", error);
       return {
         ...getEmptyStats(),
         total: processedTransactions.length,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
   }, [processedTransactions]);

@@ -85,15 +85,47 @@ export const calculateMonthsOfData = (transactions) => {
   return Math.max(1, monthsDiff);
 };
 
+interface CategoryData {
+  category: string;
+  amount: number;
+  count: number;
+  transactions: any[];
+}
+
+interface AnalysisSettings {
+  minAmount: number;
+  minTransactions: number;
+  bufferPercentage: number;
+  overspendingThreshold?: number;
+  overfundingThreshold?: number;
+}
+
+interface Suggestion {
+  id: string;
+  type: string;
+  priority: string;
+  title: string;
+  description: string;
+  suggestedAmount?: number;
+  reasoning: string;
+  action: string;
+  impact: string;
+  data: any;
+}
+
 /**
  * Analyzes unassigned transactions and suggests new envelopes
- * @param {Array} transactions - All transactions
- * @param {number} monthsOfData - Months of data for calculations
- * @param {Object} settings - Analysis settings
- * @returns {Array} Array of suggestions
+ * @param transactions - All transactions
+ * @param monthsOfData - Months of data for calculations
+ * @param settings - Analysis settings
+ * @returns Array of suggestions
  */
-export const analyzeUnassignedTransactions = (transactions, monthsOfData, settings) => {
-  const suggestions = [];
+export const analyzeUnassignedTransactions = (
+  transactions: any[],
+  monthsOfData: number,
+  settings: AnalysisSettings
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
   // Get unassigned outgoing transactions
@@ -102,7 +134,7 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
   );
 
   // Group by category
-  const unassignedByCategory = {};
+  const unassignedByCategory: Record<string, CategoryData> = {};
   unassignedTransactions.forEach((transaction) => {
     const category = transaction.category || "Uncategorized";
     if (!unassignedByCategory[category]) {
@@ -119,7 +151,7 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
   });
 
   // Generate suggestions for significant categories
-  Object.values(unassignedByCategory).forEach((categoryData, index) => {
+  Object.values(unassignedByCategory).forEach((categoryData: CategoryData, index: number) => {
     if (categoryData.amount >= minAmount && categoryData.count >= minTransactions) {
       const monthlyAverage = categoryData.amount / monthsOfData;
       const suggestedAmount = Math.ceil(monthlyAverage * bufferPercentage);
@@ -149,14 +181,19 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
 
 /**
  * Analyzes merchant patterns in unassigned transactions
- * @param {Array} transactions - All transactions
- * @param {Array} envelopes - Existing envelopes
- * @param {number} monthsOfData - Months of data for calculations
- * @param {Object} settings - Analysis settings
- * @returns {Array} Array of merchant pattern suggestions
+ * @param transactions - All transactions
+ * @param envelopes - Existing envelopes
+ * @param monthsOfData - Months of data for calculations
+ * @param settings - Analysis settings
+ * @returns Array of merchant pattern suggestions
  */
-export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, settings) => {
-  const suggestions = [];
+export const analyzeMerchantPatterns = (
+  transactions: any[],
+  envelopes: any[],
+  monthsOfData: number,
+  settings: AnalysisSettings
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
   // Get unassigned transactions
@@ -164,7 +201,7 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
     (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === "")
   );
 
-  const merchantSpending = {};
+  const merchantSpending: Record<string, CategoryData> = {};
   unassignedTransactions.forEach((transaction) => {
     const desc = transaction.description.toLowerCase();
 
@@ -172,6 +209,7 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
       if (regex.test(desc)) {
         if (!merchantSpending[category]) {
           merchantSpending[category] = {
+            category,
             amount: 0,
             count: 0,
             transactions: [],
@@ -186,7 +224,7 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
 
   // Generate suggestions for merchant patterns
   let colorIndex = 0;
-  Object.entries(merchantSpending).forEach(([category, data]) => {
+  Object.entries(merchantSpending).forEach(([category, data]: [string, CategoryData]) => {
     if (data.amount >= minAmount && data.count >= minTransactions) {
       const monthlyAverage = data.amount / monthsOfData;
       const suggestedAmount = Math.ceil(monthlyAverage * bufferPercentage);
@@ -301,22 +339,27 @@ export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfDat
   return suggestions;
 };
 
+interface GenerateSuggestionsOptions {
+  dismissedSuggestions?: Set<string>;
+  showDismissed?: boolean;
+}
+
 /**
  * Combines all suggestion types and sorts by priority
- * @param {Array} transactions - All transactions
- * @param {Array} envelopes - Existing envelopes
- * @param {Object} settings - Analysis settings
- * @param {string} dateRange - Date range for analysis
- * @param {Object} options - Additional options (dismissedSuggestions, showDismissed)
- * @returns {Array} Sorted array of all suggestions
+ * @param transactions - All transactions
+ * @param envelopes - Existing envelopes
+ * @param settings - Analysis settings
+ * @param dateRange - Date range for analysis
+ * @param options - Additional options (dismissedSuggestions, showDismissed)
+ * @returns Sorted array of all suggestions
  */
 export const generateAllSuggestions = (
-  transactions,
-  envelopes,
-  settings,
-  dateRange,
-  options = {}
-) => {
+  transactions: any[],
+  envelopes: any[],
+  settings: AnalysisSettings,
+  dateRange: string,
+  options: GenerateSuggestionsOptions = {}
+): Suggestion[] => {
   const { dismissedSuggestions = new Set(), showDismissed = false } = options;
   const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
   const monthsOfData = calculateMonthsOfData(filteredTransactions);
