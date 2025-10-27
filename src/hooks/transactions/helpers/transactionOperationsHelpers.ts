@@ -28,7 +28,10 @@ export const triggerTransactionSync = (changeType: string) => {
 /**
  * Add transaction to database
  */
-export const addTransactionToDB = async (transactionData, categoryRules = []) => {
+export const addTransactionToDB = async (
+  transactionData: Record<string, unknown>,
+  categoryRules: unknown[] = []
+) => {
   logger.debug("Adding transaction", { id: transactionData.id });
 
   const validation = validateTransactionData(transactionData);
@@ -38,19 +41,19 @@ export const addTransactionToDB = async (transactionData, categoryRules = []) =>
 
   const categorized = categorizeTransaction(transactionData, categoryRules);
   const prepared = prepareTransactionForStorage(categorized);
-  const result = await budgetDb.addTransaction(prepared);
+  await budgetDb.transactions.put(prepared);
   triggerTransactionSync("add");
 
-  return result;
+  return prepared;
 };
 
 /**
  * Update transaction in database
  */
-export const updateTransactionInDB = async (id: string, updates) => {
+export const updateTransactionInDB = async (id: string, updates: Record<string, unknown>) => {
   logger.debug("Updating transaction", { id, updates });
 
-  const current = await budgetDb.getTransaction(id);
+  const current = await budgetDb.transactions.get(id);
   if (!current) {
     throw new Error(`Transaction not found: ${id}`);
   }
@@ -62,10 +65,10 @@ export const updateTransactionInDB = async (id: string, updates) => {
   }
 
   const prepared = prepareTransactionForStorage(updatedData);
-  const result = await budgetDb.updateTransaction(id, prepared);
+  await budgetDb.transactions.put(prepared);
   triggerTransactionSync("update");
 
-  return result;
+  return prepared;
 };
 
 /**
@@ -73,7 +76,7 @@ export const updateTransactionInDB = async (id: string, updates) => {
  */
 export const deleteTransactionFromDB = async (transactionId: string) => {
   logger.debug("Deleting transaction", { id: transactionId });
-  await budgetDb.deleteTransaction(transactionId);
+  await budgetDb.transactions.delete(transactionId);
   triggerTransactionSync("delete");
   return { id: transactionId };
 };
@@ -81,7 +84,10 @@ export const deleteTransactionFromDB = async (transactionId: string) => {
 /**
  * Split transaction in database
  */
-export const splitTransactionInDB = async (originalTransaction, splitTransactions) => {
+export const splitTransactionInDB = async (
+  originalTransaction: Record<string, unknown>,
+  splitTransactions: Record<string, unknown>[]
+) => {
   logger.debug("Splitting transaction", {
     originalId: originalTransaction.id,
     splitCount: splitTransactions.length,
@@ -103,19 +109,19 @@ export const splitTransactionInDB = async (originalTransaction, splitTransaction
     isSplit: true,
     splitInto: splitTransactions.map((t) => t.id),
     metadata: {
-      ...originalTransaction.metadata,
+      ...(originalTransaction.metadata as Record<string, unknown> | undefined),
       splitAt: new Date().toISOString(),
       splitIntoTransactions: splitTransactions.length,
     },
   };
 
-  await budgetDb.updateTransaction(originalTransaction.id, updatedOriginal);
+  await budgetDb.transactions.put(updatedOriginal);
 
   // Add all split transactions
   for (const splitTxn of splitTransactions) {
     const prepared = prepareTransactionForStorage(splitTxn);
-    const result = await budgetDb.addTransaction(prepared);
-    results.push(result);
+    await budgetDb.transactions.put(prepared);
+    results.push(prepared);
   }
 
   triggerTransactionSync("split");
@@ -129,24 +135,20 @@ export const splitTransactionInDB = async (originalTransaction, splitTransaction
 /**
  * Transfer funds between envelopes
  */
-export const transferFundsInDB = async (transferData) => {
+export const transferFundsInDB = async (transferData: Record<string, unknown>) => {
   logger.debug("Creating transfer", transferData);
 
   const [outgoingTxn, incomingTxn] = createTransferPair(transferData);
 
-  const outgoingResult = await budgetDb.addTransaction(
-    prepareTransactionForStorage(outgoingTxn)
-  );
-  const incomingResult = await budgetDb.addTransaction(
-    prepareTransactionForStorage(incomingTxn)
-  );
+  await budgetDb.transactions.put(prepareTransactionForStorage(outgoingTxn));
+  await budgetDb.transactions.put(prepareTransactionForStorage(incomingTxn));
 
   triggerTransactionSync("transfer");
 
   return {
-    outgoing: outgoingResult,
-    incoming: incomingResult,
-    transferId: outgoingTxn.metadata.transferId,
+    outgoing: outgoingTxn,
+    incoming: incomingTxn,
+    transferId: (outgoingTxn.metadata as { transferId?: string } | undefined)?.transferId,
   };
 };
 
@@ -155,9 +157,9 @@ export const transferFundsInDB = async (transferData) => {
  */
 export const bulkOperationOnTransactions = async (
   operation: string,
-  transactions,
-  updates,
-  categoryRules = []
+  transactions: Record<string, unknown>[],
+  updates: Record<string, unknown>,
+  categoryRules: unknown[] = []
 ) => {
   logger.debug(`Bulk ${operation} operation`, { count: transactions.length });
 
@@ -166,7 +168,7 @@ export const bulkOperationOnTransactions = async (
   switch (operation) {
     case "delete":
       for (const txn of transactions) {
-        await budgetDb.deleteTransaction(txn.id);
+        await budgetDb.transactions.delete(txn.id as string);
         results.push({ id: txn.id, operation: "deleted" });
       }
       break;
@@ -175,8 +177,8 @@ export const bulkOperationOnTransactions = async (
       for (const txn of transactions) {
         const updatedData = { ...txn, ...updates };
         const prepared = prepareTransactionForStorage(updatedData);
-        const result = await budgetDb.updateTransaction(txn.id, prepared);
-        results.push(result);
+        await budgetDb.transactions.put(prepared);
+        results.push(prepared);
       }
       break;
 
@@ -184,8 +186,8 @@ export const bulkOperationOnTransactions = async (
       for (const txn of transactions) {
         const categorized = categorizeTransaction({ ...txn, ...updates }, categoryRules);
         const prepared = prepareTransactionForStorage(categorized);
-        const result = await budgetDb.updateTransaction(txn.id, prepared);
-        results.push(result);
+        await budgetDb.transactions.put(prepared);
+        results.push(prepared);
       }
       break;
 

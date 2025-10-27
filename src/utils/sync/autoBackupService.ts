@@ -5,8 +5,52 @@
 
 import logger from "../common/logger";
 import { budgetDb } from "../../db/budgetDb";
+import type {
+  AutoBackup,
+  Envelope,
+  Transaction,
+  Bill,
+  Debt,
+  SavingsGoal,
+  PaycheckHistory,
+  BudgetRecord,
+} from "../../db/types";
+
+interface BackupData {
+  envelopes: Envelope[];
+  transactions: Transaction[];
+  bills: Bill[];
+  debts: Debt[];
+  savingsGoals: SavingsGoal[];
+  paycheckHistory: PaycheckHistory[];
+  metadata: Record<string, unknown>;
+  timestamp: number;
+}
+
+interface BackupMetadata {
+  totalRecords: number;
+  sizeEstimate: number;
+  duration: number;
+  version: string;
+}
+
+// We use a subset approach to avoid type conflicts
+type StoredAutoBackup = {
+  id: string;
+  timestamp: number;
+  type: "manual" | "scheduled" | "sync_triggered";
+  syncType?: "firebase" | "export" | "import";
+  data?: BackupData;
+  metadata?: BackupMetadata | Record<string, unknown>;
+  size?: number;
+  checksum?: string;
+};
 
 class AutoBackupService {
+  private maxBackups: number;
+  private backupPrefix: string;
+  private isEnabled: boolean;
+
   constructor() {
     this.maxBackups = 5; // Keep last 5 backups
     this.backupPrefix = "auto_backup_";
@@ -34,10 +78,10 @@ class AutoBackupService {
       const backupData = await this.collectAllData();
       const duration = Date.now() - startTime;
 
-      const backup = {
+      const backup: StoredAutoBackup = {
         id: backupId,
-        type: "pre_sync_auto",
-        syncType,
+        type: "sync_triggered",
+        syncType: "firebase",
         timestamp: Date.now(),
         data: backupData,
         metadata: {
@@ -74,7 +118,7 @@ class AutoBackupService {
   /**
    * Collect all data for backup
    */
-  async collectAllData() {
+  async collectAllData(): Promise<BackupData> {
     const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
       await Promise.all([
         budgetDb.envelopes.toArray(),
@@ -101,7 +145,7 @@ class AutoBackupService {
   /**
    * Store backup in IndexedDB
    */
-  async storeBackup(backup) {
+  async storeBackup(backup: StoredAutoBackup) {
     try {
       await budgetDb.autoBackups.put(backup);
       logger.debug("Backup stored in IndexedDB", { backupId: backup.id });
@@ -127,16 +171,20 @@ class AutoBackupService {
   /**
    * Restore data from backup
    */
-  async restoreFromBackup(backupId) {
+  async restoreFromBackup(backupId: string) {
     try {
       logger.warn("🔄 Restoring from automatic backup", { backupId });
 
-      const backup = await budgetDb.autoBackups.get(backupId);
-      if (!backup) {
+      const backup = (await budgetDb.autoBackups.get(backupId)) as unknown;
+      const storedBackup = backup as StoredAutoBackup | undefined;
+      if (!storedBackup) {
         throw new Error(`Backup not found: ${backupId}`);
       }
 
-      const data = backup.data;
+      const data = storedBackup.data;
+      if (!data) {
+        throw new Error(`Backup data not found for: ${backupId}`);
+      }
 
       // Restore data in transaction for consistency
       await budgetDb.transaction(
@@ -170,11 +218,13 @@ class AutoBackupService {
 
           // Restore metadata
           if (data.metadata) {
-            await budgetDb.budget.put({
+            const metadataRecord: BudgetRecord = {
               id: "metadata",
+              lastModified: Date.now(),
               ...data.metadata,
               lastUpdated: new Date().toISOString(),
-            });
+            };
+            await budgetDb.budget.put(metadataRecord);
           }
         }
       );
@@ -222,8 +272,13 @@ class AutoBackupService {
    */
   async getBackupStats() {
     try {
-      const backups = await this.getBackups();
-      const totalSize = backups.reduce((sum, b) => sum + (b.metadata?.sizeEstimate || 0), 0);
+      const backups = (await this.getBackups()) as unknown as StoredAutoBackup[];
+      const totalSize = backups.reduce((sum, b) => {
+        if (b.metadata && typeof b.metadata === 'object' && 'sizeEstimate' in b.metadata) {
+          return sum + ((b.metadata as BackupMetadata).sizeEstimate || 0);
+        }
+        return sum;
+      }, 0);
 
       return {
         count: backups.length,
@@ -245,7 +300,7 @@ class AutoBackupService {
   /**
    * Helper: Count total records
    */
-  countRecords(data) {
+  countRecords(data: BackupData) {
     return (
       (data.envelopes?.length || 0) +
       (data.transactions?.length || 0) +
@@ -259,7 +314,7 @@ class AutoBackupService {
   /**
    * Helper: Format byte size
    */
-  formatSize(bytes) {
+  formatSize(bytes: number) {
     if (bytes === 0) return "0 B";
     const k = 1024;
     const sizes = ["B", "KB", "MB", "GB"];
@@ -270,7 +325,7 @@ class AutoBackupService {
   /**
    * Enable/disable automatic backups
    */
-  setEnabled(enabled) {
+  setEnabled(enabled: boolean) {
     this.isEnabled = enabled;
     logger.debug(`Auto backup ${enabled ? "enabled" : "disabled"}`);
   }
@@ -278,7 +333,7 @@ class AutoBackupService {
   /**
    * Delete specific backup
    */
-  async deleteBackup(backupId) {
+  async deleteBackup(backupId: string) {
     try {
       await budgetDb.autoBackups.delete(backupId);
       logger.debug("Deleted backup", { backupId });
@@ -286,7 +341,7 @@ class AutoBackupService {
     } catch (error) {
       logger.error("Failed to delete backup", {
         backupId,
-        error: error.message,
+        error: (error as Error).message,
       });
       return false;
     }

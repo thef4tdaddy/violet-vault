@@ -6,9 +6,30 @@ import { checkForVersionUpdate } from "../common/version";
  * Handles service worker registration, update detection, and install prompts
  */
 
+interface UIStore {
+  getState: () => {
+    setUpdateAvailable: (available: boolean) => void;
+    setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) => void;
+    showInstallModal: () => void;
+    hideInstallModal: () => void;
+    loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<unknown>;
+    updateAvailable?: boolean;
+    installPromptEvent?: BeforeInstallPromptEvent | null;
+  };
+}
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+interface WindowWithPWAManager extends Window {
+  pwaManager?: PWAManager;
+}
+
 class PWAManager {
   registration: ServiceWorkerRegistration | null;
-  uiStore: { setUpdateAvailable: (available: boolean) => void } | null;
+  uiStore: UIStore | null;
   isInitialized: boolean;
 
   constructor() {
@@ -20,7 +41,7 @@ class PWAManager {
   /**
    * Initialize PWA Manager with UI store
    */
-  async initialize(uiStore) {
+  async initialize(uiStore: UIStore) {
     if (this.isInitialized) return;
 
     this.uiStore = uiStore;
@@ -66,7 +87,7 @@ class PWAManager {
         // Check if there's already a waiting service worker
         if (this.registration.waiting) {
           logger.info("⏳ Service Worker already waiting");
-          this.uiStore.getState().setUpdateAvailable(true);
+          this.uiStore?.getState().setUpdateAvailable(true);
         }
       } else {
         logger.info("⏳ Waiting for service worker registration...");
@@ -96,7 +117,7 @@ class PWAManager {
         if (navigator.serviceWorker.controller) {
           // New service worker is ready to activate
           logger.info("✅ New service worker installed and ready");
-          this.uiStore.getState().setUpdateAvailable(true);
+          this.uiStore?.getState().setUpdateAvailable(true);
         } else {
           // First time install
           logger.info("🎉 Service worker installed for the first time");
@@ -117,7 +138,7 @@ class PWAManager {
       logger.info("📱 PWA install prompt available");
 
       // Store the event for later use
-      this.uiStore.getState().setInstallPromptEvent(event);
+      this.uiStore?.getState().setInstallPromptEvent(event as BeforeInstallPromptEvent);
 
       // Check if user has dismissed install prompt recently
       const lastDismissed = localStorage.getItem("pwa_install_last_dismissed");
@@ -135,8 +156,8 @@ class PWAManager {
 
       setTimeout(() => {
         // Double-check that the prompt is still available
-        if (this.uiStore.getState().installPromptEvent) {
-          this.uiStore.getState().showInstallModal();
+        if (this.uiStore?.getState().installPromptEvent) {
+          this.uiStore?.getState().showInstallModal();
         }
       }, delay);
     });
@@ -144,8 +165,8 @@ class PWAManager {
     // Listen for app installation
     window.addEventListener("appinstalled", () => {
       logger.info("🎉 PWA was installed successfully");
-      this.uiStore.getState().setInstallPromptEvent(null);
-      this.uiStore.hideInstallModal();
+      this.uiStore?.getState().setInstallPromptEvent(null);
+      this.uiStore?.getState().hideInstallModal();
     });
 
     // Check if app is already installed
@@ -171,7 +192,7 @@ class PWAManager {
       switch (type) {
         case "UPDATE_AVAILABLE":
           logger.info("📡 Received update available message from service worker");
-          this.uiStore.getState().setUpdateAvailable(true);
+          this.uiStore?.getState().setUpdateAvailable(true);
           break;
         case "UPDATE_INSTALLED":
           logger.info("✅ Update installed, app will refresh");
@@ -209,7 +230,7 @@ class PWAManager {
    */
   getInstallationStatus() {
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-    const isInstallable = !!this.uiStore?.installPromptEvent;
+    const isInstallable = !!this.uiStore?.getState().installPromptEvent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     return {
@@ -236,7 +257,7 @@ class PWAManager {
         // Show patch notes after a short delay to allow app to fully load
         setTimeout(() => {
           this.uiStore
-            .getState()
+            ?.getState()
             .loadPatchNotesForUpdate(versionCheck.lastSeenVersion, versionCheck.currentVersion);
         }, 2000); // 2 second delay
       } else if (versionCheck.isFirstTime) {
@@ -261,7 +282,7 @@ class PWAManager {
       registrationScope: this.registration?.scope,
       serviceWorkerState: this.registration?.active?.state,
       hasWaitingWorker: !!this.registration?.waiting,
-      updateAvailable: this.uiStore?.updateAvailable || false,
+      updateAvailable: this.uiStore?.getState().updateAvailable || false,
       ...installStatus,
     };
   }
@@ -272,7 +293,7 @@ const pwaManager = new PWAManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as Record<string, unknown>).pwaManager = pwaManager;
+  (window as WindowWithPWAManager).pwaManager = pwaManager;
 }
 
 export default pwaManager;

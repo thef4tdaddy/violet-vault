@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import logger from "@/utils/common/logger";
+import type { AutoFundingData } from "./types";
 import {
   checkImportData,
   migrateDataIfNeeded,
@@ -14,50 +15,6 @@ import {
   saveToStorage,
   loadFromStorage,
 } from "@/hooks/budgeting/autofunding/useAutoFundingDataHelpers";
-
-const _STORAGE_KEY = "violetVault_autoFunding"; // Defined for documentation, used in helpers
-
-interface AutoFundingRule {
-  id: string;
-  name: string;
-  type: string;
-  [key: string]: unknown;
-}
-
-interface ExecutionHistoryEntry {
-  id: string;
-  timestamp: string;
-  [key: string]: unknown;
-}
-
-interface UndoStackEntry {
-  action: string;
-  timestamp: string;
-  [key: string]: unknown;
-}
-
-interface IncomePattern {
-  amount: number;
-  frequency: string;
-  [key: string]: unknown;
-}
-
-interface AutoFundingData {
-  rules?: AutoFundingRule[];
-  executionHistory?: ExecutionHistoryEntry[];
-  undoStack?: UndoStackEntry[];
-  incomePatterns?: IncomePattern[];
-  lastSaved?: string;
-  version?: string;
-  settings?: {
-    autoSave?: boolean;
-    autoBackup?: boolean;
-    maxHistoryEntries?: number;
-    maxUndoEntries?: number;
-  };
-  createdAt?: string;
-  [key: string]: unknown;
-}
 
 /**
  * Hook for managing auto-funding data persistence and initialization
@@ -105,11 +62,11 @@ export const useAutoFundingData = () => {
       data = migrateDataIfNeeded(data);
       data = ensureRequiredFields(data);
       data.importedAt = new Date().toISOString();
-      data.importedFrom = importData.source || "unknown";
+      data.importedFrom = (importData as AutoFundingData & { source?: string }).source || "unknown";
 
       logger.info("Auto-funding data imported", {
-        rulesCount: data.rules.length,
-        historyCount: data.executionHistory.length,
+        rulesCount: data.rules?.length ?? 0,
+        historyCount: data.executionHistory?.length ?? 0,
         source: data.importedFrom,
       });
 

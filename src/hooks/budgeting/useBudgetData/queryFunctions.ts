@@ -6,13 +6,23 @@
 import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.ts";
 
+interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+interface TransactionFilters {
+  dateRange?: DateRange;
+  envelopeId?: string;
+}
+
 export const queryFunctions = {
   envelopes: async () => {
     const cachedEnvelopes = await budgetDb.envelopes.toArray();
     return cachedEnvelopes || [];
   },
 
-  transactions: async (filters = {}) => {
+  transactions: async (filters: TransactionFilters = {}) => {
     let result;
 
     if (filters.dateRange) {
@@ -71,24 +81,26 @@ export const queryFunctions = {
     const safeTransactions = Array.isArray(cachedTransactions) ? cachedTransactions : [];
 
     const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
-      const balance = parseFloat(env?.currentBalance) || 0;
+      const balance = parseFloat(String(env?.currentBalance)) || 0;
       return sum + (isNaN(balance) ? 0 : balance);
     }, 0);
 
     const totalSavingsBalance = safeSavingsGoals.reduce((sum, goal) => {
-      const amount = parseFloat(goal?.currentAmount) || 0;
+      const amount = parseFloat(String(goal?.currentAmount)) || 0;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 
     // Ensure all values are numbers, not NaN
-    const unassignedCashValue = parseFloat(budgetMetadata?.unassignedCash) || 0;
-    const actualBalanceValue = parseFloat(budgetMetadata?.actualBalance) || 0;
+    const unassignedCashValue = parseFloat(String(budgetMetadata?.unassignedCash)) || 0;
+    const actualBalanceValue = parseFloat(String(budgetMetadata?.actualBalance)) || 0;
 
     const summary = {
       totalEnvelopeBalance: isNaN(totalEnvelopeBalance) ? 0 : totalEnvelopeBalance,
       totalSavingsBalance: isNaN(totalSavingsBalance) ? 0 : totalSavingsBalance,
       unassignedCash: isNaN(unassignedCashValue) ? 0 : unassignedCashValue,
       actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
+      virtualBalance: 0, // Will be calculated below
+      balanceDifference: 0, // Will be calculated below
       recentTransactions: safeTransactions.slice(0, 10),
       upcomingBills: safeBills.filter((bill) => {
         const dueDate = new Date(bill.dueDate);
