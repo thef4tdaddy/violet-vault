@@ -121,7 +121,7 @@
     "util": "^0.12.5",
     "vite": "^7.1.11",
     "vite-plugin-pwa": "^1.0.3",
-    "vitest": "^4.0.3",
+    "vitest": "^4.0.4",
     "workbox-window": "^7.3.0"
   }
 }
