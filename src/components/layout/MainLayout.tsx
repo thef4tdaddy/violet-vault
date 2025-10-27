@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import { useLayoutData } from "@/hooks/layout";
@@ -41,7 +41,6 @@ import {
   getUserForSync,
   extractLayoutData,
   extractAuthData,
-  extractOnboardingState,
   hasSecurityAcknowledgement,
 } from "./MainLayoutHelpers";
 
@@ -86,6 +85,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
 
   // Navigation hooks
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Auth state
   const auth = useAuthManager();
@@ -129,12 +129,12 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     });
   }, [isUnlocked, currentUser]);
 
-  // Redirect to dashboard after login
+  // Redirect to dashboard only if user just logged in and isn't on an app route yet
   useEffect(() => {
-    if (isUnlocked && currentUser) {
+    if (isUnlocked && currentUser && !location.pathname.startsWith("/app")) {
       navigate("/app/dashboard");
     }
-  }, [isUnlocked, currentUser, navigate]);
+  }, [isUnlocked, currentUser, location.pathname, navigate]);
 
   // Log sync state changes
   const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
@@ -218,10 +218,9 @@ const MainContent = ({
   const navigate = useNavigate();
 
   // Onboarding state
-  const onboardingState = useOnboardingStore((state: Record<string, unknown>) => ({
-    isOnboarded: (state as Record<string, unknown>)?.isOnboarded,
-  }));
-  const isOnboarded = extractOnboardingState(onboardingState);
+  const isOnboarded = useOnboardingStore(
+    (state: Record<string, unknown>) => (state as Record<string, unknown>)?.isOnboarded as boolean
+  );
 
   // Extract layout data using helper
   const { budget, totalBiweeklyNeed, paycheckHistory } = extractLayoutData(layoutData);
@@ -277,7 +276,14 @@ const MainContent = ({
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
         <div className="max-w-7xl mx-auto relative">
           <div className="relative z-50">
-            <Header />
+            <Header
+              currentUser={currentUser}
+              onUserChange={() => {}}
+              onUpdateProfile={() => {}}
+              isLocalOnlyMode={isLocalOnlyMode}
+              onShowSettings={() => modals.settings.setOpen(true)}
+              onShowDataSettings={() => modals.security.setOpen(true)}
+            />
           </div>
 
           {rotationDue && (
