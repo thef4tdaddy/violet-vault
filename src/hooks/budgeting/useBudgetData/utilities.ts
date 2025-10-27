@@ -53,7 +53,7 @@ export const useBudgetUtilities = () => {
   const reconcileTransactionMutation = useMutation({
     mutationKey: ["transactions", "reconcile"],
     mutationFn: async (transactionData) => {
-      await optimisticHelpers.addTransaction(transactionData);
+      await optimisticHelpers.addTransaction(queryClient, transactionData);
       return transactionData;
     },
     onSuccess: () => {

@@ -276,7 +276,14 @@ const MainContent = ({
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
         <div className="max-w-7xl mx-auto relative">
           <div className="relative z-50">
-            <Header />
+            <Header
+              currentUser={currentUser}
+              onUserChange={() => {}}
+              onUpdateProfile={() => {}}
+              isLocalOnlyMode={isLocalOnlyMode}
+              onShowSettings={() => modals.settings.setOpen(true)}
+              onShowDataSettings={() => modals.security.setOpen(true)}
+            />
           </div>
 
           {rotationDue && (
