@@ -4,13 +4,13 @@
  */
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
+import type { PaycheckHistory, Transaction } from "@/db/types";
 
-interface PaycheckRecord {
-  amount: number;
-  unassignedCashAfter: number;
-  unassignedCashBefore: number;
+// Extended interfaces for paycheck operations
+interface PaycheckRecordExtended extends PaycheckHistory {
+  unassignedCashAfter?: number;
+  unassignedCashBefore?: number;
   envelopeAllocations?: EnvelopeAllocation[];
-  [key: string]: unknown;
 }
 
 interface BudgetMetadata {
@@ -35,18 +35,22 @@ interface PaycheckDeletionResult {
   deletedPaycheck: string | boolean;
 }
 
+interface TransactionExtended extends Transaction {
+  paycheckId?: string;
+}
+
 /**
  * Reverse paycheck balance changes
  */
 export const reversePaycheckBalances = async (
-  paycheckRecord: PaycheckRecord,
+  paycheckRecord: PaycheckRecordExtended,
   currentMetadata: BudgetMetadata
 ): Promise<void> => {
   const currentActualBalance = currentMetadata?.actualBalance || 0;
   const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
   const newActualBalance = currentActualBalance - paycheckRecord.amount;
-  const unassignedCashChange = paycheckRecord.unassignedCashAfter - paycheckRecord.unassignedCashBefore;
+  const unassignedCashChange = (paycheckRecord.unassignedCashAfter || 0) - (paycheckRecord.unassignedCashBefore || 0);
   const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
   await setBudgetMetadata({
@@ -86,7 +90,7 @@ export const deleteAssociatedPaycheck = async (
   paycheckId: string,
   transactionId: string
 ): Promise<PaycheckDeletionResult> => {
-  const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId);
+  const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId) as PaycheckRecordExtended | undefined;
   
   if (!paycheckRecord) {
     return { deletedPaycheck: false };
@@ -111,7 +115,7 @@ export const deleteAssociatedPaycheck = async (
 export const processTransactionDeletion = async (transactionId: string): Promise<TransactionDeletionResult> => {
   logger.info("Starting transaction deletion", { transactionId });
 
-  const transaction = await budgetDb.transactions.get(transactionId);
+  const transaction = await budgetDb.transactions.get(transactionId) as TransactionExtended | undefined;
   if (!transaction) {
     throw new Error("Transaction not found");
   }

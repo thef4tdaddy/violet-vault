@@ -3,13 +3,58 @@
  * Enhanced utilities for safely handling corruption recovery operations
  */
 import { detectLocalData, hasLocalData } from "./dataDetectionHelper";
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
+
+interface DataDetectionDetails {
+  databaseOpen: boolean;
+  samplesFound?: {
+    envelopes: boolean;
+    transactions: boolean;
+    bills: boolean;
+  };
+  envelopes: number;
+  transactions: number;
+  bills: number;
+  savingsGoals: number;
+  paychecks: number;
+  cache: number;
+  lastOptimized: number;
+  error?: string;
+}
+
+interface DataDetectionResult {
+  hasData: boolean;
+  totalItems: number;
+  details: DataDetectionDetails;
+  recommendation: string;
+}
+
+interface SafeCloudDataResetResult {
+  success: boolean;
+  error?: string;
+  safetyAbort?: boolean;
+  detectionDetails?: DataDetectionResult;
+  message?: string;
+  localDataConfirmed?: boolean;
+  readyForCloudReset?: boolean;
+  exception?: string;
+}
+
+// Extend Window interface to include custom debug functions
+declare global {
+  interface Window {
+    safeCloudDataReset: () => Promise<SafeCloudDataResetResult>;
+    forceCloudDataReset?: () => void;
+    detectLocalDataDebug: () => Promise<DataDetectionResult>;
+    hasLocalDataDebug: () => Promise<boolean>;
+  }
+}
 
 /**
  * Safe cloud data reset with comprehensive local data validation
  * Should be used instead of direct cloud reset operations
  */
-export const safeCloudDataReset = async () => {
+export const safeCloudDataReset = async (): Promise<SafeCloudDataResetResult> => {
   try {
     logger.info("🚨 Starting safe cloud data reset procedure...");
 
@@ -60,13 +105,13 @@ export const safeCloudDataReset = async () => {
       readyForCloudReset: true,
     };
   } catch (error) {
-    const errorMsg = `SAFETY ABORT: Data detection failed - ${error.message}`;
+    const errorMsg = `SAFETY ABORT: Data detection failed - ${(error as Error).message}`;
     logger.error(errorMsg, error);
     return {
       success: false,
       error: errorMsg,
       safetyAbort: true,
-      exception: error.message,
+      exception: (error as Error).message,
     };
   }
 };
