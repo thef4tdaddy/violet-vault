@@ -1,5 +1,5 @@
 // Prefetch Helpers Tests
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
 import { prefetchHelpers } from "../prefetchHelpers";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
@@ -26,6 +26,18 @@ vi.mock("../../../services/budgetDatabaseService", () => ({
   },
 }));
 
+// Type the mocked functions
+const mockGetEnvelopes = budgetDatabaseService.getEnvelopes as unknown as Mock;
+const mockGetTransactions = budgetDatabaseService.getTransactions as unknown as Mock;
+const mockGetBills = budgetDatabaseService.getBills as unknown as Mock;
+const mockGetSavingsGoals = budgetDatabaseService.getSavingsGoals as unknown as Mock;
+const mockGetBudgetMetadata = budgetDatabaseService.getBudgetMetadata as unknown as Mock;
+const mockGetAnalyticsData = budgetDatabaseService.getAnalyticsData as unknown as Mock;
+const mockGetEnvelopesByCategory = budgetDb.getEnvelopesByCategory as unknown as Mock;
+const mockGetTransactionsByDateRange = budgetDb.getTransactionsByDateRange as unknown as Mock;
+const mockGetCachedValue = budgetDb.getCachedValue as unknown as Mock;
+const mockSetCachedValue = budgetDb.setCachedValue as unknown as Mock;
+
 describe("prefetchHelpers", () => {
   let mockQueryClient;
 
@@ -48,7 +60,7 @@ describe("prefetchHelpers", () => {
       ];
 
       const filters = { category: "expenses", includeArchived: false };
-      budgetDatabaseService.getEnvelopes.mockResolvedValue(mockEnvelopes);
+      mockGetEnvelopes.mockResolvedValue(mockEnvelopes);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockEnvelopes);
 
       const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient, filters);
@@ -64,10 +76,10 @@ describe("prefetchHelpers", () => {
 
     it("should fall back to direct database query", async () => {
       const mockEnvelopes = [{ id: "1", name: "Food" }];
-      const filters = { category: "expenses" };
+      const filters = { category: "expenses", includeArchived: false };
 
-      budgetDatabaseService.getEnvelopes.mockResolvedValue([]);
-      budgetDb.getEnvelopesByCategory.mockResolvedValue(mockEnvelopes);
+      mockGetEnvelopes.mockResolvedValue([]);
+      mockGetEnvelopesByCategory.mockResolvedValue(mockEnvelopes);
 
       // Execute the queryFn directly to test fallback logic
       mockQueryClient.prefetchQuery.mockImplementation(async ({ queryFn }) => {
@@ -93,8 +105,8 @@ describe("prefetchHelpers", () => {
     });
 
     it("should throw error when no data available", async () => {
-      budgetDatabaseService.getEnvelopes.mockResolvedValue([]);
-      budgetDb.getEnvelopesByCategory.mockResolvedValue([]);
+      mockGetEnvelopes.mockResolvedValue([]);
+      mockGetEnvelopesByCategory.mockResolvedValue([]);
 
       mockQueryClient.prefetchQuery.mockImplementation(async ({ queryFn }) => {
         await expect(queryFn()).rejects.toThrow("No cached envelope data available");
@@ -116,7 +128,7 @@ describe("prefetchHelpers", () => {
         end: new Date("2024-01-31"),
       };
 
-      budgetDatabaseService.getTransactions.mockResolvedValue(mockTransactions);
+      mockGetTransactions.mockResolvedValue(mockTransactions);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockTransactions);
 
       const result = await prefetchHelpers.prefetchTransactions(mockQueryClient, dateRange, {
@@ -149,8 +161,8 @@ describe("prefetchHelpers", () => {
         end: new Date("2024-01-31"),
       };
 
-      budgetDatabaseService.getTransactions.mockResolvedValue([]);
-      budgetDb.getTransactionsByDateRange.mockResolvedValue(mockTransactions);
+      mockGetTransactions.mockResolvedValue([]);
+      mockGetTransactionsByDateRange.mockResolvedValue(mockTransactions);
 
       mockQueryClient.prefetchQuery.mockImplementation(async ({ queryFn }) => {
         return await queryFn();
@@ -170,7 +182,7 @@ describe("prefetchHelpers", () => {
       const mockBills = [{ id: "1", name: "Rent", isPaid: false, dueDate: new Date() }];
 
       const options = { category: "housing", isPaid: false, daysAhead: 30 };
-      budgetDatabaseService.getBills.mockResolvedValue(mockBills);
+      mockGetBills.mockResolvedValue(mockBills);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockBills);
 
       const result = await prefetchHelpers.prefetchBills(mockQueryClient, options);
@@ -186,7 +198,7 @@ describe("prefetchHelpers", () => {
     });
 
     it("should handle empty bills array", async () => {
-      budgetDatabaseService.getBills.mockResolvedValue([]);
+      mockGetBills.mockResolvedValue([]);
 
       mockQueryClient.prefetchQuery.mockImplementation(async ({ queryFn }) => {
         return await queryFn();
@@ -202,7 +214,7 @@ describe("prefetchHelpers", () => {
       const mockGoals = [{ id: "1", name: "Emergency Fund", targetAmount: 10000 }];
 
       const options = { isCompleted: false, category: "emergency" };
-      budgetDatabaseService.getSavingsGoals.mockResolvedValue(mockGoals);
+      mockGetSavingsGoals.mockResolvedValue(mockGoals);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockGoals);
 
       const result = await prefetchHelpers.prefetchSavingsGoals(mockQueryClient, options);
@@ -220,7 +232,7 @@ describe("prefetchHelpers", () => {
         unassignedCash: 1000,
       };
 
-      budgetDb.getCachedValue.mockResolvedValue(mockDashboardData);
+      mockGetCachedValue.mockResolvedValue(mockDashboardData);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockDashboardData);
 
       const result = await prefetchHelpers.prefetchDashboard(mockQueryClient);
@@ -235,12 +247,12 @@ describe("prefetchHelpers", () => {
       const mockBills = [{ id: "1", isPaid: false }];
       const mockMetadata = { unassignedCash: 1000, actualBalance: 5000 };
 
-      budgetDb.getCachedValue.mockResolvedValue(null);
-      budgetDatabaseService.getEnvelopes.mockResolvedValue(mockEnvelopes);
-      budgetDatabaseService.getTransactions.mockResolvedValue(mockTransactions);
-      budgetDatabaseService.getBills.mockResolvedValue(mockBills);
-      budgetDatabaseService.getBudgetMetadata.mockResolvedValue(mockMetadata);
-      budgetDb.setCachedValue.mockResolvedValue(true);
+      mockGetCachedValue.mockResolvedValue(null);
+      mockGetEnvelopes.mockResolvedValue(mockEnvelopes);
+      mockGetTransactions.mockResolvedValue(mockTransactions);
+      mockGetBills.mockResolvedValue(mockBills);
+      mockGetBudgetMetadata.mockResolvedValue(mockMetadata);
+      mockSetCachedValue.mockResolvedValue(true);
 
       mockQueryClient.prefetchQuery.mockImplementation(async ({ queryFn }) => {
         return await queryFn();
@@ -270,7 +282,7 @@ describe("prefetchHelpers", () => {
     it("should prefetch analytics for different periods", async () => {
       const mockAnalyticsData = [{ id: "1", amount: 100, category: "food" }];
 
-      budgetDatabaseService.getAnalyticsData.mockResolvedValue(mockAnalyticsData);
+      mockGetAnalyticsData.mockResolvedValue(mockAnalyticsData);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockAnalyticsData);
 
       const result = await prefetchHelpers.prefetchAnalytics(mockQueryClient, "week");
@@ -286,7 +298,7 @@ describe("prefetchHelpers", () => {
 
     it("should calculate correct date ranges for different periods", async () => {
       const mockAnalyticsData = [];
-      budgetDatabaseService.getAnalyticsData.mockResolvedValue(mockAnalyticsData);
+      mockGetAnalyticsData.mockResolvedValue(mockAnalyticsData);
 
       mockQueryClient.prefetchQuery.mockImplementation(async ({ queryFn }) => {
         return await queryFn();
@@ -306,14 +318,6 @@ describe("prefetchHelpers", () => {
 
   describe("prefetchDashboardBundle", () => {
     it("should prefetch multiple dashboard-related queries", async () => {
-      // Mock all the individual prefetch functions
-      const mockResults = [
-        { status: "fulfilled", value: "dashboard" },
-        { status: "fulfilled", value: "envelopes" },
-        { status: "fulfilled", value: "bills" },
-        { status: "fulfilled", value: "transactions" },
-      ];
-
       // Mock the individual prefetch methods
       vi.spyOn(prefetchHelpers, "prefetchDashboard").mockResolvedValue("dashboard");
       vi.spyOn(prefetchHelpers, "prefetchEnvelopes").mockResolvedValue("envelopes");
