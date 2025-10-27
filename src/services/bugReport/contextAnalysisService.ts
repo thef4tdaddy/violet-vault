@@ -68,7 +68,7 @@ interface RecentInteractions {
   keyboardNavigable?: number;
 }
 
-interface PageContext {
+export interface PageContext {
   page: string;
   route: ReturnType<typeof PageDetectionService.getRouteInfo>;
   screen: ReturnType<typeof PageDetectionService.getScreenContext>;

@@ -4,34 +4,15 @@ import { useAuthenticationManager } from "../useAuthenticationManager";
 
 // Mock all dependencies
 vi.mock("../useAuthFlow", () => ({
-  useAuthFlow: vi.fn(() => ({
-    isUnlocked: true,
-    currentUser: { id: 1, userName: "testuser" },
-    encryptionKey: "test-key",
-    budgetId: "test-budget-id",
-    salt: "test-salt",
-    handleSetup: vi.fn(),
-    handleLogout: vi.fn(),
-    handleChangePassword: vi.fn(),
-    handleUpdateProfile: vi.fn(),
-  })),
+  useAuthFlow: vi.fn(),
 }));
 
 vi.mock("../useSecurityManager", () => ({
-  useSecurityManager: vi.fn(() => ({
-    isLocked: false,
-    canUnlock: true,
-    lockApp: vi.fn(),
-    unlockSession: vi.fn(),
-    checkSecurityStatus: vi.fn(),
-  })),
+  useSecurityManager: vi.fn(),
 }));
 
 vi.mock("../../common/useLocalOnlyMode", () => ({
-  useLocalOnlyMode: vi.fn(() => ({
-    isLocalOnlyMode: false,
-    localOnlyUser: null,
-  })),
+  useLocalOnlyMode: vi.fn(),
 }));
 
 // Import mocked dependencies
@@ -44,7 +25,7 @@ describe("useAuthenticationManager", () => {
     vi.clearAllMocks();
 
     // Reset to default mocks
-    useAuthFlow.mockReturnValue({
+    (useAuthFlow as ReturnType<typeof vi.fn>).mockReturnValue({
       isUnlocked: true,
       currentUser: { id: 1, userName: "testuser" },
       encryptionKey: "test-key",
@@ -56,7 +37,7 @@ describe("useAuthenticationManager", () => {
       handleUpdateProfile: vi.fn(),
     });
 
-    useSecurityManager.mockReturnValue({
+    (useSecurityManager as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocked: false,
       canUnlock: true,
       lockApp: vi.fn(),
@@ -64,7 +45,7 @@ describe("useAuthenticationManager", () => {
       checkSecurityStatus: vi.fn(),
     });
 
-    useLocalOnlyMode.mockReturnValue({
+    (useLocalOnlyMode as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocalOnlyMode: false,
       localOnlyUser: null,
     });
@@ -110,7 +91,7 @@ describe("useAuthenticationManager", () => {
       budgetId: "local-budget",
     };
 
-    useLocalOnlyMode.mockReturnValue({
+    (useLocalOnlyMode as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocalOnlyMode: true,
       localOnlyUser: localUser,
     });
@@ -124,7 +105,7 @@ describe("useAuthenticationManager", () => {
   });
 
   it("should handle unauthenticated state", () => {
-    useAuthFlow.mockReturnValue({
+    (useAuthFlow as ReturnType<typeof vi.fn>).mockReturnValue({
       isUnlocked: false,
       currentUser: null,
       encryptionKey: null,
@@ -149,7 +130,7 @@ describe("useAuthenticationManager", () => {
     expect(result.current.shouldShowAuthGateway()).toBe(false);
 
     // Test unauthenticated state
-    useAuthFlow.mockReturnValue({
+    (useAuthFlow as ReturnType<typeof vi.fn>).mockReturnValue({
       isUnlocked: false,
       currentUser: null,
       encryptionKey: null,
@@ -166,7 +147,7 @@ describe("useAuthenticationManager", () => {
   });
 
   it("should handle local-only mode auth gateway logic", () => {
-    useLocalOnlyMode.mockReturnValue({
+    (useLocalOnlyMode as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocalOnlyMode: true,
       localOnlyUser: null, // No local user yet
     });
@@ -176,7 +157,7 @@ describe("useAuthenticationManager", () => {
     expect(result.current.shouldShowAuthGateway()).toBe(true);
 
     // With local user
-    useLocalOnlyMode.mockReturnValue({
+    (useLocalOnlyMode as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocalOnlyMode: true,
       localOnlyUser: { id: 1, userName: "localuser" },
     });
@@ -186,7 +167,7 @@ describe("useAuthenticationManager", () => {
   });
 
   it("should handle security locked state", () => {
-    useSecurityManager.mockReturnValue({
+    (useSecurityManager as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocked: true,
       canUnlock: false,
       lockApp: vi.fn(),
