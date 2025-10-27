@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useConfirm } from "@/hooks/common/useConfirm";
-import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
-import logger from "@/utils/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import { useAutoFundingHandlers } from "./useAutoFundingHandlers";
 
 function AutoFundingView() {
   const navigate = useNavigate();
-  const confirm = useConfirm();
   const envelopes = useBudgetStore((state) => state.envelopes) as unknown[];
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
@@ -27,67 +24,14 @@ function AutoFundingView() {
   // Get execution history
   const displayHistory = getHistory(20);
 
-  const handleCreateRule = () => {
-    setEditingRule(null);
-    setShowRuleBuilder(true);
-  };
-
-  const handleEditRule = (rule: unknown) => {
-    if (rule && typeof rule === "object") {
-      setEditingRule(rule);
-      setShowRuleBuilder(true);
-    }
-  };
-
-  const handleSaveRule = async (ruleData: unknown) => {
-    if (!ruleData || typeof ruleData !== "object") return;
-    try {
-      if (editingRule) {
-        updateRule(editingRule.id, ruleData);
-      } else {
-        addRule(ruleData);
-      }
-      setShowRuleBuilder(false);
-      setEditingRule(null);
-      globalToast.showSuccess(
-        editingRule ? "Rule updated successfully!" : "Rule created successfully!",
-        "Success",
-        5000
-      );
-    } catch (error) {
-      logger.error("Failed to save rule", error);
-      globalToast.showError("Failed to save rule: " + error.message, "Save Failed", 8000);
-    }
-  };
-
-  const handleDeleteRule = async (ruleId: string) => {
-    const confirmed = await confirm({
-      title: "Delete Auto-Funding Rule",
-      message: "Are you sure you want to delete this rule? This action cannot be undone.",
-      confirmLabel: "Delete Rule",
-      cancelLabel: "Cancel",
-      destructive: true,
+  // Get handlers from custom hook
+  const { handleCreateRule, handleEditRule, handleSaveRule, handleDeleteRule, handleToggleRule } =
+    useAutoFundingHandlers({
+      editingRule,
+      setEditingRule,
+      setShowRuleBuilder,
+      ruleActions: { updateRule, addRule, deleteRule, toggleRule },
     });
-
-    if (confirmed) {
-      try {
-        deleteRule(ruleId);
-        globalToast.showSuccess("Rule deleted successfully!", "Success", 5000);
-      } catch (error) {
-        logger.error("Failed to delete rule", error);
-        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed", 8000);
-      }
-    }
-  };
-
-  const handleToggleRule = (ruleId: string) => {
-    try {
-      toggleRule(ruleId);
-    } catch (error) {
-      logger.error("Failed to toggle rule", error);
-      globalToast.showError("Failed to toggle rule: " + error.message, "Toggle Failed", 8000);
-    }
-  };
 
   const handleExecuteRules = async () => {
     if (isExecuting) return;
