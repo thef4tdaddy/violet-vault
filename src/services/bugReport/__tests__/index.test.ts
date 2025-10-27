@@ -29,7 +29,6 @@ vi.mock("../systemInfoService.js", () => ({
 vi.mock("../apiService.js", () => ({
   BugReportAPIService: {
     validateReportData: vi.fn(),
-    prepareReportData: vi.fn(),
     submitWithFallbacks: vi.fn(),
   },
 }));
@@ -55,48 +54,126 @@ vi.mock("../../../utils/common/version.js", () => ({
 }));
 
 // Mock environment variables
-vi.mock(
-  "import.meta.env",
-  () => ({
-    env: {
-      VITE_BUG_REPORT_ENDPOINT: "https://api.test.com/bug-reports",
-    },
-  }),
-  { virtual: true }
-);
+vi.mock("import.meta.env", () => ({
+  env: {
+    VITE_BUG_REPORT_ENDPOINT: "https://api.test.com/bug-reports",
+  },
+}));
+
+// Get mocked versions with proper typing
+const mockedScreenshotService = vi.mocked(ScreenshotService);
+const mockedSystemInfoService = vi.mocked(SystemInfoService);
+const mockedBugReportAPIService = vi.mocked(BugReportAPIService);
+const mockedContextAnalysisService = vi.mocked(ContextAnalysisService);
 
 describe("BugReportService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Set up default mock implementations
-    ScreenshotService.captureScreenshot.mockResolvedValue("screenshot-data");
-    ScreenshotService.getScreenshotInfo.mockReturnValue({ sizeKB: 100 });
-    ScreenshotService.autoCompressScreenshot.mockImplementation((data) => Promise.resolve(data));
+    mockedScreenshotService.captureScreenshot.mockResolvedValue("screenshot-data");
+    mockedScreenshotService.getScreenshotInfo.mockReturnValue({ 
+      size: 100 * 1024,
+      sizeKB: 100,
+      format: "png",
+      timestamp: new Date().toISOString()
+    });
+    mockedScreenshotService.autoCompressScreenshot.mockImplementation((data) => Promise.resolve(data));
 
-    SystemInfoService.collectSystemInfo.mockResolvedValue({
-      browser: { userAgent: "test-agent" },
-      viewport: { width: 1920, height: 1080 },
+    mockedSystemInfoService.collectSystemInfo.mockResolvedValue({
       timestamp: "2023-01-01T00:00:00.000Z",
+      browser: { 
+        userAgent: "test-agent",
+        name: "test",
+        version: "1.0",
+        engine: "test",
+        os: "test"
+      },
+      viewport: { width: 1920, height: 1080 },
+      url: {
+        href: "http://test.com",
+        protocol: "http:",
+        hostname: "test.com",
+        pathname: "/test",
+        search: "",
+        hash: ""
+      },
+      performance: {
+        timing: {},
+        memory: null,
+        navigation: null
+      },
+      storage: {
+        localStorage: { available: true }
+      },
+      network: {
+        effectiveType: "4g",
+        downlink: 10,
+        rtt: 50,
+        saveData: false
+      },
+      errors: {
+        recentErrors: [],
+        consoleLogs: []
+      },
+      userAgent: "test-agent"
     });
 
-    ContextAnalysisService.getCurrentPageContext.mockReturnValue({
+    mockedContextAnalysisService.getCurrentPageContext.mockReturnValue({
       page: "test-page",
-      route: { pathname: "/test" },
+      route: {
+        pathname: "/test",
+        search: "",
+        hash: "",
+        searchParams: new URLSearchParams(),
+        segments: ["test"],
+        params: {},
+        query: {},
+        isRoot: false,
+        isNested: false
+      },
+      screen: {
+        documentTitle: "Test",
+        screenTitle: "Test",
+        breadcrumbs: [],
+        mainHeading: "Test"
+      },
+      userLocation: "test",
+      ui: {
+        modals: [],
+        forms: [],
+        buttons: [],
+        inputs: [],
+        drawers: [],
+        tabs: [],
+        loading: [],
+        interactions: []
+      },
+      performance: {
+        available: true
+      },
+      accessibility: {
+        available: true
+      },
+      data: {
+        available: true
+      },
+      interactions: []
     });
 
-    BugReportAPIService.validateReportData.mockReturnValue({
+    mockedBugReportAPIService.validateReportData.mockReturnValue({
       isValid: true,
       errors: [],
       warnings: [],
     });
 
-    BugReportAPIService.prepareReportData.mockImplementation((data) => data);
-
-    BugReportAPIService.submitWithFallbacks.mockResolvedValue({
+    mockedBugReportAPIService.submitWithFallbacks.mockResolvedValue({
       success: true,
+      overallSuccess: true,
       submissionId: "test-123",
       primaryProvider: "webhook",
+      attempts: 1,
+      results: []
     });
   });
 
@@ -106,17 +183,17 @@ describe("BugReportService", () => {
         title: "Test Bug",
         description: "Test description",
         includeScreenshot: true,
-        severity: "medium",
+        severity: "medium" as const,
       };
 
       const result = await BugReportService.submitBugReport(options);
 
       expect(result.success).toBe(true);
       expect(result.submissionId).toBe("test-123");
-      expect(SystemInfoService.collectSystemInfo).toHaveBeenCalled();
-      expect(ContextAnalysisService.getCurrentPageContext).toHaveBeenCalled();
-      expect(ScreenshotService.captureScreenshot).toHaveBeenCalled();
-      expect(BugReportAPIService.submitWithFallbacks).toHaveBeenCalled();
+      expect(mockedSystemInfoService.collectSystemInfo).toHaveBeenCalled();
+      expect(mockedContextAnalysisService.getCurrentPageContext).toHaveBeenCalled();
+      expect(mockedScreenshotService.captureScreenshot).toHaveBeenCalled();
+      expect(mockedBugReportAPIService.submitWithFallbacks).toHaveBeenCalled();
     });
 
     it("should skip screenshot when not requested", async () => {
@@ -128,11 +205,11 @@ describe("BugReportService", () => {
 
       await BugReportService.submitBugReport(options);
 
-      expect(ScreenshotService.captureScreenshot).not.toHaveBeenCalled();
+      expect(mockedScreenshotService.captureScreenshot).not.toHaveBeenCalled();
     });
 
     it("should handle validation errors", async () => {
-      BugReportAPIService.validateReportData.mockReturnValue({
+      mockedBugReportAPIService.validateReportData.mockReturnValue({
         isValid: false,
         errors: ["Title is required"],
         warnings: [],
@@ -148,7 +225,7 @@ describe("BugReportService", () => {
     });
 
     it("should handle submission failures gracefully", async () => {
-      BugReportAPIService.submitWithFallbacks.mockRejectedValue(new Error("Submission failed"));
+      mockedBugReportAPIService.submitWithFallbacks.mockRejectedValue(new Error("Submission failed"));
 
       const options = {
         title: "Test Bug",
@@ -170,43 +247,98 @@ describe("BugReportService", () => {
       expect(data).toHaveProperty("contextInfo");
       expect(data).toHaveProperty("timestamp");
 
-      expect(ScreenshotService.captureScreenshot).toHaveBeenCalled();
-      expect(SystemInfoService.collectSystemInfo).toHaveBeenCalled();
-      expect(ContextAnalysisService.getCurrentPageContext).toHaveBeenCalled();
+      expect(mockedScreenshotService.captureScreenshot).toHaveBeenCalled();
+      expect(mockedSystemInfoService.collectSystemInfo).toHaveBeenCalled();
+      expect(mockedContextAnalysisService.getCurrentPageContext).toHaveBeenCalled();
     });
 
     it("should handle data collection failures", async () => {
-      SystemInfoService.collectSystemInfo.mockRejectedValue(new Error("Collection failed"));
-      SystemInfoService.getFallbackSystemInfo.mockReturnValue({
+      mockedSystemInfoService.collectSystemInfo.mockRejectedValue(new Error("Collection failed"));
+      mockedSystemInfoService.getFallbackSystemInfo.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        browser: {
+          name: "Unknown",
+          version: "Unknown",
+          userAgent: "test",
+          engine: "test",
+          os: "test"
+        },
+        viewport: { width: 0, height: 0 },
+        url: {
+          href: "Unknown",
+          protocol: "",
+          hostname: "",
+          pathname: "",
+          search: "",
+          hash: ""
+        },
+        performance: { timing: {}, memory: null, navigation: null },
+        storage: { localStorage: { available: false } },
+        network: { onLine: true, effectiveType: "4g", downlink: 10, rtt: 50, saveData: false },
+        errors: { recentErrors: [], consoleLogs: [] },
+        userAgent: "Unknown",
         fallback: true,
       });
-      ContextAnalysisService.getFallbackContext.mockReturnValue({
+      mockedContextAnalysisService.getFallbackContext.mockReturnValue({
+        page: "Unknown",
+        route: {
+          pathname: "/",
+          search: "",
+          hash: "",
+          searchParams: new URLSearchParams(),
+          segments: [],
+          params: {},
+          query: {},
+          isRoot: true,
+          isNested: false
+        },
+        screen: {
+          documentTitle: "",
+          screenTitle: "",
+          breadcrumbs: [],
+          mainHeading: ""
+        },
+        userLocation: "Unknown",
+        ui: {
+          modals: [],
+          forms: [],
+          buttons: [],
+          inputs: [],
+          drawers: [],
+          tabs: [],
+          loading: [],
+          interactions: []
+        },
+        performance: { available: false },
+        accessibility: { available: false },
+        data: { available: false },
+        interactions: [],
         fallback: true,
       });
 
       const options = { includeScreenshot: false };
       const data = await BugReportService.collectAllData(options);
 
-      expect(data.systemInfo).toEqual({ fallback: true });
-      expect(data.contextInfo).toEqual({ fallback: true });
+      expect(data.systemInfo.fallback).toBe(true);
+      expect(data.contextInfo.fallback).toBe(true);
       expect(data.collectionError).toBe("Collection failed");
     });
   });
 
   describe("captureScreenshotSafely", () => {
     it("should capture screenshot and check size", async () => {
-      ScreenshotService.captureScreenshot.mockResolvedValue("large-screenshot");
-      ScreenshotService.getScreenshotInfo.mockReturnValue({ sizeKB: 1500 });
+      mockedScreenshotService.captureScreenshot.mockResolvedValue("large-screenshot");
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 1500 * 1024, sizeKB: 1500, format: 'png', timestamp: new Date().toISOString() });
 
       const screenshot = await BugReportService.captureScreenshotSafely();
 
       expect(screenshot).toBe("large-screenshot");
-      expect(ScreenshotService.captureScreenshot).toHaveBeenCalled();
-      expect(ScreenshotService.getScreenshotInfo).toHaveBeenCalledWith("large-screenshot");
+      expect(mockedScreenshotService.captureScreenshot).toHaveBeenCalled();
+      expect(mockedScreenshotService.getScreenshotInfo).toHaveBeenCalledWith("large-screenshot");
     });
 
     it("should handle screenshot capture failure", async () => {
-      ScreenshotService.captureScreenshot.mockRejectedValue(new Error("Capture failed"));
+      mockedScreenshotService.captureScreenshot.mockRejectedValue(new Error("Capture failed"));
 
       const screenshot = await BugReportService.captureScreenshotSafely();
 
@@ -217,34 +349,37 @@ describe("BugReportService", () => {
   describe("submitWithProperScreenshotHandling", () => {
     it("should handle large screenshots separately", async () => {
       const reportData = { screenshot: "large-screenshot" };
-      ScreenshotService.getScreenshotInfo.mockReturnValue({ sizeKB: 600 });
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 600 * 1024, sizeKB: 600, format: 'png', timestamp: new Date().toISOString() });
 
-      BugReportAPIService.submitWithFallbacks.mockResolvedValue({
+      mockedBugReportAPIService.submitWithFallbacks.mockResolvedValue({
         success: true,
+        overallSuccess: true,
         submissionId: "test-456",
+        attempts: 1,
+        results: []
       });
 
       const result = await BugReportService.submitWithProperScreenshotHandling(reportData, []);
 
       expect(result.screenshotStatus).toBeDefined();
-      expect(result.screenshotStatus.captured).toBe(true);
-      expect(result.screenshotStatus.uploaded).toBe(false);
-      expect(result.screenshotStatus.reason).toContain("too large");
+      expect(result.screenshotStatus?.captured).toBe(true);
+      expect(result.screenshotStatus?.uploaded).toBe(false);
+      expect(result.screenshotStatus?.reason).toContain("too large");
     });
 
     it("should submit normally for small screenshots", async () => {
       const reportData = { screenshot: "small-screenshot" };
-      ScreenshotService.getScreenshotInfo.mockReturnValue({ sizeKB: 100 });
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 100 * 1024, sizeKB: 100, format: 'png', timestamp: new Date().toISOString() });
 
       await BugReportService.submitWithProperScreenshotHandling(reportData, []);
 
-      expect(BugReportAPIService.submitWithFallbacks).toHaveBeenCalledWith(reportData, []);
+      expect(mockedBugReportAPIService.submitWithFallbacks).toHaveBeenCalledWith(reportData, []);
     });
   });
 
   describe("quickReport", () => {
     it("should create quick report with minimal options", async () => {
-      BugReportAPIService.submitWithFallbacks.mockResolvedValue({
+      mockedBugReportAPIService.submitWithFallbacks.mockResolvedValue({
         success: true,
         submissionId: "quick-123",
       });
@@ -316,8 +451,8 @@ describe("BugReportService", () => {
 
   describe("diagnostic methods", () => {
     it("should test screenshot functionality", async () => {
-      ScreenshotService.captureScreenshot.mockResolvedValue("test-screenshot");
-      ScreenshotService.getScreenshotInfo.mockReturnValue({ sizeKB: 100 });
+      mockedScreenshotService.captureScreenshot.mockResolvedValue("test-screenshot");
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 100 * 1024, sizeKB: 100, format: 'png', timestamp: new Date().toISOString() });
 
       const result = await BugReportService.testScreenshot();
 

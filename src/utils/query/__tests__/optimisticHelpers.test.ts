@@ -1,5 +1,5 @@
 // Optimistic Helpers Tests
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
 import { optimisticHelpers } from "../optimisticHelpers";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
@@ -29,6 +29,15 @@ vi.mock("../../../services/budgetDatabaseService", () => ({
   },
 }));
 
+// Type the mocked functions
+const mockEnvelopesUpdate = budgetDb.envelopes.update as unknown as Mock;
+const mockEnvelopesAdd = budgetDb.envelopes.add as unknown as Mock;
+const mockEnvelopesDelete = budgetDb.envelopes.delete as unknown as Mock;
+const mockTransactionsUpdate = budgetDb.transactions.update as unknown as Mock;
+const mockTransactionsAdd = budgetDb.transactions.add as unknown as Mock;
+const mockBillsUpdate = budgetDb.bills.update as unknown as Mock;
+const mockSaveBudgetMetadata = budgetDatabaseService.saveBudgetMetadata as unknown as Mock;
+
 describe("optimisticHelpers", () => {
   let mockQueryClient;
 
@@ -54,14 +63,14 @@ describe("optimisticHelpers", () => {
       const updates = { name: "Updated Food", balance: 500 };
       const existingEnvelope = { id: envelopeId, name: "Food", balance: 300 };
 
-      mockQueryClient.setQueryData.mockImplementation((key, updater) => {
+      mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
         if (typeof updater === "function") {
           return updater(existingEnvelope);
         }
         return updater;
       });
 
-      budgetDb.envelopes.update.mockResolvedValue(true);
+      mockEnvelopesUpdate.mockResolvedValue(true);
 
       await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
 
@@ -92,7 +101,7 @@ describe("optimisticHelpers", () => {
       const updates = { name: "Updated Food" };
       const error = new Error("Database update failed");
 
-      budgetDb.envelopes.update.mockRejectedValue(error);
+      mockEnvelopesUpdate.mockRejectedValue(error);
 
       // Should not throw error
       await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
@@ -141,14 +150,14 @@ describe("optimisticHelpers", () => {
         { id: "env2", name: "Gas", balance: 100 },
       ];
 
-      mockQueryClient.setQueryData.mockImplementation((key, updater) => {
+      mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
         if (typeof updater === "function") {
           return updater(existingEnvelopes);
         }
         return updater;
       });
 
-      budgetDb.envelopes.add.mockResolvedValue(true);
+      mockEnvelopesAdd.mockResolvedValue(true);
 
       await optimisticHelpers.addEnvelope(mockQueryClient, newEnvelope);
 
@@ -169,7 +178,7 @@ describe("optimisticHelpers", () => {
     it("should handle adding to empty list", async () => {
       const newEnvelope = { id: "env1", name: "Food", balance: 300 };
 
-      mockQueryClient.setQueryData.mockImplementation((key, updater) => {
+      mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
         if (typeof updater === "function") {
           return updater(null);
         }
@@ -199,14 +208,14 @@ describe("optimisticHelpers", () => {
         { id: "env2", name: "Gas", balance: 100 },
       ];
 
-      mockQueryClient.setQueryData.mockImplementation((key, updater) => {
+      mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
         if (typeof updater === "function") {
           return updater(existingEnvelopes);
         }
         return updater;
       });
 
-      budgetDb.envelopes.delete.mockResolvedValue(true);
+      mockEnvelopesDelete.mockResolvedValue(true);
 
       await optimisticHelpers.removeEnvelope(mockQueryClient, envelopeId);
 
@@ -234,14 +243,14 @@ describe("optimisticHelpers", () => {
       const updates = { amount: 150, description: "Updated transaction" };
       const existingTransaction = { id: transactionId, amount: 100 };
 
-      mockQueryClient.setQueryData.mockImplementation((key, updater) => {
+      mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
         if (typeof updater === "function") {
           return updater(existingTransaction);
         }
         return updater;
       });
 
-      budgetDb.transactions.update.mockResolvedValue(true);
+      mockTransactionsUpdate.mockResolvedValue(true);
 
       await optimisticHelpers.updateTransaction(mockQueryClient, transactionId, updates);
 
@@ -274,7 +283,7 @@ describe("optimisticHelpers", () => {
         envelopeId: "env1",
       };
 
-      budgetDb.transactions.add.mockResolvedValue(true);
+      mockTransactionsAdd.mockResolvedValue(true);
 
       await optimisticHelpers.addTransaction(mockQueryClient, newTransaction);
 
@@ -306,7 +315,7 @@ describe("optimisticHelpers", () => {
       const billId = "bill1";
       const updates = { isPaid: true, paidDate: new Date() };
 
-      budgetDb.bills.update.mockResolvedValue(true);
+      mockBillsUpdate.mockResolvedValue(true);
 
       await optimisticHelpers.updateBill(mockQueryClient, billId, updates);
 
@@ -334,7 +343,7 @@ describe("optimisticHelpers", () => {
     it("should update budget metadata optimistically", async () => {
       const updates = { unassignedCash: 1500, actualBalance: 6000 };
 
-      budgetDatabaseService.saveBudgetMetadata.mockResolvedValue(true);
+      mockSaveBudgetMetadata.mockResolvedValue(true);
 
       await optimisticHelpers.updateBudgetMetadata(mockQueryClient, updates);
 
@@ -488,6 +497,7 @@ describe("optimisticHelpers", () => {
         mutationKey: ["test"],
         queryKey,
         updateFn,
+        rollbackFn: vi.fn(),
       });
 
       const variables = { newItem: { id: "env2" } };
@@ -507,6 +517,7 @@ describe("optimisticHelpers", () => {
       const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
         mutationKey: ["test"],
         queryKey,
+        updateFn: vi.fn(),
         rollbackFn,
       });
 
@@ -526,6 +537,8 @@ describe("optimisticHelpers", () => {
       const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
         mutationKey: ["test"],
         queryKey,
+        updateFn: vi.fn(),
+        rollbackFn: vi.fn(),
       });
 
       config.onSettled();

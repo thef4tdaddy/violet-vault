@@ -46,7 +46,7 @@ const CurrencyInput = ({
   required 
 }: {
   label: string;
-  value: unknown;
+  value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   canEdit: boolean;
@@ -87,7 +87,7 @@ const FrequencySelector = ({
   error, 
   canEdit 
 }: {
-  value: unknown;
+  value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   error?: string;
   canEdit: boolean;
@@ -133,13 +133,13 @@ const EnvelopeBudgetFields = ({
         {React.createElement(getIcon("DollarSign"), {
           className: "h-4 w-4 mr-2 text-blue-600",
         })}
-        {getSectionTitle(formData.envelopeType)}
+        {getSectionTitle(String(formData.envelopeType))}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <CurrencyInput
           label="Monthly Amount"
-          value={formData.monthlyAmount}
+          value={String(formData.monthlyAmount || "")}
           onChange={(e) => onUpdateField("monthlyAmount", e.target.value)}
           error={errors.monthlyAmount}
           canEdit={canEdit}
@@ -153,7 +153,7 @@ const EnvelopeBudgetFields = ({
 
         <CurrencyInput
           label="Current Balance"
-          value={formData.currentBalance}
+          value={String(formData.currentBalance || "")}
           onChange={(e) => onUpdateField("currentBalance", e.target.value)}
           error={errors.currentBalance}
           canEdit={canEdit}
@@ -164,7 +164,7 @@ const EnvelopeBudgetFields = ({
         <CurrencyInput
           label="Target Amount"
           icon="Target"
-          value={formData.targetAmount}
+          value={String(formData.targetAmount || "")}
           onChange={(e) => onUpdateField("targetAmount", e.target.value)}
           error={errors.targetAmount}
           canEdit={canEdit}
@@ -174,7 +174,7 @@ const EnvelopeBudgetFields = ({
 
       {isBillEnvelope && (
         <FrequencySelector
-          value={formData.frequency}
+          value={String(formData.frequency || "monthly")}
           onChange={(e) => onUpdateField("frequency", e.target.value)}
           error={errors.frequency}
           canEdit={canEdit}

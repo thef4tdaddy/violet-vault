@@ -9,7 +9,7 @@ export const useActualBalanceOperations = () => {
   const { mutation: updateMetadataMutation } = useBudgetMetadataMutation();
 
   const updateActualBalance = useCallback(
-    async (balance, options = {}) => {
+    async (balance: number, options: { isManual?: boolean; author?: string } = {}) => {
       const { isManual = true, author = "Unknown User" } = options;
 
       if (typeof balance !== "number" || isNaN(balance)) {

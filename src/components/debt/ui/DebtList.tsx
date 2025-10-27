@@ -30,7 +30,6 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }: DebtListProps) => {
           key={debt.id}
           debt={debt}
           onClick={() => onDebtClick(debt)}
-          _onRecordPayment={onRecordPayment}
         />
       ))}
     </div>
@@ -56,19 +55,32 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     handleRecordPayment,
     currentBalance,
     interestRate,
+  }: {
+    config: { bgColor: string; textColor: string; name: string };
+    IconComponent: string;
+    statusStyle: string;
+    statusText: string;
+    progressData: { percentage: number };
+    paymentInfo: { display: string };
+    nextPaymentInfo: { label: string; hasIcon: boolean; type: string; value: string };
+    relationships: { hasRelationships: boolean; items: Array<{ icon: string; label: string; name: string; className: string }> };
+    canQuickPay: boolean;
+    handleRecordPayment: () => void;
+    currentBalance: number;
+    interestRate: number;
   } = {
-    config: { bgColor: "bg-gray-50", textColor: "text-gray-600" },
+    config: { bgColor: "bg-gray-50", textColor: "text-gray-600", name: "Standard" },
     IconComponent: "Clock",
     statusStyle: "text-gray-600",
     statusText: "Active",
     progressData: { percentage: 0 },
-    paymentInfo: {},
-    nextPaymentInfo: {},
-    relationships: [],
+    paymentInfo: { display: "$0.00" },
+    nextPaymentInfo: { label: "Next Payment", hasIcon: true, type: "next_payment", value: "N/A" },
+    relationships: { hasRelationships: false, items: [] },
     canQuickPay: false,
     handleRecordPayment: () => {},
-    currentBalance: debt?.currentBalance || 0,
-    interestRate: debt?.interestRate || 0,
+    currentBalance: Number(debt?.currentBalance) || 0,
+    interestRate: Number(debt?.interestRate) || 0,
   }; // useDebtCard(debt, onRecordPayment) is commented out
 
   return (
@@ -117,7 +129,7 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
               <div>
                 <p className="text-xs text-gray-500">Payment</p>
                 <p className="text-base md:text-lg font-semibold text-gray-900">
-                  {paymentInfo.display}
+                  {paymentInfo.display || "$0.00"}
                 </p>
               </div>
 
@@ -125,13 +137,13 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
               <div>
                 <p className="text-xs text-gray-500">Interest Rate</p>
                 <p className="text-base md:text-lg font-semibold text-purple-600">
-                  {interestRate}%
+                  {interestRate || 0}%
                 </p>
               </div>
 
               {/* Next Payment / Payoff Info */}
               <div>
-                <p className="text-xs text-gray-500">{nextPaymentInfo.label}</p>
+                <p className="text-xs text-gray-500">{nextPaymentInfo.label || "Next Payment"}</p>
                 <p className="text-sm md:text-base font-semibold text-gray-900">
                   {nextPaymentInfo.hasIcon && (
                     <span className="flex items-center">
@@ -142,7 +154,7 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
                         : React.createElement(getIcon("Clock"), {
                             className: "h-3 w-3 mr-1",
                           })}
-                      {nextPaymentInfo.value}
+                      {nextPaymentInfo.value || "N/A"}
                     </span>
                   )}
                 </p>

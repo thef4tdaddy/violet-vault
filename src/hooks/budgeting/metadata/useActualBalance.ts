@@ -2,13 +2,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { queryKeys } from "../../../utils/common/queryClient";
 import { getBudgetMetadata, setBudgetMetadata, getActualBalance } from "../../../db/budgetDb";
+import type { BudgetRecord } from "../../../db/types";
 import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
 import logger from "../../../utils/common/logger";
 import { validateBalance } from "../../../utils/validation";
 
 // Helper to initialize default metadata
-const initializeDefaultMetadata = async () => {
-  const defaultMetadata = {
+const initializeDefaultMetadata = async (): Promise<BudgetRecord> => {
+  const defaultMetadata: Partial<BudgetRecord> = {
+    id: "metadata",
+    lastModified: Date.now(),
     unassignedCash: 0,
     actualBalance: 0,
     isActualBalanceManual: false,
@@ -18,7 +21,7 @@ const initializeDefaultMetadata = async () => {
   await setBudgetMetadata(defaultMetadata);
   logger.debug("TanStack Query: Budget metadata initialized in useActualBalance", defaultMetadata);
 
-  return defaultMetadata;
+  return defaultMetadata as BudgetRecord;
 };
 
 // Helper to fetch balance data
@@ -70,15 +73,16 @@ export const useActualBalance = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: balanceData = { actualBalance: 0, isActualBalanceManual: false },
+    data: balanceData,
     isLoading,
     error,
     refetch,
-  } = useQuery<BalanceData>({
+  } = useQuery<BalanceData, Error, BalanceData>({
     queryKey: [...queryKeys.budgetMetadata, "actualBalance"],
     queryFn: fetchBalanceData,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
+    initialData: { actualBalance: 0, isActualBalanceManual: false },
   });
 
   const updateActualBalanceMutation = useMutation({
@@ -116,7 +120,7 @@ export const useActualBalance = () => {
         return false;
       }
 
-      const previousBalance = balanceData.actualBalance || 0;
+      const previousBalance = balanceData?.actualBalance || 0;
 
       try {
         await updateActualBalanceMutation.mutateAsync({
@@ -131,24 +135,24 @@ export const useActualBalance = () => {
         return false;
       }
     },
-    [updateActualBalanceMutation, balanceData.actualBalance]
+    [updateActualBalanceMutation, balanceData?.actualBalance]
   );
 
   // Utility functions (same as original useActualBalance hook)
   const getBalanceDifference = useCallback(
-    (calculatedBalance) => {
-      if (!balanceData.isActualBalanceManual || !calculatedBalance) return 0;
-      return (balanceData.actualBalance || 0) - calculatedBalance;
+    (calculatedBalance: number) => {
+      if (!balanceData?.isActualBalanceManual || !calculatedBalance) return 0;
+      return (balanceData?.actualBalance || 0) - calculatedBalance;
     },
-    [balanceData.actualBalance, balanceData.isActualBalanceManual]
+    [balanceData?.actualBalance, balanceData?.isActualBalanceManual]
   );
 
   const shouldConfirmChange = useCallback(
     (newBalance: number, threshold = 500) => {
-      const changeAmount = Math.abs(newBalance - (balanceData.actualBalance || 0));
+      const changeAmount = Math.abs(newBalance - (balanceData?.actualBalance || 0));
       return changeAmount >= threshold;
     },
-    [balanceData.actualBalance]
+    [balanceData?.actualBalance]
   );
 
   const formatBalance = useCallback(
@@ -204,8 +208,8 @@ export const useActualBalance = () => {
 
   return {
     // State
-    actualBalance: balanceData.actualBalance || 0,
-    isActualBalanceManual: balanceData.isActualBalanceManual || false,
+    actualBalance: balanceData?.actualBalance || 0,
+    isActualBalanceManual: balanceData?.isActualBalanceManual || false,
 
     // Loading states
     isLoading,

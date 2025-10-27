@@ -6,10 +6,48 @@
  */
 import { ScreenshotService } from "./screenshotService.ts";
 import { SystemInfoService } from "./systemInfoService.ts";
-import { BugReportAPIService } from "./apiService.ts";
+import { BugReportAPIService, type ProviderConfig } from "./apiService.ts";
 import { ContextAnalysisService } from "./contextAnalysisService.ts";
 import logger from "../../utils/common/logger.ts";
 import { APP_VERSION } from "../../utils/common/version.ts";
+
+/**
+ * Bug report submission options
+ */
+export interface BugReportOptions {
+  title?: string;
+  description?: string;
+  steps?: string;
+  expected?: string;
+  actual?: string;
+  includeScreenshot?: boolean;
+  severity?: "low" | "medium" | "high" | "critical";
+  labels?: string[];
+  providers?: {
+    github?: Record<string, unknown>;
+    email?: Record<string, unknown>;
+    webhook?: { url: string };
+  };
+  customData?: Record<string, unknown>;
+}
+
+/**
+ * Screenshot capture options
+ */
+export interface ScreenshotOptions {
+  compress?: boolean;
+}
+
+/**
+ * Data collection result
+ */
+export interface DataCollection {
+  screenshot: string | null;
+  systemInfo: ReturnType<typeof SystemInfoService.collectSystemInfo> | Awaited<ReturnType<typeof SystemInfoService.getFallbackSystemInfo>>;
+  contextInfo: ReturnType<typeof ContextAnalysisService.getCurrentPageContext> | ReturnType<typeof ContextAnalysisService.getFallbackContext>;
+  timestamp: string;
+  collectionError?: string;
+}
 
 export class BugReportService {
   /**
@@ -27,7 +65,7 @@ export class BugReportService {
    * @param {Object} options.customData - Additional custom data
    * @returns {Promise<Object>} Submission result
    */
-  static async submitBugReport(options = {}) {
+  static async submitBugReport(options: BugReportOptions = {}) {
     try {
       logger.debug("Starting comprehensive bug report submission", {
         title: options.title,
@@ -84,7 +122,7 @@ export class BugReportService {
    * @param {Object} options - Collection options
    * @returns {Promise<Object>} Collected data
    */
-  static async collectAllData(options) {
+  static async collectAllData(options: BugReportOptions): Promise<DataCollection> {
     try {
       // Collect data in parallel for better performance
       const [screenshot, systemInfo, contextInfo] = await Promise.all([
@@ -117,7 +155,7 @@ export class BugReportService {
    * Capture screenshot with proper error handling
    * @returns {Promise<string|null>} Screenshot data URL or null
    */
-  static async captureScreenshotSafely() {
+  static async captureScreenshotSafely(): Promise<string | null> {
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
 
@@ -145,7 +183,7 @@ export class BugReportService {
    * @param {Object} dataCollection - Collected data
    * @returns {Object} Prepared report data
    */
-  static prepareReportData(options, dataCollection) {
+  static prepareReportData(options: BugReportOptions, dataCollection: DataCollection) {
     const reportData = {
       // Basic report information
       title: options.title || "Bug Report",
@@ -184,7 +222,7 @@ export class BugReportService {
    * @param {Array} providers - Provider configurations
    * @returns {Promise<Object>} Submission result
    */
-  static async submitWithProperScreenshotHandling(reportData, providers) {
+  static async submitWithProperScreenshotHandling(reportData: Record<string, unknown>, providers: ProviderConfig[]) {
     // If screenshot is too large for JSON payload, handle separately
     if (reportData.screenshot) {
       const screenshotInfo = ScreenshotService.getScreenshotInfo(reportData.screenshot);
@@ -229,8 +267,8 @@ export class BugReportService {
    * @param {Object} customProviders - Custom provider configuration
    * @returns {Array} Provider configurations
    */
-  static getProviders(customProviders = {}) {
-    const defaultProviders = [];
+  static getProviders(customProviders: BugReportOptions['providers'] = {}): ProviderConfig[] {
+    const defaultProviders: ProviderConfig[] = [];
 
     // GitHub provider (if endpoint configured)
     const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
@@ -275,7 +313,7 @@ export class BugReportService {
    * @param {Object} options - Original options
    * @param {Error} error - The error that caused fallback
    */
-  static async saveReportLocally(options, error) {
+  static async saveReportLocally(options: BugReportOptions, error: Error): Promise<void> {
     try {
       const fallbackData = {
         title: options.title,
@@ -311,7 +349,7 @@ export class BugReportService {
    * Get locally saved reports
    * @returns {Array} Saved reports
    */
-  static getLocalReports() {
+  static getLocalReports(): unknown[] {
     try {
       return JSON.parse(localStorage.getItem("violet-vault-bug-reports") || "[]");
     } catch (error) {
@@ -323,7 +361,7 @@ export class BugReportService {
   /**
    * Clear locally saved reports
    */
-  static clearLocalReports() {
+  static clearLocalReports(): void {
     try {
       localStorage.removeItem("violet-vault-bug-reports");
       logger.info("Local bug reports cleared");
@@ -338,7 +376,7 @@ export class BugReportService {
    * @param {Object} options - Additional options
    * @returns {Promise<Object>} Submission result
    */
-  static async quickReport(description, options = {}) {
+  static async quickReport(description: string, options: Partial<BugReportOptions> = {}) {
     return this.submitBugReport({
       title: "Quick Bug Report",
       description,

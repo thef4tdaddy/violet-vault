@@ -5,6 +5,23 @@
  */
 import logger from "../../utils/common/logger";
 
+/**
+ * Screenshot capture options
+ */
+export interface ScreenshotOptions {
+  compress?: boolean;
+}
+
+/**
+ * Screenshot information
+ */
+export interface ScreenshotInfo {
+  size: number;
+  sizeKB: number;
+  format: string;
+  timestamp: string;
+}
+
 export class ScreenshotService {
   /**
    * Capture screenshot with multiple fallback methods and auto-compression
@@ -12,7 +29,7 @@ export class ScreenshotService {
    * @param {boolean} options.compress - Whether to auto-compress (default: true)
    * @returns {Promise<string>} Base64 encoded screenshot data URL
    */
-  static async captureScreenshot(options = {}) {
+  static async captureScreenshot(options: ScreenshotOptions = {}): Promise<string | null> {
     const { compress = true } = options;
 
     try {
@@ -293,7 +310,7 @@ export class ScreenshotService {
    * @param {string} dataUrl - Screenshot data URL
    * @returns {Promise<string>} Potentially compressed screenshot
    */
-  static async autoCompressScreenshot(dataUrl) {
+  static async autoCompressScreenshot(dataUrl: string | null): Promise<string | null> {
     if (!dataUrl) return dataUrl;
 
     const info = this.getScreenshotInfo(dataUrl);
@@ -340,8 +357,8 @@ export class ScreenshotService {
    * @param {string} dataUrl - Base64 data URL
    * @returns {Object}
    */
-  static getScreenshotInfo(dataUrl) {
-    if (!dataUrl) return null;
+  static getScreenshotInfo(dataUrl: string): ScreenshotInfo {
+    if (!dataUrl) return { size: 0, sizeKB: 0, format: '', timestamp: new Date().toISOString() };
 
     const sizeInBytes = Math.round((dataUrl.length * 3) / 4);
     const sizeInKB = Math.round(sizeInBytes / 1024);

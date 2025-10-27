@@ -18,6 +18,15 @@ interface UseSavingsGoalsOptions {
   includeCompleted?: boolean;
 }
 
+interface SavingsGoal {
+  id: string;
+  isCompleted: boolean;
+  urgency: string;
+  category: string;
+  priority: string;
+  [key: string]: unknown;
+}
+
 /**
  * Main savings goals hook - combines queries, mutations, and calculations
  */
@@ -46,7 +55,7 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
     sortBy,
     sortOrder,
     includeCompleted,
-  });
+  }) as { data: SavingsGoal[]; isLoading: boolean; isError: boolean; error: Error | null; refetch: () => void; isFetching: boolean; isStale: boolean };
 
   // Mutation hooks
   const addSavingsGoalMutation = useAddSavingsGoalMutation();
@@ -139,38 +148,38 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
 
       // Get active goals only
       getActiveGoals: () => {
-        return savingsGoals.filter((goal: { isCompleted: boolean }) => !goal.isCompleted);
+        return savingsGoals.filter((goal) => !goal.isCompleted);
       },
 
       // Get completed goals only
       getCompletedGoals: () => {
-        return savingsGoals.filter((goal: { isCompleted: boolean }) => goal.isCompleted);
+        return savingsGoals.filter((goal) => goal.isCompleted);
       },
 
       // Get goals by urgency
       getUrgentGoals: () => {
-        return savingsGoals.filter((goal: { urgency: string }) => goal.urgency === "urgent");
+        return savingsGoals.filter((goal) => goal.urgency === "urgent");
       },
 
       // Get overdue goals
       getOverdueGoals: () => {
-        return savingsGoals.filter((goal: { urgency: string }) => goal.urgency === "overdue");
+        return savingsGoals.filter((goal) => goal.urgency === "overdue");
       },
 
       // Get goals by category
       getGoalsByCategory: (category: string) => {
-        return savingsGoals.filter((goal: { category: string }) => goal.category === category);
+        return savingsGoals.filter((goal) => goal.category === category);
       },
 
       // Get goals by priority
       getGoalsByPriority: (priority: string) => {
-        return savingsGoals.filter((goal: { priority: string }) => goal.priority === priority);
+        return savingsGoals.filter((goal) => goal.priority === priority);
       },
 
       // Check if any goals need attention
       hasGoalsNeedingAttention: () => {
         return savingsGoals.some(
-          (goal: { urgency: string }) =>
+          (goal) =>
             goal.urgency === "urgent" || goal.urgency === "overdue" || goal.urgency === "behind"
         );
       },

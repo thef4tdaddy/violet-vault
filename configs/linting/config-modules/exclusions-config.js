@@ -313,4 +313,14 @@ export default [
       'react-hooks/incompatible-library': 'off', // TanStack Virtual API limitation
     },
   },
+  {
+    // Function overload declarations - legitimate TypeScript pattern
+    // These files use function overloads for proper TypeScript type checking
+    files: [
+      'src/utils/budgeting/envelopeFormUtils.ts', // Helper function overloads for type safety
+    ],
+    rules: {
+      'no-redeclare': 'off', // Function overloads require multiple declarations
+    },
+  },
 ];

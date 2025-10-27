@@ -6,9 +6,34 @@ import { budgetDb } from "../../../db/budgetDb.ts";
 import logger from "../../../utils/common/logger.ts";
 
 /**
+ * Bill query options interface
+ */
+interface BillQueryOptions {
+  status?: string;
+  daysAhead?: number;
+  category?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+/**
+ * Bill interface
+ */
+interface Bill {
+  id: string;
+  dueDate: string;
+  isPaid: boolean;
+  category?: string;
+  lastPaid?: string;
+  amount?: number;
+  estimatedAmount?: number;
+  [key: string]: unknown;
+}
+
+/**
  * Core bill data fetching query function
  */
-export const useBillQueryFunction = (options = {}) => {
+export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
   const {
     status = "all",
     daysAhead = 30,
@@ -20,7 +45,7 @@ export const useBillQueryFunction = (options = {}) => {
   return useCallback(async () => {
     // Fetch bills from Dexie (reduced logging)
 
-    let bills = [];
+    let bills: Bill[] = [];
 
     try {
       // Always fetch from Dexie (single source of truth for local data)
@@ -74,8 +99,8 @@ export const useBillQueryFunction = (options = {}) => {
 
     // Apply sorting
     filteredBills.sort((a, b) => {
-      let aVal = a[sortBy];
-      let bVal = b[sortBy];
+      let aVal: string | number | Date = a[sortBy as keyof Bill] as string | number;
+      let bVal: string | number | Date = b[sortBy as keyof Bill] as string | number;
 
       // Handle date fields
       if (sortBy === "dueDate" || sortBy === "lastPaid") {
@@ -120,7 +145,7 @@ export const useBillQueryFunction = (options = {}) => {
 /**
  * Main bills query hook
  */
-export const useBillsQuery = (options = {}) => {
+export const useBillsQuery = (options: BillQueryOptions = {}) => {
   const {
     status = "all",
     daysAhead = 30,
@@ -153,7 +178,7 @@ export const useBillsQuery = (options = {}) => {
 /**
  * Upcoming bills query (separate for dashboard widgets)
  */
-export const useUpcomingBillsQuery = (daysAhead = 30, billsData = []) => {
+export const useUpcomingBillsQuery = (daysAhead = 30, billsData: Bill[] = []) => {
   return useQuery({
     queryKey: queryKeys.upcomingBills(daysAhead),
     queryFn: async () => {

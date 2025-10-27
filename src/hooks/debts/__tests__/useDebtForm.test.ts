@@ -3,8 +3,21 @@
  */
 
 import { renderHook, act } from "@testing-library/react";
+import { vi } from "vitest";
 import { useDebtForm } from "../useDebtForm";
-import { DEBT_TYPES, PAYMENT_FREQUENCIES } from "../../../constants/debts";
+import { DEBT_TYPES, PAYMENT_FREQUENCIES } from "@/constants/debts";
+
+interface DebtFormErrors {
+  name?: string;
+  creditor?: string;
+  currentBalance?: string;
+  originalBalance?: string;
+  interestRate?: string;
+  minimumPayment?: string;
+  existingBillId?: string;
+  submit?: string;
+  [key: string]: string | undefined;
+}
 
 describe("useDebtForm", () => {
   const mockDebt = {
@@ -77,10 +90,11 @@ describe("useDebtForm", () => {
         expect(isValid).toBe(false);
       });
 
-      expect(result.current.errors.name).toBe("Debt name is required");
-      expect(result.current.errors.creditor).toBe("Creditor name is required");
-      expect(result.current.errors.currentBalance).toBe("Valid current balance is required");
-      expect(result.current.errors.minimumPayment).toBe("Valid minimum payment is required");
+      const errors = result.current.errors as DebtFormErrors;
+      expect(errors.name).toBe("Debt name is required");
+      expect(errors.creditor).toBe("Creditor name is required");
+      expect(errors.currentBalance).toBe("Valid current balance is required");
+      expect(errors.minimumPayment).toBe("Valid minimum payment is required");
     });
 
     test("should validate numeric fields", () => {
@@ -102,10 +116,11 @@ describe("useDebtForm", () => {
         expect(isValid).toBe(false);
       });
 
-      expect(result.current.errors.currentBalance).toBe("Valid current balance is required");
-      expect(result.current.errors.originalBalance).toBe("Original balance must be positive");
-      expect(result.current.errors.interestRate).toBe("Interest rate must be between 0 and 100");
-      expect(result.current.errors.minimumPayment).toBe("Valid minimum payment is required");
+      const errors = result.current.errors as DebtFormErrors;
+      expect(errors.currentBalance).toBe("Valid current balance is required");
+      expect(errors.originalBalance).toBe("Original balance must be positive");
+      expect(errors.interestRate).toBe("Interest rate must be between 0 and 100");
+      expect(errors.minimumPayment).toBe("Valid minimum payment is required");
     });
 
     test("should pass validation with valid data", () => {
@@ -150,7 +165,8 @@ describe("useDebtForm", () => {
         expect(isValid).toBe(false);
       });
 
-      expect(result.current.errors.existingBillId).toBe("Please select a bill to connect");
+      const errors = result.current.errors as DebtFormErrors;
+      expect(errors.existingBillId).toBe("Please select a bill to connect");
     });
   });
 
@@ -163,7 +179,8 @@ describe("useDebtForm", () => {
         result.current.validateForm();
       });
 
-      expect(result.current.errors.name).toBeTruthy();
+      const errorsBeforeUpdate = result.current.errors as DebtFormErrors;
+      expect(errorsBeforeUpdate.name).toBeTruthy();
 
       // Update the field that had an error
       act(() => {
@@ -171,13 +188,14 @@ describe("useDebtForm", () => {
       });
 
       expect(result.current.formData.name).toBe("Valid Name");
-      expect(result.current.errors.name).toBeUndefined();
+      const errorsAfterUpdate = result.current.errors as DebtFormErrors;
+      expect(errorsAfterUpdate.name).toBeUndefined();
     });
   });
 
   describe("Form submission", () => {
     test("should handle successful submission for new debt", async () => {
-      const mockOnSubmit = vi.fn().mockResolvedValue();
+      const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
       const { result } = renderHook(() => useDebtForm(null, true));
 
       act(() => {
@@ -223,7 +241,7 @@ describe("useDebtForm", () => {
     });
 
     test("should handle successful submission for debt edit", async () => {
-      const mockOnSubmit = vi.fn().mockResolvedValue();
+      const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
       const { result } = renderHook(() => useDebtForm(mockDebt, true));
 
       let submissionResult;
@@ -262,7 +280,8 @@ describe("useDebtForm", () => {
       });
 
       expect(submissionResult).toBe(false);
-      expect(result.current.errors.submit).toBe("Failed to create debt. Please try again.");
+      const errors = result.current.errors as DebtFormErrors;
+      expect(errors.submit).toBe("Failed to create debt. Please try again.");
     });
 
     test("should not submit if validation fails", async () => {
@@ -309,7 +328,7 @@ describe("useDebtForm", () => {
 
   describe("Loading states", () => {
     test("should handle submitting state", async () => {
-      const mockOnSubmit = jest
+      const mockOnSubmit = vi
         .fn()
         .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
       const { result } = renderHook(() => useDebtForm(null, true));

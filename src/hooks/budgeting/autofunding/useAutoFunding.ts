@@ -29,7 +29,7 @@ export const useAutoFunding = () => {
       unassignedCash: state.unassignedCash,
       allTransactions: state.allTransactions,
     }))
-  );
+  ) as { envelopes: any; unassignedCash: any; allTransactions: any };
 
   // Initialize individual hooks
   const dataHook = useAutoFundingData();
@@ -40,14 +40,14 @@ export const useAutoFunding = () => {
   // Initialize the complete auto-funding system
   useEffect(() => {
     if (dataHook.isInitialized) {
-      initializeAutoFundingSystem(dataHook, rulesHook);
+      initializeAutoFundingSystem(dataHook as any, rulesHook as any);
     }
   }, [dataHook.isInitialized, dataHook, rulesHook]);
 
   // Auto-save functionality
   useEffect(() => {
     if (dataHook.isInitialized && dataHook.hasUnsavedChanges) {
-      const currentData = getCurrentDataForSave(rulesHook, historyHook);
+      const currentData = getCurrentDataForSave(rulesHook as any, historyHook as any);
       const cleanup = dataHook.enableAutoSave(currentData, 30000);
       return cleanup;
     }
@@ -62,22 +62,22 @@ export const useAutoFunding = () => {
   // Enhanced rule execution with history tracking
   const executeRules = useCallback(
     (shouldAutoAllocate?: boolean) => {
-      const executeFunction = createExecuteRules(rulesHook, executionHook, historyHook, dataHook);
-      return executeFunction(shouldAutoAllocate);
+      const executeFunction = createExecuteRules(rulesHook as any, executionHook as any, historyHook as any, dataHook as any);
+      return executeFunction(shouldAutoAllocate as any);
     },
     [rulesHook, executionHook, historyHook, dataHook]
   );
 
   // Handle transaction-based auto-funding triggers
   const handleTransactionAdded = useCallback(
-    async (transaction) => {
+    async (transaction: any) => {
       if (!dataHook.isInitialized || executionHook.isExecuting) {
         return;
       }
 
       try {
         if (isLikelyIncome(transaction)) {
-          await handleIncomeDetection(transaction, rulesHook, executeRules);
+          await handleIncomeDetection(transaction, rulesHook as any, executeRules);
         }
       } catch (error) {
         logger.error("Error handling transaction-based auto-funding", error);
@@ -90,7 +90,7 @@ export const useAutoFunding = () => {
   useEffect(() => {
     if (!dataHook.isInitialized) return;
 
-    const checkRules = () => checkScheduledRules(rulesHook, budget, executeRules);
+    const checkRules = () => checkScheduledRules(rulesHook as any, budget, executeRules);
 
     // Check every 5 minutes
     const interval = setInterval(checkRules, 5 * 60 * 1000);
@@ -125,20 +125,20 @@ export const useAutoFunding = () => {
 
   // Export all data with current state
   const exportData = useCallback(() => {
-    return exportCurrentData(rulesHook, historyHook, dataHook);
+    return exportCurrentData(rulesHook as any, historyHook as any, dataHook as any);
   }, [rulesHook, historyHook, dataHook]);
 
   // Import data and update all hooks
   const importData = useCallback(
-    (importData) => {
-      importAndUpdateData(importData, dataHook, rulesHook);
+    (importData: any) => {
+      importAndUpdateData(importData, dataHook as any, rulesHook as any);
     },
     [dataHook, rulesHook]
   );
 
   // Get comprehensive statistics
   const getStatsCallback = useCallback(() => {
-    return getStatistics(rulesHook, historyHook, budget, dataHook, executionHook);
+    return getStatistics(rulesHook as any, historyHook as any, budget, dataHook as any, executionHook as any);
   }, [rulesHook, historyHook, budget, dataHook, executionHook]);
 
   return {
