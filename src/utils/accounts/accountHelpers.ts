@@ -127,13 +127,13 @@ export const formatCurrency = (amount, showDecimals = true) => {
  * @param {Object} options - Formatting options
  * @returns {string} Formatted date string
  */
-export const formatDate = (dateString, options = {}) => {
+export const formatDate = (dateString, options: Intl.DateTimeFormatOptions = {}) => {
   if (!dateString) return "";
 
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return "Invalid Date";
 
-  const defaultOptions = {
+  const defaultOptions: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -186,8 +186,6 @@ export const isValidAccountColor = (color) => {
  * @returns {string} Icon component name
  */
 export const getAccountIconName = (type) => {
-  const _typeInfo = getAccountTypeInfo(type);
-
   // Map account types to Lucide icon names
   const iconMap = {
     FSA: "Heart",
@@ -234,13 +232,25 @@ export const sortAccounts = (accounts, sortBy = "name") => {
       if (!a.expirationDate && !b.expirationDate) return 0;
       if (!a.expirationDate) return 1;
       if (!b.expirationDate) return -1;
-      return new Date(a.expirationDate) - new Date(b.expirationDate);
+      return new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime();
     },
-    lastUpdated: (a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated),
+    lastUpdated: (a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
   };
 
   return [...accounts].sort(sortFunctions[sortBy] || sortFunctions.name);
 };
+
+/**
+ * Filter options for accounts
+ */
+export interface FilterAccountsOptions {
+  activeOnly?: boolean;
+  type?: string;
+  minBalance?: number;
+  expiringSoon?: boolean;
+  expirationDays?: number;
+  search?: string;
+}
 
 /**
  * Filters accounts by various criteria
@@ -248,7 +258,7 @@ export const sortAccounts = (accounts, sortBy = "name") => {
  * @param {Object} filters - Filter criteria
  * @returns {Array} Filtered accounts
  */
-export const filterAccounts = (accounts, filters = {}) => {
+export const filterAccounts = (accounts, filters: FilterAccountsOptions = {}) => {
   if (!Array.isArray(accounts)) return [];
 
   let filteredAccounts = [...accounts];
@@ -303,7 +313,7 @@ const calculateDaysUntilExpiration = (expirationDate) => {
   today.setHours(0, 0, 0, 0);
   expiry.setHours(0, 0, 0, 0);
 
-  const diffTime = expiry - today;
+  const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return diffDays;

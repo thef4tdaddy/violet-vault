@@ -3,12 +3,58 @@
  * Usage: Copy and paste this into browser developer console
  */
 import logger from "@/utils/common/logger";
+import type { VioletVaultDB } from "@/db/budgetDb";
 
-export const runSyncDiagnostic = async () => {
+interface DiagnosticResults {
+  timestamp: string;
+  browser: string;
+  url: string;
+  errors: string[];
+  warnings: string[];
+  info: string[];
+  indexedDB?: {
+    version: number;
+    stores: string[];
+  };
+  budgetMetadata?: {
+    exists: boolean;
+    unassignedCash: number | string;
+    actualBalance: number | string;
+    lastModified: number | string;
+  };
+  dataCounts?: Record<string, number | string>;
+  cloudSync?: {
+    isRunning: boolean;
+    config: boolean;
+    lastSyncTime: any;
+  };
+  firebaseAuth?: {
+    isSignedIn: boolean;
+    userId: string | null;
+    email: string | null;
+    isAnonymous: boolean | null;
+  };
+  network?: {
+    online: boolean;
+    connection: any;
+  };
+}
+
+// Extend Window interface for diagnostic tools
+declare global {
+  interface Window {
+    budgetDb: VioletVaultDB;
+    cloudSyncService: any;
+    firebase: any;
+    runSyncDiagnostic: typeof runSyncDiagnostic;
+  }
+}
+
+export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   logger.info("🔍 VioletVault Sync Diagnostic Tool");
   logger.info("=".repeat(50));
 
-  const results = {
+  const results: DiagnosticResults = {
     timestamp: new Date().toISOString(),
     browser: navigator.userAgent,
     url: window.location.href,
@@ -31,10 +77,10 @@ export const runSyncDiagnostic = async () => {
       logger.info("✅ IndexedDB stores:", storeNames);
     };
     dbRequest.onerror = (error) => {
-      results.errors.push("IndexedDB connection failed: " + error);
+      results.errors.push("IndexedDB connection failed: " + String(error));
       logger.error("❌ IndexedDB failed:", error);
     };
-  } catch (error) {
+  } catch (error: any) {
     results.errors.push("IndexedDB error: " + error.message);
     logger.error("❌ IndexedDB error:", error);
   }
@@ -61,7 +107,7 @@ export const runSyncDiagnostic = async () => {
       results.errors.push("budgetDb not available on window");
       logger.error("❌ budgetDb not available");
     }
-  } catch (error) {
+  } catch (error: any) {
     results.errors.push("Budget metadata check failed: " + error.message);
     logger.error("❌ Budget metadata error:", error);
   }
@@ -70,7 +116,7 @@ export const runSyncDiagnostic = async () => {
   logger.info("📊 Checking Data Counts...");
   try {
     if (window.budgetDb) {
-      const counts = {};
+      const counts: Record<string, number | string> = {};
       const tables = [
         "envelopes",
         "transactions",
@@ -83,7 +129,7 @@ export const runSyncDiagnostic = async () => {
       for (const table of tables) {
         try {
           counts[table] = await window.budgetDb[table].count();
-        } catch (err) {
+        } catch (err: any) {
           counts[table] = "error: " + err.message;
         }
       }
@@ -102,7 +148,7 @@ export const runSyncDiagnostic = async () => {
         logger.warn("⚠️ All data tables are empty");
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     results.errors.push("Data count check failed: " + error.message);
     logger.error("❌ Data count error:", error);
   }
@@ -127,7 +173,7 @@ export const runSyncDiagnostic = async () => {
       results.errors.push("cloudSyncService not available");
       logger.error("❌ cloudSyncService not available on window");
     }
-  } catch (error) {
+  } catch (error: any) {
     results.errors.push("Cloud sync check failed: " + error.message);
     logger.error("❌ Cloud sync error:", error);
   }
@@ -158,19 +204,23 @@ export const runSyncDiagnostic = async () => {
       results.errors.push("Firebase not available");
       logger.error("❌ Firebase not available on window");
     }
-  } catch (error) {
+  } catch (error: any) {
     results.errors.push("Firebase auth check failed: " + error.message);
     logger.error("❌ Firebase auth error:", error);
   }
 
   // Check 6: Network Status
   logger.info("🌐 Checking Network...");
+  
+  // Extend navigator type for connection property
+  const nav = navigator as Navigator & { connection?: any };
+  
   results.network = {
     online: navigator.onLine,
-    connection: navigator.connection
+    connection: nav.connection
       ? {
-          effectiveType: navigator.connection.effectiveType,
-          downlink: navigator.connection.downlink,
+          effectiveType: nav.connection.effectiveType,
+          downlink: nav.connection.downlink,
         }
       : "not available",
   };
