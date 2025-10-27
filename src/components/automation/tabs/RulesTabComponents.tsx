@@ -185,7 +185,7 @@ export const CreateRuleButton = ({ onCreateRule }) => {
     <div className="text-center py-4">
       <Button
         onClick={onCreateRule}
-        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium border-2 border-black"
       >
         {React.createElement(getIcon("Plus"), { className: "h-5 w-5" })}
         Create New Rule
@@ -205,7 +205,7 @@ export const ExecuteAllButton = ({ onExecuteRules, isExecuting, hasActiveRules }
       <Button
         onClick={onExecuteRules}
         disabled={isExecuting}
-        className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium border-2 border-black"
       >
         {React.createElement(getIcon("Play"), { className: "h-4 w-4" })}
         {isExecuting ? "Executing..." : "Execute All Rules"}

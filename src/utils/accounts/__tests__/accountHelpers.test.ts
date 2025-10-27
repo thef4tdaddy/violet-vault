@@ -294,18 +294,21 @@ describe("Account Helpers", () => {
         currentBalance: 100,
         type: "FSA",
         lastUpdated: "2024-01-01",
+        isActive: true
       },
       {
         name: "A Account",
         currentBalance: 500,
         type: "HSA",
         lastUpdated: "2024-01-02",
+        isActive: true
       },
       {
         name: "M Account",
         currentBalance: 300,
         type: "FSA",
         lastUpdated: "2024-01-03",
+        isActive: true
       },
     ];
 
@@ -344,6 +347,7 @@ describe("Account Helpers", () => {
         type: "FSA",
         isActive: true,
         currentBalance: 500,
+        lastUpdated: "2024-01-01"
       },
       {
         id: 2,
@@ -351,6 +355,7 @@ describe("Account Helpers", () => {
         type: "HSA",
         isActive: false,
         currentBalance: 1000,
+        lastUpdated: "2024-01-02"
       },
       {
         id: 3,
@@ -358,6 +363,7 @@ describe("Account Helpers", () => {
         type: "Gift Cards",
         isActive: true,
         currentBalance: 50,
+        lastUpdated: "2024-01-03"
       },
       {
         id: 4,
@@ -366,6 +372,7 @@ describe("Account Helpers", () => {
         isActive: true,
         currentBalance: 200,
         expirationDate: "2024-01-15",
+        lastUpdated: "2024-01-04"
       },
     ];
 

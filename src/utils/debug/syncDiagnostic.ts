@@ -5,7 +5,7 @@
 import logger from "@/utils/common/logger";
 import type { VioletVaultDB } from "@/db/budgetDb";
 
-interface CloudSyncServiceType {
+interface _CloudSyncServiceType {
   isRunning: boolean;
   config?: unknown;
   lastSyncTime: string | null;

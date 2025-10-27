@@ -52,13 +52,13 @@ vi.mock("../useAuthQueries", () => ({
 }));
 
 vi.mock("../authOperations", () => ({
-  createLoginOperation: vi.fn((mutation) => vi.fn()),
-  createJoinBudgetOperation: vi.fn((mutation) => vi.fn()),
-  createLogoutOperation: vi.fn((mutation) => vi.fn()),
-  createChangePasswordOperation: vi.fn((mutation, context) => vi.fn()),
-  createUpdateProfileOperation: vi.fn((mutation) => vi.fn()),
-  createLockSessionOperation: vi.fn((context) => vi.fn()),
-  createUpdateActivityOperation: vi.fn((context) => vi.fn()),
+  createLoginOperation: vi.fn((_mutation) => vi.fn()),
+  createJoinBudgetOperation: vi.fn((_mutation) => vi.fn()),
+  createLogoutOperation: vi.fn((_mutation) => vi.fn()),
+  createChangePasswordOperation: vi.fn((_mutation, _context) => vi.fn()),
+  createUpdateProfileOperation: vi.fn((_mutation) => vi.fn()),
+  createLockSessionOperation: vi.fn((_context) => vi.fn()),
+  createUpdateActivityOperation: vi.fn((_context) => vi.fn()),
 }));
 
 describe("useAuthManager", () => {
@@ -91,16 +91,16 @@ describe("useAuthManager", () => {
 
     // Legacy interface properties
     expect(result.current.isUnlocked).toBeDefined();
-    expect(result.current.currentUser).toBeDefined();
+    expect(result.current._legacy.currentUser).toBeDefined();
     expect(result.current.budgetId).toBeDefined();
     expect(result.current.encryptionKey).toBeDefined();
     expect(result.current.salt).toBeDefined();
     expect(result.current.lastActivity).toBeDefined();
-    expect(result.current.joinBudgetWithShareCode).toBeDefined();
-    expect(result.current.handleSetup).toBeDefined();
-    expect(result.current.handleLogout).toBeDefined();
-    expect(result.current.handleChangePassword).toBeDefined();
-    expect(result.current.handleUpdateProfile).toBeDefined();
+    expect(result.current._legacy.joinBudgetWithShareCode).toBeDefined();
+    expect(result.current._legacy.handleSetup).toBeDefined();
+    expect(result.current._legacy.handleLogout).toBeDefined();
+    expect(result.current._legacy.handleChangePassword).toBeDefined();
+    expect(result.current._legacy.handleUpdateProfile).toBeDefined();
   });
 
   it("should propagate context state to manager", () => {
@@ -119,8 +119,8 @@ describe("useAuthManager", () => {
     expect(typeof result.current.logout).toBe("function");
 
     // Legacy interface (backward compatibility)
-    expect(typeof result.current.handleSetup).toBe("function");
-    expect(typeof result.current.handleLogout).toBe("function");
+    expect(typeof result.current._legacy.handleSetup).toBe("function");
+    expect(typeof result.current._legacy.handleLogout).toBe("function");
   });
 
   describe("Error Handling", () => {
@@ -152,20 +152,20 @@ describe("useAuthManager", () => {
       const { result } = renderHook(() => useAuthManager());
 
       // currentUser maps to user
-      expect(result.current.currentUser === result.current.user).toBeTruthy();
+      expect(result.current._legacy.currentUser === result.current.user).toBeTruthy();
 
       // Legacy methods exist
-      expect(result.current.handleSetup).toBeDefined();
-      expect(result.current.handleLogout).toBeDefined();
-      expect(result.current.handleChangePassword).toBeDefined();
-      expect(result.current.joinBudgetWithShareCode).toBeDefined();
+      expect(result.current._legacy.handleSetup).toBeDefined();
+      expect(result.current._legacy.handleLogout).toBeDefined();
+      expect(result.current._legacy.handleChangePassword).toBeDefined();
+      expect(result.current._legacy.joinBudgetWithShareCode).toBeDefined();
     });
 
     it("should provide setters for legacy interface", () => {
       const { result } = renderHook(() => useAuthManager());
 
       expect(result.current.updateUser).toBeDefined();
-      expect(result.current.setLastActivity).toBeDefined();
+      expect(result.current._legacy.setLastActivity).toBeDefined();
     });
   });
 });
