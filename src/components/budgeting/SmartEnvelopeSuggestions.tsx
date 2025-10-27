@@ -167,6 +167,21 @@ const SmartEnvelopeSuggestions = ({
 
   // Auto-collapse when no suggestions available
   const effectiveIsCollapsed = hasSuggestions ? isCollapsed : true;
+
+  // When collapsed and no suggestions, just show a button
+  if (effectiveIsCollapsed && !hasSuggestions) {
+    return (
+      <Button
+        onClick={toggleCollapse}
+        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+      >
+        <IconBadge isCollapsed={true} />
+        <span className="text-sm font-medium text-gray-900">Smart Suggestions</span>
+      </Button>
+    );
+  }
+
+  // When has suggestions, show full container
   const containerPadding = effectiveIsCollapsed ? "p-3" : "p-6";
 
   return (

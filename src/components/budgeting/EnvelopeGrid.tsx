@@ -11,13 +11,8 @@ import {
   filterEnvelopes,
   calculateEnvelopeTotals,
 } from "@/utils/budgeting";
-import { EnvelopeGridHeader } from "./envelope/EnvelopeGridHeader";
-import EnvelopeSummary from "./envelope/EnvelopeSummary";
-import EnvelopeItem from "./envelope/EnvelopeItem";
-import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
-import EmptyStateHints from "../onboarding/EmptyStateHints";
+import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
-import PullToRefreshIndicator from "../mobile/PullToRefreshIndicator";
 import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -28,14 +23,24 @@ const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
 // Empty state component
-const EmptyStateView = ({ filterOptions, setShowCreateModal }: {
+const EmptyStateView = ({
+  filterOptions,
+  setShowCreateModal,
+}: {
   filterOptions: { envelopeType: string; showEmpty: boolean };
   setShowCreateModal: (show: boolean) => void;
 }) => {
   const isAllFilters = filterOptions.envelopeType === "all" && filterOptions.showEmpty;
 
   if (isAllFilters) {
-    return <EmptyStateHints type="envelopes" onAction={() => setShowCreateModal(true)} customMessage={undefined} customActions={undefined} />;
+    return (
+      <EmptyStateHints
+        type="envelopes"
+        onAction={() => setShowCreateModal(true)}
+        customMessage={undefined}
+        customActions={undefined}
+      />
+    );
   }
 
   return (
@@ -92,7 +97,12 @@ const EnvelopeModals = ({
         onCreateEnvelope={handleCreateEnvelope}
         onCreateBill={() => {}}
         existingEnvelopes={envelopes}
-        currentUser={(budget.currentUser as { userName: string; userColor: string } | undefined) || { userName: "User", userColor: "#000000" }}
+        currentUser={
+          (budget.currentUser as { userName: string; userColor: string } | undefined) || {
+            userName: "User",
+            userColor: "#000000",
+          }
+        }
       />
     )}
 
@@ -104,7 +114,12 @@ const EnvelopeModals = ({
         onUpdateEnvelope={handleUpdateEnvelope}
         onDeleteEnvelope={deleteEnvelope}
         existingEnvelopes={envelopes}
-        currentUser={(budget.currentUser as { userName: string; userColor: string } | undefined) || { userName: "User", userColor: "#000000" }}
+        currentUser={
+          (budget.currentUser as { userName: string; userColor: string } | undefined) || {
+            userName: "User",
+            userColor: "#000000",
+          }
+        }
       />
     )}
 
@@ -127,151 +142,6 @@ const EnvelopeModals = ({
       />
     )}
   </Suspense>
-);
-
-// Main grid view component
-const EnvelopeGridView = ({
-  containerRef,
-  touchHandlers,
-  pullStyles,
-  className,
-  isPulling,
-  isRefreshing,
-  pullProgress,
-  isReady,
-  pullRotation,
-  totals,
-  unassignedCash,
-  filterOptions,
-  setFilterOptions,
-  setShowCreateModal,
-  viewMode,
-  setViewMode,
-  handleViewHistory,
-  sortedEnvelopes,
-  handleEnvelopeSelect,
-  handleEnvelopeEdit,
-  handleQuickFund,
-  selectedEnvelopeId,
-  bills,
-  showCreateModal,
-  handleCreateEnvelope,
-  envelopes,
-  budget,
-  editingEnvelope,
-  setEditingEnvelope,
-  handleUpdateEnvelope,
-  deleteEnvelope,
-  updateBill,
-  historyEnvelope,
-  setHistoryEnvelope,
-  quickFundModal,
-  closeQuickFundModal,
-  handleQuickFundConfirm,
-}: {
-  containerRef: React.RefObject<HTMLDivElement>;
-  touchHandlers: Record<string, unknown>;
-  pullStyles: React.CSSProperties;
-  className: string;
-  isPulling: boolean;
-  isRefreshing: boolean;
-  pullProgress: number;
-  isReady: boolean;
-  pullRotation: number;
-  totals: unknown;
-  unassignedCash: number;
-  filterOptions: unknown;
-  setFilterOptions: (opts: unknown) => void;
-  setShowCreateModal: (show: boolean) => void;
-  viewMode: string;
-  setViewMode: (mode: string) => void;
-  handleViewHistory: (env: unknown) => void;
-  sortedEnvelopes: unknown[];
-  handleEnvelopeSelect: (id: string) => void;
-  handleEnvelopeEdit: (env: unknown) => void;
-  handleQuickFund: (id: string, amount: number) => void;
-  selectedEnvelopeId: string | null;
-  bills: unknown[];
-  showCreateModal: boolean;
-  handleCreateEnvelope: (data: unknown) => Promise<void>;
-  envelopes: unknown[];
-  budget: { currentUser: unknown; updateBill: (bill: unknown) => void };
-  editingEnvelope: unknown;
-  setEditingEnvelope: (env: unknown) => void;
-  handleUpdateEnvelope: (data: unknown) => Promise<void>;
-  deleteEnvelope: (id: string) => Promise<void>;
-  updateBill: (data: { id: string; updates: unknown }) => Promise<void>;
-  historyEnvelope: unknown;
-  setHistoryEnvelope: (env: unknown) => void;
-  quickFundModal: { isOpen: boolean; envelope: unknown; suggestedAmount: number };
-  closeQuickFundModal: () => void;
-  handleQuickFundConfirm: (id: string, amount: number) => Promise<void>;
-}) => (
-  <div
-    ref={containerRef}
-    {...touchHandlers}
-    className={`space-y-6 ${className} relative`}
-    style={pullStyles}
-  >
-    <PullToRefreshIndicator
-      isVisible={isPulling}
-      isRefreshing={isRefreshing}
-      pullProgress={pullProgress}
-      isReady={isReady}
-      pullRotation={pullRotation}
-    />
-
-    <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
-
-    <EnvelopeGridHeader
-      filterOptions={filterOptions}
-      setFilterOptions={setFilterOptions}
-      setShowCreateModal={setShowCreateModal}
-      viewMode={viewMode}
-      setViewMode={setViewMode}
-    />
-
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} />
-      {sortedEnvelopes.map((envelope: { id: string; [key: string]: unknown }) => (
-        <EnvelopeItem
-          key={envelope.id}
-          envelope={envelope as never}
-          onSelect={handleEnvelopeSelect}
-          onEdit={handleEnvelopeEdit}
-          onViewHistory={handleViewHistory}
-          onQuickFund={(envelopeId: string) => handleQuickFund(envelopeId, 0)}
-          isSelected={selectedEnvelopeId === envelope.id}
-          bills={bills as never}
-          unassignedCash={unassignedCash}
-        />
-      ))}
-    </div>
-
-    {sortedEnvelopes.length === 0 && (
-      <EmptyStateView filterOptions={filterOptions as { envelopeType: string; showEmpty: boolean }} setShowCreateModal={setShowCreateModal} />
-    )}
-
-    <EnvelopeModals
-      showCreateModal={showCreateModal}
-      setShowCreateModal={setShowCreateModal}
-      handleCreateEnvelope={handleCreateEnvelope}
-      envelopes={envelopes}
-      budget={budget}
-      unassignedCash={unassignedCash}
-      editingEnvelope={editingEnvelope}
-      setEditingEnvelope={setEditingEnvelope}
-      handleUpdateEnvelope={handleUpdateEnvelope}
-      deleteEnvelope={deleteEnvelope}
-      updateBill={updateBill}
-      bills={bills}
-      historyEnvelope={historyEnvelope}
-      setHistoryEnvelope={setHistoryEnvelope}
-      quickFundModal={quickFundModal}
-      closeQuickFundModal={closeQuickFundModal}
-      handleQuickFundConfirm={handleQuickFundConfirm}
-    />
-  </div>
 );
 
 // Hook for envelope UI state and handlers
@@ -376,7 +246,8 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
     isLoading: envelopesLoading,
   } = useEnvelopes();
 
-  const { transactions: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { transactions: tanStackTransactions = [], isLoading: transactionsLoading } =
+    useTransactions();
   const { bills: tanStackBills = [], updateBill, isLoading: billsLoading } = useBills();
   const { unassignedCash: tanStackUnassignedCash } = useUnassignedCash();
   // Selective subscriptions - only subscribe to specific properties needed
@@ -527,23 +398,28 @@ const UnifiedEnvelopeManager = ({
       handleQuickFund={uiState.handleQuickFund}
       selectedEnvelopeId={uiState.selectedEnvelopeId}
       bills={bills}
-      showCreateModal={uiState.showCreateModal}
-      handleCreateEnvelope={uiState.handleCreateEnvelope}
-      envelopes={envelopes}
-      budget={budget}
-      editingEnvelope={uiState.editingEnvelope}
-      setEditingEnvelope={uiState.setEditingEnvelope}
-      handleUpdateEnvelope={uiState.handleUpdateEnvelope}
-      deleteEnvelope={(id: string) => Promise.resolve(deleteEnvelope(id))}
-      updateBill={async (data: { id: string; updates: unknown }) => {
-        updateBill(data.updates as never);
-      }}
-      historyEnvelope={uiState.historyEnvelope}
-      setHistoryEnvelope={uiState.setHistoryEnvelope}
-      quickFundModal={uiState.quickFundModal}
-      closeQuickFundModal={uiState.closeQuickFundModal}
-      handleQuickFundConfirm={uiState.handleQuickFundConfirm}
-    />
+    >
+      <EnvelopeModals
+        showCreateModal={uiState.showCreateModal}
+        setShowCreateModal={uiState.setShowCreateModal}
+        handleCreateEnvelope={uiState.handleCreateEnvelope}
+        envelopes={envelopes}
+        budget={budget}
+        unassignedCash={unassignedCash}
+        editingEnvelope={uiState.editingEnvelope}
+        setEditingEnvelope={uiState.setEditingEnvelope}
+        handleUpdateEnvelope={uiState.handleUpdateEnvelope}
+        deleteEnvelope={(id: string) => Promise.resolve(deleteEnvelope(id))}
+        updateBill={async (data: { id: string; updates: unknown }) => {
+          updateBill(data.updates as never);
+        }}
+        historyEnvelope={uiState.historyEnvelope}
+        setHistoryEnvelope={uiState.setHistoryEnvelope}
+        quickFundModal={uiState.quickFundModal}
+        closeQuickFundModal={uiState.closeQuickFundModal}
+        handleQuickFundConfirm={uiState.handleQuickFundConfirm}
+      />
+    </EnvelopeGridView>
   );
 };
 

@@ -25,39 +25,9 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
   setViewMode,
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-      <div className="flex items-center gap-4">
-        <h2 className="font-black text-black text-xl flex items-center">
-          <span className="text-2xl mr-1">E</span>nvelopes
-          <span className="text-2xl ml-3 mr-1">M</span>anagement
-        </h2>
-
-        {/* View Mode Toggle */}
-        <div className="flex bg-gray-200 rounded-lg p-1 border border-gray-300">
-          <Button
-            onClick={() => setViewMode("overview")}
-            className={`px-3 py-1 text-sm rounded-md transition-colors font-medium ${
-              viewMode === "overview"
-                ? "bg-white text-gray-900 shadow-sm border-2 border-gray-400"
-                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-            }`}
-          >
-            Overview
-          </Button>
-          <Button
-            onClick={() => setViewMode("detailed")}
-            className={`px-3 py-1 text-sm rounded-md transition-colors font-medium ${
-              viewMode === "detailed"
-                ? "bg-white text-gray-900 shadow-sm border-2 border-gray-400"
-                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-            }`}
-          >
-            Detailed
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Left side - Filter and Action buttons */}
+      <div className="flex items-center gap-2 flex-wrap">
         {/* Filter Toggle */}
         <Button
           onClick={() =>
@@ -83,6 +53,30 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
         >
           {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
           Add Envelope
+        </Button>
+      </div>
+
+      {/* Right side - View Mode Toggle */}
+      <div className="flex bg-gray-200 rounded-lg p-1 border border-gray-300">
+        <Button
+          onClick={() => setViewMode("overview")}
+          className={`px-3 py-1 text-sm rounded-md transition-colors font-medium ${
+            viewMode === "overview"
+              ? "bg-white text-gray-900 shadow-sm border-2 border-gray-400"
+              : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+          }`}
+        >
+          Overview
+        </Button>
+        <Button
+          onClick={() => setViewMode("detailed")}
+          className={`px-3 py-1 text-sm rounded-md transition-colors font-medium ${
+            viewMode === "detailed"
+              ? "bg-white text-gray-900 shadow-sm border-2 border-gray-400"
+              : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+          }`}
+        >
+          Detailed
         </Button>
       </div>
     </div>
