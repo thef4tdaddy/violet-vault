@@ -41,6 +41,12 @@ export const queryKeys = {
   savingsGoalById: (id) => [...queryKeys.savingsGoals, "detail", id],
   activeSavingsGoals: () => [...queryKeys.savingsGoals, "active"],
 
+  // Receipts
+  receipts: ["receipts"],
+  receiptsList: (filters = {}) => [...queryKeys.receipts, "list", filters],
+  receiptById: (id) => [...queryKeys.receipts, "detail", id],
+  receiptsByTransaction: (transactionId) => [...queryKeys.receipts, "transaction", transactionId],
+
   // Analytics
   analytics: ["analytics"],
   analyticsSpending: (period) => [...queryKeys.analytics, "spending", period],
