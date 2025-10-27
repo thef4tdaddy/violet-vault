@@ -249,7 +249,7 @@ jobs:
           exit 1
 
       - name: Upload bundle analysis
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: bundle-analysis
