@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create or update the recurring milestone issue
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: "📋 Update docs & roadmap for milestone: ${{ github.event.milestone.title || inputs.milestone_title }}"
           content-filepath: .github/data/milestone-closeout-checklist.md
