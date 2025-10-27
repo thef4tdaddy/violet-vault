@@ -80,7 +80,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.1.8",
@@ -96,6 +96,6 @@
     "prettier": "^3.6.2",
     "terser": "^5.43.1",
     "vite": "^7.0.6",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.3"
   }
 }
