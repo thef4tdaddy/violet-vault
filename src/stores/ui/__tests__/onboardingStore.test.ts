@@ -1,6 +1,37 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import useOnboardingStore from "../onboardingStore";
 
+interface OnboardingStoreState {
+  isOnboarded: boolean;
+  tutorialProgress: {
+    accountSetup: boolean;
+    firstBankBalance: boolean;
+    firstPaycheck: boolean;
+    firstDebts: boolean;
+    firstBills: boolean;
+    firstEnvelope: boolean;
+    linkedEnvelopes: boolean;
+    firstAllocation: boolean;
+    firstTransaction: boolean;
+    syncExplained: boolean;
+  };
+  currentTutorialStep: string | null;
+  preferences: {
+    showHints: boolean;
+    skipEmptyStateHelp: boolean;
+    tourCompleted: boolean;
+  };
+  markStepComplete: (step: string) => void;
+  startTutorialStep: (step: string) => void;
+  endTutorialStep: () => void;
+  completeOnboarding: () => void;
+  resetOnboarding: () => void;
+  setPreference: (key: string, value: any) => void;
+  isStepComplete: (step: string) => boolean;
+  shouldShowHint: (step: string) => boolean;
+  getProgress: () => { completed: number; total: number; percentage: number };
+}
+
 describe("useOnboardingStore", () => {
   beforeEach(() => {
     // Reset to initial state before each test
@@ -29,12 +60,12 @@ describe("useOnboardingStore", () => {
 
   describe("initial state", () => {
     it("should initialize with isOnboarded as true", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.isOnboarded).toBe(true);
     });
 
     it("should initialize with all tutorial steps completed", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       const progress = state.tutorialProgress;
 
       expect(progress.accountSetup).toBe(true);
@@ -50,12 +81,12 @@ describe("useOnboardingStore", () => {
     });
 
     it("should initialize currentTutorialStep as null", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.currentTutorialStep).toBeNull();
     });
 
     it("should initialize preferences with correct defaults", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.preferences).toEqual({
         showHints: false,
         skipEmptyStateHelp: true,
@@ -66,7 +97,7 @@ describe("useOnboardingStore", () => {
 
   describe("tutorialProgress", () => {
     it("should have all tutorial steps in tutorialProgress", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       const steps = Object.keys(state.tutorialProgress);
 
       expect(steps).toContain("accountSetup");
@@ -89,7 +120,7 @@ describe("useOnboardingStore", () => {
         },
       }));
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.tutorialProgress.accountSetup).toBe(false);
       expect(state.tutorialProgress.firstBankBalance).toBe(true);
     });
@@ -110,7 +141,7 @@ describe("useOnboardingStore", () => {
         },
       });
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       const progress = state.tutorialProgress;
 
       expect(progress.accountSetup).toBe(false);
@@ -130,7 +161,7 @@ describe("useOnboardingStore", () => {
     it("should allow setting currentTutorialStep", () => {
       useOnboardingStore.setState({ currentTutorialStep: "firstBankBalance" });
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.currentTutorialStep).toBe("firstBankBalance");
     });
 
@@ -138,7 +169,7 @@ describe("useOnboardingStore", () => {
       useOnboardingStore.setState({ currentTutorialStep: "accountSetup" });
       useOnboardingStore.setState({ currentTutorialStep: null });
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.currentTutorialStep).toBeNull();
     });
   });
@@ -152,7 +183,7 @@ describe("useOnboardingStore", () => {
         },
       }));
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.preferences.showHints).toBe(true);
     });
 
@@ -164,7 +195,7 @@ describe("useOnboardingStore", () => {
         },
       }));
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.preferences.skipEmptyStateHelp).toBe(false);
     });
 
@@ -176,7 +207,7 @@ describe("useOnboardingStore", () => {
         },
       }));
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.preferences.tourCompleted).toBe(false);
     });
 
@@ -189,7 +220,7 @@ describe("useOnboardingStore", () => {
         },
       });
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.preferences).toEqual({
         showHints: true,
         skipEmptyStateHelp: false,
@@ -200,104 +231,104 @@ describe("useOnboardingStore", () => {
 
   describe("actions", () => {
     it("should have markStepComplete action", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.markStepComplete).toBe("function");
     });
 
     it("should have startTutorialStep action", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.startTutorialStep).toBe("function");
     });
 
     it("should have endTutorialStep action", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.endTutorialStep).toBe("function");
     });
 
     it("should have completeOnboarding action", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.completeOnboarding).toBe("function");
     });
 
     it("should have resetOnboarding action", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.resetOnboarding).toBe("function");
     });
 
     it("should have setPreference action", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.setPreference).toBe("function");
     });
 
     it("markStepComplete should be callable without error", () => {
       expect(() => {
-        useOnboardingStore.getState().markStepComplete("accountSetup");
+        (useOnboardingStore.getState() as OnboardingStoreState).markStepComplete("accountSetup");
       }).not.toThrow();
     });
 
     it("startTutorialStep should be callable without error", () => {
       expect(() => {
-        useOnboardingStore.getState().startTutorialStep("firstBankBalance");
+        (useOnboardingStore.getState() as OnboardingStoreState).startTutorialStep("firstBankBalance");
       }).not.toThrow();
     });
 
     it("endTutorialStep should be callable without error", () => {
       expect(() => {
-        useOnboardingStore.getState().endTutorialStep();
+        (useOnboardingStore.getState() as OnboardingStoreState).endTutorialStep();
       }).not.toThrow();
     });
 
     it("completeOnboarding should be callable without error", () => {
       expect(() => {
-        useOnboardingStore.getState().completeOnboarding();
+        (useOnboardingStore.getState() as OnboardingStoreState).completeOnboarding();
       }).not.toThrow();
     });
 
     it("resetOnboarding should be callable without error", () => {
       expect(() => {
-        useOnboardingStore.getState().resetOnboarding();
+        (useOnboardingStore.getState() as OnboardingStoreState).resetOnboarding();
       }).not.toThrow();
     });
 
     it("setPreference should be callable without error", () => {
       expect(() => {
-        useOnboardingStore.getState().setPreference("showHints", true);
+        (useOnboardingStore.getState() as OnboardingStoreState).setPreference("showHints", true);
       }).not.toThrow();
     });
   });
 
   describe("helper methods", () => {
     it("should have isStepComplete helper method", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.isStepComplete).toBe("function");
     });
 
     it("isStepComplete should always return true (temp disabled)", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.isStepComplete("accountSetup")).toBe(true);
       expect(state.isStepComplete("firstBankBalance")).toBe(true);
       expect(state.isStepComplete("nonExistentStep")).toBe(true);
     });
 
     it("should have shouldShowHint helper method", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.shouldShowHint).toBe("function");
     });
 
     it("shouldShowHint should always return false (temp disabled)", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.shouldShowHint("accountSetup")).toBe(false);
       expect(state.shouldShowHint("firstBankBalance")).toBe(false);
       expect(state.shouldShowHint("nonExistentStep")).toBe(false);
     });
 
     it("should have getProgress helper method", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(typeof state.getProgress).toBe("function");
     });
 
     it("getProgress should return completion percentage", () => {
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       const progress = state.getProgress();
 
       expect(progress).toEqual({
@@ -313,7 +344,7 @@ describe("useOnboardingStore", () => {
       useOnboardingStore.setState({ isOnboarded: false });
       useOnboardingStore.setState({ currentTutorialStep: "accountSetup" });
 
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.isOnboarded).toBe(false);
       expect(state.currentTutorialStep).toBe("accountSetup");
     });
@@ -322,7 +353,7 @@ describe("useOnboardingStore", () => {
       useOnboardingStore.setState({ isOnboarded: false });
 
       // Get state after setState
-      const state = useOnboardingStore.getState();
+      const state = useOnboardingStore.getState() as OnboardingStoreState;
       expect(state.isOnboarded).toBe(false);
     });
   });

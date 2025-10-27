@@ -7,13 +7,14 @@ import { queryKeys, queryKeyUtils } from "../../queryKeys";
 import { prefetchHelpers } from "../../prefetchHelpers";
 import { optimisticHelpers } from "../../optimisticHelpers";
 import { queryClientUtils } from "../../queryClientConfig";
+import type { Envelope } from "@/types";
 
 // Test configuration
 const TEST_TIMEOUT = 15000; // 15 seconds for real operations
 
 describe("Query Integration Tests", () => {
-  let queryClient;
-  let testData;
+  let queryClient: QueryClient;
+  let testData: any;
 
   beforeEach(async () => {
     // Create a real QueryClient instance
@@ -344,7 +345,7 @@ describe("Query Integration Tests", () => {
       async () => {
         // Get initial envelope data
         const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const foodEnvelope = initialEnvelopes.find((e) => e.name === "Food & Dining");
+        const foodEnvelope = initialEnvelopes.find((e) => e.name === "Food & Dining")!;
 
         // Set initial cache state
         queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
@@ -356,17 +357,17 @@ describe("Query Integration Tests", () => {
           name: "Food & Groceries",
         };
 
-        await optimisticHelpers.updateEnvelope(queryClient, foodEnvelope.id, updates);
+        await optimisticHelpers.updateEnvelope(queryClient, foodEnvelope!.id, updates);
 
         // Check cache was updated
-        const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(foodEnvelope.id));
+        const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(foodEnvelope!.id)) as Envelope;
         expect(cachedEnvelope.balance).toBe(300.0);
         expect(cachedEnvelope.name).toBe("Food & Groceries");
         expect(cachedEnvelope.lastModified).toBeTruthy();
 
         // Check database was updated
         const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const updatedEnvelope = dbEnvelopes.find((e) => e.id === foodEnvelope.id);
+        const updatedEnvelope = dbEnvelopes.find((e) => e.id === foodEnvelope!.id)!;
         expect(updatedEnvelope.balance).toBe(300.0);
         expect(updatedEnvelope.name).toBe("Food & Groceries");
       },
