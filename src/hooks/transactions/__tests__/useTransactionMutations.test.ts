@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useTransactionMutations from "../useTransactionMutations";
+import { useTransactionMutations } from "../useTransactionMutations";
 
 // Mock dependencies
 vi.mock("@tanstack/react-query", () => ({
@@ -38,7 +38,7 @@ describe("useTransactionMutations", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useQueryClient.mockReturnValue(mockQueryClient);
+    (useQueryClient as Mock).mockReturnValue(mockQueryClient);
   });
 
   describe("addTransaction mutation", () => {
@@ -50,7 +50,7 @@ describe("useTransactionMutations", () => {
         error: null,
       };
 
-      useMutation.mockReturnValue(mockMutation);
+      (useMutation as Mock).mockReturnValue(mockMutation);
 
       const { result } = renderHook(() => useTransactionMutations());
 
@@ -74,7 +74,7 @@ describe("useTransactionMutations", () => {
         error: null,
       };
 
-      useMutation.mockImplementation(({ onSuccess }) => {
+      (useMutation as Mock).mockImplementation(({ onSuccess }) => {
         // Store the onSuccess callback to call later
         mockOnSuccess.mockImplementation(onSuccess);
         return mockMutation;
@@ -104,7 +104,7 @@ describe("useTransactionMutations", () => {
         error: null,
       };
 
-      useMutation.mockImplementation(({ onError }) => {
+      (useMutation as Mock).mockImplementation(({ onError }) => {
         mockOnError.mockImplementation(onError);
         return mockMutation;
       });
@@ -128,7 +128,7 @@ describe("useTransactionMutations", () => {
         { mutate: vi.fn(), isPending: false, error: null }, // delete
       ];
 
-      useMutation.mockImplementation(() => mockMutations.shift());
+      (useMutation as Mock).mockImplementation(() => mockMutations.shift());
 
       const { result } = renderHook(() => useTransactionMutations());
 
@@ -144,7 +144,7 @@ describe("useTransactionMutations", () => {
         { mutate: vi.fn(), isPending: false, error: null }, // delete
       ];
 
-      useMutation.mockImplementation(({ onSuccess }) => {
+      (useMutation as Mock).mockImplementation(({ onSuccess }) => {
         if (!updateOnSuccess) updateOnSuccess = onSuccess;
         return mockMutations.shift();
       });
@@ -174,7 +174,7 @@ describe("useTransactionMutations", () => {
         { mutate: vi.fn(), isPending: false, error: null }, // delete
       ];
 
-      useMutation.mockImplementation(() => mockMutations.shift());
+      (useMutation as Mock).mockImplementation(() => mockMutations.shift());
 
       const { result } = renderHook(() => useTransactionMutations());
 
@@ -190,7 +190,7 @@ describe("useTransactionMutations", () => {
         { mutate: vi.fn(), isPending: false, error: null }, // delete
       ];
 
-      useMutation.mockImplementation(({ onSuccess }) => {
+      (useMutation as Mock).mockImplementation(({ onSuccess }) => {
         if (deleteOnSuccess) return mockMutations.shift();
         deleteOnSuccess = onSuccess;
         return mockMutations.shift();
@@ -216,7 +216,7 @@ describe("useTransactionMutations", () => {
         { mutate: vi.fn(), isPending: true, error: null }, // delete
       ];
 
-      useMutation.mockImplementation(() => mockMutations.shift());
+      (useMutation as Mock).mockImplementation(() => mockMutations.shift());
 
       const { result } = renderHook(() => useTransactionMutations());
 
@@ -235,7 +235,7 @@ describe("useTransactionMutations", () => {
         { mutate: vi.fn(), isPending: false, error: mockError }, // delete
       ];
 
-      useMutation.mockImplementation(() => mockMutations.shift());
+      (useMutation as Mock).mockImplementation(() => mockMutations.shift());
 
       const { result } = renderHook(() => useTransactionMutations());
 
