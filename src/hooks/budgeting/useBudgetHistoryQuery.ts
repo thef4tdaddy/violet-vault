@@ -224,7 +224,7 @@ export const useBudgetHistoryOperations = () => {
 
   const exportHistoryMutation = useMutation({
     mutationKey: ["budgetHistory", "export"],
-    mutationFn: async (options: Record<string, unknown> = {}) => {
+    mutationFn: async (_options: Record<string, unknown> = {}) => {
       const commits = await budgetDb.budgetCommits
         .orderBy("timestamp")
         .reverse()
