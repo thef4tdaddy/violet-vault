@@ -16,6 +16,7 @@ import {
   filterRules,
   getRuleStatistics,
   createRuleSummary,
+  type AutoFundingRule,
 } from "../rules.js";
 
 describe("autoFundingRules", () => {
@@ -71,7 +72,7 @@ describe("autoFundingRules", () => {
 
   describe("validateRule", () => {
     it("should validate a complete valid rule", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         name: "Test Rule",
         type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
@@ -88,7 +89,7 @@ describe("autoFundingRules", () => {
     });
 
     it("should require rule name", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
         config: { amount: 100 },
@@ -100,7 +101,7 @@ describe("autoFundingRules", () => {
     });
 
     it("should require valid rule type", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         name: "Test Rule",
         type: "invalid_type",
         trigger: TRIGGER_TYPES.MANUAL,
@@ -112,7 +113,7 @@ describe("autoFundingRules", () => {
     });
 
     it("should validate fixed amount rules", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         name: "Test Rule",
         type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
@@ -125,7 +126,7 @@ describe("autoFundingRules", () => {
     });
 
     it("should validate percentage rules", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         name: "Test Rule",
         type: RULE_TYPES.PERCENTAGE,
         trigger: TRIGGER_TYPES.MANUAL,
@@ -138,7 +139,7 @@ describe("autoFundingRules", () => {
     });
 
     it("should validate conditional rules", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         name: "Test Rule",
         type: RULE_TYPES.CONDITIONAL,
         trigger: TRIGGER_TYPES.MANUAL,
@@ -151,7 +152,7 @@ describe("autoFundingRules", () => {
     });
 
     it("should validate target envelope selection", () => {
-      const rule = {
+      const rule: Partial<AutoFundingRule> = {
         name: "Test Rule",
         type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
@@ -181,8 +182,17 @@ describe("autoFundingRules", () => {
     };
 
     it("should calculate fixed amount correctly", () => {
-      const rule = {
+      const rule: AutoFundingRule = {
+        id: "rule1",
+        name: "Test",
+        description: "",
         type: RULE_TYPES.FIXED_AMOUNT,
+        trigger: TRIGGER_TYPES.MANUAL,
+        priority: 100,
+        enabled: true,
+        createdAt: new Date().toISOString(),
+        lastExecuted: null,
+        executionCount: 0,
         config: { amount: 300 },
       };
 
@@ -191,8 +201,17 @@ describe("autoFundingRules", () => {
     });
 
     it("should limit fixed amount to available unassigned cash", () => {
-      const rule = {
+      const rule: AutoFundingRule = {
+        id: "rule1",
+        name: "Test",
+        description: "",
         type: RULE_TYPES.FIXED_AMOUNT,
+        trigger: TRIGGER_TYPES.MANUAL,
+        priority: 100,
+        enabled: true,
+        createdAt: new Date().toISOString(),
+        lastExecuted: null,
+        executionCount: 0,
         config: { amount: 1500 }, // More than available
       };
 
