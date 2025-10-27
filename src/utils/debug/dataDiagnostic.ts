@@ -3,45 +3,12 @@
  * Usage: Copy and paste this into browser console to check data state
  */
 import logger from "@/utils/common/logger";
-import type { VioletVaultDB } from "@/db/budgetDb";
 
-interface DataDiagnosticResults {
-  timestamp: string;
-  browser: string;
-  url: string;
-  data: {
-    metadata?: {
-      exists: boolean;
-      record: any;
-      unassignedCash: number | string;
-      actualBalance: number | string;
-      lastModified: number | string;
-      created?: boolean;
-    };
-    tableCounts?: Record<string, { count: number; sample: any } | { error: string }>;
-    budgetTable?: {
-      totalRecords: number;
-      records: any[];
-    };
-  };
-  errors: string[];
-}
-
-// Extend Window interface for diagnostic tools
-declare global {
-  interface Window {
-    budgetDb: VioletVaultDB;
-    runDataDiagnostic: typeof runDataDiagnostic;
-    cleanupCorruptedPaychecks: typeof cleanupCorruptedPaychecks;
-    inspectPaycheckRecords: typeof inspectPaycheckRecords;
-  }
-}
-
-export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
+export const runDataDiagnostic = async () => {
   logger.info("🔍 VioletVault Data Diagnostic Tool");
   logger.info("=".repeat(50));
 
-  const results: DataDiagnosticResults = {
+  const results = {
     timestamp: new Date().toISOString(),
     browser: navigator.userAgent,
     url: window.location.href,
@@ -91,7 +58,7 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
         logger.info("✅ Created metadata record:", defaultMetadata);
         results.data.metadata.created = true;
         results.data.metadata.record = defaultMetadata;
-      } catch (error: any) {
+      } catch (error) {
         logger.error("❌ Failed to create metadata:", error);
         results.errors.push(`Failed to create metadata: ${error.message}`);
       }
@@ -99,7 +66,7 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
 
     // Check all other tables (including paycheckHistory)
     const tables = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"];
-    const counts: Record<string, { count: number; sample: any } | { error: string }> = {};
+    const counts = {};
 
     for (const table of tables) {
       try {
@@ -110,7 +77,7 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
           sample: sample[0] || null,
         };
         logger.info(`📊 ${table}: ${count} records`);
-      } catch (err: any) {
+      } catch (err) {
         counts[table] = { error: err.message };
         logger.error(`❌ Error checking ${table}:`, err);
       }
@@ -127,7 +94,7 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
     };
 
     logger.info("📋 Budget table records:", budgetRecords);
-  } catch (error: any) {
+  } catch (error) {
     results.errors.push(`Diagnostic failed: ${error.message}`);
     logger.error("❌ Diagnostic error:", error);
   }

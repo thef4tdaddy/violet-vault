@@ -5,23 +5,10 @@
 import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
 
-interface MerchantPattern {
-  merchant: string;
-  transactions: any[];
-  totalAmount: number;
-  avgAmount: number;
-}
-
-interface AnalysisSettings {
-  minTransactionCount: number;
-  minAmount: number;
-  unusedCategoryThreshold?: number;
-}
-
 /**
  * Analyze uncategorized transactions and suggest categories
  */
-export const analyzeUncategorizedTransactions = (transactions: any[], settings: AnalysisSettings) => {
+export const analyzeUncategorizedTransactions = (transactions, settings) => {
   const suggestions = [];
   const { minTransactionCount, minAmount } = settings;
 
@@ -30,7 +17,7 @@ export const analyzeUncategorizedTransactions = (transactions: any[], settings: 
     (t) => !t.category || t.category === "Uncategorized" || t.category === ""
   );
 
-  const merchantPatterns: Record<string, MerchantPattern> = {};
+  const merchantPatterns = {};
   uncategorizedTransactions.forEach((transaction) => {
     const merchant = extractMerchantName(transaction.description);
 
@@ -55,8 +42,8 @@ export const analyzeUncategorizedTransactions = (transactions: any[], settings: 
 
       // Find suggested category from merchant patterns
       let suggestedCategory = "General";
-      for (const [category, patternRegex] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
-        if (patternRegex.test(pattern.merchant.toLowerCase())) {
+      for (const [category, patterns] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
+        if (patterns.some((p) => pattern.merchant.includes(p.toLowerCase()))) {
           suggestedCategory = category;
           break;
         }
@@ -89,7 +76,7 @@ export const analyzeUncategorizedTransactions = (transactions: any[], settings: 
 /**
  * Analyze unused categories and suggest removal
  */
-export const analyzeUnusedCategories = (transactions: any[], filteredTransactions: any[], settings: AnalysisSettings) => {
+export const analyzeUnusedCategories = (transactions, filteredTransactions, settings) => {
   const suggestions = [];
   const { unusedCategoryThreshold } = settings;
 
