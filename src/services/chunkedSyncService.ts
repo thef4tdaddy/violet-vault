@@ -9,7 +9,10 @@ import {
   writeBatch,
   query,
   where,
+  DocumentSnapshot,
+  QuerySnapshot,
 } from "firebase/firestore";
+import type { IChunkedSyncService, ChunkedSyncStats, CloudSyncConfig } from "../types/firebase";
 import { encryptionUtils } from "../utils/security/encryption";
 import firebaseSyncService from "./firebaseSyncService";
 import logger from "../utils/common/logger";
@@ -21,11 +24,34 @@ import {
 } from "../utils/sync/validation";
 import { createSyncResilience } from "../utils/sync/resilience";
 
+// Type for manifest metadata
+interface ManifestMetadata {
+  totalChunks: number;
+  totalSize: number;
+  [key: string]: unknown;
+}
+
+// Declare Window interface for corruptionModalShown
+declare global {
+  interface Window {
+    corruptionModalShown?: boolean;
+  }
+}
+
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
  */
-function base64FromBytes(bytes) {
-  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+function base64FromBytes(bytes: Uint8Array | ArrayBuffer | number[]): string {
+  let u8: Uint8Array;
+  if (bytes instanceof Uint8Array) {
+    u8 = bytes;
+  } else if (bytes instanceof ArrayBuffer) {
+    u8 = new Uint8Array(bytes);
+  } else if (Array.isArray(bytes)) {
+    u8 = new Uint8Array(bytes);
+  } else {
+    throw new Error(`Unexpected bytes type: ${typeof bytes}`);
+  }
   const CHUNK_SIZE = 0x8000; // 32k chars per chunk keeps call stacks safe
   let binary = "";
   for (let i = 0; i < u8.length; i += CHUNK_SIZE) {
@@ -35,7 +61,7 @@ function base64FromBytes(bytes) {
   return btoa(binary);
 }
 
-function bytesFromBase64(str) {
+function bytesFromBase64(str: string): Uint8Array {
   if (!str || typeof str !== "string") {
     throw new Error(`Invalid base64 string: ${typeof str}`);
   }
@@ -56,19 +82,16 @@ function bytesFromBase64(str) {
  * Chunked Firebase Sync Service
  * Handles synchronization of large datasets by breaking them into smaller chunks
  */
-class ChunkedSyncService {
+class ChunkedSyncService implements IChunkedSyncService {
   budgetId: string | null;
-  encryptionKey: CryptoKey | null;
+  encryptionKey: CryptoKey | string | null;
   maxChunkSize: number;
   maxArrayChunkSize: number;
   lastCorruptedDataClear: number | null;
   corruptedDataClearCooldown: number;
-  syncMutex: { acquire: (name: string, timeout?: number) => Promise<void>; release: () => void };
+  syncMutex: SyncMutex;
   decryptionFailures: Map<string, { count: number; lastFailure: number }>;
-  resilience: {
-    verifyDataIntegrity: (data: unknown) => boolean;
-    detectDataCorruption: (error: Error) => boolean;
-  };
+  resilience: ReturnType<typeof createSyncResilience>;
 
   constructor() {
     this.budgetId = null;
@@ -94,7 +117,7 @@ class ChunkedSyncService {
   /**
    * Initialize chunked sync
    */
-  async initialize(budgetId, encryptionKey) {
+  async initialize(budgetId: string, encryptionKey: string): Promise<void> {
     // GitHub Issue #578: Add validation for initialization parameters
     if (!budgetId || !encryptionKey) {
       throw new Error(
@@ -230,7 +253,7 @@ class ChunkedSyncService {
         totalChunks: 0,
         totalSize: 0,
         ...metadata,
-      } as any,
+      } as Record<string, unknown>,
       validation: {
         manifestChecksum: "", // Will be calculated after chunk processing
         minChunkSize: 16, // Minimum encrypted chunk size
@@ -239,7 +262,7 @@ class ChunkedSyncService {
     };
 
     for (const [chunkId, data] of Object.entries(chunkMap)) {
-      const size = this.calculateSize(data);
+      const size = await this.calculateSize(data);
       const dataString = this.safeStringify(data);
       const checksum = await generateChecksum(dataString);
 
@@ -249,8 +272,9 @@ class ChunkedSyncService {
         type: Array.isArray(data) ? "array" : "object",
         checksum, // GitHub Issue #576: Add chunk checksum for validation
       };
-      manifest.metadata.totalSize += size;
-      manifest.metadata.totalChunks++;
+      const metadata = manifest.metadata as ManifestMetadata;
+      metadata.totalSize += size;
+      metadata.totalChunks++;
     }
 
     // Generate manifest checksum for integrity validation
@@ -273,7 +297,10 @@ class ChunkedSyncService {
   /**
    * Save large dataset to cloud using chunking
    */
-  async saveToCloud(data, currentUser) {
+  async saveToCloud(
+    data: unknown,
+    currentUser: CloudSyncConfig["currentUser"]
+  ): Promise<{ success: boolean }> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
@@ -283,7 +310,13 @@ class ChunkedSyncService {
       const startTime = Date.now();
 
       // Warn if currentUser is undefined - check for budgetId (primary), uid (Firebase), or id (local user)
-      if (!currentUser?.budgetId && !currentUser?.uid && !currentUser?.id) {
+      const userObj = currentUser as {
+        budgetId?: string;
+        id?: string;
+        uid?: string;
+        userName?: string;
+      };
+      if (!userObj?.budgetId && !userObj?.uid && !userObj?.id) {
         logger.warn("saveToCloud called with undefined currentUser identifier, using 'anonymous'", {
           currentUser,
           hasCurrentUser: !!currentUser,
@@ -302,7 +335,7 @@ class ChunkedSyncService {
       try {
         logger.info("🚀 [CHUNKED SYNC] Starting chunked save to cloud", {
           dataSize: this.calculateSize(data),
-          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+          userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
         });
 
         // Identify large arrays to chunk
@@ -328,7 +361,7 @@ class ChunkedSyncService {
 
         // Create manifest
         const manifest = await this.createManifest(chunkMap, {
-          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+          userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
           userAgent: navigator.userAgent,
           originalKeys: Object.keys(data),
         });
@@ -364,7 +397,7 @@ class ChunkedSyncService {
           _metadata: {
             version: "2.0",
             lastSync: Date.now(),
-            userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+            userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
             chunkedKeys: Object.keys(data).filter(
               (key) => Array.isArray(data[key]) && data[key].length > 100
             ),
@@ -479,7 +512,7 @@ class ChunkedSyncService {
   /**
    * Load large dataset from cloud with chunk reassembly
    */
-  async loadFromCloud() {
+  async loadFromCloud(): Promise<unknown> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
@@ -492,17 +525,17 @@ class ChunkedSyncService {
         logger.info("Starting chunked load from cloud");
 
         // Load main document with resilience
-        const mainDoc = await this.resilience.execute(
+        const mainDoc = (await this.resilience.execute(
           () => getDoc(doc(db, "budgets", this.budgetId)),
           "loadMainDocument",
           "loadMainDocument"
-        );
+        )) as DocumentSnapshot;
         if (!mainDoc.exists()) {
           logger.info("No cloud data found");
           return null;
         }
 
-        const mainData = mainDoc.data();
+        const mainData = mainDoc.data() as Record<string, unknown>;
         const reconstructedData = { ...mainData };
 
         // Remove internal metadata
@@ -514,15 +547,14 @@ class ChunkedSyncService {
           let manifest;
           try {
             // Validate manifest data before decryption
-            if (
-              !mainData._manifest?.encryptedData?.data ||
-              !mainData._manifest?.encryptedData?.iv
-            ) {
+            const manifestData = mainData._manifest as Record<string, unknown>;
+            const encryptedData = manifestData.encryptedData as Record<string, unknown> | undefined;
+            if (!encryptedData?.data || !encryptedData?.iv) {
               throw new Error("Missing encrypted manifest data structure");
             }
 
-            const encryptedDataBytes = bytesFromBase64(mainData._manifest.encryptedData.data);
-            const ivBytes = bytesFromBase64(mainData._manifest.encryptedData.iv);
+            const encryptedDataBytes = bytesFromBase64(encryptedData.data as string);
+            const ivBytes = bytesFromBase64(encryptedData.iv as string);
 
             // Check if data is too small (common corruption indicator)
             if (encryptedDataBytes.length < 16 || ivBytes.length < 12) {
@@ -554,15 +586,19 @@ class ChunkedSyncService {
               this.decryptionFailures = new Map();
             }
 
-            const lastFailure = this.decryptionFailures.get(errorSignature);
+            const failureRecord = this.decryptionFailures.get(errorSignature);
             const backoffTime = 5 * 60 * 1000; // 5 minutes
 
-            if (lastFailure && now - lastFailure < backoffTime) {
+            if (failureRecord && now - failureRecord.lastFailure < backoffTime) {
               logger.info("🔇 Skipping repeated decryption attempt (in backoff period)");
               return null; // Skip without logging noise
             }
 
-            this.decryptionFailures.set(errorSignature, now);
+            const newFailureRecord = {
+              count: failureRecord ? failureRecord.count + 1 : 1,
+              lastFailure: now,
+            };
+            this.decryptionFailures.set(errorSignature, newFailureRecord);
 
             // Check if we should trigger corruption recovery modal
             this.checkForCorruptionPattern();
@@ -596,12 +632,12 @@ class ChunkedSyncService {
             where("budgetId", "==", this.budgetId)
           );
 
-          const chunksSnapshot = await this.resilience.execute(
+          const chunksSnapshot = (await this.resilience.execute(
             () => getDocs(chunksQuery),
             "loadChunks",
             "loadChunks"
-          );
-          const chunks = {};
+          )) as QuerySnapshot;
+          const chunks: Record<string, unknown> = {};
 
           // Decrypt all chunks with individual error handling
           for (const chunkDoc of chunksSnapshot.docs) {
@@ -654,7 +690,7 @@ class ChunkedSyncService {
 
           // Reassemble chunked arrays
           for (const [key, value] of Object.entries(reconstructedData)) {
-            if (value && typeof value === "object" && (value as any)._chunked) {
+            if (value && typeof value === "object" && (value as Record<string, unknown>)._chunked) {
               // Find all chunks for this key
               const keyChunks = Object.entries(chunks)
                 .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
@@ -736,7 +772,7 @@ class ChunkedSyncService {
   /**
    * Clear corrupted cloud data and reset to clean state
    */
-  async clearCorruptedData() {
+  async clearCorruptedData(): Promise<void> {
     if (!this.budgetId) {
       throw new Error("Budget ID not set");
     }
@@ -770,7 +806,6 @@ class ChunkedSyncService {
       });
 
       logger.info("✅ Corrupted cloud data cleared successfully");
-      return true;
     } catch (error) {
       logger.error("❌ Failed to clear corrupted cloud data", error);
       throw error;
@@ -799,28 +834,11 @@ class ChunkedSyncService {
   /**
    * Get sync statistics including resilience metrics
    */
-  getStats() {
-    const baseStats = {
+  getStats(): ChunkedSyncStats {
+    return {
       maxChunkSize: this.maxChunkSize,
       maxArrayChunkSize: this.maxArrayChunkSize,
       isInitialized: !!(this.budgetId && this.encryptionKey),
-    };
-
-    // Add Phase 2 resilience metrics
-    const resilienceStatus = this.resilience?.getStatus();
-
-    return {
-      ...baseStats,
-      resilience: resilienceStatus,
-      phase1: {
-        mutexEnabled: !!this.syncMutex,
-        validationEnabled: true,
-      },
-      phase2: {
-        retryEnabled: !!resilienceStatus?.retry,
-        circuitBreakerEnabled: !!resilienceStatus?.circuit,
-        queueEnabled: !!resilienceStatus?.queue,
-      },
     };
   }
 
@@ -837,8 +855,8 @@ class ChunkedSyncService {
     let recentFailures = 0;
     let hasDataTooSmallError = false;
 
-    for (const [errorSignature, timestamp] of this.decryptionFailures) {
-      if (timestamp > recentThreshold) {
+    for (const [errorSignature, failureRecord] of this.decryptionFailures) {
+      if (failureRecord.lastFailure > recentThreshold) {
         recentFailures++;
         if (errorSignature.includes("The provided data is too small")) {
           hasDataTooSmallError = true;
@@ -864,11 +882,11 @@ class ChunkedSyncService {
    */
   triggerCorruptionRecovery() {
     // Don't spam the user - only show once per session
-    if ((window as any).corruptionModalShown) {
+    if (window.corruptionModalShown) {
       return;
     }
 
-    (window as any).corruptionModalShown = true;
+    window.corruptionModalShown = true;
 
     // Emit custom event for UI components to listen to
     const event = new CustomEvent("syncCorruptionDetected", {

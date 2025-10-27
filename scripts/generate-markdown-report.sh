@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # This script combines the text-based lint and typecheck reports into a single markdown file.
+# It also generates a summary table with current counts and compares with previous audit run.
 
 # --- Configuration ---
 LINT_INPUT="docs/audits/sorted-lint-report.txt"
 TYPECHECK_INPUT="docs/audits/sorted-typecheck-report.txt"
 OUTPUT_FILE="docs/audits/audit-report.md"
+METRICS_FILE=".audit-metrics.json"
 
 # --- Pre-flight checks ---
 if [ ! -f "$LINT_INPUT" ] || [ ! -f "$TYPECHECK_INPUT" ]; then
@@ -14,12 +16,70 @@ if [ ! -f "$LINT_INPUT" ] || [ ! -f "$TYPECHECK_INPUT" ]; then
     exit 1
 fi
 
+# --- Extract Metrics ---
+# Count total lint issues (only from Issue Count by Category section, excluding fully-excluded rules)
+# Excludes react-hooks/* rules which are all handled by exclusions config
+LINT_TOTAL=$(sed -n '/--- Issue Count by Category (ESLint Rule) ---/,/--- Detailed Lint Report ---/p' "$LINT_INPUT" | grep -E "^\s+[0-9]+" | grep -v "react-hooks/" | awk '{sum+=$1} END {print sum}')
+
+# Count total typecheck errors
+TYPECHECK_TOTAL=$(grep -c "error TS" "$TYPECHECK_INPUT")
+
+# Get timestamp
+CURRENT_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+# Load previous metrics if they exist
+PREV_LINT=0
+PREV_TYPECHECK=0
+if [ -f "$METRICS_FILE" ]; then
+    PREV_LINT=$(grep '"lint_total"' "$METRICS_FILE" | grep -o '[0-9]*' | head -1)
+    PREV_TYPECHECK=$(grep '"typecheck_total"' "$METRICS_FILE" | grep -o '[0-9]*' | head -1)
+fi
+
+# Calculate differences
+LINT_DIFF=$((LINT_TOTAL - PREV_LINT))
+TYPECHECK_DIFF=$((TYPECHECK_TOTAL - PREV_TYPECHECK))
+
+# Format difference with +/- sign
+format_diff() {
+    local diff=$1
+    if [ "$diff" -gt 0 ]; then
+        echo "+$diff"
+    elif [ "$diff" -lt 0 ]; then
+        echo "$diff"
+    else
+        echo "0"
+    fi
+}
+
+LINT_DIFF_STR=$(format_diff "$LINT_DIFF")
+TYPECHECK_DIFF_STR=$(format_diff "$TYPECHECK_DIFF")
+
+# Save current metrics for next run
+cat > "$METRICS_FILE" <<EOF
+{
+  "timestamp": "$CURRENT_TIMESTAMP",
+  "lint_total": $LINT_TOTAL,
+  "typecheck_total": $TYPECHECK_TOTAL,
+  "previous_lint": $PREV_LINT,
+  "previous_typecheck": $PREV_TYPECHECK
+}
+EOF
+
 # --- Report Generation ---
 > "$OUTPUT_FILE"
 
 # Main Title and TOC
 cat <<EOF >> "$OUTPUT_FILE"
 # Combined Audit Report
+
+## Summary
+
+| Category | Current | Change |
+|----------|---------|--------|
+| ESLint Issues | $LINT_TOTAL | $LINT_DIFF_STR |
+| TypeScript Errors | $TYPECHECK_TOTAL | $TYPECHECK_DIFF_STR |
+
+*Last updated: $CURRENT_TIMESTAMP*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)

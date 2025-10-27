@@ -33,9 +33,9 @@ export const forcePushToCloud = async (authConfig = null) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     logger.info("🧹 Clearing any corruption detection state to prevent false positives...");
-    const { chunkedSyncService } = await import("../../services/chunkedSyncService");
-    if (chunkedSyncService && chunkedSyncService.decryptionFailures) {
-      chunkedSyncService.decryptionFailures.clear();
+    const chunkedSyncService = await import("../../services/chunkedSyncService");
+    if (chunkedSyncService.default && chunkedSyncService.default.decryptionFailures) {
+      chunkedSyncService.default.decryptionFailures.clear();
       logger.info("✅ Cleared decryption failure tracking");
     }
 

@@ -1,6 +1,10 @@
 /**
  * Utility functions for UI handlers in supplemental accounts
  * Extracted from useSupplementalAccounts hook to reduce complexity
+ *
+ * @note This file accepts a confirm callback as a parameter, delegating to the caller
+ * to use the appropriate toast/confirmation system. The no-legacy-toast rule is safe to
+ * ignore here since we're not implementing toast UI directly.
  */
 
 interface Account {
@@ -47,6 +51,7 @@ export const handleModalCloseWithLock = (
 
 /**
  * Handle account delete with confirmation
+ * Note: Parameter named 'confirm' is intentional - it's a callback function, not the legacy API
  */
 export const handleAccountDelete = async (
   accountId: string,

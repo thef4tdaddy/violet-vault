@@ -7,6 +7,63 @@ import AccountFinancialFields from "./form/AccountFinancialFields";
 import AccountColorAndSettings from "./form/AccountColorAndSettings";
 import AccountFormActions from "./form/AccountFormActions";
 
+// Extract modal content for reuse between mobile and desktop
+const ModalContent = ({
+  editingAccount,
+  accountForm,
+  setAccountForm,
+  canEdit,
+  isLocked,
+  isOwnLock,
+  lock,
+  breakLock,
+  onClose,
+  onSubmit,
+}) => (
+  <>
+    {/* Edit Lock Warning */}
+    {editingAccount && (
+      <EditLockIndicator
+        isLocked={isLocked}
+        isOwnLock={isOwnLock}
+        lock={lock}
+        onBreakLock={breakLock}
+        className="mb-4"
+      />
+    )}
+
+    <div className="space-y-4">
+      <AccountBasicFields
+        accountForm={accountForm}
+        setAccountForm={setAccountForm}
+        canEdit={canEdit}
+        editingAccount={editingAccount}
+      />
+
+      <AccountFinancialFields
+        accountForm={accountForm}
+        setAccountForm={setAccountForm}
+        canEdit={canEdit}
+        editingAccount={editingAccount}
+      />
+
+      <AccountColorAndSettings
+        accountForm={accountForm}
+        setAccountForm={setAccountForm}
+        canEdit={canEdit}
+        editingAccount={editingAccount}
+      />
+    </div>
+
+    <AccountFormActions
+      editingAccount={editingAccount}
+      canEdit={canEdit}
+      onClose={onClose}
+      onSubmit={onSubmit}
+    />
+  </>
+);
+
 const AccountFormModal = ({
   isOpen,
   onClose,
@@ -27,51 +84,18 @@ const AccountFormModal = ({
 
   if (!isOpen) return null;
 
-  // Extract modal content for reuse between mobile and desktop
-  const ModalContent = () => (
-    <>
-      {/* Edit Lock Warning */}
-      {editingAccount && (
-        <EditLockIndicator
-          isLocked={isLocked}
-          isOwnLock={isOwnLock}
-          lock={lock}
-          onBreakLock={breakLock}
-          className="mb-4"
-        />
-      )}
-
-      <div className="space-y-4">
-        <AccountBasicFields
-          accountForm={accountForm}
-          setAccountForm={setAccountForm}
-          canEdit={canEdit}
-          editingAccount={editingAccount}
-        />
-
-        <AccountFinancialFields
-          accountForm={accountForm}
-          setAccountForm={setAccountForm}
-          canEdit={canEdit}
-          editingAccount={editingAccount}
-        />
-
-        <AccountColorAndSettings
-          accountForm={accountForm}
-          setAccountForm={setAccountForm}
-          canEdit={canEdit}
-          editingAccount={editingAccount}
-        />
-      </div>
-
-      <AccountFormActions
-        editingAccount={editingAccount}
-        canEdit={canEdit}
-        onClose={onClose}
-        onSubmit={onSubmit}
-      />
-    </>
-  );
+  const modalContentProps = {
+    editingAccount,
+    accountForm,
+    setAccountForm,
+    canEdit,
+    isLocked,
+    isOwnLock,
+    lock,
+    breakLock,
+    onClose,
+    onSubmit,
+  };
 
   // Mobile slide-up modal
   if (isMobile || _forceMobileMode) {
@@ -85,7 +109,7 @@ const AccountFormModal = ({
         backdrop={true}
       >
         <div className="px-6 pb-6">
-          <ModalContent />
+          <ModalContent {...modalContentProps} />
         </div>
       </SlideUpModal>
     );
@@ -105,7 +129,7 @@ const AccountFormModal = ({
           lockLoading={lockLoading}
         />
 
-        <ModalContent />
+        <ModalContent {...modalContentProps} />
       </div>
     </div>
   );

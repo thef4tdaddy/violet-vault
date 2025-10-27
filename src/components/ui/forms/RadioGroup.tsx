@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 export interface RadioOption {
   /** The value of the radio button */
@@ -86,7 +86,7 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
     ref
   ) => {
     const hasDescriptions = options.some((opt) => opt.description);
-    const groupId = `radio-group-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId(); const groupId = `radio-group-${generatedId}`;
 
     const handleChange = (optionValue: string) => {
       onChange?.(optionValue);
