@@ -28,7 +28,7 @@ export const triggerTransactionSync = (changeType: string) => {
 /**
  * Add transaction to database
  */
-export const addTransactionToDB = async (transactionData, categoryRules = []) => {
+export const addTransactionToDB = async (transactionData: Record<string, unknown>, categoryRules: unknown[] = []) => {
   logger.debug("Adding transaction", { id: transactionData.id });
 
   const validation = validateTransactionData(transactionData);
@@ -47,7 +47,7 @@ export const addTransactionToDB = async (transactionData, categoryRules = []) =>
 /**
  * Update transaction in database
  */
-export const updateTransactionInDB = async (id: string, updates) => {
+export const updateTransactionInDB = async (id: string, updates: Record<string, unknown>) => {
   logger.debug("Updating transaction", { id, updates });
 
   const current = await budgetDb.getTransaction(id);
@@ -81,7 +81,7 @@ export const deleteTransactionFromDB = async (transactionId: string) => {
 /**
  * Split transaction in database
  */
-export const splitTransactionInDB = async (originalTransaction, splitTransactions) => {
+export const splitTransactionInDB = async (originalTransaction: Record<string, unknown>, splitTransactions: Record<string, unknown>[]) => {
   logger.debug("Splitting transaction", {
     originalId: originalTransaction.id,
     splitCount: splitTransactions.length,
@@ -129,7 +129,7 @@ export const splitTransactionInDB = async (originalTransaction, splitTransaction
 /**
  * Transfer funds between envelopes
  */
-export const transferFundsInDB = async (transferData) => {
+export const transferFundsInDB = async (transferData: Record<string, unknown>) => {
   logger.debug("Creating transfer", transferData);
 
   const [outgoingTxn, incomingTxn] = createTransferPair(transferData);
@@ -155,9 +155,9 @@ export const transferFundsInDB = async (transferData) => {
  */
 export const bulkOperationOnTransactions = async (
   operation: string,
-  transactions,
-  updates,
-  categoryRules = []
+  transactions: Record<string, unknown>[],
+  updates: Record<string, unknown>,
+  categoryRules: unknown[] = []
 ) => {
   logger.debug(`Bulk ${operation} operation`, { count: transactions.length });
 
