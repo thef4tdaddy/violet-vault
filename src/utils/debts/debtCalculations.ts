@@ -1,7 +1,13 @@
 // Debt calculation utilities to prevent temporal dead zone issues
 // This file contains pure functions that can be safely imported and used anywhere
 
-import type { DebtAccount, DebtType, PaymentFrequency, DebtSpecialTerms } from "../../types/debt";
+import type {
+  DebtAccount,
+  DebtType,
+  PaymentFrequency,
+  DebtSpecialTerms,
+  PayoffProjection,
+} from "../../types/debt";
 
 import { DEBT_TYPES, DEBT_STATUS, PAYMENT_FREQUENCIES } from "../../constants/debts";
 

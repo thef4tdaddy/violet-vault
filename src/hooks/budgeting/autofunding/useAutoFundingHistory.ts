@@ -40,7 +40,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
         logger.error("Failed to cleanup history", error);
       }
     },
-    [historyHook, undoHook]
+    [historyHook]
   );
 
   return {
@@ -68,6 +68,10 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
 
     // Import/Export
     exportHistory: (options) =>
-      exportHook.exportHistory(historyHook.executionHistory as never[], undoHook.undoStack, options),
+      exportHook.exportHistory(
+        historyHook.executionHistory as never[],
+        undoHook.undoStack,
+        options
+      ),
   };
 };

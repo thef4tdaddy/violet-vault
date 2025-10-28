@@ -6,6 +6,7 @@
  */
 
 import { budgetDb } from "../../db/budgetDb";
+import type { Transaction } from "../../types/finance";
 import logger from "../common/logger";
 
 // Default archiving configuration
@@ -161,11 +162,15 @@ export class TransactionArchiver {
   /**
    * Create initial group data structure
    */
-  private createGroupData(transaction: {
-    date: string;
-    category?: string;
-    [key: string]: unknown;
-  }, periodKey: string, periodType: string) {
+  private createGroupData(
+    transaction: {
+      date: string;
+      category?: string;
+      [key: string]: unknown;
+    },
+    periodKey: string,
+    periodType: string
+  ) {
     return {
       period: periodKey,
       category: transaction.category || "uncategorized",
