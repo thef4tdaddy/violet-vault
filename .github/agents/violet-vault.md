@@ -1,3 +1,10 @@
+---
+name: "Violet Vault Development Agent"
+description: "GitHub Copilot Agent for Violet Vault - Secure encrypted envelope budgeting application"
+visibility: "private"
+version: "1.0"
+---
+
 # Violet Vault Development Agent
 
 **Description:** GitHub Copilot Agent for Violet Vault - Secure encrypted envelope budgeting application
