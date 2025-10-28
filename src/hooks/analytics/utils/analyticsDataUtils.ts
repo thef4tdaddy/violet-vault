@@ -101,7 +101,7 @@ export const calculateMonthlyTrends = (transactions: Transaction[]): MonthlyTren
       grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
       grouped[monthKey].transactionCount++;
     } catch {
-      logger.warn("Error processing transaction in monthlyTrends:", transaction);
+      logger.warn("Error processing transaction in monthlyTrends:", { transaction });
       return;
     }
   });
@@ -221,7 +221,7 @@ export const calculateWeeklyPatterns = (transactions: Transaction[]): WeeklyPatt
           patterns[dayIndex].count++;
         }
       } catch {
-        logger.warn("Invalid date in weeklyPatterns:", transaction.date);
+        logger.warn("Invalid date in weeklyPatterns:", { date: transaction.date });
       }
     }
   });

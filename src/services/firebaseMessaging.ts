@@ -328,7 +328,7 @@ class FirebaseMessagingService {
     // This would typically be done from your backend
     logger.info(
       "🧪 Test message would be sent to token:",
-      this.currentToken.substring(0, 20) + "..."
+      { tokenPreview: this.currentToken.substring(0, 20) + "..." }
     );
     logger.info(
       "💡 Use this token in your Firebase Console or backend service to send test messages"

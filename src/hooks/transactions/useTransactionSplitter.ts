@@ -59,7 +59,7 @@ const useTransactionSplitter = (options: UseTransactionSplitterOptions = {}) => 
    * Update a split field
    */
   const updateSplit = useCallback(
-    (splitId: string, field: string, value: unknown) => {
+    (splitId: string, field: keyof SplitAllocation, value: unknown) => {
       updateSplitHandler(
         { splitId, field, value, envelopes, errorsLength: errors.length },
         setSplitAllocations,

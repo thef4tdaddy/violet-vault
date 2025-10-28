@@ -60,14 +60,14 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
 
   const updateTransaction = useCallback(
     (id: string | number, updates: Partial<Transaction>) => {
-      return updateTransactionMutation.mutateAsync({ id, updates });
+      return updateTransactionMutation.mutateAsync({ id: String(id), updates });
     },
     [updateTransactionMutation]
   );
 
   const deleteTransaction = useCallback(
     (transactionId: string | number) => {
-      return deleteTransactionMutation.mutateAsync(transactionId);
+      return deleteTransactionMutation.mutateAsync(String(transactionId));
     },
     [deleteTransactionMutation]
   );
