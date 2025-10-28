@@ -132,8 +132,8 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                   title: "Safe Cloud Data Reset",
                   message:
                     "🛡️ Run safe cloud data reset? This includes comprehensive local data validation.",
-                  confirmText: "Run Safe Reset",
-                  cancelText: "Cancel",
+                  confirmLabel: "Run Safe Reset",
+                  cancelLabel: "Cancel",
                 });
                 if (confirmed) {
                   try {
@@ -163,8 +163,8 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 const confirmed = await confirm({
                   title: "Reset Cloud Data",
                   message: "⚠️ Reset Cloud Data? This cannot be undone!",
-                  confirmText: "Reset",
-                  cancelText: "Cancel",
+                  confirmLabel: "Reset",
+                  cancelLabel: "Cancel",
                 });
                 if (confirmed) {
                   try {
