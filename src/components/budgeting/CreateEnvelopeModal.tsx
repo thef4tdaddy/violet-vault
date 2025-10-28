@@ -1,4 +1,3 @@
-import React from "react";
 import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";

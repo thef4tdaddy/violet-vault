@@ -192,9 +192,10 @@ describe("queryKeyUtils", () => {
       expect(related).toContain(queryKeys.budgetMetadata);
     });
 
-    it("should return undefined for unknown entity", () => {
-      const related = queryKeyUtils.getRelatedKeys("unknown");
-      expect(related).toEqual([undefined]);
+  it("should return base key for unknown entity", () => {
+    const related = queryKeyUtils.getRelatedKeys("unknown");
+    expect(related).toEqual([queryKeys.unknown]);
+  });
     });
   });
 

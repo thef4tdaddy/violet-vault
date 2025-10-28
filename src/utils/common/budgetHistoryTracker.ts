@@ -344,7 +344,7 @@ export class BudgetHistoryTracker {
         created: Date.now(),
       };
 
-      await budgetDb.createBudgetTag(tag as Record<string, unknown>);
+      await budgetDb.createBudgetTag(tag as unknown as BudgetTag);
 
       logger.info("Budget history tag created", {
         tagName,

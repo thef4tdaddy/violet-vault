@@ -36,7 +36,7 @@ const validateFormAndAllocations = (formData, currentAllocations, setErrors) => 
   const validation = validateFormAndAllocationsUtil(
     formData,
     currentAllocations,
-    validatePaycheckForm,
+    validatePaycheckForm as (data: typeof formData) => ReturnType<typeof validatePaycheckForm>,
     validateAllocations
   );
   setErrors(validation.errors);
@@ -127,6 +127,17 @@ const usePaycheckProcessor = ({
     return validateFormAndAllocations(formData, currentAllocations, setErrors);
   }, [formData, currentAllocations]);
 
+  // Reset form to default state
+  const resetForm = useCallback(() => {
+    setFormData({
+      amount: "",
+      payerName: "",
+      allocationMode: "allocate",
+    });
+    setErrors({});
+    setCurrentAllocations(getDefaultAllocations());
+  }, []);
+
   // Process paycheck
   const processPaycheck = useCallback(async () => {
     try {
@@ -186,17 +197,6 @@ const usePaycheckProcessor = ({
     validateForm,
     resetForm,
   ]);
-
-  // Reset form to default state
-  const resetForm = useCallback(() => {
-    setFormData({
-      amount: "",
-      payerName: "",
-      allocationMode: "allocate",
-    });
-    setErrors({});
-    setCurrentAllocations(getDefaultAllocations());
-  }, []);
 
   // Get unique payers for dropdown
   const uniquePayers = getUniquePayers(paycheckHistory, tempPayers);

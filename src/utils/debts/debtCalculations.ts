@@ -78,7 +78,7 @@ export function enrichDebt(
   const nextPaymentDate = calculateNextPaymentDate(debt, null);
 
   // Calculate payoff projection
-  const payoffInfo = calculatePayoffProjection(debt);
+  const payoffInfo = calculatePayoffProjection(debt) as unknown as PayoffProjection;
 
   return {
     ...debt,

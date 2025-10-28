@@ -173,8 +173,8 @@ const getActualCommitTimestamp = () => {
   const buildTime = import.meta.env.VITE_BUILD_TIME;
   if (buildTime && buildTime !== "undefined") {
     logger.warn(
-      "⚠️ Using build time as fallback for git commit (no git timestamp found):",
-      buildTime
+      "⚠️ Using build time as fallback for git commit (no git timestamp found)",
+      { buildTime }
     );
     const buildDate = new Date(buildTime);
 

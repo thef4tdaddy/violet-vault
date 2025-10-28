@@ -36,7 +36,9 @@ class KeyManagementService {
       const keyBuffer =
         typeof encryptionKey === "string" ? new TextEncoder().encode(encryptionKey) : encryptionKey;
 
-      const hashBuffer = await crypto.subtle.digest("SHA-256", keyBuffer as ArrayBuffer);
+      // Convert to ArrayBuffer if needed
+      const bufferToHash = keyBuffer instanceof Uint8Array ? keyBuffer.buffer : keyBuffer as unknown as ArrayBuffer;
+      const hashBuffer = await crypto.subtle.digest("SHA-256", bufferToHash);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
@@ -323,8 +325,8 @@ class KeyManagementService {
           throw new Error("Import password required for protected key file");
         }
 
-        // Derive key from import password
-        const importKeyData = await encryptionUtils.deriveKey(
+        // Derive key from import password using the salt
+        const importKeyData = await encryptionUtils.deriveKeyFromSalt(
           importPassword,
           new Uint8Array(keyFileData.exportSalt)
         );

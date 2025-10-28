@@ -18,7 +18,7 @@ export type TransactionType = z.infer<typeof TransactionTypeSchema>;
  */
 export const TransactionSchema = z.object({
   id: z.string().min(1, 'Transaction ID is required'),
-  date: z.union([z.date(), z.string()], { errorMap: () => ({ message: 'Date must be a valid date' }) }),
+  date: z.union([z.date(), z.string()], { message: 'Date must be a valid date' }),
   amount: z.number().min(0, 'Amount cannot be negative'),
   envelopeId: z.string().min(1, 'Envelope ID is required'),
   category: z.string().min(1, 'Category is required'),

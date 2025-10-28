@@ -97,9 +97,9 @@ export const useBillForm = ({
 
       try {
         const billData: Bill = {
-          ...buildBillData(formData, editingBill, suggestedIconName),
+          ...buildBillData(formData, editingBill, suggestedIconName) as Record<string, unknown>,
           id: editingBill?.id || uuidv4(),
-        };
+        } as Bill;
 
         logger.debug("Submitting bill data:", billData);
 

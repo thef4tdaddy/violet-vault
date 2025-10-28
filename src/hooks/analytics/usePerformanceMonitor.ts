@@ -48,17 +48,15 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
     const alerts = generateAlerts(analyticsData, balanceData, {
       budgetAdherence,
       savingsRate,
-      spendingEfficiency,
       balanceStability,
-    });
+    } as never);
 
     const recommendations = generateRecommendations({
       budgetAdherence,
       savingsRate,
-      spendingEfficiency,
       balanceStability,
       overallScore,
-    });
+    } as never);
 
     return {
       overallScore,
