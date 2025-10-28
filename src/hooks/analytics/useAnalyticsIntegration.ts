@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useAnalyticsData } from "./useAnalyticsData";
-import { useChartConfig } from "./useChartConfig";
+// import { useChartConfig } from "./useChartConfig"; // TODO: File does not exist
 import {
   _calculateFinancialMetrics,
   calculateTrends,
@@ -35,13 +35,13 @@ export const useAnalyticsIntegration = ({
     timeFilter,
   });
 
-  // Get chart configuration
-  const chartConfig = useChartConfig();
+  // Get chart configuration - TODO: useChartConfig hook doesn't exist
+  const chartConfig = useMemo(() => ({}), []);
 
   // Enhanced metrics with additional calculations
   const enhancedMetrics = useMemo(() => {
     const baseMetrics = analyticsData.metrics;
-    const trends = calculateTrends(analyticsData.monthlyTrends);
+    const trends = calculateTrends(analyticsData.monthlyTrends as unknown[]);
 
     // Performance indicators
     const budgetAdherence =
@@ -57,9 +57,11 @@ export const useAnalyticsIntegration = ({
         ? Math.min(100, analyticsData.categoryBreakdown.length * 10) // More categories = higher diversity
         : 0;
 
+    const trendsObj = typeof trends === 'object' && trends !== null ? trends : {};
+
     return {
       ...baseMetrics,
-      ...trends,
+      ...trendsObj,
       budgetAdherence,
       diversityScore,
       // Financial health indicators
