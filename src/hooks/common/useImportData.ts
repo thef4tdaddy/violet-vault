@@ -105,7 +105,7 @@ export const useImportData = () => {
         logger.info("Starting import process");
 
         const fileContent = await readFileContent(file);
-        const importedData = JSON.parse(fileContent);
+        const importedData = JSON.parse(String(fileContent));
 
         const { validatedData, hasBudgetIdMismatch, importBudgetId } = validateImportedData(
           importedData,

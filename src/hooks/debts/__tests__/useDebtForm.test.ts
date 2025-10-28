@@ -328,7 +328,7 @@ describe("useDebtForm", () => {
 
   describe("Loading states", () => {
     test("should handle submitting state", async () => {
-      const mockOnSubmit = jest
+      const mockOnSubmit = vi
         .fn()
         .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
       const { result } = renderHook(() => useDebtForm(null, true));

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import useTransactionBalanceUpdater from "../useTransactionBalanceUpdater";
+import { useTransactionBalanceUpdater } from "../useTransactionBalanceUpdater";
 
 // Mock dependencies
 vi.mock("../../../services/budgetDatabaseService", () => ({

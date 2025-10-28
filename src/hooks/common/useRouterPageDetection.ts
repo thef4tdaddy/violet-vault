@@ -98,7 +98,7 @@ export const useEnhancedPageDetection = () => {
 
         for (const selector of modalSelectors) {
           const element = document.querySelector(selector);
-          if (element && element.offsetParent !== null) {
+          if (element && (element as HTMLElement).offsetParent !== null) {
             const title = element.textContent?.trim();
             if (title) return title;
           }

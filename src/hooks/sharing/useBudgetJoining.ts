@@ -62,9 +62,9 @@ export const useBudgetJoining = () => {
       onClose();
 
       // Clear URL parameter
-      const url = new URL(window.location);
+      const url = new URL(window.location.href);
       url.searchParams.delete("share");
-      window.history.replaceState({}, "", url);
+      window.history.replaceState({}, "", url.toString());
 
       return true;
     } catch (error) {

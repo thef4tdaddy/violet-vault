@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import useTransactionSplitterUI from "../useTransactionSplitterUI";
+import { useTransactionSplitterUI } from "../useTransactionSplitterUI";
 
 // Mock dependencies
 vi.mock("../../../services/transactions/transactionSplitterService", () => ({

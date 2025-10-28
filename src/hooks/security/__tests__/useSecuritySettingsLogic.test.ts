@@ -95,7 +95,7 @@ describe("useSecuritySettingsLogic", () => {
     const mockElement = {
       setAttribute: mockSetAttribute,
       click: mockClick,
-    };
+    } as unknown as HTMLElement;
     vi.spyOn(document, "createElement").mockReturnValue(mockElement);
 
     act(() => {

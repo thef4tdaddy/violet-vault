@@ -89,7 +89,7 @@ export const useSavingsGoalsQuery = (options: SavingsGoalsQueryOptions = {}) => 
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    placeholderData: (previousData: unknown) => previousData,
+    placeholderData: (previousData) => previousData,
     enabled: true,
   });
 };

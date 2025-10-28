@@ -164,7 +164,6 @@ const dbTransactionToAppTransaction = (dbTxn: DbTransaction): Transaction => {
     envelopeId: dbTxn.envelopeId,
     type: dbTxn.type,
     createdAt: dbTxn.createdAt ? String(dbTxn.createdAt) : undefined,
-    receiptUrl: dbTxn.receiptUrl,
   };
 };
 
