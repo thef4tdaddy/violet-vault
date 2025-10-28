@@ -50,7 +50,6 @@ const BillManagerModals = ({
           isOpen={showAddBillModal}
           onClose={handleCloseModal}
           editingBill={editingBill}
-          availableEnvelopes={envelopes}
           onAddBill={addBill}
           onUpdateBill={updateBill}
           onDeleteBill={deleteBill}
@@ -65,7 +64,6 @@ const BillManagerModals = ({
           selectedBills={Array.from(selectedBills)
             .map((id) => bills.find((b) => b.id === id))
             .filter(Boolean)}
-          availableEnvelopes={envelopes}
           onUpdateBills={handleBulkUpdate}
           onError={onError}
         />
@@ -78,7 +76,6 @@ const BillManagerModals = ({
             setShowDiscoveryModal(false);
           }}
           discoveredBills={discoveredBills}
-          existingBills={bills}
           availableEnvelopes={envelopes}
           onAddBills={handleAddDiscoveredBills}
           onError={onError}
@@ -104,11 +101,10 @@ const BillManagerModals = ({
 
       {historyBill && (
         <ObjectHistoryViewer
-          isOpen={!!historyBill}
-          onClose={() => setHistoryBill(null)}
           objectId={historyBill.id}
           objectType="bill"
-          title={`Bill History: ${historyBill.name}`}
+          objectName={historyBill.name}
+          onClose={() => setHistoryBill(null)}
         />
       )}
     </>

@@ -17,8 +17,8 @@ export const AuditLogEntrySchema = z.object({
   entityType: z.string().min(1, 'Entity type is required').max(100),
   entityId: z.string().min(1, 'Entity ID is required'),
   userId: z.string().max(200).optional(),
-  changes: z.record(z.unknown()).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  changes: z.record(z.string(), z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 /**

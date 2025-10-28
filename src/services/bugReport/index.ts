@@ -6,7 +6,7 @@
  */
 import { ScreenshotService } from "./screenshotService.ts";
 import { SystemInfoService } from "./systemInfoService.ts";
-import { BugReportAPIService, type ProviderConfig } from "./apiService.ts";
+import { BugReportAPIService, type BugReportData, type ProviderConfig } from "./apiService.ts";
 import { ContextAnalysisService } from "./contextAnalysisService.ts";
 import logger from "../../utils/common/logger.ts";
 import { APP_VERSION } from "../../utils/common/version.ts";
@@ -164,7 +164,7 @@ export class BugReportService {
         const info = ScreenshotService.getScreenshotInfo(screenshot);
         if (info.sizeKB > 1024) {
           // > 1MB
-          logger.warn(`Large screenshot captured: ${info.sizeKB}KB`, info);
+          logger.warn(`Large screenshot captured: ${info.sizeKB}KB`, info as Record<string, unknown>);
         }
 
         return screenshot;
@@ -183,23 +183,22 @@ export class BugReportService {
    * @param {Object} dataCollection - Collected data
    * @returns {Object} Prepared report data
    */
-  static prepareReportData(options: BugReportOptions, dataCollection: DataCollection) {
-    const reportData = {
+  static prepareReportData(options: BugReportOptions, dataCollection: DataCollection): BugReportData {
+    const reportData: BugReportData = {
       // Basic report information
       title: options.title || "Bug Report",
       description: options.description || "",
-      steps: options.steps || "",
-      expected: options.expected || "",
-      actual: options.actual || "",
+      steps: options.steps ? [options.steps] : undefined,
+      expectedBehavior: options.expected || "",
+      actualBehavior: options.actual || "",
 
       // Severity and classification
       severity: options.severity || "medium",
       labels: [...(options.labels || []), "automated-report", "bug"],
 
       // Technical data
-      screenshot: dataCollection.screenshot,
+      screenshot: dataCollection.screenshot || undefined,
       systemInfo: dataCollection.systemInfo,
-      contextInfo: dataCollection.contextInfo,
 
       // Application context
       appVersion: APP_VERSION,
@@ -208,7 +207,8 @@ export class BugReportService {
       // Custom data
       customData: options.customData || {},
 
-      // Report metadata
+      // Additional metadata
+      contextInfo: dataCollection.contextInfo,
       reportSource: "violet-vault-bug-reporter",
       reportVersion: "2.0.0",
     };
@@ -222,21 +222,21 @@ export class BugReportService {
    * @param {Array} providers - Provider configurations
    * @returns {Promise<Object>} Submission result
    */
-  static async submitWithProperScreenshotHandling(reportData: Record<string, unknown>, providers: ProviderConfig[]) {
+  static async submitWithProperScreenshotHandling(reportData: BugReportData, providers: ProviderConfig[]) {
     // If screenshot is too large for JSON payload, handle separately
     if (reportData.screenshot) {
-      const screenshotInfo = ScreenshotService.getScreenshotInfo(reportData.screenshot);
+      const screenshotInfo = ScreenshotService.getScreenshotInfo(reportData.screenshot as string);
 
       if (screenshotInfo.sizeKB > 500) {
         // > 500KB
-        logger.info("Large screenshot detected, using alternative upload method", screenshotInfo);
+        logger.info("Large screenshot detected, using alternative upload method", screenshotInfo as Record<string, unknown>);
 
         // For large screenshots, we'll:
         // 1. Submit the bug report without the screenshot first
         // 2. Upload the screenshot separately (if provider supports it)
         // 3. Link them together
 
-        const reportWithoutScreenshot = { ...reportData };
+        const reportWithoutScreenshot: BugReportData = { ...reportData };
         delete reportWithoutScreenshot.screenshot;
         reportWithoutScreenshot.screenshotNote = `Large screenshot (${screenshotInfo.sizeKB}KB) - will be uploaded separately`;
 

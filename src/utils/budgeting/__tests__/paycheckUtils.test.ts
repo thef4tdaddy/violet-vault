@@ -11,6 +11,14 @@ import {
 } from "../paycheckUtils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 
+// Type for test data
+type PaycheckRecord = { payerName: string; amount: number; processedAt?: string };
+type AllocationResult = {
+  allocations: Array<{ envelopeId: string; amount: number }>;
+  totalAllocated: number;
+  remainingAmount: number;
+};
+
 describe("paycheckUtils", () => {
   describe("validatePaycheckForm", () => {
     const validFormData = {
@@ -120,11 +128,11 @@ describe("paycheckUtils", () => {
   });
 
   describe("getUniquePayers", () => {
-    const paycheckHistory = [
-      { payerName: "John Doe" },
-      { payerName: "Jane Smith" },
-      { payerName: "John Doe" }, // Duplicate
-      { payerName: "   " }, // Empty/whitespace
+    const paycheckHistory: PaycheckRecord[] = [
+      { payerName: "John Doe", amount: 1000 },
+      { payerName: "Jane Smith", amount: 1500 },
+      { payerName: "John Doe", amount: 1200 }, // Duplicate
+      { payerName: "   ", amount: 500 }, // Empty/whitespace
     ];
 
     it("should return unique sorted payers", () => {
@@ -221,7 +229,7 @@ describe("paycheckUtils", () => {
       allocationMode: "allocate",
     };
 
-    const allocations = {
+    const allocations: AllocationResult = {
       allocations: [
         { envelopeId: "env1", amount: 400 },
         { envelopeId: "env2", amount: 200 },

@@ -86,7 +86,7 @@ const buildMiddlewareStack = (
   let middlewareStack: StateCreator<Record<string, unknown>, [], []> = storeInitializer as StateCreator<Record<string, unknown>, [], []>;
 
   if (enableImmer) {
-    middlewareStack = immer(middlewareStack) as StateCreator<Record<string, unknown>, [], []>;
+    middlewareStack = immer(middlewareStack) as unknown as StateCreator<Record<string, unknown>, [], []>;
   }
 
   if (enablePersist && !LOCAL_ONLY_MODE) {
@@ -103,14 +103,14 @@ const buildMiddlewareStack = (
         }, {});
     }
 
-    middlewareStack = persist(middlewareStack, persistConfig) as StateCreator<Record<string, unknown>, [], []>;
+    middlewareStack = persist(middlewareStack, persistConfig) as unknown as StateCreator<Record<string, unknown>, [], []>;
   }
 
   if (enableDevtools) {
-    middlewareStack = devtools(middlewareStack, { name: `${name}-devtools` }) as StateCreator<Record<string, unknown>, [], []>;
+    middlewareStack = devtools(middlewareStack, { name: `${name}-devtools` }) as unknown as StateCreator<Record<string, unknown>, [], []>;
   }
 
-  return subscribeWithSelector(middlewareStack) as StateCreator<Record<string, unknown>>;
+  return subscribeWithSelector(middlewareStack) as unknown as StateCreator<Record<string, unknown>>;
 };
 
 /**

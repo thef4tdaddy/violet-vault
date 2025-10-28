@@ -72,10 +72,21 @@ export const detectLocalData = async () => {
     return result;
   } catch (error) {
     logger.error("❌ Data detection failed:", error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return {
       hasData: false,
       totalItems: 0,
-      details: { error: error.message },
+      details: {
+        databaseOpen: false,
+        envelopes: 0,
+        transactions: 0,
+        bills: 0,
+        savingsGoals: 0,
+        paychecks: 0,
+        cache: 0,
+        lastOptimized: 0,
+        error: errorMsg,
+      },
       recommendation: "❌ Data detection failed - assume no data for safety",
     };
   }

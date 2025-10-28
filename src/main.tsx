@@ -14,7 +14,7 @@ declare global {
     dataDiagnostic?: () => void;
     syncDiagnostic?: () => void;
     runSyncHealthCheck?: () => void;
-    runSyncEdgeCaseTests?: () => void;
+    runSyncEdgeCaseTests?: () => Promise<unknown>;
     validateAllSyncFlows?: () => void;
     fixAutoAllocateUndefined?: () => void;
     swDiagnostics?: () => Promise<unknown>;
@@ -247,14 +247,14 @@ const initializeApp = () => {
 
         // Test console log capture
         const errors = SystemInfoService.getRecentErrors();
-        logger.info("📝 Console logs captured:", errors.consoleLogs?.length || 0);
-        logger.info("❌ Errors captured:", errors.recentErrors?.length || 0);
+        logger.info("📝 Console logs captured:", { count: errors.consoleLogs?.length || 0 });
+        logger.info("❌ Errors captured:", { count: errors.recentErrors?.length || 0 });
 
         // Test screenshot capture
         try {
           const screenshot = await ScreenshotService.captureScreenshot();
           const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
-          logger.info("📸 Screenshot capture:", info ? `Success (${info.sizeKB}KB)` : "Failed");
+          logger.info("📸 Screenshot capture:", { status: info ? `Success (${info.sizeKB}KB)` : "Failed" });
           return {
             success: true,
             errors,
@@ -262,7 +262,7 @@ const initializeApp = () => {
             screenshotInfo: info,
           };
         } catch (error) {
-          logger.info("📸 Screenshot capture failed:", error.message);
+          logger.info("📸 Screenshot capture failed:", { error: (error as Error).message });
           return {
             success: false,
             errors,
