@@ -151,13 +151,22 @@ const StepCategory: React.FC<StepCategoryProps> = ({ category, steps, tutorialPr
 const OnboardingProgress = () => {
   const { isOnboarded, tutorialProgress, getProgress, preferences, setPreference } =
     useOnboardingStore(
-      useShallow((state) => ({
-        isOnboarded: state.isOnboarded,
-        tutorialProgress: state.tutorialProgress,
-        getProgress: state.getProgress,
-        preferences: state.preferences,
-        setPreference: state.setPreference,
-      }))
+      useShallow((state) => {
+        const stateTyped = state as {
+          isOnboarded: boolean;
+          tutorialProgress: Record<string, boolean>;
+          getProgress: () => { completed: number; total: number; percentage: number };
+          preferences: { showHints: boolean; skipEmptyStateHelp: boolean; tourCompleted: boolean };
+          setPreference: (key: string, value: boolean) => void;
+        };
+        return {
+          isOnboarded: stateTyped.isOnboarded,
+          tutorialProgress: stateTyped.tutorialProgress,
+          getProgress: stateTyped.getProgress,
+          preferences: stateTyped.preferences,
+          setPreference: stateTyped.setPreference,
+        };
+      })
     );
 
   const [isExpanded, setIsExpanded] = useState(!isOnboarded);
@@ -176,7 +185,7 @@ const OnboardingProgress = () => {
   }));
 
   // Group steps by category
-  const stepsByCategory = steps.reduce((groups, step) => {
+  const stepsByCategory = steps.reduce<Record<string, StepData[]>>((groups, step) => {
     const category = step.category || "Other";
     if (!groups[category]) groups[category] = [];
     groups[category].push(step);

@@ -8,11 +8,8 @@ import { useBillsQuery, useUpcomingBillsQuery } from "../billQueries";
 import {
   createTestQueryClient,
   createQueryWrapper,
-  expectQuerySuccess,
-  expectQueryData,
 } from "@/test/queryTestUtils";
 import { createMockDexie, mockDataGenerators } from "@/test/queryMocks";
-import { queryKeys } from "@/utils/common/queryClient";
 
 // Mock dependencies
 vi.mock("@/db/budgetDb", () => ({
