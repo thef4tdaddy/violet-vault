@@ -45,6 +45,22 @@ interface Transaction {
   [key: string]: unknown;
 }
 
+interface CategorizedBills {
+  all: Bill[];
+  upcoming: Bill[];
+  overdue: Bill[];
+  paid: Bill[];
+  [key: string]: Bill[];
+}
+
+interface FilterOptions {
+  search: string;
+  urgency: string;
+  envelope: string;
+  amountMin: string;
+  amountMax: string;
+}
+
 interface UseBillManagerOptions {
   propTransactions?: Transaction[];
   propEnvelopes?: Envelope[];
