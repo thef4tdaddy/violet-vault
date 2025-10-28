@@ -7,16 +7,43 @@
 import { z } from "zod";
 
 /**
- * Debt type enum
+ * Debt type enum - expanded to match DEBT_TYPES constants
  */
-export const DebtTypeSchema = z.enum(["credit_card", "loan", "mortgage", "other"]);
+export const DebtTypeSchema = z.enum([
+  "mortgage",
+  "auto",
+  "credit_card",
+  "chapter13",
+  "student",
+  "personal",
+  "business",
+  "other",
+]);
 export type DebtType = z.infer<typeof DebtTypeSchema>;
 
 /**
- * Debt status enum
+ * Debt status enum - expanded to match DEBT_STATUS constants
  */
-export const DebtStatusSchema = z.enum(["active", "paid_off", "delinquent"]);
+export const DebtStatusSchema = z.enum(["active", "paid_off", "deferred", "default"]);
 export type DebtStatus = z.infer<typeof DebtStatusSchema>;
+
+/**
+ * Payment frequency enum
+ */
+export const PaymentFrequencySchema = z.enum([
+  "weekly",
+  "biweekly",
+  "monthly",
+  "quarterly",
+  "annually",
+]);
+export type PaymentFrequency = z.infer<typeof PaymentFrequencySchema>;
+
+/**
+ * Compound frequency enum
+ */
+export const CompoundFrequencySchema = z.enum(["daily", "monthly", "annually"]);
+export type CompoundFrequency = z.infer<typeof CompoundFrequencySchema>;
 
 /**
  * Zod schema for Debt validation
