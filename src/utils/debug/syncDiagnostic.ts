@@ -111,7 +111,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 2: Budget Metadata
   logger.info("💰 Checking Budget Metadata...");
   try {
-    const windowObj = window as WindowWithDiagnostics;
+    const windowObj = window as unknown as WindowWithDiagnostics;
     if (windowObj.budgetDb) {
       const metadata = await windowObj.budgetDb.budget.get("metadata");
       results.budgetMetadata = {
@@ -139,7 +139,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 3: Data Counts
   logger.info("📊 Checking Data Counts...");
   try {
-    const windowObj = window as WindowWithDiagnostics;
+    const windowObj = window as unknown as WindowWithDiagnostics;
     if (windowObj.budgetDb) {
       const counts = {};
       const tables = [
@@ -181,7 +181,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   // Check 4: Cloud Sync Service
   logger.info("☁️ Checking Cloud Sync Service...");
   try {
-    const windowObj = window as WindowWithDiagnostics;
+    const windowObj = window as unknown as WindowWithDiagnostics;
     if (windowObj.cloudSyncService) {
       const cloudSyncService = windowObj.cloudSyncService;
       results.cloudSync = {
@@ -282,7 +282,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
 
 // Auto-run if in browser console
 if (typeof window !== "undefined") {
-  const windowObj = window as WindowWithDiagnostics;
+  const windowObj = window as unknown as WindowWithDiagnostics;
   windowObj.runSyncDiagnostic = runSyncDiagnostic;
   // Sync diagnostic tool available via sync health dropdown
   // Console command: runSyncDiagnostic()

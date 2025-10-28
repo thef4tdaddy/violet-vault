@@ -63,9 +63,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 logger.info("🚀 TESTING: window.runMasterSyncValidation");
                 try {
                   const result = await window.runMasterSyncValidation();
-                  logger.info("🚀 SUCCESS:", result);
+                  logger.info("🚀 SUCCESS:", result as Record<string, unknown>);
                 } catch (error) {
-                  logger.error("🚀 ERROR:", error);
+                  logger.error("🚀 ERROR:", error as Record<string, unknown>);
                 }
               }}
               className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
@@ -84,9 +84,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 logger.info("🔍 TESTING: window.detectLocalDataDebug");
                 try {
                   const result = await window.detectLocalDataDebug();
-                  logger.info("🔍 SUCCESS:", result);
+                  logger.info("🔍 SUCCESS:", result as Record<string, unknown>);
                 } catch (error) {
-                  logger.error("🔍 ERROR:", error);
+                  logger.error("🔍 ERROR:", error as Record<string, unknown>);
                 }
               }}
               className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
@@ -107,9 +107,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 logger.info("⚡ TESTING: window.hasLocalDataDebug");
                 try {
                   const result = await window.hasLocalDataDebug();
-                  logger.info("⚡ SUCCESS:", result);
+                  logger.info("⚡ SUCCESS:", { hasData: result });
                 } catch (error) {
-                  logger.error("⚡ ERROR:", error);
+                  logger.error("⚡ ERROR:", error as Record<string, unknown>);
                 }
               }}
               className="w-full flex items-center p-3 border border-indigo-200 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
@@ -138,9 +138,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 if (confirmed) {
                   try {
                     const result = await window.safeCloudDataReset();
-                    logger.info("🛡️ SUCCESS:", result);
+                    logger.info("🛡️ SUCCESS:", result as Record<string, unknown>);
                   } catch (error) {
-                    logger.error("🛡️ ERROR:", error);
+                    logger.error("🛡️ ERROR:", error as Record<string, unknown>);
                   }
                 }
               }}

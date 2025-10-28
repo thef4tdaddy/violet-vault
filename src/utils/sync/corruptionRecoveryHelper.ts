@@ -75,7 +75,7 @@ export const safeCloudDataReset = async (): Promise<SafeCloudDataResetResult> =>
 
     logger.info("✅ Local data confirmed:", {
       totalItems: dataDetection.totalItems,
-      samplesFound: dataDetection.details.samplesFound,
+      samplesFound: dataDetection.details.samplesFound || {},
     });
 
     // Step 2: Validate data is actually accessible
