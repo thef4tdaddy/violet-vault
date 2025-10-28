@@ -88,6 +88,7 @@ export class ReportSubmissionService {
     }
 
     const finalResult = {
+      success: !!successfulSubmission,
       overallSuccess: !!successfulSubmission,
       successfulProvider: successfulSubmission?.provider || null,
       attempts: results.length,

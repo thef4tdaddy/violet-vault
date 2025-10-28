@@ -20,7 +20,7 @@ interface UseTransactionsV2Options {
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   limit?: number;
-  categoryRules?: Array<unknown>;
+  categoryRules?: Array<{ pattern: string; category: string; envelopeId?: string | number }>;
   enabled?: boolean;
   staleTime?: number;
   refetchInterval?: number | null;
@@ -55,7 +55,7 @@ const useTransactionsV2 = (options: UseTransactionsV2Options = {}) => {
   // Get UI state from Zustand (for legacy compatibility)
   const budgetStore = useBudgetStore(
     useShallow((state) => ({
-      updateTransactions: state.updateTransactions,
+      updateTransactions: (state as Record<string, unknown>).updateTransactions,
     }))
   );
 

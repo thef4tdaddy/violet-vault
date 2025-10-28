@@ -13,9 +13,9 @@ export const useBudgetUtilities = () => {
 
   // Prefetch utilities
   const prefetchData = {
-    envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(filters),
-    dashboard: () => prefetchHelpers.prefetchDashboard(),
-    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(dateRange),
+    envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(queryClient, filters),
+    dashboard: () => prefetchHelpers.prefetchDashboard(queryClient),
+    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(queryClient, dateRange),
   };
 
   // Sync utilities
