@@ -437,7 +437,7 @@ export class TransactionArchiver {
 
     // Restore transactions to active storage
     for (const transaction of archiveValue.transactions) {
-      await budgetDb.transactions.put(transaction);
+      await budgetDb.transactions.put(transaction as unknown as Transaction);
     }
 
     logger.info(

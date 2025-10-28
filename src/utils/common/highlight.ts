@@ -128,6 +128,7 @@ export const initHighlight = () => {
 };
 
 // Disabled function to avoid unused declaration error
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _setupConsoleCapture(): void {
   // Disabled function - console capture commented out
   // to avoid conflicts with other error tracking
