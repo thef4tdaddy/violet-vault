@@ -1,5 +1,22 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { securityService } from "../securityService";
+
+// Import types for testing
+interface SecuritySettings {
+  autoLockEnabled: boolean;
+  autoLockTimeout: number;
+  clipboardClearTimeout: number;
+  securityLoggingEnabled: boolean;
+  lockOnPageHide: boolean;
+}
+
+interface SecurityEvent {
+  id: string;
+  timestamp: string;
+  type: string;
+  description: string;
+  metadata: Record<string, unknown>;
+}
 
 // Mock localStorage
 const localStorageMock = {
@@ -86,9 +103,9 @@ describe("securityService", () => {
 
   describe("saveSettings", () => {
     it("should save settings to localStorage", () => {
-      const settings = { autoLockEnabled: false };
+      const settings: Partial<SecuritySettings> = { autoLockEnabled: false };
 
-      securityService.saveSettings(settings);
+      securityService.saveSettings(settings as SecuritySettings);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "violetVault_securitySettings",
@@ -101,7 +118,7 @@ describe("securityService", () => {
         throw new Error("Storage full");
       });
 
-      expect(() => securityService.saveSettings({})).not.toThrow();
+      expect(() => securityService.saveSettings({} as SecuritySettings)).not.toThrow();
     });
   });
 
@@ -126,9 +143,12 @@ describe("securityService", () => {
 
   describe("saveSecurityEvents", () => {
     it("should save events with limit of 100", () => {
-      const events = Array.from({ length: 150 }, (_, i) => ({
+      const events: SecurityEvent[] = Array.from({ length: 150 }, (_, i) => ({
         id: `event-${i}`,
         type: "TEST",
+        timestamp: new Date().toISOString(),
+        description: "Test event",
+        metadata: {},
       }));
 
       securityService.saveSecurityEvents(events);
@@ -166,16 +186,16 @@ describe("securityService", () => {
 
     it("should respect max depth", () => {
       const deepObj = { level1: { level2: { level3: { level4: "deep" } } } };
-      const result = securityService.safeSerialize(deepObj, 2);
+      const result = securityService.safeSerialize(deepObj, 2) as { level1: { level2: unknown } };
 
       expect(result.level1.level2).toBe("[Max Depth Reached]");
     });
 
     it("should handle circular references", () => {
-      const obj = { name: "test" };
+      const obj: { name: string; self?: unknown } = { name: "test" };
       obj.self = obj;
 
-      const result = securityService.safeSerialize(obj);
+      const result = securityService.safeSerialize(obj) as { name: string; self: unknown };
 
       expect(result.name).toBe("test");
       expect(result.self).toBe("[Max Depth Reached]");
@@ -207,14 +227,14 @@ describe("securityService", () => {
     });
 
     it("should handle malformed events gracefully", () => {
-      const badEvent = {
+      const badEvent: { type: number; description: null; metadata: { circular: { ref?: unknown } } } = {
         type: 123, // Invalid type
         description: null,
         metadata: { circular: {} },
       };
       badEvent.metadata.circular.ref = badEvent.metadata.circular;
 
-      const result = securityService.createSecurityEvent(badEvent);
+      const result = securityService.createSecurityEvent(badEvent as unknown as Partial<SecurityEvent> & { type: string; description: string });
 
       expect(result.type).toBe("UNKNOWN");
       expect(result.description).toBe("Security event");
@@ -222,7 +242,7 @@ describe("securityService", () => {
     });
 
     it("should create minimal event on serialization failure", () => {
-      vi.spyOn(JSON, "stringify").mockImplementationOnce(() => {
+      const stringifySpy = vi.spyOn(JSON, "stringify").mockImplementationOnce(() => {
         throw new Error("Serialization error");
       });
 
@@ -232,18 +252,18 @@ describe("securityService", () => {
       expect(result.type).toBe("TEST");
       expect(result.metadata.error).toBe("Serialization failed");
 
-      JSON.stringify.mockRestore();
+      stringifySpy.mockRestore();
     });
   });
 
   describe("logSecurityEvent", () => {
     it("should log event when logging enabled", () => {
-      const settings = { securityLoggingEnabled: true };
+      const settings: Partial<SecuritySettings> = { securityLoggingEnabled: true };
       const event = { type: "TEST", description: "Test event" };
 
       localStorageMock.getItem.mockReturnValue("[]");
 
-      securityService.logSecurityEvent(event, settings);
+      securityService.logSecurityEvent(event, settings as SecuritySettings);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "violetVault_securityEvents",
@@ -252,10 +272,10 @@ describe("securityService", () => {
     });
 
     it("should not log when logging disabled", () => {
-      const settings = { securityLoggingEnabled: false };
+      const settings: Partial<SecuritySettings> = { securityLoggingEnabled: false };
       const event = { type: "TEST", description: "Test event" };
 
-      securityService.logSecurityEvent(event, settings);
+      securityService.logSecurityEvent(event, settings as SecuritySettings);
 
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
