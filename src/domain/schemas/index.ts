@@ -208,3 +208,20 @@ export {
   type BulkUpdate,
   type DatabaseStats,
 } from "./utility";
+
+// Bug Report Schemas & Types
+export {
+  BugReportSchema,
+  BugReportPartialSchema,
+  BugSeveritySchema,
+  SystemInfoSchema,
+  ContextInfoSchema,
+  validateBugReport,
+  validateBugReportSafe,
+  validateBugReportPartial,
+  type BugReport,
+  type BugReportPartial,
+  type BugSeverity,
+  type SystemInfo,
+  type ContextInfo,
+} from "./bug-report";
