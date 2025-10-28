@@ -42,7 +42,7 @@ interface Suggestion {
 /**
  * Analyze bill categorization gaps and suggest improvements
  */
-export const analyzeBillCategorization = (bills: BillItem[], settings: Settings): Suggestion[] => {
+export const analyzeBillCategorization = (bills: BillItem[], _settings: Settings): Suggestion[] => {
   const suggestions: Suggestion[] = [];
 
   // Group bills by category
