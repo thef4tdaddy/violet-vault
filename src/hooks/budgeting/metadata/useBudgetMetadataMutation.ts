@@ -17,7 +17,7 @@ export const useBudgetMetadataMutation = () => {
       // Invalidate queries to refresh UI
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata as readonly unknown[] });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
       logger.debug("TanStack Query: Budget metadata updated successfully");
     },
     onError: (error) => {

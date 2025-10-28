@@ -20,7 +20,7 @@ export const useUnassignedCashOperations = () => {
       } = {}
     ) => {
       if (typeof amount !== "number" || isNaN(amount)) {
-        logger.warn("Invalid unassigned cash amount:", amount);
+        logger.warn("Invalid unassigned cash amount:", { amount });
         return false;
       }
 

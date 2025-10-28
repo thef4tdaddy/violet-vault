@@ -121,7 +121,7 @@ export const processBills = (
     });
 
     // Apply calculations (days until due, urgency)
-    return processBillCalculations(processedBill);
+    return processBillCalculations(processedBill) as unknown as Bill;
   });
 };
 
