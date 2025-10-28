@@ -175,10 +175,10 @@ describe("filtering utilities", () => {
     it("should filter transfer transactions", () => {
       const transferTransaction = {
         ...mockTransactions[0],
-        type: "transfer",
+        type: "transfer" as const,
         amount: 100,
       };
-      const result = filterByType([transferTransaction], "transfer");
+      const result = filterByType([transferTransaction as never], "transfer");
       expect(result).toHaveLength(1);
     });
 
@@ -237,7 +237,7 @@ describe("filtering utilities", () => {
         { id: "1", description: "Test", amount: 100 },
         { id: "2", amount: 200, account: "Test Account" },
       ];
-      const result = filterBySearch(incompleteTransactions, "test");
+      const result = filterBySearch(incompleteTransactions as never[], "test");
       expect(result).toHaveLength(2);
     });
   });
@@ -459,7 +459,7 @@ describe("filtering utilities", () => {
         },
       ];
 
-      const result = calculateTransactionStats(incompleteTransactions);
+      const result = calculateTransactionStats(incompleteTransactions as never[]);
 
       expect(result.categories["Uncategorized"].count).toBe(2);
       expect(result.accounts["Unknown"].count).toBe(2);

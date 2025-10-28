@@ -106,19 +106,19 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
     () => ({
       // Add a new savings goal
       addGoal: async (goalData: unknown) => {
-        logger.debug("Adding savings goal:", goalData);
+        logger.debug("Adding savings goal", goalData as Record<string, unknown>);
         return addSavingsGoalMutation.mutateAsync(goalData as never);
       },
 
       // Update existing goal
       updateGoal: async (goalId: string, updates: unknown) => {
-        logger.debug("Updating savings goal:", { goalId, updates });
+        logger.debug("Updating savings goal", { goalId, updates } as Record<string, unknown>);
         return updateSavingsGoalMutation.mutateAsync({ goalId, updates } as never);
       },
 
       // Delete a goal
       deleteGoal: async (goalId: string) => {
-        logger.debug("Deleting savings goal:", goalId);
+        logger.debug("Deleting savings goal", { goalId } as Record<string, unknown>);
         return deleteSavingsGoalMutation.mutateAsync(goalId as never);
       },
 

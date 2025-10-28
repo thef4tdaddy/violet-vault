@@ -1,9 +1,9 @@
-// Prefetch Helpers - Utilities for pre-loading data with Dexie fallback
 import { QueryClient } from "@tanstack/react-query";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
+import type { DateRange } from "@/db/types";
 
 interface EnvelopeFilters {
   category?: string;
@@ -78,7 +78,7 @@ export const prefetchHelpers = {
    */
   prefetchTransactions: async (
     queryClient: QueryClient,
-    dateRange: { start: string; end: string },
+    dateRange: DateRange,
     options: TransactionOptions = {}
   ) => {
     try {
@@ -213,12 +213,12 @@ export const prefetchHelpers = {
           ]);
 
           const dashboardData = {
-            totalEnvelopes: envelopes.length,
-            activeEnvelopes: envelopes.filter((e) => !e.archived).length,
-            recentTransactionCount: recentTransactions.length,
-            upcomingBillsCount: upcomingBills.length,
-            unassignedCash: metadata?.unassignedCash || 0,
-            actualBalance: metadata?.actualBalance || 0,
+            totalEnvelopes: (envelopes as unknown[]).length,
+            activeEnvelopes: (envelopes as Array<{ archived?: boolean }>).filter((e) => !e.archived).length,
+            recentTransactionCount: (recentTransactions as unknown[]).length,
+            upcomingBillsCount: (upcomingBills as unknown[]).length,
+            unassignedCash: (metadata as { unassignedCash?: number })?.unassignedCash || 0,
+            actualBalance: (metadata as { actualBalance?: number })?.actualBalance || 0,
             lastUpdated: Date.now(),
           };
 

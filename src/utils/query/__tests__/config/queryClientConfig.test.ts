@@ -2,7 +2,7 @@
  * Tests for QueryClient Configuration
  * Verifies TanStack Query client setup, default options, and caching behavior
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { createQueryClient } from "../../queryClientConfig";
 import { QueryCache, MutationCache } from "@tanstack/react-query";
 
@@ -218,7 +218,6 @@ describe("QueryClient Configuration", () => {
     it("should handle query errors through onError callback", async () => {
       // Arrange
       const queryClient = createQueryClient();
-      const onErrorSpy = vi.fn();
       const queryFn = vi.fn(async () => {
         throw new Error("Query error");
       });

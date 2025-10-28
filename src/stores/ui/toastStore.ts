@@ -44,12 +44,12 @@ interface ToastState {
 }
 
 export const useToastStore = create<ToastState>((set, _get) => {
-  const store = {
+  const store: ToastState = {
     toasts: [],
 
-    addToast: ({ type = "info", title, message, duration = 5000 }) => {
+    addToast: ({ type = "info", title, message, duration = 5000 }: AddToastOptions) => {
       const id = ++toastId;
-      const toast = {
+      const toast: Toast = {
         id,
         type,
         title,
@@ -57,7 +57,8 @@ export const useToastStore = create<ToastState>((set, _get) => {
         duration,
       };
 
-      set((state) => ({
+      set((state: ToastState): ToastState => ({
+        ...state,
         toasts: [...state.toasts, toast],
       }));
 
@@ -71,34 +72,35 @@ export const useToastStore = create<ToastState>((set, _get) => {
       return id;
     },
 
-    removeToast: (id) => {
-      set((state) => ({
+    removeToast: (id: number) => {
+      set((state: ToastState): ToastState => ({
+        ...state,
         toasts: state.toasts.filter((toast) => toast.id !== id),
       }));
     },
 
     clearAllToasts: () => {
-      set({ toasts: [] });
+      set({ toasts: [] } as ToastState);
     },
 
     // Convenience methods for different toast types
-    showSuccess: (message, title = "Success", duration = 5000) => {
+    showSuccess: (message: string, title: string = "Success", duration: number = 5000) => {
       return store.addToast({ type: "success", title, message, duration });
     },
 
-    showError: (message, title = "Error", duration = 8000) => {
+    showError: (message: string, title: string = "Error", duration: number = 8000) => {
       return store.addToast({ type: "error", title, message, duration });
     },
 
-    showWarning: (message, title = "Warning", duration = 6000) => {
+    showWarning: (message: string, title: string = "Warning", duration: number = 6000) => {
       return store.addToast({ type: "warning", title, message, duration });
     },
 
-    showInfo: (message, title = "Info", duration = 5000) => {
+    showInfo: (message: string, title: string = "Info", duration: number = 5000) => {
       return store.addToast({ type: "info", title, message, duration });
     },
 
-    showPayday: (message, title = "Payday", duration = 6000) => {
+    showPayday: (message: string, title: string = "Payday", duration: number = 6000) => {
       return store.addToast({ type: "payday", title, message, duration });
     },
   };

@@ -1,7 +1,7 @@
 // Legacy exports
-export { default as envelopeMatching } from "./envelopeMatching.ts";
-export { default as fileParser } from "./fileParser.ts";
-export { default as tableHelpers } from "./tableHelpers.ts";
+export * as envelopeMatching from "./envelopeMatching.ts";
+export * as fileParser from "./fileParser.ts";
+export * as tableHelpers from "./tableHelpers.ts";
 
 // New refactored utilities (Issue #508)
 // Splitting utilities

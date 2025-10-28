@@ -20,6 +20,7 @@ export interface Envelope {
   currentBalance?: number;
   targetAmount?: number;
   description?: string;
+  autoAllocate?: boolean;
   // Connection properties
   billId?: string;
   debtId?: string;

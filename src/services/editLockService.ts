@@ -302,7 +302,7 @@ class EditLockService {
   ownsLock(recordType, recordId) {
     const lockId = `${recordType}_${recordId}`;
     const lock = this.locks.get(lockId);
-    return lock && lock.userId === this.currentUser?.id;
+    return lock && lock.userId === this.currentUser?.userId;
   }
 
   /**
@@ -317,7 +317,7 @@ class EditLockService {
 
     // Release all owned locks
     for (const [, lock] of this.locks) {
-      if (lock.userId === this.currentUser?.id) {
+      if (lock.userId === this.currentUser?.userId) {
         this.releaseLock(lock.recordType, lock.recordId);
       }
     }

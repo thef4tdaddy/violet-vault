@@ -14,9 +14,17 @@ import { ENVELOPE_TYPES } from "../../../constants/categories";
 // Type for test data
 type PaycheckRecord = { payerName: string; amount: number; processedAt?: string };
 type AllocationResult = {
-  allocations: Array<{ envelopeId: string; amount: number }>;
+  allocations: Array<{ 
+    envelopeId: string; 
+    envelopeName: string;
+    amount: number; 
+    monthlyAmount: number;
+    envelopeType: string;
+    priority: string;
+  }>;
   totalAllocated: number;
   remainingAmount: number;
+  allocationRate: number;
 };
 
 describe("paycheckUtils", () => {

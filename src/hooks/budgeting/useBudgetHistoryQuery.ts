@@ -58,7 +58,8 @@ export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
         author: commitData.author || "Unknown",
         parentHash: commitData.parentHash || null,
         deviceFingerprint: "",
-        encryptedSnapshot: encryptedSnapshot.encrypted,
+        encryptedSnapshot: encryptedSnapshot.data,
+        iv: encryptedSnapshot.iv,
         timestamp: Date.now(),
       };
 
@@ -77,7 +78,7 @@ export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetCommits() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.budgetHistory() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetHistory as readonly unknown[] });
     },
   });
 
@@ -161,9 +162,11 @@ export const useBudgetHistoryOperations = () => {
 
       // Decrypt and restore the snapshot
       const encryptionKey = await encryptionUtils.deriveKey(password);
+      const commitWithSnapshot = commit as typeof commit & { encryptedSnapshot: number[]; iv: number[] };
       const decrypted = await encryptionUtils.decrypt(
-        commit.encryptedSnapshot,
-        encryptionKey
+        commitWithSnapshot.encryptedSnapshot,
+        encryptionKey,
+        new Uint8Array(commitWithSnapshot.iv)
       );
       const snapshot = JSON.parse(decrypted);
 
@@ -218,7 +221,7 @@ export const useBudgetHistoryOperations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetCommits() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.budgetHistory() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetHistory as readonly unknown[] });
     },
   });
 

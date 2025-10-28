@@ -63,7 +63,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 logger.info("🚀 TESTING: window.runMasterSyncValidation");
                 try {
                   const result = await window.runMasterSyncValidation();
-                  logger.info("🚀 SUCCESS:", result as Record<string, unknown>);
+                  logger.info("🚀 SUCCESS:", result as unknown as Record<string, unknown>);
                 } catch (error) {
                   logger.error("🚀 ERROR:", error as Record<string, unknown>);
                 }
@@ -84,7 +84,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 logger.info("🔍 TESTING: window.detectLocalDataDebug");
                 try {
                   const result = await window.detectLocalDataDebug();
-                  logger.info("🔍 SUCCESS:", result as Record<string, unknown>);
+                  logger.info("🔍 SUCCESS:", result as unknown as Record<string, unknown>);
                 } catch (error) {
                   logger.error("🔍 ERROR:", error as Record<string, unknown>);
                 }
@@ -138,7 +138,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 if (confirmed) {
                   try {
                     const result = await window.safeCloudDataReset();
-                    logger.info("🛡️ SUCCESS:", result as Record<string, unknown>);
+                    logger.info("🛡️ SUCCESS:", result as unknown as Record<string, unknown>);
                   } catch (error) {
                     logger.error("🛡️ ERROR:", error as Record<string, unknown>);
                   }

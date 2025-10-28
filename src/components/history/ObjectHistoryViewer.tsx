@@ -1,4 +1,4 @@
-import React, { useState, useMemo, createElement } from "react";
+import { useState, useMemo, createElement } from "react";
 import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
 import { getIcon } from "@/utils";
 import {
@@ -35,7 +35,7 @@ const ObjectHistoryViewer = ({
   objectName,
   onClose,
 }: ObjectHistoryViewerProps) => {
-  const { data: allCommits = [], isLoading } = useBudgetCommits();
+  const { commits: allCommits = [], isLoading } = useBudgetCommits();
 
   const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
 

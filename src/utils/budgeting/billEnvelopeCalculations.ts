@@ -6,6 +6,28 @@
 import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
+type Envelope = {
+  id: string | number;
+  name?: string;
+  currentBalance?: number;
+  biweeklyAllocation?: number;
+  envelopeType?: string;
+  [key: string]: unknown;
+};
+
+type Bill = {
+  id: string | number;
+  name?: string;
+  provider?: string;
+  description?: string;
+  amount?: number;
+  estimatedAmount?: number;
+  dueDate: string | Date;
+  category?: string;
+  frequency?: string;
+  [key: string]: unknown;
+};
+
 interface BillEnvelopeResult {
   isValidBillEnvelope: boolean;
   nextBillAmount: number;
@@ -128,7 +150,7 @@ export const calculateBillEnvelopeNeeds = (envelope: Envelope, bills: Bill[] = [
 
   // Calculate funding needs
   const currentBalance = envelope.currentBalance || 0;
-  const biweeklyAllocation = envelope.biweeklyAllocation || 0;
+  const biweeklyAllocation = (envelope.biweeklyAllocation as number) || 0;
   const targetMonthlyAmount = nextBillAmount || biweeklyAllocation * BIWEEKLY_MULTIPLIER;
   const remainingToFund = Math.max(0, nextBillAmount - currentBalance);
   const isFullyFunded = remainingToFund <= 0;
@@ -155,15 +177,15 @@ export const calculateBillEnvelopeNeeds = (envelope: Envelope, bills: Bill[] = [
     upcomingBillsAmount,
     currentBalance,
     targetMonthlyAmount,
-    biweeklyAllocation,
+    biweeklyAllocation: biweeklyAllocation as number,
     nextBill: nextBill
       ? {
-          id: nextBill.id,
-          name: nextBill.name || nextBill.provider || nextBill.description,
+          id: nextBill.id as string,
+          name: (nextBill.name || nextBill.provider || nextBill.description) as string,
           amount: nextBillAmount,
-          dueDate: nextBill.dueDate,
-          category: nextBill.category,
-          frequency: nextBill.frequency || "monthly",
+          dueDate: nextBill.dueDate as string,
+          category: nextBill.category as string | undefined,
+          frequency: (nextBill.frequency || "monthly") as string,
         }
       : null,
   };

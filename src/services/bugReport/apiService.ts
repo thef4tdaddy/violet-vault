@@ -235,7 +235,7 @@ export class BugReportAPIService {
    * Format console logs for GitHub - delegate to GitHubAPIService
    */
   static formatConsoleLogsForGitHub(errors: unknown[]): string {
-    return GitHubAPIService.formatConsoleLogsForGitHub(errors);
+    return GitHubAPIService.formatConsoleLogsForGitHub(errors as never);
   }
 
   /**

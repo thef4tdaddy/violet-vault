@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import MainLayout from "../MainLayout";
@@ -132,7 +132,7 @@ vi.mock("../AppRoutes", () => ({
 }));
 
 vi.mock("../NavigationTabs", () => ({
-  default: ({ activeView, setActiveView }) => (
+  default: ({ setActiveView }: { activeView: string; setActiveView: (view: string) => void }) => (
     <div data-testid="navigation-tabs">
       <button onClick={() => setActiveView("dashboard")}>Dashboard</button>
       <button onClick={() => setActiveView("envelopes")}>Envelopes</button>

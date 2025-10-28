@@ -5,7 +5,7 @@ import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts"
 import logger from "../../utils/common/logger.ts";
 import type { Transaction } from "../../db/types.ts";
 
-interface TransactionInput {
+export interface TransactionInput {
   date?: string;
   amount?: number;
   type?: "income" | "expense" | "transfer";

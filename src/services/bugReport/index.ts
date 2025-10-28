@@ -164,7 +164,7 @@ export class BugReportService {
         const info = ScreenshotService.getScreenshotInfo(screenshot);
         if (info.sizeKB > 1024) {
           // > 1MB
-          logger.warn(`Large screenshot captured: ${info.sizeKB}KB`, info as Record<string, unknown>);
+          logger.warn(`Large screenshot captured: ${info.sizeKB}KB`, info as unknown as Record<string, unknown>);
         }
 
         return screenshot;
@@ -198,7 +198,7 @@ export class BugReportService {
 
       // Technical data
       screenshot: dataCollection.screenshot || undefined,
-      systemInfo: dataCollection.systemInfo,
+      systemInfo: dataCollection.systemInfo as SystemInfo,
 
       // Application context
       appVersion: APP_VERSION,
@@ -229,7 +229,7 @@ export class BugReportService {
 
       if (screenshotInfo.sizeKB > 500) {
         // > 500KB
-        logger.info("Large screenshot detected, using alternative upload method", screenshotInfo as Record<string, unknown>);
+        logger.info("Large screenshot detected, using alternative upload method", screenshotInfo as unknown as Record<string, unknown>);
 
         // For large screenshots, we'll:
         // 1. Submit the bug report without the screenshot first

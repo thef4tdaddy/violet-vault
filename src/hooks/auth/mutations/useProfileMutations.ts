@@ -3,6 +3,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import localStorageService from "../../../services/storage/localStorageService";
+import type { UserData } from "../../../types/auth";
 
 /**
  * Profile-related TanStack Query mutations
@@ -16,7 +17,7 @@ export const useUpdateProfileMutation = () => {
   const { updateUser, encryptionKey, salt } = useAuth();
 
   return useMutation({
-    mutationFn: async (updatedProfile) => {
+    mutationFn: async (updatedProfile: Partial<UserData>) => {
       try {
         if (!encryptionKey || !salt) {
           return { success: false, error: "Not authenticated." };
@@ -51,7 +52,7 @@ export const useUpdateProfileMutation = () => {
         return { success: true, profile: updatedProfile };
       } catch (error) {
         logger.error("Failed to update profile:", error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
       }
     },
     onSuccess: (result) => {

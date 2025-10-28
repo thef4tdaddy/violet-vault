@@ -24,11 +24,11 @@ export const detectLocalData = async () => {
 
     // 2. Get detailed database stats
     const stats = await budgetDb.getDatabaseStats();
-    logger.info("📊 Database stats:", stats);
+    logger.info("📊 Database stats:" as unknown as Record<string, unknown>, stats);
 
     // 3. Calculate total data items
     const totalItems =
-      stats.envelopes + stats.transactions + stats.bills + stats.goals + stats.paychecks;
+      stats.envelopes + stats.transactions + stats.bills + stats.savingsGoals + stats.paychecks;
 
     // 4. Check for any core budget data (envelopes, transactions, bills)
     const hasCoreData = stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;

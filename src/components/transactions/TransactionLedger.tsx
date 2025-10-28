@@ -124,7 +124,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       {/* Transactions Table */}
       <TransactionTable
         transactions={paginatedTransactions}
-        envelopes={envelopes}
+        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
         onEdit={startEdit}
         onDelete={(id) => deleteTransaction(id as never)}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
@@ -145,7 +145,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         transactionForm={transactionForm}
         setTransactionForm={setTransactionForm}
         envelopes={envelopes}
-        categories={TRANSACTION_CATEGORIES}
+        categories={[...TRANSACTION_CATEGORIES]}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={handleSuggestEnvelope}
         onPayBill={handlePayBill}
@@ -172,8 +172,8 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
         envelopes={envelopes}
-        availableCategories={TRANSACTION_CATEGORIES}
-        onSave={handleSplitTransaction}
+        availableCategories={[...TRANSACTION_CATEGORIES]}
+        onSave={handleSplitTransaction as unknown as (allocations: unknown[]) => void}
       />
     </div>
   );
