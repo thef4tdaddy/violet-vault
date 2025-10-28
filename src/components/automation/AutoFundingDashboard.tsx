@@ -16,8 +16,8 @@ import {
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const envelopes = useBudgetStore((state) => state.envelopes);
-  const unassignedCash = useBudgetStore((state) => state.unassignedCash);
-  const allTransactions = useBudgetStore((state) => state.allTransactions);
+  const _unassignedCash = useBudgetStore((state) => state.unassignedCash);
+  const _allTransactions = useBudgetStore((state) => state.allTransactions);
   const confirm = useConfirm();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
@@ -87,13 +87,6 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
     setIsExecuting(true);
     try {
-      const triggerData = {
-        currentDate: new Date().toISOString(),
-        envelopes: envelopes || [],
-        unassignedCash: unassignedCash || 0,
-        transactions: allTransactions || [],
-      };
-
       const result = await executeRules(TRIGGER_TYPES.MANUAL);
 
       if (result.success && 'execution' in result) {
