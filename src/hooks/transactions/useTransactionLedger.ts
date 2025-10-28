@@ -10,6 +10,7 @@ import { useShallow } from "zustand/react/shallow";
 import logger from "../../utils/common/logger";
 import { useLedgerState } from "./helpers/useLedgerState";
 import { useLedgerOperations } from "./helpers/useLedgerOperations";
+import type { TransactionInput } from "./useTransactionMutations";
 
 /**
  * Custom hook for TransactionLedger component
@@ -28,16 +29,16 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore(
-    useShallow((state) => ({
+    useShallow((state: {
+      updateTransaction?: (transaction: unknown) => void;
+      setAllTransactions?: (transactions: unknown[]) => void;
+      updateBill?: (bill: unknown) => void;
+    }) => ({
       updateTransaction: state.updateTransaction,
       setAllTransactions: state.setAllTransactions,
       updateBill: state.updateBill,
     }))
-  ) as {
-    updateTransaction?: (transaction: unknown) => void;
-    setAllTransactions?: (transactions: unknown[]) => void;
-    updateBill?: (bill: unknown) => void;
-  };
+  );
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // Use extracted state management hook
@@ -47,10 +48,10 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions: unknown[]) => {
-    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
+    logger.debug("🔄 Bulk import called with transactions:", { count: newTransactions.length });
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions?.(updatedAllTransactions);
-    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+    logger.debug("💾 Bulk import complete. Total transactions:", { count: updatedAllTransactions.length });
   };
 
   // Custom hooks
@@ -109,10 +110,10 @@ export const useTransactionLedger = (currentUser: unknown) => {
         ...newTransaction,
         id: ledgerState.editingTransaction.id,
       };
-      updateTransaction(transactionWithId);
+      updateTransaction?.(transactionWithId);
       ledgerState.setEditingTransaction(null);
     } else {
-      addTransaction(newTransaction);
+      addTransaction(newTransaction as TransactionInput);
     }
 
     ledgerState.setShowAddModal(false);
