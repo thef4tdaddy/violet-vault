@@ -1,5 +1,4 @@
 import { cloudSyncService } from "../../services/cloudSyncService.ts";
-import { budgetDb } from "../../db/budgetDb.ts";
 import logger from "../common/logger";
 
 export const clearFirebaseData = async () => {

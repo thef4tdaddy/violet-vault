@@ -5,7 +5,7 @@
 
 import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.ts";
-import type { Bill as DexieBill, Transaction } from "../../../db/types";
+import type { Bill as DexieBill } from "../../../db/types";
 
 interface TransactionFilters {
   dateRange?: {
@@ -13,11 +13,6 @@ interface TransactionFilters {
     end: Date;
   };
   envelopeId?: string;
-}
-
-interface Bill {
-  dueDate: Date | string;
-  [key: string]: unknown;
 }
 
 export const queryFunctions = {

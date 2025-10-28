@@ -94,7 +94,6 @@ export const validatePassword = async (password: string): Promise<boolean> => {
     logger.auth("validatePassword: Key derived successfully");
 
     // Attempt to decrypt the data to validate the password
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
 
     logger.auth("validatePassword: Decryption successful - password is correct");

@@ -10,7 +10,7 @@ import { ReportSubmissionService } from "./reportSubmissionService";
 /**
  * System information structure
  */
-interface SystemInfo {
+export interface SystemInfo {
   browser?: string;
   version?: string;
   platform?: string;

@@ -3,7 +3,6 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import localStorageService from "../../../services/storage/localStorageService";
-import type { UserData } from "../../../types/auth";
 
 /**
  * Profile-related TanStack Query mutations
