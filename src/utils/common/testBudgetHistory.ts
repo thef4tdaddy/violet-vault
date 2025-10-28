@@ -1,4 +1,5 @@
 import { budgetDb } from "../../db/budgetDb.ts";
+import type { BudgetChange } from "../../db/types.ts";
 import logger from "./logger.ts";
 
 /**
@@ -21,24 +22,24 @@ export const createTestBudgetHistory = async () => {
     };
 
     // Create test changes
-    const testChanges = [
+    const testChanges: BudgetChange[] = [
       {
         commitHash: testCommit.hash,
         entityType: "envelope",
         entityId: "test_envelope_1",
-        changeType: "modify",
+        changeType: "update",
         description: "Updated envelope balance for testing",
-        beforeData: { balance: 100 },
-        afterData: { balance: 150 },
+        oldValue: { balance: 100 },
+        newValue: { balance: 150 },
       },
       {
         commitHash: testCommit.hash,
         entityType: "transaction",
         entityId: "test_transaction_1",
-        changeType: "add",
+        changeType: "create",
         description: "Added test transaction",
-        beforeData: null,
-        afterData: { amount: 50, description: "Test transaction" },
+        oldValue: null,
+        newValue: { amount: 50, description: "Test transaction" },
       },
     ];
 
@@ -63,7 +64,7 @@ export const createTestBudgetHistory = async () => {
  */
 export const checkBudgetHistory = async () => {
   try {
-    const commits = await budgetDb.getBudgetCommits({ limit: 10 });
+    const commits = await budgetDb.budgetCommits.limit(10).toArray();
     const changes = await budgetDb.budgetChanges.limit(10).toArray();
 
     logger.info("📊 Budget history status", {

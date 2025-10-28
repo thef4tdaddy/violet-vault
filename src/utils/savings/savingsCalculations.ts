@@ -40,7 +40,7 @@ export const calculateDaysRemaining = (targetDate, fromDate = new Date()) => {
     const timeDiff = target.getTime() - from.getTime();
     return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   } catch (error) {
-    logger.warn("Invalid target date for savings goal:", targetDate, error);
+    logger.warn("Invalid target date for savings goal:", { targetDate, error });
     return null;
   }
 };
@@ -258,7 +258,7 @@ const matchesAttributeFilters = (goal, filters) => {
 /**
  * Filter savings goals by status and other criteria
  */
-export const filterSavingsGoals = (goals, filters = {}) => {
+export const filterSavingsGoals = (goals: unknown[], filters: { status?: string; includeCompleted?: boolean } = {}) => {
   const { status = "all", includeCompleted = true } = filters;
 
   return goals.filter((goal) => {

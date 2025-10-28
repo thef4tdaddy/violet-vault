@@ -11,8 +11,8 @@ import { z } from 'zod';
  * Used for querying data within a date range
  */
 export const DateRangeSchema = z.object({
-  start: z.union([z.date(), z.string()], { errorMap: () => ({ message: 'Start date must be valid' }) }),
-  end: z.union([z.date(), z.string()], { errorMap: () => ({ message: 'End date must be valid' }) }),
+  start: z.union([z.date(), z.string()], 'Start date must be valid'),
+  end: z.union([z.date(), z.string()], 'End date must be valid'),
 });
 
 export type DateRange = z.infer<typeof DateRangeSchema>;

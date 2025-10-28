@@ -113,7 +113,7 @@ export const formatLastChecked = (lastChecked: string | Date | null): string => 
   try {
     const date = new Date(lastChecked);
     const now = new Date();
-    const diffMs = now - date;
+    const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / (1000 * 60));
 
     if (diffMins < 1) return "Just now";
@@ -159,7 +159,7 @@ export const requiresImmediateAttention = (syncStatus: SyncStatus): boolean => {
  * Check if recovery actions are available
  */
 export const hasRecoveryActions = (): boolean => {
-  return (
+  return Boolean(
     typeof window !== "undefined" && (window.runMasterSyncValidation || window.forceCloudDataReset)
   );
 };

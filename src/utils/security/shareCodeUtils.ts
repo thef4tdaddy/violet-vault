@@ -170,7 +170,14 @@ export const shareCodeUtils = {
     }
 
     // Enhanced format with optional creator info
-    const qrData = {
+    const qrData: {
+      type: string;
+      shareCode: string;
+      version: string;
+      createdBy?: string;
+      creatorColor?: string;
+      createdAt?: number;
+    } = {
       type: "violetVault_share",
       shareCode: normalizedShareCode,
       version: "2.0",
