@@ -107,16 +107,21 @@ export const useAddBillMutation = () => {
 
       const newBill = {
         id: uniqueId,
-        ...billData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        name: (billData.name as string) || "Unnamed Bill",
+        dueDate: new Date(billData.dueDate as string | Date),
+        amount: (billData.amount as number) || 0,
+        category: (billData.category as string) || "Uncategorized",
         isPaid: false, // Default to unpaid
+        isRecurring: (billData.isRecurring as boolean) || false,
+        lastModified: Date.now(),
+        ...billData,
+        createdAt: Date.now(),
       };
 
       // Persist to Dexie (optimistic update handled by React Query)
       await budgetDb.bills.add(newBill);
 
-      logger.debug("✅ Added bill:", newBill);
+      logger.debug("✅ Added bill:", newBill as Record<string, unknown>);
 
       return newBill;
     },
@@ -178,13 +183,13 @@ export const useUpdateBillMutation = () => {
         ...existingBill,
         ...updates,
         id: billId, // Ensure ID stays the same
-        updatedAt: new Date().toISOString(),
+        lastModified: Date.now(),
       };
 
       // Update in Dexie (optimistic update handled by React Query)
       await budgetDb.bills.update(billId, updatedBill);
 
-      logger.debug("✅ Updated bill:", updatedBill);
+      logger.debug("✅ Updated bill:", updatedBill as Record<string, unknown>);
 
       return updatedBill;
     },
@@ -262,18 +267,14 @@ export const useMarkBillPaidMutation = () => {
 
       const paymentDate = paidDate || new Date().toISOString().split("T")[0];
 
-      const paidData = {
+      // Apply to Dexie directly (optimistic update handled by React Query)
+      await budgetDb.bills.update(billId, {
         isPaid: true,
         paidAmount: paidAmount,
         paidDate: paymentDate,
         envelopeId: envelopeId,
         lastPaid: new Date().toISOString(),
-      };
-
-      // Apply to Dexie directly (optimistic update handled by React Query)
-      await budgetDb.bills.update(billId, {
-        ...paidData,
-        updatedAt: new Date().toISOString(),
+        lastModified: Date.now(),
       });
 
       // Create transaction record for the bill payment
