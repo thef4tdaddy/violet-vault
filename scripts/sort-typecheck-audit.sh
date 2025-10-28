@@ -16,19 +16,30 @@ fi
 # --- Report Generation ---
 > "$OUTPUT_FILE"
 
-# Section 1: Summary of files with the most errors.
-echo "--- Files with Most Type Errors ---" >> "$OUTPUT_FILE"
-grep -oE '^[a-zA-Z0-9/._-]+' "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" | sort | uniq -c | sort -nr >> "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
+# Count total errors
+TOTAL_ERRORS=$(grep -c "error TS" "$INPUT_FILE" 2>/dev/null || echo 0)
 
-# Section 2: Breakdown of errors by category.
-echo "--- Type Error Breakdown by Category ---" >> "$OUTPUT_FILE"
-grep -oE 'TS[0-9]+' "$INPUT_FILE" | sort | uniq -c | sort -nr >> "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
+if [ "$TOTAL_ERRORS" -eq 0 ]; then
+    # No errors found
+    echo "✅ No TypeScript Type Errors Found" >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
+    echo "All files passed TypeScript type checking!" >> "$OUTPUT_FILE"
+    echo "Last check: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> "$OUTPUT_FILE"
+else
+    # Section 1: Summary of files with the most errors.
+    echo "--- Files with Most Type Errors ---" >> "$OUTPUT_FILE"
+    grep -oE '^[a-zA-Z0-9/._-]+' "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" | sort | uniq -c | sort -nr >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
 
-# Section 3: A detailed, classic-style report.
-echo "--- Detailed Type Error Report ---" >> "$OUTPUT_FILE"
-cat "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" >> "$OUTPUT_FILE"
+    # Section 2: Breakdown of errors by category.
+    echo "--- Type Error Breakdown by Category ---" >> "$OUTPUT_FILE"
+    grep -oE 'TS[0-9]+' "$INPUT_FILE" | sort | uniq -c | sort -nr >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
+
+    # Section 3: A detailed, classic-style report.
+    echo "--- Detailed Type Error Report ---" >> "$OUTPUT_FILE"
+    cat "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" >> "$OUTPUT_FILE"
+fi
 
 # --- Completion ---
 echo "Sorted typecheck report has been generated at '$OUTPUT_FILE'"
