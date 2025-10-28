@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import useTransactionAnalytics from "../useTransactionAnalytics";
+import { renderHook } from "@testing-library/react";
+import { useTransactionAnalytics } from "../useTransactionAnalytics";
 
 describe("useTransactionAnalytics", () => {
   const mockTransactions = [
@@ -233,6 +233,7 @@ describe("useTransactionAnalytics", () => {
           amount: -15.5,
           date: "2024-01-25T08:00:00Z",
           category: "Food",
+          tags: ["coffee"],
         },
       ];
 

@@ -33,22 +33,24 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
   const { categoryRules = [] } = options;
 
   // Create mutation configurations
-  const addTransactionMutation = useMutation(
-    createAddTransactionMutationConfig(queryClient, categoryRules)
-  );
-  const updateTransactionMutation = useMutation(
-    createUpdateTransactionMutationConfig(queryClient)
-  );
-  const deleteTransactionMutation = useMutation(
-    createDeleteTransactionMutationConfig(queryClient)
-  );
-  const splitTransactionMutation = useMutation(
-    createSplitTransactionMutationConfig(queryClient)
-  );
-  const transferFundsMutation = useMutation(createTransferFundsMutationConfig(queryClient));
-  const bulkOperationMutation = useMutation(
-    createBulkOperationMutationConfig(queryClient, categoryRules)
-  );
+  const addTransactionMutation = useMutation({
+    ...createAddTransactionMutationConfig(queryClient, categoryRules),
+  });
+  const updateTransactionMutation = useMutation({
+    ...createUpdateTransactionMutationConfig(queryClient),
+  });
+  const deleteTransactionMutation = useMutation({
+    ...createDeleteTransactionMutationConfig(queryClient),
+  });
+  const splitTransactionMutation = useMutation({
+    ...createSplitTransactionMutationConfig(queryClient),
+  });
+  const transferFundsMutation = useMutation({
+    ...createTransferFundsMutationConfig(queryClient),
+  });
+  const bulkOperationMutation = useMutation({
+    ...createBulkOperationMutationConfig(queryClient, categoryRules),
+  });
 
   // Convenience methods
   const addTransaction = useCallback(
