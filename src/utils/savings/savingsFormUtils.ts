@@ -80,7 +80,7 @@ export const validateSavingsGoalForm = (formData: unknown): string[] => {
     return [];
   }
 
-  // Extract error messages from Zod validation errors (Zod v4 uses 'issues')
+  // Extract error messages from Zod validation errors
   return result.error?.issues.map((err) => err.message) || [];
 };
 
@@ -108,11 +108,6 @@ export const processSavingsGoalFormData = (
   formData: SavingsGoalFormData,
   editingGoal: SavingsGoalData | null = null
 ): SavingsGoalData => {
-  const validation = validateSavingsGoalForm(formData);
-  if (validation.length > 0) {
-    throw new Error(`Validation failed: ${validation.join(", ")}`);
-  }
-
   // Parse and validate with Zod schema
   const result = validateSavingsGoalFormSafe(formData);
   if (!result.success) {
