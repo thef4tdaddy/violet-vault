@@ -325,7 +325,7 @@ export const validateTransfers = (transfers, context) => {
  * @returns {Object} Impact analysis
  */
 export const calculateTransferImpact = (transfers, context) => {
-  const { envelopes, _unassignedCash } = context.data;
+  const { envelopes } = context.data;
   const impact = {
     envelopes: new Map(),
     unassignedChange: 0,

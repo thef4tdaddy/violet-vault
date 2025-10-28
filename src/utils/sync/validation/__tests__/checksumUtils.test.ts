@@ -129,7 +129,7 @@ describe("checksumUtils", () => {
     });
 
     it("should handle circular references safely", async () => {
-      const data = { name: "test" };
+      const data: Record<string, unknown> = { name: "test" };
       data.self = data; // Create circular reference
 
       // Should not throw, but handle gracefully

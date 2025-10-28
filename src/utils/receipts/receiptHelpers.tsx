@@ -198,7 +198,7 @@ export const getReceiptFormChanges = (receiptData, transactionForm) => {
  * Render confidence indicator for receipt data fields
  * UI utility function extracted from ReceiptScanner
  */
-export const renderConfidenceIndicator = (field, confidence) => {
+export const renderConfidenceIndicator = (_field, confidence) => {
   const confidenceMap = {
     high: { color: "text-green-600", iconName: "CheckCircle" },
     medium: { color: "text-yellow-600", iconName: "CheckCircle" },

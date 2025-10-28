@@ -23,7 +23,7 @@ export const generateChecksum = async (data) => {
       dataBuffer = encoder.encode(data);
     } else {
       // Handle objects, arrays, null, undefined, etc.
-      const jsonString = JSON.stringify(data, (key, value) => {
+      const jsonString = JSON.stringify(data, (_key, value) => {
         if (value === undefined) return null;
         if (typeof value === "function") return "[Function]";
         if (value instanceof Date) return value.toISOString();

@@ -83,7 +83,7 @@ class BackgroundSyncManager {
           operationId: operation.id,
         });
       } catch (error) {
-        operation.retryCount = (operation.retryCount || 0) + 1;
+        operation.retryCount = ((operation.retryCount as number | undefined) || 0) + 1;
         operation.lastError = (error as Error).message;
 
         if (operation.retryCount >= operation.maxRetries) {
