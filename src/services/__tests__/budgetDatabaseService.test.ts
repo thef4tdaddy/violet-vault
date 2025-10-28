@@ -1,5 +1,5 @@
 // Budget Database Service Tests
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { budgetDb } from "@/db/budgetDb";
 
@@ -49,8 +49,6 @@ vi.mock("../../db/budgetDb", () => ({
     },
     envelopes: { clear: vi.fn() },
     transactions: { clear: vi.fn() },
-    bills: { clear: vi.fn() },
-    savingsGoals: { clear: vi.fn() },
     paycheckHistory: { clear: vi.fn() },
     cache: { clear: vi.fn() },
     auditLog: { clear: vi.fn() },
@@ -75,7 +73,7 @@ describe("BudgetDatabaseService", () => {
 
   describe("initialize", () => {
     it("should initialize successfully", async () => {
-      budgetDb.open.mockResolvedValue(true);
+      (budgetDb.open as Mock).mockResolvedValue(true);
 
       const result = await budgetDatabaseService.initialize();
 
@@ -85,7 +83,7 @@ describe("BudgetDatabaseService", () => {
 
     it("should handle initialization errors", async () => {
       const error = new Error("Database connection failed");
-      budgetDb.open.mockRejectedValue(error);
+      (budgetDb.open as Mock).mockRejectedValue(error);
 
       await expect(budgetDatabaseService.initialize()).rejects.toThrow(
         "Database connection failed"
@@ -104,7 +102,7 @@ describe("BudgetDatabaseService", () => {
         cache: 15,
       };
 
-      budgetDb.getDatabaseStats.mockResolvedValue(mockStats);
+      (budgetDb.getDatabaseStats as Mock).mockResolvedValue(mockStats);
 
       const result = await budgetDatabaseService.getStats();
 
@@ -120,7 +118,7 @@ describe("BudgetDatabaseService", () => {
         { id: "2", name: "Gas", archived: false },
       ];
 
-      budgetDb.getActiveEnvelopes.mockResolvedValue(mockEnvelopes);
+      (budgetDb.getActiveEnvelopes as Mock).mockResolvedValue(mockEnvelopes);
 
       const result = await budgetDatabaseService.getEnvelopes();
 
@@ -131,7 +129,7 @@ describe("BudgetDatabaseService", () => {
     it("should get envelopes by category", async () => {
       const mockEnvelopes = [{ id: "1", name: "Food", category: "expenses", archived: false }];
 
-      budgetDb.getEnvelopesByCategory.mockResolvedValue(mockEnvelopes);
+      (budgetDb.getEnvelopesByCategory as Mock).mockResolvedValue(mockEnvelopes);
 
       const result = await budgetDatabaseService.getEnvelopes({
         category: "expenses",
@@ -145,7 +143,7 @@ describe("BudgetDatabaseService", () => {
     it("should use cached data when available", async () => {
       const mockEnvelopes = [{ id: "1", name: "Food" }];
 
-      budgetDb.getCachedValue.mockResolvedValue(mockEnvelopes);
+      (budgetDb.getCachedValue as Mock).mockResolvedValue(mockEnvelopes);
 
       const result = await budgetDatabaseService.getEnvelopes({
         useCache: true,
@@ -163,8 +161,8 @@ describe("BudgetDatabaseService", () => {
         { id: "2", name: "Gas" },
       ];
 
-      budgetDb.bulkUpsertEnvelopes.mockResolvedValue(true);
-      budgetDb.clearCacheCategory.mockResolvedValue(true);
+      (budgetDb.bulkUpsertEnvelopes as Mock).mockResolvedValue(true);
+      (budgetDb.clearCacheCategory as Mock).mockResolvedValue(true);
 
       await budgetDatabaseService.saveEnvelopes(envelopes);
 
@@ -185,7 +183,7 @@ describe("BudgetDatabaseService", () => {
         end: new Date("2024-01-31"),
       };
 
-      budgetDb.getTransactionsByDateRange.mockResolvedValue(mockTransactions);
+      (budgetDb.getTransactionsByDateRange as Mock).mockResolvedValue(mockTransactions);
 
       const result = await budgetDatabaseService.getTransactions({
         dateRange,
@@ -202,7 +200,7 @@ describe("BudgetDatabaseService", () => {
     it("should get transactions by envelope", async () => {
       const mockTransactions = [{ id: "1", envelopeId: "env1", amount: 100 }];
 
-      budgetDb.getTransactionsByEnvelope.mockResolvedValue(mockTransactions);
+      (budgetDb.getTransactionsByEnvelope as Mock).mockResolvedValue(mockTransactions);
 
       const result = await budgetDatabaseService.getTransactions({
         envelopeId: "env1",
@@ -223,7 +221,7 @@ describe("BudgetDatabaseService", () => {
         end: new Date("2024-01-31"),
       };
 
-      budgetDb.getTransactionsByDateRange.mockResolvedValue(mockTransactions);
+      (budgetDb.getTransactionsByDateRange as Mock).mockResolvedValue(mockTransactions);
 
       const result = await budgetDatabaseService.getTransactions({
         dateRange,
@@ -240,8 +238,8 @@ describe("BudgetDatabaseService", () => {
       const upcomingBills = [{ id: "1", isPaid: false, dueDate: new Date() }];
       const overdueBills = [{ id: "2", isPaid: false, dueDate: new Date() }];
 
-      budgetDb.getUpcomingBills.mockResolvedValue(upcomingBills);
-      budgetDb.getOverdueBills.mockResolvedValue(overdueBills);
+      (budgetDb.getUpcomingBills as Mock).mockResolvedValue(upcomingBills);
+      (budgetDb.getOverdueBills as Mock).mockResolvedValue(overdueBills);
 
       const result = await budgetDatabaseService.getBills({
         isPaid: false,
@@ -256,7 +254,7 @@ describe("BudgetDatabaseService", () => {
     it("should get paid bills", async () => {
       const paidBills = [{ id: "1", isPaid: true }];
 
-      budgetDb.getPaidBills.mockResolvedValue(paidBills);
+      (budgetDb.getPaidBills as Mock).mockResolvedValue(paidBills);
 
       const result = await budgetDatabaseService.getBills({
         isPaid: true,
@@ -275,7 +273,7 @@ describe("BudgetDatabaseService", () => {
         lastModified: Date.now(),
       };
 
-      budgetDb.budget.get.mockResolvedValue(mockMetadata);
+      (budgetDb.budget.get as Mock).mockResolvedValue(mockMetadata);
 
       const result = await budgetDatabaseService.getBudgetMetadata();
 
@@ -284,7 +282,7 @@ describe("BudgetDatabaseService", () => {
     });
 
     it("should return null when no metadata exists", async () => {
-      budgetDb.budget.get.mockResolvedValue(undefined);
+      (budgetDb.budget.get as Mock).mockResolvedValue(undefined);
 
       const result = await budgetDatabaseService.getBudgetMetadata();
 
@@ -300,9 +298,9 @@ describe("BudgetDatabaseService", () => {
       };
       const mockData = [{ id: "1", amount: 100 }];
 
-      budgetDb.getCachedValue.mockResolvedValue(null);
-      budgetDb.getAnalyticsData.mockResolvedValue(mockData);
-      budgetDb.setCachedValue.mockResolvedValue(true);
+      (budgetDb.getCachedValue as Mock).mockResolvedValue(null);
+      (budgetDb.getAnalyticsData as Mock).mockResolvedValue(mockData);
+      (budgetDb.setCachedValue as Mock).mockResolvedValue(true);
 
       const result = await budgetDatabaseService.getAnalyticsData(dateRange, {
         includeTransfers: false,
@@ -321,7 +319,7 @@ describe("BudgetDatabaseService", () => {
       };
       const cachedData = [{ id: "cached", amount: 200 }];
 
-      budgetDb.getCachedValue.mockResolvedValue(cachedData);
+      (budgetDb.getCachedValue as Mock).mockResolvedValue(cachedData);
 
       const result = await budgetDatabaseService.getAnalyticsData(dateRange, {
         useCache: true,
@@ -334,7 +332,7 @@ describe("BudgetDatabaseService", () => {
 
   describe("clearData", () => {
     it("should clear all budget data", async () => {
-      budgetDb.transaction.mockImplementation((mode, tables, fn) => fn());
+      (budgetDb.transaction as Mock).mockImplementation((_mode, _tables, fn) => fn());
 
       await budgetDatabaseService.clearData();
 
@@ -351,7 +349,7 @@ describe("BudgetDatabaseService", () => {
 
   describe("getStatus", () => {
     it("should return service status", () => {
-      budgetDb.isOpen.mockReturnValue(true);
+      (budgetDb.isOpen as Mock).mockReturnValue(true);
 
       const status = budgetDatabaseService.getStatus();
 
