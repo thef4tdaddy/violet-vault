@@ -33,7 +33,7 @@ class StoreRegistry {
 
     // Make available globally in development
     if (import.meta.env.DEV) {
-      const globalWindow = window as Record<string, unknown>;
+      const globalWindow = window as unknown as Record<string, unknown>;
       if (!globalWindow.__VIOLET_VAULT_STORES__) {
         globalWindow.__VIOLET_VAULT_STORES__ = {};
       }
