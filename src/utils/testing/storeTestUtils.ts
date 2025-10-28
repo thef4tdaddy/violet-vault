@@ -35,9 +35,10 @@ export class StoreTestHelper<T = unknown> {
    * Reset store to initial state
    */
   reset() {
-    if (this.storeHook.getState().reset) {
+    const state = this.storeHook.getState();
+    if (state && typeof state === 'object' && 'reset' in state && typeof state.reset === 'function') {
       act(() => {
-        this.storeHook.getState().reset();
+        (state.reset as () => void)();
       });
     }
   }

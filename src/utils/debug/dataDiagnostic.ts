@@ -138,10 +138,10 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
     const budgetRecords = await window.budgetDb.budget.toArray();
     results.data.budgetTable = {
       totalRecords: budgetRecords.length,
-      records: budgetRecords as unknown as Record<string, unknown>[],
+      records: budgetRecords,
     };
 
-    logger.info("📋 Budget table records:", budgetRecords);
+    logger.info("📋 Budget table records:", budgetRecords as unknown as Record<string, unknown>);
   } catch (error) {
     results.errors.push(`Diagnostic failed: ${error.message}`);
     logger.error("❌ Diagnostic error:", error);
@@ -269,7 +269,7 @@ export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback
     logger.info(`🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`);
 
     if (corruptedPaychecks.length > 0) {
-      logger.info("💀 Corrupted paychecks:", corruptedPaychecks);
+      logger.info("💀 Corrupted paychecks:", corruptedPaychecks as unknown as Record<string, unknown>);
 
       const confirmed = confirmCallback
         ? await confirmCallback({
@@ -278,7 +278,7 @@ export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback
             confirmLabel: "Delete Records",
             cancelLabel: "Cancel",
             destructive: true,
-          } as unknown as Record<string, unknown>)
+          } as ConfirmDialogOptions)
         : /* eslint-disable-next-line no-restricted-syntax -- diagnostic tool for browser console */
           window.confirm(
             `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`

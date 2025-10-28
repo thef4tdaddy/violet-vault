@@ -3,6 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 // import { useDebtCard } from "@/hooks/debts/useDebtCard";
 import DebtCardProgressBar from "./DebtCardProgressBar";
+import { DebtAccount } from "@/types/debt";
 
 interface Debt {
   id: string;
@@ -13,9 +14,9 @@ interface Debt {
 }
 
 interface DebtListProps {
-  debts: Debt[];
-  onDebtClick: (debt: Debt) => void;
-  onRecordPayment: (debt: Debt, amount: number) => void;
+  debts: Debt[] | DebtAccount[];
+  onDebtClick: (debt: Debt | DebtAccount) => void;
+  onRecordPayment: (debt: Debt | DebtAccount, amount: number) => void;
 }
 
 /**
@@ -26,7 +27,7 @@ const DebtList = ({ debts, onDebtClick, _onRecordPayment }: DebtListProps) => {
   return (
     <div className="divide-y divide-gray-100">
       {debts.map((debt) => (
-        <DebtCard key={debt.id} debt={debt} onClick={() => onDebtClick(debt)} />
+        <DebtCard key={debt.id} debt={debt as Debt} onClick={() => onDebtClick(debt)} />
       ))}
     </div>
   );

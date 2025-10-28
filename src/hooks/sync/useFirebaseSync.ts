@@ -58,7 +58,6 @@ const useFirebaseSync = ({
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState<User[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
-  const [_isLoading, _setIsLoading] = useState(false); // TODO: Use for loading states
 
   // Auto-initialize Firebase sync when dependencies are ready
   useEffect(() => {
@@ -104,24 +103,6 @@ const useFirebaseSync = ({
     };
   }, [firebaseSync, currentUser, budgetId, encryptionKey]);
 
-  // Legacy code for manual save operations (if needed)
-  const _handleManualSave = async (): Promise<void> => {
-    // TODO: Implement manual save functionality
-    try {
-      logger.production("Manual save triggered");
-      const result = await firebaseSync.forceSync();
-      if (result && result.success) {
-        logger.production("Manual save completed successfully");
-        showSuccessToast("Data saved successfully");
-      } else {
-        showErrorToast("Failed to save data");
-      }
-    } catch (error) {
-      logger.warn("Manual save failed:", (error as Error).message);
-      showErrorToast("Failed to save data");
-    }
-  };
-
   const handleManualSync = useCallback(async (): Promise<void> => {
     try {
       if (!firebaseSync) return;
@@ -129,16 +110,17 @@ const useFirebaseSync = ({
       logger.info("🔄 Manual sync triggered...");
       const result = await firebaseSync.forceSync();
 
-      if (result && result.success) {
+      if (result && typeof result === 'object' && 'success' in result && result.success) {
         showSuccessToast("Manual sync completed successfully");
-        logger.info("✅ Manual sync completed:", result);
+        logger.info("✅ Manual sync completed:", result as Record<string, unknown>);
       } else {
         showErrorToast("Manual sync failed");
-        logger.warn("❌ Manual sync failed:", result);
+        logger.warn("❌ Manual sync failed:", result as Record<string, unknown>);
       }
     } catch (err) {
-      logger.error("Manual sync failed", err);
-      showErrorToast(`Sync failed: ${(err as Error).message}`, "Sync Failed");
+      const error = err as Error;
+      logger.error("Manual sync failed", { message: error.message });
+      showErrorToast(`Sync failed: ${error.message}`, "Sync Failed");
     }
   }, [firebaseSync, showErrorToast, showSuccessToast]);
 
