@@ -67,11 +67,16 @@ export const useReceiptToTransaction = (receiptData) => {
     setIsSubmitting(true);
 
     try {
-      // Create the transaction
+      // Create the transaction with proper type casting
       const transaction = await addTransactionAsync({
-        ...transactionForm,
         amount: Math.abs(parseFloat(transactionForm.amount)),
-      });
+        description: transactionForm.description,
+        date: transactionForm.date,
+        envelopeId: transactionForm.envelopeId,
+        category: transactionForm.category,
+        type: transactionForm.type as "income" | "expense" | "transfer",
+        notes: transactionForm.notes,
+      } as Parameters<typeof addTransactionAsync>[0]);
 
       // Save the receipt with reference to transaction
       const receipt = await addReceiptAsync({

@@ -55,9 +55,9 @@ class SyncServiceInitializer {
         [import("./chunkedSyncService.js"), import("./firebaseSyncService.js")]
       );
 
-      // Store references for access
-      this.chunkedSyncService = chunkedSyncService;
-      this.firebaseSyncService = firebaseSyncService;
+      // Store references for access - cast as unknown first since these are class instances
+      this.chunkedSyncService = chunkedSyncService as unknown as ChunkedSyncService;
+      this.firebaseSyncService = firebaseSyncService as unknown as FirebaseSyncService;
 
       logger.info("✅ Firebase sync services loaded successfully");
       this.initialized = true;

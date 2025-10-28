@@ -83,8 +83,8 @@ class BackgroundSyncManager {
           operationId: operation.id,
         });
       } catch (error) {
-        operation.retryCount++;
-        operation.lastError = error.message;
+        operation.retryCount = (operation.retryCount || 0) + 1;
+        operation.lastError = (error as Error).message;
 
         if (operation.retryCount >= operation.maxRetries) {
           logger.error("❌ Background Sync: Operation failed permanently", error, {
@@ -232,7 +232,7 @@ const backgroundSyncManager = new BackgroundSyncManager();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as Record<string, unknown>).backgroundSyncManager = backgroundSyncManager;
+  (window as unknown as Record<string, unknown>).backgroundSyncManager = backgroundSyncManager;
 }
 
 export default backgroundSyncManager;

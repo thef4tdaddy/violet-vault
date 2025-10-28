@@ -4,7 +4,7 @@ import { vi } from "vitest";
 
 vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
-    transaction: vi.fn((mode, tables, callback) => callback()),
+    transaction: vi.fn((_mode, _tables, callback) => callback()),
     envelopes: {
       clear: vi.fn(),
       bulkAdd: vi.fn(),

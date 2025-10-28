@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 // Mock Firebase modules
 vi.mock("firebase/app", () => ({
@@ -162,7 +162,7 @@ describe("Sync Error Handling Tests", () => {
 
       let isAuthenticated = false;
 
-      onAuthStateChanged.mockImplementationOnce((auth, callback) => {
+      onAuthStateChanged.mockImplementationOnce((_auth, callback) => {
         callback(null); // No user
         return () => {};
       });

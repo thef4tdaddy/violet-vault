@@ -152,8 +152,15 @@ export const createSafeStore = <T extends object>({
       },
     };
 
-    // Add wrapped actions
-    Object.assign(store, wrapActions(actions, name, set, useStore, store));
+    // Add wrapped actions - cast set to the correct type
+    const wrappedActions = wrapActions(
+      actions, 
+      name, 
+      set as (fn: (state: Record<string, unknown>) => Record<string, unknown> | void) => void, 
+      useStore, 
+      store
+    );
+    Object.assign(store, wrappedActions);
     return store as T & Record<string, unknown>;
   };
 
@@ -169,7 +176,7 @@ export const createSafeStore = <T extends object>({
     name
   );
 
-  useStore = create(middlewareStack);
+  useStore = create(middlewareStack) as unknown as StoreApi<T & Record<string, unknown>>;
 
   logger.info(`Created safe store: ${name}`, {
     persist: enablePersist && !LOCAL_ONLY_MODE,

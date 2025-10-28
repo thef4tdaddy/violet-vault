@@ -38,7 +38,13 @@ export const generateUserId = (currentUser) => {
 /**
  * Create lock document structure
  */
-export const createLockDocument = (recordType, recordId, budgetId, currentUser, options = {}) => {
+export const createLockDocument = (
+  recordType: string, 
+  recordId: string, 
+  budgetId: string, 
+  currentUser: { userName?: string }, 
+  options: { duration?: number } = {}
+) => {
   const lockId = `${recordType}_${recordId}`;
   const userId = generateUserId(currentUser);
 
@@ -92,7 +98,7 @@ export const handleExistingLock = async (existingLock, currentUser, releaseLockF
 /**
  * Create extended lock document for existing user locks
  */
-export const createExtendedLock = (lockDoc, options = {}) => {
+export const createExtendedLock = (lockDoc: Record<string, unknown>, options: { duration?: number } = {}) => {
   return {
     ...lockDoc,
     expiresAt: new Date(Date.now() + (options.duration || 60000)),
