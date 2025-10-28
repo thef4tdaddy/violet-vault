@@ -20,19 +20,30 @@ fi
 # --- Report Generation ---
 > "$OUTPUT_FILE"
 
-# Section 1: Summary of files with the most issues.
-echo "--- Files with Most Issues (Errors + Warnings) ---" >> "$OUTPUT_FILE"
-jq -r '.[] | select((.errorCount + .warningCount) > 0) | "\((.errorCount + .warningCount)) issues in \(.filePath)"' "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" | sort -nr >> "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
+# Count total issues
+TOTAL_ISSUES=$(jq -r '.[] | select((.errorCount + .warningCount) > 0) | (.errorCount + .warningCount)' "$INPUT_FILE" | paste -sd+ | bc 2>/dev/null || echo 0)
 
-# Section 2: Breakdown of issues by ESLint rule.
-echo "--- Issue Count by Category (ESLint Rule) ---" >> "$OUTPUT_FILE"
-jq -r '.[].messages[].ruleId' "$INPUT_FILE" | sort | uniq -c | sort -nr >> "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
+if [ "$TOTAL_ISSUES" -eq 0 ]; then
+    # No issues found
+    echo "✅ No Lint Issues Found" >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
+    echo "All files passed ESLint validation!" >> "$OUTPUT_FILE"
+    echo "Last check: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> "$OUTPUT_FILE"
+else
+    # Section 1: Summary of files with the most issues.
+    echo "--- Files with Most Issues (Errors + Warnings) ---" >> "$OUTPUT_FILE"
+    jq -r '.[] | select((.errorCount + .warningCount) > 0) | "\((.errorCount + .warningCount)) issues in \(.filePath)"' "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" | sort -nr >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
 
-# Section 3: A detailed, classic lint-style report.
-echo "--- Detailed Lint Report ---" >> "$OUTPUT_FILE"
-jq -r '.[] | .filePath as $file | .messages[] | "\($file):\(.line):\(.column) - \(.severity) - \(.message) (\(.ruleId))"' "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" >> "$OUTPUT_FILE"
+    # Section 2: Breakdown of issues by ESLint rule.
+    echo "--- Issue Count by Category (ESLint Rule) ---" >> "$OUTPUT_FILE"
+    jq -r '.[].messages[].ruleId' "$INPUT_FILE" | sort | uniq -c | sort -nr >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
+
+    # Section 3: A detailed, classic lint-style report.
+    echo "--- Detailed Lint Report ---" >> "$OUTPUT_FILE"
+    jq -r '.[] | .filePath as $file | .messages[] | "\($file):\(.line):\(.column) - \(.severity) - \(.message) (\(.ruleId))"' "$INPUT_FILE" | sed "s|$PROJECT_ROOT||" >> "$OUTPUT_FILE"
+fi
 
 # --- Completion ---
 echo "Sorted lint report has been generated at '$OUTPUT_FILE'"
