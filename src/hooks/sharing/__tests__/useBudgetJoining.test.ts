@@ -219,7 +219,9 @@ describe("useBudgetJoining", () => {
 
   it("should handle join errors gracefully", async () => {
     const { shareCodeUtils } = await import("../../../utils/security/shareCodeUtils");
-    vi.mocked(shareCodeUtils.generateBudgetId).mockRejectedValueOnce(new Error("Generation failed"));
+    vi.mocked(shareCodeUtils.generateBudgetId).mockRejectedValueOnce(
+      new Error("Generation failed")
+    );
 
     const { result } = renderHook(() => useBudgetJoining());
 

@@ -194,7 +194,9 @@ describe("TypedFirebaseSyncService", () => {
     it("should handle invalid status structure", () => {
       const mockFirebaseService = vi.mocked(require("../../firebaseSyncService").default);
 
-      (mockFirebaseService.getStatus as Mock).mockReturnValue({ invalid: "status" } as unknown as ReturnType<typeof mockFirebaseService.getStatus>);
+      (mockFirebaseService.getStatus as Mock).mockReturnValue({
+        invalid: "status",
+      } as unknown as ReturnType<typeof mockFirebaseService.getStatus>);
 
       const status = typedFirebaseSyncService.getStatus();
 
@@ -258,7 +260,10 @@ describe("TypedChunkedSyncService", () => {
   describe("Data Operations", () => {
     it("should validate user information for save operations", async () => {
       const testData = { test: "data" };
-      const invalidUser = { uid: "" } as unknown as { readonly uid: string; readonly userName: string }; // missing userName and empty uid
+      const invalidUser = { uid: "" } as unknown as {
+        readonly uid: string;
+        readonly userName: string;
+      }; // missing userName and empty uid
 
       const result = await typedChunkedSyncService.saveToCloud(testData, invalidUser);
 

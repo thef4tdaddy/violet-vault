@@ -24,7 +24,12 @@ const isDevelopmentMode = () => {
 };
 
 interface SyncHealthToolsProps {
-  confirm: (options: { title: string; message: string; confirmText: string; cancelText: string }) => Promise<boolean>;
+  confirm: (options: {
+    title: string;
+    message: string;
+    confirmText: string;
+    cancelText: string;
+  }) => Promise<boolean>;
 }
 
 // Sync health tools component
@@ -118,9 +123,7 @@ const SyncHealthTools: React.FC<SyncHealthToolsProps> = ({ confirm }) => {
               })}
               <div className="text-left">
                 <p className="font-medium text-blue-900">🧪 Run Full Sync Validation</p>
-                <p className="text-xs text-blue-700">
-                  Comprehensive sync system check (Dev Only)
-                </p>
+                <p className="text-xs text-blue-700">Comprehensive sync system check (Dev Only)</p>
               </div>
             </Button>
 

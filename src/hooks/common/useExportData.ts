@@ -19,8 +19,6 @@ const gatherDataForExport = async () => {
   ]);
 };
 
-
-
 const triggerDownload = (exportableData) => {
   const dataStr = JSON.stringify(exportableData, null, 2);
   const dataBlob = new Blob([dataStr], { type: "application/json" });

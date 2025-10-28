@@ -107,7 +107,9 @@ const PaydayPrediction = ({
   const confidenceColor = getConfidenceColor(prediction.confidence);
 
   return (
-    <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle(daysUntil)} ${className}`}>
+    <div
+      className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle(daysUntil)} ${className}`}
+    >
       <PredictionHeader
         prediction={prediction}
         daysUntil={daysUntil}
@@ -135,7 +137,9 @@ const ActionCard = ({ bgColor, borderColor, icon, iconColor, title, description,
         {React.createElement(getIcon(icon), {
           className: `h-4 w-4 ${iconColor} mr-2`,
         })}
-        <span className={`text-sm font-medium ${iconColor.replace("text-", "text-").replace("-600", "-800")}`}>
+        <span
+          className={`text-sm font-medium ${iconColor.replace("text-", "text-").replace("-600", "-800")}`}
+        >
           {title}
         </span>
       </div>

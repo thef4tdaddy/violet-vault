@@ -108,7 +108,7 @@ describe("useTrendAnalysis", () => {
     const insights = result.current.insights;
     expect(Array.isArray(insights)).toBe(true);
     expect(insights.length).toBeGreaterThan(0);
-    
+
     if (insights.length > 0) {
       expect(insights[0]).toHaveProperty("type");
       expect(insights[0]).toHaveProperty("title");

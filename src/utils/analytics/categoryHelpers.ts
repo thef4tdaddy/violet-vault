@@ -22,7 +22,9 @@ interface TransactionForStats {
 /**
  * Calculate category statistics from filtered transactions
  */
-export const calculateCategoryStats = (filteredTransactions: TransactionForStats[]): CategoryStat[] => {
+export const calculateCategoryStats = (
+  filteredTransactions: TransactionForStats[]
+): CategoryStat[] => {
   const stats: Record<string, CategoryStat> = {};
 
   // Transaction category stats
@@ -56,7 +58,8 @@ export const calculateCategoryStats = (filteredTransactions: TransactionForStats
 
       // Calculate frequency (transactions per month)
       if (stat.lastUsed) {
-        const monthsAgo = (new Date().getTime() - stat.lastUsed.getTime()) / (1000 * 60 * 60 * 24 * 30);
+        const monthsAgo =
+          (new Date().getTime() - stat.lastUsed.getTime()) / (1000 * 60 * 60 * 24 * 30);
         stat.frequency = stat.transactionCount / Math.max(1, monthsAgo);
       }
     }
@@ -200,7 +203,11 @@ export const validateCategoryName = (name: string) => {
 /**
  * Generate category suggestion ID
  */
-export const generateSuggestionId = (action: string, categoryName: string, type: string): string => {
+export const generateSuggestionId = (
+  action: string,
+  categoryName: string,
+  type: string
+): string => {
   const timestamp = Date.now();
   return `${action}_${categoryName.toLowerCase().replace(/\s+/g, "_")}_${type}_${timestamp}`;
 };

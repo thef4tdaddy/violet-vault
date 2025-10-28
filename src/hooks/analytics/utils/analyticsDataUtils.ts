@@ -213,7 +213,12 @@ export const calculateWeeklyPatterns = (transactions: Transaction[]): WeeklyPatt
   const patterns = days.map((day) => ({ day, amount: 0, count: 0 }));
 
   transactions.forEach((transaction) => {
-    if (transaction && transaction.amount && transaction.amount < 0 && isValidDate(transaction.date)) {
+    if (
+      transaction &&
+      transaction.amount &&
+      transaction.amount < 0 &&
+      isValidDate(transaction.date)
+    ) {
       try {
         const dayIndex = new Date(transaction.date!).getDay();
         if (dayIndex >= 0 && dayIndex < 7) {

@@ -13,12 +13,7 @@ import {
 } from "../../utils/common/billIcons";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";
-import type {
-  Bill,
-  BillFormData,
-  BillFormOptions,
-  BillFormHookReturn,
-} from "../../types/bills";
+import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "../../types/bills";
 import {
   getInitialFormData,
   calculateMonthlyAmountHelper,

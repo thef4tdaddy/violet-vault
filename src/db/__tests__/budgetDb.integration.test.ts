@@ -329,9 +329,7 @@ describe("BudgetDB Integration Tests", () => {
       const past = new Date();
       past.setDate(past.getDate() - 10);
 
-      const bills: Bill[] = [
-        { ...testBill, id: "bill-1", dueDate: past, isPaid: false },
-      ];
+      const bills: Bill[] = [{ ...testBill, id: "bill-1", dueDate: past, isPaid: false }];
 
       try {
         await budgetDb.bulkUpsertBills(bills);

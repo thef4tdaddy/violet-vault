@@ -55,7 +55,17 @@ vi.mock("./steps/ShareCodeStep", () => ({
 }));
 
 vi.mock("./steps/UserSetupStep", () => ({
-  default: ({ userName, userColor, password, onUserNameChange, onUserColorChange, onPasswordChange, onJoin, onBack, isJoining }) => (
+  default: ({
+    userName,
+    userColor,
+    password,
+    onUserNameChange,
+    onUserColorChange,
+    onPasswordChange,
+    onJoin,
+    onBack,
+    isJoining,
+  }) => (
     <div data-testid="user-setup-step">
       <input
         data-testid="user-name-input"
@@ -113,9 +123,7 @@ describe("JoinBudgetModal", () => {
   describe("Rendering", () => {
     it("should not render when isOpen is false", () => {
       render(<JoinBudgetModal {...defaultProps} isOpen={false} />);
-      expect(
-        screen.queryByTestId("share-code-step")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("share-code-step")).not.toBeInTheDocument();
     });
 
     it("should render when isOpen is true", () => {
@@ -126,9 +134,7 @@ describe("JoinBudgetModal", () => {
     it("should render ShareCodeStep on step 1", () => {
       render(<JoinBudgetModal {...defaultProps} />);
       expect(screen.getByTestId("share-code-step")).toBeInTheDocument();
-      expect(
-        screen.queryByTestId("user-setup-step")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("user-setup-step")).not.toBeInTheDocument();
     });
 
     it("should render UserSetupStep on step 2", async () => {

@@ -19,10 +19,7 @@ export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
     queryFn: async () => {
       try {
         // Query budget commits table directly
-        const commits = await budgetDb.budgetCommits
-          .orderBy("timestamp")
-          .reverse()
-          .toArray();
+        const commits = await budgetDb.budgetCommits.orderBy("timestamp").reverse().toArray();
         return commits || [];
       } catch (error) {
         logger.warn("Failed to fetch budget commits:", error);
@@ -162,7 +159,10 @@ export const useBudgetHistoryOperations = () => {
 
       // Decrypt and restore the snapshot
       const encryptionKey = await encryptionUtils.deriveKey(password);
-      const commitWithSnapshot = commit as typeof commit & { encryptedSnapshot: number[]; iv: number[] };
+      const commitWithSnapshot = commit as typeof commit & {
+        encryptedSnapshot: number[];
+        iv: number[];
+      };
       const decrypted = await encryptionUtils.decrypt(
         commitWithSnapshot.encryptedSnapshot,
         encryptionKey,
@@ -228,10 +228,7 @@ export const useBudgetHistoryOperations = () => {
   const exportHistoryMutation = useMutation({
     mutationKey: ["budgetHistory", "export"],
     mutationFn: async (_options: Record<string, unknown> = {}) => {
-      const commits = await budgetDb.budgetCommits
-        .orderBy("timestamp")
-        .reverse()
-        .toArray();
+      const commits = await budgetDb.budgetCommits.orderBy("timestamp").reverse().toArray();
       const exportData = {
         version: "1.0",
         exportDate: new Date().toISOString(),

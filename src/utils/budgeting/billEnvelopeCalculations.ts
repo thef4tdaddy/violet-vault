@@ -110,7 +110,10 @@ const calculateUpcomingBillsAmount = (linkedBills) => {
  * @param {Array} bills - Array of bills linked to this envelope
  * @returns {BillEnvelopeResult} Calculation results
  */
-export const calculateBillEnvelopeNeeds = (envelope: Envelope, bills: Bill[] = []): BillEnvelopeResult => {
+export const calculateBillEnvelopeNeeds = (
+  envelope: Envelope,
+  bills: Bill[] = []
+): BillEnvelopeResult => {
   if (!envelope || envelope.envelopeType !== ENVELOPE_TYPES.BILL) {
     return getInvalidBillEnvelopeResult();
   }

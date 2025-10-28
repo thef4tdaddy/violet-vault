@@ -161,11 +161,15 @@ export class TransactionArchiver {
   /**
    * Create initial group data structure
    */
-  private createGroupData(transaction: {
-    date: string;
-    category?: string;
-    [key: string]: unknown;
-  }, periodKey: string, periodType: string) {
+  private createGroupData(
+    transaction: {
+      date: string;
+      category?: string;
+      [key: string]: unknown;
+    },
+    periodKey: string,
+    periodType: string
+  ) {
     return {
       period: periodKey,
       category: transaction.category || "uncategorized",

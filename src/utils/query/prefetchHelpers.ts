@@ -214,7 +214,8 @@ export const prefetchHelpers = {
 
           const dashboardData = {
             totalEnvelopes: (envelopes as unknown[]).length,
-            activeEnvelopes: (envelopes as Array<{ archived?: boolean }>).filter((e) => !e.archived).length,
+            activeEnvelopes: (envelopes as Array<{ archived?: boolean }>).filter((e) => !e.archived)
+              .length,
             recentTransactionCount: (recentTransactions as unknown[]).length,
             upcomingBillsCount: (upcomingBills as unknown[]).length,
             unassignedCash: (metadata as { unassignedCash?: number })?.unassignedCash || 0,

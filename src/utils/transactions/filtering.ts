@@ -48,7 +48,10 @@ export const filterByDateRange = (transactions: Transaction[] = [], dateRange?: 
  * @param {string} envelopeId - Envelope ID to filter by
  * @returns {Array} Filtered transactions
  */
-export const filterByEnvelope = (transactions: Transaction[] = [], envelopeId?: string | number) => {
+export const filterByEnvelope = (
+  transactions: Transaction[] = [],
+  envelopeId?: string | number
+) => {
   if (!envelopeId) return transactions;
 
   try {
@@ -160,7 +163,11 @@ const getSortValue = (transaction: Transaction, sortBy: string): string | number
 /**
  * Compare two values for sorting
  */
-const compareValues = (aValue: string | number | Date, bValue: string | number | Date, sortOrder: string) => {
+const compareValues = (
+  aValue: string | number | Date,
+  bValue: string | number | Date,
+  sortOrder: string
+) => {
   if (aValue < bValue) {
     return sortOrder === "asc" ? -1 : 1;
   }
@@ -177,7 +184,11 @@ const compareValues = (aValue: string | number | Date, bValue: string | number |
  * @param {string} sortOrder - Sort order (asc or desc)
  * @returns {Array} Sorted transactions
  */
-export const sortTransactions = (transactions: Transaction[] = [], sortBy: string = "date", sortOrder: string = "desc") => {
+export const sortTransactions = (
+  transactions: Transaction[] = [],
+  sortBy: string = "date",
+  sortOrder: string = "desc"
+) => {
   try {
     return [...transactions].sort((a, b) => {
       const aValue = getSortValue(a, sortBy);
@@ -207,7 +218,10 @@ interface ProcessTransactionsOptions {
  * @param {ProcessTransactionsOptions} options - Filter and sort options
  * @returns {Array} Processed transactions
  */
-export const processTransactions = (transactions: Transaction[] = [], options: ProcessTransactionsOptions = {}) => {
+export const processTransactions = (
+  transactions: Transaction[] = [],
+  options: ProcessTransactionsOptions = {}
+) => {
   try {
     const {
       dateRange,
@@ -264,7 +278,10 @@ export const processTransactions = (transactions: Transaction[] = [], options: P
  * @param {string} groupBy - Grouping period (day, week, month, year)
  * @returns {Object} Grouped transactions
  */
-export const groupTransactionsByDate = (transactions: Transaction[] = [], groupBy: string = "month") => {
+export const groupTransactionsByDate = (
+  transactions: Transaction[] = [],
+  groupBy: string = "month"
+) => {
   try {
     const groups = {};
 

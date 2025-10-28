@@ -6,7 +6,9 @@
 /**
  * Build export metadata
  */
-const buildExportMetadata = (currentUser: { userName?: string; budgetId?: string; userColor?: string } | null) => ({
+const buildExportMetadata = (
+  currentUser: { userName?: string; budgetId?: string; userColor?: string } | null
+) => ({
   exportedBy: currentUser?.userName || "Unknown User",
   exportDate: new Date().toISOString(),
   appVersion: "1.8.0",
@@ -48,7 +50,10 @@ const buildDataGuide = () => ({
 /**
  * Construct export object with all data and metadata
  */
-export const constructExportObject = (data: unknown[], currentUser: { userName?: string; budgetId?: string; userColor?: string } | null) => {
+export const constructExportObject = (
+  data: unknown[],
+  currentUser: { userName?: string; budgetId?: string; userColor?: string } | null
+) => {
   const [envelopes, bills, transactions, savingsGoals, debts, paycheckHistory, auditLog, metadata] =
     data as [
       unknown[],
@@ -58,7 +63,16 @@ export const constructExportObject = (data: unknown[], currentUser: { userName?:
       unknown[],
       unknown[],
       unknown[],
-      { supplementalAccounts?: unknown[]; unassignedCash?: number; biweeklyAllocation?: number; actualBalance?: number; isActualBalanceManual?: boolean } | undefined
+      (
+        | {
+            supplementalAccounts?: unknown[];
+            unassignedCash?: number;
+            biweeklyAllocation?: number;
+            actualBalance?: number;
+            isActualBalanceManual?: boolean;
+          }
+        | undefined
+      ),
     ];
 
   const pureTransactions = transactions.filter((t) => !t.type || t.type === "transaction");

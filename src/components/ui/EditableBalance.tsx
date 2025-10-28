@@ -21,7 +21,15 @@ interface ConfirmationViewProps {
 }
 
 // Confirmation view for large balance changes
-const ConfirmationView: React.FC<ConfirmationViewProps> = ({ value, pendingValue, bgClass, className, formatCurrency, onConfirm, onCancel }) => {
+const ConfirmationView: React.FC<ConfirmationViewProps> = ({
+  value,
+  pendingValue,
+  bgClass,
+  className,
+  formatCurrency,
+  onConfirm,
+  onCancel,
+}) => {
   const currentValue = parseFloat(value) || 0;
   const changeAmount = pendingValue - currentValue;
   const isIncrease = changeAmount > 0;
@@ -45,7 +53,8 @@ const ConfirmationView: React.FC<ConfirmationViewProps> = ({ value, pendingValue
             {formatNumber(changeAmount, formatCurrency)}
           </p>
           <p className="mt-2">
-            From: {formatNumber(currentValue, formatCurrency)} → To: {formatNumber(pendingValue, formatCurrency)}
+            From: {formatNumber(currentValue, formatCurrency)} → To:{" "}
+            {formatNumber(pendingValue, formatCurrency)}
           </p>
         </div>
 
@@ -84,7 +93,18 @@ interface EditViewProps {
 }
 
 // Edit mode view
-const EditView: React.FC<EditViewProps> = ({ title, isManuallySet, editValue, bgClass, className, inputRef, onInputChange, onKeyPress, onSave, onCancel }) => (
+const EditView: React.FC<EditViewProps> = ({
+  title,
+  isManuallySet,
+  editValue,
+  bgClass,
+  className,
+  inputRef,
+  onInputChange,
+  onKeyPress,
+  onSave,
+  onCancel,
+}) => (
   <div className={`${bgClass} rounded-lg p-6 ${className}`}>
     <div className="flex items-center justify-between mb-4">
       <h3 className="font-medium text-gray-700">
@@ -143,7 +163,18 @@ interface DisplayViewProps {
 }
 
 // Display mode view
-const DisplayView: React.FC<DisplayViewProps> = ({ title, isManuallySet, value, subtitle, bgClass, hoverClass, className, colorClass, formatCurrency, onClick }) => (
+const DisplayView: React.FC<DisplayViewProps> = ({
+  title,
+  isManuallySet,
+  value,
+  subtitle,
+  bgClass,
+  hoverClass,
+  className,
+  colorClass,
+  formatCurrency,
+  onClick,
+}) => (
   <div
     className={`${bgClass} rounded-lg p-6 cursor-pointer transition-colors ${hoverClass} group ${className}`}
     onClick={onClick}

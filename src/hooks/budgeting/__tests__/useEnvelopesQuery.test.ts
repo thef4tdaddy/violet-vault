@@ -361,9 +361,9 @@ describe("useEnvelopesQuery", () => {
       });
 
       // Verify query completed successfully
-      expect(result.current.envelopes).toEqual(expect.arrayContaining([
-        expect.objectContaining({ id: "env_1" })
-      ]));
+      expect(result.current.envelopes).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: "env_1" })])
+      );
       expect(result.current.isError).toBe(false);
     });
   });
@@ -447,7 +447,7 @@ describe("useEnvelopesQuery", () => {
     it("should warn about corrupted envelopes missing critical fields", async () => {
       // Arrange
       const logger = (await import("@/utils/common/logger")).default;
-      
+
       mockDb._mockData.envelopes = [
         { id: "env_1", currentBalance: 100 }, // Missing name and category
         mockDataGenerators.envelope({ id: "env_2" }), // Valid

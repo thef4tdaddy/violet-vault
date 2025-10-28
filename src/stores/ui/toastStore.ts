@@ -57,10 +57,12 @@ export const useToastStore = create<ToastState>((set, _get) => {
         duration,
       };
 
-      set((state: ToastState): ToastState => ({
-        ...state,
-        toasts: [...state.toasts, toast],
-      }));
+      set(
+        (state: ToastState): ToastState => ({
+          ...state,
+          toasts: [...state.toasts, toast],
+        })
+      );
 
       // Auto-remove toast after duration using external store reference
       if (duration > 0) {
@@ -73,10 +75,12 @@ export const useToastStore = create<ToastState>((set, _get) => {
     },
 
     removeToast: (id: number) => {
-      set((state: ToastState): ToastState => ({
-        ...state,
-        toasts: state.toasts.filter((toast) => toast.id !== id),
-      }));
+      set(
+        (state: ToastState): ToastState => ({
+          ...state,
+          toasts: state.toasts.filter((toast) => toast.id !== id),
+        })
+      );
     },
 
     clearAllToasts: () => {

@@ -7,10 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { budgetDb } from "@/db/budgetDb";
 import { queryKeys } from "@/utils/common/queryClient";
-import {
-  processTransactions,
-  calculateTransactionStats,
-} from "@/utils/transactions/filtering";
+import { processTransactions, calculateTransactionStats } from "@/utils/transactions/filtering";
 import logger from "@/utils/common/logger";
 import {
   fetchTransactionsFromDb,

@@ -257,7 +257,10 @@ class AutoBackupService {
   async getBackupStats() {
     try {
       const backups = await this.getBackups();
-      const totalSize = backups.reduce((sum, b) => sum + ((b.metadata?.sizeEstimate as number) || 0), 0);
+      const totalSize = backups.reduce(
+        (sum, b) => sum + ((b.metadata?.sizeEstimate as number) || 0),
+        0
+      );
 
       return {
         count: backups.length,

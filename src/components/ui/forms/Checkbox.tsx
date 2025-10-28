@@ -1,6 +1,7 @@
 import React, { useId } from "react";
 
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+export interface CheckboxProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   /** Label text */
   label?: string;
   /** Error message */
@@ -31,7 +32,10 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
  * />
  */
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ label, error, helperText, className = "", id, disabled, onChange, onCheckedChange, ...props }, ref) => {
+  (
+    { label, error, helperText, className = "", id, disabled, onChange, onCheckedChange, ...props },
+    ref
+  ) => {
     const generatedId = useId();
     const checkboxId = id || `checkbox-${generatedId}`;
 

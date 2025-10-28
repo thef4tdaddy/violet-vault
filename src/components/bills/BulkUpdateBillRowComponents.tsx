@@ -20,9 +20,7 @@ export const AmountUpdateField = ({ change, amountChange, billId, updateChange }
         }`}
       />
       {amountChange?.hasChange && (
-        <span className="text-xs text-purple-700 font-medium">
-          (was ${amountChange.original})
-        </span>
+        <span className="text-xs text-purple-700 font-medium">(was ${amountChange.original})</span>
       )}
     </div>
   );

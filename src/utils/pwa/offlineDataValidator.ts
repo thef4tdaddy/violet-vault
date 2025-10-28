@@ -166,8 +166,15 @@ class OfflineDataValidator {
 
       return {
         totalEnvelopes: envelopes.length,
-        totalAllocated: envelopes.reduce((sum, env) => sum + ((env as unknown as Record<string, unknown>).allocated as number || 0), 0),
-        totalSpent: envelopes.reduce((sum, env) => sum + ((env as unknown as Record<string, unknown>).spent as number || 0), 0),
+        totalAllocated: envelopes.reduce(
+          (sum, env) =>
+            sum + (((env as unknown as Record<string, unknown>).allocated as number) || 0),
+          0
+        ),
+        totalSpent: envelopes.reduce(
+          (sum, env) => sum + (((env as unknown as Record<string, unknown>).spent as number) || 0),
+          0
+        ),
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
     } catch (error) {

@@ -181,7 +181,9 @@ export const SecurityReportDetails = ({
           </div>
           <div>
             <span className="text-gray-600">Risk Level:</span>
-            <span className={`ml-2 font-medium capitalize ${getRiskLevelColor(securityReport.riskLevel)}`}>
+            <span
+              className={`ml-2 font-medium capitalize ${getRiskLevelColor(securityReport.riskLevel)}`}
+            >
               {securityReport.riskLevel}
             </span>
           </div>
@@ -220,7 +222,9 @@ const TamperIndicators = ({ indicators }: TamperIndicatorsProps) => {
       <div className="space-y-1">
         {indicators.map((indicator, index) => (
           <div key={index} className="text-xs">
-            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${getSeverityColor(indicator.severity)}`}></span>
+            <span
+              className={`inline-block w-2 h-2 rounded-full mr-2 ${getSeverityColor(indicator.severity)}`}
+            ></span>
             {indicator.description}
           </div>
         ))}

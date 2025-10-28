@@ -251,11 +251,15 @@ describe("Sync Integration Tests", () => {
           budgetDatabaseService.getBudgetMetadata(),
         ]);
 
-        expect((envelopes as Envelope[])).toHaveLength(2);
-        expect((transactions as Transaction[])).toHaveLength(2);
-        expect((bills as Bill[])).toHaveLength(1);
-        expect((metadata as { unassignedCash: number; actualBalance: number }).unassignedCash).toBe(1000);
-        expect((metadata as { unassignedCash: number; actualBalance: number }).actualBalance).toBe(5000);
+        expect(envelopes as Envelope[]).toHaveLength(2);
+        expect(transactions as Transaction[]).toHaveLength(2);
+        expect(bills as Bill[]).toHaveLength(1);
+        expect((metadata as { unassignedCash: number; actualBalance: number }).unassignedCash).toBe(
+          1000
+        );
+        expect((metadata as { unassignedCash: number; actualBalance: number }).actualBalance).toBe(
+          5000
+        );
 
         // Verify relationships
         const foodTransactions = (await budgetDatabaseService.getTransactions({
@@ -283,8 +287,16 @@ describe("Sync Integration Tests", () => {
     it("should prepare data for encryption correctly", async () => {
       // Test data preparation without actual cloud save
       try {
-        const encryptedData = (firebaseSyncService as unknown as { encryptForCloud?: (data: TestData) => Promise<{ success: boolean; data: string }> }).encryptForCloud
-          ? await (firebaseSyncService as unknown as { encryptForCloud: (data: TestData) => Promise<{ success: boolean; data: string }> }).encryptForCloud(testData)
+        const encryptedData = (
+          firebaseSyncService as unknown as {
+            encryptForCloud?: (data: TestData) => Promise<{ success: boolean; data: string }>;
+          }
+        ).encryptForCloud
+          ? await (
+              firebaseSyncService as unknown as {
+                encryptForCloud: (data: TestData) => Promise<{ success: boolean; data: string }>;
+              }
+            ).encryptForCloud(testData)
           : { success: true, data: "encrypted" };
 
         // If using demo config, this might not work, which is fine
@@ -379,7 +391,11 @@ describe("Sync Integration Tests", () => {
         const saveSuccess = await chunkedSyncService.saveToCloud(largeData, currentUser);
         expect(saveSuccess).toBe(true);
 
-        const loadedData = (await chunkedSyncService.loadFromCloud()) as { transactions: Transaction[]; envelopes: Envelope[]; bills: Bill[] };
+        const loadedData = (await chunkedSyncService.loadFromCloud()) as {
+          transactions: Transaction[];
+          envelopes: Envelope[];
+          bills: Bill[];
+        };
         expect(loadedData.transactions).toHaveLength(1200);
       },
       TEST_TIMEOUT
@@ -417,7 +433,11 @@ describe("Sync Integration Tests", () => {
         expect(emptyEnvelopes).toHaveLength(0);
 
         // 5. Load from cloud
-        const cloudData = (await firebaseSyncService.loadFromCloud()) as { envelopes?: Envelope[]; transactions?: Transaction[]; bills?: Bill[] };
+        const cloudData = (await firebaseSyncService.loadFromCloud()) as {
+          envelopes?: Envelope[];
+          transactions?: Transaction[];
+          bills?: Bill[];
+        };
         expect(cloudData).toBeTruthy();
 
         // 6. Restore to local database

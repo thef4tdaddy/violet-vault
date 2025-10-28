@@ -271,7 +271,10 @@ interface FilterAccountsOptions {
  * @param {Object} filters - Filter criteria
  * @returns {Array} Filtered accounts
  */
-export const filterAccounts = (accounts: Account[], filters: FilterAccountsOptions = {}): Account[] => {
+export const filterAccounts = (
+  accounts: Account[],
+  filters: FilterAccountsOptions = {}
+): Account[] => {
   if (!Array.isArray(accounts)) return [];
 
   let filteredAccounts = [...accounts];

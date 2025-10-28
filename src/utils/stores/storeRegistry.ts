@@ -89,7 +89,12 @@ class StoreRegistry {
 
     this.stores.forEach(({ store, metadata }, name) => {
       try {
-        const storeWithState = store as { getState: () => Record<string, unknown> & { reset?: () => void; getDebugInfo?: () => unknown } };
+        const storeWithState = store as {
+          getState: () => Record<string, unknown> & {
+            reset?: () => void;
+            getDebugInfo?: () => unknown;
+          };
+        };
         const state = storeWithState.getState();
         info[name] = {
           metadata,
@@ -116,14 +121,16 @@ class StoreRegistry {
     if (this.initialized || !import.meta.env.DEV) return;
 
     // Global debugging functions
-    (window as Window & {
-      __VIOLET_VAULT_DEBUG__?: {
-        stores: () => Record<string, unknown>;
-        resetAll: () => void;
-        getStore: (name: string) => unknown;
-        listStores: () => string[];
-      };
-    }).__VIOLET_VAULT_DEBUG__ = {
+    (
+      window as Window & {
+        __VIOLET_VAULT_DEBUG__?: {
+          stores: () => Record<string, unknown>;
+          resetAll: () => void;
+          getStore: (name: string) => unknown;
+          listStores: () => string[];
+        };
+      }
+    ).__VIOLET_VAULT_DEBUG__ = {
       stores: () => this.getDebugInfo(),
       resetAll: () => this.resetAll(),
       getStore: (name: string) => this.get(name),

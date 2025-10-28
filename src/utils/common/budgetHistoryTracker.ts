@@ -368,9 +368,12 @@ export class BudgetHistoryTracker {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
-      await budgetDb.budgetBranches.where("isActive").equals(1 as number).modify({
-        isActive: false,
-      });
+      await budgetDb.budgetBranches
+        .where("isActive")
+        .equals(1 as number)
+        .modify({
+          isActive: false,
+        });
 
       // Activate the target branch
       const updatedCount = await budgetDb.budgetBranches.where("name").equals(branchName).modify({

@@ -56,7 +56,10 @@ export const ensureRequiredFields = (data: AutoFundingData): AutoFundingData => 
 /**
  * Create backup data structure
  */
-export const createBackupData = (data: AutoFundingData, includeHistory: boolean): AutoFundingData => {
+export const createBackupData = (
+  data: AutoFundingData,
+  includeHistory: boolean
+): AutoFundingData => {
   const backup: AutoFundingData = {
     ...data,
     backupCreatedAt: new Date().toISOString(),
@@ -227,7 +230,9 @@ export const saveToStorage = (
 /**
  * Load data from localStorage
  */
-export const loadFromStorage = (setLastSaved: (val: string | null) => void): AutoFundingData | null => {
+export const loadFromStorage = (
+  setLastSaved: (val: string | null) => void
+): AutoFundingData | null => {
   try {
     const data = localStorageService.getJSON(STORAGE_KEY) as AutoFundingData | null;
     if (!data) {

@@ -12,11 +12,11 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Type definition for valid validation result
-type ValidResult = { 
-  isValid: true; 
-  errors: unknown[]; 
-  warnings: unknown[]; 
-  chunkCount: number; 
+type ValidResult = {
+  isValid: true;
+  errors: unknown[];
+  warnings: unknown[];
+  chunkCount: number;
   manifestSize: number;
 };
 

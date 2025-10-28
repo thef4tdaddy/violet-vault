@@ -8,9 +8,7 @@ import { getIcon } from "../../../utils/icons";
 const ToggleSwitch = ({ enabled, onChange, label, description }) => (
   <div className="flex items-center justify-between py-3">
     <div className="flex-1 mr-4">
-      <label className="text-sm font-black text-purple-800 uppercase tracking-wide">
-        {label}
-      </label>
+      <label className="text-sm font-black text-purple-800 uppercase tracking-wide">{label}</label>
       <p className="text-xs text-purple-700 mt-1 font-medium">{description}</p>
     </div>
     <Button
@@ -33,7 +31,6 @@ const ToggleSwitch = ({ enabled, onChange, label, description }) => (
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
 const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
-
   return (
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">

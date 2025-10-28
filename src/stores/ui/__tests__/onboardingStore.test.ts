@@ -268,7 +268,9 @@ describe("useOnboardingStore", () => {
 
     it("startTutorialStep should be callable without error", () => {
       expect(() => {
-        (useOnboardingStore.getState() as OnboardingStoreState).startTutorialStep("firstBankBalance");
+        (useOnboardingStore.getState() as OnboardingStoreState).startTutorialStep(
+          "firstBankBalance"
+        );
       }).not.toThrow();
     });
 

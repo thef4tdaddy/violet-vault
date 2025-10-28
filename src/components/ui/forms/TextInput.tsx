@@ -34,7 +34,8 @@ export interface TextInputProps extends React.InputHTMLAttributes<HTMLInputEleme
  */
 const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
   ({ label, error, helperText, icon, className = "", id, disabled, ...props }, ref) => {
-    const generatedId = useId(); const inputId = id || `input-${generatedId}`;
+    const generatedId = useId();
+    const inputId = id || `input-${generatedId}`;
 
     return (
       <div className="w-full">

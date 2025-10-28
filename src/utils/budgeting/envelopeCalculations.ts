@@ -104,7 +104,8 @@ export const calculateUtilizationRate = (envelope, billsAndTransactions, balance
       if (allEnvelopeBills.length > 0) {
         // Use the most recent bill amount as reference
         const mostRecentBill = allEnvelopeBills.sort(
-          (a, b) => new Date(b.date || b.dueDate).getTime() - new Date(a.date || a.dueDate).getTime()
+          (a, b) =>
+            new Date(b.date || b.dueDate).getTime() - new Date(a.date || a.dueDate).getTime()
         )[0];
         nextBillAmount = Math.abs(mostRecentBill.amount);
       } else {

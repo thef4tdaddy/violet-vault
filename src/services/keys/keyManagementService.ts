@@ -3,7 +3,7 @@ import logger from "../../utils/common/logger";
 
 interface KeyFileData {
   version?: string;
-  type?: 'protected' | 'unprotected';
+  type?: "protected" | "unprotected";
   key?: number[];
   salt?: number[];
   encryptedKey?: number[];

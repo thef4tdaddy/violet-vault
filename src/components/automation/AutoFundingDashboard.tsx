@@ -7,11 +7,7 @@ import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import logger from "@/utils/common/logger";
-import {
-  DashboardHeader,
-  DashboardTabs,
-  DashboardContent,
-} from "./AutoFundingDashboardComponents";
+import { DashboardHeader, DashboardTabs, DashboardContent } from "./AutoFundingDashboardComponents";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const envelopes = useBudgetStore((state) => state.envelopes);
@@ -86,7 +82,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
     try {
       const result = await executeRules(false);
 
-      if (result.success && 'execution' in result) {
+      if (result.success && "execution" in result) {
         const totalFunded = result.execution.totalFunded || 0;
         const rulesExecuted = result.execution.rulesExecuted || 0;
 

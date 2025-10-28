@@ -48,9 +48,7 @@ export const CommitCard = ({ commit, isExpanded, onToggleExpanded }: CommitCardP
             </span>
           </div>
 
-          <p className="text-sm font-medium text-gray-900 mb-1">
-            {commit.message || "No message"}
-          </p>
+          <p className="text-sm font-medium text-gray-900 mb-1">{commit.message || "No message"}</p>
 
           <div className="flex items-center text-xs text-gray-500">
             {React.createElement(getIcon("Calendar"), {

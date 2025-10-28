@@ -225,79 +225,83 @@ const WellFundedAlert = ({
  * Shows remaining amount needed for next bill payment and funding progress
  */
 const BillEnvelopeFundingInfo = memo(
-  ({ envelope, bills = [], showDetails = false }: {
+  ({
+    envelope,
+    bills = [],
+    showDetails = false,
+  }: {
     envelope: { id: string; name?: string; currentBalance?: number; [key: string]: unknown };
     bills?: unknown[];
     showDetails?: boolean;
   }) => {
-  const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+    const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
 
-  if (!displayInfo) {
-    return null;
-  }
+    if (!displayInfo) {
+      return null;
+    }
 
-  const {
-    nextBill,
-    remainingToFund,
-    daysUntilNextBill,
-    fundingProgress,
-    isFullyFunded,
-    currentBalance,
-    targetMonthlyAmount,
-    upcomingBillsAmount,
-    priority,
-    status,
-    displayText,
-  } = displayInfo as {
-    nextBill?: { name: string; amount: number; frequency?: string };
-    remainingToFund: number;
-    daysUntilNextBill: number | null;
-    fundingProgress: number;
-    isFullyFunded: boolean;
-    currentBalance: number;
-    targetMonthlyAmount: number;
-    upcomingBillsAmount: number;
-    priority: { priorityLevel: string; reason?: string };
-    status: { bgColor: string; textColor: string; color: string; icon?: string };
-    displayText: { primaryStatus: string; secondaryStatus?: string; fundingProgress?: string };
-    linkedBills?: number;
-  };
+    const {
+      nextBill,
+      remainingToFund,
+      daysUntilNextBill,
+      fundingProgress,
+      isFullyFunded,
+      currentBalance,
+      targetMonthlyAmount,
+      upcomingBillsAmount,
+      priority,
+      status,
+      displayText,
+    } = displayInfo as {
+      nextBill?: { name: string; amount: number; frequency?: string };
+      remainingToFund: number;
+      daysUntilNextBill: number | null;
+      fundingProgress: number;
+      isFullyFunded: boolean;
+      currentBalance: number;
+      targetMonthlyAmount: number;
+      upcomingBillsAmount: number;
+      priority: { priorityLevel: string; reason?: string };
+      status: { bgColor: string; textColor: string; color: string; icon?: string };
+      displayText: { primaryStatus: string; secondaryStatus?: string; fundingProgress?: string };
+      linkedBills?: number;
+    };
 
-  const iconName = status.icon || "DollarSign";
+    const iconName = status.icon || "DollarSign";
 
-  return (
-    <div className={`${status.bgColor} border border-${status.color}-200 rounded-lg p-3`}>
-      <StatusHeader
-        status={status}
-        displayText={displayText}
-        priority={priority}
-        iconName={iconName}
-      />
-
-      {!isFullyFunded && <ProgressBar fundingProgress={fundingProgress} />}
-
-      {nextBill && <NextBillInfo nextBill={nextBill} daysUntilNextBill={daysUntilNextBill} />}
-
-      <StatusDisplay
-        targetMonthlyAmount={targetMonthlyAmount}
-        nextBill={nextBill}
-        remainingToFund={remainingToFund}
-        currentBalance={currentBalance}
-      />
-
-      {showDetails && (
-        <DetailedInfo
-          displayInfo={displayInfo as unknown as { linkedBills?: number }}
-          upcomingBillsAmount={upcomingBillsAmount}
-          remainingToFund={remainingToFund}
-          targetMonthlyAmount={targetMonthlyAmount}
-          daysUntilNextBill={daysUntilNextBill}
-          currentBalance={currentBalance}
+    return (
+      <div className={`${status.bgColor} border border-${status.color}-200 rounded-lg p-3`}>
+        <StatusHeader
+          status={status}
+          displayText={displayText}
           priority={priority}
+          iconName={iconName}
         />
-      )}
-    </div>
-  );
+
+        {!isFullyFunded && <ProgressBar fundingProgress={fundingProgress} />}
+
+        {nextBill && <NextBillInfo nextBill={nextBill} daysUntilNextBill={daysUntilNextBill} />}
+
+        <StatusDisplay
+          targetMonthlyAmount={targetMonthlyAmount}
+          nextBill={nextBill}
+          remainingToFund={remainingToFund}
+          currentBalance={currentBalance}
+        />
+
+        {showDetails && (
+          <DetailedInfo
+            displayInfo={displayInfo as unknown as { linkedBills?: number }}
+            upcomingBillsAmount={upcomingBillsAmount}
+            remainingToFund={remainingToFund}
+            targetMonthlyAmount={targetMonthlyAmount}
+            daysUntilNextBill={daysUntilNextBill}
+            currentBalance={currentBalance}
+            priority={priority}
+          />
+        )}
+      </div>
+    );
   }
 );
 
