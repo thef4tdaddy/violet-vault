@@ -67,11 +67,12 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
               >
                 <option value="all">All Types</option>
                 {Object.values(debtTypes || {}).map((type) => {
-                  const config = DEBT_TYPE_CONFIG[type];
-                  const count = debtsByType[type]?.length || 0;
+                  const typeStr = String(type);
+                  const config = DEBT_TYPE_CONFIG[typeStr as keyof typeof DEBT_TYPE_CONFIG];
+                  const count = debtsByType?.[typeStr]?.length || 0;
                   return (
-                    <option key={type} value={type}>
-                      {config?.name || type} {count > 0 && `(${count})`}
+                    <option key={typeStr} value={typeStr}>
+                      {config?.name || typeStr} {count > 0 && `(${count})`}
                     </option>
                   );
                 })}
