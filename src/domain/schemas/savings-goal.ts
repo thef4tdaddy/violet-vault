@@ -63,3 +63,62 @@ export const validateSavingsGoalSafe = (data: unknown) => {
 export const validateSavingsGoalPartial = (data: unknown): SavingsGoalPartial => {
   return SavingsGoalPartialSchema.parse(data);
 };
+
+/**
+ * Zod schema for SavingsGoal form data validation
+ * Validates form input before converting to entity
+ */
+export const SavingsGoalFormSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, "Goal name is required")
+      .max(100, "Goal name cannot exceed 100 characters"),
+    targetAmount: z
+      .union([z.string(), z.number()])
+      .transform((val) => (typeof val === "string" ? parseFloat(val) : val))
+      .refine((val) => !isNaN(val) && val > 0, "Valid target amount is required"),
+    currentAmount: z
+      .union([z.string(), z.number()])
+      .transform((val) => (typeof val === "string" ? parseFloat(val) || 0 : val))
+      .refine((val) => !isNaN(val) && val >= 0, "Current amount cannot be negative"),
+    targetDate: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          const date = new Date(val);
+          if (isNaN(date.getTime())) return false;
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return date >= today;
+        },
+        { message: "Target date cannot be in the past" }
+      ),
+    category: z.string().min(1, "Category is required"),
+    color: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid color format"),
+    description: z
+      .string()
+      .max(500, "Description cannot exceed 500 characters")
+      .optional()
+      .default(""),
+    priority: PrioritySchema.default("medium"),
+  })
+  .refine((data) => data.currentAmount <= data.targetAmount, {
+    message: "Current amount cannot exceed target amount",
+    path: ["currentAmount"],
+  });
+
+/**
+ * Type inference from form schema
+ */
+export type SavingsGoalFormData = z.infer<typeof SavingsGoalFormSchema>;
+
+/**
+ * Safe validation helper for form data - returns result with error details
+ */
+export const validateSavingsGoalFormSafe = (data: unknown) => {
+  return SavingsGoalFormSchema.safeParse(data);
+};
