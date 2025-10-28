@@ -135,7 +135,6 @@ export class OCRProcessor {
     return {
       ...extractedData,
       rawText: ocrResult.text,
-      confidence: ocrResult.confidence,
       processingTime: ocrResult.processingTime,
     };
   }
@@ -192,13 +191,13 @@ export class OCRProcessor {
       for (const pattern of fieldPatterns) {
         const match = text.match(pattern);
         if (match) {
-          (extracted as Record<string, string | null>)[field] = match[1]?.trim() ?? null;
+          (extracted as unknown as Record<string, string | null>)[field] = match[1]?.trim() ?? null;
           extracted.confidence[field] = "high";
           break; // Use first match
         }
       }
 
-      if (!(extracted as Record<string, string | null>)[field]) {
+      if (!(extracted as unknown as Record<string, string | null>)[field]) {
         extracted.confidence[field] = "none";
       }
     }

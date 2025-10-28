@@ -2,12 +2,32 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import logger from "../../utils/common/logger";
 
+interface OnboardingState {
+  isOnboarded: boolean;
+  tutorialProgress: Record<string, boolean>;
+  currentTutorialStep: string | null;
+  preferences: {
+    showHints: boolean;
+    skipEmptyStateHelp: boolean;
+    tourCompleted: boolean;
+  };
+  markStepComplete: (step: string) => void;
+  startTutorialStep: (step: string) => void;
+  endTutorialStep: () => void;
+  completeOnboarding: () => void;
+  resetOnboarding: () => void;
+  setPreference: (key: string, value: unknown) => void;
+  isStepComplete: (step: string) => boolean;
+  shouldShowHint: (step: string) => boolean;
+  getProgress: () => { completed: number; total: number; percentage: number };
+}
+
 /**
  * 🚨 TEMPORARILY SIMPLIFIED Onboarding Store
  * Minimal implementation to prevent React error #185 while we implement proper architecture
  * This removes all get() calls that were causing infinite render loops
  */
-const useOnboardingStore = create(
+const useOnboardingStore = create<OnboardingState>(
   persist(
     (_set, _get) => ({
       // Onboarding completion status
