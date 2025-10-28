@@ -23,7 +23,7 @@ const useTransactionArchiving = () => {
     refetch: refreshInfo,
     error: infoError,
   } = useQuery({
-    queryKey: queryKeys.analytics.balance(),
+    queryKey: queryKeys.analyticsBalance(),
     queryFn: getArchivingRecommendations,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
@@ -47,7 +47,7 @@ const useTransactionArchiving = () => {
         logger.info("Starting transaction archiving", { olderThanMonths });
 
         // Create progress tracking
-        const archiver = createArchiver();
+        const archiver = createArchiver({});
 
         setArchivingProgress({ stage: "analyzing", progress: 10 });
 
@@ -84,7 +84,7 @@ const useTransactionArchiving = () => {
    */
   const getArchivedAnalytics = useCallback(async (period = "yearly", category = null) => {
     try {
-      const archiver = createArchiver();
+      const archiver = createArchiver({});
       return await archiver.getArchivedAnalytics(period, category);
     } catch (error) {
       logger.error("Failed to retrieve archived analytics", error);
@@ -99,7 +99,7 @@ const useTransactionArchiving = () => {
     async (archiveId) => {
       try {
         logger.warn("Restoring archived transactions", { archiveId });
-        const archiver = createArchiver();
+        const archiver = createArchiver({});
         const restored = await archiver.restoreArchivedTransactions(archiveId);
 
         // Refresh data after restore

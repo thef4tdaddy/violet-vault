@@ -124,6 +124,22 @@ describe("useUpdateProfileMutation", () => {
       updateUser: vi.fn(),
       encryptionKey: null,
       salt: null,
+      user: null,
+      isAuthenticated: false,
+      isUnlocked: false,
+      budgetId: null,
+      lastActivity: null,
+      isLoading: false,
+      error: null,
+      currentUser: null,
+      hasCurrentUser: false,
+      hasBudgetId: false,
+      setAuthenticated: vi.fn(),
+      clearAuth: vi.fn(),
+      setLoading: vi.fn(),
+      setError: vi.fn(),
+      updateActivity: vi.fn(),
+      lockSession: vi.fn(),
     });
 
     const { result } = renderHook(() => useUpdateProfileMutation());
