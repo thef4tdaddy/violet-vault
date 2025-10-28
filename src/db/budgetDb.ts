@@ -118,7 +118,7 @@ export class VioletVaultDB extends Dexie {
               try {
                 extensibleObj[key] = (obj as Record<string, unknown>)[key];
               } catch (copyError: unknown) {
-                logger.warn(`Failed to copy property ${key}:`, (copyError as Error).message);
+                logger.warn(`Failed to copy property ${key}:`, { error: (copyError as Error).message });
               }
             });
 
@@ -146,11 +146,11 @@ export class VioletVaultDB extends Dexie {
                   try {
                     (obj as Record<string, unknown>)[key] = extensibleObj[key];
                   } catch (setError: unknown) {
-                    logger.warn(`Failed to set property ${key}:`, (setError as Error).message);
+                    logger.warn(`Failed to set property ${key}:`, { error: (setError as Error).message });
                   }
                 });
               } catch (finalError: unknown) {
-                logger.warn("Complete object replacement failed:", (finalError as Error).message);
+                logger.warn("Complete object replacement failed:", { error: (finalError as Error).message });
                 // As a last resort, try to modify the transaction
                 // Note: trans.source is a Dexie internal property
                 if (
@@ -649,7 +649,7 @@ export const migrateData = async (): Promise<DatabaseStats> => {
   try {
     // Check if migration is needed by looking for new tables
     const stats = await budgetDb.getDatabaseStats();
-    logger.info("Database migration completed. Stats:", stats);
+    logger.info("Database migration completed. Stats:", stats as unknown as Record<string, unknown>);
     return stats;
   } catch (error) {
     logger.error("Database migration failed:", error);

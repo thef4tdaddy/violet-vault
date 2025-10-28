@@ -2,8 +2,7 @@
  * Migration and Schema Evolution Tests for Dexie Database
  * Tests database version upgrades, schema migrations, and data transformations
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import Dexie from "dexie";
+import { describe, it, expect, vi } from "vitest";
 import { VioletVaultDB } from "../budgetDb";
 
 // Mock logger
