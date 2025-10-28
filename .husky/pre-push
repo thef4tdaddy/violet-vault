@@ -7,4 +7,20 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "✅ ESLint passed! Push proceeding..."
+echo "✅ ESLint passed!"
+
+echo "🔍 Running TypeScript type check before push..."
+TYPECHECK_OUTPUT=$(npx tsc --noEmit 2>&1)
+ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | grep -c "error TS" || echo "0")
+ERROR_THRESHOLD=250
+
+if [ "$ERROR_COUNT" -gt "$ERROR_THRESHOLD" ]; then
+  echo "❌ TypeScript errors exceed threshold! ($ERROR_COUNT > $ERROR_THRESHOLD)"
+  echo "📊 Current errors: $ERROR_COUNT"
+  echo "📈 Threshold: $ERROR_THRESHOLD"
+  echo "🔧 Run: npm run typecheck to see all errors"
+  exit 1
+fi
+
+echo "✅ TypeScript check passed! ($ERROR_COUNT/$ERROR_THRESHOLD errors)"
+echo "✅ All checks passed! Push proceeding..."
