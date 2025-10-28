@@ -230,7 +230,7 @@ describe("keyManagementService", () => {
     });
 
     it("should handle malformed data gracefully", () => {
-      const result = keyManagementService.validateKeyFile(null as unknown as typeof import("@/services/keys/keyManagementService").KeyFileData);
+      const result = keyManagementService.validateKeyFile(null as never);
 
       expect(result.valid).toBe(false);
       expect(result.error).toBe("Invalid file format");
@@ -248,7 +248,7 @@ describe("keyManagementService", () => {
       const result = await keyManagementService.importKeyData(keyFile);
 
       expect(result).toBeDefined();
-      expect(result.key).toEqual(new Uint8Array([1, 2, 3, 4]));
+      expect(result.encryptionKey).toEqual(new Uint8Array([1, 2, 3, 4]));
       expect(result.salt).toEqual(new Uint8Array([5, 6, 7, 8]));
     });
 
@@ -262,7 +262,7 @@ describe("keyManagementService", () => {
       const result = await keyManagementService.importKeyData(keyFile, "exportpassword");
 
       expect(result).toBeDefined();
-      expect(result.key).toBeDefined();
+      expect(result.encryptionKey).toBeDefined();
       expect(result.salt).toBeDefined();
     });
 

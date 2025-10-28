@@ -58,7 +58,7 @@ interface TestData {
 
 describe("Sync Integration Tests", () => {
   let testBudgetId: string;
-  let testEncryptionKey: unknown;
+  let testEncryptionKey: CryptoKey;
   let testData: TestData;
 
   beforeEach(async () => {
@@ -544,8 +544,10 @@ describe("Sync Integration Tests", () => {
             id: "corrupted",
             name: null, // Invalid data
             balance: "not_a_number",
-            archived: "not_a_boolean",
-          });
+            archived: false,
+            category: "",
+            lastModified: Date.now(),
+          } as never);
 
           // Service should handle corrupted data gracefully
           const envelopes = (await budgetDatabaseService.getEnvelopes()) as Envelope[];

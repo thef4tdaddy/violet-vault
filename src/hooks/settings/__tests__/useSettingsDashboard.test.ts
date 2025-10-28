@@ -148,7 +148,7 @@ describe("useCloudSyncManager", () => {
     // Set up sync enabled state
     mockUseBudgetStore.cloudSyncEnabled = true;
     const { cloudSyncService } = await import("../../../services/cloudSyncService");
-    cloudSyncService.forceSync.mockResolvedValue({ success: true });
+    vi.mocked(cloudSyncService.forceSync).mockResolvedValue({ success: true });
 
     const { result } = renderHook(() => useCloudSyncManager());
 
@@ -201,7 +201,7 @@ describe("useSettingsActions", () => {
     const { createTestBudgetHistory } = await import("../../../utils/common/testBudgetHistory");
     const { globalToast } = await import("../../../stores/ui/toastStore");
 
-    createTestBudgetHistory.mockResolvedValue();
+    vi.mocked(createTestBudgetHistory).mockResolvedValue();
 
     const { result } = renderHook(() => useSettingsActions());
 
@@ -221,7 +221,7 @@ describe("useSettingsActions", () => {
     const { globalToast } = await import("../../../stores/ui/toastStore");
 
     const error = new Error("Test error");
-    createTestBudgetHistory.mockRejectedValue(error);
+    vi.mocked(createTestBudgetHistory).mockRejectedValue(error);
 
     const { result } = renderHook(() => useSettingsActions());
 

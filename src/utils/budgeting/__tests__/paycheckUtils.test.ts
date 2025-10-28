@@ -239,8 +239,22 @@ describe("paycheckUtils", () => {
 
     const allocations: AllocationResult = {
       allocations: [
-        { envelopeId: "env1", amount: 400 },
-        { envelopeId: "env2", amount: 200 },
+        {
+          envelopeId: "env1",
+          envelopeName: "Envelope 1",
+          amount: 400,
+          monthlyAmount: 400,
+          envelopeType: ENVELOPE_TYPES.EXPENSE,
+          priority: "high",
+        },
+        {
+          envelopeId: "env2",
+          envelopeName: "Envelope 2",
+          amount: 200,
+          monthlyAmount: 200,
+          envelopeType: ENVELOPE_TYPES.EXPENSE,
+          priority: "medium",
+        },
       ],
       totalAllocated: 600,
       remainingAmount: 400,

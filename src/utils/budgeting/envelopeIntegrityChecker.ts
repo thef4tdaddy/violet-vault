@@ -43,7 +43,7 @@ export const findCorruptedEnvelopes = async () => {
   try {
     logger.debug("🔍 Scanning for corrupted envelopes...");
 
-    const allEnvelopes = (await budgetDb.envelopes.toArray()) as EnvelopeWithOptionalFields[];
+    const allEnvelopes = (await budgetDb.envelopes.toArray()) as unknown as EnvelopeWithOptionalFields[];
     const corruptedEnvelopes = allEnvelopes.filter(isEmptyEnvelope);
 
     if (corruptedEnvelopes.length > 0) {
@@ -226,7 +226,7 @@ export const getEnvelopeIntegrityReport = async () => {
   try {
     logger.debug("📊 Generating envelope integrity report...");
 
-    const allEnvelopes = (await budgetDb.envelopes.toArray()) as EnvelopeWithOptionalFields[];
+    const allEnvelopes = (await budgetDb.envelopes.toArray()) as unknown as EnvelopeWithOptionalFields[];
     const corruptedEnvelopes = allEnvelopes.filter(isEmptyEnvelope);
 
     const report = {

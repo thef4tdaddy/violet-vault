@@ -1,7 +1,7 @@
 import { encryptionUtils } from "../../utils/security/encryption";
 import logger from "../../utils/common/logger";
 
-interface KeyFileData {
+export interface KeyFileData {
   version?: string;
   type?: 'protected' | 'unprotected';
   key?: number[];
