@@ -214,11 +214,11 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
       <EnvelopeView
-        envelopes={envelopes}
+        envelopes={envelopes as unknown as Array<Record<string, unknown>>}
         safeTransactions={safeTransactions}
         unassignedCash={unassignedCash}
-        addEnvelope={budgetOps.addEnvelope}
-        updateEnvelope={budgetOps.updateEnvelope}
+        addEnvelope={budgetOps.addEnvelope as () => void}
+        updateEnvelope={budgetOps.updateEnvelope as () => void}
         setActiveView={setActiveView}
       />
     ),
