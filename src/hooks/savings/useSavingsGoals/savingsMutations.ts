@@ -34,10 +34,10 @@ export const useAddSavingsGoalMutation = () => {
       // Apply optimistic update first
       await optimisticHelpers.addSavingsGoal(newGoal);
 
-      // Then persist to Dexie
-      await budgetDb.savingsGoals.add(newGoal);
+      // Then persist to Dexie (redundant as optimisticHelpers already does this)
+      // await budgetDb.savingsGoals.add(newGoal);
 
-      logger.debug("✅ Added savings goal:", newGoal);
+      logger.debug("✅ Added savings goal:", newGoal as unknown as Record<string, unknown>);
 
       return newGoal;
     },
@@ -58,7 +58,7 @@ export const useAddSavingsGoalMutation = () => {
       // Trigger cloud sync
       triggerSavingsGoalSync("add");
     },
-    onError: (error, goalData, context) => {
+    onError: (error, _goalData, context) => {
       logger.error("Failed to add savings goal:", error);
       // Rollback optimistic update if needed
       if (context?.previousGoals) {
@@ -90,12 +90,15 @@ export const useUpdateSavingsGoalMutation = () => {
       };
 
       // Apply optimistic update
-      await optimisticHelpers.updateSavingsGoal(goalId, updatedGoal);
+      await optimisticHelpers.updateSavingsGoal(goalId, {
+        ...updates,
+        lastModified: Date.now(),
+      });
 
-      // Update in Dexie
-      await budgetDb.savingsGoals.update(goalId, updatedGoal);
+      // Update in Dexie (redundant as optimisticHelpers already does this)
+      // await budgetDb.savingsGoals.update(goalId, updatedGoal);
 
-      logger.debug("✅ Updated savings goal:", updatedGoal);
+      logger.debug("✅ Updated savings goal:", updatedGoal as unknown as Record<string, unknown>);
 
       return updatedGoal;
     },
@@ -124,10 +127,10 @@ export const useDeleteSavingsGoalMutation = () => {
       // Apply optimistic update
       await optimisticHelpers.deleteSavingsGoal(goalId);
 
-      // Delete from Dexie
-      await budgetDb.savingsGoals.delete(goalId);
+      // Delete from Dexie (redundant as optimisticHelpers already does this)
+      // await budgetDb.savingsGoals.delete(goalId);
 
-      logger.debug("✅ Deleted savings goal:", goalId);
+      logger.debug("✅ Deleted savings goal:", { goalId });
 
       return goalId;
     },
@@ -227,8 +230,11 @@ export const useDistributeFundsMutation = () => {
     mutationKey: ["savingsGoals", "distribute"],
     mutationFn: async ({ distribution, description = "Fund distribution" }: { distribution: Record<string, string | number>; description?: string }) => {
       const results = [];
-      const totalAmount = Object.values(distribution).reduce(
-        (sum, amount) => sum + (typeof amount === 'string' ? parseFloat(amount) : amount) || 0,
+      const totalAmount = Object.values(distribution).reduce<number>(
+        (sum, amount) => {
+          const numAmount = Number(amount);
+          return sum + (isNaN(numAmount) ? 0 : numAmount);
+        },
         0
       );
 
