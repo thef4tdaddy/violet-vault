@@ -34,7 +34,9 @@ describe("firebaseUtils", () => {
 
   describe("forcePushToCloud", () => {
     it("should stop service, force push, and return success", async () => {
-      (cloudSyncService.forcePushToCloud as never as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true });
+      (cloudSyncService.forcePushToCloud as never as ReturnType<typeof vi.fn>).mockResolvedValue({
+        success: true,
+      });
       const result = await forcePushToCloud();
       expect(cloudSyncService.stop).toHaveBeenCalled();
       expect(cloudSyncService.forcePushToCloud).toHaveBeenCalled();

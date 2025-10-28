@@ -3,7 +3,11 @@
  * Defines return types for all autofunding-related hooks
  */
 
-import type { AutoFundingRule, RuleStatistics, RuleSummary } from "@/utils/budgeting/autofunding/rules";
+import type {
+  AutoFundingRule,
+  RuleStatistics,
+  RuleSummary,
+} from "@/utils/budgeting/autofunding/rules";
 import type { Transaction, Envelope } from "@/types/finance";
 
 // Re-export commonly used types from rules.ts for convenience
@@ -161,11 +165,23 @@ export interface UseAutoFundingExecutionReturn {
     trigger?: string,
     triggerData?: Record<string, unknown>
   ) => Promise<ExecutionResult>;
-  executeSingleRule: (rule: AutoFundingRule, context: Record<string, unknown>) => Promise<RuleExecutionResult>;
-  simulateExecution: (rules: AutoFundingRule[], context: Record<string, unknown>) => Record<string, unknown>;
-  createPlan: (rules: AutoFundingRule[], context: Record<string, unknown>) => Record<string, unknown>;
+  executeSingleRule: (
+    rule: AutoFundingRule,
+    context: Record<string, unknown>
+  ) => Promise<RuleExecutionResult>;
+  simulateExecution: (
+    rules: AutoFundingRule[],
+    context: Record<string, unknown>
+  ) => Record<string, unknown>;
+  createPlan: (
+    rules: AutoFundingRule[],
+    context: Record<string, unknown>
+  ) => Record<string, unknown>;
   validatePlannedTransfers: (plan: Record<string, unknown>) => boolean;
-  calculateImpact: (rules: AutoFundingRule[], context: Record<string, unknown>) => Record<string, unknown>;
+  calculateImpact: (
+    rules: AutoFundingRule[],
+    context: Record<string, unknown>
+  ) => Record<string, unknown>;
   canExecuteRules: (rules: AutoFundingRule[]) => boolean;
   getExecutionSummary: () => Record<string, unknown>;
 }

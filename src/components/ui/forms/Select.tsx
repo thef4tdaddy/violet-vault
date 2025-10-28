@@ -46,7 +46,8 @@ const SelectComponent = React.forwardRef<HTMLSelectElement, SelectProps>(
     { label, error, helperText, options = [], placeholder, className = "", id, disabled, ...props },
     ref
   ) => {
-    const generatedId = useId(); const selectId = id || `select-${generatedId}`;
+    const generatedId = useId();
+    const selectId = id || `select-${generatedId}`;
 
     return (
       <div className="w-full">

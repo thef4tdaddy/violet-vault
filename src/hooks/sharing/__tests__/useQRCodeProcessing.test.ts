@@ -168,7 +168,12 @@ describe("useQRCodeProcessing", () => {
     const setCreatorInfo = vi.fn();
     const validateShareCode = vi.fn();
 
-    const success = result.current.processQRData(null, setShareCode, setCreatorInfo, validateShareCode);
+    const success = result.current.processQRData(
+      null,
+      setShareCode,
+      setCreatorInfo,
+      validateShareCode
+    );
 
     expect(success).toBe(false);
   });

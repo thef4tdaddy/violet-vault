@@ -28,7 +28,9 @@ export const useMainLayoutHandlers = (auth: unknown): LayoutHandlers => {
   const handleLogoutFn = (
     typeof rawHandleLogout === "function" ? rawHandleLogout : () => {}
   ) as () => void;
-  const handleSetupFn = (typeof _handleSetup === "function" ? _handleSetup : () => {}) as () => void;
+  const handleSetupFn = (
+    typeof _handleSetup === "function" ? _handleSetup : () => {}
+  ) as () => void;
   const handleChangePasswordFn = (
     typeof handleChangePassword === "function" ? handleChangePassword : async () => {}
   ) as (old: string, newPwd: string) => Promise<void>;

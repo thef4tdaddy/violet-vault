@@ -4,17 +4,17 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for BudgetCommit validation
  * Represents a commit in the budget history
  */
 export const BudgetCommitSchema = z.object({
-  hash: z.string().min(1, 'Commit hash is required').max(200),
-  timestamp: z.number().int().positive('Timestamp must be a positive number'),
-  message: z.string().min(1, 'Commit message is required').max(1000),
-  author: z.string().min(1, 'Author is required').max(200),
+  hash: z.string().min(1, "Commit hash is required").max(200),
+  timestamp: z.number().int().positive("Timestamp must be a positive number"),
+  message: z.string().min(1, "Commit message is required").max(1000),
+  author: z.string().min(1, "Author is required").max(200),
   parentHash: z.string().max(200).optional(),
   deviceFingerprint: z.string().max(200).optional(),
   changes: z.record(z.unknown()).optional(),
@@ -28,10 +28,10 @@ export type BudgetCommit = z.infer<typeof BudgetCommitSchema>;
  */
 export const BudgetChangeSchema = z.object({
   id: z.number().int().positive().optional(),
-  commitHash: z.string().min(1, 'Commit hash is required'),
-  entityType: z.string().min(1, 'Entity type is required').max(100),
-  entityId: z.string().min(1, 'Entity ID is required'),
-  changeType: z.enum(['create', 'update', 'delete']),
+  commitHash: z.string().min(1, "Commit hash is required"),
+  entityType: z.string().min(1, "Entity type is required").max(100),
+  entityId: z.string().min(1, "Entity ID is required"),
+  changeType: z.enum(["create", "update", "delete"]),
   description: z.string().max(500).optional(),
   oldValue: z.unknown().optional(),
   newValue: z.unknown().optional(),
@@ -45,12 +45,12 @@ export type BudgetChange = z.infer<typeof BudgetChangeSchema>;
  */
 export const BudgetBranchSchema = z.object({
   id: z.number().int().positive().optional(),
-  name: z.string().min(1, 'Branch name is required').max(200),
+  name: z.string().min(1, "Branch name is required").max(200),
   description: z.string().max(500).optional(),
-  sourceCommitHash: z.string().min(1, 'Source commit hash is required'),
-  headCommitHash: z.string().min(1, 'Head commit hash is required'),
-  author: z.string().min(1, 'Author is required').max(200),
-  created: z.number().int().positive('Creation time must be a positive number'),
+  sourceCommitHash: z.string().min(1, "Source commit hash is required"),
+  headCommitHash: z.string().min(1, "Head commit hash is required"),
+  author: z.string().min(1, "Author is required").max(200),
+  created: z.number().int().positive("Creation time must be a positive number"),
   isActive: z.boolean().default(true),
   isMerged: z.boolean().default(false),
   mergedAt: z.number().int().positive().optional(),
@@ -65,12 +65,12 @@ export type BudgetBranch = z.infer<typeof BudgetBranchSchema>;
  */
 export const BudgetTagSchema = z.object({
   id: z.number().int().positive().optional(),
-  name: z.string().min(1, 'Tag name is required').max(200),
+  name: z.string().min(1, "Tag name is required").max(200),
   description: z.string().max(500).optional(),
-  commitHash: z.string().min(1, 'Commit hash is required'),
-  tagType: z.enum(['release', 'milestone', 'backup']),
-  author: z.string().min(1, 'Author is required').max(200),
-  created: z.number().int().positive('Creation time must be a positive number'),
+  commitHash: z.string().min(1, "Commit hash is required"),
+  tagType: z.enum(["release", "milestone", "backup"]),
+  author: z.string().min(1, "Author is required").max(200),
+  created: z.number().int().positive("Creation time must be a positive number"),
   version: z.string().max(100).optional(),
 });
 

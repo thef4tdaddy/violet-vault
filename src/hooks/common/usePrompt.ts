@@ -34,7 +34,8 @@ const usePromptStore = create<PromptStore>((set) => ({
   config: {},
   resolver: null,
 
-  showPrompt: (config: PromptConfig, resolver: (value: string | null) => void) => set({ isOpen: true, config, resolver }),
+  showPrompt: (config: PromptConfig, resolver: (value: string | null) => void) =>
+    set({ isOpen: true, config, resolver }),
 
   hidePrompt: () => set({ isOpen: false, config: {}, resolver: null }),
 }));

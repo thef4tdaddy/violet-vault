@@ -78,9 +78,7 @@ vi.mock("@/hooks/transactions/useTransactionLedger", () => ({
 // Mock child components
 vi.mock("../TransactionSummaryCards", () => ({
   default: ({ transactions }) => (
-    <div data-testid="transaction-summary">
-      Transactions: {transactions.length}
-    </div>
+    <div data-testid="transaction-summary">Transactions: {transactions.length}</div>
   ),
 }));
 
@@ -147,7 +145,9 @@ vi.mock("../ledger/TransactionLedgerHeader", () => ({
 vi.mock("../ledger/TransactionPagination", () => ({
   default: ({ currentPage, totalPages, onPageChange }) => (
     <div data-testid="pagination">
-      <span>Page {currentPage} of {totalPages}</span>
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
       <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
         Previous
       </button>

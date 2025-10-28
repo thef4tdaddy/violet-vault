@@ -17,11 +17,7 @@ vi.mock("./EnvelopeGrid", () => ({
 }));
 
 vi.mock("./EnvelopeSummaryCards", () => ({
-  default: ({ totals }) => (
-    <div data-testid="envelope-summary">
-      Total: ${totals?.total || 0}
-    </div>
-  ),
+  default: ({ totals }) => <div data-testid="envelope-summary">Total: ${totals?.total || 0}</div>,
 }));
 
 vi.mock("./CashFlowSummary", () => ({
@@ -29,9 +25,7 @@ vi.mock("./CashFlowSummary", () => ({
 }));
 
 vi.mock("@/components/ui", () => ({
-  Button: ({ children, onClick }) => (
-    <button onClick={onClick}>{children}</button>
-  ),
+  Button: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
 vi.mock("../../utils", () => ({
@@ -110,10 +104,8 @@ describe("EnvelopeSystem", () => {
   describe("Envelope Actions", () => {
     it("should call onCreateEnvelope when creating envelope", async () => {
       const mockOnCreateEnvelope = vi.fn();
-      
-      render(
-        <EnvelopeSystem {...defaultProps} onCreateEnvelope={mockOnCreateEnvelope} />
-      );
+
+      render(<EnvelopeSystem {...defaultProps} onCreateEnvelope={mockOnCreateEnvelope} />);
 
       // Assuming there's a create button
       const createButtons = screen.queryAllByText(/create/i);
@@ -125,20 +117,16 @@ describe("EnvelopeSystem", () => {
 
     it("should call onUpdateEnvelope when updating envelope", async () => {
       const mockOnUpdateEnvelope = vi.fn();
-      
-      render(
-        <EnvelopeSystem {...defaultProps} onUpdateEnvelope={mockOnUpdateEnvelope} />
-      );
+
+      render(<EnvelopeSystem {...defaultProps} onUpdateEnvelope={mockOnUpdateEnvelope} />);
 
       // Update functionality would be triggered through the grid
     });
 
     it("should call onDeleteEnvelope when deleting envelope", async () => {
       const mockOnDeleteEnvelope = vi.fn();
-      
-      render(
-        <EnvelopeSystem {...defaultProps} onDeleteEnvelope={mockOnDeleteEnvelope} />
-      );
+
+      render(<EnvelopeSystem {...defaultProps} onDeleteEnvelope={mockOnDeleteEnvelope} />);
 
       // Delete functionality would be triggered through the grid
     });
@@ -147,20 +135,20 @@ describe("EnvelopeSystem", () => {
   describe("Unassigned Cash", () => {
     it("should display unassigned cash amount", async () => {
       render(<EnvelopeSystem {...defaultProps} unassignedCash={250} />);
-      
+
       // Unassigned cash should be shown somewhere in the component
       // The exact location depends on implementation
     });
 
     it("should handle zero unassigned cash", async () => {
       render(<EnvelopeSystem {...defaultProps} unassignedCash={0} />);
-      
+
       expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
     });
 
     it("should handle negative unassigned cash", async () => {
       render(<EnvelopeSystem {...defaultProps} unassignedCash={-100} />);
-      
+
       expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
     });
   });
@@ -179,9 +167,7 @@ describe("EnvelopeSystem", () => {
     });
 
     it("should handle envelopes with zero balance", async () => {
-      const envelopes = [
-        { id: "1", name: "Empty", balance: 0 },
-      ];
+      const envelopes = [{ id: "1", name: "Empty", balance: 0 }];
 
       render(<EnvelopeSystem {...defaultProps} envelopes={envelopes} />);
 
@@ -193,13 +179,13 @@ describe("EnvelopeSystem", () => {
     it("should handle missing required props gracefully", async () => {
       // @ts-expect-error Testing missing props
       render(<EnvelopeSystem />);
-      
+
       // Should still render something even without props
     });
 
     it("should handle null envelope values", async () => {
       render(<EnvelopeSystem {...defaultProps} envelopes={null} />);
-      
+
       expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
     });
   });

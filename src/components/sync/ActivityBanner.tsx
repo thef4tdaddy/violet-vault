@@ -38,7 +38,10 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
   useEffect(() => {
     // Sort activities by timestamp and get recent ones
     const sortedActivities = [...recentActivity]
-      .sort((activityA, activityB) => new Date(activityB.timestamp).getTime() - new Date(activityA.timestamp).getTime())
+      .sort(
+        (activityA, activityB) =>
+          new Date(activityB.timestamp).getTime() - new Date(activityA.timestamp).getTime()
+      )
       .slice(0, 10);
 
     setDisplayedActivities(sortedActivities);

@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import logger from "../../utils/common/logger";
-import {  convertToCSV,
+import {
+  convertToCSV,
   downloadCSV,
   exportChartAsImage,
   getChartElements,

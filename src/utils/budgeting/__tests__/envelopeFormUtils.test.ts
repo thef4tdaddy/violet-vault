@@ -80,7 +80,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).name).toBe("Envelope name must be less than 50 characters");
+      expect((result.errors as ValidationErrors).name).toBe(
+        "Envelope name must be less than 50 characters"
+      );
     });
 
     it("should detect duplicate names", () => {
@@ -89,7 +91,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData, existingEnvelopes);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).name).toBe("An envelope with this name already exists");
+      expect((result.errors as ValidationErrors).name).toBe(
+        "An envelope with this name already exists"
+      );
     });
 
     it("should allow same name when editing existing envelope", () => {
@@ -106,7 +110,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).monthlyAmount).toBe("Monthly amount must be a positive number");
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe(
+        "Monthly amount must be a positive number"
+      );
     });
 
     it("should validate monthly amount maximum", () => {
@@ -114,7 +120,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).monthlyAmount).toBe("Monthly amount cannot exceed $100,000");
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe(
+        "Monthly amount cannot exceed $100,000"
+      );
     });
 
     it("should require target amount for sinking funds", () => {
@@ -126,7 +134,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).targetAmount).toBe("Target amount is required for sinking funds");
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount is required for sinking funds"
+      );
     });
 
     it("should validate target amount format", () => {
@@ -138,7 +148,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).targetAmount).toBe("Target amount must be a positive number");
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount must be a positive number"
+      );
     });
 
     it("should require category", () => {

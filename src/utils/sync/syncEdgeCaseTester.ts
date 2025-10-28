@@ -318,7 +318,10 @@ class SyncEdgeCaseTester {
   async testCircularReferences() {
     logger.info("🧪 Testing circular reference handling...");
 
-    const testObj: Partial<Envelope> & { id: string; self?: unknown } = { id: "circular-test", name: "Test" };
+    const testObj: Partial<Envelope> & { id: string; self?: unknown } = {
+      id: "circular-test",
+      name: "Test",
+    };
     testObj.self = testObj; // Create circular reference
 
     try {
@@ -383,7 +386,8 @@ class SyncEdgeCaseTester {
       const syncData = await cloudSyncService.fetchDexieData();
       const foundItem = syncData.transactions.find((t) => t.id === "unicode-test");
       // Check if name property exists (it's not in Transaction type but test data has it)
-      const passed = foundItem && (foundItem as Transaction & { name?: string }).name === testData.name;
+      const passed =
+        foundItem && (foundItem as Transaction & { name?: string }).name === testData.name;
 
       this.testResults.push({
         test: "testUnicodeAndSpecialChars",

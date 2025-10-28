@@ -4,19 +4,19 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for PaycheckHistory validation
  * Represents income deposits with allocation tracking
  */
 export const PaycheckHistorySchema = z.object({
-  id: z.string().min(1, 'Paycheck ID is required'),
-  date: z.union([z.date(), z.string()], 'Date must be a valid date'),
-  amount: z.number().min(0, 'Amount cannot be negative'),
-  source: z.string().min(1, 'Source is required').max(100),
+  id: z.string().min(1, "Paycheck ID is required"),
+  date: z.union([z.date(), z.string()], "Date must be a valid date"),
+  amount: z.number().min(0, "Amount cannot be negative"),
+  source: z.string().min(1, "Source is required").max(100),
   allocations: z.record(z.string(), z.number().min(0)).optional(),
-  lastModified: z.number().int().positive('Last modified must be a positive number'),
+  lastModified: z.number().int().positive("Last modified must be a positive number"),
   createdAt: z.number().int().positive().optional(),
   deductions: z.record(z.string(), z.number().min(0)).optional(),
   netAmount: z.number().min(0).optional(),

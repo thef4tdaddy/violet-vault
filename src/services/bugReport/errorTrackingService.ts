@@ -180,7 +180,9 @@ export class ErrorTrackingService {
 
       // Override console methods
       (["log", "warn", "error", "info", "debug"] as const).forEach((level) => {
-        (console as unknown as Record<string, (...args: unknown[]) => void>)[level] = (...args: unknown[]) => {
+        (console as unknown as Record<string, (...args: unknown[]) => void>)[level] = (
+          ...args: unknown[]
+        ) => {
           // Call original method first
           originalConsole[level](...args);
 

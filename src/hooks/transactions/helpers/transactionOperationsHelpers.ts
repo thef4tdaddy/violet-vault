@@ -29,7 +29,9 @@ export const triggerTransactionSync = (changeType: string) => {
 /**
  * Convert app transaction to database transaction
  */
-const appTransactionToDbTransaction = (appTxn: ReturnType<typeof prepareTransactionForStorage>): DbTransaction => {
+const appTransactionToDbTransaction = (
+  appTxn: ReturnType<typeof prepareTransactionForStorage>
+): DbTransaction => {
   return {
     id: String(appTxn.id),
     date: new Date(appTxn.date),
@@ -56,7 +58,10 @@ const toTransactionBase = (data: any): Parameters<typeof prepareTransactionForSt
 /**
  * Add transaction to database
  */
-export const addTransactionToDB = async (transactionData: Record<string, unknown>, categoryRules: unknown[] = []) => {
+export const addTransactionToDB = async (
+  transactionData: Record<string, unknown>,
+  categoryRules: unknown[] = []
+) => {
   logger.debug("Adding transaction", { id: transactionData.id });
 
   const validation = validateTransactionData(transactionData);
@@ -111,7 +116,10 @@ export const deleteTransactionFromDB = async (transactionId: string) => {
 /**
  * Split transaction in database
  */
-export const splitTransactionInDB = async (originalTransaction: Record<string, unknown>, splitTransactions: Record<string, unknown>[]) => {
+export const splitTransactionInDB = async (
+  originalTransaction: Record<string, unknown>,
+  splitTransactions: Record<string, unknown>[]
+) => {
   logger.debug("Splitting transaction", {
     originalId: originalTransaction.id,
     splitCount: splitTransactions.length,
@@ -167,8 +175,12 @@ export const transferFundsInDB = async (transferData: Record<string, unknown>) =
 
   const [outgoingTxn, incomingTxn] = createTransferPair(toTransactionBase(transferData));
 
-  const dbOutgoing = appTransactionToDbTransaction(prepareTransactionForStorage(toTransactionBase(outgoingTxn)));
-  const dbIncoming = appTransactionToDbTransaction(prepareTransactionForStorage(toTransactionBase(incomingTxn)));
+  const dbOutgoing = appTransactionToDbTransaction(
+    prepareTransactionForStorage(toTransactionBase(outgoingTxn))
+  );
+  const dbIncoming = appTransactionToDbTransaction(
+    prepareTransactionForStorage(toTransactionBase(incomingTxn))
+  );
 
   const outgoingResult = await budgetDb.transactions.add(dbOutgoing);
   const incomingResult = await budgetDb.transactions.add(dbIncoming);
@@ -215,7 +227,10 @@ export const bulkOperationOnTransactions = async (
 
     case "categorize":
       for (const txn of transactions) {
-        const categorized = categorizeTransaction(toTransactionBase({ ...txn, ...updates }), categoryRules);
+        const categorized = categorizeTransaction(
+          toTransactionBase({ ...txn, ...updates }),
+          categoryRules
+        );
         const prepared = prepareTransactionForStorage(toTransactionBase(categorized));
         const dbTransaction = appTransactionToDbTransaction(prepared);
         await budgetDb.transactions.put(dbTransaction);

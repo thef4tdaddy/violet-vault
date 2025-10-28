@@ -55,7 +55,15 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
     sortBy,
     sortOrder,
     includeCompleted,
-  }) as { data: SavingsGoal[]; isLoading: boolean; isError: boolean; error: Error | null; refetch: () => void; isFetching: boolean; isStale: boolean };
+  }) as {
+    data: SavingsGoal[];
+    isLoading: boolean;
+    isError: boolean;
+    error: Error | null;
+    refetch: () => void;
+    isFetching: boolean;
+    isStale: boolean;
+  };
 
   // Mutation hooks
   const addSavingsGoalMutation = useAddSavingsGoalMutation();

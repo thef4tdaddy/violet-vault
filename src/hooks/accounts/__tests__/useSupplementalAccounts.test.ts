@@ -89,7 +89,13 @@ vi.mock("../utils/accountHandlersUtils", () => ({
     setShowAddModal(true);
   }),
   startAccountTransfer: vi.fn(
-    (account, setTransferringAccount, setTransferForm, setShowTransferModal, createTransferFormForAccount) => {
+    (
+      account,
+      setTransferringAccount,
+      setTransferForm,
+      setShowTransferModal,
+      createTransferFormForAccount
+    ) => {
       setTransferringAccount(account);
       setTransferForm(createTransferFormForAccount(account));
       setShowTransferModal(true);

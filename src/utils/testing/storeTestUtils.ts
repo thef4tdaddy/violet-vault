@@ -36,7 +36,12 @@ export class StoreTestHelper<T = unknown> {
    */
   reset() {
     const state = this.storeHook.getState();
-    if (state && typeof state === 'object' && 'reset' in state && typeof state.reset === 'function') {
+    if (
+      state &&
+      typeof state === "object" &&
+      "reset" in state &&
+      typeof state.reset === "function"
+    ) {
       act(() => {
         (state.reset as () => void)();
       });
@@ -63,7 +68,7 @@ export class StoreTestHelper<T = unknown> {
     const currentState = this.storeHook.getState();
 
     Object.entries(expected).forEach(([key, value]) => {
-      if (typeof expect !== 'undefined') {
+      if (typeof expect !== "undefined") {
         expect(currentState[key]).toEqual(value);
       }
     });
@@ -80,7 +85,10 @@ export class StoreTestHelper<T = unknown> {
 /**
  * Create a test helper for a store
  */
-export const createStoreTestHelper = <T = unknown>(storeHook: StoreHook<T>, storeName: string): StoreTestHelper<T> => {
+export const createStoreTestHelper = <T = unknown>(
+  storeHook: StoreHook<T>,
+  storeName: string
+): StoreTestHelper<T> => {
   return new StoreTestHelper(storeHook, storeName);
 };
 

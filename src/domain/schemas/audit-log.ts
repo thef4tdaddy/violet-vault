@@ -4,7 +4,7 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for AuditLogEntry validation
@@ -12,10 +12,10 @@ import { z } from 'zod';
  */
 export const AuditLogEntrySchema = z.object({
   id: z.number().int().positive().optional(),
-  timestamp: z.number().int().positive('Timestamp must be a positive number'),
-  action: z.string().min(1, 'Action is required').max(100),
-  entityType: z.string().min(1, 'Entity type is required').max(100),
-  entityId: z.string().min(1, 'Entity ID is required'),
+  timestamp: z.number().int().positive("Timestamp must be a positive number"),
+  action: z.string().min(1, "Action is required").max(100),
+  entityType: z.string().min(1, "Entity type is required").max(100),
+  entityId: z.string().min(1, "Entity ID is required"),
   userId: z.string().max(200).optional(),
   changes: z.record(z.string(), z.unknown()).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),

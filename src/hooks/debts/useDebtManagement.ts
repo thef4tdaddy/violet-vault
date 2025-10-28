@@ -11,9 +11,7 @@ import {
   COMPOUND_FREQUENCIES,
   calculateDebtStats,
 } from "@/constants/debts";
-import {
-  getUpcomingPayments,
-} from "@/utils/debts/debtCalculations";
+import { getUpcomingPayments } from "@/utils/debts/debtCalculations";
 import logger from "@/utils/common/logger";
 import {
   enrichDebtsWithRelations,

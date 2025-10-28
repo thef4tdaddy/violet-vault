@@ -29,15 +29,17 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore(
-    useShallow((state: {
-      updateTransaction?: (transaction: unknown) => void;
-      setAllTransactions?: (transactions: unknown[]) => void;
-      updateBill?: (bill: unknown) => void;
-    }) => ({
-      updateTransaction: state.updateTransaction,
-      setAllTransactions: state.setAllTransactions,
-      updateBill: state.updateBill,
-    }))
+    useShallow(
+      (state: {
+        updateTransaction?: (transaction: unknown) => void;
+        setAllTransactions?: (transactions: unknown[]) => void;
+        updateBill?: (bill: unknown) => void;
+      }) => ({
+        updateTransaction: state.updateTransaction,
+        setAllTransactions: state.setAllTransactions,
+        updateBill: state.updateBill,
+      })
+    )
   );
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
@@ -51,7 +53,9 @@ export const useTransactionLedger = (currentUser: unknown) => {
     logger.debug("🔄 Bulk import called with transactions:", { count: newTransactions.length });
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions?.(updatedAllTransactions);
-    logger.debug("💾 Bulk import complete. Total transactions:", { count: updatedAllTransactions.length });
+    logger.debug("💾 Bulk import complete. Total transactions:", {
+      count: updatedAllTransactions.length,
+    });
   };
 
   // Custom hooks

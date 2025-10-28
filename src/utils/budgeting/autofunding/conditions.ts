@@ -68,10 +68,7 @@ export interface FilterCriteria {
  * @param {Object} context - Execution context with envelopes, unassigned cash, etc.
  * @returns {boolean} True if all conditions are met
  */
-export const evaluateConditions = (
-  conditions: Condition[],
-  context: ExecutionContext
-): boolean => {
+export const evaluateConditions = (conditions: Condition[], context: ExecutionContext): boolean => {
   if (!conditions || conditions.length === 0) {
     return true;
   }
@@ -352,7 +349,10 @@ export const validateCondition = (condition: Condition): { isValid: boolean; err
  * @param {Array} envelopes - Available envelopes for name lookup
  * @returns {string} Human-readable condition description
  */
-export const getConditionDescription = (condition: Condition, envelopes: Envelope[] = []): string => {
+export const getConditionDescription = (
+  condition: Condition,
+  envelopes: Envelope[] = []
+): string => {
   switch (condition.type) {
     case CONDITION_TYPES.BALANCE_LESS_THAN:
       if (condition.envelopeId) {

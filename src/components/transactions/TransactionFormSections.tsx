@@ -221,7 +221,10 @@ export const TransactionEnvelopeSelector = ({
 }: TransactionEnvelopeSelectorProps) => {
   const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
   const isBillEnvelope = selectedEnvelope && selectedEnvelope.envelopeType === "bill";
-  const suggested = transactionForm.description && suggestEnvelope ? suggestEnvelope(transactionForm.description) : null;
+  const suggested =
+    transactionForm.description && suggestEnvelope
+      ? suggestEnvelope(transactionForm.description)
+      : null;
 
   return (
     <div>
@@ -252,7 +255,8 @@ export const TransactionEnvelopeSelector = ({
       {transactionForm.envelopeId && isBillEnvelope && (
         <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-800">
-            💡 <strong>Bill Payment:</strong> Assigning this transaction to "{selectedEnvelope.name}" will automatically mark it as a bill payment and deduct from the envelope balance.
+            💡 <strong>Bill Payment:</strong> Assigning this transaction to "{selectedEnvelope.name}
+            " will automatically mark it as a bill payment and deduct from the envelope balance.
           </p>
         </div>
       )}
@@ -346,7 +350,10 @@ interface TransactionReceiptSectionProps {
  * Receipt scanner section for new transactions
  * Extracted to reduce complexity
  */
-export const TransactionReceiptSection = ({ editingTransaction, onClose }: TransactionReceiptSectionProps) => {
+export const TransactionReceiptSection = ({
+  editingTransaction,
+  onClose,
+}: TransactionReceiptSectionProps) => {
   if (editingTransaction) return null;
 
   return (

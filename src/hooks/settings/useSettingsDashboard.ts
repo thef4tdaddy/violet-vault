@@ -230,12 +230,15 @@ export const useSettingsActions = () => {
     }
   }, []);
 
-  const handleResetConfirmAction = useCallback((onClose: () => void, onResetEncryption: () => void) => {
-    return () => {
-      onClose();
-      onResetEncryption();
-    };
-  }, []);
+  const handleResetConfirmAction = useCallback(
+    (onClose: () => void, onResetEncryption: () => void) => {
+      return () => {
+        onClose();
+        onResetEncryption();
+      };
+    },
+    []
+  );
 
   return {
     handleCreateTestHistory,

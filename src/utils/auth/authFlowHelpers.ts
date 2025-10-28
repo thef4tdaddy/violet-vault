@@ -84,7 +84,10 @@ export const handleSharedBudgetJoin = async (
 /**
  * Generate budget ID for new user
  */
-export const generateNewUserBudgetId = async (password: string, shareCode: string): Promise<string> => {
+export const generateNewUserBudgetId = async (
+  password: string,
+  shareCode: string
+): Promise<string> => {
   const { encryptionUtils } = await import("../security/encryption");
 
   if (!shareCode) {

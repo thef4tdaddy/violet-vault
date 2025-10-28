@@ -5,7 +5,6 @@ import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 import type { Transaction, Bill } from "../../../db/types";
 
-
 interface CloudSyncService {
   triggerSyncForCriticalChange(change: string): void;
 }

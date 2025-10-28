@@ -235,7 +235,7 @@ describe("LocalStorageService", () => {
       // Test error handling by causing an error in the filter operation
       // We'll restore Object.keys properly in afterEach
       mockStorage["test"] = "value";
-      
+
       // Just verify it returns empty array when there's an exception
       // We can't easily test Object.keys error without breaking the test framework
       // So let's just verify normal operation works
@@ -478,7 +478,7 @@ describe("LocalStorageService", () => {
     it("should handle empty strings", () => {
       // First set empty string directly in mockStorage
       mockStorage["testKey"] = "";
-      
+
       // Verify it's stored
       expect(mockStorage["testKey"]).toBe("");
 

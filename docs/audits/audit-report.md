@@ -2,14 +2,15 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 13 | +8 |
-| TypeScript Errors | 587 | -1534 |
+| Category          | Current | Change |
+| ----------------- | ------- | ------ |
+| ESLint Issues     | 13      | +8     |
+| TypeScript Errors | 587     | -1534  |
 
-*Last updated: 2025-10-28 17:21:37 UTC*
+_Last updated: 2025-10-28 17:21:37 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -22,6 +23,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+
 - 2 issues in `violet-vault/src/utils/budgeting/billEnvelopeCalculations.ts`
 - 2 issues in `violet-vault/src/hooks/budgeting/useBudgetData/queryFunctions.ts`
 - 1 issues in `violet-vault/src/utils/dataManagement/firebaseUtils.ts`
@@ -35,15 +37,17 @@
 - 1 issues in `violet-vault/src/hooks/auth/mutations/useProfileMutations.ts`
 
 ### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 4 | `@typescript-eslint/no-unused-vars` |
-| 3 | `no-undef` |
-| 2 | `null` |
-| 2 | `no-redeclare` |
-| 2 | `@typescript-eslint/no-explicit-any` |
+
+| Count | Rule ID                              |
+| ----- | ------------------------------------ |
+| 4     | `@typescript-eslint/no-unused-vars`  |
+| 3     | `no-undef`                           |
+| 2     | `null`                               |
+| 2     | `no-redeclare`                       |
+| 2     | `@typescript-eslint/no-explicit-any` |
 
 ### Detailed Lint Report
+
 ```
 violet-vault/src/hooks/auth/mutations/useProfileMutations.ts:6:15 - 1 - 'UserData' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/budgeting/useBudgetData/queryFunctions.ts:8:34 - 1 - 'Transaction' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
@@ -63,6 +67,7 @@ violet-vault/src/utils/dataManagement/firebaseUtils.ts:2:10 - 1 - 'budgetDb' is 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+
 - 88 errors in `src/hooks/transactions/__tests__/useTransactionSplitterUI.test.ts`
 - 36 errors in `src/components/budgeting/__tests__/EnvelopeSystem.test.tsx`
 - 23 errors in `src/services/bugReport/__tests__/index.test.ts`
@@ -271,42 +276,44 @@ violet-vault/src/utils/dataManagement/firebaseUtils.ts:2:10 - 1 - 'budgetDb' is 
 - 1 errors in `src/components/accounts/AccountFormModal.tsx`
 
 ### Type Error Breakdown by Category
+
 | Count | Error Code |
-|---|---|
-| 164 | `TS2339` |
-| 126 | `TS2345` |
-| 73 | `TS2322` |
-| 37 | `TS2554` |
-| 33 | `TS6133` |
-| 30 | `TS2352` |
-| 18 | `TS2786` |
-| 18 | `TS2551` |
-| 14 | `TS2740` |
-| 14 | `TS2353` |
-| 10 | `TS2739` |
-| 8 | `TS2559` |
-| 7 | `TS2741` |
-| 5 | `TS2365` |
-| 4 | `TS2769` |
-| 4 | `TS2307` |
-| 4 | `TS2300` |
-| 2 | `TS6196` |
-| 2 | `TS2419` |
-| 2 | `TS2363` |
-| 1 | `TS6192` |
-| 1 | `TS4104` |
-| 1 | `TS2698` |
-| 1 | `TS2694` |
-| 1 | `TS2677` |
-| 1 | `TS2614` |
-| 1 | `TS2613` |
-| 1 | `TS2538` |
-| 1 | `TS2448` |
-| 1 | `TS2416` |
-| 1 | `TS2305` |
-| 1 | `TS2304` |
+| ----- | ---------- |
+| 164   | `TS2339`   |
+| 126   | `TS2345`   |
+| 73    | `TS2322`   |
+| 37    | `TS2554`   |
+| 33    | `TS6133`   |
+| 30    | `TS2352`   |
+| 18    | `TS2786`   |
+| 18    | `TS2551`   |
+| 14    | `TS2740`   |
+| 14    | `TS2353`   |
+| 10    | `TS2739`   |
+| 8     | `TS2559`   |
+| 7     | `TS2741`   |
+| 5     | `TS2365`   |
+| 4     | `TS2769`   |
+| 4     | `TS2307`   |
+| 4     | `TS2300`   |
+| 2     | `TS6196`   |
+| 2     | `TS2419`   |
+| 2     | `TS2363`   |
+| 1     | `TS6192`   |
+| 1     | `TS4104`   |
+| 1     | `TS2698`   |
+| 1     | `TS2694`   |
+| 1     | `TS2677`   |
+| 1     | `TS2614`   |
+| 1     | `TS2613`   |
+| 1     | `TS2538`   |
+| 1     | `TS2448`   |
+| 1     | `TS2416`   |
+| 1     | `TS2305`   |
+| 1     | `TS2304`   |
 
 ### Detailed Type Error Report
+
 ```
 src/components/accounts/AccountFormModal.tsx(127,11): error TS2322: Type '{ editingAccount: any; onClose: any; isLocked: any; isOwnLock: any; _lock: any; breakLock: any; lockLoading: any; }' is not assignable to type 'IntrinsicAttributes & AccountModalHeaderProps'.
   Property '_lock' does not exist on type 'IntrinsicAttributes & AccountModalHeaderProps'.
@@ -1302,4 +1309,3 @@ src/utils/transactions/__tests__/operations.test.ts(439,53): error TS2345: Argum
     Type 'string' is not assignable to type '"income" | "expense" | "transfer"'.
 src/utils/validation/transactionValidation.ts(13,3): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
 ```
-

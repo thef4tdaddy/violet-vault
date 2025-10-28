@@ -145,7 +145,7 @@ describe("useSavingsGoalsActions", () => {
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
 
     const goal = { id: "goal-123", name: "Test Goal" };
-    
+
     act(() => {
       result.current.handleEditGoal(goal);
     });
@@ -165,7 +165,7 @@ describe("useSavingsGoalsActions", () => {
     act(() => {
       result.current.openAddForm();
     });
-    
+
     expect(result.current.showAddForm).toBe(true);
 
     await act(async () => {
@@ -243,19 +243,19 @@ describe("useSavingsGoalsActions", () => {
     act(() => {
       result.current.openAddForm();
     });
-    
+
     expect(result.current.isAddEditModalOpen).toBe(true);
 
     act(() => {
       result.current.handleCloseModals();
     });
-    
+
     expect(result.current.isAddEditModalOpen).toBe(false);
 
     act(() => {
       result.current.handleEditGoal({ id: "goal-123", name: "Test" });
     });
-    
+
     expect(result.current.isAddEditModalOpen).toBe(true);
   });
 

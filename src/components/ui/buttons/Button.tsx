@@ -1,6 +1,13 @@
 import React from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "destructive" | "icon" | "ghost" | "outline" | "default";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "destructive"
+  | "icon"
+  | "ghost"
+  | "outline"
+  | "default";
 export type ButtonColor = "red" | "orange" | "purple" | "blue" | "green" | "gradient" | "success";
 export type ButtonSize = "sm" | "md" | "lg";
 

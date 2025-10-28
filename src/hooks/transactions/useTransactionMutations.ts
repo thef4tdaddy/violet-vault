@@ -166,7 +166,10 @@ export const useTransactionMutations = () => {
   // Update transaction mutation
   const updateTransactionMutation = useMutation({
     mutationKey: ["transactions", "update"],
-    mutationFn: async ({ id, updates }: TransactionUpdateInput): Promise<TransactionUpdateInput> => {
+    mutationFn: async ({
+      id,
+      updates,
+    }: TransactionUpdateInput): Promise<TransactionUpdateInput> => {
       const updatedTransaction = {
         ...updates,
         updatedAt: new Date().toISOString(),

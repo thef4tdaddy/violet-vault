@@ -4,12 +4,12 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Transaction type enum
  */
-export const TransactionTypeSchema = z.enum(['income', 'expense', 'transfer']);
+export const TransactionTypeSchema = z.enum(["income", "expense", "transfer"]);
 export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 
 /**
@@ -17,17 +17,19 @@ export type TransactionType = z.infer<typeof TransactionTypeSchema>;
  * Represents financial transactions (income, expenses, transfers)
  */
 export const TransactionSchema = z.object({
-  id: z.string().min(1, 'Transaction ID is required'),
-  date: z.union([z.date(), z.string()], { errorMap: () => ({ message: 'Date must be a valid date' }) }),
-  amount: z.number().min(0, 'Amount cannot be negative'),
-  envelopeId: z.string().min(1, 'Envelope ID is required'),
-  category: z.string().min(1, 'Category is required'),
-  type: TransactionTypeSchema.default('expense'),
-  lastModified: z.number().int().positive('Last modified must be a positive number'),
+  id: z.string().min(1, "Transaction ID is required"),
+  date: z.union([z.date(), z.string()], {
+    errorMap: () => ({ message: "Date must be a valid date" }),
+  }),
+  amount: z.number().min(0, "Amount cannot be negative"),
+  envelopeId: z.string().min(1, "Envelope ID is required"),
+  category: z.string().min(1, "Category is required"),
+  type: TransactionTypeSchema.default("expense"),
+  lastModified: z.number().int().positive("Last modified must be a positive number"),
   createdAt: z.number().int().positive().optional(),
-  description: z.string().max(500, 'Description must be 500 characters or less').optional(),
-  merchant: z.string().max(200, 'Merchant must be 200 characters or less').optional(),
-  receiptUrl: z.string().url('Receipt URL must be a valid URL').optional(),
+  description: z.string().max(500, "Description must be 500 characters or less").optional(),
+  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
+  receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
 });
 
 /**

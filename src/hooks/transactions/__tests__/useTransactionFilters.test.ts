@@ -178,26 +178,30 @@ describe("useTransactionFilters", () => {
   });
 
   it("should handle empty transactions array", () => {
-    const { result } = renderHook(() => useTransactionFilters({ ...defaultFilters, transactions: [] }));
+    const { result } = renderHook(() =>
+      useTransactionFilters({ ...defaultFilters, transactions: [] })
+    );
 
     expect(result.current).toEqual([]);
   });
 
   it("should handle null/undefined transactions", () => {
-    const { result } = renderHook(() => useTransactionFilters({ ...defaultFilters, transactions: null as unknown as typeof mockTransactions }));
+    const { result } = renderHook(() =>
+      useTransactionFilters({
+        ...defaultFilters,
+        transactions: null as unknown as typeof mockTransactions,
+      })
+    );
 
     expect(result.current).toEqual([]);
   });
 
   it("should memoize results for same inputs", () => {
-    const { result, rerender } = renderHook(
-      ({ filters }) => useTransactionFilters(filters),
-      {
-        initialProps: {
-          filters: defaultFilters,
-        },
-      }
-    );
+    const { result, rerender } = renderHook(({ filters }) => useTransactionFilters(filters), {
+      initialProps: {
+        filters: defaultFilters,
+      },
+    });
 
     const firstResult = result.current;
 
@@ -210,16 +214,23 @@ describe("useTransactionFilters", () => {
   });
 
   it("should recalculate when transactions change", () => {
-    const newTransactions = [...mockTransactions, { id: "4", description: "New", amount: -10, date: "2023-09-02", envelopeId: "env1", type: "expense" }];
-
-    const { result, rerender } = renderHook(
-      ({ filters }) => useTransactionFilters(filters),
+    const newTransactions = [
+      ...mockTransactions,
       {
-        initialProps: {
-          filters: defaultFilters,
-        },
-      }
-    );
+        id: "4",
+        description: "New",
+        amount: -10,
+        date: "2023-09-02",
+        envelopeId: "env1",
+        type: "expense",
+      },
+    ];
+
+    const { result, rerender } = renderHook(({ filters }) => useTransactionFilters(filters), {
+      initialProps: {
+        filters: defaultFilters,
+      },
+    });
 
     const firstResult = result.current;
 
@@ -232,14 +243,11 @@ describe("useTransactionFilters", () => {
   });
 
   it("should recalculate when filters change", () => {
-    const { result, rerender } = renderHook(
-      ({ filters }) => useTransactionFilters(filters),
-      {
-        initialProps: {
-          filters: defaultFilters,
-        },
-      }
-    );
+    const { result, rerender } = renderHook(({ filters }) => useTransactionFilters(filters), {
+      initialProps: {
+        filters: defaultFilters,
+      },
+    });
 
     const firstResult = result.current;
 

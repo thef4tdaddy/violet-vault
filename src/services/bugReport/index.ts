@@ -6,7 +6,12 @@
  */
 import { ScreenshotService } from "./screenshotService.ts";
 import { SystemInfoService } from "./systemInfoService.ts";
-import { BugReportAPIService, type BugReportData, type ProviderConfig, type SystemInfo } from "./apiService.ts";
+import {
+  BugReportAPIService,
+  type BugReportData,
+  type ProviderConfig,
+  type SystemInfo,
+} from "./apiService.ts";
 import { ContextAnalysisService } from "./contextAnalysisService.ts";
 import logger from "../../utils/common/logger.ts";
 import { APP_VERSION } from "../../utils/common/version.ts";
@@ -43,8 +48,12 @@ export interface ScreenshotOptions {
  */
 export interface DataCollection {
   screenshot: string | null;
-  systemInfo: ReturnType<typeof SystemInfoService.collectSystemInfo> | Awaited<ReturnType<typeof SystemInfoService.getFallbackSystemInfo>>;
-  contextInfo: ReturnType<typeof ContextAnalysisService.getCurrentPageContext> | ReturnType<typeof ContextAnalysisService.getFallbackContext>;
+  systemInfo:
+    | ReturnType<typeof SystemInfoService.collectSystemInfo>
+    | Awaited<ReturnType<typeof SystemInfoService.getFallbackSystemInfo>>;
+  contextInfo:
+    | ReturnType<typeof ContextAnalysisService.getCurrentPageContext>
+    | ReturnType<typeof ContextAnalysisService.getFallbackContext>;
   timestamp: string;
   collectionError?: string;
 }
@@ -164,7 +173,10 @@ export class BugReportService {
         const info = ScreenshotService.getScreenshotInfo(screenshot);
         if (info.sizeKB > 1024) {
           // > 1MB
-          logger.warn(`Large screenshot captured: ${info.sizeKB}KB`, info as unknown as Record<string, unknown>);
+          logger.warn(
+            `Large screenshot captured: ${info.sizeKB}KB`,
+            info as unknown as Record<string, unknown>
+          );
         }
 
         return screenshot;
@@ -183,7 +195,10 @@ export class BugReportService {
    * @param {Object} dataCollection - Collected data
    * @returns {Object} Prepared report data
    */
-  static prepareReportData(options: BugReportOptions, dataCollection: DataCollection): BugReportData {
+  static prepareReportData(
+    options: BugReportOptions,
+    dataCollection: DataCollection
+  ): BugReportData {
     const reportData: BugReportData = {
       // Basic report information
       title: options.title || "Bug Report",
@@ -222,14 +237,20 @@ export class BugReportService {
    * @param {Array} providers - Provider configurations
    * @returns {Promise<Object>} Submission result
    */
-  static async submitWithProperScreenshotHandling(reportData: BugReportData, providers: ProviderConfig[]) {
+  static async submitWithProperScreenshotHandling(
+    reportData: BugReportData,
+    providers: ProviderConfig[]
+  ) {
     // If screenshot is too large for JSON payload, handle separately
     if (reportData.screenshot) {
       const screenshotInfo = ScreenshotService.getScreenshotInfo(reportData.screenshot as string);
 
       if (screenshotInfo.sizeKB > 500) {
         // > 500KB
-        logger.info("Large screenshot detected, using alternative upload method", screenshotInfo as unknown as Record<string, unknown>);
+        logger.info(
+          "Large screenshot detected, using alternative upload method",
+          screenshotInfo as unknown as Record<string, unknown>
+        );
 
         // For large screenshots, we'll:
         // 1. Submit the bug report without the screenshot first
@@ -267,7 +288,7 @@ export class BugReportService {
    * @param {Object} customProviders - Custom provider configuration
    * @returns {Array} Provider configurations
    */
-  static getProviders(customProviders: BugReportOptions['providers'] = {}): ProviderConfig[] {
+  static getProviders(customProviders: BugReportOptions["providers"] = {}): ProviderConfig[] {
     const defaultProviders: ProviderConfig[] = [];
 
     // GitHub provider (if endpoint configured)

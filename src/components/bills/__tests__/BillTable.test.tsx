@@ -10,9 +10,7 @@ vi.mock("../BillTableHeader", () => ({
       <tr>
         <th>
           <button onClick={selectAllBills}>Select All</button>
-          {selectionState.isAllSelected && (
-            <button onClick={clearSelection}>Clear</button>
-          )}
+          {selectionState.isAllSelected && <button onClick={clearSelection}>Clear</button>}
         </th>
       </tr>
     </thead>
@@ -157,9 +155,7 @@ describe("BillTable", () => {
 
       render(<BillTable {...defaultProps} filteredBills={bills} />);
 
-      expect(
-        screen.queryByTestId("bill-table-empty-state")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("bill-table-empty-state")).not.toBeInTheDocument();
     });
 
     it("should display pay button for unpaid bills", () => {
@@ -259,9 +255,7 @@ describe("BillTable", () => {
     it("should not show bulk actions when no bills selected", () => {
       render(<BillTable {...defaultProps} />);
 
-      expect(
-        screen.queryByTestId("bill-table-bulk-actions")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("bill-table-bulk-actions")).not.toBeInTheDocument();
     });
   });
 

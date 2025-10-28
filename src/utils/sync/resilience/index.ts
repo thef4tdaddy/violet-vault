@@ -20,11 +20,13 @@ export { createRetryMetrics, formatMetrics } from "../retryMetrics";
 /**
  * Create configured resilience system for sync operations
  */
-export const createSyncResilience = (options: {
-  retryManager?: { name?: string };
-  circuitBreaker?: { name?: string; failureThreshold?: number; timeout?: number };
-  syncQueue?: { name?: string; debounceMs?: number; maxQueueAge?: number };
-} = {}) => {
+export const createSyncResilience = (
+  options: {
+    retryManager?: { name?: string };
+    circuitBreaker?: { name?: string; failureThreshold?: number; timeout?: number };
+    syncQueue?: { name?: string; debounceMs?: number; maxQueueAge?: number };
+  } = {}
+) => {
   const retryManager = new RetryManager(options.retryManager?.name || "SyncRetry");
   const circuitBreaker = new CircuitBreaker({
     name: "SyncCircuit",

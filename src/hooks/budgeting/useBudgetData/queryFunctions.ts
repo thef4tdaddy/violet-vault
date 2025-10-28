@@ -80,18 +80,20 @@ export const queryFunctions = {
     const safeTransactions = Array.isArray(cachedTransactions) ? cachedTransactions : [];
 
     const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
-      const balance = parseFloat((env?.currentBalance as string | number | undefined) as string) || 0;
+      const balance = parseFloat(env?.currentBalance as string | number | undefined as string) || 0;
       return sum + (isNaN(balance) ? 0 : balance);
     }, 0);
 
     const totalSavingsBalance = safeSavingsGoals.reduce((sum, goal) => {
-      const amount = parseFloat((goal?.currentAmount as string | number | undefined) as string) || 0;
+      const amount = parseFloat(goal?.currentAmount as string | number | undefined as string) || 0;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 
     // Ensure all values are numbers, not NaN
-    const unassignedCashValue = parseFloat((budgetMetadata?.unassignedCash as string | number | undefined) as string) || 0;
-    const actualBalanceValue = parseFloat((budgetMetadata?.actualBalance as string | number | undefined) as string) || 0;
+    const unassignedCashValue =
+      parseFloat(budgetMetadata?.unassignedCash as string | number | undefined as string) || 0;
+    const actualBalanceValue =
+      parseFloat(budgetMetadata?.actualBalance as string | number | undefined as string) || 0;
 
     const summary = {
       totalEnvelopeBalance: isNaN(totalEnvelopeBalance) ? 0 : totalEnvelopeBalance,

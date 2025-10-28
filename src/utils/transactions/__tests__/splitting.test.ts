@@ -191,14 +191,18 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should catch missing description", () => {
-      const invalidSplits = [{ id: 1, description: "", category: "Food", amount: 100, envelopeId: "env1" }];
+      const invalidSplits = [
+        { id: 1, description: "", category: "Food", amount: 100, envelopeId: "env1" },
+      ];
 
       const errors = validateSplitAllocations(invalidSplits, mockTransaction);
       expect(errors).toContain("Split 1: Description is required");
     });
 
     it("should catch missing category", () => {
-      const invalidSplits = [{ id: 1, description: "Split 1", category: "", amount: 100, envelopeId: "env1" }];
+      const invalidSplits = [
+        { id: 1, description: "Split 1", category: "", amount: 100, envelopeId: "env1" },
+      ];
 
       const errors = validateSplitAllocations(invalidSplits, mockTransaction);
       expect(errors).toContain("Split 1: Category is required");
@@ -216,7 +220,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should catch total amount mismatches", () => {
-      const mismatchedSplits = [{ id: 1, description: "Split 1", category: "Food", amount: 120, envelopeId: "env1" }];
+      const mismatchedSplits = [
+        { id: 1, description: "Split 1", category: "Food", amount: 120, envelopeId: "env1" },
+      ];
 
       const errors = validateSplitAllocations(mismatchedSplits, mockTransaction);
       expect(errors.some((error) => error.includes("exceed original amount"))).toBe(true);
@@ -271,7 +277,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should handle single split", () => {
-      const splits = [{ id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" }];
+      const splits = [
+        { id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" },
+      ];
 
       const evenSplits = splitEvenly(splits, mockTransaction);
 
@@ -279,7 +287,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should preserve other properties", () => {
-      const splits = [{ id: 1, description: "Test", category: "Food", amount: 0, envelopeId: "env1" }];
+      const splits = [
+        { id: 1, description: "Test", category: "Food", amount: 0, envelopeId: "env1" },
+      ];
 
       const evenSplits = splitEvenly(splits, mockTransaction);
 
@@ -338,7 +348,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should auto-update envelope when category changes", () => {
-      const splits = [{ id: 1, description: "Split 1", amount: 100, category: "Old", envelopeId: "" }];
+      const splits = [
+        { id: 1, description: "Split 1", amount: 100, category: "Old", envelopeId: "" },
+      ];
 
       const updated = updateSplitField(splits, 1, "category", "Food", mockEnvelopes);
 
@@ -362,7 +374,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should not remove last remaining split", () => {
-      const splits = [{ id: 1, description: "Only", amount: 100, category: "Food", envelopeId: "env1" }];
+      const splits = [
+        { id: 1, description: "Only", amount: 100, category: "Food", envelopeId: "env1" },
+      ];
 
       const updated = removeSplit(splits, 1);
 
@@ -406,7 +420,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should preserve original transaction properties", () => {
-      const splits = [{ id: 1, description: "Split", amount: 100, category: "Food", envelopeId: "env1" }];
+      const splits = [
+        { id: 1, description: "Split", amount: 100, category: "Food", envelopeId: "env1" },
+      ];
 
       const prepared = prepareSplitTransactions(splits, mockTransaction);
 
@@ -439,7 +455,9 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should detect invalid state", () => {
-      const invalidSplits = [{ id: 1, description: "", category: "Food", amount: 120, envelopeId: "env1" }];
+      const invalidSplits = [
+        { id: 1, description: "", category: "Food", amount: 120, envelopeId: "env1" },
+      ];
 
       const summary = getSplitSummary(invalidSplits, mockTransaction);
 

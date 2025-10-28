@@ -36,9 +36,7 @@ export const filterByCategory = (
   transactions: Transaction[],
   categoryName: string
 ): Transaction[] => {
-  return transactions.filter(
-    (txn) => txn.category?.toLowerCase() === categoryName.toLowerCase()
-  );
+  return transactions.filter((txn) => txn.category?.toLowerCase() === categoryName.toLowerCase());
 };
 
 /**
@@ -157,7 +155,7 @@ interface Logger {
 const dbTransactionToAppTransaction = (dbTxn: DbTransaction): Transaction => {
   return {
     id: dbTxn.id,
-    date: dbTxn.date instanceof Date ? dbTxn.date.toISOString().split('T')[0] : String(dbTxn.date),
+    date: dbTxn.date instanceof Date ? dbTxn.date.toISOString().split("T")[0] : String(dbTxn.date),
     description: dbTxn.description || dbTxn.merchant || "",
     amount: dbTxn.amount,
     category: dbTxn.category,
@@ -170,7 +168,10 @@ const dbTransactionToAppTransaction = (dbTxn: DbTransaction): Transaction => {
 /**
  * Fetch transactions from database
  */
-export const fetchTransactionsFromDb = async (budgetDb: BudgetDb, logger: Logger): Promise<Transaction[]> => {
+export const fetchTransactionsFromDb = async (
+  budgetDb: BudgetDb,
+  logger: Logger
+): Promise<Transaction[]> => {
   logger.debug("Fetching transactions from database");
 
   try {

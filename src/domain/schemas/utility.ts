@@ -4,15 +4,15 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for DateRange validation
  * Used for querying data within a date range
  */
 export const DateRangeSchema = z.object({
-  start: z.union([z.date(), z.string()], 'Start date must be valid'),
-  end: z.union([z.date(), z.string()], 'End date must be valid'),
+  start: z.union([z.date(), z.string()], "Start date must be valid"),
+  end: z.union([z.date(), z.string()], "End date must be valid"),
 });
 
 export type DateRange = z.infer<typeof DateRangeSchema>;
@@ -20,7 +20,13 @@ export type DateRange = z.infer<typeof DateRangeSchema>;
 /**
  * Bulk update type enum
  */
-export const BulkUpdateTypeSchema = z.enum(['envelope', 'transaction', 'bill', 'savingsGoal', 'paycheck']);
+export const BulkUpdateTypeSchema = z.enum([
+  "envelope",
+  "transaction",
+  "bill",
+  "savingsGoal",
+  "paycheck",
+]);
 export type BulkUpdateType = z.infer<typeof BulkUpdateTypeSchema>;
 
 /**
@@ -39,13 +45,13 @@ export type BulkUpdate = z.infer<typeof BulkUpdateSchema>;
  * Represents statistics about the database
  */
 export const DatabaseStatsSchema = z.object({
-  envelopes: z.number().int().min(0, 'Envelope count cannot be negative'),
-  transactions: z.number().int().min(0, 'Transaction count cannot be negative'),
-  bills: z.number().int().min(0, 'Bill count cannot be negative'),
-  savingsGoals: z.number().int().min(0, 'Savings goal count cannot be negative'),
-  paychecks: z.number().int().min(0, 'Paycheck count cannot be negative'),
-  cache: z.number().int().min(0, 'Cache count cannot be negative'),
-  lastOptimized: z.number().int().positive('Last optimized must be a positive number'),
+  envelopes: z.number().int().min(0, "Envelope count cannot be negative"),
+  transactions: z.number().int().min(0, "Transaction count cannot be negative"),
+  bills: z.number().int().min(0, "Bill count cannot be negative"),
+  savingsGoals: z.number().int().min(0, "Savings goal count cannot be negative"),
+  paychecks: z.number().int().min(0, "Paycheck count cannot be negative"),
+  cache: z.number().int().min(0, "Cache count cannot be negative"),
+  lastOptimized: z.number().int().positive("Last optimized must be a positive number"),
 });
 
 export type DatabaseStats = z.infer<typeof DatabaseStatsSchema>;

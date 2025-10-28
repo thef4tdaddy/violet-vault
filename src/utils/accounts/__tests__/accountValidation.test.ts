@@ -207,7 +207,9 @@ describe("Account Validation", () => {
       testDate.setHours(0, 0, 0, 0);
       const expiryDate = new Date("2024-02-15");
       expiryDate.setHours(0, 0, 0, 0);
-      const expectedDays = Math.ceil((expiryDate.getTime() - testDate.getTime()) / (1000 * 60 * 60 * 24));
+      const expectedDays = Math.ceil(
+        (expiryDate.getTime() - testDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
 
       // The actual function uses current date, so let's test with a known scenario
       expect(typeof result).toBe("number");

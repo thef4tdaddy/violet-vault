@@ -4,17 +4,19 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for BudgetRecord validation
  * Main record for budget data with flexible additional properties
  */
-export const BudgetRecordSchema = z.object({
-  id: z.string().min(1, 'Budget record ID is required'),
-  lastModified: z.number().int().positive('Last modified must be a positive number'),
-  version: z.number().int().positive().optional(),
-}).passthrough(); // Allow additional properties for encrypted budget data
+export const BudgetRecordSchema = z
+  .object({
+    id: z.string().min(1, "Budget record ID is required"),
+    lastModified: z.number().int().positive("Last modified must be a positive number"),
+    version: z.number().int().positive().optional(),
+  })
+  .passthrough(); // Allow additional properties for encrypted budget data
 
 /**
  * Type inference from schema

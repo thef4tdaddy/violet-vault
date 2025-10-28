@@ -28,9 +28,7 @@ export const useConnectionData = ({
     switch (entityType) {
       case "bill": {
         const billEntity = currentEntity as Bill;
-        return billEntity.envelopeId
-          ? envelopes.filter((e) => e.id === billEntity.envelopeId)
-          : [];
+        return billEntity.envelopeId ? envelopes.filter((e) => e.id === billEntity.envelopeId) : [];
       }
 
       case "envelope":
@@ -38,9 +36,7 @@ export const useConnectionData = ({
 
       case "debt": {
         const debtEntity = currentEntity as Debt;
-        return debtEntity.envelopeId
-          ? envelopes.filter((e) => e.id === debtEntity.envelopeId)
-          : [];
+        return debtEntity.envelopeId ? envelopes.filter((e) => e.id === debtEntity.envelopeId) : [];
       }
 
       default:

@@ -5,10 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useBillsQuery, useUpcomingBillsQuery } from "../billQueries";
-import {
-  createTestQueryClient,
-  createQueryWrapper,
-} from "@/test/queryTestUtils";
+import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
 import { createMockDexie, mockDataGenerators } from "@/test/queryMocks";
 
 // Mock dependencies
@@ -238,10 +235,9 @@ describe("Bill Query Hooks", () => {
 
       it("should sort by name ascending", async () => {
         // Act
-        const { result } = renderHook(
-          () => useBillsQuery({ sortBy: "name", sortOrder: "asc" }),
-          { wrapper }
-        );
+        const { result } = renderHook(() => useBillsQuery({ sortBy: "name", sortOrder: "asc" }), {
+          wrapper,
+        });
 
         // Assert
         await waitFor(() => {

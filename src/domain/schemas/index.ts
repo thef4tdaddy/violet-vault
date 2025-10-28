@@ -4,6 +4,57 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
+// Auth Schemas & Types
+export {
+  AuthModeSchema,
+  SetupStepSchema,
+  UserDataSchema,
+  UserDataPartialSchema,
+  SecurityContextSchema,
+  AuthStateSchema,
+  AuthResultSchema,
+  PasswordValidationResultSchema,
+  LocalOnlyUserSchema,
+  LocalOnlyModeResultSchema,
+  JoinBudgetDataSchema,
+  KeyDerivationResultSchema,
+  ShareCodeOptionsSchema,
+  validateUserData,
+  validateUserDataSafe,
+  validateUserDataPartial,
+  validateAuthState,
+  validateAuthStateSafe,
+  validateAuthResult,
+  validateAuthResultSafe,
+  validateSecurityContext,
+  validateSecurityContextSafe,
+  validatePasswordValidationResult,
+  validatePasswordValidationResultSafe,
+  validateLocalOnlyUser,
+  validateLocalOnlyUserSafe,
+  validateLocalOnlyModeResult,
+  validateLocalOnlyModeResultSafe,
+  validateJoinBudgetData,
+  validateJoinBudgetDataSafe,
+  validateKeyDerivationResult,
+  validateKeyDerivationResultSafe,
+  validateShareCodeOptions,
+  validateShareCodeOptionsSafe,
+  type AuthMode,
+  type SetupStep,
+  type UserData,
+  type UserDataPartial,
+  type SecurityContext,
+  type AuthState,
+  type AuthResult,
+  type PasswordValidationResult,
+  type LocalOnlyUser,
+  type LocalOnlyModeResult,
+  type JoinBudgetData,
+  type KeyDerivationResult,
+  type ShareCodeOptions,
+} from "./auth";
+
 // Core Finance Schemas & Types
 export {
   EnvelopeSchema,
@@ -13,7 +64,7 @@ export {
   validateEnvelopePartial,
   type Envelope,
   type EnvelopePartial,
-} from './envelope';
+} from "./envelope";
 
 export {
   TransactionSchema,
@@ -25,7 +76,7 @@ export {
   type Transaction,
   type TransactionPartial,
   type TransactionType,
-} from './transaction';
+} from "./transaction";
 
 export {
   BillSchema,
@@ -37,7 +88,7 @@ export {
   type Bill,
   type BillPartial,
   type BillFrequency,
-} from './bill';
+} from "./bill";
 
 export {
   SavingsGoalSchema,
@@ -49,7 +100,7 @@ export {
   type SavingsGoal,
   type SavingsGoalPartial,
   type Priority,
-} from './savings-goal';
+} from "./savings-goal";
 
 export {
   DebtSchema,
@@ -63,7 +114,7 @@ export {
   type DebtPartial,
   type DebtType,
   type DebtStatus,
-} from './debt';
+} from "./debt";
 
 export {
   PaycheckHistorySchema,
@@ -73,7 +124,7 @@ export {
   validatePaycheckHistoryPartial,
   type PaycheckHistory,
   type PaycheckHistoryPartial,
-} from './paycheck-history';
+} from "./paycheck-history";
 
 // Database Infrastructure Schemas & Types
 export {
@@ -84,7 +135,7 @@ export {
   validateBudgetRecordPartial,
   type BudgetRecord,
   type BudgetRecordPartial,
-} from './budget-record';
+} from "./budget-record";
 
 export {
   AuditLogEntrySchema,
@@ -94,7 +145,7 @@ export {
   validateAuditLogEntryPartial,
   type AuditLogEntry,
   type AuditLogEntryPartial,
-} from './audit-log';
+} from "./audit-log";
 
 export {
   CacheEntrySchema,
@@ -104,7 +155,7 @@ export {
   validateCacheEntryPartial,
   type CacheEntry,
   type CacheEntryPartial,
-} from './cache';
+} from "./cache";
 
 export {
   AutoBackupSchema,
@@ -118,7 +169,7 @@ export {
   type AutoBackupPartial,
   type BackupType,
   type SyncType,
-} from './backup';
+} from "./backup";
 
 // Version Control Schemas & Types
 export {
@@ -138,7 +189,7 @@ export {
   type BudgetChange,
   type BudgetBranch,
   type BudgetTag,
-} from './version-control';
+} from "./version-control";
 
 // Utility Schemas & Types
 export {
@@ -156,4 +207,4 @@ export {
   type BulkUpdateType,
   type BulkUpdate,
   type DatabaseStats,
-} from './utility';
+} from "./utility";

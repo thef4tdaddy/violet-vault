@@ -273,7 +273,10 @@ async function runHealthChecksInternal(results) {
 
     const dataDetection = await detectLocalData();
 
-    const samplesFound = "samplesFound" in dataDetection ? dataDetection.samplesFound : { envelopes: false, transactions: false, bills: false };
+    const samplesFound =
+      "samplesFound" in dataDetection
+        ? dataDetection.samplesFound
+        : { envelopes: false, transactions: false, bills: false };
 
     results.tests.push({
       name: "Comprehensive Data Detection",
@@ -314,7 +317,8 @@ async function runHealthChecksInternal(results) {
 
 // Expose to window for immediate testing
 if (typeof window !== "undefined") {
-  (window as { runSyncHealthCheck?: () => Promise<unknown> }).runSyncHealthCheck = runImmediateSyncHealthCheck;
+  (window as { runSyncHealthCheck?: () => Promise<unknown> }).runSyncHealthCheck =
+    runImmediateSyncHealthCheck;
 }
 
 export default runImmediateSyncHealthCheck;
