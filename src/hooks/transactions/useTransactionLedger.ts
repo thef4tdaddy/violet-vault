@@ -33,7 +33,11 @@ export const useTransactionLedger = (currentUser: unknown) => {
       setAllTransactions: state.setAllTransactions,
       updateBill: state.updateBill,
     }))
-  );
+  ) as {
+    updateTransaction?: (transaction: unknown) => void;
+    setAllTransactions?: (transactions: unknown[]) => void;
+    updateBill?: (bill: unknown) => void;
+  };
   const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // Use extracted state management hook
@@ -42,10 +46,10 @@ export const useTransactionLedger = (currentUser: unknown) => {
   const pageSize = 10;
 
   // Handle bulk import by updating both store arrays
-  const handleBulkImport = (newTransactions) => {
+  const handleBulkImport = (newTransactions: unknown[]) => {
     logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
     const updatedAllTransactions = [...transactions, ...newTransactions];
-    setAllTransactions(updatedAllTransactions);
+    setAllTransactions?.(updatedAllTransactions);
     logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
   };
 
@@ -63,17 +67,17 @@ export const useTransactionLedger = (currentUser: unknown) => {
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, handleBulkImport, budget);
+  } = useTransactionImport(currentUser, handleBulkImport);
 
-  const filteredTransactions = useTransactionFilters(
+  const filteredTransactions = useTransactionFilters({
     transactions,
-    ledgerState.searchTerm,
-    ledgerState.dateFilter,
-    ledgerState.typeFilter,
-    ledgerState.envelopeFilter,
-    ledgerState.sortBy,
-    ledgerState.sortOrder
-  );
+    searchTerm: ledgerState.searchTerm,
+    dateFilter: ledgerState.dateFilter,
+    typeFilter: ledgerState.typeFilter,
+    envelopeFilter: ledgerState.envelopeFilter,
+    sortBy: ledgerState.sortBy,
+    sortOrder: ledgerState.sortOrder,
+  });
 
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
 
