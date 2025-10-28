@@ -231,7 +231,7 @@ describe("TypedChunkedSyncService", () => {
 
     it("should initialize with valid parameters", async () => {
       const mockChunkedService = await import("../../chunkedSyncService");
-      (mockChunkedService.default.initialize as Mock).mockResolvedValue();
+      (mockChunkedService.default.initialize as Mock).mockResolvedValue(undefined);
       (mockChunkedService.default.getStats as Mock).mockReturnValue({
         maxChunkSize: 900000,
         maxArrayChunkSize: 5000,

@@ -244,7 +244,7 @@ describe("paycheckUtils", () => {
           envelopeName: "Envelope 1",
           amount: 400,
           monthlyAmount: 400,
-          envelopeType: ENVELOPE_TYPES.EXPENSE,
+          envelopeType: ENVELOPE_TYPES.BILL,
           priority: "high",
         },
         {
@@ -252,12 +252,13 @@ describe("paycheckUtils", () => {
           envelopeName: "Envelope 2",
           amount: 200,
           monthlyAmount: 200,
-          envelopeType: ENVELOPE_TYPES.EXPENSE,
+          envelopeType: ENVELOPE_TYPES.VARIABLE,
           priority: "medium",
         },
       ],
       totalAllocated: 600,
       remainingAmount: 400,
+      allocationRate: 0.6,
     };
 
     const currentUser = { userName: "Test User" };

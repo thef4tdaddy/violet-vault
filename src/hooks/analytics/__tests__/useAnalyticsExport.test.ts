@@ -3,10 +3,11 @@ import { vi } from "vitest";
 import { useAnalyticsExport } from "../useAnalyticsExport";
 
 // Mock URL.createObjectURL and related methods
-(global.URL as { createObjectURL: typeof vi.fn; revokeObjectURL: typeof vi.fn }) = {
+const mockURLObj = {
   createObjectURL: vi.fn(() => "mock-url"),
   revokeObjectURL: vi.fn(),
-} as never;
+} as unknown as typeof URL;
+(global as { URL: typeof URL }).URL = mockURLObj;
 
 // Mock document.createElement and click
 const mockClick = vi.fn();
@@ -17,16 +18,14 @@ const mockLink = {
   style: { visibility: "" },
 };
 
-(global.document as {
-  createElement: typeof vi.fn;
-  body: { appendChild: typeof vi.fn; removeChild: typeof vi.fn };
-}) = {
+const mockDocObj = {
   createElement: vi.fn(() => mockLink),
   body: {
     appendChild: vi.fn(),
     removeChild: vi.fn(),
   },
-} as never;
+} as unknown as Document;
+(global as { document: Document }).document = mockDocObj;
 
 describe("useAnalyticsExport", () => {
   beforeEach(() => {

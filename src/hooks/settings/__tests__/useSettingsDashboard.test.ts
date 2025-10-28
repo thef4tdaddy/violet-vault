@@ -201,7 +201,7 @@ describe("useSettingsActions", () => {
     const { createTestBudgetHistory } = await import("../../../utils/common/testBudgetHistory");
     const { globalToast } = await import("../../../stores/ui/toastStore");
 
-    vi.mocked(createTestBudgetHistory).mockResolvedValue();
+    vi.mocked(createTestBudgetHistory).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useSettingsActions());
 

@@ -64,7 +64,8 @@ describe("Sync Integration Tests", () => {
   beforeEach(async () => {
     // Generate real test credentials
     testBudgetId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    testEncryptionKey = await encryptionUtils.generateKey("test_password_123");
+    const keyData = await encryptionUtils.generateKey("test_password_123");
+    testEncryptionKey = keyData.key;
 
     // Create realistic test data
     testData = {
@@ -136,7 +137,7 @@ describe("Sync Integration Tests", () => {
     // Initialize services with real credentials
     await budgetDatabaseService.initialize();
     await firebaseSyncService.initialize(testBudgetId, testEncryptionKey);
-    await chunkedSyncService.initialize(testBudgetId, testEncryptionKey);
+    await chunkedSyncService.initialize(testBudgetId, testBudgetId); // Using budgetId as key placeholder for test
 
     // Clear any existing test data
     await budgetDatabaseService.clearData();
