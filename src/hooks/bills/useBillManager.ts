@@ -22,6 +22,8 @@ import {
   handleSearchNewBills,
   handleAddDiscoveredBillsAction,
   createUIActions,
+  type CategorizedBills,
+  type FilterOptions,
 } from "@/hooks/bills/useBillManagerHelpers";
 
 interface Bill {
@@ -43,22 +45,6 @@ interface Transaction {
   date: Date | string;
   amount: number;
   [key: string]: unknown;
-}
-
-interface CategorizedBills {
-  all: Bill[];
-  upcoming: Bill[];
-  overdue: Bill[];
-  paid: Bill[];
-  [key: string]: Bill[];
-}
-
-interface FilterOptions {
-  search: string;
-  urgency: string;
-  envelope: string;
-  amountMin: string;
-  amountMax: string;
 }
 
 interface UseBillManagerOptions {
