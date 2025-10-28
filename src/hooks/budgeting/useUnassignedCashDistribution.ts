@@ -110,7 +110,7 @@ const useUnassignedCashDistribution = () => {
 
   // Calculate total being distributed
   const totalDistributed = useMemo(() => {
-    return Object.values(distributions).reduce((sum, amount) => {
+    return Object.values(distributions).reduce<number>((sum, amount) => {
       const numAmount = parseFloat(String(amount)) || 0;
       return sum + numAmount;
     }, 0);
@@ -118,7 +118,8 @@ const useUnassignedCashDistribution = () => {
 
   // Calculate remaining unassigned cash
   const remainingCash = useMemo(() => {
-    return unassignedCash - totalDistributed;
+    const cash = Number(unassignedCash) || 0;
+    return cash - totalDistributed;
   }, [unassignedCash, totalDistributed]);
 
   // Validation - Allow distributions that would make unassigned cash negative

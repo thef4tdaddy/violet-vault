@@ -73,7 +73,7 @@ const handleNewUserSetup = async (userData: UserData, password: string): Promise
     ...userData,
     budgetId: deterministicBudgetId,
     userName: userData.userName?.trim() || "User",
-    userColor: userData.userColor || "#a855f7",
+    userColor: (userData.userColor as string) || "#a855f7",
   };
 
   logger.auth("Setting auth state for new user.", {
@@ -240,7 +240,12 @@ export const useLoginMutation = () => {
     },
     onSuccess: async (result: LoginResult) => {
       if (result.success && result.user) {
-        setAuthenticated(result.user as import("@/types/auth").UserData, result.sessionData);
+        // Cast to the expected types for AuthContext
+        const authSessionData = {
+          encryptionKey: undefined,
+          salt: undefined,
+        };
+        setAuthenticated(result.user as unknown as import("@/types/auth").UserData, authSessionData);
 
         // Start background sync for successful logins
         try {
