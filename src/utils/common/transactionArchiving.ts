@@ -433,15 +433,17 @@ export class TransactionArchiver {
       throw new Error(`Archive ${archiveId} not found`);
     }
 
+    const archiveValue = archive.value as { transactions: Array<Record<string, unknown>> };
+
     // Restore transactions to active storage
-    for (const transaction of archive.value.transactions) {
+    for (const transaction of archiveValue.transactions) {
       await budgetDb.transactions.put(transaction);
     }
 
     logger.info(
-      `Restored ${archive.value.transactions.length} transactions from archive ${archiveId}`
+      `Restored ${archiveValue.transactions.length} transactions from archive ${archiveId}`
     );
-    return archive.value.transactions.length;
+    return archiveValue.transactions.length;
   }
 }
 

@@ -3,6 +3,7 @@ import { useDebts } from "./useDebts";
 import useBills from "@/hooks/bills/useBills";
 import useEnvelopes from "@/hooks/budgeting/useEnvelopes";
 import useTransactions from "@/hooks/common/useTransactions";
+import type { DebtType, DebtAccount } from "@/types/debt";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
@@ -52,7 +53,7 @@ export const useDebtManagement = () => {
         totalDebt: 0,
         totalMonthlyPayments: 0,
         averageInterestRate: 0,
-        debtsByType: {},
+        debtsByType: {} as Record<DebtType, DebtAccount[]>,
         totalInterestPaid: 0,
         activeDebtCount: 0,
         totalDebtCount: 0,

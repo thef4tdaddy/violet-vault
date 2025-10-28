@@ -1,6 +1,16 @@
 import { budgetDb } from "../../db/budgetDb";
 import logger from "../common/logger";
 
+type EnvelopeWithOptionalFields = {
+  id: string | number;
+  name?: string;
+  category?: string;
+  monthlyAmount?: number;
+  currentBalance?: number;
+  createdAt?: string;
+  [key: string]: unknown;
+};
+
 /**
  * Utility for detecting and handling corrupted/empty envelopes
  * Addresses GitHub issue #539 - empty envelopes with no details
@@ -11,7 +21,7 @@ import logger from "../common/logger";
  * @param {Object} envelope - The envelope to check
  * @returns {boolean} - True if envelope is empty/corrupted
  */
-export const isEmptyEnvelope = (envelope) => {
+export const isEmptyEnvelope = (envelope: EnvelopeWithOptionalFields) => {
   if (!envelope) return true;
 
   // Critical fields that should be present
@@ -33,7 +43,7 @@ export const findCorruptedEnvelopes = async () => {
   try {
     logger.debug("🔍 Scanning for corrupted envelopes...");
 
-    const allEnvelopes = await budgetDb.envelopes.toArray();
+    const allEnvelopes = (await budgetDb.envelopes.toArray()) as EnvelopeWithOptionalFields[];
     const corruptedEnvelopes = allEnvelopes.filter(isEmptyEnvelope);
 
     if (corruptedEnvelopes.length > 0) {
@@ -216,7 +226,7 @@ export const getEnvelopeIntegrityReport = async () => {
   try {
     logger.debug("📊 Generating envelope integrity report...");
 
-    const allEnvelopes = await budgetDb.envelopes.toArray();
+    const allEnvelopes = (await budgetDb.envelopes.toArray()) as EnvelopeWithOptionalFields[];
     const corruptedEnvelopes = allEnvelopes.filter(isEmptyEnvelope);
 
     const report = {

@@ -16,7 +16,7 @@ vi.mock("../../../db/budgetDb", () => ({
     syncMetadata: {
       clear: vi.fn(),
     },
-  },
+  } as never,
 }));
 
 describe("firebaseUtils", () => {
@@ -34,7 +34,7 @@ describe("firebaseUtils", () => {
 
   describe("forcePushToCloud", () => {
     it("should stop service, force push, and return success", async () => {
-      cloudSyncService.forcePushToCloud.mockResolvedValue({ success: true });
+      (cloudSyncService.forcePushToCloud as never as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true });
       const result = await forcePushToCloud();
       expect(cloudSyncService.stop).toHaveBeenCalled();
       expect(cloudSyncService.forcePushToCloud).toHaveBeenCalled();
@@ -42,7 +42,7 @@ describe("firebaseUtils", () => {
     });
 
     it("should throw an error if force push fails", async () => {
-      cloudSyncService.forcePushToCloud.mockResolvedValue({
+      (cloudSyncService.forcePushToCloud as never as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: false,
         error: "Test Error",
       });

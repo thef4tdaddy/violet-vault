@@ -23,7 +23,7 @@ vi.mock("@/hooks/transactions/useTransactionTable", () => ({
 
 // Mock child components
 vi.mock("./components/TransactionRow", () => ({
-  default: ({ transaction, envelopes, onEdit, onDelete, onSplit, onViewHistory }) => (
+  default: ({ transaction, onEdit, onDelete, onSplit, onViewHistory }) => (
     <tr data-testid={`transaction-row-${transaction.id}`}>
       <td>{transaction.date}</td>
       <td>{transaction.description}</td>
@@ -479,8 +479,8 @@ describe("TransactionTable", () => {
       render(
         <TransactionTable
           {...defaultProps}
-          transactions={transactions}
-          envelopes={envelopes}
+          transactions={transactions as never[]}
+          envelopes={envelopes as never[]}
         />
       );
 

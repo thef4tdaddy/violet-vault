@@ -108,7 +108,7 @@ describe("suggestionUtils", () => {
     it("should calculate months correctly", () => {
       const transactions = [{ date: "2024-01-01" }, { date: "2024-03-15" }];
 
-      const result = calculateMonthsOfData(transactions);
+      const result = calculateMonthsOfData(transactions as never[]);
       expect(result).toBe(3); // Jan, Feb, Mar
     });
 
@@ -120,7 +120,7 @@ describe("suggestionUtils", () => {
     it("should handle same month transactions", () => {
       const transactions = [{ date: "2024-01-01" }, { date: "2024-01-15" }];
 
-      const result = calculateMonthsOfData(transactions);
+      const result = calculateMonthsOfData(transactions as never[]);
       expect(result).toBe(1);
     });
   });
@@ -212,7 +212,7 @@ describe("suggestionUtils", () => {
 
       const result = analyzeMerchantPatterns(
         coffeeTransactions,
-        existingEnvelopes,
+        existingEnvelopes as never[],
         1,
         DEFAULT_ANALYSIS_SETTINGS
       );

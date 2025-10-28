@@ -11,9 +11,9 @@ export const ModalHeader = ({ debt, onClose }: ModalHeaderProps) => {
   return (
     <div className="flex justify-between items-start mb-6">
       <div>
-        <h3 className="text-xl font-semibold text-gray-900">{debt.name}</h3>
+        <h3 className="text-xl font-semibold text-gray-900">{debt.name as string}</h3>
         <p className="text-gray-600">
-          {debt.creditor} • {debt.type}
+          {debt.creditor as string} • {debt.type as string}
         </p>
       </div>
       <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">

@@ -1,4 +1,3 @@
-import React from "react";
 import { useDebtDashboard } from "../../hooks/debts/useDebtDashboard";
 import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
 import AddDebtModal from "./modals/AddDebtModal";

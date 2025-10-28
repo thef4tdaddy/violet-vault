@@ -123,13 +123,13 @@ interface PaycheckStatistics {
  * @returns {Object} Validation result
  */
 export const validatePaycheckForm = (formData: PaycheckFormData): ValidationResult => {
-  const errors = {};
+  const errors: Record<string, string> = {};
 
   // Amount validation
   if (!formData.amount) {
     errors.amount = "Paycheck amount is required";
   } else {
-    const amount = parseFloat(formData.amount);
+    const amount = parseFloat(String(formData.amount));
     if (isNaN(amount) || amount <= 0) {
       errors.amount = "Paycheck amount must be a positive number";
     } else if (amount > 1000000) {
@@ -218,7 +218,7 @@ export const getUniquePayers = (
     }
   });
 
-  return Array.from(payers).sort();
+  return Array.from(payers).sort() as string[];
 };
 
 /**
@@ -242,7 +242,7 @@ export const calculateEnvelopeAllocations = (
     };
   }
 
-  const amount = parseFloat(paycheckAmount);
+  const amount = parseFloat(String(paycheckAmount));
   const allocatableEnvelopes = envelopes.filter(
     (env) =>
       env.autoAllocate && env.envelopeType !== ENVELOPE_TYPES.SAVINGS && env.id !== "unassigned"
@@ -339,7 +339,7 @@ export const createPaycheckTransaction = (
 ): PaycheckTransaction => {
   return {
     id: Date.now(),
-    amount: parseFloat(formData.amount),
+    amount: parseFloat(String(formData.amount)),
     payerName: formData.payerName.trim(),
     allocationMode: formData.allocationMode,
     allocations: allocations.allocations,

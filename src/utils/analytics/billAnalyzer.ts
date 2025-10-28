@@ -4,15 +4,49 @@
  */
 import { suggestBillCategory } from "./categoryPatterns";
 
+interface BillItem {
+  id?: string;
+  name?: string;
+  category?: string;
+  amount?: number;
+}
+
+interface Settings {
+  minAmount?: number;
+}
+
+interface BillCategoryGroup {
+  bills: BillItem[];
+  totalAmount: number;
+  count: number;
+}
+
+interface Suggestion {
+  id: string;
+  type: string;
+  priority: string;
+  category: string;
+  title: string;
+  description: string;
+  reasoning: string;
+  suggestedCategory: string;
+  affectedTransactions: number;
+  impact: number;
+  action: string;
+  data: {
+    categoryName: string;
+    billIds: (string | undefined)[];
+  };
+}
+
 /**
  * Analyze bill categorization gaps and suggest improvements
  */
-export const analyzeBillCategorization = (bills, settings) => {
-  const suggestions = [];
-  const { _minAmount } = settings;
+export const analyzeBillCategorization = (bills: BillItem[], _settings: Settings): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
 
   // Group bills by category
-  const billsByCategory = {};
+  const billsByCategory: Record<string, BillCategoryGroup> = {};
   bills.forEach((bill) => {
     const category = bill.category || "Uncategorized";
     if (!billsByCategory[category]) {
@@ -32,7 +66,7 @@ export const analyzeBillCategorization = (bills, settings) => {
     const uncategorizedBills = billsByCategory["Uncategorized"].bills;
 
     // Group by suggested bill type
-    const billTypePatterns = {};
+    const billTypePatterns: Record<string, BillItem[]> = {};
     uncategorizedBills.forEach((bill) => {
       const suggestedType = suggestBillCategory(bill.name);
       if (suggestedType) {
@@ -46,7 +80,7 @@ export const analyzeBillCategorization = (bills, settings) => {
     // Create suggestions for each bill type with multiple bills
     Object.entries(billTypePatterns).forEach(([categoryType, billsInType]) => {
       if (billsInType.length >= 2) {
-        const totalAmount = billsInType.reduce((sum, bill) => sum + (bill.amount || 0), 0);
+        const totalAmount = billsInType.reduce((sum: number, bill) => sum + (bill.amount || 0), 0) as number;
 
         suggestions.push({
           id: `bill_category_${categoryType}`,
@@ -75,12 +109,12 @@ export const analyzeBillCategorization = (bills, settings) => {
 /**
  * Analyze bill category optimization opportunities
  */
-export const analyzeBillCategoryOptimization = (bills, settings) => {
-  const suggestions = [];
-  const { minAmount } = settings;
+export const analyzeBillCategoryOptimization = (bills: BillItem[], settings: Settings): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
+  const { minAmount = 0 } = settings;
 
   // Group bills by category
-  const billsByCategory = {};
+  const billsByCategory: Record<string, BillCategoryGroup> = {};
   bills.forEach((bill) => {
     const category = bill.category || "Uncategorized";
     if (!billsByCategory[category]) {
@@ -105,7 +139,7 @@ export const analyzeBillCategoryOptimization = (bills, settings) => {
         category: "bill",
         title: `Remove "${category}" Bill Category`,
         description: "Only one small bill uses this category",
-        reasoning: `${data.bills[0].name} ($${data.totalAmount.toFixed(2)}) could use a more general category`,
+        reasoning: `${data.bills[0]?.name} ($${data.totalAmount.toFixed(2)}) could use a more general category`,
         suggestedCategory: "General",
         affectedTransactions: 1,
         impact: data.totalAmount,
