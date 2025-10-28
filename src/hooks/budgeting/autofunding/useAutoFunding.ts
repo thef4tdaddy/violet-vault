@@ -5,6 +5,10 @@ import { useAutoFundingData } from "@/hooks/budgeting/autofunding/useAutoFunding
 import { useAutoFundingHistory } from "@/hooks/budgeting/autofunding/useAutoFundingHistory";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
+import type {
+  UseAutoFundingRulesReturn,
+  UseAutoFundingHistoryReturn,
+} from "@/hooks/budgeting/autofunding/types";
 import {
   isLikelyIncome,
   handleIncomeDetection,
@@ -29,13 +33,17 @@ export const useAutoFunding = () => {
       unassignedCash: state.unassignedCash,
       allTransactions: state.allTransactions,
     }))
-  );
+  ) as {
+    envelopes: unknown[];
+    unassignedCash: number;
+    allTransactions: unknown[];
+  };
 
   // Initialize individual hooks
   const dataHook = useAutoFundingData();
-  const rulesHook = useAutoFundingRules([]);
+  const rulesHook = useAutoFundingRules([]) as unknown as UseAutoFundingRulesReturn;
   const executionHook = useAutoFundingExecution();
-  const historyHook = useAutoFundingHistory([], []);
+  const historyHook = useAutoFundingHistory([], []) as unknown as UseAutoFundingHistoryReturn;
 
   // Initialize the complete auto-funding system
   useEffect(() => {
@@ -61,9 +69,9 @@ export const useAutoFunding = () => {
 
   // Enhanced rule execution with history tracking
   const executeRules = useCallback(
-    (shouldAutoAllocate?: boolean) => {
+    (trigger?: string, triggerData?: Record<string, unknown>) => {
       const executeFunction = createExecuteRules(rulesHook, executionHook, historyHook, dataHook);
-      return executeFunction(shouldAutoAllocate);
+      return executeFunction(trigger, triggerData);
     },
     [rulesHook, executionHook, historyHook, dataHook]
   );

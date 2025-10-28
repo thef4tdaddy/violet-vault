@@ -9,6 +9,7 @@ import BugReportService, {
   BugReportAPIService,
   ContextAnalysisService,
 } from "../index.js";
+import type { BugReportData } from "../apiService.js";
 
 // Mock all service dependencies
 vi.mock("../screenshotService.js", () => ({
@@ -61,10 +62,23 @@ vi.mock("import.meta.env", () => ({
 }));
 
 // Get mocked versions with proper typing
-const mockedScreenshotService = vi.mocked(ScreenshotService);
-const mockedSystemInfoService = vi.mocked(SystemInfoService);
-const mockedBugReportAPIService = vi.mocked(BugReportAPIService);
-const mockedContextAnalysisService = vi.mocked(ContextAnalysisService);
+const mockedScreenshotService = ScreenshotService as unknown as {
+  captureScreenshot: ReturnType<typeof vi.fn>;
+  getScreenshotInfo: ReturnType<typeof vi.fn>;
+  autoCompressScreenshot: ReturnType<typeof vi.fn>;
+};
+const mockedSystemInfoService = SystemInfoService as unknown as {
+  collectSystemInfo: ReturnType<typeof vi.fn>;
+  getFallbackSystemInfo: ReturnType<typeof vi.fn>;
+};
+const mockedBugReportAPIService = BugReportAPIService as unknown as {
+  validateReportData: ReturnType<typeof vi.fn>;
+  submitWithFallbacks: ReturnType<typeof vi.fn>;
+};
+const mockedContextAnalysisService = ContextAnalysisService as unknown as {
+  getCurrentPageContext: ReturnType<typeof vi.fn>;
+  getFallbackContext: ReturnType<typeof vi.fn>;
+};
 
 describe("BugReportService", () => {
   beforeEach(() => {
@@ -389,7 +403,10 @@ describe("BugReportService", () => {
 
   describe("submitWithProperScreenshotHandling", () => {
     it("should handle large screenshots separately", async () => {
-      const reportData = { screenshot: "large-screenshot" };
+      const reportData: BugReportData = { 
+        title: "Test Report",
+        screenshot: "large-screenshot" 
+      };
       mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 600 * 1024, sizeKB: 600, format: 'png', timestamp: new Date().toISOString() });
 
       mockedBugReportAPIService.submitWithFallbacks.mockResolvedValue({
@@ -409,7 +426,10 @@ describe("BugReportService", () => {
     });
 
     it("should submit normally for small screenshots", async () => {
-      const reportData = { screenshot: "small-screenshot" };
+      const reportData: BugReportData = { 
+        title: "Test Report",
+        screenshot: "small-screenshot" 
+      };
       mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 100 * 1024, sizeKB: 100, format: 'png', timestamp: new Date().toISOString() });
 
       await BugReportService.submitWithProperScreenshotHandling(reportData, []);

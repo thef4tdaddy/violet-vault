@@ -32,9 +32,9 @@ import {
 export const useDebtManagement = () => {
   // Get data dependencies
   const debtsHook = useDebts();
-  const { bills = [], createBill, updateBill, deleteBill } = useBills();
-  const { envelopes = [], createEnvelope } = useEnvelopes();
-  const { transactions = [], createTransaction } = useTransactions();
+  const { bills = [], addBill: createBill, updateBill, deleteBill } = useBills();
+  const { envelopes = [], addEnvelope: createEnvelope } = useEnvelopes();
+  const { transactions = [], addTransaction: createTransaction } = useTransactions();
 
   const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
   const createDebtData = debtsHook?.addDebtAsync;
@@ -43,7 +43,7 @@ export const useDebtManagement = () => {
 
   // Enrich debts with related data and calculations FIRST
   const enrichedDebts = useMemo(() => {
-    return enrichDebtsWithRelations(debts, bills, envelopes, transactions);
+    return enrichDebtsWithRelations(debts, bills as unknown[], envelopes as unknown[], transactions as unknown[]);
   }, [debts, bills, envelopes, transactions]);
 
   // Calculate debt statistics using enriched debts
@@ -68,7 +68,7 @@ export const useDebtManagement = () => {
     logger.debug("📊 Calculated debt stats:", {
       inputDebtsCount: enrichedDebts.length,
       calculatedStats,
-      firstDebtBalance: enrichedDebts[0]?.currentBalance,
+      firstDebtBalance: enrichedDebts[0]?.balance,
       firstDebtMinPayment: enrichedDebts[0]?.minimumPayment,
     });
 
@@ -93,67 +93,67 @@ export const useDebtManagement = () => {
   }, [enrichedDebts]);
 
   // Create a new debt with optional bill and envelope integration
-  const createDebt = async (debtData) => {
+  const createDebt = async (debtData: Record<string, unknown>) => {
     return createDebtOperation(debtData, {
-      connectionData: debtData.connectionData,
-      createEnvelope,
-      createBill,
-      updateBill,
-      createDebtData,
+      connectionData: debtData.connectionData as Record<string, unknown> | undefined,
+      createEnvelope: createEnvelope as (data: Record<string, unknown>) => Promise<void>,
+      createBill: createBill as (data: Record<string, unknown>) => void,
+      updateBill: updateBill as (id: string, data: Record<string, unknown>) => void,
+      createDebtData: createDebtData as (data: Record<string, unknown>) => Promise<unknown>,
     });
   };
 
   // Record a debt payment
-  const recordPayment = async (debtId, paymentData) => {
-    const debt = debts.find((d) => d.id === debtId);
+  const recordPayment = async (debtId: string, paymentData: Record<string, unknown>) => {
+    const debt = debts.find((d: { id: string }) => d.id === debtId);
     if (!debt) throw new Error("Debt not found");
 
     return recordPaymentOperation({
       debt,
       paymentData,
-      updateDebtData,
-      createTransaction,
+      updateDebtData: updateDebtData as (id: string, data: Record<string, unknown>) => Promise<unknown>,
+      createTransaction: createTransaction as (data: Record<string, unknown>) => void,
     });
   };
 
   // Link debt to an existing bill
-  const linkDebtToBill = async (debtId, billId) => {
+  const linkDebtToBill = async (debtId: string, billId: string) => {
     return linkDebtToBillOperation({
       debtId,
       billId,
-      debts,
-      bills,
-      updateBill,
-      updateDebtData,
+      debts: debts as unknown[],
+      bills: bills as unknown[],
+      updateBill: updateBill as (id: string, data: Record<string, unknown>) => void,
+      updateDebtData: updateDebtData as (id: string, data: Record<string, unknown>) => Promise<unknown>,
     });
   };
 
   // Sync debt due dates with linked bills
   const syncDebtDueDates = async () => {
     return syncDebtDueDatesOperation({
-      debts,
-      bills,
-      updateDebtData,
+      debts: debts as unknown[],
+      bills: bills as unknown[],
+      updateDebtData: updateDebtData as unknown as (id: string, data: Record<string, unknown>) => Promise<unknown>,
     });
   };
 
   // Update a debt with proper parameter formatting
-  const updateDebt = async (debtId, updates, author = "Unknown User") => {
+  const updateDebt = async (debtId: string, updates: Record<string, unknown>, author = "Unknown User") => {
     return updateDebtOperation({
       debtId,
       updates,
       author,
-      updateDebtData,
+      updateDebtData: updateDebtData as unknown as (id: string, data: Record<string, unknown>) => Promise<unknown>,
     });
   };
 
   // Delete a debt and its related connections
-  const deleteDebt = async (debtId) => {
+  const deleteDebt = async (debtId: string) => {
     return deleteDebtOperation({
       debtId,
-      bills,
-      deleteBill,
-      deleteDebtData,
+      bills: bills as unknown[],
+      deleteBill: deleteBill as unknown as (id: string) => Promise<void>,
+      deleteDebtData: deleteDebtData as unknown as (id: string) => Promise<unknown>,
     });
   };
 

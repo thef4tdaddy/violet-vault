@@ -120,13 +120,18 @@ describe("ScreenshotService", () => {
 
     beforeEach(() => {
       // Mock document.createElement for canvas
-      vi.spyOn(document, "createElement").mockImplementation((tagName) => {
-        if (tagName === "canvas") return mockCanvas;
-        return {};
+      vi.spyOn(document, "createElement").mockImplementation((tagName: string): HTMLElement => {
+        if (tagName === "canvas") return mockCanvas as unknown as HTMLElement;
+        return document.createElement(tagName);
       });
 
       // Mock Image constructor
-      global.Image = class {
+      global.Image = class MockImage {
+        width = 0;
+        height = 0;
+        onload: (() => void) | null = null;
+        onerror: ((error: Error) => void) | null = null;
+        
         constructor() {
           setTimeout(() => {
             this.width = 1920;
@@ -134,7 +139,7 @@ describe("ScreenshotService", () => {
             if (this.onload) this.onload();
           }, 0);
         }
-      };
+      } as unknown as typeof Image;
     });
 
     it("should compress screenshot with default options", async () => {
@@ -161,13 +166,18 @@ describe("ScreenshotService", () => {
     });
 
     it("should return original on compression error", async () => {
-      global.Image = class {
+      global.Image = class MockImage {
+        width = 0;
+        height = 0;
+        onload: (() => void) | null = null;
+        onerror: ((error: Error) => void) | null = null;
+        
         constructor() {
           setTimeout(() => {
             if (this.onerror) this.onerror(new Error("Test error"));
           }, 0);
         }
-      };
+      } as unknown as typeof Image;
 
       const testDataUrl = "data:image/png;base64,test";
       const result = await ScreenshotService.compressScreenshot(testDataUrl);
@@ -181,7 +191,10 @@ describe("ScreenshotService", () => {
       const smallDataUrl = "data:image/png;base64,small"; // <200KB
 
       vi.spyOn(ScreenshotService, "getScreenshotInfo").mockReturnValue({
+        size: 100 * 1024,
         sizeKB: 100,
+        format: "png",
+        timestamp: new Date().toISOString(),
       });
 
       const result = await ScreenshotService.autoCompressScreenshot(smallDataUrl);
@@ -192,7 +205,10 @@ describe("ScreenshotService", () => {
       const mediumDataUrl = "data:image/png;base64,medium";
 
       vi.spyOn(ScreenshotService, "getScreenshotInfo").mockReturnValue({
+        size: 300 * 1024,
         sizeKB: 300,
+        format: "png",
+        timestamp: new Date().toISOString(),
       });
 
       vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue("compressed");
@@ -211,7 +227,10 @@ describe("ScreenshotService", () => {
       const largeDataUrl = "data:image/png;base64,large";
 
       vi.spyOn(ScreenshotService, "getScreenshotInfo").mockReturnValue({
+        size: 700 * 1024,
         sizeKB: 700,
+        format: "png",
+        timestamp: new Date().toISOString(),
       });
 
       vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue("compressed");
@@ -230,7 +249,10 @@ describe("ScreenshotService", () => {
       const veryLargeDataUrl = "data:image/png;base64,verylarge";
 
       vi.spyOn(ScreenshotService, "getScreenshotInfo").mockReturnValue({
+        size: 1500 * 1024,
         sizeKB: 1500,
+        format: "png",
+        timestamp: new Date().toISOString(),
       });
 
       vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue("compressed");
@@ -261,9 +283,9 @@ describe("ScreenshotService", () => {
         toDataURL: vi.fn(() => "data:image/png;base64,manual"),
       };
 
-      vi.spyOn(document, "createElement").mockImplementation((tagName) => {
-        if (tagName === "canvas") return mockCanvas;
-        return {};
+      vi.spyOn(document, "createElement").mockImplementation((tagName: string): HTMLElement => {
+        if (tagName === "canvas") return mockCanvas as unknown as HTMLElement;
+        return document.createElement(tagName);
       });
     });
 

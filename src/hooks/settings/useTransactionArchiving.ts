@@ -10,9 +10,19 @@ export const useTransactionArchivingUI = () => {
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [confirmArchiving, setConfirmArchiving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [previewData, setPreviewData] = useState(null);
+  const [previewData, setPreviewData] = useState<{
+    totalCount: number;
+    cutoffDate: Date;
+    categories: Record<string, { count: number; amount: number }>;
+    envelopes: Record<string, { count: number; amount: number }>;
+    totalAmount: number;
+    dateRange: {
+      earliest: Date | null;
+      latest: Date | null;
+    };
+  } | null>(null);
 
-  const handlePeriodChange = useCallback((period) => {
+  const handlePeriodChange = useCallback((period: number | string) => {
     setSelectedPeriod(Number(period));
   }, []);
 
@@ -34,8 +44,8 @@ export const useTransactionArchivingUI = () => {
     try {
       setShowPreview(true);
       // Create a temporary archiver to get preview data
-      const { createArchiver } = await import("../../utils/transactionArchiving");
-      const archiver = createArchiver();
+      const { createArchiver } = await import("@/utils/common/transactionArchiving");
+      const archiver = createArchiver({});
       const cutoffDate = archiver.calculateCutoffDate(selectedPeriod);
       const transactionsToArchive = await archiver.getTransactionsForArchiving(cutoffDate);
 
@@ -43,12 +53,12 @@ export const useTransactionArchivingUI = () => {
       const preview = {
         totalCount: transactionsToArchive.length,
         cutoffDate,
-        categories: {},
-        envelopes: {},
+        categories: {} as Record<string, { count: number; amount: number }>,
+        envelopes: {} as Record<string, { count: number; amount: number }>,
         totalAmount: 0,
         dateRange: {
-          earliest: null,
-          latest: null,
+          earliest: null as Date | null,
+          latest: null as Date | null,
         },
       };
 
@@ -114,8 +124,15 @@ export const useTransactionArchivingUI = () => {
  * Manages the archiving workflow and error handling
  */
 export const useTransactionArchivingProcess = () => {
-  const handleArchive = useCallback(async (selectedPeriod, executeArchiving, callbacks = {}) => {
-    const { onSuccess, onError, _onReset } = callbacks;
+  const handleArchive = useCallback(async (
+    selectedPeriod: number,
+    executeArchiving: (period: number) => Promise<void>,
+    callbacks: {
+      onSuccess?: () => void;
+      onError?: (error: unknown) => void;
+    } = {}
+  ) => {
+    const { onSuccess, onError } = callbacks;
 
     try {
       await executeArchiving(selectedPeriod);
@@ -135,7 +152,7 @@ export const useTransactionArchivingProcess = () => {
  * Utility functions for archiving UI display
  */
 export const useArchivingUIHelpers = () => {
-  const getUrgencyColor = useCallback((urgency) => {
+  const getUrgencyColor = useCallback((urgency: string) => {
     switch (urgency) {
       case "high":
         return "text-red-600 bg-red-50";
@@ -148,8 +165,8 @@ export const useArchivingUIHelpers = () => {
     }
   }, []);
 
-  const getUrgencyIcon = useCallback((urgency) => {
-    const icons = {
+  const getUrgencyIcon = useCallback((urgency: string) => {
+    const icons: Record<string, string> = {
       high: "AlertTriangle",
       medium: "Clock",
       low: "CheckCircle",
@@ -158,14 +175,14 @@ export const useArchivingUIHelpers = () => {
     return icons[urgency] || icons.default;
   }, []);
 
-  const formatStorageSize = useCallback((bytes) => {
+  const formatStorageSize = useCallback((bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
     return `${Math.round(bytes / (1024 * 1024))} MB`;
   }, []);
 
   const calculateStorageImpact = useCallback(
-    (transactionCount) => {
+    (transactionCount: number) => {
       // Estimate: ~0.35KB per transaction
       const bytes = transactionCount * 0.35 * 1024;
       return {
