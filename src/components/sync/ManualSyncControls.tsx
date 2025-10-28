@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import useManualSync from "../../hooks/common/useManualSync";
+import useManualSync from "../../hooks/sync/useManualSync";
 import logger from "../../utils/common/logger";
 
 /**
@@ -48,9 +48,9 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
     clearSyncError();
     const result: SyncResult = await forceUploadSync();
     if (result.success) {
-      logger.info("✅ Upload sync completed:", result.message);
+      logger.info("✅ Upload sync completed:", { message: result.message });
     } else {
-      logger.error("❌ Upload sync failed:", result.error);
+      logger.error("❌ Upload sync failed:", { error: result.error });
     }
   };
 
@@ -61,9 +61,9 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
     clearSyncError();
     const result: SyncResult = await forceDownloadSync();
     if (result.success) {
-      logger.info("✅ Download sync completed:", result.message);
+      logger.info("✅ Download sync completed:", { message: result.message });
     } else {
-      logger.error("❌ Download sync failed:", result.error);
+      logger.error("❌ Download sync failed:", { error: result.error });
     }
   };
 
@@ -74,9 +74,9 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
     clearSyncError();
     const result: SyncResult = await forceFullSync();
     if (result.success) {
-      logger.info("✅ Full sync completed:", result.message);
+      logger.info("✅ Full sync completed:", { message: result.message });
     } else {
-      logger.error("❌ Full sync failed:", result.error);
+      logger.error("❌ Full sync failed:", { error: result.error });
     }
   };
 
