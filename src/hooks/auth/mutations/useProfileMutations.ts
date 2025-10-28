@@ -10,6 +10,13 @@ import type { UserData } from "../../../types/auth";
  * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
  */
 
+interface UpdateProfileInput {
+  userName?: string;
+  userColor?: string;
+  budgetId?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Hook for profile update mutation
  */
@@ -17,7 +24,7 @@ export const useUpdateProfileMutation = () => {
   const { updateUser, encryptionKey, salt } = useAuth();
 
   return useMutation({
-    mutationFn: async (updatedProfile: Partial<UserData>) => {
+    mutationFn: async (updatedProfile: UpdateProfileInput) => {
       try {
         if (!encryptionKey || !salt) {
           return { success: false, error: "Not authenticated." };
@@ -51,8 +58,9 @@ export const useUpdateProfileMutation = () => {
 
         return { success: true, profile: updatedProfile };
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
         logger.error("Failed to update profile:", error);
-        return { success: false, error: (error as Error).message };
+        return { success: false, error: errorMessage };
       }
     },
     onSuccess: (result) => {

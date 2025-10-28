@@ -5,6 +5,7 @@
 
 import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.ts";
+import type { Bill as DexieBill, Transaction } from "../../../db/types";
 
 interface TransactionFilters {
   dateRange?: {
@@ -103,12 +104,14 @@ export const queryFunctions = {
       unassignedCash: isNaN(unassignedCashValue) ? 0 : unassignedCashValue,
       actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
       recentTransactions: safeTransactions.slice(0, 10),
-      upcomingBills: (safeBills as Bill[]).filter((bill) => {
+      upcomingBills: (safeBills as DexieBill[]).filter((bill) => {
         const dueDate = new Date(bill.dueDate);
         const thirtyDaysFromNow = new Date();
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
         return dueDate <= thirtyDaysFromNow;
       }),
+      virtualBalance: 0,
+      balanceDifference: 0,
     };
 
     // Calculate difference for balance reconciliation with NaN protection

@@ -2,9 +2,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import JoinBudgetModal from "../JoinBudgetModal";
 import userEvent from "@testing-library/user-event";
-import { useShareCodeValidationOriginal } from "@/hooks/sharing/useShareCodeValidation";
-import { useBudgetJoiningOriginal } from "@/hooks/sharing/useBudgetJoining";
-import { useQRCodeProcessingOriginal } from "@/hooks/sharing/useQRCodeProcessing";
 
 // Mock all hooks
 vi.mock("@/hooks/sharing/useShareCodeValidation", () => ({
@@ -96,10 +93,6 @@ vi.mock("@/utils", () => ({
   renderIcon: vi.fn(() => <div>Icon</div>),
 }));
 
-const useShareCodeValidation = useShareCodeValidationOriginal as unknown as Mock;
-const useBudgetJoining = useBudgetJoiningOriginal as unknown as Mock;
-const useQRCodeProcessing = useQRCodeProcessingOriginal as unknown as Mock;
-
 describe("JoinBudgetModal", () => {
   const mockOnClose = vi.fn();
   const mockOnJoinSuccess = vi.fn();
@@ -139,15 +132,16 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should render UserSetupStep on step 2", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
-      useShareCodeValidation.mockReturnValue({
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
         creatorInfo: null,
         isValidating: false,
         validateShareCode: mockValidateShareCode,
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
@@ -171,15 +165,16 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should call validateShareCode when validate button is clicked", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
-      useShareCodeValidation.mockReturnValue({
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: null,
         creatorInfo: null,
         isValidating: false,
         validateShareCode: mockValidateShareCode,
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
@@ -192,28 +187,30 @@ describe("JoinBudgetModal", () => {
       expect(mockValidateShareCode).toHaveBeenCalledWith("TEST123");
     });
 
-    it("should show validating state", () => {
-      useShareCodeValidation.mockReturnValue({
+    it("should show validating state", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: null,
         creatorInfo: null,
         isValidating: true,
         validateShareCode: vi.fn(),
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
       expect(screen.getByText("Validating...")).toBeInTheDocument();
     });
 
-    it("should display share info when code is valid", () => {
-      useShareCodeValidation.mockReturnValue({
+    it("should display share info when code is valid", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
         creatorInfo: null,
         isValidating: false,
         validateShareCode: vi.fn(),
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
@@ -222,16 +219,17 @@ describe("JoinBudgetModal", () => {
   });
 
   describe("User Setup", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
-      useShareCodeValidation.mockReturnValue({
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
         creatorInfo: null,
         isValidating: false,
         validateShareCode: mockValidateShareCode,
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
     });
 
     it("should allow entering user name", async () => {
@@ -304,21 +302,23 @@ describe("JoinBudgetModal", () => {
 
   describe("Budget Joining", () => {
     it("should call joinBudget when join button is clicked", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useBudgetJoining } = await import("@/hooks/sharing/useBudgetJoining");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
       const mockJoinBudget = vi.fn();
 
-      useShareCodeValidation.mockReturnValue({
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
         creatorInfo: null,
         isValidating: false,
         validateShareCode: mockValidateShareCode,
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
-      useBudgetJoining.mockReturnValue({
+      vi.mocked(useBudgetJoining).mockReturnValue({
         isJoining: false,
         joinBudget: mockJoinBudget,
-      });
+      } as ReturnType<typeof useBudgetJoining>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
@@ -343,20 +343,22 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should show joining state", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useBudgetJoining } = await import("@/hooks/sharing/useBudgetJoining");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
-      useShareCodeValidation.mockReturnValue({
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
         creatorInfo: null,
         isValidating: false,
         validateShareCode: mockValidateShareCode,
         resetValidation: vi.fn(),
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
-      useBudgetJoining.mockReturnValue({
+      vi.mocked(useBudgetJoining).mockReturnValue({
         isJoining: true,
         joinBudget: vi.fn(),
-      });
+      } as ReturnType<typeof useBudgetJoining>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
@@ -371,15 +373,16 @@ describe("JoinBudgetModal", () => {
 
   describe("State Reset", () => {
     it("should reset state when modal closes", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
       const mockResetValidation = vi.fn();
 
-      useShareCodeValidation.mockReturnValue({
+      vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: null,
         creatorInfo: null,
         isValidating: false,
         validateShareCode: vi.fn(),
         resetValidation: mockResetValidation,
-      });
+      } as ReturnType<typeof useShareCodeValidation>);
 
       const { rerender } = render(<JoinBudgetModal {...defaultProps} />);
 

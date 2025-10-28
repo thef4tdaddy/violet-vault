@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient";
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
+import type { Transaction, Bill } from "../../../db/types";
+
 
 interface CloudSyncService {
   triggerSyncForCriticalChange(change: string): void;
@@ -22,24 +24,22 @@ const triggerBillSync = (changeType: string) => {
 
 // Helper to create payment transaction record
 const createPaymentTransaction = (
-  bill: Record<string, unknown>,
+  bill: Bill,
   billId: string,
   paidAmount: number,
   paymentDate: string,
   envelopeId?: string
-) => {
+): Transaction => {
   return {
     id: `${billId}_payment_${Date.now()}`,
-    date: paymentDate,
-    description: (bill.provider || bill.description || bill.name || "Bill Payment") as string,
+    date: new Date(paymentDate),
+    description: bill.name || "Bill Payment",
     amount: -Math.abs(paidAmount), // Negative for expense
     envelopeId: envelopeId || "unassigned",
-    category: (bill.category || "Bills & Utilities") as string,
+    category: bill.category || "Bills & Utilities",
     type: "expense" as const,
-    source: "bill_payment",
-    billId: billId,
-    notes: `Payment for ${bill.provider || bill.description || bill.name}`,
-    createdAt: new Date().toISOString(),
+    lastModified: Date.now(),
+    createdAt: Date.now(),
   };
 };
 
@@ -268,13 +268,18 @@ export const useMarkBillPaidMutation = () => {
       const paymentDate = paidDate || new Date().toISOString().split("T")[0];
 
       // Apply to Dexie directly (optimistic update handled by React Query)
+      // Note: These properties extend the Bill interface for payment tracking
       await budgetDb.bills.update(billId, {
         isPaid: true,
-        paidAmount: paidAmount,
+        paidAmount,
         paidDate: paymentDate,
-        envelopeId: envelopeId,
+        envelopeId,
         lastPaid: new Date().toISOString(),
         lastModified: Date.now(),
+      } as Partial<Bill> & {
+        paidAmount?: number;
+        paidDate?: string;
+        lastPaid?: string;
       });
 
       // Create transaction record for the bill payment
@@ -287,20 +292,19 @@ export const useMarkBillPaidMutation = () => {
       );
 
       // Add transaction to Dexie
-      const transactionRecord = paymentTransaction as unknown as Record<string, unknown>;
-      await budgetDb.transactions.put(transactionRecord);
-      await optimisticHelpers.addTransaction(queryClient, transactionRecord);
+      await budgetDb.transactions.put(paymentTransaction);
+      await optimisticHelpers.addTransaction(queryClient, paymentTransaction);
 
       // If bill is linked to envelope, update envelope balance
       if (envelopeId && paidAmount) {
-        await updateEnvelopeForPayment(
+        await updateEnvelopeForPayment({
           queryClient,
           envelopeId,
           paidAmount,
           paymentDate,
           billId,
-          paymentTransaction.id
-        );
+          transactionId: paymentTransaction.id,
+        });
       }
 
       return { billId, paymentTransaction };
