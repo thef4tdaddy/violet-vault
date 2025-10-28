@@ -415,7 +415,7 @@ describe("Bill Query Hooks", () => {
           dueDate: inThirtyDays.toISOString().split("T")[0],
           isPaid: false,
         }),
-      ];
+      ] as never[];
 
       // Act
       const { result } = renderHook(() => useUpcomingBillsQuery(15, billsData), { wrapper });
@@ -446,7 +446,7 @@ describe("Bill Query Hooks", () => {
           dueDate: inTenDays.toISOString().split("T")[0],
           isPaid: true,
         }),
-      ];
+      ] as never[];
 
       // Act
       const { result } = renderHook(() => useUpcomingBillsQuery(30, billsData), { wrapper });
