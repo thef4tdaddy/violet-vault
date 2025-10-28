@@ -88,7 +88,7 @@ const LockScreen = () => {
       }
       processedValidationRef.current = validationResult;
 
-      if (validationResult?.isValid) {
+      if ((validationResult as { isValid?: boolean })?.isValid) {
         // Password is correct, unlock the session
         if (pendingConfirm) {
           pendingConfirm.cancel();

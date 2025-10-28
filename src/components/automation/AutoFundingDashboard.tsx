@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
@@ -94,9 +94,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         transactions: allTransactions || [],
       };
 
-      const result = await executeRules(TRIGGER_TYPES.MANUAL, triggerData);
+      const result = await executeRules(TRIGGER_TYPES.MANUAL);
 
-      if (result.success) {
+      if (result.success && 'execution' in result) {
         const totalFunded = result.execution.totalFunded || 0;
         const rulesExecuted = result.execution.rulesExecuted || 0;
 

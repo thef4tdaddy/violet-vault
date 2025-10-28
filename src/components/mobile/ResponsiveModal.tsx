@@ -63,8 +63,8 @@ const ResponsiveModal = ({
  * withResponsiveModal - Higher-order component that wraps existing modal components
  * to automatically add responsive slide-up behavior
  */
-export const withResponsiveModal = (ModalComponent) => {
-  return React.forwardRef((props, ref) => {
+export const withResponsiveModal = (ModalComponent: React.ComponentType<any>) => {
+  return React.forwardRef((props: any, ref) => {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -78,7 +78,7 @@ export const withResponsiveModal = (ModalComponent) => {
     }, []);
 
     // If on mobile, wrap the modal content with SlideUpModal
-    if (isMobile && props.isOpen) {
+    if (isMobile && props?.isOpen) {
       return (
         <SlideUpModal
           isOpen={props.isOpen}
