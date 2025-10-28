@@ -38,7 +38,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
   useEffect(() => {
     // Sort activities by timestamp and get recent ones
     const sortedActivities = [...recentActivity]
-      .sort((activityA, activityB) => new Date(activityB.timestamp) - new Date(activityA.timestamp))
+      .sort((activityA, activityB) => new Date(activityB.timestamp).getTime() - new Date(activityA.timestamp).getTime())
       .slice(0, 10);
 
     setDisplayedActivities(sortedActivities);
@@ -125,7 +125,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
     const time = new Date(timestamp);
-    const diffInSeconds = Math.floor((now - time) / 1000);
+    const diffInSeconds = Math.floor((now.getTime() - time.getTime()) / 1000);
 
     if (diffInSeconds < 10) return "just now";
     if (diffInSeconds < 60) return `${diffInSeconds}s ago`;

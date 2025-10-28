@@ -12,6 +12,7 @@ interface FilterOptions {
   status: string;
   sortBy: string;
   sortOrder: string;
+  showPaidOff?: boolean;
 }
 
 interface OverviewTabProps {
@@ -23,6 +24,8 @@ interface OverviewTabProps {
   handleDebtClick: (debt: DebtAccount) => void;
   handleRecordPayment: (debt: DebtAccount, amount: number) => void;
   handleAddDebt: () => void;
+  debtTypes?: Record<string, string>;
+  debtsByType?: Record<string, DebtAccount[]>;
 }
 
 export const OverviewTab = ({
@@ -34,6 +37,8 @@ export const OverviewTab = ({
   handleDebtClick,
   handleRecordPayment,
   handleAddDebt,
+  debtTypes,
+  debtsByType,
 }: OverviewTabProps) => {
   return (
     <div className="space-y-6">
@@ -51,7 +56,12 @@ export const OverviewTab = ({
 
       {/* Filters and Controls */}
       {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-        <DebtFilters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
+        <DebtFilters 
+          filterOptions={filterOptions} 
+          setFilterOptions={setFilterOptions}
+          debtTypes={debtTypes}
+          debtsByType={debtsByType}
+        />
       )}
 
       {/* Debt List */}

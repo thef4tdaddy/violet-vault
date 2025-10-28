@@ -65,27 +65,34 @@ const ArchivingPreviewResults = ({ showPreview, previewData, onClosePreview }) =
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {Object.entries(previewData.categories)
-                  .sort(([, a], [, b]) => b.count - a.count)
+                  .sort(([, a], [, b]) => {
+                    const aData = a as { count: number; amount: number };
+                    const bData = b as { count: number; amount: number };
+                    return bData.count - aData.count;
+                  })
                   .slice(0, 8)
-                  .map(([category, data]) => (
-                    <div
-                      key={category}
-                      className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0"
-                    >
-                      <span className="text-sm font-medium text-gray-700 capitalize">
-                        {category}
-                      </span>
-                      <div className="text-right">
-                        <span className="text-sm font-semibold text-gray-900">
-                          {data.count} transactions
+                  .map(([category, data]) => {
+                    const categoryData = data as { count: number; amount: number };
+                    return (
+                      <div
+                        key={category}
+                        className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0"
+                      >
+                        <span className="text-sm font-medium text-gray-700 capitalize">
+                          {category}
                         </span>
-                        <br />
-                        <span className="text-xs text-gray-500">
-                          ${Math.abs(data.amount).toLocaleString()}
-                        </span>
+                        <div className="text-right">
+                          <span className="text-sm font-semibold text-gray-900">
+                            {categoryData.count} transactions
+                          </span>
+                          <br />
+                          <span className="text-xs text-gray-500">
+                            ${Math.abs(categoryData.amount).toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
               {Object.keys(previewData.categories).length > 8 && (
                 <p className="text-xs text-gray-500 mt-3 text-center">
