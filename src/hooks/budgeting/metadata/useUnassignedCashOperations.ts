@@ -9,7 +9,16 @@ export const useUnassignedCashOperations = () => {
   const { mutation: updateMetadataMutation } = useBudgetMetadataMutation();
 
   const updateUnassignedCash = useCallback(
-    async (amount, options = {}) => {
+    async (
+      amount: number,
+      options: {
+        author?: string;
+        source?: string;
+        actualBalance?: number;
+        isActualBalanceManual?: boolean;
+        biweeklyAllocation?: number;
+      } = {}
+    ) => {
       if (typeof amount !== "number" || isNaN(amount)) {
         logger.warn("Invalid unassigned cash amount:", amount);
         return false;
