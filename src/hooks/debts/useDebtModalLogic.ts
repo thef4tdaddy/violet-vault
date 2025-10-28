@@ -32,7 +32,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
 
   // Find connected bill and envelope for this debt
   const connectedBill = useMemo(
-    () => (debt?.id ? bills.find((bill) => (bill as any).debtId === debt.id) : null),
+    () => (debt?.id ? bills.find((bill) => bill && typeof bill === 'object' && 'debtId' in bill && bill.debtId === debt.id) : null),
     [debt?.id, bills]
   );
 

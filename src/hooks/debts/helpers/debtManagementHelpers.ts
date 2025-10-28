@@ -452,7 +452,7 @@ export const enrichDebtsWithRelations = (
     );
 
     // Enrich the debt with calculated properties
-    const enrichedDebt = enrichDebt(debt as unknown as DebtAccount, relatedBill as any, relatedEnvelope, relatedTransactions);
+    const enrichedDebt = enrichDebt(debt as unknown as DebtAccount, relatedBill || null, relatedEnvelope, relatedTransactions);
 
     // Log first debt enrichment details
     if (index === 0) {
