@@ -35,7 +35,7 @@ export interface ConsoleLogEntry {
  */
 interface ErrorListener {
   type: string;
-  handler: ((event: Event) => void) | { handleEvent: (event: Event) => void };
+  handler: EventListenerOrEventListenerObject;
 }
 
 /**

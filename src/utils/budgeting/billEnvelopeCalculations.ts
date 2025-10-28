@@ -6,23 +6,27 @@
 import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
-interface Bill {
-  id: string;
-  dueDate: string | Date;
+type Envelope = {
+  id: string | number;
+  name?: string;
+  currentBalance?: number;
+  biweeklyAllocation?: number;
+  envelopeType?: string;
+  [key: string]: unknown;
+};
+
+type Bill = {
+  id: string | number;
+  name?: string;
+  provider?: string;
+  description?: string;
   amount?: number;
   estimatedAmount?: number;
-  envelopeId?: string;
-  isPaid?: boolean;
+  dueDate: string | Date;
+  category?: string;
+  frequency?: string;
   [key: string]: unknown;
-}
-
-interface Envelope {
-  id: string;
-  envelopeType?: string;
-  currentBalance?: number;
-  monthlyAmount?: number;
-  [key: string]: unknown;
-}
+};
 
 interface BillEnvelopeResult {
   isValidBillEnvelope: boolean;
@@ -60,6 +64,24 @@ const getInvalidBillEnvelopeResult = (): BillEnvelopeResult => ({
   nextBillDate: null,
   linkedBills: 0,
 });
+
+interface Bill {
+  id: string;
+  dueDate: string | Date;
+  amount?: number;
+  estimatedAmount?: number;
+  envelopeId?: string;
+  isPaid?: boolean;
+  [key: string]: unknown;
+}
+
+interface Envelope {
+  id: string;
+  envelopeType?: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+  [key: string]: unknown;
+}
 
 /**
  * Get the next upcoming bill from linked bills

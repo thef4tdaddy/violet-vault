@@ -6,7 +6,7 @@
  */
 import { ScreenshotService } from "./screenshotService.ts";
 import { SystemInfoService } from "./systemInfoService.ts";
-import { BugReportAPIService, type BugReportData, type ProviderConfig, type SystemInfo } from "./apiService.ts";
+import { BugReportAPIService, type BugReportData, type ProviderConfig } from "./apiService.ts";
 import { ContextAnalysisService } from "./contextAnalysisService.ts";
 import logger from "../../utils/common/logger.ts";
 import { APP_VERSION } from "../../utils/common/version.ts";

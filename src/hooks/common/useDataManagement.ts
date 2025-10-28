@@ -1,4 +1,3 @@
-import React from "react";
 import { useExportData } from "./useExportData";
 import { useImportData } from "./useImportData";
 import { useResetEncryption } from "./useResetEncryption";
