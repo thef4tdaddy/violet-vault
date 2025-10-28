@@ -71,7 +71,7 @@ export const resolveEnvelopes = (
 export const extractBillsFromTransactions = (transactions: Transaction[]): Bill[] => {
   return transactions.filter(
     (t) => t.isBill || t.type === "bill" || t.category === "bill"
-  ) as Bill[];
+  ) as unknown as Bill[];
 };
 
 /**
@@ -129,7 +129,7 @@ export const processBills = (
  * Categorize and calculate totals for bills
  */
 export const categorizeBillsWithTotals = (bills: Bill[]) => {
-  const categorizedBills = categorizeBills(bills);
+  const categorizedBills = categorizeBills(bills) as unknown as ReturnType<typeof categorizeBills>;
   const totals = calculateBillTotals(categorizedBills);
   return { categorizedBills, totals };
 };
@@ -160,7 +160,7 @@ export const getFilteredBills = (
   filterOptions: FilterOptions
 ): Bill[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
-  return filterBills(billsToFilter, filterOptions);
+  return filterBills(billsToFilter, filterOptions) as unknown as Bill[];
 };
 
 /**
