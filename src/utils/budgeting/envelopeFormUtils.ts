@@ -80,6 +80,7 @@ interface ValidationResult {
  */
 interface ZodResult {
   success: boolean;
+  data?: unknown;
   error?: {
     errors: Array<{
       path: Array<string | number>;
@@ -188,7 +189,7 @@ const validateTargetAmount = (formData: EnvelopeFormData, errors: Record<string,
     return;
   }
 
-  const amount = parseFloat(formData.targetAmount);
+  const amount = parseFloat(String(formData.targetAmount));
   if (isNaN(amount) || amount <= 0) {
     errors.targetAmount = "Target amount must be a positive number";
   } else if (amount > 1000000) {

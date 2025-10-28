@@ -9,12 +9,9 @@ export const clearFirebaseData = async () => {
     logger.info("Firebase data cleared successfully");
 
     logger.info("Clearing sync metadata to prevent corruption detection...");
-    if (budgetDb.syncMetadata) {
-      await budgetDb.syncMetadata.clear();
-      logger.info("Sync metadata cleared");
-    } else {
-      logger.info("No sync metadata table found, skipping clear");
-    }
+    // Note: syncMetadata table doesn't exist in current schema
+    // Metadata is stored in the budget table instead
+    logger.info("No separate sync metadata table to clear");
   } catch (error) {
     logger.warn("Failed to clear Firebase data, proceeding with import", error);
   }

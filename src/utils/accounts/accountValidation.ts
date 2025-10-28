@@ -191,7 +191,7 @@ export const calculateDaysUntilExpiration = (expirationDate) => {
   today.setHours(0, 0, 0, 0);
   expiry.setHours(0, 0, 0, 0);
 
-  const diffTime = expiry - today;
+  const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return diffDays;

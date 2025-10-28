@@ -1,3 +1,3 @@
-export { default as encryption } from "./encryption.ts";
-export { default as keyExport } from "./keyExport.ts";
-export { default as errorViewer } from "./errorViewer.ts";
+export * as encryption from "./encryption.ts";
+export * as keyExport from "./keyExport.ts";
+export * as errorViewer from "./errorViewer.ts";
