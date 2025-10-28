@@ -377,7 +377,7 @@ const swDiagnostics = new ServiceWorkerDiagnostics();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  (window as Record<string, unknown>).swDiagnostics = swDiagnostics;
+  (window as unknown as Record<string, unknown>).swDiagnostics = swDiagnostics;
 }
 
 export default swDiagnostics;

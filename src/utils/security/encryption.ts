@@ -151,7 +151,7 @@ export const encryptionUtils = {
       new Date().getTimezoneOffset(),
       canvas.toDataURL(),
       navigator.hardwareConcurrency || "unknown",
-      navigator.deviceMemory || "unknown",
+      (navigator as { deviceMemory?: number }).deviceMemory || "unknown",
     ].join("|");
 
     let hash = 0;
