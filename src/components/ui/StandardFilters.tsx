@@ -2,7 +2,7 @@ import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 
-interface FilterConfig {
+export interface FilterConfig {
   key: string;
   type: "select";
   options: Array<{ value: string; label: string }>;

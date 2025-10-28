@@ -5,14 +5,15 @@
 
 import logger from "../common/logger";
 import { budgetDb } from "../../db/budgetDb";
+import type { Envelope, Transaction, Bill, Debt, SavingsGoal, PaycheckHistory } from "@/db/types";
 
 interface BackupData {
-  envelopes: unknown[];
-  transactions: unknown[];
-  bills: unknown[];
-  debts: unknown[];
-  savingsGoals: unknown[];
-  paycheckHistory: unknown[];
+  envelopes: Envelope[];
+  transactions: Transaction[];
+  bills: Bill[];
+  debts: Debt[];
+  savingsGoals: SavingsGoal[];
+  paycheckHistory: PaycheckHistory[];
   metadata: unknown;
   timestamp: number;
 }
@@ -26,11 +27,13 @@ interface BackupMetadata {
 
 interface Backup {
   id: string;
-  type: string;
-  syncType: string;
+  type: "manual" | "scheduled" | "sync_triggered";
+  syncType?: "firebase" | "export" | "import";
   timestamp: number;
-  data: BackupData;
-  metadata: BackupMetadata;
+  data?: BackupData;
+  metadata?: BackupMetadata;
+  size?: number;
+  checksum?: string;
 }
 
 class AutoBackupService {
@@ -65,10 +68,10 @@ class AutoBackupService {
       const backupData = await this.collectAllData();
       const duration = Date.now() - startTime;
 
-      const backup = {
+      const backup: Backup = {
         id: backupId,
-        type: "pre_sync_auto",
-        syncType,
+        type: "sync_triggered",
+        syncType: syncType as "firebase" | "export" | "import" | undefined,
         timestamp: Date.now(),
         data: backupData,
         metadata: {
@@ -134,7 +137,7 @@ class AutoBackupService {
    */
   async storeBackup(backup: Backup): Promise<void> {
     try {
-      await budgetDb.autoBackups.put(backup);
+      await budgetDb.autoBackups.put(backup as unknown as import("@/db/types").AutoBackup);
       logger.debug("Backup stored in IndexedDB", { backupId: backup.id });
     } catch (error) {
       logger.error("Failed to store backup in IndexedDB", error);
@@ -148,7 +151,7 @@ class AutoBackupService {
   async getBackups(): Promise<Backup[]> {
     try {
       const backups = await budgetDb.autoBackups.orderBy("timestamp").reverse().toArray();
-      return backups;
+      return backups as unknown as Backup[];
     } catch (error) {
       logger.error("Failed to retrieve backups", error);
       return [];
@@ -167,7 +170,7 @@ class AutoBackupService {
         throw new Error(`Backup not found: ${backupId}`);
       }
 
-      const data = (backup as Backup).data;
+      const data = (backup as unknown as Backup).data;
 
       // Restore data in transaction for consistency
       await budgetDb.transaction(
@@ -203,9 +206,9 @@ class AutoBackupService {
           if (data.metadata) {
             await budgetDb.budget.put({
               id: "metadata",
-              ...data.metadata,
-              lastUpdated: new Date().toISOString(),
-            });
+              ...(data.metadata as Record<string, unknown>),
+              lastModified: Date.now(),
+            } as import("@/db/types").BudgetRecord);
           }
         }
       );
