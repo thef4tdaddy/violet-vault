@@ -16,6 +16,14 @@ interface Receipt {
   transactionId?: string;
   processingStatus?: string;
   lastModified: number;
+  ocrData?: {
+    rawText?: string;
+    confidence?: number;
+    items?: unknown[];
+    tax?: number;
+    subtotal?: number;
+    processingTime?: number;
+  };
 }
 
 const useReceipts = () => {

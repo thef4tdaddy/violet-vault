@@ -7,8 +7,22 @@ import { useResetEncryption } from "./useResetEncryption";
  */
 interface UseDataManagementReturn {
   exportData: () => Promise<void>;
-  importData: (file: File) => Promise<void>;
-  resetEncryptionAndStartFresh: () => Promise<void>;
+  importData: (event: React.ChangeEvent<HTMLInputElement>) => Promise<
+    | {
+        success: boolean;
+        imported: {
+          envelopes: number;
+          bills: number;
+          transactions: number;
+          savingsGoals: number;
+          debts: number;
+          paycheckHistory: number;
+          auditLog: number;
+        };
+      }
+    | undefined
+  >;
+  resetEncryptionAndStartFresh: () => void;
 }
 
 /**

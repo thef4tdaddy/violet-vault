@@ -127,7 +127,7 @@ export class GitHubAPIService {
         logger.error("GitHub bug report submission failed", result);
         return {
           success: false,
-          error: result.error,
+          error: (result as GitHubAPIErrorResponse).error,
           provider: "github",
         };
       }
@@ -419,13 +419,13 @@ export class GitHubAPIService {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Simulate successful response
-      const simulatedResponse = {
+      const simulatedResponse: GitHubAPIResponse = {
         success: true,
         issueNumber: Math.floor(Math.random() * 1000) + 100,
         url: `https://github.com/your-repo/issues/${Math.floor(Math.random() * 1000) + 100}`,
       };
 
-      logger.info("GitHub API call completed", simulatedResponse);
+      logger.info("GitHub API call completed", simulatedResponse as unknown as Record<string, unknown>);
       return simulatedResponse;
     } catch (error) {
       logger.error("GitHub API call failed", error);
