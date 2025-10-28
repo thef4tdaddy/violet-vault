@@ -1,236 +1,212 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import EnvelopeSystem from "../EnvelopeSystem";
-import userEvent from "@testing-library/user-event";
+import useEnvelopeSystem from "../EnvelopeSystem";
 
-// Mock child components
-vi.mock("./EnvelopeGrid", () => ({
-  default: ({ envelopes }) => (
-    <div data-testid="envelope-grid">
-      {envelopes?.map((env) => (
-        <div key={env.id} data-testid={`envelope-${env.id}`}>
-          {env.name}
-        </div>
-      ))}
-    </div>
-  ),
-}));
-
-vi.mock("./EnvelopeSummaryCards", () => ({
-  default: ({ totals }) => (
-    <div data-testid="envelope-summary">
-      Total: ${totals?.total || 0}
-    </div>
-  ),
-}));
-
-vi.mock("./CashFlowSummary", () => ({
-  default: () => <div data-testid="cash-flow-summary">Cash Flow</div>,
-}));
-
-vi.mock("@/components/ui", () => ({
-  Button: ({ children, onClick }) => (
-    <button onClick={onClick}>{children}</button>
-  ),
-}));
-
-vi.mock("../../utils", () => ({
-  getIcon: vi.fn(() => {
-    return function MockIcon() {
-      return <div data-testid="icon">Icon</div>;
+// Mock dependencies
+vi.mock("@/stores/ui/uiStore", () => ({
+  useBudgetStore: vi.fn((selector) => {
+    const mockState = {
+      unassignedCash: 0,
+      setEnvelopes: vi.fn(),
+      setBiweeklyAllocation: vi.fn(),
+      setUnassignedCash: vi.fn(),
     };
+    return selector ? selector(mockState) : mockState;
   }),
 }));
 
-describe("EnvelopeSystem", () => {
-  const defaultProps = {
+vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+  useEnvelopes: vi.fn(() => ({
     envelopes: [],
-    onCreateEnvelope: vi.fn(),
-    onUpdateEnvelope: vi.fn(),
-    onDeleteEnvelope: vi.fn(),
-    unassignedCash: 0,
-  };
+    addEnvelope: vi.fn(),
+    updateEnvelope: vi.fn(),
+    deleteEnvelope: vi.fn(),
+    isLoading: false,
+  })),
+}));
 
+vi.mock("@/hooks/bills/useBills", () => ({
+  default: vi.fn(() => ({
+    bills: [],
+    isLoading: false,
+  })),
+}));
+
+vi.mock("@/utils/budgeting", () => ({
+  calculateBiweeklyNeeds: vi.fn(() => 0),
+}));
+
+vi.mock("@/utils/common/logger", () => ({
+  default: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+describe("useEnvelopeSystem", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Rendering", () => {
-    it("should render without crashing", async () => {
-      render(<EnvelopeSystem {...defaultProps} />);
-      await waitFor(() => {
-        expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
-      });
+  describe("Hook Initialization", () => {
+    it("should initialize with default values", () => {
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      expect(result.current.envelopes).toEqual([]);
+      expect(result.current.bills).toEqual([]);
+      expect(result.current.unassignedCash).toBe(0);
+      expect(result.current.isLoading).toBe(false);
     });
 
-    it("should render envelope grid", async () => {
-      render(<EnvelopeSystem {...defaultProps} />);
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
+    it("should provide envelope operations", () => {
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      expect(typeof result.current.createEnvelope).toBe("function");
+      expect(typeof result.current.updateEnvelope).toBe("function");
+      expect(typeof result.current.deleteEnvelope).toBe("function");
     });
 
-    it("should render envelope summary cards", async () => {
-      render(<EnvelopeSystem {...defaultProps} />);
-      expect(screen.getByTestId("envelope-summary")).toBeInTheDocument();
-    });
+    it("should provide utility functions", () => {
+      const { result } = renderHook(() => useEnvelopeSystem());
 
-    it("should render cash flow summary", async () => {
-      render(<EnvelopeSystem {...defaultProps} />);
-      expect(screen.getByTestId("cash-flow-summary")).toBeInTheDocument();
+      expect(typeof result.current.updateBiweeklyAllocations).toBe("function");
+      expect(typeof result.current.setUnassignedCash).toBe("function");
     });
   });
 
-  describe("Envelope Display", () => {
-    it("should display envelopes when they exist", async () => {
-      const envelopes = [
+  describe("Envelope Operations", () => {
+    it("should create envelope successfully", async () => {
+      const mockAddEnvelope = vi.fn().mockResolvedValue(undefined);
+      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+        envelopes: [],
+        addEnvelope: mockAddEnvelope,
+        updateEnvelope: vi.fn(),
+        deleteEnvelope: vi.fn(),
+        isLoading: false,
+      });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      const envelopeData = { name: "Test", monthlyAmount: 100 };
+      const response = await result.current.createEnvelope(envelopeData);
+
+      expect(response.success).toBe(true);
+      expect(mockAddEnvelope).toHaveBeenCalledWith(envelopeData);
+    });
+
+    it("should handle create envelope error", async () => {
+      const mockAddEnvelope = vi.fn().mockRejectedValue(new Error("Create failed"));
+      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+        envelopes: [],
+        addEnvelope: mockAddEnvelope,
+        updateEnvelope: vi.fn(),
+        deleteEnvelope: vi.fn(),
+        isLoading: false,
+      });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      const envelopeData = { name: "Test", monthlyAmount: 100 };
+      const response = await result.current.createEnvelope(envelopeData);
+
+      expect(response.success).toBe(false);
+      expect(response.error).toBe("Create failed");
+    });
+
+    it("should update envelope successfully", async () => {
+      const mockUpdateEnvelope = vi.fn().mockResolvedValue(undefined);
+      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+        envelopes: [],
+        addEnvelope: vi.fn(),
+        updateEnvelope: mockUpdateEnvelope,
+        deleteEnvelope: vi.fn(),
+        isLoading: false,
+      });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      const response = await result.current.updateEnvelope("env1", { name: "Updated" });
+
+      expect(response.success).toBe(true);
+      expect(mockUpdateEnvelope).toHaveBeenCalledWith({ id: "env1", updates: { name: "Updated" } });
+    });
+
+    it("should delete envelope successfully", async () => {
+      const mockDeleteEnvelope = vi.fn().mockResolvedValue(undefined);
+      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+        envelopes: [],
+        addEnvelope: vi.fn(),
+        updateEnvelope: vi.fn(),
+        deleteEnvelope: mockDeleteEnvelope,
+        isLoading: false,
+      });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      const response = await result.current.deleteEnvelope("env1", false);
+
+      expect(response.success).toBe(true);
+      expect(mockDeleteEnvelope).toHaveBeenCalledWith("env1", false);
+    });
+  });
+
+  describe("Data Integration", () => {
+    it("should integrate envelopes from useEnvelopes hook", () => {
+      const mockEnvelopes = [
         { id: "1", name: "Groceries", balance: 500 },
         { id: "2", name: "Gas", balance: 200 },
       ];
 
-      render(<EnvelopeSystem {...defaultProps} envelopes={envelopes} />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("envelope-1")).toBeInTheDocument();
-        expect(screen.getByTestId("envelope-2")).toBeInTheDocument();
-        expect(screen.getByText("Groceries")).toBeInTheDocument();
-        expect(screen.getByText("Gas")).toBeInTheDocument();
+      const { useEnvelopes } = require("@/hooks/budgeting/useEnvelopes");
+      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+        envelopes: mockEnvelopes,
+        addEnvelope: vi.fn(),
+        updateEnvelope: vi.fn(),
+        deleteEnvelope: vi.fn(),
+        isLoading: false,
       });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      expect(result.current.envelopes).toEqual(mockEnvelopes);
     });
 
-    it("should handle empty envelopes array", async () => {
-      render(<EnvelopeSystem {...defaultProps} envelopes={[]} />);
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
-    });
-
-    it("should handle undefined envelopes", async () => {
-      render(<EnvelopeSystem {...defaultProps} envelopes={undefined} />);
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
-    });
-  });
-
-  describe("Envelope Actions", () => {
-    it("should call onCreateEnvelope when creating envelope", async () => {
-      const mockOnCreateEnvelope = vi.fn();
-      
-      render(
-        <EnvelopeSystem {...defaultProps} onCreateEnvelope={mockOnCreateEnvelope} />
-      );
-
-      // Assuming there's a create button
-      const createButtons = screen.queryAllByText(/create/i);
-      if (createButtons.length > 0) {
-        await userEvent.click(createButtons[0]);
-        // The actual call might happen in a modal or form
-      }
-    });
-
-    it("should call onUpdateEnvelope when updating envelope", async () => {
-      const mockOnUpdateEnvelope = vi.fn();
-      
-      render(
-        <EnvelopeSystem {...defaultProps} onUpdateEnvelope={mockOnUpdateEnvelope} />
-      );
-
-      // Update functionality would be triggered through the grid
-    });
-
-    it("should call onDeleteEnvelope when deleting envelope", async () => {
-      const mockOnDeleteEnvelope = vi.fn();
-      
-      render(
-        <EnvelopeSystem {...defaultProps} onDeleteEnvelope={mockOnDeleteEnvelope} />
-      );
-
-      // Delete functionality would be triggered through the grid
-    });
-  });
-
-  describe("Unassigned Cash", () => {
-    it("should display unassigned cash amount", async () => {
-      render(<EnvelopeSystem {...defaultProps} unassignedCash={250} />);
-      
-      // Unassigned cash should be shown somewhere in the component
-      // The exact location depends on implementation
-    });
-
-    it("should handle zero unassigned cash", async () => {
-      render(<EnvelopeSystem {...defaultProps} unassignedCash={0} />);
-      
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
-    });
-
-    it("should handle negative unassigned cash", async () => {
-      render(<EnvelopeSystem {...defaultProps} unassignedCash={-100} />);
-      
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
-    });
-  });
-
-  describe("Summary Display", () => {
-    it("should calculate and display total allocated", async () => {
-      const envelopes = [
-        { id: "1", name: "Groceries", balance: 500 },
-        { id: "2", name: "Gas", balance: 200 },
+    it("should integrate bills from useBills hook", () => {
+      const mockBills = [
+        { id: "1", name: "Rent", amount: 1000 },
+        { id: "2", name: "Electric", amount: 100 },
       ];
 
-      render(<EnvelopeSystem {...defaultProps} envelopes={envelopes} />);
-
-      // Total should be calculated from envelopes
-      expect(screen.getByTestId("envelope-summary")).toBeInTheDocument();
-    });
-
-    it("should handle envelopes with zero balance", async () => {
-      const envelopes = [
-        { id: "1", name: "Empty", balance: 0 },
-      ];
-
-      render(<EnvelopeSystem {...defaultProps} envelopes={envelopes} />);
-
-      expect(screen.getByTestId("envelope-summary")).toBeInTheDocument();
-    });
-  });
-
-  describe("Props Validation", () => {
-    it("should handle missing required props gracefully", async () => {
-      // @ts-expect-error Testing missing props
-      render(<EnvelopeSystem />);
-      
-      // Should still render something even without props
-    });
-
-    it("should handle null envelope values", async () => {
-      render(<EnvelopeSystem {...defaultProps} envelopes={null} />);
-      
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
-    });
-  });
-
-  describe("Multiple Envelopes", () => {
-    it("should render many envelopes", async () => {
-      const envelopes = Array.from({ length: 20 }, (_, i) => ({
-        id: `${i + 1}`,
-        name: `Envelope ${i + 1}`,
-        balance: Math.random() * 1000,
-      }));
-
-      render(<EnvelopeSystem {...defaultProps} envelopes={envelopes} />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("envelope-1")).toBeInTheDocument();
+      const useBills = require("@/hooks/bills/useBills").default;
+      (useBills as ReturnType<typeof vi.fn>).mockReturnValue({
+        bills: mockBills,
+        isLoading: false,
       });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      expect(result.current.bills).toEqual(mockBills);
     });
 
-    it("should handle duplicate envelope names", async () => {
-      const envelopes = [
-        { id: "1", name: "Groceries", balance: 500 },
-        { id: "2", name: "Groceries", balance: 200 },
-      ];
-
-      render(<EnvelopeSystem {...defaultProps} envelopes={envelopes} />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("envelope-1")).toBeInTheDocument();
-        expect(screen.getByTestId("envelope-2")).toBeInTheDocument();
+    it("should report loading state correctly", () => {
+      const { useEnvelopes } = require("@/hooks/budgeting/useEnvelopes");
+      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+        envelopes: [],
+        addEnvelope: vi.fn(),
+        updateEnvelope: vi.fn(),
+        deleteEnvelope: vi.fn(),
+        isLoading: true,
       });
+
+      const { result } = renderHook(() => useEnvelopeSystem());
+
+      expect(result.current.isLoading).toBe(true);
     });
   });
 });
