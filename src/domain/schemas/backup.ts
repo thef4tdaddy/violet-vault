@@ -29,7 +29,7 @@ export const AutoBackupSchema = z.object({
   syncType: SyncTypeSchema,
   size: z.number().int().min(0).optional(),
   checksum: z.string().max(200).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 /**

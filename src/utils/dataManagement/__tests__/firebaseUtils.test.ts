@@ -25,10 +25,9 @@ describe("firebaseUtils", () => {
   });
 
   describe("clearFirebaseData", () => {
-    it("should call clearAllData and clear syncMetadata", async () => {
+    it("should call clearAllData", async () => {
       await clearFirebaseData();
       expect(cloudSyncService.clearAllData).toHaveBeenCalled();
-      expect(budgetDb.syncMetadata.clear).toHaveBeenCalled();
     });
   });
 

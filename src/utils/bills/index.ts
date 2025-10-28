@@ -1,1 +1,1 @@
-export { default as recurringBillUtils } from "./recurringBillUtils.ts";
+export * from "./recurringBillUtils.ts";

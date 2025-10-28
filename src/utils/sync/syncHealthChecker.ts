@@ -314,7 +314,7 @@ async function runHealthChecksInternal(results) {
 
 // Expose to window for immediate testing
 if (typeof window !== "undefined") {
-  (window as { runSyncHealthCheck?: () => Promise<unknown> }).runSyncHealthCheck = runImmediateSyncHealthCheck;
+  (window as unknown as { runSyncHealthCheck?: () => Promise<unknown> }).runSyncHealthCheck = runImmediateSyncHealthCheck;
 }
 
 export default runImmediateSyncHealthCheck;
