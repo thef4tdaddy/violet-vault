@@ -228,7 +228,7 @@ class PWAManager {
    */
   getInstallationStatus() {
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-    const isInstallable = !!(this.uiStore?.getState().installPromptEvent);
+    const isInstallable = !!this.uiStore?.getState().installPromptEvent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     return {

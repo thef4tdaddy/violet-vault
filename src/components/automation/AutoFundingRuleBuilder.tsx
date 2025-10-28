@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
-import { createDefaultRule, validateRule, type AutoFundingRule } from "../../utils/budgeting/autofunding";
+import {
+  createDefaultRule,
+  validateRule,
+  type AutoFundingRule,
+} from "../../utils/budgeting/autofunding";
 import { Button } from "@/components/ui";
 import RuleTypeStep from "./steps/RuleTypeStep";
 import TriggerScheduleStep from "./steps/TriggerScheduleStep";
@@ -149,7 +153,9 @@ const AutoFundingRuleBuilder = ({
     if (!isOpen) {
       // Batch state updates when closing to synchronize modal state
       setStep(1);
-      setRuleData(editingRule ? { ...editingRule, config: { ...editingRule.config } } : createDefaultRule());
+      setRuleData(
+        editingRule ? { ...editingRule, config: { ...editingRule.config } } : createDefaultRule()
+      );
       setErrors({});
     } else if (editingRule) {
       // Initialize with editing rule when opening with existing data
@@ -193,7 +199,7 @@ const AutoFundingRuleBuilder = ({
   const validateCurrentStep = () => {
     // Step validation logic extracted to keep component small
     const validation = validateRule(ruleData as Partial<AutoFundingRule>);
-    setErrors(validation.isValid ? {} : { general: validation.errors.join(', ') });
+    setErrors(validation.isValid ? {} : { general: validation.errors.join(", ") });
     return validation.isValid;
   };
 

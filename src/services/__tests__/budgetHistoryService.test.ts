@@ -538,7 +538,9 @@ describe("BudgetHistoryService", () => {
 
       await budgetHistoryService.cleanup();
 
-      expect(mockedBudgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(oldCommits.map((c) => c.hash));
+      expect(mockedBudgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(
+        oldCommits.map((c) => c.hash)
+      );
     });
 
     it("should not cleanup when within limits", async () => {

@@ -5,10 +5,7 @@
 import type { BillFormData, Bill, BillFrequency, CalculationFrequency } from "../../../types/bills";
 import { toMonthly } from "../../../utils/common/frequencyCalculations";
 import { convertToBiweekly } from "../../../constants/frequency";
-import {
-  getBillIcon,
-  getIconNameForStorage,
-} from "../../../utils/common/billIcons";
+import { getBillIcon, getIconNameForStorage } from "../../../utils/common/billIcons";
 import logger from "../../../utils/common/logger";
 
 /**
@@ -25,12 +22,12 @@ const resolveIconName = (bill: Bill): string => {
   if (bill.iconName) {
     return bill.iconName;
   }
-  
+
   const billName = getBillName(bill);
   const notes = bill.notes || "";
   const category = bill.category || "";
   const icon = bill.icon || getBillIcon(billName, notes, category);
-  
+
   return getIconNameForStorage(icon);
 };
 

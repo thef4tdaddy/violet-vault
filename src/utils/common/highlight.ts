@@ -174,7 +174,7 @@ function _setupConsoleCapture(): void {
   //     logger.debug("⚠️ Warning captured", { message });
   //   }
   // };
-};
+}
 
 /**
  * Fallback error reporting when Highlight.io is blocked
@@ -243,7 +243,8 @@ class ErrorReportingFallback {
 
         // Send queued errors
         for (const errorData of this.queue) {
-          const errorMessage = (errorData.error as { message?: string })?.message ?? "Unknown error";
+          const errorMessage =
+            (errorData.error as { message?: string })?.message ?? "Unknown error";
           H.consumeError(new Error(errorMessage), JSON.stringify(errorData.context));
         }
 

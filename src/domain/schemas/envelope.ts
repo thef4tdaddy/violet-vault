@@ -4,22 +4,25 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for Envelope validation
  * Represents budget allocation containers (e.g., "Groceries", "Gas")
  */
 export const EnvelopeSchema = z.object({
-  id: z.string().min(1, 'Envelope ID is required'),
-  name: z.string().min(1, 'Envelope name is required').max(100, 'Envelope name must be 100 characters or less'),
-  category: z.string().min(1, 'Category is required'),
+  id: z.string().min(1, "Envelope ID is required"),
+  name: z
+    .string()
+    .min(1, "Envelope name is required")
+    .max(100, "Envelope name must be 100 characters or less"),
+  category: z.string().min(1, "Category is required"),
   archived: z.boolean().default(false),
-  lastModified: z.number().int().positive('Last modified must be a positive number'),
+  lastModified: z.number().int().positive("Last modified must be a positive number"),
   createdAt: z.number().int().positive().optional(),
-  currentBalance: z.number().min(0, 'Current balance cannot be negative').optional(),
-  targetAmount: z.number().min(0, 'Target amount cannot be negative').optional(),
-  description: z.string().max(500, 'Description must be 500 characters or less').optional(),
+  currentBalance: z.number().min(0, "Current balance cannot be negative").optional(),
+  targetAmount: z.number().min(0, "Target amount cannot be negative").optional(),
+  description: z.string().max(500, "Description must be 500 characters or less").optional(),
 });
 
 /**

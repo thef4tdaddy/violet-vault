@@ -53,9 +53,7 @@ const convertTwoDigitYear = (year: string): string => {
  */
 const parseYYYYMMDD = (dateStr: string): Date => {
   const parts = dateStr.split("-");
-  return new Date(
-    Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
-  );
+  return new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
 };
 
 /**
@@ -63,9 +61,7 @@ const parseYYYYMMDD = (dateStr: string): Date => {
  */
 const parseMMDDYYYY = (dateStr: string): Date => {
   const parts = dateStr.split(/[/-]/);
-  return new Date(
-    Date.UTC(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]))
-  );
+  return new Date(Date.UTC(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1])));
 };
 
 /**
@@ -222,7 +218,8 @@ export const categorizeBills = (bills: Bill[]): CategorizedBills => {
     overdue: overdueBills.sort((a, b) => (a.daysUntilDue ?? 0) - (b.daysUntilDue ?? 0)),
     paid: paidBills.sort(
       (a, b) =>
-        new Date(b.paidDate || b.date || 0).getTime() - new Date(a.paidDate || a.date || 0).getTime()
+        new Date(b.paidDate || b.date || 0).getTime() -
+        new Date(a.paidDate || a.date || 0).getTime()
     ),
     all: bills,
   };

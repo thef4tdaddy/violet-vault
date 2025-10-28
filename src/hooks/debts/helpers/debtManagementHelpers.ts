@@ -3,7 +3,11 @@
  * Extracted to reduce complexity in useDebtManagement
  */
 import logger from "@/utils/common/logger";
-import { convertPaymentFrequency, calculateInterestPortion, enrichDebt } from "@/utils/debts/debtCalculations";
+import {
+  convertPaymentFrequency,
+  calculateInterestPortion,
+  enrichDebt,
+} from "@/utils/debts/debtCalculations";
 import { DEBT_STATUS } from "@/constants/debts";
 import type { PaymentFrequency, DebtAccount } from "@/types/debt";
 
@@ -64,11 +68,11 @@ interface BillConnectionOptions {
   connectionData: ConnectionData | null;
   cleanDebtData: DebtData;
   createdDebt: CreatedDebt;
-  createEnvelope: (data: { 
-    name: string; 
-    targetAmount: number; 
-    currentBalance: number; 
-    category: string 
+  createEnvelope: (data: {
+    name: string;
+    targetAmount: number;
+    currentBalance: number;
+    category: string;
   }) => Promise<Envelope>;
   createBill: (data: {
     name: string;
@@ -127,7 +131,11 @@ interface UpdateDebtOptions {
   debtId: string;
   updates: Partial<Debt>;
   author?: string;
-  updateDebtData: (params: { id: string; updates: Partial<Debt>; author?: string }) => Promise<void>;
+  updateDebtData: (params: {
+    id: string;
+    updates: Partial<Debt>;
+    author?: string;
+  }) => Promise<void>;
 }
 
 interface DeleteDebtOptions {
@@ -173,19 +181,17 @@ export const createEnvelopeAndBillForDebt = async (
  * Handle bill connections for debt
  */
 export const handleBillConnectionsForDebt = async (options: BillConnectionOptions) => {
-  const {
-    connectionData,
-    cleanDebtData,
-    createdDebt,
-    createEnvelope,
-    createBill,
-    updateBill,
-  } = options;
+  const { connectionData, cleanDebtData, createdDebt, createEnvelope, createBill, updateBill } =
+    options;
 
   if (!connectionData) return;
 
-  const { paymentMethod, createBill: shouldCreateBill, existingBillId, newEnvelopeName } =
-    connectionData;
+  const {
+    paymentMethod,
+    createBill: shouldCreateBill,
+    existingBillId,
+    newEnvelopeName,
+  } = connectionData;
 
   if (paymentMethod === "create_new" && shouldCreateBill) {
     await createEnvelopeAndBillForDebt(
@@ -205,7 +211,7 @@ export const handleBillConnectionsForDebt = async (options: BillConnectionOption
  * Build debt with payment history
  */
 export const buildDebtWithPayment = (
-  debt: Debt, 
+  debt: Debt,
   paymentInfo: {
     amount: number;
     paymentDate: string;
@@ -243,11 +249,16 @@ export const buildDebtWithPayment = (
 /**
  * Create a new debt with optional bill and envelope integration
  */
-export const createDebtOperation = async (debtData: DebtData & { connectionData?: ConnectionData }, options: CreateDebtOptions) => {
+export const createDebtOperation = async (
+  debtData: DebtData & { connectionData?: ConnectionData },
+  options: CreateDebtOptions
+) => {
   const { connectionData, createEnvelope, createBill, updateBill, createDebtData } = options;
-  
+
   try {
-    logger.info("Creating debt with data", { debtData: debtData as unknown as Record<string, unknown> });
+    logger.info("Creating debt with data", {
+      debtData: debtData as unknown as Record<string, unknown>,
+    });
 
     const { connectionData: _, ...cleanDebtData } = debtData;
     const createdDebt = await createDebtData(cleanDebtData);
@@ -274,7 +285,7 @@ export const createDebtOperation = async (debtData: DebtData & { connectionData?
  */
 export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
   const { debt, paymentData, updateDebtData, createTransaction } = options;
-  
+
   try {
     const { amount, paymentDate, notes } = paymentData;
 
@@ -313,7 +324,7 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
  */
 export const linkDebtToBillOperation = async (options: LinkDebtToBillOptions) => {
   const { debtId, billId, debts, bills, updateBill, updateDebtData } = options;
-  
+
   try {
     const debt = debts.find((d) => d.id === debtId);
     const bill = bills.find((b) => b.id === billId);
@@ -349,7 +360,7 @@ export const linkDebtToBillOperation = async (options: LinkDebtToBillOptions) =>
  */
 export const syncDebtDueDatesOperation = async (options: SyncDebtDueDatesOptions) => {
   const { debts, bills, updateDebtData } = options;
-  
+
   try {
     const syncPromises = debts.map(async (debt) => {
       const linkedBill = bills.find((bill) => bill.debtId === debt.id);
@@ -376,7 +387,7 @@ export const syncDebtDueDatesOperation = async (options: SyncDebtDueDatesOptions
  */
 export const updateDebtOperation = async (options: UpdateDebtOptions) => {
   const { debtId, updates, author = "Unknown User", updateDebtData } = options;
-  
+
   try {
     if (!debtId) {
       throw new Error("Debt ID is required for update");
@@ -400,7 +411,7 @@ export const updateDebtOperation = async (options: UpdateDebtOptions) => {
  */
 export const deleteDebtOperation = async (options: DeleteDebtOptions) => {
   const { debtId, bills, deleteBill, deleteDebtData } = options;
-  
+
   try {
     // Find and delete related bill
     const relatedBill = bills.find((bill) => bill.debtId === debtId);
@@ -452,7 +463,12 @@ export const enrichDebtsWithRelations = (
     );
 
     // Enrich the debt with calculated properties
-    const enrichedDebt = enrichDebt(debt as unknown as DebtAccount, relatedBill || null, relatedEnvelope, relatedTransactions);
+    const enrichedDebt = enrichDebt(
+      debt as unknown as DebtAccount,
+      relatedBill || null,
+      relatedEnvelope,
+      relatedTransactions
+    );
 
     // Log first debt enrichment details
     if (index === 0) {
@@ -468,7 +484,9 @@ export const enrichDebtsWithRelations = (
           id: enrichedDebt.id,
           name: enrichedDebt.name,
           status: enrichedDebt.status,
-          currentBalance: (enrichedDebt as unknown as { currentBalance?: number }).currentBalance ?? enrichedDebt.balance,
+          currentBalance:
+            (enrichedDebt as unknown as { currentBalance?: number }).currentBalance ??
+            enrichedDebt.balance,
           minimumPayment: enrichedDebt.minimumPayment,
           interestRate: enrichedDebt.interestRate,
           payoffInfo: enrichedDebt.payoffInfo,

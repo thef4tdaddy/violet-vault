@@ -113,10 +113,16 @@ export class ContextAnalysisService {
   static getFallbackContext(): PageContext {
     return {
       page: "unknown",
-      route: { currentPage: "unknown", pathname: window.location.pathname } as ReturnType<typeof PageDetectionService.getRouteInfo>,
-      screen: { documentTitle: document.title || "Unknown" } as ReturnType<typeof PageDetectionService.getScreenContext>,
+      route: { currentPage: "unknown", pathname: window.location.pathname } as ReturnType<
+        typeof PageDetectionService.getRouteInfo
+      >,
+      screen: { documentTitle: document.title || "Unknown" } as ReturnType<
+        typeof PageDetectionService.getScreenContext
+      >,
       userLocation: "unknown",
-      ui: { modals: [], forms: [], buttons: [], inputs: [] } as ReturnType<typeof UIStateService.getUIState>,
+      ui: { modals: [], forms: [], buttons: [], inputs: [] } as ReturnType<
+        typeof UIStateService.getUIState
+      >,
       performance: { available: false },
       accessibility: { available: false },
       data: { available: false },

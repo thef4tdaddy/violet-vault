@@ -201,7 +201,10 @@ export const useLoginMutation = () => {
   const { setAuthenticated, setError, setLoading } = useAuth();
 
   return useMutation<LoginResult, Error, LoginMutationVariables>({
-    mutationFn: async ({ password, userData = null }: LoginMutationVariables): Promise<LoginResult> => {
+    mutationFn: async ({
+      password,
+      userData = null,
+    }: LoginMutationVariables): Promise<LoginResult> => {
       logger.auth("TanStack Login attempt started.", {
         hasPassword: !!password,
         hasUserData: !!userData,

@@ -258,7 +258,10 @@ const matchesAttributeFilters = (goal, filters) => {
 /**
  * Filter savings goals by status and other criteria
  */
-export const filterSavingsGoals = (goals: unknown[], filters: { status?: string; includeCompleted?: boolean } = {}) => {
+export const filterSavingsGoals = (
+  goals: unknown[],
+  filters: { status?: string; includeCompleted?: boolean } = {}
+) => {
   const { status = "all", includeCompleted = true } = filters;
 
   return goals.filter((goal) => {

@@ -16,7 +16,7 @@ export const createEnhancedOperations = (operationsHook: unknown, dataHook: unkn
     transferFunds: (data: unknown) => Promise<unknown>;
     bulkOperation: (op: string, trans: unknown[], updates: unknown) => Promise<unknown>;
   };
-  
+
   const data = dataHook as {
     refetch: () => Promise<unknown>;
   };
@@ -67,7 +67,10 @@ export const createEnhancedOperations = (operationsHook: unknown, dataHook: unkn
     /**
      * Split transaction with automatic data refresh
      */
-    splitTransactionWithRefresh: async (originalTransaction: unknown, splitTransactions: unknown[]) => {
+    splitTransactionWithRefresh: async (
+      originalTransaction: unknown,
+      splitTransactions: unknown[]
+    ) => {
       try {
         const result = await ops.splitTransaction(originalTransaction, splitTransactions);
         await data.refetch();
@@ -95,7 +98,11 @@ export const createEnhancedOperations = (operationsHook: unknown, dataHook: unkn
     /**
      * Bulk operation with automatic data refresh
      */
-    bulkOperationWithRefresh: async (operation: string, transactions: unknown[], updates: unknown) => {
+    bulkOperationWithRefresh: async (
+      operation: string,
+      transactions: unknown[],
+      updates: unknown
+    ) => {
       try {
         const result = await ops.bulkOperation(operation, transactions, updates);
         await data.refetch();

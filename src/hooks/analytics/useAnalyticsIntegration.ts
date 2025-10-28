@@ -135,10 +135,7 @@ export const useAnalyticsIntegration = ({
   );
 
   // Performance metrics for monitoring
-  const performance = useMemo(
-    () => calculatePerformanceMetrics(analyticsData),
-    [analyticsData]
-  );
+  const performance = useMemo(() => calculatePerformanceMetrics(analyticsData), [analyticsData]);
 
   return {
     // Core analytics data

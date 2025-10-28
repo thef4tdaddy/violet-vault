@@ -51,13 +51,7 @@ export const useAutoFunding = () => {
       const cleanup = dataHook.enableAutoSave(currentData, 30000);
       return cleanup;
     }
-  }, [
-    dataHook.isInitialized,
-    dataHook.hasUnsavedChanges,
-    dataHook,
-    rulesHook,
-    historyHook,
-  ]);
+  }, [dataHook.isInitialized, dataHook.hasUnsavedChanges, dataHook, rulesHook, historyHook]);
 
   // Enhanced rule execution with history tracking
   const executeRules = useCallback(

@@ -106,9 +106,7 @@ describe("SavingsGoals", () => {
 
     it("should display empty state when no goals exist", () => {
       render(<SavingsGoals {...defaultProps} />);
-      expect(
-        screen.getByText(/No savings goals yet/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/No savings goals yet/i)).toBeInTheDocument();
     });
 
     it("should render goals when they exist", () => {
@@ -128,13 +126,7 @@ describe("SavingsGoals", () => {
     it("should display distribute button when unassigned cash is available", () => {
       const goals = [{ id: "1", name: "Goal", balance: 0, targetAmount: 100 }];
 
-      render(
-        <SavingsGoals
-          {...defaultProps}
-          savingsGoals={goals}
-          unassignedCash={100}
-        />
-      );
+      render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={100} />);
 
       expect(screen.getByText(/Distribute Cash/i)).toBeInTheDocument();
     });
@@ -142,21 +134,13 @@ describe("SavingsGoals", () => {
     it("should not display distribute button when no unassigned cash", () => {
       const goals = [{ id: "1", name: "Goal", balance: 0, targetAmount: 100 }];
 
-      render(
-        <SavingsGoals
-          {...defaultProps}
-          savingsGoals={goals}
-          unassignedCash={0}
-        />
-      );
+      render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={0} />);
 
       expect(screen.queryByText(/Distribute Cash/i)).not.toBeInTheDocument();
     });
 
     it("should not display distribute button when no goals exist", () => {
-      render(
-        <SavingsGoals {...defaultProps} savingsGoals={[]} unassignedCash={100} />
-      );
+      render(<SavingsGoals {...defaultProps} savingsGoals={[]} unassignedCash={100} />);
 
       expect(screen.queryByText(/Distribute Cash/i)).not.toBeInTheDocument();
     });
@@ -216,13 +200,7 @@ describe("SavingsGoals", () => {
 
       const goals = [{ id: "1", name: "Goal", balance: 0, targetAmount: 100 }];
 
-      render(
-        <SavingsGoals
-          {...defaultProps}
-          savingsGoals={goals}
-          unassignedCash={100}
-        />
-      );
+      render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={100} />);
 
       const distributeButton = screen.getByText(/Distribute Cash/i);
       await userEvent.click(distributeButton);
@@ -273,20 +251,13 @@ describe("SavingsGoals", () => {
 
   describe("Default Props", () => {
     it("should handle missing savingsGoals prop", () => {
-      render(
-        <SavingsGoals
-          {...defaultProps}
-          savingsGoals={undefined}
-        />
-      );
+      render(<SavingsGoals {...defaultProps} savingsGoals={undefined} />);
 
       expect(screen.getByText(/No savings goals yet/i)).toBeInTheDocument();
     });
 
     it("should handle missing unassignedCash prop", () => {
-      render(
-        <SavingsGoals {...defaultProps} unassignedCash={undefined} />
-      );
+      render(<SavingsGoals {...defaultProps} unassignedCash={undefined} />);
 
       expect(screen.getByTestId("savings-summary")).toBeInTheDocument();
     });

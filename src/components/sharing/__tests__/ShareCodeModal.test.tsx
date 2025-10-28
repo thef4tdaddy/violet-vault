@@ -42,9 +42,7 @@ vi.mock("@/utils/common/logger", () => ({
 
 // Mock components
 vi.mock("qrcode.react", () => ({
-  QRCodeSVG: ({ value }) => (
-    <div data-testid="qr-code">{value}</div>
-  ),
+  QRCodeSVG: ({ value }) => <div data-testid="qr-code">{value}</div>,
 }));
 
 vi.mock("@/components/ui", () => ({
@@ -150,7 +148,7 @@ describe("ShareCodeModal", () => {
     it("should copy share code to clipboard when copy button is clicked", async () => {
       const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
-      
+
       const mockShowSuccessToast = vi.fn();
       vi.mocked(useAuthManager).mockReturnValue({
         user: {
@@ -185,7 +183,7 @@ describe("ShareCodeModal", () => {
     it("should show success message after copying", async () => {
       const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
-      
+
       const mockShowSuccessToast = vi.fn();
       vi.mocked(useAuthManager).mockReturnValue({
         user: {
@@ -212,7 +210,7 @@ describe("ShareCodeModal", () => {
     it("should show error when user is not authenticated", async () => {
       const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
-      
+
       const mockShowErrorToast = vi.fn();
       vi.mocked(useAuthManager).mockReturnValue({
         user: {
@@ -237,7 +235,7 @@ describe("ShareCodeModal", () => {
     it("should handle errors when generating share code", async () => {
       const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
-      
+
       const mockShowErrorToast = vi.fn();
       vi.mocked(useAuthManager).mockReturnValue({
         user: {

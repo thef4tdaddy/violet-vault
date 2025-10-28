@@ -30,7 +30,8 @@ const useConfirmStore = create<ConfirmStore>((set) => ({
   config: {},
   resolver: null,
 
-  showConfirm: (config: ConfirmConfig, resolver: (value: boolean) => void) => set({ isOpen: true, config, resolver }),
+  showConfirm: (config: ConfirmConfig, resolver: (value: boolean) => void) =>
+    set({ isOpen: true, config, resolver }),
 
   hideConfirm: () => set({ isOpen: false, config: {}, resolver: null }),
 }));

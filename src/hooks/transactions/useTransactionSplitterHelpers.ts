@@ -90,7 +90,13 @@ export const updateSplitHandler = (
 ) => {
   try {
     setSplitAllocations((current) => {
-      const updated = updateSplitField(current, params.splitId, params.field, params.value, params.envelopes);
+      const updated = updateSplitField(
+        current,
+        params.splitId,
+        params.field,
+        params.value,
+        params.envelopes
+      );
 
       // Clear errors when user makes changes
       if (params.errorsLength > 0) {

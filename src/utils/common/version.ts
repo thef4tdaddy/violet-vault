@@ -134,7 +134,10 @@ const getActualCommitTimestamp = () => {
   if (gitCommitDate && gitCommitDate !== "undefined") {
     // Only log once to prevent console spam (Issue #560)
     if (!hasLoggedGitDate) {
-      logger.debug("✅ Using git commit date:", gitCommitDate as unknown as Record<string, unknown>);
+      logger.debug(
+        "✅ Using git commit date:",
+        gitCommitDate as unknown as Record<string, unknown>
+      );
       hasLoggedGitDate = true;
     }
     const commitDate = new Date(gitCommitDate as string);

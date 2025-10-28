@@ -152,13 +152,21 @@ export const useAddContributionMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "contribute"],
-    mutationFn: async ({ goalId, amount, description }: { goalId: string; amount: string | number; description?: string }) => {
+    mutationFn: async ({
+      goalId,
+      amount,
+      description,
+    }: {
+      goalId: string;
+      amount: string | number;
+      description?: string;
+    }) => {
       const goal = await budgetDb.savingsGoals.get(goalId);
       if (!goal) {
         throw new Error(`Savings goal with ID ${goalId} not found`);
       }
 
-      const contributionAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+      const contributionAmount = typeof amount === "string" ? parseFloat(amount) : amount;
       if (isNaN(contributionAmount) || contributionAmount <= 0) {
         throw new Error("Invalid contribution amount");
       }
@@ -225,10 +233,16 @@ export const useDistributeFundsMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "distribute"],
-    mutationFn: async ({ distribution, description = "Fund distribution" }: { distribution: Record<string, string | number>; description?: string }) => {
+    mutationFn: async ({
+      distribution,
+      description = "Fund distribution",
+    }: {
+      distribution: Record<string, string | number>;
+      description?: string;
+    }) => {
       const results = [];
       const totalAmount = Object.values(distribution).reduce(
-        (sum, amount) => sum + (typeof amount === 'string' ? parseFloat(amount) : amount) || 0,
+        (sum, amount) => sum + (typeof amount === "string" ? parseFloat(amount) : amount) || 0,
         0
       );
 
@@ -238,7 +252,7 @@ export const useDistributeFundsMutation = () => {
 
       // Process each goal in the distribution
       for (const [goalId, amount] of Object.entries(distribution)) {
-        const contributionAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+        const contributionAmount = typeof amount === "string" ? parseFloat(amount) : amount;
         if (contributionAmount <= 0) continue;
 
         const goal = await budgetDb.savingsGoals.get(goalId);

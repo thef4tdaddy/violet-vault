@@ -29,7 +29,9 @@ describe("syncHealthHelpers", () => {
 
   describe("getStatusBackgroundColor", () => {
     it("should return blue background for loading states", () => {
-      expect(getStatusBackgroundColor({ status: "HEALTHY", isLoading: true }, false)).toBe("bg-blue-100");
+      expect(getStatusBackgroundColor({ status: "HEALTHY", isLoading: true }, false)).toBe(
+        "bg-blue-100"
+      );
       expect(getStatusBackgroundColor({ status: "HEALTHY" }, true)).toBe("bg-blue-100");
     });
 

@@ -17,13 +17,13 @@ const BillManagerModals = ({
   showBillDetail,
   historyBill,
   editingBill,
-  
+
   // Data
   bills,
   envelopes,
   selectedBills,
   discoveredBills,
-  
+
   // Handlers
   handleCloseModal,
   setShowBulkUpdateModal,
@@ -31,7 +31,7 @@ const BillManagerModals = ({
   setShowBillDetail,
   setHistoryBill,
   handleEditBill,
-  
+
   // Operations
   addBill,
   updateBill,
@@ -39,7 +39,7 @@ const BillManagerModals = ({
   handleBulkUpdate,
   handleAddDiscoveredBills,
   billOperations,
-  
+
   // Callbacks
   onError,
 }) => {

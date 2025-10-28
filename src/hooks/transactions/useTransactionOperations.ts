@@ -36,15 +36,9 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
   const addTransactionMutation = useMutation(
     createAddTransactionMutationConfig(queryClient, categoryRules)
   );
-  const updateTransactionMutation = useMutation(
-    createUpdateTransactionMutationConfig(queryClient)
-  );
-  const deleteTransactionMutation = useMutation(
-    createDeleteTransactionMutationConfig(queryClient)
-  );
-  const splitTransactionMutation = useMutation(
-    createSplitTransactionMutationConfig(queryClient)
-  );
+  const updateTransactionMutation = useMutation(createUpdateTransactionMutationConfig(queryClient));
+  const deleteTransactionMutation = useMutation(createDeleteTransactionMutationConfig(queryClient));
+  const splitTransactionMutation = useMutation(createSplitTransactionMutationConfig(queryClient));
   const transferFundsMutation = useMutation(createTransferFundsMutationConfig(queryClient));
   const bulkOperationMutation = useMutation(
     createBulkOperationMutationConfig(queryClient, categoryRules)

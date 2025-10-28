@@ -176,7 +176,9 @@ class FirebaseMessagingService {
 
       if (token) {
         logger.info("📱 FCM registration token generated successfully");
-        logger.debug("FCM Token (first 20 chars):", { tokenPreview: token.substring(0, 20) + "..." });
+        logger.debug("FCM Token (first 20 chars):", {
+          tokenPreview: token.substring(0, 20) + "...",
+        });
         this.currentToken = token;
 
         // Store token in localStorage for debugging and backup
@@ -326,10 +328,9 @@ class FirebaseMessagingService {
     }
 
     // This would typically be done from your backend
-    logger.info(
-      "🧪 Test message would be sent to token:",
-      { tokenPreview: this.currentToken.substring(0, 20) + "..." }
-    );
+    logger.info("🧪 Test message would be sent to token:", {
+      tokenPreview: this.currentToken.substring(0, 20) + "...",
+    });
     logger.info(
       "💡 Use this token in your Firebase Console or backend service to send test messages"
     );

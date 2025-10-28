@@ -104,9 +104,7 @@ describe("keyManagementService", () => {
     });
 
     it("should handle clipboard errors gracefully", async () => {
-      (navigator.clipboard.writeText as Mock).mockRejectedValueOnce(
-        new Error("Clipboard error")
-      );
+      (navigator.clipboard.writeText as Mock).mockRejectedValueOnce(new Error("Clipboard error"));
 
       await expect(
         keyManagementService.copyKeyToClipboard(mockEncryptionKey, mockSalt)
@@ -230,7 +228,9 @@ describe("keyManagementService", () => {
     });
 
     it("should handle malformed data gracefully", () => {
-      const result = keyManagementService.validateKeyFile(null as unknown as typeof import("@/services/keys/keyManagementService").KeyFileData);
+      const result = keyManagementService.validateKeyFile(
+        null as unknown as typeof import("@/services/keys/keyManagementService").KeyFileData
+      );
 
       expect(result.valid).toBe(false);
       expect(result.error).toBe("Invalid file format");

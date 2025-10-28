@@ -4,12 +4,7 @@
  */
 import logger from "../../../utils/common/logger";
 
-export const useLedgerOperations = (
-  addTransaction,
-  deleteTransaction,
-  updateBill,
-  envelopes
-) => {
+export const useLedgerOperations = (addTransaction, deleteTransaction, updateBill, envelopes) => {
   const handlePayBill = (billPayment) => {
     const billEnvelope = envelopes.find((env) => env.id === billPayment.billId);
     if (billEnvelope) {

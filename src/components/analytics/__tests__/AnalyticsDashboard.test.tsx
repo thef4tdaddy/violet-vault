@@ -79,9 +79,7 @@ vi.mock("./dashboard/AnalyticsLoadingState", () => ({
 }));
 
 vi.mock("./dashboard/AnalyticsErrorState", () => ({
-  default: ({ error }) => (
-    <div data-testid="error-state">Error: {error?.message}</div>
-  ),
+  default: ({ error }) => <div data-testid="error-state">Error: {error?.message}</div>,
 }));
 
 vi.mock("./dashboard/OverviewTabContent", () => ({
@@ -152,7 +150,7 @@ describe("AnalyticsDashboard", () => {
   describe("Tab Navigation", () => {
     it("should switch to spending tab when clicked", async () => {
       render(<AnalyticsDashboard />);
-      
+
       await waitFor(() => {
         expect(screen.getByText("Spending")).toBeInTheDocument();
       });
@@ -167,7 +165,7 @@ describe("AnalyticsDashboard", () => {
 
     it("should switch to trends tab when clicked", async () => {
       render(<AnalyticsDashboard />);
-      
+
       const trendsButton = screen.getByText("Trends");
       await userEvent.click(trendsButton);
 
@@ -178,7 +176,7 @@ describe("AnalyticsDashboard", () => {
 
     it("should switch to overview tab when clicked", async () => {
       render(<AnalyticsDashboard />);
-      
+
       const overviewButton = screen.getByText("Overview");
       await userEvent.click(overviewButton);
 
@@ -191,7 +189,7 @@ describe("AnalyticsDashboard", () => {
   describe("Time Filter", () => {
     it("should allow changing time filter", async () => {
       render(<AnalyticsDashboard />);
-      
+
       await waitFor(() => {
         expect(screen.getByTestId("time-filter")).toBeInTheDocument();
       });
@@ -204,7 +202,7 @@ describe("AnalyticsDashboard", () => {
 
     it("should call useAnalytics with updated period", async () => {
       render(<AnalyticsDashboard />);
-      
+
       await waitFor(() => {
         expect(useAnalytics).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -218,7 +216,7 @@ describe("AnalyticsDashboard", () => {
   describe("Export Functionality", () => {
     it("should open export modal when export button is clicked", async () => {
       render(<AnalyticsDashboard />);
-      
+
       await waitFor(() => {
         expect(screen.getByText("Export")).toBeInTheDocument();
       });
@@ -233,7 +231,7 @@ describe("AnalyticsDashboard", () => {
 
     it("should close export modal when close is clicked", async () => {
       render(<AnalyticsDashboard />);
-      
+
       const exportButton = screen.getByText("Export");
       await userEvent.click(exportButton);
 
@@ -245,9 +243,7 @@ describe("AnalyticsDashboard", () => {
       await userEvent.click(closeButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByTestId("report-exporter")
-        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("report-exporter")).not.toBeInTheDocument();
       });
     });
   });
@@ -289,9 +285,7 @@ describe("AnalyticsDashboard", () => {
 
   describe("Data Integration", () => {
     it("should fetch transactions from store", async () => {
-      const mockTransactions = [
-        { id: "1", amount: 100, category: "Food" },
-      ];
+      const mockTransactions = [{ id: "1", amount: 100, category: "Food" }];
 
       useBudgetStore.mockReturnValue({
         transactions: mockTransactions,
@@ -306,9 +300,7 @@ describe("AnalyticsDashboard", () => {
     });
 
     it("should fetch envelopes from store", async () => {
-      const mockEnvelopes = [
-        { id: "1", name: "Groceries", balance: 500 },
-      ];
+      const mockEnvelopes = [{ id: "1", name: "Groceries", balance: 500 }];
 
       useBudgetStore.mockReturnValue({
         transactions: [],

@@ -138,12 +138,7 @@ export const ManualSyncControls: React.FC<ManualSyncControlsProps> = ({ classNam
             })}
             <div className="flex-1">
               <p className="text-sm text-red-800">{syncError}</p>
-              <Button
-                variant="icon"
-                size="sm"
-                className="ml-2 h-auto p-1"
-                onClick={clearSyncError}
-              >
+              <Button variant="icon" size="sm" className="ml-2 h-auto p-1" onClick={clearSyncError}>
                 Dismiss
               </Button>
             </div>
