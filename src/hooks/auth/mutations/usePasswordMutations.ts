@@ -16,7 +16,7 @@ export const useChangePasswordMutation = () => {
   const { setError } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ oldPassword, newPassword }) => {
+    mutationFn: async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }) => {
       try {
         const savedData = localStorageService.getBudgetData();
         if (!savedData) {

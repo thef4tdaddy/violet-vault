@@ -8,6 +8,7 @@ import localStorageService from "../../../services/storage/localStorageService";
 interface UserInfo {
   userName?: string;
   email?: string;
+  userColor?: string;
   [key: string]: unknown;
 }
 
@@ -52,6 +53,7 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
     joinedVia: "shareCode",
     sharedBy: joinData.sharedBy,
     userName: joinData.userInfo?.userName?.trim() || "Shared User",
+    userColor: joinData.userInfo?.userColor || "#a855f7",
   };
 
   // Save user profile
@@ -133,8 +135,8 @@ export const useJoinBudgetMutation = () => {
       setError(null);
     },
     onSuccess: async (result: JoinBudgetResult) => {
-      if (result.success) {
-        setAuthenticated(result.user, result.sessionData);
+      if (result.success && result.user) {
+        setAuthenticated(result.user as import("@/types/auth").UserData, result.sessionData);
 
         // Start background sync
         try {

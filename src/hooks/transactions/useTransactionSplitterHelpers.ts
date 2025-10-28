@@ -80,7 +80,7 @@ export const addSplitHandler = (
 export const updateSplitHandler = (
   params: {
     splitId: string;
-    field: string;
+    field: keyof SplitAllocation;
     value: unknown;
     envelopes: Envelope[];
     errorsLength: number;
@@ -136,7 +136,7 @@ export const removeSplitHandler = (
 export const autoBalanceHandler = (
   transaction: Transaction,
   setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
-  setErrors: (errors: string[]) => void
+  setErrors: (errorsOrFn: string[] | ((prev: string[]) => string[])) => void
 ) => {
   try {
     setSplitAllocations((current) => {
@@ -163,7 +163,7 @@ export const autoBalanceHandler = (
 export const distributeEvenlyHandler = (
   transaction: Transaction,
   setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
-  setErrors: (errors: string[]) => void
+  setErrors: (errorsOrFn: string[] | ((prev: string[]) => string[])) => void
 ) => {
   try {
     setSplitAllocations((current) => {

@@ -13,7 +13,7 @@ export const useBudgetMutations = () => {
   // Envelope Mutations
   const addEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "add"],
-    mutationFn: async (newEnvelope) => {
+    mutationFn: async (newEnvelope: Record<string, unknown>) => {
       await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
       return newEnvelope;
     },
@@ -30,7 +30,7 @@ export const useBudgetMutations = () => {
 
   const updateEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "update"],
-    mutationFn: async ({ envelopeId, updates }) => {
+    mutationFn: async ({ envelopeId, updates }: { envelopeId: string; updates: Record<string, unknown> }) => {
       await optimisticHelpers.updateEnvelope(queryClient, envelopeId, updates);
       return { envelopeId, updates };
     },
@@ -42,7 +42,7 @@ export const useBudgetMutations = () => {
 
   const deleteEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "delete"],
-    mutationFn: async (envelopeId) => {
+    mutationFn: async (envelopeId: string) => {
       await optimisticHelpers.removeEnvelope(queryClient, envelopeId);
       return envelopeId;
     },
@@ -55,7 +55,7 @@ export const useBudgetMutations = () => {
   // Transaction Mutations
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
-    mutationFn: async (newTransaction) => {
+    mutationFn: async (newTransaction: Record<string, unknown>) => {
       await optimisticHelpers.addTransaction(queryClient, newTransaction);
       return newTransaction;
     },
@@ -73,7 +73,7 @@ export const useBudgetMutations = () => {
 
   const deleteTransactionMutation = useMutation({
     mutationKey: ["transactions", "delete"],
-    mutationFn: (transactionId) => processTransactionDeletion(transactionId),
+    mutationFn: (transactionId: string) => processTransactionDeletion(transactionId),
     onSuccess: () => {
       // Comprehensive cache invalidation for all dashboard components
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
