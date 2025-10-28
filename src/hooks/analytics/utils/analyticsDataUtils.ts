@@ -53,7 +53,7 @@ export const filterTransactionsByDate = (
     try {
       return new Date(t.date!) >= dateRange;
     } catch {
-      logger.warn("Invalid date in transaction:", t.date);
+      logger.warn("Invalid date in transaction:", { date: t.date });
       return false;
     }
   });

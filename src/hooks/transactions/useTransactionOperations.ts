@@ -3,7 +3,7 @@
  * Focused hook for CRUD operations on transactions
  * Created for Issue #508 - extracted from useTransactions.js
  */
-import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import type { Transaction } from "@/types/finance";
 import {
