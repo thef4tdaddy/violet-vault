@@ -1,22 +1,22 @@
 /**
  * Debt form validation utilities
- * Extracted financial validation logic for debt forms
+ * Migrated to use Zod schemas for validation
  */
 
-import type { DebtFormData, DebtFormErrors } from "../../types/debt";
+import { validateDebtFormDataSafe, type DebtFormData } from "@/domain/schemas/debt";
 
 interface ValidationResult {
   isValid: boolean;
-  errors: DebtFormErrors;
+  errors: Record<string, string>;
   warnings: string[];
   parsedData: DebtFormData;
 }
 
 export interface DebtMetrics {
-  payoffTimeMonths: number;
-  monthsToPayoff: number; // Alias for payoffTimeMonths
-  totalInterestPaid: number;
-  totalInterest: number; // Alias for totalInterestPaid
+  payoffTimeMonths: number | null;
+  monthsToPayoff: number | null; // Alias for payoffTimeMonths
+  totalInterestPaid: number | null;
+  totalInterest: number | null; // Alias for totalInterestPaid
   totalAmountPaid: number;
   totalPaid: number; // Additional property for total amount already paid
   effectiveAPR: number;
@@ -26,201 +26,38 @@ export interface DebtMetrics {
   isPaymentSufficient: boolean;
 }
 
-// Helper to parse and validate numeric fields
-const parseNumericField = (value: unknown): number | null => {
-  if (!value) return null;
-  const parsed = parseFloat(String(value));
-  return isNaN(parsed) ? null : parsed;
-};
-
-// Helper to add payment ratio warnings
-const addPaymentRatioWarnings = (
-  currentBalance: number,
-  minimumPayment: number,
-  warnings: string[]
-) => {
-  if (currentBalance <= 0 || minimumPayment <= 0) return;
-
-  const paymentPercent = (minimumPayment / currentBalance) * 100;
-  if (paymentPercent < 1) {
-    warnings.push(
-      "Minimum payment is less than 1% of balance - this will take very long to pay off"
-    );
-  } else if (paymentPercent > 50) {
-    warnings.push("Minimum payment is more than 50% of balance - verify this is correct");
-  }
-};
-
-// Helper to add interest rate warnings
-const addInterestRateWarnings = (interestRate: number, warnings: string[]) => {
-  if (interestRate > 25) {
-    warnings.push("Interest rate is very high - consider debt consolidation options");
-  }
-};
-
-// Helper to add balance comparison warnings
-const addBalanceComparisonWarnings = (
-  currentBalance: number,
-  originalBalance: number | null,
-  warnings: string[]
-) => {
-  if (originalBalance !== null && currentBalance > originalBalance) {
-    warnings.push(
-      "Current balance is higher than original balance - interest and fees may have accrued"
-    );
-  }
-};
-
 /**
  * Validate debt form data with financial business rules
+ * Now uses Zod schema for validation
  */
 export function validateDebtFormData(formData: Record<string, unknown>): ValidationResult {
-  const errors: DebtFormErrors = {};
-  const warnings: string[] = [];
+  const result = validateDebtFormDataSafe(formData);
 
-  // Basic validation
-  checkRequiredTextField(formData.name, "name", errors);
-  checkRequiredTextField(formData.creditor, "creditor", errors);
-
-  // Parse numeric fields
-  const currentBalance = parseNumericField(formData.currentBalance || formData.balance) ?? -1;
-  const originalBalance = parseNumericField(formData.originalBalance);
-  const interestRate = parseNumericField(formData.interestRate) ?? 0;
-  const minimumPayment = parseNumericField(formData.minimumPayment) ?? -1;
-
-  // Validate numeric fields
-  validateNumericFields(
-    { currentBalance, originalBalance, interestRate, minimumPayment },
-    formData,
-    errors
-  );
-
-  // Add warnings
-  addPaymentRatioWarnings(currentBalance, minimumPayment, warnings);
-  addInterestRateWarnings(interestRate, warnings);
-  addBalanceComparisonWarnings(currentBalance, originalBalance, warnings);
+  if (!result.success) {
+    return {
+      isValid: false,
+      errors: result.errors,
+      warnings: [],
+      parsedData: {} as DebtFormData,
+    };
+  }
 
   return {
-    isValid: Object.keys(errors).length === 0,
-    errors,
-    warnings,
-    parsedData: {
-      name: typeof formData.name === "string" ? formData.name.trim() : "",
-      creditor: typeof formData.creditor === "string" ? formData.creditor.trim() : "",
-      type: formData.type,
-      balance: currentBalance,
-      currentBalance, // Add alias for compatibility
-      originalBalance: originalBalance ?? currentBalance,
-      interestRate,
-      minimumPayment,
-      status: formData.status,
-      paymentFrequency: formData.paymentFrequency,
-      compoundFrequency: formData.compoundFrequency,
-      notes: typeof formData.notes === "string" ? formData.notes.trim() : "",
-      specialTerms: formData.specialTerms,
-    } as DebtFormData,
+    isValid: true,
+    errors: {},
+    warnings: result.warnings,
+    parsedData: result.data!,
   };
 }
-
-// Helper to validate numeric fields
-const validateNumericFields = (
-  fields: {
-    currentBalance: number;
-    originalBalance: number | null;
-    interestRate: number;
-    minimumPayment: number;
-  },
-  formData: Record<string, unknown>,
-  errors: DebtFormErrors
-) => {
-  if (fields.currentBalance < 0) {
-    errors.balance = "Valid current balance is required";
-    errors.currentBalance = "Valid current balance is required"; // Alias for compatibility
-  }
-  if (fields.originalBalance !== null && fields.originalBalance < 0) {
-    errors.originalBalance = "Original balance must be positive";
-  }
-  if (formData.interestRate && (fields.interestRate < 0 || fields.interestRate > 100)) {
-    errors.interestRate = "Interest rate must be between 0 and 100";
-  }
-  if (fields.minimumPayment < 0) {
-    errors.minimumPayment = "Valid minimum payment is required";
-  }
-};
-
-// Helper functions to reduce complexity
-const isValidNumber = (value: unknown): boolean => {
-  const num = parseFloat(String(value));
-  return !isNaN(num) && num >= 0;
-};
-
-const checkRequiredTextField = (
-  value: unknown,
-  fieldName: string,
-  errors: Record<string, string>
-) => {
-  if (!value || typeof value !== "string" || !value.trim()) {
-    errors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
-  }
-};
-
-const checkBalanceField = (
-  value: unknown,
-  fieldName: string,
-  required: boolean,
-  errors: Record<string, string>
-) => {
-  if (required) {
-    if (!value || !isValidNumber(value)) {
-      errors[fieldName] = `Valid ${fieldName.replace(/([A-Z])/g, " $1").toLowerCase()} is required`;
-    }
-  } else if (value) {
-    const num = parseFloat(String(value));
-    if (isNaN(num) || num < 0) {
-      errors[fieldName] =
-        `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be positive`;
-    }
-  }
-};
-
-const checkInterestRate = (value: unknown, errors: Record<string, string>) => {
-  if (value) {
-    const rate = parseFloat(String(value));
-    if (isNaN(rate) || rate < 0 || rate > 100) {
-      errors.interestRate = "Interest rate must be between 0 and 100";
-    }
-  }
-};
-
-const checkPaymentMethodFields = (
-  formData: Record<string, unknown>,
-  errors: Record<string, string>
-) => {
-  if (formData.paymentMethod === "connect_existing" && !formData.existingBillId) {
-    errors.existingBillId = "Please select a bill to connect";
-  }
-
-  if (formData.paymentMethod === "create_new" && formData.createBill && !formData.envelopeId) {
-    errors.envelopeId = "Please select an envelope for payment funding";
-  }
-};
 
 /**
  * Validate debt form fields (for useDebtForm hook)
  * Returns object with field-specific error messages
+ * Now uses Zod schema for validation
  */
 export function validateDebtFormFields(formData: Record<string, unknown>): Record<string, string> {
-  const errors: Record<string, string> = {};
-
-  checkRequiredTextField(formData.name, "name", errors);
-  checkRequiredTextField(formData.creditor, "creditor", errors);
-  checkBalanceField(formData.currentBalance, "currentBalance", true, errors);
-  checkBalanceField(formData.originalBalance, "originalBalance", false, errors);
-  checkInterestRate(formData.interestRate, errors);
-  checkBalanceField(formData.minimumPayment, "minimumPayment", true, errors);
-  checkPaymentMethodFields(formData, errors);
-
-  return errors;
+  const result = validateDebtFormDataSafe(formData);
+  return result.errors;
 }
 
 // Helper to calculate payoff metrics with interest
@@ -228,7 +65,11 @@ function calculatePayoffMetrics(
   currentBalance: number,
   minimumPayment: number,
   monthlyInterestRate: number
-): { payoffTimeMonths: number; totalInterestPaid: number; isPaymentSufficient: boolean } {
+): {
+  payoffTimeMonths: number | null;
+  totalInterestPaid: number | null;
+  isPaymentSufficient: boolean;
+} {
   if (monthlyInterestRate === 0) {
     return {
       payoffTimeMonths: currentBalance / minimumPayment,
@@ -239,8 +80,8 @@ function calculatePayoffMetrics(
 
   if (minimumPayment <= currentBalance * monthlyInterestRate) {
     return {
-      payoffTimeMonths: 999,
-      totalInterestPaid: currentBalance * 10,
+      payoffTimeMonths: null,
+      totalInterestPaid: null,
       isPaymentSufficient: false,
     };
   }
@@ -286,16 +127,18 @@ export function calculateDebtMetrics(debtData: {
 
   const totalPaid = Math.max(0, originalBalance - currentBalance);
   const paymentToBalanceRatio = minimumPayment / currentBalance;
-  const totalAmountPaid = currentBalance + totalInterestPaid;
+  const totalAmountPaid = currentBalance + (totalInterestPaid ?? 0);
   const payoffDate = new Date();
-  payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(payoffTimeMonths));
+  if (payoffTimeMonths !== null) {
+    payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(payoffTimeMonths));
+  }
 
   const effectiveAPR = Math.pow(1 + monthlyInterestRate, 12) - 1;
   const monthlyInterestCost = currentBalance * monthlyInterestRate;
 
   return {
-    payoffTimeMonths: Math.ceil(payoffTimeMonths),
-    monthsToPayoff: Math.ceil(payoffTimeMonths), // Alias
+    payoffTimeMonths: payoffTimeMonths !== null ? Math.ceil(payoffTimeMonths) : null,
+    monthsToPayoff: payoffTimeMonths !== null ? Math.ceil(payoffTimeMonths) : null, // Alias
     totalInterestPaid,
     totalInterest: totalInterestPaid, // Alias
     totalAmountPaid,
