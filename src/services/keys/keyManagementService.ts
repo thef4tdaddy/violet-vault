@@ -36,7 +36,7 @@ class KeyManagementService {
       const keyBuffer =
         typeof encryptionKey === "string" ? new TextEncoder().encode(encryptionKey) : encryptionKey;
 
-      const hashBuffer = await crypto.subtle.digest("SHA-256", keyBuffer);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", keyBuffer as ArrayBuffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
@@ -332,7 +332,8 @@ class KeyManagementService {
         // Decrypt the key and salt
         const decryptedData = await encryptionUtils.decrypt(
           keyFileData.encryptedKey,
-          importKeyData.key
+          importKeyData.key,
+          keyFileData.iv
         );
         const parsedData = JSON.parse(decryptedData);
 

@@ -128,6 +128,7 @@ export const initHighlight = () => {
 };
 
 // Disabled function to avoid unused declaration error
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _setupConsoleCapture(): void {
   // Disabled function - console capture commented out
   // to avoid conflicts with other error tracking
@@ -244,7 +245,7 @@ class ErrorReportingFallback {
         // Send queued errors
         for (const errorData of this.queue) {
           const errorMessage = (errorData.error as { message?: string })?.message ?? "Unknown error";
-          H.consumeError(new Error(errorMessage), errorData.context as Record<string, unknown>);
+          H.consumeError(new Error(errorMessage), JSON.stringify(errorData.context));
         }
 
         this.queue = [];
@@ -276,7 +277,7 @@ const errorFallback = new ErrorReportingFallback();
 export const captureError = (error: Error, context: Record<string, unknown> = {}) => {
   try {
     // Try Highlight.io first
-    H.consumeError(error, context);
+    H.consumeError(error, JSON.stringify(context));
   } catch (highlightError) {
     // Fallback to local storage and retry mechanism
     errorFallback.addError(error, context);

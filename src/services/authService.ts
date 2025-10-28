@@ -94,6 +94,7 @@ export const validatePassword = async (password: string): Promise<boolean> => {
     logger.auth("validatePassword: Key derived successfully");
 
     // Attempt to decrypt the data to validate the password
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
 
     logger.auth("validatePassword: Decryption successful - password is correct");
@@ -145,7 +146,7 @@ export const login = async (password: string, userData: UserData | null = null) 
         // Log key derivation for cross-browser sync debugging
         if (import.meta?.env?.MODE === "development") {
           const saltPreview =
-            Array.from(newSalt.slice(0, 8))
+            Array.from(newSalt.slice(0, 8) as Uint8Array)
               .map((b) => b.toString(16).padStart(2, "0"))
               .join("") + "...";
           logger.auth("Key derived deterministically for cross-browser sync", {
@@ -278,7 +279,7 @@ export const login = async (password: string, userData: UserData | null = null) 
         // Debug encryption key derivation for cross-browser sync troubleshooting
         if (import.meta?.env?.MODE === "development") {
           const saltPreview =
-            Array.from(deterministicSalt.slice(0, 8))
+            Array.from(deterministicSalt.slice(0, 8) as Uint8Array)
               .map((b) => b.toString(16).padStart(2, "0"))
               .join("") + "...";
           logger.auth("Using deterministic key derivation for cross-browser sync", {
