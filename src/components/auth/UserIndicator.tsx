@@ -4,7 +4,23 @@ import { getIcon } from "../../utils";
 import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
-const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
+interface UserIndicatorProps {
+  currentUser: {
+    userName: string;
+    userColor: string;
+    budgetId?: string;
+    [key: string]: unknown;
+  } | null;
+  onUserChange?: () => void;
+  onUpdateProfile?: (updates: {
+    userName: string;
+    userColor: string;
+    budgetId?: string;
+    [key: string]: unknown;
+  }) => Promise<void>;
+}
+
+const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }: UserIndicatorProps) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showKeyManagement, setShowKeyManagement] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);

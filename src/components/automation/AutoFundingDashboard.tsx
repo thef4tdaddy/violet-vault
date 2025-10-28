@@ -4,7 +4,6 @@ import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
-import { TRIGGER_TYPES } from "@/utils/budgeting/autofunding";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import logger from "@/utils/common/logger";
@@ -16,8 +15,6 @@ import {
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const envelopes = useBudgetStore((state) => state.envelopes);
-  const _unassignedCash = useBudgetStore((state) => state.unassignedCash);
-  const _allTransactions = useBudgetStore((state) => state.allTransactions);
   const confirm = useConfirm();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
@@ -87,7 +84,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
     setIsExecuting(true);
     try {
-      const result = await executeRules(TRIGGER_TYPES.MANUAL);
+      const result = await executeRules(false);
 
       if (result.success && 'execution' in result) {
         const totalFunded = result.execution.totalFunded || 0;

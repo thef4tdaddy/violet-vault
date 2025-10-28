@@ -403,7 +403,7 @@ export const formatTransactionForDisplay = (transaction: TransactionBase, option
   try {
     const { currency = "USD", dateFormat = "short", includeTime = false } = options;
 
-    const formatted = { ...transaction };
+    const formatted: FormattedTransaction = { ...transaction };
 
     // Format amount
     formatted.formattedAmount = new Intl.NumberFormat("en-US", {

@@ -4,6 +4,7 @@
  * Created for Issue #508 - extracted from TransactionSplitter.jsx
  */
 import { useState, useEffect, useCallback } from "react";
+import type { Transaction, Envelope, SplitAllocation } from "@/types/finance";
 import {
   initializeSplitsHandler,
   addSplitHandler,
@@ -16,21 +17,24 @@ import {
   calculateSplitComputedProperties,
 } from "./useTransactionSplitterHelpers";
 
+interface UseTransactionSplitterOptions {
+  transaction?: Transaction;
+  envelopes?: Envelope[];
+  onSplit?: (splitTransactions: Transaction[], transaction: Transaction) => Promise<void>;
+}
+
 /**
  * Hook for managing transaction splitting functionality
- * @param {Object} options - Hook options
- * @param {Object} options.transaction - Transaction to split
- * @param {Array} options.envelopes - Available envelopes
- * @param {Function} options.onSplit - Callback when split is completed
- * @returns {Object} Splitter state and actions
+ * @param options - Hook options
+ * @returns Splitter state and actions
  */
-const useTransactionSplitter = (options = {}) => {
-  const { transaction, envelopes = [], onSplit } = options || {};
+const useTransactionSplitter = (options: UseTransactionSplitterOptions = {}) => {
+  const { transaction, envelopes = [], onSplit } = options;
 
   // Core state
-  const [splitAllocations, setSplitAllocations] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const [splitAllocations, setSplitAllocations] = useState<SplitAllocation[]>([]);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   /**
    * Initialize splits when transaction changes
@@ -55,7 +59,7 @@ const useTransactionSplitter = (options = {}) => {
    * Update a split field
    */
   const updateSplit = useCallback(
-    (splitId, field, value) => {
+    (splitId: string, field: keyof SplitAllocation, value: unknown) => {
       updateSplitHandler(
         { splitId, field, value, envelopes, errorsLength: errors.length },
         setSplitAllocations,
@@ -68,7 +72,7 @@ const useTransactionSplitter = (options = {}) => {
   /**
    * Remove a split allocation
    */
-  const removeSplitById = useCallback((splitId) => {
+  const removeSplitById = useCallback((splitId: string) => {
     removeSplitHandler(splitId, setSplitAllocations, setErrors);
   }, []);
 
