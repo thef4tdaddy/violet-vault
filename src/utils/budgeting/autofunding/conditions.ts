@@ -9,7 +9,7 @@ import { CONDITION_TYPES, TRIGGER_TYPES } from "./rules.ts";
 /**
  * Envelope interface
  */
-interface Envelope {
+export interface Envelope {
   id: string;
   currentBalance: number;
   [key: string]: unknown;
@@ -18,19 +18,20 @@ interface Envelope {
 /**
  * Condition interface
  */
-interface Condition {
+export interface Condition {
+  id?: string;
   type: string;
-  envelopeId?: string;
+  envelopeId?: string | null;
   value: number;
   operator?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 /**
  * Execution context
  */
-interface ExecutionContext {
+export interface ExecutionContext {
   data: {
     envelopes: Envelope[];
     unassignedCash: number;
@@ -43,7 +44,7 @@ interface ExecutionContext {
 /**
  * Rule configuration
  */
-interface Rule {
+export interface Rule {
   enabled: boolean;
   trigger: string;
   type: string;
@@ -56,7 +57,7 @@ interface Rule {
 /**
  * Filter criteria for conditions
  */
-interface FilterCriteria {
+export interface FilterCriteria {
   type?: string;
   envelopeId?: string;
 }

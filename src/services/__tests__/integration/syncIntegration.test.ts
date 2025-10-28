@@ -1,5 +1,5 @@
 // Sync Integration Tests - Real End-to-End Testing
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import firebaseSyncService from "@/services/firebaseSyncService";
@@ -9,15 +9,62 @@ import { encryptionUtils } from "@/utils/security/encryption";
 // Test configuration
 const TEST_TIMEOUT = 30000; // 30 seconds for real operations
 
+interface Envelope {
+  id: string;
+  name: string;
+  category: string;
+  balance: number;
+  targetAmount: number;
+  archived: boolean;
+  lastModified: number;
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  description: string;
+  envelopeId: string;
+  category: string;
+  date: string;
+  type: string;
+  lastModified: number;
+}
+
+interface Bill {
+  id: string;
+  name: string;
+  amount: number;
+  dueDate: Date;
+  isPaid: boolean;
+  isRecurring: boolean;
+  frequency: string;
+  category: string;
+  lastModified: number;
+}
+
+interface TestData {
+  envelopes: Envelope[];
+  transactions: Transaction[];
+  bills: Bill[];
+  unassignedCash: number;
+  actualBalance: number;
+  lastActivity: {
+    userName: string;
+    timestamp: number;
+    userColor: string;
+    deviceFingerprint: string;
+  };
+}
+
 describe("Sync Integration Tests", () => {
-  let testBudgetId;
-  let testEncryptionKey;
-  let testData;
+  let testBudgetId: string;
+  let testEncryptionKey: unknown;
+  let testData: TestData;
 
   beforeEach(async () => {
     // Generate real test credentials
     testBudgetId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    testEncryptionKey = await encryptionUtils.generateEncryptionKey("test_password_123");
+    testEncryptionKey = await encryptionUtils.generateKey("test_password_123");
 
     // Create realistic test data
     testData = {
@@ -114,9 +161,9 @@ describe("Sync Integration Tests", () => {
         await budgetDatabaseService.saveEnvelopes(testData.envelopes);
 
         // Retrieve envelopes
-        const retrievedEnvelopes = await budgetDatabaseService.getEnvelopes({
+        const retrievedEnvelopes = (await budgetDatabaseService.getEnvelopes({
           useCache: false,
-        });
+        })) as Envelope[];
 
         expect(retrievedEnvelopes).toHaveLength(2);
         expect(retrievedEnvelopes[0].name).toBe("Food");
@@ -136,10 +183,10 @@ describe("Sync Integration Tests", () => {
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        const transactions = await budgetDatabaseService.getTransactions({
+        const transactions = (await budgetDatabaseService.getTransactions({
           dateRange: { start: yesterday, end: tomorrow },
           limit: 10,
-        });
+        })) as Transaction[];
 
         expect(transactions).toHaveLength(2);
         expect(transactions[0].description).toBe("Grocery Store");
@@ -155,10 +202,10 @@ describe("Sync Integration Tests", () => {
         await budgetDatabaseService.saveBills(testData.bills);
 
         // Get unpaid bills
-        const unpaidBills = await budgetDatabaseService.getBills({
+        const unpaidBills = (await budgetDatabaseService.getBills({
           isPaid: false,
           daysAhead: 30,
-        });
+        })) as Bill[];
 
         expect(unpaidBills).toHaveLength(1);
         expect(unpaidBills[0].name).toBe("Rent");
@@ -172,9 +219,9 @@ describe("Sync Integration Tests", () => {
         };
         await budgetDatabaseService.saveBills([updatedBill]);
 
-        const paidBills = await budgetDatabaseService.getBills({
+        const paidBills = (await budgetDatabaseService.getBills({
           isPaid: true,
-        });
+        })) as Bill[];
 
         expect(paidBills).toHaveLength(1);
         expect(paidBills[0].isPaid).toBe(true);
@@ -204,16 +251,16 @@ describe("Sync Integration Tests", () => {
           budgetDatabaseService.getBudgetMetadata(),
         ]);
 
-        expect(envelopes).toHaveLength(2);
-        expect(transactions).toHaveLength(2);
-        expect(bills).toHaveLength(1);
-        expect(metadata.unassignedCash).toBe(1000);
-        expect(metadata.actualBalance).toBe(5000);
+        expect((envelopes as Envelope[])).toHaveLength(2);
+        expect((transactions as Transaction[])).toHaveLength(2);
+        expect((bills as Bill[])).toHaveLength(1);
+        expect((metadata as { unassignedCash: number; actualBalance: number }).unassignedCash).toBe(1000);
+        expect((metadata as { unassignedCash: number; actualBalance: number }).actualBalance).toBe(5000);
 
         // Verify relationships
-        const foodTransactions = await budgetDatabaseService.getTransactions({
+        const foodTransactions = (await budgetDatabaseService.getTransactions({
           envelopeId: "env1",
-        });
+        })) as Transaction[];
         expect(foodTransactions).toHaveLength(1);
         expect(foodTransactions[0].description).toBe("Grocery Store");
       },
@@ -236,8 +283,8 @@ describe("Sync Integration Tests", () => {
     it("should prepare data for encryption correctly", async () => {
       // Test data preparation without actual cloud save
       try {
-        const encryptedData = (await firebaseSyncService.encryptForCloud)
-          ? await firebaseSyncService.encryptForCloud(testData)
+        const encryptedData = (firebaseSyncService as unknown as { encryptForCloud?: (data: TestData) => Promise<{ success: boolean; data: string }> }).encryptForCloud
+          ? await (firebaseSyncService as unknown as { encryptForCloud: (data: TestData) => Promise<{ success: boolean; data: string }> }).encryptForCloud(testData)
           : { success: true, data: "encrypted" };
 
         // If using demo config, this might not work, which is fine
@@ -246,7 +293,7 @@ describe("Sync Integration Tests", () => {
         }
       } catch (error) {
         // Expected when using demo Firebase config
-        expect(error.message).toBeTruthy();
+        expect((error as Error).message).toBeTruthy();
       }
     });
 
@@ -332,7 +379,7 @@ describe("Sync Integration Tests", () => {
         const saveSuccess = await chunkedSyncService.saveToCloud(largeData, currentUser);
         expect(saveSuccess).toBe(true);
 
-        const loadedData = await chunkedSyncService.loadFromCloud();
+        const loadedData = (await chunkedSyncService.loadFromCloud()) as { transactions: Transaction[]; envelopes: Envelope[]; bills: Bill[] };
         expect(loadedData.transactions).toHaveLength(1200);
       },
       TEST_TIMEOUT
@@ -366,11 +413,11 @@ describe("Sync Integration Tests", () => {
         await budgetDatabaseService.clearData();
 
         // 4. Verify local data is gone
-        const emptyEnvelopes = await budgetDatabaseService.getEnvelopes();
+        const emptyEnvelopes = (await budgetDatabaseService.getEnvelopes()) as Envelope[];
         expect(emptyEnvelopes).toHaveLength(0);
 
         // 5. Load from cloud
-        const cloudData = await firebaseSyncService.loadFromCloud();
+        const cloudData = (await firebaseSyncService.loadFromCloud()) as { envelopes?: Envelope[]; transactions?: Transaction[]; bills?: Bill[] };
         expect(cloudData).toBeTruthy();
 
         // 6. Restore to local database
@@ -385,12 +432,12 @@ describe("Sync Integration Tests", () => {
         }
 
         // 7. Verify data is restored
-        const restoredEnvelopes = await budgetDatabaseService.getEnvelopes();
+        const restoredEnvelopes = (await budgetDatabaseService.getEnvelopes()) as Envelope[];
         expect(restoredEnvelopes.length).toBeGreaterThan(0);
 
-        const restoredTransactions = await budgetDatabaseService.getTransactions({
+        const restoredTransactions = (await budgetDatabaseService.getTransactions({
           limit: 100,
-        });
+        })) as Transaction[];
         expect(restoredTransactions.length).toBeGreaterThan(0);
       },
       TEST_TIMEOUT
@@ -458,13 +505,13 @@ describe("Sync Integration Tests", () => {
         const originalOnline = navigator.onLine;
         Object.defineProperty(navigator, "onLine", {
           writable: true,
-          value: false,
+          value: "false" as unknown as boolean,
         });
 
         try {
           // Local operations should still work
           await budgetDatabaseService.saveEnvelopes(testData.envelopes);
-          const envelopes = await budgetDatabaseService.getEnvelopes();
+          const envelopes = (await budgetDatabaseService.getEnvelopes()) as Envelope[];
           expect(envelopes).toHaveLength(2);
 
           // Cloud operations should handle offline state
@@ -501,7 +548,7 @@ describe("Sync Integration Tests", () => {
           });
 
           // Service should handle corrupted data gracefully
-          const envelopes = await budgetDatabaseService.getEnvelopes();
+          const envelopes = (await budgetDatabaseService.getEnvelopes()) as Envelope[];
 
           // Should still return the valid envelopes
           const validEnvelopes = envelopes.filter(
