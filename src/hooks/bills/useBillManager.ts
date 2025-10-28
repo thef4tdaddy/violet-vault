@@ -80,7 +80,7 @@ export const useBillManager = ({
   } = useBills();
 
   // Type-safe wrapper for updateBill
-  const updateBillMutation = updateBillFromHook as (bill: Bill) => Promise<void>;
+  const updateBillMutation = updateBillFromHook as unknown as (bill: Bill) => Promise<void>;
 
   // Fallback to Zustand for backward compatibility
   interface BudgetState {
@@ -120,11 +120,11 @@ export const useBillManager = ({
   const { transactions, envelopes, bills, categorizedBills, totals, filteredBills } = useMemo(() => {
     const resolvedTransactions = resolveTransactions(propTransactions, tanStackTransactions, budget.allTransactions);
     const resolvedEnvelopes = resolveEnvelopes(propEnvelopes, tanStackEnvelopes, budget.envelopes);
-    const billsFromTransactions = extractBillsFromTransactions(resolvedTransactions);
-    const combinedBills = combineBills(tanStackBills, budget.bills || [], billsFromTransactions);
-    const processedBills = processBills(combinedBills, onUpdateBill, updateBillMutation);
+    const billsFromTransactions = extractBillsFromTransactions(resolvedTransactions as unknown[]);
+    const combinedBills = combineBills(tanStackBills as unknown[], budget.bills as unknown[] || [], billsFromTransactions);
+    const processedBills = processBills(combinedBills, onUpdateBill, updateBillMutation as unknown as (updates: { billId: string; updates: Record<string, unknown> }) => Promise<void>);
     const { categorizedBills: catBills, totals: billTotals } = categorizeBillsWithTotals(processedBills);
-    const filtered = getFilteredBills(catBills, viewMode, filterOptions);
+    const filtered = getFilteredBills(catBills as unknown as CategorizedBills, viewMode, filterOptions);
     
     return {
       transactions: resolvedTransactions,
@@ -162,26 +162,34 @@ export const useBillManager = ({
   // Business Logic Actions
   const searchNewBills = useCallback(
     () => handleSearchNewBills(
-      transactions,
-      bills,
-      envelopes,
-      onSearchNewBills,
-      onError,
-      setIsSearching,
-      setDiscoveredBills,
-      setShowDiscoveryModal
+      {
+        transactions: transactions as unknown[],
+        bills: bills as unknown[],
+        envelopes: envelopes as unknown[],
+        onSearchNewBills,
+        onError,
+      },
+      {
+        setIsSearching,
+        setDiscoveredBills,
+        setShowDiscoveryModal,
+      }
     ),
     [transactions, bills, envelopes, onSearchNewBills, onError]
   );
 
   const handleAddDiscoveredBills = useCallback(
-    (billsToAdd) => handleAddDiscoveredBillsAction(
-      billsToAdd,
-      onCreateRecurringBill,
-      addBill,
-      onError,
-      setShowDiscoveryModal,
-      setDiscoveredBills
+    (billsToAdd: unknown[]) => handleAddDiscoveredBillsAction(
+      {
+        billsToAdd,
+        onCreateRecurringBill,
+        addBill: addBill as (bill: unknown) => void,
+        onError,
+      },
+      {
+        setShowDiscoveryModal,
+        setDiscoveredBills,
+      }
     ),
     [addBill, onCreateRecurringBill, onError]
   );
@@ -196,8 +204,15 @@ export const useBillManager = ({
 
   // UI State Actions and loading
   const uiActions = createUIActions({
-    setSelectedBills, setViewMode, setShowBillDetail, setShowAddBillModal,
-    setEditingBill, setShowBulkUpdateModal, setShowDiscoveryModal, setHistoryBill, setFilterOptions,
+    setSelectedBills,
+    setViewMode,
+    setShowBillDetail,
+    setShowAddBillModal,
+    setEditingBill,
+    setShowBulkUpdateModal,
+    setShowDiscoveryModal,
+    setHistoryBill,
+    setFilterOptions: setFilterOptions as (options: FilterOptions) => void,
   });
   const isLoading = transactionsLoading || envelopesLoading || billsLoading;
 
