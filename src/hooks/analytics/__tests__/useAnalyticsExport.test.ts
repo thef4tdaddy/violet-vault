@@ -1,11 +1,13 @@
 import { renderHook, act } from "@testing-library/react";
+import { vi } from "vitest";
 import { useAnalyticsExport } from "../useAnalyticsExport";
 
 // Mock URL.createObjectURL and related methods
-global.URL = {
+const mockURLObj = {
   createObjectURL: vi.fn(() => "mock-url"),
   revokeObjectURL: vi.fn(),
-};
+} as unknown as typeof URL;
+(global as { URL: typeof URL }).URL = mockURLObj;
 
 // Mock document.createElement and click
 const mockClick = vi.fn();
@@ -16,13 +18,14 @@ const mockLink = {
   style: { visibility: "" },
 };
 
-global.document = {
+const mockDocObj = {
   createElement: vi.fn(() => mockLink),
   body: {
     appendChild: vi.fn(),
     removeChild: vi.fn(),
   },
-};
+} as unknown as Document;
+(global as { document: Document }).document = mockDocObj;
 
 describe("useAnalyticsExport", () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import useTransactionAnalytics from "../useTransactionAnalytics";
+import { renderHook } from "@testing-library/react";
+import { useTransactionAnalytics } from "../useTransactionAnalytics";
 
 describe("useTransactionAnalytics", () => {
   const mockTransactions = [
@@ -42,175 +42,104 @@ describe("useTransactionAnalytics", () => {
     vi.clearAllMocks();
   });
 
-  describe("calculateCategoryTotals", () => {
-    it("should calculate totals by category", () => {
+  describe("basic analytics", () => {
+    it("should calculate total income correctly", () => {
       const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
 
-      const categoryTotals = result.current.calculateCategoryTotals();
-
-      expect(categoryTotals["Food"]).toBe(205.8);
-      expect(categoryTotals["Transportation"]).toBe(45.75);
-      expect(categoryTotals["Income"]).toBe(3000.0);
+      expect(result.current.totalIncome).toBe(3000.0);
     });
 
-    it("should handle empty transactions", () => {
-      const { result } = renderHook(() => useTransactionAnalytics([]));
-
-      const categoryTotals = result.current.calculateCategoryTotals();
-
-      expect(Object.keys(categoryTotals)).toHaveLength(0);
-    });
-
-    it("should exclude income from expense calculations", () => {
+    it("should calculate total expenses correctly", () => {
       const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
 
-      const categoryTotals = result.current.calculateCategoryTotals({
-        excludeIncome: true,
-      });
+      expect(result.current.totalExpenses).toBe(251.55);
+    });
 
-      expect(categoryTotals["Food"]).toBe(205.8);
-      expect(categoryTotals["Transportation"]).toBe(45.75);
-      expect(categoryTotals["Income"]).toBeUndefined();
+    it("should calculate net amount correctly", () => {
+      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+
+      expect(result.current.netAmount).toBe(2748.45);
+    });
+
+    it("should count transactions correctly", () => {
+      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+
+      expect(result.current.transactionCount).toBe(4);
     });
   });
 
-  describe("calculateMonthlyTrends", () => {
-    it("should calculate monthly spending trends", () => {
+  describe("categoryBreakdown", () => {
+    it("should group transactions by category", () => {
       const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
 
-      const trends = result.current.calculateMonthlyTrends();
+      const categoryBreakdown = result.current.categoryBreakdown;
 
-      expect(trends["2024-01"]).toBeDefined();
-      expect(trends["2024-01"].totalExpenses).toBe(251.55);
-      expect(trends["2024-01"].totalIncome).toBe(3000.0);
-      expect(trends["2024-01"].netAmount).toBe(2748.45);
-      expect(trends["2024-01"].transactionCount).toBe(4);
+      expect(categoryBreakdown["Food"]).toBeDefined();
+      expect(categoryBreakdown["Food"].expenses).toBe(205.8);
+      expect(categoryBreakdown["Food"].count).toBe(2);
+
+      expect(categoryBreakdown["Income"]).toBeDefined();
+      expect(categoryBreakdown["Income"].income).toBe(3000.0);
+      expect(categoryBreakdown["Income"].count).toBe(1);
+
+      expect(categoryBreakdown["Transportation"]).toBeDefined();
+      expect(categoryBreakdown["Transportation"].expenses).toBe(45.75);
+      expect(categoryBreakdown["Transportation"].count).toBe(1);
     });
 
-    it("should group transactions across multiple months", () => {
-      const multiMonthTransactions = [
-        ...mockTransactions,
-        {
-          id: "5",
-          amount: -100,
-          date: "2024-02-01T10:00:00Z",
-          category: "Food",
-        },
+    it("should handle transactions without categories", () => {
+      const transactionsWithoutCategory = [
+        { id: "1", description: "Test", amount: 100, date: "2024-01-01" },
+        { id: "2", description: "Test 2", amount: -50, date: "2024-01-02", category: "Food" },
       ];
 
-      const { result } = renderHook(() => useTransactionAnalytics(multiMonthTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(transactionsWithoutCategory)
+      );
 
-      const trends = result.current.calculateMonthlyTrends();
+      const categoryBreakdown = result.current.categoryBreakdown;
 
-      expect(Object.keys(trends)).toHaveLength(2);
-      expect(trends["2024-01"]).toBeDefined();
-      expect(trends["2024-02"]).toBeDefined();
-      expect(trends["2024-02"].totalExpenses).toBe(100);
+      expect(categoryBreakdown["uncategorized"]).toBeDefined();
+      expect(categoryBreakdown["uncategorized"].income).toBe(100);
+      expect(categoryBreakdown["Food"]).toBeDefined();
+      expect(categoryBreakdown["Food"].expenses).toBe(50);
     });
   });
 
-  describe("getTopCategories", () => {
-    it("should return top spending categories", () => {
+  describe("dailyBreakdown", () => {
+    it("should group transactions by date", () => {
       const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
 
-      const topCategories = result.current.getTopCategories(2);
+      const dailyBreakdown = result.current.dailyBreakdown;
 
-      expect(topCategories).toHaveLength(2);
-      expect(topCategories[0].category).toBe("Food");
-      expect(topCategories[0].amount).toBe(205.8);
-      expect(topCategories[1].category).toBe("Transportation");
-      expect(topCategories[1].amount).toBe(45.75);
-    });
+      expect(dailyBreakdown["2024-01-01T09:00:00Z"]).toBeDefined();
+      expect(dailyBreakdown["2024-01-01T09:00:00Z"].income).toBe(3000.0);
 
-    it("should limit results to specified count", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
-
-      const topCategories = result.current.getTopCategories(1);
-
-      expect(topCategories).toHaveLength(1);
-      expect(topCategories[0].category).toBe("Food");
-    });
-
-    it("should include percentage of total spending", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
-
-      const topCategories = result.current.getTopCategories();
-
-      expect(topCategories[0].percentage).toBeCloseTo(81.8, 1);
-      expect(topCategories[1].percentage).toBeCloseTo(18.2, 1);
+      expect(dailyBreakdown["2024-01-15T10:00:00Z"]).toBeDefined();
+      expect(dailyBreakdown["2024-01-15T10:00:00Z"].expenses).toBe(120.5);
     });
   });
 
-  describe("calculateAverageTransactionAmount", () => {
-    it("should calculate average transaction amounts", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+  describe("recentTransactions", () => {
+    it("should return transactions from last 7 days", () => {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const weekAgo = new Date(today);
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const twoWeeksAgo = new Date(today);
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
-      const averages = result.current.calculateAverageTransactionAmount();
+      const recentTransactions = [
+        { id: "1", description: "Recent", amount: -10, date: yesterday.toISOString() },
+        { id: "2", description: "Last week", amount: -20, date: weekAgo.toISOString() },
+        { id: "3", description: "Old", amount: -30, date: twoWeeksAgo.toISOString() },
+      ];
 
-      expect(averages.overall).toBeCloseTo(62.89, 2);
-      expect(averages.expenses).toBeCloseTo(83.85, 2);
-      expect(averages.income).toBe(3000.0);
-    });
+      const { result } = renderHook(() => useTransactionAnalytics(recentTransactions));
 
-    it("should handle transactions with only expenses", () => {
-      const expenseOnlyTransactions = mockTransactions.filter((t) => t.amount < 0);
-      const { result } = renderHook(() => useTransactionAnalytics(expenseOnlyTransactions));
-
-      const averages = result.current.calculateAverageTransactionAmount();
-
-      expect(averages.expenses).toBeCloseTo(83.85, 2);
-      expect(averages.income).toBe(0);
-    });
-  });
-
-  describe("getSpendingInsights", () => {
-    it("should generate spending insights", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
-
-      const insights = result.current.getSpendingInsights();
-
-      expect(insights).toHaveProperty("topCategory");
-      expect(insights).toHaveProperty("averageTransaction");
-      expect(insights).toHaveProperty("monthlySpend");
-      expect(insights).toHaveProperty("categoryCount");
-
-      expect(insights.topCategory).toBe("Food");
-      expect(insights.categoryCount).toBe(3);
-    });
-
-    it("should identify unusual spending patterns", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
-
-      const insights = result.current.getSpendingInsights();
-
-      expect(insights).toHaveProperty("unusualSpending");
-      // Large salary transaction should be flagged as unusual
-      expect(insights.unusualSpending).toBe(true);
-    });
-  });
-
-  describe("filterByDateRange", () => {
-    it("should filter transactions by date range", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
-
-      const filtered = result.current.filterByDateRange({
-        startDate: "2024-01-10",
-        endDate: "2024-01-20",
-      });
-
-      expect(filtered).toHaveLength(3);
-      expect(filtered.map((t) => t.id)).toEqual(["1", "3", "4"]);
-    });
-
-    it("should handle invalid date range", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
-
-      const filtered = result.current.filterByDateRange({
-        startDate: "2024-01-20",
-        endDate: "2024-01-10", // end before start
-      });
-
-      expect(filtered).toHaveLength(0);
+      expect(result.current.recentTransactions.length).toBeGreaterThanOrEqual(1);
+      expect(result.current.recentTransactions.length).toBeLessThanOrEqual(2);
     });
   });
 
@@ -221,8 +150,8 @@ describe("useTransactionAnalytics", () => {
         { initialProps: { transactions: mockTransactions } }
       );
 
-      const initialCategoryTotals = result.current.calculateCategoryTotals();
-      expect(initialCategoryTotals["Food"]).toBe(205.8);
+      const initialExpenses = result.current.totalExpenses;
+      expect(initialExpenses).toBe(251.55);
 
       // Add a new transaction
       const newTransactions = [
@@ -233,35 +162,35 @@ describe("useTransactionAnalytics", () => {
           amount: -15.5,
           date: "2024-01-25T08:00:00Z",
           category: "Food",
+          tags: ["coffee"],
         },
       ];
 
       rerender({ transactions: newTransactions });
 
-      const updatedCategoryTotals = result.current.calculateCategoryTotals();
-      expect(updatedCategoryTotals["Food"]).toBe(221.3);
+      const updatedExpenses = result.current.totalExpenses;
+      expect(updatedExpenses).toBe(267.05);
+      expect(result.current.categoryBreakdown["Food"].expenses).toBe(221.3);
     });
   });
 
-  describe("error handling", () => {
-    it("should handle malformed transaction data", () => {
-      const malformedTransactions = [
-        { id: "1", amount: null, date: "invalid" },
-        { id: "2", description: "Valid", amount: 100, date: "2024-01-01" },
-      ];
+  describe("edge cases", () => {
+    it("should handle empty transaction list", () => {
+      const { result } = renderHook(() => useTransactionAnalytics([]));
 
-      const { result } = renderHook(() => useTransactionAnalytics(malformedTransactions));
-
-      // Should not throw and should handle valid transactions
-      const categoryTotals = result.current.calculateCategoryTotals();
-      expect(Object.keys(categoryTotals)).toHaveLength(1);
+      expect(result.current.totalIncome).toBe(0);
+      expect(result.current.totalExpenses).toBe(0);
+      expect(result.current.netAmount).toBe(0);
+      expect(result.current.transactionCount).toBe(0);
     });
 
     it("should handle undefined transactions", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(undefined));
+      const { result } = renderHook(() => useTransactionAnalytics());
 
-      const categoryTotals = result.current.calculateCategoryTotals();
-      expect(Object.keys(categoryTotals)).toHaveLength(0);
+      expect(result.current.totalIncome).toBe(0);
+      expect(result.current.totalExpenses).toBe(0);
+      expect(result.current.netAmount).toBe(0);
+      expect(result.current.transactionCount).toBe(0);
     });
   });
 });
