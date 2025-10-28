@@ -105,8 +105,8 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
     errors,
     warnings,
     parsedData: {
-      name: formData.name?.trim() || "",
-      creditor: formData.creditor?.trim() || "",
+      name: typeof formData.name === 'string' ? formData.name.trim() : "",
+      creditor: typeof formData.creditor === 'string' ? formData.creditor.trim() : "",
       type: formData.type,
       balance: currentBalance,
       currentBalance, // Add alias for compatibility
@@ -116,7 +116,7 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
       status: formData.status,
       paymentFrequency: formData.paymentFrequency,
       compoundFrequency: formData.compoundFrequency,
-      notes: formData.notes?.trim() || "",
+      notes: typeof formData.notes === 'string' ? formData.notes.trim() : "",
       specialTerms: formData.specialTerms,
     } as DebtFormData,
   };

@@ -279,7 +279,6 @@ export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback
             cancelLabel: "Cancel",
             destructive: true,
           } as ConfirmDialogOptions)
-          } as unknown as Record<string, unknown>)
         : /* eslint-disable-next-line no-restricted-syntax -- diagnostic tool for browser console */
           window.confirm(
             `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`
