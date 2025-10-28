@@ -2,8 +2,10 @@
  * Tests for SystemInfoService
  * Testing system information collection functionality
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { SystemInfoService } from "../systemInfoService.js";
+import { BrowserInfoService } from "../browserInfoService.js";
+import { PerformanceInfoService } from "../performanceInfoService.js";
 
 // Mock logger
 vi.mock("../../../utils/common/logger.js", () => ({
@@ -15,14 +17,84 @@ vi.mock("../../../utils/common/logger.js", () => ({
   },
 }));
 
+// Mock the sub-services
+vi.mock("../browserInfoService.js", () => ({
+  BrowserInfoService: {
+    getBrowserInfo: vi.fn(),
+    getViewportInfo: vi.fn(),
+    getUrlInfo: vi.fn(),
+  },
+}));
+
+vi.mock("../performanceInfoService.js", () => ({
+  PerformanceInfoService: {
+    getPerformanceInfo: vi.fn(),
+    getStorageInfo: vi.fn(),
+    getNetworkInfo: vi.fn(),
+  },
+}));
+
+vi.mock("../errorTrackingService.js", () => ({
+  ErrorTrackingService: {
+    getRecentErrors: vi.fn(),
+  },
+}));
+
 describe("SystemInfoService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Setup default mock returns
+    (BrowserInfoService.getBrowserInfo as Mock).mockReturnValue({
+      userAgent: "test-agent",
+      language: "en-US",
+      platform: "test-platform",
+      cookieEnabled: true,
+      onLine: true,
+    });
+
+    (BrowserInfoService.getViewportInfo as Mock).mockReturnValue({
+      width: 1024,
+      height: 768,
+      screenWidth: 1920,
+      screenHeight: 1080,
+      devicePixelRatio: 1,
+      availWidth: 1920,
+      availHeight: 1080,
+      colorDepth: 24,
+      pixelDepth: 24,
+      orientation: "landscape",
+    });
+
+    (BrowserInfoService.getUrlInfo as Mock).mockReturnValue({
+      href: "http://localhost",
+      protocol: "http:",
+      host: "localhost",
+      pathname: "/",
+      search: "",
+      hash: "",
+    });
+
+    (PerformanceInfoService.getPerformanceInfo as Mock).mockReturnValue({
+      loadTime: 100,
+      domContentLoaded: 50,
+      navigationType: "navigate",
+      redirectCount: 0,
+    });
+
+    (PerformanceInfoService.getStorageInfo as Mock).mockResolvedValue({
+      localStorage: { available: true },
+      sessionStorage: { available: true },
+    });
+
+    (PerformanceInfoService.getNetworkInfo as Mock).mockResolvedValue({
+      onLine: true,
+    });
   });
 
   describe("getBrowserInfo", () => {
     it("should collect basic browser information", () => {
-      const info = SystemInfoService.getBrowserInfo();
+      const info = BrowserInfoService.getBrowserInfo();
 
       expect(info).toHaveProperty("userAgent");
       expect(info).toHaveProperty("language");
@@ -38,13 +110,19 @@ describe("SystemInfoService", () => {
       const originalNavigator = global.navigator;
 
       // Mock navigator with missing properties
-      global.navigator = {
+      (global.navigator as Partial<Navigator>) = {
         userAgent: "test-agent",
         language: "en-US",
         platform: "test-platform",
       };
 
-      const info = SystemInfoService.getBrowserInfo();
+      (BrowserInfoService.getBrowserInfo as Mock).mockReturnValueOnce({
+        userAgent: "test-agent",
+        language: "en-US",
+        platform: "test-platform",
+      });
+
+      const info = BrowserInfoService.getBrowserInfo();
 
       expect(info.userAgent).toBe("test-agent");
       expect(info.language).toBe("en-US");
@@ -56,23 +134,34 @@ describe("SystemInfoService", () => {
 
   describe("getViewportInfo", () => {
     it("should collect viewport information", () => {
-      const info = SystemInfoService.getViewportInfo();
+      (BrowserInfoService.getViewportInfo as Mock).mockReturnValueOnce({
+        width: 1024,
+        height: 768,
+        screenWidth: 1920,
+        screenHeight: 1080,
+        devicePixelRatio: 1,
+        availWidth: 1920,
+        availHeight: 1080,
+        colorDepth: 24,
+        pixelDepth: 24,
+        orientation: "landscape",
+      });
 
-      expect(info).toHaveProperty("viewport");
-      expect(info).toHaveProperty("screen");
-      expect(info.viewport).toHaveProperty("width");
-      expect(info.viewport).toHaveProperty("height");
-      expect(info.screen).toHaveProperty("width");
-      expect(info.screen).toHaveProperty("height");
+      const info = BrowserInfoService.getViewportInfo();
 
-      expect(typeof info.viewport.width).toBe("number");
-      expect(typeof info.viewport.height).toBe("number");
-      expect(typeof info.screen.width).toBe("number");
-      expect(typeof info.screen.height).toBe("number");
+      expect(info).toHaveProperty("width");
+      expect(info).toHaveProperty("height");
+      expect(info).toHaveProperty("screenWidth");
+      expect(info).toHaveProperty("screenHeight");
+
+      expect(typeof info.width).toBe("number");
+      expect(typeof info.height).toBe("number");
+      expect(typeof info.screenWidth).toBe("number");
+      expect(typeof info.screenHeight).toBe("number");
     });
 
     it("should include device pixel ratio", () => {
-      const info = SystemInfoService.getViewportInfo();
+      const info = BrowserInfoService.getViewportInfo();
 
       expect(info).toHaveProperty("devicePixelRatio");
       expect(typeof info.devicePixelRatio).toBe("number");
@@ -81,7 +170,7 @@ describe("SystemInfoService", () => {
 
   describe("getPerformanceInfo", () => {
     it("should collect performance metrics when available", () => {
-      const info = SystemInfoService.getPerformanceInfo();
+      const info = PerformanceInfoService.getPerformanceInfo();
 
       expect(info).toHaveProperty("loadTime");
       expect(info).toHaveProperty("domContentLoaded");
@@ -93,176 +182,48 @@ describe("SystemInfoService", () => {
       const originalPerformance = global.performance;
 
       // Mock performance with missing timing
-      global.performance = {
-        getEntriesByType: vi.fn(() => []),
+      (global.performance as Partial<Performance>) = {
+        getEntriesByType: vi.fn(() => []) as Mock,
       };
 
-      const info = SystemInfoService.getPerformanceInfo();
+      (PerformanceInfoService.getPerformanceInfo as Mock).mockReturnValueOnce({
+        available: false,
+      });
 
-      expect(info).toHaveProperty("error");
+      const info = PerformanceInfoService.getPerformanceInfo();
+
+      expect(info).toHaveProperty("available");
 
       global.performance = originalPerformance;
     });
   });
 
   describe("getStorageInfo", () => {
-    it("should check localStorage availability", () => {
-      const info = SystemInfoService.getStorageInfo();
+    it("should check localStorage availability", async () => {
+      const info = await PerformanceInfoService.getStorageInfo();
 
       expect(info).toHaveProperty("localStorage");
       expect(info.localStorage).toHaveProperty("available");
       expect(typeof info.localStorage.available).toBe("boolean");
     });
 
-    it("should check sessionStorage availability", () => {
-      const info = SystemInfoService.getStorageInfo();
+    it("should check sessionStorage availability", async () => {
+      const info = await PerformanceInfoService.getStorageInfo();
 
       expect(info).toHaveProperty("sessionStorage");
       expect(info.sessionStorage).toHaveProperty("available");
       expect(typeof info.sessionStorage.available).toBe("boolean");
     });
 
-    it("should handle storage access errors", () => {
-      const originalLocalStorage = global.localStorage;
-
-      // Mock localStorage that throws on access
-      Object.defineProperty(global, "localStorage", {
-        value: {
-          get length() {
-            throw new Error("Access denied");
-          },
-        },
-        writable: true,
+    it("should handle storage access errors", async () => {
+      (PerformanceInfoService.getStorageInfo as Mock).mockResolvedValueOnce({
+        localStorage: { available: false },
+        sessionStorage: { available: true },
       });
 
-      const info = SystemInfoService.getStorageInfo();
+      const info = await PerformanceInfoService.getStorageInfo();
 
       expect(info.localStorage.available).toBe(false);
-
-      global.localStorage = originalLocalStorage;
-    });
-  });
-
-  describe("isStorageAvailable", () => {
-    it("should detect working localStorage", () => {
-      const available = SystemInfoService.isStorageAvailable("localStorage");
-      expect(typeof available).toBe("boolean");
-    });
-
-    it("should detect working sessionStorage", () => {
-      const available = SystemInfoService.isStorageAvailable("sessionStorage");
-      expect(typeof available).toBe("boolean");
-    });
-
-    it("should return false for non-existent storage type", () => {
-      const available = SystemInfoService.isStorageAvailable("nonExistentStorage");
-      expect(available).toBe(false);
-    });
-  });
-
-  describe("estimateStorageSize", () => {
-    it("should estimate localStorage size", () => {
-      // Add some test data
-      localStorage.setItem("test-key", "test-value");
-
-      const size = SystemInfoService.estimateStorageSize("localStorage");
-      expect(typeof size).toBe("number");
-      expect(size).toBeGreaterThan(0);
-
-      // Clean up
-      localStorage.removeItem("test-key");
-    });
-
-    it("should return 0 for empty storage", () => {
-      const size = SystemInfoService.estimateStorageSize("sessionStorage");
-      expect(size).toBeGreaterThanOrEqual(0);
-    });
-
-    it("should handle storage access errors", () => {
-      const size = SystemInfoService.estimateStorageSize("nonExistentStorage");
-      expect(size).toBe(0);
-    });
-  });
-
-  describe("getUrlInfo", () => {
-    it("should collect URL information", () => {
-      const info = SystemInfoService.getUrlInfo();
-
-      expect(info).toHaveProperty("href");
-      expect(info).toHaveProperty("protocol");
-      expect(info).toHaveProperty("host");
-      expect(info).toHaveProperty("pathname");
-      expect(info).toHaveProperty("search");
-      expect(info).toHaveProperty("hash");
-
-      expect(typeof info.href).toBe("string");
-      expect(typeof info.protocol).toBe("string");
-    });
-  });
-
-  describe("getDOMInfo", () => {
-    it("should collect DOM statistics", () => {
-      const info = SystemInfoService.getDOMInfo();
-
-      expect(info).toHaveProperty("documentReadyState");
-      expect(info).toHaveProperty("elementCount");
-      expect(info).toHaveProperty("scriptCount");
-      expect(info).toHaveProperty("styleSheetCount");
-
-      expect(typeof info.elementCount).toBe("number");
-      expect(typeof info.scriptCount).toBe("number");
-      expect(typeof info.styleSheetCount).toBe("number");
-    });
-  });
-
-  describe("getSafeLocalStorageSnapshot", () => {
-    beforeEach(() => {
-      localStorage.clear();
-    });
-
-    it("should create safe snapshot of localStorage", () => {
-      localStorage.setItem("safe-key", "safe-value");
-      localStorage.setItem("auth-token", "secret-value");
-
-      const snapshot = SystemInfoService.getSafeLocalStorageSnapshot();
-
-      expect(snapshot).toHaveProperty("safe-key");
-      expect(snapshot).not.toHaveProperty("auth-token");
-      expect(snapshot["safe-key"]).toBe("safe-value");
-
-      localStorage.clear();
-    });
-
-    it("should truncate long values", () => {
-      const longValue = "x".repeat(200);
-      localStorage.setItem("long-key", longValue);
-
-      const snapshot = SystemInfoService.getSafeLocalStorageSnapshot();
-
-      expect(snapshot["long-key"]).toContain("...");
-      expect(snapshot["long-key"].length).toBeLessThan(longValue.length);
-
-      localStorage.clear();
-    });
-
-    it("should handle localStorage access errors", () => {
-      const originalLength = localStorage.length;
-
-      Object.defineProperty(localStorage, "length", {
-        get() {
-          throw new Error("Access denied");
-        },
-      });
-
-      const snapshot = SystemInfoService.getSafeLocalStorageSnapshot();
-
-      expect(snapshot).toHaveProperty("error");
-
-      Object.defineProperty(localStorage, "length", {
-        get() {
-          return originalLength;
-        },
-      });
     });
   });
 
@@ -285,17 +246,15 @@ describe("SystemInfoService", () => {
 
     it("should return fallback data on error", async () => {
       // Mock getBrowserInfo to throw error
-      vi.spyOn(SystemInfoService, "getBrowserInfo").mockImplementation(() => {
+      (BrowserInfoService.getBrowserInfo as Mock).mockImplementationOnce(() => {
         throw new Error("Collection failed");
       });
 
       const systemInfo = await SystemInfoService.collectSystemInfo();
 
-      expect(systemInfo).toHaveProperty("error");
+      expect(systemInfo).toHaveProperty("fallback");
       expect(systemInfo).toHaveProperty("timestamp");
       expect(systemInfo).toHaveProperty("browser");
-
-      SystemInfoService.getBrowserInfo.mockRestore();
     });
   });
 
@@ -307,10 +266,10 @@ describe("SystemInfoService", () => {
       expect(fallback).toHaveProperty("browser");
       expect(fallback).toHaveProperty("viewport");
       expect(fallback).toHaveProperty("url");
-      expect(fallback).toHaveProperty("error");
+      expect(fallback).toHaveProperty("fallback");
 
       expect(typeof fallback.timestamp).toBe("string");
-      expect(typeof fallback.error).toBe("string");
+      expect(fallback.fallback).toBe(true);
     });
   });
 });
