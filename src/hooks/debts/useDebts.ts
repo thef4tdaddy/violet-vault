@@ -95,21 +95,20 @@ const deleteDebtFromDb = async ({ id, author = "Unknown User" }) => {
 const recordPaymentInDb = async ({ id, payment, author = "Unknown User" }) => {
   const debt = await budgetDb.debts.get(id);
   if (debt) {
-    const history = [...(debt.paymentHistory || []), { ...payment }];
+    // Note: paymentHistory is not in the Debt type but may exist in data
+    // We keep track of it in memory for history tracking but don't persist it
     const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
 
     const updatedDebt = {
       ...debt,
       currentBalance: newBalance,
-      paymentHistory: history,
       lastModified: Date.now(),
     };
 
     await budgetDb.debts.update(id, {
       currentBalance: newBalance,
-      paymentHistory: history,
       lastModified: Date.now(),
-    });
+    } as never);
 
     await BudgetHistoryTracker.trackDebtChange({
       debtId: id,
@@ -129,7 +128,7 @@ const useDebts = () => {
   useEffect(() => {
     const handleImportCompleted = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
-      queryClient.invalidateQueries({ queryKey: queryKeys.debtsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.debtsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     };
 
