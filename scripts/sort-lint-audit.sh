@@ -20,8 +20,13 @@ fi
 # --- Report Generation ---
 > "$OUTPUT_FILE"
 
-# Count total issues
-TOTAL_ISSUES=$(jq -r '.[] | select((.errorCount + .warningCount) > 0) | (.errorCount + .warningCount)' "$INPUT_FILE" | paste -sd+ | bc 2>/dev/null || echo 0)
+# Count total issues - sum all errorCount and warningCount across all files
+TOTAL_ISSUES=$(jq '[.[] | (.errorCount + .warningCount)] | add // 0' "$INPUT_FILE")
+
+# Ensure TOTAL_ISSUES is a valid integer
+if [ -z "$TOTAL_ISSUES" ] || [ "$TOTAL_ISSUES" = "null" ]; then
+    TOTAL_ISSUES=0
+fi
 
 if [ "$TOTAL_ISSUES" -eq 0 ]; then
     # No issues found
