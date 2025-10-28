@@ -267,14 +267,6 @@ export const useMarkBillPaidMutation = () => {
 
       const paymentDate = paidDate || new Date().toISOString().split("T")[0];
 
-      const paidData = {
-        isPaid: true,
-        paidAmount: paidAmount,
-        paidDate: paymentDate,
-        envelopeId: envelopeId,
-        lastPaid: new Date().toISOString(),
-      };
-
       // Apply to Dexie directly (optimistic update handled by React Query)
       await budgetDb.bills.update(billId, {
         isPaid: true,
