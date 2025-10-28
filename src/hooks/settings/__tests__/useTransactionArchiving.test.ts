@@ -135,7 +135,7 @@ describe("useTransactionArchivingUI", () => {
 describe("useTransactionArchivingProcess", () => {
   it("should handle successful archiving", async () => {
     const { result } = renderHook(() => useTransactionArchivingProcess());
-    const mockExecuteArchiving = vi.fn().mockResolvedValue();
+    const mockExecuteArchiving = vi.fn().mockResolvedValue(undefined);
     const mockOnSuccess = vi.fn();
     const mockOnError = vi.fn();
 

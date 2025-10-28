@@ -70,7 +70,7 @@ export const useDashboardCalculations = (
     }, 0);
 
     const totalSavingsBalance = savingsGoals.reduce((sum, goal) => {
-      const amount = parseFloat(goal?.currentAmount) || 0;
+      const amount = parseFloat(String(goal?.currentAmount)) || 0;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 

@@ -42,7 +42,7 @@ const updateEnvelopeBalance = async (
     const newBalance = (envelope.currentBalance || 0) + balanceChange;
     await budgetDb.envelopes.update(envelopeId, {
       currentBalance: newBalance,
-      updatedAt: new Date().toISOString(),
+      lastModified: Date.now(),
     });
   }
 

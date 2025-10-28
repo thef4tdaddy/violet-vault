@@ -130,7 +130,7 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
       logger.info("🚀 Running full sync validation from UI...");
       try {
         const results = await (window as { runMasterSyncValidation: () => Promise<ValidationResults> }).runMasterSyncValidation();
-        logger.info("✅ Sync Health: Full validation completed", results.summary);
+        logger.info("✅ Sync Health: Full validation completed", { ...results.summary });
         // Update status based on results
         setSyncStatus({
           isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",

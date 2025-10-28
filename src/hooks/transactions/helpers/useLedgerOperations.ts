@@ -6,7 +6,6 @@ import logger from "../../../utils/common/logger";
 
 export const useLedgerOperations = (
   addTransaction,
-  updateTransaction,
   deleteTransaction,
   updateBill,
   envelopes

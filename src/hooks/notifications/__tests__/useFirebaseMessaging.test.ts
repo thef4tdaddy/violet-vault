@@ -96,6 +96,7 @@ describe("useFirebaseMessaging", () => {
     const permissionUtils = await import("../../../utils/notifications/permissionUtils");
     vi.mocked(permissionUtils.requestNotificationPermission).mockResolvedValueOnce({
       success: false,
+      permission: "denied",
       reason: "denied",
     });
 

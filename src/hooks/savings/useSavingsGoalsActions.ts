@@ -49,8 +49,8 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
     const isConfirmed = await confirm({
       title: "Delete Savings Goal",
       message: `Are you sure you want to delete "${goal.name}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      variant: "danger",
+      confirmLabel: "Delete",
+      destructive: true,
     });
 
     if (isConfirmed) {
