@@ -1,7 +1,11 @@
 import { memo } from "react";
 import { renderIcon } from "../../utils/icons";
 
-const LoadingSpinner = memo(({ message = "Loading..." }) => {
+interface LoadingSpinnerProps {
+  message?: string;
+}
+
+const LoadingSpinner = memo(({ message = "Loading..." }: LoadingSpinnerProps) => {
   return (
     <div className="flex items-center justify-center p-8">
       <div className="glassmorphism rounded-2xl p-8 text-center">

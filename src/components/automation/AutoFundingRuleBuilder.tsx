@@ -61,10 +61,10 @@ const StepContent = ({
     return (
       <RuleConfigurationStep
         ruleData={ruleData}
+        updateConfig={updateConfig}
         envelopes={envelopes}
         toggleTargetEnvelope={toggleTargetEnvelope}
         errors={errors}
-        {...({ updateConfig } as unknown)}
       />
     );
   }
