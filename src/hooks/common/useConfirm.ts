@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { create } from "zustand";
 import logger from "../../utils/common/logger";
 
@@ -10,6 +10,7 @@ interface ConfirmConfig {
   destructive?: boolean;
   icon?: string | null;
   onConfirm?: () => Promise<void> | void;
+  children?: React.ReactNode;
 }
 
 interface ConfirmStore {
@@ -30,7 +31,8 @@ const useConfirmStore = create<ConfirmStore>((set) => ({
   config: {},
   resolver: null,
 
-  showConfirm: (config: ConfirmConfig, resolver: (value: boolean) => void) => set({ isOpen: true, config, resolver }),
+  showConfirm: (config: ConfirmConfig, resolver: (value: boolean) => void) =>
+    set({ isOpen: true, config, resolver }),
 
   hideConfirm: () => set({ isOpen: false, config: {}, resolver: null }),
 }));

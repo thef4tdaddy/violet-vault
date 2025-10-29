@@ -35,7 +35,9 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
         const { displayText } = displayInfo;
         return (
           <>
-            <p className="text-xs text-gray-500">{displayText.balanceLabel || "Balance"}</p>
+            <p className="text-xs text-gray-500">
+              {(displayText as unknown)?.balanceLabel || "Balance"}
+            </p>
             <p
               className={`text-lg font-semibold ${
                 envelope.available >= 0 ? "text-green-600" : "text-red-600"

@@ -205,7 +205,15 @@ export const BudgetVsActualChart = ({
   ];
 
   return (
-    <ComposedFinancialChart title={title} data={data} series={series} xAxisKey="name" {...props} />
+    <ComposedFinancialChart
+      title={title}
+      data={data}
+      series={series}
+      subtitle=""
+      actions={[]}
+      formatTooltip={() => null}
+      {...props}
+    />
   );
 };
 

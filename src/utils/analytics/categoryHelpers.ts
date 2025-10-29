@@ -70,9 +70,14 @@ interface Suggestion {
   priority: "high" | "medium" | "low";
   impact: number;
   category: string;
+  title?: string;
+  description?: string;
+  action?: string;
   data?: {
     totalAmount?: number;
     transactionCount?: number;
+    categoryName?: string;
+    billIds?: (string | undefined)[];
   };
 }
 

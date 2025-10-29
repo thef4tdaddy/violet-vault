@@ -65,7 +65,5 @@ export const usePasswordValidation = (password, options = {}) => {
     },
     enabled: !!password && password.length > 0,
     staleTime: 0, // Always fresh validation
-    cacheTime: 0, // Don't cache password validation results
-    ...options,
   });
 };

@@ -1,6 +1,5 @@
 import { clearFirebaseData, forcePushToCloud } from "../firebaseUtils";
 import { cloudSyncService } from "../../../services/cloudSyncService";
-import { budgetDb } from "../../../db/budgetDb";
 import { vi } from "vitest";
 
 vi.mock("../../../services/cloudSyncService", () => ({
@@ -9,14 +8,6 @@ vi.mock("../../../services/cloudSyncService", () => ({
     stop: vi.fn(),
     forcePushToCloud: vi.fn(),
   },
-}));
-
-vi.mock("../../../db/budgetDb", () => ({
-  budgetDb: {
-    syncMetadata: {
-      clear: vi.fn(),
-    },
-  } as never,
 }));
 
 describe("firebaseUtils", () => {

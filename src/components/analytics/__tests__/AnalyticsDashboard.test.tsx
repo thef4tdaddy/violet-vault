@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import AnalyticsDashboard from "../AnalyticsDashboard";
 import userEvent from "@testing-library/user-event";
 import useAnalyticsOriginal from "@/hooks/analytics/useAnalytics";
-import { useBudgetStoreOriginal } from "@/stores/ui/uiStore";
+import { useBudgetStore as useBudgetStoreOriginal } from "@/stores/ui/uiStore";
 
 // Mock hooks and stores
 vi.mock("@/hooks/analytics/useAnalytics", () => ({
@@ -65,7 +65,7 @@ vi.mock("./dashboard/AnalyticsDashboardHeader", () => ({
 }));
 
 vi.mock("./dashboard/AnalyticsTabNavigation", () => ({
-  default: ({ activeTab, onTabChange }) => (
+  default: ({ activeTab: _activeTabIgnored, onTabChange }) => (
     <div data-testid="tab-navigation">
       <button onClick={() => onTabChange("overview")}>Overview</button>
       <button onClick={() => onTabChange("spending")}>Spending</button>
@@ -112,7 +112,7 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 const useAnalytics = useAnalyticsOriginal as unknown as Mock;
-const useBudgetStore = useBudgetStoreOriginal as unknown as Mock;
+const useBudgetStoreOriginalMock = useBudgetStoreOriginal as unknown as Mock;
 
 describe("AnalyticsDashboard", () => {
   beforeEach(() => {
@@ -293,7 +293,7 @@ describe("AnalyticsDashboard", () => {
         { id: "1", amount: 100, category: "Food" },
       ];
 
-      useBudgetStore.mockReturnValue({
+      useBudgetStoreOriginalMock.mockReturnValue({
         transactions: mockTransactions,
         envelopes: [],
       });
@@ -301,7 +301,7 @@ describe("AnalyticsDashboard", () => {
       render(<AnalyticsDashboard />);
 
       await waitFor(() => {
-        expect(useBudgetStore).toHaveBeenCalled();
+        expect(useBudgetStoreOriginalMock).toHaveBeenCalled();
       });
     });
 
@@ -310,7 +310,7 @@ describe("AnalyticsDashboard", () => {
         { id: "1", name: "Groceries", balance: 500 },
       ];
 
-      useBudgetStore.mockReturnValue({
+      useBudgetStoreOriginalMock.mockReturnValue({
         transactions: [],
         envelopes: mockEnvelopes,
       });
@@ -318,7 +318,7 @@ describe("AnalyticsDashboard", () => {
       render(<AnalyticsDashboard />);
 
       await waitFor(() => {
-        expect(useBudgetStore).toHaveBeenCalled();
+        expect(useBudgetStoreOriginalMock).toHaveBeenCalled();
       });
     });
   });

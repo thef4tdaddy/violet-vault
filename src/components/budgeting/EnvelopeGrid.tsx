@@ -384,6 +384,7 @@ const UnifiedEnvelopeManager = ({
         updateBill={async (data: { id: string; updates: unknown }) => {
           updateBill(data.updates as never);
         }}
+        bills={bills}
         historyEnvelope={uiState.historyEnvelope}
         setHistoryEnvelope={uiState.setHistoryEnvelope}
         quickFundModal={uiState.quickFundModal}

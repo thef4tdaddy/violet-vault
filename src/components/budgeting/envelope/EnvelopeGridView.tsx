@@ -123,7 +123,7 @@ function EnvelopeGridView({
 
       {/* Action Buttons Row */}
       <EnvelopeGridHeader
-        filterOptions={filterOptions}
+        filterOptions={filterOptions as { timeRange: string; showEmpty: boolean; sortBy: string; envelopeType: string }}
         setFilterOptions={setFilterOptions}
         setShowCreateModal={setShowCreateModal}
         viewMode={viewMode}
@@ -153,7 +153,7 @@ function EnvelopeGridView({
 
       {sortedEnvelopes.length === 0 && (
         <EmptyStateView
-          filterOptions={filterOptions as { envelopeType: string; showEmpty: boolean }}
+          filterOptions={filterOptions as { envelopeType: string; showEmpty: boolean; timeRange: string; sortBy: string }}
           setShowCreateModal={setShowCreateModal}
         />
       )}

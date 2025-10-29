@@ -25,11 +25,6 @@ export const createTestQueryClient = () => {
         retry: false, // Disable retries in tests
       },
     },
-    logger: {
-      log: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-    },
   });
 };
 

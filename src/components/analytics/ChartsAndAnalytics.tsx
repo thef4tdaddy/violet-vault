@@ -142,8 +142,8 @@ const ChartsAnalytics = ({
 
       {/* Key Metrics */}
       <MetricsGrid
-        filteredTransactions={filteredTransactions}
-        metrics={metrics}
+        filteredTransactions={filteredTransactions as unknown}
+        metrics={metrics as unknown}
         envelopes={envelopes}
       />
 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { create } from "zustand";
 import logger from "../../utils/common/logger";
 
@@ -14,6 +14,7 @@ interface PromptConfig {
   validation?: ((value: string) => { valid: boolean; error?: string }) | null;
   icon?: string | null;
   onConfirm?: (value: string) => Promise<string | void> | string | void;
+  children?: React.ReactNode;
 }
 
 interface PromptStore {
@@ -34,7 +35,8 @@ const usePromptStore = create<PromptStore>((set) => ({
   config: {},
   resolver: null,
 
-  showPrompt: (config: PromptConfig, resolver: (value: string | null) => void) => set({ isOpen: true, config, resolver }),
+  showPrompt: (config: PromptConfig, resolver: (value: string | null) => void) =>
+    set({ isOpen: true, config, resolver }),
 
   hidePrompt: () => set({ isOpen: false, config: {}, resolver: null }),
 }));

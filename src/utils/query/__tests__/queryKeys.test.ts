@@ -194,7 +194,7 @@ describe("queryKeyUtils", () => {
 
     it("should return base key for unknown entity", () => {
       const related = queryKeyUtils.getRelatedKeys("unknown");
-      expect(related).toEqual([queryKeys.unknown]);
+      expect(related).toEqual([["unknown"]]);
     });
   });
 

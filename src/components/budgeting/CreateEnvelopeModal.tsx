@@ -74,7 +74,7 @@ const CreateEnvelopeModal = ({
           <ModalContent
             formData={formData}
             errors={errors}
-            calculatedAmounts={calculatedAmounts}
+            calculatedAmounts={calculatedAmounts as Record<string, number>}
             isLoading={isLoading}
             canSubmit={canSubmit}
             allBills={allBills}
@@ -82,7 +82,7 @@ const CreateEnvelopeModal = ({
             onBillSelection={handleBillSelection}
             onCreateBill={onCreateBill}
             onCancel={handleClose}
-            onSubmit={handleSubmit}
+            onSubmit={() => handleSubmit(formData) as unknown}
           />
         </div>
       </SlideUpModal>
@@ -108,7 +108,7 @@ const CreateEnvelopeModal = ({
             onBillSelection={handleBillSelection}
             onCreateBill={onCreateBill}
             onCancel={handleClose}
-            onSubmit={handleSubmit}
+            onSubmit={() => handleSubmit(formData) as unknown}
           />
         </div>
       </div>

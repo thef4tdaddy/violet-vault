@@ -55,7 +55,13 @@ const SmartCategoryManager = ({
 
   // Process all suggestions
   const allSuggestions = useMemo(
-    () => processSuggestions(transactionAnalysis, billAnalysis, dismissedSuggestions, 12),
+    () =>
+      processSuggestions(
+        transactionAnalysis as unknown,
+        billAnalysis as unknown,
+        dismissedSuggestions as unknown as Set<string>,
+        12
+      ),
     [transactionAnalysis, billAnalysis, dismissedSuggestions]
   );
 

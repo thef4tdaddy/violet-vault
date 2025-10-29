@@ -32,12 +32,12 @@ const AccountsGrid = ({ accounts, showBalances, onEdit, onDelete, onStartTransfe
             key={String(acc.id)}
             account={account}
             typeInfo={typeInfo}
-            _daysUntilExpiration={daysUntilExpiration}
             expirationStatus={expirationStatus}
             showBalances={showBalances}
             onEdit={onEdit}
             onDelete={onDelete}
             onStartTransfer={onStartTransfer}
+            {...({} as unknown)}
           />
         );
       })}

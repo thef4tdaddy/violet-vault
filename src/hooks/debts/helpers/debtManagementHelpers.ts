@@ -398,9 +398,9 @@ export const updateDebtOperation = async (options: UpdateDebtOptions) => {
 /**
  * Delete a debt and its related connections
  */
-export const deleteDebtOperation = async (options: DeleteDebtOptions) => {
+export const deleteDebtOperation = async (options: DeleteDebtOptions): Promise<void> => {
   const { debtId, bills, deleteBill, deleteDebtData } = options;
-  
+
   try {
     // Find and delete related bill
     const relatedBill = bills.find((bill) => bill.debtId === debtId);

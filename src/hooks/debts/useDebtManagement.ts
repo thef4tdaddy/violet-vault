@@ -53,7 +53,7 @@ export const useDebtManagement = () => {
   const enrichedDebts = useMemo(() => {
     return enrichDebtsWithRelations(
       debts as unknown as DebtForHelper[],
-      bills as BillWithDebtId[],
+      bills as unknown as BillWithDebtId[],
       envelopes as Envelope[],
       transactions as TransactionWithDebtId[]
     );
@@ -122,7 +122,7 @@ export const useDebtManagement = () => {
       debtId,
       billId,
       debts: debts as unknown as DebtForHelper[],
-      bills: bills as BillWithDebtId[],
+      bills: bills as unknown as BillWithDebtId[],
       updateBill: (id, data) => updateBillAsync({ billId: id, updates: data }),
       updateDebtData: (params) => updateDebtData(params),
     });
@@ -132,7 +132,7 @@ export const useDebtManagement = () => {
     if (!updateDebtData) throw new Error('Update debt function not available');
     return syncDebtDueDatesOperation({
       debts: debts as unknown as DebtForHelper[],
-      bills: bills as BillWithDebtId[],
+      bills: bills as unknown as BillWithDebtId[],
       updateDebtData: (params) => updateDebtData(params),
     });
   };
@@ -149,12 +149,17 @@ export const useDebtManagement = () => {
 
   const deleteDebt = async (debtId: string) => {
     if (!deleteDebtData || !deleteBillAsync) throw new Error('Delete functions not available');
-    return deleteDebtOperation({
+    const transformedBills = bills.map((bill) =>
+      makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId)
+    );
+
+    const result = await deleteDebtOperation({
       debtId,
-      bills: bills as BillWithDebtId[],
+      bills: transformedBills,
       deleteBill: (id) => deleteBillAsync(id),
       deleteDebtData: (params) => deleteDebtData(params),
     });
+    return result;
   };
 
   const getUpcomingPaymentsData = (daysAhead = 30) => {
