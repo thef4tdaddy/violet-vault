@@ -33,11 +33,9 @@ export const createTestQueryClient = () => {
  */
 export const createQueryWrapper = (queryClient?: QueryClient) => {
   const testQueryClient = queryClient || createTestQueryClient();
-  
+
   return ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={testQueryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>
   );
 };
 
@@ -49,7 +47,7 @@ export const waitForQueries = async (queryClient: QueryClient) => {
     const unsubscribe = queryClient.getQueryCache().subscribe(() => {
       const queries = queryClient.getQueryCache().getAll();
       const isLoading = queries.some((query) => query.state.fetchStatus === "fetching");
-      
+
       if (!isLoading) {
         unsubscribe();
         resolve(true);
@@ -66,7 +64,7 @@ export const waitForMutations = async (queryClient: QueryClient) => {
     const unsubscribe = queryClient.getMutationCache().subscribe(() => {
       const mutations = queryClient.getMutationCache().getAll();
       const isLoading = mutations.some((mutation) => mutation.state.status === "pending");
-      
+
       if (!isLoading) {
         unsubscribe();
         resolve(true);

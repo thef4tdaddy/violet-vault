@@ -2,14 +2,15 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 0 | -25 |
-| TypeScript Errors | 165 | +15 |
+| Category          | Current | Change |
+| ----------------- | ------- | ------ |
+| ESLint Issues     | 0       | -25    |
+| TypeScript Errors | 165     | +15    |
 
-*Last updated: 2025-10-29 17:11:16 UTC*
+_Last updated: 2025-10-29 17:11:16 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -28,6 +29,7 @@ Last check: 2025-10-29 17:11:05 UTC
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+
 - 10 errors in `src/hooks/debts/useDebtManagement.ts`
 - 9 errors in `src/hooks/bills/useBillManager.ts`
 - 7 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
@@ -144,29 +146,31 @@ Last check: 2025-10-29 17:11:05 UTC
 - 1 errors in `src/components/accounts/AccountFormModal.tsx`
 
 ### Type Error Breakdown by Category
+
 | Count | Error Code |
-|---|---|
-| 51 | `TS2345` |
-| 42 | `TS2322` |
-| 19 | `TS2339` |
-| 7 | `TS2554` |
-| 6 | `TS6133` |
-| 6 | `TS2353` |
-| 6 | `TS2352` |
-| 5 | `TS2741` |
-| 5 | `TS2698` |
-| 4 | `TS2739` |
-| 3 | `TS2769` |
-| 3 | `TS2559` |
-| 2 | `TS2307` |
-| 1 | `TS4104` |
-| 1 | `TS2740` |
-| 1 | `TS2677` |
-| 1 | `TS2538` |
-| 1 | `TS2416` |
-| 1 | `TS2365` |
+| ----- | ---------- |
+| 51    | `TS2345`   |
+| 42    | `TS2322`   |
+| 19    | `TS2339`   |
+| 7     | `TS2554`   |
+| 6     | `TS6133`   |
+| 6     | `TS2353`   |
+| 6     | `TS2352`   |
+| 5     | `TS2741`   |
+| 5     | `TS2698`   |
+| 4     | `TS2739`   |
+| 3     | `TS2769`   |
+| 3     | `TS2559`   |
+| 2     | `TS2307`   |
+| 1     | `TS4104`   |
+| 1     | `TS2740`   |
+| 1     | `TS2677`   |
+| 1     | `TS2538`   |
+| 1     | `TS2416`   |
+| 1     | `TS2365`   |
 
 ### Detailed Type Error Report
+
 ```
 src/components/accounts/AccountFormModal.tsx(129,15): error TS2698: Spread types may only be created from object types.
 src/components/accounts/AccountsGrid.tsx(40,17): error TS2698: Spread types may only be created from object types.
@@ -524,4 +528,3 @@ src/utils/security/errorViewer.ts(27,9): error TS2345: Argument of type 'string'
 src/utils/sync/dataDetectionHelper.ts(27,39): error TS2345: Argument of type 'DatabaseStats' is not assignable to parameter of type 'Record<string, unknown>'.
   Index signature for type 'string' is missing in type 'DatabaseStats'.
 ```
-

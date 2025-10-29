@@ -11,7 +11,9 @@ declare global {
   interface Window {
     budgetDb?: VioletVaultDB;
     runDataDiagnostic?: () => Promise<DataDiagnosticResults>;
-    cleanupCorruptedPaychecks?: (confirmCallback?: ConfirmCallback | null) => Promise<CleanupResult>;
+    cleanupCorruptedPaychecks?: (
+      confirmCallback?: ConfirmCallback | null
+    ) => Promise<CleanupResult>;
     inspectPaycheckRecords?: () => Promise<InspectionResult>;
   }
 }
@@ -215,7 +217,9 @@ interface ConfirmDialogOptions {
 
 type ConfirmCallback = (options: ConfirmDialogOptions) => Promise<boolean>;
 
-export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback | null = null): Promise<CleanupResult> => {
+export const cleanupCorruptedPaychecks = async (
+  confirmCallback: ConfirmCallback | null = null
+): Promise<CleanupResult> => {
   logger.info("🧹 VioletVault Paycheck Cleanup Tool");
   logger.info("=".repeat(50));
 
@@ -269,7 +273,10 @@ export const cleanupCorruptedPaychecks = async (confirmCallback: ConfirmCallback
     logger.info(`🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`);
 
     if (corruptedPaychecks.length > 0) {
-      logger.info("💀 Corrupted paychecks:", corruptedPaychecks as unknown as Record<string, unknown>);
+      logger.info(
+        "💀 Corrupted paychecks:",
+        corruptedPaychecks as unknown as Record<string, unknown>
+      );
 
       const confirmed = confirmCallback
         ? await confirmCallback({

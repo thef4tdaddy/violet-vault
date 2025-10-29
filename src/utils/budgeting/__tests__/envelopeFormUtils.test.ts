@@ -82,7 +82,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).name).toBe("Envelope name must be less than 50 characters");
+      expect((result.errors as ValidationErrors).name).toBe(
+        "Envelope name must be less than 50 characters"
+      );
     });
 
     it("should detect duplicate names", () => {
@@ -91,7 +93,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData, existingEnvelopes);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).name).toBe("An envelope with this name already exists");
+      expect((result.errors as ValidationErrors).name).toBe(
+        "An envelope with this name already exists"
+      );
     });
 
     it("should allow same name when editing existing envelope", () => {
@@ -108,7 +112,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).monthlyAmount).toBe("Monthly amount must be a positive number");
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe(
+        "Monthly amount must be a positive number"
+      );
     });
 
     it("should validate monthly amount maximum", () => {
@@ -116,7 +122,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).monthlyAmount).toBe("Monthly amount cannot exceed $100,000");
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe(
+        "Monthly amount cannot exceed $100,000"
+      );
     });
 
     it("should require target amount for sinking funds", () => {
@@ -128,7 +136,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).targetAmount).toBe("Target amount is required for sinking funds");
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount is required for sinking funds"
+      );
     });
 
     it("should validate target amount format", () => {
@@ -140,7 +150,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect((result.errors as ValidationErrors).targetAmount).toBe("Target amount must be a positive number");
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount must be a positive number"
+      );
     });
 
     it("should require category", () => {
@@ -170,7 +182,7 @@ describe("envelopeFormUtils", () => {
 
   describe("calculateEnvelopeAmounts", () => {
     it("should calculate biweekly allocation correctly", () => {
-      const formData = { 
+      const formData = {
         monthlyAmount: "100",
         name: "",
         currentBalance: "",
@@ -191,7 +203,7 @@ describe("envelopeFormUtils", () => {
     });
 
     it("should handle zero amounts", () => {
-      const formData = { 
+      const formData = {
         monthlyAmount: "0",
         name: "",
         currentBalance: "",
@@ -212,7 +224,7 @@ describe("envelopeFormUtils", () => {
     });
 
     it("should calculate annual and weekly amounts", () => {
-      const formData = { 
+      const formData = {
         monthlyAmount: "100",
         name: "",
         currentBalance: "",
@@ -349,10 +361,10 @@ describe("envelopeFormUtils", () => {
     });
 
     it("should return null for non-sinking fund envelopes", () => {
-      const envelope = { 
+      const envelope = {
         id: "test-id",
         name: "Test",
-        envelopeType: ENVELOPE_TYPES.VARIABLE 
+        envelopeType: ENVELOPE_TYPES.VARIABLE,
       };
       const result = calculateEnvelopeProgress(envelope);
       expect(result).toBeNull();
@@ -397,10 +409,10 @@ describe("envelopeFormUtils", () => {
 
   describe("validateEnvelopeTypeChange", () => {
     it("should allow type change with no warnings", () => {
-      const envelope = { 
+      const envelope = {
         id: "test-id",
         name: "Test",
-        envelopeType: ENVELOPE_TYPES.VARIABLE 
+        envelopeType: ENVELOPE_TYPES.VARIABLE,
       };
       const result = validateEnvelopeTypeChange(ENVELOPE_TYPES.BILL, envelope);
 
@@ -425,10 +437,10 @@ describe("envelopeFormUtils", () => {
     });
 
     it("should error when changing to sinking fund without target", () => {
-      const envelope = { 
+      const envelope = {
         id: "test-id",
         name: "Test",
-        envelopeType: ENVELOPE_TYPES.VARIABLE 
+        envelopeType: ENVELOPE_TYPES.VARIABLE,
       };
       const result = validateEnvelopeTypeChange(ENVELOPE_TYPES.SINKING_FUND, envelope);
 

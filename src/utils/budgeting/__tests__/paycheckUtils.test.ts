@@ -14,10 +14,10 @@ import { ENVELOPE_TYPES } from "../../../constants/categories";
 // Type for test data
 type PaycheckRecord = { payerName: string; amount: number; processedAt?: string };
 type AllocationResult = {
-  allocations: Array<{ 
-    envelopeId: string; 
+  allocations: Array<{
+    envelopeId: string;
     envelopeName: string;
-    amount: number; 
+    amount: number;
     monthlyAmount: number;
     envelopeType: string;
     priority: string;
@@ -290,8 +290,22 @@ describe("paycheckUtils", () => {
   describe("validateAllocations", () => {
     it("should validate correct allocations", () => {
       const allocations = [
-        { envelopeId: "1", envelopeName: "Groceries", amount: 400, monthlyAmount: 400, envelopeType: "expense", priority: "high" },
-        { envelopeId: "2", envelopeName: "Rent", amount: 300, monthlyAmount: 300, envelopeType: "expense", priority: "high" }
+        {
+          envelopeId: "1",
+          envelopeName: "Groceries",
+          amount: 400,
+          monthlyAmount: 400,
+          envelopeType: "expense",
+          priority: "high",
+        },
+        {
+          envelopeId: "2",
+          envelopeName: "Rent",
+          amount: 300,
+          monthlyAmount: 300,
+          envelopeType: "expense",
+          priority: "high",
+        },
       ];
 
       const result = validateAllocations(allocations, 1000);
@@ -302,8 +316,22 @@ describe("paycheckUtils", () => {
 
     it("should detect overage", () => {
       const allocations = [
-        { envelopeId: "1", envelopeName: "Groceries", amount: 600, monthlyAmount: 600, envelopeType: "expense", priority: "high" },
-        { envelopeId: "2", envelopeName: "Rent", amount: 500, monthlyAmount: 500, envelopeType: "expense", priority: "high" }
+        {
+          envelopeId: "1",
+          envelopeName: "Groceries",
+          amount: 600,
+          monthlyAmount: 600,
+          envelopeType: "expense",
+          priority: "high",
+        },
+        {
+          envelopeId: "2",
+          envelopeName: "Rent",
+          amount: 500,
+          monthlyAmount: 500,
+          envelopeType: "expense",
+          priority: "high",
+        },
       ];
 
       const result = validateAllocations(allocations, 1000);
@@ -315,7 +343,14 @@ describe("paycheckUtils", () => {
 
     it("should detect negative allocations", () => {
       const allocations = [
-        { envelopeId: "1", envelopeName: "Groceries", amount: -100, monthlyAmount: -100, envelopeType: "expense", priority: "high" }
+        {
+          envelopeId: "1",
+          envelopeName: "Groceries",
+          amount: -100,
+          monthlyAmount: -100,
+          envelopeType: "expense",
+          priority: "high",
+        },
       ];
 
       const result = validateAllocations(allocations, 1000);

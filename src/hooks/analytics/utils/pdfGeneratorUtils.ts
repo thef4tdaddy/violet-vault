@@ -3,11 +3,7 @@
  * Extracted from useReportExporter hook to reduce complexity
  */
 
-import {
-  addSummaryToPDF,
-  addEnvelopeAnalysisToPDF,
-  addInsightsToPDF,
-} from "./pdfExportUtils";
+import { addSummaryToPDF, addEnvelopeAnalysisToPDF, addInsightsToPDF } from "./pdfExportUtils";
 
 interface ExportOptions {
   includeSummary: boolean;

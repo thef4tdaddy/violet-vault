@@ -7,6 +7,7 @@ The Testing Epic (#919) provides a comprehensive framework for testing and valid
 ## Structure
 
 ### Epic Hierarchy
+
 ```
 Epic #919: 🧪 E2E Testing & QA
 ├── Core Features (6 issues)
@@ -31,6 +32,7 @@ Each sub-issue includes:
 ## Testing Levels Explained
 
 ### Unit Tests
+
 Component and function-level tests. Test individual pieces in isolation.
 
 ```bash
@@ -38,9 +40,11 @@ npm run test
 ```
 
 ### Integration Tests
+
 Test how components and services work together.
 
 ### E2E Tests
+
 Full user workflow tests using browser automation.
 
 ```bash
@@ -48,11 +52,13 @@ npm run test:e2e
 ```
 
 ### Manual QA
+
 Human validation of UI/UX, visual appearance, and user experience.
 
 ## How to Use Sub-Issues
 
 ### For Manual Testing
+
 1. Open a sub-issue (e.g., #920 - Authentication Testing)
 2. Go through the test checklist
 3. Document results in comments
@@ -60,6 +66,7 @@ Human validation of UI/UX, visual appearance, and user experience.
 5. Close issue when all tests pass
 
 ### For Test Automation
+
 1. Use the sub-issue as a specification
 2. Create test files matching the scope
 3. Add tests for each checklist item
@@ -67,6 +74,7 @@ Human validation of UI/UX, visual appearance, and user experience.
 5. Update issue with coverage metrics
 
 ### For Bug Reporting
+
 Create bugs and link to the relevant sub-issue:
 
 ```bash
@@ -77,6 +85,7 @@ gh issue create --title "Bug: [description]" \
 ## Regenerating the Epic
 
 ### Automatic (Recommended)
+
 Run the creation script to generate a fresh epic with all 20 sub-issues:
 
 ```bash
@@ -84,12 +93,14 @@ Run the creation script to generate a fresh epic with all 20 sub-issues:
 ```
 
 ### When to Regenerate
+
 - After major release (to start fresh testing cycle)
 - When adding significant new features
 - Quarterly testing sweeps
 - Before major version releases
 
 ### What Gets Created
+
 - 1 master epic issue
 - 20 sub-issues across 5 categories
 - All properly labeled with `testing`
@@ -100,6 +111,7 @@ Run the creation script to generate a fresh epic with all 20 sub-issues:
 ### Individual Sub-Issue Reports
 
 Each sub-issue should track:
+
 - ✅ Test cases passed/failed
 - 📊 Coverage percentage
 - 🐛 Bugs found
@@ -107,6 +119,7 @@ Each sub-issue should track:
 - ♿ Accessibility score
 
 Example report in issue comment:
+
 ```
 ## Test Results - [Date]
 
@@ -187,6 +200,7 @@ npm run lint
 ## Best Practices
 
 ### ✅ Do
+
 - Link related PRs and issues to sub-issues
 - Update sub-issue status regularly
 - Document all bugs found with reproducible steps
@@ -194,6 +208,7 @@ npm run lint
 - Assign sub-issues for accountability
 
 ### ❌ Don't
+
 - Leave sub-issues without documentation
 - Skip testing levels
 - Close without verifying all items pass
@@ -203,14 +218,18 @@ npm run lint
 ## Advanced Features
 
 ### Progress Tracking
+
 Use GitHub's epic view to see:
+
 - Overall completion percentage
 - Sub-issue burndown
 - Related PRs and branches
 - Team member assignments
 
 ### Automation
+
 Link this epic to your CI/CD pipeline:
+
 ```yaml
 # In workflow file
 - name: Update testing issue
@@ -219,6 +238,7 @@ Link this epic to your CI/CD pipeline:
 ```
 
 ### Integration with Other Tools
+
 - Link to Jira for additional tracking
 - Export results to spreadsheets
 - Create dashboards from data
@@ -227,6 +247,7 @@ Link this epic to your CI/CD pipeline:
 ## Support & Questions
 
 For questions about:
+
 - **Testing approach**: See `docs/testing/` directory
 - **Component testing**: See specific component tests
 - **E2E setup**: See `playwright.config.ts`

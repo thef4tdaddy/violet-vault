@@ -8,7 +8,10 @@
 /**
  * Calculate delay with exponential backoff and jitter
  */
-export const calculateRetryDelay = (attempt: number, options: { baseDelay?: number; maxDelay?: number; jitter?: boolean } = {}) => {
+export const calculateRetryDelay = (
+  attempt: number,
+  options: { baseDelay?: number; maxDelay?: number; jitter?: boolean } = {}
+) => {
   const { baseDelay = 1000, maxDelay = 16000, jitter = true } = options;
 
   const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);

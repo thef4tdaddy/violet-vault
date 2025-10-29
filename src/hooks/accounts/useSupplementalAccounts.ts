@@ -119,13 +119,7 @@ const useSupplementalAccounts = ({
   };
 
   const handleCloseModal = () => {
-    handleModalCloseWithLock(
-      isOwnLock,
-      releaseLock,
-      setEditingAccount,
-      setShowAddModal,
-      resetForm
-    );
+    handleModalCloseWithLock(isOwnLock, releaseLock, setEditingAccount, setShowAddModal, resetForm);
   };
 
   const handleDelete = async (accountId) => {

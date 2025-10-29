@@ -118,9 +118,7 @@ describe("Sync Data Integrity Tests", () => {
       ];
 
       // When deleting envelope, related items should be identified
-      const affectedTransactions = transactions.filter(
-        (t) => t.envelopeId === envelopeToDelete
-      );
+      const affectedTransactions = transactions.filter((t) => t.envelopeId === envelopeToDelete);
       const affectedBills = bills.filter((b) => b.envelopeId === envelopeToDelete);
 
       expect(affectedTransactions).toHaveLength(1);

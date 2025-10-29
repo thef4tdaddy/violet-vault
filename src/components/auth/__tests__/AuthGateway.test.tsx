@@ -108,8 +108,7 @@ describe("AuthGateway", () => {
 
   describe("Local Only Mode", () => {
     it("should render nothing when local only mode is active", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: true,
         localOnlyUser: { id: "test-user", name: "Test" },
@@ -125,8 +124,7 @@ describe("AuthGateway", () => {
 
     it("should call onLocalOnlyReady when local only user exists", async () => {
       const mockUser = { id: "test-user", name: "Test" };
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: mockUser,
@@ -151,8 +149,7 @@ describe("AuthGateway", () => {
     });
 
     it("should handle error during mode check", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: null,
@@ -172,8 +169,7 @@ describe("AuthGateway", () => {
 
   describe("Mode Switching", () => {
     it("should switch to local only setup", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: { id: "test", name: "Test" },
@@ -189,8 +185,7 @@ describe("AuthGateway", () => {
 
     it("should handle local only mode selection", async () => {
       const mockUser = { id: "test-user", name: "Test" };
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: mockUser,
@@ -212,8 +207,7 @@ describe("AuthGateway", () => {
     });
 
     it("should switch back to auth from local only", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: { id: "test", name: "Test" },
@@ -260,8 +254,7 @@ describe("AuthGateway", () => {
 
   describe("Error Recovery", () => {
     it("should recover from checkLocalOnlyMode failure", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode")
-        .useLocalOnlyMode as any;
+      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
       useLocalOnlyMode.mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: null,

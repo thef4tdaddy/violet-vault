@@ -105,7 +105,10 @@ export const calculateGrowthRate = (current: number, previous: number): number =
 };
 
 // Transaction processing
-export const _filterTransactionsByDateRange = (transactions: unknown[], timeFilter: string): unknown[] => {
+export const _filterTransactionsByDateRange = (
+  transactions: unknown[],
+  timeFilter: string
+): unknown[] => {
   const dateRange = getDateRangeFilter(timeFilter);
 
   return transactions.filter((transaction) => {
@@ -235,7 +238,10 @@ export const groupTransactionsByWeekday = (transactions: unknown[]): unknown[] =
 };
 
 // Envelope processing
-export const analyzeEnvelopeSpending = (transactions: unknown[], envelopes: unknown[]): EnvelopeSpendingData[] => {
+export const analyzeEnvelopeSpending = (
+  transactions: unknown[],
+  envelopes: unknown[]
+): EnvelopeSpendingData[] => {
   const spending: Record<string, EnvelopeSpendingData> = {};
 
   transactions.forEach((transaction) => {
@@ -246,7 +252,9 @@ export const analyzeEnvelopeSpending = (transactions: unknown[], envelopes: unkn
       return;
     }
 
-    const envelope = envelopes.find((e) => (e as { id?: string }).id === txn.envelopeId) as { name?: string; monthlyAmount?: number; color?: string } | undefined;
+    const envelope = envelopes.find((e) => (e as { id?: string }).id === txn.envelopeId) as
+      | { name?: string; monthlyAmount?: number; color?: string }
+      | undefined;
     const envelopeName = envelope ? envelope.name || "Unknown Envelope" : "Unknown Envelope";
 
     if (!spending[envelopeName]) {
@@ -278,11 +286,11 @@ export const analyzeEnvelopeSpending = (transactions: unknown[], envelopes: unkn
 
 export const analyzeEnvelopeHealth = (envelopes: unknown[]): unknown[] => {
   return envelopes.filter(validateEnvelope).map((envelope) => {
-    const env = envelope as { 
-      id?: string; 
-      name?: string; 
-      monthlyAmount?: number; 
-      currentBalance?: number; 
+    const env = envelope as {
+      id?: string;
+      name?: string;
+      monthlyAmount?: number;
+      currentBalance?: number;
       color?: string;
       spendingHistory?: Array<{ amount: number }>;
     };
@@ -312,7 +320,10 @@ export const analyzeEnvelopeHealth = (envelopes: unknown[]): unknown[] => {
 };
 
 // Financial metrics calculation
-export const _calculateFinancialMetrics = (transactions: unknown[], envelopes: unknown[]): unknown => {
+export const _calculateFinancialMetrics = (
+  transactions: unknown[],
+  envelopes: unknown[]
+): unknown => {
   const validTransactions = transactions.filter(validateTransaction);
 
   const totalIncome: number = validTransactions
@@ -349,11 +360,17 @@ export const _calculateFinancialMetrics = (transactions: unknown[], envelopes: u
   // Envelope metrics
   const totalEnvelopeBudget: number = envelopes
     .filter(validateEnvelope)
-    .reduce((sum: number, env) => sum + ((env as { monthlyAmount?: number }).monthlyAmount || 0), 0) as number;
+    .reduce(
+      (sum: number, env) => sum + ((env as { monthlyAmount?: number }).monthlyAmount || 0),
+      0
+    ) as number;
 
   const totalEnvelopeBalance: number = envelopes
     .filter(validateEnvelope)
-    .reduce((sum: number, env) => sum + ((env as { currentBalance?: number }).currentBalance || 0), 0) as number;
+    .reduce(
+      (sum: number, env) => sum + ((env as { currentBalance?: number }).currentBalance || 0),
+      0
+    ) as number;
 
   const budgetUtilization: number = safeDivision(totalExpenses, totalEnvelopeBudget, 0) * 100;
 
@@ -411,12 +428,15 @@ export const calculateTrends = (monthlyData: MonthlyGroupData[]): unknown => {
 };
 
 // Export processing
-export const prepareDataForExport = (analyticsData: { 
-  monthlyTrends: unknown[]; 
-  categoryBreakdown: unknown[]; 
-  envelopeSpending: unknown[]; 
-  metrics: unknown;
-}, format = "csv"): unknown => {
+export const prepareDataForExport = (
+  analyticsData: {
+    monthlyTrends: unknown[];
+    categoryBreakdown: unknown[];
+    envelopeSpending: unknown[];
+    metrics: unknown;
+  },
+  format = "csv"
+): unknown => {
   const { monthlyTrends, categoryBreakdown, envelopeSpending, metrics } = analyticsData;
 
   if (format === "csv") {

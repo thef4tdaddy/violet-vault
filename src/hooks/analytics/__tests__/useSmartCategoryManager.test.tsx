@@ -74,7 +74,7 @@ const createWrapper = () => {
     defaultOptions: { queries: { retry: false } },
   });
 
-  return ({ children }: {children: React.ReactNode}) => (
+  return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
@@ -142,12 +142,12 @@ describe("useSmartCategoryManager", () => {
       wrapper: createWrapper(),
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).suggestions).toEqual([]);
-    expect(((result.current as unknown) as TestExpectedHookReturn).isAnalyzing).toBe(false);
-    expect(((result.current as unknown) as TestExpectedHookReturn).isApplying).toBe(false);
-    expect(((result.current as unknown) as TestExpectedHookReturn).selectedSuggestions).toEqual([]);
-    expect(((result.current as unknown) as TestExpectedHookReturn).modelAccuracy).toBe(null);
-    expect(((result.current as unknown) as TestExpectedHookReturn).analysisResults).toBe(null);
+    expect((result.current as unknown as TestExpectedHookReturn).suggestions).toEqual([]);
+    expect((result.current as unknown as TestExpectedHookReturn).isAnalyzing).toBe(false);
+    expect((result.current as unknown as TestExpectedHookReturn).isApplying).toBe(false);
+    expect((result.current as unknown as TestExpectedHookReturn).selectedSuggestions).toEqual([]);
+    expect((result.current as unknown as TestExpectedHookReturn).modelAccuracy).toBe(null);
+    expect((result.current as unknown as TestExpectedHookReturn).analysisResults).toBe(null);
   });
 
   it("should analyze transactions and generate suggestions", async () => {
@@ -158,15 +158,17 @@ describe("useSmartCategoryManager", () => {
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).analyzeSuggestions();
+      await (result.current as unknown as TestExpectedHookReturn).analyzeSuggestions();
     });
 
     expect(smartCategoryService.suggestCategories).toHaveBeenCalledWith(
       mockTransactions,
       mockEnvelopes
     );
-    expect(((result.current as unknown) as TestExpectedHookReturn).suggestions).toEqual(mockSuggestions);
-    expect(((result.current as unknown) as TestExpectedHookReturn).isAnalyzing).toBe(false);
+    expect((result.current as unknown as TestExpectedHookReturn).suggestions).toEqual(
+      mockSuggestions
+    );
+    expect((result.current as unknown as TestExpectedHookReturn).isAnalyzing).toBe(false);
   });
 
   it("should handle analysis errors gracefully", async () => {
@@ -178,11 +180,11 @@ describe("useSmartCategoryManager", () => {
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).analyzeSuggestions();
+      await (result.current as unknown as TestExpectedHookReturn).analyzeSuggestions();
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).suggestions).toEqual([]);
-    expect(((result.current as unknown) as TestExpectedHookReturn).isAnalyzing).toBe(false);
+    expect((result.current as unknown as TestExpectedHookReturn).suggestions).toEqual([]);
+    expect((result.current as unknown as TestExpectedHookReturn).isAnalyzing).toBe(false);
   });
 
   it("should toggle suggestion selection", () => {
@@ -193,22 +195,26 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
     });
 
     // Select first suggestion
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).toggleSuggestionSelection("1");
+      (result.current as unknown as TestExpectedHookReturn).toggleSuggestionSelection("1");
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).selectedSuggestions).toContain("1");
+    expect((result.current as unknown as TestExpectedHookReturn).selectedSuggestions).toContain(
+      "1"
+    );
 
     // Deselect first suggestion
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).toggleSuggestionSelection("1");
+      (result.current as unknown as TestExpectedHookReturn).toggleSuggestionSelection("1");
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).selectedSuggestions).not.toContain("1");
+    expect((result.current as unknown as TestExpectedHookReturn).selectedSuggestions).not.toContain(
+      "1"
+    );
   });
 
   it("should select all high-confidence suggestions", () => {
@@ -217,15 +223,18 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).selectHighConfidenceSuggestions(0.85);
+      (result.current as unknown as TestExpectedHookReturn).selectHighConfidenceSuggestions(0.85);
     });
 
     // Both suggestions have confidence > 0.85
-    expect(((result.current as unknown) as TestExpectedHookReturn).selectedSuggestions).toEqual(["1", "2"]);
+    expect((result.current as unknown as TestExpectedHookReturn).selectedSuggestions).toEqual([
+      "1",
+      "2",
+    ]);
   });
 
   it("should apply selected suggestions", async () => {
@@ -246,19 +255,19 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
-      ((result.current as unknown) as TestExpectedHookReturn).setSelectedSuggestions(["1", "2"]);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSelectedSuggestions(["1", "2"]);
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).applySelectedSuggestions();
+      await (result.current as unknown as TestExpectedHookReturn).applySelectedSuggestions();
     });
 
     expect(smartCategoryService.applyCategoryMapping).toHaveBeenCalledWith(
       mockSuggestions.filter((s) => ["1", "2"].includes(s.transactionId)),
       mockUpdateTransaction
     );
-    expect(((result.current as unknown) as TestExpectedHookReturn).isApplying).toBe(false);
+    expect((result.current as unknown as TestExpectedHookReturn).isApplying).toBe(false);
   });
 
   it("should handle apply suggestions errors", async () => {
@@ -270,15 +279,15 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
-      ((result.current as unknown) as TestExpectedHookReturn).setSelectedSuggestions(["1"]);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSelectedSuggestions(["1"]);
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).applySelectedSuggestions();
+      await (result.current as unknown as TestExpectedHookReturn).applySelectedSuggestions();
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).isApplying).toBe(false);
+    expect((result.current as unknown as TestExpectedHookReturn).isApplying).toBe(false);
   });
 
   it("should train the category model", async () => {
@@ -293,7 +302,7 @@ describe("useSmartCategoryManager", () => {
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).trainModel();
+      await (result.current as unknown as TestExpectedHookReturn).trainModel();
     });
 
     expect(smartCategoryService.trainCategoryModel).toHaveBeenCalledWith(mockTransactions);
@@ -311,10 +320,10 @@ describe("useSmartCategoryManager", () => {
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).checkModelAccuracy();
+      await (result.current as unknown as TestExpectedHookReturn).checkModelAccuracy();
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).modelAccuracy).toEqual({
+    expect((result.current as unknown as TestExpectedHookReturn).modelAccuracy).toEqual({
       accuracy: 0.89,
       lastTrained: "2023-09-01T12:00:00Z",
       sampleSize: 300,
@@ -336,10 +345,12 @@ describe("useSmartCategoryManager", () => {
     });
 
     await act(async () => {
-      await ((result.current as unknown) as TestExpectedHookReturn).analyzeCategoryPatterns();
+      await (result.current as unknown as TestExpectedHookReturn).analyzeCategoryPatterns();
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).analysisResults).toEqual(mockPatterns);
+    expect((result.current as unknown as TestExpectedHookReturn).analysisResults).toEqual(
+      mockPatterns
+    );
   });
 
   it("should clear suggestions", () => {
@@ -348,16 +359,16 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
-      ((result.current as unknown) as TestExpectedHookReturn).setSelectedSuggestions(["1", "2"]);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSelectedSuggestions(["1", "2"]);
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).clearSuggestions();
+      (result.current as unknown as TestExpectedHookReturn).clearSuggestions();
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).suggestions).toEqual([]);
-    expect(((result.current as unknown) as TestExpectedHookReturn).selectedSuggestions).toEqual([]);
+    expect((result.current as unknown as TestExpectedHookReturn).suggestions).toEqual([]);
+    expect((result.current as unknown as TestExpectedHookReturn).selectedSuggestions).toEqual([]);
   });
 
   it("should filter suggestions by confidence threshold", () => {
@@ -366,12 +377,18 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
     });
 
-    const highConfidence = ((result.current as unknown) as TestExpectedHookReturn).getFilteredSuggestions(0.9);
-    const mediumConfidence = ((result.current as unknown) as TestExpectedHookReturn).getFilteredSuggestions(0.85);
-    const allSuggestions = ((result.current as unknown) as TestExpectedHookReturn).getFilteredSuggestions(0.5);
+    const highConfidence = (
+      result.current as unknown as TestExpectedHookReturn
+    ).getFilteredSuggestions(0.9);
+    const mediumConfidence = (
+      result.current as unknown as TestExpectedHookReturn
+    ).getFilteredSuggestions(0.85);
+    const allSuggestions = (
+      result.current as unknown as TestExpectedHookReturn
+    ).getFilteredSuggestions(0.5);
 
     expect(highConfidence).toHaveLength(1); // Only 0.92 confidence
     expect(mediumConfidence).toHaveLength(2); // Both 0.92 and 0.88
@@ -384,11 +401,11 @@ describe("useSmartCategoryManager", () => {
     });
 
     act(() => {
-      ((result.current as unknown) as TestExpectedHookReturn).setSuggestions(mockSuggestions);
-      ((result.current as unknown) as TestExpectedHookReturn).setSelectedSuggestions(["1"]);
+      (result.current as unknown as TestExpectedHookReturn).setSuggestions(mockSuggestions);
+      (result.current as unknown as TestExpectedHookReturn).setSelectedSuggestions(["1"]);
     });
 
-    const stats = ((result.current as unknown) as TestExpectedHookReturn).getSuggestionStats();
+    const stats = (result.current as unknown as TestExpectedHookReturn).getSuggestionStats();
 
     expect(stats).toEqual({
       total: 2,
@@ -416,6 +433,6 @@ describe("useSmartCategoryManager", () => {
       wrapper: createWrapper(),
     });
 
-    expect(((result.current as unknown) as TestExpectedHookReturn).isDataLoading).toBe(true);
+    expect((result.current as unknown as TestExpectedHookReturn).isDataLoading).toBe(true);
   });
 });

@@ -52,10 +52,7 @@ function applyDragTransform(
 }
 
 // Reset drag transform to original position
-function resetDragTransform(
-  modalRef: React.RefObject<HTMLDivElement>,
-  backdrop: boolean
-) {
+function resetDragTransform(modalRef: React.RefObject<HTMLDivElement>, backdrop: boolean) {
   if (!modalRef.current) return;
 
   modalRef.current.style.transform = "translateY(0)";
@@ -186,7 +183,9 @@ function processDragMove(
   modalRef: React.RefObject<HTMLDivElement>,
   touch: React.Touch,
   backdrop: boolean,
-  setDragState: React.Dispatch<React.SetStateAction<{ isDragging: boolean; startY: number; currentY: number; deltaY: number }>>
+  setDragState: React.Dispatch<
+    React.SetStateAction<{ isDragging: boolean; startY: number; currentY: number; deltaY: number }>
+  >
 ) {
   if (!dragState.isDragging || !modalRef.current) return;
 
@@ -210,7 +209,9 @@ function processDragEnd(
   modalRef: React.RefObject<HTMLDivElement>,
   backdrop: boolean,
   onClose: (() => void) | undefined,
-  setDragState: React.Dispatch<React.SetStateAction<{ isDragging: boolean; startY: number; currentY: number; deltaY: number }>>
+  setDragState: React.Dispatch<
+    React.SetStateAction<{ isDragging: boolean; startY: number; currentY: number; deltaY: number }>
+  >
 ) {
   if (!dragState.isDragging || !modalRef.current) return;
 
@@ -298,7 +299,7 @@ const SlideUpModal = ({
   // Handle opening/closing animations
   useEffect(() => {
     if (!isOpen) return;
-    
+
     setIsAnimating(true);
     const timer = setTimeout(() => setIsAnimating(false), 300);
     return () => clearTimeout(timer);

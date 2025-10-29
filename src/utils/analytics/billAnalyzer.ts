@@ -80,7 +80,10 @@ export const analyzeBillCategorization = (bills: BillItem[], _settings: Settings
     // Create suggestions for each bill type with multiple bills
     Object.entries(billTypePatterns).forEach(([categoryType, billsInType]) => {
       if (billsInType.length >= 2) {
-        const totalAmount = billsInType.reduce((sum: number, bill) => sum + (bill.amount || 0), 0) as number;
+        const totalAmount = billsInType.reduce(
+          (sum: number, bill) => sum + (bill.amount || 0),
+          0
+        ) as number;
 
         suggestions.push({
           id: `bill_category_${categoryType}`,
@@ -109,7 +112,10 @@ export const analyzeBillCategorization = (bills: BillItem[], _settings: Settings
 /**
  * Analyze bill category optimization opportunities
  */
-export const analyzeBillCategoryOptimization = (bills: BillItem[], settings: Settings): Suggestion[] => {
+export const analyzeBillCategoryOptimization = (
+  bills: BillItem[],
+  settings: Settings
+): Suggestion[] => {
   const suggestions: Suggestion[] = [];
   const { minAmount = 0 } = settings;
 

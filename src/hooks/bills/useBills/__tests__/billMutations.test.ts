@@ -10,11 +10,12 @@ import {
   useDeleteBillMutation,
   useMarkBillPaidMutation,
 } from "../billMutations";
+import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
 import {
-  createTestQueryClient,
-  createQueryWrapper,
-} from "@/test/queryTestUtils";
-import { createMockDexie, mockDataGenerators, createMockOptimisticHelpers } from "@/test/queryMocks";
+  createMockDexie,
+  mockDataGenerators,
+  createMockOptimisticHelpers,
+} from "@/test/queryMocks";
 import { queryKeys } from "@/utils/common/queryClient";
 
 // Mock dependencies
@@ -96,7 +97,7 @@ describe("Bill Mutation Hooks", () => {
       // Assert
       expect(mockOptimistic.addBill).toHaveBeenCalled();
       expect(mockDb.bills.add).toHaveBeenCalled();
-      
+
       const addedBill = mockDb.bills.add.mock.calls[0][0];
       expect(addedBill.name).toBe("Test Bill");
       expect(addedBill.isPaid).toBe(false);
@@ -140,7 +141,7 @@ describe("Bill Mutation Hooks", () => {
     it("should rollback on error", async () => {
       // Arrange
       mockDb.bills.add.mockRejectedValue(new Error("Database error"));
-      
+
       const { result } = renderHook(() => useAddBillMutation(), { wrapper });
       const setQueryDataSpy = vi.spyOn(queryClient, "setQueryData");
 
@@ -175,14 +176,20 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      expect(mockOptimistic.updateBill).toHaveBeenCalledWith("bill_1", expect.objectContaining({
-        name: "New Name",
-        amount: 150,
-      }));
-      expect(mockDb.bills.update).toHaveBeenCalledWith("bill_1", expect.objectContaining({
-        name: "New Name",
-        amount: 150,
-      }));
+      expect(mockOptimistic.updateBill).toHaveBeenCalledWith(
+        "bill_1",
+        expect.objectContaining({
+          name: "New Name",
+          amount: 150,
+        })
+      );
+      expect(mockDb.bills.update).toHaveBeenCalledWith(
+        "bill_1",
+        expect.objectContaining({
+          name: "New Name",
+          amount: 150,
+        })
+      );
     });
 
     it("should throw error if bill not found", async () => {
@@ -312,13 +319,16 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      expect(mockDb.bills.update).toHaveBeenCalledWith("bill_1", expect.objectContaining({
-        isPaid: true,
-        paidAmount: 100,
-        paidDate: "2024-01-15",
-        envelopeId: "envelope_1",
-      }));
-      
+      expect(mockDb.bills.update).toHaveBeenCalledWith(
+        "bill_1",
+        expect.objectContaining({
+          isPaid: true,
+          paidAmount: 100,
+          paidDate: "2024-01-15",
+          envelopeId: "envelope_1",
+        })
+      );
+
       // Should create payment transaction
       expect(mockDb.transactions.put).toHaveBeenCalled();
       const transaction = mockDb.transactions.put.mock.calls[0][0];
@@ -333,7 +343,7 @@ describe("Bill Mutation Hooks", () => {
         id: "envelope_1",
         currentBalance: 500,
       });
-      
+
       mockDb._mockData.bills = [unpaidBill];
       mockDb._mockData.envelopes = [envelope];
 
@@ -351,9 +361,12 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      expect(mockDb.envelopes.update).toHaveBeenCalledWith("envelope_1", expect.objectContaining({
-        currentBalance: 400, // 500 - 100
-      }));
+      expect(mockDb.envelopes.update).toHaveBeenCalledWith(
+        "envelope_1",
+        expect.objectContaining({
+          currentBalance: 400, // 500 - 100
+        })
+      );
     });
 
     it("should use current date if paidDate not provided", async () => {

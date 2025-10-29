@@ -13,12 +13,7 @@ import {
 } from "../../utils/common/billIcons";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";
-import type {
-  Bill,
-  BillFormData,
-  BillFormOptions,
-  BillFormHookReturn,
-} from "../../types/bills";
+import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "../../types/bills";
 import {
   getInitialFormData,
   calculateMonthlyAmountHelper,
@@ -97,7 +92,7 @@ export const useBillForm = ({
 
       try {
         const billData: Bill = {
-          ...buildBillData(formData, editingBill, suggestedIconName) as Record<string, unknown>,
+          ...(buildBillData(formData, editingBill, suggestedIconName) as Record<string, unknown>),
           id: editingBill?.id || uuidv4(),
         } as Bill;
 

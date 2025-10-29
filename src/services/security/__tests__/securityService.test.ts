@@ -227,14 +227,20 @@ describe("securityService", () => {
     });
 
     it("should handle malformed events gracefully", () => {
-      const badEvent: { type: number; description: null; metadata: { circular: { ref?: unknown } } } = {
+      const badEvent: {
+        type: number;
+        description: null;
+        metadata: { circular: { ref?: unknown } };
+      } = {
         type: 123, // Invalid type
         description: null,
         metadata: { circular: {} },
       };
       badEvent.metadata.circular.ref = badEvent.metadata.circular;
 
-      const result = securityService.createSecurityEvent(badEvent as unknown as Partial<SecurityEvent> & { type: string; description: string });
+      const result = securityService.createSecurityEvent(
+        badEvent as unknown as Partial<SecurityEvent> & { type: string; description: string }
+      );
 
       expect(result.type).toBe("UNKNOWN");
       expect(result.description).toBe("Security event");

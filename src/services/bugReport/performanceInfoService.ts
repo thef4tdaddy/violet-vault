@@ -318,7 +318,7 @@ export class PerformanceInfoService {
         return { available: false };
       }
 
-      const estimate = await navigator.storage.estimate() as ExtendedStorageEstimate;
+      const estimate = (await navigator.storage.estimate()) as ExtendedStorageEstimate;
       return {
         available: true,
         quota: estimate.quota,

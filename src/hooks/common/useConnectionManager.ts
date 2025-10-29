@@ -42,13 +42,13 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
 
   // Get connection data using extracted hook
   const { currentConnections, availableOptions, hasConnections, hasAvailableOptions } =
-    useConnectionData({ 
-      entityType, 
-      entityId, 
-      currentEntity: currentEntity as Envelope | Bill | Debt | null, 
-      bills: bills as unknown as Bill[], 
-      envelopes, 
-      debts: debts as unknown as Debt[] 
+    useConnectionData({
+      entityType,
+      entityId,
+      currentEntity: currentEntity as Envelope | Bill | Debt | null,
+      bills: bills as unknown as Bill[],
+      envelopes,
+      debts: debts as unknown as Debt[],
     });
 
   // Connection operations with state management
@@ -66,7 +66,10 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         bills: bills as unknown as Bill[],
         debts: debts as unknown as Debt[],
         updateBill: updateBill as unknown as (id: string, updates: unknown) => Promise<void>,
-        updateDebt: updateDebt as unknown as (params: { id: string; updates: unknown }) => Promise<void>,
+        updateDebt: updateDebt as unknown as (params: {
+          id: string;
+          updates: unknown;
+        }) => Promise<void>,
       });
       if (result.success) setSelectedConnectionId("");
       return result;
@@ -85,7 +88,10 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         entityId,
         currentConnections: currentConnections as never,
         updateBill: updateBill as unknown as (id: string, updates: unknown) => Promise<void>,
-        updateDebt: updateDebt as unknown as (params: { id: string; updates: unknown }) => Promise<void>,
+        updateDebt: updateDebt as unknown as (params: {
+          id: string;
+          updates: unknown;
+        }) => Promise<void>,
       });
     } finally {
       setIsConnecting(false);
@@ -101,7 +107,10 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         billId: targetId,
         bills: bills as unknown as Bill[],
         currentEntity: currentEntity as Envelope | Bill | Debt,
-        updateEnvelope: updateEnvelope as unknown as (id: string, updates: unknown) => Promise<void>,
+        updateEnvelope: updateEnvelope as unknown as (
+          id: string,
+          updates: unknown
+        ) => Promise<void>,
       });
     }
   };

@@ -214,8 +214,14 @@ export const useFABStore = create<FABState>()(
   subscribeWithSelector(
     devtools(
       immer((set, get) => {
-        const storeActions = createStoreActions(set as (fn: (state: FABState) => void) => void, get);
-        const actionManagement = createActionManagement(set as (fn: (state: FABState) => void) => void, get);
+        const storeActions = createStoreActions(
+          set as (fn: (state: FABState) => void) => void,
+          get
+        );
+        const actionManagement = createActionManagement(
+          set as (fn: (state: FABState) => void) => void,
+          get
+        );
 
         return {
           // Core state
@@ -246,9 +252,9 @@ export const useFABStore = create<FABState>()(
               isExpanded: state.isExpanded,
               primaryActionsCount: state.primaryActions.size,
               secondaryActionsCount: state.secondaryActions.size,
-              defaultActionsWithHandlers: (Object.values(state.defaultSecondaryActions) as FABAction[]).filter(
-                (a) => a.action !== null
-              ).length,
+              defaultActionsWithHandlers: (
+                Object.values(state.defaultSecondaryActions) as FABAction[]
+              ).filter((a) => a.action !== null).length,
             };
           },
         };

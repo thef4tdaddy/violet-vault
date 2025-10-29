@@ -82,7 +82,7 @@ const CreateEnvelopeModal = ({
             onBillSelection={handleBillSelection}
             onCreateBill={onCreateBill}
             onCancel={handleClose}
-            onSubmit={() => handleSubmit(formData) as unknown}
+            onSubmit={handleSubmit}
           />
         </div>
       </SlideUpModal>
@@ -108,7 +108,7 @@ const CreateEnvelopeModal = ({
             onBillSelection={handleBillSelection}
             onCreateBill={onCreateBill}
             onCancel={handleClose}
-            onSubmit={() => handleSubmit(formData) as unknown}
+            onSubmit={handleSubmit}
           />
         </div>
       </div>

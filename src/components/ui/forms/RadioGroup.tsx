@@ -86,7 +86,8 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
     ref
   ) => {
     const hasDescriptions = options.some((opt) => opt.description);
-    const generatedId = useId(); const groupId = `radio-group-${generatedId}`;
+    const generatedId = useId();
+    const groupId = `radio-group-${generatedId}`;
 
     const handleChange = (optionValue: string) => {
       onChange?.(optionValue);

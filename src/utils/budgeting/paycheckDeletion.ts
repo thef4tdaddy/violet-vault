@@ -46,7 +46,9 @@ export const deletePaycheck = async (paycheckId: string) => {
   logger.info("Starting paycheck deletion", { paycheckId });
 
   // Get paycheck record
-  const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId) as PaycheckHistoryExtended | undefined;
+  const paycheckRecord = (await budgetDb.paycheckHistory.get(paycheckId)) as
+    | PaycheckHistoryExtended
+    | undefined;
   if (!paycheckRecord) {
     throw new Error("Paycheck record not found");
   }
@@ -76,8 +78,8 @@ export const deletePaycheck = async (paycheckId: string) => {
 
   logger.info("Paycheck deleted and effects reversed", {
     paycheckId,
-    actualBalanceChange: (newActualBalance - currentActualBalance),
-    unassignedCashChange: (newUnassignedCash - currentUnassignedCash),
+    actualBalanceChange: newActualBalance - currentActualBalance,
+    unassignedCashChange: newUnassignedCash - currentUnassignedCash,
   });
 
   return { success: true, paycheckId };

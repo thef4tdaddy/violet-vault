@@ -52,7 +52,9 @@ class Logger {
     // Show debug logs only in development or on dev.* sites
     if (this.isDevelopment || this.isDevSite) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
-      const consoleLog = (window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log || console.log;
+      const consoleLog =
+        ((window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log) ||
+        console.log;
       consoleLog(
         `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
         data
@@ -90,7 +92,9 @@ class Logger {
   info(message: string, data: Record<string, unknown> = {}) {
     // Show info logs only in development or on dev.* sites
     if (this.isDevelopment || this.isDevSite) {
-      const consoleLog = (window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log || console.log;
+      const consoleLog =
+        ((window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log) ||
+        console.log;
       consoleLog(`ℹ️ ${message}`, data);
     }
 
@@ -159,7 +163,9 @@ class Logger {
   // - Internal state changes
   production(message: string, data: Record<string, unknown> = {}) {
     // Always show production logs in console with distinctive styling
-    const consoleLog = (window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log || console.log;
+    const consoleLog =
+      ((window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log) ||
+      console.log;
     consoleLog(`🟢 [PROD] ${message}`, data);
 
     try {

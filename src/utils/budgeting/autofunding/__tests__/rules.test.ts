@@ -301,7 +301,10 @@ describe("autoFundingRules", () => {
       };
 
       const rule = { config: { targetId: "env1" } };
-      const result = calculatePriorityFillAmount(rule as unknown as AutoFundingRule, limitedContext);
+      const result = calculatePriorityFillAmount(
+        rule as unknown as AutoFundingRule,
+        limitedContext
+      );
       expect(result).toBe(500); // Limited to available cash
     });
 

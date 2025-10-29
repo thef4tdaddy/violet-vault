@@ -403,9 +403,11 @@ export class GitHubAPIService {
    * @param {Object} payload - Issue payload
    * @returns {Promise<Object>} API response
    */
-  static async makeGitHubAPICall(
-    payload: { title: string; body: string; labels: string[] }
-  ): Promise<GitHubAPIResponse> {
+  static async makeGitHubAPICall(payload: {
+    title: string;
+    body: string;
+    labels: string[];
+  }): Promise<GitHubAPIResponse> {
     try {
       // This is a placeholder for actual GitHub API integration
       // In a real implementation, you would:
@@ -425,7 +427,10 @@ export class GitHubAPIService {
         url: `https://github.com/your-repo/issues/${Math.floor(Math.random() * 1000) + 100}`,
       };
 
-      logger.info("GitHub API call completed", simulatedResponse as unknown as Record<string, unknown>);
+      logger.info(
+        "GitHub API call completed",
+        simulatedResponse as unknown as Record<string, unknown>
+      );
       return simulatedResponse;
     } catch (error) {
       logger.error("GitHub API call failed", error);

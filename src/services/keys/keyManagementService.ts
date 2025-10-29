@@ -3,7 +3,7 @@ import logger from "../../utils/common/logger";
 
 export interface KeyFileData {
   version?: string;
-  type?: 'protected' | 'unprotected';
+  type?: "protected" | "unprotected";
   key?: number[];
   salt?: number[];
   encryptedKey?: number[];
@@ -37,7 +37,8 @@ class KeyManagementService {
         typeof encryptionKey === "string" ? new TextEncoder().encode(encryptionKey) : encryptionKey;
 
       // Convert to ArrayBuffer if needed
-      const bufferToHash = keyBuffer instanceof Uint8Array ? keyBuffer.buffer : keyBuffer as unknown as ArrayBuffer;
+      const bufferToHash =
+        keyBuffer instanceof Uint8Array ? keyBuffer.buffer : (keyBuffer as unknown as ArrayBuffer);
       const hashBuffer = await crypto.subtle.digest("SHA-256", bufferToHash);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");

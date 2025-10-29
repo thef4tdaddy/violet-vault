@@ -29,7 +29,11 @@ vi.mock("@/components/ui", () => ({
 vi.mock("../../utils", () => ({
   getIcon: vi.fn(() => {
     return function MockIcon({ className }) {
-      return <div className={className} data-testid="icon">Icon</div>;
+      return (
+        <div className={className} data-testid="icon">
+          Icon
+        </div>
+      );
     };
   }),
 }));
@@ -69,7 +73,7 @@ describe("TransactionFilters", () => {
 
     it("should render all filter inputs", () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/start date/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/end date/i)).toBeInTheDocument();
@@ -77,7 +81,7 @@ describe("TransactionFilters", () => {
 
     it("should render category selector", () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const selects = screen.getAllByRole("combobox");
       expect(selects.length).toBeGreaterThan(0);
     });
@@ -91,37 +95,37 @@ describe("TransactionFilters", () => {
   describe("Filter Updates", () => {
     it("should call onFilterChange when description is entered", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const input = screen.getByPlaceholderText(/description/i);
       await userEvent.type(input, "coffee");
-      
+
       expect(mockOnFilterChange).toHaveBeenCalled();
     });
 
     it("should call onFilterChange when start date is set", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const input = screen.getByPlaceholderText(/start date/i);
       await userEvent.type(input, "2024-01-01");
-      
+
       expect(mockOnFilterChange).toHaveBeenCalled();
     });
 
     it("should call onFilterChange when end date is set", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const input = screen.getByPlaceholderText(/end date/i);
       await userEvent.type(input, "2024-12-31");
-      
+
       expect(mockOnFilterChange).toHaveBeenCalled();
     });
 
     it("should call onReset when reset button is clicked", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const resetButton = screen.getByText(/reset/i);
       await userEvent.click(resetButton);
-      
+
       expect(mockOnReset).toHaveBeenCalled();
     });
   });
@@ -130,7 +134,7 @@ describe("TransactionFilters", () => {
     it.skip("should display current filter values - Test needs updating for new component interface", () => {
       const searchTerm = "coffee";
       render(<TransactionFilters {...defaultProps} searchTerm={searchTerm} />);
-      
+
       expect(screen.getByDisplayValue("coffee")).toBeInTheDocument();
     });
   });
@@ -149,7 +153,7 @@ describe("TransactionFilters", () => {
 
     it("should handle empty envelopes", () => {
       render(<TransactionFilters {...defaultProps} envelopes={[]} />);
-      
+
       const selects = screen.getAllByRole("combobox");
       expect(selects).toBeDefined();
     });
@@ -158,7 +162,7 @@ describe("TransactionFilters", () => {
   describe("Amount Filters", () => {
     it("should accept minimum amount", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const inputs = screen.getAllByRole("spinbutton");
       if (inputs.length > 0) {
         await userEvent.type(inputs[0], "10");
@@ -168,7 +172,7 @@ describe("TransactionFilters", () => {
 
     it("should accept maximum amount", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const inputs = screen.getAllByRole("spinbutton");
       if (inputs.length > 1) {
         await userEvent.type(inputs[1], "100");
@@ -180,13 +184,13 @@ describe("TransactionFilters", () => {
   describe("Date Range", () => {
     it("should accept date range", async () => {
       render(<TransactionFilters {...defaultProps} />);
-      
+
       const startDate = screen.getByPlaceholderText(/start date/i);
       const endDate = screen.getByPlaceholderText(/end date/i);
-      
+
       await userEvent.type(startDate, "2024-01-01");
       await userEvent.type(endDate, "2024-12-31");
-      
+
       expect(mockOnFilterChange).toHaveBeenCalled();
     });
   });

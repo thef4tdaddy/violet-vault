@@ -3,8 +3,13 @@
  * Defines return types for all autofunding-related hooks
  */
 
-import type { AutoFundingRule, RuleStatistics, RuleSummary } from "@/utils/budgeting/autofunding/rules";
+import type {
+  AutoFundingRule,
+  RuleStatistics,
+  RuleSummary,
+} from "@/utils/budgeting/autofunding/rules";
 import type { Transaction, Envelope } from "@/types/finance";
+import type { ExecutionFilters } from "./useExecutionHistory";
 
 // Re-export commonly used types from rules.ts for convenience
 export type { AutoFundingRule, RuleStatistics, RuleSummary };
@@ -123,7 +128,7 @@ export interface UseAutoFundingHistoryReturn {
   undoStack: UndoStackEntry[];
   addToHistory: (execution: ExecutionHistoryEntry) => void;
   addToUndoStack: (execution: ExecutionDetails, results: RuleExecutionResult[]) => void;
-  getHistory: (filters?: Record<string, unknown>) => ExecutionHistoryEntry[];
+  getHistory: (limit?: number, filters?: ExecutionFilters) => ExecutionHistoryEntry[];
   getExecutionById: (executionId: string) => ExecutionHistoryEntry | undefined;
   clearHistory: () => void;
   cleanup: (maxHistoryAge?: number, maxUndoAge?: number) => void;
@@ -161,11 +166,23 @@ export interface UseAutoFundingExecutionReturn {
     trigger?: string,
     triggerData?: Record<string, unknown>
   ) => Promise<ExecutionResult>;
-  executeSingleRule: (rule: AutoFundingRule, context: Record<string, unknown>) => Promise<RuleExecutionResult>;
-  simulateExecution: (rules: AutoFundingRule[], context: Record<string, unknown>) => Record<string, unknown>;
-  createPlan: (rules: AutoFundingRule[], context: Record<string, unknown>) => Record<string, unknown>;
+  executeSingleRule: (
+    rule: AutoFundingRule,
+    context: Record<string, unknown>
+  ) => Promise<RuleExecutionResult>;
+  simulateExecution: (
+    rules: AutoFundingRule[],
+    context: Record<string, unknown>
+  ) => Record<string, unknown>;
+  createPlan: (
+    rules: AutoFundingRule[],
+    context: Record<string, unknown>
+  ) => Record<string, unknown>;
   validatePlannedTransfers: (plan: Record<string, unknown>) => boolean;
-  calculateImpact: (rules: AutoFundingRule[], context: Record<string, unknown>) => Record<string, unknown>;
+  calculateImpact: (
+    rules: AutoFundingRule[],
+    context: Record<string, unknown>
+  ) => Record<string, unknown>;
   canExecuteRules: (rules: AutoFundingRule[]) => boolean;
   getExecutionSummary: () => Record<string, unknown>;
 }

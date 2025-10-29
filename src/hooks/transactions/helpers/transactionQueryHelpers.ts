@@ -8,21 +8,21 @@ import logger from "@/utils/common/logger";
 interface FilterOptions {
   envelopeId?: string;
   category?: string;
-  type?: 'income' | 'expense' | 'transfer';
+  type?: "income" | "expense" | "transfer";
 }
 
 interface SortOptions {
   sortBy: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
 }
 
 /**
  * Compare two date values
  */
-const compareDates = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): number => {
+const compareDates = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc"): number => {
   const aDate = new Date(aVal as Date | string);
   const bDate = new Date(bVal as Date | string);
-  
+
   if (sortOrder === "desc") {
     return bDate > aDate ? 1 : bDate < aDate ? -1 : 0;
   }
@@ -32,10 +32,10 @@ const compareDates = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): 
 /**
  * Compare two numeric values
  */
-const compareNumbers = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): number => {
+const compareNumbers = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc"): number => {
   const aNum = typeof aVal === "number" ? aVal : parseFloat(String(aVal)) || 0;
   const bNum = typeof bVal === "number" ? bVal : parseFloat(String(bVal)) || 0;
-  
+
   if (sortOrder === "desc") {
     return bNum > aNum ? 1 : bNum < aNum ? -1 : 0;
   }
@@ -45,7 +45,7 @@ const compareNumbers = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc')
 /**
  * Compare two string values
  */
-const compareStrings = (aVal: unknown, bVal: unknown, sortOrder: 'asc' | 'desc'): number => {
+const compareStrings = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc"): number => {
   if (sortOrder === "desc") {
     return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
   }
@@ -85,12 +85,9 @@ export const applyFilters = (
 /**
  * Apply sorting to transactions
  */
-export const applySorting = (
-  transactions: Transaction[],
-  options: SortOptions
-): Transaction[] => {
+export const applySorting = (transactions: Transaction[], options: SortOptions): Transaction[] => {
   const sorted = [...transactions];
-  
+
   sorted.sort((a, b) => {
     // Safely access the property with proper typing
     const aVal = a[options.sortBy as keyof Transaction];
@@ -116,10 +113,7 @@ export const applySorting = (
 /**
  * Apply limit to transactions
  */
-export const applyLimit = (
-  transactions: Transaction[],
-  limit?: number
-): Transaction[] => {
+export const applyLimit = (transactions: Transaction[], limit?: number): Transaction[] => {
   return limit ? transactions.slice(0, limit) : transactions;
 };
 
@@ -134,7 +128,7 @@ export const seedDexieFromZustand = async (
 ): Promise<Transaction[]> => {
   const zustandData =
     zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
-  
+
   if (dexieTransactions.length === 0 && zustandData && zustandData.length > 0) {
     logger.debug("TanStack Query: Seeding Dexie from Zustand", {
       zustandDataLength: zustandData.length,
@@ -143,6 +137,6 @@ export const seedDexieFromZustand = async (
     await budgetDb.bulkUpsertTransactions(zustandData);
     return [...zustandData];
   }
-  
+
   return dexieTransactions;
 };

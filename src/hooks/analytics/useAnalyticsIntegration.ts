@@ -57,7 +57,7 @@ export const useAnalyticsIntegration = ({
         ? Math.min(100, analyticsData.categoryBreakdown.length * 10) // More categories = higher diversity
         : 0;
 
-    const trendsObj = typeof trends === 'object' && trends !== null ? trends : {};
+    const trendsObj = typeof trends === "object" && trends !== null ? trends : {};
 
     return {
       ...baseMetrics,
@@ -137,10 +137,7 @@ export const useAnalyticsIntegration = ({
   );
 
   // Performance metrics for monitoring
-  const performance = useMemo(
-    () => calculatePerformanceMetrics(analyticsData),
-    [analyticsData]
-  );
+  const performance = useMemo(() => calculatePerformanceMetrics(analyticsData), [analyticsData]);
 
   return {
     // Core analytics data

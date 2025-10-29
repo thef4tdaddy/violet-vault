@@ -257,50 +257,98 @@ describe("conditions", () => {
     };
 
     it("should evaluate greater_than operator", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "greater_than", value: 500 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "greater_than",
+        value: 500,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
 
-      const condition2 = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "greater_than", value: 1500 } as Condition;
+      const condition2 = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "greater_than",
+        value: 1500,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
     });
 
     it("should evaluate less_than operator", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "less_than", value: 1500 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "less_than",
+        value: 1500,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
 
-      const condition2 = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "less_than", value: 500 } as Condition;
+      const condition2 = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "less_than",
+        value: 500,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
     });
 
     it("should evaluate equals operator", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "equals", value: 1000 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "equals",
+        value: 1000,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
 
-      const condition2 = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "equals", value: 999.99 } as Condition;
+      const condition2 = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "equals",
+        value: 999.99,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(true);
 
-      const condition3 = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "equals", value: 1001 } as Condition;
+      const condition3 = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "equals",
+        value: 1001,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition3, contextWithIncome)).toBe(false);
     });
 
     it("should evaluate greater_than_or_equal operator", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "greater_than_or_equal", value: 1000 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "greater_than_or_equal",
+        value: 1000,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
 
-      const condition2 = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "greater_than_or_equal", value: 1001 } as Condition;
+      const condition2 = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "greater_than_or_equal",
+        value: 1001,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
     });
 
     it("should evaluate less_than_or_equal operator", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "less_than_or_equal", value: 1000 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "less_than_or_equal",
+        value: 1000,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
 
-      const condition2 = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "less_than_or_equal", value: 999 } as Condition;
+      const condition2 = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "less_than_or_equal",
+        value: 999,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
     });
 
     it("should return false if no income amount provided", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "greater_than", value: 500 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "greater_than",
+        value: 500,
+      } as Condition;
       const contextWithoutIncome: ExecutionContext = {
         ...mockContext,
         data: { ...mockContext.data, newIncomeAmount: undefined },
@@ -309,7 +357,11 @@ describe("conditions", () => {
     });
 
     it("should return true for unknown operators", () => {
-      const condition = { type: CONDITION_TYPES.TRANSACTION_AMOUNT, operator: "unknown", value: 500 } as Condition;
+      const condition = {
+        type: CONDITION_TYPES.TRANSACTION_AMOUNT,
+        operator: "unknown",
+        value: 500,
+      } as Condition;
       expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
     });
   });

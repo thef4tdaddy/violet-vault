@@ -201,7 +201,10 @@ export const useLoginMutation = () => {
   const { setAuthenticated, setError, setLoading } = useAuth();
 
   return useMutation<LoginResult, Error, LoginMutationVariables>({
-    mutationFn: async ({ password, userData = null }: LoginMutationVariables): Promise<LoginResult> => {
+    mutationFn: async ({
+      password,
+      userData = null,
+    }: LoginMutationVariables): Promise<LoginResult> => {
       logger.auth("TanStack Login attempt started.", {
         hasPassword: !!password,
         hasUserData: !!userData,
@@ -245,7 +248,10 @@ export const useLoginMutation = () => {
           encryptionKey: undefined,
           salt: undefined,
         };
-        setAuthenticated(result.user as unknown as import("@/types/auth").UserData, authSessionData);
+        setAuthenticated(
+          result.user as unknown as import("@/types/auth").UserData,
+          authSessionData
+        );
 
         // Start background sync for successful logins
         try {

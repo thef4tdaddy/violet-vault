@@ -4,7 +4,9 @@
  */
 
 // Database to UI transformations
-export const transformEnvelopeFromDB = (dbEnv: import('@/db/types').Envelope): import('@/types/finance').Envelope => ({
+export const transformEnvelopeFromDB = (
+  dbEnv: import("@/db/types").Envelope
+): import("@/types/finance").Envelope => ({
   id: dbEnv.id,
   name: dbEnv.name,
   category: dbEnv.category,
@@ -20,10 +22,12 @@ export const transformEnvelopeFromDB = (dbEnv: import('@/db/types').Envelope): i
   isArchived: dbEnv.archived,
 });
 
-export const transformTransactionFromDB = (dbTx: import('@/db/types').Transaction): import('@/types/finance').Transaction => ({
+export const transformTransactionFromDB = (
+  dbTx: import("@/db/types").Transaction
+): import("@/types/finance").Transaction => ({
   id: dbTx.id,
-  date: dbTx.date.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
-  description: dbTx.description ?? '',
+  date: dbTx.date.toISOString().split("T")[0], // Convert Date to YYYY-MM-DD string
+  description: dbTx.description ?? "",
   amount: dbTx.amount,
   category: dbTx.category,
   envelopeId: dbTx.envelopeId,
@@ -46,13 +50,15 @@ export const transformTransactionFromDB = (dbTx: import('@/db/types').Transactio
   toEnvelopeId: undefined,
 });
 
-export const transformBillFromDB = (dbBill: import('@/db/types').Bill): import('@/db/types').Bill & Record<string, unknown> => {
+export const transformBillFromDB = (
+  dbBill: import("@/db/types").Bill
+): import("@/db/types").Bill & Record<string, unknown> => {
   const transformed = {
     id: dbBill.id,
     name: dbBill.name,
     category: dbBill.category,
     amount: dbBill.amount,
-    dueDate: dbBill.dueDate.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
+    dueDate: dbBill.dueDate.toISOString().split("T")[0], // Convert Date to YYYY-MM-DD string
     isPaid: dbBill.isPaid,
     isRecurring: dbBill.isRecurring,
     frequency: dbBill.frequency,
@@ -65,8 +71,10 @@ export const transformBillFromDB = (dbBill: import('@/db/types').Bill): import('
 };
 
 // UI to Database transformations (reverse)
-export const transformEnvelopeToDB = (uiEnv: Partial<import('@/types/finance').Envelope>): Partial<import('@/db/types').Envelope> => ({
-  id: typeof uiEnv.id === 'string' ? uiEnv.id : undefined,
+export const transformEnvelopeToDB = (
+  uiEnv: Partial<import("@/types/finance").Envelope>
+): Partial<import("@/db/types").Envelope> => ({
+  id: typeof uiEnv.id === "string" ? uiEnv.id : undefined,
   name: uiEnv.name,
   category: uiEnv.category,
   currentBalance: uiEnv.currentBalance ?? uiEnv.currentBalance,

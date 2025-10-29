@@ -208,9 +208,7 @@ describe("FirebaseMessagingService", () => {
     });
 
     it("should throw error when not initialized", async () => {
-      const uninitializedService = Object.create(
-        Object.getPrototypeOf(firebaseMessagingService)
-      );
+      const uninitializedService = Object.create(Object.getPrototypeOf(firebaseMessagingService));
       uninitializedService.messaging = null;
 
       await expect(uninitializedService.getRegistrationToken()).rejects.toThrow(
@@ -223,7 +221,7 @@ describe("FirebaseMessagingService", () => {
     it("should return current token after getting one", async () => {
       (isSupported as Mock).mockResolvedValue(true);
       await firebaseMessagingService.initialize();
-      
+
       const mockToken = "test-token-def";
       (getToken as Mock).mockResolvedValue(mockToken);
       await firebaseMessagingService.getRegistrationToken();
@@ -307,9 +305,7 @@ describe("FirebaseMessagingService", () => {
     });
 
     it("should return false when not initialized", async () => {
-      const uninitializedService = Object.create(
-        Object.getPrototypeOf(firebaseMessagingService)
-      );
+      const uninitializedService = Object.create(Object.getPrototypeOf(firebaseMessagingService));
       uninitializedService.messaging = null;
       uninitializedService.isInitialized = false;
 
@@ -518,9 +514,7 @@ describe("FirebaseMessagingService", () => {
       const result = await firebaseMessagingService.sendTestMessage();
 
       expect(result).toBe(false);
-      expect(logger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("No FCM token available")
-      );
+      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("No FCM token available"));
     });
 
     it("should log test message info when token exists", async () => {
