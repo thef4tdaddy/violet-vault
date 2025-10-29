@@ -342,7 +342,7 @@ describe("Example 9: Integration Testing", () => {
   });
 
   it("should update envelope balance after transaction", () => {
-    const newBalance = testEnvelope.currentBalance! - testTransaction.amount;
+    const newBalance = (testEnvelope.currentBalance ?? 0) - testTransaction.amount;
 
     expect(newBalance).toBe(400);
   });
