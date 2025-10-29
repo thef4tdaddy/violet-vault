@@ -20,3 +20,10 @@ export {
 
 // Paycheck validation
 export { validateFormAndAllocations } from "./paycheckValidation";
+
+// Component props validation
+export {
+  validateComponentProps,
+  isValidProps,
+  validateComponentPropsStrict,
+} from "./propValidator";

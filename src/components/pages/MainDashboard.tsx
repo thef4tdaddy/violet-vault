@@ -22,12 +22,17 @@ import {
   usePaydayManager,
   useDashboardHelpers,
 } from "@/hooks/dashboard/useMainDashboard";
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { MainDashboardPropsSchema } from "@/domain/schemas/component-props";
 
 interface DashboardProps {
   setActiveView: (view: string) => void;
 }
 
 const Dashboard = ({ setActiveView }: DashboardProps) => {
+  // Validate props in development
+  validateComponentProps("MainDashboard", { setActiveView }, MainDashboardPropsSchema);
+
   // Enhanced TanStack Query integration with optimistic updates
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 

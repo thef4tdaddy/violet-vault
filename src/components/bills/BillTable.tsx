@@ -4,6 +4,8 @@ import { getIcon } from "../../utils";
 import BillTableHeader from "./BillTableHeader";
 import BillTableEmptyState from "./BillTableEmptyState";
 import BillTableBulkActions from "./BillTableBulkActions";
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { BillTablePropsSchema } from "@/domain/schemas/component-props";
 
 /**
  * Bill table with bulk actions and selection
@@ -22,6 +24,25 @@ const BillTable = ({
   categorizedBills,
   viewMode,
 }) => {
+  // Validate props in development
+  validateComponentProps(
+    "BillTable",
+    {
+      filteredBills,
+      selectionState,
+      clearSelection,
+      selectAllBills,
+      toggleBillSelection,
+      setShowBulkUpdateModal,
+      setShowBillDetail,
+      getBillDisplayData,
+      billOperations,
+      categorizedBills,
+      viewMode,
+    },
+    BillTablePropsSchema
+  );
+
   return (
     <>
       {/* Bulk Actions */}

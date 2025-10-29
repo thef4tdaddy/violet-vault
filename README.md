@@ -89,6 +89,8 @@
 **Development:**
 
 - ESLint + Prettier for code quality
+- Zod for runtime validation and type safety
+- Vitest for unit and integration testing
 - Husky + Commitlint for git hooks
 - Release Please for automated releases
 
@@ -182,6 +184,7 @@ VioletVault takes your financial privacy seriously:
 
 - **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
 - **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
+- **[✅ Component Props Validation](docs/Component-Props-Validation-Guide.md)** - Runtime prop validation with Zod schemas
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
 - **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
 - **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
