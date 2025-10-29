@@ -123,7 +123,14 @@ function EnvelopeGridView({
 
       {/* Action Buttons Row */}
       <EnvelopeGridHeader
-        filterOptions={filterOptions as { timeRange: string; showEmpty: boolean; sortBy: string; envelopeType: string }}
+        filterOptions={
+          filterOptions as {
+            timeRange: string;
+            showEmpty: boolean;
+            sortBy: string;
+            envelopeType: string;
+          }
+        }
         setFilterOptions={setFilterOptions}
         setShowCreateModal={setShowCreateModal}
         viewMode={viewMode}
@@ -131,7 +138,7 @@ function EnvelopeGridView({
       />
 
       {/* Summary Cards */}
-      <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
+      <EnvelopeSummary totals={totals} />
 
       {/* Envelope Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -153,7 +160,14 @@ function EnvelopeGridView({
 
       {sortedEnvelopes.length === 0 && (
         <EmptyStateView
-          filterOptions={filterOptions as { envelopeType: string; showEmpty: boolean; timeRange: string; sortBy: string }}
+          filterOptions={
+            filterOptions as {
+              envelopeType: string;
+              showEmpty: boolean;
+              timeRange: string;
+              sortBy: string;
+            }
+          }
           setShowCreateModal={setShowCreateModal}
         />
       )}

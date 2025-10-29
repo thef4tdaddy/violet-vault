@@ -110,7 +110,7 @@ const useFirebaseSync = ({
       logger.info("🔄 Manual sync triggered...");
       const result = await firebaseSync.forceSync();
 
-      if (result && typeof result === 'object' && 'success' in result && result.success) {
+      if (result && typeof result === "object" && "success" in result && result.success) {
         showSuccessToast("Manual sync completed successfully");
         logger.info("✅ Manual sync completed:", result as Record<string, unknown>);
       } else {

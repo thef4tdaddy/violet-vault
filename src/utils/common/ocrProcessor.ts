@@ -334,7 +334,9 @@ export class OCRProcessor {
 export const ocrProcessor = new OCRProcessor();
 
 // Utility function for quick receipt processing
-export const processReceiptImage = async (imageSource: File | Blob | string): Promise<ExtendedReceiptData> => {
+export const processReceiptImage = async (
+  imageSource: File | Blob | string
+): Promise<ExtendedReceiptData> => {
   return await ocrProcessor.processReceipt(imageSource);
 };
 

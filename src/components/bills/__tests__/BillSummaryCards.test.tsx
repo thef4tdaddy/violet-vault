@@ -16,7 +16,11 @@ vi.mock("../ui/PageSummaryCard", () => ({
 vi.mock("../../utils", () => ({
   getIcon: vi.fn(() => {
     return function MockIcon({ className }) {
-      return <div className={className} data-testid="icon">Icon</div>;
+      return (
+        <div className={className} data-testid="icon">
+          Icon
+        </div>
+      );
     };
   }),
 }));

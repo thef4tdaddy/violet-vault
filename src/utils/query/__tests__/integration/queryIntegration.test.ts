@@ -16,16 +16,18 @@ describe("Query Integration Tests", () => {
   let queryClient: QueryClient;
   let testData: {
     envelopes: Array<Partial<Envelope>>;
-    transactions: Array<Partial<{
-      id: string;
-      amount: number;
-      description: string;
-      envelopeId: string;
-      category: string;
-      date: Date;
-      type: string;
-      lastModified: number;
-    }>>;
+    transactions: Array<
+      Partial<{
+        id: string;
+        amount: number;
+        description: string;
+        envelopeId: string;
+        category: string;
+        date: Date;
+        type: string;
+        lastModified: number;
+      }>
+    >;
     bills: Array<Record<string, unknown>>;
     savingsGoals: Array<Record<string, unknown>>;
   };
@@ -244,8 +246,12 @@ describe("Query Integration Tests", () => {
 
         expect(cachedEnvelopes).toBeTruthy();
         expect(cachedEnvelopes).toHaveLength(2); // Only non-archived
-        expect(cachedEnvelopes.find((e: Record<string, unknown>) => e.name === "Food & Dining")).toBeTruthy();
-        expect(cachedEnvelopes.find((e: Record<string, unknown>) => e.archived === true)).toBeFalsy();
+        expect(
+          cachedEnvelopes.find((e: Record<string, unknown>) => e.name === "Food & Dining")
+        ).toBeTruthy();
+        expect(
+          cachedEnvelopes.find((e: Record<string, unknown>) => e.archived === true)
+        ).toBeFalsy();
       },
       TEST_TIMEOUT
     );
@@ -314,7 +320,10 @@ describe("Query Integration Tests", () => {
       async () => {
         await prefetchHelpers.prefetchDashboard(queryClient);
 
-        const dashboardData = queryClient.getQueryData(queryKeys.dashboardSummary()) as Record<string, unknown>;
+        const dashboardData = queryClient.getQueryData(queryKeys.dashboardSummary()) as Record<
+          string,
+          unknown
+        >;
 
         expect(dashboardData).toBeTruthy();
         expect(dashboardData.totalEnvelopes).toBe(3);
@@ -354,7 +363,9 @@ describe("Query Integration Tests", () => {
       async () => {
         // Get initial envelope data
         const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const foodEnvelope = initialEnvelopes.find((e: Record<string, unknown>) => e.name === "Food & Dining")! as Record<string, unknown>;
+        const foodEnvelope = initialEnvelopes.find(
+          (e: Record<string, unknown>) => e.name === "Food & Dining"
+        )! as Record<string, unknown>;
         const foodEnvelopeId = foodEnvelope.id as string;
 
         // Set initial cache state
@@ -370,15 +381,19 @@ describe("Query Integration Tests", () => {
         await optimisticHelpers.updateEnvelope(queryClient, foodEnvelopeId, updates);
 
         // Check cache was updated
-        const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(foodEnvelopeId)) as Record<string, unknown>;
-        expect((cachedEnvelope as {currentBalance?: number}).currentBalance).toBe(300.0);
+        const cachedEnvelope = queryClient.getQueryData(
+          queryKeys.envelopeById(foodEnvelopeId)
+        ) as Record<string, unknown>;
+        expect((cachedEnvelope as { currentBalance?: number }).currentBalance).toBe(300.0);
         expect(cachedEnvelope.name).toBe("Food & Groceries");
         expect(cachedEnvelope.lastModified).toBeTruthy();
 
         // Check database was updated
         const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const updatedEnvelope = dbEnvelopes.find((e: Record<string, unknown>) => e.id === foodEnvelopeId)! as Record<string, unknown>;
-        expect((updatedEnvelope as {currentBalance?: number}).currentBalance).toBe(300.0);
+        const updatedEnvelope = dbEnvelopes.find(
+          (e: Record<string, unknown>) => e.id === foodEnvelopeId
+        )! as Record<string, unknown>;
+        expect((updatedEnvelope as { currentBalance?: number }).currentBalance).toBe(300.0);
         expect(updatedEnvelope.name).toBe("Food & Groceries");
       },
       TEST_TIMEOUT
@@ -402,13 +417,17 @@ describe("Query Integration Tests", () => {
         await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
 
         // Check cache was updated
-        const cachedEnvelopes = queryClient.getQueryData(queryKeys.envelopesList()) as Array<Record<string, unknown>>;
+        const cachedEnvelopes = queryClient.getQueryData(queryKeys.envelopesList()) as Array<
+          Record<string, unknown>
+        >;
         expect(cachedEnvelopes).toHaveLength(4); // 3 original + 1 new
         expect(cachedEnvelopes[0].id).toBe("env_new"); // Should be first (newly added)
 
         // Check database was updated
         const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const addedEnvelope = dbEnvelopes.find((e: Record<string, unknown>) => e.id === "env_new") as Record<string, unknown> | undefined;
+        const addedEnvelope = dbEnvelopes.find(
+          (e: Record<string, unknown>) => e.id === "env_new"
+        ) as Record<string, unknown> | undefined;
         expect(addedEnvelope).toBeTruthy();
         expect(addedEnvelope!.name).toBe("Entertainment");
       },
@@ -430,7 +449,9 @@ describe("Query Integration Tests", () => {
             { id: (initialEnvelopes[0] as Record<string, unknown>).id, currentBalance: 999.99 },
             { id: (initialEnvelopes[1] as Record<string, unknown>).id, currentBalance: 888.88 },
           ],
-          transactions: [{ id: (initialTransactions[0] as Record<string, unknown>).id, amount: -123.45 }],
+          transactions: [
+            { id: (initialTransactions[0] as Record<string, unknown>).id, amount: -123.45 },
+          ],
           bills: [], // Empty array should be handled gracefully
         };
 
@@ -438,14 +459,33 @@ describe("Query Integration Tests", () => {
 
         // Verify envelope updates in database
         const updatedEnvelopes = await budgetDatabaseService.getEnvelopes();
-        expect((updatedEnvelopes.find((e: Record<string, unknown>) => e.id === (initialEnvelopes[0] as Record<string, unknown>).id)! as {currentBalance?: number}).currentBalance).toBe(999.99);
-        expect((updatedEnvelopes.find((e: Record<string, unknown>) => e.id === (initialEnvelopes[1] as Record<string, unknown>).id)! as {currentBalance?: number}).currentBalance).toBe(888.88);
+        expect(
+          (
+            updatedEnvelopes.find(
+              (e: Record<string, unknown>) =>
+                e.id === (initialEnvelopes[0] as Record<string, unknown>).id
+            )! as { currentBalance?: number }
+          ).currentBalance
+        ).toBe(999.99);
+        expect(
+          (
+            updatedEnvelopes.find(
+              (e: Record<string, unknown>) =>
+                e.id === (initialEnvelopes[1] as Record<string, unknown>).id
+            )! as { currentBalance?: number }
+          ).currentBalance
+        ).toBe(888.88);
 
         // Verify transaction updates in database
         const updatedTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
-        expect((updatedTransactions.find((t: Record<string, unknown>) => t.id === (initialTransactions[0] as Record<string, unknown>).id)! as {amount?: number}).amount).toBe(
-          -123.45
-        );
+        expect(
+          (
+            updatedTransactions.find(
+              (t: Record<string, unknown>) =>
+                t.id === (initialTransactions[0] as Record<string, unknown>).id
+            )! as { amount?: number }
+          ).amount
+        ).toBe(-123.45);
       },
       TEST_TIMEOUT
     );
@@ -461,7 +501,11 @@ describe("Query Integration Tests", () => {
 
         // Mock database failure
         const originalUpdate = budgetDb.envelopes.update;
-        budgetDb.envelopes.update = vi.fn().mockRejectedValue(new Error("Database error")) as unknown as typeof budgetDb.envelopes.update;
+        budgetDb.envelopes.update = vi
+          .fn()
+          .mockRejectedValue(
+            new Error("Database error")
+          ) as unknown as typeof budgetDb.envelopes.update;
 
         try {
           // This should still update cache but log database error
@@ -470,13 +514,19 @@ describe("Query Integration Tests", () => {
           });
 
           // Cache should still be updated (optimistic)
-          const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(testEnvelope.id as string)) as Record<string, unknown>;
-          expect((cachedEnvelope as {currentBalance?: number}).currentBalance).toBe(99999);
+          const cachedEnvelope = queryClient.getQueryData(
+            queryKeys.envelopeById(testEnvelope.id as string)
+          ) as Record<string, unknown>;
+          expect((cachedEnvelope as { currentBalance?: number }).currentBalance).toBe(99999);
 
           // But database should remain unchanged
           const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-          const dbEnvelope = dbEnvelopes.find((e: Record<string, unknown>) => e.id === testEnvelope.id) as Record<string, unknown>;
-          expect((dbEnvelope as {currentBalance?: number}).currentBalance).toBe((testEnvelope as {currentBalance?: number}).currentBalance); // Original balance
+          const dbEnvelope = dbEnvelopes.find(
+            (e: Record<string, unknown>) => e.id === testEnvelope.id
+          ) as Record<string, unknown>;
+          expect((dbEnvelope as { currentBalance?: number }).currentBalance).toBe(
+            (testEnvelope as { currentBalance?: number }).currentBalance
+          ); // Original balance
         } finally {
           // Restore original function
           budgetDb.envelopes.update = originalUpdate;

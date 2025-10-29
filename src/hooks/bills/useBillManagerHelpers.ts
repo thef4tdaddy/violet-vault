@@ -3,7 +3,12 @@
  * Extracted to reduce file size and complexity
  */
 import { processRecurringBill } from "@/utils/bills/recurringBillUtils";
-import { processBillCalculations, categorizeBills, calculateBillTotals, filterBills } from "@/utils/bills/billCalculations";
+import {
+  processBillCalculations,
+  categorizeBills,
+  calculateBillTotals,
+  filterBills,
+} from "@/utils/bills/billCalculations";
 import { generateBillSuggestions } from "@/utils/common/billDiscovery";
 import logger from "@/utils/common/logger";
 
@@ -83,7 +88,7 @@ export const combineBills = (
   billsFromTransactions: Bill[]
 ): Bill[] => {
   const allBills = [...tanStackBills, ...budgetBills, ...billsFromTransactions];
-  
+
   // Remove duplicates by ID
   const combinedBills: Bill[] = [];
   allBills.forEach((bill) => {
@@ -91,7 +96,7 @@ export const combineBills = (
       combinedBills.push(bill);
     }
   });
-  
+
   return combinedBills;
 };
 
@@ -101,7 +106,10 @@ export const combineBills = (
 export const processBills = (
   combinedBills: Bill[],
   onUpdateBill: ((bill: Bill) => void) | undefined,
-  updateBillMutation: (updates: { billId: string; updates: Record<string, unknown> }) => Promise<void>
+  updateBillMutation: (updates: {
+    billId: string;
+    updates: Record<string, unknown>;
+  }) => Promise<void>
 ): Bill[] => {
   return combinedBills.map((bill) => {
     // Handle recurring bill logic using utility

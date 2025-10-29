@@ -35,15 +35,15 @@ const ErrorMessage = ({ error }: { error?: string }) => {
 };
 
 // Currency input field component
-const CurrencyInput = ({ 
-  label, 
-  value, 
-  onChange, 
-  error, 
-  canEdit, 
-  hint, 
-  icon, 
-  required 
+const CurrencyInput = ({
+  label,
+  value,
+  onChange,
+  error,
+  canEdit,
+  hint,
+  icon,
+  required,
 }: {
   label: string;
   value: string | number;
@@ -81,11 +81,11 @@ const CurrencyInput = ({
 );
 
 // Frequency selector component
-const FrequencySelector = ({ 
-  value, 
-  onChange, 
-  error, 
-  canEdit 
+const FrequencySelector = ({
+  value,
+  onChange,
+  error,
+  canEdit,
 }: {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;

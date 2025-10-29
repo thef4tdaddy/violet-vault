@@ -363,7 +363,7 @@ export class ScreenshotService {
    * @returns {Object}
    */
   static getScreenshotInfo(dataUrl: string): ScreenshotInfo {
-    if (!dataUrl) return { size: 0, sizeKB: 0, format: '', timestamp: new Date().toISOString() };
+    if (!dataUrl) return { size: 0, sizeKB: 0, format: "", timestamp: new Date().toISOString() };
 
     const sizeInBytes = Math.round((dataUrl.length * 3) / 4);
     const sizeInKB = Math.round(sizeInBytes / 1024);

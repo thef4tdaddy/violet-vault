@@ -111,7 +111,7 @@ const BillManager = ({
     `bills-${budgetId}`,
     currentUser?.userName || "User"
   );
-  
+
   const currentEditor = lockedBy;
 
   // Loading state

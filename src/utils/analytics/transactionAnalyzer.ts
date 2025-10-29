@@ -90,7 +90,11 @@ export const analyzeUncategorizedTransactions = (transactions, settings: Analysi
 /**
  * Analyze unused categories and suggest removal
  */
-export const analyzeUnusedCategories = (transactions, filteredTransactions, settings: AnalysisSettings) => {
+export const analyzeUnusedCategories = (
+  transactions,
+  filteredTransactions,
+  settings: AnalysisSettings
+) => {
   const suggestions = [];
   const { unusedCategoryThreshold } = settings;
 

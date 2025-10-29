@@ -148,12 +148,9 @@ describe("useMobileDetection", () => {
       value: 700,
     });
 
-    const { result, rerender } = renderHook(
-      ({ breakpoint }) => useMobileDetection(breakpoint),
-      {
-        initialProps: { breakpoint: 640 },
-      }
-    );
+    const { result, rerender } = renderHook(({ breakpoint }) => useMobileDetection(breakpoint), {
+      initialProps: { breakpoint: 640 },
+    });
 
     expect(result.current).toBe(false);
 

@@ -28,17 +28,20 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### AUTH/SETTINGS (3 files)
 
 **1. KeyManagementSettings.tsx** (232 lines)
+
 - **Issue:** Direct service calls in component (architecture violation)
 - **Action:** Remove all `keyManagementService` calls, move to hooks
 - **Extract:** UI sections into sub-components
 - **Notes:** This is UI only - all logic must move to useKeyManagement hook
 
 **2. LocalOnlyModeSettings.tsx** (369 lines)
+
 - **Issue:** Multiple settings/modes combined
 - **Action:** Extract UI sections, use hook only
 - **Extract:** Settings groups into separate components
 
 **3. LocalOnlySetup.tsx** (258 lines)
+
 - **Issue:** Setup steps combined in one component
 - **Action:** Extract as step components
 - **Extract:** Setup steps/screens
@@ -48,23 +51,28 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### ANALYTICS (5 files)
 
 **4. AnalyticsDashboard.tsx**
+
 - **Action:** Extract chart sections into components
 - **Notes:** Keep dashboard as orchestrator only
 
 **5. useAnalyticsData.ts** (241 lines)
+
 - **Issue:** Multiple data queries bundled
 - **Action:** Split into focused query hooks
 - **Extract:** Query hooks for each data type
 
 **6. useAnalyticsIntegration.ts**
+
 - **Issue:** Multiple integrations bundled
 - **Action:** Split each integration into separate hook
 
 **7. usePerformanceMonitor.ts** (249 lines)
+
 - **Issue:** Metrics collection combined
 - **Action:** Extract metric collectors into sub-hooks
 
 **8. useReportExporter.ts** (299 lines)
+
 - **Issue:** PDF/CSV/Chart export logic bundled
 - **Action:** Split into 3 separate hooks (PDF, CSV, Chart)
 - **Extract:** usePDFExport, useCSVExport, useChartExport
@@ -75,12 +83,15 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### AUTOMATION (3 files)
 
 **9. AutoFundingDashboard.tsx**
+
 - **Action:** Extract dashboard sections into components
 
 **10. AutoFundingView.tsx**
+
 - **Action:** Extract view/screen components
 
 **11. RulesTab.tsx**
+
 - **Action:** Extract rule list and form into separate components
 
 ---
@@ -88,21 +99,27 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### BILLS (6 files)
 
 **12. BillManager.tsx**
+
 - **Action:** Extract bill operations to hooks
 
 **13. BillTable.tsx**
+
 - **Action:** Extract table logic and rendering
 
 **14. BulkBillUpdateModal.tsx**
+
 - **Action:** Extract bulk operation logic
 
 **15. BulkUpdateEditor.tsx**
+
 - **Action:** Extract editor sections/steps
 
 **16. SmartBillMatcher.tsx**
+
 - **Action:** Extract matching algorithm logic
 
 **17. BillDetailModal.tsx**
+
 - **Action:** Extract detail sections into components
 
 ---
@@ -110,12 +127,15 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### BUDGETING (3 files)
 
 **18. CreateEnvelopeModal.tsx**
+
 - **Action:** Extract as step components
 
 **19. EditEnvelopeModal.tsx**
+
 - **Action:** Extract as step components
 
 **20. PaydayPrediction.tsx**
+
 - **Action:** Extract prediction calculation logic to hooks
 
 ---
@@ -123,9 +143,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### DEBT (2 files)
 
 **21. DebtDashboard.tsx**
+
 - **Action:** Extract dashboard sections
 
 **22. DebtDetailModal.tsx**
+
 - **Action:** Extract detail sections
 
 ---
@@ -133,9 +155,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HISTORY (2 files)
 
 **23. IntegrityStatusIndicator.tsx**
+
 - **Action:** Extract status display components
 
 **24. ObjectHistoryViewer.tsx**
+
 - **Action:** Extract history filtering and display logic
 
 ---
@@ -143,9 +167,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### LAYOUT (2 files)
 
 **25. MainLayout.tsx**
+
 - **Action:** Extract layout sections into components
 
 **26. ViewRenderer.tsx**
+
 - **Action:** Extract view type detection logic to utilities/hooks
 
 ---
@@ -153,6 +179,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### MOBILE (1 file)
 
 **27. SlideUpModal.tsx**
+
 - **Action:** Extract modal logic to hooks
 
 ---
@@ -160,6 +187,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### MODALS (1 file)
 
 **28. UnassignedCashModal.tsx**
+
 - **Action:** Extract cash assignment logic
 
 ---
@@ -167,9 +195,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### ONBOARDING (2 files)
 
 **29. EmptyStateHints.tsx**
+
 - **Action:** Extract hint display components
 
 **30. OnboardingProgress.tsx**
+
 - **Action:** Extract progress steps
 
 ---
@@ -177,6 +207,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### PAGES (1 file)
 
 **31. MainDashboard.tsx**
+
 - **Action:** Extract dashboard sections into components
 
 ---
@@ -184,12 +215,15 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### SETTINGS (3 files)
 
 **32. DataManagementSection.tsx**
+
 - **Action:** Extract data operation logic
 
 **33. GeneralSettingsSection.tsx**
+
 - **Action:** Extract setting groups
 
 **34. NotificationSettingsSection.tsx**
+
 - **Action:** Extract notification options
 
 ---
@@ -197,6 +231,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### UI (1 file)
 
 **35. EditableBalance.tsx**
+
 - **Action:** Extract edit logic to hooks
 
 ---
@@ -204,6 +239,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HOOKS: ACCOUNTS (1 file)
 
 **36. useSupplementalAccounts.ts**
+
 - **Action:** Split account operations into sub-hooks
 
 ---
@@ -211,9 +247,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HOOKS: BILLS (2 files)
 
 **37. useBillForm.ts**
+
 - **Action:** Split form validation and submission logic
 
 **38. useBillManager.ts**
+
 - **Action:** Split CRUD operations
 
 ---
@@ -221,12 +259,15 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HOOKS: BUDGETING (3 files)
 
 **39. useAutoFunding.ts** (274 lines)
+
 - **Action:** Split funding logic into sub-hooks
 
 **40. useAutoFundingData.ts** (259 lines)
+
 - **Action:** Split data queries into focused hooks
 
 **41. useBudgetData/mutations.ts**
+
 - **Action:** Extract mutations into separate functions/hooks
 
 ---
@@ -234,6 +275,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HOOKS: COMMON (1 file)
 
 **42. useExportData.ts**
+
 - **Action:** Split export formats (PDF, CSV, JSON) into sub-hooks
 
 ---
@@ -241,6 +283,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HOOKS: DEBTS (1 file)
 
 **43. useDebtManagement.ts** (293 lines)
+
 - **Action:** Split debt operations into sub-hooks
 
 ---
@@ -248,21 +291,27 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### HOOKS: TRANSACTIONS (6 files)
 
 **44. useTransactionData.ts** (202 lines)
+
 - **Action:** Split data queries
 
 **45. useTransactionLedger.ts** (191 lines)
+
 - **Action:** Split ledger logic
 
 **46. useTransactionOperations.ts** (278 lines)
+
 - **Action:** Split transaction operations (create, update, delete, etc.)
 
 **47. useTransactionQuery.ts**
+
 - **Action:** Split query logic into focused hooks
 
 **48. useTransactionSplitter.ts**
+
 - **Action:** Extract transaction splitting logic
 
 **49. useTransactionsV2.ts**
+
 - **Action:** Split transaction management into operations/queries/subscriptions
 
 ---
@@ -270,6 +319,7 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### UTILS: BILLS (1 file)
 
 **50. billCalculations.ts**
+
 - **Action:** Extract calculation functions (modular approach)
 
 ---
@@ -277,9 +327,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### UTILS: BUDGETING (2 files)
 
 **51. autofunding/rules.ts**
+
 - **Action:** Extract rule validators into separate functions
 
 **52. envelopeFormUtils.ts**
+
 - **Action:** Extract form utility functions (modular approach)
 
 ---
@@ -287,9 +339,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### UTILS: COMMON (2 files)
 
 **53. billDiscovery.ts**
+
 - **Action:** Extract discovery algorithm logic
 
 **54. transactionArchiving.ts**
+
 - **Action:** Extract archiving logic
 
 ---
@@ -297,9 +351,11 @@ These rules are NON-NEGOTIABLE for every single file refactored:
 ### UTILS: DEBTS (2 files)
 
 **55. debtFormValidation.ts**
+
 - **Action:** Extract validators into focused functions
 
 **56. debtStrategies.ts**
+
 - **Action:** Extract strategy functions
 
 ---

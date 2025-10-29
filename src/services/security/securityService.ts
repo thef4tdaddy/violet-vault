@@ -152,7 +152,9 @@ class SecurityService {
   /**
    * Create a security event with safe serialization
    */
-  createSecurityEvent(event: Partial<SecurityEvent> & { type: string; description: string }): SecurityEvent {
+  createSecurityEvent(
+    event: Partial<SecurityEvent> & { type: string; description: string }
+  ): SecurityEvent {
     try {
       // Safely extract only the primitive values from event to avoid circular references
       const safeEvent = {

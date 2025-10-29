@@ -8,17 +8,24 @@ interface EnvelopeBasicFieldsProps {
     name?: string;
     category?: string;
     description?: string;
+    [key: string]: unknown;
   };
   onUpdateField: (field: string, value: string) => void;
   errors?: {
     name?: string;
     category?: string;
     description?: string;
+    [key: string]: unknown;
   };
   canEdit?: boolean;
 }
 
-const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = true }: EnvelopeBasicFieldsProps) => {
+const EnvelopeBasicFields = ({
+  formData,
+  onUpdateField,
+  errors = {},
+  canEdit = true,
+}: EnvelopeBasicFieldsProps) => {
   const categories = getEnvelopeCategories();
 
   return (

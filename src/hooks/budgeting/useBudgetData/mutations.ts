@@ -30,7 +30,13 @@ export const useBudgetMutations = () => {
 
   const updateEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "update"],
-    mutationFn: async ({ envelopeId, updates }: { envelopeId: string; updates: Record<string, unknown> }) => {
+    mutationFn: async ({
+      envelopeId,
+      updates,
+    }: {
+      envelopeId: string;
+      updates: Record<string, unknown>;
+    }) => {
       await optimisticHelpers.updateEnvelope(queryClient, envelopeId, updates);
       return { envelopeId, updates };
     },

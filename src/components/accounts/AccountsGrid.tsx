@@ -37,7 +37,6 @@ const AccountsGrid = ({ accounts, showBalances, onEdit, onDelete, onStartTransfe
             onEdit={onEdit}
             onDelete={onDelete}
             onStartTransfer={onStartTransfer}
-            {...({} as unknown)}
           />
         );
       })}

@@ -4,17 +4,17 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod schema for CacheEntry validation
  * Represents cached data with expiration
  */
 export const CacheEntrySchema = z.object({
-  key: z.string().min(1, 'Cache key is required').max(500),
+  key: z.string().min(1, "Cache key is required").max(500),
   value: z.unknown(),
-  expiresAt: z.number().int().positive('Expiration time must be a positive number'),
-  category: z.string().min(1, 'Category is required').max(100),
+  expiresAt: z.number().int().positive("Expiration time must be a positive number"),
+  category: z.string().min(1, "Category is required").max(100),
   size: z.number().int().min(0).optional(),
 });
 

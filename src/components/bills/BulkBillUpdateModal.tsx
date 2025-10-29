@@ -99,11 +99,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
               />
 
               {/* Summary and Actions */}
-              <BulkUpdateSummary
-                summary={summary}
-                onClose={onClose}
-                handleSubmit={handleSubmit}
-              />
+              <BulkUpdateSummary summary={summary} onClose={onClose} handleSubmit={handleSubmit} />
             </div>
           </div>
         </div>

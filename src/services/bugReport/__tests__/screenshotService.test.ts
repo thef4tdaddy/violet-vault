@@ -131,7 +131,7 @@ describe("ScreenshotService", () => {
         height = 0;
         onload: (() => void) | null = null;
         onerror: ((error: Error) => void) | null = null;
-        
+
         constructor() {
           setTimeout(() => {
             this.width = 1920;
@@ -171,7 +171,7 @@ describe("ScreenshotService", () => {
         height = 0;
         onload: (() => void) | null = null;
         onerror: ((error: Error) => void) | null = null;
-        
+
         constructor() {
           setTimeout(() => {
             if (this.onerror) this.onerror(new Error("Test error"));

@@ -124,24 +124,27 @@ export const useTransactionArchivingUI = () => {
  * Manages the archiving workflow and error handling
  */
 export const useTransactionArchivingProcess = () => {
-  const handleArchive = useCallback(async (
-    selectedPeriod: number,
-    executeArchiving: (period: number) => Promise<void>,
-    callbacks: {
-      onSuccess?: () => void;
-      onError?: (error: unknown) => void;
-    } = {}
-  ) => {
-    const { onSuccess, onError } = callbacks;
+  const handleArchive = useCallback(
+    async (
+      selectedPeriod: number,
+      executeArchiving: (period: number) => Promise<void>,
+      callbacks: {
+        onSuccess?: () => void;
+        onError?: (error: unknown) => void;
+      } = {}
+    ) => {
+      const { onSuccess, onError } = callbacks;
 
-    try {
-      await executeArchiving(selectedPeriod);
-      onSuccess?.();
-    } catch (error) {
-      logger.error("Archiving failed:", error);
-      onError?.(error);
-    }
-  }, []);
+      try {
+        await executeArchiving(selectedPeriod);
+        onSuccess?.();
+      } catch (error) {
+        logger.error("Archiving failed:", error);
+        onError?.(error);
+      }
+    },
+    []
+  );
 
   return {
     handleArchive,

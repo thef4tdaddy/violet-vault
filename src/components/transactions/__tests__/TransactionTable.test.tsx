@@ -98,7 +98,7 @@ describe("TransactionTable", () => {
 
     it("should render table headers", () => {
       render(<TransactionTable {...defaultProps} />);
-      
+
       expect(screen.getByText("Date")).toBeInTheDocument();
       expect(screen.getByText("Description")).toBeInTheDocument();
       expect(screen.getByText("Category")).toBeInTheDocument();
@@ -322,9 +322,7 @@ describe("TransactionTable", () => {
       render(<TransactionTable {...defaultProps} />);
 
       expect(screen.getByTestId("delete-confirmation")).toBeInTheDocument();
-      expect(
-        screen.getByText("Delete Test Transaction?")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Delete Test Transaction?")).toBeInTheDocument();
     });
 
     it("should call onDelete when delete is confirmed", async () => {
@@ -467,9 +465,7 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      const transactions = [
-        { id: "1", description: "Test", amount: 50 },
-      ];
+      const transactions = [{ id: "1", description: "Test", amount: 50 }];
 
       const envelopes = [
         { id: "env1", name: "Groceries" },

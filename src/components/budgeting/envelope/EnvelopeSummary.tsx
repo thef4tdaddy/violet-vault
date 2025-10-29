@@ -1,9 +1,9 @@
 import EnvelopeSummaryCards from "../EnvelopeSummaryCards";
 
-const EnvelopeSummary = ({ totals, unassignedCash = 0 }) => {
+const EnvelopeSummary = ({ totals }) => {
   return (
     <div className="mb-6">
-      <EnvelopeSummaryCards totals={totals} {...({ unassignedCash } as unknown)} />
+      <EnvelopeSummaryCards totals={totals} />
     </div>
   );
 };

@@ -14,9 +14,7 @@ export const BillDetailStats = ({ bill }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-purple-600 font-medium">Amount Due</p>
-            <p className="text-2xl font-bold text-purple-700">
-              ${formatBillAmount(bill.amount)}
-            </p>
+            <p className="text-2xl font-bold text-purple-700">${formatBillAmount(bill.amount)}</p>
           </div>
           {React.createElement(getIcon("DollarSign"), {
             className: "h-8 w-8 text-purple-500",

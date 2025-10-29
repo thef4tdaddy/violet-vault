@@ -86,17 +86,19 @@ describe("BugReportService", () => {
 
     // Set up default mock implementations
     mockedScreenshotService.captureScreenshot.mockResolvedValue("screenshot-data");
-    mockedScreenshotService.getScreenshotInfo.mockReturnValue({ 
+    mockedScreenshotService.getScreenshotInfo.mockReturnValue({
       size: 100 * 1024,
       sizeKB: 100,
       format: "png",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    mockedScreenshotService.autoCompressScreenshot.mockImplementation((data) => Promise.resolve(data));
+    mockedScreenshotService.autoCompressScreenshot.mockImplementation((data) =>
+      Promise.resolve(data)
+    );
 
     mockedSystemInfoService.collectSystemInfo.mockResolvedValue({
       timestamp: "2023-01-01T00:00:00.000Z",
-      browser: { 
+      browser: {
         userAgent: "test-agent",
         name: "test",
         version: "1.0",
@@ -107,7 +109,7 @@ describe("BugReportService", () => {
         cookieEnabled: true,
         onLine: true,
         hardwareConcurrency: 4,
-        permissions: { notifications: "default", geolocation: "default" }
+        permissions: { notifications: "default", geolocation: "default" },
       },
       viewport: { width: 1920, height: 1080 },
       url: {
@@ -119,21 +121,21 @@ describe("BugReportService", () => {
         hash: "",
         host: "test.com",
         port: "",
-        origin: "http://test.com"
+        origin: "http://test.com",
       },
       performance: {
         timing: {
           navigationStart: 0,
           domContentLoaded: 100,
           loadComplete: 200,
-          domInteractive: 50
+          domInteractive: 50,
         },
         memory: null,
         navigation: null,
-        available: true
+        available: true,
       },
       storage: {
-        localStorage: { available: true }
+        localStorage: { available: true },
       },
       network: {
         effectiveType: "4g",
@@ -141,13 +143,13 @@ describe("BugReportService", () => {
         rtt: 50,
         saveData: false,
         onLine: true,
-        connection: null
+        connection: null,
       },
       errors: {
         recentErrors: [],
-        consoleLogs: []
+        consoleLogs: [],
       },
-      userAgent: "test-agent"
+      userAgent: "test-agent",
     });
 
     mockedContextAnalysisService.getCurrentPageContext.mockReturnValue({
@@ -160,13 +162,13 @@ describe("BugReportService", () => {
         segments: ["test"],
         query: {},
         isRoot: false,
-        isNested: false
+        isNested: false,
       },
       screen: {
         documentTitle: "Test",
         screenTitle: "Test",
         breadcrumbs: [],
-        mainHeading: "Test"
+        mainHeading: "Test",
       },
       userLocation: "test",
       ui: {
@@ -177,18 +179,18 @@ describe("BugReportService", () => {
         drawers: [],
         tabs: [],
         loading: [],
-        interactions: []
+        interactions: [],
       },
       performance: {
-        available: true
+        available: true,
       },
       accessibility: {
-        available: true
+        available: true,
       },
       data: {
-        available: true
+        available: true,
       },
-      interactions: []
+      interactions: [],
     });
 
     mockedBugReportAPIService.validateReportData.mockReturnValue({
@@ -203,7 +205,7 @@ describe("BugReportService", () => {
       submissionId: "test-123",
       primaryProvider: "webhook",
       attempts: 1,
-      results: []
+      results: [],
     });
   });
 
@@ -255,7 +257,9 @@ describe("BugReportService", () => {
     });
 
     it("should handle submission failures gracefully", async () => {
-      mockedBugReportAPIService.submitWithFallbacks.mockRejectedValue(new Error("Submission failed"));
+      mockedBugReportAPIService.submitWithFallbacks.mockRejectedValue(
+        new Error("Submission failed")
+      );
 
       const options = {
         title: "Test Bug",
@@ -297,7 +301,7 @@ describe("BugReportService", () => {
           cookieEnabled: false,
           onLine: false,
           hardwareConcurrency: 0,
-          permissions: { notifications: "default", geolocation: "default" }
+          permissions: { notifications: "default", geolocation: "default" },
         },
         viewport: { width: 0, height: 0 },
         url: {
@@ -309,27 +313,27 @@ describe("BugReportService", () => {
           hash: "",
           host: "",
           port: "",
-          origin: ""
+          origin: "",
         },
-        performance: { 
+        performance: {
           timing: {
             navigationStart: 0,
             domContentLoaded: 0,
             loadComplete: 0,
-            domInteractive: 0
-          }, 
-          memory: null, 
+            domInteractive: 0,
+          },
+          memory: null,
           navigation: null,
-          available: false
+          available: false,
         },
         storage: { localStorage: { available: false } },
-        network: { 
-          onLine: true, 
-          effectiveType: "4g", 
-          downlink: 10, 
-          rtt: 50, 
+        network: {
+          onLine: true,
+          effectiveType: "4g",
+          downlink: 10,
+          rtt: 50,
           saveData: false,
-          connection: null
+          connection: null,
         },
         errors: { recentErrors: [], consoleLogs: [] },
         userAgent: "Unknown",
@@ -345,13 +349,13 @@ describe("BugReportService", () => {
           segments: [],
           query: {},
           isRoot: true,
-          isNested: false
+          isNested: false,
         },
         screen: {
           documentTitle: "",
           screenTitle: "",
           breadcrumbs: [],
-          mainHeading: ""
+          mainHeading: "",
         },
         userLocation: "Unknown",
         ui: {
@@ -362,7 +366,7 @@ describe("BugReportService", () => {
           drawers: [],
           tabs: [],
           loading: [],
-          interactions: []
+          interactions: [],
         },
         performance: { available: false },
         accessibility: { available: false },
@@ -383,7 +387,12 @@ describe("BugReportService", () => {
   describe("captureScreenshotSafely", () => {
     it("should capture screenshot and check size", async () => {
       mockedScreenshotService.captureScreenshot.mockResolvedValue("large-screenshot");
-      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 1500 * 1024, sizeKB: 1500, format: 'png', timestamp: new Date().toISOString() });
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({
+        size: 1500 * 1024,
+        sizeKB: 1500,
+        format: "png",
+        timestamp: new Date().toISOString(),
+      });
 
       const screenshot = await BugReportService.captureScreenshotSafely();
 
@@ -403,18 +412,23 @@ describe("BugReportService", () => {
 
   describe("submitWithProperScreenshotHandling", () => {
     it("should handle large screenshots separately", async () => {
-      const reportData: BugReportData = { 
+      const reportData: BugReportData = {
         title: "Test Report",
-        screenshot: "large-screenshot" 
+        screenshot: "large-screenshot",
       };
-      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 600 * 1024, sizeKB: 600, format: 'png', timestamp: new Date().toISOString() });
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({
+        size: 600 * 1024,
+        sizeKB: 600,
+        format: "png",
+        timestamp: new Date().toISOString(),
+      });
 
       mockedBugReportAPIService.submitWithFallbacks.mockResolvedValue({
         success: true,
         overallSuccess: true,
         submissionId: "test-456",
         attempts: 1,
-        results: []
+        results: [],
       });
 
       const result = await BugReportService.submitWithProperScreenshotHandling(reportData, []);
@@ -426,11 +440,16 @@ describe("BugReportService", () => {
     });
 
     it("should submit normally for small screenshots", async () => {
-      const reportData: BugReportData = { 
+      const reportData: BugReportData = {
         title: "Test Report",
-        screenshot: "small-screenshot" 
+        screenshot: "small-screenshot",
       };
-      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 100 * 1024, sizeKB: 100, format: 'png', timestamp: new Date().toISOString() });
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({
+        size: 100 * 1024,
+        sizeKB: 100,
+        format: "png",
+        timestamp: new Date().toISOString(),
+      });
 
       await BugReportService.submitWithProperScreenshotHandling(reportData, []);
 
@@ -444,7 +463,7 @@ describe("BugReportService", () => {
         success: true,
         submissionId: "quick-123",
         timestamp: new Date().toISOString(),
-        fallbackUsed: false
+        fallbackUsed: false,
       });
 
       const result = await BugReportService.quickReport("Quick bug description");
@@ -515,7 +534,12 @@ describe("BugReportService", () => {
   describe("diagnostic methods", () => {
     it("should test screenshot functionality", async () => {
       mockedScreenshotService.captureScreenshot.mockResolvedValue("test-screenshot");
-      mockedScreenshotService.getScreenshotInfo.mockReturnValue({ size: 100 * 1024, sizeKB: 100, format: 'png', timestamp: new Date().toISOString() });
+      mockedScreenshotService.getScreenshotInfo.mockReturnValue({
+        size: 100 * 1024,
+        sizeKB: 100,
+        format: "png",
+        timestamp: new Date().toISOString(),
+      });
 
       const result = await BugReportService.testScreenshot();
 

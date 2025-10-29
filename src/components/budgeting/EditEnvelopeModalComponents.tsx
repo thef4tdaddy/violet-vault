@@ -213,11 +213,7 @@ export const ModalContent = ({
       )}
 
       {/* Additional Settings */}
-      <AdditionalSettings
-        formData={formData}
-        canEdit={canEdit}
-        onUpdateField={onUpdateField}
-      />
+      <AdditionalSettings formData={formData} canEdit={canEdit} onUpdateField={onUpdateField} />
 
       {/* Action Buttons */}
       <ActionButtons

@@ -10,7 +10,9 @@ import type { Bill } from "../types/bills";
  * Type helper for window event listeners
  * Using generic object type since EventListener/EventListenerObject are DOM builtins
  */
-type EventListenerOrEventListenerObject = ((evt: Event) => void) | { handleEvent(object: Event): void };
+type EventListenerOrEventListenerObject =
+  | ((evt: Event) => void)
+  | { handleEvent(object: Event): void };
 
 /**
  * Mock Dexie database for testing
@@ -155,7 +157,10 @@ export const createMockDexie = () => {
 export const createMockOptimisticHelpers = () => {
   return {
     addTransaction: vi.fn(async (transaction: Transaction) => transaction),
-    updateTransaction: vi.fn(async (id: string, updates: Partial<Transaction>) => ({ id, ...updates })),
+    updateTransaction: vi.fn(async (id: string, updates: Partial<Transaction>) => ({
+      id,
+      ...updates,
+    })),
     deleteTransaction: vi.fn(async (id: string) => id),
     addBill: vi.fn(async (bill: Bill) => bill),
     updateBill: vi.fn(async (id: string, updates: Partial<Bill>) => ({ id, ...updates })),
@@ -184,7 +189,7 @@ export const createMockCloudSyncService = () => {
  */
 export const setupGlobalMocks = () => {
   const mockCloudSync = createMockCloudSyncService();
-  
+
   // Mock window.cloudSyncService
   Object.defineProperty(window, "cloudSyncService", {
     value: mockCloudSync,
@@ -199,22 +204,34 @@ export const setupGlobalMocks = () => {
   const originalRemoveEventListener = window.removeEventListener;
   const originalDispatchEvent = window.dispatchEvent;
 
-  window.addEventListener = vi.fn((event: string, listener: EventListenerOrEventListenerObject | null) => {
-    if (listener && !eventListeners.has(event)) {
-      eventListeners.set(event, new Set());
+  window.addEventListener = vi.fn(
+    (event: string, listener: EventListenerOrEventListenerObject | null) => {
+      if (listener && !eventListeners.has(event)) {
+        eventListeners.set(event, new Set());
+      }
+      if (listener) {
+        eventListeners.get(event)!.add(listener);
+      }
+      return originalAddEventListener.call(
+        window,
+        event,
+        listener as EventListenerOrEventListenerObject
+      );
     }
-    if (listener) {
-      eventListeners.get(event)!.add(listener);
-    }
-    return originalAddEventListener.call(window, event, listener as EventListenerOrEventListenerObject);
-  });
+  );
 
-  window.removeEventListener = vi.fn((event: string, listener: EventListenerOrEventListenerObject | null) => {
-    if (listener) {
-      eventListeners.get(event)?.delete(listener);
+  window.removeEventListener = vi.fn(
+    (event: string, listener: EventListenerOrEventListenerObject | null) => {
+      if (listener) {
+        eventListeners.get(event)?.delete(listener);
+      }
+      return originalRemoveEventListener.call(
+        window,
+        event,
+        listener as EventListenerOrEventListenerObject
+      );
     }
-    return originalRemoveEventListener.call(window, event, listener as EventListenerOrEventListenerObject);
-  });
+  );
 
   window.dispatchEvent = vi.fn((event: Event) => {
     return originalDispatchEvent.call(window, event);

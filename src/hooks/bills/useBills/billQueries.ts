@@ -97,8 +97,14 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
     filteredBills.sort((a, b) => {
       const billA = a as BillExtended;
       const billB = b as BillExtended;
-      let aVal: string | number | Date = billA[sortBy as keyof BillExtended] as string | number | Date;
-      let bVal: string | number | Date = billB[sortBy as keyof BillExtended] as string | number | Date;
+      let aVal: string | number | Date = billA[sortBy as keyof BillExtended] as
+        | string
+        | number
+        | Date;
+      let bVal: string | number | Date = billB[sortBy as keyof BillExtended] as
+        | string
+        | number
+        | Date;
 
       // Handle date fields
       if (sortBy === "dueDate" || sortBy === "lastPaid") {

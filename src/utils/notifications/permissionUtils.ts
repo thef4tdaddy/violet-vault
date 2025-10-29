@@ -166,7 +166,10 @@ export const requestNotificationPermission = async (): Promise<PermissionRequest
   const browserSupport = getBrowserSupport();
 
   if (!browserSupport.isSupported) {
-    logger.warn("Push notifications not supported in this browser", browserSupport as unknown as Record<string, unknown>);
+    logger.warn(
+      "Push notifications not supported in this browser",
+      browserSupport as unknown as Record<string, unknown>
+    );
     return {
       success: false,
       permission: "unsupported",

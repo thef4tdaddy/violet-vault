@@ -126,7 +126,6 @@ const AccountFormModal = ({
           isOwnLock={isOwnLock}
           breakLock={breakLock}
           lockLoading={lockLoading}
-          {...({ _lock: lock } as unknown)}
         />
 
         <ModalContent {...modalContentProps} />

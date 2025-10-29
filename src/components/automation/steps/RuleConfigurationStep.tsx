@@ -34,7 +34,6 @@ const RuleConfigurationStep = ({
       {ruleData.type === RULE_TYPES.SPLIT_REMAINDER && (
         <SplitRemainderConfig
           ruleData={ruleData}
-          updateConfig={updateConfig}
           envelopes={envelopes}
           toggleTargetEnvelope={toggleTargetEnvelope}
           errors={errors}

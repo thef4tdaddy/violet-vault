@@ -56,8 +56,8 @@ export const OverviewTab = ({
 
       {/* Filters and Controls */}
       {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-        <DebtFilters 
-          filterOptions={filterOptions} 
+        <DebtFilters
+          filterOptions={filterOptions}
           setFilterOptions={setFilterOptions}
           debtTypes={debtTypes}
           debtsByType={debtsByType}

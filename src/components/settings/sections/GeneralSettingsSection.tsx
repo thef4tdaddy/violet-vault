@@ -81,7 +81,12 @@ interface CloudSyncSectionProps {
 }
 
 // Cloud sync section component
-const CloudSyncSection: React.FC<CloudSyncSectionProps> = ({ cloudSyncEnabled, isSyncing, onToggleCloudSync, onManualSync }) => (
+const CloudSyncSection: React.FC<CloudSyncSectionProps> = ({
+  cloudSyncEnabled,
+  isSyncing,
+  onToggleCloudSync,
+  onManualSync,
+}) => (
   <div className="glassmorphism rounded-lg p-4 border-2 border-black ring-1 ring-gray-800/10 space-y-4">
     <h4 className="font-medium text-purple-900">Cloud Sync</h4>
     <div className="flex items-center justify-between">
@@ -129,7 +134,11 @@ interface PwaInstallSectionProps {
 }
 
 // PWA install section component
-const PwaInstallSection: React.FC<PwaInstallSectionProps> = ({ pwaStatus, isInstalling, onInstall }) => (
+const PwaInstallSection: React.FC<PwaInstallSectionProps> = ({
+  pwaStatus,
+  isInstalling,
+  onInstall,
+}) => (
   <div className="glassmorphism rounded-lg p-4 border-2 border-black ring-1 ring-gray-800/10 space-y-4">
     <h4 className="font-medium text-purple-900 flex items-center space-x-2">
       {React.createElement(getIcon("Smartphone"), {
@@ -163,7 +172,11 @@ interface PwaInstallPromptProps {
 }
 
 // PWA installation prompt component
-const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({ pwaStatus, isInstalling, onInstall }) => (
+const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
+  pwaStatus,
+  isInstalling,
+  onInstall,
+}) => (
   <div className="space-y-3">
     <div className="flex items-start space-x-3">
       {React.createElement(getIcon("Download"), {
@@ -284,7 +297,9 @@ const GeneralSettingsSection = ({
         <span className="text-lg">G</span>ENERAL <span className="text-lg">S</span>ETTINGS
       </h3>
 
-      {isLocalOnlyMode && <LocalOnlyModeSection onOpenLocalOnlySettings={onOpenLocalOnlySettings} />}
+      {isLocalOnlyMode && (
+        <LocalOnlyModeSection onOpenLocalOnlySettings={onOpenLocalOnlySettings} />
+      )}
 
       {!isLocalOnlyMode && (
         <CloudSyncSection

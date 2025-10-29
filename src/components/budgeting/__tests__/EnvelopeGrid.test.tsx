@@ -33,18 +33,14 @@ vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
 
 vi.mock("@/hooks/common/useTransactions", () => ({
   useTransactions: vi.fn(() => ({
-    transactions: [
-      { id: "1", envelopeId: "1", amount: -50, date: "2025-01-01" },
-    ],
+    transactions: [{ id: "1", envelopeId: "1", amount: -50, date: "2025-01-01" }],
     isLoading: false,
   })),
 }));
 
 vi.mock("@/hooks/bills/useBills", () => ({
   default: vi.fn(() => ({
-    bills: [
-      { id: "1", name: "Electric", amount: 100, envelopeId: "1" },
-    ],
+    bills: [{ id: "1", name: "Electric", amount: 100, envelopeId: "1" }],
     updateBill: vi.fn(),
   })),
 }));
@@ -262,8 +258,7 @@ describe("EnvelopeGrid", () => {
 
   describe("Filtering and Sorting", () => {
     it("should apply envelope calculations", () => {
-      const calculateEnvelopeData = require("@/utils/budgeting")
-        .calculateEnvelopeData as Mock;
+      const calculateEnvelopeData = require("@/utils/budgeting").calculateEnvelopeData as Mock;
       calculateEnvelopeData.mockImplementation((envelopes) =>
         envelopes.map((e) => ({ ...e, calculated: true }))
       );
@@ -290,8 +285,7 @@ describe("EnvelopeGrid", () => {
     });
 
     it("should calculate envelope totals", () => {
-      const calculateEnvelopeTotals = require("@/utils/budgeting")
-        .calculateEnvelopeTotals as Mock;
+      const calculateEnvelopeTotals = require("@/utils/budgeting").calculateEnvelopeTotals as Mock;
 
       renderEnvelopeGrid();
 
@@ -301,8 +295,7 @@ describe("EnvelopeGrid", () => {
 
   describe("Integration with Transactions", () => {
     it("should load transactions for envelope calculations", () => {
-      const useTransactions = require("@/hooks/common/useTransactions")
-        .useTransactions as Mock;
+      const useTransactions = require("@/hooks/common/useTransactions").useTransactions as Mock;
 
       renderEnvelopeGrid();
 
@@ -310,8 +303,7 @@ describe("EnvelopeGrid", () => {
     });
 
     it("should handle envelopes with transactions", () => {
-      const useTransactions = require("@/hooks/common/useTransactions")
-        .useTransactions as Mock;
+      const useTransactions = require("@/hooks/common/useTransactions").useTransactions as Mock;
       useTransactions.mockReturnValue({
         transactions: [
           { id: "1", envelopeId: "1", amount: -50 },

@@ -10,15 +10,23 @@ import logger from "@/utils/common/logger";
  * Hook that automatically detects user actions and marks onboarding steps as complete
  */
 export const useOnboardingAutoComplete = () => {
-  const markStepComplete = useOnboardingStore((state) => (state as { markStepComplete: (step: string) => void }).markStepComplete);
-  const isStepComplete = useOnboardingStore((state) => (state as { isStepComplete: (step: string) => boolean }).isStepComplete);
-  const preferences = useOnboardingStore((state) => (state as { preferences: { showHints: boolean } }).preferences);
-  const isOnboarded = useOnboardingStore((state) => (state as { isOnboarded: boolean }).isOnboarded);
+  const markStepComplete = useOnboardingStore(
+    (state) => (state as { markStepComplete: (step: string) => void }).markStepComplete
+  );
+  const isStepComplete = useOnboardingStore(
+    (state) => (state as { isStepComplete: (step: string) => boolean }).isStepComplete
+  );
+  const preferences = useOnboardingStore(
+    (state) => (state as { preferences: { showHints: boolean } }).preferences
+  );
+  const isOnboarded = useOnboardingStore(
+    (state) => (state as { isOnboarded: boolean }).isOnboarded
+  );
 
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();
   const transactionsResult = useTransactions();
-  
+
   // Wrap transactions initialization in useMemo to fix exhaustive-deps warning
   const transactions = useMemo(() => {
     return (transactionsResult?.transactions || []) as Array<{
@@ -28,7 +36,7 @@ export const useOnboardingAutoComplete = () => {
       category?: string;
     }>;
   }, [transactionsResult?.transactions]);
-  
+
   const { actualBalance } = useActualBalance();
 
   // Skip if user has disabled hints or is already onboarded
@@ -58,7 +66,9 @@ export const useOnboardingAutoComplete = () => {
       actualBalance !== undefined &&
       !isStepComplete("firstBankBalance")
     ) {
-      logger.info("🎯 Auto-completing firstBankBalance step - actual balance set", { actualBalance });
+      logger.info("🎯 Auto-completing firstBankBalance step - actual balance set", {
+        actualBalance,
+      });
       markStepComplete("firstBankBalance");
     }
   }, [actualBalance, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -80,10 +90,9 @@ export const useOnboardingAutoComplete = () => {
 
     if (userCreatedEnvelopes.length > 0 && !isStepComplete("firstEnvelope")) {
       const firstEnvelope = userCreatedEnvelopes[0] as { name: string };
-      logger.info(
-        "🎯 Auto-completing firstEnvelope step - user envelope created",
-        { name: firstEnvelope.name }
-      );
+      logger.info("🎯 Auto-completing firstEnvelope step - user envelope created", {
+        name: firstEnvelope.name,
+      });
       markStepComplete("firstEnvelope");
     }
   }, [envelopes, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -94,7 +103,9 @@ export const useOnboardingAutoComplete = () => {
 
     if (bills.length > 0 && !isStepComplete("firstBills")) {
       const firstBill = bills[0] as { description?: string };
-      logger.info("🎯 Auto-completing firstBills step - bill added", { description: firstBill.description });
+      logger.info("🎯 Auto-completing firstBills step - bill added", {
+        description: firstBill.description,
+      });
       markStepComplete("firstBills");
     }
   }, [bills, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -108,10 +119,9 @@ export const useOnboardingAutoComplete = () => {
     );
 
     if (expenseTransactions.length > 0 && !isStepComplete("firstTransaction")) {
-      logger.info(
-        "🎯 Auto-completing firstTransaction step - expense recorded",
-        { description: expenseTransactions[0].description }
-      );
+      logger.info("🎯 Auto-completing firstTransaction step - expense recorded", {
+        description: expenseTransactions[0].description,
+      });
       markStepComplete("firstTransaction");
     }
   }, [transactions, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -131,10 +141,9 @@ export const useOnboardingAutoComplete = () => {
     );
 
     if (incomeTransactions.length > 0 && !isStepComplete("firstPaycheck")) {
-      logger.info(
-        "🎯 Auto-completing firstPaycheck step - income recorded",
-        { description: incomeTransactions[0].description }
-      );
+      logger.info("🎯 Auto-completing firstPaycheck step - income recorded", {
+        description: incomeTransactions[0].description,
+      });
       markStepComplete("firstPaycheck");
     }
   }, [transactions, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -147,10 +156,9 @@ export const useOnboardingAutoComplete = () => {
 
     if (linkedBills.length > 0 && !isStepComplete("linkedEnvelopes")) {
       const firstLinked = linkedBills[0] as { description?: string };
-      logger.info(
-        "🎯 Auto-completing linkedEnvelopes step - bill linked to envelope",
-        { description: firstLinked.description }
-      );
+      logger.info("🎯 Auto-completing linkedEnvelopes step - bill linked to envelope", {
+        description: firstLinked.description,
+      });
       markStepComplete("linkedEnvelopes");
     }
   }, [bills, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -159,14 +167,15 @@ export const useOnboardingAutoComplete = () => {
   useEffect(() => {
     if (!shouldAutoComplete) return;
 
-    const fundedEnvelopes = envelopes.filter((env: { currentBalance?: number }) => (env.currentBalance || 0) > 0);
+    const fundedEnvelopes = envelopes.filter(
+      (env: { currentBalance?: number }) => (env.currentBalance || 0) > 0
+    );
 
     if (fundedEnvelopes.length > 0 && !isStepComplete("firstAllocation")) {
       const firstFunded = fundedEnvelopes[0] as { name?: string };
-      logger.info(
-        "🎯 Auto-completing firstAllocation step - envelope funded",
-        { name: firstFunded.name }
-      );
+      logger.info("🎯 Auto-completing firstAllocation step - envelope funded", {
+        name: firstFunded.name,
+      });
       markStepComplete("firstAllocation");
     }
   }, [envelopes, shouldAutoComplete, isStepComplete, markStepComplete]);

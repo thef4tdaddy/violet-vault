@@ -24,7 +24,6 @@ declare global {
   }
 }
 
-
 // Firebase sync services loaded conditionally to reduce initial bundle size
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
 if (typeof window !== "undefined") {
@@ -254,7 +253,9 @@ const initializeApp = () => {
         try {
           const screenshot = await ScreenshotService.captureScreenshot();
           const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
-          logger.info("📸 Screenshot capture:", { status: info ? `Success (${info.sizeKB}KB)` : "Failed" });
+          logger.info("📸 Screenshot capture:", {
+            status: info ? `Success (${info.sizeKB}KB)` : "Failed",
+          });
           return {
             success: true,
             errors,

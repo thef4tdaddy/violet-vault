@@ -6,9 +6,9 @@
 
 // TypeScript interfaces for auto-funding rules
 export interface RuleConfig {
-  sourceType: 'unassigned' | 'envelope' | 'income';
+  sourceType: "unassigned" | "envelope" | "income";
   sourceId: string | null;
-  targetType: 'envelope' | 'multiple';
+  targetType: "envelope" | "multiple";
   targetId: string | null;
   targetIds: string[];
   amount: number;
@@ -229,7 +229,9 @@ const validateTargetConfig = (ruleConfig: Partial<AutoFundingRule>, errors: stri
 /**
  * Validates a rule configuration
  */
-export const validateRule = (ruleConfig: Partial<AutoFundingRule>): { isValid: boolean; errors: string[] } => {
+export const validateRule = (
+  ruleConfig: Partial<AutoFundingRule>
+): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
   validateRequiredFields(ruleConfig, errors);
@@ -245,7 +247,10 @@ export const validateRule = (ruleConfig: Partial<AutoFundingRule>): { isValid: b
 /**
  * Calculates the funding amount for a rule based on context
  */
-export const calculateFundingAmount = (rule: AutoFundingRule, context: AutoFundingContext): number => {
+export const calculateFundingAmount = (
+  rule: AutoFundingRule,
+  context: AutoFundingContext
+): number => {
   const { unassignedCash } = context.data;
 
   switch (rule.type) {
@@ -271,7 +276,10 @@ export const calculateFundingAmount = (rule: AutoFundingRule, context: AutoFundi
 /**
  * Gets base amount for percentage calculations
  */
-export const getBaseAmountForPercentage = (rule: AutoFundingRule, context: AutoFundingContext): number => {
+export const getBaseAmountForPercentage = (
+  rule: AutoFundingRule,
+  context: AutoFundingContext
+): number => {
   const { envelopes, unassignedCash, newIncomeAmount } = context.data;
 
   switch (rule.config.sourceType) {
@@ -296,7 +304,10 @@ export const getBaseAmountForPercentage = (rule: AutoFundingRule, context: AutoF
 /**
  * Calculates priority fill amount
  */
-export const calculatePriorityFillAmount = (rule: AutoFundingRule, context: AutoFundingContext): number => {
+export const calculatePriorityFillAmount = (
+  rule: AutoFundingRule,
+  context: AutoFundingContext
+): number => {
   const { envelopes, unassignedCash } = context.data;
 
   if (!rule.config.targetId) return 0;
@@ -332,7 +343,10 @@ interface RuleFilters {
 /**
  * Filters rules based on various criteria
  */
-export const filterRules = (rules: AutoFundingRule[], filters: RuleFilters = {}): AutoFundingRule[] => {
+export const filterRules = (
+  rules: AutoFundingRule[],
+  filters: RuleFilters = {}
+): AutoFundingRule[] => {
   let filtered = [...rules];
 
   if (filters.enabled !== undefined) {

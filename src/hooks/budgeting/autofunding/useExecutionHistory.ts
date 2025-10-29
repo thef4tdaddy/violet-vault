@@ -10,7 +10,7 @@ interface ExecutionRecord {
   [key: string]: unknown;
 }
 
-interface ExecutionFilters {
+export interface ExecutionFilters {
   trigger?: string;
   successful?: boolean;
   dateFrom?: string;

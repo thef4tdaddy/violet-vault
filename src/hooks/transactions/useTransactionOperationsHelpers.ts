@@ -86,7 +86,10 @@ export const createSplitTransactionMutationConfig = (queryClient: QueryClient) =
       splitTransactions: unknown[];
     }) => {
       const { splitTransactionInDB } = await import("./helpers/transactionOperationsHelpers");
-      return splitTransactionInDB(originalTransaction as Record<string, unknown>, splitTransactions as Record<string, unknown>[]);
+      return splitTransactionInDB(
+        originalTransaction as Record<string, unknown>,
+        splitTransactions as Record<string, unknown>[]
+      );
     },
     onSuccess: (data: { originalTransaction: { id: string }; splitTransactions: unknown[] }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
@@ -147,7 +150,12 @@ export const createBulkOperationMutationConfig = (
       const { bulkOperationOnTransactions } = await import(
         "./helpers/transactionOperationsHelpers"
       );
-      return bulkOperationOnTransactions(operation, transactions as Record<string, unknown>[], updates as Record<string, unknown>, categoryRules);
+      return bulkOperationOnTransactions(
+        operation,
+        transactions as Record<string, unknown>[],
+        updates as Record<string, unknown>,
+        categoryRules
+      );
     },
     onSuccess: (data: unknown[], variables: { operation: string }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });

@@ -192,7 +192,10 @@ interface SavingsGoalData {
 /**
  * Process form data into savings goal object
  */
-export const processSavingsGoalFormData = (formData: SavingsGoalFormData, editingGoal: SavingsGoalData | null = null): SavingsGoalData => {
+export const processSavingsGoalFormData = (
+  formData: SavingsGoalFormData,
+  editingGoal: SavingsGoalData | null = null
+): SavingsGoalData => {
   const validation = validateSavingsGoalForm(formData);
   if (validation.length > 0) {
     throw new Error(`Validation failed: ${validation.join(", ")}`);

@@ -22,10 +22,10 @@ interface UseTransactionQueryOptions {
   dateRange?: { start: Date; end: Date };
   envelopeId?: string;
   category?: string;
-  type?: 'income' | 'expense' | 'transfer';
+  type?: "income" | "expense" | "transfer";
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) => {
