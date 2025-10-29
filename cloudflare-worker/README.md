@@ -2,6 +2,14 @@
 
 This Cloudflare Worker handles bug reports submitted from the VioletVault application, automatically creating GitHub issues and optionally storing screenshots.
 
+## 📚 API Documentation
+
+**Complete API documentation is available in:**
+
+- **[API.md](./API.md)** - Full API reference with examples
+- **[openapi.yaml](./openapi.yaml)** - OpenAPI 3.0 specification
+- **[Swagger Editor](https://editor.swagger.io/)** - Interactive API explorer
+
 ## Quick Start
 
 1. **Install Wrangler CLI:**
@@ -48,38 +56,29 @@ npm run deploy
 
 ## API Endpoints
 
-### POST /report-issue
+This worker provides 5 main endpoints:
 
-Accepts bug reports and creates GitHub issues.
+1. **POST /report-issue** - Submit bug reports (main endpoint)
+2. **POST /cleanup** - Clean up old screenshots (admin only)
+3. **GET /stats** - Get usage statistics (admin only)
+4. **GET /milestones** - Fetch GitHub milestones
+5. **GET /releases** - Fetch release information
 
-**Request Body:**
+For complete endpoint documentation, examples, and request/response schemas, see **[API.md](./API.md)**.
 
-```json
-{
-  "description": "Bug description",
-  "screenshot": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
-  "sessionUrl": "https://app.highlight.io/sessions/...",
-  "env": {
-    "userAgent": "Mozilla/5.0...",
-    "url": "https://app.violetVault.com/dashboard",
-    "timestamp": "2024-01-01T00:00:00.000Z",
-    "appVersion": "1.6.1",
-    "viewport": "1920x1080",
-    "referrer": "https://app.violetVault.com"
-  }
-}
+### Quick Example: POST /report-issue
+
+```bash
+curl -X POST http://localhost:8787/report-issue \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "App crashes on envelope creation",
+    "description": "Detailed description",
+    "screenshot": "data:image/png;base64,..."
+  }'
 ```
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "issueNumber": 123,
-  "issueUrl": "https://github.com/username/repo/issues/123",
-  "screenshotUrl": "https://cdn.your-domain.com/screenshots/..."
-}
-```
+See [API.md](./API.md) for all available fields and response formats.
 
 ## Development
 

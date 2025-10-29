@@ -1,0 +1,532 @@
+openapi: 3.0.3
+info:
+  title: VioletVault Bug Reporter API
+  description: |
+    Cloudflare Worker API for handling VioletVault bug reports, GitHub issue creation, and screenshot storage.
+    
+    This API provides endpoints for:
+    - Submitting bug reports with optional screenshots
+    - Viewing usage statistics
+    - Managing screenshot cleanup
+    - Accessing GitHub milestones and releases
+    
+    All endpoints support CORS for cross-origin requests from the VioletVault application.
+  version: 1.0.0
+  contact:
+    name: VioletVault Development Team
+    url: https://github.com/thef4tdaddy/violet-vault
+  license:
+    name: CC-BY-NC-SA-4.0
+    url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+servers:
+  - url: https://bug-reporter.violetvault.workers.dev
+    description: Production Cloudflare Worker
+  - url: http://localhost:8787
+    description: Local development server
+
+tags:
+  - name: Bug Reports
+    description: Bug report submission and management
+  - name: Admin
+    description: Administrative endpoints (requires authentication)
+  - name: GitHub Integration
+    description: GitHub API integration endpoints
+
+paths:
+  /report-issue:
+    post:
+      tags:
+        - Bug Reports
+      summary: Submit a bug report
+      description: |
+        Submit a bug report to create a GitHub issue. Optionally include a screenshot which will be stored in R2.
+        
+        The endpoint accepts either:
+        - Direct bug report object
+        - Nested object with `data` field containing the bug report
+      operationId: submitBugReport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/BugReport'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/BugReport'
+                    type:
+                      type: string
+                      example: bug-report
+            examples:
+              minimalReport:
+                summary: Minimal bug report
+                value:
+                  title: App crashes on envelope creation
+                  description: When I try to create a new envelope, the app crashes
+              fullReport:
+                summary: Complete bug report with all fields
+                value:
+                  title: Sync failure after network timeout
+                  description: Detailed description of the issue
+                  steps: |
+                    1. Open the app
+                    2. Go offline
+                    3. Try to sync
+                  expected: Should queue sync for later
+                  actual: Shows error message and doesn't queue
+                  severity: high
+                  screenshot: data:image/png;base64,iVBORw0KGgo...
+                  sessionUrl: https://app.highlight.io/sessions/abc123
+                  env:
+                    userAgent: Mozilla/5.0...
+                    url: https://app.violetvault.com/dashboard
+                    timestamp: 2024-01-01T12:00:00Z
+                    appVersion: 1.6.1
+                    viewport: 1920x1080
+                  systemInfo:
+                    browser: Chrome
+                    version: 120.0.0
+                    os: Windows
+      responses:
+        '200':
+          description: Bug report successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugReportResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    issueNumber: 123
+                    issueUrl: https://github.com/thef4tdaddy/violet-vault/issues/123
+                    screenshotUrl: https://cdn.violetvault.com/screenshots/abc123.png
+        '400':
+          description: Invalid request (missing required fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingFields:
+                  value:
+                    error: Either title or description is required
+                    received:
+                      hasTitle: false
+                      hasDescription: false
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                serverError:
+                  value:
+                    error: Internal server error
+                    message: Failed to create GitHub issue
+
+  /:
+    post:
+      tags:
+        - Bug Reports
+      summary: Submit a bug report (alias)
+      description: Alias for /report-issue endpoint
+      operationId: submitBugReportRoot
+      requestBody:
+        $ref: '#/paths/~1report-issue/post/requestBody'
+      responses:
+        $ref: '#/paths/~1report-issue/post/responses'
+
+  /cleanup:
+    post:
+      tags:
+        - Admin
+      summary: Clean up old screenshots
+      description: |
+        Remove screenshots older than 30 days from R2 storage.
+        This endpoint is typically triggered by scheduled cron jobs.
+      operationId: cleanupScreenshots
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Cleanup completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanupResponse'
+              examples:
+                success:
+                  value:
+                    deleted: 15
+                    errors: 0
+                    message: Cleanup completed successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /stats:
+    get:
+      tags:
+        - Admin
+      summary: Get usage statistics
+      description: |
+        Retrieve usage statistics including:
+        - Total number of bug reports
+        - Screenshot storage usage
+        - Error rates
+      operationId: getUsageStats
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Usage statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageStats'
+              examples:
+                stats:
+                  value:
+                    totalReports: 150
+                    totalScreenshots: 120
+                    storageUsedMB: 45.3
+                    errorRate: 0.02
+                    lastReport: 2024-01-15T10:30:00Z
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /milestones:
+    get:
+      tags:
+        - GitHub Integration
+      summary: Get GitHub milestones
+      description: Fetch active milestones from the VioletVault GitHub repository
+      operationId: getGitHubMilestones
+      responses:
+        '200':
+          description: List of GitHub milestones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  milestones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Milestone'
+              examples:
+                milestones:
+                  value:
+                    milestones:
+                      - number: 1
+                        title: v2.0 - TypeScript Conversion
+                        state: open
+                        dueOn: 2024-09-01T00:00:00Z
+                        openIssues: 15
+                        closedIssues: 32
+        '500':
+          description: Failed to fetch milestones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /releases:
+    get:
+      tags:
+        - GitHub Integration
+      summary: Get release information
+      description: Fetch release-please information from the VioletVault GitHub repository
+      operationId: getReleaseInfo
+      responses:
+        '200':
+          description: Release information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  releases:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Release'
+              examples:
+                releases:
+                  value:
+                    releases:
+                      - tagName: v1.9.0
+                        name: Version 1.9.0
+                        publishedAt: 2024-01-15T10:00:00Z
+                        htmlUrl: https://github.com/thef4tdaddy/violet-vault/releases/tag/v1.9.0
+        '500':
+          description: Failed to fetch releases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Admin API key for authenticated endpoints
+
+  schemas:
+    BugReport:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Bug report title (optional if description provided)
+          example: App crashes on envelope creation
+        description:
+          type: string
+          description: Detailed description of the bug
+          example: When creating a new envelope with a very long name, the app crashes unexpectedly
+        steps:
+          type: string
+          description: Steps to reproduce the issue
+          example: |
+            1. Navigate to Budget page
+            2. Click "Create Envelope"
+            3. Enter name longer than 100 characters
+            4. Click Save
+        expected:
+          type: string
+          description: Expected behavior
+          example: Envelope should be created successfully or show validation error
+        actual:
+          type: string
+          description: Actual behavior
+          example: App crashes with white screen
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+          description: Bug severity level
+          example: high
+        screenshot:
+          type: string
+          format: byte
+          description: Base64-encoded screenshot (data URL format)
+          example: data:image/png;base64,iVBORw0KGgo...
+        sessionUrl:
+          type: string
+          format: uri
+          description: Highlight.io session replay URL
+          example: https://app.highlight.io/sessions/abc123
+        env:
+          $ref: '#/components/schemas/EnvironmentInfo'
+        systemInfo:
+          $ref: '#/components/schemas/SystemInfo'
+        contextInfo:
+          type: object
+          description: Additional context information
+          additionalProperties: true
+        customData:
+          type: object
+          description: Custom data fields
+          additionalProperties: true
+      required:
+        - one of title or description must be provided
+
+    EnvironmentInfo:
+      type: object
+      properties:
+        userAgent:
+          type: string
+          example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+        url:
+          type: string
+          format: uri
+          example: https://app.violetvault.com/dashboard
+        timestamp:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00Z
+        appVersion:
+          type: string
+          example: 1.9.0
+        viewport:
+          type: string
+          example: 1920x1080
+        referrer:
+          type: string
+          format: uri
+          example: https://app.violetvault.com
+        pageContext:
+          type: object
+          description: Additional page context
+          additionalProperties: true
+
+    SystemInfo:
+      type: object
+      properties:
+        browser:
+          type: string
+          example: Chrome
+        version:
+          type: string
+          example: 120.0.0
+        os:
+          type: string
+          example: Windows
+        platform:
+          type: string
+          example: desktop
+        deviceMemory:
+          type: number
+          example: 8
+        hardwareConcurrency:
+          type: number
+          example: 8
+
+    BugReportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        issueNumber:
+          type: integer
+          description: Created GitHub issue number
+          example: 123
+        issueUrl:
+          type: string
+          format: uri
+          description: URL to the created GitHub issue
+          example: https://github.com/thef4tdaddy/violet-vault/issues/123
+        screenshotUrl:
+          type: string
+          format: uri
+          description: URL to the uploaded screenshot (if provided)
+          example: https://cdn.violetvault.com/screenshots/abc123.png
+      required:
+        - success
+        - issueNumber
+        - issueUrl
+
+    CleanupResponse:
+      type: object
+      properties:
+        deleted:
+          type: integer
+          description: Number of screenshots deleted
+          example: 15
+        errors:
+          type: integer
+          description: Number of errors encountered
+          example: 0
+        message:
+          type: string
+          example: Cleanup completed successfully
+      required:
+        - deleted
+        - errors
+
+    UsageStats:
+      type: object
+      properties:
+        totalReports:
+          type: integer
+          description: Total number of bug reports submitted
+          example: 150
+        totalScreenshots:
+          type: integer
+          description: Total number of screenshots stored
+          example: 120
+        storageUsedMB:
+          type: number
+          format: float
+          description: Storage used in megabytes
+          example: 45.3
+        errorRate:
+          type: number
+          format: float
+          description: Error rate (0.0 to 1.0)
+          example: 0.02
+        lastReport:
+          type: string
+          format: date-time
+          description: Timestamp of the last bug report
+          example: 2024-01-15T10:30:00Z
+
+    Milestone:
+      type: object
+      properties:
+        number:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: v2.0 - TypeScript Conversion
+        state:
+          type: string
+          enum: [open, closed]
+          example: open
+        dueOn:
+          type: string
+          format: date-time
+          nullable: true
+          example: 2024-09-01T00:00:00Z
+        openIssues:
+          type: integer
+          example: 15
+        closedIssues:
+          type: integer
+          example: 32
+
+    Release:
+      type: object
+      properties:
+        tagName:
+          type: string
+          example: v1.9.0
+        name:
+          type: string
+          example: Version 1.9.0
+        publishedAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:00:00Z
+        htmlUrl:
+          type: string
+          format: uri
+          example: https://github.com/thef4tdaddy/violet-vault/releases/tag/v1.9.0
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: Internal server error
+        message:
+          type: string
+          description: Detailed error message
+          example: Failed to create GitHub issue
+        received:
+          type: object
+          description: Additional error context
+          additionalProperties: true
+      required:
+        - error
