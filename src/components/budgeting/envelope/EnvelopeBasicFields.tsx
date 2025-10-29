@@ -8,12 +8,14 @@ interface EnvelopeBasicFieldsProps {
     name?: string;
     category?: string;
     description?: string;
+    [key: string]: unknown;
   };
   onUpdateField: (field: string, value: string) => void;
   errors?: {
     name?: string;
     category?: string;
     description?: string;
+    [key: string]: unknown;
   };
   canEdit?: boolean;
 }
