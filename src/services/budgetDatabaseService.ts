@@ -1,11 +1,22 @@
 // Budget Database Service - Centralized database operations with optimized queries
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/common/logger";
-
-/**
- * Budget Database Service
- * Provides centralized database operations with caching and optimized queries
- */
+import { type z } from "zod";
+import { EnvelopeSchema, type Envelope as ZodEnvelope } from "@/domain/schemas/envelope";
+import {
+  TransactionSchema,
+  type Transaction as ZodTransaction,
+} from "@/domain/schemas/transaction";
+import { BillSchema, type Bill as ZodBill } from "@/domain/schemas/bill";
+import {
+  SavingsGoalSchema,
+  type SavingsGoal as ZodSavingsGoal,
+} from "@/domain/schemas/savings-goal";
+import {
+  PaycheckHistorySchema,
+  type PaycheckHistory as ZodPaycheckHistory,
+} from "@/domain/schemas/paycheck-history";
+import { DebtSchema, type Debt as ZodDebt } from "@/domain/schemas/debt";
 
 interface DateRange {
   start: Date;
@@ -18,9 +29,22 @@ interface GetEnvelopesOptions {
   useCache?: boolean;
 }
 
-// Generic data type for flexible database operations
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DbData = any;
+// Budget metadata structure stored in the database
+interface BudgetMetadata {
+  id: string;
+  lastModified: number;
+  unassignedCash?: number;
+  actualBalance?: number;
+  [key: string]: unknown;
+}
+
+// Encrypted budget data structure
+interface EncryptedBudgetData {
+  id: string;
+  lastModified: number;
+  version: number;
+  [key: string]: unknown;
+}
 
 interface GetTransactionsOptions {
   dateRange?: DateRange;
@@ -57,6 +81,7 @@ interface GetAnalyticsDataOptions {
 
 interface BatchUpdateItem {
   collection: string;
+  type: "envelope" | "transaction" | "bill" | "savingsGoal" | "paycheck";
   operation: "upsert" | "delete";
   data: unknown;
 }
@@ -78,9 +103,34 @@ class BudgetDatabaseService {
     this.defaultCacheTtl = 300000; // 5 minutes
   }
 
-  /**
-   * Initialize database service
-   */
+  // Validate output data from database, returning empty array on validation failure
+  private _validateOutput<T>(
+    rawData: unknown[],
+    schema: z.ZodArray<z.ZodType<T>>,
+    entityName: string
+  ): T[] {
+    const result = schema.safeParse(rawData);
+    if (!result.success) {
+      logger.error(`Failed to validate ${entityName} from database`, result.error);
+      return [];
+    }
+    return result.data;
+  }
+
+  // Validate input data before saving, throwing error on validation failure
+  private _validateInput<T>(
+    data: T[],
+    schema: z.ZodArray<z.ZodType<T>>,
+    entityName: string
+  ): T[] {
+    const result = schema.safeParse(data);
+    if (!result.success) {
+      logger.error(`Failed to validate ${entityName} for save`, result.error);
+      throw new Error(`Invalid ${entityName} data: ${result.error.message}`);
+    }
+    return result.data;
+  }
+
   async initialize(): Promise<boolean> {
     try {
       await this.db.open();
@@ -92,9 +142,6 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Get database statistics
-   */
   async getStats(): Promise<unknown> {
     try {
       return await this.db.getDatabaseStats();
@@ -104,39 +151,36 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Envelope operations with optimized queries
-   */
-  async getEnvelopes(options: GetEnvelopesOptions = {}): Promise<unknown[]> {
+  // Envelope operations with optimized queries
+  async getEnvelopes(options: GetEnvelopesOptions = {}): Promise<ZodEnvelope[]> {
     const { category, includeArchived = false, useCache = true } = options;
-
     try {
+      let rawData: unknown[];
       if (category) {
-        return await this.db.getEnvelopesByCategory(category, includeArchived);
-      }
-
-      if (useCache) {
+        rawData = await this.db.getEnvelopesByCategory(category, includeArchived);
+      } else if (useCache) {
         const cacheKey = `${this.cachePrefix}envelopes_active`;
         let envelopes = await this.db.getCachedValue(cacheKey, this.defaultCacheTtl);
-
         if (!envelopes) {
           envelopes = await this.db.getActiveEnvelopes();
           await this.db.setCachedValue(cacheKey, envelopes, this.defaultCacheTtl);
         }
-
-        return (envelopes as unknown as unknown[]) || [];
+        rawData = (envelopes as unknown as unknown[]) || [];
+      } else {
+        rawData = await this.db.getActiveEnvelopes();
       }
-
-      return await this.db.getActiveEnvelopes();
+      return this._validateOutput(rawData, EnvelopeSchema.array(), "envelopes");
     } catch (error) {
       logger.error("Failed to get envelopes", error);
       throw error;
     }
   }
 
-  async saveEnvelopes(envelopes: DbData[]): Promise<void> {
+  async saveEnvelopes(envelopes: ZodEnvelope[]): Promise<void> {
     try {
-      await this.db.bulkUpsertEnvelopes(envelopes);
+      const validated = this._validateInput(envelopes, EnvelopeSchema.array(), "envelope");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.bulkUpsertEnvelopes(validated as any);
       await this._invalidateEnvelopeCache();
       logger.debug(`Saved ${envelopes.length} envelopes`);
     } catch (error) {
@@ -145,62 +189,52 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Transaction operations with date range optimization
-   */
-  async getTransactions(options: GetTransactionsOptions = {}): Promise<unknown[]> {
+  // Transaction operations with date range optimization
+  async getTransactions(options: GetTransactionsOptions = {}): Promise<ZodTransaction[]> {
     const { dateRange, envelopeId, category, type, limit = 100, useCache = false } = options;
-
     try {
+      let rawData: unknown[];
       if (envelopeId) {
-        return await this.db.getTransactionsByEnvelope(envelopeId, dateRange);
-      }
-
-      if (category) {
-        return await this.db.getTransactionsByCategory(category, dateRange);
-      }
-
-      if (type) {
-        return await this.db.getTransactionsByType(
+        rawData = await this.db.getTransactionsByEnvelope(envelopeId, dateRange);
+      } else if (category) {
+        rawData = await this.db.getTransactionsByCategory(category, dateRange);
+      } else if (type) {
+        rawData = await this.db.getTransactionsByType(
           type as "income" | "expense" | "transfer",
           dateRange
         );
-      }
-
-      if (dateRange) {
+      } else if (dateRange) {
         const transactions = await this.db.getTransactionsByDateRange(
           dateRange.start,
           dateRange.end
         );
-        return limit ? transactions.slice(0, limit) : transactions;
-      }
-
-      // Recent transactions with cache
-      if (useCache && !dateRange) {
+        rawData = limit ? transactions.slice(0, limit) : transactions;
+      } else if (useCache) {
         const cacheKey = `${this.cachePrefix}recent_transactions_${limit}`;
-        let transactions = await this.db.getCachedValue(cacheKey, 60000); // 1 minute cache
-
+        let transactions = await this.db.getCachedValue(cacheKey, 60000);
         if (!transactions) {
           const startDate = new Date();
-          startDate.setDate(startDate.getDate() - 30); // Last 30 days
+          startDate.setDate(startDate.getDate() - 30);
           transactions = await this.db.getTransactionsByDateRange(startDate, new Date());
           transactions = (transactions as unknown[]).slice(0, limit);
           await this.db.setCachedValue(cacheKey, transactions, 60000);
         }
-
-        return (transactions as unknown as unknown[]) || [];
+        rawData = (transactions as unknown as unknown[]) || [];
+      } else {
+        rawData = [];
       }
-
-      return [];
+      return this._validateOutput(rawData, TransactionSchema.array(), "transactions");
     } catch (error) {
       logger.error("Failed to get transactions", error);
       throw error;
     }
   }
 
-  async saveTransactions(transactions: DbData[]): Promise<void> {
+  async saveTransactions(transactions: ZodTransaction[]): Promise<void> {
     try {
-      await this.db.bulkUpsertTransactions(transactions);
+      const validated = this._validateInput(transactions, TransactionSchema.array(), "transaction");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.bulkUpsertTransactions(validated as any);
       await this._invalidateTransactionCache();
       logger.debug(`Saved ${transactions.length} transactions`);
     } catch (error) {
@@ -209,41 +243,36 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Bill operations with due date optimization
-   */
-  async getBills(options: GetBillsOptions = {}): Promise<unknown[]> {
+  // Bill operations with due date optimization
+  async getBills(options: GetBillsOptions = {}): Promise<ZodBill[]> {
     const { category, isPaid, daysAhead = 30, includeOverdue = true } = options;
-
     try {
+      let rawData: unknown[];
       if (category) {
-        return await this.db.getBillsByCategory(category);
-      }
-
-      if (isPaid === true) {
-        return await this.db.getPaidBills();
-      }
-
-      if (isPaid === false) {
+        rawData = await this.db.getBillsByCategory(category);
+      } else if (isPaid === true) {
+        rawData = await this.db.getPaidBills();
+      } else if (isPaid === false) {
         const [upcoming, overdue] = await Promise.all([
           this.db.getUpcomingBills(daysAhead),
           includeOverdue ? this.db.getOverdueBills() : [],
         ]);
-
-        return [...overdue, ...upcoming];
+        rawData = [...overdue, ...upcoming];
+      } else {
+        rawData = await this.db.bills.toArray();
       }
-
-      // All bills
-      return await this.db.bills.toArray();
+      return this._validateOutput(rawData, BillSchema.array(), "bills");
     } catch (error) {
       logger.error("Failed to get bills", error);
       throw error;
     }
   }
 
-  async saveBills(bills: DbData[]): Promise<void> {
+  async saveBills(bills: ZodBill[]): Promise<void> {
     try {
-      await this.db.bulkUpsertBills(bills);
+      const validated = this._validateInput(bills, BillSchema.array(), "bill");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.bulkUpsertBills(validated as any);
       logger.debug(`Saved ${bills.length} bills`);
     } catch (error) {
       logger.error("Failed to save bills", error);
@@ -251,40 +280,34 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Savings Goals operations with status optimization
-   */
-  async getSavingsGoals(options: GetSavingsGoalsOptions = {}): Promise<unknown[]> {
+  // Savings Goals operations with status optimization
+  async getSavingsGoals(options: GetSavingsGoalsOptions = {}): Promise<ZodSavingsGoal[]> {
     const { category, isCompleted, priority } = options;
-
     try {
+      let rawData: unknown[];
       if (category) {
-        return await this.db.getSavingsGoalsByCategory(category);
+        rawData = await this.db.getSavingsGoalsByCategory(category);
+      } else if (priority) {
+        rawData = await this.db.getSavingsGoalsByPriority(priority as "low" | "medium" | "high");
+      } else if (isCompleted === true) {
+        rawData = await this.db.getCompletedSavingsGoals();
+      } else if (isCompleted === false) {
+        rawData = await this.db.getActiveSavingsGoals();
+      } else {
+        rawData = await this.db.savingsGoals.toArray();
       }
-
-      if (priority) {
-        return await this.db.getSavingsGoalsByPriority(priority as "low" | "medium" | "high");
-      }
-
-      if (isCompleted === true) {
-        return await this.db.getCompletedSavingsGoals();
-      }
-
-      if (isCompleted === false) {
-        return await this.db.getActiveSavingsGoals();
-      }
-
-      // All savings goals
-      return await this.db.savingsGoals.toArray();
+      return this._validateOutput(rawData, SavingsGoalSchema.array(), "savings goals");
     } catch (error) {
       logger.error("Failed to get savings goals", error);
       throw error;
     }
   }
 
-  async saveSavingsGoals(goals: DbData[]): Promise<void> {
+  async saveSavingsGoals(goals: ZodSavingsGoal[]): Promise<void> {
     try {
-      await this.db.bulkUpsertSavingsGoals(goals);
+      const validated = this._validateInput(goals, SavingsGoalSchema.array(), "savings goal");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.bulkUpsertSavingsGoals(validated as any);
       logger.debug(`Saved ${goals.length} savings goals`);
     } catch (error) {
       logger.error("Failed to save savings goals", error);
@@ -292,31 +315,30 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Paycheck operations
-   */
-  async getPaycheckHistory(options: GetPaycheckHistoryOptions = {}): Promise<unknown[]> {
+  // Paycheck operations
+  async getPaycheckHistory(options: GetPaycheckHistoryOptions = {}): Promise<ZodPaycheckHistory[]> {
     const { limit = 50, dateRange, source } = options;
-
     try {
+      let rawData: unknown[];
       if (source) {
-        return await this.db.getPaychecksBySource(source);
+        rawData = await this.db.getPaychecksBySource(source);
+      } else if (dateRange) {
+        rawData = await this.db.getPaychecksByDateRange(dateRange.start, dateRange.end);
+      } else {
+        rawData = await this.db.getPaycheckHistory(limit);
       }
-
-      if (dateRange) {
-        return await this.db.getPaychecksByDateRange(dateRange.start, dateRange.end);
-      }
-
-      return await this.db.getPaycheckHistory(limit);
+      return this._validateOutput(rawData, PaycheckHistorySchema.array(), "paycheck history");
     } catch (error) {
       logger.error("Failed to get paycheck history", error);
       throw error;
     }
   }
 
-  async savePaychecks(paychecks: DbData[]): Promise<void> {
+  async savePaychecks(paychecks: ZodPaycheckHistory[]): Promise<void> {
     try {
-      await this.db.bulkUpsertPaychecks(paychecks);
+      const validated = this._validateInput(paychecks, PaycheckHistorySchema.array(), "paycheck");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.bulkUpsertPaychecks(validated as any);
       logger.debug(`Saved ${paychecks.length} paychecks`);
     } catch (error) {
       logger.error("Failed to save paychecks", error);
@@ -324,21 +346,22 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Debt operations
-   */
-  async getDebts(): Promise<unknown[]> {
+  // Debt operations
+  async getDebts(): Promise<ZodDebt[]> {
     try {
-      return await this.db.debts.toArray();
+      const rawData = await this.db.debts.toArray();
+      return this._validateOutput(rawData, DebtSchema.array(), "debts");
     } catch (error) {
       logger.error("Failed to get debts", error);
       throw error;
     }
   }
 
-  async saveDebts(debts: DbData[]): Promise<void> {
+  async saveDebts(debts: ZodDebt[]): Promise<void> {
     try {
-      await this.db.bulkUpsertDebts(debts);
+      const validated = this._validateInput(debts, DebtSchema.array(), "debt");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.bulkUpsertDebts(validated as any);
       logger.debug(`Saved ${debts.length} debts`);
     } catch (error) {
       logger.error("Failed to save debts", error);
@@ -346,25 +369,23 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Budget metadata operations
-   */
-  async getBudgetMetadata(): Promise<unknown> {
+  // Budget metadata operations
+  async getBudgetMetadata(): Promise<BudgetMetadata | null> {
     try {
       const metadata = await this.db.budget.get("metadata");
-      return metadata || null;
+      return metadata ? (metadata as BudgetMetadata) : null;
     } catch (error) {
       logger.error("Failed to get budget metadata", error);
       throw error;
     }
   }
 
-  async saveBudgetMetadata(metadata: DbData): Promise<void> {
+  async saveBudgetMetadata(metadata: Partial<BudgetMetadata>): Promise<void> {
     try {
       await this.db.budget.put({
         id: "metadata",
         lastModified: Date.now(),
-        ...(metadata as Record<string, unknown>),
+        ...metadata,
       });
       logger.debug("Saved budget metadata");
     } catch (error) {
@@ -373,25 +394,24 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Encrypted data operations
-   */
-  async getEncryptedBudgetData(): Promise<unknown> {
+  // Encrypted data operations
+  async getEncryptedBudgetData(): Promise<EncryptedBudgetData | null> {
     try {
-      return await this.db.budget.get("budgetData");
+      const data = await this.db.budget.get("budgetData");
+      return data ? (data as EncryptedBudgetData) : null;
     } catch (error) {
       logger.error("Failed to get encrypted budget data", error);
       return null;
     }
   }
 
-  async saveEncryptedBudgetData(data: DbData): Promise<void> {
+  async saveEncryptedBudgetData(data: Partial<EncryptedBudgetData>): Promise<void> {
     try {
       await this.db.budget.put({
         id: "budgetData",
         lastModified: Date.now(),
-        version: ((data as Record<string, unknown>)?.version as number) || 1,
-        ...(data as Record<string, unknown>),
+        version: data.version || 1,
+        ...data,
       });
       logger.debug("Saved encrypted budget data");
     } catch (error) {
@@ -400,31 +420,22 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Analytics and reporting
-   */
+  // Analytics and reporting
   async getAnalyticsData(
     dateRange: DateRange,
     options: GetAnalyticsDataOptions = {}
   ): Promise<unknown> {
     const { includeTransfers = false, useCache = true } = options;
-
     try {
       const cacheKey = `${this.cachePrefix}analytics_${dateRange.start}_${dateRange.end}_${includeTransfers}`;
-
       if (useCache) {
         let data = await this.db.getCachedValue(cacheKey, this.defaultCacheTtl);
-        if (data) {
-          return data;
-        }
+        if (data) return data;
       }
-
       const transactions = await this.db.getAnalyticsData(dateRange, includeTransfers);
-
       if (useCache) {
         await this.db.setCachedValue(cacheKey, transactions, this.defaultCacheTtl);
       }
-
       return transactions;
     } catch (error) {
       logger.error("Failed to get analytics data", error);
@@ -432,12 +443,11 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Batch operations
-   */
+  // Batch operations
   async batchUpdate(updates: BatchUpdateItem[]): Promise<void> {
     try {
-      await this.db.batchUpdate(updates as DbData[]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.db.batchUpdate(updates as any);
       await this._invalidateAllCaches();
       logger.debug(`Completed batch update with ${updates.length} operations`);
     } catch (error) {
@@ -446,9 +456,7 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Database maintenance
-   */
+  // Database maintenance
   async optimize(): Promise<void> {
     try {
       await this.db.optimizeDatabase();
@@ -461,34 +469,20 @@ class BudgetDatabaseService {
 
   async clearData(): Promise<void> {
     try {
-      await this.db.transaction(
-        "rw",
-        [
-          this.db.budget,
-          this.db.envelopes,
-          this.db.transactions,
-          this.db.bills,
-          this.db.savingsGoals,
-          this.db.paycheckHistory,
-          this.db.debts,
-          this.db.cache,
-          this.db.auditLog,
-        ],
-        async () => {
-          await Promise.all([
-            this.db.budget.clear(),
-            this.db.envelopes.clear(),
-            this.db.transactions.clear(),
-            this.db.bills.clear(),
-            this.db.savingsGoals.clear(),
-            this.db.paycheckHistory.clear(),
-            this.db.debts.clear(),
-            this.db.cache.clear(),
-            this.db.auditLog.clear(),
-          ]);
-        }
-      );
-
+      const tables = [
+        this.db.budget,
+        this.db.envelopes,
+        this.db.transactions,
+        this.db.bills,
+        this.db.savingsGoals,
+        this.db.paycheckHistory,
+        this.db.debts,
+        this.db.cache,
+        this.db.auditLog,
+      ];
+      await this.db.transaction("rw", tables, async () => {
+        await Promise.all(tables.map((t) => t.clear()));
+      });
       logger.info("All budget data cleared");
     } catch (error) {
       logger.error("Failed to clear data", error);
@@ -496,9 +490,6 @@ class BudgetDatabaseService {
     }
   }
 
-  /**
-   * Cache management
-   */
   private async _invalidateEnvelopeCache(): Promise<void> {
     await this.db.clearCacheCategory("envelopes");
   }
@@ -511,9 +502,6 @@ class BudgetDatabaseService {
     await this.db.cache.clear();
   }
 
-  /**
-   * Get service status
-   */
   getStatus(): ServiceStatus {
     return {
       isInitialized: this.db.isOpen(),
@@ -522,9 +510,6 @@ class BudgetDatabaseService {
     };
   }
 
-  /**
-   * Cleanup resources
-   */
   async cleanup(): Promise<void> {
     try {
       await this.db.close();
