@@ -20,7 +20,6 @@ import {
   generateAmount,
   generateRecentDate,
   generateFutureDate,
-  generateColor,
   mergeDefaults,
   pickRandom,
 } from "./factoryUtils";
