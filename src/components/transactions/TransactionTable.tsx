@@ -5,6 +5,8 @@ import DeleteConfirmation from "./components/DeleteConfirmation";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 import { COLUMN_WIDTHS } from "../../utils/transactions/tableHelpers";
 import type { Transaction, Envelope } from "../../types/finance";
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
 
 interface TransactionTableProps {
   transactions?: Transaction[];
@@ -21,6 +23,19 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   onDelete,
   onSplit,
 }) => {
+  // Validate props in development
+  validateComponentProps(
+    "TransactionTable",
+    {
+      transactions,
+      envelopes,
+      onEdit,
+      onDelete,
+      onSplit,
+    },
+    TransactionTablePropsSchema
+  );
+
   const {
     parentRef,
     rowVirtualizer,

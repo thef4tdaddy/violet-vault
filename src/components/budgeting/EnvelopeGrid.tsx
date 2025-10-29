@@ -15,6 +15,8 @@ import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
 import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 
 // Lazy load modals for better performance
 const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));
@@ -289,6 +291,18 @@ const UnifiedEnvelopeManager = ({
   unassignedCash: propUnassignedCash,
   className = "",
 }) => {
+  // Validate props in development
+  validateComponentProps(
+    "EnvelopeGrid",
+    {
+      envelopes: propEnvelopes,
+      transactions: propTransactions,
+      unassignedCash: propUnassignedCash,
+      className,
+    },
+    EnvelopeGridPropsSchema
+  );
+
   const {
     envelopes,
     transactions,
