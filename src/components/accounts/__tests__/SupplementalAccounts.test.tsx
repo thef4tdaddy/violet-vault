@@ -36,7 +36,7 @@ vi.mock("@/hooks/accounts/useSupplementalAccounts", () => ({
   })),
 }));
 
-// Type cast the mocked hook  
+// Type cast the mocked hook
 const useSupplementalAccounts = useSupplementalAccountsOriginal as unknown as Mock;
 
 // Mock child components

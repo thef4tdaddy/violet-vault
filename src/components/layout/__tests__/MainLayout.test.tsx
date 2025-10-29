@@ -326,8 +326,7 @@ describe("MainLayout", () => {
     it("should initialize data on mount", () => {
       renderLayout();
 
-      const useDataInitialization = require("@/hooks/common/useDataInitialization")
-        .default as any;
+      const useDataInitialization = require("@/hooks/common/useDataInitialization").default as any;
       expect(useDataInitialization).toHaveBeenCalled();
     });
   });

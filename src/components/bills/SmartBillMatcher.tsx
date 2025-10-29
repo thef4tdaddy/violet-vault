@@ -3,10 +3,7 @@ import { Button } from "@/components/ui";
 import React from "react";
 import { getIcon } from "../../utils";
 import { useSmartBillSuggestions } from "../../hooks/bills/useSmartBillSuggestions";
-import {
-  getConfidenceColor,
-  getConfidenceIcon,
-} from "./smartBillMatcherHelpers";
+import { getConfidenceColor, getConfidenceIcon } from "./smartBillMatcherHelpers";
 
 const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) => {
   const suggestions = useSmartBillSuggestions(bills, envelopes, searchQuery);

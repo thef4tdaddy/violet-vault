@@ -24,10 +24,7 @@ describe("TransactionSplitterService", () => {
 
   describe("findEnvelopeForCategory", () => {
     it("should find envelope by exact name match", () => {
-      const result = transactionSplitterService.findEnvelopeForCategory(
-        mockEnvelopes,
-        "Groceries"
-      );
+      const result = transactionSplitterService.findEnvelopeForCategory(mockEnvelopes, "Groceries");
 
       expect(result).toBeDefined();
       expect(result?.id).toBe("env1");
@@ -41,10 +38,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should be case insensitive", () => {
-      const result = transactionSplitterService.findEnvelopeForCategory(
-        mockEnvelopes,
-        "groceries"
-      );
+      const result = transactionSplitterService.findEnvelopeForCategory(mockEnvelopes, "groceries");
 
       expect(result).toBeDefined();
       expect(result?.id).toBe("env1");
@@ -250,7 +244,9 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should require description", () => {
-      const splits = [{ id: 1, amount: 100, description: "", category: "Food", envelopeId: "env1" }];
+      const splits = [
+        { id: 1, amount: 100, description: "", category: "Food", envelopeId: "env1" },
+      ];
 
       const errors = transactionSplitterService.validateSplits(splits, 100);
 

@@ -91,7 +91,7 @@ describe("CloudSyncService - Sync Core Tests", () => {
     it("should not start if already running", () => {
       cloudSyncService.start(mockConfig);
       const wasRunning = cloudSyncService.isRunning;
-      
+
       cloudSyncService.start(mockConfig);
 
       // Should still be running (no error thrown)

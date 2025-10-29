@@ -50,7 +50,8 @@ export const reversePaycheckBalances = async (
   const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
   const newActualBalance = currentActualBalance - paycheckRecord.amount;
-  const unassignedCashChange = (paycheckRecord.unassignedCashAfter || 0) - (paycheckRecord.unassignedCashBefore || 0);
+  const unassignedCashChange =
+    (paycheckRecord.unassignedCashAfter || 0) - (paycheckRecord.unassignedCashBefore || 0);
   const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
   await setBudgetMetadata({
@@ -67,7 +68,9 @@ export const reversePaycheckBalances = async (
 /**
  * Reverse envelope allocations
  */
-export const reverseEnvelopeAllocations = async (envelopeAllocations: EnvelopeAllocation[]): Promise<void> => {
+export const reverseEnvelopeAllocations = async (
+  envelopeAllocations: EnvelopeAllocation[]
+): Promise<void> => {
   if (!envelopeAllocations || envelopeAllocations.length === 0) {
     return;
   }
@@ -90,8 +93,10 @@ export const deleteAssociatedPaycheck = async (
   paycheckId: string,
   transactionId: string
 ): Promise<PaycheckDeletionResult> => {
-  const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId) as PaycheckRecordExtended | undefined;
-  
+  const paycheckRecord = (await budgetDb.paycheckHistory.get(paycheckId)) as
+    | PaycheckRecordExtended
+    | undefined;
+
   if (!paycheckRecord) {
     return { deletedPaycheck: false };
   }
@@ -112,10 +117,14 @@ export const deleteAssociatedPaycheck = async (
 /**
  * Process transaction deletion with paycheck handling
  */
-export const processTransactionDeletion = async (transactionId: string): Promise<TransactionDeletionResult> => {
+export const processTransactionDeletion = async (
+  transactionId: string
+): Promise<TransactionDeletionResult> => {
   logger.info("Starting transaction deletion", { transactionId });
 
-  const transaction = await budgetDb.transactions.get(transactionId) as TransactionExtended | undefined;
+  const transaction = (await budgetDb.transactions.get(transactionId)) as
+    | TransactionExtended
+    | undefined;
   if (!transaction) {
     throw new Error("Transaction not found");
   }

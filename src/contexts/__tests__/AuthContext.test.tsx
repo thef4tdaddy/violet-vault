@@ -54,8 +54,8 @@ describe("AuthContext", () => {
   const screen = {
     getByTestId: (id: string) => document.querySelector(`[data-testid="${id}"]`) as HTMLElement,
     getByText: (text: string) => {
-      const elements = Array.from(document.querySelectorAll('*'));
-      return elements.find(el => el.textContent?.includes(text)) as HTMLElement;
+      const elements = Array.from(document.querySelectorAll("*"));
+      return elements.find((el) => el.textContent?.includes(text)) as HTMLElement;
     },
   };
 
@@ -66,7 +66,7 @@ describe("AuthContext", () => {
         callback();
         return;
       } catch {
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
     }
     callback();

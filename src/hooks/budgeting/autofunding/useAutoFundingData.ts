@@ -39,10 +39,7 @@ export const useAutoFundingData = () => {
   );
 
   // Load data from localStorage
-  const loadData = useCallback(
-    () => loadFromStorage(setLastSaved),
-    []
-  );
+  const loadData = useCallback(() => loadFromStorage(setLastSaved), []);
 
   // Export data for backup/sharing
   const exportData = useCallback((data: AutoFundingData): AutoFundingData => {
@@ -112,7 +109,14 @@ export const useAutoFundingData = () => {
       return { available: true, ...usage };
     } catch (error) {
       logger.error("Storage health check failed", error);
-      return { available: false, error: (error as Error).message, currentSize: 0, usedSpace: 0, availableSpace: 0, healthScore: 0 };
+      return {
+        available: false,
+        error: (error as Error).message,
+        currentSize: 0,
+        usedSpace: 0,
+        availableSpace: 0,
+        healthScore: 0,
+      };
     }
   }, []);
 

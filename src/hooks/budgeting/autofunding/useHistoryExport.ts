@@ -75,7 +75,11 @@ export const useHistoryExport = () => {
 
   // Export history data
   const exportHistory = useCallback(
-    (executionHistory: HistoryExecution[], undoStack: UndoStackEntry[], options: ExportOptions = {}): ExportResult => {
+    (
+      executionHistory: HistoryExecution[],
+      undoStack: UndoStackEntry[],
+      options: ExportOptions = {}
+    ): ExportResult => {
       try {
         const { includeUndoStack = true, dateFrom, dateTo, format = "json" } = options;
 

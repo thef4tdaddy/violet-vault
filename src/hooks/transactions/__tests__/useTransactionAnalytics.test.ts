@@ -93,9 +93,7 @@ describe("useTransactionAnalytics", () => {
         { id: "2", description: "Test 2", amount: -50, date: "2024-01-02", category: "Food" },
       ];
 
-      const { result } = renderHook(() =>
-        useTransactionAnalytics(transactionsWithoutCategory)
-      );
+      const { result } = renderHook(() => useTransactionAnalytics(transactionsWithoutCategory));
 
       const categoryBreakdown = result.current.categoryBreakdown;
 

@@ -263,7 +263,13 @@ const GoalDistributionItem = ({
   );
 };
 
-const DistributionSummary = ({ total, unassignedCash }: { total: number; unassignedCash: number }) => (
+const DistributionSummary = ({
+  total,
+  unassignedCash,
+}: {
+  total: number;
+  unassignedCash: number;
+}) => (
   <div className="border-t pt-4 mb-6">
     <div className="flex justify-between items-center">
       <span className="font-medium">Total to Distribute:</span>
@@ -280,7 +286,15 @@ const DistributionSummary = ({ total, unassignedCash }: { total: number; unassig
   </div>
 );
 
-const ActionButtons = ({ onCancel, onDistribute, isValid }: { onCancel: () => void; onDistribute: () => void; isValid: boolean }) => (
+const ActionButtons = ({
+  onCancel,
+  onDistribute,
+  isValid,
+}: {
+  onCancel: () => void;
+  onDistribute: () => void;
+  isValid: boolean;
+}) => (
   <div className="flex justify-end space-x-3">
     <Button
       onClick={onCancel}

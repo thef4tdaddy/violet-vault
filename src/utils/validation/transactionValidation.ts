@@ -12,9 +12,9 @@ interface Transaction {
 export const isValidTransaction = (transaction: unknown): boolean => {
   return Boolean(
     transaction &&
-    typeof transaction === "object" &&
-    typeof (transaction as Record<string, unknown>).amount === "number" &&
-    (transaction as Record<string, unknown>).description
+      typeof transaction === "object" &&
+      typeof (transaction as Record<string, unknown>).amount === "number" &&
+      (transaction as Record<string, unknown>).description
   );
 };
 

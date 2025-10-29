@@ -88,7 +88,7 @@ describe("Transaction Operations Utilities", () => {
   describe("prepareTransactionForStorage", () => {
     const rawTransaction = {
       description: "  Test Transaction  ",
-      amount: -50.00,
+      amount: -50.0,
       date: "2023-01-01T10:00:00Z",
       category: "  Food  ",
       account: "  checking  ",
@@ -123,7 +123,7 @@ describe("Transaction Operations Utilities", () => {
 
       expect(prepared.metadata).toBeDefined();
       expect(prepared.metadata?.updatedAt).toBeDefined();
-      if (prepared.metadata?.updatedAt && typeof prepared.metadata.updatedAt === 'string') {
+      if (prepared.metadata?.updatedAt && typeof prepared.metadata.updatedAt === "string") {
         expect(new Date(prepared.metadata.updatedAt)).toBeInstanceOf(Date);
       }
     });
@@ -145,7 +145,12 @@ describe("Transaction Operations Utilities", () => {
 
   describe("determineTransactionType", () => {
     it("should return explicit type if set", () => {
-      const transaction = { description: "Test", date: "2023-01-01", amount: -50, type: "transfer" as const };
+      const transaction = {
+        description: "Test",
+        date: "2023-01-01",
+        amount: -50,
+        type: "transfer" as const,
+      };
 
       expect(determineTransactionType(transaction)).toBe("transfer");
     });
@@ -163,7 +168,12 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should detect transfer from metadata", () => {
-      const transaction = { description: "Test", date: "2023-01-01", amount: -50, metadata: { isTransfer: true } };
+      const transaction = {
+        description: "Test",
+        date: "2023-01-01",
+        amount: -50,
+        metadata: { isTransfer: true },
+      };
 
       expect(determineTransactionType(transaction)).toBe("transfer");
     });

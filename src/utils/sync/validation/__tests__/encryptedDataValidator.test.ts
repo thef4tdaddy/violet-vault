@@ -12,11 +12,11 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Type definition for valid validation result
-type ValidResult = { 
-  isValid: true; 
-  errors: unknown[]; 
-  warnings: unknown[]; 
-  dataLength: number; 
+type ValidResult = {
+  isValid: true;
+  errors: unknown[];
+  warnings: unknown[];
+  dataLength: number;
   ivLength: number;
 };
 
@@ -37,7 +37,9 @@ describe("encryptedDataValidator", () => {
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
       expect(result.warnings).toHaveLength(0);
-      expect((result as ValidResult).dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect((result as ValidResult).dataLength).toBe(
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH
+      );
       expect((result as ValidResult).ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
     });
 
@@ -161,7 +163,9 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
-      expect((result as ValidResult).dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect((result as ValidResult).dataLength).toBe(
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH
+      );
       expect((result as ValidResult).ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
     });
 

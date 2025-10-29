@@ -18,7 +18,8 @@ export async function fixAutoAllocateUndefined() {
     logger.info("🔧 Starting auto-allocate undefined value fix...");
 
     // Get all envelopes
-    const allEnvelopes = (await budgetDb.envelopes.toArray()) as unknown as EnvelopeWithAutoAllocate[];
+    const allEnvelopes =
+      (await budgetDb.envelopes.toArray()) as unknown as EnvelopeWithAutoAllocate[];
     logger.info(`Found ${allEnvelopes.length} envelopes to check`);
 
     // Find envelopes with undefined autoAllocate
@@ -43,7 +44,8 @@ export async function fixAutoAllocateUndefined() {
     logger.info(`✅ Fixed ${fixedCount} envelopes with undefined autoAllocate values`);
 
     // Verify the fix
-    const verification = (await budgetDb.envelopes.toArray()) as unknown as EnvelopeWithAutoAllocate[];
+    const verification =
+      (await budgetDb.envelopes.toArray()) as unknown as EnvelopeWithAutoAllocate[];
     const stillUndefined = verification.filter((env) => env.autoAllocate === undefined);
 
     if (stillUndefined.length > 0) {

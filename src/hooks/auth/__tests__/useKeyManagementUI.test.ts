@@ -281,7 +281,9 @@ describe("useKeyManagementOperations", () => {
         text: vi.fn(() => Promise.reject(new Error("File read error"))),
       };
 
-      await expect(result.current.handleFileRead(mockFile as any)).rejects.toThrow("File read error");
+      await expect(result.current.handleFileRead(mockFile as any)).rejects.toThrow(
+        "File read error"
+      );
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Failed to read key file. Please check the file format.",
         "File Read Error"

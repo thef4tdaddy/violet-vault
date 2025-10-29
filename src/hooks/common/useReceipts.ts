@@ -134,7 +134,13 @@ const useReceipts = () => {
 
   const linkReceiptToTransactionMutation = useMutation({
     mutationKey: ["receipts", "linkTransaction"],
-    mutationFn: async ({ receiptId, transactionId }: { receiptId: string; transactionId: string }) => {
+    mutationFn: async ({
+      receiptId,
+      transactionId,
+    }: {
+      receiptId: string;
+      transactionId: string;
+    }) => {
       // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.update(receiptId, {
         transactionId,

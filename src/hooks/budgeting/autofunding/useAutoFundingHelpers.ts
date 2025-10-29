@@ -212,26 +212,31 @@ export const processExecutionResults = (
 /**
  * Enhanced rule execution with history tracking
  */
-export const createExecuteRules = (
-  rulesHook: UseAutoFundingRulesReturn,
-  executionHook: UseAutoFundingExecutionReturn,
-  historyHook: UseAutoFundingHistoryReturn,
-  dataHook: UseAutoFundingDataReturn
-) => async (trigger = TRIGGER_TYPES.MANUAL, triggerData: Record<string, unknown> = {}) => {
-  try {
-    const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
-    processExecutionResults(result, historyHook, rulesHook, dataHook);
-    return result;
-  } catch (error) {
-    logger.error("Enhanced rule execution failed", error);
-    return { success: false, error: error.message };
-  }
-};
+export const createExecuteRules =
+  (
+    rulesHook: UseAutoFundingRulesReturn,
+    executionHook: UseAutoFundingExecutionReturn,
+    historyHook: UseAutoFundingHistoryReturn,
+    dataHook: UseAutoFundingDataReturn
+  ) =>
+  async (trigger = TRIGGER_TYPES.MANUAL, triggerData: Record<string, unknown> = {}) => {
+    try {
+      const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
+      processExecutionResults(result, historyHook, rulesHook, dataHook);
+      return result;
+    } catch (error) {
+      logger.error("Enhanced rule execution failed", error);
+      return { success: false, error: error.message };
+    }
+  };
 
 /**
  * Get current data for auto-save
  */
-export const getCurrentDataForSave = (rulesHook: UseAutoFundingRulesReturn, historyHook: UseAutoFundingHistoryReturn) => ({
+export const getCurrentDataForSave = (
+  rulesHook: UseAutoFundingRulesReturn,
+  historyHook: UseAutoFundingHistoryReturn
+) => ({
   rules: rulesHook.rules,
   executionHistory: historyHook.executionHistory,
   undoStack: historyHook.undoStack,

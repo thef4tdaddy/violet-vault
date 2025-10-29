@@ -4,18 +4,18 @@
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Backup type enum
  */
-export const BackupTypeSchema = z.enum(['manual', 'scheduled', 'sync_triggered']);
+export const BackupTypeSchema = z.enum(["manual", "scheduled", "sync_triggered"]);
 export type BackupType = z.infer<typeof BackupTypeSchema>;
 
 /**
  * Sync type enum
  */
-export const SyncTypeSchema = z.enum(['firebase', 'export', 'import']).optional();
+export const SyncTypeSchema = z.enum(["firebase", "export", "import"]).optional();
 export type SyncType = z.infer<typeof SyncTypeSchema>;
 
 /**
@@ -23,8 +23,8 @@ export type SyncType = z.infer<typeof SyncTypeSchema>;
  * Represents a backup snapshot of budget data
  */
 export const AutoBackupSchema = z.object({
-  id: z.string().min(1, 'Backup ID is required'),
-  timestamp: z.number().int().positive('Timestamp must be a positive number'),
+  id: z.string().min(1, "Backup ID is required"),
+  timestamp: z.number().int().positive("Timestamp must be a positive number"),
   type: BackupTypeSchema,
   syncType: SyncTypeSchema,
   size: z.number().int().min(0).optional(),

@@ -152,7 +152,7 @@ describe("useTransactionUtils", () => {
 
       expect(start).toBeInstanceOf(Date);
       expect(end).toBeInstanceOf(Date);
-      
+
       const daysDiff = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
       expect(daysDiff).toBeGreaterThanOrEqual(29);
       expect(daysDiff).toBeLessThanOrEqual(30);

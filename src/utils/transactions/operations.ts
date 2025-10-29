@@ -22,7 +22,9 @@ interface TransactionBase {
   metadata?: Record<string, unknown>;
 }
 
-type Transaction = Required<Omit<TransactionBase, "metadata">> & { metadata: Record<string, unknown> };
+type Transaction = Required<Omit<TransactionBase, "metadata">> & {
+  metadata: Record<string, unknown>;
+};
 
 interface ValidationResult {
   isValid: boolean;
@@ -71,7 +73,10 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
     const prepared = {
       id: transactionData.id || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       description: (transactionData.description || "").trim(),
-      amount: typeof transactionData.amount === "number" ? transactionData.amount : parseFloat(String(transactionData.amount)) || 0,
+      amount:
+        typeof transactionData.amount === "number"
+          ? transactionData.amount
+          : parseFloat(String(transactionData.amount)) || 0,
       date: new Date(transactionData.date).toISOString(),
       category: (transactionData.category || "").trim(),
       account: (transactionData.account || "").trim() || "default",
@@ -96,7 +101,9 @@ export const prepareTransactionForStorage = (transactionData: TransactionBase): 
 /**
  * Calculate transaction type based on amount and metadata
  */
-export const determineTransactionType = (transaction: TransactionBase): "income" | "expense" | "transfer" => {
+export const determineTransactionType = (
+  transaction: TransactionBase
+): "income" | "expense" | "transfer" => {
   try {
     if (!transaction) return "expense";
 
@@ -119,7 +126,14 @@ export const determineTransactionType = (transaction: TransactionBase): "income"
 /**
  * Create transfer transaction pair
  */
-export const createTransferPair = (transferData: TransactionBase & { fromAccount: string; toAccount: string; fromEnvelopeId?: string; toEnvelopeId?: string }): Transaction[] => {
+export const createTransferPair = (
+  transferData: TransactionBase & {
+    fromAccount: string;
+    toAccount: string;
+    fromEnvelopeId?: string;
+    toEnvelopeId?: string;
+  }
+): Transaction[] => {
   try {
     const validation = validateTransactionData({
       ...transferData,
@@ -196,7 +210,10 @@ interface CategoryRule {
 /**
  * Categorize transaction based on description and rules
  */
-export const categorizeTransaction = (transaction: TransactionBase, categoryRules: CategoryRule[] = []): TransactionBase => {
+export const categorizeTransaction = (
+  transaction: TransactionBase,
+  categoryRules: CategoryRule[] = []
+): TransactionBase => {
   try {
     if (!transaction || transaction.category) {
       return transaction; // Already has category
@@ -269,10 +286,16 @@ export const categorizeTransaction = (transaction: TransactionBase, categoryRule
 /**
  * Check if two transactions are duplicates based on criteria
  */
-const areDuplicateTransactions = (transaction: TransactionBase, existing: TransactionBase, options: DuplicateCheckOptions): boolean => {
+const areDuplicateTransactions = (
+  transaction: TransactionBase,
+  existing: TransactionBase,
+  options: DuplicateCheckOptions
+): boolean => {
   const { timeWindowMs, amountTolerance, checkDescription, checkAccount } = options;
 
-  const timeDiff = Math.abs(new Date(transaction.date).getTime() - new Date(existing.date).getTime());
+  const timeDiff = Math.abs(
+    new Date(transaction.date).getTime() - new Date(existing.date).getTime()
+  );
   const amountDiff = Math.abs(transaction.amount - existing.amount);
   const sameDescription = !checkDescription || transaction.description === existing.description;
   const sameAccount = !checkAccount || transaction.account === existing.account;
@@ -288,11 +311,22 @@ const areDuplicateTransactions = (transaction: TransactionBase, existing: Transa
 const mergeDuplicateMetadata = (existing: TransactionBase, transaction: TransactionBase): void => {
   existing.metadata = {
     ...existing.metadata,
-    duplicates: (existing.metadata?.duplicates as Array<{ id?: string; originalDate: string | Date; mergedAt: string }>) || [],
+    duplicates:
+      (existing.metadata?.duplicates as Array<{
+        id?: string;
+        originalDate: string | Date;
+        mergedAt: string;
+      }>) || [],
     mergedAt: new Date().toISOString(),
   };
 
-  (existing.metadata.duplicates as Array<{ id?: string; originalDate: string | Date; mergedAt: string }>).push({
+  (
+    existing.metadata.duplicates as Array<{
+      id?: string;
+      originalDate: string | Date;
+      mergedAt: string;
+    }>
+  ).push({
     id: transaction.id,
     originalDate: transaction.date,
     mergedAt: new Date().toISOString(),
@@ -320,7 +354,10 @@ interface TransactionWithRunningBalance extends TransactionBase {
 /**
  * Merge duplicate transactions
  */
-export const mergeDuplicateTransactions = (transactions: TransactionBase[] = [], options: MergeDuplicateOptions = {}): TransactionBase[] => {
+export const mergeDuplicateTransactions = (
+  transactions: TransactionBase[] = [],
+  options: MergeDuplicateOptions = {}
+): TransactionBase[] => {
   try {
     const {
       timeWindowMinutes = 5,
@@ -360,7 +397,10 @@ export const mergeDuplicateTransactions = (transactions: TransactionBase[] = [],
 /**
  * Calculate running balance for transactions
  */
-export const calculateRunningBalance = (transactions: TransactionBase[] = [], startingBalance: number = 0): TransactionWithRunningBalance[] => {
+export const calculateRunningBalance = (
+  transactions: TransactionBase[] = [],
+  startingBalance: number = 0
+): TransactionWithRunningBalance[] => {
   try {
     let runningBalance = startingBalance;
 
@@ -399,7 +439,10 @@ interface FormattedTransaction extends TransactionBase {
 /**
  * Format transaction for display
  */
-export const formatTransactionForDisplay = (transaction: TransactionBase, options: FormatDisplayOptions = {}): FormattedTransaction => {
+export const formatTransactionForDisplay = (
+  transaction: TransactionBase,
+  options: FormatDisplayOptions = {}
+): FormattedTransaction => {
   try {
     const { currency = "USD", dateFormat = "short", includeTime = false } = options;
 

@@ -95,7 +95,10 @@ interface GenerateSuggestionsOptions {
  * @param {string|number} dateRange - Range identifier (7, 30, 90, etc.)
  * @returns {Array} Filtered transactions
  */
-export const filterTransactionsByDateRange = (transactions: Transaction[], dateRange: string | number): Transaction[] => {
+export const filterTransactionsByDateRange = (
+  transactions: Transaction[],
+  dateRange: string | number
+): Transaction[] => {
   const now = new Date();
   const ranges: Record<string | number, Date> = {
     7: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
@@ -117,8 +120,8 @@ export const calculateMonthsOfData = (transactions: Transaction[]): number => {
   if (transactions.length === 0) return 1;
 
   const dates = transactions.map((t) => new Date(t.date));
-  const earliest = new Date(Math.min(...dates.map(d => d.getTime())));
-  const latest = new Date(Math.max(...dates.map(d => d.getTime())));
+  const earliest = new Date(Math.min(...dates.map((d) => d.getTime())));
+  const latest = new Date(Math.max(...dates.map((d) => d.getTime())));
 
   const monthsDiff =
     (latest.getFullYear() - earliest.getFullYear()) * 12 +

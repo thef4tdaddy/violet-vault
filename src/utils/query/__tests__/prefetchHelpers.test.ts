@@ -56,7 +56,10 @@ describe("prefetchHelpers", () => {
       (budgetDatabaseService.getEnvelopes as Mock).mockResolvedValue(mockEnvelopes);
       (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockEnvelopes);
 
-      const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient as unknown as QueryClient, filters);
+      const result = await prefetchHelpers.prefetchEnvelopes(
+        mockQueryClient as unknown as QueryClient,
+        filters
+      );
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
         queryKey: queryKeys.envelopesList(filters),
@@ -75,11 +78,16 @@ describe("prefetchHelpers", () => {
       (budgetDb.getEnvelopesByCategory as Mock).mockResolvedValue(mockEnvelopes);
 
       // Execute the queryFn directly to test fallback logic
-      (mockQueryClient.prefetchQuery as Mock).mockImplementation(async ({ queryFn }: {queryFn: () => unknown}) => {
-        return await queryFn();
-      });
+      (mockQueryClient.prefetchQuery as Mock).mockImplementation(
+        async ({ queryFn }: { queryFn: () => unknown }) => {
+          return await queryFn();
+        }
+      );
 
-      const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient as unknown as QueryClient, filters);
+      const result = await prefetchHelpers.prefetchEnvelopes(
+        mockQueryClient as unknown as QueryClient,
+        filters
+      );
 
       expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith(
         filters.category,
@@ -92,7 +100,9 @@ describe("prefetchHelpers", () => {
       const error = new Error("Prefetch failed");
       (mockQueryClient.prefetchQuery as Mock).mockRejectedValue(error);
 
-      const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient as unknown as QueryClient);
+      const result = await prefetchHelpers.prefetchEnvelopes(
+        mockQueryClient as unknown as QueryClient
+      );
 
       expect(result).toBeNull();
     });
@@ -124,12 +134,19 @@ describe("prefetchHelpers", () => {
       (budgetDatabaseService.getTransactions as Mock).mockResolvedValue(mockTransactions);
       (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockTransactions);
 
-      const result = await prefetchHelpers.prefetchTransactions(mockQueryClient as unknown as QueryClient, dateRange, {
-        limit: 100,
-      });
+      const result = await prefetchHelpers.prefetchTransactions(
+        mockQueryClient as unknown as QueryClient,
+        dateRange,
+        {
+          limit: 100,
+        }
+      );
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
-        queryKey: queryKeys.transactionsByDateRange(dateRange.start.toISOString(), dateRange.end.toISOString()),
+        queryKey: queryKeys.transactionsByDateRange(
+          dateRange.start.toISOString(),
+          dateRange.end.toISOString()
+        ),
         queryFn: expect.any(Function),
         staleTime: 60 * 1000,
       });
@@ -161,9 +178,13 @@ describe("prefetchHelpers", () => {
         return await queryFn();
       });
 
-      const result = await prefetchHelpers.prefetchTransactions(mockQueryClient as unknown as QueryClient, dateRange, {
-        limit: 50,
-      });
+      const result = await prefetchHelpers.prefetchTransactions(
+        mockQueryClient as unknown as QueryClient,
+        dateRange,
+        {
+          limit: 50,
+        }
+      );
 
       expect(result).toHaveLength(50);
       expect(result).toEqual(mockTransactions.slice(0, 50));
@@ -178,7 +199,10 @@ describe("prefetchHelpers", () => {
       (budgetDatabaseService.getBills as Mock).mockResolvedValue(mockBills);
       (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockBills);
 
-      const result = await prefetchHelpers.prefetchBills(mockQueryClient as unknown as QueryClient, options);
+      const result = await prefetchHelpers.prefetchBills(
+        mockQueryClient as unknown as QueryClient,
+        options
+      );
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
         queryKey: queryKeys.billsList(options),
@@ -210,7 +234,10 @@ describe("prefetchHelpers", () => {
       (budgetDatabaseService.getSavingsGoals as Mock).mockResolvedValue(mockGoals);
       (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockGoals);
 
-      const result = await prefetchHelpers.prefetchSavingsGoals(mockQueryClient as unknown as QueryClient, options);
+      const result = await prefetchHelpers.prefetchSavingsGoals(
+        mockQueryClient as unknown as QueryClient,
+        options
+      );
 
       expect(budgetDatabaseService.getSavingsGoals).toHaveBeenCalledWith(options);
       expect(result).toEqual(mockGoals);
@@ -228,7 +255,9 @@ describe("prefetchHelpers", () => {
       (budgetDb.getCachedValue as Mock).mockResolvedValue(mockDashboardData);
       (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockDashboardData);
 
-      const result = await prefetchHelpers.prefetchDashboard(mockQueryClient as unknown as QueryClient);
+      const result = await prefetchHelpers.prefetchDashboard(
+        mockQueryClient as unknown as QueryClient
+      );
 
       expect(budgetDb.getCachedValue).toHaveBeenCalledWith("dashboard_summary");
       expect(result).toEqual(mockDashboardData);
@@ -251,7 +280,9 @@ describe("prefetchHelpers", () => {
         return await queryFn();
       });
 
-      const result = await prefetchHelpers.prefetchDashboard(mockQueryClient as unknown as QueryClient);
+      const result = await prefetchHelpers.prefetchDashboard(
+        mockQueryClient as unknown as QueryClient
+      );
 
       expect(result).toEqual({
         totalEnvelopes: 1,
@@ -278,7 +309,10 @@ describe("prefetchHelpers", () => {
       (budgetDatabaseService.getAnalyticsData as Mock).mockResolvedValue(mockAnalyticsData);
       (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockAnalyticsData);
 
-      const result = await prefetchHelpers.prefetchAnalytics(mockQueryClient as unknown as QueryClient, "week");
+      const result = await prefetchHelpers.prefetchAnalytics(
+        mockQueryClient as unknown as QueryClient,
+        "week"
+      );
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
         queryKey: queryKeys.analyticsReport("spending", { period: "week" }),
@@ -313,12 +347,20 @@ describe("prefetchHelpers", () => {
     it("should prefetch multiple dashboard-related queries", async () => {
       // Mock all the individual prefetch functions
       // Mock the individual prefetch methods
-      vi.spyOn(prefetchHelpers, "prefetchDashboard").mockResolvedValue("dashboard" as unknown as void);
-      vi.spyOn(prefetchHelpers, "prefetchEnvelopes").mockResolvedValue("envelopes" as unknown as void);
+      vi.spyOn(prefetchHelpers, "prefetchDashboard").mockResolvedValue(
+        "dashboard" as unknown as void
+      );
+      vi.spyOn(prefetchHelpers, "prefetchEnvelopes").mockResolvedValue(
+        "envelopes" as unknown as void
+      );
       vi.spyOn(prefetchHelpers, "prefetchBills").mockResolvedValue("bills" as unknown as void);
-      vi.spyOn(prefetchHelpers, "prefetchTransactions").mockResolvedValue("transactions" as unknown as void);
+      vi.spyOn(prefetchHelpers, "prefetchTransactions").mockResolvedValue(
+        "transactions" as unknown as void
+      );
 
-      const result = await prefetchHelpers.prefetchDashboardBundle(mockQueryClient as unknown as QueryClient);
+      const result = await prefetchHelpers.prefetchDashboardBundle(
+        mockQueryClient as unknown as QueryClient
+      );
 
       expect(prefetchHelpers.prefetchDashboard).toHaveBeenCalledWith(mockQueryClient);
       expect(prefetchHelpers.prefetchEnvelopes).toHaveBeenCalledWith(mockQueryClient, {
@@ -341,8 +383,12 @@ describe("prefetchHelpers", () => {
   describe("smartPrefetch", () => {
     it("should prefetch based on current route", async () => {
       // Mock individual prefetch methods
-      vi.spyOn(prefetchHelpers, "prefetchDashboard").mockResolvedValue("dashboard" as unknown as void);
-      vi.spyOn(prefetchHelpers, "prefetchEnvelopes").mockResolvedValue("envelopes" as unknown as void);
+      vi.spyOn(prefetchHelpers, "prefetchDashboard").mockResolvedValue(
+        "dashboard" as unknown as void
+      );
+      vi.spyOn(prefetchHelpers, "prefetchEnvelopes").mockResolvedValue(
+        "envelopes" as unknown as void
+      );
       vi.spyOn(prefetchHelpers, "prefetchBills").mockResolvedValue("bills" as unknown as void);
 
       await prefetchHelpers.smartPrefetch(mockQueryClient as unknown as QueryClient, "/");
@@ -353,17 +399,27 @@ describe("prefetchHelpers", () => {
     });
 
     it("should handle unknown routes gracefully", async () => {
-      await prefetchHelpers.smartPrefetch(mockQueryClient as unknown as QueryClient, "/unknown-route");
+      await prefetchHelpers.smartPrefetch(
+        mockQueryClient as unknown as QueryClient,
+        "/unknown-route"
+      );
 
       // Should not throw and should handle gracefully
       expect(true).toBe(true); // Test passes if no error is thrown
     });
 
     it("should prefetch transactions for transaction route", async () => {
-      vi.spyOn(prefetchHelpers, "prefetchTransactions").mockResolvedValue("transactions" as unknown as void);
-      vi.spyOn(prefetchHelpers, "prefetchAnalytics").mockResolvedValue("analytics" as unknown as void);
+      vi.spyOn(prefetchHelpers, "prefetchTransactions").mockResolvedValue(
+        "transactions" as unknown as void
+      );
+      vi.spyOn(prefetchHelpers, "prefetchAnalytics").mockResolvedValue(
+        "analytics" as unknown as void
+      );
 
-      await prefetchHelpers.smartPrefetch(mockQueryClient as unknown as QueryClient, "/transactions");
+      await prefetchHelpers.smartPrefetch(
+        mockQueryClient as unknown as QueryClient,
+        "/transactions"
+      );
 
       expect(prefetchHelpers.prefetchTransactions).toHaveBeenCalledWith(
         mockQueryClient,

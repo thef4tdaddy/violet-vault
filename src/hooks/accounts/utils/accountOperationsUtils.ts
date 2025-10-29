@@ -3,10 +3,7 @@
  * Extracted from useSupplementalAccounts hook to reduce complexity
  */
 
-import {
-  formatAccountData,
-  generateAccountId,
-} from "@/utils/accounts/accountHelpers";
+import { formatAccountData, generateAccountId } from "@/utils/accounts/accountHelpers";
 
 interface AccountForm {
   name: string;

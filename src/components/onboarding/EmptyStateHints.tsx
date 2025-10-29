@@ -25,8 +25,7 @@ const HINT_CONFIGS = {
   debts: {
     icon: "CreditCard",
     title: "Track Your Debts",
-    message:
-      "Add credit cards, loans, and other debts to get a complete picture of your finances.",
+    message: "Add credit cards, loans, and other debts to get a complete picture of your finances.",
     actions: (onAction, markStepComplete) => [
       {
         label: "Add Debt",

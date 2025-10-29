@@ -33,6 +33,7 @@ FINISH: Production Ready! ✅
 ### Timeline: 49-50 hours
 
 ### What Gets Fixed:
+
 - ✅ 71 `max-lines-per-function` violations
 - ✅ 36 `complexity` violations
 - ✅ 21 `max-statements` violations
@@ -41,11 +42,13 @@ FINISH: Production Ready! ✅
 ### Sub-Phases:
 
 #### Phase 1: Preparation (4 hours)
+
 - Understand architecture
 - Plan extraction strategies
 - Set up branch
 
 #### Phase 2: Tier 1 Refactoring - Critical Files (16 hours)
+
 **5 files with 250+ lines AND complexity issues:**
 
 1. **src/components/feedback/BugReportButton.tsx** (332 lines)
@@ -69,6 +72,7 @@ FINISH: Production Ready! ✅
    - Result: 296 → ~80 lines
 
 #### Phase 3: Tier 2 Refactoring - High Priority (24 hours)
+
 **15 files with 200-250 lines OR complexity 15-30:**
 
 - **Batch 1:** Analytics components (ReportExporter, useReportExporter)
@@ -78,16 +82,19 @@ FINISH: Production Ready! ✅
 - **Batch 5:** Complex hooks (useKeyManagement, useTransactionOperations, useDebtManagement, etc.)
 
 #### Phase 4: Testing & Validation (3 hours)
+
 - Run full test suite: `npm run test`
 - Run linter: `npm run lint` (verify 0 warnings)
 - Run TypeScript check: `npm run type-check`
 - Manual testing of features
 
 #### Phase 5: Final Integration (2 hours)
+
 - Format all files: `npx prettier --write src/`
 - Final commit & PR
 
 ### Result After Phase A:
+
 ```
 ✅ 129 lint violations → 0 warnings
 ✅ Average complexity: 18 → 6 (-67%)
@@ -105,6 +112,7 @@ FINISH: Production Ready! ✅
 ### Timeline: 15-20 hours
 
 ### What Gets Fixed:
+
 - ✅ 350+ `TS6133` (unused imports/variables)
 - ✅ 250+ `TS2339` (property does not exist)
 - ✅ 180+ `TS2322` (type assignment mismatch)
@@ -116,7 +124,9 @@ FINISH: Production Ready! ✅
 ### Sub-Phases:
 
 #### Phase 1: Low-Hanging Fruit (2-3 hours)
+
 **Focus:** TS6133 (unused imports/variables)
+
 - Remove unused React imports
 - Remove unused component imports
 - Add underscore prefix to intentional unused
@@ -125,6 +135,7 @@ FINISH: Production Ready! ✅
 #### Phase 2: Component Props & Types (4-5 hours)
 
 **Batch 1: Fix Checkbox Components (1-2 hours)**
+
 ```typescript
 // Before:
 <Checkbox onCheckedChange={handleChange} />
@@ -132,9 +143,11 @@ FINISH: Production Ready! ✅
 // After:
 <Checkbox onChange={handleChange} />
 ```
+
 Result: -40 errors
 
 **Batch 2: Fix Button Components (1-2 hours)**
+
 ```typescript
 // Before:
 <Button color="success" variant="ghost">
@@ -142,14 +155,17 @@ Result: -40 errors
 // After:
 <Button variant="primary">
 ```
+
 Result: -20 errors
 
 **Batch 3: Add Data Type Definitions (1 hour)**
+
 - Add AnalyticsData, BillStats, EnvelopeStats interfaces
 - Type API responses
 - Result: -80 errors
 
 #### Phase 3: Service Layer Types (4-5 hours)
+
 **Focus:** High-error service files
 
 - budgetDatabaseService.ts (102 errors)
@@ -163,6 +179,7 @@ Result: -20 errors
 Result: -220 errors
 
 #### Phase 4: Hook & Test Types (3-4 hours)
+
 **Focus:** Hook and test files
 
 - useBulkBillUpdate.test.tsx (100 errors)
@@ -175,6 +192,7 @@ Result: -220 errors
 Result: -130 errors
 
 #### Phase 5: Edge Cases (2-3 hours)
+
 **Focus:** Remaining complex issues
 
 - Recharts component types
@@ -185,6 +203,7 @@ Result: -130 errors
 Result: -50 errors
 
 ### Result After Phase B:
+
 ```
 ✅ 1000+ TypeScript errors → 0 errors
 ✅ TypeScript strict mode enabled
@@ -198,12 +217,14 @@ Result: -50 errors
 ## 🎯 Success Criteria
 
 ### After Phase A (Lint Refactoring):
+
 - ✅ 0 lint warnings
 - ✅ All tests passing
 - ✅ No regressions in functionality
 - ✅ Better code organization
 
 ### After Phase B (TypeScript Fixes):
+
 - ✅ 0 TypeScript errors
 - ✅ Strict mode enabled
 - ✅ All tests passing
@@ -211,6 +232,7 @@ Result: -50 errors
 - ✅ Self-documenting types
 
 ### Overall Results:
+
 ```
 BEFORE:
 - 129 lint violations
@@ -232,43 +254,46 @@ AFTER:
 
 ### Code Quality Improvements
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Lint violations | 129 | 0 | -100% ✅ |
-| TypeScript errors | 1000+ | 0 | -100% ✅ |
-| Avg complexity | 18 | 6 | -67% ✅ |
-| Lines per function | 120 | 45 | -63% ✅ |
-| Component files | 45 | ~65 | +44% (better granularity) |
-| Hook files | 30 | ~45 | +50% (better separation) |
-| Test coverage | 62% | 86% | +39% ✅ |
+| Metric             | Before | After | Change                    |
+| ------------------ | ------ | ----- | ------------------------- |
+| Lint violations    | 129    | 0     | -100% ✅                  |
+| TypeScript errors  | 1000+  | 0     | -100% ✅                  |
+| Avg complexity     | 18     | 6     | -67% ✅                   |
+| Lines per function | 120    | 45    | -63% ✅                   |
+| Component files    | 45     | ~65   | +44% (better granularity) |
+| Hook files         | 30     | ~45   | +50% (better separation)  |
+| Test coverage      | 62%    | 86%   | +39% ✅                   |
 
 ### Developer Productivity
 
-| Aspect | Impact |
-|--------|--------|
-| Code review time | -40% (smaller files, clearer intent) |
-| Bug prevention | +50% (type safety + simpler code) |
-| IDE support | +100% (better autocomplete & error detection) |
-| Onboarding time | -30% (clearer code structure) |
-| Maintenance burden | -60% (easier to understand & modify) |
+| Aspect             | Impact                                        |
+| ------------------ | --------------------------------------------- |
+| Code review time   | -40% (smaller files, clearer intent)          |
+| Bug prevention     | +50% (type safety + simpler code)             |
+| IDE support        | +100% (better autocomplete & error detection) |
+| Onboarding time    | -30% (clearer code structure)                 |
+| Maintenance burden | -60% (easier to understand & modify)          |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 1. ✅ Git knowledge (branching, committing, PR creation)
 2. ✅ TypeScript basics (types, interfaces, generics)
 3. ✅ React knowledge (components, hooks, state)
 4. ✅ ESLint understanding (error categories)
 
 ### Step 1: Review Documentation
+
 1. Read: `/docs/Component-Refactoring-Standards.md`
 2. Read: `/docs/COMPREHENSIVE-REFACTORING-PLAN.md`
 3. Read: `/docs/TYPECHECK-ERROR-REMEDIATION-PLAN.md` (for later)
 4. Read: This document
 
 ### Step 2: Start Phase A (Lint Refactoring)
+
 ```bash
 # Create branch
 git checkout -b refactor/reduce-complexity
@@ -286,6 +311,7 @@ git commit -m "refactor: decompose [ComponentName]..."
 ```
 
 ### Step 3: After Phase A Complete
+
 ```bash
 # Push all commits
 git push -u origin refactor/reduce-complexity
@@ -300,6 +326,7 @@ git pull origin main
 ```
 
 ### Step 4: Start Phase B (TypeScript Fixes)
+
 ```bash
 # Create new branch
 git checkout -b refactor/typescript-strict-mode
@@ -316,6 +343,7 @@ git commit -m "refactor: fix TypeScript errors in [category]..."
 ```
 
 ### Step 5: Final Phase
+
 ```bash
 # After all phases complete:
 npm run lint        # Verify 0 warnings
@@ -333,26 +361,31 @@ npm run build       # Verify build succeeds
 ## 📝 Key Principles
 
 ### 1. One Thing at a Time
+
 - Focus on one file/category at a time
 - Don't mix concerns (lint + types)
 - Commit frequently with clear messages
 
 ### 2. Test Continuously
+
 - Run tests after every commit
 - Verify functionality preserved
 - Check for regressions immediately
 
 ### 3. Keep It Small
+
 - Smaller files are easier to understand
 - Smaller functions are easier to test
 - Smaller PRs are easier to review
 
 ### 4. Document As You Go
+
 - Write clear commit messages
 - Add comments for complex logic
 - Update documentation if needed
 
 ### 5. Celebrate Progress
+
 - Track errors eliminated per phase
 - Commit each batch
 - Notice improvements in code clarity
@@ -362,16 +395,19 @@ npm run build       # Verify build succeeds
 ## 🔗 Related Documents
 
 ### Main Refactoring Plans
+
 - `/docs/COMPREHENSIVE-REFACTORING-PLAN.md` - Detailed lint refactoring
 - `/docs/TYPECHECK-ERROR-REMEDIATION-PLAN.md` - Detailed type fixes
 - `/docs/Component-Refactoring-Standards.md` - Best practices & patterns
 
 ### Original Audits
+
 - `/docs/audits/sorted-lint-report.txt` - All 129 lint violations
 - `/docs/audits/sorted-typecheck-report.txt` - Top type error files
 - `/docs/audits/typecheck-results.txt` - All TypeScript errors
 
 ### Project Information
+
 - `/docs/audits/MAX-LINES-AND-COMPLEXITY-REFACTOR-PLAN.md` - Original analysis
 - `/docs/audits/REACT-HOOKS-EXHAUSTIVE-DEPS-PLAN.md` - Previous work
 - `/docs/audits/ZUSTAND-SAFE-PATTERNS-PLAN.md` - Previous work
@@ -410,6 +446,7 @@ npm run build       # Verify build succeeds
 ## ⏱️ Expected Timeline
 
 ### Week 1 (40 hours)
+
 - **Days 1-2:** Phase A Phases 1-2 (Preparation + Tier 1)
   - 4 hours prep + 16 hours refactoring = 20 hours
   - Complete 5 critical files
@@ -425,6 +462,7 @@ npm run build       # Verify build succeeds
   - Result: 0 lint violations ✅
 
 ### Week 2 (20 hours)
+
 - **Days 1-2:** Phase B Phases 1-2
   - 6 hours quick wins + component types
   - Result: -430 errors
@@ -444,6 +482,7 @@ npm run build       # Verify build succeeds
 ## 🎉 After Completion
 
 ### What You've Achieved
+
 - ✅ Reduced code complexity by 67%
 - ✅ Eliminated all lint violations
 - ✅ Fixed all TypeScript errors
@@ -453,6 +492,7 @@ npm run build       # Verify build succeeds
 - ✅ Improved developer experience
 
 ### Next Steps
+
 1. Review with team
 2. Update team documentation
 3. Establish guidelines for new code
@@ -460,6 +500,7 @@ npm run build       # Verify build succeeds
 5. Continue improvements
 
 ### Future Opportunities
+
 - Add more aggressive ESLint rules
 - Enable additional TypeScript strictness
 - Implement pre-commit hooks

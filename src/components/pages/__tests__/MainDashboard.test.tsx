@@ -29,9 +29,7 @@ vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
 
 vi.mock("@/hooks/common/useSavingsGoals", () => ({
   useSavingsGoals: vi.fn(() => ({
-    savingsGoals: [
-      { id: "1", name: "Emergency Fund", currentAmount: 1000, targetAmount: 5000 },
-    ],
+    savingsGoals: [{ id: "1", name: "Emergency Fund", currentAmount: 1000, targetAmount: 5000 }],
     isLoading: false,
   })),
 }));
@@ -49,9 +47,7 @@ vi.mock("@/hooks/common/useTransactions", () => ({
 vi.mock("@/hooks/budgeting/useBudgetData", () => ({
   default: vi.fn(() => ({
     reconcileTransaction: vi.fn(),
-    paycheckHistory: [
-      { id: "1", amount: 3000, date: "2025-01-01" },
-    ],
+    paycheckHistory: [{ id: "1", amount: 3000, date: "2025-01-01" }],
   })),
 }));
 

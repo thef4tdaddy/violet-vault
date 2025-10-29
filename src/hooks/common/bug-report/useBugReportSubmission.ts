@@ -86,7 +86,11 @@ export const useBugReportSubmissionV2 = (
     includeScreenshot: options.includeScreenshot && !!options.screenshot,
     severity: options.severity,
     labels: options.labels,
-    providers: options.providers as { github?: Record<string, unknown>; email?: Record<string, unknown>; webhook?: { url: string } },
+    providers: options.providers as {
+      github?: Record<string, unknown>;
+      email?: Record<string, unknown>;
+      webhook?: { url: string };
+    },
     customData: {
       highlightSession: await getHighlightSessionData(),
     },
@@ -182,11 +186,18 @@ export const useBugReportSubmissionV2 = (
   /**
    * Quick bug report with minimal setup
    */
-  const quickReport = async (description: string, severity: "low" | "medium" | "high" | "critical" = "medium") => {
+  const quickReport = async (
+    description: string,
+    severity: "low" | "medium" | "high" | "critical" = "medium"
+  ) => {
     try {
       return await BugReportService.quickReport(description, {
         severity,
-        providers: options.providers as { github?: Record<string, unknown>; email?: Record<string, unknown>; webhook?: { url: string } },
+        providers: options.providers as {
+          github?: Record<string, unknown>;
+          email?: Record<string, unknown>;
+          webhook?: { url: string };
+        },
       });
     } catch (error) {
       logger.error("Quick report failed", error);

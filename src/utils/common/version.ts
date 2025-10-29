@@ -134,7 +134,10 @@ const getActualCommitTimestamp = () => {
   if (gitCommitDate && gitCommitDate !== "undefined") {
     // Only log once to prevent console spam (Issue #560)
     if (!hasLoggedGitDate) {
-      logger.debug("✅ Using git commit date:", gitCommitDate as unknown as Record<string, unknown>);
+      logger.debug(
+        "✅ Using git commit date:",
+        gitCommitDate as unknown as Record<string, unknown>
+      );
       hasLoggedGitDate = true;
     }
     const commitDate = new Date(gitCommitDate as string);
@@ -172,10 +175,9 @@ const getActualCommitTimestamp = () => {
   // Priority 4: Use build time only as last resort (not preferred for git commit display)
   const buildTime = import.meta.env.VITE_BUILD_TIME;
   if (buildTime && buildTime !== "undefined") {
-    logger.warn(
-      "⚠️ Using build time as fallback for git commit (no git timestamp found)",
-      { buildTime }
-    );
+    logger.warn("⚠️ Using build time as fallback for git commit (no git timestamp found)", {
+      buildTime,
+    });
     const buildDate = new Date(buildTime);
 
     // Note: Year correction removed - we're now in 2025

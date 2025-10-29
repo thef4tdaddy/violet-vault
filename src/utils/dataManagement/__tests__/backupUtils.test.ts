@@ -4,7 +4,7 @@ import { vi, describe, it, expect } from "vitest";
 vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
-      toArray: vi.fn(() => Promise.resolve([{ id: 1, name: "Groceries" }]))
+      toArray: vi.fn(() => Promise.resolve([{ id: 1, name: "Groceries" }])),
     },
     bills: { toArray: vi.fn() },
     transactions: { toArray: vi.fn() },

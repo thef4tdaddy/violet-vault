@@ -104,9 +104,7 @@ describe("keyManagementService", () => {
     });
 
     it("should handle clipboard errors gracefully", async () => {
-      (navigator.clipboard.writeText as Mock).mockRejectedValueOnce(
-        new Error("Clipboard error")
-      );
+      (navigator.clipboard.writeText as Mock).mockRejectedValueOnce(new Error("Clipboard error"));
 
       await expect(
         keyManagementService.copyKeyToClipboard(mockEncryptionKey, mockSalt)
