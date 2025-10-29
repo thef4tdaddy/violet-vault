@@ -8,7 +8,7 @@ import { z } from "zod";
  */
 const BasicTransactionSchema = z.object({
   amount: z.number(),
-  description: z.unknown().refine((val) => !!val, "Description is required"),
+  description: z.string().min(1, "Description is required"),
   date: z.union([z.string(), z.number()]).optional(),
   envelopeId: z.string().optional(),
 });

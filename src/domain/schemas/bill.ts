@@ -67,10 +67,12 @@ export const validateBillPartial = (data: unknown): BillPartial => {
 };
 
 /**
- * Zod schema for Bill Form Data validation
+ * Zod schema for Bill Form Data validation (minimal required fields)
  * Used for validating user input in bill forms
+ * Note: This validates only the minimal required fields.
+ * The full BillFormData type in types/bills.ts includes additional UI state fields.
  */
-export const BillFormDataSchema = z.object({
+export const BillFormDataMinimalSchema = z.object({
   name: z.string().min(1, "Bill name is required").max(100, "Bill name is too long"),
   amount: z
     .string()
@@ -82,11 +84,11 @@ export const BillFormDataSchema = z.object({
   dueDate: z.string().min(1, "Due date is required"),
 });
 
-export type BillFormData = z.infer<typeof BillFormDataSchema>;
+export type BillFormDataMinimal = z.infer<typeof BillFormDataMinimalSchema>;
 
 /**
- * Validation helper for bill form data
+ * Validation helper for minimal bill form data
  */
-export const validateBillFormData = (data: unknown) => {
-  return BillFormDataSchema.safeParse(data);
+export const validateBillFormDataMinimal = (data: unknown) => {
+  return BillFormDataMinimalSchema.safeParse(data);
 };
