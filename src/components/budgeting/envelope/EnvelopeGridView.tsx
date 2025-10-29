@@ -138,7 +138,7 @@ function EnvelopeGridView({
       />
 
       {/* Summary Cards */}
-      <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
+      <EnvelopeSummary totals={totals} />
 
       {/* Envelope Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
