@@ -9,6 +9,7 @@ import type {
   RuleSummary,
 } from "@/utils/budgeting/autofunding/rules";
 import type { Transaction, Envelope } from "@/types/finance";
+import type { ExecutionFilters } from "./useExecutionHistory";
 
 // Re-export commonly used types from rules.ts for convenience
 export type { AutoFundingRule, RuleStatistics, RuleSummary };
