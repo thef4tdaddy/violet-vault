@@ -296,3 +296,23 @@ export {
   type SyncOperationResult,
   type ValidationResult,
 } from "./api-responses";
+
+// Component Props Schemas & Types (Phase 3)
+export {
+  EnvelopeGridPropsSchema,
+  TransactionTablePropsSchema,
+  BillTablePropsSchema,
+  MainDashboardPropsSchema,
+  EnvelopeItemPropsSchema,
+  TransactionRowPropsSchema,
+  BillItemPropsSchema,
+  AnalyticsDashboardPropsSchema,
+  type EnvelopeGridProps,
+  type TransactionTableProps,
+  type BillTableProps,
+  type MainDashboardProps,
+  type EnvelopeItemProps,
+  type TransactionRowProps,
+  type BillItemProps,
+  type AnalyticsDashboardProps,
+} from "./component-props";

@@ -7,7 +7,9 @@ This directory contains Zod validation schemas for runtime type checking and val
 ```
 src/domain/schemas/
 ├── __tests__/               # Schema test files
-│   └── api-responses.test.ts
+│   ├── api-responses.test.ts
+│   ├── bug-report.test.ts
+│   └── component-props.test.ts
 ├── api-responses.ts         # Phase 2: API response validation schemas
 ├── audit-log.ts            # Audit log entry schemas
 ├── auth.ts                 # Authentication schemas
@@ -16,6 +18,7 @@ src/domain/schemas/
 ├── budget-record.ts        # Budget record schemas
 ├── bug-report.ts           # Bug report schemas
 ├── cache.ts                # Cache entry schemas
+├── component-props.ts      # Phase 3: Component prop validation schemas
 ├── debt.ts                 # Debt entity schemas
 ├── envelope.ts             # Envelope entity schemas
 ├── index.ts                # Barrel export for all schemas
@@ -37,7 +40,7 @@ Core data model validation schemas for VioletVault entities:
 - Authentication and user data
 - Version control and backups
 
-### Phase 2: API Response Validation (Current)
+### Phase 2: API Response Validation
 
 External API response validation schemas:
 
@@ -45,6 +48,15 @@ External API response validation schemas:
 - Bug report service responses (GitHub, webhooks, screenshots)
 - Sync operation results
 - Generic API response patterns
+
+### Phase 3: Component Prop Validation (Issue #987 - Current)
+
+React component prop validation schemas for runtime type checking:
+
+- High priority components (EnvelopeGrid, TransactionTable, BillTable, MainDashboard)
+- Medium priority components (EnvelopeItem, TransactionRow, BillItem, AnalyticsDashboard)
+- Development-only validation (no performance impact in production)
+- Comprehensive error reporting with logger integration
 
 ## Usage
 
@@ -64,10 +76,16 @@ import {
   GitHubIssueResponseSchema,
   SyncOperationResultSchema,
 
+  // Phase 3: Component Props
+  EnvelopeGridPropsSchema,
+  TransactionTablePropsSchema,
+  BillTablePropsSchema,
+
   // Types
   type Envelope,
   type FirebaseDocument,
   type SyncOperationResult,
+  type EnvelopeGridProps,
 } from "@/domain/schemas";
 ```
 
@@ -197,6 +215,30 @@ const updates = validateEnvelopePartial({
 });
 ```
 
+### 6. Validate Component Props (Phase 3)
+
+Use prop validation for runtime type checking in components (development only):
+
+```typescript
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
+
+function EnvelopeGrid(props: EnvelopeGridProps) {
+  // Validates props in development mode only (no performance impact in production)
+  validateComponentProps("EnvelopeGrid", props, EnvelopeGridPropsSchema);
+
+  return <div>...</div>;
+}
+```
+
+**Benefits:**
+
+- ✅ Catch prop type errors at runtime during development
+- ✅ Better error messages for component users
+- ✅ Development-only validation (zero performance impact in production)
+- ✅ Component contract documentation through schemas
+- ✅ Improved refactoring safety
+
 ## Documentation
 
 - **[API Response Validation Guide](/docs/API-Response-Validation-Guide.md)** - Comprehensive guide for Phase 2 schemas
@@ -268,7 +310,8 @@ export const validateMyTypeSafe = (data: unknown) => {
 ## Related Issues
 
 - **[#412](https://github.com/thef4tdaddy/violet-vault/issues/412)** - Phase 1: Domain Types & Zod Schemas
-- **Current Issue** - Phase 2: API Response Validation Schemas
+- **Phase 2** - API Response Validation Schemas
+- **[#987](https://github.com/thef4tdaddy/violet-vault/issues/987)** - Phase 3: Component Prop Validation (Current)
 
 ## Architecture Compliance
 
