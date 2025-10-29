@@ -186,6 +186,7 @@ VioletVault takes your financial privacy seriously:
 - **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
 - **[🔌 API Development Guide](docs/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
 - **[✅ Component Props Validation](docs/Component-Props-Validation-Guide.md)** - Runtime prop validation with Zod schemas
+- **[📝 Zod Integration Guide](docs/ZOD-INTEGRATION-GUIDE.md)** - Comprehensive guide for Zod validation patterns and form hooks
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
 - **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
 - **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
