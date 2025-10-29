@@ -1,5 +1,4 @@
 // Budget Database Service - Centralized database operations with optimized queries
-/* eslint-disable max-lines */
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/common/logger";
 import { type z } from "zod";
