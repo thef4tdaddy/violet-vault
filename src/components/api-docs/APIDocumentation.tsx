@@ -7,8 +7,6 @@
 import React, { useEffect, useState } from "react";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
-import { getOpenAPISpecObject } from "@/utils/openapi/exportOpenAPISpec";
-import logger from "@/utils/common/logger";
 
 /**
  * API Documentation Page Component
@@ -19,15 +17,23 @@ const APIDocumentation: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const openAPISpec = getOpenAPISpecObject();
-      setSpec(openAPISpec);
-      logger.info("OpenAPI spec loaded successfully");
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      setError(errorMessage);
-      logger.error("Failed to load OpenAPI spec", err);
-    }
+    // Load OpenAPI spec from public directory
+    fetch("/openapi.json")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setSpec(data);
+        console.log("OpenAPI spec loaded successfully");
+      })
+      .catch((err) => {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
+        console.error("Failed to load OpenAPI spec", err);
+      });
   }, []);
 
   if (error) {

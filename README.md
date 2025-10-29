@@ -182,12 +182,29 @@ VioletVault takes your financial privacy seriously:
 
 - **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
 - **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
+- **[🔌 API Development Guide](docs/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
 - **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
 - **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
 - **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
 - **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
 - **[❓ Troubleshooting FAQ](docs/Troubleshooting-FAQ.md)** - Common issues and solutions
+
+### API Documentation
+
+VioletVault provides comprehensive API documentation with OpenAPI 3.0 specification:
+
+- **[📖 Interactive API Docs](/api-docs)** - Swagger UI with live API testing (available when running the app)
+- **[📋 API Development Guide](docs/API-Development-Guide.md)** - Complete developer guide with examples
+- **[📄 OpenAPI Spec](/openapi.json)** - Download the OpenAPI specification
+
+#### Key API Endpoints
+
+- **Bug Report Worker**: Submit bug reports with screenshots
+- **Cloud Sync**: Encrypted data synchronization with Firebase
+- **Budget Data**: Local database operations for envelopes, transactions, and bills
+
+See the [API Development Guide](docs/API-Development-Guide.md) for detailed usage examples and authentication information.
 
 ## 🗺️ Roadmap
 
