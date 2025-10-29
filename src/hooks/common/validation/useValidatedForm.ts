@@ -77,14 +77,16 @@ export function useValidatedForm<T extends Record<string, unknown>>({
       setErrors((prev) => removeErrors(prev, [field]));
 
       // Optional: validate on change
+      // Note: Using React.startTransition would be better for performance,
+      // but this approach is compatible with React 18 and earlier
       if (validateOnChange) {
-        // Defer validation slightly to allow state to update
-        setTimeout(() => {
+        // Use queueMicrotask for better performance than setTimeout
+        queueMicrotask(() => {
           const result = parseWithSchema(schema, { ...data, [field]: value });
           if (result.errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: result.errors[field] }));
           }
-        }, 0);
+        });
       }
     },
     [data, schema, validateOnChange]
@@ -102,11 +104,14 @@ export function useValidatedForm<T extends Record<string, unknown>>({
       setErrors((prev) => removeErrors(prev, updatedFields));
 
       // Optional: validate on change
+      // Note: Using React.startTransition would be better for performance,
+      // but this approach is compatible with React 18 and earlier
       if (validateOnChange) {
-        setTimeout(() => {
+        // Use queueMicrotask for better performance than setTimeout
+        queueMicrotask(() => {
           const result = parseWithSchema(schema, { ...data, ...updates });
           setErrors((prev) => ({ ...prev, ...result.errors }));
-        }, 0);
+        });
       }
     },
     [data, schema, validateOnChange]

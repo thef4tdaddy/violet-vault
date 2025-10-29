@@ -27,8 +27,8 @@ export function parseWithSchema<T>(schema: z.ZodSchema<T>, data: unknown): Valid
   // Transform Zod errors to field-based error map
   const errors: ValidationErrors<T> = {};
 
-  // Zod v4 uses `issues` instead of `errors`
-  const issues = result.error.issues || result.error.errors || [];
+  // Zod uses `issues` property for validation errors
+  const issues = result.error.issues || [];
 
   issues.forEach((error) => {
     const field = error.path[0];
@@ -98,8 +98,8 @@ export function parseField<T>(
     const result = schema.safeParse(testData);
 
     if (!result.success) {
-      // Find error for this specific field
-      const fieldError = result.error.errors.find((err) => err.path[0] === fieldName);
+      // Find error for this specific field using issues property
+      const fieldError = result.error.issues.find((err) => err.path[0] === fieldName);
       return fieldError?.message;
     }
 
