@@ -16,7 +16,7 @@ export const passwordValidationQueryKeys = {
 /**
  * Hook for password validation query
  */
-export const usePasswordValidation = (password, options = {}) => {
+export const usePasswordValidation = (password, _options = {}) => {
   return useQuery({
     queryKey: passwordValidationQueryKeys.validation(password),
     queryFn: async () => {

@@ -1,20 +1,21 @@
-import { useMemo } from 'react';
-import { useDebts } from './useDebts';
-import useBills from '@/hooks/bills/useBills';
-import useEnvelopes from '@/hooks/budgeting/useEnvelopes';
-import useTransactions from '@/hooks/common/useTransactions';
-import type { DebtType, DebtAccount, DebtFormData } from '@/types/debt';
-import type { Bill } from '@/db/types'; // Correct Bill type from Dexie
-import type { Envelope } from '@/db/types';
-import type { Transaction } from '@/db/types';
+import { useMemo } from "react";
+import { useDebts } from "./useDebts";
+import useBills from "@/hooks/bills/useBills";
+import useEnvelopes from "@/hooks/budgeting/useEnvelopes";
+import useTransactions from "@/hooks/common/useTransactions";
+import type { DebtType, DebtAccount, DebtFormData } from "@/types/debt";
+import type { Bill } from "@/db/types"; // Correct Bill type from Dexie
+import type { Envelope } from "@/db/types";
+import type { Transaction } from "@/db/types";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
   PAYMENT_FREQUENCIES,
   COMPOUND_FREQUENCIES,
   calculateDebtStats,
-} from '@/constants/debts';
-import { getUpcomingPayments } from '@/utils/debts/debtCalculations';
+} from "@/constants/debts";
+import { getUpcomingPayments } from "@/utils/debts/debtCalculations";
+import { makeRecordCompatible, transformBillFromDB } from "@/utils/common/typeTransforms";
 import {
   enrichDebtsWithRelations,
   createDebtOperation,
@@ -23,7 +24,7 @@ import {
   syncDebtDueDatesOperation,
   updateDebtOperation,
   deleteDebtOperation,
-} from './helpers/debtManagementHelpers';
+} from "./helpers/debtManagementHelpers";
 
 // Helper types to bridge inconsistencies
 type BillWithDebtId = Bill & { debtId?: string };
@@ -93,7 +94,7 @@ export const useDebtManagement = () => {
   }, [enrichedDebts]);
 
   const createDebt = async (debtData: CreateDebtPayload) => {
-    if (!createDebtData || !addBillAsync) throw new Error('Create functions not available');
+    if (!createDebtData || !addBillAsync) throw new Error("Create functions not available");
     return createDebtOperation(debtData, {
       connectionData: debtData.connectionData,
       createEnvelope,
@@ -103,10 +104,13 @@ export const useDebtManagement = () => {
     });
   };
 
-  const recordPayment = async (debtId: string, paymentData: { amount: number; paymentDate: string; notes?: string }) => {
-    if (!updateDebtData) throw new Error('Update debt function not available');
+  const recordPayment = async (
+    debtId: string,
+    paymentData: { amount: number; paymentDate: string; notes?: string }
+  ) => {
+    if (!updateDebtData) throw new Error("Update debt function not available");
     const debt = debts.find((d) => d.id === debtId);
-    if (!debt) throw new Error('Debt not found');
+    if (!debt) throw new Error("Debt not found");
 
     return recordPaymentOperation({
       debt: debt as unknown as DebtForHelper,
@@ -117,7 +121,7 @@ export const useDebtManagement = () => {
   };
 
   const linkDebtToBill = async (debtId: string, billId: string) => {
-    if (!updateDebtData || !updateBillAsync) throw new Error('Update functions not available');
+    if (!updateDebtData || !updateBillAsync) throw new Error("Update functions not available");
     return linkDebtToBillOperation({
       debtId,
       billId,
@@ -129,7 +133,7 @@ export const useDebtManagement = () => {
   };
 
   const syncDebtDueDates = async () => {
-    if (!updateDebtData) throw new Error('Update debt function not available');
+    if (!updateDebtData) throw new Error("Update debt function not available");
     return syncDebtDueDatesOperation({
       debts: debts as unknown as DebtForHelper[],
       bills: bills as unknown as BillWithDebtId[],
@@ -137,8 +141,12 @@ export const useDebtManagement = () => {
     });
   };
 
-  const updateDebt = async (debtId: string, updates: Partial<DebtAccount>, author = 'Unknown User') => {
-    if (!updateDebtData) throw new Error('Update debt function not available');
+  const updateDebt = async (
+    debtId: string,
+    updates: Partial<DebtAccount>,
+    author = "Unknown User"
+  ) => {
+    if (!updateDebtData) throw new Error("Update debt function not available");
     return updateDebtOperation({
       debtId,
       updates,
@@ -148,7 +156,7 @@ export const useDebtManagement = () => {
   };
 
   const deleteDebt = async (debtId: string) => {
-    if (!deleteDebtData || !deleteBillAsync) throw new Error('Delete functions not available');
+    if (!deleteDebtData || !deleteBillAsync) throw new Error("Delete functions not available");
     const transformedBills = bills.map((bill) =>
       makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId)
     );

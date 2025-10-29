@@ -4,10 +4,10 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 25 | +19 |
-| TypeScript Errors | 150 | -16 |
+| ESLint Issues | 0 | -25 |
+| TypeScript Errors | 165 | +15 |
 
-*Last updated: 2025-10-29 01:19:24 UTC*
+*Last updated: 2025-10-29 17:11:16 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -21,59 +21,9 @@
 
 ## Lint Audit
 
-### Files with Most Issues
-- 3 issues in `violet-vault/src/components/automation/AutoFundingDashboard.tsx`
-- 3 issues in `violet-vault/src/components/analytics/SmartCategoryManager.tsx`
-- 2 issues in `violet-vault/src/components/ui/EditLockIndicator.tsx`
-- 2 issues in `violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx`
-- 2 issues in `violet-vault/src/components/automation/AutoFundingView.tsx`
-- 2 issues in `violet-vault/src/components/analytics/ChartsAndAnalytics.tsx`
-- 1 issues in `violet-vault/src/hooks/common/usePrompt.ts`
-- 1 issues in `violet-vault/src/hooks/common/useConfirm.ts`
-- 1 issues in `violet-vault/src/components/ui/ConnectionDisplay.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeSummary.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
-- 1 issues in `violet-vault/src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
-- 1 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
-- 1 issues in `violet-vault/src/components/auth/KeyManagementSettings.tsx`
-- 1 issues in `violet-vault/src/components/analytics/CategoryAdvancedTab.tsx`
-- 1 issues in `violet-vault/src/components/accounts/AccountsGrid.tsx`
-- 1 issues in `violet-vault/src/components/accounts/AccountFormModal.tsx`
+✅ **All files passed ESLint validation!**
 
-### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 22 | `@typescript-eslint/no-explicit-any` |
-| 3 | `no-undef` |
-
-### Detailed Lint Report
-```
-violet-vault/src/components/accounts/AccountFormModal.tsx:129:37 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/accounts/AccountsGrid.tsx:40:24 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/analytics/CategoryAdvancedTab.tsx:31:32 - 1 - 'React' is not defined. (no-undef)
-violet-vault/src/components/analytics/ChartsAndAnalytics.tsx:145:55 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/analytics/ChartsAndAnalytics.tsx:146:29 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/analytics/SmartCategoryManager.tsx:58:53 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/analytics/SmartCategoryManager.tsx:58:74 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/analytics/SmartCategoryManager.tsx:58:103 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/auth/KeyManagementSettings.tsx:159:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/automation/AutoFundingDashboard.tsx:28:45 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/automation/AutoFundingDashboard.tsx:28:53 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/automation/AutoFundingDashboard.tsx:146:43 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:63:34 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/automation/AutoFundingView.tsx:27:43 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/automation/AutoFundingView.tsx:27:51 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx:85:55 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/budgeting/CreateEnvelopeModal.tsx:111:55 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/budgeting/envelope/EnvelopeHistoryModal.tsx:48:45 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx:38:67 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/budgeting/envelope/EnvelopeSummary.tsx:6:72 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/ui/ConnectionDisplay.tsx:20:10 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/ui/EditLockIndicator.tsx:5:39 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/components/ui/EditLockIndicator.tsx:10:39 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/common/useConfirm.ts:13:14 - 1 - 'React' is not defined. (no-undef)
-violet-vault/src/hooks/common/usePrompt.ts:17:14 - 1 - 'React' is not defined. (no-undef)
-```
+Last check: 2025-10-29 17:11:05 UTC
 
 ## Typecheck Audit
 
@@ -99,11 +49,16 @@ violet-vault/src/hooks/common/usePrompt.ts:17:14 - 1 - 'React' is not defined. (
 - 2 errors in `src/components/debt/ui/DebtList.tsx`
 - 2 errors in `src/components/debt/modals/DebtFormSections.tsx`
 - 2 errors in `src/components/charts/CategoryBarChart.tsx`
+- 2 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
 - 2 errors in `src/components/budgeting/EditEnvelopeModalComponents.tsx`
 - 2 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
 - 2 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
+- 2 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
+- 2 errors in `src/components/automation/AutoFundingDashboard.tsx`
+- 2 errors in `src/components/analytics/ChartsAndAnalytics.tsx`
 - 1 errors in `src/utils/sync/dataDetectionHelper.ts`
 - 1 errors in `src/utils/security/errorViewer.ts`
+- 1 errors in `src/utils/common/typeTransforms.ts`
 - 1 errors in `src/utils/common/transactionArchiving.ts`
 - 1 errors in `src/utils/common/highlight.ts`
 - 1 errors in `src/stores/ui/onboardingStore.ts`
@@ -151,13 +106,13 @@ violet-vault/src/hooks/common/usePrompt.ts:17:14 - 1 - 'React' is not defined. (
 - 1 errors in `src/hooks/auth/useSecurityManagerUI.ts`
 - 1 errors in `src/hooks/auth/useAuthenticationManager.ts`
 - 1 errors in `src/hooks/auth/useAuthCompatibility.ts`
-- 1 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 1 errors in `src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts`
 - 1 errors in `src/hooks/auth/__tests__/useUserSetup.test.ts`
 - 1 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
 - 1 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
 - 1 errors in `src/components/ui/VersionFooter.tsx`
 - 1 errors in `src/components/ui/LoadingSpinner.tsx`
+- 1 errors in `src/components/ui/ConnectionDisplay.tsx`
 - 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 1 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
 - 1 errors in `src/components/settings/sections/NotificationSettingsSection.tsx`
@@ -177,27 +132,35 @@ violet-vault/src/hooks/common/usePrompt.ts:17:14 - 1 - 'React' is not defined. (
 - 1 errors in `src/components/charts/DistributionPieChart.tsx`
 - 1 errors in `src/components/charts/ComposedFinancialChart.tsx`
 - 1 errors in `src/components/budgeting/paycheck/PaycheckHistory.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
-- 1 errors in `src/components/automation/AutoFundingDashboard.tsx`
+- 1 errors in `src/components/automation/AutoFundingView.tsx`
+- 1 errors in `src/components/auth/KeyManagementSettings.tsx`
+- 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
+- 1 errors in `src/components/accounts/AccountsGrid.tsx`
+- 1 errors in `src/components/accounts/AccountFormModal.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 48 | `TS2345` |
-| 40 | `TS2322` |
-| 18 | `TS2339` |
+| 51 | `TS2345` |
+| 42 | `TS2322` |
+| 19 | `TS2339` |
 | 7 | `TS2554` |
 | 6 | `TS6133` |
 | 6 | `TS2353` |
 | 6 | `TS2352` |
+| 5 | `TS2741` |
+| 5 | `TS2698` |
+| 4 | `TS2739` |
 | 3 | `TS2769` |
-| 3 | `TS2741` |
-| 3 | `TS2739` |
 | 3 | `TS2559` |
 | 2 | `TS2307` |
 | 1 | `TS4104` |
+| 1 | `TS2740` |
 | 1 | `TS2677` |
 | 1 | `TS2538` |
 | 1 | `TS2416` |
@@ -205,7 +168,19 @@ violet-vault/src/hooks/common/usePrompt.ts:17:14 - 1 - 'React' is not defined. (
 
 ### Detailed Type Error Report
 ```
-src/components/automation/AutoFundingDashboard.tsx(87,41): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'string'.
+src/components/accounts/AccountFormModal.tsx(129,15): error TS2698: Spread types may only be created from object types.
+src/components/accounts/AccountsGrid.tsx(40,17): error TS2698: Spread types may only be created from object types.
+src/components/analytics/ChartsAndAnalytics.tsx(145,9): error TS2740: Type '{}' is missing the following properties from type 'Transaction[]': length, pop, push, concat, and 29 more.
+src/components/analytics/ChartsAndAnalytics.tsx(146,9): error TS2322: Type 'unknown' is not assignable to type 'AnalyticsMetrics'.
+  Index signature for type 'string' is missing in type '{}'.
+src/components/analytics/SmartCategoryManager.tsx(60,9): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Suggestion[]'.
+  Type '{}' is missing the following properties from type 'Suggestion[]': length, pop, push, concat, and 29 more.
+src/components/auth/KeyManagementSettings.tsx(159,11): error TS2739: Type '{}' is missing the following properties from type '{ success: boolean; importResult: { budgetId: string; fingerprint: string; exportedAt?: string; deviceFingerprint?: string; }; loginResult: { success: boolean; error?: string; suggestion?: string; code?: string; canCreateNew?: boolean; data?: unknown; }; }': success, importResult, loginResult
+src/components/automation/AutoFundingDashboard.tsx(24,39): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, unknown>'.
+src/components/automation/AutoFundingDashboard.tsx(83,41): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'string'.
+src/components/automation/AutoFundingRuleBuilder.tsx(62,8): error TS2741: Property 'updateConfig' is missing in type '{ ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }' but required in type '{ ruleData: any; updateConfig: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
+src/components/automation/AutoFundingRuleBuilder.tsx(67,13): error TS2698: Spread types may only be created from object types.
+src/components/automation/AutoFundingView.tsx(27,37): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, unknown>'.
 src/components/automation/steps/RuleConfigurationStep.tsx(37,11): error TS2322: Type '{ ruleData: any; updateConfig: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }' is not assignable to type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
   Property 'updateConfig' does not exist on type 'IntrinsicAttributes & { ruleData: any; envelopes: any; toggleTargetEnvelope: any; errors: any; }'.
 src/components/budgeting/CreateEnvelopeModal.tsx(85,42): error TS2554: Expected 0 arguments, but got 1.
@@ -217,6 +192,10 @@ src/components/budgeting/EditEnvelopeModal.tsx(126,13): error TS2322: Type 'unkn
 src/components/budgeting/EditEnvelopeModalComponents.tsx(188,9): error TS2559: Type '{ envelopeType: string; priority?: string; autoAllocate?: boolean; }' has no properties in common with type '{ name?: string; category?: string; description?: string; }'.
 src/components/budgeting/EditEnvelopeModalComponents.tsx(210,11): error TS2322: Type 'unknown' is not assignable to type 'Record<string, number>'.
   Index signature for type 'string' is missing in type '{}'.
+src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(44,14): error TS2741: Property 'onClose' is missing in type '{ objectType: string; objectId: any; objectName: any; }' but required in type 'ObjectHistoryViewerProps'.
+src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(48,19): error TS2698: Spread types may only be created from object types.
+src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(39,42): error TS2339: Property 'balanceLabel' does not exist on type 'unknown'.
+src/components/budgeting/envelope/EnvelopeSummary.tsx(6,49): error TS2698: Spread types may only be created from object types.
 src/components/budgeting/paycheck/PaycheckHistory.tsx(92,47): error TS2554: Expected 0 arguments, but got 1.
 src/components/budgeting/PaycheckProcessor.tsx(63,9): error TS2322: Type '{ paycheckHistory: any[]; onDeletePaycheck: (paycheck: any) => Promise<void>; deletingPaycheckId: any; }' is not assignable to type 'IntrinsicAttributes & { paycheckHistory?: any[]; paycheckStats: any; onSelectPaycheck?: () => void; }'.
   Property 'onDeletePaycheck' does not exist on type 'IntrinsicAttributes & { paycheckHistory?: any[]; paycheckStats: any; onSelectPaycheck?: () => void; }'. Did you mean 'onSelectPaycheck'?
@@ -303,6 +282,9 @@ src/components/transactions/TransactionLedger.tsx(174,9): error TS2322: Type 'En
     Property 'currentBalance' is optional in type 'Envelope' but required in type 'Envelope'.
 src/components/transactions/TransactionLedger.tsx(176,9): error TS2322: Type '(allocations: unknown[]) => void' is not assignable to type '(splitTransactions: Transaction[], transaction: Transaction) => Promise<void>'.
   Type 'void' is not assignable to type 'Promise<void>'.
+src/components/ui/ConnectionDisplay.tsx(55,33): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | FunctionComponent<{ className: string; }> | ComponentClass<{ className: string; }, any>'.
 src/components/ui/LoadingSpinner.tsx(4,32): error TS2339: Property 'message' does not exist on type '{}'.
 src/components/ui/VersionFooter.tsx(34,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown>'.
   Index signature for type 'string' is missing in type '{}'.
@@ -320,13 +302,6 @@ src/hooks/auth/mutations/__tests__/useJoinBudgetMutation.test.ts(190,11): error 
 src/hooks/auth/mutations/useJoinBudgetMutation.ts(139,26): error TS2352: Conversion of type 'UserData' to type 'import("violet-vault/src/types/auth").UserData' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Property 'userColor' is missing in type 'UserData' but required in type 'import("violet-vault/src/types/auth").UserData'.
 src/hooks/auth/mutations/useJoinBudgetMutation.ts(139,74): error TS2559: Type 'SessionData' has no properties in common with type 'SessionData'.
-src/hooks/auth/queries/usePasswordValidation.ts(68,5): error TS2769: No overload matches this call.
-  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, any[]>, queryClient?: QueryClient): DefinedUseQueryResult<unknown, Error>', gave the following error.
-    Object literal may only specify known properties, and 'cacheTime' does not exist in type 'DefinedInitialDataOptions<unknown, Error, unknown, any[]>'.
-  Overload 2 of 3, '(options: UndefinedInitialDataOptions<{ isValid: boolean; reason: string; error?: undefined; } | { isValid: boolean; reason?: undefined; error?: undefined; } | { isValid: boolean; reason: string; error: any; }, Error, { ...; } | { ...; } | { ...; }, any[]>, queryClient?: QueryClient): UseQueryResult<...>', gave the following error.
-    Object literal may only specify known properties, and 'cacheTime' does not exist in type 'UndefinedInitialDataOptions<{ isValid: boolean; reason: string; error?: undefined; } | { isValid: boolean; reason?: undefined; error?: undefined; } | { isValid: boolean; reason: string; error: any; }, Error, { isValid: boolean; reason: string; error?: undefined; } | { ...; } | { ...; }, any[]>'.
-  Overload 3 of 3, '(options: UseQueryOptions<{ isValid: boolean; reason: string; error?: undefined; } | { isValid: boolean; reason?: undefined; error?: undefined; } | { isValid: boolean; reason: string; error: any; }, Error, { ...; } | { ...; } | { ...; }, any[]>, queryClient?: QueryClient): UseQueryResult<...>', gave the following error.
-    Object literal may only specify known properties, and 'cacheTime' does not exist in type 'UseQueryOptions<{ isValid: boolean; reason: string; error?: undefined; } | { isValid: boolean; reason?: undefined; error?: undefined; } | { isValid: boolean; reason: string; error: any; }, Error, { isValid: boolean; reason: string; error?: undefined; } | { ...; } | { ...; }, any[]>'.
 src/hooks/auth/useAuthCompatibility.ts(63,38): error TS2339: Property 'refetch' does not exist on type '{ password: any; enabled: boolean; }'.
 src/hooks/auth/useAuthenticationManager.ts(132,7): error TS2322: Type '(userDataOrPassword: any) => Promise<LoginResult>' is not assignable to type '(userDataOrPassword: unknown) => Promise<void>'.
   Type 'Promise<LoginResult>' is not assignable to type 'Promise<void>'.
@@ -436,34 +411,34 @@ src/hooks/common/useConnectionManager.ts(103,9): error TS2322: Type 'Envelope | 
 src/hooks/dashboard/useMainDashboard.ts(78,43): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
 src/hooks/debts/helpers/debtManagementHelpers.ts(455,69): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'import("violet-vault/src/db/types").Bill'.
   Type 'Bill' is missing the following properties from type 'Bill': name, category, isPaid, isRecurring, lastModified
-src/hooks/debts/useDebtManagement.ts(56,7): error TS2345: Argument of type 'BillWithDebtId[]' is not assignable to parameter of type 'Bill[]'.
+src/hooks/debts/useDebtManagement.ts(57,7): error TS2345: Argument of type 'BillWithDebtId[]' is not assignable to parameter of type 'Bill[]'.
   Type 'BillWithDebtId' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
       Type 'Date' is not assignable to type 'string'.
-src/hooks/debts/useDebtManagement.ts(99,7): error TS2322: Type 'UseMutateFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to type '(data: { name: string; targetAmount: number; currentBalance: number; category: string; }) => Promise<Envelope>'.
+src/hooks/debts/useDebtManagement.ts(100,7): error TS2322: Type 'UseMutateFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to type '(data: { name: string; targetAmount: number; currentBalance: number; category: string; }) => Promise<Envelope>'.
   Type 'void' is not assignable to type 'Promise<Envelope>'.
-src/hooks/debts/useDebtManagement.ts(100,29): error TS2322: Type 'Promise<{ createdAt: number; id: string; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; }>' is not assignable to type 'Promise<Bill>'.
+src/hooks/debts/useDebtManagement.ts(101,29): error TS2322: Type 'Promise<{ createdAt: number; id: string; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; }>' is not assignable to type 'Promise<Bill>'.
   Type '{ createdAt: number; id: string; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; }' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
       Type 'Date' is not assignable to type 'string'.
-src/hooks/debts/useDebtManagement.ts(101,33): error TS2322: Type 'Promise<{ id: string; lastModified: number; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }>' is not assignable to type 'Promise<void>'.
+src/hooks/debts/useDebtManagement.ts(102,33): error TS2322: Type 'Promise<{ id: string; lastModified: number; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }>' is not assignable to type 'Promise<void>'.
   Type '{ id: string; lastModified: number; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }' is not assignable to type 'void'.
-src/hooks/debts/useDebtManagement.ts(115,36): error TS2322: Type 'void' is not assignable to type 'Promise<void>'.
-src/hooks/debts/useDebtManagement.ts(125,7): error TS2322: Type 'BillWithDebtId[]' is not assignable to type 'Bill[]'.
+src/hooks/debts/useDebtManagement.ts(116,36): error TS2322: Type 'void' is not assignable to type 'Promise<void>'.
+src/hooks/debts/useDebtManagement.ts(126,7): error TS2322: Type 'BillWithDebtId[]' is not assignable to type 'Bill[]'.
   Type 'BillWithDebtId' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
       Type 'Date' is not assignable to type 'string'.
-src/hooks/debts/useDebtManagement.ts(126,33): error TS2322: Type 'Promise<{ id: string; lastModified: number; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }>' is not assignable to type 'Promise<void>'.
+src/hooks/debts/useDebtManagement.ts(127,33): error TS2322: Type 'Promise<{ id: string; lastModified: number; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }>' is not assignable to type 'Promise<void>'.
   Type '{ id: string; lastModified: number; name: string; dueDate: Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }' is not assignable to type 'void'.
-src/hooks/debts/useDebtManagement.ts(135,7): error TS2322: Type 'BillWithDebtId[]' is not assignable to type 'Bill[]'.
+src/hooks/debts/useDebtManagement.ts(136,7): error TS2322: Type 'BillWithDebtId[]' is not assignable to type 'Bill[]'.
   Type 'BillWithDebtId' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
       Type 'Date' is not assignable to type 'string'.
-src/hooks/debts/useDebtManagement.ts(154,7): error TS2322: Type 'BillWithDebtId[]' is not assignable to type 'Bill[]'.
-  Type 'BillWithDebtId' is not assignable to type 'Bill'.
+src/hooks/debts/useDebtManagement.ts(159,7): error TS2322: Type '(Bill & { debtId?: string; } & Record<string, unknown>)[]' is not assignable to type 'Bill[]'.
+  Type 'Bill & { debtId?: string; } & Record<string, unknown>' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
       Type 'Date' is not assignable to type 'string'.
-src/hooks/debts/useDebtManagement.ts(155,27): error TS2322: Type 'Promise<string>' is not assignable to type 'Promise<void>'.
+src/hooks/debts/useDebtManagement.ts(160,27): error TS2322: Type 'Promise<string>' is not assignable to type 'Promise<void>'.
   Type 'string' is not assignable to type 'void'.
 src/hooks/layout/useLayoutData.ts(74,28): error TS2339: Property 'error' does not exist on type '{ envelopes: Envelope[]; transactions: any; bills: Bill[]; savingsGoals: SavingsGoal[]; paycheckHistory: PaycheckHistory[]; dashboardSummary: {}; ... 33 more ...; dashboardError: Error; }'.
 src/hooks/settings/useEnvelopeIntegrity.ts(49,17): error TS2345: Argument of type '{ total: number; corrupted: number; healthy: number; corruptedEnvelopes: { id: string | number; name: string; category: string; monthlyAmount: number; currentBalance: number; createdAt: string; issues: string[]; }[]; recommendations: string[]; } | { ...; }' is not assignable to parameter of type 'SetStateAction<IntegrityReport>'.
@@ -543,6 +518,8 @@ src/stores/ui/onboardingStore.ts(31,3): error TS2345: Argument of type 'StateCre
 src/utils/common/highlight.ts(131,10): error TS6133: '_setupConsoleCapture' is declared but its value is never read.
 src/utils/common/transactionArchiving.ts(445,39): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'import("/Users/thef4tdaddy/Git/violet-vault/src/db/types").Transaction'.
   Property 'lastModified' is missing in type 'import("violet-vault/src/types/finance").Transaction' but required in type 'import("/Users/thef4tdaddy/Git/violet-vault/src/db/types").Transaction'.
+src/utils/common/typeTransforms.ts(64,3): error TS2322: Type '{ id: string; name: string; category: string; amount: number; dueDate: string; isPaid: boolean; isRecurring: boolean; frequency: "monthly" | "quarterly" | "annually"; envelopeId: string; createdAt: string; description: string; paymentMethod: string; } & Record<...>' is not assignable to type 'Bill & Record<string, unknown>'.
+  Property 'lastModified' is missing in type '{ id: string; name: string; category: string; amount: number; dueDate: string; isPaid: boolean; isRecurring: boolean; frequency: "monthly" | "quarterly" | "annually"; envelopeId: string; createdAt: string; description: string; paymentMethod: string; } & Record<...>' but required in type 'Bill'.
 src/utils/security/errorViewer.ts(27,9): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/utils/sync/dataDetectionHelper.ts(27,39): error TS2345: Argument of type 'DatabaseStats' is not assignable to parameter of type 'Record<string, unknown>'.
   Index signature for type 'string' is missing in type 'DatabaseStats'.
