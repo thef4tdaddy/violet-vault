@@ -1,3 +1,37 @@
+/**
+ * Paycheck validation using Zod schemas
+ */
+import { z } from "zod";
+
+/**
+ * Zod schema for form data validation
+ * Note: These schemas are defined for potential future use in validation pipeline.
+ * Currently, validation is handled by the passed-in validatePaycheckForm function.
+ */
+const _FormDataSchema = z.object({
+  amount: z.union([z.string(), z.number()]).refine(
+    (val) => {
+      const num = typeof val === "string" ? parseFloat(val) : val;
+      return !isNaN(num) && num > 0;
+    },
+    { message: "Amount must be a valid positive number" }
+  ),
+});
+
+/**
+ * Zod schema for allocation validation
+ * Note: These schemas are defined for potential future use in validation pipeline.
+ */
+const _AllocationSchema = z.record(z.string(), z.unknown());
+
+/**
+ * Zod schema for allocation response
+ * Note: These schemas are defined for potential future use in validation pipeline.
+ */
+const _AllocationResponseSchema = z.object({
+  allocations: z.array(_AllocationSchema),
+});
+
 interface FormData {
   amount: string | number;
   [key: string]: unknown;

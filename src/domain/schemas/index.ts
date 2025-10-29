@@ -82,12 +82,15 @@ export {
   BillSchema,
   BillFrequencySchema,
   BillPartialSchema,
+  BillFormDataMinimalSchema,
   validateBill,
   validateBillSafe,
   validateBillPartial,
+  validateBillFormDataMinimal,
   type Bill,
   type BillPartial,
   type BillFrequency,
+  type BillFormDataMinimal,
 } from "./bill";
 
 export {

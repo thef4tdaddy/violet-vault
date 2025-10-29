@@ -1,25 +1,20 @@
 /**
- * Bill form validation functions
+ * Bill form validation functions using Zod schemas
  */
-import type { BillFormData } from "../../types/bills";
+import { BillFormDataMinimalSchema } from "@/domain/schemas/bill";
+import type { BillFormData } from "@/types/bills";
 
 /**
- * Validate bill form data
+ * Validate bill form data using Zod schema
+ * Note: This validates only the minimal required fields (name, amount, dueDate).
+ * The full BillFormData type includes additional UI state fields that are validated elsewhere.
  */
 export const validateBillFormData = (formData: BillFormData): string[] => {
-  const errors: string[] = [];
+  const result = BillFormDataMinimalSchema.safeParse(formData);
 
-  if (!formData.name.trim()) {
-    errors.push("Bill name is required");
+  if (result.success) {
+    return [];
   }
 
-  if (!formData.amount || parseFloat(formData.amount) <= 0) {
-    errors.push("Valid amount is required");
-  }
-
-  if (!formData.dueDate) {
-    errors.push("Due date is required");
-  }
-
-  return errors;
+  return result.error.errors.map((err) => err.message);
 };
