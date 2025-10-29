@@ -297,3 +297,28 @@ export const validateShareCodeOptions = (data: unknown): ShareCodeOptions => {
 export const validateShareCodeOptionsSafe = (data: unknown) => {
   return ShareCodeOptionsSchema.safeParse(data);
 };
+
+/**
+ * User profile form validation schema
+ * Used for validating user profile updates
+ */
+export const UserProfileFormSchema = z.object({
+  userName: z
+    .string()
+    .min(1, "User name is required")
+    .max(100, "User name must be 100 characters or less")
+    .trim(),
+  userColor: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, "Invalid color format")
+    .default("#3B82F6"),
+});
+
+export type UserProfileFormData = z.infer<typeof UserProfileFormSchema>;
+
+/**
+ * Safe validation helper for user profile form data
+ */
+export const validateUserProfileFormSafe = (data: unknown) => {
+  return UserProfileFormSchema.safeParse(data);
+};

@@ -53,3 +53,43 @@ export const validatePaycheckHistorySafe = (data: unknown) => {
 export const validatePaycheckHistoryPartial = (data: unknown): PaycheckHistoryPartial => {
   return PaycheckHistoryPartialSchema.parse(data);
 };
+
+/**
+ * Paycheck/Income form validation schema
+ * Used for validating form input before creating/updating paycheck entries
+ */
+export const PaycheckFormSchema = z.object({
+  date: z
+    .string()
+    .min(1, "Date is required")
+    .refine(
+      (val) => {
+        const date = new Date(val);
+        return !isNaN(date.getTime());
+      },
+      { message: "Invalid date format" }
+    ),
+  amount: z.union([z.string(), z.number()]).pipe(
+    z.coerce
+      .number({
+        invalid_type_error: "Valid amount is required",
+      })
+      .min(0.01, "Amount must be greater than 0")
+  ),
+  source: z
+    .string()
+    .min(1, "Income source is required")
+    .max(100, "Source must be 100 characters or less"),
+  allocations: z.record(z.string(), z.number().min(0)).optional().default({}),
+  deductions: z.record(z.string(), z.number().min(0)).optional().default({}),
+  netAmount: z.union([z.string(), z.number()]).pipe(z.coerce.number().min(0)).optional(),
+});
+
+export type PaycheckFormData = z.infer<typeof PaycheckFormSchema>;
+
+/**
+ * Safe validation helper for paycheck form data
+ */
+export const validatePaycheckFormSafe = (data: unknown) => {
+  return PaycheckFormSchema.safeParse(data);
+};

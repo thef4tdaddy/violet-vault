@@ -60,6 +60,7 @@ Successfully implemented comprehensive OpenAPI 3.0 schema documentation for Viol
 **Location:** `/docs/API-Development-Guide.md` (14KB)
 
 Comprehensive developer guide including:
+
 - API architecture overview
 - Authentication and authorization
 - Available APIs documentation
@@ -83,6 +84,7 @@ Comprehensive developer guide including:
 **Location:** `/README.md`
 
 Added comprehensive API documentation section:
+
 - Link to interactive API docs
 - Link to development guide
 - Link to OpenAPI spec download
@@ -97,12 +99,13 @@ Added comprehensive API documentation section:
 
 **Base URL:** `https://bug-report-worker.thef4tdaddy.workers.dev`
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/report-issue` | POST | Submit bug reports with screenshots |
-| `/stats` | GET | Get usage statistics |
+| Endpoint        | Method | Description                         |
+| --------------- | ------ | ----------------------------------- |
+| `/report-issue` | POST   | Submit bug reports with screenshots |
+| `/stats`        | GET    | Get usage statistics                |
 
 **Schemas:**
+
 - `BugReport`
 - `BugSeverity`
 - `SystemInfo`
@@ -112,14 +115,15 @@ Added comprehensive API documentation section:
 
 **Base URL:** Firebase Firestore (configured per environment)
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/sync/upload` | POST | Upload encrypted budget data |
-| `/api/sync/download` | GET | Download encrypted budget data |
-| `/api/sync/chunk/upload` | POST | Upload data chunk |
-| `/api/sync/manifest` | GET | Get sync manifest |
+| Endpoint                 | Method | Description                    |
+| ------------------------ | ------ | ------------------------------ |
+| `/api/sync/upload`       | POST   | Upload encrypted budget data   |
+| `/api/sync/download`     | GET    | Download encrypted budget data |
+| `/api/sync/chunk/upload` | POST   | Upload data chunk              |
+| `/api/sync/manifest`     | GET    | Get sync manifest              |
 
 **Schemas:**
+
 - `FirebaseDocument`
 - `FirebaseChunk`
 - `FirebaseManifest`
@@ -128,36 +132,39 @@ Added comprehensive API documentation section:
 
 **Base URL:** Local Dexie IndexedDB
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/envelopes` | GET | List all envelopes |
-| `/api/envelopes` | POST | Create envelope |
+| Endpoint         | Method | Description        |
+| ---------------- | ------ | ------------------ |
+| `/api/envelopes` | GET    | List all envelopes |
+| `/api/envelopes` | POST   | Create envelope    |
 
 **Schemas:**
+
 - `Envelope`
 - `EnvelopeListResponse`
 - `EnvelopeCreateResponse`
 
 ### Transaction API (Local)
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/transactions` | GET | List transactions |
-| `/api/transactions` | POST | Create transaction |
+| Endpoint            | Method | Description        |
+| ------------------- | ------ | ------------------ |
+| `/api/transactions` | GET    | List transactions  |
+| `/api/transactions` | POST   | Create transaction |
 
 **Schemas:**
+
 - `Transaction`
 - `TransactionListResponse`
 - `TransactionCreateResponse`
 
 ### Bill API (Local)
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/bills` | GET | List bills |
-| `/api/bills` | POST | Create bill |
+| Endpoint     | Method | Description |
+| ------------ | ------ | ----------- |
+| `/api/bills` | GET    | List bills  |
+| `/api/bills` | POST   | Create bill |
 
 **Schemas:**
+
 - `Bill`
 - `BillListResponse`
 - `BillCreateResponse`
@@ -247,14 +254,17 @@ Added comprehensive API documentation section:
 ### Using in External Tools
 
 **Postman:**
+
 1. Import > OpenAPI 3.0
 2. Upload `/public/openapi.json`
 
 **Insomnia:**
+
 1. Import/Export > Import Data
 2. Select OpenAPI 3.0 format
 
 **Swagger Editor:**
+
 1. Visit https://editor.swagger.io
 2. Paste contents of `openapi.json`
 
@@ -330,7 +340,8 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (cache) ↔ Reac
 
 **BugReportButton Error:** An unrelated error in the BugReportButton component causes the entire application to crash when it tries to render on the `/api-docs` page. This is not related to the OpenAPI implementation itself.
 
-**Workaround:** 
+**Workaround:**
+
 1. Access the OpenAPI spec directly at `/openapi.json`
 2. Use external tools (Swagger Editor, Postman) to view documentation
 3. Fix the BugReportButton component separately
@@ -376,15 +387,15 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (cache) ↔ Reac
 
 ## Acceptance Criteria
 
-| Criteria | Status | Notes |
-|----------|--------|-------|
-| OpenAPI spec generated | ✅ Complete | Full OpenAPI 3.0 spec with 11 endpoints |
-| Swagger UI deployed | ✅ Complete | Available at `/api-docs` route |
-| All endpoints documented | ✅ Complete | Bug Reports, Cloud Sync, Budget Data, Transactions, Bills |
-| Request/response schemas defined | ✅ Complete | All schemas from Zod domain layer |
-| TypeScript clients supported | ✅ Complete | Compatible with openapi-typescript |
-| Documentation complete | ✅ Complete | 14KB comprehensive developer guide |
-| Examples provided | ✅ Complete | Examples for all major entities |
+| Criteria                         | Status      | Notes                                                     |
+| -------------------------------- | ----------- | --------------------------------------------------------- |
+| OpenAPI spec generated           | ✅ Complete | Full OpenAPI 3.0 spec with 11 endpoints                   |
+| Swagger UI deployed              | ✅ Complete | Available at `/api-docs` route                            |
+| All endpoints documented         | ✅ Complete | Bug Reports, Cloud Sync, Budget Data, Transactions, Bills |
+| Request/response schemas defined | ✅ Complete | All schemas from Zod domain layer                         |
+| TypeScript clients supported     | ✅ Complete | Compatible with openapi-typescript                        |
+| Documentation complete           | ✅ Complete | 14KB comprehensive developer guide                        |
+| Examples provided                | ✅ Complete | Examples for all major entities                           |
 
 ---
 
@@ -400,6 +411,7 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (cache) ↔ Reac
 ## Support
 
 For questions or issues:
+
 - GitHub Issues: https://github.com/thef4tdaddy/violet-vault/issues
 - Pull Requests: https://github.com/thef4tdaddy/violet-vault/pulls
 

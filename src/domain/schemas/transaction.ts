@@ -63,3 +63,61 @@ export const validateTransactionSafe = (data: unknown) => {
 export const validateTransactionPartial = (data: unknown): TransactionPartial => {
   return TransactionPartialSchema.parse(data);
 };
+
+/**
+ * Transaction form validation schema
+ * Used for validating form input before creating/updating transactions
+ */
+export const TransactionFormSchema = z.object({
+  date: z
+    .string()
+    .min(1, "Date is required")
+    .refine(
+      (val) => {
+        const date = new Date(val);
+        return !isNaN(date.getTime());
+      },
+      { message: "Invalid date format" }
+    ),
+  amount: z.union([z.string(), z.number()]).pipe(
+    z.coerce
+      .number({
+        invalid_type_error: "Valid amount is required",
+      })
+      .min(0.01, "Amount must be greater than 0")
+  ),
+  envelopeId: z.string().min(1, "Envelope is required"),
+  category: z.string().min(1, "Category is required"),
+  type: TransactionTypeSchema.default("expense"),
+  description: z
+    .string()
+    .max(500, "Description must be 500 characters or less")
+    .optional()
+    .default(""),
+  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional().default(""),
+  receiptUrl: z
+    .string()
+    .refine(
+      (val) => {
+        if (!val || val === "") return true;
+        try {
+          new URL(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: "Receipt URL must be a valid URL" }
+    )
+    .optional()
+    .default(""),
+});
+
+export type TransactionFormData = z.infer<typeof TransactionFormSchema>;
+
+/**
+ * Safe validation helper for transaction form data
+ */
+export const validateTransactionFormSafe = (data: unknown) => {
+  return TransactionFormSchema.safeParse(data);
+};
