@@ -60,7 +60,7 @@
     "dexie": "^4.0.11",
     "esbuild": "^0.25.9",
     "firebase": "^12.0.0",
-    "highlight.run": "^9.18.23",
+    "highlight.run": "^9.22.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "lightningcss": "^1.30.1",
