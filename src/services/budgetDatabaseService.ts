@@ -118,11 +118,7 @@ class BudgetDatabaseService {
   }
 
   // Validate input data before saving, throwing error on validation failure
-  private _validateInput<T>(
-    data: T[],
-    schema: z.ZodArray<z.ZodType<T>>,
-    entityName: string
-  ): T[] {
+  private _validateInput<T>(data: T[], schema: z.ZodArray<z.ZodType<T>>, entityName: string): T[] {
     const result = schema.safeParse(data);
     if (!result.success) {
       logger.error(`Failed to validate ${entityName} for save`, result.error);
