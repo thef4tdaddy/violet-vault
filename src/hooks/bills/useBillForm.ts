@@ -6,11 +6,7 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  getBillIcon,
-  getBillIconOptions,
-  getIconNameForStorage,
-} from "@/utils/common/billIcons";
+import { getBillIcon, getBillIconOptions, getIconNameForStorage } from "@/utils/common/billIcons";
 import { getBillCategories } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "@/types/bills";

@@ -178,7 +178,9 @@ export const useAutoLockManager = (
 
       if (timeSinceActivity >= timeoutMs) {
         lockSession();
-        logger.debug("Auto-lock activated after timeout", { timeoutMinutes: securitySettings.autoLockTimeout });
+        logger.debug("Auto-lock activated after timeout", {
+          timeoutMinutes: securitySettings.autoLockTimeout,
+        });
       } else {
         // Restart timer for remaining time
         const remainingTime = timeoutMs - timeSinceActivity;

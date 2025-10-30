@@ -17,7 +17,6 @@ type Bill = {
   amount?: number;
 };
 
-
 type DebtFormFieldsProps = {
   formData: DebtFormData;
   setFormData: (patch: Partial<DebtFormData>) => void;
@@ -46,13 +45,28 @@ const DebtFormFields = ({
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
       {/* Basic Information */}
-      <DebtBasicInfo formData={formData} setFormData={setFormData} errors={errors} canEdit={canEdit} />
+      <DebtBasicInfo
+        formData={formData}
+        setFormData={setFormData}
+        errors={errors}
+        canEdit={canEdit}
+      />
 
       {/* Financial Details */}
-      <DebtFinancialDetails formData={formData} setFormData={setFormData} errors={errors} canEdit={canEdit} />
+      <DebtFinancialDetails
+        formData={formData}
+        setFormData={setFormData}
+        errors={errors}
+        canEdit={canEdit}
+      />
 
       {/* Payment Details */}
-      <DebtPaymentDetails formData={formData} setFormData={setFormData} errors={errors} canEdit={canEdit} />
+      <DebtPaymentDetails
+        formData={formData}
+        setFormData={setFormData}
+        errors={errors}
+        canEdit={canEdit}
+      />
 
       {/* Connection Management */}
       <div className="space-y-4">
@@ -86,7 +100,9 @@ const DebtFormFields = ({
         {/* Legacy bill connection (fallback if needed) */}
         {formData.shouldCreateBill && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Connect to Existing Bill</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Connect to Existing Bill
+            </label>
             <Select
               value={String(formData.existingBillId ?? "")}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -103,7 +119,9 @@ const DebtFormFields = ({
               ))}
             </Select>
 
-            {errors.existingBillId && <p className="mt-1 text-sm text-red-600">{errors.existingBillId}</p>}
+            {errors.existingBillId && (
+              <p className="mt-1 text-sm text-red-600">{errors.existingBillId}</p>
+            )}
           </div>
         )}
       </div>
@@ -113,7 +131,9 @@ const DebtFormFields = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
         <textarea
           value={String(formData.notes ?? "")}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ notes: e.target.value })}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setFormData({ notes: e.target.value })
+          }
           rows={3}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
           placeholder="Add any additional notes about this debt..."

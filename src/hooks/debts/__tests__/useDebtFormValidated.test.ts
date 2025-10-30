@@ -153,10 +153,13 @@ describe("useDebtFormValidated", () => {
       expect(mockSubmit).toHaveBeenCalledTimes(1);
     });
 
-    expect(mockSubmit).toHaveBeenCalledWith(null, expect.objectContaining({
-      name: "Credit Card",
-      creditor: "Chase",
-    }));
+    expect(mockSubmit).toHaveBeenCalledWith(
+      null,
+      expect.objectContaining({
+        name: "Credit Card",
+        creditor: "Chase",
+      })
+    );
   });
 
   it("should not submit with invalid data", async () => {

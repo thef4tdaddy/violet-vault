@@ -21,7 +21,10 @@ interface SmartCategoryManagerProps {
   bills?: Array<Record<string, unknown>>;
   onAddCategory: (name: string, category: string) => void;
   onRemoveCategory: (name: string, category: string) => void;
-  onApplyToTransactions: (suggestion: Suggestion, updates?: Record<string, unknown>) => Promise<void>;
+  onApplyToTransactions: (
+    suggestion: Suggestion,
+    updates?: Record<string, unknown>
+  ) => Promise<void>;
   onApplyToBills: (suggestion: Suggestion, updates?: Record<string, unknown>) => Promise<void>;
   dateRange?: string;
   className?: string;
@@ -80,9 +83,19 @@ const SmartCategoryManager = ({
   const handleApplySuggestion = async (suggestion: Suggestion) => {
     try {
       const success = await applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
-      if (success && suggestion.action && suggestion.action.includes("add") && suggestion.data?.categoryName) {
+      if (
+        success &&
+        suggestion.action &&
+        suggestion.action.includes("add") &&
+        suggestion.data?.categoryName
+      ) {
         onAddCategory(suggestion.data.categoryName, suggestion.category);
-      } else if (success && suggestion.action && suggestion.action.includes("remove") && suggestion.data?.categoryName) {
+      } else if (
+        success &&
+        suggestion.action &&
+        suggestion.action.includes("remove") &&
+        suggestion.data?.categoryName
+      ) {
         onRemoveCategory(suggestion.data.categoryName, suggestion.category);
       }
     } catch (error) {

@@ -7,7 +7,9 @@ import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent } from "./EditEnvelopeModalComponents";
 
-interface EnvelopeRef { id: string }
+interface EnvelopeRef {
+  id: string;
+}
 
 interface EditEnvelopeModalProps {
   isOpen?: boolean;

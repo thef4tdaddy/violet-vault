@@ -1,6 +1,11 @@
 import React from "react";
 import { ResponsiveContainer } from "recharts";
-import { getIcon } from "../../utils";
+import {
+  ChartHeader,
+  ChartLoadingState,
+  ChartErrorState,
+  ChartEmptyState,
+} from "./ChartContainerStates";
 
 /**
  * Reusable chart container component
@@ -32,52 +37,25 @@ const ChartContainer = ({
   formatTooltip?: React.ComponentType<unknown> | ((props: unknown) => React.ReactNode);
   dataTestId?: string;
 }) => {
+  const containerClass = `glassmorphism rounded-xl p-6 ${className}`;
+  const formatTooltipAttr = formatTooltip ? "true" : "false";
+
+  // Loading state
   if (loading) {
     return (
-      <div className={`glassmorphism rounded-xl p-6 ${className}`} data-format-tooltip={formatTooltip ? "true" : "false"}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            {subtitle && <p className="text-sm text-gray-600 mt-1">{subtitle}</p>}
-          </div>
-          {actions}
-        </div>
-        <div className="flex items-center justify-center text-gray-500" style={{ height }}>
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-3"></div>
-            <p>Loading chart data...</p>
-          </div>
-        </div>
+      <div className={containerClass} data-format-tooltip={formatTooltipAttr}>
+        <ChartHeader title={title} subtitle={subtitle} actions={actions} />
+        <ChartLoadingState height={height} />
       </div>
     );
   }
 
+  // Error state
   if (error) {
-    const errorMessage =
-      error == null
-        ? ""
-        : typeof error === "object" && error !== null && "message" in error
-        ? String((error as { message?: unknown }).message)
-        : String(error);
-
     return (
-      <div className={`glassmorphism rounded-xl p-6 ${className}`} data-format-tooltip={formatTooltip ? "true" : "false"}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            {subtitle && <p className="text-sm text-gray-600 mt-1">{subtitle}</p>}
-          </div>
-          {actions}
-        </div>
-        <div className="flex items-center justify-center text-red-500" style={{ height }}>
-          <div className="text-center">
-            {React.createElement(getIcon("BarChart3"), {
-              className: "h-12 w-12 mx-auto mb-3 opacity-50",
-            })}
-            <p className="font-medium">Error loading chart</p>
-            <p className="text-sm text-gray-500 mt-1">{errorMessage}</p>
-          </div>
-        </div>
+      <div className={containerClass} data-format-tooltip={formatTooltipAttr}>
+        <ChartHeader title={title} subtitle={subtitle} actions={actions} />
+        <ChartErrorState height={height} error={error} />
       </div>
     );
   }
@@ -87,32 +65,15 @@ const ChartContainer = ({
 
   return (
     <div
-      className={`glassmorphism rounded-xl p-6 ${className}`}
+      className={containerClass}
       data-testid={dataTestId}
       data-chart
-      data-format-tooltip={formatTooltip ? "true" : "false"}
+      data-format-tooltip={formatTooltipAttr}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          {subtitle && <p className="text-sm text-gray-600 mt-1">{subtitle}</p>}
-        </div>
-        {actions}
-      </div>
+      <ChartHeader title={title} subtitle={subtitle} actions={actions} />
 
       <ResponsiveContainer width="100%" height={height}>
-        {hasData ? (
-          children
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            <div className="text-center">
-              {React.createElement(getIcon("BarChart3"), {
-                className: "h-12 w-12 mx-auto mb-3 opacity-50",
-              })}
-              <p>{emptyMessage}</p>
-            </div>
-          </div>
-        )}
+        {hasData ? children : <ChartEmptyState emptyMessage={emptyMessage} />}
       </ResponsiveContainer>
     </div>
   );

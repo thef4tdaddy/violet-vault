@@ -9,7 +9,13 @@ import logger from "@/utils/common/logger";
 /**
  * Create mutation configuration for adding transactions
  */
-export type CategoryRule = { keywords?: string[]; pattern?: string; category: string; name?: string; envelopeId?: string | number };
+export type CategoryRule = {
+  keywords?: string[];
+  pattern?: string;
+  category: string;
+  name?: string;
+  envelopeId?: string | number;
+};
 
 const normalizeCategoryRules = (rules: CategoryRule[]) =>
   rules.map((r) => ({
@@ -27,7 +33,10 @@ export const createAddTransactionMutationConfig = (
     mutationFn: async (transactionData: unknown) => {
       const { addTransactionToDB } = await import("./helpers/transactionOperationsHelpers");
       const normalized = normalizeCategoryRules(categoryRules || []);
-      const result = await addTransactionToDB(transactionData as Record<string, unknown>, normalized);
+      const result = await addTransactionToDB(
+        transactionData as Record<string, unknown>,
+        normalized
+      );
       // normalize to { id: string } for downstream handlers
       return { id: String(result) };
     },
@@ -183,12 +192,18 @@ export const createBulkOperationMutationConfig = (
         normalized
       );
     },
-    onSuccess: (data: unknown[], variables: { operation: string; transactions?: unknown[]; updates?: unknown }) => {
+    onSuccess: (
+      data: unknown[],
+      variables: { operation: string; transactions?: unknown[]; updates?: unknown }
+    ) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
       logger.info(`Bulk ${variables.operation} completed`, { count: data.length });
     },
-    onError: (error: Error, variables: { operation: string; transactions?: unknown[]; updates?: unknown }) => {
+    onError: (
+      error: Error,
+      variables: { operation: string; transactions?: unknown[]; updates?: unknown }
+    ) => {
       logger.error(`Bulk ${variables.operation} failed`, error);
     },
   };

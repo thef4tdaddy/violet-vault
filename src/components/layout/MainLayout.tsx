@@ -63,7 +63,23 @@ interface MainContentProps {
   auth: unknown;
   layoutData: unknown;
   _onExport: () => void;
-  _onImport: (event: React.ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; } } | undefined>;
+  _onImport: (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => Promise<
+    | {
+        success: boolean;
+        imported: {
+          envelopes: number;
+          bills: number;
+          transactions: number;
+          savingsGoals: number;
+          debts: number;
+          paycheckHistory: number;
+          auditLog: number;
+        };
+      }
+    | undefined
+  >;
   onLogout: () => void;
   onResetEncryption: () => void;
   onChangePassword: (oldPassword: string, newPassword: string) => Promise<void>;

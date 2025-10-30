@@ -57,30 +57,43 @@ interface ConnectionData {
 type CreateDebtPayload = DebtFormData & { connectionData?: ConnectionData; paymentDueDate: string };
 
 // Factory helpers to create lightweight wrappers outside the hook to reduce function length
-const makeCreateEnvelopeWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<{ id: string }> => {
-  const res = await Promise.resolve(fn(data) as unknown);
-  return (res as unknown) as { id: string };
-};
+const makeCreateEnvelopeWrapper =
+  (fn: (...args: unknown[]) => unknown) =>
+  async (data: unknown): Promise<{ id: string }> => {
+    const res = await Promise.resolve(fn(data) as unknown);
+    return res as unknown as { id: string };
+  };
 
-const makeCreateBillWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<HelperBill> => {
-  const res = await Promise.resolve(fn(data) as unknown);
-  const raw = res as unknown as Record<string, unknown>;
-  const rawDue = raw.dueDate as unknown;
-  const dueDate = typeof rawDue === "string" ? (rawDue as string) : rawDue instanceof Date ? (rawDue as Date).toISOString() : undefined;
-  const transformed: HelperBill = {
-    ...raw,
-    dueDate,
-  } as HelperBill;
-  return transformed;
-};
+const makeCreateBillWrapper =
+  (fn: (...args: unknown[]) => unknown) =>
+  async (data: unknown): Promise<HelperBill> => {
+    const res = await Promise.resolve(fn(data) as unknown);
+    const raw = res as unknown as Record<string, unknown>;
+    const rawDue = raw.dueDate as unknown;
+    const dueDate =
+      typeof rawDue === "string"
+        ? (rawDue as string)
+        : rawDue instanceof Date
+          ? (rawDue as Date).toISOString()
+          : undefined;
+    const transformed: HelperBill = {
+      ...raw,
+      dueDate,
+    } as HelperBill;
+    return transformed;
+  };
 
-const makeUpdateBillWrapper = (fn: (...args: unknown[]) => unknown) => async (id: string, data: unknown): Promise<void> => {
-  await Promise.resolve(fn({ billId: id, updates: data as Record<string, unknown> }));
-};
+const makeUpdateBillWrapper =
+  (fn: (...args: unknown[]) => unknown) =>
+  async (id: string, data: unknown): Promise<void> => {
+    await Promise.resolve(fn({ billId: id, updates: data as Record<string, unknown> }));
+  };
 
-const makeCreateTransactionWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<void> => {
-  await Promise.resolve(fn(data));
-};
+const makeCreateTransactionWrapper =
+  (fn: (...args: unknown[]) => unknown) =>
+  async (data: unknown): Promise<void> => {
+    await Promise.resolve(fn(data));
+  };
 
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
@@ -88,7 +101,11 @@ export const useDebtManagement = () => {
   // Normalize DB bill shapes to helper-friendly shapes (convert Date dueDate -> string)
   const normalizedBills = (bills || []).map((b) => ({
     ...b,
-    dueDate: b.dueDate ? (typeof b.dueDate === "string" ? b.dueDate : (b.dueDate as Date).toISOString()) : undefined,
+    dueDate: b.dueDate
+      ? typeof b.dueDate === "string"
+        ? b.dueDate
+        : (b.dueDate as Date).toISOString()
+      : undefined,
   }));
   const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
   const { transactions = [], addTransaction: createTransaction } = useTransactions();
@@ -213,12 +230,14 @@ export const useDebtManagement = () => {
     if (!deleteDebtData || !deleteBillAsync) throw new Error("Delete functions not available");
     const transformedBills = (bills || []).map((bill) => {
       const tb = makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId);
-      return (
-        ({
-          ...tb,
-          dueDate: tb.dueDate ? (typeof tb.dueDate === "string" ? tb.dueDate : (tb.dueDate as Date).toISOString()) : undefined,
-        } as unknown) as HelperBill & Record<string, unknown>
-      );
+      return {
+        ...tb,
+        dueDate: tb.dueDate
+          ? typeof tb.dueDate === "string"
+            ? tb.dueDate
+            : (tb.dueDate as Date).toISOString()
+          : undefined,
+      } as unknown as HelperBill & Record<string, unknown>;
     });
 
     await deleteDebtOperation({

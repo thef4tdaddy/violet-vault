@@ -88,19 +88,16 @@ export const useSecurityManager = () => {
     lockSession();
   }, [lockSession, logSecurityEvent]);
 
-  const enhancedUnlockSession = useCallback(
-    () => {
-      // Password validation would happen in auth store
-      logSecurityEvent({
-        type: "SESSION_UNLOCKED",
-        description: "Session unlocked successfully",
-        metadata: { trigger: "manual" },
-      });
-      unlockSession();
-      resetAutoLockTimer();
-    },
-    [unlockSession, logSecurityEvent, resetAutoLockTimer]
-  );
+  const enhancedUnlockSession = useCallback(() => {
+    // Password validation would happen in auth store
+    logSecurityEvent({
+      type: "SESSION_UNLOCKED",
+      description: "Session unlocked successfully",
+      metadata: { trigger: "manual" },
+    });
+    unlockSession();
+    resetAutoLockTimer();
+  }, [unlockSession, logSecurityEvent, resetAutoLockTimer]);
 
   const updateSettings = useCallback(
     (newSettings) => {

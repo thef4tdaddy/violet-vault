@@ -152,9 +152,14 @@ export const useBillManager = ({
         }) => Promise<void>
       );
 
-      const { categorizedBills: catBills, totals: billTotals } = categorizeBillsWithTotals(processedBills);
+      const { categorizedBills: catBills, totals: billTotals } =
+        categorizeBillsWithTotals(processedBills);
 
-      const filtered: Bill[] = getFilteredBills(catBills as CategorizedBills, viewMode, filterOptions);
+      const filtered: Bill[] = getFilteredBills(
+        catBills as CategorizedBills,
+        viewMode,
+        filterOptions
+      );
 
       return {
         transactions: resolvedTransactions,
