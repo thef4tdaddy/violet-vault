@@ -27,7 +27,7 @@ interface OnboardingState {
  * Minimal implementation to prevent React error #185 while we implement proper architecture
  * This removes all get() calls that were causing infinite render loops
  */
-const useOnboardingStore = create<OnboardingState>(
+const useOnboardingStore = create<OnboardingState>()(
   persist(
     (_set, _get) => ({
       // Onboarding completion status

@@ -252,7 +252,7 @@ export class PageDetectionService {
 
       for (const selector of modalSelectors) {
         const element = document.querySelector(selector);
-        if (element && element.offsetParent !== null) {
+        if (element && (element as HTMLElement).offsetParent !== null) {
           // visible
           const title = element.textContent?.trim();
           if (title) return title;

@@ -300,7 +300,7 @@ class ChunkedSyncService implements IChunkedSyncService {
   async saveToCloud(
     data: unknown,
     currentUser: CloudSyncConfig["currentUser"]
-  ): Promise<{ success: boolean }> {
+  ): Promise<boolean> {
     return this.syncMutex.execute(async () => {
       if (!this.budgetId || !this.encryptionKey) {
         throw new Error("Chunked sync not initialized");
@@ -501,7 +501,7 @@ class ChunkedSyncService implements IChunkedSyncService {
           mainDocSize: this.calculateSize(mainDocument),
         });
 
-        return { success: true };
+        return true;
       } catch (error) {
         logger.error("❌ Chunked save failed", error);
         throw error;

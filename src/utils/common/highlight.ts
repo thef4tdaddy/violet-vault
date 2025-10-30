@@ -128,6 +128,7 @@ export const initHighlight = () => {
 };
 
 // Disabled function to avoid unused declaration error
+// @ts-expect-error - Intentionally unused function kept for future use
 function _setupConsoleCapture(): void {
   // Disabled function - console capture commented out
   // to avoid conflicts with other error tracking

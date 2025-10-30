@@ -1,14 +1,8 @@
 import { useCallback } from "react";
-import { validateRule } from "@/utils/budgeting/autofunding/rules";
-
-interface Rule {
-  id: string;
-  name: string;
-  [key: string]: unknown;
-}
+import { validateRule, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface UseRuleValidationProps {
-  rules: Rule[];
+  rules: AutoFundingRule[];
 }
 
 /**

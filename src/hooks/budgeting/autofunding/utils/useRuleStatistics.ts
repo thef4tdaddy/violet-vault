@@ -1,13 +1,9 @@
 import { useCallback } from "react";
-import { getRuleStatistics } from "@/utils/budgeting/autofunding/rules";
+import { getRuleStatistics, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
 
-interface Rule {
-  [key: string]: unknown;
-}
-
 interface UseRuleStatisticsProps {
-  rules: Rule[];
+  rules: AutoFundingRule[];
 }
 
 /**

@@ -4,10 +4,12 @@ import { getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
 
 interface BudgetMetadata {
+  id: string;
   unassignedCash?: number;
   actualBalance?: number;
   isActualBalanceManual?: boolean;
   biweeklyAllocation?: number;
+  lastModified: number;
   [key: string]: unknown;
 }
 
@@ -27,7 +29,7 @@ export const useBudgetMetadataQuery = () => {
       if (!result) {
         logger.debug("TanStack Query: No metadata found, initializing with defaults");
         const defaultMetadata: BudgetMetadata = {
-          id: 'metadata',
+          id: "metadata",
           unassignedCash: 0,
           actualBalance: 0,
           isActualBalanceManual: false,

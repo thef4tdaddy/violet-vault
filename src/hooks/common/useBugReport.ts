@@ -36,7 +36,7 @@ const useBugReport = (options: BugReportOptions = {}) => {
     title: form.title,
     description: form.description,
     includeScreenshot: form.includeScreenshot,
-    severity: form.severity,
+    severity: form.severity as "low" | "medium" | "high" | "critical",
     labels: form.labels,
     screenshot: screenshot.screenshot,
   });
@@ -94,6 +94,7 @@ const useBugReport = (options: BugReportOptions = {}) => {
     closeModal,
 
     // Screenshot actions (from sub-hook)
+    setScreenshot: screenshot.setScreenshot,
     captureScreenshot: screenshot.captureScreenshot,
     showScreenshotPreview: screenshot.showScreenshotPreview,
 

@@ -9,8 +9,8 @@ import { useShallow } from "zustand/react/shallow";
 export const usePaycheckTrendsQuery = () => {
   // Get data from Zustand store
   const { paycheckHistory } = useBudgetStore(
-    useShallow((state) => ({
-      paycheckHistory: state.paycheckHistory,
+    useShallow((state: { paycheckHistory?: unknown[] }) => ({
+      paycheckHistory: state.paycheckHistory || [],
     }))
   );
 

@@ -41,7 +41,7 @@ export const useAnalyticsIntegration = ({
   // Enhanced metrics with additional calculations
   const enhancedMetrics = useMemo(() => {
     const baseMetrics = analyticsData.metrics;
-    const trends = calculateTrends(analyticsData.monthlyTrends as unknown[]);
+    const trends = calculateTrends(analyticsData.monthlyTrends as never);
 
     // Performance indicators
     const budgetAdherence =
@@ -99,7 +99,7 @@ export const useAnalyticsIntegration = ({
       const filename = `VioletVault_Analytics_${timeFilter}_${timestamp}`;
 
       if (format === "csv") {
-        const csvContent = processedData
+        const csvContent = (processedData as unknown[][])
           .map((row) => row.map((field) => `"${field}"`).join(","))
           .join("\n");
 

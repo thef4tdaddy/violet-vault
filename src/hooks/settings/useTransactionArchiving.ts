@@ -46,8 +46,9 @@ export const useTransactionArchivingUI = () => {
       // Create a temporary archiver to get preview data
       const { createArchiver } = await import("@/utils/common/transactionArchiving");
       const archiver = createArchiver({});
-      const cutoffDate = archiver.calculateCutoffDate(selectedPeriod);
-      const transactionsToArchive = await archiver.getTransactionsForArchiving(cutoffDate);
+      const cutoffDateStr = archiver.calculateCutoffDate(selectedPeriod);
+      const cutoffDate = new Date(cutoffDateStr);
+      const transactionsToArchive = await archiver.getTransactionsForArchiving(cutoffDateStr);
 
       // Group by category and envelope for preview
       const preview = {
@@ -127,7 +128,7 @@ export const useTransactionArchivingProcess = () => {
   const handleArchive = useCallback(
     async (
       selectedPeriod: number,
-      executeArchiving: (period: number) => Promise<void>,
+      executeArchiving: (period: number) => Promise<unknown>,
       callbacks: {
         onSuccess?: () => void;
         onError?: (error: unknown) => void;

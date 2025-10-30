@@ -236,7 +236,7 @@ export const getEnvelopeIntegrityReport = async () => {
       corrupted: corruptedEnvelopes.length,
       healthy: allEnvelopes.length - corruptedEnvelopes.length,
       corruptedEnvelopes: corruptedEnvelopes.map((env) => ({
-        id: env.id,
+        id: String(env.id),
         name: env.name || "[MISSING NAME]",
         category: env.category || "[MISSING CATEGORY]",
         monthlyAmount: env.monthlyAmount,
@@ -247,7 +247,7 @@ export const getEnvelopeIntegrityReport = async () => {
           !env.category ? "Missing category" : null,
           env.monthlyAmount == null ? "Missing monthly amount" : null,
           env.currentBalance == null ? "Missing current balance" : null,
-        ].filter(Boolean),
+        ].filter(Boolean) as string[],
       })),
       recommendations:
         corruptedEnvelopes.length > 0

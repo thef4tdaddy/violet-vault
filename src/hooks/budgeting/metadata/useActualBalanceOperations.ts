@@ -13,7 +13,7 @@ export const useActualBalanceOperations = () => {
       const { isManual = true, author = "Unknown User" } = options;
 
       if (typeof balance !== "number" || isNaN(balance)) {
-        logger.warn("Invalid actual balance:", balance);
+        logger.warn("Invalid actual balance:", { balance });
         return false;
       }
 

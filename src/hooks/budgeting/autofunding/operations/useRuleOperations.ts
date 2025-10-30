@@ -1,5 +1,9 @@
 import React, { useCallback } from "react";
-import { createDefaultRule, validateRule, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import {
+  createDefaultRule,
+  validateRule,
+  type AutoFundingRule,
+} from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
 
 interface UseRuleOperationsProps {
