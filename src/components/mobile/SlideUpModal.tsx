@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { useTouchFeedback } from "../../utils/ui/touchFeedback";
+import { getIcon } from "@/utils";
+import { useTouchFeedback } from "@/utils/ui/touchFeedback";
 
 /**
  * Reusable SlideUpModal component for mobile-optimized bottom sheet modals
@@ -68,17 +68,7 @@ function resetDragTransform(modalRef: React.RefObject<HTMLDivElement>, backdrop:
 // Sub-Components
 // ============================================================================
 
-interface ModalHeaderProps {
-  title: string;
-  onClose?: () => void;
-  closeFeedback: {
-    onClick: (handler?: () => void) => () => void;
-    onTouchStart: () => void;
-    className: string;
-  };
-}
-
-const ModalHeader = ({ title, onClose, closeFeedback }: ModalHeaderProps) => (
+const ModalHeader = ({ title, onClose, closeFeedback }) => (
   <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
     <h2 id="slide-modal-title" className="font-bold text-lg text-black">
       {title}
@@ -102,27 +92,7 @@ const DragHandle = ({ handleRef }: { handleRef: React.RefObject<HTMLDivElement> 
   </div>
 );
 
-interface ModalPanelProps {
-  modalRef: React.RefObject<HTMLDivElement>;
-  handleRef: React.RefObject<HTMLDivElement>;
-  height: string;
-  isOpen: boolean;
-  isAnimating: boolean;
-  className: string;
-  showHandle: boolean;
-  title?: string;
-  onClose?: () => void;
-  closeFeedback: {
-    onClick: (handler?: () => void) => () => void;
-    onTouchStart: () => void;
-    className: string;
-  };
-  handleTouchStart: (e: React.TouchEvent) => void;
-  handleTouchMove: (e: React.TouchEvent) => void;
-  handleTouchEnd: () => void;
-  children: React.ReactNode;
-}
-
+// ModalPanelProps removed (unused) — ModalPanel uses `any` for props to avoid strict type mismatches with touch feedback
 const ModalPanel = ({
   modalRef,
   handleRef,
@@ -138,7 +108,7 @@ const ModalPanel = ({
   handleTouchMove,
   handleTouchEnd,
   children,
-}: ModalPanelProps) => (
+}) => (
   <div
     ref={modalRef}
     className={`

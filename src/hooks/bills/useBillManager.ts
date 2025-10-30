@@ -122,23 +122,28 @@ export const useBillManager = ({
   // Data Resolution and Processing - combined to reduce statements
   const { transactions, envelopes, bills, categorizedBills, totals, filteredBills } =
     useMemo(() => {
-      const resolvedTransactions = resolveTransactions(
-        propTransactions,
-        tanStackTransactions,
-        budget.allTransactions
+      // Coerce incoming external arrays to our local shapes safely (we don't mutate them)
+      const resolvedTransactions: Transaction[] = resolveTransactions(
+        propTransactions as Transaction[],
+        tanStackTransactions as unknown as Transaction[],
+        budget.allTransactions as Transaction[]
       );
-      const resolvedEnvelopes = resolveEnvelopes(
-        propEnvelopes,
-        tanStackEnvelopes,
-        budget.envelopes
+
+      const resolvedEnvelopes: Envelope[] = resolveEnvelopes(
+        propEnvelopes as Envelope[],
+        tanStackEnvelopes as unknown as Envelope[],
+        budget.envelopes as Envelope[]
       );
-      const billsFromTransactions = extractBillsFromTransactions(resolvedTransactions as unknown[]);
-      const combinedBills = combineBills(
-        tanStackBills as unknown[],
-        (budget.bills as unknown[]) || [],
+
+      const billsFromTransactions: Bill[] = extractBillsFromTransactions(resolvedTransactions);
+
+      const combinedBills: Bill[] = combineBills(
+        tanStackBills as unknown as Bill[],
+        (budget.bills as unknown as Bill[]) || [],
         billsFromTransactions
       );
-      const processedBills = processBills(
+
+      const processedBills: Bill[] = processBills(
         combinedBills,
         onUpdateBill,
         updateBillMutation as unknown as (updates: {
@@ -146,13 +151,10 @@ export const useBillManager = ({
           updates: Record<string, unknown>;
         }) => Promise<void>
       );
-      const { categorizedBills: catBills, totals: billTotals } =
-        categorizeBillsWithTotals(processedBills);
-      const filtered = getFilteredBills(
-        catBills as unknown as CategorizedBills,
-        viewMode,
-        filterOptions
-      );
+
+      const { categorizedBills: catBills, totals: billTotals } = categorizeBillsWithTotals(processedBills);
+
+      const filtered: Bill[] = getFilteredBills(catBills as CategorizedBills, viewMode, filterOptions);
 
       return {
         transactions: resolvedTransactions,
@@ -192,9 +194,9 @@ export const useBillManager = ({
     () =>
       handleSearchNewBills(
         {
-          transactions: transactions as unknown[],
-          bills: bills as unknown[],
-          envelopes: envelopes as unknown[],
+          transactions,
+          bills,
+          envelopes,
           onSearchNewBills,
           onError,
         },
@@ -208,12 +210,13 @@ export const useBillManager = ({
   );
 
   const handleAddDiscoveredBills = useCallback(
-    (billsToAdd: unknown[]) =>
+    (billsToAdd: Bill[]) =>
       handleAddDiscoveredBillsAction(
         {
           billsToAdd,
           onCreateRecurringBill,
-          addBill: addBill as (bill: unknown) => void,
+          // ensure addBill matches helper signature (returns Promise<void>)
+          addBill: addBill as unknown as (bill: Bill) => Promise<void>,
           onError,
         },
         {

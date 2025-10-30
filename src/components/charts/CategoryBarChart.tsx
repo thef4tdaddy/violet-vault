@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, type XAxisProps } from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
@@ -11,13 +11,15 @@ import { useChartConfig } from "../../hooks/common/useChartConfig";
 const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
 
 // Helper function to get axis configuration based on orientation
-const getAxisConfig = (isHorizontal, chartDefaults) => {
+const getAxisConfig = (isHorizontal: boolean, chartDefaults: any) => {
   if (isHorizontal) {
+    const xType = "number" as XAxisProps["type"];
+    const yType = "category" as XAxisProps["type"];
     return {
-      XAxis: { type: "number", stroke: chartDefaults.axis.stroke },
+      XAxis: { type: xType, stroke: chartDefaults.axis.stroke },
       YAxis: {
         dataKey: "name",
-        type: "category",
+        type: yType,
         stroke: chartDefaults.axis.stroke,
         width: 100,
       },

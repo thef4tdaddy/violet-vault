@@ -99,7 +99,6 @@ export const useTransactionLedger = (currentUser: unknown) => {
   // Use extracted operations hook
   const operations = useLedgerOperations(
     addTransaction,
-    updateTransaction,
     deleteTransaction,
     updateBill,
     envelopes

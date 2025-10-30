@@ -36,7 +36,7 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
         return (
           <>
             <p className="text-xs text-gray-500">
-              {(displayText as unknown)?.balanceLabel || "Balance"}
+              {displayText?.primaryStatus || "Balance"}
             </p>
             <p
               className={`text-lg font-semibold ${
