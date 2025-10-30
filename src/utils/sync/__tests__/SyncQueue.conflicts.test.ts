@@ -33,9 +33,18 @@ describe("SyncQueue - Conflict Resolution", () => {
       const promise1 = syncQueue.enqueue("transaction:txn-1", operation1, txn);
       const promise2 = syncQueue.enqueue("transaction:txn-1", operation2, txn);
 
-      await Promise.all([promise1, promise2]);
+      // First promise will be rejected as superseded, second will resolve
+      const results = await Promise.allSettled([promise1, promise2]);
+
+      // First should be rejected (superseded)
+      expect(results[0].status).toBe("rejected");
+      expect(results[0].reason).toBeInstanceOf(Error);
+      if (results[0].status === "rejected") {
+        expect(results[0].reason.message).toContain("Superseded");
+      }
 
       // Second operation should supersede the first
+      expect(results[1].status).toBe("fulfilled");
       expect(operation2).toHaveBeenCalled();
       // First operation should not be called if superseded
     });
@@ -53,7 +62,12 @@ describe("SyncQueue - Conflict Resolution", () => {
       // Enqueue later transaction (should supersede)
       const promise2 = syncQueue.enqueue("transaction:txn-1", laterOperation, laterTxn);
 
-      await Promise.all([promise1, promise2]);
+      const results = await Promise.allSettled([promise1, promise2]);
+
+      // First should be rejected (superseded)
+      expect(results[0].status).toBe("rejected");
+      // Second should succeed
+      expect(results[1].status).toBe("fulfilled");
 
       // Only the later operation should be processed
       expect(laterOperation).toHaveBeenCalled();
@@ -68,7 +82,12 @@ describe("SyncQueue - Conflict Resolution", () => {
       const promise1 = syncQueue.enqueue("transaction:txn-1", operation1, txn);
       const promise2 = syncQueue.enqueue("transaction:txn-1", operation2, txn);
 
-      await Promise.all([promise1, promise2]);
+      const results = await Promise.allSettled([promise1, promise2]);
+
+      // First should be rejected (superseded)
+      expect(results[0].status).toBe("rejected");
+      // Second should succeed
+      expect(results[1].status).toBe("fulfilled");
 
       // Should handle duplicate gracefully
       expect(operation2).toHaveBeenCalled();
@@ -108,7 +127,12 @@ describe("SyncQueue - Conflict Resolution", () => {
       const promise1 = syncQueue.enqueue("bill:bill-1", operation, bill);
       const promise2 = syncQueue.enqueue("bill:bill-1", operation, bill);
 
-      await Promise.all([promise1, promise2]);
+      const results = await Promise.allSettled([promise1, promise2]);
+
+      // First should be rejected (superseded)
+      expect(results[0].status).toBe("rejected");
+      // Second should succeed
+      expect(results[1].status).toBe("fulfilled");
 
       // Should handle duplicate bill
       expect(operation).toHaveBeenCalled();
@@ -123,7 +147,12 @@ describe("SyncQueue - Conflict Resolution", () => {
       const promise1 = syncQueue.enqueue("bill:bill-1", operation, bill1);
       const promise2 = syncQueue.enqueue("bill:bill-1", operation, bill2);
 
-      await Promise.all([promise1, promise2]);
+      const results = await Promise.allSettled([promise1, promise2]);
+
+      // First should be rejected (superseded)
+      expect(results[0].status).toBe("rejected");
+      // Second should succeed
+      expect(results[1].status).toBe("fulfilled");
 
       // Latest version should win
       expect(operation).toHaveBeenCalledWith(bill2);
@@ -327,14 +356,17 @@ describe("SyncQueue - Conflict Resolution", () => {
     });
 
     it("should log conflict resolution details", async () => {
-      const logger = require("../../common/logger").default;
+      const loggerModule = await import("@/utils/common/logger");
+      const logger = loggerModule.default;
       const operation = vi.fn(async (data) => data);
 
       const v1 = { id: "doc-1", value: "v1" };
       const v2 = { id: "doc-1", value: "v2" };
 
-      await syncQueue.enqueue("doc:doc-1", operation, v1);
-      await syncQueue.enqueue("doc:doc-1", operation, v2);
+      const promise1 = syncQueue.enqueue("doc:doc-1", operation, v1);
+      const promise2 = syncQueue.enqueue("doc:doc-1", operation, v2);
+
+      await Promise.allSettled([promise1, promise2]);
 
       // Logger should be called for queue operations
       expect(logger.debug).toHaveBeenCalled();
@@ -367,13 +399,17 @@ describe("SyncQueue - Conflict Resolution", () => {
         throw new Error("Operation failed");
       });
 
-      try {
-        await syncQueue.enqueue("doc:1", failingOp, {});
-      } catch (e) {
-        // Expected to fail
-      }
+      // Enqueue and catch the expected rejection
+      const promise = syncQueue.enqueue("doc:1", failingOp, {}).catch(() => {
+        // Expected to fail, suppress unhandled rejection
+      });
 
-      expect(syncQueue.stats.failed).toBeGreaterThanOrEqual(0);
+      const results = await syncQueue.flush();
+      await promise; // Ensure promise is fully handled
+
+      // Operation should have failed
+      expect(results[0].success).toBe(false);
+      expect(syncQueue.stats.failed).toBeGreaterThanOrEqual(1);
     });
   });
 });

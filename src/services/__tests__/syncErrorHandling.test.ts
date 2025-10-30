@@ -32,7 +32,8 @@ vi.mock("../../utils/common/logger", () => ({
 describe("Sync Error Handling Tests", () => {
   describe("Network Errors", () => {
     it("should handle connection timeout", async () => {
-      const { setDoc } = require("firebase/firestore");
+      const firestoreModule = await import("firebase/firestore");
+      const setDoc = vi.mocked(firestoreModule.setDoc);
 
       setDoc.mockImplementationOnce(() => {
         return new Promise((_, reject) => {
@@ -41,10 +42,11 @@ describe("Sync Error Handling Tests", () => {
       });
 
       try {
-        await setDoc({}, {});
+        await setDoc({} as any, {});
         expect(true).toBe(false); // Should not reach here
-      } catch (error: any) {
-        expect(error.message).toBe("Connection timeout");
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe("Connection timeout");
       }
     });
 
@@ -116,8 +118,9 @@ describe("Sync Error Handling Tests", () => {
       expect(toRetry.map((op) => op.id)).toEqual(["op-2", "op-3"]);
     });
 
-    it("should log connection errors", () => {
-      const logger = require("../../utils/common/logger").default;
+    it("should log connection errors", async () => {
+      const loggerModule = await import("@/utils/common/logger");
+      const logger = loggerModule.default;
 
       const error = new Error("Connection failed");
       logger.error("Sync failed", error);
@@ -158,22 +161,24 @@ describe("Sync Error Handling Tests", () => {
     });
 
     it("should re-authenticate on token expiry", async () => {
-      const { onAuthStateChanged, signInAnonymously } = require("firebase/auth");
+      const authModule = await import("firebase/auth");
+      const onAuthStateChanged = vi.mocked(authModule.onAuthStateChanged);
+      const signInAnonymously = vi.mocked(authModule.signInAnonymously);
 
       let isAuthenticated = false;
 
-      onAuthStateChanged.mockImplementationOnce((_auth, callback) => {
+      onAuthStateChanged.mockImplementationOnce((_auth: any, callback: any) => {
         callback(null); // No user
         return () => {};
       });
 
       signInAnonymously.mockImplementationOnce(() => {
         isAuthenticated = true;
-        return Promise.resolve({ user: { uid: "new-user-id" } });
+        return Promise.resolve({ user: { uid: "new-user-id" } } as any);
       });
 
       // Simulate re-authentication
-      await signInAnonymously();
+      await signInAnonymously({} as any);
 
       expect(isAuthenticated).toBe(true);
     });
@@ -230,14 +235,16 @@ describe("Sync Error Handling Tests", () => {
 
   describe("Firebase Service Errors", () => {
     it("should handle Firebase unavailability", async () => {
-      const { setDoc } = require("firebase/firestore");
+      const firestoreModule = await import("firebase/firestore");
+      const setDoc = vi.mocked(firestoreModule.setDoc);
 
       setDoc.mockRejectedValueOnce(new Error("Firebase service unavailable"));
 
       try {
-        await setDoc({}, {});
-      } catch (error: any) {
-        expect(error.message).toBe("Firebase service unavailable");
+        await setDoc({} as any, {});
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe("Firebase service unavailable");
       }
     });
 
@@ -370,8 +377,9 @@ describe("Sync Error Handling Tests", () => {
   });
 
   describe("Error Logging", () => {
-    it("should log detailed error information", () => {
-      const logger = require("../../utils/common/logger").default;
+    it("should log detailed error information", async () => {
+      const loggerModule = await import("@/utils/common/logger");
+      const logger = loggerModule.default;
 
       const error = new Error("Sync failed");
       const context = {
