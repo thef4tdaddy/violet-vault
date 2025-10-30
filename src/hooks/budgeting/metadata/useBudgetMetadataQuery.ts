@@ -27,10 +27,12 @@ export const useBudgetMetadataQuery = () => {
       if (!result) {
         logger.debug("TanStack Query: No metadata found, initializing with defaults");
         const defaultMetadata: BudgetMetadata = {
+          id: 'metadata',
           unassignedCash: 0,
           actualBalance: 0,
           isActualBalanceManual: false,
           biweeklyAllocation: 0,
+          lastModified: Date.now(),
         };
 
         await setBudgetMetadata(defaultMetadata);

@@ -1,21 +1,10 @@
 import React, { useCallback } from "react";
-import { createDefaultRule, validateRule } from "@/utils/budgeting/autofunding/rules";
+import { createDefaultRule, validateRule, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
 
-interface Rule {
-  id: string;
-  name: string;
-  type: string;
-  enabled: boolean;
-  lastExecuted?: string | null;
-  executionCount: number;
-  updatedAt?: string;
-  [key: string]: unknown;
-}
-
 interface UseRuleOperationsProps {
-  rules: Rule[];
-  setRules: React.Dispatch<React.SetStateAction<Rule[]>>;
+  rules: AutoFundingRule[];
+  setRules: React.Dispatch<React.SetStateAction<AutoFundingRule[]>>;
 }
 
 /**
@@ -24,17 +13,17 @@ interface UseRuleOperationsProps {
 export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) => {
   // Add new rule
   const addRule = useCallback(
-    (ruleConfig: Partial<Rule>) => {
+    (ruleConfig: Partial<AutoFundingRule>) => {
       try {
         const validation = validateRule(ruleConfig);
         if (!validation.isValid) {
           throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
         }
 
-        const newRule: Rule = {
+        const newRule: AutoFundingRule = {
           ...createDefaultRule(),
           ...ruleConfig,
-        } as Rule;
+        } as AutoFundingRule;
 
         setRules((prevRules) => [...prevRules, newRule]);
 
@@ -55,7 +44,7 @@ export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) =
 
   // Update existing rule
   const updateRule = useCallback(
-    (ruleId: string, updates: Partial<Rule>) => {
+    (ruleId: string, updates: Partial<AutoFundingRule>) => {
       try {
         setRules((prevRules) => {
           const ruleIndex = prevRules.findIndex((rule) => rule.id === ruleId);
@@ -63,11 +52,11 @@ export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) =
             throw new Error(`Rule not found: ${ruleId}`);
           }
 
-          const updatedRule: Rule = {
+          const updatedRule: AutoFundingRule = {
             ...prevRules[ruleIndex],
             ...updates,
             updatedAt: new Date().toISOString(),
-          } as Rule;
+          } as AutoFundingRule;
 
           const validation = validateRule(updatedRule);
           if (!validation.isValid) {
@@ -125,7 +114,7 @@ export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) =
           throw new Error(`Rule not found: ${ruleId}`);
         }
 
-        const duplicatedRule: Partial<Rule> = {
+        const duplicatedRule: Partial<AutoFundingRule> = {
           ...rule,
           name: `${rule.name} (Copy)`,
           enabled: false, // Disable copies by default
