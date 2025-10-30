@@ -76,13 +76,25 @@ export const SavingsGoalFormSchema = z
       .min(1, "Goal name is required")
       .max(100, "Goal name cannot exceed 100 characters"),
     targetAmount: z
-      .union([z.string(), z.number()])
-      .transform((val) => (typeof val === "string" ? parseFloat(val) : val))
-      .refine((val) => !isNaN(val) && val > 0, "Valid target amount is required"),
+      .string()
+      .min(1, "Target amount is required")
+      .refine(
+        (val) => {
+          const num = parseFloat(val);
+          return !isNaN(num) && num > 0;
+        },
+        { message: "Target amount must be a valid positive number" }
+      ),
     currentAmount: z
-      .union([z.string(), z.number()])
-      .transform((val) => (typeof val === "string" ? parseFloat(val) || 0 : val))
-      .refine((val) => !isNaN(val) && val >= 0, "Current amount cannot be negative"),
+      .string()
+      .refine(
+        (val) => {
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0;
+        },
+        { message: "Current amount cannot be negative" }
+      )
+      .default("0"),
     targetDate: z
       .string()
       .optional()
@@ -106,10 +118,17 @@ export const SavingsGoalFormSchema = z
       .default(""),
     priority: PrioritySchema.default("medium"),
   })
-  .refine((data) => data.currentAmount <= data.targetAmount, {
-    message: "Current amount cannot exceed target amount",
-    path: ["currentAmount"],
-  });
+  .refine(
+    (data) => {
+      const current = parseFloat(data.currentAmount);
+      const target = parseFloat(data.targetAmount);
+      return !isNaN(current) && !isNaN(target) && current <= target;
+    },
+    {
+      message: "Current amount cannot exceed target amount",
+      path: ["currentAmount"],
+    }
+  );
 
 /**
  * Type inference from form schema

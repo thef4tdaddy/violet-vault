@@ -115,8 +115,8 @@ export const processSavingsGoalFormData = (
   }
 
   const validatedData = result.data;
-  const targetAmount = validatedData.targetAmount;
-  const currentAmount = validatedData.currentAmount;
+  const targetAmount = parseFloat(validatedData.targetAmount);
+  const currentAmount = parseFloat(validatedData.currentAmount);
 
   const goalData: SavingsGoalData = {
     id: editingGoal?.id || `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

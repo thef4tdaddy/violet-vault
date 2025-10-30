@@ -9,10 +9,9 @@
 
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/common/validation";
-import { DebtFormSchema, type DebtFormData } from "@/domain/schemas/debt";
-import type { Debt } from "@/types/debts";
+import { DebtFormSchema, type DebtFormData, type Debt } from "@/domain/schemas/debt";
 import type { Bill } from "@/types/bills";
-import type { Envelope } from "@/types/envelopes";
+import type { Envelope } from "@/types/finance";
 import logger from "@/utils/common/logger";
 
 interface UseDebtFormValidatedOptions {
@@ -42,24 +41,40 @@ export function useDebtFormValidated({
   }, [connectedBill]);
 
   // Build initial form data
+  // Complexity justified: Necessary default value initialization for all form fields
+  // eslint-disable-next-line complexity
   const buildInitialData = useCallback((): DebtFormData => {
     if (debt) {
       // Edit mode - populate from existing debt
+      // Extended type for runtime fields not in schema
+      type DebtWithExtras = Debt & {
+        paymentFrequency?: "monthly" | "quarterly" | "annually" | "weekly" | "biweekly";
+        compoundFrequency?: "monthly" | "annually" | "daily";
+        notes?: string;
+        envelopeId?: string | number;
+      };
+      const extendedDebt = debt as unknown as DebtWithExtras;
+      const currentBalanceStr = debt.currentBalance?.toString() || "";
       return {
         name: debt.name || "",
         creditor: debt.creditor || "",
         type: debt.type || "personal",
         status: debt.status || "active",
-        paymentFrequency: debt.paymentFrequency || "monthly",
-        compoundFrequency: debt.compoundFrequency || "monthly",
-        currentBalance: debt.currentBalance?.toString() || "",
+        paymentFrequency: extendedDebt.paymentFrequency || "monthly",
+        compoundFrequency: extendedDebt.compoundFrequency || "monthly",
+        currentBalance: currentBalanceStr,
+        balance: currentBalanceStr,
         originalBalance: debt.originalBalance?.toString() || "",
         interestRate: debt.interestRate?.toString() || "0",
         minimumPayment: debt.minimumPayment?.toString() || "",
-        notes: debt.notes || "",
+        notes: extendedDebt.notes || "",
         paymentMethod: determinePaymentMethod(),
         createBill: false,
-        envelopeId: debt.envelopeId || connectedEnvelope?.id || "",
+        envelopeId: extendedDebt.envelopeId
+          ? String(extendedDebt.envelopeId)
+          : connectedEnvelope?.id
+            ? String(connectedEnvelope.id)
+            : "",
         existingBillId: connectedBill?.id || "",
         newEnvelopeName: "",
       };
@@ -73,6 +88,7 @@ export function useDebtFormValidated({
         paymentFrequency: "monthly",
         compoundFrequency: "monthly",
         currentBalance: "",
+        balance: "",
         originalBalance: "",
         interestRate: "0",
         minimumPayment: "",

@@ -9,8 +9,11 @@
 
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/common/validation";
-import { PaycheckFormSchema, type PaycheckFormData } from "@/domain/schemas/paycheck-history";
-import type { PaycheckHistory } from "@/types/paycheck";
+import {
+  PaycheckFormSchema,
+  type PaycheckFormData,
+  type PaycheckHistory,
+} from "@/domain/schemas/paycheck-history";
 import logger from "@/utils/common/logger";
 
 interface UsePaycheckFormValidatedOptions {

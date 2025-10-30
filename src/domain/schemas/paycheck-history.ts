@@ -69,20 +69,33 @@ export const PaycheckFormSchema = z.object({
       },
       { message: "Invalid date format" }
     ),
-  amount: z.union([z.string(), z.number()]).pipe(
-    z.coerce
-      .number({
-        invalid_type_error: "Valid amount is required",
-      })
-      .min(0.01, "Amount must be greater than 0")
-  ),
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num > 0;
+      },
+      { message: "Amount must be a valid positive number" }
+    ),
   source: z
     .string()
     .min(1, "Income source is required")
     .max(100, "Source must be 100 characters or less"),
   allocations: z.record(z.string(), z.number().min(0)).optional().default({}),
   deductions: z.record(z.string(), z.number().min(0)).optional().default({}),
-  netAmount: z.union([z.string(), z.number()]).pipe(z.coerce.number().min(0)).optional(),
+  netAmount: z
+    .string()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= 0;
+      },
+      { message: "Net amount must be a valid number" }
+    )
+    .optional(),
 });
 
 export type PaycheckFormData = z.infer<typeof PaycheckFormSchema>;

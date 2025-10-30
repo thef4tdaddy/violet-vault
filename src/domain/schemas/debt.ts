@@ -115,25 +115,62 @@ export const DebtFormSchema = z
     status: DebtStatusSchema.optional().default("active"),
     paymentFrequency: PaymentFrequencySchema.optional().default("monthly"),
     compoundFrequency: CompoundFrequencySchema.optional().default("monthly"),
-    // Support both string and number inputs for numeric fields (from form inputs)
-    currentBalance: z.coerce
-      .number({ message: "Valid current balance is required" })
-      .min(0, "Valid current balance is required")
+    // Support string inputs for numeric fields (from form inputs)
+    currentBalance: z
+      .string()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0;
+        },
+        { message: "Valid current balance is required" }
+      )
       .optional(),
-    balance: z.coerce.number().min(0).optional(), // Alias for currentBalance
-    minimumPayment: z.coerce
-      .number({ message: "Valid minimum payment is required" })
-      .min(0, "Valid minimum payment is required")
+    balance: z
+      .string()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0;
+        },
+        { message: "Valid balance is required" }
+      )
       .optional(),
-    interestRate: z.coerce
-      .number({ message: "Interest rate must be a number" })
-      .min(0, "Interest rate must be between 0 and 100")
-      .max(100, "Interest rate must be between 0 and 100")
+    minimumPayment: z
+      .string()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0;
+        },
+        { message: "Valid minimum payment is required" }
+      )
+      .optional(),
+    interestRate: z
+      .string()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0 && num <= 100;
+        },
+        { message: "Interest rate must be between 0 and 100" }
+      )
       .optional()
-      .default(0),
-    originalBalance: z.coerce
-      .number()
-      .min(0, "Original balance must be positive")
+      .default("0"),
+    originalBalance: z
+      .string()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0;
+        },
+        { message: "Original balance must be positive" }
+      )
       .optional()
       .nullable(),
     notes: z.string().max(500, "Notes must be 500 characters or less").optional().default(""),
@@ -198,10 +235,8 @@ export const DebtFormSchema = z
     }
   )
   .transform((data) => {
-    // Use balance as fallback for currentBalance if provided
-    const currentBalance = data.currentBalance || (data.balance ?? 0);
-    // Default originalBalance to currentBalance if not provided
-    const originalBalance = data.originalBalance ?? currentBalance;
+    // Keep balance as fallback for currentBalance
+    const currentBalance = data.currentBalance || data.balance || "";
 
     return {
       ...data,
@@ -210,7 +245,6 @@ export const DebtFormSchema = z
       notes: data.notes?.trim() || "",
       balance: currentBalance,
       currentBalance,
-      originalBalance,
     };
   });
 
@@ -259,9 +293,14 @@ export const validateDebtFormDataSafe = (
   const warnings: string[] = [];
   const data = result.data;
 
+  // Parse numeric string values for comparison
+  const currentBalance = parseFloat(data.currentBalance || "0");
+  const minimumPayment = parseFloat(data.minimumPayment || "0");
+  const interestRate = parseFloat(data.interestRate || "0");
+
   // Warning: Very low minimum payment (less than 1% of balance)
-  if (data.currentBalance > 0 && data.minimumPayment > 0) {
-    const paymentPercent = (data.minimumPayment / data.currentBalance) * 100;
+  if (currentBalance > 0 && minimumPayment > 0) {
+    const paymentPercent = (minimumPayment / currentBalance) * 100;
     if (paymentPercent < 1) {
       warnings.push(
         "Minimum payment is less than 1% of balance - this will take very long to pay off"
@@ -272,12 +311,13 @@ export const validateDebtFormDataSafe = (
   }
 
   // Warning: High interest rate
-  if (data.interestRate && data.interestRate > 25) {
+  if (interestRate > 25) {
     warnings.push("Interest rate is very high - consider debt consolidation options");
   }
 
   // Warning: Current balance higher than original
-  if (data.originalBalance && data.currentBalance > data.originalBalance) {
+  const originalBalance = parseFloat(data.originalBalance || "0");
+  if (originalBalance > 0 && currentBalance > originalBalance) {
     warnings.push(
       "Current balance is higher than original balance - interest and fees may have accrued"
     );

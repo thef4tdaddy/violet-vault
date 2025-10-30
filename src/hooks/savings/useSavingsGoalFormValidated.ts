@@ -9,8 +9,11 @@
 
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/common/validation";
-import { SavingsGoalFormSchema, type SavingsGoalFormData } from "@/domain/schemas/savings-goal";
-import type { SavingsGoal } from "@/types/savings";
+import {
+  SavingsGoalFormSchema,
+  type SavingsGoalFormData,
+  type SavingsGoal,
+} from "@/domain/schemas/savings-goal";
 import logger from "@/utils/common/logger";
 
 interface UseSavingsGoalFormValidatedOptions {
@@ -34,6 +37,9 @@ export function useSavingsGoalFormValidated({
   const buildInitialData = useCallback((): SavingsGoalFormData => {
     if (goal) {
       // Edit mode - populate from existing goal
+      // Extended type for runtime fields not in schema
+      type SavingsGoalWithExtras = SavingsGoal & { color?: string };
+      const extendedGoal = goal as unknown as SavingsGoalWithExtras;
       return {
         name: goal.name || "",
         targetAmount: goal.targetAmount?.toString() || "",
@@ -44,7 +50,7 @@ export function useSavingsGoalFormValidated({
             : new Date(goal.targetDate).toISOString().split("T")[0]
           : "",
         category: goal.category || "",
-        color: goal.color || "#3B82F6",
+        color: extendedGoal.color || "#3B82F6",
         description: goal.description || "",
         priority: goal.priority || "medium",
       };

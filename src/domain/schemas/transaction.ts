@@ -18,9 +18,7 @@ export type TransactionType = z.infer<typeof TransactionTypeSchema>;
  */
 export const TransactionSchema = z.object({
   id: z.string().min(1, "Transaction ID is required"),
-  date: z.union([z.date(), z.string()], {
-    errorMap: () => ({ message: "Date must be a valid date" }),
-  }),
+  date: z.union([z.date(), z.string()]),
   amount: z.number().min(0, "Amount cannot be negative"),
   envelopeId: z.string().min(1, "Envelope ID is required"),
   category: z.string().min(1, "Category is required"),
@@ -65,59 +63,33 @@ export const validateTransactionPartial = (data: unknown): TransactionPartial =>
 };
 
 /**
- * Transaction form validation schema
- * Used for validating form input before creating/updating transactions
+ * Transaction Form Data Schema
+ * Used for form inputs where amounts and dates are strings
+ * Part of standardized form validation pattern with useValidatedForm
  */
-export const TransactionFormSchema = z.object({
-  date: z
-    .string()
-    .min(1, "Date is required")
-    .refine(
-      (val) => {
-        const date = new Date(val);
-        return !isNaN(date.getTime());
-      },
-      { message: "Invalid date format" }
-    ),
-  amount: z.union([z.string(), z.number()]).pipe(
-    z.coerce
-      .number({
-        invalid_type_error: "Valid amount is required",
-      })
-      .min(0.01, "Amount must be greater than 0")
-  ),
-  envelopeId: z.string().min(1, "Envelope is required"),
-  category: z.string().min(1, "Category is required"),
-  type: TransactionTypeSchema.default("expense"),
+export const TransactionFormDataSchema = z.object({
+  date: z.string().min(1, "Date is required"),
   description: z
     .string()
-    .max(500, "Description must be 500 characters or less")
-    .optional()
-    .default(""),
-  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional().default(""),
-  receiptUrl: z
+    .min(1, "Description is required")
+    .max(500, "Description must be 500 characters or less"),
+  amount: z
     .string()
+    .min(1, "Amount is required")
     .refine(
       (val) => {
-        if (!val || val === "") return true;
-        try {
-          new URL(val);
-          return true;
-        } catch {
-          return false;
-        }
+        const num = parseFloat(val);
+        return !isNaN(num) && num > 0;
       },
-      { message: "Receipt URL must be a valid URL" }
-    )
-    .optional()
-    .default(""),
+      { message: "Amount must be a valid positive number" }
+    ),
+  type: TransactionTypeSchema.default("expense"),
+  envelopeId: z.string().min(1, "Envelope is required"),
+  category: z.string().min(1, "Category is required"),
+  notes: z.string().max(1000, "Notes must be 1000 characters or less").optional().default(""),
+  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
+  receiptUrl: z.string().url("Receipt URL must be a valid URL").optional().or(z.literal("")),
+  reconciled: z.boolean().default(false),
 });
 
-export type TransactionFormData = z.infer<typeof TransactionFormSchema>;
-
-/**
- * Safe validation helper for transaction form data
- */
-export const validateTransactionFormSafe = (data: unknown) => {
-  return TransactionFormSchema.safeParse(data);
-};
+export type TransactionFormData = z.infer<typeof TransactionFormDataSchema>;
