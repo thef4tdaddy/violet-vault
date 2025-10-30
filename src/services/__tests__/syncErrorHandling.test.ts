@@ -42,7 +42,9 @@ describe("Sync Error Handling Tests", () => {
       });
 
       try {
-        await setDoc({} as any, {});
+        // Mock document reference - using empty object as minimal valid reference
+        const mockDocRef = {} as ReturnType<typeof firestoreModule.doc>;
+        await setDoc(mockDocRef, {});
         expect(true).toBe(false); // Should not reach here
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
@@ -167,18 +169,28 @@ describe("Sync Error Handling Tests", () => {
 
       let isAuthenticated = false;
 
-      onAuthStateChanged.mockImplementationOnce((_auth: any, callback: any) => {
-        callback(null); // No user
-        return () => {};
-      });
+      // Type-safe mock implementation
+      type AuthStateCallback = (user: unknown) => void;
+      onAuthStateChanged.mockImplementationOnce(
+        (_auth: ReturnType<typeof authModule.getAuth>, callback: AuthStateCallback) => {
+          callback(null); // No user
+          return () => {};
+        }
+      );
 
       signInAnonymously.mockImplementationOnce(() => {
         isAuthenticated = true;
-        return Promise.resolve({ user: { uid: "new-user-id" } } as any);
+        // Mock minimal UserCredential structure
+        return Promise.resolve({
+          user: { uid: "new-user-id" },
+          providerId: null,
+          operationType: "signIn",
+        } as ReturnType<typeof signInAnonymously>);
       });
 
-      // Simulate re-authentication
-      await signInAnonymously({} as any);
+      // Simulate re-authentication with mock auth instance
+      const mockAuth = {} as ReturnType<typeof authModule.getAuth>;
+      await signInAnonymously(mockAuth);
 
       expect(isAuthenticated).toBe(true);
     });
@@ -241,7 +253,9 @@ describe("Sync Error Handling Tests", () => {
       setDoc.mockRejectedValueOnce(new Error("Firebase service unavailable"));
 
       try {
-        await setDoc({} as any, {});
+        // Mock document reference - using empty object as minimal valid reference
+        const mockDocRef = {} as ReturnType<typeof firestoreModule.doc>;
+        await setDoc(mockDocRef, {});
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect((error as Error).message).toBe("Firebase service unavailable");

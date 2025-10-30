@@ -38,8 +38,8 @@ describe("SyncQueue - Conflict Resolution", () => {
 
       // First should be rejected (superseded)
       expect(results[0].status).toBe("rejected");
-      expect(results[0].reason).toBeInstanceOf(Error);
       if (results[0].status === "rejected") {
+        expect(results[0].reason).toBeInstanceOf(Error);
         expect(results[0].reason.message).toContain("Superseded");
       }
 
