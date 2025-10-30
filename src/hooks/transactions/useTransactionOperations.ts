@@ -33,15 +33,48 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
   const { categoryRules = [] } = options;
 
   // Create mutation configurations
-  const addTransactionMutation = useMutation(
-    createAddTransactionMutationConfig(queryClient, categoryRules)
+  const addTransactionMutation = useMutation<{ id: string }, Error, Partial<Transaction>>({
+    ...createAddTransactionMutationConfig(queryClient, categoryRules),
+  });
+
+  const updateTransactionMutation = useMutation<unknown, Error, { id: string; updates: Partial<Transaction> }>(
+    {
+      ...createUpdateTransactionMutationConfig(queryClient),
+    }
   );
-  const updateTransactionMutation = useMutation(createUpdateTransactionMutationConfig(queryClient));
-  const deleteTransactionMutation = useMutation(createDeleteTransactionMutationConfig(queryClient));
-  const splitTransactionMutation = useMutation(createSplitTransactionMutationConfig(queryClient));
-  const transferFundsMutation = useMutation(createTransferFundsMutationConfig(queryClient));
-  const bulkOperationMutation = useMutation(
-    createBulkOperationMutationConfig(queryClient, categoryRules)
+
+  const deleteTransactionMutation = useMutation<{ id: string }, Error, string>({
+    ...createDeleteTransactionMutationConfig(queryClient),
+  });
+
+  const splitTransactionMutation = useMutation<
+    { originalTransaction: { id: string }; splitTransactions: unknown[] },
+    Error,
+    { originalTransaction: Transaction; splitTransactions: Partial<Transaction>[] }
+  >({
+    ...createSplitTransactionMutationConfig(queryClient),
+  });
+
+  type TransferVars = {
+    fromEnvelopeId: string | number;
+    toEnvelopeId: string | number;
+    amount: number;
+    date: string;
+    description?: string;
+  };
+
+  const transferFundsMutation = useMutation<
+    { outgoing: unknown; incoming: unknown; transferId?: unknown },
+    Error,
+    TransferVars
+  >({
+    ...createTransferFundsMutationConfig(queryClient),
+  });
+
+  const bulkOperationMutation = useMutation<unknown[], Error, { operation: string; transactions: Transaction[]; updates?: Partial<Transaction> }>(
+    {
+      ...createBulkOperationMutationConfig(queryClient, categoryRules),
+    }
   );
 
   // Convenience methods

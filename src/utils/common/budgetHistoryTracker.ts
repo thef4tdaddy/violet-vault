@@ -1,4 +1,5 @@
 import { budgetDb } from "../../db/budgetDb";
+import type { BudgetTag } from "../../db/types";
 import { encryptionUtils } from "../security/encryption";
 import logger from "../common/logger";
 import { formatCurrency } from "../accounts/accountHelpers";
@@ -344,7 +345,7 @@ export class BudgetHistoryTracker {
         created: Date.now(),
       };
 
-      await budgetDb.createBudgetTag(tag as Record<string, unknown>);
+      await budgetDb.createBudgetTag(tag as unknown as BudgetTag);
 
       logger.info("Budget history tag created", {
         tagName,

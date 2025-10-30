@@ -12,8 +12,7 @@ const MIN_BALANCE = -100000;
  */
 export const BalanceSchema = z
   .number({
-    invalid_type_error: "Balance must be a number",
-    required_error: "Balance is required",
+    message: "Balance must be a number",
   })
   .finite("Balance must be a finite number")
   .min(MIN_BALANCE, `Balance cannot be less than ${MIN_BALANCE}`)
@@ -42,7 +41,7 @@ export const validateBalance = (balance: unknown): boolean => {
   if (!result.success) {
     logger.warn("Invalid balance value provided:", {
       value: balance,
-      errors: result.error.errors,
+      errors: result.error.issues,
     });
     return false;
   }
@@ -66,7 +65,7 @@ export const validateBalanceInput = (
   if (!result.success) {
     return {
       isValid: false,
-      error: result.error.errors[0]?.message || "Invalid number format",
+      error: result.error.issues[0]?.message || "Invalid number format",
     };
   }
 

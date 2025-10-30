@@ -143,7 +143,7 @@ export const queryKeyUtils = {
       debts: [queryKeys.debts, queryKeys.dashboard],
     };
 
-    return related[entityType] || [queryKeys[entityType]];
+    return related[entityType] || [[entityType]];
   },
 
   /**

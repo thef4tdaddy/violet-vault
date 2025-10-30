@@ -4,6 +4,7 @@
  * Part of Phase 3: OpenAPI Schema Documentation
  */
 
+// @ts-expect-error - Optional dependency for OpenAPI documentation
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 

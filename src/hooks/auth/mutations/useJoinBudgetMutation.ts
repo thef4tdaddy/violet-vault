@@ -4,6 +4,8 @@ import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
 import localStorageService from "../../../services/storage/localStorageService";
+import type { UserData } from "../../../types/auth";
+import type { SessionData } from "../../../contexts/authConstants";
 
 interface UserInfo {
   userName?: string;
@@ -17,18 +19,6 @@ interface JoinBudgetData {
   password: string;
   userInfo: UserInfo;
   sharedBy: string;
-}
-
-interface UserData {
-  budgetId?: string;
-  userName?: string;
-  [key: string]: unknown;
-}
-
-interface SessionData {
-  token?: string;
-  expiresAt?: string;
-  [key: string]: unknown;
 }
 
 interface JoinBudgetResult {
@@ -136,7 +126,7 @@ export const useJoinBudgetMutation = () => {
     },
     onSuccess: async (result: JoinBudgetResult) => {
       if (result.success && result.user) {
-        setAuthenticated(result.user as import("@/types/auth").UserData, result.sessionData);
+        setAuthenticated(result.user, result.sessionData);
 
         // Start background sync
         try {

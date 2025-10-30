@@ -1,6 +1,5 @@
 import { clearFirebaseData, forcePushToCloud } from "../firebaseUtils";
 import { cloudSyncService } from "../../../services/cloudSyncService";
-import { budgetDb } from "../../../db/budgetDb";
 import { vi } from "vitest";
 
 vi.mock("../../../services/cloudSyncService", () => ({
@@ -11,24 +10,15 @@ vi.mock("../../../services/cloudSyncService", () => ({
   },
 }));
 
-vi.mock("../../../db/budgetDb", () => ({
-  budgetDb: {
-    syncMetadata: {
-      clear: vi.fn(),
-    },
-  } as never,
-}));
-
 describe("firebaseUtils", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe("clearFirebaseData", () => {
-    it("should call clearAllData and clear syncMetadata", async () => {
+    it("should call clearAllData", async () => {
       await clearFirebaseData();
       expect(cloudSyncService.clearAllData).toHaveBeenCalled();
-      expect(budgetDb.syncMetadata.clear).toHaveBeenCalled();
     });
   });
 

@@ -240,7 +240,7 @@ export const validateEnvelopeForm = (
 ): ValidationResult => {
   // Use Zod schema for base validation
   const zodResult = validateEnvelopeSafe(formData);
-  const errors = convertZodErrors(zodResult);
+  const errors = convertZodErrors(zodResult as unknown as ZodResult);
 
   // Additional form-specific validations beyond Zod schema
   validateUniqueName(formData, existingEnvelopes, editingEnvelopeId, errors);

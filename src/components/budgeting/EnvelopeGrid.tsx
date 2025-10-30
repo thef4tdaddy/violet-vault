@@ -1,5 +1,5 @@
 // src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
-import React, { useState, useMemo, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
@@ -25,6 +25,8 @@ const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
 // Modals container component
+interface EnvelopeRef { id: string }
+
 const EnvelopeModals = ({
   showCreateModal,
   setShowCreateModal,
@@ -50,15 +52,15 @@ const EnvelopeModals = ({
   envelopes: unknown[];
   budget: { currentUser: unknown; updateBill: (bill: unknown) => void };
   unassignedCash: number;
-  editingEnvelope: unknown;
-  setEditingEnvelope: (env: unknown) => void;
+  editingEnvelope: EnvelopeRef | null;
+  setEditingEnvelope: (env: EnvelopeRef | null) => void;
   handleUpdateEnvelope: (data: unknown) => Promise<void>;
   deleteEnvelope: (id: string) => Promise<void>;
   updateBill: (data: { id: string; updates: unknown }) => Promise<void>;
   bills: unknown[];
-  historyEnvelope: unknown;
-  setHistoryEnvelope: (env: unknown) => void;
-  quickFundModal: { isOpen: boolean; envelope: unknown; suggestedAmount: number };
+  historyEnvelope: EnvelopeRef | null;
+  setHistoryEnvelope: (env: EnvelopeRef | null) => void;
+  quickFundModal: { isOpen: boolean; envelope: EnvelopeRef | null; suggestedAmount: number };
   closeQuickFundModal: () => void;
   handleQuickFundConfirm: (id: string, amount: number) => Promise<void>;
 }) => (
@@ -83,7 +85,7 @@ const EnvelopeModals = ({
       <EnvelopeEditModal
         isOpen={!!editingEnvelope}
         onClose={() => setEditingEnvelope(null)}
-        envelope={editingEnvelope}
+        envelope={editingEnvelope as EnvelopeRef}
         onUpdateEnvelope={handleUpdateEnvelope}
         onDeleteEnvelope={deleteEnvelope}
         existingEnvelopes={envelopes}
@@ -100,7 +102,7 @@ const EnvelopeModals = ({
       <EnvelopeHistoryModal
         isOpen={!!historyEnvelope}
         onClose={() => setHistoryEnvelope(null)}
-        envelope={historyEnvelope}
+        envelope={historyEnvelope as EnvelopeRef}
       />
     )}
 
@@ -109,7 +111,7 @@ const EnvelopeModals = ({
         isOpen={quickFundModal.isOpen}
         onClose={closeQuickFundModal}
         onConfirm={handleQuickFundConfirm}
-        envelope={quickFundModal.envelope}
+        envelope={quickFundModal.envelope as EnvelopeRef}
         suggestedAmount={quickFundModal.suggestedAmount}
         unassignedCash={unassignedCash}
       />
@@ -398,6 +400,7 @@ const UnifiedEnvelopeManager = ({
         updateBill={async (data: { id: string; updates: unknown }) => {
           updateBill(data.updates as never);
         }}
+        bills={bills}
         historyEnvelope={uiState.historyEnvelope}
         setHistoryEnvelope={uiState.setHistoryEnvelope}
         quickFundModal={uiState.quickFundModal}

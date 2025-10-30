@@ -1,4 +1,3 @@
-import React from "react";
 import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
@@ -75,7 +74,7 @@ const CreateEnvelopeModal = ({
           <ModalContent
             formData={formData}
             errors={errors}
-            calculatedAmounts={calculatedAmounts}
+            calculatedAmounts={calculatedAmounts as Record<string, number>}
             isLoading={isLoading}
             canSubmit={canSubmit}
             allBills={allBills}

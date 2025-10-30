@@ -228,7 +228,7 @@ export class BugReportAPIService {
    * Format GitHub issue body - delegate to GitHubAPIService
    */
   static formatGitHubIssueBody(reportData: BugReportData): string {
-    return GitHubAPIService.formatGitHubIssueBody(reportData);
+    return GitHubAPIService.formatGitHubIssueBody(reportData as never);
   }
 
   /**

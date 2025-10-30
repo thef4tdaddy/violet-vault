@@ -95,7 +95,7 @@ export const FirebaseManifestSchema = z.object({
   totalSize: z.number().int().nonnegative(),
   checksum: z.string().optional(),
   lastModified: z.number().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type FirebaseManifest = z.infer<typeof FirebaseManifestSchema>;

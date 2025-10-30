@@ -5,8 +5,11 @@
  */
 
 import React, { useEffect, useState } from "react";
+// @ts-expect-error - Optional dependency for API documentation
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
+import { Button } from "@/components/ui";
+import logger from "@/utils/common/logger";
 
 /**
  * API Documentation Page Component
@@ -27,12 +30,12 @@ const APIDocumentation: React.FC = () => {
       })
       .then((data) => {
         setSpec(data);
-        console.log("OpenAPI spec loaded successfully");
+        logger.info("OpenAPI spec loaded successfully");
       })
       .catch((err) => {
         const errorMessage = err instanceof Error ? err.message : "Unknown error";
         setError(errorMessage);
-        console.error("Failed to load OpenAPI spec", err);
+        logger.error("Failed to load OpenAPI spec", { error: err });
       });
   }, []);
 
@@ -58,12 +61,12 @@ const APIDocumentation: React.FC = () => {
           </div>
           <p className="text-gray-700">{error}</p>
           <div className="mt-6">
-            <button
+            <Button
               onClick={() => window.location.reload()}
               className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
             >
               Reload Page
-            </button>
+            </Button>
           </div>
         </div>
       </div>

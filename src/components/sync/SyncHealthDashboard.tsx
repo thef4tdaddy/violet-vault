@@ -45,7 +45,7 @@ interface SyncHealthDashboardProps {
 const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const { healthData, refreshHealthData } = useSyncHealthMonitor(isOpen && autoRefresh, 5000);
-  const { exportBackup } = useExportData();
+  const { exportData } = useExportData();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   useEffect(() => {
@@ -102,7 +102,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
    */
   const handleExportBackup = async () => {
     try {
-      await exportBackup();
+      await exportData();
       showSuccessToast("Backup exported successfully", "Backup Created");
     } catch (error) {
       showErrorToast(`Failed to export backup: ${error.message}`, "Export Failed");

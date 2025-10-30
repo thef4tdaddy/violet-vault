@@ -265,8 +265,8 @@ describe("Query Integration Tests", () => {
         await prefetchHelpers.prefetchTransactions(
           queryClient,
           {
-            start: yesterday.toISOString(),
-            end: tomorrow.toISOString(),
+            start: yesterday,
+            end: tomorrow,
           },
           { limit: 25 }
         );
@@ -543,8 +543,8 @@ describe("Query Integration Tests", () => {
         // Populate cache with various queries
         await prefetchHelpers.prefetchEnvelopes(queryClient);
         await prefetchHelpers.prefetchTransactions(queryClient, {
-          start: new Date(Date.now() - 86400000).toISOString(),
-          end: new Date().toISOString(),
+          start: new Date(Date.now() - 86400000),
+          end: new Date(),
         });
 
         const stats = queryClientUtils.getCacheStats();
@@ -668,8 +668,8 @@ describe("Query Integration Tests", () => {
         const concurrentOperations = [
           prefetchHelpers.prefetchEnvelopes(queryClient),
           prefetchHelpers.prefetchTransactions(queryClient, {
-            start: new Date(Date.now() - 86400000).toISOString(),
-            end: new Date().toISOString(),
+            start: new Date(Date.now() - 86400000),
+            end: new Date(),
           }),
           prefetchHelpers.prefetchBills(queryClient),
           prefetchHelpers.prefetchSavingsGoals(queryClient),

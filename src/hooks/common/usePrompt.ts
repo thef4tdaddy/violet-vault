@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { create } from "zustand";
 import logger from "../../utils/common/logger";
 
@@ -14,6 +14,7 @@ interface PromptConfig {
   validation?: ((value: string) => { valid: boolean; error?: string }) | null;
   icon?: string | null;
   onConfirm?: (value: string) => Promise<string | void> | string | void;
+  children?: React.ReactNode;
 }
 
 interface PromptStore {

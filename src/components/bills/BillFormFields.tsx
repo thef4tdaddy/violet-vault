@@ -1,4 +1,3 @@
-import React from "react";
 import { Textarea } from "@/components/ui";
 import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
 import { BillBasicFields, BillIconSelector, BillFormActions } from "./BillFormSections";

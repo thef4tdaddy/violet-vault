@@ -14,7 +14,7 @@ import { queryKeys } from "../../../utils/common/queryClient";
  * Main useBills hook - Combines all bill functionality
  * Provides bill operations with smart filtering, due date tracking, and envelope integration
  */
-const useBills = (options = {}) => {
+const useBills = (options: { daysAhead?: number; [key: string]: unknown } = {}) => {
   const queryClient = useQueryClient();
 
   // Query hooks

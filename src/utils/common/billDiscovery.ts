@@ -123,7 +123,7 @@ const groupSimilarTransactions = (transactions) => {
   // Only return groups with multiple transactions (indicating recurring)
   const recurringGroups = {};
   for (const [key, group] of Object.entries(groups)) {
-    if (group.length >= 2) {
+    if ((group as unknown[]).length >= 2) {
       recurringGroups[key] = group;
     }
   }

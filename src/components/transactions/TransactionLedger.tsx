@@ -171,9 +171,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
-        envelopes={envelopes}
+        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
         availableCategories={[...TRANSACTION_CATEGORIES]}
-        onSave={handleSplitTransaction as unknown as (allocations: unknown[]) => void}
+        onSave={handleSplitTransaction}
       />
     </div>
   );

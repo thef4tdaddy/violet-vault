@@ -24,7 +24,7 @@ export const detectLocalData = async () => {
 
     // 2. Get detailed database stats
     const stats = await budgetDb.getDatabaseStats();
-    logger.info("📊 Database stats:" as unknown as Record<string, unknown>, stats);
+    logger.info("📊 Database stats:", JSON.parse(JSON.stringify(stats)));
 
     // 3. Calculate total data items
     const totalItems =

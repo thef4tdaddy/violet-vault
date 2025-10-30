@@ -148,9 +148,8 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
     const confirmed = await confirm({
       title: "Generate New Share Code",
       message: "This will generate a completely new share code. Are you sure you want to continue?",
-      confirmText: "Generate New",
-      cancelText: "Cancel",
-      variant: "default",
+      confirmLabel: "Generate New",
+      cancelLabel: "Cancel",
     });
     if (!confirmed) return;
 

@@ -274,7 +274,7 @@ if (LOCAL_ONLY_MODE) {
 
 // Add PWA install and update actions after store creation (they need useUiStore reference)
 import { createUpdateAppAction, createInstallAppAction } from "./uiStoreActions.ts";
-Object.assign(useUiStore.getState(), createUpdateAppAction(useUiStore.setState, useUiStore));
+Object.assign(useUiStore.getState(), createUpdateAppAction(useUiStore.setState));
 Object.assign(useUiStore.getState(), createInstallAppAction(useUiStore.setState, useUiStore));
 
 export default useUiStore;

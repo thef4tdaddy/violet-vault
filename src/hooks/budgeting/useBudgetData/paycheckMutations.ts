@@ -33,7 +33,7 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
 
   const deletePaycheckMutation = useMutation({
     mutationKey: ["paychecks", "delete"],
-    mutationFn: async (paycheckId) => {
+    mutationFn: async (paycheckId: string) => {
       return await deletePaycheck(paycheckId);
     },
     onSuccess: () => {

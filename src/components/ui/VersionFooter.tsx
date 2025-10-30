@@ -31,7 +31,7 @@ const VersionFooter = () => {
             setIsLoadingMilestone(false);
           })
           .catch((error: unknown) => {
-            logger.warn("Failed to fetch milestone info:", error);
+            logger.warn("Failed to fetch milestone info: " + String(error));
             setIsLoadingMilestone(false);
           });
       } else {

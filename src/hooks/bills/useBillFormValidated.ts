@@ -50,7 +50,6 @@ interface UseBillFormValidatedOptions {
  */
 export function useBillFormValidated({
   editingBill = null,
-  _availableEnvelopes = [],
   onAddBill,
   onUpdateBill,
   onDeleteBill,
@@ -63,8 +62,8 @@ export function useBillFormValidated({
     amount: editingBill?.amount?.toString() || "",
     dueDate: editingBill?.dueDate?.toString() || "",
     category: editingBill?.category || "",
-    notes: editingBill?.description || "",
-    isRecurring: editingBill?.isRecurring || false,
+    notes: editingBill?.notes || "",
+    isRecurring: (editingBill?.frequency && editingBill.frequency !== "once") || false,
     selectedEnvelope: "",
     icon: "",
   };
@@ -82,13 +81,12 @@ export function useBillFormValidated({
           amount: parseFloat(data.amount),
           dueDate: data.dueDate,
           category: data.category,
-          description: data.notes,
-          isRecurring: data.isRecurring,
-          isPaid: editingBill?.isPaid || false,
-          frequency: editingBill?.frequency,
-          envelopeId: data.selectedEnvelope,
-          lastModified: Date.now(),
-          createdAt: editingBill?.createdAt || Date.now(),
+          notes: data.notes,
+          frequency: data.isRecurring ? editingBill?.frequency || "monthly" : "once",
+          isPaid: editingBill?.isPaid,
+          envelopeId: data.selectedEnvelope || undefined,
+          color: editingBill?.color || "#6366f1",
+          createdAt: editingBill?.createdAt || new Date().toISOString(),
         };
 
         if (editingBill) {
@@ -117,8 +115,8 @@ export function useBillFormValidated({
         amount: editingBill.amount?.toString() || "",
         dueDate: editingBill.dueDate?.toString() || "",
         category: editingBill.category || "",
-        notes: editingBill.description || "",
-        isRecurring: editingBill.isRecurring || false,
+        notes: editingBill.notes || "",
+        isRecurring: (editingBill.frequency && editingBill.frequency !== "once") || false,
       });
     }
   }, [editingBill, form]);

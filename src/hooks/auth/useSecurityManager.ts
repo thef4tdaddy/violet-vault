@@ -89,7 +89,7 @@ export const useSecurityManager = () => {
   }, [lockSession, logSecurityEvent]);
 
   const enhancedUnlockSession = useCallback(
-    (_password) => {
+    () => {
       // Password validation would happen in auth store
       logSecurityEvent({
         type: "SESSION_UNLOCKED",

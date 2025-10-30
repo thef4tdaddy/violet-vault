@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 import ShareCodeModal from "../ShareCodeModal";
 import userEvent from "@testing-library/user-event";
 
@@ -89,7 +89,7 @@ describe("ShareCodeModal", () => {
           shareCode: null,
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -109,7 +109,7 @@ describe("ShareCodeModal", () => {
           shareCode: "existing-share-code",
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -126,7 +126,7 @@ describe("ShareCodeModal", () => {
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -156,12 +156,15 @@ describe("ShareCodeModal", () => {
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: mockShowSuccessToast,
         showErrorToast: vi.fn(),
-      } as ReturnType<typeof useToastHelpers>);
+        showWarningToast: vi.fn(),
+        showInfoToast: vi.fn(),
+        showPaydayToast: vi.fn(),
+      });
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -191,12 +194,15 @@ describe("ShareCodeModal", () => {
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: mockShowSuccessToast,
         showErrorToast: vi.fn(),
-      } as ReturnType<typeof useToastHelpers>);
+        showWarningToast: vi.fn(),
+        showInfoToast: vi.fn(),
+        showPaydayToast: vi.fn(),
+      });
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -218,12 +224,15 @@ describe("ShareCodeModal", () => {
           shareCode: null,
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: vi.fn(),
         showErrorToast: mockShowErrorToast,
-      } as ReturnType<typeof useToastHelpers>);
+        showWarningToast: vi.fn(),
+        showInfoToast: vi.fn(),
+        showPaydayToast: vi.fn(),
+      });
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -243,12 +252,15 @@ describe("ShareCodeModal", () => {
           shareCode: null,
         },
         updateProfile: vi.fn().mockRejectedValue(new Error("Failed to generate")),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: vi.fn(),
         showErrorToast: mockShowErrorToast,
-      } as ReturnType<typeof useToastHelpers>);
+        showWarningToast: vi.fn(),
+        showInfoToast: vi.fn(),
+        showPaydayToast: vi.fn(),
+      });
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -268,7 +280,7 @@ describe("ShareCodeModal", () => {
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -293,7 +305,7 @@ describe("ShareCodeModal", () => {
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -316,7 +328,7 @@ describe("ShareCodeModal", () => {
           shareCode: "old-share-code",
         },
         updateProfile: mockUpdateProfile,
-      } as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuthManager>);
 
       render(<ShareCodeModal {...defaultProps} />);
 

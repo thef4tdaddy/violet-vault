@@ -3,7 +3,10 @@ import { useDebts } from "./useDebts";
 import useBills from "@/hooks/bills/useBills";
 import useEnvelopes from "@/hooks/budgeting/useEnvelopes";
 import useTransactions from "@/hooks/common/useTransactions";
-import type { DebtType, DebtAccount } from "@/types/debt";
+import type { DebtType, DebtAccount, DebtFormData } from "@/types/debt";
+import type { Bill } from "@/db/types"; // Correct Bill type from Dexie
+import type { Envelope } from "@/db/types";
+import type { Transaction } from "@/db/types";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
@@ -12,7 +15,7 @@ import {
   calculateDebtStats,
 } from "@/constants/debts";
 import { getUpcomingPayments } from "@/utils/debts/debtCalculations";
-import logger from "@/utils/common/logger";
+import { makeRecordCompatible, transformBillFromDB } from "@/utils/common/typeTransforms";
 import {
   enrichDebtsWithRelations,
   createDebtOperation,
@@ -23,31 +26,97 @@ import {
   deleteDebtOperation,
 } from "./helpers/debtManagementHelpers";
 
-/**
- * Business logic hook for debt management
- * Handles relationships between debts, bills, envelopes, and transactions
- */
+// Helper types to bridge inconsistencies
+type BillWithDebtId = Bill & { debtId?: string };
+// Helper bill shape expected by debt helpers (dueDate as string)
+type HelperBill = {
+  id: string;
+  debtId?: string;
+  envelopeId?: string;
+  amount?: number;
+  dueDate?: string;
+  name?: string;
+  category?: string;
+  isPaid?: boolean;
+  isRecurring?: boolean;
+  frequency?: string;
+  lastModified?: number;
+  [key: string]: unknown;
+};
+type TransactionWithDebtId = Transaction & { debtId?: string };
+type DebtForHelper = DebtAccount & { currentBalance: number };
+
+// Connection data + payload types (restore missing types)
+interface ConnectionData {
+  paymentMethod?: string;
+  createBill?: boolean;
+  existingBillId?: string;
+  newEnvelopeName?: string;
+}
+
+type CreateDebtPayload = DebtFormData & { connectionData?: ConnectionData; paymentDueDate: string };
+
+// Factory helpers to create lightweight wrappers outside the hook to reduce function length
+const makeCreateEnvelopeWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<{ id: string }> => {
+  const res = await Promise.resolve(fn(data) as unknown);
+  return (res as unknown) as { id: string };
+};
+
+const makeCreateBillWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<HelperBill> => {
+  const res = await Promise.resolve(fn(data) as unknown);
+  const raw = res as unknown as Record<string, unknown>;
+  const rawDue = raw.dueDate as unknown;
+  const dueDate = typeof rawDue === "string" ? (rawDue as string) : rawDue instanceof Date ? (rawDue as Date).toISOString() : undefined;
+  const transformed: HelperBill = {
+    ...raw,
+    dueDate,
+  } as HelperBill;
+  return transformed;
+};
+
+const makeUpdateBillWrapper = (fn: (...args: unknown[]) => unknown) => async (id: string, data: unknown): Promise<void> => {
+  await Promise.resolve(fn({ billId: id, updates: data as Record<string, unknown> }));
+};
+
+const makeCreateTransactionWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<void> => {
+  await Promise.resolve(fn(data));
+};
+
 export const useDebtManagement = () => {
-  // Get data dependencies
   const debtsHook = useDebts();
-  const { bills = [], createBill, updateBill, deleteBill } = useBills();
-  const { envelopes = [], createEnvelope } = useEnvelopes();
-  const { transactions = [], createTransaction } = useTransactions();
+  const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
+  // Normalize DB bill shapes to helper-friendly shapes (convert Date dueDate -> string)
+  const normalizedBills = (bills || []).map((b) => ({
+    ...b,
+    dueDate: b.dueDate ? (typeof b.dueDate === "string" ? b.dueDate : (b.dueDate as Date).toISOString()) : undefined,
+  }));
+  const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
+  const { transactions = [], addTransaction: createTransaction } = useTransactions();
+
+  // Helper wrappers to adapt external hooks' APIs to the helper expectations
+  // Prefer async variants when available (addEnvelopeAsync may be provided by the envelopes hook)
+  const createEnvelopeWrapper = makeCreateEnvelopeWrapper(addEnvelopeAsync || createEnvelope);
+  const createBillWrapper = makeCreateBillWrapper(addBillAsync);
+  const updateBillWrapper = makeUpdateBillWrapper(updateBillAsync);
+  const createTransactionWrapper = makeCreateTransactionWrapper(createTransaction);
 
   const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
   const createDebtData = debtsHook?.addDebtAsync;
   const updateDebtData = debtsHook?.updateDebtAsync;
   const deleteDebtData = debtsHook?.deleteDebtAsync;
 
-  // Enrich debts with related data and calculations FIRST
   const enrichedDebts = useMemo(() => {
-    return enrichDebtsWithRelations(debts, bills, envelopes, transactions);
-  }, [debts, bills, envelopes, transactions]);
+    return enrichDebtsWithRelations(
+      debts as unknown as DebtForHelper[],
+      normalizedBills as unknown as HelperBill[],
+      envelopes as Envelope[],
+      transactions as TransactionWithDebtId[]
+    );
+  }, [debts, envelopes, transactions, normalizedBills]);
 
-  // Calculate debt statistics using enriched debts
   const debtStats = useMemo(() => {
     if (!enrichedDebts?.length) {
-      const emptyStats = {
+      return {
         totalDebt: 0,
         totalMonthlyPayments: 0,
         averageInterestRate: 0,
@@ -58,24 +127,12 @@ export const useDebtManagement = () => {
         dueSoonAmount: 0,
         dueSoonCount: 0,
       };
-      logger.debug("📊 Using empty debt stats (no enriched debts):", emptyStats);
-      return emptyStats;
     }
-
-    const calculatedStats = calculateDebtStats(enrichedDebts);
-    logger.debug("📊 Calculated debt stats:", {
-      inputDebtsCount: enrichedDebts.length,
-      calculatedStats,
-      firstDebtBalance: enrichedDebts[0]?.currentBalance,
-      firstDebtMinPayment: enrichedDebts[0]?.minimumPayment,
-    });
-
-    return calculatedStats;
+    return calculateDebtStats(enrichedDebts);
   }, [enrichedDebts]);
 
-  // Group debts by status and type for easy filtering
   const debtsByStatus = useMemo(() => {
-    const grouped = {};
+    const grouped: Record<string, DebtAccount[]> = {};
     Object.values(DEBT_STATUS).forEach((status) => {
       grouped[status] = enrichedDebts.filter((debt) => debt.status === status);
     });
@@ -83,102 +140,112 @@ export const useDebtManagement = () => {
   }, [enrichedDebts]);
 
   const debtsByType = useMemo(() => {
-    const grouped = {};
+    const grouped: Record<string, DebtAccount[]> = {};
     Object.values(DEBT_TYPES).forEach((type) => {
       grouped[type] = enrichedDebts.filter((debt) => debt.type === type);
     });
     return grouped;
   }, [enrichedDebts]);
 
-  // Create a new debt with optional bill and envelope integration
-  const createDebt = async (debtData) => {
+  const createDebt = async (debtData: CreateDebtPayload) => {
+    if (!createDebtData || !addBillAsync) throw new Error("Create functions not available");
     return createDebtOperation(debtData, {
       connectionData: debtData.connectionData,
-      createEnvelope,
-      createBill,
-      updateBill,
+      createEnvelope: createEnvelopeWrapper,
+      createBill: createBillWrapper,
+      updateBill: updateBillWrapper,
       createDebtData,
     });
   };
 
-  // Record a debt payment
-  const recordPayment = async (debtId, paymentData) => {
+  const recordPayment = async (
+    debtId: string,
+    paymentData: { amount: number; paymentDate: string; notes?: string }
+  ) => {
+    if (!updateDebtData) throw new Error("Update debt function not available");
     const debt = debts.find((d) => d.id === debtId);
     if (!debt) throw new Error("Debt not found");
 
     return recordPaymentOperation({
-      debt,
+      debt: debt as unknown as DebtForHelper,
       paymentData,
-      updateDebtData,
-      createTransaction,
+      updateDebtData: (params) => updateDebtData(params),
+      createTransaction: (data) => createTransactionWrapper(data),
     });
   };
 
-  // Link debt to an existing bill
-  const linkDebtToBill = async (debtId, billId) => {
+  const linkDebtToBill = async (debtId: string, billId: string) => {
+    if (!updateDebtData || !updateBillAsync) throw new Error("Update functions not available");
     return linkDebtToBillOperation({
       debtId,
       billId,
-      debts,
-      bills,
-      updateBill,
-      updateDebtData,
+      debts: debts as unknown as DebtForHelper[],
+      bills: normalizedBills as unknown as HelperBill[],
+      updateBill: updateBillWrapper,
+      updateDebtData: (params) => updateDebtData(params),
     });
   };
 
-  // Sync debt due dates with linked bills
   const syncDebtDueDates = async () => {
+    if (!updateDebtData) throw new Error("Update debt function not available");
     return syncDebtDueDatesOperation({
-      debts,
-      bills,
-      updateDebtData,
+      debts: debts as unknown as DebtForHelper[],
+      bills: normalizedBills as unknown as HelperBill[],
+      updateDebtData: (params) => updateDebtData(params),
     });
   };
 
-  // Update a debt with proper parameter formatting
-  const updateDebt = async (debtId, updates, author = "Unknown User") => {
+  const updateDebt = async (
+    debtId: string,
+    updates: Partial<DebtAccount>,
+    author = "Unknown User"
+  ) => {
+    if (!updateDebtData) throw new Error("Update debt function not available");
     return updateDebtOperation({
       debtId,
       updates,
       author,
-      updateDebtData,
+      updateDebtData: (params) => updateDebtData(params),
     });
   };
 
-  // Delete a debt and its related connections
-  const deleteDebt = async (debtId) => {
-    return deleteDebtOperation({
+  const deleteDebt = async (debtId: string) => {
+    if (!deleteDebtData || !deleteBillAsync) throw new Error("Delete functions not available");
+    const transformedBills = (bills || []).map((bill) => {
+      const tb = makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId);
+      return (
+        ({
+          ...tb,
+          dueDate: tb.dueDate ? (typeof tb.dueDate === "string" ? tb.dueDate : (tb.dueDate as Date).toISOString()) : undefined,
+        } as unknown) as HelperBill & Record<string, unknown>
+      );
+    });
+
+    await deleteDebtOperation({
       debtId,
-      bills,
-      deleteBill,
-      deleteDebtData,
+      bills: transformedBills as unknown as HelperBill[],
+      deleteBill: (id) => deleteBillAsync(id).then(() => {}),
+      deleteDebtData: (params) => deleteDebtData(params),
     });
+    return;
   };
 
-  // Get upcoming payments
   const getUpcomingPaymentsData = (daysAhead = 30) => {
     return getUpcomingPayments(enrichedDebts, daysAhead);
   };
 
   return {
-    // Data
     debts: enrichedDebts,
     debtStats,
     debtsByStatus,
     debtsByType,
-
-    // Actions
     createDebt,
     updateDebt,
     deleteDebt,
     recordPayment,
     linkDebtToBill,
     syncDebtDueDates,
-
-    // Utilities
     getUpcomingPayments: getUpcomingPaymentsData,
-
-    // Constants
     DEBT_TYPES,
     DEBT_STATUS,
     PAYMENT_FREQUENCIES,

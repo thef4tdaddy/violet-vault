@@ -1,6 +1,5 @@
 import { backupCurrentData } from "../backupUtils";
-import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
-import { vi } from "vitest";
+import { vi, describe, it, expect } from "vitest";
 
 vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
@@ -14,7 +13,6 @@ vi.mock("../../../db/budgetDb", () => ({
     paycheckHistory: { toArray: vi.fn() },
     auditLog: { toArray: vi.fn() },
   },
-  getBudgetMetadata: vi.fn(() => Promise.resolve({ unassignedCash: 100 })),
 }));
 
 describe("backupUtils", () => {

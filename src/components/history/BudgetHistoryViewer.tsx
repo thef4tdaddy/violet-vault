@@ -69,7 +69,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
             </div>
 
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800">{error.message || error}</p>
+              <p className="text-red-800">{typeof error === 'string' ? error : error.message}</p>
               <Button
                 onClick={onClose}
                 className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"

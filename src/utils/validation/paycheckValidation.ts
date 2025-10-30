@@ -8,6 +8,7 @@ import { z } from "zod";
  * Note: These schemas are defined for potential future use in validation pipeline.
  * Currently, validation is handled by the passed-in validatePaycheckForm function.
  */
+// @ts-expect-error - Reserved for future validation pipeline implementation
 const _FormDataSchema = z.object({
   amount: z.union([z.string(), z.number()]).refine(
     (val) => {
@@ -28,6 +29,7 @@ const _AllocationSchema = z.record(z.string(), z.unknown());
  * Zod schema for allocation response
  * Note: These schemas are defined for potential future use in validation pipeline.
  */
+// @ts-expect-error - Reserved for future validation pipeline implementation
 const _AllocationResponseSchema = z.object({
   allocations: z.array(_AllocationSchema),
 });

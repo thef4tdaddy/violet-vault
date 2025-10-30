@@ -94,7 +94,7 @@ export const validatePassword = async (password: string): Promise<boolean> => {
     logger.auth("validatePassword: Key derived successfully");
 
     // Attempt to decrypt the data to validate the password
-    const _decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
+    await encryptionUtils.decrypt(encryptedData, key, iv);
 
     logger.auth("validatePassword: Decryption successful - password is correct");
     logger.production("Password validation successful", {

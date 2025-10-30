@@ -1,14 +1,8 @@
 import { useCallback } from "react";
-
-interface Rule {
-  id: string;
-  type?: string;
-  trigger?: string;
-  [key: string]: unknown;
-}
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface UseRuleQueriesProps {
-  rules: Rule[];
+  rules: AutoFundingRule[];
 }
 
 /**

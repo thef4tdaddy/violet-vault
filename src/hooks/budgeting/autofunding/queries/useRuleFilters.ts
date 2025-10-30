@@ -1,13 +1,9 @@
 import { useCallback } from "react";
-import { filterRules, sortRulesByPriority } from "@/utils/budgeting/autofunding/rules";
+import { filterRules, sortRulesByPriority, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
 
-interface Rule {
-  [key: string]: unknown;
-}
-
 interface UseRuleFiltersProps {
-  rules: Rule[];
+  rules: AutoFundingRule[];
 }
 
 /**

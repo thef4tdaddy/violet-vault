@@ -43,7 +43,7 @@ const BillManager = ({
     envelopes: _envelopes,
 
     // UI State
-    selectedBills,
+    selectedBills: selectedBillsRaw,
     viewMode,
     isSearching,
     showBillDetail,
@@ -95,7 +95,7 @@ const BillManager = ({
     bills,
     categorizedBills,
     filteredBills,
-    selectedBills,
+    selectedBills: selectedBillsRaw as Set<string>,
     setSelectedBills,
     setShowAddBillModal,
     setEditingBill,
@@ -169,7 +169,7 @@ const BillManager = ({
         editingBill={editingBill}
         bills={bills}
         envelopes={_envelopes}
-        selectedBills={selectedBills}
+        selectedBills={selectedBillsRaw as Set<string>}
         discoveredBills={discoveredBills}
         handleCloseModal={handleCloseModal}
         setShowBulkUpdateModal={setShowBulkUpdateModal}

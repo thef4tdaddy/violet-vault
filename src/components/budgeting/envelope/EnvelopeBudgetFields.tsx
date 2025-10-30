@@ -117,13 +117,16 @@ const EnvelopeBudgetFields = ({
   errors = {},
   calculatedAmounts = {},
   canEdit = true,
+  disabled,
 }: {
   formData: Record<string, unknown>;
   onUpdateField: (field: string, value: unknown) => void;
   errors?: Record<string, string>;
   calculatedAmounts?: Record<string, number>;
   canEdit?: boolean;
+  disabled?: boolean;
 }) => {
+  const effectiveCanEdit = typeof disabled === "boolean" ? !disabled : canEdit;
   const isBillEnvelope = formData.envelopeType === ENVELOPE_TYPES.BILL;
   const isSavingsGoal = formData.envelopeType === ENVELOPE_TYPES.SAVINGS;
 
@@ -142,7 +145,7 @@ const EnvelopeBudgetFields = ({
           value={String(formData.monthlyAmount || "")}
           onChange={(e) => onUpdateField("monthlyAmount", e.target.value)}
           error={errors.monthlyAmount}
-          canEdit={canEdit}
+          canEdit={effectiveCanEdit}
           required
           hint={
             calculatedAmounts?.biweeklyAllocation && calculatedAmounts.biweeklyAllocation > 0
@@ -156,7 +159,7 @@ const EnvelopeBudgetFields = ({
           value={String(formData.currentBalance || "")}
           onChange={(e) => onUpdateField("currentBalance", e.target.value)}
           error={errors.currentBalance}
-          canEdit={canEdit}
+          canEdit={effectiveCanEdit}
         />
       </div>
 
@@ -167,7 +170,7 @@ const EnvelopeBudgetFields = ({
           value={String(formData.targetAmount || "")}
           onChange={(e) => onUpdateField("targetAmount", e.target.value)}
           error={errors.targetAmount}
-          canEdit={canEdit}
+          canEdit={effectiveCanEdit}
           required
         />
       )}
@@ -177,7 +180,7 @@ const EnvelopeBudgetFields = ({
           value={String(formData.frequency || "monthly")}
           onChange={(e) => onUpdateField("frequency", e.target.value)}
           error={errors.frequency}
-          canEdit={canEdit}
+          canEdit={effectiveCanEdit}
         />
       )}
     </div>

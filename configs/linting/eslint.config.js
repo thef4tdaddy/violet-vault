@@ -52,6 +52,7 @@ export default [
       'postcss.config.ts',
       'cloudflare-worker/**',
       'js-version/**',
+      'docs/examples/**',
     ],
   },
   {

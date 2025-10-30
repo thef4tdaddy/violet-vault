@@ -17,7 +17,7 @@ export const BudgetCommitSchema = z.object({
   author: z.string().min(1, "Author is required").max(200),
   parentHash: z.string().max(200).optional(),
   deviceFingerprint: z.string().max(200).optional(),
-  changes: z.record(z.unknown()).optional(),
+  changes: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type BudgetCommit = z.infer<typeof BudgetCommitSchema>;

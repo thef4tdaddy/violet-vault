@@ -124,7 +124,6 @@ const AccountFormModal = ({
           onClose={onClose}
           isLocked={isLocked}
           isOwnLock={isOwnLock}
-          _lock={lock}
           breakLock={breakLock}
           lockLoading={lockLoading}
         />

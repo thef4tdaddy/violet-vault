@@ -25,7 +25,7 @@ const initializeDefaultMetadata = async (): Promise<BudgetRecord> => {
 };
 
 // Helper to fetch balance data
-const fetchBalanceData = async () => {
+const fetchBalanceData = async (): Promise<BalanceData> => {
   let metadata = await getBudgetMetadata();
 
   if (!metadata) {
@@ -37,7 +37,7 @@ const fetchBalanceData = async () => {
 
   return {
     actualBalance: await getActualBalance(),
-    isActualBalanceManual: metadata?.isActualBalanceManual || false,
+    isActualBalanceManual: Boolean(metadata?.isActualBalanceManual),
   };
 };
 

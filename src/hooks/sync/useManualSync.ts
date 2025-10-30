@@ -231,7 +231,7 @@ export const useManualSync = (): UseManualSyncReturn => {
   const getSyncStatus = useCallback((): SyncStatus => {
     return {
       isServiceRunning: cloudSyncService?.isRunning || false,
-      serviceStatus: cloudSyncService.getStatus() as ServiceStatus,
+      serviceStatus: cloudSyncService.getStatus() as unknown as ServiceStatus,
       isUploadingSyncInProgress,
       isDownloadingSyncInProgress,
       lastSyncTime,

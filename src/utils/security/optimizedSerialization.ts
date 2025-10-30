@@ -61,7 +61,7 @@ export const optimizedSerialization = {
       const startTime = performance.now();
 
       // Step 1: Unpack MessagePack to get compressed data
-      const compressed = decode(packedData);
+      const compressed = decode(packedData) as Uint8Array;
 
       // Step 2: Decompress gzip to get JSON string
       const jsonString = pako.ungzip(compressed, { to: "string" });

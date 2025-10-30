@@ -15,6 +15,14 @@ const ConnectionDisplay = ({
   isVisible = true,
   className = "",
   theme = "purple", // Default to purple theme for violet branding
+}: {
+  title?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  onDisconnect?: (() => void) | undefined | null;
+  children: React.ReactNode;
+  isVisible?: boolean;
+  className?: string;
+  theme?: string;
 }) => {
   if (!isVisible) return null;
 

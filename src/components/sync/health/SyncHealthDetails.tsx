@@ -136,7 +136,7 @@ const SyncHealthDetails = ({
             </p>
             {formattedRecoveryResult.details && (
               <p className="text-xs text-gray-600 font-medium mt-1">
-                {formattedRecoveryResult.details}
+                {String(formattedRecoveryResult.details)}
               </p>
             )}
           </div>

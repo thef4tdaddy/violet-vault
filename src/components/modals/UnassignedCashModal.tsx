@@ -227,7 +227,7 @@ interface EnvelopeItemProps {
     currentBalance?: number;
     monthlyBudget?: number;
     monthlyAmount?: number;
-    color: string;
+    color?: string;
     envelopeType: string;
   };
   distributionAmount: number;
@@ -236,7 +236,6 @@ interface EnvelopeItemProps {
   bills?: Array<{
     id: string;
     name: string;
-    [key: string]: unknown;
   }>;
 }
 

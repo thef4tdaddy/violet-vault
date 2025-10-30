@@ -39,8 +39,10 @@ const useBudgetData = () => {
     dashboardSummary: queries.dashboardSummary,
 
     // Computed values from dashboard query
-    unassignedCash: queries.dashboardSummary?.unassignedCash || 0,
-    actualBalance: queries.dashboardSummary?.actualBalance || 0,
+    unassignedCash:
+      ((queries.dashboardSummary as Record<string, unknown>)?.unassignedCash as number) || 0,
+    actualBalance:
+      ((queries.dashboardSummary as Record<string, unknown>)?.actualBalance as number) || 0,
 
     // Loading states - maintain backward compatibility
     isLoading: queries.isLoading,

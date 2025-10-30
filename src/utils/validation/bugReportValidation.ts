@@ -31,7 +31,7 @@ export const validateBugReportForm = (
 
   return {
     isValid: false,
-    errors: result.error.errors.map((err) => err.message),
+    errors: result.error.issues.map((err) => err.message),
   };
 };
 
@@ -63,6 +63,6 @@ export const validateBugReportSubmission = (
 
   return {
     isValid: false,
-    error: result.error.errors[0]?.message || "Validation failed",
+    error: result.error.issues[0]?.message || "Validation failed",
   };
 };

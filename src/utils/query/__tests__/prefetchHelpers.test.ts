@@ -127,8 +127,8 @@ describe("prefetchHelpers", () => {
       ];
 
       const dateRange = {
-        start: "2024-01-01",
-        end: "2024-01-31",
+        start: new Date("2024-01-01"),
+        end: new Date("2024-01-31"),
       };
 
       (budgetDatabaseService.getTransactions as Mock).mockResolvedValue(mockTransactions);
@@ -143,7 +143,10 @@ describe("prefetchHelpers", () => {
       );
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
-        queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
+        queryKey: queryKeys.transactionsByDateRange(
+          dateRange.start.toISOString(),
+          dateRange.end.toISOString()
+        ),
         queryFn: expect.any(Function),
         staleTime: 60 * 1000,
       });
@@ -164,8 +167,8 @@ describe("prefetchHelpers", () => {
       }));
 
       const dateRange = {
-        start: "2024-01-01",
-        end: "2024-01-31",
+        start: new Date("2024-01-01"),
+        end: new Date("2024-01-31"),
       };
 
       (budgetDatabaseService.getTransactions as Mock).mockResolvedValue([]);

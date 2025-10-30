@@ -409,7 +409,7 @@ export const updateDebtOperation = async (options: UpdateDebtOptions) => {
 /**
  * Delete a debt and its related connections
  */
-export const deleteDebtOperation = async (options: DeleteDebtOptions) => {
+export const deleteDebtOperation = async (options: DeleteDebtOptions): Promise<void> => {
   const { debtId, bills, deleteBill, deleteDebtData } = options;
 
   try {
@@ -465,9 +465,9 @@ export const enrichDebtsWithRelations = (
     // Enrich the debt with calculated properties
     const enrichedDebt = enrichDebt(
       debt as unknown as DebtAccount,
-      relatedBill || null,
-      relatedEnvelope,
-      relatedTransactions
+      (relatedBill as unknown as import("@/db/types").Bill) || null,
+      relatedEnvelope as unknown as import("@/db/types").Envelope,
+      relatedTransactions as unknown as import("@/db/types").Transaction[]
     );
 
     // Log first debt enrichment details

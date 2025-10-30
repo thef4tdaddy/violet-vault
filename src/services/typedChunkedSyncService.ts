@@ -147,7 +147,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
       };
     }
 
-    const stats = rawStats as Record<string, unknown>;
+    const stats = rawStats as unknown as Record<string, unknown>;
     return {
       maxChunkSize: Number(stats.maxChunkSize) || 900 * 1024,
       maxArrayChunkSize: Number(stats.maxArrayChunkSize) || 5000,
