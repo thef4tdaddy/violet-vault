@@ -4,10 +4,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTransactionMutations } from "../useTransactionMutations";
 
 // Mock dependencies
-vi.mock("@tanstack/react-query", () => ({
-  useMutation: vi.fn(),
-  useQueryClient: vi.fn(),
-}));
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as Record<string, unknown>),
+    useMutation: vi.fn(),
+    useQueryClient: vi.fn(),
+  };
+});
 
 vi.mock("../../../services/budgetDatabaseService", () => ({
   default: {
@@ -26,7 +30,11 @@ vi.mock("../../../stores/ui/toastStore", () => ({
 
 vi.mock("../../../utils/common/logger", () => ({
   default: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
     error: vi.fn(),
+    log: vi.fn(),
   },
 }));
 
