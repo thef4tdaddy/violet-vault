@@ -60,7 +60,7 @@ class TypedFirebaseSyncServiceImpl implements TypedFirebaseSyncService {
       );
     }
 
-    firebaseSyncService.initialize(budgetId, encryptionKey);
+    firebaseSyncService.initialize(budgetId, encryptionKey as unknown as CryptoKey);
     logger.info("Typed Firebase sync service initialized", {
       budgetId: budgetId.substring(0, 8) + "...",
       hasEncryptionKey: true,

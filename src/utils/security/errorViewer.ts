@@ -23,8 +23,8 @@ class ErrorViewer {
     // Add friendly console message
     if (process.env.NODE_ENV === "development") {
       logger.info(
-        "%c🔍 VioletVault Error Viewer Available" as unknown as Record<string, unknown>,
-        "color: #8b5cf6; font-weight: bold; font-size: 14px"
+        "🔍 VioletVault Error Viewer Available",
+        { style: "color: #8b5cf6; font-weight: bold; font-size: 14px" }
       );
       logger.info("Use window.VioletVaultErrors.view() to see stored errors");
       logger.info("Other commands: .clear(), .export(), .count(), .latest(n)");

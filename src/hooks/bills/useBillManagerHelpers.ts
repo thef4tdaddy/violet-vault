@@ -142,7 +142,7 @@ export const categorizeBillsWithTotals = (bills: Bill[]) => {
   return { categorizedBills, totals };
 };
 
-interface CategorizedBills {
+export interface CategorizedBills {
   all: Bill[];
   upcoming: Bill[];
   overdue: Bill[];
@@ -150,7 +150,7 @@ interface CategorizedBills {
   [key: string]: Bill[];
 }
 
-interface FilterOptions {
+export interface FilterOptions {
   search?: string;
   urgency?: string;
   envelope?: string;

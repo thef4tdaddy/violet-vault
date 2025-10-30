@@ -30,7 +30,7 @@ const ConfirmationView: React.FC<ConfirmationViewProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const currentValue = parseFloat(value) || 0;
+  const currentValue = value || 0;
   const changeAmount = pendingValue - currentValue;
   const isIncrease = changeAmount > 0;
 
@@ -233,7 +233,7 @@ const EditableBalance = ({
 
   const handleStartEdit = () => {
     setIsEditing(true);
-    setEditValue(value?.toString() || "0");
+    setEditValue(String(value || 0));
   };
 
   const handleCancel = () => {

@@ -9,18 +9,15 @@ import SplitAllocationsSection from "./splitter/SplitAllocationsSection";
 import SplitTotals from "./splitter/SplitTotals";
 import SplitActions from "./splitter/SplitActions";
 
+import type { Transaction, Envelope } from "@/types/finance";
+
 interface TransactionSplitterProps {
   isOpen: boolean;
-  transaction: {
-    id: string;
-    amount: number;
-    description?: string;
-    date?: Date;
-  } | null;
+  transaction: Transaction | null;
   onClose?: () => void;
-  onSave?: (allocations: unknown[]) => void;
-  envelopes?: unknown[];
-  availableCategories?: unknown[];
+  onSave?: (splitTransactions: Transaction[], transaction: Transaction) => Promise<void>;
+  envelopes?: Envelope[];
+  availableCategories?: string[];
   className?: string;
 }
 
@@ -44,8 +41,8 @@ const TransactionSplitter = ({
   const handleSave = async () => {
     try {
       const success = await splitter.submitSplit();
-      if (success) {
-        onSave?.(splitter.splitAllocations);
+      if (success && transaction) {
+        onSave?.(splitter.splitAllocations as unknown as Transaction[], transaction);
         onClose?.();
       }
     } catch (error) {
@@ -59,9 +56,9 @@ const TransactionSplitter = ({
       const confirmed = await confirm({
         title: "Unsaved Changes",
         message: "You have unsaved changes. Are you sure you want to cancel?",
-        confirmText: "Discard Changes",
-        cancelText: "Keep Editing",
-        variant: "destructive",
+        confirmLabel: "Discard Changes",
+        cancelLabel: "Keep Editing",
+        destructive: true,
       });
       if (confirmed) {
         onClose?.();

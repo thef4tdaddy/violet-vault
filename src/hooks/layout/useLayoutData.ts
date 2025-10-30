@@ -71,7 +71,7 @@ export const useLayoutData = () => {
     isLoading: budgetData.isLoading || bills.isLoading,
 
     // Error states
-    hasError: !!budgetData.error || !!bills.error,
+    hasError: !!budgetData.envelopesError || !!budgetData.transactionsError || !!budgetData.billsError || !!budgetData.dashboardError,
   };
 };
 

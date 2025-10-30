@@ -17,7 +17,7 @@ export const useBudgetMetadataUtils = () => {
   const setBiweeklyAllocation = useCallback(
     async (amount: number) => {
       if (typeof amount !== "number" || isNaN(amount)) {
-        logger.warn("Invalid biweekly allocation:", amount);
+        logger.warn("Invalid biweekly allocation:", { amount });
         return false;
       }
 

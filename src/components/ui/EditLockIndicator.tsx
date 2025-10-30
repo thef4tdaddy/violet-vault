@@ -2,15 +2,25 @@ import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
 
 // Helper functions
-const getExpirationDate = (expiresAt) => {
+interface LockData {
+  expiresAt?: unknown;
+}
+
+const getExpirationDate = (expiresAt: unknown): Date => {
   if (!expiresAt) return new Date(0);
-  return expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
+  const data = expiresAt as unknown as { toDate?: () => Date };
+  return data?.toDate ? data.toDate() : new Date(expiresAt as unknown as number | string);
 };
 
-const calculateTimeRemaining = (lock) => {
+const calculateTimeRemaining = (lock: unknown) => {
   if (!lock) return { timeRemaining: 0, secondsRemaining: 0, minutesRemaining: 0 };
-  const expirationDate = getExpirationDate(lock.expiresAt);
-  const timeRemaining = Math.max(0, expirationDate - new Date());
+  const lockData = lock as unknown as LockData;
+  const expirationDate = getExpirationDate(lockData?.expiresAt);
+  const now = new Date();
+  const timeRemaining = Math.max(
+    0,
+    (expirationDate.getTime ? expirationDate.getTime() : Number(expirationDate)) - now.getTime()
+  );
   return {
     timeRemaining,
     secondsRemaining: Math.ceil(timeRemaining / 1000),

@@ -20,7 +20,7 @@ export const useLedgerOperations = (addTransaction, deleteTransaction, updateBil
     }
   };
 
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
+  const handleSplitTransaction = async (splitTransactions, originalTransaction) => {
     try {
       deleteTransaction(originalTransaction.id);
       for (const splitTransaction of splitTransactions) {

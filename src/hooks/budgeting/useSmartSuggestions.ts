@@ -44,7 +44,7 @@ const useSmartSuggestions = ({
 }) => {
   // Settings and state
   const [analysisSettings, setAnalysisSettings] = useState(DEFAULT_ANALYSIS_SETTINGS);
-  const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set());
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
   const [showSettings, setShowSettings] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Initialize from localStorage, default to expanded (false)

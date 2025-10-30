@@ -1,4 +1,3 @@
-import React from "react";
 import { useDebtDetailModal } from "@/hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
@@ -46,7 +45,14 @@ const DebtDetailModal = ({
     handleEdit,
     handleShowPaymentForm,
     handleCancelPayment,
-  } = useDebtDetailModal(debt, isOpen, onClose, onDelete, onRecordPayment, onEdit);
+  } = useDebtDetailModal({
+    debt,
+    isOpen,
+    onClose,
+    onDelete,
+    onRecordPayment,
+    onEdit,
+  });
 
   if (!isOpen || !debt) return null;
 

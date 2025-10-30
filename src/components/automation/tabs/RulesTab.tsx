@@ -1,4 +1,3 @@
-import React from "react";
 import { EmptyRulesList, RuleCard, CreateRuleButton, ExecuteAllButton } from "./RulesTabComponents";
 
 const RulesTab = ({

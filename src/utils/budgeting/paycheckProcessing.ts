@@ -91,6 +91,10 @@ export const createPaycheckRecord = async (
     id: `paycheck_${Date.now()}`,
     date: new Date(),
     amount: paycheckData.amount,
+    source: paycheckData.payerName || "Unknown",
+    lastModified: Date.now(),
+    createdAt: Date.now(),
+    // Additional custom fields
     mode: paycheckData.mode,
     unassignedCashBefore: currentBalances.unassignedCash,
     unassignedCashAfter: newBalances.unassignedCash,
@@ -101,7 +105,7 @@ export const createPaycheckRecord = async (
   };
 
   // Save paycheck record to Dexie
-  await budgetDb.paycheckHistory.add(paycheckRecord);
+  await budgetDb.paycheckHistory.add(paycheckRecord as never);
 
   logger.info("Paycheck processing completed successfully", {
     paycheckId: paycheckRecord.id,

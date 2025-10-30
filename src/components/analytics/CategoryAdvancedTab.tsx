@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui";
 
 const CategoryAdvancedTab = ({
@@ -20,7 +21,7 @@ const CategoryAdvancedTab = ({
         <div className="flex gap-2 flex-wrap">
           {dateRangeOptions.map((option) => (
             <Button
-              key={option.value}
+              key={option.value as string}
               onClick={() => onDateRangeChange(option.value)}
               className={`px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold ${
                 dateRange === option.value
@@ -28,7 +29,7 @@ const CategoryAdvancedTab = ({
                   : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
               }`}
             >
-              {option.label}
+              {option.label as React.ReactNode}
             </Button>
           ))}
         </div>
@@ -42,10 +43,10 @@ const CategoryAdvancedTab = ({
           <div className="space-y-2">
             {Array.from(dismissedSuggestions).map((suggestionId) => (
               <div
-                key={suggestionId}
+                key={suggestionId as string}
                 className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm rounded border border-gray-200 shadow-sm"
               >
-                <span className="text-sm text-purple-800 font-medium">{suggestionId}</span>
+                <span className="text-sm text-purple-800 font-medium">{String(suggestionId)}</span>
                 <Button
                   onClick={() => onUndismissSuggestion(suggestionId)}
                   className="text-emerald-600 hover:text-emerald-800 text-sm font-bold border border-emerald-300 px-2 py-1 rounded hover:bg-emerald-50 transition-all"

@@ -1,17 +1,7 @@
 import React, { createElement } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-
-interface BudgetCommit {
-  id?: string;
-  hash: string;
-  message: string;
-  author?: string;
-  timestamp?: string;
-  changes?: Array<Record<string, unknown>>;
-  deviceFingerprint?: string;
-  parentHash?: string;
-}
+import { BudgetCommit } from "@/domain/schemas";
 
 export const getAuthorColor = (author?: string) => {
   switch (author) {

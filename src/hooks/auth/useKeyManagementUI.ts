@@ -12,6 +12,27 @@ interface ValidationResult {
 }
 
 /**
+ * Shape of the import result returned by importAndLogin etc.
+ */
+export interface ImportResult {
+  success: boolean;
+  importResult: {
+    budgetId: string;
+    fingerprint: string;
+    exportedAt?: string;
+    deviceFingerprint?: string;
+  };
+  loginResult: {
+    success: boolean;
+    error?: string;
+    suggestion?: string;
+    code?: string;
+    canCreateNew?: boolean;
+    data?: unknown;
+  };
+}
+
+/**
  * Key management UI state
  */
 interface KeyManagementUIState {
@@ -25,7 +46,7 @@ interface KeyManagementUIState {
   showVaultPassword: boolean;
   keyFingerprint: string;
   copiedToClipboard: boolean;
-  importResult: unknown;
+  importResult: ImportResult | null;
   fileInputRef: React.RefObject<HTMLInputElement>;
 }
 
@@ -57,7 +78,7 @@ export const useKeyManagementUI = (): KeyManagementUIState & {
   resetState: () => void;
   handleClipboardSuccess: () => void;
   setKeyFingerprint: React.Dispatch<React.SetStateAction<string>>;
-  setImportResult: React.Dispatch<React.SetStateAction<unknown>>;
+  setImportResult: React.Dispatch<React.SetStateAction<ImportResult | null>>;
 } => {
   const [activeTab, setActiveTab] = useState<string>("export"); // export, import
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
@@ -69,7 +90,7 @@ export const useKeyManagementUI = (): KeyManagementUIState & {
   const [showVaultPassword, setShowVaultPassword] = useState<boolean>(false);
   const [keyFingerprint, setKeyFingerprint] = useState<string>("");
   const [copiedToClipboard, setCopiedToClipboard] = useState<boolean>(false);
-  const [importResult, setImportResult] = useState<unknown>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 

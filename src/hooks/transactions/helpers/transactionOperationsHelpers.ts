@@ -60,7 +60,7 @@ const toTransactionBase = (data: any): Parameters<typeof prepareTransactionForSt
  */
 export const addTransactionToDB = async (
   transactionData: Record<string, unknown>,
-  categoryRules: unknown[] = []
+  categoryRules: Array<{ keywords: string[]; category: string; name?: string }> = []
 ) => {
   logger.debug("Adding transaction", { id: transactionData.id });
 
@@ -69,7 +69,7 @@ export const addTransactionToDB = async (
     throw new Error("Invalid transaction data: " + validation.errors.join(", "));
   }
 
-  const categorized = categorizeTransaction(transactionData, categoryRules);
+  const categorized = categorizeTransaction(toTransactionBase(transactionData), categoryRules);
   const prepared = prepareTransactionForStorage(categorized);
   const dbTransaction = appTransactionToDbTransaction(prepared);
   const result = await budgetDb.transactions.add(dbTransaction);
@@ -173,7 +173,8 @@ export const splitTransactionInDB = async (
 export const transferFundsInDB = async (transferData: Record<string, unknown>) => {
   logger.debug("Creating transfer", transferData);
 
-  const [outgoingTxn, incomingTxn] = createTransferPair(toTransactionBase(transferData));
+  const baseTransfer = toTransactionBase(transferData) as Parameters<typeof createTransferPair>[0];
+  const [outgoingTxn, incomingTxn] = createTransferPair(baseTransfer);
 
   const dbOutgoing = appTransactionToDbTransaction(
     prepareTransactionForStorage(toTransactionBase(outgoingTxn))
@@ -201,7 +202,7 @@ export const bulkOperationOnTransactions = async (
   operation: string,
   transactions: Record<string, unknown>[],
   updates: Record<string, unknown>,
-  categoryRules: unknown[] = []
+  categoryRules: Array<{ keywords: string[]; category: string; name?: string }> = []
 ) => {
   logger.debug(`Bulk ${operation} operation`, { count: transactions.length });
 
@@ -229,7 +230,7 @@ export const bulkOperationOnTransactions = async (
       for (const txn of transactions) {
         const categorized = categorizeTransaction(
           toTransactionBase({ ...txn, ...updates }),
-          categoryRules
+          categoryRules as Array<{ keywords: string[]; category: string; name?: string }>
         );
         const prepared = prepareTransactionForStorage(toTransactionBase(categorized));
         const dbTransaction = appTransactionToDbTransaction(prepared);

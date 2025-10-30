@@ -29,7 +29,7 @@ const SuggestionBadge = ({ count, hasSuggestions }) => {
 };
 
 // Settings button component
-const SettingsButton = ({ _showSettings, onClick }) => {
+const SettingsButton = ({ onClick }) => {
   return (
     <Button onClick={onClick} variant="icon" size="sm" title="Settings">
       {React.createElement(getIcon("Settings"), {
@@ -45,7 +45,6 @@ const SuggestionsHeader = ({
   toggleCollapse,
   hasSuggestions,
   suggestions,
-  showSettings,
   toggleSettings,
 }) => (
   <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
@@ -68,7 +67,7 @@ const SuggestionsHeader = ({
 
     {!isCollapsed && (
       <div className="flex items-center space-x-2">
-        <SettingsButton showSettings={showSettings} onClick={toggleSettings} />
+        <SettingsButton onClick={toggleSettings} />
       </div>
     )}
   </div>
@@ -193,7 +192,6 @@ const SmartEnvelopeSuggestions = ({
         toggleCollapse={toggleCollapse}
         hasSuggestions={hasSuggestions}
         suggestions={suggestions}
-        showSettings={showSettings}
         toggleSettings={toggleSettings}
       />
 

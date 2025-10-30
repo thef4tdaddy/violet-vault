@@ -88,6 +88,7 @@ export class ReportSubmissionService {
     }
 
     const finalResult = {
+      success: !!successfulSubmission,
       overallSuccess: !!successfulSubmission,
       successfulProvider: successfulSubmission?.provider || null,
       attempts: results.length,
@@ -168,11 +169,11 @@ export class ReportSubmissionService {
 
   /**
    * Submit bug report to email (placeholder)
-   * @param {Object} reportData - Bug report data
+   * @param {Object} _reportData - Bug report data
    * @param {Object} emailConfig - Email configuration
    * @returns {Promise<Object>} Submission result
    */
-  static async submitToEmail(reportData, emailConfig) {
+  static async submitToEmail(_reportData, emailConfig) {
     try {
       logger.debug("Email submission requested", emailConfig);
 

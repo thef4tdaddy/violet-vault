@@ -161,7 +161,7 @@ export const useBugReportState = (): BugReportState => {
         const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
         setScreenshot(screenshotDataUrl);
       } catch (error) {
-        logger.warn("Manual screen capture failed:", error as Error);
+        logger.warn("Manual screen capture failed:", { error: error instanceof Error ? error.message : String(error) });
         addToast({
           type: "error",
           title: "Screen Capture Failed",

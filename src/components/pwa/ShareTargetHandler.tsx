@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getIcon } from "../../utils";
-import logger from "../../utils/common/logger";
+import { getIcon } from "@/utils";
+import logger from "@/utils/common/logger";
 
 /**
  * Share Target Handler
@@ -33,6 +33,7 @@ const ShareTargetHandler = () => {
         text,
         url,
         timestamp: new Date().toISOString(),
+        hasFiles: false,
       };
 
       // Check if there are files in the form data (for POST requests)

@@ -342,8 +342,9 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
 
 // Expose to window
 if (typeof window !== "undefined") {
-  (window as Window & { validateAllSyncFlows?: typeof validateAllSyncFlows }).validateAllSyncFlows =
-    validateAllSyncFlows;
+  (
+    window as unknown as Window & { validateAllSyncFlows?: typeof validateAllSyncFlows }
+  ).validateAllSyncFlows = validateAllSyncFlows;
 }
 
 export default validateAllSyncFlows;

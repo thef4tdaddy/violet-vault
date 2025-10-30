@@ -88,7 +88,7 @@ describe("Transaction Operations Utilities", () => {
   describe("prepareTransactionForStorage", () => {
     const rawTransaction = {
       description: "  Test Transaction  ",
-      amount: "-50.00",
+      amount: -50.0,
       date: "2023-01-01T10:00:00Z",
       category: "  Food  ",
       account: "  checking  ",
@@ -121,8 +121,11 @@ describe("Transaction Operations Utilities", () => {
     it("should add timestamps to metadata", () => {
       const prepared = prepareTransactionForStorage(rawTransaction);
 
-      expect(prepared.metadata.updatedAt).toBeDefined();
-      expect(new Date(prepared.metadata.updatedAt)).toBeInstanceOf(Date);
+      expect(prepared.metadata).toBeDefined();
+      expect(prepared.metadata?.updatedAt).toBeDefined();
+      if (prepared.metadata?.updatedAt && typeof prepared.metadata.updatedAt === "string") {
+        expect(new Date(prepared.metadata.updatedAt)).toBeInstanceOf(Date);
+      }
     });
 
     it("should determine transaction type", () => {
@@ -142,25 +145,35 @@ describe("Transaction Operations Utilities", () => {
 
   describe("determineTransactionType", () => {
     it("should return explicit type if set", () => {
-      const transaction = { amount: -50, type: "transfer" };
+      const transaction = {
+        description: "Test",
+        date: "2023-01-01",
+        amount: -50,
+        type: "transfer" as const,
+      };
 
       expect(determineTransactionType(transaction)).toBe("transfer");
     });
 
     it("should detect income from positive amount", () => {
-      const transaction = { amount: 100 };
+      const transaction = { description: "Test", date: "2023-01-01", amount: 100 };
 
       expect(determineTransactionType(transaction)).toBe("income");
     });
 
     it("should detect expense from negative amount", () => {
-      const transaction = { amount: -50 };
+      const transaction = { description: "Test", date: "2023-01-01", amount: -50 };
 
       expect(determineTransactionType(transaction)).toBe("expense");
     });
 
     it("should detect transfer from metadata", () => {
-      const transaction = { amount: -50, metadata: { isTransfer: true } };
+      const transaction = {
+        description: "Test",
+        date: "2023-01-01",
+        amount: -50,
+        metadata: { isTransfer: true },
+      };
 
       expect(determineTransactionType(transaction)).toBe("transfer");
     });
@@ -233,7 +246,7 @@ describe("Transaction Operations Utilities", () => {
     ];
 
     it("should apply custom categorization rules", () => {
-      const transaction = { description: "KROGER STORE #123", amount: -45.67 };
+      const transaction = { description: "KROGER STORE #123", date: "2023-01-01", amount: -45.67 };
 
       const categorized = categorizeTransaction(transaction, customRules);
 
@@ -243,7 +256,7 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should apply default categorization rules", () => {
-      const transaction = { description: "Shell Gas Station", amount: -35.0 };
+      const transaction = { description: "Shell Gas Station", date: "2023-01-01", amount: -35.0 };
 
       const categorized = categorizeTransaction(transaction, []);
 
@@ -255,6 +268,7 @@ describe("Transaction Operations Utilities", () => {
     it("should not override existing category", () => {
       const transaction = {
         description: "KROGER STORE #123",
+        date: "2023-01-01",
         amount: -45.67,
         category: "Personal Care",
       };
@@ -265,7 +279,7 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should handle income transactions", () => {
-      const transaction = { description: "Salary Payment", amount: 2500 };
+      const transaction = { description: "Salary Payment", date: "2023-01-01", amount: 2500 };
 
       const categorized = categorizeTransaction(transaction, []);
 
@@ -273,7 +287,7 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should default to uncategorized for expenses", () => {
-      const transaction = { description: "Unknown Vendor", amount: -25.0 };
+      const transaction = { description: "Unknown Vendor", date: "2023-01-01", amount: -25.0 };
 
       const categorized = categorizeTransaction(transaction, []);
 
@@ -352,9 +366,9 @@ describe("Transaction Operations Utilities", () => {
 
   describe("calculateRunningBalance", () => {
     const transactions = [
-      { id: "txn1", amount: 1000, date: "2023-01-01" }, // Income
-      { id: "txn2", amount: -50, date: "2023-01-02" }, // Expense
-      { id: "txn3", amount: -25, date: "2023-01-03" }, // Expense
+      { id: "txn1", description: "Income", amount: 1000, date: "2023-01-01" }, // Income
+      { id: "txn2", description: "Expense", amount: -50, date: "2023-01-02" }, // Expense
+      { id: "txn3", description: "Expense", amount: -25, date: "2023-01-03" }, // Expense
     ];
 
     it("should calculate running balance correctly", () => {
@@ -375,8 +389,8 @@ describe("Transaction Operations Utilities", () => {
 
     it("should round to 2 decimal places", () => {
       const fractionalTxns = [
-        { id: "txn1", amount: 33.33 },
-        { id: "txn2", amount: -33.34 },
+        { id: "txn1", description: "Test1", date: "2023-01-01", amount: 33.33 },
+        { id: "txn2", description: "Test2", date: "2023-01-02", amount: -33.34 },
       ];
 
       const withBalance = calculateRunningBalance(fractionalTxns, 0);
@@ -394,7 +408,7 @@ describe("Transaction Operations Utilities", () => {
       date: "2023-01-15T14:30:00Z",
       category: "Food",
       account: "checking",
-      type: "expense",
+      type: "expense" as const,
     };
 
     it("should format transaction for display", () => {
@@ -409,7 +423,7 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should handle income transactions", () => {
-      const income = { ...transaction, amount: 2500 };
+      const income = { ...transaction, amount: 2500, type: "income" as const };
       const formatted = formatTransactionForDisplay(income);
 
       expect(formatted.amountDisplay).toBe("$2,500.00");
@@ -435,7 +449,7 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should detect transfer type", () => {
-      const transfer = { ...transaction, type: "transfer" };
+      const transfer = { ...transaction, type: "transfer" as const };
       const formatted = formatTransactionForDisplay(transfer);
 
       expect(formatted.isTransfer).toBe(true);

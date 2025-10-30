@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ReactNode } from "react";
+import React, { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
@@ -63,7 +63,7 @@ interface MainContentProps {
   auth: unknown;
   layoutData: unknown;
   _onExport: () => void;
-  _onImport: (file: File) => Promise<void>;
+  _onImport: (event: React.ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; } } | undefined>;
   onLogout: () => void;
   onResetEncryption: () => void;
   onChangePassword: (oldPassword: string, newPassword: string) => Promise<void>;
@@ -218,9 +218,7 @@ const MainContent = ({
   const navigate = useNavigate();
 
   // Onboarding state
-  const isOnboarded = useOnboardingStore(
-    (state: Record<string, unknown>) => (state as Record<string, unknown>)?.isOnboarded as boolean
-  );
+  const isOnboarded = useOnboardingStore((state) => state.isOnboarded);
 
   // Extract layout data using helper
   const { budget, totalBiweeklyNeed, paycheckHistory } = extractLayoutData(layoutData);

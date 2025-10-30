@@ -40,7 +40,7 @@ function AutoFundingView() {
 
     setIsExecuting(true);
     try {
-      const result = await executeRules();
+      const result = await executeRules("manual");
 
       if (result.success && "execution" in result) {
         const resultWithExecution = result as {
@@ -108,7 +108,7 @@ function AutoFundingView() {
           handleDeleteRule={handleDeleteRule}
           handleToggleRule={handleToggleRule}
           handleExecuteRules={handleExecuteRules}
-          isExecuting={isExecuting}
+          isExecuting={isExecuting ? "true" : "false"}
           RulesTabComponent={RulesTab}
           HistoryTabComponent={HistoryTab}
         />

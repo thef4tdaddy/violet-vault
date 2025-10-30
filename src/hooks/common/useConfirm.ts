@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { create } from "zustand";
 import logger from "../../utils/common/logger";
 
@@ -10,6 +10,7 @@ interface ConfirmConfig {
   destructive?: boolean;
   icon?: string | null;
   onConfirm?: () => Promise<void> | void;
+  children?: React.ReactNode;
 }
 
 interface ConfirmStore {

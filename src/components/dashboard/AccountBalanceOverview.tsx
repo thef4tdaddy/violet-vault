@@ -54,9 +54,9 @@ const AccountBalanceOverview = ({
             onChange={onUpdateBalance}
             title="Bank Balance"
             subtitle="Click to edit your current checking account balance"
-            className="text-blue-900"
-            currencyClassName="text-2xl font-bold text-blue-900"
-            subtitleClassName="text-sm text-blue-700"
+            colorClass="text-blue-900"
+            bgClass="bg-blue-50"
+            hoverClass="hover:bg-blue-100"
           />
         </div>
 

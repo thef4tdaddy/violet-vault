@@ -425,8 +425,12 @@ const syncEdgeCaseTester = new SyncEdgeCaseTester();
 
 // Expose to window for debugging
 if (typeof window !== "undefined") {
-  window.syncEdgeCaseTester = syncEdgeCaseTester;
-  window.runSyncEdgeCaseTests = () => syncEdgeCaseTester.runAllTests();
+  (
+    window as unknown as typeof window & { syncEdgeCaseTester: typeof syncEdgeCaseTester }
+  ).syncEdgeCaseTester = syncEdgeCaseTester;
+  (
+    window as unknown as typeof window & { runSyncEdgeCaseTests: () => Promise<unknown> }
+  ).runSyncEdgeCaseTests = () => syncEdgeCaseTester.runAllTests();
 }
 
 export default syncEdgeCaseTester;

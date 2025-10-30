@@ -1,6 +1,6 @@
-import { useAnalyticsData } from "../../hooks/analytics/useAnalyticsData";
-import { useChartsAnalytics } from "../../hooks/analytics/useChartsAnalytics";
-import { useAnalyticsExport } from "../../hooks/analytics/useAnalyticsExport";
+import { useAnalyticsData } from "@/hooks/analytics/useAnalyticsData";
+import { useChartsAnalytics } from "@/hooks/analytics/useChartsAnalytics";
+import { useAnalyticsExport } from "@/hooks/analytics/useAnalyticsExport";
 import AnalyticsHeader from "./components/AnalyticsHeader";
 import MetricsGrid from "./components/MetricsGrid";
 import TabNavigation from "./components/TabNavigation";
@@ -142,8 +142,10 @@ const ChartsAnalytics = ({
 
       {/* Key Metrics */}
       <MetricsGrid
-        filteredTransactions={filteredTransactions}
-        metrics={metrics}
+        filteredTransactions={
+          (Array.isArray(filteredTransactions) ? filteredTransactions : []) as unknown as import("@/types/analytics").Transaction[]
+        }
+        metrics={(metrics || {}) as unknown as import("@/types/analytics").AnalyticsMetrics}
         envelopes={envelopes}
       />
 

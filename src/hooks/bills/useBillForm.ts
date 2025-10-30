@@ -10,10 +10,10 @@ import {
   getBillIcon,
   getBillIconOptions,
   getIconNameForStorage,
-} from "../../utils/common/billIcons";
-import { getBillCategories } from "../../constants/categories";
-import logger from "../../utils/common/logger";
-import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "../../types/bills";
+} from "@/utils/common/billIcons";
+import { getBillCategories } from "@/constants/categories";
+import logger from "@/utils/common/logger";
+import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "@/types/bills";
 import {
   getInitialFormData,
   calculateMonthlyAmountHelper,
@@ -22,7 +22,7 @@ import {
   normalizeDateFormatHelper,
   buildBillData,
 } from "./helpers/billFormHelpers";
-import { validateBillFormData } from "../../utils/validation/billFormValidation";
+import { validateBillFormData } from "@/utils/validation/billFormValidation";
 
 /**
  * Custom hook for bill form management
@@ -74,7 +74,7 @@ export const useBillForm = ({
   const iconSuggestions = useMemo(() => getBillIconOptions(formData.category), [formData.category]);
 
   // Available categories
-  const categories = useMemo(() => getBillCategories(), []);
+  const categories = useMemo(() => getBillCategories().slice(), []);
 
   // Form Submission
   const handleSubmit = useCallback(
@@ -91,12 +91,14 @@ export const useBillForm = ({
       setIsSubmitting(true);
 
       try {
+        const built = buildBillData(formData, editingBill, suggestedIconName) as unknown;
         const billData: Bill = {
-          ...buildBillData(formData, editingBill, suggestedIconName),
+          ...(built as Record<string, unknown>),
           id: editingBill?.id || uuidv4(),
-        };
+        } as Bill;
 
-        logger.debug("Submitting bill data:", billData);
+        // logger accepts unknown payloads; wrap in object to satisfy type expectations
+        logger.debug("Submitting bill data:", { billData });
 
         if (editingBill) {
           logger.debug("Updating existing bill", { billId: billData.id });

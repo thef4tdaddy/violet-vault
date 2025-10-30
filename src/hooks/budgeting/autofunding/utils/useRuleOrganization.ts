@@ -1,14 +1,9 @@
 import React, { useCallback } from "react";
 import logger from "@/utils/common/logger";
-
-interface Rule {
-  id: string;
-  priority?: number;
-  [key: string]: unknown;
-}
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface UseRuleOrganizationProps {
-  setRules: React.Dispatch<React.SetStateAction<Rule[]>>;
+  setRules: React.Dispatch<React.SetStateAction<AutoFundingRule[]>>;
 }
 
 /**

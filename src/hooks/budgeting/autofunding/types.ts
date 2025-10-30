@@ -9,6 +9,7 @@ import type {
   RuleSummary,
 } from "@/utils/budgeting/autofunding/rules";
 import type { Transaction, Envelope } from "@/types/finance";
+import type { ExecutionFilters } from "./useExecutionHistory";
 
 // Re-export commonly used types from rules.ts for convenience
 export type { AutoFundingRule, RuleStatistics, RuleSummary };
@@ -127,7 +128,7 @@ export interface UseAutoFundingHistoryReturn {
   undoStack: UndoStackEntry[];
   addToHistory: (execution: ExecutionHistoryEntry) => void;
   addToUndoStack: (execution: ExecutionDetails, results: RuleExecutionResult[]) => void;
-  getHistory: (filters?: Record<string, unknown>) => ExecutionHistoryEntry[];
+  getHistory: (limit?: number, filters?: ExecutionFilters) => ExecutionHistoryEntry[];
   getExecutionById: (executionId: string) => ExecutionHistoryEntry | undefined;
   clearHistory: () => void;
   cleanup: (maxHistoryAge?: number, maxUndoAge?: number) => void;

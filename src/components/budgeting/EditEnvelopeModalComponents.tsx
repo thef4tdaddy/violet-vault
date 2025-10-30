@@ -138,7 +138,7 @@ interface ModalContentProps {
     autoAllocate?: boolean;
   };
   errors: Record<string, string>;
-  calculatedAmounts: unknown;
+  calculatedAmounts: Record<string, number>;
   canEdit: boolean;
   canDelete: boolean;
   canSubmit: boolean;

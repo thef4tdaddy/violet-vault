@@ -69,6 +69,7 @@ export const importDataToDexie = async (data) => {
 
       await budgetDb.budget.put({
         id: "metadata",
+        lastModified: Date.now(),
         unassignedCash: data.unassignedCash || 0,
         biweeklyAllocation: data.biweeklyAllocation || 0,
         actualBalance: data.actualBalance || 0,

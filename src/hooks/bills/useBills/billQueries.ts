@@ -216,7 +216,6 @@ export const useBillQueryEvents = () => {
     const handleInvalidateAll = () => {
       logger.debug("Invalidating all bill queries");
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     };
 

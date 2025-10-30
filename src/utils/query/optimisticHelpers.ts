@@ -4,6 +4,7 @@ import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
 import { cloudSyncService } from "@/services/cloudSyncService";
+import type { SavingsGoal } from "@/db/types";
 
 /**
  * Enhanced optimistic update helpers with Dexie persistence for offline support.
@@ -274,7 +275,7 @@ export const optimisticHelpers = {
   /**
    * Add new savings goal optimistically
    */
-  addSavingsGoal: async (newGoal) => {
+  addSavingsGoal: async (newGoal: SavingsGoal) => {
     try {
       const goalWithTimestamp = {
         ...newGoal,
@@ -305,7 +306,7 @@ export const optimisticHelpers = {
   /**
    * Update savings goal optimistically
    */
-  updateSavingsGoal: async (goalId, updatedGoal) => {
+  updateSavingsGoal: async (goalId: string, updatedGoal: Partial<SavingsGoal>) => {
     try {
       // Update database
       await budgetDb.savingsGoals.update(goalId, {
@@ -334,7 +335,7 @@ export const optimisticHelpers = {
   /**
    * Delete savings goal optimistically
    */
-  deleteSavingsGoal: async (goalId) => {
+  deleteSavingsGoal: async (goalId: string) => {
     try {
       // Remove from database
       await budgetDb.savingsGoals.delete(goalId);

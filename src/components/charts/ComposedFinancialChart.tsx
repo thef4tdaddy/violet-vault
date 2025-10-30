@@ -1,3 +1,4 @@
+import React from "react";
 import {
   ComposedChart,
   Bar,
@@ -12,11 +13,14 @@ import {
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
+// Chart datum type
+type ChartDatum = Record<string, unknown>;
+
 // Helper to format currency values
-const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
+const formatCurrency = (value?: number) => `$${((value || 0) / 1000).toFixed(0)}K`;
 
 // Default series configuration for income/expense analysis
-const DEFAULT_SERIES = [
+const DEFAULT_SERIES: SeriesItem[] = [
   {
     type: "bar",
     dataKey: "income",
@@ -38,8 +42,20 @@ const DEFAULT_SERIES = [
   },
 ];
 
+// Series item type used by chart components
+type SeriesItem = {
+  type: string;
+  dataKey: string;
+  name?: string;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  dot?: boolean | Record<string, unknown>;
+  activeDot?: Record<string, unknown> | boolean;
+};
+
 // Helper to group series by type
-const groupSeriesByType = (seriesConfig) => {
+const groupSeriesByType = (seriesConfig: SeriesItem[]) => {
   return {
     barSeries: seriesConfig.filter((s) => s.type === "bar"),
     lineSeries: seriesConfig.filter((s) => s.type === "line"),
@@ -69,11 +85,27 @@ const ComposedFinancialChart = ({
   formatTooltip,
   xAxisKey = "month",
   ...props
+}: {
+  title?: string;
+  subtitle?: React.ReactNode;
+  data?: ChartDatum[];
+  series?: SeriesItem[];
+  height?: number;
+  className?: string;
+  loading?: boolean;
+  error?: unknown;
+  emptyMessage?: string;
+  actions?: React.ReactNode;
+  showGrid?: boolean;
+  showLegend?: boolean;
+  formatTooltip?: React.ComponentType<unknown> | ((props: unknown) => React.ReactNode);
+  xAxisKey?: string;
+  [key: string]: unknown;
 }) => {
   const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
 
-  // Use custom tooltip or default
-  const TooltipComponent = formatTooltip || CustomTooltip;
+  // Use custom tooltip or default; keep as a generic React component
+  const TooltipComponent = (formatTooltip as React.ComponentType<unknown>) || (CustomTooltip as React.ComponentType<unknown>);
 
   // Ensure data is valid
   const chartData = Array.isArray(data) ? data : [];
@@ -84,6 +116,32 @@ const ComposedFinancialChart = ({
   // Group series by type for rendering
   const { barSeries, lineSeries, areaSeries } = groupSeriesByType(seriesConfig);
 
+  // Normalize bar radius and maxBarSize types to match Recharts expected unions
+  const rawBarRadius = (chartTypeConfigs.bar && (chartTypeConfigs.bar.radius as unknown)) || 0;
+  let radiusValue: number | [number, number, number, number];
+  if (typeof rawBarRadius === "number") {
+    radiusValue = rawBarRadius;
+  } else if (Array.isArray(rawBarRadius)) {
+    if (rawBarRadius.length === 4) {
+      radiusValue = [
+        Number(rawBarRadius[0]) || 0,
+        Number(rawBarRadius[1]) || 0,
+        Number(rawBarRadius[2]) || 0,
+        Number(rawBarRadius[3]) || 0,
+      ];
+    } else if (rawBarRadius.length === 2) {
+      const [a, b] = rawBarRadius.map((v) => Number(v) || 0);
+      radiusValue = [a, b, a, b];
+    } else {
+      // Fallback to single number
+      radiusValue = Number(rawBarRadius[0]) || 0;
+    }
+  } else {
+    radiusValue = 0;
+  }
+
+  const maxBarSizeValue = Number((chartTypeConfigs.bar && chartTypeConfigs.bar.maxBarSize) as unknown) || undefined;
+
   return (
     <ChartContainer
       title={title}
@@ -93,7 +151,8 @@ const ComposedFinancialChart = ({
       loading={loading}
       error={error}
       emptyMessage={emptyMessage}
-      actions={actions}
+      actions={actions || []}
+      formatTooltip={TooltipComponent}
       dataTestId="composed-financial-chart"
     >
       {hasData && (
@@ -108,32 +167,35 @@ const ComposedFinancialChart = ({
           <XAxis dataKey={xAxisKey} stroke={chartDefaults.axis.stroke} fontSize={12} />
           <YAxis stroke={chartDefaults.axis.stroke} fontSize={12} tickFormatter={formatCurrency} />
 
-          <Tooltip content={<TooltipComponent />} />
+          {/* Render default tooltip here; formatTooltip is passed to ChartContainer for custom tooltip rendering there */}
+          <Tooltip />
           {showLegend && <Legend />}
 
           {/* Render Areas first (background) */}
-          {areaSeries.map((areaProps, index) => (
-            <Area
-              key={`area-${areaProps.dataKey}`}
-              type={chartTypeConfigs.area.type}
-              fillOpacity={chartTypeConfigs.area.fillOpacity}
-              strokeWidth={chartTypeConfigs.area.strokeWidth}
-              fill={areaProps.fill || getColorByCategory(areaProps.dataKey, index)}
-              stroke={
-                areaProps.stroke || areaProps.fill || getColorByCategory(areaProps.dataKey, index)
-              }
-              {...areaProps}
-            />
-          ))}
+          {areaSeries.map((areaProps, index) =>
+            areaProps && (areaProps as { dataKey?: string }).dataKey ? (
+              <Area
+                key={`area-${(areaProps as SeriesItem).dataKey}`}
+                dataKey={(areaProps as SeriesItem).dataKey} // Add dataKey prop here
+                fillOpacity={chartTypeConfigs.area.fillOpacity as number}
+                strokeWidth={(chartTypeConfigs.area.strokeWidth as number) || undefined}
+                fill={(areaProps as SeriesItem).fill || getColorByCategory((areaProps as SeriesItem).dataKey, index)}
+                stroke={
+                  ((areaProps as SeriesItem).stroke as string) || ((areaProps as SeriesItem).fill as string) || getColorByCategory((areaProps as SeriesItem).dataKey, index)
+                }
+                {...(areaProps as Record<string, unknown>)}
+              />
+            ) : null
+          )}
 
           {/* Render Bars */}
           {barSeries.map((barProps, index) => (
             <Bar
               key={`bar-${barProps.dataKey}`}
-              radius={chartTypeConfigs.bar.radius}
-              maxBarSize={chartTypeConfigs.bar.maxBarSize}
+              radius={radiusValue as number | [number, number, number, number]}
+              maxBarSize={maxBarSizeValue}
               fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
-              {...barProps}
+              {...(barProps as Record<string, unknown>)}
             />
           ))}
 
@@ -141,12 +203,11 @@ const ComposedFinancialChart = ({
           {lineSeries.map((lineProps, index) => (
             <Line
               key={`line-${lineProps.dataKey}`}
-              type={chartTypeConfigs.line.type}
-              strokeWidth={lineProps.strokeWidth || chartTypeConfigs.line.strokeWidth}
+              strokeWidth={(lineProps.strokeWidth as number) || (chartTypeConfigs.line.strokeWidth as number)}
               dot={lineProps.dot !== undefined ? lineProps.dot : chartTypeConfigs.line.dot}
               activeDot={lineProps.activeDot || chartTypeConfigs.line.activeDot}
-              stroke={lineProps.stroke || getColorByCategory(lineProps.dataKey, index)}
-              {...lineProps}
+              stroke={(lineProps.stroke as string) || getColorByCategory(lineProps.dataKey, index)}
+              {...(lineProps as Record<string, unknown>)}
             />
           ))}
         </ComposedChart>
@@ -205,7 +266,15 @@ export const BudgetVsActualChart = ({
   ];
 
   return (
-    <ComposedFinancialChart title={title} data={data} series={series} xAxisKey="name" {...props} />
+    <ComposedFinancialChart
+      title={title}
+      data={data}
+      series={series}
+      subtitle=""
+      actions={[]}
+      formatTooltip={() => null}
+      {...props}
+    />
   );
 };
 

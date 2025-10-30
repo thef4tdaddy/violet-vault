@@ -50,7 +50,7 @@ export const DebtBasicInfo = ({ formData, setFormData, errors, canEdit }) => {
         >
           {Object.entries(DEBT_TYPE_CONFIG).map(([key, config]) => (
             <option key={key} value={key}>
-              {config.label}
+              {config.name}
             </option>
           ))}
         </Select>
@@ -203,9 +203,9 @@ export const DebtPaymentDetails = ({ formData, setFormData, errors, canEdit }) =
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
           disabled={!canEdit}
         >
-          {PAYMENT_FREQUENCIES.map((freq) => (
-            <option key={freq.value} value={freq.value}>
-              {freq.label}
+          {Object.entries(PAYMENT_FREQUENCIES).map(([key, value]) => (
+            <option key={value} value={value}>
+              {key.charAt(0) + key.slice(1).toLowerCase()}
             </option>
           ))}
         </Select>

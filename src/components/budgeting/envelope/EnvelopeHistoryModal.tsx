@@ -45,7 +45,7 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
               objectType="envelope"
               objectId={envelope.id}
               objectName={envelope.name}
-              showModal={false} // We're already in a modal
+              onClose={onClose}
             />
           </Suspense>
         </div>
