@@ -8,10 +8,7 @@ import logger from "../common/logger";
  * Zod schema for share code validation
  */
 export const ShareCodeSchema = z
-  .string({
-    required_error: "Share code is required",
-    invalid_type_error: "Share code must be a string",
-  })
+  .string({ message: "Share code must be a string" })
   .min(1, "Share code cannot be empty")
   .trim();
 
@@ -24,7 +21,7 @@ export const isValidShareCode = (code: string): boolean => {
   if (!result.success) {
     logger.warn("isValidShareCode validation failed:", {
       code,
-      errors: result.error.errors,
+      errors: result.error.issues,
     });
     return false;
   }

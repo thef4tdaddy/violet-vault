@@ -48,10 +48,10 @@ export const validateComponentProps = <T extends z.ZodType>(
       path: issue.path.join("."),
       message: issue.message,
       received:
-        issue.code === "invalid_type" ? (issue as z.ZodInvalidTypeIssue).received : undefined,
+        issue.code === "invalid_type" ? (issue as { received?: string }).received : undefined,
     }));
 
-    logger.warn(`📋 Validation errors for ${componentName}:`, formattedErrors);
+    logger.warn(`📋 Validation errors for ${componentName}:`, { errors: formattedErrors });
 
     return false;
   }

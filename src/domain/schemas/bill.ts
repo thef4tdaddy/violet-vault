@@ -19,9 +19,7 @@ export type BillFrequency = z.infer<typeof BillFrequencySchema>;
 export const BillSchema = z.object({
   id: z.string().min(1, "Bill ID is required"),
   name: z.string().min(1, "Bill name is required").max(100),
-  dueDate: z.union([z.date(), z.string()], {
-    errorMap: () => ({ message: "Due date must be a valid date" }),
-  }),
+  dueDate: z.union([z.date(), z.string()]),
   amount: z.number().min(0, "Amount cannot be negative"),
   category: z.string().min(1, "Category is required"),
   isPaid: z.boolean().default(false),

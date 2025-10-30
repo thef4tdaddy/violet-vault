@@ -116,46 +116,28 @@ export const DebtFormSchema = z
     paymentFrequency: PaymentFrequencySchema.optional().default("monthly"),
     compoundFrequency: CompoundFrequencySchema.optional().default("monthly"),
     // Support both string and number inputs for numeric fields (from form inputs)
-    currentBalance: z
-      .union([z.string(), z.number()])
-      .pipe(
-        z.coerce
-          .number({
-            invalid_type_error: "Valid current balance is required",
-          })
-          .min(0, "Valid current balance is required")
-      )
+    currentBalance: z.coerce
+      .number({ message: "Valid current balance is required" })
+      .min(0, "Valid current balance is required")
       .optional(),
-    balance: z.union([z.string(), z.number()]).pipe(z.coerce.number().min(0)).optional(), // Alias for currentBalance
-    minimumPayment: z
-      .union([z.string(), z.number()])
-      .pipe(
-        z.coerce
-          .number({
-            invalid_type_error: "Valid minimum payment is required",
-          })
-          .min(0, "Valid minimum payment is required")
-      )
+    balance: z.coerce.number().min(0).optional(), // Alias for currentBalance
+    minimumPayment: z.coerce
+      .number({ message: "Valid minimum payment is required" })
+      .min(0, "Valid minimum payment is required")
       .optional(),
-    interestRate: z
-      .union([z.string(), z.number()])
-      .pipe(
-        z.coerce
-          .number({
-            invalid_type_error: "Interest rate must be a number",
-          })
-          .min(0, "Interest rate must be between 0 and 100")
-          .max(100, "Interest rate must be between 0 and 100")
-      )
+    interestRate: z.coerce
+      .number({ message: "Interest rate must be a number" })
+      .min(0, "Interest rate must be between 0 and 100")
+      .max(100, "Interest rate must be between 0 and 100")
       .optional()
       .default(0),
-    originalBalance: z
-      .union([z.string(), z.number()])
-      .pipe(z.coerce.number().min(0, "Original balance must be positive"))
+    originalBalance: z.coerce
+      .number()
+      .min(0, "Original balance must be positive")
       .optional()
       .nullable(),
     notes: z.string().max(500, "Notes must be 500 characters or less").optional().default(""),
-    specialTerms: z.record(z.unknown()).optional(),
+    specialTerms: z.record(z.string(), z.unknown()).optional(),
     // Connection fields
     paymentMethod: z.string().optional(),
     createBill: z.boolean().optional(),

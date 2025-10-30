@@ -81,7 +81,7 @@ export const withResponsiveModal = (ModalComponent: React.ComponentType<Record<s
     if (isMobile && props?.isOpen) {
       return (
         <SlideUpModal
-          isOpen={props.isOpen}
+          isOpen={Boolean(props.isOpen)}
           onClose={props.onClose}
           title={props.title || "Modal"}
           height="auto"

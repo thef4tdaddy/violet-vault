@@ -12,22 +12,24 @@ const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
 
 // Helper function to get axis configuration based on orientation
 const getAxisConfig = (isHorizontal: boolean, chartDefaults: Record<string, unknown>) => {
+  const axisStroke = (chartDefaults.axis as Record<string, unknown>)?.stroke as string;
+  
   if (isHorizontal) {
     const xType = "number" as XAxisProps["type"];
     const yType = "category" as XAxisProps["type"];
     return {
-      XAxis: { type: xType, stroke: chartDefaults.axis.stroke },
+      XAxis: { type: xType, stroke: axisStroke },
       YAxis: {
         dataKey: "name",
         type: yType,
-        stroke: chartDefaults.axis.stroke,
+        stroke: axisStroke,
         width: 100,
       },
     };
   }
   return {
-    XAxis: { dataKey: "name", stroke: chartDefaults.axis.stroke },
-    YAxis: { stroke: chartDefaults.axis.stroke },
+    XAxis: { dataKey: "name", stroke: axisStroke },
+    YAxis: { stroke: axisStroke },
   };
 };
 

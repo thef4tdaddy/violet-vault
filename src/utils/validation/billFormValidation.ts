@@ -16,5 +16,5 @@ export const validateBillFormData = (formData: BillFormData): string[] => {
     return [];
   }
 
-  return result.error.errors.map((err) => err.message);
+  return result.error.issues.map((err) => err.message);
 };
