@@ -124,9 +124,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       {/* Transactions Table */}
       <TransactionTable
         transactions={paginatedTransactions}
-        envelopes={envelopes}
+        envelopes={envelopes as never}
         onEdit={startEdit}
-        onDelete={(id) => deleteTransaction(id as string | number)}
+        onDelete={(id) => deleteTransaction(id.toString())}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
 
@@ -142,9 +142,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         isOpen={showAddModal}
         onClose={handleCloseModal}
         editingTransaction={editingTransaction}
-        transactionForm={transactionForm}
+        transactionForm={transactionForm as never}
         setTransactionForm={setTransactionForm}
-        envelopes={envelopes}
+        envelopes={envelopes as never}
         categories={[...TRANSACTION_CATEGORIES]}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={handleSuggestEnvelope}
@@ -171,7 +171,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
-        envelopes={envelopes}
+        envelopes={envelopes as never}
         availableCategories={[...TRANSACTION_CATEGORIES]}
         onSave={handleSplitTransaction}
       />

@@ -6,6 +6,13 @@ import logger from "../../utils/common/logger";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
 
+// Local Envelope interface with minimal required properties
+interface Envelope {
+  id: string;
+  name: string;
+  envelopeType?: string;
+}
+
 interface TransactionBasicFieldsProps {
   transactionForm: TransactionFormData;
   setTransactionForm: (form: TransactionFormData) => void;
@@ -177,12 +184,6 @@ export const TransactionDetailsFields = ({
     </>
   );
 };
-
-interface Envelope {
-  id: string;
-  name: string;
-  envelopeType?: string;
-}
 
 interface TransactionEnvelopeSelectorProps {
   transactionForm: TransactionFormData;

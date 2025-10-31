@@ -1,9 +1,13 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import type { Transaction } from "@/types/finance";
+
+// Minimal transaction interface for summary calculations
+interface TransactionForSummary {
+  amount: number;
+}
 
 interface TransactionSummaryProps {
-  transactions?: Transaction[];
+  transactions?: TransactionForSummary[];
 }
 
 const TransactionSummary: React.FC<TransactionSummaryProps> = ({ transactions = [] }) => {

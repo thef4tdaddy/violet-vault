@@ -6,8 +6,15 @@ import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
-import type { Transaction, Envelope } from "@/types/finance";
+import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
+
+// Local Envelope interface with minimal required properties
+interface Envelope {
+  id: string | number;
+  name: string;
+  envelopeType?: string;
+}
 
 interface BillPayment {
   billId: string | number;
@@ -56,8 +63,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   }, [isOpen, budgetId, currentUser]);
 
   // Edit locking for the transaction (only when editing existing transaction)
-  const editLock = useEditLock("transaction", editingTransaction?.id, {
-    autoAcquire: isOpen && editingTransaction?.id, // Only auto-acquire for edits
+  const editLock = useEditLock("transaction", editingTransaction?.id?.toString(), {
+    autoAcquire: isOpen && !!editingTransaction?.id, // Only auto-acquire for edits
     autoRelease: true,
     showToasts: true,
   });
@@ -134,7 +141,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           canEdit={editLock.canEdit}
           editingTransaction={editingTransaction}
           lockedBy={editLock.lockedBy}
-          envelopes={envelopes}
+          envelopes={envelopes as never}
           categories={categories}
           suggestEnvelope={suggestEnvelope}
         />

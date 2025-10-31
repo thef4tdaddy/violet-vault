@@ -1,10 +1,14 @@
 import React from "react";
 import PageSummaryCard from "../ui/PageSummaryCard";
 import { getIcon } from "../../utils";
-import type { Transaction } from "@/types/finance";
+
+// Minimal transaction interface for summary calculations
+interface TransactionForSummary {
+  amount: number;
+}
 
 interface TransactionSummaryCardsProps {
-  transactions?: Transaction[];
+  transactions?: TransactionForSummary[];
 }
 
 /**

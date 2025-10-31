@@ -7,8 +7,15 @@ import {
   TransactionReceiptSection,
   TransactionFormActions,
 } from "./TransactionFormSections";
-import type { Transaction, Envelope } from "@/types/finance";
+import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
+
+// Local Envelope interface with minimal required properties
+interface Envelope {
+  id: string;
+  name: string;
+  envelopeType?: string;
+}
 
 interface TransactionFormFieldsProps {
   transactionForm: TransactionFormData;
