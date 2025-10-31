@@ -13,22 +13,68 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Label PR
-        uses: actions/labeler@v6
-        with:
-          configuration-path: .github/labeler.yml
-        continue-on-error: true
-
-      - name: Check for missing labels
-        uses: actions/github-script@v7
+      - name: Label PR based on commit types
+        uses: actions/github-script@v8
         with:
           script: |
-            const expectedLabels = ['feature', 'bug', 'chore', 'docs', 'refactor', 'testing', 'typescript', 'performance', 'security'];
+            // Get PR commits
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // Extract commit types from conventional commits
+            const commitTypes = new Set();
+            for (const commit of commits) {
+              const message = commit.commit.message.split('\n')[0];
+              const match = message.match(/^(\w+)(\(.+?\))?:/);
+              if (match) {
+                commitTypes.add(match[1]);
+              }
+            }
+
+            // Map commit types to labels
+            const typeToLabel = {
+              'feat': 'Feature',
+              'fix': 'bug',
+              'chore': 'Chore',
+              'docs': 'documentation',
+              'refactor': 'Refactor',
+              'test': 'testing',
+              'perf': 'performance',
+              'style': 'UX'
+            };
+
+            const labelsToAdd = [];
+            for (const type of commitTypes) {
+              const label = typeToLabel[type];
+              if (label) {
+                labelsToAdd.push(label);
+              }
+            }
+
+            // Apply labels if we found any
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: labelsToAdd
+              });
+              console.log(`Applied labels: ${labelsToAdd.join(', ')}`);
+            }
+
+      - name: Verify labels exist (silent check)
+        uses: actions/github-script@v8
+        with:
+          script: |
+            // Check that the labels we're trying to use actually exist
+            const expectedLabels = ['Feature', 'bug', 'Chore', 'documentation', 'Refactor', 'testing', 'performance', 'UX'];
 
             try {
-              // Get existing labels in the repository
               const { data: repoLabels } = await github.rest.issues.listLabelsForRepo({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -39,12 +85,11 @@ jobs:
               const missingLabels = expectedLabels.filter(label => !existingLabelNames.includes(label));
 
               if (missingLabels.length > 0) {
-                await github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: `⚠️ **Missing Repository Labels**\n\nThe labeler tried to apply these labels but they don't exist in the repository:\n\n${missingLabels.map(l => `- \`${l}\``).join('\n')}\n\nPlease create these labels in [repository settings](https://github.com/${context.repo.owner}/${context.repo.repo}/labels) to enable automatic PR labeling.`
-                });
+                console.log('⚠️ Warning: These labels are used in workflow but do not exist:', missingLabels.join(', '));
+                console.log('Create them at: https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/labels');
+                // Don't comment - just log for debugging
+              } else {
+                console.log('✅ All expected labels exist');
               }
             } catch (error) {
               console.log('Label check skipped:', error.message);

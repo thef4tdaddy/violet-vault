@@ -37,10 +37,10 @@ jobs:
               'documentation': ['docs', 'documentation', 'readme', 'guide', 'tutorial'],
               'testing': ['test', 'tests', 'testing', 'coverage', 'qa'],
               'performance': ['performance', 'slow', 'optimize', 'speed', 'lag', 'memory'],
-              'security': ['security', 'vulnerability', 'cve', 'exploit', 'authentication', 'encryption'],
+              'security': ['security', 'vulnerability', 'cve', 'exploit'],
               'accessibility': ['a11y', 'accessibility', 'wcag', 'keyboard', 'screen reader'],
-              'question': ['question', 'how do i', 'how to', 'help', '?'],
-              'good first issue': ['good first issue', 'beginner', 'easy fix']
+              'question': ['question', 'how do i', 'how to', 'help', '?']
+              // Removed 'good first issue' - too broad, apply manually
             };
 
             // Component-based labels
@@ -115,15 +115,12 @@ jobs:
               console.log(`Applied labels: ${uniqueLabels.join(', ')}`);
             }
 
-            // Comment about missing labels
+            // Log missing labels (don't spam with comments)
             if (missing.length > 0) {
               const uniqueMissing = [...new Set(missing)];
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `⚠️ **Missing Labels**\n\nThe auto-labeler detected these categories but the labels don't exist:\n\n${uniqueMissing.map(l => `- \`${l}\``).join('\n')}\n\nPlease create them in [repository settings](https://github.com/${context.repo.owner}/${context.repo.repo}/labels) if needed.`
-              });
+              console.log('⚠️ Missing labels detected (not created):', uniqueMissing.join(', '));
+              console.log('Create these labels at: https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/labels');
+              // Don't post comment - it spams issues unnecessarily
             }
 
   triage:
