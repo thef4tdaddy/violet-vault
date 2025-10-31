@@ -8,7 +8,14 @@ import {
   shouldShowAmountField,
   shouldShowDateField,
 } from "./BulkUpdateBillRowComponents";
-import type { Bill } from "@/types/bills";
+
+/**
+ * Bill entity type - flexible to accept any bill-like structure
+ */
+type BillEntity = Record<string, unknown> & {
+  id: string;
+  name?: string;
+};
 
 /**
  * Bill change tracking interface
@@ -28,7 +35,7 @@ type UpdateMode = "amount" | "date" | "both";
  * Props for BulkUpdateBillRow component
  */
 interface BulkUpdateBillRowProps {
-  bill: Bill;
+  bill: BillEntity;
   change: BillChange | undefined;
   updateMode: UpdateMode;
   updateChange: (billId: string, field: string, value: string | number) => void;

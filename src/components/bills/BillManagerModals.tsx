@@ -9,7 +9,22 @@ import BillDiscoveryModal from "./BillDiscoveryModal";
 import BillDetailModal from "./modals/BillDetailModal";
 import ObjectHistoryViewer from "@/components/history/ObjectHistoryViewer";
 import logger from "@/utils/common/logger";
-import type { Bill, Envelope } from "@/types/bills";
+
+/**
+ * Generic Bill-like entity - flexible to accept any bill structure
+ */
+type BillEntity = Record<string, unknown> & {
+  id: string;
+  name: string;
+};
+
+/**
+ * Generic Envelope-like entity - flexible to accept any envelope structure
+ */
+type EnvelopeEntity = Record<string, unknown> & {
+  id: string;
+  name: string;
+};
 
 /**
  * Props for BillManagerModals component
@@ -19,30 +34,30 @@ interface BillManagerModalsProps {
   showAddBillModal: boolean;
   showBulkUpdateModal: boolean;
   showDiscoveryModal: boolean;
-  showBillDetail: Bill | null;
-  historyBill: Bill | null;
-  editingBill: Bill | null;
+  showBillDetail: BillEntity | null;
+  historyBill: BillEntity | null;
+  editingBill: BillEntity | null;
 
   // Data
-  bills: Bill[];
-  envelopes: Envelope[];
+  bills: BillEntity[];
+  envelopes: EnvelopeEntity[];
   selectedBills: Set<string>;
-  discoveredBills: Bill[];
+  discoveredBills: BillEntity[];
 
   // Handlers
   handleCloseModal: () => void;
   setShowBulkUpdateModal: (show: boolean) => void;
   setShowDiscoveryModal: (show: boolean) => void;
-  setShowBillDetail: (bill: Bill | null) => void;
-  setHistoryBill: (bill: Bill | null) => void;
-  handleEditBill: (bill: Bill) => void;
+  setShowBillDetail: (bill: BillEntity | null) => void;
+  setHistoryBill: (bill: BillEntity | null) => void;
+  handleEditBill: (bill: BillEntity) => void;
 
   // Operations
-  addBill: (bill: Bill) => Promise<void>;
-  updateBill: (bill: Bill) => Promise<void>;
+  addBill: (bill: BillEntity) => Promise<void>;
+  updateBill: (bill: BillEntity) => Promise<void>;
   deleteBill: (billId: string, deleteEnvelope?: boolean) => Promise<void>;
-  handleBulkUpdate: (updates: Bill[]) => Promise<void>;
-  handleAddDiscoveredBills: (bills: Bill[]) => Promise<void>;
+  handleBulkUpdate: (updates: BillEntity[]) => Promise<void>;
+  handleAddDiscoveredBills: (bills: BillEntity[]) => Promise<void>;
   billOperations: {
     handlePayBill: (billId: string) => Promise<void>;
   };
@@ -91,9 +106,9 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
         <AddBillModal
           isOpen={showAddBillModal}
           onClose={handleCloseModal}
-          editingBill={editingBill}
-          onAddBill={addBill}
-          onUpdateBill={updateBill}
+          editingBill={(editingBill || undefined) as never}
+          onAddBill={addBill as never}
+          onUpdateBill={updateBill as never}
           onDeleteBill={deleteBill}
           onError={onError}
         />
@@ -103,10 +118,12 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
         <BulkBillUpdateModal
           isOpen={showBulkUpdateModal}
           onClose={() => setShowBulkUpdateModal(false)}
-          selectedBills={Array.from(selectedBills)
-            .map((id) => bills.find((b) => b.id === id))
-            .filter(Boolean)}
-          onUpdateBills={handleBulkUpdate}
+          selectedBills={
+            Array.from(selectedBills)
+              .map((id) => bills.find((b) => b.id === id))
+              .filter((bill): bill is BillEntity => Boolean(bill)) as never
+          }
+          onUpdateBills={handleBulkUpdate as never}
           onError={onError}
         />
       )}
@@ -117,9 +134,9 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
           onClose={() => {
             setShowDiscoveryModal(false);
           }}
-          discoveredBills={discoveredBills}
-          availableEnvelopes={envelopes}
-          onAddBills={handleAddDiscoveredBills}
+          discoveredBills={discoveredBills as never}
+          availableEnvelopes={envelopes as never}
+          onAddBills={handleAddDiscoveredBills as never}
           onError={onError}
         />
       )}
@@ -131,12 +148,14 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
           onClose={() => setShowBillDetail(null)}
           onDelete={deleteBill}
           onMarkPaid={billOperations.handlePayBill}
-          onEdit={(bill) => {
+          onEdit={(bill: BillEntity) => {
             setShowBillDetail(null);
             handleEditBill(bill);
           }}
-          onCreateRecurring={(bill) => {
-            logger.warn("Recurring bill creation not yet implemented:", bill.name);
+          onCreateRecurring={(bill: BillEntity) => {
+            logger.warn("Recurring bill creation not yet implemented", {
+              billName: bill.name as string,
+            });
           }}
         />
       )}

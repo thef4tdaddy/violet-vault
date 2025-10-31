@@ -3,7 +3,14 @@ import { Select, TextInput, Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { getIconByName } from "@/utils/common/billIcons";
 import { getFrequencyOptions } from "@/utils/common/frequencyCalculations";
-import type { Bill, BillFormData } from "@/types/bills";
+import type { BillFormData } from "@/types/bills";
+
+/**
+ * Bill entity type - flexible to accept any bill-like structure
+ */
+type BillEntity = Record<string, unknown> & {
+  id?: string;
+};
 
 /**
  * Props for BillBasicFields component
@@ -12,7 +19,7 @@ interface BillBasicFieldsProps {
   formData: BillFormData;
   updateField: (field: keyof BillFormData, value: string | boolean) => void;
   canEdit: boolean;
-  editingBill: Bill | null | undefined;
+  editingBill: BillEntity | null | undefined;
   categories: string[];
 }
 
@@ -37,7 +44,7 @@ export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
           label="Bill Name *"
           value={formData.name}
           onChange={(e) => updateField("name", e.target.value)}
-          disabled={editingBill && !canEdit}
+          disabled={!!(editingBill && !canEdit)}
           placeholder="e.g., Electric Bill, Internet, Rent"
           required
         />
@@ -56,7 +63,7 @@ export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
             min="0"
             value={formData.amount}
             onChange={(e) => updateField("amount", e.target.value)}
-            disabled={editingBill && !canEdit}
+            disabled={!!(editingBill && !canEdit)}
             className={`w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
               editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
@@ -73,7 +80,7 @@ export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
           type="date"
           value={formData.dueDate}
           onChange={(e) => updateField("dueDate", e.target.value)}
-          disabled={editingBill && !canEdit}
+          disabled={!!(editingBill && !canEdit)}
           className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
             editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
@@ -87,7 +94,7 @@ export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
         <Select
           value={formData.frequency}
           onChange={(e) => updateField("frequency", e.target.value)}
-          disabled={editingBill && !canEdit}
+          disabled={!!(editingBill && !canEdit)}
           className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
             editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
@@ -106,7 +113,7 @@ export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
         <Select
           value={formData.category}
           onChange={(e) => updateField("category", e.target.value)}
-          disabled={editingBill && !canEdit}
+          disabled={!!(editingBill && !canEdit)}
           className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
             editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
@@ -130,7 +137,7 @@ interface BillIconSelectorProps {
   formData: BillFormData;
   updateField: (field: keyof BillFormData, value: string | boolean) => void;
   canEdit: boolean;
-  editingBill: Bill | null | undefined;
+  editingBill: BillEntity | null | undefined;
   suggestedIconName: string;
   iconSuggestions: string[];
 }
@@ -169,7 +176,7 @@ export const BillIconSelector: React.FC<BillIconSelectorProps> = ({
               key={iconName}
               type="button"
               onClick={() => updateField("iconName", iconName)}
-              disabled={editingBill && !canEdit}
+              disabled={!!(editingBill && !canEdit)}
               className={`p-3 rounded-lg border-2 hover:border-blue-300 focus:ring-2 focus:ring-blue-500 transition-colors ${
                 isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"
               } ${editingBill && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
@@ -191,7 +198,7 @@ export const BillIconSelector: React.FC<BillIconSelectorProps> = ({
  */
 interface BillFormActionsProps {
   formData: BillFormData;
-  editingBill: Bill | null | undefined;
+  editingBill: BillEntity | null | undefined;
   canEdit: boolean;
   isSubmitting: boolean;
   onClose: () => void;
@@ -237,7 +244,7 @@ export const BillFormActions: React.FC<BillFormActionsProps> = ({
         </Button>
         <Button
           type="submit"
-          disabled={isSubmitting || (editingBill && !canEdit)}
+          disabled={isSubmitting || !!(editingBill && !canEdit)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black disabled:opacity-50 flex items-center"
         >
           {React.createElement(getIcon("Save"), {

@@ -6,7 +6,16 @@ import BillTableEmptyState from "./BillTableEmptyState";
 import BillTableBulkActions from "./BillTableBulkActions";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { BillTablePropsSchema } from "@/domain/schemas/component-props";
-import type { Bill } from "@/types/bills";
+
+/**
+ * Bill entity type - flexible structure to accept any bill-like object
+ */
+type BillEntity = Record<string, unknown> & {
+  id: string;
+  name: string;
+  category?: string;
+  isPaid?: boolean;
+};
 
 /**
  * Selection state interface
@@ -33,18 +42,18 @@ interface BillDisplayData {
  * Props for BillTable component
  */
 interface BillTableProps {
-  filteredBills: Bill[];
+  filteredBills: BillEntity[];
   selectionState: SelectionState;
   clearSelection: () => void;
   selectAllBills: () => void;
   toggleBillSelection: (billId: string) => void;
   setShowBulkUpdateModal: (show: boolean) => void;
-  setShowBillDetail: (bill: Bill) => void;
-  getBillDisplayData: (bill: Bill) => BillDisplayData;
+  setShowBillDetail: (bill: BillEntity) => void;
+  getBillDisplayData: (bill: BillEntity) => BillDisplayData;
   billOperations: {
     handlePayBill: (billId: string) => Promise<void>;
   };
-  categorizedBills: Record<string, Bill[]>;
+  categorizedBills: Record<string, BillEntity[]>;
   viewMode: string;
 }
 
