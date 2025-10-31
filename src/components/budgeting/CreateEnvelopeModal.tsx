@@ -2,6 +2,25 @@ import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent, DesktopModalHeader } from "./CreateEnvelopeModalComponents";
+import type { Envelope } from "@/types/finance";
+import type { Bill } from "@/types/bills";
+
+// Type definitions
+interface CurrentUser {
+  userName: string;
+  userColor: string;
+}
+
+interface CreateEnvelopeModalProps {
+  isOpen?: boolean;
+  onClose: () => void;
+  onCreateEnvelope: (envelope: Partial<Envelope>) => void | Promise<void>;
+  onCreateBill?: () => void;
+  existingEnvelopes?: Envelope[];
+  allBills?: Bill[];
+  currentUser?: CurrentUser;
+  _forceMobileMode?: boolean;
+}
 
 const CreateEnvelopeModal = ({
   isOpen = false,
@@ -12,7 +31,7 @@ const CreateEnvelopeModal = ({
   allBills = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
   _forceMobileMode = false, // Internal prop for testing
-}) => {
+}: CreateEnvelopeModalProps) => {
   const isMobile = useMobileDetection();
 
   const {
@@ -37,7 +56,7 @@ const CreateEnvelopeModal = ({
   });
 
   // Handle bill selection and auto-populate envelope data
-  const handleBillSelection = (billId) => {
+  const handleBillSelection = (billId: string) => {
     if (!billId) return;
 
     const selectedBill = allBills.find((bill) => bill.id === billId);

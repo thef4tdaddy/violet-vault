@@ -2,13 +2,25 @@ import React, { Suspense } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+// Type definitions
+interface Envelope {
+  id: string | number;
+  name: string;
+}
+
+interface EnvelopeHistoryModalProps {
+  isOpen?: boolean;
+  onClose: () => void;
+  envelope: Envelope | null;
+}
+
 // Lazy load the history viewer for better performance
 const ObjectHistoryViewer = React.lazy(() => import("../../history/ObjectHistoryViewer"));
 
-const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
+const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }: EnvelopeHistoryModalProps) => {
   if (!isOpen || !envelope) return null;
 
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
     }

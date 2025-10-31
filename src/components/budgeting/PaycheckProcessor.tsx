@@ -9,6 +9,26 @@ import PaycheckPayerSelector from "./paycheck/PaycheckPayerSelector";
 import PaycheckAllocationModes from "./paycheck/PaycheckAllocationModes";
 import PaycheckAllocationPreview from "./paycheck/PaycheckAllocationPreview";
 import PaycheckHistory from "./paycheck/PaycheckHistory";
+import type { Envelope } from "@/types/finance";
+
+// Type definitions
+interface PaycheckHistoryItem {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface CurrentUser {
+  userName?: string;
+  userColor?: string;
+}
+
+interface PaycheckProcessorProps {
+  envelopes?: Envelope[];
+  paycheckHistory?: PaycheckHistoryItem[];
+  onProcessPaycheck?: (data: unknown) => void | Promise<void>;
+  onDeletePaycheck?: (id: string | number) => void | Promise<void>;
+  currentUser?: CurrentUser;
+}
 
 /**
  * Main PaycheckProcessor component
@@ -21,7 +41,7 @@ const PaycheckProcessor = ({
   onProcessPaycheck,
   onDeletePaycheck,
   currentUser,
-}) => {
+}: PaycheckProcessorProps) => {
   // Custom hooks for state management
   const formHook = usePaycheckForm({
     paycheckHistory,
@@ -88,7 +108,7 @@ const PaycheckHeader = () => (
 /**
  * Main paycheck form component
  */
-const PaycheckForm = ({ formHook }) => (
+const PaycheckForm = ({ formHook }: { formHook: ReturnType<typeof usePaycheckForm> }) => (
   <div className="space-y-6">
     <PaycheckAmountInput
       value={formHook.paycheckAmount}
@@ -122,7 +142,7 @@ const PaycheckForm = ({ formHook }) => (
 /**
  * Form action buttons component
  */
-const PaycheckFormButtons = ({ formHook }) => (
+const PaycheckFormButtons = ({ formHook }: { formHook: ReturnType<typeof usePaycheckForm> }) => (
   <div className="flex gap-4">
     <Button
       onClick={() => formHook.setShowPreview(true)}

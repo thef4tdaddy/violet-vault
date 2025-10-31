@@ -3,6 +3,14 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { getButtonClasses, withHapticFeedback } from "../../../utils/ui/touchFeedback";
 
+// Type definitions
+interface EnvelopeActionsProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  onEdit: () => void;
+  onViewHistory: () => void;
+}
+
 /**
  * Envelope actions component
  * Shows action buttons and toggle for envelope
@@ -10,8 +18,8 @@ import { getButtonClasses, withHapticFeedback } from "../../../utils/ui/touchFee
  * Part of EnvelopeItem refactoring for ESLint compliance
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
-const EnvelopeActions = ({ isCollapsed, onToggleCollapse, onEdit, onViewHistory }) => {
-  const getToggleIcon = (isCollapsed) =>
+const EnvelopeActions = ({ isCollapsed, onToggleCollapse, onEdit, onViewHistory }: EnvelopeActionsProps) => {
+  const getToggleIcon = (isCollapsed: boolean) =>
     React.createElement(getIcon(isCollapsed ? "ChevronDown" : "ChevronUp"), {
       className: "h-4 w-4",
     });

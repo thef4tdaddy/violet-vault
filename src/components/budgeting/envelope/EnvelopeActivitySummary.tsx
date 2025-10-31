@@ -1,6 +1,16 @@
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 
+// Type definitions
+interface Envelope {
+  envelopeType: string;
+  totalSpent: number;
+  monthlyBudget?: number;
+  monthlyAmount?: number;
+  available?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Envelope activity summary component
  * Shows different metrics based on envelope type (Variable vs Bill)
@@ -8,7 +18,7 @@ import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
  * Part of EnvelopeItem refactoring for ESLint compliance
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
-const EnvelopeActivitySummary = ({ envelope }) => {
+const EnvelopeActivitySummary = ({ envelope }: { envelope: Envelope }) => {
   if (envelope.envelopeType === ENVELOPE_TYPES.VARIABLE) {
     return (
       <div className="grid grid-cols-3 gap-4 py-4">

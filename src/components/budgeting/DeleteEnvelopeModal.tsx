@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import { Button, Radio } from "@/components/ui";
 import { getIcon } from "../../utils";
+import type { Envelope } from "@/types/finance";
+import type { Bill } from "@/types/bills";
+
+// Type definitions
+interface DeleteEnvelopeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (envelopeId: string | number, deleteBillsToo: boolean) => void;
+  envelope: Envelope | null;
+  connectedBills?: Bill[];
+  isDeleting?: boolean;
+}
 
 const DeleteEnvelopeModal = ({
   isOpen,
@@ -9,7 +21,7 @@ const DeleteEnvelopeModal = ({
   envelope,
   connectedBills = [],
   isDeleting = false,
-}) => {
+}: DeleteEnvelopeModalProps) => {
   const [deleteBillsToo, setDeleteBillsToo] = useState(false);
 
   if (!isOpen || !envelope) return null;
