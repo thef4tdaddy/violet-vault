@@ -59,14 +59,6 @@ interface ConnectionData {
 
 type CreateDebtPayload = DebtFormData & { connectionData?: ConnectionData; paymentDueDate: string };
 
-// Factory helpers to create lightweight wrappers outside the hook to reduce function length
-const makeCreateEnvelopeWrapper =
-  (fn: (...args: unknown[]) => unknown) =>
-  async (data: unknown): Promise<{ id: string }> => {
-    const res = await Promise.resolve(fn(data) as unknown);
-    return res as unknown as { id: string };
-  };
-
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
   const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
