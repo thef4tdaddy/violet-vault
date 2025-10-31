@@ -18,8 +18,13 @@ export interface RuleConfig {
 }
 
 export interface RuleCondition {
+  id?: string;
   type: string;
-  value: unknown;
+  envelopeId?: string | null;
+  value: number;
+  operator?: string;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 export interface AutoFundingRule {

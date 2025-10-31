@@ -4,16 +4,17 @@
  * Extracted from autoFundingEngine.js for Issue #506
  */
 
-import { CONDITION_TYPES, TRIGGER_TYPES } from "./rules.ts";
+import { CONDITION_TYPES, TRIGGER_TYPES, type AutoFundingRule } from "./rules.ts";
 
 /**
- * Envelope interface
+ * Envelope interface - compatible with EnvelopeData from rules.ts
  */
-export interface Envelope {
+export type Envelope = {
   id: string;
-  currentBalance: number;
-  [key: string]: unknown;
-}
+  name?: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+};
 
 /**
  * Condition interface
@@ -29,7 +30,7 @@ export interface Condition {
 }
 
 /**
- * Execution context
+ * Execution context - compatible with AutoFundingContext from rules.ts
  */
 export interface ExecutionContext {
   data: {
@@ -37,22 +38,14 @@ export interface ExecutionContext {
     unassignedCash: number;
     newIncomeAmount?: number;
   };
-  currentDate: string;
-  trigger: string;
+  currentDate?: string;
+  trigger?: string;
 }
 
 /**
- * Rule configuration
+ * Rule configuration - using AutoFundingRule from rules.ts
  */
-export interface Rule {
-  enabled: boolean;
-  trigger: string;
-  type: string;
-  lastExecuted?: string;
-  config?: {
-    conditions?: Condition[];
-  };
-}
+export type Rule = AutoFundingRule;
 
 /**
  * Filter criteria for conditions
@@ -80,14 +73,14 @@ export const evaluateConditions = (conditions: Condition[], context: ExecutionCo
       case CONDITION_TYPES.BALANCE_LESS_THAN:
         if (condition.envelopeId) {
           const envelope = envelopes.find((e) => e.id === condition.envelopeId);
-          return envelope && envelope.currentBalance < condition.value;
+          return !!envelope && (envelope.currentBalance ?? 0) < condition.value;
         }
         return unassignedCash < condition.value;
 
       case CONDITION_TYPES.BALANCE_GREATER_THAN:
         if (condition.envelopeId) {
           const envelope = envelopes.find((e) => e.id === condition.envelopeId);
-          return envelope && envelope.currentBalance > condition.value;
+          return !!envelope && (envelope.currentBalance ?? 0) > condition.value;
         }
         return unassignedCash > condition.value;
 
@@ -95,7 +88,7 @@ export const evaluateConditions = (conditions: Condition[], context: ExecutionCo
         return unassignedCash > condition.value;
 
       case CONDITION_TYPES.DATE_RANGE:
-        return evaluateDateRangeCondition(condition, context.currentDate);
+        return context.currentDate ? evaluateDateRangeCondition(condition, context.currentDate) : true;
 
       case CONDITION_TYPES.TRANSACTION_AMOUNT:
         return evaluateTransactionAmountCondition(condition, context);
@@ -165,7 +158,7 @@ export const evaluateTransactionAmountCondition = (
  */
 export const checkSchedule = (
   trigger: string,
-  lastExecuted: string | undefined,
+  lastExecuted: string | null | undefined,
   currentDate: string
 ): boolean => {
   if (!lastExecuted) return true;
@@ -214,7 +207,7 @@ export const shouldRuleExecute = (rule: Rule, context: ExecutionContext): boolea
   }
 
   // Check trigger compatibility
-  if (rule.trigger !== context.trigger && rule.trigger !== TRIGGER_TYPES.MANUAL) {
+  if (context.trigger && rule.trigger !== context.trigger && rule.trigger !== TRIGGER_TYPES.MANUAL) {
     return false;
   }
 
@@ -227,14 +220,14 @@ export const shouldRuleExecute = (rule: Rule, context: ExecutionContext): boolea
       TRIGGER_TYPES.PAYDAY,
     ].includes(rule.trigger)
   ) {
-    if (!checkSchedule(rule.trigger, rule.lastExecuted, context.currentDate)) {
+    if (context.currentDate && !checkSchedule(rule.trigger, rule.lastExecuted, context.currentDate)) {
       return false;
     }
   }
 
   // Check conditions for conditional rules
   if (rule.type === "conditional") {
-    return evaluateConditions(rule.config.conditions, context);
+    return evaluateConditions(rule.config?.conditions ?? [], context);
   }
 
   return true;
@@ -374,20 +367,20 @@ export const getConditionDescription = (
       return `Unassigned cash > $${condition.value}`;
 
     case CONDITION_TYPES.DATE_RANGE: {
-      const startDate = new Date(condition.startDate).toLocaleDateString();
-      const endDate = new Date(condition.endDate).toLocaleDateString();
+      const startDate = condition.startDate ? new Date(condition.startDate).toLocaleDateString() : "unknown";
+      const endDate = condition.endDate ? new Date(condition.endDate).toLocaleDateString() : "unknown";
       return `Between ${startDate} and ${endDate}`;
     }
 
     case CONDITION_TYPES.TRANSACTION_AMOUNT: {
-      const operators = {
+      const operators: Record<string, string> = {
         greater_than: ">",
         less_than: "<",
         equals: "=",
         greater_than_or_equal: "≥",
         less_than_or_equal: "≤",
       };
-      const operator = operators[condition.operator] || condition.operator;
+      const operator = condition.operator ? operators[condition.operator] ?? condition.operator : "?";
       return `Transaction amount ${operator} $${condition.value}`;
     }
 
