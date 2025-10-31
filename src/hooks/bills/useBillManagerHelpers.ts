@@ -280,9 +280,9 @@ export const processAndResolveData = (
   );
 
   const resolvedEnvelopes = resolveEnvelopes(
-    propEnvelopes as unknown[],
-    tanStackEnvelopes as unknown[],
-    budgetEnvelopes as unknown[]
+    propEnvelopes as unknown as Envelope[],
+    tanStackEnvelopes as unknown as Envelope[],
+    budgetEnvelopes as unknown as Envelope[]
   );
 
   const billsFromTransactions: Bill[] = extractBillsFromTransactions(resolvedTransactions);

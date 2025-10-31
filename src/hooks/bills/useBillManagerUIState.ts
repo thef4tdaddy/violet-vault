@@ -4,13 +4,7 @@
  */
 import { useState } from "react";
 
-interface FilterOptions {
-  search: string;
-  urgency: string;
-  envelope: string;
-  amountMin: string;
-  amountMax: string;
-}
+import type { FilterOptions } from "./useBillManagerHelpers";
 
 /**
  * Custom hook for managing UI state in bill manager
