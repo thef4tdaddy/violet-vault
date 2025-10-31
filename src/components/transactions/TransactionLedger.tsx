@@ -124,9 +124,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       {/* Transactions Table */}
       <TransactionTable
         transactions={paginatedTransactions}
-        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        envelopes={envelopes}
         onEdit={startEdit}
-        onDelete={(id) => deleteTransaction(id as never)}
+        onDelete={(id) => deleteTransaction(id as string | number)}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
 
@@ -171,7 +171,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
-        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        envelopes={envelopes}
         availableCategories={[...TRANSACTION_CATEGORIES]}
         onSave={handleSplitTransaction}
       />

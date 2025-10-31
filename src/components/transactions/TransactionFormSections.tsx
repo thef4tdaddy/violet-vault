@@ -3,21 +3,14 @@ import { Select, TextInput, Textarea, Checkbox, Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import ReceiptButton from "../receipts/ReceiptButton";
 import logger from "../../utils/common/logger";
+import type { Transaction } from "@/types/finance";
+import type { TransactionFormData } from "@/domain/schemas/transaction";
 
 interface TransactionBasicFieldsProps {
-  transactionForm: {
-    date: string;
-    type: string;
-    description?: string;
-    amount?: string;
-    category?: string;
-    envelopeId?: string;
-    notes?: string;
-    reconciled?: boolean;
-  };
-  setTransactionForm: (form: Record<string, unknown>) => void;
+  transactionForm: TransactionFormData;
+  setTransactionForm: (form: TransactionFormData) => void;
   canEdit: boolean;
-  editingTransaction: unknown;
+  editingTransaction?: Transaction | null;
 }
 
 /**
@@ -101,14 +94,10 @@ export const TransactionBasicFields = ({
 };
 
 interface TransactionDetailsFieldsProps {
-  transactionForm: {
-    description: string;
-    amount: string;
-    category: string;
-  };
-  setTransactionForm: (form: Record<string, unknown>) => void;
+  transactionForm: TransactionFormData;
+  setTransactionForm: (form: TransactionFormData) => void;
   canEdit: boolean;
-  editingTransaction: unknown;
+  editingTransaction?: Transaction | null;
   categories: string[];
 }
 
@@ -196,13 +185,10 @@ interface Envelope {
 }
 
 interface TransactionEnvelopeSelectorProps {
-  transactionForm: {
-    envelopeId: string;
-    description: string;
-  };
-  setTransactionForm: (form: Record<string, unknown>) => void;
+  transactionForm: TransactionFormData;
+  setTransactionForm: (form: TransactionFormData) => void;
   canEdit: boolean;
-  editingTransaction: unknown;
+  editingTransaction?: Transaction | null;
   envelopes: Envelope[];
   suggestEnvelope?: (description: string) => { id: string; name: string } | null;
 }
@@ -284,13 +270,10 @@ export const TransactionEnvelopeSelector = ({
 };
 
 interface TransactionNotesAndReconciledProps {
-  transactionForm: {
-    notes: string;
-    reconciled: boolean;
-  };
-  setTransactionForm: (form: Record<string, unknown>) => void;
+  transactionForm: TransactionFormData;
+  setTransactionForm: (form: TransactionFormData) => void;
   canEdit: boolean;
-  editingTransaction: unknown;
+  editingTransaction?: Transaction | null;
 }
 
 /**
@@ -342,7 +325,7 @@ export const TransactionNotesAndReconciled = ({
 };
 
 interface TransactionReceiptSectionProps {
-  editingTransaction: unknown;
+  editingTransaction?: Transaction | null;
   onClose: () => void;
 }
 
@@ -378,7 +361,7 @@ export const TransactionReceiptSection = ({
 };
 
 interface TransactionFormActionsProps {
-  editingTransaction: unknown;
+  editingTransaction?: Transaction | null;
   canEdit: boolean;
   lockedBy?: string;
   onClose: () => void;
