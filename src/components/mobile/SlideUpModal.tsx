@@ -22,7 +22,9 @@ const MODAL_HEIGHTS = {
   "three-quarters": "h-[75vh]",
   half: "h-[50vh]",
   auto: "h-auto max-h-[90vh]",
-};
+} as const;
+
+type ModalHeight = keyof typeof MODAL_HEIGHTS;
 
 const SWIPE_THRESHOLD = 100;
 const BACKDROP_OPACITY = 0.5;
@@ -68,7 +70,13 @@ function resetDragTransform(modalRef: React.RefObject<HTMLDivElement>, backdrop:
 // Sub-Components
 // ============================================================================
 
-const ModalHeader = ({ title, onClose, closeFeedback }) => (
+interface ModalHeaderProps {
+  title: string;
+  onClose?: () => void;
+  closeFeedback: ReturnType<typeof useTouchFeedback>;
+}
+
+const ModalHeader: React.FC<ModalHeaderProps> = ({ title, onClose, closeFeedback }) => (
   <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
     <h2 id="slide-modal-title" className="font-bold text-lg text-black">
       {title}
@@ -92,8 +100,24 @@ const DragHandle = ({ handleRef }: { handleRef: React.RefObject<HTMLDivElement> 
   </div>
 );
 
-// ModalPanelProps removed (unused) — ModalPanel uses `any` for props to avoid strict type mismatches with touch feedback
-const ModalPanel = ({
+interface ModalPanelProps {
+  modalRef: React.RefObject<HTMLDivElement>;
+  handleRef: React.RefObject<HTMLDivElement>;
+  height: ModalHeight;
+  isOpen: boolean;
+  isAnimating: boolean;
+  className: string;
+  showHandle: boolean;
+  title?: string;
+  onClose?: () => void;
+  closeFeedback: ReturnType<typeof useTouchFeedback>;
+  handleTouchStart: (e: React.TouchEvent) => void;
+  handleTouchMove: (e: React.TouchEvent) => void;
+  handleTouchEnd: () => void;
+  children: React.ReactNode;
+}
+
+const ModalPanel: React.FC<ModalPanelProps> = ({
   modalRef,
   handleRef,
   height,
@@ -147,16 +171,21 @@ const ModalPanel = ({
 // Custom Hooks
 // ============================================================================
 
+interface DragState {
+  isDragging: boolean;
+  startY: number;
+  currentY: number;
+  deltaY: number;
+}
+
 // Process drag move logic
 function processDragMove(
-  dragState: { isDragging: boolean; startY: number; currentY: number; deltaY: number },
+  dragState: DragState,
   modalRef: React.RefObject<HTMLDivElement>,
   touch: React.Touch,
   backdrop: boolean,
-  setDragState: React.Dispatch<
-    React.SetStateAction<{ isDragging: boolean; startY: number; currentY: number; deltaY: number }>
-  >
-) {
+  setDragState: React.Dispatch<React.SetStateAction<DragState>>
+): void {
   if (!dragState.isDragging || !modalRef.current) return;
 
   const deltaY = touch.clientY - dragState.startY;
@@ -175,14 +204,12 @@ function processDragMove(
 
 // Process drag end logic
 function processDragEnd(
-  dragState: { isDragging: boolean; startY: number; currentY: number; deltaY: number },
+  dragState: DragState,
   modalRef: React.RefObject<HTMLDivElement>,
   backdrop: boolean,
   onClose: (() => void) | undefined,
-  setDragState: React.Dispatch<
-    React.SetStateAction<{ isDragging: boolean; startY: number; currentY: number; deltaY: number }>
-  >
-) {
+  setDragState: React.Dispatch<React.SetStateAction<DragState>>
+): void {
   if (!dragState.isDragging || !modalRef.current) return;
 
   const { deltaY } = dragState;
@@ -209,14 +236,14 @@ function useDragHandlers(
   backdrop: boolean,
   onClose?: () => void
 ) {
-  const [dragState, setDragState] = useState({
+  const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     startY: 0,
     currentY: 0,
     deltaY: 0,
   });
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = (e: React.TouchEvent): void => {
     if (!modalRef.current) return;
 
     const touch = e.touches[0];
@@ -228,11 +255,11 @@ function useDragHandlers(
     });
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = (e: React.TouchEvent): void => {
     processDragMove(dragState, modalRef, e.touches[0], backdrop, setDragState);
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (): void => {
     processDragEnd(dragState, modalRef, backdrop, onClose, setDragState);
   };
 
@@ -243,7 +270,18 @@ function useDragHandlers(
   };
 }
 
-const SlideUpModal = ({
+interface SlideUpModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  title?: string;
+  height?: ModalHeight;
+  children: React.ReactNode;
+  showHandle?: boolean;
+  backdrop?: boolean;
+  className?: string;
+}
+
+const SlideUpModal: React.FC<SlideUpModalProps> = ({
   isOpen = false,
   onClose,
   title,
@@ -253,8 +291,8 @@ const SlideUpModal = ({
   backdrop = true,
   className = "",
 }) => {
-  const modalRef = useRef(null);
-  const handleRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const closeFeedback = useTouchFeedback("tap", "secondary");
@@ -279,7 +317,7 @@ const SlideUpModal = ({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === "Escape") {
         onClose?.();
       }
@@ -289,7 +327,7 @@ const SlideUpModal = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     if (e.target === e.currentTarget) {
       onClose?.();
     }

@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from "react";
 import SlideUpModal from "./SlideUpModal";
 
+type ModalHeight = "full" | "three-quarters" | "half" | "auto";
+
+/**
+ * Props for ResponsiveModal component
+ */
+interface ResponsiveModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  title?: string;
+  children: React.ReactNode;
+  className?: string;
+  mobileHeight?: ModalHeight;
+  [key: string]: unknown;
+}
+
 /**
  * ResponsiveModal - Higher-order component that wraps existing modals
  * to provide slide-up behavior on mobile while preserving desktop modal behavior
@@ -13,7 +28,7 @@ import SlideUpModal from "./SlideUpModal";
  *
  * Part of Issue #164 - Implement Slide-Up Modals for Mobile Flows
  */
-const ResponsiveModal = ({
+const ResponsiveModal: React.FC<ResponsiveModalProps> = ({
   isOpen = false,
   onClose,
   title,
@@ -26,7 +41,7 @@ const ResponsiveModal = ({
 
   // Detect screen size
   useEffect(() => {
-    const checkIsMobile = () => {
+    const checkIsMobile = (): void => {
       setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
     };
 
@@ -60,17 +75,27 @@ const ResponsiveModal = ({
 };
 
 /**
+ * Props for wrapped modal components
+ */
+interface WrappedModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  title?: string;
+  _forceMobileMode?: boolean;
+}
+
+/**
  * withResponsiveModal - Higher-order component that wraps existing modal components
  * to automatically add responsive slide-up behavior
  */
-export const withResponsiveModal = (
-  ModalComponent: React.ComponentType<Record<string, unknown>>
+export const withResponsiveModal = <P extends WrappedModalProps>(
+  ModalComponent: React.ComponentType<P>
 ) => {
-  return React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => {
+  const WrappedComponent = React.forwardRef<unknown, P>((props, ref) => {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-      const checkIsMobile = () => {
+      const checkIsMobile = (): void => {
         setIsMobile(window.innerWidth < 640);
       };
 
@@ -81,25 +106,30 @@ export const withResponsiveModal = (
 
     // If on mobile, wrap the modal content with SlideUpModal
     if (isMobile && props?.isOpen) {
+      const onCloseHandler = props.onClose || undefined;
       return (
         <SlideUpModal
           isOpen={Boolean(props.isOpen)}
-          onClose={props.onClose}
-          title={props.title || "Modal"}
+          onClose={onCloseHandler}
+          title={typeof props.title === "string" ? props.title : "Modal"}
           height="auto"
           showHandle={true}
           backdrop={true}
         >
           <div className="px-6">
-            <ModalComponent {...props} ref={ref} _forceMobileMode={true} />
+            <ModalComponent {...(props as P)} ref={ref} />
           </div>
         </SlideUpModal>
       );
     }
 
     // On desktop, render modal normally
-    return <ModalComponent {...props} ref={ref} />;
+    return <ModalComponent {...(props as P)} ref={ref} />;
   });
+
+  WrappedComponent.displayName = `withResponsiveModal(${ModalComponent.displayName || ModalComponent.name || "Component"})`;
+
+  return WrappedComponent;
 };
 
 export default ResponsiveModal;

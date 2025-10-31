@@ -5,15 +5,26 @@ import { getIcon } from "@/utils";
 import logger from "@/utils/common/logger";
 
 /**
+ * Shared data interface
+ */
+interface SharedData {
+  title: string | null;
+  text: string | null;
+  url: string | null;
+  timestamp: string;
+  hasFiles: boolean;
+}
+
+/**
  * Share Target Handler
  * Handles files and data shared to the PWA via the Share Target API
  */
-const ShareTargetHandler = () => {
+const ShareTargetHandler: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [sharedData, setSharedData] = useState(null);
+  const [sharedData, setSharedData] = useState<SharedData | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSharedContent = useCallback(async () => {
     setIsProcessing(true);
@@ -41,7 +52,7 @@ const ShareTargetHandler = () => {
         data.hasFiles = true;
       }
 
-      setSharedData(data);
+      setSharedData(data as SharedData);
 
       // Auto-redirect to appropriate section after showing preview
       setTimeout(() => {
@@ -69,13 +80,13 @@ const ShareTargetHandler = () => {
           });
         }
       }, 3000);
-    } catch (error) {
-      logger.error("Failed to process shared content:", error);
+    } catch (err) {
+      logger.error("Failed to process shared content:", err);
       setError("Failed to process shared content. Please try again.");
     } finally {
       setIsProcessing(false);
     }
-  }, [location.search, navigate, setIsProcessing, setError, setSharedData]);
+  }, [location.search, navigate]);
 
   useEffect(() => {
     // Check if this is a share target request
@@ -84,7 +95,7 @@ const ShareTargetHandler = () => {
     }
   }, [location, handleSharedContent]);
 
-  const handleManualNavigation = (path) => {
+  const handleManualNavigation = (path: string): void => {
     navigate(path, { state: { importData: sharedData } });
   };
 
@@ -166,14 +177,14 @@ const ShareTargetHandler = () => {
               </h2>
 
               <div className="text-left text-sm space-y-2 mb-4">
-                {sharedData.title && (
+                {sharedData?.title && (
                   <div>
                     <span className="font-medium text-gray-600">Title:</span>
                     <span className="ml-2 text-gray-800">{sharedData.title}</span>
                   </div>
                 )}
 
-                {sharedData.text && (
+                {sharedData?.text && (
                   <div>
                     <span className="font-medium text-gray-600">Content:</span>
                     <span className="ml-2 text-gray-800 break-words">
@@ -184,14 +195,14 @@ const ShareTargetHandler = () => {
                   </div>
                 )}
 
-                {sharedData.url && (
+                {sharedData?.url && (
                   <div>
                     <span className="font-medium text-gray-600">URL:</span>
                     <span className="ml-2 text-blue-600 break-all">{sharedData.url}</span>
                   </div>
                 )}
 
-                {sharedData.hasFiles && (
+                {sharedData?.hasFiles && (
                   <div className="flex items-center space-x-2">
                     {React.createElement(getIcon("File"), {
                       className: "w-4 h-4 text-purple-600",
