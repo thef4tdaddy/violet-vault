@@ -43,9 +43,9 @@ export const TransactionBasicFields = ({
               date: e.target.value,
             })
           }
-          disabled={editingTransaction && !canEdit}
+          disabled={!!editingTransaction && !canEdit}
           className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+            !!!!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           required
         />
@@ -62,12 +62,12 @@ export const TransactionBasicFields = ({
                 type: "expense",
               })
             }
-            disabled={editingTransaction && !canEdit}
+            disabled={!!editingTransaction && !canEdit}
             className={`p-2 rounded-lg border-2 transition-all ${
               transactionForm.type === "expense"
                 ? "border-red-500 bg-red-50 text-red-700"
                 : "border-gray-200 hover:border-red-300"
-            } ${editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
+            } ${!!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
           >
             {React.createElement(getIcon("TrendingDown"), {
               className: "h-4 w-4 mx-auto mb-1",
@@ -82,12 +82,12 @@ export const TransactionBasicFields = ({
                 type: "income",
               })
             }
-            disabled={editingTransaction && !canEdit}
+            disabled={!!editingTransaction && !canEdit}
             className={`p-2 rounded-lg border-2 transition-all ${
               transactionForm.type === "income"
                 ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                 : "border-gray-200 hover:border-emerald-300"
-            } ${editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
+            } ${!!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
           >
             {React.createElement(getIcon("TrendingUp"), {
               className: "h-4 w-4 mx-auto mb-1",
@@ -132,7 +132,7 @@ export const TransactionDetailsFields = ({
               description: e.target.value,
             })
           }
-          disabled={editingTransaction && !canEdit}
+          disabled={!!editingTransaction && !canEdit}
           placeholder="e.g., Grocery shopping at Walmart"
           required
         />
@@ -151,7 +151,7 @@ export const TransactionDetailsFields = ({
                 amount: e.target.value,
               })
             }
-            disabled={editingTransaction && !canEdit}
+            disabled={!!editingTransaction && !canEdit}
             placeholder="0.00"
             required
           />
@@ -167,9 +167,9 @@ export const TransactionDetailsFields = ({
                 category: e.target.value,
               })
             }
-            disabled={editingTransaction && !canEdit}
+            disabled={!!editingTransaction && !canEdit}
             className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-              editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+              !!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
           >
             <option value="">Select category...</option>
@@ -224,9 +224,9 @@ export const TransactionEnvelopeSelector = ({
             envelopeId: e.target.value,
           })
         }
-        disabled={editingTransaction && !canEdit}
+        disabled={!!editingTransaction && !canEdit}
         className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-          editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+          !!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
         }`}
       >
         <option value="">Leave unassigned</option>
@@ -300,7 +300,7 @@ export const TransactionNotesAndReconciled = ({
             })
           }
           rows={3}
-          disabled={editingTransaction && !canEdit}
+          disabled={!!editingTransaction && !canEdit}
           placeholder="Additional notes about this transaction..."
         />
       </div>
@@ -315,7 +315,7 @@ export const TransactionNotesAndReconciled = ({
               reconciled: e.target.checked,
             })
           }
-          disabled={editingTransaction && !canEdit}
+          disabled={!!editingTransaction && !canEdit}
         />
         <label htmlFor="reconciled" className="ml-3 text-sm text-gray-700">
           Mark as reconciled
@@ -351,7 +351,7 @@ export const TransactionReceiptSection = ({
         </div>
         <ReceiptButton
           variant="secondary"
-          onTransactionCreated={(transaction) => {
+          onTransactionCreated={(transaction: unknown) => {
             logger.info("Transaction created from receipt in form", transaction);
             onClose();
           }}
@@ -389,7 +389,7 @@ export const TransactionFormActions = ({
       </Button>
       <Button
         type="submit"
-        disabled={editingTransaction && !canEdit}
+        disabled={!!editingTransaction && !canEdit}
         className={`flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center ${
           editingTransaction && !canEdit ? "cursor-not-allowed" : ""
         }`}

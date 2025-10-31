@@ -63,7 +63,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   }, [isOpen, budgetId, currentUser]);
 
   // Edit locking for the transaction (only when editing existing transaction)
-  const editLock = useEditLock("transaction", editingTransaction?.id?.toString(), {
+  const editLock = useEditLock("transaction", editingTransaction?.id?.toString() || "", {
     autoAcquire: isOpen && !!editingTransaction?.id, // Only auto-acquire for edits
     autoRelease: true,
     showToasts: true,

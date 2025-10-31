@@ -170,7 +170,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       <TransactionSplitter
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
-        transaction={splittingTransaction}
+        transaction={splittingTransaction || null}
         envelopes={envelopes as never}
         availableCategories={[...TRANSACTION_CATEGORIES]}
         onSave={handleSplitTransaction}
