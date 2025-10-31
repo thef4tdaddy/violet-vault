@@ -6,14 +6,13 @@ type ModalHeight = "full" | "three-quarters" | "half" | "auto";
 /**
  * Props for ResponsiveModal component
  */
-interface ResponsiveModalProps {
+interface ResponsiveModalProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen?: boolean;
   onClose?: () => void;
   title?: string;
   children: React.ReactNode;
   className?: string;
   mobileHeight?: ModalHeight;
-  [key: string]: unknown;
 }
 
 /**
@@ -117,6 +116,7 @@ export const withResponsiveModal = <P extends WrappedModalProps>(
           backdrop={true}
         >
           <div className="px-6">
+            {/* Type assertion necessary for HOC pattern with generic props */}
             <ModalComponent {...(props as P)} ref={ref} />
           </div>
         </SlideUpModal>
@@ -124,6 +124,9 @@ export const withResponsiveModal = <P extends WrappedModalProps>(
     }
 
     // On desktop, render modal normally
+    {
+      /* Type assertion necessary for HOC pattern with generic props */
+    }
     return <ModalComponent {...(props as P)} ref={ref} />;
   });
 
