@@ -11,8 +11,14 @@ import { z } from "zod";
 import { useValidatedForm } from "@/hooks/common/validation";
 import { BillFormDataMinimalSchema } from "@/domain/schemas/bill";
 import type { Bill } from "@/types/bills";
-import logger from "@/utils/common/logger";
-import { v4 as uuidv4 } from "uuid";
+import {
+  buildInitialFormData,
+  transformFormDataToBill,
+  handleBillSubmission,
+  handleBillSubmissionError,
+  handleBillDeletion,
+  updateFormDataFromBill,
+} from "./useBillFormValidatedHelpers";
 
 /**
  * Extended schema for bill form with all UI fields
@@ -57,16 +63,7 @@ export function useBillFormValidated({
   onError,
 }: UseBillFormValidatedOptions = {}) {
   // Initial form data
-  const initialData: BillFormSchemaType = {
-    name: editingBill?.name || "",
-    amount: editingBill?.amount?.toString() || "",
-    dueDate: editingBill?.dueDate?.toString() || "",
-    category: editingBill?.category || "",
-    notes: editingBill?.notes || "",
-    isRecurring: (editingBill?.frequency && editingBill.frequency !== "once") || false,
-    selectedEnvelope: "",
-    icon: "",
-  };
+  const initialData = buildInitialFormData<BillFormSchemaType>(editingBill);
 
   // Use the validation hook
   const form = useValidatedForm({
@@ -75,34 +72,14 @@ export function useBillFormValidated({
     validateOnChange: false, // Can enable for real-time validation
     onSubmit: async (data) => {
       try {
-        const billData: Bill = {
-          id: editingBill?.id || uuidv4(),
-          name: data.name,
-          amount: parseFloat(data.amount),
-          dueDate: data.dueDate,
-          category: data.category,
-          notes: data.notes,
-          frequency: data.isRecurring ? editingBill?.frequency || "monthly" : "once",
-          isPaid: editingBill?.isPaid,
-          envelopeId: data.selectedEnvelope || undefined,
-          color: editingBill?.color || "#6366f1",
-          createdAt: editingBill?.createdAt || new Date().toISOString(),
-        };
-
-        if (editingBill) {
-          logger.debug("Updating bill", { billId: billData.id });
-          await onUpdateBill?.(billData);
-        } else {
-          logger.debug("Adding new bill", { billId: billData.id });
-          await onAddBill?.(billData);
-        }
-
-        onClose?.();
+        const billData = transformFormDataToBill(data, editingBill);
+        await handleBillSubmission(billData, editingBill, {
+          onAddBill,
+          onUpdateBill,
+          onClose,
+        });
       } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : "Failed to save bill";
-        logger.error("Bill submission error", error);
-        onError?.(errorMsg);
-        throw error; // Re-throw to let useValidatedForm handle state
+        handleBillSubmissionError(error, onError);
       }
     },
   });
@@ -110,30 +87,19 @@ export function useBillFormValidated({
   // Update form when editing bill changes
   useEffect(() => {
     if (editingBill) {
-      form.updateFormData({
-        name: editingBill.name || "",
-        amount: editingBill.amount?.toString() || "",
-        dueDate: editingBill.dueDate?.toString() || "",
-        category: editingBill.category || "",
-        notes: editingBill.notes || "",
-        isRecurring: (editingBill.frequency && editingBill.frequency !== "once") || false,
-      });
+      const updatedData = updateFormDataFromBill(editingBill);
+      form.updateFormData(updatedData);
     }
   }, [editingBill, form]);
 
   // Delete handler
   const handleDelete = useCallback(
     async (deleteEnvelopeToo: boolean = false) => {
-      if (!editingBill) return;
-
-      try {
-        await onDeleteBill?.(editingBill.id, deleteEnvelopeToo);
-        onClose?.();
-      } catch (error) {
-        logger.error("Error deleting bill", error);
-        const errorMsg = error instanceof Error ? error.message : "Failed to delete bill";
-        onError?.(errorMsg);
-      }
+      await handleBillDeletion(editingBill, deleteEnvelopeToo, {
+        onDeleteBill,
+        onClose,
+        onError,
+      });
     },
     [editingBill, onDeleteBill, onClose, onError]
   );

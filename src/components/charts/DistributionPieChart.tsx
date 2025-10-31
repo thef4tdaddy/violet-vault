@@ -1,5 +1,13 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  type PieLabelRenderProps,
+} from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
@@ -33,7 +41,9 @@ const enhanceChartData = (
     .filter((item) => item != null)
     .map((item, index) => {
       const value = Number((item as Record<string, unknown>)[dataKey] ?? 0);
-      const color = ((item as Record<string, unknown>).color as string | undefined) || chartColors[index % chartColors.length];
+      const color =
+        ((item as Record<string, unknown>).color as string | undefined) ||
+        chartColors[index % chartColors.length];
       return {
         ...item,
         percentage: calculatePercentage(value, total),
@@ -78,7 +88,7 @@ const DistributionPieChart = ({
   labelFormatter,
   maxItems = 8,
   ...props
- }: {
+}: {
   title?: string;
   subtitle?: React.ReactNode;
   data?: Array<Record<string, unknown>>;
@@ -102,14 +112,16 @@ const DistributionPieChart = ({
   const { CustomTooltip, chartColors, chartTypeConfigs } = useChartConfig();
 
   // Use custom tooltip or default; treat as a generic React component type
-  const TooltipComponent: React.ComponentType<unknown> = (formatTooltip as React.ComponentType<unknown>) ||
+  const TooltipComponent: React.ComponentType<unknown> =
+    (formatTooltip as React.ComponentType<unknown>) ||
     (CustomTooltip as React.ComponentType<unknown>);
 
   // Ensure data is valid and limit items
   const chartData = Array.isArray(data) ? data.slice(0, maxItems) : [];
   const hasData = chartData.length > 0;
 
-  const labelFunc = (labelFormatter as ((props: PieLabelRenderProps) => React.ReactNode)) || defaultLabelFormatter;
+  const labelFunc =
+    (labelFormatter as (props: PieLabelRenderProps) => React.ReactNode) || defaultLabelFormatter;
 
   // Calculate total for percentage display
   const total = calculateTotal(chartData, dataKey);
@@ -141,14 +153,18 @@ const DistributionPieChart = ({
               outerRadius={outerRadius}
               dataKey={dataKey}
               nameKey={nameKey}
-              label={showLabels ? (labelFunc as (props: PieLabelRenderProps) => React.ReactNode) : undefined}
-                labelLine={false}
-                startAngle={chartTypeConfigs.pie.startAngle}
-                endAngle={chartTypeConfigs.pie.endAngle}
-                {...props}
-              >
-               {renderPieCells(enhancedData)}
-             </Pie>
+              label={
+                showLabels
+                  ? (labelFunc as (props: PieLabelRenderProps) => React.ReactNode)
+                  : undefined
+              }
+              labelLine={false}
+              startAngle={chartTypeConfigs.pie.startAngle}
+              endAngle={chartTypeConfigs.pie.endAngle}
+              {...props}
+            >
+              {renderPieCells(enhancedData)}
+            </Pie>
             <Tooltip content={<TooltipComponent />} />
             {showLegend && <Legend />}
           </PieChart>

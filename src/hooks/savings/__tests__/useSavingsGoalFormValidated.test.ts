@@ -151,11 +151,14 @@ describe("useSavingsGoalFormValidated", () => {
       expect(mockSubmit).toHaveBeenCalledTimes(1);
     });
 
-    expect(mockSubmit).toHaveBeenCalledWith(null, expect.objectContaining({
-      name: "Emergency Fund",
-      targetAmount: 10000,
-      category: "emergency",
-    }));
+    expect(mockSubmit).toHaveBeenCalledWith(
+      null,
+      expect.objectContaining({
+        name: "Emergency Fund",
+        targetAmount: 10000,
+        category: "emergency",
+      })
+    );
   });
 
   it("should not submit with invalid data", async () => {

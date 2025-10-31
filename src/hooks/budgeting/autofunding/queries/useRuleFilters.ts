@@ -1,5 +1,9 @@
 import { useCallback } from "react";
-import { filterRules, sortRulesByPriority, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import {
+  filterRules,
+  sortRulesByPriority,
+  type AutoFundingRule,
+} from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
 
 interface UseRuleFiltersProps {

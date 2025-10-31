@@ -224,10 +224,11 @@ const OfflineStatusIndicator: React.FC = () => {
               </h4>
               <div className="max-h-24 overflow-y-auto space-y-1">
                 {syncStatus.pendingOperations.slice(0, 3).map((op, index) => {
-                  const opId = typeof op.id === 'string' || typeof op.id === 'number' ? op.id : index;
-                  const opType = typeof op.type === 'string' ? op.type : "Operation";
-                  const retryCount = typeof op.retryCount === 'number' ? op.retryCount : 0;
-                  
+                  const opId =
+                    typeof op.id === "string" || typeof op.id === "number" ? op.id : index;
+                  const opType = typeof op.type === "string" ? op.type : "Operation";
+                  const retryCount = typeof op.retryCount === "number" ? op.retryCount : 0;
+
                   return (
                     <div
                       key={opId}

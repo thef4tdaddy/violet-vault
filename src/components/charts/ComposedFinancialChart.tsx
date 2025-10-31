@@ -105,7 +105,9 @@ const ComposedFinancialChart = ({
   const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
 
   // Use custom tooltip or default; keep as a generic React component
-  const TooltipComponent = (formatTooltip as React.ComponentType<unknown>) || (CustomTooltip as React.ComponentType<unknown>);
+  const TooltipComponent =
+    (formatTooltip as React.ComponentType<unknown>) ||
+    (CustomTooltip as React.ComponentType<unknown>);
 
   // Ensure data is valid
   const chartData = Array.isArray(data) ? data : [];
@@ -140,7 +142,8 @@ const ComposedFinancialChart = ({
     radiusValue = 0;
   }
 
-  const maxBarSizeValue = Number((chartTypeConfigs.bar && chartTypeConfigs.bar.maxBarSize) as unknown) || undefined;
+  const maxBarSizeValue =
+    Number((chartTypeConfigs.bar && chartTypeConfigs.bar.maxBarSize) as unknown) || undefined;
 
   return (
     <ChartContainer
@@ -179,9 +182,14 @@ const ComposedFinancialChart = ({
                 dataKey={(areaProps as SeriesItem).dataKey} // Add dataKey prop here
                 fillOpacity={chartTypeConfigs.area.fillOpacity as number}
                 strokeWidth={(chartTypeConfigs.area.strokeWidth as number) || undefined}
-                fill={(areaProps as SeriesItem).fill || getColorByCategory((areaProps as SeriesItem).dataKey, index)}
+                fill={
+                  (areaProps as SeriesItem).fill ||
+                  getColorByCategory((areaProps as SeriesItem).dataKey, index)
+                }
                 stroke={
-                  ((areaProps as SeriesItem).stroke as string) || ((areaProps as SeriesItem).fill as string) || getColorByCategory((areaProps as SeriesItem).dataKey, index)
+                  ((areaProps as SeriesItem).stroke as string) ||
+                  ((areaProps as SeriesItem).fill as string) ||
+                  getColorByCategory((areaProps as SeriesItem).dataKey, index)
                 }
                 {...(areaProps as Record<string, unknown>)}
               />
@@ -203,7 +211,9 @@ const ComposedFinancialChart = ({
           {lineSeries.map((lineProps, index) => (
             <Line
               key={`line-${lineProps.dataKey}`}
-              strokeWidth={(lineProps.strokeWidth as number) || (chartTypeConfigs.line.strokeWidth as number)}
+              strokeWidth={
+                (lineProps.strokeWidth as number) || (chartTypeConfigs.line.strokeWidth as number)
+              }
               dot={lineProps.dot !== undefined ? lineProps.dot : chartTypeConfigs.line.dot}
               activeDot={lineProps.activeDot || chartTypeConfigs.line.activeDot}
               stroke={(lineProps.stroke as string) || getColorByCategory(lineProps.dataKey, index)}

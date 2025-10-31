@@ -75,11 +75,9 @@ export const useDashboardCalculations = (
     }, 0);
 
     // Ensure unassignedCash is not NaN
-    const safeUnassignedCash = typeof unassignedCash === 'number' && !isNaN(unassignedCash) ? unassignedCash : 0;
-    const totalVirtualBalance =
-      totalEnvelopeBalance +
-      totalSavingsBalance +
-      safeUnassignedCash;
+    const safeUnassignedCash =
+      typeof unassignedCash === "number" && !isNaN(unassignedCash) ? unassignedCash : 0;
+    const totalVirtualBalance = totalEnvelopeBalance + totalSavingsBalance + safeUnassignedCash;
 
     // Calculate difference
     const difference = actualBalance - totalVirtualBalance;

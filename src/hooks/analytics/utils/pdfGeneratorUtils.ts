@@ -86,7 +86,10 @@ const addSections = (config: PDFSectionConfig): number => {
     setExportProgress(30);
   }
 
-  if (exportOptions.includeEnvelopes && (balanceData as Record<string, unknown>)?.envelopeAnalysis) {
+  if (
+    exportOptions.includeEnvelopes &&
+    (balanceData as Record<string, unknown>)?.envelopeAnalysis
+  ) {
     checkPageBreak(60);
     y = addEnvelopeAnalysisToPDF(pdf, balanceData, y, margin, checkPageBreak);
     setExportProgress(50);

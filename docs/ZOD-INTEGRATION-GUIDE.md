@@ -5,6 +5,7 @@ This guide documents the comprehensive Zod schema integration across the Violet 
 ## Overview
 
 The Zod integration provides:
+
 - **Type-safe validation** using Zod schemas
 - **Standardized form validation** with `useValidatedForm` hook pattern
 - **Runtime prop validation** for React components
@@ -27,13 +28,13 @@ The `useValidatedForm` hook provides a standardized pattern for managing form st
 ### Basic Usage
 
 ```tsx
-import { useValidatedForm } from '@/hooks/common/validation';
-import { MyFormSchema } from '@/domain/schemas/my-schema';
+import { useValidatedForm } from "@/hooks/common/validation";
+import { MyFormSchema } from "@/domain/schemas/my-schema";
 
 const MyComponent = () => {
   const form = useValidatedForm({
     schema: MyFormSchema,
-    initialData: { name: '', email: '' },
+    initialData: { name: "", email: "" },
     validateOnChange: false, // Optional: validate as user types
     onSubmit: async (data) => {
       // Handle submission with validated data
@@ -43,12 +44,9 @@ const MyComponent = () => {
 
   return (
     <form onSubmit={form.handleSubmit}>
-      <input
-        value={form.data.name}
-        onChange={(e) => form.updateField('name', e.target.value)}
-      />
+      <input value={form.data.name} onChange={(e) => form.updateField("name", e.target.value)} />
       {form.errors.name && <span>{form.errors.name}</span>}
-      
+
       <button type="submit" disabled={!form.canSubmit}>
         Submit
       </button>
@@ -60,6 +58,7 @@ const MyComponent = () => {
 ### Hook API
 
 #### State
+
 - `data: T` - Current form data
 - `errors: ValidationErrors<T>` - Field-specific error messages
 - `isDirty: boolean` - Whether form has been modified
@@ -67,6 +66,7 @@ const MyComponent = () => {
 - `isValid: boolean` - Whether form has no validation errors
 
 #### Methods
+
 - `updateField(field, value)` - Update a single form field
 - `updateFormData(updates)` - Update multiple fields at once
 - `validate()` - Manually trigger validation
@@ -87,7 +87,7 @@ const MyComponent = () => {
 Standardized validation for debt management forms.
 
 ```tsx
-import { useDebtFormValidated } from '@/hooks/debts/useDebtFormValidated';
+import { useDebtFormValidated } from "@/hooks/debts/useDebtFormValidated";
 
 const DebtModal = ({ debt, isOpen, onClose }) => {
   const form = useDebtFormValidated({
@@ -107,21 +107,18 @@ const DebtModal = ({ debt, isOpen, onClose }) => {
 
   return (
     <Modal isOpen={isOpen}>
-      <input
-        value={form.data.name}
-        onChange={(e) => form.updateField('name', e.target.value)}
-      />
+      <input value={form.data.name} onChange={(e) => form.updateField("name", e.target.value)} />
       {form.errors.name && <span>{form.errors.name}</span>}
-      
+
       <input
         type="number"
         value={form.data.currentBalance}
-        onChange={(e) => form.updateField('currentBalance', e.target.value)}
+        onChange={(e) => form.updateField("currentBalance", e.target.value)}
       />
       {form.errors.currentBalance && <span>{form.errors.currentBalance}</span>}
-      
+
       <button onClick={form.handleSubmit} disabled={!form.canSubmit}>
-        {form.isEditMode ? 'Update' : 'Create'} Debt
+        {form.isEditMode ? "Update" : "Create"} Debt
       </button>
     </Modal>
   );
@@ -131,6 +128,7 @@ const DebtModal = ({ debt, isOpen, onClose }) => {
 **Schema:** `DebtFormSchema` from `@/domain/schemas/debt`
 
 **Fields:**
+
 - `name` (required): Debt name
 - `creditor` (required): Creditor name
 - `currentBalance` (required): Current balance
@@ -143,7 +141,7 @@ const DebtModal = ({ debt, isOpen, onClose }) => {
 Standardized validation for savings goal forms.
 
 ```tsx
-import { useSavingsGoalFormValidated } from '@/hooks/savings/useSavingsGoalFormValidated';
+import { useSavingsGoalFormValidated } from "@/hooks/savings/useSavingsGoalFormValidated";
 
 const SavingsGoalModal = ({ goal, isOpen, onClose }) => {
   const form = useSavingsGoalFormValidated({
@@ -161,12 +159,9 @@ const SavingsGoalModal = ({ goal, isOpen, onClose }) => {
 
   return (
     <Modal isOpen={isOpen}>
-      <input
-        value={form.data.name}
-        onChange={(e) => form.updateField('name', e.target.value)}
-      />
+      <input value={form.data.name} onChange={(e) => form.updateField("name", e.target.value)} />
       {form.errors.name && <span>{form.errors.name}</span>}
-      
+
       <button onClick={form.handleSubmit} disabled={!form.canSubmit}>
         Save Goal
       </button>
@@ -178,6 +173,7 @@ const SavingsGoalModal = ({ goal, isOpen, onClose }) => {
 **Schema:** `SavingsGoalFormSchema` from `@/domain/schemas/savings-goal`
 
 **Fields:**
+
 - `name` (required): Goal name
 - `targetAmount` (required): Target amount (must be > 0)
 - `currentAmount` (optional): Current saved amount
@@ -191,7 +187,7 @@ const SavingsGoalModal = ({ goal, isOpen, onClose }) => {
 Standardized validation for transaction forms.
 
 ```tsx
-import { useTransactionFormValidated } from '@/hooks/transactions/useTransactionFormValidated';
+import { useTransactionFormValidated } from "@/hooks/transactions/useTransactionFormValidated";
 
 const TransactionModal = ({ transaction, isOpen, onClose }) => {
   const form = useTransactionFormValidated({
@@ -218,7 +214,7 @@ const TransactionModal = ({ transaction, isOpen, onClose }) => {
 Standardized validation for paycheck/income forms.
 
 ```tsx
-import { usePaycheckFormValidated } from '@/hooks/budgeting/usePaycheckFormValidated';
+import { usePaycheckFormValidated } from "@/hooks/budgeting/usePaycheckFormValidated";
 
 const PaycheckModal = ({ paycheck, isOpen, onClose }) => {
   const form = usePaycheckFormValidated({
@@ -245,7 +241,7 @@ const PaycheckModal = ({ paycheck, isOpen, onClose }) => {
 Standardized validation for user profile forms.
 
 ```tsx
-import { useUserProfileFormValidated } from '@/hooks/settings/useUserProfileFormValidated';
+import { useUserProfileFormValidated } from "@/hooks/settings/useUserProfileFormValidated";
 
 const ProfileSettings = ({ currentUser }) => {
   const form = useUserProfileFormValidated({
@@ -271,16 +267,12 @@ Component prop validation helps catch bugs during development by ensuring compon
 ### Using validateComponentProps
 
 ```tsx
-import { validateComponentProps } from '@/utils/validation/propValidator';
-import { MyComponentPropsSchema } from '@/domain/schemas/component-props';
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { MyComponentPropsSchema } from "@/domain/schemas/component-props";
 
 const MyComponent = ({ data, onAction }) => {
   // Validate props in development
-  validateComponentProps(
-    'MyComponent',
-    { data, onAction },
-    MyComponentPropsSchema
-  );
+  validateComponentProps("MyComponent", { data, onAction }, MyComponentPropsSchema);
 
   // Component implementation...
 };
@@ -291,6 +283,7 @@ const MyComponent = ({ data, onAction }) => {
 All schemas are defined in `@/domain/schemas/component-props`:
 
 **High-Priority Components:**
+
 - `SavingsGoalsPropsSchema` - Savings goals list component
 - `SavingsGoalItemPropsSchema` - Individual savings goal item
 - `PaycheckHistoryPropsSchema` - Paycheck history list
@@ -301,15 +294,18 @@ All schemas are defined in `@/domain/schemas/component-props`:
 - `SettingsPropsSchema` - Settings component
 
 **Modal Components:**
+
 - `CreateEnvelopeModalPropsSchema`
 - `EditEnvelopeModalPropsSchema`
 
 **UI Components:**
+
 - `DatePickerPropsSchema`
 - `SelectPropsSchema`
 - `InputFieldPropsSchema`
 
 **Already Implemented:**
+
 - `EnvelopeGridPropsSchema`
 - `TransactionTablePropsSchema`
 - `BillTablePropsSchema`
@@ -346,10 +342,7 @@ Create a hook in the appropriate directory:
 // src/hooks/my-feature/useMyEntityFormValidated.ts
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/common/validation";
-import {
-  MyEntityFormSchema,
-  type MyEntityFormData,
-} from "@/domain/schemas/my-entity";
+import { MyEntityFormSchema, type MyEntityFormData } from "@/domain/schemas/my-entity";
 import type { MyEntity } from "@/types/my-entity";
 import logger from "@/utils/common/logger";
 
@@ -450,13 +443,14 @@ describe("useMyEntityFormValidated", () => {
 ### 1. Always Use Zod Schemas for Forms
 
 ❌ **Don't:**
+
 ```tsx
-const [name, setName] = useState('');
+const [name, setName] = useState("");
 const [errors, setErrors] = useState({});
 
 const validateForm = () => {
   if (!name) {
-    setErrors({ name: 'Name is required' });
+    setErrors({ name: "Name is required" });
     return false;
   }
   return true;
@@ -464,10 +458,11 @@ const validateForm = () => {
 ```
 
 ✅ **Do:**
+
 ```tsx
 const form = useValidatedForm({
   schema: MyFormSchema,
-  initialData: { name: '' },
+  initialData: { name: "" },
 });
 
 // Validation is automatic
@@ -546,7 +541,7 @@ The `validateComponentProps` function only runs in development mode and is strip
 
 ```tsx
 const MyComponent = (props) => {
-  validateComponentProps('MyComponent', props, MyComponentPropsSchema);
+  validateComponentProps("MyComponent", props, MyComponentPropsSchema);
   // Component implementation
 };
 ```
@@ -564,8 +559,8 @@ const useMyForm = (initialData) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!data.name) newErrors.name = 'Required';
-    if (!data.amount || data.amount < 0) newErrors.amount = 'Must be positive';
+    if (!data.name) newErrors.name = "Required";
+    if (!data.amount || data.amount < 0) newErrors.amount = "Must be positive";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -605,6 +600,7 @@ const useMyFormValidated = (initialData, onSubmit) => {
 ## Support
 
 For questions or issues with Zod integration:
+
 1. Check this guide for examples and patterns
 2. Review existing validated form hooks in `/src/hooks`
 3. Look at test files for usage examples

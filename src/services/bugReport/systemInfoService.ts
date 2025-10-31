@@ -69,7 +69,10 @@ export class SystemInfoService {
         userAgent: navigator.userAgent,
       };
 
-      logger.debug("System information collected successfully", systemInfo as unknown as Record<string, unknown>);
+      logger.debug(
+        "System information collected successfully",
+        systemInfo as unknown as Record<string, unknown>
+      );
       return systemInfo;
     } catch (error) {
       logger.error("Failed to collect system information", error);

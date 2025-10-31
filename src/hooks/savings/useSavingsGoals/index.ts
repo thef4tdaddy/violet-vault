@@ -8,8 +8,8 @@ import {
   useAddContributionMutation,
   useDistributeFundsMutation,
 } from "./savingsMutations";
-import { calculateSavingsSummary } from "../../../utils/savings/savingsCalculations";
-import logger from "../../../utils/common/logger";
+import { calculateSavingsSummary } from "@/utils/savings/savingsCalculations";
+import { createSavingsGoalHelpers, getEmptySummary } from "./useSavingsGoalsHelpers";
 
 interface UseSavingsGoalsOptions {
   status?: string;
@@ -74,21 +74,7 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
 
   // Calculate summary statistics
   const summary = useMemo(() => {
-    if (!savingsGoals.length) {
-      return {
-        totalGoals: 0,
-        completedGoals: 0,
-        activeGoals: 0,
-        totalTargetAmount: 0,
-        totalCurrentAmount: 0,
-        totalRemainingAmount: 0,
-        overallProgressRate: 0,
-        urgentGoals: 0,
-        overdueGoals: 0,
-        totalMonthlyNeeded: 0,
-      };
-    }
-
+    if (!savingsGoals.length) return getEmptySummary();
     return calculateSavingsSummary(savingsGoals);
   }, [savingsGoals]);
 
@@ -111,87 +97,14 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
 
   // Helper functions for common operations
   const helpers = useMemo(
-    () => ({
-      // Add a new savings goal
-      addGoal: async (goalData: unknown) => {
-        logger.debug("Adding savings goal", goalData as Record<string, unknown>);
-        return addSavingsGoalMutation.mutateAsync(goalData as never);
-      },
-
-      // Update existing goal
-      updateGoal: async (goalId: string, updates: unknown) => {
-        logger.debug("Updating savings goal", { goalId, updates } as Record<string, unknown>);
-        return updateSavingsGoalMutation.mutateAsync({ goalId, updates } as never);
-      },
-
-      // Delete a goal
-      deleteGoal: async (goalId: string) => {
-        logger.debug("Deleting savings goal", { goalId } as Record<string, unknown>);
-        return deleteSavingsGoalMutation.mutateAsync(goalId as never);
-      },
-
-      // Add contribution to goal
-      addContribution: async (goalId: string, amount: number, description: string) => {
-        logger.debug("Adding contribution:", { goalId, amount, description });
-        return addContributionMutation.mutateAsync({
-          goalId,
-          amount,
-          description,
-        } as never);
-      },
-
-      // Distribute funds across multiple goals
-      distributeFunds: async (distribution: unknown, description: string) => {
-        logger.debug("Distributing funds:", { distribution, description });
-        return distributeFundsMutation.mutateAsync({
-          distribution,
-          description,
-        } as never);
-      },
-
-      // Find goal by ID
-      getGoalById: (goalId: string) => {
-        return savingsGoals.find((goal) => goal.id === goalId) || null;
-      },
-
-      // Get active goals only
-      getActiveGoals: () => {
-        return savingsGoals.filter((goal) => !goal.isCompleted);
-      },
-
-      // Get completed goals only
-      getCompletedGoals: () => {
-        return savingsGoals.filter((goal) => goal.isCompleted);
-      },
-
-      // Get goals by urgency
-      getUrgentGoals: () => {
-        return savingsGoals.filter((goal) => goal.urgency === "urgent");
-      },
-
-      // Get overdue goals
-      getOverdueGoals: () => {
-        return savingsGoals.filter((goal) => goal.urgency === "overdue");
-      },
-
-      // Get goals by category
-      getGoalsByCategory: (category: string) => {
-        return savingsGoals.filter((goal) => goal.category === category);
-      },
-
-      // Get goals by priority
-      getGoalsByPriority: (priority: string) => {
-        return savingsGoals.filter((goal) => goal.priority === priority);
-      },
-
-      // Check if any goals need attention
-      hasGoalsNeedingAttention: () => {
-        return savingsGoals.some(
-          (goal) =>
-            goal.urgency === "urgent" || goal.urgency === "overdue" || goal.urgency === "behind"
-        );
-      },
-    }),
+    () =>
+      createSavingsGoalHelpers(savingsGoals, {
+        addSavingsGoalMutation,
+        updateSavingsGoalMutation,
+        deleteSavingsGoalMutation,
+        addContributionMutation,
+        distributeFundsMutation,
+      }),
     [
       savingsGoals,
       addSavingsGoalMutation,

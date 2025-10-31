@@ -253,6 +253,71 @@ export const createUIActions = (setters: UISetters) => ({
 });
 
 /**
+ * Process and resolve all bill data from multiple sources
+ * Extracted to reduce complexity in main hook
+ */
+export const processAndResolveData = (
+  propTransactions: Transaction[],
+  tanStackTransactions: Transaction[],
+  budgetTransactions: Transaction[],
+  propEnvelopes: unknown[],
+  tanStackEnvelopes: unknown[],
+  budgetEnvelopes: unknown[],
+  tanStackBills: unknown[],
+  budgetBills: unknown[],
+  viewMode: string,
+  filterOptions: FilterOptions,
+  onUpdateBill?: (bill: Bill) => void | Promise<void>,
+  updateBillMutation?: (updates: {
+    billId: string;
+    updates: Record<string, unknown>;
+  }) => Promise<void>
+) => {
+  const resolvedTransactions: Transaction[] = resolveTransactions(
+    propTransactions as Transaction[],
+    tanStackTransactions as unknown as Transaction[],
+    budgetTransactions as Transaction[]
+  );
+
+  const resolvedEnvelopes = resolveEnvelopes(
+    propEnvelopes as unknown[],
+    tanStackEnvelopes as unknown[],
+    budgetEnvelopes as unknown[]
+  );
+
+  const billsFromTransactions: Bill[] = extractBillsFromTransactions(resolvedTransactions);
+
+  const combinedBills: Bill[] = combineBills(
+    tanStackBills as unknown as Bill[],
+    (budgetBills as unknown as Bill[]) || [],
+    billsFromTransactions
+  );
+
+  const processedBills: Bill[] = processBills(
+    combinedBills,
+    onUpdateBill,
+    updateBillMutation as unknown as (updates: {
+      billId: string;
+      updates: Record<string, unknown>;
+    }) => Promise<void>
+  );
+
+  const { categorizedBills: catBills, totals: billTotals } =
+    categorizeBillsWithTotals(processedBills);
+
+  const filtered: Bill[] = getFilteredBills(catBills as CategorizedBills, viewMode, filterOptions);
+
+  return {
+    transactions: resolvedTransactions,
+    envelopes: resolvedEnvelopes,
+    bills: processedBills,
+    categorizedBills: catBills,
+    totals: billTotals,
+    filteredBills: filtered,
+  };
+};
+
+/**
  * Handle search new bills action with state management
  */
 export const handleSearchNewBills = async (

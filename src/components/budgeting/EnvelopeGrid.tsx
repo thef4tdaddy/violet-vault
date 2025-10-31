@@ -25,7 +25,9 @@ const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
 // Modals container component
-interface EnvelopeRef { id: string }
+interface EnvelopeRef {
+  id: string;
+}
 
 const EnvelopeModals = ({
   showCreateModal,

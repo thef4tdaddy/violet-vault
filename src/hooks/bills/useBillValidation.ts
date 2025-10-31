@@ -17,7 +17,9 @@ export const useBillValidation = (envelopes = []) => {
       const zodResult = validateBillSafe(bill);
 
       if (!zodResult.success) {
-        const errors = ((zodResult.error as never) as { errors: Array<{ path: string[]; message: string }> }).errors.map((err) => {
+        const errors = (
+          zodResult.error as never as { errors: Array<{ path: string[]; message: string }> }
+        ).errors.map((err) => {
           const path = err.path.join(".");
           return `${path}: ${err.message}`;
         });

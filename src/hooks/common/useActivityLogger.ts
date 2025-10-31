@@ -14,7 +14,7 @@ const useActivityLogger = () => {
   useEffect(() => {
     if (currentUser) {
       activityLogger.setCurrentUser({
-        id: currentUser.budgetId || 'default',
+        id: currentUser.budgetId || "default",
         userName: currentUser.userName,
         userColor: currentUser.userColor,
       });

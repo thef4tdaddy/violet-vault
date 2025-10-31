@@ -228,13 +228,13 @@ export const createExecuteRules =
     historyHook: UseAutoFundingHistoryReturn,
     dataHook: UseAutoFundingDataReturn
   ) =>
-   async (trigger = TRIGGER_TYPES.MANUAL, triggerData: Record<string, unknown> = {}) => {
-     try {
-       const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
-       processExecutionResults(result, historyHook, rulesHook, dataHook);
-       return result;
-     } catch (error) {
-       logger.error("Enhanced rule execution failed", error);
+  async (trigger = TRIGGER_TYPES.MANUAL, triggerData: Record<string, unknown> = {}) => {
+    try {
+      const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
+      processExecutionResults(result, historyHook, rulesHook, dataHook);
+      return result;
+    } catch (error) {
+      logger.error("Enhanced rule execution failed", error);
       // Return a shaped ExecutionResult even on error so callers have a consistent type
       const execution = {
         id: `err-${Date.now()}`,
@@ -249,8 +249,8 @@ export const createExecuteRules =
         results: [],
         error: String((error as Error)?.message || error),
       };
-     }
-   };
+    }
+  };
 
 /**
  * Get current data for auto-save

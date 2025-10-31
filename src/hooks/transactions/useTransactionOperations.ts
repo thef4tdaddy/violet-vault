@@ -37,11 +37,13 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
     ...createAddTransactionMutationConfig(queryClient, categoryRules),
   });
 
-  const updateTransactionMutation = useMutation<unknown, Error, { id: string; updates: Partial<Transaction> }>(
-    {
-      ...createUpdateTransactionMutationConfig(queryClient),
-    }
-  );
+  const updateTransactionMutation = useMutation<
+    unknown,
+    Error,
+    { id: string; updates: Partial<Transaction> }
+  >({
+    ...createUpdateTransactionMutationConfig(queryClient),
+  });
 
   const deleteTransactionMutation = useMutation<{ id: string }, Error, string>({
     ...createDeleteTransactionMutationConfig(queryClient),
@@ -71,11 +73,13 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
     ...createTransferFundsMutationConfig(queryClient),
   });
 
-  const bulkOperationMutation = useMutation<unknown[], Error, { operation: string; transactions: Transaction[]; updates?: Partial<Transaction> }>(
-    {
-      ...createBulkOperationMutationConfig(queryClient, categoryRules),
-    }
-  );
+  const bulkOperationMutation = useMutation<
+    unknown[],
+    Error,
+    { operation: string; transactions: Transaction[]; updates?: Partial<Transaction> }
+  >({
+    ...createBulkOperationMutationConfig(queryClient, categoryRules),
+  });
 
   // Convenience methods
   const addTransaction = useCallback(

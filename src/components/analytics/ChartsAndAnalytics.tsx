@@ -143,7 +143,9 @@ const ChartsAnalytics = ({
       {/* Key Metrics */}
       <MetricsGrid
         filteredTransactions={
-          (Array.isArray(filteredTransactions) ? filteredTransactions : []) as unknown as import("@/types/analytics").Transaction[]
+          (Array.isArray(filteredTransactions)
+            ? filteredTransactions
+            : []) as unknown as import("@/types/analytics").Transaction[]
         }
         metrics={(metrics || {}) as unknown as import("@/types/analytics").AnalyticsMetrics}
         envelopes={envelopes}
