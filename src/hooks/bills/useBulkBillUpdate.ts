@@ -1,11 +1,16 @@
 import { useState } from "react";
-import type { Bill } from "@/types/bills";
+import type { Bill as DBBill } from "@/db/types";
+
+// Extended Bill type to match runtime data
+interface Bill extends Omit<DBBill, "dueDate"> {
+  dueDate: Date | string;
+}
 
 interface BillChange {
   amount: number;
-  dueDate: string;
+  dueDate: Date | string;
   originalAmount: number;
-  originalDueDate: string;
+  originalDueDate: Date | string;
 }
 
 /**
@@ -32,7 +37,11 @@ export const useBulkBillUpdate = (selectedBills: Bill[] = [], _isOpen: boolean) 
   };
 
   // Update individual bill change
-  const updateChange = (billId: string, field: keyof BillChange, value: number | string) => {
+  const updateChange = <K extends keyof BillChange>(
+    billId: string,
+    field: K,
+    value: BillChange[K]
+  ) => {
     setChanges((prev) => ({
       ...prev,
       [billId]: {
@@ -43,7 +52,7 @@ export const useBulkBillUpdate = (selectedBills: Bill[] = [], _isOpen: boolean) 
   };
 
   // Apply bulk change to all selected bills
-  const applyBulkChange = (field: keyof BillChange, value: number | string) => {
+  const applyBulkChange = <K extends keyof BillChange>(field: K, value: BillChange[K]) => {
     const newChanges = { ...changes };
     selectedBills.forEach((bill) => {
       if (newChanges[bill.id]) {

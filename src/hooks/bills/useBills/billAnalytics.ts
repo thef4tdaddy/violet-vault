@@ -1,6 +1,6 @@
 // Bill Analytics and Utility Functions
 import { useMemo } from "react";
-import type { Bill } from "@/types/bills";
+import type { Bill } from "@/db/types";
 
 /**
  * Calculate bill analytics from bill data
@@ -152,8 +152,9 @@ export const useBillUtilities = (bills: Bill[] = []) => {
         const nextDate = new Date(dueDate);
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth();
+        const frequency = bill.frequency as string;
 
-        switch (bill.frequency) {
+        switch (frequency) {
           case "weekly":
             while (nextDate <= today) {
               nextDate.setDate(nextDate.getDate() + 7);
