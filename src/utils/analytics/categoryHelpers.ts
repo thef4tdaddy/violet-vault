@@ -3,7 +3,7 @@
  * Handles calculations, statistics, and data transformations
  */
 
-interface CategoryStat {
+export interface CategoryStat {
   name: string;
   type: string;
   transactionCount: number;
@@ -13,7 +13,7 @@ interface CategoryStat {
   frequency: number;
 }
 
-interface TransactionForStats {
+export interface TransactionForStats {
   category?: string;
   amount: number;
   date: string;
@@ -68,7 +68,7 @@ export const calculateCategoryStats = (
   return Object.values(stats).sort((a, b) => b.totalAmount - a.totalAmount);
 };
 
-interface Suggestion {
+export interface Suggestion {
   id: string;
   priority: "high" | "medium" | "low";
   impact: number;

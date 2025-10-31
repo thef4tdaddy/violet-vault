@@ -1,16 +1,10 @@
 import { useCallback } from "react";
 import logger from "@/utils/common/logger";
-
-interface Rule {
-  id: string;
-  name: string;
-  enabled: boolean;
-  [key: string]: unknown;
-}
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface UseRuleTogglesProps {
-  rules: Rule[];
-  updateRule: (ruleId: string, updates: Partial<Rule>) => Rule | undefined;
+  rules: AutoFundingRule[];
+  updateRule: (ruleId: string, updates: Partial<AutoFundingRule>) => AutoFundingRule | undefined;
 }
 
 /**

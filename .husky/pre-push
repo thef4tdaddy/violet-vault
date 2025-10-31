@@ -12,7 +12,7 @@ echo "✅ ESLint passed!"
 echo "🔍 Running TypeScript type check before push..."
 TYPECHECK_OUTPUT=$(npx tsc --noEmit 2>&1)
 ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | grep -c "error TS" || echo "0")
-ERROR_THRESHOLD=220
+ERROR_THRESHOLD=50
 
 if [ "$ERROR_COUNT" -gt "$ERROR_THRESHOLD" ]; then
   echo "❌ TypeScript errors exceed threshold! ($ERROR_COUNT > $ERROR_THRESHOLD)"

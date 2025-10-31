@@ -33,13 +33,26 @@ class KeyManagementService {
       }
 
       // Create a fingerprint using the key data
-      const keyBuffer =
-        typeof encryptionKey === "string" ? new TextEncoder().encode(encryptionKey) : encryptionKey;
+      let bufferToHash: Uint8Array;
 
-      // Convert to ArrayBuffer if needed
-      const bufferToHash =
-        keyBuffer instanceof Uint8Array ? keyBuffer.buffer : (keyBuffer as unknown as ArrayBuffer);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", bufferToHash);
+      if (typeof encryptionKey === "string") {
+        bufferToHash = new TextEncoder().encode(encryptionKey);
+      } else if (encryptionKey instanceof Uint8Array) {
+        bufferToHash = encryptionKey;
+      } else {
+        // CryptoKey - export it first
+        const exported = await crypto.subtle.exportKey("raw", encryptionKey);
+        // Copy to a new ArrayBuffer to ensure it's not SharedArrayBuffer
+        const tempArray = new Uint8Array(exported);
+        const newBuffer = new ArrayBuffer(tempArray.length);
+        bufferToHash = new Uint8Array(newBuffer);
+        bufferToHash.set(tempArray);
+      }
+
+      // Create a pure ArrayBuffer copy to avoid SharedArrayBuffer issues
+      const pureBuffer = new ArrayBuffer(bufferToHash.length);
+      new Uint8Array(pureBuffer).set(bufferToHash);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", pureBuffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 

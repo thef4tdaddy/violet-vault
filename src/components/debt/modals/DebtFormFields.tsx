@@ -1,57 +1,58 @@
-import { Select, Checkbox } from "@/components/ui";
-import { Button } from "@/components/ui";
+import React from "react";
+import { Select, Checkbox, Button } from "@/components/ui";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import { DebtBasicInfo, DebtFinancialDetails, DebtPaymentDetails } from "./DebtFormSections";
 
-/**
- * Form fields section for AddDebtModal
- * Pure UI component that preserves exact visual appearance
- * Refactored to reduce complexity by extracting sub-components
- */
+// Minimal strongly-typed shapes used by this form
+type DebtFormData = Record<string, unknown> & {
+  id?: string;
+  shouldCreateBill?: boolean;
+  existingBillId?: string | null;
+  notes?: string;
+};
+
+type Bill = {
+  id: string;
+  name?: string;
+  amount?: number;
+};
+
+
+type DebtFormFieldsProps = {
+  formData: DebtFormData;
+  setFormData: (patch: Partial<DebtFormData>) => void;
+  errors: Partial<Record<string, string | undefined>>;
+  canEdit: boolean;
+  isEditMode: boolean;
+  isSubmitting: boolean;
+  handleFormSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onClose: () => void;
+  bills: Bill[];
+  billsLoading?: boolean;
+};
+
 const DebtFormFields = ({
-  // Form data and handlers
   formData,
   setFormData,
   errors,
-
-  // UI state
   canEdit,
   isEditMode,
   isSubmitting,
-
-  // Form handlers
   handleFormSubmit,
   onClose,
-
-  // Data
   bills,
   billsLoading,
-}) => {
+}: DebtFormFieldsProps) => {
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
       {/* Basic Information */}
-      <DebtBasicInfo
-        formData={formData}
-        setFormData={setFormData}
-        errors={errors}
-        canEdit={canEdit}
-      />
+      <DebtBasicInfo formData={formData} setFormData={setFormData} errors={errors} canEdit={canEdit} />
 
       {/* Financial Details */}
-      <DebtFinancialDetails
-        formData={formData}
-        setFormData={setFormData}
-        errors={errors}
-        canEdit={canEdit}
-      />
+      <DebtFinancialDetails formData={formData} setFormData={setFormData} errors={errors} canEdit={canEdit} />
 
       {/* Payment Details */}
-      <DebtPaymentDetails
-        formData={formData}
-        setFormData={setFormData}
-        errors={errors}
-        canEdit={canEdit}
-      />
+      <DebtPaymentDetails formData={formData} setFormData={setFormData} errors={errors} canEdit={canEdit} />
 
       {/* Connection Management */}
       <div className="space-y-4">
@@ -63,9 +64,12 @@ const DebtFormFields = ({
             <h4 className="font-medium text-gray-900">Automatic Bill Creation</h4>
             <p className="text-sm text-gray-600">Create recurring bills for this debt's payments</p>
           </div>
+
           <Checkbox
-            checked={formData.shouldCreateBill}
-            onChange={(e) => setFormData({ shouldCreateBill: e.target.checked })}
+            checked={Boolean(formData.shouldCreateBill)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData({ shouldCreateBill: e.target.checked })
+            }
             disabled={!canEdit}
           />
         </div>
@@ -73,7 +77,7 @@ const DebtFormFields = ({
         {/* Universal Connection Manager for standardized connection UI */}
         <UniversalConnectionManager
           entityType="debt"
-          entityId={isEditMode ? formData.id : null}
+          entityId={isEditMode ? (formData.id as string | undefined) : null}
           canEdit={canEdit}
           theme="red"
           showSelector={true}
@@ -82,12 +86,12 @@ const DebtFormFields = ({
         {/* Legacy bill connection (fallback if needed) */}
         {formData.shouldCreateBill && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Connect to Existing Bill
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Connect to Existing Bill</label>
             <Select
-              value={formData.existingBillId || ""}
-              onChange={(e) => setFormData({ existingBillId: e.target.value })}
+              value={String(formData.existingBillId ?? "")}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setFormData({ existingBillId: e.target.value })
+              }
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               disabled={!canEdit || billsLoading}
             >
@@ -98,9 +102,8 @@ const DebtFormFields = ({
                 </option>
               ))}
             </Select>
-            {errors.existingBillId && (
-              <p className="mt-1 text-sm text-red-600">{errors.existingBillId}</p>
-            )}
+
+            {errors.existingBillId && <p className="mt-1 text-sm text-red-600">{errors.existingBillId}</p>}
           </div>
         )}
       </div>
@@ -109,8 +112,8 @@ const DebtFormFields = ({
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
         <textarea
-          value={formData.notes}
-          onChange={(e) => setFormData({ notes: e.target.value })}
+          value={String(formData.notes ?? "")}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ notes: e.target.value })}
           rows={3}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
           placeholder="Add any additional notes about this debt..."

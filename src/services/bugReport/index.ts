@@ -213,7 +213,7 @@ export class BugReportService {
 
       // Technical data
       screenshot: dataCollection.screenshot || undefined,
-      systemInfo: dataCollection.systemInfo as SystemInfo,
+      systemInfo: dataCollection.systemInfo as unknown as SystemInfo,
 
       // Application context
       appVersion: APP_VERSION,

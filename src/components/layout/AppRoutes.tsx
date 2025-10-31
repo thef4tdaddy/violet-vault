@@ -4,6 +4,7 @@ import LandingPage from "../marketing/LandingPage";
 import OfflinePage from "../pwa/OfflinePage";
 import ShareTargetHandler from "../pwa/ShareTargetHandler";
 import DevAuthBypass from "../dev/DevAuthBypass";
+import APIDocumentation from "../api-docs/APIDocumentation";
 import { routeConfig } from "./routeConfig";
 
 /**
@@ -32,6 +33,9 @@ const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) =>
 
       {/* Dev auth bypass route */}
       <Route path="/__dev_auth" element={<DevAuthBypass />} />
+
+      {/* API Documentation route */}
+      <Route path="/api-docs" element={<APIDocumentation />} />
 
       {/* App routes under /app prefix */}
       {routeConfig.map(({ path, activeView }) => (

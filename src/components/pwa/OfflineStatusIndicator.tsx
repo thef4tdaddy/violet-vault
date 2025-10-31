@@ -10,9 +10,11 @@ import { useConfirm } from "../../hooks/common/useConfirm";
  * Pending operation interface
  */
 interface PendingOperation {
-  id?: string | number;
-  type?: string;
-  retryCount?: number;
+  id?: string | number | unknown;
+  type?: string | unknown;
+  retryCount?: number | unknown;
+  timestamp?: unknown;
+  lastError?: unknown;
 }
 
 /**
@@ -221,17 +223,23 @@ const OfflineStatusIndicator: React.FC = () => {
                 Pending Operations
               </h4>
               <div className="max-h-24 overflow-y-auto space-y-1">
-                {syncStatus.pendingOperations.slice(0, 3).map((op, index) => (
-                  <div
-                    key={op.id || index}
-                    className="text-xs text-gray-600 flex items-center justify-between"
-                  >
-                    <span>{op.type || "Operation"}</span>
-                    <span className="text-yellow-600">
-                      {op.retryCount > 0 ? `Retry ${op.retryCount}` : "Queued"}
-                    </span>
-                  </div>
-                ))}
+                {syncStatus.pendingOperations.slice(0, 3).map((op, index) => {
+                  const opId = typeof op.id === 'string' || typeof op.id === 'number' ? op.id : index;
+                  const opType = typeof op.type === 'string' ? op.type : "Operation";
+                  const retryCount = typeof op.retryCount === 'number' ? op.retryCount : 0;
+                  
+                  return (
+                    <div
+                      key={opId}
+                      className="text-xs text-gray-600 flex items-center justify-between"
+                    >
+                      <span>{opType}</span>
+                      <span className="text-yellow-600">
+                        {retryCount > 0 ? `Retry ${retryCount}` : "Queued"}
+                      </span>
+                    </div>
+                  );
+                })}
                 {syncStatus.pendingOperations.length > 3 && (
                   <div className="text-xs text-gray-500">
                     +{syncStatus.pendingOperations.length - 3} more...

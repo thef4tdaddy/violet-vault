@@ -184,7 +184,7 @@ export class PerformanceInfoService {
             }
           : null,
         navigation: {
-          type: navigation?.type || 0,
+          type: typeof navigation?.type === 'number' ? navigation.type : 0,
           redirectCount: navigation?.redirectCount || 0,
         },
         resourceCount: perf.getEntries?.()?.length || 0,

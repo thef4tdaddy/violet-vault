@@ -45,9 +45,9 @@ const LockScreen = () => {
         title: "Incorrect Password",
         message:
           "That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?",
-        confirmText: "Start New Budget",
-        cancelText: "Try Again",
-        variant: "destructive",
+        confirmLabel: "Start New Budget",
+        cancelLabel: "Try Again",
+        destructive: true,
       });
 
       originalConfirm.then(resolve).catch(() => resolve(false));

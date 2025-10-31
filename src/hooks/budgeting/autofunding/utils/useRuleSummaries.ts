@@ -1,14 +1,9 @@
 import { useCallback } from "react";
-import { createRuleSummary } from "@/utils/budgeting/autofunding/rules";
+import type { AutoFundingRule, RuleSummary } from "@/utils/budgeting/autofunding/rules";
 import logger from "@/utils/common/logger";
 
-interface Rule {
-  id: string;
-  [key: string]: unknown;
-}
-
 interface UseRuleSummariesProps {
-  rules: Rule[];
+  rules: AutoFundingRule[];
 }
 
 /**
@@ -23,7 +18,16 @@ export const useRuleSummaries = ({ rules }: UseRuleSummariesProps) => {
           ? rules.filter((rule) => ruleIds.includes(rule.id))
           : rules;
 
-        return rulesToSummarize.map((rule) => createRuleSummary(rule));
+        return rulesToSummarize.map((rule): RuleSummary => ({
+          id: rule.id,
+          name: rule.name,
+          enabled: rule.enabled,
+          priority: rule.priority,
+          type: rule.type,
+          trigger: rule.trigger,
+          description: rule.description,
+          targetDescription: `${rule.config.targetType}: ${rule.config.targetId || 'multiple'}`,
+        }));
       } catch (error) {
         logger.error("Failed to create rule summaries", error);
         return [];

@@ -194,7 +194,7 @@ const NotificationSettingsSection = () => {
       if (result.success) {
         logger.info("✅ Notifications enabled successfully");
       } else {
-        logger.warn("❌ Failed to enable notifications:", result.reason);
+        logger.warn("❌ Failed to enable notifications:", { reason: result.reason });
         if (result.reason === "permission_denied") {
           handlePermissionDenied();
         }

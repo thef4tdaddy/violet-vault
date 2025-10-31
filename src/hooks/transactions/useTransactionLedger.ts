@@ -1,13 +1,14 @@
 import { useEffect } from "react";
 import { useTransactionFilters } from "./useTransactionFilters";
 import { useTransactionForm } from "./useTransactionForm";
+import { useTransactionFormValidated } from "./useTransactionFormValidated";
 import { useTransactionImport } from "./useTransactionImport";
-import { suggestEnvelope } from "../../utils/transactions/envelopeMatching";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useTransactions } from "../common/useTransactions";
-import { useEnvelopes } from "../budgeting/useEnvelopes";
+import { suggestEnvelope } from "@/utils/transactions/envelopeMatching";
+import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useTransactions } from "@/hooks/common/useTransactions";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { useShallow } from "zustand/react/shallow";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import { useLedgerState } from "./helpers/useLedgerState";
 import { useLedgerOperations } from "./helpers/useLedgerOperations";
 import type { TransactionInput } from "./useTransactionMutations";
@@ -58,7 +59,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
     });
   };
 
-  // Custom hooks
+  // Custom hooks - Keep old hook for backwards compatibility with TransactionForm component
   const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
     useTransactionForm();
 
@@ -97,13 +98,24 @@ export const useTransactionLedger = (currentUser: unknown) => {
   }, [filteredTransactions.length, ledgerState]);
 
   // Use extracted operations hook
-  const operations = useLedgerOperations(
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    updateBill,
-    envelopes
-  );
+  const operations = useLedgerOperations(addTransaction, deleteTransaction, updateBill, envelopes);
+
+  // New validated form hook
+  const validatedForm = useTransactionFormValidated({
+    editingTransaction: ledgerState.editingTransaction,
+    onAddTransaction: (transaction) => addTransaction(transaction as unknown as TransactionInput),
+    onUpdateTransaction: updateTransaction,
+    onDeleteTransaction: async (id) => {
+      await deleteTransaction(id as never);
+    },
+    onPayBill: operations.handlePayBill,
+    onClose: () => {
+      ledgerState.setShowAddModal(false);
+      ledgerState.setEditingTransaction(null);
+    },
+    onError: (error) => logger.error("Transaction form error", { error }),
+    envelopes,
+  });
 
   // Event handlers
   const handleSubmitTransaction = () => {
@@ -166,9 +178,12 @@ export const useTransactionLedger = (currentUser: unknown) => {
     // Modal states - from ledgerState
     ...ledgerState,
 
-    // Form data
+    // Form data (legacy - for backwards compatibility)
     transactionForm,
     setTransactionForm,
+
+    // Validated form (new pattern)
+    validatedForm,
 
     // Pagination
     totalPages,

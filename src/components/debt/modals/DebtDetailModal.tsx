@@ -45,7 +45,14 @@ const DebtDetailModal = ({
     handleEdit,
     handleShowPaymentForm,
     handleCancelPayment,
-  } = useDebtDetailModal(debt, isOpen, onClose, onDelete, onRecordPayment, onEdit);
+  } = useDebtDetailModal({
+    debt,
+    isOpen,
+    onClose,
+    onDelete,
+    onRecordPayment,
+    onEdit,
+  });
 
   if (!isOpen || !debt) return null;
 

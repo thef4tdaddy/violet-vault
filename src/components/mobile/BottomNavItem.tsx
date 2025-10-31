@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { hapticFeedback } from "../../utils/ui/touchFeedback";
+import { hapticFeedback } from "@/utils/ui/touchFeedback";
 
 /**
  * Individual navigation item for bottom navigation bar
@@ -7,7 +7,7 @@ import { hapticFeedback } from "../../utils/ui/touchFeedback";
  */
 const BottomNavItem = ({ to, icon: _Icon, label, isActive }) => {
   const handleClick = () => {
-    hapticFeedback("light");
+    hapticFeedback(10, "light");
   };
 
   return (

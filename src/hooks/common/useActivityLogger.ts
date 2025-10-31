@@ -13,7 +13,11 @@ const useActivityLogger = () => {
   // Set current user when it changes
   useEffect(() => {
     if (currentUser) {
-      activityLogger.setCurrentUser(currentUser);
+      activityLogger.setCurrentUser({
+        id: currentUser.budgetId || 'default',
+        userName: currentUser.userName,
+        userColor: currentUser.userColor,
+      });
     }
   }, [currentUser]);
 

@@ -1,14 +1,9 @@
 import React, { useCallback } from "react";
 import logger from "@/utils/common/logger";
-
-interface Rule {
-  id: string;
-  updatedAt?: string;
-  [key: string]: unknown;
-}
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface UseRuleBulkOperationsProps {
-  setRules: React.Dispatch<React.SetStateAction<Rule[]>>;
+  setRules: React.Dispatch<React.SetStateAction<AutoFundingRule[]>>;
 }
 
 /**
@@ -17,7 +12,7 @@ interface UseRuleBulkOperationsProps {
 export const useRuleBulkOperations = ({ setRules }: UseRuleBulkOperationsProps) => {
   // Bulk update rules
   const bulkUpdateRules = useCallback(
-    (ruleIds: string[], updates: Partial<Rule>) => {
+    (ruleIds: string[], updates: Partial<AutoFundingRule>) => {
       try {
         setRules((prevRules) =>
           prevRules.map((rule) =>

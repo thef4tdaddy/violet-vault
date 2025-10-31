@@ -1,6 +1,7 @@
 import { useState, useMemo, createElement } from "react";
 import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
 import { getIcon } from "@/utils";
+import { BudgetCommit } from "@/domain/schemas";
 import {
   CommitCard,
   ViewerHeader,
@@ -15,20 +16,6 @@ interface ObjectHistoryViewerProps {
   onClose: () => void;
 }
 
-/**
- * ObjectHistoryViewer - Shows history for a specific envelope, transaction, etc.
- */
-interface _BudgetCommit {
-  id?: string;
-  hash: string;
-  message: string;
-  author?: string;
-  timestamp?: string;
-  changes?: Array<Record<string, unknown>>;
-  deviceFingerprint?: string;
-  parentHash?: string;
-}
-
 const ObjectHistoryViewer = ({
   objectId,
   objectType,
@@ -40,11 +27,11 @@ const ObjectHistoryViewer = ({
   const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
 
   // Compute history filtered for this specific object
-  const relevantHistory = useMemo((): _BudgetCommit[] => {
+  const relevantHistory = useMemo((): BudgetCommit[] => {
     if (!allCommits.length || isLoading) return [];
 
     // Filter for commits that likely affected this specific object
-    const objectHistory = allCommits.filter((commit): commit is _BudgetCommit => {
+    const objectHistory = allCommits.filter((commit): commit is BudgetCommit => {
       // For now, include all commits as we need commit details to filter properly
       // This could be optimized later by adding object-specific tracking
       return (
