@@ -109,8 +109,10 @@ export const calculateStorageUsage = (): StorageUsage => {
     const storageQuota = 5 * 1024 * 1024; // 5MB localStorage limit
     const allKeys = localStorageService.getKeysByPrefix("");
     const usedSpace = allKeys
-      .map((key) => localStorageService.getItem(key))
-      .reduce((total, item) => total + (item ? new Blob([item]).size : 0), 0);
+      .map((key: string) => localStorageService.getItem(key))
+      .reduce((total: number, item: string | null) => {
+        return total + (item ? new Blob([item]).size : 0);
+      }, 0);
 
     return {
       currentSize,
@@ -212,7 +214,7 @@ export const saveToStorage = (
     };
 
     localStorageService.setJSON(STORAGE_KEY, dataToSave);
-    setLastSaved(dataToSave.lastSaved);
+    setLastSaved(dataToSave.lastSaved ?? null);
     setHasUnsavedChanges(false);
 
     logger.debug("Auto-funding data saved to localStorage", {

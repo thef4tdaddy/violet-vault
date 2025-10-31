@@ -3,13 +3,17 @@ import { useExecutionHistory } from "./useExecutionHistory";
 import { useUndoOperations } from "./useUndoOperations";
 import { useExecutionStatistics } from "./useExecutionStatistics";
 import { useHistoryExport } from "./useHistoryExport";
-import logger from "../../../utils/common/logger";
+import logger from "@/utils/common/logger";
+import type { ExecutionHistoryEntry, UndoStackEntry } from "@/hooks/budgeting/autofunding/types";
 
 /**
  * Hook for managing auto-funding execution history and undo operations
  * Refactored to use focused sub-hooks for better maintainability
  */
-export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []) => {
+export const useAutoFundingHistory = (
+  initialHistory: ExecutionHistoryEntry[] = [],
+  initialUndoStack: UndoStackEntry[] = []
+) => {
   // Use focused hooks for specific functionality
   const historyHook = useExecutionHistory(initialHistory);
   const undoHook = useUndoOperations(initialUndoStack, historyHook.addToHistory);
@@ -67,11 +71,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
       statisticsHook.getExecutionStatistics(historyHook.executionHistory),
 
     // Import/Export
-    exportHistory: (options) =>
-      exportHook.exportHistory(
-        historyHook.executionHistory as never[],
-        undoHook.undoStack,
-        options
-      ),
+    exportHistory: (options?: Record<string, unknown>) =>
+      exportHook.exportHistory(historyHook.executionHistory, undoHook.undoStack, options),
   };
 };
