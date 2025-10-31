@@ -5,108 +5,125 @@
  */
 export const queryKeys = {
   // Budget data
-  budget: ["budget"],
-  budgetData: () => [...queryKeys.budget, "data"],
-  budgetSummary: () => [...queryKeys.budget, "summary"],
+  budget: ["budget"] as const,
+  budgetData: () => [...queryKeys.budget, "data"] as const,
+  budgetSummary: () => [...queryKeys.budget, "summary"] as const,
 
   // Budget metadata (unassigned cash, actual balance, etc.)
-  budgetMetadata: ["budgetMetadata"],
-  unassignedCash: () => [...queryKeys.budgetMetadata, "unassignedCash"],
-  actualBalance: () => [...queryKeys.budgetMetadata, "actualBalance"],
+  budgetMetadata: ["budgetMetadata"] as const,
+  unassignedCash: () => [...queryKeys.budgetMetadata, "unassignedCash"] as const,
+  actualBalance: () => [...queryKeys.budgetMetadata, "actualBalance"] as const,
 
   // Envelopes
-  envelopes: ["envelopes"],
-  envelopesList: (filters = {}) => [...queryKeys.envelopes, "list", filters],
-  envelopeById: (id) => [...queryKeys.envelopes, "detail", id],
-  envelopesByCategory: (category) => [...queryKeys.envelopes, "category", category],
-  envelopeBalances: () => [...queryKeys.envelopes, "balances"],
+  envelopes: ["envelopes"] as const,
+  envelopesList: (filters: Record<string, unknown> = {}) =>
+    [...queryKeys.envelopes, "list", filters] as const,
+  envelopeById: (id: string) => [...queryKeys.envelopes, "detail", id] as const,
+  envelopesByCategory: (category: string) =>
+    [...queryKeys.envelopes, "category", category] as const,
+  envelopeBalances: () => [...queryKeys.envelopes, "balances"] as const,
 
   // Transactions
-  transactions: ["transactions"],
-  transactionsList: (filters = {}) => [...queryKeys.transactions, "list", filters],
-  transactionById: (id) => [...queryKeys.transactions, "detail", id],
-  transactionsByDateRange: (start, end) => [...queryKeys.transactions, "dateRange", start, end],
-  transactionsByEnvelope: (envelopeId) => [...queryKeys.transactions, "envelope", envelopeId],
+  transactions: ["transactions"] as const,
+  transactionsList: (filters: Record<string, unknown> = {}) =>
+    [...queryKeys.transactions, "list", filters] as const,
+  transactionById: (id: string) => [...queryKeys.transactions, "detail", id] as const,
+  transactionsByDateRange: (start: string | number | Date, end: string | number | Date) =>
+    [...queryKeys.transactions, "dateRange", start, end] as const,
+  transactionsByEnvelope: (envelopeId: string) =>
+    [...queryKeys.transactions, "envelope", envelopeId] as const,
 
   // Bills
-  bills: ["bills"],
-  billsList: (filters = {}) => [...queryKeys.bills, "list", filters],
-  billById: (id) => [...queryKeys.bills, "detail", id],
-  upcomingBills: (days = 30) => [...queryKeys.bills, "upcoming", days],
-  overdueBills: () => [...queryKeys.bills, "overdue"],
+  bills: ["bills"] as const,
+  billsList: (filters: Record<string, unknown> = {}) =>
+    [...queryKeys.bills, "list", filters] as const,
+  billById: (id: string) => [...queryKeys.bills, "detail", id] as const,
+  upcomingBills: (days: number = 30) => [...queryKeys.bills, "upcoming", days] as const,
+  overdueBills: () => [...queryKeys.bills, "overdue"] as const,
 
   // Savings Goals
-  savingsGoals: ["savingsGoals"],
-  savingsGoalsList: () => [...queryKeys.savingsGoals, "list"],
-  savingsGoalById: (id) => [...queryKeys.savingsGoals, "detail", id],
-  activeSavingsGoals: () => [...queryKeys.savingsGoals, "active"],
+  savingsGoals: ["savingsGoals"] as const,
+  savingsGoalsList: () => [...queryKeys.savingsGoals, "list"] as const,
+  savingsGoalById: (id: string) => [...queryKeys.savingsGoals, "detail", id] as const,
+  activeSavingsGoals: () => [...queryKeys.savingsGoals, "active"] as const,
 
   // Receipts
-  receipts: ["receipts"],
-  receiptsList: (filters = {}) => [...queryKeys.receipts, "list", filters],
-  receiptById: (id) => [...queryKeys.receipts, "detail", id],
-  receiptsByTransaction: (transactionId) => [...queryKeys.receipts, "transaction", transactionId],
+  receipts: ["receipts"] as const,
+  receiptsList: (filters: Record<string, unknown> = {}) =>
+    [...queryKeys.receipts, "list", filters] as const,
+  receiptById: (id: string) => [...queryKeys.receipts, "detail", id] as const,
+  receiptsByTransaction: (transactionId: string) =>
+    [...queryKeys.receipts, "transaction", transactionId] as const,
 
   // Analytics
-  analytics: ["analytics"],
-  analyticsSpending: (period) => [...queryKeys.analytics, "spending", period],
-  analyticsTrends: (period) => [...queryKeys.analytics, "trends", period],
-  analyticsCategories: (period) => [...queryKeys.analytics, "categories", period],
-  analyticsBalance: () => [...queryKeys.analytics, "balance"],
-  analyticsReport: (type, params) => [...queryKeys.analytics, type, params],
+  analytics: ["analytics"] as const,
+  analyticsSpending: (period: string) => [...queryKeys.analytics, "spending", period] as const,
+  analyticsTrends: (period: string) => [...queryKeys.analytics, "trends", period] as const,
+  analyticsCategories: (period: string) => [...queryKeys.analytics, "categories", period] as const,
+  analyticsBalance: () => [...queryKeys.analytics, "balance"] as const,
+  analyticsReport: (type: string, params: Record<string, unknown>) =>
+    [...queryKeys.analytics, type, params] as const,
 
   // Dashboard
-  dashboard: ["dashboard"],
-  dashboardSummary: () => [...queryKeys.dashboard, "summary"],
-  dashboardOverview: () => [...queryKeys.dashboard, "overview"],
-  dashboardMetrics: () => [...queryKeys.dashboard, "metrics"],
+  dashboard: ["dashboard"] as const,
+  dashboardSummary: () => [...queryKeys.dashboard, "summary"] as const,
+  dashboardOverview: () => [...queryKeys.dashboard, "overview"] as const,
+  dashboardMetrics: () => [...queryKeys.dashboard, "metrics"] as const,
 
   // Debt tracking
-  debts: ["debts"],
-  debtsList: () => [...queryKeys.debts, "list"],
-  debtById: (id) => [...queryKeys.debts, "detail", id],
-  debtPaymentPlan: (id) => [...queryKeys.debts, "paymentPlan", id],
+  debts: ["debts"] as const,
+  debtsList: () => [...queryKeys.debts, "list"] as const,
+  debtById: (id: string) => [...queryKeys.debts, "detail", id] as const,
+  debtPaymentPlan: (id: string) => [...queryKeys.debts, "paymentPlan", id] as const,
 
   // Paycheck history
-  paychecks: ["paychecks"],
-  paycheckHistory: () => [...queryKeys.paychecks, "history"],
-  paycheckPredictions: () => [...queryKeys.paychecks, "predictions"],
+  paychecks: ["paychecks"] as const,
+  paycheckHistory: () => [...queryKeys.paychecks, "history"] as const,
+  paycheckPredictions: () => [...queryKeys.paychecks, "predictions"] as const,
 
   // Budget History (version control)
-  budgetHistory: ["budgetHistory"],
-  budgetCommits: (options = {}) => [...queryKeys.budgetHistory, "commits", options],
-  budgetCommit: (hash) => [...queryKeys.budgetHistory, "commit", hash],
-  budgetChanges: (commitHash) => [...queryKeys.budgetHistory, "changes", commitHash],
-  budgetHistoryStats: () => [...queryKeys.budgetHistory, "stats"],
-  budgetBranches: () => [...queryKeys.budgetHistory, "branches"],
-  budgetTags: () => [...queryKeys.budgetHistory, "tags"],
+  budgetHistory: ["budgetHistory"] as const,
+  budgetCommits: (options: Record<string, unknown> = {}) =>
+    [...queryKeys.budgetHistory, "commits", options] as const,
+  budgetCommit: (hash: string) => [...queryKeys.budgetHistory, "commit", hash] as const,
+  budgetChanges: (commitHash: string) =>
+    [...queryKeys.budgetHistory, "changes", commitHash] as const,
+  budgetHistoryStats: () => [...queryKeys.budgetHistory, "stats"] as const,
+  budgetBranches: () => [...queryKeys.budgetHistory, "branches"] as const,
+  budgetTags: () => [...queryKeys.budgetHistory, "tags"] as const,
 
   // Sync and Cloud
-  sync: ["sync"],
-  syncStatus: () => [...queryKeys.sync, "status"],
-  cloudData: () => [...queryKeys.sync, "cloudData"],
-  syncActivity: () => [...queryKeys.sync, "activity"],
+  sync: ["sync"] as const,
+  syncStatus: () => [...queryKeys.sync, "status"] as const,
+  cloudData: () => [...queryKeys.sync, "cloudData"] as const,
+  syncActivity: () => [...queryKeys.sync, "activity"] as const,
 };
 
 /**
  * Query key utilities for common operations
  */
+type EntityType = "envelopes" | "transactions" | "bills" | "savingsGoals" | "debts";
+
+type RelatedKeysMap = {
+  [K in EntityType]: ReadonlyArray<readonly unknown[]>;
+};
+
 export const queryKeyUtils = {
   /**
    * Get all query keys for a specific entity type
    */
-  getEntityKeys: (entityType) => {
-    const baseKey = queryKeys[entityType];
+  getEntityKeys: (entityType: string): readonly unknown[] => {
+    const baseKey = queryKeys[entityType as keyof typeof queryKeys];
     if (!baseKey) {
       throw new Error(`Unknown entity type: ${entityType}`);
     }
-    return baseKey;
+    return baseKey as readonly unknown[];
   },
 
   /**
    * Check if a query key matches a pattern
    */
-  matchesPattern: (queryKey, pattern) => {
+  matchesPattern: (queryKey: unknown[], pattern: unknown[]): boolean => {
     if (!Array.isArray(queryKey) || !Array.isArray(pattern)) {
       return false;
     }
@@ -122,15 +139,15 @@ export const queryKeyUtils = {
   /**
    * Create a query key matcher function
    */
-  createMatcher: (pattern) => {
-    return (queryKey) => queryKeyUtils.matchesPattern(queryKey, pattern);
+  createMatcher: (pattern: unknown[]) => {
+    return (queryKey: unknown[]): boolean => queryKeyUtils.matchesPattern(queryKey, pattern);
   },
 
   /**
    * Get all related query keys for invalidation
    */
-  getRelatedKeys: (entityType) => {
-    const related = {
+  getRelatedKeys: (entityType: EntityType): ReadonlyArray<readonly unknown[]> => {
+    const related: RelatedKeysMap = {
       envelopes: [queryKeys.envelopes, queryKeys.dashboard, queryKeys.budgetMetadata],
       transactions: [
         queryKeys.transactions,
@@ -149,28 +166,31 @@ export const queryKeyUtils = {
   /**
    * Validate query key structure
    */
-  isValidQueryKey: (queryKey) => {
+  isValidQueryKey: (queryKey: unknown): queryKey is unknown[] => {
     return Array.isArray(queryKey) && queryKey.length > 0;
   },
 
   /**
    * Create query key with timestamp for cache busting
    */
-  withTimestamp: (baseKey, timestamp = Date.now()) => {
-    return [...baseKey, "ts", timestamp];
+  withTimestamp: (
+    baseKey: readonly unknown[],
+    timestamp: number = Date.now()
+  ): readonly unknown[] => {
+    return [...baseKey, "ts", timestamp] as const;
   },
 
   /**
    * Create query key with user context
    */
-  withUser: (baseKey, userId) => {
-    return [...baseKey, "user", userId];
+  withUser: (baseKey: readonly unknown[], userId: string): readonly unknown[] => {
+    return [...baseKey, "user", userId] as const;
   },
 
   /**
    * Extract entity type from query key
    */
-  getEntityType: (queryKey) => {
+  getEntityType: (queryKey: unknown[]): unknown => {
     if (!Array.isArray(queryKey) || queryKey.length === 0) {
       return null;
     }
@@ -180,14 +200,14 @@ export const queryKeyUtils = {
   /**
    * Create hierarchical query key
    */
-  createHierarchical: (...segments) => {
+  createHierarchical: (...segments: unknown[]): unknown[] => {
     return segments.filter((segment) => segment !== null && segment !== undefined);
   },
 
   /**
    * Get query key depth
    */
-  getDepth: (queryKey) => {
+  getDepth: (queryKey: unknown): number => {
     return Array.isArray(queryKey) ? queryKey.length : 0;
   },
 };

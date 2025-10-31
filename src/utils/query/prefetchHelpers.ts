@@ -5,22 +5,22 @@ import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
 import type { DateRange } from "@/db/types";
 
-interface EnvelopeFilters {
+interface EnvelopeFilters extends Record<string, unknown> {
   category?: string;
   includeArchived?: boolean;
 }
 
-interface TransactionOptions {
+interface TransactionOptions extends Record<string, unknown> {
   limit?: number;
 }
 
-interface BillOptions {
+interface BillOptions extends Record<string, unknown> {
   category?: string;
   isPaid?: boolean;
   daysAhead?: number;
 }
 
-interface GoalOptions {
+interface GoalOptions extends Record<string, unknown> {
   isCompleted?: boolean;
   category?: string;
 }

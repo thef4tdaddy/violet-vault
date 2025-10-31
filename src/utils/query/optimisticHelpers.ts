@@ -4,7 +4,28 @@ import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
 import { cloudSyncService } from "@/services/cloudSyncService";
-import type { SavingsGoal } from "@/db/types";
+import type { SavingsGoal, Envelope, Transaction, Bill } from "@/db/types";
+import type { QueryClient } from "@tanstack/react-query";
+
+/**
+ * Budget metadata interface
+ */
+interface BudgetMetadata {
+  id?: string;
+  lastModified?: number;
+  unassignedCash?: number;
+  actualBalance?: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Batch update interface
+ */
+interface BatchUpdate {
+  envelopes?: Partial<Envelope>[];
+  transactions?: Partial<Transaction>[];
+  bills?: Partial<Bill>[];
+}
 
 /**
  * Enhanced optimistic update helpers with Dexie persistence for offline support.
@@ -14,17 +35,21 @@ export const optimisticHelpers = {
   /**
    * Update envelope optimistically
    */
-  updateEnvelope: async (queryClient, envelopeId, updates) => {
+  updateEnvelope: async (
+    queryClient: QueryClient,
+    envelopeId: string,
+    updates: Partial<Envelope>
+  ): Promise<void> => {
     try {
       // Update TanStack Query cache - single envelope
-      queryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old) => ({
-        ...old,
+      queryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old: Envelope | undefined) => ({
+        ...(old || {}),
         ...updates,
         lastModified: Date.now(),
       }));
 
       // Update TanStack Query cache - envelope list
-      queryClient.setQueryData(queryKeys.envelopesList(), (old) => {
+      queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
         if (!old) return old;
         return old.map((envelope) =>
           envelope.id === envelopeId
@@ -49,8 +74,9 @@ export const optimisticHelpers = {
         cloudSyncService.scheduleSync("normal");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic envelope update", {
-        error: error.message,
+        error: errorMessage,
         envelopeId,
         source: "optimisticHelpers",
       });
@@ -60,7 +86,7 @@ export const optimisticHelpers = {
   /**
    * Add new envelope optimistically
    */
-  addEnvelope: async (queryClient, newEnvelope) => {
+  addEnvelope: async (queryClient: QueryClient, newEnvelope: Envelope): Promise<void> => {
     try {
       const envelopeWithTimestamp = {
         ...newEnvelope,
@@ -69,7 +95,7 @@ export const optimisticHelpers = {
       };
 
       // Update TanStack Query cache - envelope list
-      queryClient.setQueryData(queryKeys.envelopesList(), (old) => {
+      queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
         if (!old) return [envelopeWithTimestamp];
         return [envelopeWithTimestamp, ...old];
       });
@@ -86,8 +112,9 @@ export const optimisticHelpers = {
         cloudSyncService.scheduleSync("normal");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic envelope addition", {
-        error: error.message,
+        error: errorMessage,
         envelopeId: newEnvelope.id,
         source: "optimisticHelpers",
       });
@@ -97,10 +124,10 @@ export const optimisticHelpers = {
   /**
    * Remove envelope optimistically
    */
-  removeEnvelope: async (queryClient, envelopeId) => {
+  removeEnvelope: async (queryClient: QueryClient, envelopeId: string): Promise<void> => {
     try {
       // Update TanStack Query cache - envelope list
-      queryClient.setQueryData(queryKeys.envelopesList(), (old) => {
+      queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
         if (!old) return old;
         return old.filter((envelope) => envelope.id !== envelopeId);
       });
@@ -115,8 +142,9 @@ export const optimisticHelpers = {
 
       logger.debug("Optimistic envelope removal completed", { envelopeId });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic envelope removal", {
-        error: error.message,
+        error: errorMessage,
         envelopeId,
         source: "optimisticHelpers",
       });
@@ -126,24 +154,34 @@ export const optimisticHelpers = {
   /**
    * Update transaction optimistically
    */
-  updateTransaction: async (queryClient, transactionId, updates) => {
+  updateTransaction: async (
+    queryClient: QueryClient,
+    transactionId: string,
+    updates: Partial<Transaction>
+  ): Promise<void> => {
     try {
       // Update TanStack Query cache - single transaction
-      queryClient.setQueryData(queryKeys.transactionById(transactionId), (old) => ({
-        ...old,
-        ...updates,
-        lastModified: Date.now(),
-      }));
+      queryClient.setQueryData(
+        queryKeys.transactionById(transactionId),
+        (old: Transaction | undefined) => ({
+          ...(old || ({} as Transaction)),
+          ...updates,
+          lastModified: Date.now(),
+        })
+      );
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
-        if (!old) return old;
-        return old.map((transaction) =>
-          transaction.id === transactionId
-            ? { ...transaction, ...updates, lastModified: Date.now() }
-            : transaction
-        );
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old: Transaction[] | undefined) => {
+          if (!old) return old;
+          return old.map((transaction) =>
+            transaction.id === transactionId
+              ? { ...transaction, ...updates, lastModified: Date.now() }
+              : transaction
+          );
+        }
+      );
 
       // Update database
       await budgetDb.transactions.update(transactionId, {
@@ -156,8 +194,9 @@ export const optimisticHelpers = {
         updates,
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic transaction update", {
-        error: error.message,
+        error: errorMessage,
         transactionId,
         source: "optimisticHelpers",
       });
@@ -167,7 +206,7 @@ export const optimisticHelpers = {
   /**
    * Add new transaction optimistically
    */
-  addTransaction: async (queryClient, newTransaction) => {
+  addTransaction: async (queryClient: QueryClient, newTransaction: Transaction): Promise<void> => {
     try {
       const transactionWithTimestamp = {
         ...newTransaction,
@@ -176,10 +215,13 @@ export const optimisticHelpers = {
       };
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
-        if (!old) return [transactionWithTimestamp];
-        return [transactionWithTimestamp, ...old];
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old: Transaction[] | undefined) => {
+          if (!old) return [transactionWithTimestamp];
+          return [transactionWithTimestamp, ...old];
+        }
+      );
 
       // Add to database
       await budgetDb.transactions.add(transactionWithTimestamp);
@@ -192,8 +234,9 @@ export const optimisticHelpers = {
         transactionId: newTransaction.id,
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic transaction addition", {
-        error: error.message,
+        error: errorMessage,
         transactionId: newTransaction.id,
         source: "optimisticHelpers",
       });
@@ -203,13 +246,16 @@ export const optimisticHelpers = {
   /**
    * Remove transaction optimistically
    */
-  removeTransaction: async (queryClient, transactionId) => {
+  removeTransaction: async (queryClient: QueryClient, transactionId: string): Promise<void> => {
     try {
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
-        if (!old) return old;
-        return old.filter((transaction) => transaction.id !== transactionId);
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old: Transaction[] | undefined) => {
+          if (!old) return old;
+          return old.filter((transaction) => transaction.id !== transactionId);
+        }
+      );
 
       // Remove from cache - single transaction
       queryClient.removeQueries({
@@ -228,8 +274,9 @@ export const optimisticHelpers = {
         cloudSyncService.scheduleSync("normal");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic transaction removal", {
-        error: error.message,
+        error: errorMessage,
         transactionId,
         source: "optimisticHelpers",
       });
@@ -239,17 +286,21 @@ export const optimisticHelpers = {
   /**
    * Update bill optimistically
    */
-  updateBill: async (queryClient, billId, updates) => {
+  updateBill: async (
+    queryClient: QueryClient,
+    billId: string,
+    updates: Partial<Bill>
+  ): Promise<void> => {
     try {
       // Update TanStack Query cache - single bill
-      queryClient.setQueryData(queryKeys.billById(billId), (old) => ({
-        ...old,
+      queryClient.setQueryData(queryKeys.billById(billId), (old: Bill | undefined) => ({
+        ...(old || ({} as Bill)),
         ...updates,
         lastModified: Date.now(),
       }));
 
       // Update TanStack Query cache - bill lists
-      queryClient.setQueriesData({ queryKey: queryKeys.bills }, (old) => {
+      queryClient.setQueriesData({ queryKey: queryKeys.bills }, (old: Bill[] | undefined) => {
         if (!old) return old;
         return old.map((bill) =>
           bill.id === billId ? { ...bill, ...updates, lastModified: Date.now() } : bill
@@ -264,8 +315,9 @@ export const optimisticHelpers = {
 
       logger.debug("Optimistic bill update completed", { billId, updates });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic bill update", {
-        error: error.message,
+        error: errorMessage,
         billId,
         source: "optimisticHelpers",
       });
@@ -275,7 +327,7 @@ export const optimisticHelpers = {
   /**
    * Add new savings goal optimistically
    */
-  addSavingsGoal: async (newGoal: SavingsGoal) => {
+  addSavingsGoal: async (newGoal: SavingsGoal): Promise<void> => {
     try {
       const goalWithTimestamp = {
         ...newGoal,
@@ -295,8 +347,9 @@ export const optimisticHelpers = {
         cloudSyncService.scheduleSync("normal");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic savings goal addition", {
-        error: error.message,
+        error: errorMessage,
         goalId: newGoal.id,
         source: "optimisticHelpers",
       });
@@ -306,7 +359,7 @@ export const optimisticHelpers = {
   /**
    * Update savings goal optimistically
    */
-  updateSavingsGoal: async (goalId: string, updatedGoal: Partial<SavingsGoal>) => {
+  updateSavingsGoal: async (goalId: string, updatedGoal: Partial<SavingsGoal>): Promise<void> => {
     try {
       // Update database
       await budgetDb.savingsGoals.update(goalId, {
@@ -324,8 +377,9 @@ export const optimisticHelpers = {
         cloudSyncService.scheduleSync("normal");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic savings goal update", {
-        error: error.message,
+        error: errorMessage,
         goalId,
         source: "optimisticHelpers",
       });
@@ -335,7 +389,7 @@ export const optimisticHelpers = {
   /**
    * Delete savings goal optimistically
    */
-  deleteSavingsGoal: async (goalId: string) => {
+  deleteSavingsGoal: async (goalId: string): Promise<void> => {
     try {
       // Remove from database
       await budgetDb.savingsGoals.delete(goalId);
@@ -347,8 +401,9 @@ export const optimisticHelpers = {
         cloudSyncService.scheduleSync("normal");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic savings goal removal", {
-        error: error.message,
+        error: errorMessage,
         goalId,
         source: "optimisticHelpers",
       });
@@ -358,11 +413,14 @@ export const optimisticHelpers = {
   /**
    * Update budget metadata optimistically
    */
-  updateBudgetMetadata: async (queryClient, updates) => {
+  updateBudgetMetadata: async (
+    queryClient: QueryClient,
+    updates: Partial<BudgetMetadata>
+  ): Promise<void> => {
     try {
       // Update TanStack Query cache
-      queryClient.setQueryData(queryKeys.budgetMetadata, (old) => ({
-        ...old,
+      queryClient.setQueryData(queryKeys.budgetMetadata, (old: BudgetMetadata | undefined) => ({
+        ...(old || {}),
         ...updates,
         lastModified: Date.now(),
       }));
@@ -384,8 +442,9 @@ export const optimisticHelpers = {
 
       logger.debug("Optimistic budget metadata update completed", { updates });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to persist optimistic budget metadata update", {
-        error: error.message,
+        error: errorMessage,
         updates,
         source: "optimisticHelpers",
       });
@@ -395,7 +454,7 @@ export const optimisticHelpers = {
   /**
    * Batch update multiple entities optimistically
    */
-  batchUpdate: async (queryClient, updates) => {
+  batchUpdate: async (queryClient: QueryClient, updates: BatchUpdate): Promise<void> => {
     try {
       const { envelopes = [], transactions = [], bills = [] } = updates;
 
@@ -430,14 +489,19 @@ export const optimisticHelpers = {
         billCount: bills.length,
       });
     } catch (error) {
-      logger.error("Failed to complete batch optimistic update", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger.error("Failed to complete batch optimistic update", errorMessage);
     }
   },
 
   /**
    * Rollback optimistic update on failure
    */
-  rollbackUpdate: async (queryClient, queryKey, previousData) => {
+  rollbackUpdate: async (
+    queryClient: QueryClient,
+    queryKey: unknown[],
+    previousData: unknown
+  ): Promise<void> => {
     try {
       if (previousData !== undefined) {
         queryClient.setQueryData(queryKey, previousData);
@@ -447,8 +511,9 @@ export const optimisticHelpers = {
         logger.debug("Invalidated query due to rollback", { queryKey });
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logger.warn("Failed to rollback optimistic update", {
-        error: error.message,
+        error: errorMessage,
         queryKey,
       });
     }
@@ -457,36 +522,52 @@ export const optimisticHelpers = {
   /**
    * Create mutation config with automatic optimistic updates
    */
-  createOptimisticMutation: (queryClient, { mutationKey, queryKey, updateFn, rollbackFn }) => {
+  createOptimisticMutation: <
+    TData = unknown,
+    TVariables = unknown,
+    TContext = { previousData?: TData },
+  >(
+    queryClient: QueryClient,
+    options: {
+      mutationKey: unknown[];
+      queryKey: unknown[];
+      updateFn?: (old: TData | undefined, variables: TVariables) => TData;
+      rollbackFn?: (error: Error, variables: TVariables, context: TContext | undefined) => void;
+    }
+  ) => {
+    const { mutationKey, queryKey, updateFn, rollbackFn } = options;
+
     return {
       mutationKey,
-      onMutate: async (variables) => {
+      onMutate: async (variables: TVariables) => {
         // Cancel outgoing refetches
         await queryClient.cancelQueries({ queryKey });
 
         // Snapshot previous value
-        const previousData = queryClient.getQueryData(queryKey);
+        const previousData = queryClient.getQueryData<TData>(queryKey);
 
         // Optimistically update
         if (updateFn) {
-          queryClient.setQueryData(queryKey, (old) => updateFn(old, variables));
+          queryClient.setQueryData(queryKey, (old: TData | undefined) => updateFn(old, variables));
         }
 
-        return { previousData };
+        return { previousData } as TContext;
       },
-      onError: (error, variables, context) => {
+      onError: (error: Error, variables: TVariables, context: TContext | undefined) => {
         // Rollback on error
-        if (context?.previousData !== undefined) {
-          queryClient.setQueryData(queryKey, context.previousData);
+        const contextData = context as { previousData?: TData } | undefined;
+        if (contextData?.previousData !== undefined) {
+          queryClient.setQueryData(queryKey, contextData.previousData);
         }
 
         if (rollbackFn) {
           rollbackFn(error, variables, context);
         }
 
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
         logger.error("Mutation failed, rolled back optimistic update", {
           mutationKey,
-          error: error.message,
+          error: errorMessage,
         });
       },
       onSettled: () => {
