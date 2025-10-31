@@ -204,7 +204,7 @@ const getActualCommitTimestamp = () => {
 };
 
 // Format commit timestamp for display
-const formatCommitTimestamp = (timestamp, environment) => {
+const formatCommitTimestamp = (timestamp: Date, environment: string): string => {
   const date = new Date(timestamp);
 
   // For production, show just the date
@@ -262,7 +262,15 @@ const detectVercelDeployment = () => {
 /**
  * Determine environment type from various indicators
  */
-const determineEnvironment = (envVars, vercelInfo) => {
+const determineEnvironment = (
+  envVars: {
+    appEnv: string | undefined;
+    isDev: boolean;
+    vercelEnv: string | undefined;
+    nodeEnv: string | undefined;
+  },
+  vercelInfo: { isMainBranch: boolean; isPreviewBranch: boolean }
+): string => {
   const { appEnv, isDev, vercelEnv, nodeEnv } = envVars;
   const { isMainBranch, isPreviewBranch } = vercelInfo;
 
@@ -290,7 +298,18 @@ const determineEnvironment = (envVars, vercelInfo) => {
 /**
  * Get branch info object for environment
  */
-const createBranchInfo = (environment, branch, fallbackVersion, platform) => {
+const createBranchInfo = (
+  environment: string,
+  branch: string,
+  fallbackVersion: string,
+  platform: string
+): {
+  branch: string;
+  environment: string;
+  futureVersion: string | null;
+  isDevelopment: boolean;
+  platform: string;
+} => {
   const configs = {
     development: {
       branch,
@@ -319,17 +338,17 @@ const createBranchInfo = (environment, branch, fallbackVersion, platform) => {
 };
 
 // Branch and environment detection with actual git branch info
-export const getBranchInfo = (targetVersion = null) => {
+export const getBranchInfo = (targetVersion: string | null = null) => {
   // Get actual git branch from build-time injection
   const actualGitBranch = import.meta.env.VITE_GIT_BRANCH;
   const branch = actualGitBranch || "unknown";
 
   // Collect environment variables
   const envVars = {
-    appEnv: import.meta.env.VITE_APP_ENV,
-    isDev: import.meta.env.DEV,
-    vercelEnv: import.meta.env.VITE_VERCEL_ENV,
-    nodeEnv: import.meta.env.NODE_ENV,
+    appEnv: import.meta.env.VITE_APP_ENV as string | undefined,
+    isDev: import.meta.env.DEV as boolean,
+    vercelEnv: import.meta.env.VITE_VERCEL_ENV as string | undefined,
+    nodeEnv: import.meta.env.NODE_ENV as string | undefined,
   };
 
   // Detect Vercel deployment info
@@ -350,7 +369,7 @@ export const getBranchInfo = (targetVersion = null) => {
 };
 
 // Format version for display with branch differentiation (sync - immediate)
-export const getVersionInfo = (targetVersion = null) => {
+export const getVersionInfo = (targetVersion: string | null = null) => {
   const branchInfo = getBranchInfo(targetVersion);
 
   let displayVersion = APP_VERSION; // Always start with package.json version
@@ -457,7 +476,7 @@ export const getLastSeenVersion = () => {
   }
 };
 
-export const setLastSeenVersion = (version) => {
+export const setLastSeenVersion = (version: string) => {
   try {
     localStorage.setItem(LAST_SEEN_VERSION_KEY, version);
     logger.debug("Updated last seen version", { version });
@@ -529,7 +548,7 @@ export const simulateVersionTransition = (newTargetVersion: string) => {
 };
 
 // Development utility for testing patch notes
-export const simulatePatchNotesUpdate = (fromVersion, toVersion = APP_VERSION) => {
+export const simulatePatchNotesUpdate = (fromVersion: string, toVersion: string = APP_VERSION) => {
   logger.debug("Simulating patch notes update", {
     fromVersion,
     toVersion,

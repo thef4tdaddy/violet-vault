@@ -100,7 +100,7 @@ export class TransactionArchiver {
   /**
    * Calculate the cutoff date for archiving
    */
-  calculateCutoffDate(months) {
+  calculateCutoffDate(months: number): string {
     const cutoffDate = new Date();
     cutoffDate.setMonth(cutoffDate.getMonth() - months);
     cutoffDate.setDate(1); // Start of month for cleaner boundaries
@@ -110,14 +110,21 @@ export class TransactionArchiver {
   /**
    * Get transactions that are eligible for archiving
    */
-  async getTransactionsForArchiving(cutoffDate) {
+  async getTransactionsForArchiving(cutoffDate: string) {
     return budgetDb.transactions.where("date").below(cutoffDate).toArray();
   }
 
   /**
    * Create aggregated analytics data before archiving
    */
-  async createAnalyticsAggregations(transactions) {
+  async createAnalyticsAggregations(
+    transactions: Array<{
+      date: string;
+      amount?: number;
+      category?: string;
+      [key: string]: unknown;
+    }>
+  ) {
     logger.info("Creating analytics aggregations");
 
     const aggregations = {
@@ -236,7 +243,17 @@ export class TransactionArchiver {
   /**
    * Aggregate transactions by time period
    */
-  aggregateByPeriod(transactions, periodType) {
+  aggregateByPeriod(
+    transactions: Array<{
+      date: string;
+      amount?: number;
+      category?: string;
+      envelopeId?: string;
+      type?: string;
+      [key: string]: unknown;
+    }>,
+    periodType: string
+  ) {
     const groups = new Map();
 
     transactions.forEach((transaction) => {
@@ -262,7 +279,18 @@ export class TransactionArchiver {
   /**
    * Create archived transaction records (compressed format)
    */
-  async createTransactionArchives(transactions) {
+  async createTransactionArchives(
+    transactions: Array<{
+      id: string;
+      date: string;
+      amount?: number;
+      description?: string;
+      category?: string;
+      envelopeId?: string;
+      type?: string;
+      [key: string]: unknown;
+    }>
+  ) {
     logger.info("Creating transaction archives");
 
     const batchSize = this.config.BATCH_SIZE;
@@ -312,7 +340,7 @@ export class TransactionArchiver {
   /**
    * Remove transactions that have been archived
    */
-  async removeArchivedTransactions(transactions) {
+  async removeArchivedTransactions(transactions: Array<{ id: string; [key: string]: unknown }>) {
     logger.info("Removing archived transactions from active storage");
 
     const transactionIds = transactions.map((t) => t.id);
@@ -347,7 +375,7 @@ export class TransactionArchiver {
   /**
    * Get archiving statistics and recommendations
    */
-  async getArchivingInfo(customPeriods = null) {
+  async getArchivingInfo(customPeriods: Array<{ name: string; months: number }> | null = null) {
     const now = new Date();
 
     // Default periods if none specified
@@ -415,7 +443,7 @@ export class TransactionArchiver {
   /**
    * Retrieve archived transaction data for analytics
    */
-  async getArchivedAnalytics(period = "yearly", category = null) {
+  async getArchivedAnalytics(period = "yearly", category: string | null = null) {
     const keyPattern = category ? `analytics_${period}_*_${category}` : `analytics_${period}_*`;
 
     const results = await budgetDb.cache
@@ -429,7 +457,7 @@ export class TransactionArchiver {
   /**
    * Emergency restore function (for testing/recovery)
    */
-  async restoreArchivedTransactions(archiveId) {
+  async restoreArchivedTransactions(archiveId: string) {
     logger.warn(`Attempting to restore archived transactions: ${archiveId}`);
 
     const archive = await budgetDb.cache.get(`transaction_archive_${archiveId}`);
@@ -468,14 +496,15 @@ export class TransactionArchiver {
 }
 
 // Utility functions for UI components
-export const createArchiver = (config) => new TransactionArchiver(config);
+export const createArchiver = (config?: Partial<typeof ARCHIVE_CONFIG>) =>
+  new TransactionArchiver(config);
 
 export const getArchivingRecommendations = async () => {
   const archiver = new TransactionArchiver();
   return archiver.getArchivingInfo();
 };
 
-export const archiveTransactions = async (olderThanMonths) => {
+export const archiveTransactions = async (olderThanMonths: number) => {
   const archiver = new TransactionArchiver();
   return archiver.archiveOldTransactions(olderThanMonths);
 };

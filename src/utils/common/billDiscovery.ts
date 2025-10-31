@@ -76,7 +76,10 @@ export const BILL_PATTERNS = {
 /**
  * Analyze transactions to find potential recurring bills
  */
-export const analyzeTransactionsForBills = (transactions, existingBills = []) => {
+export const analyzeTransactionsForBills = (
+  transactions: Transaction[],
+  existingBills: Array<{ description?: string; provider?: string }> = []
+) => {
   const potentialBills = [];
   const existingBillDescriptions = new Set(
     existingBills.map((bill) => bill.description?.toLowerCase() || bill.provider?.toLowerCase())
@@ -105,8 +108,8 @@ export const analyzeTransactionsForBills = (transactions, existingBills = []) =>
 /**
  * Group similar transactions by normalized description
  */
-const groupSimilarTransactions = (transactions) => {
-  const groups = {};
+const groupSimilarTransactions = (transactions: Transaction[]): Record<string, Transaction[]> => {
+  const groups: Record<string, Transaction[]> = {};
 
   transactions.forEach((transaction) => {
     if (!transaction.amount || transaction.amount >= 0) return; // Only negative amounts (expenses)
@@ -121,9 +124,9 @@ const groupSimilarTransactions = (transactions) => {
   });
 
   // Only return groups with multiple transactions (indicating recurring)
-  const recurringGroups = {};
+  const recurringGroups: Record<string, Transaction[]> = {};
   for (const [key, group] of Object.entries(groups)) {
-    if ((group as unknown[]).length >= 2) {
+    if (group.length >= 2) {
       recurringGroups[key] = group;
     }
   }
@@ -134,7 +137,7 @@ const groupSimilarTransactions = (transactions) => {
 /**
  * Normalize transaction descriptions for grouping
  */
-const normalizeTransactionDescription = (description) => {
+const normalizeTransactionDescription = (description: string): string | null => {
   if (!description) return null;
 
   return description
@@ -268,7 +271,7 @@ const createBillSuggestion = (options: {
 /**
  * Analyze a group of similar transactions to determine bill characteristics
  */
-const analyzeTransactionGroup = (transactions, groupKey) => {
+const analyzeTransactionGroup = (transactions: Transaction[], groupKey: string) => {
   if (transactions.length < 2) return null;
 
   // Calculate transaction frequency
@@ -318,7 +321,9 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
 /**
  * Detect bill pattern from transaction description
  */
-const detectBillPattern = (description) => {
+const detectBillPattern = (
+  description: string
+): (BillPattern & { patternName: string; matchedKeywords: string[]; iconName: string }) | null => {
   const lowerDesc = description.toLowerCase();
 
   for (const [patternName, pattern] of Object.entries(BILL_PATTERNS)) {
@@ -340,7 +345,11 @@ const detectBillPattern = (description) => {
 /**
  * Generate smart bill suggestions based on existing data
  */
-export const generateBillSuggestions = (transactions, bills, envelopes) => {
+export const generateBillSuggestions = (
+  transactions: Transaction[],
+  bills: Array<{ description?: string; provider?: string }>,
+  envelopes: Array<{ id: string; name: string; [key: string]: unknown }>
+) => {
   const discoveredBills = analyzeTransactionsForBills(transactions, bills);
 
   // Enhance suggestions with envelope recommendations
@@ -361,7 +370,15 @@ export const generateBillSuggestions = (transactions, bills, envelopes) => {
 /**
  * Find the best matching envelope for a discovered bill
  */
-const findBestEnvelopeForBill = (bill, envelopes) => {
+const findBestEnvelopeForBill = (
+  bill: {
+    provider: string;
+    description: string;
+    category: string;
+    metadata?: { detectedPattern?: string[] };
+  },
+  envelopes: Array<{ id: string; name: string; [key: string]: unknown }>
+) => {
   let bestMatch = null;
   let highestScore = 0;
 
@@ -393,7 +410,8 @@ const findBestEnvelopeForBill = (bill, envelopes) => {
     const billWords = billDesc.split(" ");
     const envelopeWords = envelopeName.split(" ");
     const commonWords = billWords.filter(
-      (word) => word.length > 3 && envelopeWords.some((envWord) => envWord.includes(word))
+      (word: string) =>
+        word.length > 3 && envelopeWords.some((envWord: string) => envWord.includes(word))
     );
     score += commonWords.length * 0.3;
 

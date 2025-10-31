@@ -32,7 +32,28 @@ export class BudgetHistoryTracker {
     author = "Unknown User",
     deviceFingerprint = null,
     parentHash = null,
-  }) {
+  }: {
+    entityType: string;
+    entityId?: string | null;
+    changeType: string;
+    description: string;
+    beforeData: unknown;
+    afterData: unknown;
+    author?: string;
+    deviceFingerprint?: string | null;
+    parentHash?: string | null;
+  }): Promise<{
+    commit: BudgetCommit & { snapshotData: string };
+    changes: Array<{
+      commitHash: string;
+      entityType: string;
+      entityId: string;
+      changeType: string;
+      description: string;
+      beforeData: unknown;
+      afterData: unknown;
+    }>;
+  }> {
     try {
       // Generate commit hash
       const commitData = {
@@ -62,12 +83,12 @@ export class BudgetHistoryTracker {
       const snapshotData = JSON.stringify(snapshot);
 
       // Create the commit
-      const commit = {
+      const commit: BudgetCommit & { snapshotData: string } = {
         hash,
         timestamp: commitData.timestamp,
         message: description,
         author,
-        parentHash,
+        parentHash: parentHash || undefined,
         snapshotData: snapshotData,
         deviceFingerprint: commitData.deviceFingerprint,
       };
@@ -84,7 +105,7 @@ export class BudgetHistoryTracker {
       };
 
       // Save to Dexie
-      await budgetDb.createBudgetCommit(commit);
+      await budgetDb.createBudgetCommit(commit as BudgetCommit);
       await budgetDb.createBudgetChanges([change]);
 
       logger.info("Budget history commit created", {
@@ -109,6 +130,11 @@ export class BudgetHistoryTracker {
     newAmount,
     author = "Unknown User",
     source = "manual",
+  }: {
+    previousAmount: number;
+    newAmount: number;
+    author?: string;
+    source?: string;
   }) {
     const description =
       source === "distribution"
@@ -134,6 +160,11 @@ export class BudgetHistoryTracker {
     newBalance,
     isManual = true,
     author = "Unknown User",
+  }: {
+    previousBalance: number;
+    newBalance: number;
+    isManual?: boolean;
+    author?: string;
   }) {
     const source = isManual ? "manual entry" : "automatic calculation";
     const description = `Updated actual balance via ${source} from ${formatCurrency(previousBalance)} to ${formatCurrency(newBalance)}`;
@@ -158,6 +189,12 @@ export class BudgetHistoryTracker {
     previousData,
     newData,
     author = "Unknown User",
+  }: {
+    debtId: string;
+    changeType: string;
+    previousData: { name?: string; currentBalance?: number; [key: string]: unknown };
+    newData: { name?: string; currentBalance?: number; [key: string]: unknown };
+    author?: string;
   }) {
     let description = "";
 
@@ -193,7 +230,7 @@ export class BudgetHistoryTracker {
   /**
    * Get recent changes for a specific entity type
    */
-  static async getRecentChanges(entityType, limit = 10) {
+  static async getRecentChanges(entityType: string, limit = 10) {
     try {
       const changes = await budgetDb.budgetChanges
         .where("entityType")
@@ -212,7 +249,7 @@ export class BudgetHistoryTracker {
   /**
    * Get all changes for a specific entity
    */
-  static async getEntityHistory(entityType, entityId = null) {
+  static async getEntityHistory(entityType: string, entityId: string | null = null) {
     try {
       let query = budgetDb.budgetChanges.where("entityType").equals(entityType);
 
@@ -262,6 +299,11 @@ export class BudgetHistoryTracker {
     branchName,
     description = "",
     author = "Unknown User",
+  }: {
+    fromCommitHash: string;
+    branchName: string;
+    description?: string;
+    author?: string;
   }) {
     try {
       // Check if branch name already exists
@@ -320,6 +362,12 @@ export class BudgetHistoryTracker {
     description = "",
     tagType = "milestone", // milestone, release, backup
     author = "Unknown User",
+  }: {
+    commitHash: string;
+    tagName: string;
+    description?: string;
+    tagType?: "milestone" | "release" | "backup";
+    author?: string;
   }) {
     try {
       // Check if tag name already exists
@@ -365,7 +413,7 @@ export class BudgetHistoryTracker {
    * Switch to a different branch
    * @param {string} branchName - Name of the branch to switch to
    */
-  static async switchBranch(branchName) {
+  static async switchBranch(branchName: string) {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
@@ -425,7 +473,10 @@ export class BudgetHistoryTracker {
    * @param {Object} commitData - The commit data to sign
    * @param {string} deviceFingerprint - Current device fingerprint
    */
-  static async signCommit(commitData, deviceFingerprint) {
+  static async signCommit(
+    commitData: { author: string; [key: string]: unknown },
+    deviceFingerprint: string
+  ) {
     try {
       // Create signature payload
       const signaturePayload = {
@@ -462,7 +513,7 @@ export class BudgetHistoryTracker {
    * @param {string} author - Commit author
    * @param {string} currentFingerprint - Current device fingerprint
    */
-  static async verifyDeviceConsistency(author, currentFingerprint) {
+  static async verifyDeviceConsistency(author: string, currentFingerprint: string) {
     try {
       // Get recent commits from this author
       const recentCommits = await budgetDb.budgetCommits
@@ -478,7 +529,11 @@ export class BudgetHistoryTracker {
 
       // Check fingerprint consistency
       const knownFingerprints = [
-        ...new Set(recentCommits.map((c) => c.deviceFingerprint).filter((f) => f && f !== "")),
+        ...new Set(
+          recentCommits
+            .map((c) => c.deviceFingerprint)
+            .filter((f): f is string => f !== undefined && f !== "")
+        ),
       ];
 
       // Allow up to 3 different fingerprints per author (multiple devices)
@@ -509,7 +564,15 @@ export class BudgetHistoryTracker {
       const recentChanges = changes.filter((c) => commitHashes.has(c.commitHash));
 
       // Analyze patterns
-      const patterns = {
+      const patterns: {
+        totalChanges: number;
+        changesByType: Record<string, number>;
+        changesByEntity: Record<string, number>;
+        authorActivity: Record<string, number>;
+        dailyActivity: Record<string, number>;
+        mostActiveHour: string | null;
+        averageChangesPerDay: number;
+      } = {
         totalChanges: recentChanges.length,
         changesByType: {},
         changesByEntity: {},
@@ -543,14 +606,17 @@ export class BudgetHistoryTracker {
       patterns.averageChangesPerDay = days > 0 ? recentChanges.length / days : 0;
 
       // Find most active hour
-      const hourCounts = {};
+      const hourCounts: Record<number, number> = {};
       commits.forEach((commit) => {
         const hour = new Date(commit.timestamp).getHours();
         hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       });
 
       patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
+        (maxHour: string | null, hour) =>
+          hourCounts[Number(hour)] > (maxHour !== null ? hourCounts[Number(maxHour)] : 0)
+            ? hour
+            : maxHour,
         null
       );
 
