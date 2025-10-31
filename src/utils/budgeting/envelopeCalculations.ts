@@ -1,31 +1,60 @@
-import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";
+import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
+import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "@/constants/frequency";
+
+interface EnvelopeInput {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface TransactionInput {
+  envelopeId?: string;
+  type?: string;
+  isPaid?: boolean;
+  amount: number;
+  dueDate?: string | Date;
+  provider?: string;
+  name?: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
+interface BillInput {
+  envelopeId?: string;
+  isPaid?: boolean;
+  amount: number;
+  dueDate?: string | Date;
+  [key: string]: unknown;
+}
 
 /**
  * Calculate comprehensive envelope data including transactions, bills, and metrics
  */
-export const calculateEnvelopeData = (envelopes, transactions, bills) => {
-  return envelopes.map((envelope) => {
-    const envelopeTransactions = transactions.filter((t) => t.envelopeId === envelope.id);
+export const calculateEnvelopeData = (
+  envelopes: EnvelopeInput[],
+  transactions: TransactionInput[],
+  bills: BillInput[]
+) => {
+  return envelopes.map((envelope: EnvelopeInput) => {
+    const envelopeTransactions = transactions.filter((t: TransactionInput) => t.envelopeId === envelope.id);
 
     // Also get bills assigned to this envelope
-    const envelopeBills = bills.filter((b) => b.envelopeId === envelope.id);
+    const envelopeBills = bills.filter((b: BillInput) => b.envelopeId === envelope.id);
 
     const paidTransactions = envelopeTransactions.filter(
-      (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid)
+      (t: TransactionInput) => t.type === "transaction" || (t.type === "bill" && t.isPaid)
     );
 
     // Combine bills from transactions and the bills array, removing duplicates
-    const allUnpaidBills = [
+    const allUnpaidBills: (TransactionInput | BillInput)[] = [
       ...envelopeTransactions.filter(
-        (t) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
+        (t: TransactionInput) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
       ),
-      ...envelopeBills.filter((b) => !b.isPaid),
+      ...envelopeBills.filter((b: BillInput) => !b.isPaid),
     ];
 
     // Deduplicate bills based on provider/name and due date to prevent showing same bill twice
-    const unpaidBillsMap = new Map();
-    allUnpaidBills.forEach((bill) => {
+    const unpaidBillsMap = new Map<string, TransactionInput | BillInput>();
+    allUnpaidBills.forEach((bill: TransactionInput | BillInput) => {
       const key = `${bill.provider || bill.name || bill.description}-${bill.dueDate}`;
       // Keep the first occurrence, or prefer bills array over transaction bills
       if (!unpaidBillsMap.has(key) || !bill.type) {
@@ -44,12 +73,12 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
 
     const overdueBills = unpaidBills.filter((t) => t.dueDate && new Date(t.dueDate) < new Date());
 
-    const totalSpent = paidTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    const totalUpcoming = upcomingBills.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    const totalOverdue = overdueBills.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const totalSpent = paidTransactions.reduce((sum: number, t: TransactionInput) => sum + Math.abs(t.amount), 0);
+    const totalUpcoming = upcomingBills.reduce((sum: number, t: TransactionInput | BillInput) => sum + Math.abs(t.amount), 0);
+    const totalOverdue = overdueBills.reduce((sum: number, t: TransactionInput | BillInput) => sum + Math.abs(t.amount), 0);
 
-    const allocated = envelope.budget || 0;
-    const currentBalance = envelope.currentBalance || 0;
+    const allocated = (envelope.budget as number | undefined) || 0;
+    const currentBalance = (envelope.currentBalance as number | undefined) || 0;
     const committed = totalUpcoming + totalOverdue;
 
     // Use actual current balance instead of budget allocation for availability
@@ -57,8 +86,8 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
 
     // Calculate utilization rate based on envelope type and purpose
     const utilizationRate = calculateUtilizationRate(
-      envelope,
-      { upcomingBills, paidTransactions },
+      envelope as Record<string, unknown>,
+      { upcomingBills, paidTransactions } as Record<string, unknown>,
       { currentBalance, totalSpent, committed }
     );
 

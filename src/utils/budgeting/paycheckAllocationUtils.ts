@@ -135,8 +135,7 @@ const filterBillEnvelopes = (envelopes: PaycheckEnvelope[]): PaycheckEnvelope[] 
     (envelope: PaycheckEnvelope) =>
       envelope.autoAllocate &&
       (envelope.envelopeType === ENVELOPE_TYPES.BILL ||
-        (envelope.category &&
-          BILL_CATEGORIES.includes(envelope.category as (typeof BILL_CATEGORIES)[number])))
+        (envelope.category && (BILL_CATEGORIES as readonly string[]).includes(envelope.category)))
   );
 };
 

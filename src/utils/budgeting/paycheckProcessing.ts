@@ -10,7 +10,7 @@ import logger from "../common/logger";
 /**
  * Get current balances from database and queries
  */
-export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
+export const getCurrentBalances = async (envelopesQuery: {data?: unknown[]}, savingsGoalsQuery: {data?: unknown[]}) => {
   // Get current metadata from Dexie (proper data source)
   const currentMetadata = await getBudgetMetadata();
   const currentActualBalance = currentMetadata?.actualBalance || 0;

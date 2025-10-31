@@ -509,9 +509,9 @@ export const calculateTransferImpact = (
         envelopeImpact.change += transfer.amount;
         envelopeImpact.newBalance = (envelopeImpact.currentBalance ?? 0) + envelopeImpact.change;
 
-        if ((envelopeImpact.monthlyAmount ?? 0) > 0) {
-          envelopeImpact.newFillPercentage =
-            (envelopeImpact.newBalance / (envelopeImpact.monthlyAmount ?? 1)) * 100;
+        const monthlyAmount = envelopeImpact.monthlyAmount ?? 0;
+        if (monthlyAmount > 0) {
+          envelopeImpact.newFillPercentage = (envelopeImpact.newBalance / monthlyAmount) * 100;
         }
       }
     }
@@ -523,8 +523,10 @@ export const calculateTransferImpact = (
 /**
  * Generates a summary of the execution plan for display
  * @param {Object} plan - Execution plan
- * @param {Array} envelopes - Available envelopes for name lookup
+ * @param {Array} envelopes - Available envelopes for name lookup (name optional for display)
  * @returns {Object} Human-readable plan summary
+ * Note: EnvelopeData doesn't include name, but it's needed for display purposes.
+ * This is a read-only display function, not business logic.
  */
 export const generatePlanSummary = (
   plan: ExecutionPlan,
