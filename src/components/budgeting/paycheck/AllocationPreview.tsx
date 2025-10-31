@@ -1,7 +1,29 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => {
+// Type definitions
+interface AllocationItem {
+  envelopeId: string;
+  envelopeName: string;
+  amount: number;
+  priority?: string;
+  [key: string]: unknown;
+}
+
+interface AllocationPreviewData {
+  allocations: AllocationItem[];
+  totalAllocated: number;
+  remainingAmount: number;
+  allocationRate: number;
+}
+
+interface AllocationPreviewProps {
+  allocationPreview: AllocationPreviewData;
+  hasAmount: boolean;
+  allocationMode: string;
+}
+
+const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }: AllocationPreviewProps) => {
   const { allocations, totalAllocated, remainingAmount, allocationRate } = allocationPreview;
 
   if (!hasAmount) {
@@ -29,7 +51,7 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
     );
   }
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: string | undefined) => {
     switch (priority) {
       case "critical":
         return "text-red-600 bg-red-50 border-red-200";
@@ -44,7 +66,7 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
     }
   };
 
-  const getPriorityLabel = (priority) => {
+  const getPriorityLabel = (priority: string | undefined) => {
     switch (priority) {
       case "critical":
         return "Critical";

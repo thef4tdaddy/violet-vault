@@ -1,11 +1,18 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+// Type definitions
+interface PaycheckAmountInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
 /**
  * Paycheck amount input component
  * Handles amount input with proper styling and validation
  */
-const PaycheckAmountInput = ({ value, onChange, disabled = false }) => {
+const PaycheckAmountInput = ({ value, onChange, disabled = false }: PaycheckAmountInputProps) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-3">

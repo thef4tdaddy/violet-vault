@@ -4,6 +4,26 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
+// Type definitions
+interface PayerPrediction {
+  average: number;
+  mostRecent: number;
+  count: number;
+}
+
+interface PaycheckPayerSelectorProps {
+  payerName: string;
+  uniquePayers: string[];
+  showAddNewPayer: boolean;
+  newPayerName: string;
+  isProcessing: boolean;
+  onPayerChange: (payer: string) => void;
+  onNewPayerNameChange: (name: string) => void;
+  onAddNewPayer: () => void;
+  onToggleAddNewPayer: (show: boolean) => void;
+  getPayerPrediction: (payer: string) => PayerPrediction | null;
+}
+
 /**
  * Paycheck payer selector component
  * Handles payer dropdown and add new payer functionality
@@ -19,7 +39,7 @@ const PaycheckPayerSelector = ({
   onAddNewPayer,
   onToggleAddNewPayer,
   getPayerPrediction,
-}) => {
+}: PaycheckPayerSelectorProps) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-3">
@@ -77,7 +97,7 @@ const PaycheckPayerSelector = ({
 /**
  * Payer prediction information display
  */
-const PayerPredictionInfo = ({ payerName, prediction }) => (
+const PayerPredictionInfo = ({ payerName, prediction }: { payerName: string; prediction: PayerPrediction }) => (
   <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20">
     <div className="text-sm text-gray-600">
       {React.createElement(getIcon("TrendingUp"), {
@@ -98,6 +118,12 @@ const AddNewPayerForm = ({
   onNewPayerNameChange,
   onAddNewPayer,
   onToggleAddNewPayer,
+}: {
+  uniquePayers: string[];
+  newPayerName: string;
+  onNewPayerNameChange: (name: string) => void;
+  onAddNewPayer: () => void;
+  onToggleAddNewPayer: (show: boolean) => void;
 }) => {
   const confirmTouchFeedback = useTouchFeedback("confirm", "success");
   const cancelTouchFeedback = useTouchFeedback("tap", "secondary");

@@ -1,11 +1,34 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import type { Envelope } from "@/types/finance";
+
+// Type definitions
+interface AllocationPreview {
+  totalAmount: number;
+  summary: string;
+  mode: string;
+  allocations: Record<string, number>;
+  unassignedCashAmount: number;
+  debugInfo?: {
+    totalEnvelopes: number;
+    autoAllocateEnvelopes: number;
+    billEnvelopesFound: number;
+    variableEnvelopesFound: number;
+    allocatedEnvelopes: number;
+  };
+}
+
+interface PaycheckAllocationPreviewProps {
+  preview: AllocationPreview | null;
+  hasAmount: boolean;
+  envelopes?: Envelope[];
+}
 
 /**
  * Enhanced allocation preview component
  * Shows detailed allocation preview with proper UI standards
  */
-const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }) => {
+const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }: PaycheckAllocationPreviewProps) => {
   if (!hasAmount || !preview) {
     return (
       <div className="glassmorphism rounded-2xl p-6 border-2 border-black">
@@ -52,7 +75,7 @@ const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }) => {
 /**
  * Allocation summary section
  */
-const AllocationSummary = ({ preview }) => (
+const AllocationSummary = ({ preview }: { preview: AllocationPreview }) => (
   <div className="glassmorphism rounded-2xl p-6 border border-white/20">
     <div className="flex justify-between items-center mb-3">
       <span className="font-semibold text-purple-900">Total Paycheck:</span>
@@ -75,7 +98,7 @@ const AllocationSummary = ({ preview }) => (
 /**
  * Envelope allocations display
  */
-const EnvelopeAllocations = ({ preview, envelopes }) => (
+const EnvelopeAllocations = ({ preview, envelopes }: { preview: AllocationPreview; envelopes: Envelope[] }) => (
   <div className="glassmorphism rounded-2xl p-6 border border-white/20">
     <h4 className="font-semibold mb-4 text-purple-900">Envelope Allocations:</h4>
     <div className="space-y-3">
@@ -106,7 +129,7 @@ const EnvelopeAllocations = ({ preview, envelopes }) => (
 /**
  * Unassigned cash display section
  */
-const UnassignedCashDisplay = ({ preview }) => (
+const UnassignedCashDisplay = ({ preview }: { preview: AllocationPreview & { leftoverAmount: number } }) => (
   <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl p-6 text-white">
     <div className="flex justify-between items-center">
       <div>

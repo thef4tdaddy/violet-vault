@@ -2,11 +2,18 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { Radio } from "@/components/ui";
 
+// Type definitions
+interface PaycheckAllocationModesProps {
+  allocationMode: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
 /**
  * Paycheck allocation mode selector component
  * Radio button selection for allocation strategy
  */
-const PaycheckAllocationModes = ({ allocationMode, onChange, disabled = false }) => {
+const PaycheckAllocationModes = ({ allocationMode, onChange, disabled = false }: PaycheckAllocationModesProps) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-4">
@@ -54,6 +61,15 @@ const AllocationModeOption = ({
   iconColor,
   title,
   description,
+}: {
+  value: string;
+  checked: boolean;
+  onChange: (value: string) => void;
+  disabled: boolean;
+  icon: string;
+  iconColor: string;
+  title: string;
+  description: string;
 }) => (
   <div className="glassmorphism border-2 border-black rounded-2xl hover:border-purple-300 transition-all p-6">
     <div className="grid grid-cols-[auto_1fr] gap-4 items-start">
