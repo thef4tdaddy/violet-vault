@@ -22,13 +22,15 @@ const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
  */
 interface SyncConfig {
   budgetId?: string;
-  encryptionKey?: string | CryptoKey;
-  currentUser?: {
-    readonly uid?: string;
-    readonly userName?: string;
-    readonly joinedVia?: string;
-    readonly sharedBy?: string;
-  };
+  encryptionKey?: string | CryptoKey | Uint8Array;
+  currentUser?:
+    | string
+    | {
+        readonly uid?: string;
+        readonly userName?: string;
+        readonly joinedVia?: string;
+        readonly sharedBy?: string;
+      };
   clearAllData?: () => Promise<void>;
 }
 
@@ -121,10 +123,16 @@ class CloudSyncService {
     this.syncQueue = this.syncQueue.then(() => this.forceSync());
   }
 
-  async forceSync() {
+  async forceSync(): Promise<{
+    success: boolean;
+    error?: string;
+    recordsProcessed?: number;
+    direction?: string;
+    counts?: unknown;
+  }> {
     if (this.isSyncing) {
       logger.warn("🔄 Sync already in progress, skipping.");
-      return { success: false, reason: "Sync in progress" };
+      return { success: false, error: "Sync in progress" };
     }
 
     this.isSyncing = true;
@@ -143,7 +151,7 @@ class CloudSyncService {
           hasBudgetId: !!this.config?.budgetId,
           hasEncryptionKey: !!this.config?.encryptionKey,
         });
-        return { success: false, reason: "Missing encryption context" };
+        return { success: false, error: "Missing encryption context" };
       }
 
       // Additional validation for encryption key readiness
@@ -151,7 +159,7 @@ class CloudSyncService {
         logger.warn("🔐 Sync aborted - encryption key not yet resolved", {
           keyType: typeof this.config.encryptionKey,
         });
-        return { success: false, reason: "Encryption key not ready" };
+        return { success: false, error: "Encryption key not ready" };
       }
 
       // Initialize chunked Firebase sync if not already done
