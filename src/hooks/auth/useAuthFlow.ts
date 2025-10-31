@@ -26,7 +26,7 @@ const useAuthFlow = () => {
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   const handleSetup = useCallback(
-    async (userDataOrPassword) => {
+    async (userDataOrPassword: string | { password: string; budgetId?: string }) => {
       // Handle three scenarios:
       // 1. Existing user login (string password)
       // 2. Shared budget join (object with budgetId)
@@ -60,11 +60,18 @@ const useAuthFlow = () => {
         logger.error("❌ Setup error:", error);
 
         // If this is our enhanced password validation error, re-throw it
-        if (error.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET") {
+        if (
+          error instanceof Error &&
+          "code" in error &&
+          (error as { code: string }).code === "INVALID_PASSWORD_OFFER_NEW_BUDGET"
+        ) {
           throw error;
         }
 
-        showErrorToast(`Setup error: ${error.message}`, "Setup Error");
+        showErrorToast(
+          `Setup error: ${error instanceof Error ? error.message : String(error)}`,
+          "Setup Error"
+        );
       }
     },
     [login, showErrorToast]
@@ -75,7 +82,7 @@ const useAuthFlow = () => {
   }, [logout]);
 
   const handleChangePassword = useCallback(
-    async (oldPass, newPass) => {
+    async (oldPass: string, newPass: string) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
         showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
@@ -87,8 +94,8 @@ const useAuthFlow = () => {
   );
 
   const handleUpdateProfile = useCallback(
-    async (updatedProfile) => {
-      const result = await updateProfile(updatedProfile);
+    async (updatedProfile: unknown) => {
+      const result = await updateProfile(updatedProfile as { userName: string });
       if (!result.success) {
         throw new Error(result.error);
       }

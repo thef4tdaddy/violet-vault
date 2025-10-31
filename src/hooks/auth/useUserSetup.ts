@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 import { budgetDb, clearData } from "../../db/budgetDb";
@@ -81,7 +81,10 @@ export const useUserSetup = (onSetupComplete) => {
   }, []);
 
   // Timeout utility to prevent hanging operations
-  const handleWithTimeout = async (asyncFn, timeoutMs = 5000) => {
+  const handleWithTimeout = async <T>(
+    asyncFn: () => Promise<T>,
+    timeoutMs: number = 5000
+  ): Promise<T> => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
@@ -91,7 +94,7 @@ export const useUserSetup = (onSetupComplete) => {
   };
 
   // Handle final form submission (step 2)
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     logger.debug("🔄 Form submitted - STEP 2 HANDLER:", {
       step,
@@ -125,7 +128,7 @@ export const useUserSetup = (onSetupComplete) => {
   };
 
   // Handle step 1 continue - different flow for returning vs new users
-  const handleStep1Continue = async (e) => {
+  const handleStep1Continue = async (e: React.FormEvent) => {
     e.preventDefault();
     logger.debug("🔄 Step 1 continue clicked:", {
       step,
@@ -179,7 +182,7 @@ export const useUserSetup = (onSetupComplete) => {
   };
 
   // Handle start tracking button click (step 2 -> step 3)
-  const handleStartTrackingClick = async (e) => {
+  const handleStartTrackingClick = async (e: React.FormEvent) => {
     e.preventDefault();
     logger.debug("🎯 Continue to Share Code step clicked:", {
       step,
@@ -216,7 +219,7 @@ export const useUserSetup = (onSetupComplete) => {
   };
 
   // Handle final "Create Budget" button click (step 3)
-  const handleCreateBudget = async (e) => {
+  const handleCreateBudget = async (e: React.FormEvent) => {
     e.preventDefault();
     logger.debug("🚀 Create Budget button clicked:", {
       step,
