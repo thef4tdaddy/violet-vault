@@ -70,7 +70,6 @@ const makeCreateEnvelopeWrapper =
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
   const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
-  // Normalize DB bill shapes to helper-friendly shapes (convert Date dueDate -> string)
   const normalizedBills = (bills || []).map((b) => ({
     ...b,
     dueDate: b.dueDate
@@ -82,7 +81,6 @@ export const useDebtManagement = () => {
   const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
   const { transactions = [], addTransaction: createTransaction } = useTransactions();
 
-  // Create API wrappers using helper function
   const { createEnvelopeWrapper, createBillWrapper, updateBillWrapper, createTransactionWrapper } =
     createAPIWrappers(
       addEnvelopeAsync,
@@ -98,31 +96,34 @@ export const useDebtManagement = () => {
   const updateDebtData = debtsHook?.updateDebtAsync;
   const deleteDebtData = debtsHook?.deleteDebtAsync;
 
-  const enrichedDebts = useMemo(() => {
-    return enrichDebtsWithRelations(
-      debts as unknown as DebtForHelper[],
-      normalizedBills as unknown as HelperBill[],
-      envelopes as Envelope[],
-      transactions as TransactionWithDebtId[]
-    );
-  }, [debts, envelopes, transactions, normalizedBills]);
+  const enrichedDebts = useMemo(
+    () =>
+      enrichDebtsWithRelations(
+        debts as unknown as DebtForHelper[],
+        normalizedBills as unknown as HelperBill[],
+        envelopes as Envelope[],
+        transactions as TransactionWithDebtId[]
+      ),
+    [debts, envelopes, transactions, normalizedBills]
+  );
 
-  const debtStats = useMemo(() => {
-    if (!enrichedDebts?.length) {
-      return {
-        totalDebt: 0,
-        totalMonthlyPayments: 0,
-        averageInterestRate: 0,
-        debtsByType: {} as Record<DebtType, DebtAccount[]>,
-        totalInterestPaid: 0,
-        activeDebtCount: 0,
-        totalDebtCount: 0,
-        dueSoonAmount: 0,
-        dueSoonCount: 0,
-      };
-    }
-    return calculateDebtStats(enrichedDebts);
-  }, [enrichedDebts]);
+  const debtStats = useMemo(
+    () =>
+      enrichedDebts?.length
+        ? calculateDebtStats(enrichedDebts)
+        : {
+            totalDebt: 0,
+            totalMonthlyPayments: 0,
+            averageInterestRate: 0,
+            debtsByType: {} as Record<DebtType, DebtAccount[]>,
+            totalInterestPaid: 0,
+            activeDebtCount: 0,
+            totalDebtCount: 0,
+            dueSoonAmount: 0,
+            dueSoonCount: 0,
+          },
+    [enrichedDebts]
+  );
 
   const debtsByStatus = useMemo(
     () => groupDebtsByStatus(enrichedDebts, DEBT_STATUS),
@@ -149,12 +150,11 @@ export const useDebtManagement = () => {
     if (!updateDebtData) throw new Error("Update debt function not available");
     const debt = debts.find((d) => d.id === debtId);
     if (!debt) throw new Error("Debt not found");
-
     return recordPaymentOperation({
       debt: debt as unknown as DebtForHelper,
       paymentData,
-      updateDebtData: (params) => updateDebtData(params),
-      createTransaction: (data) => createTransactionWrapper(data),
+      updateDebtData,
+      createTransaction: createTransactionWrapper,
     });
   };
 
@@ -166,7 +166,7 @@ export const useDebtManagement = () => {
       debts: debts as unknown as DebtForHelper[],
       bills: normalizedBills as unknown as HelperBill[],
       updateBill: updateBillWrapper,
-      updateDebtData: (params) => updateDebtData(params),
+      updateDebtData,
     });
   };
 
@@ -175,7 +175,7 @@ export const useDebtManagement = () => {
     return syncDebtDueDatesOperation({
       debts: debts as unknown as DebtForHelper[],
       bills: normalizedBills as unknown as HelperBill[],
-      updateDebtData: (params) => updateDebtData(params),
+      updateDebtData,
     });
   };
 
@@ -185,12 +185,7 @@ export const useDebtManagement = () => {
     author = "Unknown User"
   ) => {
     if (!updateDebtData) throw new Error("Update debt function not available");
-    return updateDebtOperation({
-      debtId,
-      updates,
-      author,
-      updateDebtData: (params) => updateDebtData(params),
-    });
+    return updateDebtOperation({ debtId, updates, author, updateDebtData });
   };
 
   const deleteDebt = async (debtId: string) => {
@@ -206,19 +201,15 @@ export const useDebtManagement = () => {
           : undefined,
       } as unknown as HelperBill & Record<string, unknown>;
     });
-
     await deleteDebtOperation({
       debtId,
       bills: transformedBills as unknown as HelperBill[],
       deleteBill: (id) => deleteBillAsync(id).then(() => {}),
-      deleteDebtData: (params) => deleteDebtData(params),
+      deleteDebtData,
     });
-    return;
   };
 
-  const getUpcomingPaymentsData = (daysAhead = 30) => {
-    return getUpcomingPayments(enrichedDebts, daysAhead);
-  };
+  const getUpcomingPaymentsData = (daysAhead = 30) => getUpcomingPayments(enrichedDebts, daysAhead);
 
   return {
     debts: enrichedDebts,
