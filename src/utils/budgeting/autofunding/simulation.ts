@@ -4,7 +4,12 @@
  * Extracted from autoFundingEngine.js for Issue #506
  */
 
-import { RULE_TYPES, type AutoFundingRule, type AutoFundingContext, type EnvelopeData } from "./rules.ts";
+import {
+  RULE_TYPES,
+  type AutoFundingRule,
+  type AutoFundingContext,
+  type EnvelopeData,
+} from "./rules.ts";
 import { calculateFundingAmount, sortRulesByPriority } from "./rules.ts";
 import { shouldRuleExecute } from "./conditions.ts";
 
@@ -268,7 +273,10 @@ export const simulateSingleRule = (
  * @param {number} totalAmount - Total amount to transfer
  * @returns {Array} Array of planned transfer objects
  */
-export const planRuleTransfers = (rule: AutoFundingRule, totalAmount: number): PlannedTransfer[] => {
+export const planRuleTransfers = (
+  rule: AutoFundingRule,
+  totalAmount: number
+): PlannedTransfer[] => {
   const transfers: PlannedTransfer[] = [];
 
   switch (rule.type) {
@@ -487,7 +495,10 @@ export const calculateTransferImpact = (
   });
 
   // Track unassigned cash impact
-  impact.unassignedChange = -transfers.reduce((sum: number, t: PlannedTransfer) => sum + t.amount, 0);
+  impact.unassignedChange = -transfers.reduce(
+    (sum: number, t: PlannedTransfer) => sum + t.amount,
+    0
+  );
   impact.totalTransferred = -impact.unassignedChange;
 
   // Calculate per-envelope impact

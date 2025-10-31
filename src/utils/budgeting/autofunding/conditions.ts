@@ -88,7 +88,9 @@ export const evaluateConditions = (conditions: Condition[], context: ExecutionCo
         return unassignedCash > condition.value;
 
       case CONDITION_TYPES.DATE_RANGE:
-        return context.currentDate ? evaluateDateRangeCondition(condition, context.currentDate) : true;
+        return context.currentDate
+          ? evaluateDateRangeCondition(condition, context.currentDate)
+          : true;
 
       case CONDITION_TYPES.TRANSACTION_AMOUNT:
         return evaluateTransactionAmountCondition(condition, context);
@@ -207,7 +209,11 @@ export const shouldRuleExecute = (rule: Rule, context: ExecutionContext): boolea
   }
 
   // Check trigger compatibility
-  if (context.trigger && rule.trigger !== context.trigger && rule.trigger !== TRIGGER_TYPES.MANUAL) {
+  if (
+    context.trigger &&
+    rule.trigger !== context.trigger &&
+    rule.trigger !== TRIGGER_TYPES.MANUAL
+  ) {
     return false;
   }
 
@@ -220,7 +226,10 @@ export const shouldRuleExecute = (rule: Rule, context: ExecutionContext): boolea
       TRIGGER_TYPES.PAYDAY,
     ].includes(rule.trigger)
   ) {
-    if (context.currentDate && !checkSchedule(rule.trigger, rule.lastExecuted, context.currentDate)) {
+    if (
+      context.currentDate &&
+      !checkSchedule(rule.trigger, rule.lastExecuted, context.currentDate)
+    ) {
       return false;
     }
   }
@@ -367,8 +376,12 @@ export const getConditionDescription = (
       return `Unassigned cash > $${condition.value}`;
 
     case CONDITION_TYPES.DATE_RANGE: {
-      const startDate = condition.startDate ? new Date(condition.startDate).toLocaleDateString() : "unknown";
-      const endDate = condition.endDate ? new Date(condition.endDate).toLocaleDateString() : "unknown";
+      const startDate = condition.startDate
+        ? new Date(condition.startDate).toLocaleDateString()
+        : "unknown";
+      const endDate = condition.endDate
+        ? new Date(condition.endDate).toLocaleDateString()
+        : "unknown";
       return `Between ${startDate} and ${endDate}`;
     }
 
@@ -380,7 +393,9 @@ export const getConditionDescription = (
         greater_than_or_equal: "≥",
         less_than_or_equal: "≤",
       };
-      const operator = condition.operator ? operators[condition.operator] ?? condition.operator : "?";
+      const operator = condition.operator
+        ? (operators[condition.operator] ?? condition.operator)
+        : "?";
       return `Transaction amount ${operator} $${condition.value}`;
     }
 
