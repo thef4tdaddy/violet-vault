@@ -1,11 +1,34 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 import FileUploader from "./FileUploader";
 import FieldMapper from "./FieldMapper";
 import ImportProgress from "./ImportProgress";
 
-const ImportModal = ({
+interface FieldMapping {
+  date?: string;
+  description?: string;
+  amount?: string;
+  category?: string;
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
+interface ImportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  importStep: number;
+  setImportStep: (step: number) => void;
+  importData: unknown[];
+  setImportData: (data: unknown[]) => void;
+  fieldMapping: FieldMapping;
+  setFieldMapping: (mapping: FieldMapping) => void;
+  importProgress: number;
+  onImport: () => void;
+  onFileUpload: (file: File) => void;
+}
+
+const ImportModal: React.FC<ImportModalProps> = ({
   isOpen,
   onClose,
   importStep,

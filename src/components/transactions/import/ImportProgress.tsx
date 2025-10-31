@@ -1,7 +1,12 @@
 import React from "react";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 
-const ImportProgress = ({ importData, importProgress }) => {
+interface ImportProgressProps {
+  importData: unknown[];
+  importProgress: number;
+}
+
+const ImportProgress: React.FC<ImportProgressProps> = ({ importData, importProgress }) => {
   return (
     <div className="space-y-6">
       <div className="text-center">

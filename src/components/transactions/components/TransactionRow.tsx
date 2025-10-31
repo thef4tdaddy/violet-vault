@@ -1,18 +1,35 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 import {
   COLUMN_WIDTHS,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
   getEnvelopeDisplay,
-} from "../../../utils/transactions/tableHelpers";
+} from "@/utils/transactions/tableHelpers";
+import type { Transaction, Envelope } from "@/types/finance";
+
+interface VirtualRow {
+  index: number;
+  start: number;
+  size: number;
+}
+
+interface TransactionRowProps {
+  transaction: Transaction;
+  envelopes: Envelope[];
+  virtualRow: VirtualRow;
+  onEdit: (transaction: Transaction) => void;
+  onSplit: (transaction: Transaction) => void;
+  onDeleteClick: (transaction: Transaction) => void;
+  onHistoryClick: (transaction: Transaction) => void;
+}
 
 /**
  * Individual transaction row component - pure UI component
  */
-const TransactionRow = ({
+const TransactionRow: React.FC<TransactionRowProps> = ({
   transaction,
   envelopes,
   virtualRow,

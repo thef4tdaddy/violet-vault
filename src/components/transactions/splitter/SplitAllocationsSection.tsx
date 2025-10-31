@@ -1,9 +1,22 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 import SplitAllocationRow from "./SplitAllocationRow";
+import type { SplitAllocation, Envelope } from "@/types/finance";
 
-const SplitAllocationsSection = ({
+interface SplitAllocationsSectionProps {
+  splitAllocations: SplitAllocation[];
+  availableCategories: string[];
+  envelopes: Envelope[];
+  onUpdateSplit: (id: string | number, field: string, value: string | number) => void;
+  onRemoveSplit: (id: string | number) => void;
+  onAddSplit: () => void;
+  onSmartSplit: () => void;
+  onAutoBalance: () => void;
+  canAutoBalance: boolean;
+}
+
+const SplitAllocationsSection: React.FC<SplitAllocationsSectionProps> = ({
   splitAllocations,
   availableCategories,
   envelopes,

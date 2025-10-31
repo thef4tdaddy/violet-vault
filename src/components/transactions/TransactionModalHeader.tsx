@@ -1,12 +1,21 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
+import type { Transaction } from "@/types/finance";
+
+interface TransactionModalHeaderProps {
+  editingTransaction?: Transaction | null;
+  onClose: () => void;
+}
 
 /**
  * Header section for TransactionForm
  * Pure UI component that preserves exact visual appearance
  */
-const TransactionModalHeader = ({ editingTransaction, onClose }) => {
+const TransactionModalHeader: React.FC<TransactionModalHeaderProps> = ({
+  editingTransaction,
+  onClose,
+}) => {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-3 flex-1">
