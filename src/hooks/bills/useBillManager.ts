@@ -91,6 +91,8 @@ export const useBillManager = ({
     }))
   );
 
+  // Note: useBillManagerUIState is NOT a Zustand store - it's a custom hook with useState
+  // eslint-disable-next-line zustand-safe-patterns/zustand-selective-subscriptions
   const uiState = useBillManagerUIState();
 
   const { transactions, envelopes, bills, categorizedBills, totals, filteredBills } =
