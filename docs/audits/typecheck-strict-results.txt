@@ -40,6 +40,23 @@ src/components/accounts/AccountsHeader.tsx(5,53): error TS7031: Binding element 
 src/components/accounts/AccountsHeader.tsx(5,71): error TS7031: Binding element 'onAddAccount' implicitly has an 'any' type.
 src/components/accounts/ExpirationAlert.tsx(5,28): error TS7031: Binding element 'expiringAccounts' implicitly has an 'any' type.
 src/components/accounts/ExpirationAlert.tsx(20,36): error TS7006: Parameter 'account' implicitly has an 'any' type.
+src/components/accounts/SupplementalAccounts.tsx(10,3): error TS7031: Binding element 'onAddAccount' implicitly has an 'any' type.
+src/components/accounts/SupplementalAccounts.tsx(11,3): error TS7031: Binding element 'onUpdateAccount' implicitly has an 'any' type.
+src/components/accounts/SupplementalAccounts.tsx(12,3): error TS7031: Binding element 'onDeleteAccount' implicitly has an 'any' type.
+src/components/accounts/SupplementalAccounts.tsx(13,3): error TS7031: Binding element 'onTransferToEnvelope' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(9,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(10,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(11,3): error TS7031: Binding element 'onTransfer' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(12,3): error TS7031: Binding element 'transferringAccount' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(13,3): error TS7031: Binding element 'transferForm' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(14,3): error TS7031: Binding element 'setTransferForm' implicitly has an 'any' type.
+src/components/accounts/TransferModal.tsx(15,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/accounts/TransferModalContent.tsx(14,3): error TS7031: Binding element 'transferringAccount' implicitly has an 'any' type.
+src/components/accounts/TransferModalContent.tsx(15,3): error TS7031: Binding element 'transferForm' implicitly has an 'any' type.
+src/components/accounts/TransferModalContent.tsx(16,3): error TS7031: Binding element 'setTransferForm' implicitly has an 'any' type.
+src/components/accounts/TransferModalContent.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/accounts/TransferModalContent.tsx(18,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/accounts/TransferModalContent.tsx(19,3): error TS7031: Binding element 'onTransfer' implicitly has an 'any' type.
 src/components/accounts/form/AccountBasicFields.tsx(4,31): error TS7031: Binding element 'accountForm' implicitly has an 'any' type.
 src/components/accounts/form/AccountBasicFields.tsx(4,44): error TS7031: Binding element 'setAccountForm' implicitly has an 'any' type.
 src/components/accounts/form/AccountBasicFields.tsx(4,60): error TS7031: Binding element 'canEdit' implicitly has an 'any' type.
@@ -64,10 +81,6 @@ src/components/accounts/shared/AccountCardHeader.tsx(5,30): error TS7031: Bindin
 src/components/accounts/shared/AccountCardHeader.tsx(5,39): error TS7031: Binding element 'typeInfo' implicitly has an 'any' type.
 src/components/accounts/shared/AccountCardHeader.tsx(5,49): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
 src/components/accounts/shared/AccountCardHeader.tsx(5,57): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
-src/components/accounts/SupplementalAccounts.tsx(10,3): error TS7031: Binding element 'onAddAccount' implicitly has an 'any' type.
-src/components/accounts/SupplementalAccounts.tsx(11,3): error TS7031: Binding element 'onUpdateAccount' implicitly has an 'any' type.
-src/components/accounts/SupplementalAccounts.tsx(12,3): error TS7031: Binding element 'onDeleteAccount' implicitly has an 'any' type.
-src/components/accounts/SupplementalAccounts.tsx(13,3): error TS7031: Binding element 'onTransferToEnvelope' implicitly has an 'any' type.
 src/components/accounts/transfer/TransferFormFields.tsx(3,35): error TS7031: Binding element 'transferForm' implicitly has an 'any' type.
 src/components/accounts/transfer/TransferFormFields.tsx(3,49): error TS7031: Binding element 'setTransferForm' implicitly has an 'any' type.
 src/components/accounts/transfer/TransferFormFields.tsx(3,66): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
@@ -78,19 +91,6 @@ src/components/accounts/transfer/TransferFormFields.tsx(28,63): error TS7031: Bi
 src/components/accounts/transfer/TransferFormFields.tsx(44,37): error TS7031: Binding element 'transferForm' implicitly has an 'any' type.
 src/components/accounts/transfer/TransferFormFields.tsx(44,51): error TS7031: Binding element 'setTransferForm' implicitly has an 'any' type.
 src/components/accounts/transfer/TransferFormFields.tsx(44,68): error TS7031: Binding element 'transferringAccount' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(9,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(10,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(11,3): error TS7031: Binding element 'onTransfer' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(12,3): error TS7031: Binding element 'transferringAccount' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(13,3): error TS7031: Binding element 'transferForm' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(14,3): error TS7031: Binding element 'setTransferForm' implicitly has an 'any' type.
-src/components/accounts/TransferModal.tsx(15,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/accounts/TransferModalContent.tsx(14,3): error TS7031: Binding element 'transferringAccount' implicitly has an 'any' type.
-src/components/accounts/TransferModalContent.tsx(15,3): error TS7031: Binding element 'transferForm' implicitly has an 'any' type.
-src/components/accounts/TransferModalContent.tsx(16,3): error TS7031: Binding element 'setTransferForm' implicitly has an 'any' type.
-src/components/accounts/TransferModalContent.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/accounts/TransferModalContent.tsx(18,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/accounts/TransferModalContent.tsx(19,3): error TS7031: Binding element 'onTransfer' implicitly has an 'any' type.
 src/components/activity/ActivityFeed.tsx(35,21): error TS2345: Argument of type 'AuditLogEntry[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
   Type 'AuditLogEntry[]' is not assignable to type 'never[]'.
     Type 'AuditLogEntry' is not assignable to type 'never'.
@@ -129,6 +129,24 @@ src/components/analytics/CategorySuggestionsTab.tsx(5,67): error TS7031: Binding
 src/components/analytics/CategorySuggestionsTab.tsx(6,28): error TS7006: Parameter 'priority' implicitly has an 'any' type.
 src/components/analytics/CategorySuggestionsTab.tsx(27,26): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/analytics/CategorySuggestionsTab.tsx(64,25): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
+src/components/analytics/PerformanceMonitor.tsx(13,31): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
+src/components/analytics/PerformanceMonitor.tsx(13,46): error TS7031: Binding element 'balanceData' implicitly has an 'any' type.
+src/components/analytics/ReportExporter.tsx(15,27): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
+src/components/analytics/ReportExporter.tsx(15,42): error TS7031: Binding element 'balanceData' implicitly has an 'any' type.
+src/components/analytics/ReportExporter.tsx(15,55): error TS7031: Binding element 'timeFilter' implicitly has an 'any' type.
+src/components/analytics/ReportExporter.tsx(15,67): error TS7031: Binding element 'onExport' implicitly has an 'any' type.
+src/components/analytics/ReportExporter.tsx(15,77): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/analytics/ReportExporter.tsx(81,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: null; }' is not assignable to type 'Record<string, boolean>'.
+  Property 'customDateRange' is incompatible with index signature.
+    Type 'null' is not assignable to type 'boolean'.
+src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
+  Type 'TransactionForStats' is not assignable to type 'never'.
+src/components/analytics/TrendAnalysisCharts.tsx(20,32): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
+src/components/analytics/TrendAnalysisCharts.tsx(20,47): error TS7031: Binding element 'timeFilter' implicitly has an 'any' type.
+src/components/analytics/TrendAnalysisCharts.tsx(36,30): error TS2322: Type '{ month: string; spending: number; income: number; net: number; forecast: boolean; }[]' is not assignable to type 'never[]'.
+  Type '{ month: string; spending: number; income: number; net: number; forecast: boolean; }' is not assignable to type 'never'.
+src/components/analytics/TrendAnalysisCharts.tsx(39,22): error TS2322: Type '{ month: any; change: number; percentChange: number; }[]' is not assignable to type 'never[]'.
+  Type '{ month: any; change: number; percentChange: number; }' is not assignable to type 'never'.
 src/components/analytics/components/AnalyticsHeader.tsx(10,28): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(10,39): error TS7031: Binding element 'handleDateRangeChange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(10,62): error TS7031: Binding element 'handleExport' implicitly has an 'any' type.
@@ -183,18 +201,6 @@ src/components/analytics/performance/PerformanceTabNavigation.tsx(10,3): error T
 src/components/analytics/performance/PerformanceTabNavigation.tsx(11,3): error TS7031: Binding element 'setSelectedMetric' implicitly has an 'any' type.
 src/components/analytics/performance/PerformanceTabNavigation.tsx(12,3): error TS7031: Binding element 'alertsCount' implicitly has an 'any' type.
 src/components/analytics/performance/PerformanceTabNavigation.tsx(13,3): error TS7031: Binding element 'recommendationsCount' implicitly has an 'any' type.
-src/components/analytics/PerformanceMonitor.tsx(13,31): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
-src/components/analytics/PerformanceMonitor.tsx(13,46): error TS7031: Binding element 'balanceData' implicitly has an 'any' type.
-src/components/analytics/ReportExporter.tsx(15,27): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
-src/components/analytics/ReportExporter.tsx(15,42): error TS7031: Binding element 'balanceData' implicitly has an 'any' type.
-src/components/analytics/ReportExporter.tsx(15,55): error TS7031: Binding element 'timeFilter' implicitly has an 'any' type.
-src/components/analytics/ReportExporter.tsx(15,67): error TS7031: Binding element 'onExport' implicitly has an 'any' type.
-src/components/analytics/ReportExporter.tsx(15,77): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/analytics/ReportExporter.tsx(81,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: null; }' is not assignable to type 'Record<string, boolean>'.
-  Property 'customDateRange' is incompatible with index signature.
-    Type 'null' is not assignable to type 'boolean'.
-src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
-  Type 'TransactionForStats' is not assignable to type 'never'.
 src/components/analytics/tabs/CategoriesTab.tsx(7,26): error TS7031: Binding element 'categoryBreakdown' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(7,22): error TS7031: Binding element 'envelopeHealth' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(7,38): error TS7031: Binding element 'budgetVsActual' implicitly has an 'any' type.
@@ -205,12 +211,6 @@ src/components/analytics/tabs/TrendsTab.tsx(8,22): error TS7031: Binding element
 src/components/analytics/tabs/TrendsTab.tsx(8,33): error TS7031: Binding element 'handleChartTypeChange' implicitly has an 'any' type.
 src/components/analytics/tabs/TrendsTab.tsx(8,56): error TS7031: Binding element 'monthlyTrends' implicitly has an 'any' type.
 src/components/analytics/tabs/TrendsTab.tsx(8,71): error TS7031: Binding element 'weeklyPatterns' implicitly has an 'any' type.
-src/components/analytics/TrendAnalysisCharts.tsx(20,32): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
-src/components/analytics/TrendAnalysisCharts.tsx(20,47): error TS7031: Binding element 'timeFilter' implicitly has an 'any' type.
-src/components/analytics/TrendAnalysisCharts.tsx(36,30): error TS2322: Type '{ month: string; spending: number; income: number; net: number; forecast: boolean; }[]' is not assignable to type 'never[]'.
-  Type '{ month: string; spending: number; income: number; net: number; forecast: boolean; }' is not assignable to type 'never'.
-src/components/analytics/TrendAnalysisCharts.tsx(39,22): error TS2322: Type '{ month: any; change: number; percentChange: number; }[]' is not assignable to type 'never[]'.
-  Type '{ month: any; change: number; percentChange: number; }' is not assignable to type 'never'.
 src/components/analytics/trends/CategoryTrendsSection.tsx(4,34): error TS7031: Binding element 'categoryTrends' implicitly has an 'any' type.
 src/components/analytics/trends/CategoryTrendsSection.tsx(5,29): error TS7006: Parameter 'value' implicitly has an 'any' type.
 src/components/analytics/trends/CategoryTrendsSection.tsx(14,30): error TS7006: Parameter 'category' implicitly has an 'any' type.
@@ -235,6 +235,7 @@ src/components/analytics/ui/MetricCard.tsx(61,38): error TS7053: Element implici
   No index signature with a parameter of type 'string' was found on type '{ red: string; orange: string; amber: string; yellow: string; emerald: string; teal: string; cyan: string; blue: string; indigo: string; purple: string; pink: string; gray: string; }'.
 src/components/analytics/ui/MetricCard.tsx(67,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ red: string; orange: string; amber: string; yellow: string; emerald: string; teal: string; cyan: string; blue: string; indigo: string; purple: string; pink: string; gray: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ red: string; orange: string; amber: string; yellow: string; emerald: string; teal: string; cyan: string; blue: string; indigo: string; purple: string; pink: string; gray: string; }'.
+src/components/api-docs/APIDocumentation.tsx(8,1): error TS2578: Unused '@ts-expect-error' directive.
 src/components/auth/AuthGateway.tsx(12,24): error TS7031: Binding element 'onSetupComplete' implicitly has an 'any' type.
 src/components/auth/AuthGateway.tsx(12,41): error TS7031: Binding element 'onLocalOnlyReady' implicitly has an 'any' type.
 src/components/auth/AuthGateway.tsx(24,23): error TS2345: Argument of type '"local-only"' is not assignable to parameter of type 'SetStateAction<null>'.
@@ -250,33 +251,6 @@ src/components/auth/ChangePasswordModal.tsx(5,40): error TS7031: Binding element
 src/components/auth/ChangePasswordModal.tsx(5,49): error TS7031: Binding element 'onChangePassword' implicitly has an 'any' type.
 src/components/auth/ChangePasswordModal.tsx(14,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/auth/ChangePasswordModal.tsx(31,16): error TS18046: 'err' is of type 'unknown'.
-src/components/auth/components/ColorPicker.tsx(9,24): error TS7031: Binding element 'selectedColor' implicitly has an 'any' type.
-src/components/auth/components/ColorPicker.tsx(9,39): error TS7031: Binding element 'onColorChange' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(9,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(10,3): error TS7031: Binding element 'onChangeProfile' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(11,3): error TS7031: Binding element 'onStartFresh' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(12,3): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(13,3): error TS7031: Binding element 'canSubmit' implicitly has an 'any' type.
-src/components/auth/components/ShareCodeDisplay.tsx(10,29): error TS7031: Binding element 'shareCode' implicitly has an 'any' type.
-src/components/auth/components/ShareCodeDisplay.tsx(10,40): error TS7031: Binding element 'onCreateBudget' implicitly has an 'any' type.
-src/components/auth/components/ShareCodeDisplay.tsx(10,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/auth/components/ShareCodeDisplay.tsx(10,64): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(9,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(10,3): error TS7031: Binding element 'onContinue' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(11,3): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(12,3): error TS7031: Binding element 'onStartTracking' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(13,3): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(14,3): error TS7031: Binding element 'canContinue' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(15,3): error TS7031: Binding element 'canStartTracking' implicitly has an 'any' type.
-src/components/auth/components/UserNameInput.tsx(7,3): error TS7031: Binding element 'value' implicitly has an 'any' type.
-src/components/auth/components/UserNameInput.tsx(8,3): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
-src/components/auth/components/UserSetupHeader.tsx(9,28): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/auth/components/UserSetupHeader.tsx(9,34): error TS7031: Binding element 'isReturningUser' implicitly has an 'any' type.
-src/components/auth/components/UserSetupHeader.tsx(9,51): error TS7031: Binding element 'userName' implicitly has an 'any' type.
-src/components/auth/components/UserSetupHeader.tsx(9,61): error TS7031: Binding element 'userColor' implicitly has an 'any' type.
-src/components/auth/components/UserSetupLayout.tsx(6,28): error TS7031: Binding element 'children' implicitly has an 'any' type.
-src/components/auth/key-management/MainContent.tsx(116,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
-  Type 'null' is not assignable to type 'string'.
 src/components/auth/KeyManagementSettings.tsx(78,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
 src/components/auth/KeyManagementSettings.tsx(86,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
 src/components/auth/KeyManagementSettings.tsx(99,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
@@ -304,6 +278,33 @@ src/components/auth/PasswordRotationModal.tsx(14,3): error TS7031: Binding eleme
 src/components/auth/UserIndicator.tsx(108,9): error TS2322: Type '((updates: { [key: string]: unknown; userName: string; userColor: string; budgetId?: string | undefined; }) => Promise<void>) | undefined' is not assignable to type '(profile: User) => Promise<void>'.
   Type 'undefined' is not assignable to type '(profile: User) => Promise<void>'.
 src/components/auth/UserSetup.tsx(59,36): error TS7006: Parameter 'joinData' implicitly has an 'any' type.
+src/components/auth/components/ColorPicker.tsx(9,24): error TS7031: Binding element 'selectedColor' implicitly has an 'any' type.
+src/components/auth/components/ColorPicker.tsx(9,39): error TS7031: Binding element 'onColorChange' implicitly has an 'any' type.
+src/components/auth/components/ReturningUserActions.tsx(9,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
+src/components/auth/components/ReturningUserActions.tsx(10,3): error TS7031: Binding element 'onChangeProfile' implicitly has an 'any' type.
+src/components/auth/components/ReturningUserActions.tsx(11,3): error TS7031: Binding element 'onStartFresh' implicitly has an 'any' type.
+src/components/auth/components/ReturningUserActions.tsx(12,3): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
+src/components/auth/components/ReturningUserActions.tsx(13,3): error TS7031: Binding element 'canSubmit' implicitly has an 'any' type.
+src/components/auth/components/ShareCodeDisplay.tsx(10,29): error TS7031: Binding element 'shareCode' implicitly has an 'any' type.
+src/components/auth/components/ShareCodeDisplay.tsx(10,40): error TS7031: Binding element 'onCreateBudget' implicitly has an 'any' type.
+src/components/auth/components/ShareCodeDisplay.tsx(10,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
+src/components/auth/components/ShareCodeDisplay.tsx(10,64): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(9,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(10,3): error TS7031: Binding element 'onContinue' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(11,3): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(12,3): error TS7031: Binding element 'onStartTracking' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(13,3): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(14,3): error TS7031: Binding element 'canContinue' implicitly has an 'any' type.
+src/components/auth/components/StepButtons.tsx(15,3): error TS7031: Binding element 'canStartTracking' implicitly has an 'any' type.
+src/components/auth/components/UserNameInput.tsx(7,3): error TS7031: Binding element 'value' implicitly has an 'any' type.
+src/components/auth/components/UserNameInput.tsx(8,3): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
+src/components/auth/components/UserSetupHeader.tsx(9,28): error TS7031: Binding element 'step' implicitly has an 'any' type.
+src/components/auth/components/UserSetupHeader.tsx(9,34): error TS7031: Binding element 'isReturningUser' implicitly has an 'any' type.
+src/components/auth/components/UserSetupHeader.tsx(9,51): error TS7031: Binding element 'userName' implicitly has an 'any' type.
+src/components/auth/components/UserSetupHeader.tsx(9,61): error TS7031: Binding element 'userColor' implicitly has an 'any' type.
+src/components/auth/components/UserSetupLayout.tsx(6,28): error TS7031: Binding element 'children' implicitly has an 'any' type.
+src/components/auth/key-management/MainContent.tsx(116,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
 src/components/automation/AutoFundingDashboard.tsx(8,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/automation/AutoFundingDashboard.tsx(12,33): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboard.tsx(12,41): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
@@ -414,27 +415,6 @@ src/components/automation/AutoFundingViewComponents.tsx(74,3): error TS7031: Bin
 src/components/automation/AutoFundingViewComponents.tsx(75,3): error TS7031: Binding element 'HistoryTabComponent' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,30): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,40): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,54): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,65): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(47,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,29): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,39): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,53): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,64): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(50,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,31): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,41): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,55): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,66): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(18,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(49,46): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,33): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,43): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,54): error TS7031: Binding element 'toggleTargetEnvelope' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,76): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(14,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(6,27): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(17,30): error TS7006: Parameter 'trigger' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(28,21): error TS7031: Binding element 'label' implicitly has an 'any' type.
@@ -461,6 +441,27 @@ src/components/automation/steps/RuleTypeStep.tsx(5,35): error TS7031: Binding el
 src/components/automation/steps/RuleTypeStep.tsx(5,51): error TS7031: Binding element 'errors' implicitly has an 'any' type.
 src/components/automation/steps/TriggerScheduleStep.tsx(5,32): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
 src/components/automation/steps/TriggerScheduleStep.tsx(5,42): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
+src/components/automation/steps/config/FixedAmountConfig.tsx(5,30): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
+src/components/automation/steps/config/FixedAmountConfig.tsx(5,40): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
+src/components/automation/steps/config/FixedAmountConfig.tsx(5,54): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/automation/steps/config/FixedAmountConfig.tsx(5,65): error TS7031: Binding element 'errors' implicitly has an 'any' type.
+src/components/automation/steps/config/FixedAmountConfig.tsx(47,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/components/automation/steps/config/PercentageConfig.tsx(5,29): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
+src/components/automation/steps/config/PercentageConfig.tsx(5,39): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
+src/components/automation/steps/config/PercentageConfig.tsx(5,53): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/automation/steps/config/PercentageConfig.tsx(5,64): error TS7031: Binding element 'errors' implicitly has an 'any' type.
+src/components/automation/steps/config/PercentageConfig.tsx(50,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/components/automation/steps/config/PriorityFillConfig.tsx(5,31): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
+src/components/automation/steps/config/PriorityFillConfig.tsx(5,41): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
+src/components/automation/steps/config/PriorityFillConfig.tsx(5,55): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/automation/steps/config/PriorityFillConfig.tsx(5,66): error TS7031: Binding element 'errors' implicitly has an 'any' type.
+src/components/automation/steps/config/PriorityFillConfig.tsx(18,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/components/automation/steps/config/PriorityFillConfig.tsx(49,46): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(5,33): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(5,43): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(5,54): error TS7031: Binding element 'toggleTargetEnvelope' implicitly has an 'any' type.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(5,76): error TS7031: Binding element 'errors' implicitly has an 'any' type.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(14,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
 src/components/automation/tabs/HistoryTab.tsx(5,23): error TS7031: Binding element 'executionHistory' implicitly has an 'any' type.
 src/components/automation/tabs/HistoryTab.tsx(5,41): error TS7031: Binding element 'showExecutionDetails' implicitly has an 'any' type.
 src/components/automation/tabs/HistoryTab.tsx(5,63): error TS7031: Binding element 'onToggleDetails' implicitly has an 'any' type.
@@ -640,6 +641,18 @@ src/components/bills/BulkUpdateModeSelector.tsx(9,47): error TS7031: Binding ele
 src/components/bills/BulkUpdateSummary.tsx(9,30): error TS7031: Binding element 'summary' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,39): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,48): error TS7031: Binding element 'handleSubmit' implicitly has an 'any' type.
+src/components/bills/SmartBillMatcher.tsx(8,29): error TS7031: Binding element 'bills' implicitly has an 'any' type.
+src/components/bills/SmartBillMatcher.tsx(8,36): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/bills/SmartBillMatcher.tsx(8,47): error TS7031: Binding element 'onSuggestEnvelope' implicitly has an 'any' type.
+src/components/bills/SmartBillMatcher.tsx(8,66): error TS7031: Binding element 'searchQuery' implicitly has an 'any' type.
+src/components/bills/SmartBillMatcher.tsx(28,67): error TS2339: Property 'confidence' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(32,34): error TS2339: Property 'envelope' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(33,59): error TS2339: Property 'envelope' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(39,56): error TS2339: Property 'envelope' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(42,74): error TS2339: Property 'envelope' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(43,70): error TS2339: Property 'reason' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(50,32): error TS2339: Property 'confidence' does not exist on type 'never'.
+src/components/bills/SmartBillMatcher.tsx(53,31): error TS2339: Property 'confidence' does not exist on type 'never'.
 src/components/bills/modals/BillDetailActions.tsx(10,3): error TS7031: Binding element 'bill' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailActions.tsx(11,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailActions.tsx(12,3): error TS7031: Binding element 'handleEdit' implicitly has an 'any' type.
@@ -676,18 +689,6 @@ src/components/bills/modals/BulkUpdateConfirmModal.tsx(51,35): error TS7006: Par
 src/components/bills/modals/BulkUpdateConfirmModal.tsx(71,24): error TS18047: 'dateChange' is possibly 'null'.
 src/components/bills/modals/BulkUpdateConfirmModal.tsx(73,70): error TS18047: 'dateChange' is possibly 'null'.
 src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,72): error TS18047: 'dateChange' is possibly 'null'.
-src/components/bills/SmartBillMatcher.tsx(8,29): error TS7031: Binding element 'bills' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,36): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,47): error TS7031: Binding element 'onSuggestEnvelope' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,66): error TS7031: Binding element 'searchQuery' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(28,67): error TS2339: Property 'confidence' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(32,34): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(33,59): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(39,56): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(42,74): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(43,70): error TS2339: Property 'reason' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(50,32): error TS2339: Property 'confidence' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(53,31): error TS2339: Property 'confidence' does not exist on type 'never'.
 src/components/bills/smartBillMatcherHelpers.ts(45,36): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
 src/components/bills/smartBillMatcherHelpers.ts(52,35): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(6,30): error TS7006: Parameter 'progress' implicitly has an 'any' type.
@@ -740,46 +741,6 @@ src/components/budgeting/EditEnvelopeModal.tsx(156,15): error TS2322: Type 'stri
 src/components/budgeting/EditEnvelopeModalComponents.tsx(178,26): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/EditEnvelopeModalComponents.tsx(179,11): error TS2322: Type '"savings"[]' is not assignable to type 'never[]'.
   Type '"savings"' is not assignable to type 'never'.
-src/components/budgeting/envelope/BillEnvelopeStatus.tsx(32,68): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
-  Type 'Bill' is not assignable to type 'never'.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,28): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,41): error TS7031: Binding element 'onToggleCollapse' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,59): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,67): error TS7031: Binding element 'onViewHistory' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(14,26): error TS7006: Parameter 'isCollapsed' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(11,36): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeGridView.tsx(146,30): error TS2345: Argument of type '(envelope: { id: string; [key: string]: unknown; }) => JSX.Element' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => Element'.
-  Types of parameters 'envelope' and 'value' are incompatible.
-    Type 'unknown' is not assignable to type '{ [key: string]: unknown; id: string; }'.
-src/components/budgeting/envelope/EnvelopeHeader.tsx(42,38): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeHeader.tsx(74,40): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeHeader.tsx(86,40): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(8,49): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(8,58): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(11,32): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeItem.tsx(87,9): error TS2322: Type '((envelopeId: string) => void) | undefined' is not assignable to type '(envelopeId: string) => void'.
-  Type 'undefined' is not assignable to type '(envelopeId: string) => void'.
-src/components/budgeting/envelope/EnvelopeItem.tsx(88,9): error TS2322: Type '((envelope: Envelope) => void) | undefined' is not assignable to type '(envelope: Envelope) => void'.
-  Type 'undefined' is not assignable to type '(envelope: Envelope) => void'.
-src/components/budgeting/envelope/EnvelopeItem.tsx(89,9): error TS2322: Type '((envelope: Envelope) => void) | undefined' is not assignable to type '(envelope: Envelope) => void'.
-  Type 'undefined' is not assignable to type '(envelope: Envelope) => void'.
-src/components/budgeting/envelope/EnvelopeModalHeader.tsx(14,3): error TS7031: Binding element 'onBreakLock' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeModalHeader.tsx(15,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(13,34): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(13,44): error TS7031: Binding element 'bills' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(13,51): error TS7031: Binding element 'utilizationColorClass' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(14,26): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeSummary.tsx(3,28): error TS7031: Binding element 'totals' implicitly has an 'any' type.
-src/components/budgeting/envelope/hooks/useEnvelopeDisplayData.ts(136,64): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
-  Type 'Bill' is not assignable to type 'never'.
-src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx(11,34): error TS7031: Binding element 'swipeState' implicitly has an 'any' type.
-src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx(11,46): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(6,35): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(6,51): error TS7031: Binding element 'onViewHistory' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,35): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,51): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(13,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeGrid.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/budgeting/EnvelopeGrid.tsx(76,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
@@ -845,6 +806,97 @@ src/components/budgeting/EnvelopeSystem.tsx(157,24): error TS7006: Parameter 'up
 src/components/budgeting/EnvelopeSystem.tsx(163,41): error TS18046: 'error' is of type 'unknown'.
 src/components/budgeting/EnvelopeSystem.tsx(170,12): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeSystem.tsx(176,41): error TS18046: 'error' is of type 'unknown'.
+src/components/budgeting/PaycheckProcessor.tsx(21,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(22,3): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(23,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(91,25): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(125,32): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(48,26): error TS7031: Binding element 'confidence' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(48,38): error TS7031: Binding element 'confidenceColor' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(67,29): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(67,41): error TS7031: Binding element 'daysUntil' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(67,52): error TS7031: Binding element 'formattedPrediction' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(67,73): error TS7031: Binding element 'confidenceColor' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(95,3): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(97,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(98,3): error TS7031: Binding element 'onPrepareEnvelopes' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(106,36): error TS18047: 'daysUntil' is possibly 'null'.
+src/components/budgeting/PaydayPrediction.tsx(106,54): error TS18047: 'daysUntil' is possibly 'null'.
+src/components/budgeting/PaydayPrediction.tsx(111,74): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/components/budgeting/PaydayPrediction.tsx(133,23): error TS7031: Binding element 'bgColor' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(133,32): error TS7031: Binding element 'borderColor' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(133,45): error TS7031: Binding element 'icon' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(133,51): error TS7031: Binding element 'iconColor' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(133,62): error TS7031: Binding element 'title' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(133,69): error TS7031: Binding element 'description' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(133,82): error TS7031: Binding element 'button' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(153,33): error TS7031: Binding element 'daysUntil' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(153,44): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
+src/components/budgeting/PaydayPrediction.tsx(153,63): error TS7031: Binding element 'onPrepareEnvelopes' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(9,22): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(21,28): error TS7031: Binding element 'count' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(21,35): error TS7031: Binding element 'hasSuggestions' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(32,27): error TS7031: Binding element 'onClick' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(44,3): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(45,3): error TS7031: Binding element 'toggleCollapse' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(46,3): error TS7031: Binding element 'hasSuggestions' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(47,3): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(48,3): error TS7031: Binding element 'toggleSettings' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(77,26): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(78,45): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(102,3): error TS7031: Binding element 'showSettings' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(103,3): error TS7031: Binding element 'analysisSettings' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(104,3): error TS7031: Binding element 'updateAnalysisSettings' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(105,3): error TS7031: Binding element 'resetAnalysisSettings' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(106,3): error TS7031: Binding element 'refreshSuggestions' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(107,3): error TS7031: Binding element 'suggestionStats' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(108,3): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(109,3): error TS7031: Binding element 'handleApplySuggestion' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(110,3): error TS7031: Binding element 'handleDismissSuggestion' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(136,3): error TS7031: Binding element 'onCreateEnvelope' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(137,3): error TS7031: Binding element 'onUpdateEnvelope' implicitly has an 'any' type.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(138,3): error TS7031: Binding element 'onDismissSuggestion' implicitly has an 'any' type.
+src/components/budgeting/envelope/BillEnvelopeStatus.tsx(32,68): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
+  Type 'Bill' is not assignable to type 'never'.
+src/components/budgeting/envelope/EnvelopeActions.tsx(13,28): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeActions.tsx(13,41): error TS7031: Binding element 'onToggleCollapse' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeActions.tsx(13,59): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeActions.tsx(13,67): error TS7031: Binding element 'onViewHistory' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeActions.tsx(14,26): error TS7006: Parameter 'isCollapsed' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(11,36): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeGridView.tsx(146,30): error TS2345: Argument of type '(envelope: { id: string; [key: string]: unknown; }) => JSX.Element' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => Element'.
+  Types of parameters 'envelope' and 'value' are incompatible.
+    Type 'unknown' is not assignable to type '{ [key: string]: unknown; id: string; }'.
+src/components/budgeting/envelope/EnvelopeHeader.tsx(42,38): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeHeader.tsx(74,40): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeHeader.tsx(86,40): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(8,49): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(8,58): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(11,32): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeItem.tsx(87,9): error TS2322: Type '((envelopeId: string) => void) | undefined' is not assignable to type '(envelopeId: string) => void'.
+  Type 'undefined' is not assignable to type '(envelopeId: string) => void'.
+src/components/budgeting/envelope/EnvelopeItem.tsx(88,9): error TS2322: Type '((envelope: Envelope) => void) | undefined' is not assignable to type '(envelope: Envelope) => void'.
+  Type 'undefined' is not assignable to type '(envelope: Envelope) => void'.
+src/components/budgeting/envelope/EnvelopeItem.tsx(89,9): error TS2322: Type '((envelope: Envelope) => void) | undefined' is not assignable to type '(envelope: Envelope) => void'.
+  Type 'undefined' is not assignable to type '(envelope: Envelope) => void'.
+src/components/budgeting/envelope/EnvelopeModalHeader.tsx(14,3): error TS7031: Binding element 'onBreakLock' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeModalHeader.tsx(15,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(13,34): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(13,44): error TS7031: Binding element 'bills' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(13,51): error TS7031: Binding element 'utilizationColorClass' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(14,26): error TS7006: Parameter 'status' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeSummary.tsx(3,28): error TS7031: Binding element 'totals' implicitly has an 'any' type.
+src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx(11,34): error TS7031: Binding element 'swipeState' implicitly has an 'any' type.
+src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx(11,46): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(6,35): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(6,51): error TS7031: Binding element 'onViewHistory' implicitly has an 'any' type.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,35): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,51): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(13,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/budgeting/envelope/hooks/useEnvelopeDisplayData.ts(136,64): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
+  Type 'Bill' is not assignable to type 'never'.
 src/components/budgeting/paycheck/AllocationPreview.tsx(4,30): error TS7031: Binding element 'allocationPreview' implicitly has an 'any' type.
 src/components/budgeting/paycheck/AllocationPreview.tsx(4,49): error TS7031: Binding element 'hasAmount' implicitly has an 'any' type.
 src/components/budgeting/paycheck/AllocationPreview.tsx(4,60): error TS7031: Binding element 'allocationMode' implicitly has an 'any' type.
@@ -921,34 +973,6 @@ src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(97,3): error TS7031:
 src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(98,3): error TS7031: Binding element 'onNewPayerNameChange' implicitly has an 'any' type.
 src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(99,3): error TS7031: Binding element 'onAddNewPayer' implicitly has an 'any' type.
 src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(100,3): error TS7031: Binding element 'onToggleAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(21,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(22,3): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(23,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(91,25): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(125,32): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(48,26): error TS7031: Binding element 'confidence' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(48,38): error TS7031: Binding element 'confidenceColor' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(67,29): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(67,41): error TS7031: Binding element 'daysUntil' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(67,52): error TS7031: Binding element 'formattedPrediction' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(67,73): error TS7031: Binding element 'confidenceColor' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(95,3): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(97,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(98,3): error TS7031: Binding element 'onPrepareEnvelopes' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(106,36): error TS18047: 'daysUntil' is possibly 'null'.
-src/components/budgeting/PaydayPrediction.tsx(106,54): error TS18047: 'daysUntil' is possibly 'null'.
-src/components/budgeting/PaydayPrediction.tsx(111,74): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
-  Type 'null' is not assignable to type 'number'.
-src/components/budgeting/PaydayPrediction.tsx(133,23): error TS7031: Binding element 'bgColor' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(133,32): error TS7031: Binding element 'borderColor' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(133,45): error TS7031: Binding element 'icon' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(133,51): error TS7031: Binding element 'iconColor' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(133,62): error TS7031: Binding element 'title' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(133,69): error TS7031: Binding element 'description' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(133,82): error TS7031: Binding element 'button' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(153,33): error TS7031: Binding element 'daysUntil' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(153,44): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(153,63): error TS7031: Binding element 'onPrepareEnvelopes' implicitly has an 'any' type.
 src/components/budgeting/shared/AllocationModeSelector.tsx(9,35): error TS7031: Binding element 'autoAllocate' implicitly has an 'any' type.
 src/components/budgeting/shared/AllocationModeSelector.tsx(9,49): error TS7031: Binding element 'onAutoAllocateChange' implicitly has an 'any' type.
 src/components/budgeting/shared/BillConnectionSelector.tsx(6,28): error TS7006: Parameter 'allBills' implicitly has an 'any' type.
@@ -968,29 +992,6 @@ src/components/budgeting/shared/EnvelopeTypeSelector.tsx(16,24): error TS7006: P
 src/components/budgeting/shared/EnvelopeTypeSelector.tsx(40,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'never'.
 src/components/budgeting/shared/FrequencySelector.tsx(11,3): error TS7031: Binding element 'selectedFrequency' implicitly has an 'any' type.
 src/components/budgeting/shared/FrequencySelector.tsx(12,3): error TS7031: Binding element 'onFrequencyChange' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(9,22): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(21,28): error TS7031: Binding element 'count' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(21,35): error TS7031: Binding element 'hasSuggestions' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(32,27): error TS7031: Binding element 'onClick' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(44,3): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(45,3): error TS7031: Binding element 'toggleCollapse' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(46,3): error TS7031: Binding element 'hasSuggestions' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(47,3): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(48,3): error TS7031: Binding element 'toggleSettings' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(77,26): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(78,45): error TS7006: Parameter 's' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(102,3): error TS7031: Binding element 'showSettings' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(103,3): error TS7031: Binding element 'analysisSettings' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(104,3): error TS7031: Binding element 'updateAnalysisSettings' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(105,3): error TS7031: Binding element 'resetAnalysisSettings' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(106,3): error TS7031: Binding element 'refreshSuggestions' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(107,3): error TS7031: Binding element 'suggestionStats' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(108,3): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(109,3): error TS7031: Binding element 'handleApplySuggestion' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(110,3): error TS7031: Binding element 'handleDismissSuggestion' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(136,3): error TS7031: Binding element 'onCreateEnvelope' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(137,3): error TS7031: Binding element 'onUpdateEnvelope' implicitly has an 'any' type.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(138,3): error TS7031: Binding element 'onDismissSuggestion' implicitly has an 'any' type.
 src/components/budgeting/suggestions/SuggestionCard.tsx(24,27): error TS7031: Binding element 'suggestion' implicitly has an 'any' type.
 src/components/budgeting/suggestions/SuggestionCard.tsx(24,39): error TS7031: Binding element 'onApply' implicitly has an 'any' type.
 src/components/budgeting/suggestions/SuggestionCard.tsx(24,48): error TS7031: Binding element 'onDismiss' implicitly has an 'any' type.
@@ -1251,14 +1252,14 @@ src/components/layout/ViewRenderer.tsx(271,26): error TS2352: Conversion of type
     Index signature for type 'string' is missing in type 'Transaction'.
 src/components/layout/ViewRenderer.tsx(272,11): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
-src/components/mobile/BottomNavigationBar.tsx(29,16): error TS2339: Property 'style' does not exist on type 'never'.
-src/components/mobile/BottomNavigationBar.tsx(32,17): error TS2339: Property 'style' does not exist on type 'never'.
-src/components/mobile/BottomNavigationBar.tsx(39,16): error TS2339: Property 'addEventListener' does not exist on type 'never'.
-src/components/mobile/BottomNavigationBar.tsx(45,18): error TS2339: Property 'removeEventListener' does not exist on type 'never'.
 src/components/mobile/BottomNavItem.tsx(8,26): error TS7031: Binding element 'to' implicitly has an 'any' type.
 src/components/mobile/BottomNavItem.tsx(8,36): error TS7031: Binding element '_Icon' implicitly has an 'any' type.
 src/components/mobile/BottomNavItem.tsx(8,43): error TS7031: Binding element 'label' implicitly has an 'any' type.
 src/components/mobile/BottomNavItem.tsx(8,50): error TS7031: Binding element 'isActive' implicitly has an 'any' type.
+src/components/mobile/BottomNavigationBar.tsx(29,16): error TS2339: Property 'style' does not exist on type 'never'.
+src/components/mobile/BottomNavigationBar.tsx(32,17): error TS2339: Property 'style' does not exist on type 'never'.
+src/components/mobile/BottomNavigationBar.tsx(39,16): error TS2339: Property 'addEventListener' does not exist on type 'never'.
+src/components/mobile/BottomNavigationBar.tsx(45,18): error TS2339: Property 'removeEventListener' does not exist on type 'never'.
 src/components/mobile/FABActionMenu.tsx(11,28): error TS7031: Binding element 'action' implicitly has an 'any' type.
 src/components/mobile/FABActionMenu.tsx(11,36): error TS7031: Binding element 'index' implicitly has an 'any' type.
 src/components/mobile/FABActionMenu.tsx(11,43): error TS7031: Binding element 'onActionClick' implicitly has an 'any' type.
@@ -1328,15 +1329,6 @@ src/components/modals/UnassignedCashModal.tsx(310,52): error TS7006: Parameter '
 src/components/modals/UnassignedCashModal.tsx(391,39): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
 src/components/monitoring/HighlightLoader.tsx(22,63): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/onboarding/components/TutorialOverlay.tsx(10,3): error TS7031: Binding element 'currentStepElement' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(11,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(12,3): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(13,3): error TS7031: Binding element 'tutorialStepsLength' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(14,3): error TS7031: Binding element 'tooltipPosition' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(15,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(16,3): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(17,3): error TS7031: Binding element 'onPrev' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(18,3): error TS7031: Binding element 'onSkip' implicitly has an 'any' type.
 src/components/onboarding/EmptyStateHints.tsx(14,15): error TS7006: Parameter 'onAction' implicitly has an 'any' type.
 src/components/onboarding/EmptyStateHints.tsx(14,25): error TS7006: Parameter '_markStepComplete' implicitly has an 'any' type.
 src/components/onboarding/EmptyStateHints.tsx(29,15): error TS7006: Parameter 'onAction' implicitly has an 'any' type.
@@ -1360,6 +1352,15 @@ src/components/onboarding/EmptyStateHints.tsx(189,46): error TS7053: Element imp
 src/components/onboarding/EmptyStateHints.tsx(213,81): error TS7006: Parameter 'action' implicitly has an 'any' type.
 src/components/onboarding/EmptyStateHints.tsx(213,89): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/components/onboarding/EmptyStateHints.tsx(219,37): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
+src/components/onboarding/components/TutorialOverlay.tsx(10,3): error TS7031: Binding element 'currentStepElement' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(11,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(12,3): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(13,3): error TS7031: Binding element 'tutorialStepsLength' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(14,3): error TS7031: Binding element 'tooltipPosition' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(15,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(16,3): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(17,3): error TS7031: Binding element 'onPrev' implicitly has an 'any' type.
+src/components/onboarding/components/TutorialOverlay.tsx(18,3): error TS7031: Binding element 'onSkip' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialControls.ts(10,3): error TS7006: Parameter 'tutorialSteps' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialControls.ts(11,3): error TS7006: Parameter 'currentStep' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialControls.ts(12,3): error TS7006: Parameter 'setCurrentStep' implicitly has an 'any' type.
@@ -1429,6 +1430,26 @@ src/components/pwa/UpdateAvailableModal.tsx(13,30): error TS7005: Variable 'useU
 src/components/pwa/UpdateAvailableModal.tsx(13,42): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/pwa/UpdateAvailableModal.tsx(14,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/UpdateAvailableModal.tsx(14,33): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/receipts/ReceiptButton.tsx(13,26): error TS7031: Binding element 'onTransactionCreated' implicitly has an 'any' type.
+src/components/receipts/ReceiptButton.tsx(26,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/components/receipts/ReceiptButton.tsx(35,35): error TS7006: Parameter 'processedReceipt' implicitly has an 'any' type.
+src/components/receipts/ReceiptButton.tsx(41,38): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/components/receipts/ReceiptButton.tsx(41,51): error TS7006: Parameter 'receipt' implicitly has an 'any' type.
+src/components/receipts/ReceiptScanner.tsx(20,27): error TS7031: Binding element 'onReceiptProcessed' implicitly has an 'any' type.
+src/components/receipts/ReceiptScanner.tsx(20,47): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(11,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(11,30): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(37,24): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,30): error TS7031: Binding element 'isSubmitting' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,44): error TS7031: Binding element 'canProceed' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,64): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,72): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(67,82): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(100,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(100,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(100,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedDataField.tsx(7,31): error TS7031: Binding element 'label' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedDataField.tsx(7,38): error TS7031: Binding element 'value' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedDataField.tsx(7,45): error TS7031: Binding element 'confidence' implicitly has an 'any' type.
@@ -1453,26 +1474,6 @@ src/components/receipts/components/ReceiptUploadArea.tsx(11,3): error TS7031: Bi
 src/components/receipts/components/ReceiptUploadArea.tsx(12,3): error TS7031: Binding element 'fileInputRef' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptUploadArea.tsx(13,3): error TS7031: Binding element 'cameraInputRef' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptUploadArea.tsx(14,3): error TS7031: Binding element 'onFileInputChange' implicitly has an 'any' type.
-src/components/receipts/ReceiptButton.tsx(13,26): error TS7031: Binding element 'onTransactionCreated' implicitly has an 'any' type.
-src/components/receipts/ReceiptButton.tsx(26,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/receipts/ReceiptButton.tsx(35,35): error TS7006: Parameter 'processedReceipt' implicitly has an 'any' type.
-src/components/receipts/ReceiptButton.tsx(41,38): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/components/receipts/ReceiptButton.tsx(41,51): error TS7006: Parameter 'receipt' implicitly has an 'any' type.
-src/components/receipts/ReceiptScanner.tsx(20,27): error TS7031: Binding element 'onReceiptProcessed' implicitly has an 'any' type.
-src/components/receipts/ReceiptScanner.tsx(20,47): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(11,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(11,30): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(37,24): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,30): error TS7031: Binding element 'isSubmitting' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,44): error TS7031: Binding element 'canProceed' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,64): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,72): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(67,82): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(100,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(100,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(100,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
 src/components/receipts/steps/ConfirmationStep.tsx(10,35): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
 src/components/receipts/steps/ConfirmationStep.tsx(56,35): error TS7031: Binding element 'selectedEnvelope' implicitly has an 'any' type.
 src/components/receipts/steps/ConfirmationStep.tsx(56,53): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
@@ -1544,6 +1545,19 @@ src/components/security/LockScreen.tsx(94,26): error TS2339: Property 'cancel' d
 src/components/security/LockScreen.tsx(127,35): error TS2339: Property 'focus' does not exist on type 'never'.
 src/components/security/LockScreen.tsx(140,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/security/LockScreen.tsx(155,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/settings/EnvelopeIntegrityChecker.tsx(15,37): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+src/components/settings/EnvelopeIntegrityChecker.tsx(15,45): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(28,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(29,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(30,3): error TS7031: Binding element 'onExport' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(31,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(32,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(33,3): error TS7031: Binding element 'onResetEncryption' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(34,3): error TS7031: Binding element 'onSync' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(35,3): error TS7031: Binding element 'onChangePassword' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(36,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(38,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(76,50): error TS7006: Parameter 'sectionId' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(6,3): error TS7031: Binding element 'needsArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(7,3): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(8,3): error TS7031: Binding element 'showPreview' implicitly has an 'any' type.
@@ -1568,8 +1582,6 @@ src/components/settings/archiving/ArchivingStatusOverview.tsx(5,3): error TS7031
 src/components/settings/archiving/ArchivingStatusOverview.tsx(6,3): error TS7031: Binding element 'needsArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingStatusOverview.tsx(7,3): error TS7031: Binding element 'getUrgencyColor' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingStatusOverview.tsx(8,3): error TS7031: Binding element 'getUrgencyIcon' implicitly has an 'any' type.
-src/components/settings/EnvelopeIntegrityChecker.tsx(15,37): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/settings/EnvelopeIntegrityChecker.tsx(15,45): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(10,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(11,3): error TS7031: Binding element 'onOpenPasswordModal' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(12,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
@@ -1624,17 +1636,6 @@ src/components/settings/sections/SyncDebugToolsSection.tsx(65,40): error TS2722:
 src/components/settings/sections/SyncDebugToolsSection.tsx(65,40): error TS18048: 'window.runMasterSyncValidation' is possibly 'undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(171,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(171,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
-src/components/settings/SettingsDashboard.tsx(28,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(29,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(30,3): error TS7031: Binding element 'onExport' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(31,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(32,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(33,3): error TS7031: Binding element 'onResetEncryption' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(34,3): error TS7031: Binding element 'onSync' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(35,3): error TS7031: Binding element 'onChangePassword' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(36,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(38,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(76,50): error TS7006: Parameter 'sectionId' implicitly has an 'any' type.
 src/components/sharing/JoinBudgetModal.tsx(17,28): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/sharing/JoinBudgetModal.tsx(17,36): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/sharing/JoinBudgetModal.tsx(17,45): error TS7031: Binding element 'onJoinSuccess' implicitly has an 'any' type.
@@ -1697,6 +1698,10 @@ src/components/sync/ActivityBanner.tsx(277,39): error TS2339: Property 'userName
 src/components/sync/ConflictResolutionModal.tsx(24,36): error TS7031: Binding element 'syncConflicts' implicitly has an 'any' type.
 src/components/sync/ConflictResolutionModal.tsx(24,51): error TS7031: Binding element 'onResolveConflict' implicitly has an 'any' type.
 src/components/sync/ConflictResolutionModal.tsx(24,70): error TS7031: Binding element 'onDismiss' implicitly has an 'any' type.
+src/components/sync/SyncHealthDashboard.tsx(64,27): error TS7006: Parameter 'status' implicitly has an 'any' type.
+src/components/sync/SyncHealthDashboard.tsx(84,26): error TS7006: Parameter 'status' implicitly has an 'any' type.
+src/components/sync/SyncHealthDashboard.tsx(108,50): error TS18046: 'error' is of type 'unknown'.
+src/components/sync/SyncHealthDashboard.tsx(117,27): error TS7006: Parameter 'ms' implicitly has an 'any' type.
 src/components/sync/health/SyncHealthDetails.tsx(43,3): error TS7031: Binding element 'syncStatus' implicitly has an 'any' type.
 src/components/sync/health/SyncHealthDetails.tsx(44,3): error TS7031: Binding element 'isBackgroundSyncing' implicitly has an 'any' type.
 src/components/sync/health/SyncHealthDetails.tsx(45,3): error TS7031: Binding element 'isRecovering' implicitly has an 'any' type.
@@ -1709,77 +1714,6 @@ src/components/sync/health/SyncStatusIndicator.tsx(27,32): error TS7031: Binding
 src/components/sync/health/SyncStatusIndicator.tsx(27,44): error TS7031: Binding element 'isBackgroundSyncing' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,65): error TS7031: Binding element 'onClick' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,74): error TS7031: Binding element 'showDetails' implicitly has an 'any' type.
-src/components/sync/SyncHealthDashboard.tsx(64,27): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/components/sync/SyncHealthDashboard.tsx(84,26): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/components/sync/SyncHealthDashboard.tsx(108,50): error TS18046: 'error' is of type 'unknown'.
-src/components/sync/SyncHealthDashboard.tsx(117,27): error TS7006: Parameter 'ms' implicitly has an 'any' type.
-src/components/transactions/components/DeleteConfirmation.tsx(8,31): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
-src/components/transactions/components/DeleteConfirmation.tsx(8,44): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/transactions/components/DeleteConfirmation.tsx(8,55): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
-src/components/transactions/components/DeleteConfirmation.tsx(8,65): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(16,3): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(18,3): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(19,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(20,3): error TS7031: Binding element 'onSplit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(21,3): error TS7031: Binding element 'onDeleteClick' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(22,3): error TS7031: Binding element 'onHistoryClick' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,24): error TS7031: Binding element 'importData' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,36): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,50): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,67): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,75): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(67,69): error TS7006: Parameter 'row' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(67,74): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(9,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(10,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(11,3): error TS7031: Binding element 'importStep' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(12,3): error TS7031: Binding element 'setImportStep' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(13,3): error TS7031: Binding element 'importData' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(14,3): error TS7031: Binding element 'setImportData' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(15,3): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(16,3): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(17,3): error TS7031: Binding element 'importProgress' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(18,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(19,3): error TS7031: Binding element 'onFileUpload' implicitly has an 'any' type.
-src/components/transactions/import/ImportProgress.tsx(4,27): error TS7031: Binding element 'importData' implicitly has an 'any' type.
-src/components/transactions/import/ImportProgress.tsx(4,39): error TS7031: Binding element 'importProgress' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionLedgerHeader.tsx(7,3): error TS7031: Binding element 'transactionCount' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionLedgerHeader.tsx(8,3): error TS7031: Binding element 'netCashFlow' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionLedgerHeader.tsx(9,3): error TS7031: Binding element 'onAddTransaction' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionLedgerHeader.tsx(10,3): error TS7031: Binding element 'onImportTransactions' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionPagination.tsx(3,34): error TS7031: Binding element 'currentPage' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionPagination.tsx(3,47): error TS7031: Binding element 'totalPages' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionPagination.tsx(3,59): error TS7031: Binding element 'onPageChange' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitActions.tsx(5,25): error TS7031: Binding element 'totals' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitActions.tsx(5,33): error TS7031: Binding element 'hasUnsavedChanges' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitActions.tsx(5,52): error TS7031: Binding element 'isSaving' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitActions.tsx(5,62): error TS7031: Binding element 'onSave' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitActions.tsx(5,70): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(7,3): error TS7031: Binding element 'split' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(8,10): error TS7031: Binding element '_index' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(9,3): error TS7031: Binding element 'canRemove' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(10,3): error TS7031: Binding element 'onUpdate' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(11,3): error TS7031: Binding element 'onRemove' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(12,3): error TS7031: Binding element 'availableCategories' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(13,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(57,39): error TS7006: Parameter 'category' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(74,28): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(7,3): error TS7031: Binding element 'splitAllocations' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(8,3): error TS7031: Binding element 'availableCategories' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(9,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(10,3): error TS7031: Binding element 'onUpdateSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(11,3): error TS7031: Binding element 'onRemoveSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(12,3): error TS7031: Binding element 'onAddSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(13,3): error TS7031: Binding element 'onSmartSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(14,3): error TS7031: Binding element 'onAutoBalance' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(15,3): error TS7031: Binding element 'canAutoBalance' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(69,32): error TS7006: Parameter 'split' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(69,39): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(5,27): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(5,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(5,49): error TS7031: Binding element 'hasUnsavedChanges' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitTotals.tsx(5,24): error TS7031: Binding element 'totals' implicitly has an 'any' type.
 src/components/transactions/TransactionFilters.tsx(7,3): error TS7031: Binding element 'searchTerm' implicitly has an 'any' type.
 src/components/transactions/TransactionFilters.tsx(8,3): error TS7031: Binding element 'setSearchTerm' implicitly has an 'any' type.
 src/components/transactions/TransactionFilters.tsx(9,3): error TS7031: Binding element 'dateFilter' implicitly has an 'any' type.
@@ -1860,6 +1794,73 @@ src/components/transactions/TransactionTable.tsx(52,36): error TS2339: Property 
 src/components/transactions/TransactionTable.tsx(114,57): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionTable.tsx(145,40): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionTable.tsx(147,42): error TS2339: Property 'description' does not exist on type 'never'.
+src/components/transactions/components/DeleteConfirmation.tsx(8,31): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
+src/components/transactions/components/DeleteConfirmation.tsx(8,44): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
+src/components/transactions/components/DeleteConfirmation.tsx(8,55): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
+src/components/transactions/components/DeleteConfirmation.tsx(8,65): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(16,3): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(18,3): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(19,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(20,3): error TS7031: Binding element 'onSplit' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(21,3): error TS7031: Binding element 'onDeleteClick' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(22,3): error TS7031: Binding element 'onHistoryClick' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(4,24): error TS7031: Binding element 'importData' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(4,36): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(4,50): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(4,67): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(4,75): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(67,69): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/components/transactions/import/FieldMapper.tsx(67,74): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(9,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(10,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(11,3): error TS7031: Binding element 'importStep' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(12,3): error TS7031: Binding element 'setImportStep' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(13,3): error TS7031: Binding element 'importData' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(14,3): error TS7031: Binding element 'setImportData' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(15,3): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(16,3): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(17,3): error TS7031: Binding element 'importProgress' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(18,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(19,3): error TS7031: Binding element 'onFileUpload' implicitly has an 'any' type.
+src/components/transactions/import/ImportProgress.tsx(4,27): error TS7031: Binding element 'importData' implicitly has an 'any' type.
+src/components/transactions/import/ImportProgress.tsx(4,39): error TS7031: Binding element 'importProgress' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionLedgerHeader.tsx(7,3): error TS7031: Binding element 'transactionCount' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionLedgerHeader.tsx(8,3): error TS7031: Binding element 'netCashFlow' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionLedgerHeader.tsx(9,3): error TS7031: Binding element 'onAddTransaction' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionLedgerHeader.tsx(10,3): error TS7031: Binding element 'onImportTransactions' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionPagination.tsx(3,34): error TS7031: Binding element 'currentPage' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionPagination.tsx(3,47): error TS7031: Binding element 'totalPages' implicitly has an 'any' type.
+src/components/transactions/ledger/TransactionPagination.tsx(3,59): error TS7031: Binding element 'onPageChange' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitActions.tsx(5,25): error TS7031: Binding element 'totals' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitActions.tsx(5,33): error TS7031: Binding element 'hasUnsavedChanges' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitActions.tsx(5,52): error TS7031: Binding element 'isSaving' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitActions.tsx(5,62): error TS7031: Binding element 'onSave' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitActions.tsx(5,70): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(7,3): error TS7031: Binding element 'split' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(8,10): error TS7031: Binding element '_index' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(9,3): error TS7031: Binding element 'canRemove' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(10,3): error TS7031: Binding element 'onUpdate' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(11,3): error TS7031: Binding element 'onRemove' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(12,3): error TS7031: Binding element 'availableCategories' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(13,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(57,39): error TS7006: Parameter 'category' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationRow.tsx(74,28): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(7,3): error TS7031: Binding element 'splitAllocations' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(8,3): error TS7031: Binding element 'availableCategories' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(9,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(10,3): error TS7031: Binding element 'onUpdateSplit' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(11,3): error TS7031: Binding element 'onRemoveSplit' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(12,3): error TS7031: Binding element 'onAddSplit' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(13,3): error TS7031: Binding element 'onSmartSplit' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(14,3): error TS7031: Binding element 'onAutoBalance' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(15,3): error TS7031: Binding element 'canAutoBalance' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(69,32): error TS7006: Parameter 'split' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(69,39): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitTotals.tsx(5,24): error TS7031: Binding element 'totals' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitterHeader.tsx(5,27): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitterHeader.tsx(5,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitterHeader.tsx(5,49): error TS7031: Binding element 'hasUnsavedChanges' implicitly has an 'any' type.
 src/components/ui/ConfirmModal.tsx(71,3): error TS7031: Binding element 'cancelButtonRef' implicitly has an 'any' type.
 src/components/ui/ConfirmModal.tsx(72,3): error TS7031: Binding element 'confirmButtonRef' implicitly has an 'any' type.
 src/components/ui/ConfirmModal.tsx(73,3): error TS7031: Binding element 'cancelLabel' implicitly has an 'any' type.
@@ -1916,17 +1917,6 @@ src/components/ui/ConnectionDisplay.tsx(256,43): error TS7006: Parameter 'option
 src/components/ui/ConnectionDisplay.tsx(275,26): error TS7031: Binding element 'onClick' implicitly has an 'any' type.
 src/components/ui/ConnectionDisplay.tsx(275,35): error TS7031: Binding element 'canConnect' implicitly has an 'any' type.
 src/components/ui/ConnectionDisplay.tsx(275,47): error TS7031: Binding element 'isConnecting' implicitly has an 'any' type.
-src/components/ui/EditableBalance.tsx(205,3): error TS7031: Binding element 'value' implicitly has an 'any' type.
-src/components/ui/EditableBalance.tsx(206,3): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
-src/components/ui/EditableBalance.tsx(229,24): error TS2339: Property 'focus' does not exist on type 'never'.
-src/components/ui/EditableBalance.tsx(230,24): error TS2339: Property 'select' does not exist on type 'never'.
-src/components/ui/EditableBalance.tsx(246,24): error TS7006: Parameter 'newValue' implicitly has an 'any' type.
-src/components/ui/EditableBalance.tsx(259,23): error TS2345: Argument of type 'number' is not assignable to parameter of type 'SetStateAction<null>'.
-src/components/ui/EditableBalance.tsx(267,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/ui/EditableBalance.tsx(275,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/ui/EditableBalance.tsx(286,9): error TS2322: Type 'null' is not assignable to type 'number'.
-src/components/ui/EditableBalance.tsx(304,9): error TS2322: Type 'RefObject<null>' is not assignable to type 'RefObject<HTMLInputElement>'.
-  Type 'null' is not assignable to type 'HTMLInputElement'.
 src/components/ui/EditLockIndicator.tsx(31,30): error TS7006: Parameter 'seconds' implicitly has an 'any' type.
 src/components/ui/EditLockIndicator.tsx(31,39): error TS7006: Parameter 'minutes' implicitly has an 'any' type.
 src/components/ui/EditLockIndicator.tsx(43,3): error TS7031: Binding element 'isLocked' implicitly has an 'any' type.
@@ -1960,24 +1950,23 @@ src/components/ui/EditLockIndicator.tsx(210,35): error TS7031: Binding element '
 src/components/ui/EditLockIndicator.tsx(210,46): error TS7031: Binding element 'isExpired' implicitly has an 'any' type.
 src/components/ui/EditLockIndicator.tsx(210,57): error TS7031: Binding element 'lock' implicitly has an 'any' type.
 src/components/ui/EditLockIndicator.tsx(210,63): error TS7031: Binding element 'onBreakLock' implicitly has an 'any' type.
+src/components/ui/EditableBalance.tsx(205,3): error TS7031: Binding element 'value' implicitly has an 'any' type.
+src/components/ui/EditableBalance.tsx(206,3): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
+src/components/ui/EditableBalance.tsx(229,24): error TS2339: Property 'focus' does not exist on type 'never'.
+src/components/ui/EditableBalance.tsx(230,24): error TS2339: Property 'select' does not exist on type 'never'.
+src/components/ui/EditableBalance.tsx(246,24): error TS7006: Parameter 'newValue' implicitly has an 'any' type.
+src/components/ui/EditableBalance.tsx(259,23): error TS2345: Argument of type 'number' is not assignable to parameter of type 'SetStateAction<null>'.
+src/components/ui/EditableBalance.tsx(267,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/ui/EditableBalance.tsx(275,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/ui/EditableBalance.tsx(286,9): error TS2322: Type 'null' is not assignable to type 'number'.
+src/components/ui/EditableBalance.tsx(304,9): error TS2322: Type 'RefObject<null>' is not assignable to type 'RefObject<HTMLInputElement>'.
+  Type 'null' is not assignable to type 'HTMLInputElement'.
 src/components/ui/HelpTooltip.tsx(4,24): error TS7031: Binding element 'content' implicitly has an 'any' type.
 src/components/ui/HelpTooltip.tsx(4,33): error TS7031: Binding element 'title' implicitly has an 'any' type.
 src/components/ui/HelpTooltip.tsx(38,42): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ top: string; right: string; bottom: string; left: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ top: string; right: string; bottom: string; left: string; }'.
 src/components/ui/HelpTooltip.tsx(43,47): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ top: string; right: string; bottom: string; left: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ top: string; right: string; bottom: string; left: string; }'.
-src/components/ui/modals/ConfirmModal.tsx(232,5): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
-  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
-    Type 'null' is not assignable to type 'HTMLButtonElement'.
-src/components/ui/modals/ConfirmModal.tsx(233,5): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
-  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
-    Type 'null' is not assignable to type 'HTMLButtonElement'.
-src/components/ui/modals/ConfirmModal.tsx(261,13): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
-  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
-    Type 'null' is not assignable to type 'HTMLButtonElement'.
-src/components/ui/modals/ConfirmModal.tsx(262,13): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
-  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
-    Type 'null' is not assignable to type 'HTMLButtonElement'.
 src/components/ui/PageSummaryCard.tsx(18,9): error TS7031: Binding element 'Icon' implicitly has an 'any' type.
 src/components/ui/PageSummaryCard.tsx(19,3): error TS7031: Binding element 'label' implicitly has an 'any' type.
 src/components/ui/PageSummaryCard.tsx(20,3): error TS7031: Binding element 'value' implicitly has an 'any' type.
@@ -2069,6 +2058,18 @@ src/components/ui/Toast.tsx(4,40): error TS7031: Binding element 'message' impli
 src/components/ui/Toast.tsx(4,66): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/ui/Toast.tsx(37,49): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ success: string; error: string; warning: string; info: string; payday: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ success: string; error: string; warning: string; info: string; payday: string; }'.
+src/components/ui/modals/ConfirmModal.tsx(232,5): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
+  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
+    Type 'null' is not assignable to type 'HTMLButtonElement'.
+src/components/ui/modals/ConfirmModal.tsx(233,5): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
+  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
+    Type 'null' is not assignable to type 'HTMLButtonElement'.
+src/components/ui/modals/ConfirmModal.tsx(261,13): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
+  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
+    Type 'null' is not assignable to type 'HTMLButtonElement'.
+src/components/ui/modals/ConfirmModal.tsx(262,13): error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
+  Type 'HTMLButtonElement | null' is not assignable to type 'HTMLButtonElement'.
+    Type 'null' is not assignable to type 'HTMLButtonElement'.
 src/contexts/authUtils.ts(81,18): error TS2345: Argument of type '(prev: AuthContextState) => { user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<...> | null; lastActivity: number; error: null; isLoading: boolean; }' is not assignable to parameter of type 'SetStateAction<AuthContextState>'.
   Type '(prev: AuthContextState) => { user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<...> | null; lastActivity: number; error: null; isLoading: boolean; }' is not assignable to type '(prevState: AuthContextState) => AuthContextState'.
     Call signature return types '{ user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<ArrayBufferLike> | null; lastActivity: number; error: null; isLoading: boolean; }' and 'AuthContextState' are incompatible.
@@ -2264,8 +2265,6 @@ src/hooks/auth/useAuthCompatibility.ts(57,23): error TS7006: Parameter '_timesta
 src/hooks/auth/useAuthCompatibility.ts(61,30): error TS7006: Parameter 'password' implicitly has an 'any' type.
 src/hooks/auth/useAuthCompatibility.ts(73,28): error TS7031: Binding element '_key' implicitly has an 'any' type.
 src/hooks/auth/useAuthCompatibility.ts(73,40): error TS7031: Binding element '_salt' implicitly has an 'any' type.
-src/hooks/auth/useAuthenticationManager.ts(85,45): error TS2339: Property 'budgetId' does not exist on type 'never'.
-src/hooks/auth/useAuthenticationManager.ts(86,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useAuthFlow.ts(29,12): error TS7006: Parameter 'userDataOrPassword' implicitly has an 'any' type.
 src/hooks/auth/useAuthFlow.ts(50,58): error TS2345: Argument of type '(password: any, userData?: null) => Promise<any>' is not assignable to parameter of type 'LoginFunction'.
   Types of parameters 'userData' and 'userData' are incompatible.
@@ -2285,6 +2284,8 @@ src/hooks/auth/useAuthFlow.ts(78,12): error TS7006: Parameter 'oldPass' implicit
 src/hooks/auth/useAuthFlow.ts(78,21): error TS7006: Parameter 'newPass' implicitly has an 'any' type.
 src/hooks/auth/useAuthFlow.ts(90,12): error TS7006: Parameter 'updatedProfile' implicitly has an 'any' type.
 src/hooks/auth/useAuthManager.ts(95,31): error TS7006: Parameter 'password' implicitly has an 'any' type.
+src/hooks/auth/useAuthenticationManager.ts(85,45): error TS2339: Property 'budgetId' does not exist on type 'never'.
+src/hooks/auth/useAuthenticationManager.ts(86,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useKeyManagement.ts(54,53): error TS18046: 'err' is of type 'unknown'.
 src/hooks/auth/useKeyManagement.ts(55,16): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<null>'.
 src/hooks/auth/useKeyManagement.ts(67,12): error TS7006: Parameter 'exportPassword' implicitly has an 'any' type.
@@ -2361,34 +2362,32 @@ src/hooks/bills/useBillDetail.ts(110,33): error TS7006: Parameter 'e' implicitly
 src/hooks/bills/useBillDetail.ts(175,38): error TS7006: Parameter 'value' implicitly has an 'any' type.
 src/hooks/bills/useBillManager.ts(12,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/bills/useBillManager.ts(86,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/bills/useBillManager.ts(108,9): error TS2345: Argument of type 'FilterOptions' is not assignable to parameter of type 'import("/Users/thef4tdaddy/Git/violet-vault/src/hooks/bills/useBillManagerHelpers").FilterOptions'.
-  Index signature for type 'string' is missing in type 'FilterOptions'.
-src/hooks/bills/useBillManager.ts(131,5): error TS2322: Type 'Bill[]' is not assignable to type 'never[]'.
+src/hooks/bills/useBillManager.ts(133,5): error TS2322: Type 'Bill[]' is not assignable to type 'never[]'.
   Type 'Bill' is not assignable to type 'never'.
-src/hooks/bills/useBillManager.ts(132,5): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
+src/hooks/bills/useBillManager.ts(134,5): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
-src/hooks/bills/useBillManager.ts(151,11): error TS2322: Type 'Dispatch<SetStateAction<never[]>>' is not assignable to type '(bills: Bill[]) => void'.
+src/hooks/bills/useBillManager.ts(153,11): error TS2322: Type 'Dispatch<SetStateAction<never[]>>' is not assignable to type '(bills: Bill[]) => void'.
   Types of parameters 'value' and 'bills' are incompatible.
     Type 'Bill[]' is not assignable to type 'SetStateAction<never[]>'.
       Type 'Bill[]' is not assignable to type 'never[]'.
         Type 'Bill' is not assignable to type 'never'.
-src/hooks/bills/useBillManager.ts(169,11): error TS2322: Type 'Dispatch<SetStateAction<never[]>>' is not assignable to type '(bills: Bill[]) => void'.
+src/hooks/bills/useBillManager.ts(171,11): error TS2322: Type 'Dispatch<SetStateAction<never[]>>' is not assignable to type '(bills: Bill[]) => void'.
   Types of parameters 'value' and 'bills' are incompatible.
     Type 'Bill[]' is not assignable to type 'SetStateAction<never[]>'.
       Type 'Bill[]' is not assignable to type 'never[]'.
         Type 'Bill' is not assignable to type 'never'.
-src/hooks/bills/useBillManager.ts(176,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
-src/hooks/bills/useBillManager.ts(186,5): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(bill: Bill | null) => void'.
-  Types of parameters 'value' and 'bill' are incompatible.
-    Type 'Bill | null' is not assignable to type 'SetStateAction<null>'.
-      Type 'Bill' is not assignable to type 'SetStateAction<null>'.
-        Type 'Bill' provides no match for the signature '(prevState: null): null'.
+src/hooks/bills/useBillManager.ts(178,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
 src/hooks/bills/useBillManager.ts(188,5): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(bill: Bill | null) => void'.
   Types of parameters 'value' and 'bill' are incompatible.
     Type 'Bill | null' is not assignable to type 'SetStateAction<null>'.
       Type 'Bill' is not assignable to type 'SetStateAction<null>'.
         Type 'Bill' provides no match for the signature '(prevState: null): null'.
-src/hooks/bills/useBillManager.ts(191,5): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(bill: Bill | null) => void'.
+src/hooks/bills/useBillManager.ts(190,5): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(bill: Bill | null) => void'.
+  Types of parameters 'value' and 'bill' are incompatible.
+    Type 'Bill | null' is not assignable to type 'SetStateAction<null>'.
+      Type 'Bill' is not assignable to type 'SetStateAction<null>'.
+        Type 'Bill' provides no match for the signature '(prevState: null): null'.
+src/hooks/bills/useBillManager.ts(193,5): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(bill: Bill | null) => void'.
   Types of parameters 'value' and 'bill' are incompatible.
     Type 'Bill | null' is not assignable to type 'SetStateAction<null>'.
       Type 'Bill' is not assignable to type 'SetStateAction<null>'.
@@ -2396,8 +2395,6 @@ src/hooks/bills/useBillManager.ts(191,5): error TS2322: Type 'Dispatch<SetStateA
 src/hooks/bills/useBillManagerHelpers.ts(116,55): error TS7006: Parameter 'updatedBill' implicitly has an 'any' type.
 src/hooks/bills/useBillManagerHelpers.ts(185,3): error TS2322: Type '{ suggestedEnvelopeId: any; suggestedEnvelopeName: any; envelopeConfidence: any; id: string; provider: string; description: string; amount: number; dueDate: string; category: string; frequency: string; ... 4 more ...; metadata: { ...; }; }[]' is not assignable to type 'Bill[]'.
   Property 'name' is missing in type '{ suggestedEnvelopeId: any; suggestedEnvelopeName: any; envelopeConfidence: any; id: string; provider: string; description: string; amount: number; dueDate: string; category: string; frequency: string; ... 4 more ...; metadata: { ...; }; }' but required in type 'Bill'.
-src/hooks/bills/useBillManagerHelpers.ts(283,5): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
-  Type 'unknown' is not assignable to type 'Envelope'.
 src/hooks/bills/useBillManagerUI.ts(19,25): error TS7006: Parameter 'id' implicitly has an 'any' type.
 src/hooks/bills/useBillManagerUI.ts(19,29): error TS7006: Parameter 'label' implicitly has an 'any' type.
 src/hooks/bills/useBillManagerUI.ts(19,36): error TS7006: Parameter 'count' implicitly has an 'any' type.
@@ -2406,10 +2403,6 @@ src/hooks/bills/useBillManagerUI.ts(19,49): error TS7006: Parameter 'color' impl
 src/hooks/bills/useBillManagerUI.ts(95,50): error TS2345: Argument of type '(bill: { id: string; }) => string' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => string'.
   Types of parameters 'bill' and 'value' are incompatible.
     Type 'unknown' is not assignable to type '{ id: string; }'.
-src/hooks/bills/useBillOperations.ts(13,3): error TS7031: Binding element 'updateBill' implicitly has an 'any' type.
-src/hooks/bills/useBillOperations.ts(14,3): error TS7031: Binding element 'onUpdateBill' implicitly has an 'any' type.
-src/hooks/bills/useBillOperations.ts(15,3): error TS7031: Binding element 'onError' implicitly has an 'any' type.
-src/hooks/bills/useBillOperations.ts(16,3): error TS7031: Binding element 'budget' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(8,3): error TS7031: Binding element 'handleBulkUpdate' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(9,3): error TS7031: Binding element 'handlePayBill' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(10,3): error TS7031: Binding element 'handleBulkPayment' implicitly has an 'any' type.
@@ -2420,6 +2413,10 @@ src/hooks/bills/useBillOperationWrappers.ts(42,12): error TS7006: Parameter 'bil
 src/hooks/bills/useBillOperationWrappers.ts(48,30): error TS18046: 'error' is of type 'unknown'.
 src/hooks/bills/useBillOperationWrappers.ts(62,12): error TS7006: Parameter 'billIds' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(71,30): error TS18046: 'error' is of type 'unknown'.
+src/hooks/bills/useBillOperations.ts(13,3): error TS7031: Binding element 'updateBill' implicitly has an 'any' type.
+src/hooks/bills/useBillOperations.ts(14,3): error TS7031: Binding element 'onUpdateBill' implicitly has an 'any' type.
+src/hooks/bills/useBillOperations.ts(15,3): error TS7031: Binding element 'onError' implicitly has an 'any' type.
+src/hooks/bills/useBillOperations.ts(16,3): error TS7031: Binding element 'budget' implicitly has an 'any' type.
 src/hooks/bills/useBillPayment.ts(9,34): error TS7031: Binding element 'bills' implicitly has an 'any' type.
 src/hooks/bills/useBillPayment.ts(9,41): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
 src/hooks/bills/useBillPayment.ts(9,52): error TS7031: Binding element 'budget' implicitly has an 'any' type.
@@ -2429,6 +2426,10 @@ src/hooks/bills/useBillPayment.ts(14,6): error TS7006: Parameter 'bill' implicit
 src/hooks/bills/useBillPayment.ts(16,42): error TS7006: Parameter 'env' implicitly has an 'any' type.
 src/hooks/bills/useBillPayment.ts(47,12): error TS7006: Parameter 'billId' implicitly has an 'any' type.
 src/hooks/bills/useBillPayment.ts(49,34): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/hooks/bills/useBillValidation.ts(15,6): error TS7006: Parameter 'bill' implicitly has an 'any' type.
+src/hooks/bills/useBillValidation.ts(32,59): error TS2339: Property 'id' does not exist on type 'never'.
+src/hooks/bills/useBillValidation.ts(48,6): error TS7006: Parameter 'type' implicitly has an 'any' type.
+src/hooks/bills/useBillValidation.ts(48,12): error TS7006: Parameter 'changes' implicitly has an 'any' type.
 src/hooks/bills/useBills/billAnalytics.ts(14,51): error TS2339: Property 'isPaid' does not exist on type 'never'.
 src/hooks/bills/useBills/billAnalytics.ts(19,16): error TS2339: Property 'isPaid' does not exist on type 'never'.
 src/hooks/bills/useBills/billAnalytics.ts(20,17): error TS2339: Property 'dueDate' does not exist on type 'never'.
@@ -2479,10 +2480,6 @@ src/hooks/bills/useBills/index.ts(33,54): error TS2345: Argument of type 'Bill[]
 src/hooks/bills/useBills/index.ts(34,38): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
   Type 'Bill' is not assignable to type 'never'.
 src/hooks/bills/useBills/index.ts(43,5): error TS2783: 'upcomingBills' is specified more than once, so this usage will be overwritten.
-src/hooks/bills/useBillValidation.ts(15,6): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/hooks/bills/useBillValidation.ts(32,59): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/bills/useBillValidation.ts(48,6): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/hooks/bills/useBillValidation.ts(48,12): error TS7006: Parameter 'changes' implicitly has an 'any' type.
 src/hooks/bills/useBulkBillOperations.ts(9,41): error TS7031: Binding element 'updateBill' implicitly has an 'any' type.
 src/hooks/bills/useBulkBillOperations.ts(9,53): error TS7031: Binding element 'onUpdateBill' implicitly has an 'any' type.
 src/hooks/bills/useBulkBillOperations.ts(9,67): error TS7031: Binding element 'budget' implicitly has an 'any' type.
@@ -3037,14 +3034,6 @@ src/hooks/debts/useDebtModalLogic.ts(56,50): error TS2345: Argument of type 'Bil
   Type 'Bill' is not assignable to type 'null | undefined'.
 src/hooks/debts/useDebtModalLogic.ts(83,35): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/hooks/debts/useDebtModalLogic.ts(140,47): error TS18049: 'connectedEnvelope' is possibly 'null' or 'undefined'.
-src/hooks/debts/useDebts.ts(27,14): error TS18046: 'error' is of type 'unknown'.
-src/hooks/debts/useDebts.ts(35,28): error TS7006: Parameter 'debtData' implicitly has an 'any' type.
-src/hooks/debts/useDebts.ts(54,33): error TS7031: Binding element 'id' implicitly has an 'any' type.
-src/hooks/debts/useDebts.ts(54,37): error TS7031: Binding element 'updates' implicitly has an 'any' type.
-src/hooks/debts/useDebts.ts(76,35): error TS7031: Binding element 'id' implicitly has an 'any' type.
-src/hooks/debts/useDebts.ts(95,36): error TS7031: Binding element 'id' implicitly has an 'any' type.
-src/hooks/debts/useDebts.ts(95,40): error TS7031: Binding element 'payment' implicitly has an 'any' type.
-src/hooks/debts/useDebts.ts(191,24): error TS7006: Parameter 'id' implicitly has an 'any' type.
 src/hooks/debts/useDebtStrategies.ts(11,40): error TS2339: Property 'status' does not exist on type 'never'.
 src/hooks/debts/useDebtStrategies.ts(11,68): error TS2339: Property 'currentBalance' does not exist on type 'never'.
 src/hooks/debts/useDebtStrategies.ts(19,20): error TS2339: Property 'interestRate' does not exist on type 'never'.
@@ -3065,6 +3054,14 @@ src/hooks/debts/useDebtStrategies.ts(221,6): error TS7006: Parameter 'sum' impli
 src/hooks/debts/useDebtStrategies.ts(221,11): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtStrategies.ts(242,47): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtStrategies.ts(255,35): error TS7006: Parameter 'recommendation' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(27,14): error TS18046: 'error' is of type 'unknown'.
+src/hooks/debts/useDebts.ts(35,28): error TS7006: Parameter 'debtData' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(54,33): error TS7031: Binding element 'id' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(54,37): error TS7031: Binding element 'updates' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(76,35): error TS7031: Binding element 'id' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(95,36): error TS7031: Binding element 'id' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(95,40): error TS7031: Binding element 'payment' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(191,24): error TS7006: Parameter 'id' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(17,46): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(21,45): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(33,37): error TS7006: Parameter 'updates' implicitly has an 'any' type.
@@ -3405,9 +3402,6 @@ src/hooks/transactions/useTransactionSplitterUI.ts(133,3): error TS7006: Paramet
 src/hooks/transactions/useTransactionSplitterUI.ts(134,3): error TS7006: Parameter 'onSplitTransaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionSplitterUI.ts(135,3): error TS7006: Parameter 'onClose' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionSplitterUI.ts(166,39): error TS18046: 'error' is of type 'unknown'.
-src/hooks/transactions/useTransactionsV2.ts(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/transactions/useTransactionsV2.ts(56,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionsV2.ts(89,41): error TS2339: Property 'length' does not exist on type '{}'.
 src/hooks/transactions/useTransactionTable.ts(24,30): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionTable.ts(32,31): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionUtils.ts(6,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
@@ -3417,6 +3411,9 @@ src/hooks/transactions/useTransactionUtils.ts(11,45): error TS2339: Property 'en
 src/hooks/transactions/useTransactionUtils.ts(16,6): error TS7006: Parameter 'cat' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionUtils.ts(16,43): error TS2339: Property 'category' does not exist on type 'never'.
 src/hooks/transactions/useTransactionUtils.ts(21,58): error TS2339: Property 'category' does not exist on type 'never'.
+src/hooks/transactions/useTransactionsV2.ts(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
+src/hooks/transactions/useTransactionsV2.ts(56,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionsV2.ts(89,41): error TS2339: Property 'length' does not exist on type '{}'.
 src/main.tsx(36,32): error TS7006: Parameter 'loadOnce' implicitly has an 'any' type.
 src/main.tsx(147,40): error TS7006: Parameter 'localData' implicitly has an 'any' type.
 src/main.tsx(158,34): error TS7006: Parameter 'localData' implicitly has an 'any' type.
@@ -4291,6 +4288,12 @@ src/utils/budgeting/suggestionUtils.ts(400,44): error TS7053: Element implicitly
 src/utils/budgeting/suggestionUtils.ts(412,39): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/utils/budgeting/suggestionUtils.ts(431,43): error TS7006: Parameter 'priority' implicitly has an 'any' type.
 src/utils/budgeting/suggestionUtils.ts(449,44): error TS7006: Parameter 'priority' implicitly has an 'any' type.
+src/utils/common/BaseMutex.ts(62,35): error TS2531: Object is possibly 'null'.
+src/utils/common/BaseMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
+src/utils/common/BaseMutex.ts(71,24): error TS2339: Property 'operationName' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
+src/utils/common/BaseMutex.ts(80,17): error TS7006: Parameter 'fn' implicitly has an 'any' type.
+src/utils/common/BaseMutex.ts(109,48): error TS2531: Object is possibly 'null'.
+src/utils/common/BaseMutex.ts(116,9): error TS7006: Parameter 'operationName' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(18,35): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(29,50): error TS7006: Parameter 'sum' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(29,55): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
@@ -4306,12 +4309,6 @@ src/utils/common/balanceCalculator.ts(135,64): error TS7006: Parameter 'distribu
 src/utils/common/balanceCalculator.ts(144,50): error TS7006: Parameter 'sum' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(144,55): error TS7006: Parameter 'dist' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(178,34): error TS7006: Parameter 'balances' implicitly has an 'any' type.
-src/utils/common/BaseMutex.ts(62,35): error TS2531: Object is possibly 'null'.
-src/utils/common/BaseMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
-src/utils/common/BaseMutex.ts(71,24): error TS2339: Property 'operationName' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
-src/utils/common/BaseMutex.ts(80,17): error TS7006: Parameter 'fn' implicitly has an 'any' type.
-src/utils/common/BaseMutex.ts(109,48): error TS2531: Object is possibly 'null'.
-src/utils/common/BaseMutex.ts(116,9): error TS7006: Parameter 'operationName' implicitly has an 'any' type.
 src/utils/common/billDiscovery.ts(79,45): error TS7006: Parameter 'transactions' implicitly has an 'any' type.
 src/utils/common/billDiscovery.ts(82,38): error TS2339: Property 'description' does not exist on type 'never'.
 src/utils/common/billDiscovery.ts(82,73): error TS2339: Property 'provider' does not exist on type 'never'.
@@ -4560,6 +4557,83 @@ src/utils/layout/paycheckDeletionUtils.ts(96,44): error TS7006: Parameter 'paych
 src/utils/layout/paycheckDeletionUtils.ts(96,56): error TS7006: Parameter 'budgetDb' implicitly has an 'any' type.
 src/utils/layout/paycheckDeletionUtils.ts(117,48): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
 src/utils/layout/paycheckDeletionUtils.ts(117,61): error TS7006: Parameter 'queryKeys' implicitly has an 'any' type.
+src/utils/openapi/generateOpenAPISpec.ts(7,1): error TS2578: Unused '@ts-expect-error' directive.
+src/utils/openapi/generateOpenAPISpec.ts(29,52): error TS2345: Argument of type 'ZodObject<{ title: ZodString; description: ZodOptional<ZodString>; steps: ZodOptional<ZodArray<ZodString>>; expectedBehavior: ZodOptional<...>; ... 11 more ...; customData: ZodDefault<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ title: ZodString; description: ZodOptional<ZodString>; steps: ZodOptional<ZodArray<ZodString>>; expectedBehavior: ZodOptional<...>; ... 11 more ...; customData: ZodDefault<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ title: ZodString; description: ZodOptional<ZodString>; steps: ZodOptional<ZodArray<ZodString>>; ... 12 more ...; customData: ZodDefault<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(30,54): error TS2345: Argument of type 'ZodEnum<{ low: "low"; medium: "medium"; high: "high"; critical: "critical"; }>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodEnum<{ low: "low"; medium: "medium"; high: "high"; critical: "critical"; }>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodEnum<{ low: "low"; medium: "medium"; high: "high"; critical: "critical"; }>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(31,53): error TS2345: Argument of type 'ZodObject<{ browser: ZodOptional<ZodString>; version: ZodOptional<ZodString>; platform: ZodOptional<ZodString>; ... 6 more ...; fallback: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ browser: ZodOptional<ZodString>; version: ZodOptional<ZodString>; platform: ZodOptional<ZodString>; ... 6 more ...; fallback: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ browser: ZodOptional<ZodString>; version: ZodOptional<ZodString>; platform: ZodOptional<ZodString>; ... 6 more ...; fallback: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(36,61): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodOptional<ZodUnknown>; message: ZodOptional<ZodString>; timestamp: ZodOptional<ZodNumber>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodOptional<ZodUnknown>; message: ZodOptional<ZodString>; timestamp: ZodOptional<ZodNumber>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodOptional<ZodUnknown>; message: ZodOptional<ZodString>; timestamp: ZodOptional<ZodNumber>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(37,59): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<false>; error: ZodString; code: ZodOptional<ZodString>; details: ZodOptional<ZodUnknown>; timestamp: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<false>; error: ZodString; code: ZodOptional<ZodString>; details: ZodOptional<ZodUnknown>; timestamp: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<false>; error: ZodString; code: ZodOptional<ZodString>; details: ZodOptional<ZodUnknown>; timestamp: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(42,59): error TS2345: Argument of type 'ZodObject<{ encryptedData: ZodObject<{ data: ZodUnion<readonly [ZodString, ZodCustom<Uint8Array<ArrayBuffer>, Uint8Array<ArrayBuffer>>, ZodArray<...>]>; iv: ZodUnion<...>; algorithm: ZodDefault<...>; }, $strip>; timestamp: ZodOptional<...>; metadata: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ encryptedData: ZodObject<{ data: ZodUnion<readonly [ZodString, ZodCustom<Uint8Array<ArrayBuffer>, Uint8Array<ArrayBuffer>>, ZodArray<...>]>; iv: ZodUnion<...>; algorithm: ZodDefault<...>; }, $strip>; timestamp: ZodOptional<...>; metadata: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ encryptedData: ZodObject<{ data: ZodUnion<readonly [ZodString, ZodCustom<Uint8Array<ArrayBuffer>, Uint8Array<ArrayBuffer>>, ZodArray<...>]>; iv: ZodUnion<...>; algorithm: ZodDefault<...>; }, $strip>; timestamp: ZodOptional<...>; metadata: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(43,56): error TS2345: Argument of type 'ZodObject<{ chunkIndex: ZodNumber; totalChunks: ZodNumber; data: ZodString; checksum: ZodOptional<ZodString>; timestamp: ZodOptional<ZodUnion<readonly [ZodNumber, ZodString, ZodNull]>>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ chunkIndex: ZodNumber; totalChunks: ZodNumber; data: ZodString; checksum: ZodOptional<ZodString>; timestamp: ZodOptional<ZodUnion<readonly [ZodNumber, ZodString, ZodNull]>>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ chunkIndex: ZodNumber; totalChunks: ZodNumber; data: ZodString; checksum: ZodOptional<ZodString>; timestamp: ZodOptional<ZodUnion<...>>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(44,59): error TS2345: Argument of type 'ZodObject<{ totalChunks: ZodNumber; totalSize: ZodNumber; checksum: ZodOptional<ZodString>; lastModified: ZodOptional<ZodNumber>; metadata: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ totalChunks: ZodNumber; totalSize: ZodNumber; checksum: ZodOptional<ZodString>; lastModified: ZodOptional<ZodNumber>; metadata: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ totalChunks: ZodNumber; totalSize: ZodNumber; checksum: ZodOptional<ZodString>; lastModified: ZodOptional<ZodNumber>; metadata: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(45,68): error TS2345: Argument of type 'ZodObject<{ success: ZodBoolean; error: ZodOptional<ZodString>; validationErrors: ZodOptional<ZodArray<ZodString>>; issueNumber: ZodOptional<...>; url: ZodOptional<...>; provider: ZodOptional<...>; screenshotStatus: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodBoolean; error: ZodOptional<ZodString>; validationErrors: ZodOptional<ZodArray<ZodString>>; issueNumber: ZodOptional<...>; url: ZodOptional<...>; provider: ZodOptional<...>; screenshotStatus: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodBoolean; error: ZodOptional<ZodString>; validationErrors: ZodOptional<ZodArray<ZodString>>; issueNumber: ZodOptional<...>; url: ZodOptional<...>; provider: ZodOptional<...>; screenshotStatus: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(50,51): error TS2345: Argument of type 'ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; lastModified: ZodNumber; createdAt: ZodOptional<...>; currentBalance: ZodOptional<...>; targetAmount: ZodOptional<...>; description: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; lastModified: ZodNumber; createdAt: ZodOptional<...>; currentBalance: ZodOptional<...>; targetAmount: ZodOptional<...>; description: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; lastModified: ZodNumber; createdAt: ZodOptional<...>; currentBalance: ZodOptional<...>; targetAmount: ZodOptional<...>; description: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(51,54): error TS2345: Argument of type 'ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; envelopeId: ZodString; category: ZodString; ... 5 more ...; receiptUrl: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; envelopeId: ZodString; category: ZodString; ... 5 more ...; receiptUrl: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; envelopeId: ZodString; category: ZodString; ... 5 more ...; receiptUrl: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(52,47): error TS2345: Argument of type 'ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; category: ZodString; ... 7 more ...; paymentMethod: ZodOptional<...>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; category: ZodString; ... 7 more ...; paymentMethod: ZodOptional<...>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; category: ZodString; ... 7 more ...; paymentMethod: ZodOptional<...>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(116,56): error TS2345: Argument of type 'ZodObject<{ totalReports: ZodNumber; totalScreenshots: ZodNumber; storageUsed: ZodNumber; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ totalReports: ZodNumber; totalScreenshots: ZodNumber; storageUsed: ZodNumber; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ totalReports: ZodNumber; totalScreenshots: ZodNumber; storageUsed: ZodNumber; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(277,63): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; ... 4 more ...; description: ZodOptional<...>; }, $strip>>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; ... 4 more ...; description: ZodOptional<...>; }, $strip>>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; ... 4 more ...; description: ZodOptional<...>; }, $strip>>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(278,65): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; ... 4 more ...; description: ZodOptional<...>; }, $strip>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; ... 4 more ...; description: ZodOptional<...>; }, $strip>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; name: ZodString; category: ZodString; archived: ZodDefault<ZodBoolean>; ... 4 more ...; description: ZodOptional<...>; }, $strip>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(342,66): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; ... 7 more ...; receiptUrl: ZodOptional<...>; }, $strip>>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; ... 7 more ...; receiptUrl: ZodOptional<...>; }, $strip>>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; ... 7 more ...; receiptUrl: ZodOptional<...>; }, $strip>>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(343,68): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; envelopeId: ZodString; ... 6 more ...; receiptUrl: ZodOptional<...>; }, $strip>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; envelopeId: ZodString; ... 6 more ...; receiptUrl: ZodOptional<...>; }, $strip>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; date: ZodUnion<readonly [ZodDate, ZodString]>; amount: ZodNumber; ... 7 more ...; receiptUrl: ZodOptional<...>; }, $strip>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(407,59): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; ... 9 more ...; paymentMethod: ZodOptional<...>; }, $strip>>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; ... 9 more ...; paymentMethod: ZodOptional<...>; }, $strip>>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodArray<ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; ... 9 more ...; paymentMethod: ZodOptional<...>; }, $strip>>; }, $strip>>' is not assignable to type 'boolean | undefined'.
+src/utils/openapi/generateOpenAPISpec.ts(408,61): error TS2345: Argument of type 'ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; ... 9 more ...; paymentMethod: ZodOptional<...>; }, $strip>; }, $strip>' is not assignable to parameter of type 'SchemaObject | SchemaObject | ReferenceObject | ReferenceObject'.
+  Type 'ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; ... 9 more ...; paymentMethod: ZodOptional<...>; }, $strip>; }, $strip>' is not assignable to type 'SchemaObject'.
+    Types of property 'nullable' are incompatible.
+      Type '() => ZodNullable<ZodObject<{ success: ZodLiteral<true>; data: ZodObject<{ id: ZodString; name: ZodString; dueDate: ZodUnion<readonly [ZodDate, ZodString]>; ... 9 more ...; paymentMethod: ZodOptional<...>; }, $strip>; }, $strip>>' is not assignable to type 'boolean | undefined'.
 src/utils/pageDetection/pageIdentifier.ts(37,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/pwa/backgroundSync.ts(35,24): error TS7006: Parameter 'operation' implicitly has an 'any' type.
 src/utils/pwa/backgroundSync.ts(74,11): error TS7034: Variable 'successfulOperations' implicitly has type 'any[]' in some locations where its type cannot be determined.
@@ -4872,7 +4946,7 @@ src/utils/security/keyExport.ts(186,55): error TS18046: 'error' is of type 'unkn
 src/utils/security/keyExport.ts(196,19): error TS7006: Parameter 'keyData' implicitly has an 'any' type.
 src/utils/security/keyExport.ts(214,55): error TS18046: 'error' is of type 'unknown'.
 src/utils/security/keyExport.ts(223,24): error TS7006: Parameter 'keyData' implicitly has an 'any' type.
-src/utils/security/keyExport.ts(225,35): error TS7016: Could not find a declaration file for module 'qrcode'. '/Users/thef4tdaddy/Git/violet-vault/node_modules/qrcode/lib/index.js' implicitly has an 'any' type.
+src/utils/security/keyExport.ts(225,35): error TS7016: Could not find a declaration file for module 'qrcode'. '/home/runner/work/violet-vault/violet-vault/node_modules/qrcode/lib/index.js' implicitly has an 'any' type.
   Try `npm i --save-dev @types/qrcode` if it exists or add a new declaration (.d.ts) file containing `declare module 'qrcode';`
 src/utils/security/keyExport.ts(245,54): error TS18046: 'error' is of type 'unknown'.
 src/utils/security/keyExport.ts(254,19): error TS7006: Parameter 'keyFileData' implicitly has an 'any' type.
@@ -4931,6 +5005,24 @@ src/utils/stores/createSafeStore.ts(182,5): error TS2345: Argument of type 'Stat
         Type 'Record<string, unknown>' is not assignable to type 'T & Record<string, unknown>'.
           Type 'Record<string, unknown>' is not assignable to type 'T'.
             'Record<string, unknown>' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint 'object'.
+src/utils/sync/RetryManager.ts(24,17): error TS7006: Parameter 'operation' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(45,22): error TS7006: Parameter 'operations' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(83,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(98,27): error TS7006: Parameter 'operation' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(98,38): error TS7006: Parameter 'config' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(98,46): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(109,17): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(118,24): error TS7006: Parameter 'error' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(118,31): error TS7006: Parameter 'config' implicitly has an 'any' type.
+src/utils/sync/RetryManager.ts(118,39): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
+src/utils/sync/SyncMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
+src/utils/sync/SyncMutex.ts(80,18): error TS7006: Parameter 'duration' implicitly has an 'any' type.
+src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>' is not assignable to parameter of type 'QueueItem<unknown>'.
+  Types of property 'operation' are incompatible.
+    Type '(data: T) => Promise<unknown>' is not assignable to type '(data: unknown) => Promise<unknown>'.
+      Types of parameters 'data' and 'data' are incompatible.
+        Type 'unknown' is not assignable to type 'T'.
+          'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
 src/utils/sync/autoBackupService.ts(93,18): error TS18048: 'backup.metadata' is possibly 'undefined'.
 src/utils/sync/autoBackupService.ts(94,31): error TS18048: 'backup.metadata' is possibly 'undefined'.
 src/utils/sync/autoBackupService.ts(197,15): error TS18048: 'data' is possibly 'undefined'.
@@ -4952,16 +5044,6 @@ src/utils/sync/masterSyncValidator.ts(517,16): error TS18046: 'error' is of type
 src/utils/sync/masterSyncValidator.ts(536,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(568,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/resilience/index.ts(52,19): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(24,17): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(45,22): error TS7006: Parameter 'operations' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(83,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(98,27): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(98,38): error TS7006: Parameter 'config' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(98,46): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(109,17): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(118,24): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(118,31): error TS7006: Parameter 'config' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(118,39): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
 src/utils/sync/retryMetrics.ts(24,36): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
 src/utils/sync/retryMetrics.ts(24,45): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
 src/utils/sync/retryMetrics.ts(38,35): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
@@ -5005,14 +5087,6 @@ src/utils/sync/syncHealthChecker.ts(235,14): error TS18046: 'error' is of type '
 src/utils/sync/syncHealthChecker.ts(264,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/syncHealthChecker.ts(291,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/syncHealthChecker.ts(305,26): error TS7006: Parameter 'test' implicitly has an 'any' type.
-src/utils/sync/SyncMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
-src/utils/sync/SyncMutex.ts(80,18): error TS7006: Parameter 'duration' implicitly has an 'any' type.
-src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>' is not assignable to parameter of type 'QueueItem<unknown>'.
-  Types of property 'operation' are incompatible.
-    Type '(data: T) => Promise<unknown>' is not assignable to type '(data: unknown) => Promise<unknown>'.
-      Types of parameters 'data' and 'data' are incompatible.
-        Type 'unknown' is not assignable to type 'T'.
-          'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
 src/utils/sync/validation/checksumUtils.ts(15,40): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/sync/validation/checksumUtils.ts(51,59): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/validation/checksumUtils.ts(62,40): error TS7006: Parameter 'data' implicitly has an 'any' type.
