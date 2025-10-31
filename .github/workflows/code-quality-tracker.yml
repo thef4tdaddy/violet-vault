@@ -73,6 +73,17 @@ jobs:
           echo "total=$TS_ERRORS" >> $GITHUB_OUTPUT
           echo "📊 TypeScript Results: ${TS_ERRORS} compilation errors"
 
+      - name: Run TypeScript strict mode check and capture errors
+        id: typecheck_strict
+        run: |
+          npx tsc --noEmit --strict --allowJs false 2>&1 | tee typecheck-strict-output.txt || true
+
+          # Count TypeScript strict mode errors
+          TS_STRICT_ERRORS=$(grep -c "error TS" typecheck-strict-output.txt 2>/dev/null || echo 0)
+
+          echo "total=$TS_STRICT_ERRORS" >> $GITHUB_OUTPUT
+          echo "📊 TypeScript Strict Mode Results: ${TS_STRICT_ERRORS} errors"
+
       - name: Update Issue #748 (ESLint Tracking)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         uses: actions/github-script@v8
@@ -139,29 +150,58 @@ jobs:
         with:
           script: |
             const tsTotal = ${{ steps.typecheck.outputs.total }};
+            const tsStrictTotal = ${{ steps.typecheck_strict.outputs.total }};
             const currentDate = new Date().toISOString().split('T')[0];
 
-            // Only post comment if there are errors
-            if (tsTotal > 0) {
-              const commentBody = '## 🔴 TypeScript Errors Detected - ' + currentDate + '\n\n' +
-                '**Status**: Compilation errors found\n\n' +
-                '- **Total Errors**: ' + tsTotal + '\n\n' +
-                '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release\n\n' +
-                '_Checked: ' + currentDate + '_';
+            try {
+              const issue = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 806
+              });
 
-              try {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: 806,
-                  body: commentBody
-                });
-                console.log('✅ Posted issue comment for TypeScript errors');
-              } catch (error) {
-                console.log('❌ Failed to post comment on issue #806:', error.message);
-              }
-            } else {
-              console.log('✅ TypeScript check passed - no comment posted');
+              // Update the "Latest Error Count" line in the body
+              let newBody = issue.data.body;
+              
+              // Update non-strict mode count
+              newBody = newBody.replace(
+                /\*\*Latest Error Count\*\*: \d+.*$/m,
+                `**Latest Error Count**: ${tsTotal} remaining (non-strict) | ${tsStrictTotal} with strict mode`
+              );
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 806,
+                body: newBody
+              });
+
+              console.log('✅ Updated Issue #806 body with current counts');
+
+              // Post comment with details
+              const statusEmoji = tsTotal === 0 ? '✅' : '🔴';
+              const statusText = tsTotal === 0 ? 'All TypeScript errors resolved!' : 'Compilation errors found';
+              
+              const commentBody = `## ${statusEmoji} TypeScript Status - ${currentDate}\n\n` +
+                `**Status**: ${statusText}\n\n` +
+                `| Mode | Errors | Status |\n` +
+                `|------|--------|--------|\n` +
+                `| **Non-Strict** | ${tsTotal} | ${tsTotal === 0 ? '✅ Ready for production' : '❌ Blocks release'} |\n` +
+                `| **Strict Mode** | ${tsStrictTotal} | ${tsStrictTotal === 0 ? '✅ Issue #713 complete' : '⏳ Issue #713 in progress'} |\n\n` +
+                (tsTotal === 0 ? `🎉 **Non-strict mode is clean!** Ready for production.\n\n` : `❌ ${tsTotal} compilation errors - blocks v2.0 release\n\n`) +
+                (tsStrictTotal > 0 ? `📋 ${tsStrictTotal} strict mode errors tracked in #713\n\n` : '') +
+                `_Checked: ${currentDate}_`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 806,
+                body: commentBody
+              });
+
+              console.log('✅ Posted status comment on issue #806');
+            } catch (error) {
+              console.log('❌ Failed to update issue #806:', error.message);
             }
 
       - name: Create summary comment on PR
