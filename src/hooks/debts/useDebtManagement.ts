@@ -24,6 +24,9 @@ import {
   syncDebtDueDatesOperation,
   updateDebtOperation,
   deleteDebtOperation,
+  createAPIWrappers,
+  groupDebtsByStatus,
+  groupDebtsByType,
 } from "./helpers/debtManagementHelpers";
 
 // Helper types to bridge inconsistencies
@@ -64,37 +67,6 @@ const makeCreateEnvelopeWrapper =
     return res as unknown as { id: string };
   };
 
-const makeCreateBillWrapper =
-  (fn: (...args: unknown[]) => unknown) =>
-  async (data: unknown): Promise<HelperBill> => {
-    const res = await Promise.resolve(fn(data) as unknown);
-    const raw = res as unknown as Record<string, unknown>;
-    const rawDue = raw.dueDate as unknown;
-    const dueDate =
-      typeof rawDue === "string"
-        ? (rawDue as string)
-        : rawDue instanceof Date
-          ? (rawDue as Date).toISOString()
-          : undefined;
-    const transformed: HelperBill = {
-      ...raw,
-      dueDate,
-    } as HelperBill;
-    return transformed;
-  };
-
-const makeUpdateBillWrapper =
-  (fn: (...args: unknown[]) => unknown) =>
-  async (id: string, data: unknown): Promise<void> => {
-    await Promise.resolve(fn({ billId: id, updates: data as Record<string, unknown> }));
-  };
-
-const makeCreateTransactionWrapper =
-  (fn: (...args: unknown[]) => unknown) =>
-  async (data: unknown): Promise<void> => {
-    await Promise.resolve(fn(data));
-  };
-
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
   const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
@@ -110,12 +82,16 @@ export const useDebtManagement = () => {
   const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
   const { transactions = [], addTransaction: createTransaction } = useTransactions();
 
-  // Helper wrappers to adapt external hooks' APIs to the helper expectations
-  // Prefer async variants when available (addEnvelopeAsync may be provided by the envelopes hook)
-  const createEnvelopeWrapper = makeCreateEnvelopeWrapper(addEnvelopeAsync || createEnvelope);
-  const createBillWrapper = makeCreateBillWrapper(addBillAsync);
-  const updateBillWrapper = makeUpdateBillWrapper(updateBillAsync);
-  const createTransactionWrapper = makeCreateTransactionWrapper(createTransaction);
+  // Create API wrappers using helper function
+  const { createEnvelopeWrapper, createBillWrapper, updateBillWrapper, createTransactionWrapper } =
+    createAPIWrappers(
+      addEnvelopeAsync,
+      createEnvelope,
+      addBillAsync,
+      (id: string, updates: unknown) =>
+        updateBillAsync({ billId: id, updates: updates as Record<string, unknown> }),
+      createTransaction
+    );
 
   const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
   const createDebtData = debtsHook?.addDebtAsync;
@@ -148,21 +124,12 @@ export const useDebtManagement = () => {
     return calculateDebtStats(enrichedDebts);
   }, [enrichedDebts]);
 
-  const debtsByStatus = useMemo(() => {
-    const grouped: Record<string, DebtAccount[]> = {};
-    Object.values(DEBT_STATUS).forEach((status) => {
-      grouped[status] = enrichedDebts.filter((debt) => debt.status === status);
-    });
-    return grouped;
-  }, [enrichedDebts]);
+  const debtsByStatus = useMemo(
+    () => groupDebtsByStatus(enrichedDebts, DEBT_STATUS),
+    [enrichedDebts]
+  );
 
-  const debtsByType = useMemo(() => {
-    const grouped: Record<string, DebtAccount[]> = {};
-    Object.values(DEBT_TYPES).forEach((type) => {
-      grouped[type] = enrichedDebts.filter((debt) => debt.type === type);
-    });
-    return grouped;
-  }, [enrichedDebts]);
+  const debtsByType = useMemo(() => groupDebtsByType(enrichedDebts, DEBT_TYPES), [enrichedDebts]);
 
   const createDebt = async (debtData: CreateDebtPayload) => {
     if (!createDebtData || !addBillAsync) throw new Error("Create functions not available");

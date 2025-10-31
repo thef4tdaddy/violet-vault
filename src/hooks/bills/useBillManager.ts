@@ -12,17 +12,10 @@ import { useBillOperations } from "@/hooks/bills/useBillOperations";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import {
-  resolveTransactions,
-  resolveEnvelopes,
-  extractBillsFromTransactions,
-  combineBills,
-  processBills,
-  categorizeBillsWithTotals,
-  getFilteredBills,
   handleSearchNewBills,
   handleAddDiscoveredBillsAction,
   createUIActions,
-  type CategorizedBills,
+  processAndResolveData,
   type FilterOptions,
 } from "@/hooks/bills/useBillManagerHelpers";
 
@@ -122,53 +115,23 @@ export const useBillManager = ({
   // Data Resolution and Processing - combined to reduce statements
   const { transactions, envelopes, bills, categorizedBills, totals, filteredBills } =
     useMemo(() => {
-      // Coerce incoming external arrays to our local shapes safely (we don't mutate them)
-      const resolvedTransactions: Transaction[] = resolveTransactions(
+      return processAndResolveData(
         propTransactions as Transaction[],
         tanStackTransactions as unknown as Transaction[],
-        budget.allTransactions as Transaction[]
-      );
-
-      const resolvedEnvelopes: Envelope[] = resolveEnvelopes(
+        budget.allTransactions as Transaction[],
         propEnvelopes as Envelope[],
         tanStackEnvelopes as unknown as Envelope[],
-        budget.envelopes as Envelope[]
-      );
-
-      const billsFromTransactions: Bill[] = extractBillsFromTransactions(resolvedTransactions);
-
-      const combinedBills: Bill[] = combineBills(
+        budget.envelopes as Envelope[],
         tanStackBills as unknown as Bill[],
         (budget.bills as unknown as Bill[]) || [],
-        billsFromTransactions
-      );
-
-      const processedBills: Bill[] = processBills(
-        combinedBills,
+        viewMode,
+        filterOptions,
         onUpdateBill,
         updateBillMutation as unknown as (updates: {
           billId: string;
           updates: Record<string, unknown>;
         }) => Promise<void>
       );
-
-      const { categorizedBills: catBills, totals: billTotals } =
-        categorizeBillsWithTotals(processedBills);
-
-      const filtered: Bill[] = getFilteredBills(
-        catBills as CategorizedBills,
-        viewMode,
-        filterOptions
-      );
-
-      return {
-        transactions: resolvedTransactions,
-        envelopes: resolvedEnvelopes,
-        bills: processedBills,
-        categorizedBills: catBills,
-        totals: billTotals,
-        filteredBills: filtered,
-      };
     }, [
       propTransactions,
       tanStackTransactions,

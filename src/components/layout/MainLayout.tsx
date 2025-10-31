@@ -63,9 +63,7 @@ interface MainContentProps {
   auth: unknown;
   layoutData: unknown;
   _onExport: () => void;
-  _onImport: (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => Promise<
+  _onImport: (event: React.ChangeEvent<HTMLInputElement>) => Promise<
     | {
         success: boolean;
         imported: {
