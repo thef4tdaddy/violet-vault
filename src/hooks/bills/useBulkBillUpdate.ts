@@ -1,16 +1,24 @@
 import { useState } from "react";
+import type { Bill } from "@/types/bills";
+
+interface BillChange {
+  amount: number;
+  dueDate: string;
+  originalAmount: number;
+  originalDueDate: string;
+}
 
 /**
  * Hook for managing bulk bill update operations
  * Handles change tracking, validation, and state management for bulk operations
  */
-export const useBulkBillUpdate = (selectedBills = [], _isOpen) => {
-  const [changes, setChanges] = useState({});
+export const useBulkBillUpdate = (selectedBills: Bill[] = [], _isOpen: boolean) => {
+  const [changes, setChanges] = useState<Record<string, BillChange>>({});
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Initialize changes when modal opens
   const initializeChanges = () => {
-    const initialChanges = {};
+    const initialChanges: Record<string, BillChange> = {};
     selectedBills.forEach((bill) => {
       initialChanges[bill.id] = {
         amount: bill.amount,
@@ -24,7 +32,7 @@ export const useBulkBillUpdate = (selectedBills = [], _isOpen) => {
   };
 
   // Update individual bill change
-  const updateChange = (billId, field, value) => {
+  const updateChange = (billId: string, field: keyof BillChange, value: number | string) => {
     setChanges((prev) => ({
       ...prev,
       [billId]: {
@@ -35,7 +43,7 @@ export const useBulkBillUpdate = (selectedBills = [], _isOpen) => {
   };
 
   // Apply bulk change to all selected bills
-  const applyBulkChange = (field, value) => {
+  const applyBulkChange = (field: keyof BillChange, value: number | string) => {
     const newChanges = { ...changes };
     selectedBills.forEach((bill) => {
       if (newChanges[bill.id]) {
@@ -47,7 +55,7 @@ export const useBulkBillUpdate = (selectedBills = [], _isOpen) => {
 
   // Reset all changes to original values
   const resetChanges = () => {
-    const resetChanges = {};
+    const resetChanges: Record<string, BillChange> = {};
     selectedBills.forEach((bill) => {
       resetChanges[bill.id] = {
         amount: bill.amount,
