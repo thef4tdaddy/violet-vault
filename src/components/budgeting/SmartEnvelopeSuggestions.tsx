@@ -4,9 +4,31 @@ import { Button } from "@/components/ui";
 import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
+import type { Transaction, Envelope } from "@/types/finance";
+
+// Type definitions
+interface Suggestion {
+  id: string;
+  priority: string;
+  type: string;
+  [key: string]: unknown;
+}
+
+interface AnalysisSettings {
+  minTransactionCount?: number;
+  minAmountThreshold?: number;
+  lookbackMonths?: number;
+  [key: string]: unknown;
+}
+
+interface SuggestionStats {
+  total: number;
+  byType: Record<string, number>;
+  byPriority: Record<string, number>;
+}
 
 // Icon badge component
-const IconBadge = ({ isCollapsed }) => (
+const IconBadge = ({ isCollapsed }: { isCollapsed: boolean }) => (
   <div className={`relative ${isCollapsed ? "mr-2" : "mr-3"}`}>
     <div className="absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30"></div>
     <div className={`relative bg-amber-500 rounded-xl ${isCollapsed ? "p-1.5" : "p-2"}`}>
@@ -18,7 +40,7 @@ const IconBadge = ({ isCollapsed }) => (
 );
 
 // Suggestion count badge
-const SuggestionBadge = ({ count, hasSuggestions }) => {
+const SuggestionBadge = ({ count, hasSuggestions }: { count: number; hasSuggestions: boolean }) => {
   if (!hasSuggestions) return null;
 
   return (
@@ -29,7 +51,7 @@ const SuggestionBadge = ({ count, hasSuggestions }) => {
 };
 
 // Settings button component
-const SettingsButton = ({ onClick }) => {
+const SettingsButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <Button onClick={onClick} variant="icon" size="sm" title="Settings">
       {React.createElement(getIcon("Settings"), {
@@ -46,6 +68,12 @@ const SuggestionsHeader = ({
   hasSuggestions,
   suggestions,
   toggleSettings,
+}: {
+  isCollapsed: boolean;
+  toggleCollapse: () => void;
+  hasSuggestions: boolean;
+  suggestions: Suggestion[];
+  toggleSettings: () => void;
 }) => (
   <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
     <Button
@@ -74,7 +102,7 @@ const SuggestionsHeader = ({
 );
 
 // Collapsed view component
-const CollapsedView = ({ suggestions }) => {
+const CollapsedView = ({ suggestions }: { suggestions: Suggestion[] }) => {
   const hasHighPriority = suggestions.some((s) => s.priority === "high");
   const suggestionText =
     suggestions.length === 0
@@ -108,6 +136,16 @@ const ExpandedView = ({
   suggestions,
   handleApplySuggestion,
   handleDismissSuggestion,
+}: {
+  showSettings: boolean;
+  analysisSettings: AnalysisSettings;
+  updateAnalysisSettings: (settings: Partial<AnalysisSettings>) => void;
+  resetAnalysisSettings: () => void;
+  refreshSuggestions: () => void;
+  suggestionStats: SuggestionStats;
+  suggestions: Suggestion[];
+  handleApplySuggestion: (suggestion: Suggestion) => void;
+  handleDismissSuggestion: (suggestionId: string) => void;
 }) => (
   <>
     {showSettings && (
@@ -130,6 +168,17 @@ const ExpandedView = ({
   </>
 );
 
+interface SmartEnvelopeSuggestionsProps {
+  transactions?: Transaction[];
+  envelopes?: Envelope[];
+  onCreateEnvelope?: (envelope: Partial<Envelope>) => void;
+  onUpdateEnvelope?: (envelope: Partial<Envelope>) => void;
+  onDismissSuggestion?: (suggestionId: string) => void;
+  dateRange?: string;
+  showDismissed?: boolean;
+  className?: string;
+}
+
 const SmartEnvelopeSuggestions = ({
   transactions = [],
   envelopes = [],
@@ -139,7 +188,7 @@ const SmartEnvelopeSuggestions = ({
   dateRange = "6months",
   showDismissed = false,
   className = "",
-}) => {
+}: SmartEnvelopeSuggestionsProps) => {
   const {
     suggestions,
     analysisSettings,

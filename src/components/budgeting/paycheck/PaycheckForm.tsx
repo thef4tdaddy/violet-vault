@@ -3,8 +3,29 @@ import { Button, TextInput, Radio } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
+// Type definitions
+interface PayerStats {
+  count: number;
+  averageAmount: number;
+  minAmount: number;
+  maxAmount: number;
+  lastPaycheckDate: string | null;
+}
+
+interface FormData {
+  amount: string;
+  payerName: string;
+  allocationMode: string;
+  date: string;
+  [key: string]: unknown;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
 // PayerStats component - displays payer history
-const PayerStats = ({ stats, payerName }) => {
+const PayerStats = ({ stats, payerName }: { stats: PayerStats | null; payerName: string }) => {
   if (!stats || stats.count === 0) return null;
 
   return (
@@ -37,7 +58,19 @@ const PayerStats = ({ stats, payerName }) => {
 };
 
 // AllocationModeOption component - single radio option
-const AllocationModeOption = ({ value, checked, onChange, title, description }) => (
+const AllocationModeOption = ({
+  value,
+  checked,
+  onChange,
+  title,
+  description,
+}: {
+  value: string;
+  checked: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  title: string;
+  description: string;
+}) => (
   <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
     <div className="relative grid place-items-center">
       <Radio
@@ -62,6 +95,19 @@ const AllocationModeOption = ({ value, checked, onChange, title, description }) 
   </label>
 );
 
+interface PaycheckFormProps {
+  formData: FormData;
+  errors: FormErrors;
+  uniquePayers: string[];
+  selectedPayerStats: PayerStats | null;
+  onUpdateField: (field: string, value: string) => void;
+  onApplyPrediction: (payerName: string) => void;
+  canSubmit: boolean;
+  isLoading: boolean;
+  onProcess: () => void;
+  onReset: () => void;
+}
+
 const PaycheckForm = ({
   formData,
   errors,
@@ -73,11 +119,11 @@ const PaycheckForm = ({
   isLoading,
   onProcess,
   onReset,
-}) => {
+}: PaycheckFormProps) => {
   // Enhanced haptic feedback for success actions
   const successFeedback = useTouchFeedback("success", "success");
 
-  const handlePayerChange = (payerName) => {
+  const handlePayerChange = (payerName: string) => {
     onUpdateField("payerName", payerName);
     if (payerName && !formData.amount) {
       onApplyPrediction(payerName);

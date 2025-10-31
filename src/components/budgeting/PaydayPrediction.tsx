@@ -3,6 +3,20 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
 
+// Type definitions
+interface PaydayPrediction {
+  nextPayday: string | Date;
+  confidence: number;
+  pattern: string;
+  amount?: number;
+  [key: string]: unknown;
+}
+
+interface FormattedPrediction {
+  displayText: string;
+  [key: string]: unknown;
+}
+
 // Helper functions moved outside component
 const getConfidenceColor = (confidence: number): string => {
   if (confidence >= 80) return "emerald";
@@ -45,7 +59,7 @@ const getColorClasses = (baseColor: string) => ({
 });
 
 // Sub-component: Confidence Bar
-const ConfidenceBar = ({ confidence, confidenceColor }) => {
+const ConfidenceBar = ({ confidence, confidenceColor }: { confidence: number; confidenceColor: string }) => {
   const colors = getColorClasses(confidenceColor);
   return (
     <div className="flex items-center text-xs">
@@ -64,7 +78,17 @@ const ConfidenceBar = ({ confidence, confidenceColor }) => {
 };
 
 // Sub-component: Prediction Header
-const PredictionHeader = ({ prediction, daysUntil, formattedPrediction, confidenceColor }) => (
+const PredictionHeader = ({
+  prediction,
+  daysUntil,
+  formattedPrediction,
+  confidenceColor,
+}: {
+  prediction: PaydayPrediction;
+  daysUntil: number;
+  formattedPrediction: FormattedPrediction;
+  confidenceColor: string;
+}) => (
   <div className="flex items-start justify-between">
     <div className="flex items-start space-x-3">
       <div className="flex-shrink-0 mt-0.5">{getPaydayIcon(daysUntil)}</div>
@@ -91,12 +115,19 @@ const PredictionHeader = ({ prediction, daysUntil, formattedPrediction, confiden
   </div>
 );
 
+interface PaydayPredictionProps {
+  prediction: PaydayPrediction | null;
+  className?: string;
+  onProcessPaycheck?: () => void;
+  onPrepareEnvelopes?: () => void;
+}
+
 const PaydayPrediction = ({
   prediction,
   className = "",
   onProcessPaycheck,
   onPrepareEnvelopes,
-}) => {
+}: PaydayPredictionProps) => {
   if (!prediction || !prediction.nextPayday) {
     return null;
   }
@@ -130,7 +161,23 @@ const PaydayPrediction = ({
 };
 
 // Sub-component: Action Card
-const ActionCard = ({ bgColor, borderColor, icon, iconColor, title, description, button }) => (
+const ActionCard = ({
+  bgColor,
+  borderColor,
+  icon,
+  iconColor,
+  title,
+  description,
+  button,
+}: {
+  bgColor: string;
+  borderColor: string;
+  icon: string;
+  iconColor: string;
+  title: string;
+  description: string;
+  button: React.ReactNode;
+}) => (
   <div className={`${bgColor} rounded-lg p-3 border ${borderColor}`}>
     <div className="flex items-center justify-between">
       <div className="flex items-center">
@@ -150,7 +197,15 @@ const ActionCard = ({ bgColor, borderColor, icon, iconColor, title, description,
 );
 
 // Sub-component: Proactive Suggestions
-const ProactiveSuggestions = ({ daysUntil, onProcessPaycheck, onPrepareEnvelopes }) => (
+const ProactiveSuggestions = ({
+  daysUntil,
+  onProcessPaycheck,
+  onPrepareEnvelopes,
+}: {
+  daysUntil: number;
+  onProcessPaycheck?: () => void;
+  onPrepareEnvelopes?: () => void;
+}) => (
   <div className="mt-4 pt-4 border-t border-gray-200">
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center">
