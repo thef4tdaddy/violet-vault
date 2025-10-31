@@ -9,9 +9,9 @@ import BottomNavItem from "./BottomNavItem";
 const BottomNavigationBar = () => {
   const { isVisible, getVisibleItems, isItemActive, shouldShowScrollHint } = useBottomNavigation();
 
-  const navRef = useRef(null);
-  const leftFadeRef = useRef(null);
-  const rightFadeRef = useRef(null);
+  const navRef = useRef<HTMLElement>(null);
+  const leftFadeRef = useRef<HTMLDivElement>(null);
+  const rightFadeRef = useRef<HTMLDivElement>(null);
 
   // Handle scroll indicators for overflow
   useEffect(() => {

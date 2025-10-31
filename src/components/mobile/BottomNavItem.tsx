@@ -1,11 +1,19 @@
 import { Link } from "react-router-dom";
 import { hapticFeedback } from "@/utils/ui/touchFeedback";
+import React from "react";
 
 /**
  * Individual navigation item for bottom navigation bar
  * Touch-optimized with haptic feedback and smooth animations
  */
-const BottomNavItem = ({ to, icon: _Icon, label, isActive }) => {
+interface BottomNavItemProps {
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  isActive: boolean;
+}
+
+const BottomNavItem = ({ to, icon: _Icon, label, isActive }: BottomNavItemProps) => {
   const handleClick = () => {
     hapticFeedback(10, "light");
   };

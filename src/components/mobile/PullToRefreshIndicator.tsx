@@ -5,13 +5,21 @@ import { getIcon } from "../../utils";
  * Pull-to-refresh indicator component
  * Shows visual feedback during pull-to-refresh interaction
  */
+interface PullToRefreshIndicatorProps {
+  isVisible: boolean;
+  isRefreshing: boolean;
+  pullProgress: number;
+  pullRotation: number;
+  isReady: boolean;
+}
+
 const PullToRefreshIndicator = ({
   isVisible,
   isRefreshing,
   pullProgress,
   pullRotation,
   isReady,
-}) => {
+}: PullToRefreshIndicatorProps) => {
   if (!isVisible) return null;
 
   return (

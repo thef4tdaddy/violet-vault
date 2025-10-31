@@ -29,7 +29,7 @@ const PatchNotesModal = () => {
     window.open(releaseUrl, "_blank");
   };
 
-  const getChangeIcon = (type) => {
+  const getChangeIcon = (type: string) => {
     switch (type) {
       case "feature":
         return React.createElement(getIcon("PlusCircle"), {
@@ -50,7 +50,7 @@ const PatchNotesModal = () => {
     }
   };
 
-  const getChangeColor = (type) => {
+  const getChangeColor = (type: string) => {
     switch (type) {
       case "feature":
         return "text-green-700";

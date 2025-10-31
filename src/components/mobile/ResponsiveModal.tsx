@@ -13,6 +13,16 @@ import SlideUpModal from "./SlideUpModal";
  *
  * Part of Issue #164 - Implement Slide-Up Modals for Mobile Flows
  */
+interface ResponsiveModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  title?: string;
+  children: React.ReactNode;
+  className?: string;
+  mobileHeight?: "auto" | "full" | "three-quarters" | "half";
+  [key: string]: unknown;
+}
+
 const ResponsiveModal = ({
   isOpen = false,
   onClose,
@@ -21,7 +31,7 @@ const ResponsiveModal = ({
   className = "",
   mobileHeight = "auto",
   ...props
-}) => {
+}: ResponsiveModalProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect screen size
@@ -63,10 +73,18 @@ const ResponsiveModal = ({
  * withResponsiveModal - Higher-order component that wraps existing modal components
  * to automatically add responsive slide-up behavior
  */
-export const withResponsiveModal = (
-  ModalComponent: React.ComponentType<Record<string, unknown>>
+interface ModalWrapperProps {
+  isOpen?: boolean;
+  onClose?: (() => void) | undefined;
+  title?: string;
+  _forceMobileMode?: boolean;
+  [key: string]: unknown;
+}
+
+export const withResponsiveModal = <P extends ModalWrapperProps>(
+  ModalComponent: React.ComponentType<P>
 ) => {
-  return React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => {
+  return React.forwardRef<unknown, P>((props: P, ref: React.Ref<unknown>) => {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -85,20 +103,20 @@ export const withResponsiveModal = (
         <SlideUpModal
           isOpen={Boolean(props.isOpen)}
           onClose={props.onClose}
-          title={props.title || "Modal"}
+          title={typeof props.title === "string" ? props.title : "Modal"}
           height="auto"
           showHandle={true}
           backdrop={true}
         >
           <div className="px-6">
-            <ModalComponent {...props} ref={ref} _forceMobileMode={true} />
+            <ModalComponent {...({ ...props, ref, _forceMobileMode: true } as P)} />
           </div>
         </SlideUpModal>
       );
     }
 
     // On desktop, render modal normally
-    return <ModalComponent {...props} ref={ref} />;
+    return <ModalComponent {...({ ...props, ref } as P)} />;
   });
 };
 

@@ -6,16 +6,34 @@ import { useFABLoadingStates } from "../../hooks/mobile/useFABLoadingStates";
 import { hapticFeedback } from "../../utils/ui/touchFeedback";
 
 /**
+ * FAB Action interface
+ */
+interface FABAction {
+  id?: string;
+  label: string;
+  icon: string;
+  color: string;
+  action?: () => void;
+}
+
+/**
  * Individual action button in the menu
  */
-const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
+interface FABActionButtonProps {
+  action: FABAction;
+  index: number;
+  onActionClick: () => void;
+  isLoading: boolean;
+}
+
+const FABActionButton = ({ action, index, onActionClick, isLoading }: FABActionButtonProps) => {
   const handleClick = () => {
     hapticFeedback(15, "medium");
     action.action?.();
     onActionClick();
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       action.action?.();

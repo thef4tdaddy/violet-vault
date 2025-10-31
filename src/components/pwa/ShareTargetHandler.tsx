@@ -5,15 +5,26 @@ import { getIcon } from "@/utils";
 import logger from "@/utils/common/logger";
 
 /**
+ * Shared data structure from Share Target API
+ */
+interface SharedData {
+  title: string | null;
+  text: string | null;
+  url: string | null;
+  timestamp: string;
+  hasFiles: boolean;
+}
+
+/**
  * Share Target Handler
  * Handles files and data shared to the PWA via the Share Target API
  */
 const ShareTargetHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [sharedData, setSharedData] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState(null);
+  const [sharedData, setSharedData] = useState<SharedData | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSharedContent = useCallback(async () => {
     setIsProcessing(true);
@@ -28,7 +39,7 @@ const ShareTargetHandler = () => {
 
       logger.info("Share target data received", { title, text, url });
 
-      const data = {
+      const data: SharedData = {
         title,
         text,
         url,
@@ -84,7 +95,7 @@ const ShareTargetHandler = () => {
     }
   }, [location, handleSharedContent]);
 
-  const handleManualNavigation = (path) => {
+  const handleManualNavigation = (path: string) => {
     navigate(path, { state: { importData: sharedData } });
   };
 
