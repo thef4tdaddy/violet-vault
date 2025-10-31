@@ -16,10 +16,12 @@ fi
 # --- Report Generation ---
 > "$OUTPUT_FILE"
 
-# Count total errors
-TOTAL_ERRORS=$(grep -c "error TS" "$INPUT_FILE" 2>/dev/null || echo 0)
+# Count total errors - handle empty file case
+TOTAL_ERRORS=$(grep -c "error TS" "$INPUT_FILE" 2>/dev/null || echo "0")
+# Clean up any whitespace/newlines
+TOTAL_ERRORS=$(echo "$TOTAL_ERRORS" | tr -d '\n\r' | awk '{print $1}')
 
-if [ "$TOTAL_ERRORS" -eq 0 ]; then
+if [ "$TOTAL_ERRORS" -eq 0 ] 2>/dev/null || [ -z "$TOTAL_ERRORS" ]; then
     # No errors found
     echo "✅ No TypeScript Type Errors Found" >> "$OUTPUT_FILE"
     echo "" >> "$OUTPUT_FILE"
