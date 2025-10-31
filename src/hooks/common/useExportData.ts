@@ -88,6 +88,16 @@ export const useExportData = () => {
       const counts = logExportSuccess(data, pureTransactions, fileSize);
       const exportSummary = buildExportSummary(counts);
 
+      // Log successful data export
+      logger.info("✅ Data exported", {
+        envelopes: counts.envelopes,
+        transactions: counts.transactions,
+        bills: counts.bills,
+        debts: counts.debts,
+        savingsGoals: counts.savingsGoals,
+        fileSizeKB: counts.fileSizeKB,
+      });
+
       showSuccessToast(
         `Export created with ${exportSummary} (${counts.fileSizeKB}KB)`,
         "Export Completed"

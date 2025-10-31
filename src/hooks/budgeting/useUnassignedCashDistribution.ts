@@ -239,6 +239,13 @@ const useUnassignedCashDistribution = () => {
         queryClient.invalidateQueries({ queryKey: [queryKeys.dashboardSummary] });
       }
 
+      // Log successful distribution
+      logger.info("✅ Unassigned cash distributed", {
+        totalDistributed: Object.values(distributions).reduce((sum, amt) => sum + (parseFloat(String(amt)) || 0), 0),
+        envelopesUpdated: envelopeUpdates.length,
+        remainingUnassigned: remainingCash,
+      });
+
       // Reset distributions after successful application
       setDistributions({});
     } catch (error) {

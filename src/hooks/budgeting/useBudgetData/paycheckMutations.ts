@@ -17,12 +17,21 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
     mutationFn: async (paycheckData) => {
       return await processPaycheck(paycheckData, envelopesQuery, savingsGoalsQuery);
     },
-    onSuccess: () => {
+    onSuccess: (result, variables) => {
       // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.paychecks });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+      
+      // Log successful paycheck processing
+      logger.info("✅ Paycheck processed", {
+        amount: variables.amount,
+        payerName: variables.payerName,
+        allocationMode: variables.mode,
+        allocatedToEnvelopes: result?.allocations?.length || 0,
+        totalAllocated: result?.totalAllocated || 0,
+      });
     },
     onError: (error) => {
       logger.error("Paycheck processing failed", error, {
@@ -36,11 +45,16 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
     mutationFn: async (paycheckId: string) => {
       return await deletePaycheck(paycheckId);
     },
-    onSuccess: () => {
+    onSuccess: (_, paycheckId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.paychecks });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+      
+      // Log successful paycheck deletion
+      logger.info("✅ Paycheck deleted", {
+        paycheckId: paycheckId,
+      });
     },
   });
 
