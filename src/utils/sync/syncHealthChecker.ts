@@ -111,7 +111,10 @@ async function runHealthChecksInternal(results) {
     };
 
     const syncResult = (await Promise.race([
-      cloudSyncService.determineSyncDirection(mockDexieData, mockFirestoreData),
+      cloudSyncService.determineSyncDirection(
+        mockDexieData as Parameters<typeof cloudSyncService.determineSyncDirection>[0],
+        mockFirestoreData as Parameters<typeof cloudSyncService.determineSyncDirection>[1]
+      ),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Sync direction determination timed out")), 10000)
       ),

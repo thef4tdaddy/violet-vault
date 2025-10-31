@@ -244,8 +244,8 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     for (const scenario of scenarios) {
       try {
         const result = await cloudSyncService.determineSyncDirection(
-          scenario.dexie,
-          scenario.firestore
+          scenario.dexie as Parameters<typeof cloudSyncService.determineSyncDirection>[0],
+          scenario.firestore as Parameters<typeof cloudSyncService.determineSyncDirection>[1]
         );
         const correct = result.direction === scenario.expected;
         directionResults.push(`${scenario.name}: ${correct ? "✅" : "❌"}`);
@@ -278,7 +278,7 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     // Test config
     const testConfig = {
       budgetId: "test-budget-" + Date.now(),
-      encryptionKey: new ArrayBuffer(32),
+      encryptionKey: new Uint8Array(32),
       currentUser: { userName: "Test User", userColor: "#123456" },
     };
 
