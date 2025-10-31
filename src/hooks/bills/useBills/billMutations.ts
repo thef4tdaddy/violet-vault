@@ -120,8 +120,6 @@ export const useAddBillMutation = () => {
       // Persist to Dexie (optimistic update handled by React Query)
       await budgetDb.bills.add(newBill);
 
-      logger.debug("✅ Added bill:", newBill as Record<string, unknown>);
-
       return newBill;
     },
     onMutate: async () => {
@@ -132,7 +130,7 @@ export const useAddBillMutation = () => {
       const previousBills = queryClient.getQueryData(queryKeys.bills);
       return { previousBills };
     },
-    onSuccess: () => {
+    onSuccess: (bill) => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({
@@ -140,6 +138,15 @@ export const useAddBillMutation = () => {
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+
+      // Log successful bill addition
+      logger.info("✅ Bill added", {
+        name: bill.name,
+        amount: bill.amount,
+        dueDate: bill.dueDate,
+        category: bill.category,
+        isRecurring: bill.isRecurring,
+      });
 
       // Trigger cloud sync
       triggerBillSync("add");
@@ -188,17 +195,22 @@ export const useUpdateBillMutation = () => {
       // Update in Dexie (optimistic update handled by React Query)
       await budgetDb.bills.update(billId, updatedBill);
 
-      logger.debug("✅ Updated bill:", updatedBill as Record<string, unknown>);
-
       return updatedBill;
     },
-    onSuccess: () => {
+    onSuccess: (bill, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({
         queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+
+      // Log successful bill update
+      logger.info("✅ Bill updated", {
+        name: bill.name,
+        billId: variables.billId,
+        updates: Object.keys(variables.updates),
+      });
 
       triggerBillSync("update");
     },
@@ -220,17 +232,20 @@ export const useDeleteBillMutation = () => {
       // Delete from Dexie (optimistic update handled by React Query)
       await budgetDb.bills.delete(billId);
 
-      logger.debug("✅ Deleted bill:", { billId });
-
       return billId;
     },
-    onSuccess: () => {
+    onSuccess: (billId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({
         queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+
+      // Log successful bill deletion
+      logger.info("✅ Bill deleted", {
+        billId: billId,
+      });
 
       triggerBillSync("delete");
     },
@@ -308,7 +323,7 @@ export const useMarkBillPaidMutation = () => {
 
       return { billId, paymentTransaction };
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({
         queryKey: (queryKeys.billsList as unknown as () => unknown[])(),
@@ -316,6 +331,14 @@ export const useMarkBillPaidMutation = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+
+      // Log successful bill payment
+      logger.info("✅ Bill marked as paid", {
+        billId: variables.billId,
+        paidAmount: variables.paidAmount,
+        envelope: variables.envelopeId || "unassigned",
+        transactionCreated: !!data.paymentTransaction,
+      });
 
       triggerBillSync("mark_paid");
     },
