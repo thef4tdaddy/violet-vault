@@ -177,14 +177,14 @@ const ShareTargetHandler = () => {
               </h2>
 
               <div className="text-left text-sm space-y-2 mb-4">
-                {sharedData.title && (
+                {sharedData?.title && (
                   <div>
                     <span className="font-medium text-gray-600">Title:</span>
                     <span className="ml-2 text-gray-800">{sharedData.title}</span>
                   </div>
                 )}
 
-                {sharedData.text && (
+                {sharedData?.text && (
                   <div>
                     <span className="font-medium text-gray-600">Content:</span>
                     <span className="ml-2 text-gray-800 break-words">
@@ -195,14 +195,14 @@ const ShareTargetHandler = () => {
                   </div>
                 )}
 
-                {sharedData.url && (
+                {sharedData?.url && (
                   <div>
                     <span className="font-medium text-gray-600">URL:</span>
                     <span className="ml-2 text-blue-600 break-all">{sharedData.url}</span>
                   </div>
                 )}
 
-                {sharedData.hasFiles && (
+                {sharedData?.hasFiles && (
                   <div className="flex items-center space-x-2">
                     {React.createElement(getIcon("File"), {
                       className: "w-4 h-4 text-purple-600",

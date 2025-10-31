@@ -110,7 +110,7 @@ const FABActionMenu = () => {
       role="menu"
       aria-label="Additional actions"
     >
-      {secondaryActions.map((action, index) => (
+      {secondaryActions.map((action: FABAction, index: number) => (
         <FABActionButton
           key={action.id || action.label}
           action={action}

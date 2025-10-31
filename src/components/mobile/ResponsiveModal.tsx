@@ -109,6 +109,7 @@ export const withResponsiveModal = <P extends ModalWrapperProps>(
           backdrop={true}
         >
           <div className="px-6">
+            {/* Type assertion is safe here as we're adding a property to an extended interface */}
             <ModalComponent {...({ ...props, ref, _forceMobileMode: true } as P)} />
           </div>
         </SlideUpModal>

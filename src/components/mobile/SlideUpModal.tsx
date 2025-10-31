@@ -70,12 +70,8 @@ function resetDragTransform(modalRef: React.RefObject<HTMLDivElement>, backdrop:
 
 interface ModalHeaderProps {
   title: string;
-  onClose: () => void;
-  closeFeedback: {
-    onClick: (callback: () => void) => () => void;
-    onTouchStart: () => void;
-    className: string;
-  };
+  onClose?: () => void;
+  closeFeedback: TouchFeedback;
 }
 
 const ModalHeader = ({ title, onClose, closeFeedback }: ModalHeaderProps) => (
@@ -84,7 +80,7 @@ const ModalHeader = ({ title, onClose, closeFeedback }: ModalHeaderProps) => (
       {title}
     </h2>
     <Button
-      onClick={closeFeedback.onClick(onClose)}
+      onClick={onClose ? closeFeedback.onClick(onClose) : undefined}
       onTouchStart={closeFeedback.onTouchStart}
       className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${closeFeedback.className}`}
       aria-label="Close modal"
@@ -96,15 +92,25 @@ const ModalHeader = ({ title, onClose, closeFeedback }: ModalHeaderProps) => (
   </div>
 );
 
-const DragHandle = ({ handleRef }: { handleRef: React.RefObject<HTMLDivElement> }) => (
+const DragHandle = ({
+  handleRef,
+}: {
+  handleRef: React.RefObject<HTMLDivElement | null>;
+}) => (
   <div ref={handleRef} className="flex justify-center pt-3 pb-2 cursor-pointer">
     <div className="w-12 h-1 bg-gray-300 rounded-full" />
   </div>
 );
 
+interface TouchFeedback {
+  onClick: (callback?: (() => void) | undefined) => ((event: unknown) => void) | undefined;
+  onTouchStart: (event: unknown) => void;
+  className: string;
+}
+
 interface ModalPanelProps {
-  modalRef: React.RefObject<HTMLDivElement>;
-  handleRef: React.RefObject<HTMLDivElement>;
+  modalRef: React.RefObject<HTMLDivElement | null>;
+  handleRef: React.RefObject<HTMLDivElement | null>;
   height: keyof typeof MODAL_HEIGHTS;
   isOpen: boolean;
   isAnimating: boolean;
@@ -112,11 +118,7 @@ interface ModalPanelProps {
   showHandle: boolean;
   title?: string;
   onClose?: () => void;
-  closeFeedback: {
-    onClick: (callback: () => void) => () => void;
-    onTouchStart: () => void;
-    className: string;
-  };
+  closeFeedback: TouchFeedback;
   handleTouchStart: (e: React.TouchEvent) => void;
   handleTouchMove: (e: React.TouchEvent) => void;
   handleTouchEnd: () => void;
