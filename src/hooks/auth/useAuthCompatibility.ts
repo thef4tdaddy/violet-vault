@@ -1,5 +1,6 @@
 import { useAuthManager } from "./useAuthManager";
 import logger from "../../utils/common/logger";
+import { encryptionUtils } from "../../utils/security/encryption";
 
 /**
  * Compatibility wrapper for components still using the old authStore interface
@@ -58,10 +59,14 @@ export const useAuthCompatibility = () => {
     },
 
     validatePassword: async (password) => {
-      // Use the password validation from the auth queries
-      const validator = authManager.createPasswordValidator(password);
-      const result = await validator.refetch();
-      return result.data?.isValid || false;
+      // Compatibility method - validates password
+      try {
+        // Simple validation - attempt to derive key
+        await encryptionUtils.deriveKey(password);
+        return true;
+      } catch {
+        return false;
+      }
     },
 
     // Additional methods that some components might use

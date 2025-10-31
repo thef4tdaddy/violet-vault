@@ -1,3 +1,18 @@
+/**
+ * Transaction validation using Zod schemas
+ */
+import { z } from "zod";
+
+/**
+ * Zod schema for basic transaction validation
+ */
+const BasicTransactionSchema = z.object({
+  amount: z.number(),
+  description: z.string().min(1, "Description is required"),
+  date: z.union([z.string(), z.number()]).optional(),
+  envelopeId: z.string().optional(),
+});
+
 interface Transaction {
   amount: number;
   description: string;
@@ -10,12 +25,8 @@ interface Transaction {
  * Checks if transaction is valid
  */
 export const isValidTransaction = (transaction: unknown): boolean => {
-  return Boolean(
-    transaction &&
-      typeof transaction === "object" &&
-      typeof (transaction as Record<string, unknown>).amount === "number" &&
-      (transaction as Record<string, unknown>).description
-  );
+  const result = BasicTransactionSchema.safeParse(transaction);
+  return result.success;
 };
 
 /**

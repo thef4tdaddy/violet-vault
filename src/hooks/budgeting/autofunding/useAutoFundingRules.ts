@@ -9,23 +9,13 @@ import { useRuleValidation } from "./utils/useRuleValidation";
 import { useRuleStatistics } from "./utils/useRuleStatistics";
 import { useRuleOrganization } from "./utils/useRuleOrganization";
 import { useRuleSummaries } from "./utils/useRuleSummaries";
-
-interface Rule {
-  id: string;
-  name: string;
-  type: string;
-  enabled: boolean;
-  lastExecuted?: string | null;
-  executionCount: number;
-  updatedAt?: string;
-  [key: string]: unknown;
-}
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 /**
  * Hook for managing auto-funding rules (CRUD operations, validation, filtering)
  * Composes focused sub-hooks for better maintainability and testability
  */
-export const useAutoFundingRules = (initialRules: Rule[] = []) => {
+export const useAutoFundingRules = (initialRules: AutoFundingRule[] = []) => {
   const [rules, setRules] = useState(initialRules);
 
   // Extract operation hooks
@@ -36,7 +26,9 @@ export const useAutoFundingRules = (initialRules: Rule[] = []) => {
   // Extract query hooks
   const queries = useRuleQueries({ rules });
   const filters = useRuleFilters({ rules });
-  const executables = useExecutableRules({ rules });
+  const executables = useExecutableRules({
+    rules: rules as unknown as import("@/utils/budgeting/autofunding/conditions").Rule[],
+  });
 
   // Extract utility hooks
   const validation = useRuleValidation({ rules });
@@ -49,7 +41,7 @@ export const useAutoFundingRules = (initialRules: Rule[] = []) => {
     setRules(initialRules);
   };
 
-  const setAllRules = (newRules: Rule[]) => {
+  const setAllRules = (newRules: AutoFundingRule[]) => {
     setRules(newRules);
   };
 

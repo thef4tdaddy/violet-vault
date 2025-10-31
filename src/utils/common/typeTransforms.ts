@@ -53,21 +53,7 @@ export const transformTransactionFromDB = (
 export const transformBillFromDB = (
   dbBill: import("@/db/types").Bill
 ): import("@/db/types").Bill & Record<string, unknown> => {
-  const transformed = {
-    id: dbBill.id,
-    name: dbBill.name,
-    category: dbBill.category,
-    amount: dbBill.amount,
-    dueDate: dbBill.dueDate.toISOString().split("T")[0], // Convert Date to YYYY-MM-DD string
-    isPaid: dbBill.isPaid,
-    isRecurring: dbBill.isRecurring,
-    frequency: dbBill.frequency,
-    envelopeId: dbBill.envelopeId,
-    createdAt: dbBill.createdAt ? new Date(dbBill.createdAt).toISOString() : undefined,
-    description: dbBill.description,
-    paymentMethod: dbBill.paymentMethod,
-  };
-  return makeRecordCompatible(transformed);
+  return makeRecordCompatible(dbBill);
 };
 
 // UI to Database transformations (reverse)

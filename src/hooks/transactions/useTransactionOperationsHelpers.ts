@@ -9,15 +9,27 @@ import logger from "@/utils/common/logger";
 /**
  * Create mutation configuration for adding transactions
  */
+export type CategoryRule = { keywords?: string[]; pattern?: string; category: string; name?: string; envelopeId?: string | number };
+
+const normalizeCategoryRules = (rules: CategoryRule[]) =>
+  rules.map((r) => ({
+    keywords: r.keywords ?? (r.pattern ? [String(r.pattern)] : []),
+    category: r.category,
+    name: r.name,
+  }));
+
 export const createAddTransactionMutationConfig = (
   queryClient: QueryClient,
-  categoryRules: unknown[]
+  categoryRules: CategoryRule[]
 ) => {
   return {
     mutationKey: ["transactions", "add"],
     mutationFn: async (transactionData: unknown) => {
       const { addTransactionToDB } = await import("./helpers/transactionOperationsHelpers");
-      return addTransactionToDB(transactionData as Record<string, unknown>, categoryRules);
+      const normalized = normalizeCategoryRules(categoryRules || []);
+      const result = await addTransactionToDB(transactionData as Record<string, unknown>, normalized);
+      // normalize to { id: string } for downstream handlers
+      return { id: String(result) };
     },
     onSuccess: (data: { id: string }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
@@ -40,12 +52,12 @@ export const createUpdateTransactionMutationConfig = (queryClient: QueryClient) 
       const { updateTransactionInDB } = await import("./helpers/transactionOperationsHelpers");
       return updateTransactionInDB(id, updates as Record<string, unknown>);
     },
-    onSuccess: (_data: unknown, variables: { id: string }) => {
+    onSuccess: (_data: unknown, variables: { id: string; updates?: unknown }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
       logger.info("Transaction updated successfully", { id: variables.id });
     },
-    onError: (error: Error, variables: { id: string }) => {
+    onError: (error: Error, variables: { id: string; updates?: unknown }) => {
       logger.error("Failed to update transaction", { error, id: variables.id });
     },
   };
@@ -115,12 +127,25 @@ export const createTransferFundsMutationConfig = (queryClient: QueryClient) => {
       const { transferFundsInDB } = await import("./helpers/transactionOperationsHelpers");
       return transferFundsInDB(transferData as Record<string, unknown>);
     },
-    onSuccess: (data: { transferId: string; outgoing: { amount: number } }) => {
+    onSuccess: (data: { transferId?: unknown; outgoing: unknown; incoming: unknown }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
       logger.info("Transfer created successfully", {
         transferId: data.transferId,
-        amount: data.outgoing.amount,
+        // outgoing may be an object or id; guard access and extract numeric amount safely
+        amount: ((): number | undefined => {
+          const out = data.outgoing;
+          if (out && typeof out === "object") {
+            const o = out as Record<string, unknown>;
+            const val = o.amount;
+            if (typeof val === "number") return val;
+            if (typeof val === "string" && val.trim() !== "") {
+              const n = Number(val);
+              return Number.isFinite(n) ? n : undefined;
+            }
+          }
+          return undefined;
+        })(),
       });
     },
     onError: (error: Error) => {
@@ -134,7 +159,7 @@ export const createTransferFundsMutationConfig = (queryClient: QueryClient) => {
  */
 export const createBulkOperationMutationConfig = (
   queryClient: QueryClient,
-  categoryRules: unknown[]
+  categoryRules: CategoryRule[]
 ) => {
   return {
     mutationKey: ["transactions", "bulk"],
@@ -150,19 +175,20 @@ export const createBulkOperationMutationConfig = (
       const { bulkOperationOnTransactions } = await import(
         "./helpers/transactionOperationsHelpers"
       );
+      const normalized = normalizeCategoryRules(categoryRules || []);
       return bulkOperationOnTransactions(
         operation,
         transactions as Record<string, unknown>[],
         updates as Record<string, unknown>,
-        categoryRules
+        normalized
       );
     },
-    onSuccess: (data: unknown[], variables: { operation: string }) => {
+    onSuccess: (data: unknown[], variables: { operation: string; transactions?: unknown[]; updates?: unknown }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
       logger.info(`Bulk ${variables.operation} completed`, { count: data.length });
     },
-    onError: (error: Error, variables: { operation: string }) => {
+    onError: (error: Error, variables: { operation: string; transactions?: unknown[]; updates?: unknown }) => {
       logger.error(`Bulk ${variables.operation} failed`, error);
     },
   };

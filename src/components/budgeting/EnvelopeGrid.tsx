@@ -15,6 +15,8 @@ import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
 import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
+import { validateComponentProps } from "@/utils/validation/propValidator";
+import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 
 // Lazy load modals for better performance
 const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));
@@ -23,6 +25,8 @@ const EnvelopeHistoryModal = lazy(() => import("./envelope/EnvelopeHistoryModal"
 const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
 // Modals container component
+interface EnvelopeRef { id: string }
+
 const EnvelopeModals = ({
   showCreateModal,
   setShowCreateModal,
@@ -48,15 +52,15 @@ const EnvelopeModals = ({
   envelopes: unknown[];
   budget: { currentUser: unknown; updateBill: (bill: unknown) => void };
   unassignedCash: number;
-  editingEnvelope: unknown;
-  setEditingEnvelope: (env: unknown) => void;
+  editingEnvelope: EnvelopeRef | null;
+  setEditingEnvelope: (env: EnvelopeRef | null) => void;
   handleUpdateEnvelope: (data: unknown) => Promise<void>;
   deleteEnvelope: (id: string) => Promise<void>;
   updateBill: (data: { id: string; updates: unknown }) => Promise<void>;
   bills: unknown[];
-  historyEnvelope: unknown;
-  setHistoryEnvelope: (env: unknown) => void;
-  quickFundModal: { isOpen: boolean; envelope: unknown; suggestedAmount: number };
+  historyEnvelope: EnvelopeRef | null;
+  setHistoryEnvelope: (env: EnvelopeRef | null) => void;
+  quickFundModal: { isOpen: boolean; envelope: EnvelopeRef | null; suggestedAmount: number };
   closeQuickFundModal: () => void;
   handleQuickFundConfirm: (id: string, amount: number) => Promise<void>;
 }) => (
@@ -81,7 +85,7 @@ const EnvelopeModals = ({
       <EnvelopeEditModal
         isOpen={!!editingEnvelope}
         onClose={() => setEditingEnvelope(null)}
-        envelope={editingEnvelope}
+        envelope={editingEnvelope as EnvelopeRef}
         onUpdateEnvelope={handleUpdateEnvelope}
         onDeleteEnvelope={deleteEnvelope}
         existingEnvelopes={envelopes}
@@ -98,7 +102,7 @@ const EnvelopeModals = ({
       <EnvelopeHistoryModal
         isOpen={!!historyEnvelope}
         onClose={() => setHistoryEnvelope(null)}
-        envelope={historyEnvelope}
+        envelope={historyEnvelope as EnvelopeRef}
       />
     )}
 
@@ -107,7 +111,7 @@ const EnvelopeModals = ({
         isOpen={quickFundModal.isOpen}
         onClose={closeQuickFundModal}
         onConfirm={handleQuickFundConfirm}
-        envelope={quickFundModal.envelope}
+        envelope={quickFundModal.envelope as EnvelopeRef}
         suggestedAmount={quickFundModal.suggestedAmount}
         unassignedCash={unassignedCash}
       />
@@ -289,6 +293,18 @@ const UnifiedEnvelopeManager = ({
   unassignedCash: propUnassignedCash,
   className = "",
 }) => {
+  // Validate props in development
+  validateComponentProps(
+    "EnvelopeGrid",
+    {
+      envelopes: propEnvelopes,
+      transactions: propTransactions,
+      unassignedCash: propUnassignedCash,
+      className,
+    },
+    EnvelopeGridPropsSchema
+  );
+
   const {
     envelopes,
     transactions,

@@ -17,11 +17,24 @@ const ChartContainer = ({
   error = null,
   emptyMessage = "No data available",
   actions,
+  formatTooltip,
   dataTestId,
+}: {
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  children?: React.ReactNode;
+  height?: number;
+  className?: string;
+  loading?: boolean;
+  error?: unknown;
+  emptyMessage?: string;
+  actions?: React.ReactNode;
+  formatTooltip?: React.ComponentType<unknown> | ((props: unknown) => React.ReactNode);
+  dataTestId?: string;
 }) => {
   if (loading) {
     return (
-      <div className={`glassmorphism rounded-xl p-6 ${className}`}>
+      <div className={`glassmorphism rounded-xl p-6 ${className}`} data-format-tooltip={formatTooltip ? "true" : "false"}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -40,8 +53,15 @@ const ChartContainer = ({
   }
 
   if (error) {
+    const errorMessage =
+      error == null
+        ? ""
+        : typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : String(error);
+
     return (
-      <div className={`glassmorphism rounded-xl p-6 ${className}`}>
+      <div className={`glassmorphism rounded-xl p-6 ${className}`} data-format-tooltip={formatTooltip ? "true" : "false"}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -55,7 +75,7 @@ const ChartContainer = ({
               className: "h-12 w-12 mx-auto mb-3 opacity-50",
             })}
             <p className="font-medium">Error loading chart</p>
-            <p className="text-sm text-gray-500 mt-1">{error.message || error}</p>
+            <p className="text-sm text-gray-500 mt-1">{errorMessage}</p>
           </div>
         </div>
       </div>
@@ -70,6 +90,7 @@ const ChartContainer = ({
       className={`glassmorphism rounded-xl p-6 ${className}`}
       data-testid={dataTestId}
       data-chart
+      data-format-tooltip={formatTooltip ? "true" : "false"}
     >
       <div className="flex items-center justify-between mb-4">
         <div>

@@ -99,7 +99,6 @@ export const useTransactionMutations = () => {
         type: transactionData.type || "expense",
         lastModified: Date.now(),
         createdAt: Date.now(),
-        reconciledAt: new Date().toISOString(),
         description: transactionData.description,
       };
 

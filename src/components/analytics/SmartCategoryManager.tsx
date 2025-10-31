@@ -1,7 +1,13 @@
 import { useMemo } from "react";
 import { useSmartCategoryAnalysis } from "@/hooks/analytics/useSmartCategoryAnalysis";
 import { useSmartCategoryManager } from "@/hooks/analytics/useSmartCategoryManager";
-import { calculateCategoryStats, processSuggestions } from "@/utils/analytics/categoryHelpers";
+import {
+  calculateCategoryStats,
+  processSuggestions,
+  Suggestion,
+  TransactionForStats,
+  CategoryStat,
+} from "@/utils/analytics/categoryHelpers";
 import logger from "@/utils/common/logger";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
@@ -11,12 +17,12 @@ import CategoryAnalysisTab from "./CategoryAnalysisTab";
 import CategoryAdvancedTab from "./CategoryAdvancedTab";
 
 interface SmartCategoryManagerProps {
-  transactions?: Array<Record<string, unknown>>;
+  transactions?: TransactionForStats[];
   bills?: Array<Record<string, unknown>>;
   onAddCategory: (name: string, category: string) => void;
   onRemoveCategory: (name: string, category: string) => void;
-  onApplyToTransactions: (suggestion: unknown, updates: unknown) => Promise<void>;
-  onApplyToBills: (suggestion: unknown, updates: unknown) => Promise<void>;
+  onApplyToTransactions: (suggestion: Suggestion, updates?: Record<string, unknown>) => Promise<void>;
+  onApplyToBills: (suggestion: Suggestion, updates?: Record<string, unknown>) => Promise<void>;
   dateRange?: string;
   className?: string;
 }
@@ -57,27 +63,27 @@ const SmartCategoryManager = ({
   const allSuggestions = useMemo(
     () =>
       processSuggestions(
-        transactionAnalysis as unknown,
-        billAnalysis as unknown,
-        dismissedSuggestions as unknown as Set<string>,
+        transactionAnalysis as Suggestion[],
+        billAnalysis as Suggestion[],
+        dismissedSuggestions as Set<string>,
         12
       ),
     [transactionAnalysis, billAnalysis, dismissedSuggestions]
   );
 
   // Calculate category statistics
-  const categoryStats = useMemo(
-    () => calculateCategoryStats(filteredTransactions),
+  const categoryStats: CategoryStat[] = useMemo(
+    () => calculateCategoryStats(filteredTransactions as TransactionForStats[]),
     [filteredTransactions]
   );
 
-  const handleApplySuggestion = async (suggestion) => {
+  const handleApplySuggestion = async (suggestion: Suggestion) => {
     try {
       const success = await applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
-      if (success && suggestion.action.includes("add")) {
-        onAddCategory?.(suggestion.data.categoryName, suggestion.category);
-      } else if (success && suggestion.action.includes("remove")) {
-        onRemoveCategory?.(suggestion.data.categoryName, suggestion.category);
+      if (success && suggestion.action && suggestion.action.includes("add") && suggestion.data?.categoryName) {
+        onAddCategory(suggestion.data.categoryName, suggestion.category);
+      } else if (success && suggestion.action && suggestion.action.includes("remove") && suggestion.data?.categoryName) {
+        onRemoveCategory(suggestion.data.categoryName, suggestion.category);
       }
     } catch (error) {
       logger.error("Failed to apply category suggestion:", error);

@@ -90,7 +90,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
   const setUnassignedCash = useCallback(
     async (amount: number, options: SetUnassignedCashOptions = {}) => {
       if (typeof amount !== "number" || isNaN(amount)) {
-        logger.warn("Invalid unassigned cash amount:", amount);
+        logger.warn("Invalid unassigned cash amount:", { amount });
         return false;
       }
 

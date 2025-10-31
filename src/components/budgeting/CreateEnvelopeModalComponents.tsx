@@ -96,7 +96,7 @@ interface ModalContentProps {
     billId?: string;
   };
   errors: Record<string, string>;
-  calculatedAmounts: unknown;
+  calculatedAmounts: Record<string, number>;
   isLoading: boolean;
   canSubmit: boolean;
   allBills: unknown[];
@@ -147,7 +147,6 @@ export const ModalContent = ({
         calculatedAmounts={calculatedAmounts}
         onUpdateField={onUpdateField}
         disabled={isLoading}
-        showBiweeklyPreview={true}
       />
 
       {/* Allocation Mode */}

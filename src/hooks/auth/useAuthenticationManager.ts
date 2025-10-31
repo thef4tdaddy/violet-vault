@@ -125,33 +125,26 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
     [authFlow.encryptionKey, effectiveBudgetId, authFlow.salt]
   );
 
-  // Core authentication operations
-  const authOperations = useMemo<AuthOperations>(
-    () => ({
-      // Setup & Login
-      handleSetup: authFlow.handleSetup,
-      handleLogout: authFlow.handleLogout,
-      handleChangePassword: authFlow.handleChangePassword,
+  // Core authentication operations - direct object without useMemo to avoid React Compiler conflicts
+  const authOperations: AuthOperations = {
+    // Setup & Login
+    handleSetup: async (userDataOrPassword: unknown): Promise<void> => {
+      await authFlow.handleSetup(userDataOrPassword);
+    },
+    handleLogout: authFlow.handleLogout,
+    handleChangePassword: authFlow.handleChangePassword,
 
-      // Profile Management
-      handleUpdateProfile: authFlow.handleUpdateProfile,
+    // Profile Management
+    handleUpdateProfile: authFlow.handleUpdateProfile,
 
-      // Security Operations
-      lockApp: securityManager.lockSession,
-      unlockApp: securityManager.unlockSession,
-      checkSecurityStatus: () => {
-        // Check security status - can be implemented as needed
-        securityManager.trackActivity();
-      },
-    }),
-    [
-      authFlow.handleSetup,
-      authFlow.handleLogout,
-      authFlow.handleChangePassword,
-      authFlow.handleUpdateProfile,
-      securityManager,
-    ]
-  );
+    // Security Operations
+    lockApp: securityManager.lockSession,
+    unlockApp: securityManager.unlockSession,
+    checkSecurityStatus: () => {
+      // Check security status - can be implemented as needed
+      securityManager.trackActivity();
+    },
+  };
 
   return {
     // Authentication state

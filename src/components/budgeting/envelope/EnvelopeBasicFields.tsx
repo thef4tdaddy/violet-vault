@@ -18,6 +18,7 @@ interface EnvelopeBasicFieldsProps {
     [key: string]: unknown;
   };
   canEdit?: boolean;
+  disabled?: boolean;
 }
 
 const EnvelopeBasicFields = ({
@@ -25,7 +26,10 @@ const EnvelopeBasicFields = ({
   onUpdateField,
   errors = {},
   canEdit = true,
+  disabled,
 }: EnvelopeBasicFieldsProps) => {
+  // Support callers that pass `disabled` instead of `canEdit`.
+  const effectiveCanEdit = typeof disabled === "boolean" ? !disabled : canEdit;
   const categories = getEnvelopeCategories();
 
   return (
@@ -44,10 +48,10 @@ const EnvelopeBasicFields = ({
           type="text"
           value={formData.name || ""}
           onChange={(e) => onUpdateField("name", e.target.value)}
-          disabled={!canEdit}
+          disabled={!effectiveCanEdit}
           className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
             errors.name ? "border-red-300 bg-red-50" : "border-gray-300"
-          } ${!canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
+          } ${!effectiveCanEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
           placeholder="e.g., Groceries, Gas, Entertainment"
           maxLength={50}
         />
@@ -67,10 +71,10 @@ const EnvelopeBasicFields = ({
         <Select
           value={formData.category || ""}
           onChange={(e) => onUpdateField("category", e.target.value)}
-          disabled={!canEdit}
+          disabled={!effectiveCanEdit}
           className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             errors.category ? "border-red-300 bg-red-50" : "border-gray-300"
-          } ${!canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
+          } ${!effectiveCanEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
         >
           <option value="">Select a category...</option>
           {categories.map((category) => (
@@ -97,11 +101,11 @@ const EnvelopeBasicFields = ({
         <textarea
           value={formData.description || ""}
           onChange={(e) => onUpdateField("description", e.target.value)}
-          disabled={!canEdit}
+          disabled={!effectiveCanEdit}
           rows={2}
           maxLength={500}
           className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
-            !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+            !effectiveCanEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           placeholder="Optional notes about this envelope..."
         />

@@ -80,7 +80,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
     setIsExecuting(true);
     try {
-      const result = await executeRules(false);
+      const result = await executeRules("manual");
 
       if (result.success && "execution" in result) {
         const totalFunded = result.execution.totalFunded || 0;

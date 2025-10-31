@@ -37,7 +37,7 @@ const validateFormAndAllocations = (formData, currentAllocations, setErrors) => 
     formData,
     currentAllocations,
     validatePaycheckForm as (data: typeof formData) => ReturnType<typeof validatePaycheckForm>,
-    validateAllocations
+    validateAllocations as (allocations: unknown[], amount: number) => { isValid: boolean; message: string; overage?: number }
   );
   setErrors(validation.errors);
   return validation.isValid;
