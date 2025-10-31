@@ -1,7 +1,48 @@
 import { useState, useCallback, useMemo } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
-import { predictNextPayday } from "../../utils/budgeting/paydayPredictor";
-import logger from "../../utils/common/logger";
+import { globalToast } from "@/stores/ui/toastStore";
+import { predictNextPayday } from "@/utils/budgeting/paydayPredictor";
+import logger from "@/utils/common/logger";
+
+/**
+ * Generic envelope type that works with both DB and UI envelope structures
+ */
+interface EnvelopeData {
+  id: string | number;
+  name: string;
+  currentBalance?: number | string;
+}
+
+/**
+ * New transaction form data structure
+ */
+interface NewTransactionData {
+  amount: string;
+  description: string;
+  type: "expense" | "income";
+  envelopeId: string;
+  date: string;
+}
+
+/**
+ * Transaction data for reconciliation
+ */
+interface ReconcileTransactionData {
+  id: string | number;
+  amount: number;
+  description: string;
+  type: "expense" | "income";
+  envelopeId: string;
+  date: string;
+  reconciledAt: string;
+}
+
+/**
+ * Envelope option for dropdown selection
+ */
+interface EnvelopeOption {
+  id: string | number;
+  name: string;
+}
 
 /**
  * Hook for managing Main Dashboard UI state
@@ -9,7 +50,7 @@ import logger from "../../utils/common/logger";
  */
 export const useMainDashboardUI = () => {
   const [showReconcileModal, setShowReconcileModal] = useState(false);
-  const [newTransaction, setNewTransaction] = useState({
+  const [newTransaction, setNewTransaction] = useState<NewTransactionData>({
     amount: "",
     description: "",
     type: "expense", // 'expense' or 'income'
@@ -25,7 +66,7 @@ export const useMainDashboardUI = () => {
     setShowReconcileModal(false);
   }, []);
 
-  const updateNewTransaction = useCallback((updates) => {
+  const updateNewTransaction = useCallback((updates: Partial<NewTransactionData>) => {
     setNewTransaction((prev) => ({ ...prev, ...updates }));
   }, []);
 
@@ -53,19 +94,28 @@ export const useMainDashboardUI = () => {
 };
 
 /**
+ * Generic savings goal type
+ */
+interface SavingsGoalData {
+  id?: string | number;
+  currentAmount?: number;
+  [key: string]: unknown;
+}
+
+/**
  * Hook for dashboard balance calculations and reconciliation logic
  * Extracts balance calculations and difference analysis
  */
 export const useDashboardCalculations = (
-  envelopes = [],
-  savingsGoals = [],
+  envelopes: EnvelopeData[] = [],
+  savingsGoals: SavingsGoalData[] = [],
   unassignedCash = 0,
   actualBalance = 0
 ) => {
   const calculations = useMemo(() => {
     // Calculate totals
     const totalEnvelopeBalance = envelopes.reduce((sum, env) => {
-      const balance = parseFloat(env?.currentBalance) || 0;
+      const balance = parseFloat(String(env?.currentBalance ?? 0)) || 0;
       return sum + (isNaN(balance) ? 0 : balance);
     }, 0);
 
@@ -102,16 +152,20 @@ export const useDashboardCalculations = (
  * Hook for handling transaction reconciliation process
  * Extracts reconciliation logic and validation
  */
-export const useTransactionReconciliation = (reconcileTransaction, envelopes, savingsGoals) => {
+export const useTransactionReconciliation = (
+  reconcileTransaction: (transaction: unknown) => void,
+  envelopes: EnvelopeData[],
+  savingsGoals: SavingsGoalData[]
+) => {
   const handleReconcileTransaction = useCallback(
-    (newTransaction, onSuccess) => {
+    (newTransaction: NewTransactionData, onSuccess?: () => void) => {
       if (!newTransaction.amount || !newTransaction.description.trim()) {
         globalToast.showError("Please enter amount and description", "Required Fields", 8000);
         return false;
       }
 
       const amount = parseFloat(newTransaction.amount);
-      const transaction = {
+      const transaction: ReconcileTransactionData = {
         id: Date.now(),
         ...newTransaction,
         amount: newTransaction.type === "expense" ? -Math.abs(amount) : Math.abs(amount),
@@ -126,7 +180,7 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
   );
 
   const handleAutoReconcileDifference = useCallback(
-    (difference) => {
+    (difference: number) => {
       if (difference > 0) {
         // Add difference to unassigned cash
         reconcileTransaction({
@@ -154,8 +208,8 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
     [reconcileTransaction]
   );
 
-  const getEnvelopeOptions = useCallback(() => {
-    const options = [
+  const getEnvelopeOptions = useCallback((): EnvelopeOption[] => {
+    const options: EnvelopeOption[] = [
       { id: "unassigned", name: "Unassigned Cash" },
       ...envelopes.map((env) => ({ id: env.id, name: env.name })),
       ...savingsGoals.map((goal) => ({
@@ -177,11 +231,16 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
  * Hook for payday prediction and related actions
  * Extracts payday prediction logic and navigation handlers
  */
-export const usePaydayManager = (paycheckHistory, setActiveView) => {
+export const usePaydayManager = (
+  paycheckHistory: unknown,
+  setActiveView: (view: string) => void
+) => {
   const paydayPrediction = useMemo(() => {
-    return paycheckHistory && paycheckHistory.length >= 2
-      ? predictNextPayday(paycheckHistory)
-      : null;
+    // Cast to compatible type with index signature for predictNextPayday
+    const history = paycheckHistory as
+      | Array<{ date: Date | string; [key: string]: unknown }>
+      | undefined;
+    return history && history.length >= 2 ? predictNextPayday(history) : null;
   }, [paycheckHistory]);
 
   const handleProcessPaycheck = useCallback(() => {
@@ -209,28 +268,31 @@ export const usePaydayManager = (paycheckHistory, setActiveView) => {
  * Provides utility functions for dashboard data rendering
  */
 export const useDashboardHelpers = () => {
-  const getRecentTransactions = useCallback((transactions = [], limit = 10) => {
-    return (transactions || []).slice(0, limit);
-  }, []);
+  const getRecentTransactions = useCallback(
+    (transactions: unknown[] = [], limit = 10): unknown[] => {
+      return (transactions || []).slice(0, limit);
+    },
+    []
+  );
 
-  const formatCurrency = useCallback((amount) => {
+  const formatCurrency = useCallback((amount: number): string => {
     return `$${Math.abs(amount || 0).toFixed(2)}`;
   }, []);
 
-  const getTransactionIcon = useCallback((amount) => {
+  const getTransactionIcon = useCallback((amount: number): string => {
     return amount > 0 ? "TrendingUp" : "TrendingDown";
   }, []);
 
-  const getTransactionColor = useCallback((amount) => {
+  const getTransactionColor = useCallback((amount: number): string => {
     return amount > 0 ? "text-green-600" : "text-red-600";
   }, []);
 
-  const getBalanceStatusColor = useCallback((isBalanced, difference) => {
+  const getBalanceStatusColor = useCallback((isBalanced: boolean, difference: number): string => {
     if (isBalanced) return "bg-green-50";
     return Math.abs(difference) > 10 ? "bg-red-50" : "bg-yellow-50";
   }, []);
 
-  const getBalanceStatusIcon = useCallback((isBalanced, difference) => {
+  const getBalanceStatusIcon = useCallback((isBalanced: boolean, difference: number): string => {
     if (isBalanced) return "CheckCircle";
     return Math.abs(difference) > 10 ? "AlertTriangle" : "AlertTriangle";
   }, []);
