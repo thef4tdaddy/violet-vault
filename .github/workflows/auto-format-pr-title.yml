@@ -2,7 +2,7 @@ name: Auto-Format PR Title (Commitlint)
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, ready_for_review]
 
 permissions:
   pull-requests: write
@@ -91,13 +91,14 @@ jobs:
               });
               
               // Leave a helpful comment
+              const eventType = context.payload.action === 'ready_for_review' ? 'marked ready for review' : 'opened';
               await github.rest.issues.createComment({
                 issue_number: pr.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: `🤖 **Auto-formatted PR title to follow conventional commits**\n\n**Before:** \`${currentTitle}\`\n**After:** \`${newTitle}\`\n\nThis helps maintain a clean git history. If this isn't quite right, feel free to edit the PR title! ✍️\n\n[Learn more about conventional commits](https://www.conventionalcommits.org/)`
+                body: `🤖 **Auto-formatted PR title to follow conventional commits**\n\n**Before:** \`${currentTitle}\`\n**After:** \`${newTitle}\`\n\nThis helps maintain a clean git history and ensures commitlint passes. If this isn't quite right, feel free to edit the PR title! ✍️\n\n[Learn more about conventional commits](https://www.conventionalcommits.org/)`
               });
               
-              console.log(`✅ Renamed PR from: "${currentTitle}" to: "${newTitle}"`);
+              console.log(`✅ Renamed PR (${eventType}) from: "${currentTitle}" to: "${newTitle}"`);
             }
 
