@@ -99,22 +99,22 @@ const getAllSecondaryActions = (state: FABState): FABAction[] => {
   return actions;
 };
 
+// Type for Immer set function
+type ImmerSet<T> = (fn: (state: T) => void) => void;
+
 /**
  * Create store actions object
  */
-const createStoreActions = (
-  set: (fn: (state: FABState) => void) => void,
-  _get: () => FABState
-) => ({
+const createStoreActions = (set: ImmerSet<FABState>, _get: () => FABState) => ({
   setCurrentScreen: (screenId: string) => {
-    set((state) => {
+    set((state: FABState) => {
       state.currentScreen = screenId;
       state.isExpanded = false;
     });
   },
 
   setVisibility: (visible: boolean) => {
-    set((state) => {
+    set((state: FABState) => {
       state.isVisible = visible;
       if (!visible) {
         state.isExpanded = false;
@@ -123,13 +123,13 @@ const createStoreActions = (
   },
 
   setExpanded: (expanded: boolean) => {
-    set((state) => {
+    set((state: FABState) => {
       state.isExpanded = expanded;
     });
   },
 
   toggleExpanded: () => {
-    set((state) => {
+    set((state: FABState) => {
       state.isExpanded = !state.isExpanded;
     });
   },
@@ -138,12 +138,9 @@ const createStoreActions = (
 /**
  * Create action management methods
  */
-const createActionManagement = (
-  set: (fn: (state: FABState) => void) => void,
-  _get: () => FABState
-) => ({
+const createActionManagement = (set: ImmerSet<FABState>, _get: () => FABState) => ({
   registerPrimaryAction: (screenId: string, action: FABAction) => {
-    set((state) => {
+    set((state: FABState) => {
       state.primaryActions.set(screenId, action);
     });
     logger.debug(`FAB: Registered primary action for ${screenId}`, {
@@ -152,7 +149,7 @@ const createActionManagement = (
   },
 
   unregisterPrimaryAction: (screenId: string) => {
-    set((state) => {
+    set((state: FABState) => {
       state.primaryActions.delete(screenId);
     });
     logger.debug(`FAB: Unregistered primary action for ${screenId}`);
@@ -167,7 +164,7 @@ const createActionManagement = (
       return;
     }
 
-    set((state) => {
+    set((state: FABState) => {
       state.secondaryActions.set(action.id, action);
     });
     logger.debug(`FAB: Registered secondary action ${action.id}`, {
@@ -176,14 +173,14 @@ const createActionManagement = (
   },
 
   unregisterSecondaryAction: (actionId: string) => {
-    set((state) => {
+    set((state: FABState) => {
       state.secondaryActions.delete(actionId);
     });
     logger.debug(`FAB: Unregistered secondary action ${actionId}`);
   },
 
   setDefaultActionHandler: (actionId: string, handler: () => void) => {
-    set((state) => {
+    set((state: FABState) => {
       if (state.defaultSecondaryActions[actionId]) {
         state.defaultSecondaryActions[actionId].action = handler;
       }
@@ -191,7 +188,7 @@ const createActionManagement = (
   },
 
   clearScreenActions: (screenId: string) => {
-    set((state) => {
+    set((state: FABState) => {
       state.primaryActions.delete(screenId);
     });
     logger.debug(`FAB: Cleared actions for ${screenId}`);
@@ -217,13 +214,10 @@ export const useFABStore = create<FABState>()(
   subscribeWithSelector(
     devtools(
       immer((set, get) => {
-        const storeActions = createStoreActions(
-          set as (fn: (state: FABState) => void) => void,
-          get
-        );
+        const storeActions = createStoreActions(set as ImmerSet<FABState>, get as () => FABState);
         const actionManagement = createActionManagement(
-          set as (fn: (state: FABState) => void) => void,
-          get
+          set as ImmerSet<FABState>,
+          get as () => FABState
         );
 
         return {
@@ -246,7 +240,14 @@ export const useFABStore = create<FABState>()(
           // Computed values are now accessed directly in selectors
 
           // Debug method
-          getDebugInfo: () => {
+          getDebugInfo: (): {
+            currentScreen: string;
+            isVisible: boolean;
+            isExpanded: boolean;
+            primaryActionsCount: number;
+            secondaryActionsCount: number;
+            defaultActionsWithHandlers: number;
+          } => {
             // Safe external store access (prevents React error #185)
             const state = useFABStore.getState();
             return {
@@ -280,12 +281,12 @@ export const useFABStore = create<FABState>()(
  * Hook for easy access to FAB store selectors
  */
 export const useFABSelectors = () => {
-  const currentScreen = useFABStore((state) => state.currentScreen);
-  const isVisible = useFABStore((state) => state.isVisible);
-  const isExpanded = useFABStore((state) => state.isExpanded);
-  const shouldShowFAB = useFABStore((state) => getShouldShowFAB(state));
-  const primaryAction = useFABStore((state) => getCurrentPrimaryAction(state));
-  const secondaryActions = useFABStore((state) => getAllSecondaryActions(state));
+  const currentScreen = useFABStore((state: FABState) => state.currentScreen);
+  const isVisible = useFABStore((state: FABState) => state.isVisible);
+  const isExpanded = useFABStore((state: FABState) => state.isExpanded);
+  const shouldShowFAB = useFABStore((state: FABState) => getShouldShowFAB(state));
+  const primaryAction = useFABStore((state: FABState) => getCurrentPrimaryAction(state));
+  const secondaryActions = useFABStore((state: FABState) => getAllSecondaryActions(state));
 
   return {
     currentScreen,
@@ -301,16 +302,18 @@ export const useFABSelectors = () => {
  * Hook for FAB actions
  */
 export const useFABActions = () => {
-  const setCurrentScreen = useFABStore((state) => state.setCurrentScreen);
-  const setVisibility = useFABStore((state) => state.setVisibility);
-  const setExpanded = useFABStore((state) => state.setExpanded);
-  const toggleExpanded = useFABStore((state) => state.toggleExpanded);
-  const registerPrimaryAction = useFABStore((state) => state.registerPrimaryAction);
-  const unregisterPrimaryAction = useFABStore((state) => state.unregisterPrimaryAction);
-  const registerSecondaryAction = useFABStore((state) => state.registerSecondaryAction);
-  const unregisterSecondaryAction = useFABStore((state) => state.unregisterSecondaryAction);
-  const setDefaultActionHandler = useFABStore((state) => state.setDefaultActionHandler);
-  const clearScreenActions = useFABStore((state) => state.clearScreenActions);
+  const setCurrentScreen = useFABStore((state: FABState) => state.setCurrentScreen);
+  const setVisibility = useFABStore((state: FABState) => state.setVisibility);
+  const setExpanded = useFABStore((state: FABState) => state.setExpanded);
+  const toggleExpanded = useFABStore((state: FABState) => state.toggleExpanded);
+  const registerPrimaryAction = useFABStore((state: FABState) => state.registerPrimaryAction);
+  const unregisterPrimaryAction = useFABStore((state: FABState) => state.unregisterPrimaryAction);
+  const registerSecondaryAction = useFABStore((state: FABState) => state.registerSecondaryAction);
+  const unregisterSecondaryAction = useFABStore(
+    (state: FABState) => state.unregisterSecondaryAction
+  );
+  const setDefaultActionHandler = useFABStore((state: FABState) => state.setDefaultActionHandler);
+  const clearScreenActions = useFABStore((state: FABState) => state.clearScreenActions);
 
   return {
     setCurrentScreen,

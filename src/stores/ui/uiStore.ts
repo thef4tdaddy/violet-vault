@@ -10,7 +10,21 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 /**
  * Transform old data format to new format
  */
-const transformOldData = (parsedOldData) => ({
+const transformOldData = (parsedOldData: {
+  state: {
+    envelopes?: unknown[];
+    bills?: unknown[];
+    transactions?: unknown[];
+    allTransactions?: unknown[];
+    savingsGoals?: unknown[];
+    supplementalAccounts?: unknown[];
+    debts?: unknown[];
+    unassignedCash?: number;
+    biweeklyAllocation?: number;
+    paycheckHistory?: unknown[];
+    actualBalance?: number;
+  };
+}) => ({
   state: {
     envelopes: parsedOldData.state.envelopes || [],
     bills: parsedOldData.state.bills || [],
@@ -27,20 +41,36 @@ const transformOldData = (parsedOldData) => ({
   version: 0,
 });
 
+// Import types from db for proper typing
+import type { Envelope, Bill, Transaction, SavingsGoal, Debt, PaycheckHistory } from "@/db/types";
+
 /**
  * Seed Dexie database with migrated data
  */
-const seedDexieWithMigratedData = async (transformedData) => {
-  await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
-  await budgetDb.bulkUpsertBills(transformedData.state.bills);
+const seedDexieWithMigratedData = async (transformedData: {
+  state: {
+    envelopes: unknown[];
+    bills: unknown[];
+    transactions: unknown[];
+    allTransactions: unknown[];
+    savingsGoals: unknown[];
+    debts: unknown[];
+    paycheckHistory: unknown[];
+    unassignedCash: number;
+    actualBalance: number;
+  };
+}) => {
+  // Type assertions for legacy migration data - this code runs once during migration
+  await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes as Envelope[]);
+  await budgetDb.bulkUpsertBills(transformedData.state.bills as Bill[]);
   await budgetDb.bulkUpsertTransactions(
-    transformedData.state.allTransactions.length > 0
+    (transformedData.state.allTransactions.length > 0
       ? transformedData.state.allTransactions
-      : transformedData.state.transactions
+      : transformedData.state.transactions) as Transaction[]
   );
-  await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
-  await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-  await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+  await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals as SavingsGoal[]);
+  await budgetDb.bulkUpsertDebts(transformedData.state.debts as Debt[]);
+  await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory as PaycheckHistory[]);
 
   await setBudgetMetadata({
     unassignedCash: transformedData.state.unassignedCash || 0,
@@ -78,7 +108,7 @@ const migrateOldData = async () => {
     });
   } catch (error) {
     logger.warn("Failed to migrate old data", {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       source: "migrateOldData",
     });
   }
@@ -90,9 +120,30 @@ import {
   createPatchNotesActions,
 } from "./uiStoreActions.ts";
 
+// UI Store State interface
+interface UIStoreState {
+  biweeklyAllocation: number;
+  isUnassignedCashModalOpen: boolean;
+  paycheckHistory: unknown[];
+  isActualBalanceManual: boolean;
+  isOnline: boolean;
+  dataLoaded: boolean;
+  cloudSyncEnabled: boolean;
+  updateAvailable: boolean;
+  isUpdating: boolean;
+  showInstallPrompt: boolean;
+  installPromptEvent: Event | null;
+  showPatchNotes: boolean;
+  patchNotesData: unknown;
+  loadingPatchNotes: boolean;
+}
+
+// Type for Immer set function
+type ImmerSet<T> = (fn: (state: T) => void) => void;
+
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (set, _get) => ({
+const storeInitializer = (set: ImmerSet<UIStoreState>, _get: () => UIStoreState) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -127,8 +178,8 @@ const storeInitializer = (set, _get) => ({
   ...createPatchNotesActions(set),
 
   // Load and show patch notes for version update
-  async loadPatchNotesForUpdate(fromVersion, toVersion) {
-    set((state) => {
+  async loadPatchNotesForUpdate(fromVersion: string, toVersion: string) {
+    set((state: UIStoreState) => {
       state.loadingPatchNotes = true;
     });
 
@@ -136,7 +187,7 @@ const storeInitializer = (set, _get) => ({
       const { default: patchNotesManager } = await import("../../utils/pwa/patchNotesManager");
       const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
 
-      set((state) => {
+      set((state: UIStoreState) => {
         state.loadingPatchNotes = false;
         state.showPatchNotes = true;
         state.patchNotesData = {
@@ -151,7 +202,7 @@ const storeInitializer = (set, _get) => ({
       return patchNotes;
     } catch (error) {
       logger.error("Failed to load patch notes", error);
-      set((state) => {
+      set((state: UIStoreState) => {
         state.loadingPatchNotes = false;
       });
       return null;
@@ -163,7 +214,9 @@ const storeInitializer = (set, _get) => ({
     try {
       await migrateOldData();
     } catch (error) {
-      logger.warn("Migration failed in store", { error: error.message });
+      logger.warn("Migration failed in store", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   },
 
@@ -212,7 +265,7 @@ const storeInitializer = (set, _get) => ({
   // Reset UI state only - data arrays handled by TanStack Query/Dexie
   resetAllData() {
     logger.info("Resetting UI state");
-    set((state) => {
+    set((state: UIStoreState) => {
       // Reset UI state
       state.biweeklyAllocation = 0;
       state.isActualBalanceManual = false;
@@ -241,7 +294,8 @@ const storeInitializer = (set, _get) => ({
 
 const base = subscribeWithSelector(immer(storeInitializer));
 
-let useUiStore;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let useUiStore: any;
 
 if (LOCAL_ONLY_MODE) {
   // No persistence when running in local-only mode
@@ -251,7 +305,7 @@ if (LOCAL_ONLY_MODE) {
     devtools(
       persist(base, {
         name: "violet-vault-ui-store",
-        partialize: (state) => ({
+        partialize: (state: UIStoreState) => ({
           // UI and app state only (data arrays handled by TanStack Query → Dexie)
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,

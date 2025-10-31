@@ -4,42 +4,61 @@
  */
 import logger from "../../utils/common/logger.ts";
 
+// Type for Immer set function used by Zustand
+type ImmerSet<T> = (fn: (state: T) => void) => void;
+
+// UI Store state interface (minimal - only what actions need)
+interface UIStoreState {
+  biweeklyAllocation: number;
+  isUnassignedCashModalOpen: boolean;
+  paycheckHistory: unknown[];
+  dataLoaded: boolean;
+  isOnline: boolean;
+  cloudSyncEnabled: boolean;
+  updateAvailable: boolean;
+  isUpdating: boolean;
+  showInstallPrompt: boolean;
+  installPromptEvent: Event | null;
+  showPatchNotes: boolean;
+  patchNotesData: unknown;
+}
+
 /**
  * Create basic state management actions
  */
-export const createBasicActions = (set) => ({
-  setBiweeklyAllocation: (amount) =>
-    set((state) => {
+export const createBasicActions = (set: ImmerSet<UIStoreState>) => ({
+  setBiweeklyAllocation: (amount: number) =>
+    set((state: UIStoreState) => {
       state.biweeklyAllocation = amount;
     }),
 
   openUnassignedCashModal: () =>
-    set((state) => {
+    set((state: UIStoreState) => {
       state.isUnassignedCashModalOpen = true;
     }),
 
   closeUnassignedCashModal: () =>
-    set((state) => {
+    set((state: UIStoreState) => {
       state.isUnassignedCashModalOpen = false;
     }),
 
-  setPaycheckHistory: (history) =>
-    set((state) => {
+  setPaycheckHistory: (history: unknown[]) =>
+    set((state: UIStoreState) => {
       state.paycheckHistory = history;
     }),
 
-  setDataLoaded: (loaded) =>
-    set((state) => {
+  setDataLoaded: (loaded: boolean) =>
+    set((state: UIStoreState) => {
       state.dataLoaded = loaded;
     }),
 
-  setOnlineStatus: (status) =>
-    set((state) => {
+  setOnlineStatus: (status: boolean) =>
+    set((state: UIStoreState) => {
       state.isOnline = status;
     }),
 
-  setCloudSyncEnabled(enabled) {
-    return set((state) => {
+  setCloudSyncEnabled(enabled: boolean) {
+    return set((state: UIStoreState) => {
       state.cloudSyncEnabled = enabled;
       logger.info(`Cloud sync ${enabled ? "enabled" : "disabled"}`, {
         cloudSyncEnabled: enabled,
@@ -51,32 +70,32 @@ export const createBasicActions = (set) => ({
 /**
  * Create PWA update management actions
  */
-export const createPWAUpdateActions = (set) => ({
-  setUpdateAvailable: (available) =>
-    set((state) => {
+export const createPWAUpdateActions = (set: ImmerSet<UIStoreState>) => ({
+  setUpdateAvailable: (available: boolean) =>
+    set((state: UIStoreState) => {
       state.updateAvailable = available;
       logger.info(`PWA update ${available ? "available" : "not available"}`, {
         updateAvailable: available,
       });
     }),
 
-  setIsUpdating: (updating) =>
-    set((state) => {
+  setIsUpdating: (updating: boolean) =>
+    set((state: UIStoreState) => {
       state.isUpdating = updating;
     }),
 
   showInstallModal: () =>
-    set((state) => {
+    set((state: UIStoreState) => {
       state.showInstallPrompt = true;
     }),
 
   hideInstallModal: () =>
-    set((state) => {
+    set((state: UIStoreState) => {
       state.showInstallPrompt = false;
     }),
 
-  setInstallPromptEvent: (event) =>
-    set((state) => {
+  setInstallPromptEvent: (event: Event | null) =>
+    set((state: UIStoreState) => {
       state.installPromptEvent = event;
     }),
 });
@@ -84,10 +103,10 @@ export const createPWAUpdateActions = (set) => ({
 /**
  * Create PWA update action
  */
-export const createUpdateAppAction = (set) => ({
+export const createUpdateAppAction = (set: ImmerSet<UIStoreState>) => ({
   async updateApp() {
     let shouldUpdate = false;
-    set((state) => {
+    set((state: UIStoreState) => {
       shouldUpdate = state.updateAvailable;
       if (shouldUpdate) {
         state.isUpdating = true;
@@ -97,7 +116,7 @@ export const createUpdateAppAction = (set) => ({
     if (!shouldUpdate) return;
 
     try {
-      set((state) => {
+      set((state: UIStoreState) => {
         state.updateAvailable = false;
         state.isUpdating = false;
       });
@@ -114,7 +133,7 @@ export const createUpdateAppAction = (set) => ({
       }
     } catch (error) {
       logger.error("Failed to update app", error);
-      set((state) => {
+      set((state: UIStoreState) => {
         state.isUpdating = false;
         state.updateAvailable = true;
       });
@@ -125,7 +144,7 @@ export const createUpdateAppAction = (set) => ({
 /**
  * Track analytics event in local storage
  */
-const trackAnalytics = (eventData) => {
+const trackAnalytics = (eventData: unknown) => {
   try {
     const existingAnalytics = JSON.parse(localStorage.getItem("pwa_analytics") || "[]");
     existingAnalytics.push(eventData);
@@ -135,16 +154,29 @@ const trackAnalytics = (eventData) => {
   }
 };
 
+// Type for install prompt event
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<{ outcome: string }>;
+}
+
+// Type for store with getState method
+interface StoreWithGetState<T> {
+  getState: () => T;
+}
+
 /**
  * Create PWA install action
  */
-export const createInstallAppAction = (set, useUiStore) => ({
+export const createInstallAppAction = (
+  set: ImmerSet<UIStoreState>,
+  useUiStore: StoreWithGetState<UIStoreState>
+) => ({
   async installApp() {
     const state = useUiStore.getState();
     if (!state.installPromptEvent) return false;
 
     try {
-      const promptEvent = state.installPromptEvent;
+      const promptEvent = state.installPromptEvent as BeforeInstallPromptEvent;
       const result = await promptEvent.prompt();
 
       logger.info("PWA install prompt result", { outcome: result.outcome });
@@ -160,7 +192,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
       trackAnalytics(analytics);
       logger.info("PWA install choice tracked", analytics);
 
-      set((state) => {
+      set((state: UIStoreState) => {
         state.installPromptEvent = null;
         state.showInstallPrompt = false;
       });
@@ -186,7 +218,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
     }
 
     try {
-      const promptEvent = state.installPromptEvent;
+      const promptEvent = state.installPromptEvent as BeforeInstallPromptEvent;
       const result = await promptEvent.prompt();
 
       logger.info("Manual PWA install result", { outcome: result.outcome });
@@ -201,7 +233,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
 
       trackAnalytics(analytics);
 
-      set((state) => {
+      set((state: UIStoreState) => {
         state.installPromptEvent = null;
         state.showInstallPrompt = false;
       });
@@ -227,7 +259,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
     localStorage.setItem("pwa_install_last_dismissed", now.toString());
     logger.info("PWA install prompt dismissed", analytics);
 
-    set((state) => {
+    set((state: UIStoreState) => {
       state.showInstallPrompt = false;
     });
   },
@@ -236,18 +268,18 @@ export const createInstallAppAction = (set, useUiStore) => ({
 /**
  * Create patch notes management actions
  */
-export const createPatchNotesActions = (set) => ({
-  showPatchNotesModal: (patchNotesData) =>
-    set((state) => {
+export const createPatchNotesActions = (set: ImmerSet<UIStoreState>) => ({
+  showPatchNotesModal: (patchNotesData: unknown) =>
+    set((state: UIStoreState) => {
       state.showPatchNotes = true;
       state.patchNotesData = patchNotesData;
       logger.info("Showing patch notes modal", {
-        version: patchNotesData?.version,
+        version: (patchNotesData as { version?: string })?.version,
       });
     }),
 
   hidePatchNotesModal: () =>
-    set((state) => {
+    set((state: UIStoreState) => {
       state.showPatchNotes = false;
       state.patchNotesData = null;
     }),
