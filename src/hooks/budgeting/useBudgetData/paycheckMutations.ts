@@ -17,7 +17,7 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
     mutationFn: async (paycheckData) => {
       return await processPaycheck(paycheckData, envelopesQuery, savingsGoalsQuery);
     },
-    onSuccess: (result, variables) => {
+    onSuccess: (_, variables) => {
       // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -28,9 +28,7 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
       logger.info("✅ Paycheck processed", {
         amount: variables.amount,
         payerName: variables.payerName,
-        allocationMode: variables.mode,
-        allocatedToEnvelopes: result?.allocations?.length || 0,
-        totalAllocated: result?.totalAllocated || 0,
+        allocationMode: variables.mode || "allocate",
       });
     },
     onError: (error) => {

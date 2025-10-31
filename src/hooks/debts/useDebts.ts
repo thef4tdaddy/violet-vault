@@ -202,15 +202,11 @@ const useDebts = () => {
   const recordPaymentMutation = useMutation({
     mutationKey: ["debts", "recordPayment"],
     mutationFn: recordPaymentInDb,
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
       
       // Log successful debt payment
-      logger.info("✅ Debt payment recorded", {
-        debtId: variables.debtId,
-        paymentAmount: variables.paymentAmount,
-        newBalance: variables.newBalance,
-      });
+      logger.info("✅ Debt payment recorded");
     },
   });
 

@@ -82,6 +82,7 @@ export const useDeleteEnvelope = () => {
 
       return {
         envelopeId,
+        envelopeName: envelope?.name || "Unknown",
         deleteBillsToo,
         transferredAmount: envelope?.currentBalance || 0,
       };

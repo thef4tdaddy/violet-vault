@@ -240,8 +240,12 @@ const useUnassignedCashDistribution = () => {
       }
 
       // Log successful distribution
+      const totalDistributed = Object.values(distributions).reduce(
+        (sum: number, amt: unknown) => sum + (parseFloat(String(amt)) || 0),
+        0
+      );
       logger.info("✅ Unassigned cash distributed", {
-        totalDistributed: Object.values(distributions).reduce((sum, amt) => sum + (parseFloat(String(amt)) || 0), 0),
+        totalDistributed,
         envelopesUpdated: envelopeUpdates.length,
         remainingUnassigned: remainingCash,
       });

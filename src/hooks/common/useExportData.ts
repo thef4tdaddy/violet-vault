@@ -94,7 +94,6 @@ export const useExportData = () => {
         transactions: counts.transactions,
         bills: counts.bills,
         debts: counts.debts,
-        savingsGoals: counts.savingsGoals,
         fileSizeKB: counts.fileSizeKB,
       });
 
