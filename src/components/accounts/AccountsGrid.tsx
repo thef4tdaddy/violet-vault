@@ -7,6 +7,12 @@ import {
   getExpirationStatus,
 } from "@/utils/accounts";
 
+interface AccountTypeInfo {
+  value: string;
+  label: string;
+  icon: string;
+}
+
 interface Account {
   id: string | number;
   name: string;
@@ -31,6 +37,12 @@ interface AccountsGridProps {
   onStartTransfer: (account: Account) => void;
 }
 
+const DEFAULT_TYPE_INFO: AccountTypeInfo = {
+  value: "Other",
+  label: "Other",
+  icon: "💳",
+};
+
 const AccountsGrid = ({
   accounts,
   showBalances,
@@ -52,11 +64,7 @@ const AccountsGrid = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts.map((account) => {
-        const typeInfo = getAccountTypeInfo(account.type) || {
-          value: "Other",
-          label: "Other",
-          icon: "💳",
-        };
+        const typeInfo = getAccountTypeInfo(account.type) || DEFAULT_TYPE_INFO;
         const daysUntilExpiration = calculateDaysUntilExpiration(account.expirationDate);
         const expirationStatus = getExpirationStatus(daysUntilExpiration);
 
