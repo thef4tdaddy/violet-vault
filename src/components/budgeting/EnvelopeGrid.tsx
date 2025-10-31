@@ -188,9 +188,12 @@ const useEnvelopeUIState = (
   const handleQuickFundConfirm = async (envelopeId: string, amount: number) => {
     try {
       const currentAllocated = envelopeData.find((env) => env.id === envelopeId)?.allocated || 0;
+      const updates: Partial<Envelope> = { 
+        allocated: currentAllocated + amount 
+      };
       await updateEnvelope({
         envelopeId,
-        updates: { allocated: currentAllocated + amount } as Partial<Envelope>,
+        updates,
       });
       logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
     } catch (error) {

@@ -9,6 +9,7 @@ interface AllocationPreview {
   mode: string;
   allocations: Record<string, number>;
   unassignedCashAmount: number;
+  leftoverAmount: number;
   debugInfo?: {
     totalEnvelopes: number;
     autoAllocateEnvelopes: number;
@@ -129,7 +130,7 @@ const EnvelopeAllocations = ({ preview, envelopes }: { preview: AllocationPrevie
 /**
  * Unassigned cash display section
  */
-const UnassignedCashDisplay = ({ preview }: { preview: AllocationPreview & { leftoverAmount: number } }) => (
+const UnassignedCashDisplay = ({ preview }: { preview: AllocationPreview }) => (
   <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl p-6 text-white">
     <div className="flex justify-between items-center">
       <div>

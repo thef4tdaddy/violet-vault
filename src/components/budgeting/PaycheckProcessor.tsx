@@ -105,10 +105,32 @@ const PaycheckHeader = () => (
   </h2>
 );
 
+// PaycheckForm hook return type
+interface PaycheckFormHook {
+  paycheckAmount: string;
+  setPaycheckAmount: (amount: string) => void;
+  payerName: string;
+  uniquePayers: string[];
+  showAddNewPayer: boolean;
+  newPayerName: string;
+  isProcessing: boolean;
+  handlePayerChange: (name: string) => void;
+  setNewPayerName: (name: string) => void;
+  handleAddNewPayer: () => void;
+  setShowAddNewPayer: (show: boolean) => void;
+  getPayerPrediction: (payer: string) => { average: number; mostRecent: number; count: number } | null;
+  allocationMode: string;
+  setAllocationMode: (mode: string) => void;
+  canSubmit: boolean;
+  showPreview: boolean;
+  setShowPreview: (show: boolean) => void;
+  handleProcessPaycheck: () => void;
+}
+
 /**
  * Main paycheck form component
  */
-const PaycheckForm = ({ formHook }: { formHook: ReturnType<typeof usePaycheckForm> }) => (
+const PaycheckForm = ({ formHook }: { formHook: PaycheckFormHook }) => (
   <div className="space-y-6">
     <PaycheckAmountInput
       value={formHook.paycheckAmount}
@@ -142,7 +164,7 @@ const PaycheckForm = ({ formHook }: { formHook: ReturnType<typeof usePaycheckFor
 /**
  * Form action buttons component
  */
-const PaycheckFormButtons = ({ formHook }: { formHook: ReturnType<typeof usePaycheckForm> }) => (
+const PaycheckFormButtons = ({ formHook }: { formHook: PaycheckFormHook }) => (
   <div className="flex gap-4">
     <Button
       onClick={() => formHook.setShowPreview(true)}
