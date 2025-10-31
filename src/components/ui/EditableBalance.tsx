@@ -266,7 +266,7 @@ const EditableBalance = ({
 
   const handleSave = () => {
     const newValue = parseFloat(editValue) || 0;
-    const currentValue = parseFloat(value) || 0;
+    const currentValue = typeof value === "number" ? value : parseFloat(String(value)) || 0;
     const changeMagnitude = Math.abs(newValue - currentValue);
 
     if (changeMagnitude >= confirmThreshold) {

@@ -235,7 +235,10 @@ export const UniversalConnectionManager = ({
   theme = "purple",
   showSelector = true,
 }: UniversalConnectionManagerProps) => {
-  const managerProps = useConnectionManager(entityType, entityId);
+  const managerProps = useConnectionManager(
+    entityType as "bill" | "envelope" | "debt",
+    entityId
+  ) as unknown as ConnectionManagerProps;
   const config = managerProps.getConnectionConfig();
 
   return (
@@ -275,7 +278,7 @@ interface ExistingConnectionsProps {
   entityType: string;
   theme: ThemeName;
   canEdit: boolean;
-  connections: Connection[];
+  connections: Connection[] | unknown[];
   onDisconnect?: () => void;
 }
 
@@ -294,7 +297,7 @@ const ExistingConnections = ({
     onDisconnect={canEdit ? onDisconnect : undefined}
   >
     <div className="space-y-2">
-      {connections.map((connection: Connection) => (
+      {(connections as Connection[]).map((connection: Connection) => (
         <ConnectionItem
           key={connection.id}
           icon={getIcon("CheckCircle")}
@@ -309,8 +312,8 @@ const ExistingConnections = ({
 );
 
 interface ConnectionManagerProps {
-  currentConnections: Connection[];
-  availableOptions: Connection[];
+  currentConnections: Connection[] | unknown[];
+  availableOptions: Connection[] | unknown[];
   selectedConnectionId: string | null;
   hasConnections: boolean;
   hasAvailableOptions: boolean;
@@ -364,7 +367,7 @@ const ConnectionDropdown = ({ config, canEdit, managerProps }: ConnectionDropdow
         ? config.selectPrompt
         : `No ${config.connectionType}s available`,
     },
-    ...managerProps.availableOptions.map((option: Connection) => ({
+    ...(managerProps.availableOptions as Connection[]).map((option: Connection) => ({
       value: option.id,
       label: `${option.name || option.provider} - $${parseFloat(String(option.amount || 0)).toFixed(2)} (${option.frequency || "monthly"})`,
     })),
