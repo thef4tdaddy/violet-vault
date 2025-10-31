@@ -419,9 +419,10 @@ class CloudSyncService {
     if (!this.config || !this.config.currentUser) return;
 
     try {
+      const currentUser = this.config.currentUser;
       const activityData = {
         lastActive: new Date().toISOString(),
-        userName: this.config.currentUser?.userName,
+        userName: typeof currentUser === "object" ? currentUser.userName : undefined,
         // Add more metadata if needed
       };
       // This would be a call to a Firebase function or Firestore directly
@@ -647,6 +648,12 @@ class CloudSyncService {
    */
   isSharedBudgetUser(): boolean {
     const currentUser = this.config?.currentUser;
+
+    // If currentUser is a string, it's not a shared user
+    if (typeof currentUser === "string") {
+      return false;
+    }
+
     logger.debug("🔍 [SYNC] Checking if shared budget user", {
       hasConfig: !!this.config,
       hasCurrentUser: !!currentUser,
