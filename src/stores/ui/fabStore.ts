@@ -160,7 +160,7 @@ const createActionManagement = (
 
   registerSecondaryAction: (action: FABAction) => {
     if (!action.id) {
-      logger.warn("FAB: Secondary action must have an id", action);
+      logger.warn("FAB: Secondary action must have an id", { actionId: action.id, actionLabel: action.label });
       return;
     }
 

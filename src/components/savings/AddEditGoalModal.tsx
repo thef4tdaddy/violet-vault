@@ -2,12 +2,12 @@
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 import {
   SAVINGS_CATEGORIES,
   SAVINGS_PRIORITIES,
   SAVINGS_COLORS,
-} from "../../utils/savings/savingsFormUtils";
+} from "@/utils/savings/savingsFormUtils";
 
 const getInitialFormData = () => ({
   name: "",
@@ -181,7 +181,7 @@ const GoalFormFields = ({ formData, updateFormField }) => (
         value={formData.description}
         onChange={(e) => updateFormField("description", e.target.value)}
         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-        rows="3"
+        rows={3}
         placeholder="Add any additional details about this savings goal..."
       />
     </div>

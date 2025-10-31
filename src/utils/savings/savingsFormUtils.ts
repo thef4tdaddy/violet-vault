@@ -1,5 +1,9 @@
 // Savings Goal Form Utilities - Constants and validation for savings goals
 import logger from "@/utils/common/logger";
+import {
+  validateSavingsGoalFormSafe,
+  type SavingsGoalFormData,
+} from "@/domain/schemas/savings-goal";
 
 // Savings goal categories
 export const SAVINGS_CATEGORIES = [
@@ -66,111 +70,19 @@ export const getDefaultSavingsGoalFormData = (editingGoal = null) => {
 };
 
 /**
- * Validate required fields
+ * Validate savings goal form data using Zod schema
+ * @returns Array of error messages (empty if valid)
  */
-const validateRequiredFieldsSavings = (formData, errors) => {
-  if (!formData.name?.trim()) {
-    errors.push("Goal name is required");
+export const validateSavingsGoalForm = (formData: unknown): string[] => {
+  const result = validateSavingsGoalFormSafe(formData);
+
+  if (result.success) {
+    return [];
   }
 
-  if (
-    !formData.targetAmount ||
-    isNaN(parseFloat(formData.targetAmount)) ||
-    parseFloat(formData.targetAmount) <= 0
-  ) {
-    errors.push("Valid target amount is required");
-  }
+  // Extract error messages from Zod validation errors
+  return result.error?.issues.map((err) => err.message) || [];
 };
-
-/**
- * Validate amount fields
- */
-const validateAmountFields = (formData, errors) => {
-  const currentAmount = parseFloat(formData.currentAmount) || 0;
-  const targetAmount = parseFloat(formData.targetAmount) || 0;
-
-  if (currentAmount < 0) {
-    errors.push("Current amount cannot be negative");
-  }
-
-  if (currentAmount > targetAmount) {
-    errors.push("Current amount cannot exceed target amount");
-  }
-};
-
-/**
- * Validate date field
- */
-const validateDateField = (formData, errors) => {
-  if (!formData.targetDate) return;
-
-  const targetDate = new Date(formData.targetDate);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  if (isNaN(targetDate.getTime())) {
-    errors.push("Invalid target date");
-  } else if (targetDate < today) {
-    errors.push("Target date cannot be in the past");
-  }
-};
-
-/**
- * Validate category and priority
- */
-const validateCategoryAndPriority = (formData, errors) => {
-  if (!SAVINGS_CATEGORIES.includes(formData.category)) {
-    errors.push("Invalid category selected");
-  }
-
-  const validPriorities = SAVINGS_PRIORITIES.map((p) => p.value);
-  if (!validPriorities.includes(formData.priority)) {
-    errors.push("Invalid priority level");
-  }
-};
-
-/**
- * Validate text fields and formatting
- */
-const validateTextFields = (formData, errors) => {
-  if (formData.color && !/^#[0-9A-F]{6}$/i.test(formData.color)) {
-    errors.push("Invalid color format");
-  }
-
-  if (formData.name && formData.name.length > 100) {
-    errors.push("Goal name cannot exceed 100 characters");
-  }
-
-  if (formData.description && formData.description.length > 500) {
-    errors.push("Description cannot exceed 500 characters");
-  }
-};
-
-/**
- * Validate savings goal form data
- */
-export const validateSavingsGoalForm = (formData) => {
-  const errors = [];
-
-  validateRequiredFieldsSavings(formData, errors);
-  validateAmountFields(formData, errors);
-  validateDateField(formData, errors);
-  validateCategoryAndPriority(formData, errors);
-  validateTextFields(formData, errors);
-
-  return errors;
-};
-
-interface SavingsGoalFormData {
-  name: string;
-  targetAmount: string | number;
-  currentAmount: string | number;
-  targetDate?: string | null;
-  category: string;
-  color: string;
-  description?: string;
-  priority: string;
-}
 
 interface SavingsGoalData {
   id: string;
@@ -196,24 +108,26 @@ export const processSavingsGoalFormData = (
   formData: SavingsGoalFormData,
   editingGoal: SavingsGoalData | null = null
 ): SavingsGoalData => {
-  const validation = validateSavingsGoalForm(formData);
-  if (validation.length > 0) {
-    throw new Error(`Validation failed: ${validation.join(", ")}`);
+  // Parse and validate with Zod schema
+  const result = validateSavingsGoalFormSafe(formData);
+  if (!result.success) {
+    throw new Error(`Validation failed: ${result.error.issues.map((e) => e.message).join(", ")}`);
   }
 
-  const targetAmount = parseFloat(formData.targetAmount.toString());
-  const currentAmount = parseFloat(formData.currentAmount.toString()) || 0;
+  const validatedData = result.data;
+  const targetAmount = parseFloat(validatedData.targetAmount);
+  const currentAmount = parseFloat(validatedData.currentAmount);
 
   const goalData: SavingsGoalData = {
     id: editingGoal?.id || `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: formData.name.trim(),
+    name: validatedData.name,
     targetAmount,
     currentAmount,
-    targetDate: formData.targetDate || null,
-    category: formData.category,
-    color: formData.color,
-    description: formData.description?.trim() || "",
-    priority: formData.priority,
+    targetDate: validatedData.targetDate || null,
+    category: validatedData.category,
+    color: validatedData.color,
+    description: validatedData.description || "",
+    priority: validatedData.priority,
     createdAt: editingGoal?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

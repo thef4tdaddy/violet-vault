@@ -16,12 +16,8 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
     isSubmitting,
     isEditMode,
     editLock,
-    envelopes,
     bills,
     billsLoading,
-    connectionData,
-    shouldShowExistingConnections,
-    debtMetrics,
     canEdit,
     handleFormSubmit,
     handleClose,
@@ -70,13 +66,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
           isEditMode={isEditMode}
           isSubmitting={isSubmitting}
           handleFormSubmit={handleFormSubmit}
-          onClose={handleClose}
-          envelopes={envelopes}
+          onClose={onClose}
           bills={bills}
           billsLoading={billsLoading}
-          connectionData={connectionData}
-          shouldShowExistingConnections={shouldShowExistingConnections}
-          debtMetrics={debtMetrics}
         />
       </div>
     </div>

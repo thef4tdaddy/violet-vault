@@ -6,7 +6,6 @@
  */
 
 import { budgetDb } from "../../db/budgetDb";
-import type { Transaction } from "../../types/finance";
 import logger from "../common/logger";
 
 // Default archiving configuration
@@ -442,7 +441,23 @@ export class TransactionArchiver {
 
     // Restore transactions to active storage
     for (const transaction of archiveValue.transactions) {
-      await budgetDb.transactions.put(transaction as unknown as Transaction);
+      const transactionWithTimestamp: unknown = {
+        id: String(transaction.id || Date.now()),
+        date:
+          transaction.date instanceof Date
+            ? transaction.date
+            : new Date(transaction.date as string),
+        amount: Number(transaction.amount || 0),
+        envelopeId: String(transaction.envelopeId || ""),
+        category: String(transaction.category || "other"),
+        type: (transaction.type as "income" | "expense" | "transfer") || "expense",
+        lastModified: Date.now(),
+        createdAt: transaction.createdAt ? Number(transaction.createdAt) : Date.now(),
+        description: transaction.description as string | undefined,
+        merchant: transaction.merchant as string | undefined,
+        receiptUrl: transaction.receiptUrl as string | undefined,
+      };
+      await budgetDb.transactions.put(transactionWithTimestamp as never);
     }
 
     logger.info(

@@ -8,7 +8,12 @@ import { useShallow } from "zustand/react/shallow";
 import type {
   UseAutoFundingRulesReturn,
   UseAutoFundingHistoryReturn,
+  UseAutoFundingDataReturn,
+  UseAutoFundingExecutionReturn,
+  BudgetContext,
+  ExecutionResult,
 } from "@/hooks/budgeting/autofunding/types";
+import type { Transaction, Envelope } from "@/types/finance";
 import {
   isLikelyIncome,
   handleIncomeDetection,
@@ -27,22 +32,24 @@ import logger from "@/utils/common/logger";
  * Refactored from original useAutoFunding.js for Issue #506 - Logic ↔ UI separation
  */
 export const useAutoFunding = () => {
+  type BudgetSelector = {
+    envelopes?: Envelope[];
+    unassignedCash?: number;
+    allTransactions?: Transaction[];
+  };
+
   const budget = useBudgetStore(
-    useShallow((state) => ({
+    useShallow((state: BudgetSelector) => ({
       envelopes: state.envelopes,
       unassignedCash: state.unassignedCash,
       allTransactions: state.allTransactions,
     }))
-  ) as {
-    envelopes: unknown[];
-    unassignedCash: number;
-    allTransactions: unknown[];
-  };
+  ) as BudgetContext;
 
   // Initialize individual hooks
-  const dataHook = useAutoFundingData();
+  const dataHook = useAutoFundingData() as UseAutoFundingDataReturn;
   const rulesHook = useAutoFundingRules([]) as unknown as UseAutoFundingRulesReturn;
-  const executionHook = useAutoFundingExecution();
+  const executionHook = useAutoFundingExecution() as unknown as UseAutoFundingExecutionReturn;
   const historyHook = useAutoFundingHistory([], []) as unknown as UseAutoFundingHistoryReturn;
 
   // Initialize the complete auto-funding system
@@ -56,14 +63,13 @@ export const useAutoFunding = () => {
   useEffect(() => {
     if (dataHook.isInitialized && dataHook.hasUnsavedChanges) {
       const currentData = getCurrentDataForSave(rulesHook, historyHook);
-      const cleanup = dataHook.enableAutoSave(currentData, 30000);
-      return cleanup;
+      return dataHook.enableAutoSave(currentData, 30000);
     }
   }, [dataHook.isInitialized, dataHook.hasUnsavedChanges, dataHook, rulesHook, historyHook]);
 
   // Enhanced rule execution with history tracking
   const executeRules = useCallback(
-    (trigger?: string, triggerData?: Record<string, unknown>) => {
+    (trigger: string, triggerData?: Record<string, unknown>): Promise<ExecutionResult> => {
       const executeFunction = createExecuteRules(rulesHook, executionHook, historyHook, dataHook);
       return executeFunction(trigger, triggerData);
     },
@@ -72,7 +78,7 @@ export const useAutoFunding = () => {
 
   // Handle transaction-based auto-funding triggers
   const handleTransactionAdded = useCallback(
-    async (transaction) => {
+    async (transaction: Transaction) => {
       if (!dataHook.isInitialized || executionHook.isExecuting) {
         return;
       }

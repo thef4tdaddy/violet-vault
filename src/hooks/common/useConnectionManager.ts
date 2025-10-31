@@ -106,7 +106,7 @@ const useConnectionManager = (entityType: EntityType, entityId: string) => {
         entityId,
         billId: targetId,
         bills: bills as unknown as Bill[],
-        currentEntity: currentEntity as Envelope | Bill | Debt,
+        currentEntity: currentEntity as unknown as import("@/db/types").Envelope,
         updateEnvelope: updateEnvelope as unknown as (
           id: string,
           updates: unknown

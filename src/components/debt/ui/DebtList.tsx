@@ -23,7 +23,7 @@ interface DebtListProps {
  * List of debts with summary information
  * Pure UI component for displaying debt cards
  */
-const DebtList = ({ debts, onDebtClick, _onRecordPayment }: DebtListProps) => {
+const DebtList = ({ debts, onDebtClick }: DebtListProps) => {
   return (
     <div className="divide-y divide-gray-100">
       {debts.map((debt) => (

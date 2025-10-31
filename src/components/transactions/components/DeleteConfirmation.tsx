@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 
 /**
  * Inline delete confirmation component
@@ -17,7 +17,7 @@ const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) =>
         transform: `translateY(${virtualRow.start}px)`,
       }}
     >
-      <td colSpan="6" className="px-4 py-4">
+      <td colSpan={6} className="px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center text-red-700">
             {React.createElement(getIcon("AlertTriangle"), {

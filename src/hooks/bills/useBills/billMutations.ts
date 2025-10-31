@@ -220,7 +220,7 @@ export const useDeleteBillMutation = () => {
       // Delete from Dexie (optimistic update handled by React Query)
       await budgetDb.bills.delete(billId);
 
-      logger.debug("✅ Deleted bill:", billId);
+      logger.debug("✅ Deleted bill:", { billId });
 
       return billId;
     },

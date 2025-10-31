@@ -1,8 +1,45 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 import { formatPaycheckAmount } from "../../../utils/budgeting/paycheckUtils";
+import { Button } from "@/components/ui";
 
-const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck = () => {} }) => {
+interface PaycheckHistoryItem {
+  id: string;
+  payerName?: string;
+  allocationMode?: string;
+  amount?: number;
+  processedAt?: string;
+  processedBy?: string;
+  totalAllocated?: number;
+  remainingAmount?: number;
+  allocations?: { envelopeName: string }[];
+}
+
+interface PaycheckStats {
+  count?: number;
+  averageAmount?: number;
+  totalAmount?: number;
+  minAmount?: number;
+  maxAmount?: number;
+}
+
+const PaycheckHistory = ({
+  paycheckHistory = [],
+  paycheckStats,
+  onSelectPaycheck,
+  onDeletePaycheck,
+  deletingPaycheckId,
+}: {
+  paycheckHistory?: PaycheckHistoryItem[];
+  paycheckStats?: PaycheckStats | null;
+  onSelectPaycheck?: (paycheck: PaycheckHistoryItem) => void;
+  onDeletePaycheck?: (paycheck: PaycheckHistoryItem) => Promise<void> | void;
+  deletingPaycheckId?: string | number | null;
+}) => {
+  const handleSelect = (p: PaycheckHistoryItem) => {
+    if (onSelectPaycheck) onSelectPaycheck(p);
+  };
+
   if (paycheckHistory.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
@@ -89,8 +126,7 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
           {paycheckHistory.slice(0, 10).map((paycheck) => (
             <div
               key={paycheck.id}
-              onClick={() => onSelectPaycheck(paycheck)}
-              className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 hover:border-gray-300 transition-all"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center">
@@ -145,6 +181,29 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
                   </div>
                 </div>
               )}
+
+              <div className="mt-3 flex justify-end">
+                {onSelectPaycheck && (
+                  <Button
+                    type="button"
+                    onClick={() => handleSelect(paycheck)}
+                    className="mr-3 text-sm text-blue-600 hover:underline"
+                  >
+                    View
+                  </Button>
+                )}
+
+                {onDeletePaycheck && (
+                  <Button
+                    type="button"
+                    onClick={() => onDeletePaycheck(paycheck)}
+                    disabled={deletingPaycheckId === paycheck.id}
+                    className="text-sm text-red-600 disabled:opacity-60"
+                  >
+                    {deletingPaycheckId === paycheck.id ? "Deleting..." : "Delete"}
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>

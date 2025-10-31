@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { shouldRuleExecute } from "@/utils/budgeting/autofunding/conditions";
+import {
+  shouldRuleExecute,
+  type Rule,
+  type ExecutionContext,
+} from "@/utils/budgeting/autofunding/conditions";
 import logger from "@/utils/common/logger";
-
-interface Rule {
-  [key: string]: unknown;
-}
 
 interface UseExecutableRulesProps {
   rules: Rule[];
@@ -16,7 +16,7 @@ interface UseExecutableRulesProps {
 export const useExecutableRules = ({ rules }: UseExecutableRulesProps) => {
   // Get executable rules for a given context
   const getExecutableRules = useCallback(
-    (context: Record<string, unknown>) => {
+    (context: ExecutionContext) => {
       try {
         return rules.filter((rule) => shouldRuleExecute(rule, context));
       } catch (error) {

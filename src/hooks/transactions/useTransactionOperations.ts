@@ -33,24 +33,49 @@ const useTransactionOperations = (options: UseTransactionOperationsOptions = {})
   const { categoryRules = [] } = options;
 
   // Create mutation configurations
-  const addTransactionMutation = useMutation({
+  const addTransactionMutation = useMutation<{ id: string }, Error, Partial<Transaction>>({
     ...createAddTransactionMutationConfig(queryClient, categoryRules),
   });
-  const updateTransactionMutation = useMutation({
-    ...createUpdateTransactionMutationConfig(queryClient),
-  });
-  const deleteTransactionMutation = useMutation({
+
+  const updateTransactionMutation = useMutation<unknown, Error, { id: string; updates: Partial<Transaction> }>(
+    {
+      ...createUpdateTransactionMutationConfig(queryClient),
+    }
+  );
+
+  const deleteTransactionMutation = useMutation<{ id: string }, Error, string>({
     ...createDeleteTransactionMutationConfig(queryClient),
   });
-  const splitTransactionMutation = useMutation({
+
+  const splitTransactionMutation = useMutation<
+    { originalTransaction: { id: string }; splitTransactions: unknown[] },
+    Error,
+    { originalTransaction: Transaction; splitTransactions: Partial<Transaction>[] }
+  >({
     ...createSplitTransactionMutationConfig(queryClient),
   });
-  const transferFundsMutation = useMutation({
+
+  type TransferVars = {
+    fromEnvelopeId: string | number;
+    toEnvelopeId: string | number;
+    amount: number;
+    date: string;
+    description?: string;
+  };
+
+  const transferFundsMutation = useMutation<
+    { outgoing: unknown; incoming: unknown; transferId?: unknown },
+    Error,
+    TransferVars
+  >({
     ...createTransferFundsMutationConfig(queryClient),
   });
-  const bulkOperationMutation = useMutation({
-    ...createBulkOperationMutationConfig(queryClient, categoryRules),
-  });
+
+  const bulkOperationMutation = useMutation<unknown[], Error, { operation: string; transactions: Transaction[]; updates?: Partial<Transaction> }>(
+    {
+      ...createBulkOperationMutationConfig(queryClient, categoryRules),
+    }
+  );
 
   // Convenience methods
   const addTransaction = useCallback(

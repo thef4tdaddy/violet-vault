@@ -1,38 +1,56 @@
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import React from "react";
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps } from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
 // Default label formatter for pie chart
-const defaultLabelFormatter = ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`;
-
-// Helper to calculate total from data
-const calculateTotal = (chartData, dataKey) => {
-  return chartData
-    .filter((item) => item != null)
-    .reduce((sum, item) => sum + (item[dataKey] || 0), 0);
+const defaultLabelFormatter = (props: PieLabelRenderProps): React.ReactNode => {
+  const name = (props.name ?? "") as string;
+  const percent = (props.percent ?? 0) as number;
+  return `${name} ${(percent * 100).toFixed(0)}%`;
 };
 
-// Helper to calculate percentage
-const calculatePercentage = (value, total) => {
-  return total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+// Helper to calculate total from data
+const calculateTotal = (chartData: Array<Record<string, unknown>>, dataKey: string): number => {
+  return chartData
+    .filter((item) => item != null)
+    .reduce((sum, item) => sum + Number((item as Record<string, unknown>)[dataKey] ?? 0), 0);
+};
+
+// Helper to calculate percentage (returns number)
+const calculatePercentage = (value: number, total: number): number => {
+  return total > 0 ? (value / total) * 100 : 0;
 };
 
 // Helper to enhance data with percentages and colors
-const enhanceChartData = (chartData, dataKey, total, chartColors) => {
+const enhanceChartData = (
+  chartData: Array<Record<string, unknown>>,
+  dataKey: string,
+  total: number,
+  chartColors: string[]
+) => {
   return chartData
     .filter((item) => item != null)
-    .map((item, index) => ({
-      ...item,
-      percentage: calculatePercentage(item[dataKey] || 0, total),
-      color: item.color || chartColors[index % chartColors.length],
-    }));
+    .map((item, index) => {
+      const value = Number((item as Record<string, unknown>)[dataKey] ?? 0);
+      const color = ((item as Record<string, unknown>).color as string | undefined) || chartColors[index % chartColors.length];
+      return {
+        ...item,
+        percentage: calculatePercentage(value, total),
+        color,
+      };
+    });
 };
 
 // Helper to render pie cells
-const renderPieCells = (data) => {
+const renderPieCells = (data: Array<Record<string, unknown>>) => {
   return data
     .filter((entry) => entry != null)
-    .map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />);
+    .map((entry, index) => {
+      const colorValue = (entry as Record<string, unknown>).color ?? "";
+      const color = typeof colorValue === "string" ? colorValue : String(colorValue ?? "");
+      return <Cell key={`cell-${index}`} fill={color} />;
+    });
 };
 
 /**
@@ -60,17 +78,38 @@ const DistributionPieChart = ({
   labelFormatter,
   maxItems = 8,
   ...props
+ }: {
+  title?: string;
+  subtitle?: React.ReactNode;
+  data?: Array<Record<string, unknown>>;
+  dataKey?: string;
+  nameKey?: string;
+  height?: number;
+  className?: string;
+  loading?: boolean;
+  error?: unknown;
+  emptyMessage?: string;
+  actions?: React.ReactNode;
+  showLegend?: boolean;
+  showLabels?: boolean;
+  innerRadius?: number;
+  outerRadius?: number;
+  formatTooltip?: React.ComponentType<unknown> | ((props: unknown) => React.ReactNode);
+  labelFormatter?: (props: PieLabelRenderProps) => React.ReactNode;
+  maxItems?: number;
+  [key: string]: unknown;
 }) => {
   const { CustomTooltip, chartColors, chartTypeConfigs } = useChartConfig();
 
-  // Use custom tooltip or default
-  const TooltipComponent = formatTooltip || CustomTooltip;
+  // Use custom tooltip or default; treat as a generic React component type
+  const TooltipComponent: React.ComponentType<unknown> = (formatTooltip as React.ComponentType<unknown>) ||
+    (CustomTooltip as React.ComponentType<unknown>);
 
   // Ensure data is valid and limit items
   const chartData = Array.isArray(data) ? data.slice(0, maxItems) : [];
   const hasData = chartData.length > 0;
 
-  const labelFunc = labelFormatter || defaultLabelFormatter;
+  const labelFunc = (labelFormatter as ((props: PieLabelRenderProps) => React.ReactNode)) || defaultLabelFormatter;
 
   // Calculate total for percentage display
   const total = calculateTotal(chartData, dataKey);
@@ -87,7 +126,8 @@ const DistributionPieChart = ({
       loading={loading}
       error={error}
       emptyMessage={emptyMessage}
-      actions={actions}
+      actions={actions || []}
+      formatTooltip={TooltipComponent}
       dataTestId="distribution-pie-chart"
     >
       {hasData && (
@@ -101,14 +141,14 @@ const DistributionPieChart = ({
               outerRadius={outerRadius}
               dataKey={dataKey}
               nameKey={nameKey}
-              label={showLabels ? labelFunc : false}
-              labelLine={false}
-              startAngle={chartTypeConfigs.pie.startAngle}
-              endAngle={chartTypeConfigs.pie.endAngle}
-              {...props}
-            >
-              {renderPieCells(enhancedData)}
-            </Pie>
+              label={showLabels ? (labelFunc as (props: PieLabelRenderProps) => React.ReactNode) : undefined}
+                labelLine={false}
+                startAngle={chartTypeConfigs.pie.startAngle}
+                endAngle={chartTypeConfigs.pie.endAngle}
+                {...props}
+              >
+               {renderPieCells(enhancedData)}
+             </Pie>
             <Tooltip content={<TooltipComponent />} />
             {showLegend && <Legend />}
           </PieChart>

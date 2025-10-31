@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import useTransactionArchiving from "../../hooks/transactions/useTransactionArchiving";
+import useTransactionArchiving from "../../hooks/common/useTransactionArchiving";
 import {
   useTransactionArchivingUI,
   useTransactionArchivingProcess,

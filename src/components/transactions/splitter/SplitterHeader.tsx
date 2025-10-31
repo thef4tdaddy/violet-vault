@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui";
-import { useConfirm } from "../../../hooks/common/useConfirm";
-import { renderIcon } from "../../../utils";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import { renderIcon } from "@/utils";
 
 const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
   const confirm = useConfirm();
@@ -10,9 +10,9 @@ const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
       const confirmed = await confirm({
         title: "Unsaved Changes",
         message: "You have unsaved changes. Are you sure you want to close?",
-        confirmText: "Discard Changes",
-        cancelText: "Keep Editing",
-        variant: "destructive",
+        confirmLabel: "Discard Changes",
+        cancelLabel: "Keep Editing",
+        destructive: true,
       });
       if (confirmed) {
         onClose?.();

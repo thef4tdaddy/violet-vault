@@ -183,9 +183,9 @@ export interface AnalyticsHeaderProps {
 }
 
 export interface MetricsGridProps {
-  filteredTransactions: Transaction[];
-  metrics: AnalyticsMetrics;
-  envelopes: Envelope[];
+  filteredTransactions?: Transaction[];
+  metrics?: AnalyticsMetrics;
+  envelopes?: Envelope[];
 }
 
 export interface TabNavigationProps {

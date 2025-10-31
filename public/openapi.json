@@ -1,0 +1,573 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "2.0.0",
+    "title": "VioletVault API",
+    "description": "API documentation for VioletVault - A secure, encrypted envelope budgeting application. This includes Cloudflare Worker endpoints and conceptual local database operations.",
+    "license": {
+      "name": "CC BY-NC-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    "contact": {
+      "name": "VioletVault Contributors",
+      "url": "https://github.com/thef4tdaddy/violet-vault"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://bug-report-worker.thef4tdaddy.workers.dev",
+      "description": "Production Cloudflare Worker"
+    },
+    {
+      "url": "http://localhost:5173",
+      "description": "Local Development Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Bug Reports",
+      "description": "Bug report submission and management endpoints"
+    },
+    {
+      "name": "Cloud Sync",
+      "description": "Encrypted data synchronization with Firebase"
+    },
+    {
+      "name": "Budget Data",
+      "description": "Budget envelope management (local database operations)"
+    },
+    {
+      "name": "Transactions",
+      "description": "Transaction management (local database operations)"
+    },
+    {
+      "name": "Bills",
+      "description": "Bill management (local database operations)"
+    }
+  ],
+  "paths": {
+    "/report-issue": {
+      "post": {
+        "tags": ["Bug Reports"],
+        "summary": "Submit a bug report",
+        "description": "Submit a bug report with optional screenshot and system information",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BugReport"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bug report submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BugReportSubmissionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "tags": ["Bug Reports"],
+        "summary": "Get usage statistics",
+        "description": "Retrieve usage statistics for the bug report worker",
+        "responses": {
+          "200": {
+            "description": "Statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalReports": {
+                      "type": "number"
+                    },
+                    "totalScreenshots": {
+                      "type": "number"
+                    },
+                    "storageUsed": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/envelopes": {
+      "get": {
+        "tags": ["Budget Data"],
+        "summary": "List all envelopes",
+        "description": "Retrieve all budget envelopes (local database operation)",
+        "responses": {
+          "200": {
+            "description": "Envelopes retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Budget Data"],
+        "summary": "Create an envelope",
+        "description": "Create a new budget envelope (local database operation)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Envelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Envelope created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transactions": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "List all transactions",
+        "description": "Retrieve all transactions (local database operation)",
+        "responses": {
+          "200": {
+            "description": "Transactions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Transactions"],
+        "summary": "Create a transaction",
+        "description": "Create a new transaction (local database operation)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transaction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transaction created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bills": {
+      "get": {
+        "tags": ["Bills"],
+        "summary": "List all bills",
+        "description": "Retrieve all bills (local database operation)",
+        "responses": {
+          "200": {
+            "description": "Bills retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Bills"],
+        "summary": "Create a bill",
+        "description": "Create a new recurring bill (local database operation)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Bill"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Bill created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BugReport": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Bug report title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000,
+            "description": "Detailed description of the bug"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Steps to reproduce"
+          },
+          "expectedBehavior": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "actualBehavior": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "default": "medium"
+          },
+          "systemInfo": {
+            "$ref": "#/components/schemas/SystemInfo"
+          },
+          "screenshot": {
+            "type": "string",
+            "description": "Base64 data URL of screenshot"
+          },
+          "appVersion": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "title": "Login form not working",
+          "description": "When I try to login, the form does not submit",
+          "severity": "medium",
+          "appVersion": "2.0.0"
+        }
+      },
+      "SystemInfo": {
+        "type": "object",
+        "properties": {
+          "browser": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          },
+          "viewport": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "BugReportSubmissionResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "issueNumber": {
+            "type": "number"
+          },
+          "issueUrl": {
+            "type": "string"
+          },
+          "screenshotUrl": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "APISuccessResponse": {
+        "type": "object",
+        "required": ["success"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "description": "Response data"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          }
+        }
+      },
+      "APIErrorResponse": {
+        "type": "object",
+        "required": ["success", "error"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [false]
+          },
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          }
+        }
+      },
+      "Envelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "budgetedAmount": {
+            "type": "number"
+          },
+          "lastModified": {
+            "type": "number"
+          }
+        },
+        "example": {
+          "id": "env_123",
+          "name": "Groceries",
+          "balance": 500.0,
+          "budgetedAmount": 500.0
+        }
+      },
+      "EnvelopeListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Envelope"
+            }
+          }
+        }
+      },
+      "EnvelopeCreateResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "$ref": "#/components/schemas/Envelope"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "envelopeId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["income", "expense", "transfer"]
+          }
+        },
+        "example": {
+          "id": "txn_123",
+          "amount": 45.99,
+          "description": "Grocery shopping",
+          "type": "expense"
+        }
+      },
+      "TransactionListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      "TransactionCreateResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "$ref": "#/components/schemas/Transaction"
+          }
+        }
+      },
+      "Bill": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": ["weekly", "biweekly", "monthly", "quarterly", "yearly"]
+          },
+          "envelopeId": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "id": "bill_123",
+          "name": "Electric Bill",
+          "amount": 120.0,
+          "frequency": "monthly"
+        }
+      },
+      "BillListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Bill"
+            }
+          }
+        }
+      },
+      "BillCreateResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "data": {
+            "$ref": "#/components/schemas/Bill"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "VioletVault GitHub Repository",
+    "url": "https://github.com/thef4tdaddy/violet-vault"
+  }
+}

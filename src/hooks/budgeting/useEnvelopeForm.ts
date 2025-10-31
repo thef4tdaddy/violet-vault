@@ -42,14 +42,14 @@ const useEnvelopeForm = ({
 
   // Form field update handler
   const updateFormField = useCallback(
-    (field, value) => {
+    (field: string, value: unknown) => {
       setFormData((prev) => {
         const newData = { ...prev, [field]: value };
 
         // Clear related errors when field is updated
-        if (errors[field]) {
+        if (errors[field as keyof typeof errors]) {
           setErrors((prevErrors) => {
-            const { [field]: _removed, ...remainingErrors } = prevErrors;
+            const { [field]: _removed, ...remainingErrors } = prevErrors as Record<string, unknown>;
             return remainingErrors;
           });
         }
@@ -57,7 +57,7 @@ const useEnvelopeForm = ({
         // Handle special cases for dependent fields
         if (field === "envelopeType") {
           // Validate type change compatibility
-          const compatibility = validateEnvelopeTypeChange(value, envelope);
+          const compatibility = validateEnvelopeTypeChange(String(value), envelope);
           if (!compatibility.isValid) {
             setErrors((prevErrors) => ({
               ...prevErrors,

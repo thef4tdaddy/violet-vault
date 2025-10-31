@@ -7,6 +7,19 @@ import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent } from "./EditEnvelopeModalComponents";
 
+interface EnvelopeRef { id: string }
+
+interface EditEnvelopeModalProps {
+  isOpen?: boolean;
+  onClose: () => void;
+  envelope?: EnvelopeRef | null;
+  onUpdateEnvelope?: (envelope: unknown) => Promise<void> | void;
+  onDeleteEnvelope?: (envelopeId: string) => Promise<void> | void;
+  existingEnvelopes?: unknown[];
+  currentUser?: { userName: string; userColor: string };
+  _forceMobileMode?: boolean;
+}
+
 const EditEnvelopeModal = ({
   isOpen = false,
   onClose,
@@ -15,8 +28,8 @@ const EditEnvelopeModal = ({
   onDeleteEnvelope,
   existingEnvelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
-  _forceMobileMode = false, // Internal prop for testing
-}) => {
+  _forceMobileMode = false,
+}: EditEnvelopeModalProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const isMobile = useMobileDetection();
 
@@ -68,7 +81,8 @@ const EditEnvelopeModal = ({
 
   if (!isOpen || !envelope) return null;
 
-  const isUnassignedCash = envelope.id === "unassigned";
+  // Ensure envelope has an id (typed as EnvelopeRef) before comparing
+  const isUnassignedCash = (envelope as { id?: string }).id === "unassigned";
 
   // Mobile slide-up modal
   if (isMobile || _forceMobileMode) {
@@ -123,7 +137,7 @@ const EditEnvelopeModal = ({
             lockLoading={lockLoading}
             isLocked={isLocked}
             isOwnLock={isOwnLock}
-            isExpired={lock?.isExpired}
+            isExpired={Boolean(lock?.isExpired)}
             lock={lock}
             onBreakLock={breakLock}
             onClose={handleClose}

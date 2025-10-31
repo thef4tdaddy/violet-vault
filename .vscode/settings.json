@@ -1,13 +1,16 @@
 {
+  "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/vscode.json",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "eslint.workingDirectories": ["${workspaceFolder}"],
-  "prettier.configPath": "./configs/prettier.config.js",
+  "eslint.enable": true,
+  "eslint.lintTask.enable": true,
+  "prettier.configPath": "./configs/linting/prettier.config.js",
   "eslint.options": {
-    "configFile": "./configs/eslint.config.js"
+    "overrideConfigFile": "./configs/linting/eslint.config.js"
   },
   "files.associations": {
     "*.jsx": "javascriptreact",
@@ -34,6 +37,9 @@
   },
   "typescript.preferences.importModuleSpecifier": "relative",
   "javascript.preferences.importModuleSpecifier": "relative",
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
   "editor.rulers": [80, 120],
   "editor.wordWrap": "bounded",
   "editor.wordWrapColumn": 120,

@@ -28,9 +28,25 @@ import {
 
 // Helper types to bridge inconsistencies
 type BillWithDebtId = Bill & { debtId?: string };
+// Helper bill shape expected by debt helpers (dueDate as string)
+type HelperBill = {
+  id: string;
+  debtId?: string;
+  envelopeId?: string;
+  amount?: number;
+  dueDate?: string;
+  name?: string;
+  category?: string;
+  isPaid?: boolean;
+  isRecurring?: boolean;
+  frequency?: string;
+  lastModified?: number;
+  [key: string]: unknown;
+};
 type TransactionWithDebtId = Transaction & { debtId?: string };
 type DebtForHelper = DebtAccount & { currentBalance: number };
 
+// Connection data + payload types (restore missing types)
 interface ConnectionData {
   paymentMethod?: string;
   createBill?: boolean;
@@ -40,11 +56,49 @@ interface ConnectionData {
 
 type CreateDebtPayload = DebtFormData & { connectionData?: ConnectionData; paymentDueDate: string };
 
+// Factory helpers to create lightweight wrappers outside the hook to reduce function length
+const makeCreateEnvelopeWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<{ id: string }> => {
+  const res = await Promise.resolve(fn(data) as unknown);
+  return (res as unknown) as { id: string };
+};
+
+const makeCreateBillWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<HelperBill> => {
+  const res = await Promise.resolve(fn(data) as unknown);
+  const raw = res as unknown as Record<string, unknown>;
+  const rawDue = raw.dueDate as unknown;
+  const dueDate = typeof rawDue === "string" ? (rawDue as string) : rawDue instanceof Date ? (rawDue as Date).toISOString() : undefined;
+  const transformed: HelperBill = {
+    ...raw,
+    dueDate,
+  } as HelperBill;
+  return transformed;
+};
+
+const makeUpdateBillWrapper = (fn: (...args: unknown[]) => unknown) => async (id: string, data: unknown): Promise<void> => {
+  await Promise.resolve(fn({ billId: id, updates: data as Record<string, unknown> }));
+};
+
+const makeCreateTransactionWrapper = (fn: (...args: unknown[]) => unknown) => async (data: unknown): Promise<void> => {
+  await Promise.resolve(fn(data));
+};
+
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
   const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
-  const { envelopes = [], addEnvelope: createEnvelope } = useEnvelopes();
+  // Normalize DB bill shapes to helper-friendly shapes (convert Date dueDate -> string)
+  const normalizedBills = (bills || []).map((b) => ({
+    ...b,
+    dueDate: b.dueDate ? (typeof b.dueDate === "string" ? b.dueDate : (b.dueDate as Date).toISOString()) : undefined,
+  }));
+  const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
   const { transactions = [], addTransaction: createTransaction } = useTransactions();
+
+  // Helper wrappers to adapt external hooks' APIs to the helper expectations
+  // Prefer async variants when available (addEnvelopeAsync may be provided by the envelopes hook)
+  const createEnvelopeWrapper = makeCreateEnvelopeWrapper(addEnvelopeAsync || createEnvelope);
+  const createBillWrapper = makeCreateBillWrapper(addBillAsync);
+  const updateBillWrapper = makeUpdateBillWrapper(updateBillAsync);
+  const createTransactionWrapper = makeCreateTransactionWrapper(createTransaction);
 
   const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
   const createDebtData = debtsHook?.addDebtAsync;
@@ -54,11 +108,11 @@ export const useDebtManagement = () => {
   const enrichedDebts = useMemo(() => {
     return enrichDebtsWithRelations(
       debts as unknown as DebtForHelper[],
-      bills as unknown as BillWithDebtId[],
+      normalizedBills as unknown as HelperBill[],
       envelopes as Envelope[],
       transactions as TransactionWithDebtId[]
     );
-  }, [debts, bills, envelopes, transactions]);
+  }, [debts, envelopes, transactions, normalizedBills]);
 
   const debtStats = useMemo(() => {
     if (!enrichedDebts?.length) {
@@ -97,9 +151,9 @@ export const useDebtManagement = () => {
     if (!createDebtData || !addBillAsync) throw new Error("Create functions not available");
     return createDebtOperation(debtData, {
       connectionData: debtData.connectionData,
-      createEnvelope,
-      createBill: (data) => addBillAsync(data),
-      updateBill: (id, data) => updateBillAsync({ billId: id, updates: data }),
+      createEnvelope: createEnvelopeWrapper,
+      createBill: createBillWrapper,
+      updateBill: updateBillWrapper,
       createDebtData,
     });
   };
@@ -116,7 +170,7 @@ export const useDebtManagement = () => {
       debt: debt as unknown as DebtForHelper,
       paymentData,
       updateDebtData: (params) => updateDebtData(params),
-      createTransaction: (data) => createTransaction(data),
+      createTransaction: (data) => createTransactionWrapper(data),
     });
   };
 
@@ -126,8 +180,8 @@ export const useDebtManagement = () => {
       debtId,
       billId,
       debts: debts as unknown as DebtForHelper[],
-      bills: bills as unknown as BillWithDebtId[],
-      updateBill: (id, data) => updateBillAsync({ billId: id, updates: data }),
+      bills: normalizedBills as unknown as HelperBill[],
+      updateBill: updateBillWrapper,
       updateDebtData: (params) => updateDebtData(params),
     });
   };
@@ -136,7 +190,7 @@ export const useDebtManagement = () => {
     if (!updateDebtData) throw new Error("Update debt function not available");
     return syncDebtDueDatesOperation({
       debts: debts as unknown as DebtForHelper[],
-      bills: bills as unknown as BillWithDebtId[],
+      bills: normalizedBills as unknown as HelperBill[],
       updateDebtData: (params) => updateDebtData(params),
     });
   };
@@ -157,17 +211,23 @@ export const useDebtManagement = () => {
 
   const deleteDebt = async (debtId: string) => {
     if (!deleteDebtData || !deleteBillAsync) throw new Error("Delete functions not available");
-    const transformedBills = bills.map((bill) =>
-      makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId)
-    );
+    const transformedBills = (bills || []).map((bill) => {
+      const tb = makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId);
+      return (
+        ({
+          ...tb,
+          dueDate: tb.dueDate ? (typeof tb.dueDate === "string" ? tb.dueDate : (tb.dueDate as Date).toISOString()) : undefined,
+        } as unknown) as HelperBill & Record<string, unknown>
+      );
+    });
 
-    const result = await deleteDebtOperation({
+    await deleteDebtOperation({
       debtId,
-      bills: transformedBills,
-      deleteBill: (id) => deleteBillAsync(id),
+      bills: transformedBills as unknown as HelperBill[],
+      deleteBill: (id) => deleteBillAsync(id).then(() => {}),
       deleteDebtData: (params) => deleteDebtData(params),
     });
-    return result;
+    return;
   };
 
   const getUpcomingPaymentsData = (daysAhead = 30) => {
