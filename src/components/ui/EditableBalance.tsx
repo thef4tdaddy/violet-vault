@@ -85,7 +85,7 @@ interface EditViewProps {
   editValue: string;
   bgClass: string;
   className: string;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onSave: () => void;
@@ -201,6 +201,20 @@ const DisplayView: React.FC<DisplayViewProps> = ({
   </div>
 );
 
+interface EditableBalanceProps {
+  value: number;
+  onChange: (value: number) => void;
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  colorClass?: string;
+  bgClass?: string;
+  hoverClass?: string;
+  isManuallySet?: boolean;
+  confirmThreshold?: number;
+  formatCurrency?: boolean;
+}
+
 const EditableBalance = ({
   value,
   onChange,
@@ -213,12 +227,12 @@ const EditableBalance = ({
   isManuallySet = false,
   confirmThreshold = 1000,
   formatCurrency = true,
-}) => {
+}: EditableBalanceProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value?.toString() || "0");
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [pendingValue, setPendingValue] = useState(null);
-  const inputRef = useRef(null);
+  const [pendingValue, setPendingValue] = useState<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setEditValue(value?.toString() || "0");
@@ -243,7 +257,7 @@ const EditableBalance = ({
     setPendingValue(null);
   };
 
-  const confirmSave = (newValue) => {
+  const confirmSave = (newValue: number) => {
     onChange(newValue);
     setIsEditing(false);
     setShowConfirmation(false);
@@ -264,7 +278,7 @@ const EditableBalance = ({
     confirmSave(newValue);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSave();
     } else if (e.key === "Escape") {
@@ -272,14 +286,14 @@ const EditableBalance = ({
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     if (inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue)) {
       setEditValue(inputValue);
     }
   };
 
-  if (showConfirmation) {
+  if (showConfirmation && pendingValue !== null) {
     return (
       <ConfirmationView
         value={value}

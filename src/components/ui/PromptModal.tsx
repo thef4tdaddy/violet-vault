@@ -1,6 +1,29 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { getIcon } from "@/utils";
 
+interface ValidationResult {
+  valid: boolean;
+  error: string;
+}
+
+interface PromptModalProps {
+  isOpen?: boolean;
+  title?: string;
+  message?: string;
+  placeholder?: string;
+  defaultValue?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  inputType?: string;
+  isRequired?: boolean;
+  validation?: ((value: string) => ValidationResult) | null;
+  isLoading?: boolean;
+  icon?: React.ComponentType<{ className?: string }> | null;
+  onConfirm?: (value: string) => void;
+  onCancel?: (value: null) => void;
+  children?: React.ReactNode;
+}
+
 /**
  * Reusable PromptModal Component
  * Replaces window.prompt() with a custom modal for better UX and accessibility
@@ -18,14 +41,14 @@ const PromptModal = ({
   cancelLabel = "Cancel",
   inputType = "text",
   isRequired = true,
-  validation = null, // Function to validate input: (value) => ({ valid: boolean, error: string })
+  validation = null,
   isLoading = false,
   icon = null,
   onConfirm,
   onCancel,
-  children, // For custom content between message and input
-}) => {
-  const inputRef = useRef(null);
+  children,
+}: PromptModalProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState(defaultValue);
   const [validationError, setValidationError] = useState("");
 
@@ -67,7 +90,7 @@ const PromptModal = ({
     }
   }, [isOpen, defaultValue]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
 
@@ -81,7 +104,7 @@ const PromptModal = ({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !isLoading) {
         handleCancel();
       }
@@ -133,7 +156,12 @@ const PromptModal = ({
   );
 };
 
-const ModalHeader = ({ icon, title }) => (
+interface ModalHeaderProps {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+}
+
+const ModalHeader = ({ icon, title }: ModalHeaderProps) => (
   <div className="flex items-center mb-4">
     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
       {React.createElement(icon, {
@@ -148,6 +176,18 @@ const ModalHeader = ({ icon, title }) => (
   </div>
 );
 
+interface ModalContentProps {
+  message: string;
+  children?: React.ReactNode;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  inputType: string;
+  inputValue: string;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  validationError: string;
+  isLoading: boolean;
+}
+
 const ModalContent = ({
   message,
   children,
@@ -158,7 +198,7 @@ const ModalContent = ({
   placeholder,
   validationError,
   isLoading,
-}) => (
+}: ModalContentProps) => (
   <div className="mb-6">
     <p id="prompt-modal-description" className="text-gray-700 mb-4">
       {message}
@@ -176,6 +216,16 @@ const ModalContent = ({
   </div>
 );
 
+interface InputFieldProps {
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  inputType: string;
+  inputValue: string;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  validationError: string;
+  isLoading: boolean;
+}
+
 const InputField = ({
   inputRef,
   inputType,
@@ -184,7 +234,7 @@ const InputField = ({
   placeholder,
   validationError,
   isLoading,
-}) => (
+}: InputFieldProps) => (
   <div className="space-y-2">
     <input
       ref={inputRef}
@@ -203,7 +253,11 @@ const InputField = ({
   </div>
 );
 
-const ValidationError = ({ error }) => (
+interface ValidationErrorProps {
+  error: string;
+}
+
+const ValidationError = ({ error }: ValidationErrorProps) => (
   <div id="input-error" className="flex items-center text-red-600 text-sm">
     {React.createElement(getIcon("AlertCircle"), {
       className: "h-4 w-4 mr-1",
@@ -212,7 +266,21 @@ const ValidationError = ({ error }) => (
   </div>
 );
 
-const ModalActions = ({ handleCancel, handleConfirm, isLoading, cancelLabel, confirmLabel }) => (
+interface ModalActionsProps {
+  handleCancel: () => void;
+  handleConfirm: () => void;
+  isLoading: boolean;
+  cancelLabel: string;
+  confirmLabel: string;
+}
+
+const ModalActions = ({
+  handleCancel,
+  handleConfirm,
+  isLoading,
+  cancelLabel,
+  confirmLabel,
+}: ModalActionsProps) => (
   <div className="flex gap-3 justify-end">
     <button
       type="button"

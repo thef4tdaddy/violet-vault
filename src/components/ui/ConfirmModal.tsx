@@ -64,6 +64,17 @@ const ModalHeader = ({
   );
 };
 
+interface ModalActionsProps {
+  cancelButtonRef: React.RefObject<HTMLButtonElement | null>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement | null>;
+  cancelLabel: string;
+  confirmLabel: string;
+  destructive: boolean;
+  isLoading: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
 /**
  * Modal action buttons component
  */
@@ -76,7 +87,7 @@ const ModalActions = ({
   isLoading,
   onCancel,
   onConfirm,
-}) => {
+}: ModalActionsProps) => {
   const colorScheme = getColorScheme(destructive);
   const cancelTouchFeedback = useTouchFeedback("tap", "secondary");
   const confirmTouchFeedback = useTouchFeedback(
@@ -124,8 +135,8 @@ interface KeyboardHandlingProps {
   isLoading: boolean;
   onCancel?: () => void;
   onConfirm?: () => void;
-  cancelButtonRef: React.RefObject<HTMLButtonElement>;
-  confirmButtonRef: React.RefObject<HTMLButtonElement>;
+  cancelButtonRef: React.RefObject<HTMLButtonElement | null>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 /**
@@ -159,6 +170,20 @@ const useKeyboardHandling = ({
   }, [isOpen, isLoading, onCancel, onConfirm, cancelButtonRef, confirmButtonRef]);
 };
 
+interface ConfirmModalProps {
+  isOpen?: boolean;
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  destructive?: boolean;
+  isLoading?: boolean;
+  icon?: React.ComponentType<{ className?: string }> | null;
+  onConfirm: () => void;
+  onCancel: () => void;
+  children?: React.ReactNode;
+}
+
 /**
  * Reusable ConfirmModal Component
  * Replaces window.confirm() with a custom modal for better UX and accessibility
@@ -178,10 +203,10 @@ const ConfirmModal = ({
   icon = null,
   onConfirm,
   onCancel,
-  children, // For custom content between message and buttons
-}) => {
-  const cancelButtonRef = useRef(null);
-  const confirmButtonRef = useRef(null);
+  children,
+}: ConfirmModalProps) => {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   // Focus management - focus cancel button by default for safety
   useEffect(() => {
