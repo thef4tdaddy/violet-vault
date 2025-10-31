@@ -5,6 +5,35 @@ import SlideUpModal from "../mobile/SlideUpModal";
 import TransferModalContent from "./TransferModalContent";
 import { Button } from "@/components/ui";
 
+interface TransferForm {
+  envelopeId: string;
+  amount: string;
+  description: string;
+}
+
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentAmount?: number;
+}
+
+interface TransferringAccount {
+  id: string | number;
+  name: string;
+  currentBalance: number;
+}
+
+interface TransferModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onTransfer: () => void;
+  transferringAccount: TransferringAccount | null;
+  transferForm: TransferForm;
+  setTransferForm: (form: TransferForm) => void;
+  envelopes: Envelope[];
+  _forceMobileMode?: boolean;
+}
+
 const TransferModal = ({
   isOpen,
   onClose,
@@ -14,7 +43,7 @@ const TransferModal = ({
   setTransferForm,
   envelopes,
   _forceMobileMode = false, // Internal prop for testing
-}) => {
+}: TransferModalProps) => {
   const isMobile = useMobileDetection();
 
   if (!isOpen || !transferringAccount) return null;

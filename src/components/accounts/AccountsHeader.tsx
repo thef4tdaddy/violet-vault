@@ -2,7 +2,19 @@ import React from "react";
 import { getIcon } from "@/utils";
 import Button from "../ui/buttons/Button";
 
-const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccount }) => {
+interface AccountsHeaderProps {
+  totalValue: number;
+  showBalances: boolean;
+  onToggleBalances: () => void;
+  onAddAccount: () => void;
+}
+
+const AccountsHeader = ({
+  totalValue,
+  showBalances,
+  onToggleBalances,
+  onAddAccount,
+}: AccountsHeaderProps) => {
   return (
     <div className="flex justify-between items-center">
       <div>

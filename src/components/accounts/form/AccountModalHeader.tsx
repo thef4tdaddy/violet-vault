@@ -2,8 +2,12 @@ import { createElement } from "react";
 import { getIcon } from "@/utils";
 import { Button } from "@/components/ui";
 
+interface EditingAccount {
+  id: string | number;
+}
+
 interface AccountModalHeaderProps {
-  editingAccount?: Record<string, unknown> | null;
+  editingAccount?: EditingAccount | null;
   onClose: () => void;
   isLocked: boolean;
   isOwnLock: boolean;

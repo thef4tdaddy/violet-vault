@@ -1,7 +1,34 @@
 import { ACCOUNT_COLORS } from "../../../utils/accounts";
 import { Button, Checkbox } from "@/components/ui";
 
-const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
+interface AccountForm {
+  name: string;
+  type: string;
+  currentBalance: string;
+  annualContribution: string;
+  expirationDate: string;
+  description: string;
+  color: string;
+  isActive: boolean;
+}
+
+interface EditingAccount {
+  id: string | number;
+}
+
+interface AccountColorAndSettingsProps {
+  accountForm: AccountForm;
+  setAccountForm: (form: AccountForm) => void;
+  canEdit: boolean | null;
+  editingAccount: EditingAccount | null;
+}
+
+const AccountColorAndSettings = ({
+  accountForm,
+  setAccountForm,
+  canEdit,
+  editingAccount,
+}: AccountColorAndSettingsProps) => (
   <>
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-2">Color</label>
@@ -32,7 +59,7 @@ const AccountColorAndSettings = ({ accountForm, setAccountForm, canEdit, editing
             isActive: e.target.checked,
           })
         }
-        disabled={editingAccount && !canEdit}
+        disabled={Boolean(editingAccount && !canEdit)}
       />
       <label htmlFor="isActive" className="ml-2 block text-sm font-medium text-purple-900">
         Account is active

@@ -7,6 +7,41 @@ import AccountFinancialFields from "./form/AccountFinancialFields";
 import AccountColorAndSettings from "./form/AccountColorAndSettings";
 import AccountFormActions from "./form/AccountFormActions";
 
+interface AccountForm {
+  name: string;
+  type: string;
+  currentBalance: string;
+  annualContribution: string;
+  expirationDate: string;
+  description: string;
+  color: string;
+  isActive: boolean;
+}
+
+interface EditingAccount {
+  id: string | number;
+}
+
+interface Lock {
+  userId?: string;
+  userName?: string;
+  expiresAt?: number;
+  [key: string]: unknown;
+}
+
+interface ModalContentProps {
+  editingAccount: EditingAccount | null;
+  accountForm: AccountForm;
+  setAccountForm: (form: AccountForm) => void;
+  canEdit: boolean | null;
+  isLocked: boolean;
+  isOwnLock: boolean;
+  lock: Lock | null;
+  breakLock: () => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}
+
 // Extract modal content for reuse between mobile and desktop
 const ModalContent = ({
   editingAccount,
@@ -19,7 +54,7 @@ const ModalContent = ({
   breakLock,
   onClose,
   onSubmit,
-}) => (
+}: ModalContentProps) => (
   <>
     {/* Edit Lock Warning */}
     {editingAccount && (
@@ -64,6 +99,22 @@ const ModalContent = ({
   </>
 );
 
+interface AccountFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+  editingAccount: EditingAccount | null;
+  accountForm: AccountForm;
+  setAccountForm: (form: AccountForm) => void;
+  isLocked: boolean;
+  isOwnLock: boolean;
+  canEdit: boolean | null;
+  lock: Lock | null;
+  breakLock: () => void;
+  lockLoading: boolean;
+  _forceMobileMode?: boolean;
+}
+
 const AccountFormModal = ({
   isOpen,
   onClose,
@@ -79,7 +130,7 @@ const AccountFormModal = ({
   breakLock,
   lockLoading,
   _forceMobileMode = false, // Internal prop for testing
-}) => {
+}: AccountFormModalProps) => {
   const isMobile = useMobileDetection();
 
   if (!isOpen) return null;
