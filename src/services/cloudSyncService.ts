@@ -1,5 +1,13 @@
 import { budgetDb } from "../db/budgetDb";
-import type { BudgetRecord } from "../db/types";
+import type {
+  BudgetRecord,
+  Envelope,
+  Transaction,
+  Bill,
+  Debt,
+  SavingsGoal,
+  PaycheckHistory,
+} from "../db/types";
 import type { CloudSyncConfig } from "../types/firebase";
 import logger from "../utils/common/logger";
 import chunkedSyncService from "./chunkedSyncService";
@@ -24,6 +32,22 @@ interface SyncConfig {
   clearAllData?: () => Promise<void>;
 }
 
+/**
+ * Budget data structure for sync operations
+ */
+interface BudgetData {
+  envelopes?: Envelope[];
+  transactions?: Transaction[];
+  bills?: Bill[];
+  debts?: Debt[];
+  savingsGoals?: SavingsGoal[];
+  paycheckHistory?: PaycheckHistory[];
+  unassignedCash?: number;
+  actualBalance?: number;
+  supplementalAccounts?: unknown[];
+  lastModified?: number;
+}
+
 class CloudSyncService {
   syncIntervalId: ReturnType<typeof setTimeout> | null;
   isSyncing: boolean;
@@ -41,7 +65,7 @@ class CloudSyncService {
     this.syncQueue = Promise.resolve();
   }
 
-  start(config) {
+  start(config: SyncConfig): void {
     if (this.isRunning) {
       logger.debug("🔄 Sync service already running.");
       return;
@@ -61,20 +85,24 @@ class CloudSyncService {
     // The sync will be triggered by data mutations via TanStack Query optimistic updates
   }
 
-  stop() {
+  stop(): void {
     if (!this.isRunning) return;
 
     logger.production("Cloud sync service stopped", {
       user: this.config?.budgetId || "unknown",
     });
     // No more periodic sync interval to clear
-    clearTimeout(this.debounceTimer);
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+    }
     this.isRunning = false;
   }
 
   // Debounced sync to avoid rapid consecutive syncs
-  scheduleSync(priority = "normal") {
-    clearTimeout(this.debounceTimer);
+  scheduleSync(priority: "normal" | "high" = "normal"): void {
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+    }
 
     // Use shorter delay for high-priority changes (paycheck, envelope changes, etc.)
     const delay = priority === "high" ? 2000 : DEBOUNCE_DELAY;
@@ -85,9 +113,11 @@ class CloudSyncService {
   }
 
   // Trigger sync immediately for critical changes (paycheck, imports, etc.)
-  triggerSyncForCriticalChange(changeType) {
+  triggerSyncForCriticalChange(changeType: string): void {
     logger.info(`🚨 Critical change detected: ${changeType}, triggering immediate sync`);
-    clearTimeout(this.debounceTimer);
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+    }
     this.syncQueue = this.syncQueue.then(() => this.forceSync());
   }
 
@@ -136,7 +166,7 @@ class CloudSyncService {
       const localData = await this.fetchDexieData();
 
       // Check what data exists in cloud to determine sync direction
-      let cloudData;
+      let cloudData: BudgetData | null = null;
       try {
         const cloudResult = await chunkedSyncService.loadFromCloud();
         cloudData = cloudResult || null;
@@ -154,17 +184,20 @@ class CloudSyncService {
               }
             : null,
         });
-      } catch (error) {
+      } catch (error: unknown) {
         // GitHub Issue #576 Phase 2: Universal decryption error handling for all users
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorName = error instanceof Error ? error.name : "UnknownError";
+
         if (
-          error.message?.includes("The provided data is too small") ||
-          error.message?.includes("decrypt") ||
-          error.message?.includes("key mismatch") ||
-          error.name === "OperationError"
+          errorMessage.includes("The provided data is too small") ||
+          errorMessage.includes("decrypt") ||
+          errorMessage.includes("key mismatch") ||
+          errorName === "OperationError"
         ) {
           logger.warn("🔑 Decryption failed during sync - treating as no cloud data", {
-            errorMessage: error.message,
-            errorName: error.name,
+            errorMessage,
+            errorName,
             budgetId: (this.config?.budgetId as string | undefined)?.substring(0, 8) + "...",
             timestamp: new Date().toISOString(),
           });
@@ -173,7 +206,9 @@ class CloudSyncService {
           // This prevents crashes and allows sync to continue gracefully
           cloudData = null;
         } else {
-          logger.warn("Could not load cloud data, assuming no cloud data exists", error);
+          logger.warn("Could not load cloud data, assuming no cloud data exists", {
+            error: error instanceof Error ? error.message : String(error),
+          });
           cloudData = null;
         }
       }
@@ -201,7 +236,12 @@ class CloudSyncService {
         ),
       });
 
-      let result;
+      let result: {
+        success: boolean;
+        error?: string;
+        recordsProcessed?: number;
+        direction?: string;
+      };
       if (syncDecision.direction === "fromFirestore") {
         // Download from Firebase to Dexie
         const cloudResult = await chunkedSyncService.loadFromCloud();
@@ -214,8 +254,10 @@ class CloudSyncService {
             const { queryClient } = await import("../utils/common/queryClient");
             await queryClient.invalidateQueries();
             logger.info("✅ TanStack Query cache invalidated after cloud data sync");
-          } catch (error) {
-            logger.warn("Failed to invalidate query cache after sync", error);
+          } catch (error: unknown) {
+            logger.warn("Failed to invalidate query cache after sync", {
+              error: error instanceof Error ? error.message : String(error),
+            });
           }
 
           result = { success: true, direction: "fromFirestore" };
@@ -227,10 +269,11 @@ class CloudSyncService {
         }
       } else {
         // Upload from Dexie to Firebase (default behavior)
-        result = await chunkedSyncService.saveToCloud(
+        const saveSuccess = await chunkedSyncService.saveToCloud(
           localData,
           this.config.currentUser as CloudSyncConfig["currentUser"]
         );
+        result = { success: saveSuccess };
       }
 
       if (result.success) {
@@ -251,7 +294,7 @@ class CloudSyncService {
         logger.error("❌ Chunked sync failed:", result.error);
 
         // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
-        const errorCategory = this.categorizeError(result.error);
+        const errorCategory = this.categorizeError(result.error || "Unknown error");
         syncHealthMonitor.recordSyncFailure(syncId, new Error(result.error), {
           backupId,
           stage: "sync_execution",
@@ -259,18 +302,23 @@ class CloudSyncService {
         });
       }
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("❌ An unexpected error occurred during sync:", error);
 
       // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
-      const errorCategory = this.categorizeError(error.message);
-      syncHealthMonitor.recordSyncFailure(syncId, error, {
-        backupId,
-        stage: "unknown",
-        errorCategory,
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorCategory = this.categorizeError(errorMessage);
+      syncHealthMonitor.recordSyncFailure(
+        syncId,
+        error instanceof Error ? error : new Error(errorMessage),
+        {
+          backupId,
+          stage: "unknown",
+          errorCategory,
+        }
+      );
 
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     } finally {
       this.isSyncing = false;
     }
@@ -278,10 +326,10 @@ class CloudSyncService {
 
   /**
    * GitHub Issue #576 Phase 3: Categorize error for enhanced error detection
-   * @param {string} errorMessage - The error message to categorize
-   * @returns {string} - Error category
+   * @param errorMessage - The error message to categorize
+   * @returns Error category
    */
-  categorizeError(errorMessage) {
+  categorizeError(errorMessage: string | undefined): string {
     if (!errorMessage || typeof errorMessage !== "string") {
       return "unknown";
     }
@@ -359,7 +407,7 @@ class CloudSyncService {
     return "unknown";
   }
 
-  async updateUserActivity() {
+  async updateUserActivity(): Promise<void> {
     if (!this.config || !this.config.currentUser) return;
 
     try {
@@ -372,18 +420,18 @@ class CloudSyncService {
       // to update the user's activity status.
       // For now, we'll just log it.
       logger.debug("Updating user activity:", activityData);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to update user activity:", error);
     }
   }
 
-  async getActiveUsers() {
+  async getActiveUsers(): Promise<unknown[]> {
     // This would fetch the list of active users from Firebase
     // and filter out users who haven't been active recently.
     return [];
   }
 
-  async updateLastSyncTime() {
+  async updateLastSyncTime(): Promise<void> {
     try {
       await budgetDb.setCachedValue(
         "lastSyncTime",
@@ -391,21 +439,22 @@ class CloudSyncService {
         86400000, // 24 hours TTL
         "sync"
       );
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to update last sync time in Dexie:", error);
     }
   }
 
-  async getLastSyncTime() {
+  async getLastSyncTime(): Promise<string | null> {
     try {
-      return await budgetDb.getCachedValue("lastSyncTime", 86400000); // 24 hours
-    } catch (error) {
+      const value = await budgetDb.getCachedValue("lastSyncTime", 86400000); // 24 hours
+      return typeof value === "string" ? value : null;
+    } catch (error: unknown) {
       logger.error("Failed to get last sync time from Dexie:", error);
       return null;
     }
   }
 
-  async fetchDexieData() {
+  async fetchDexieData(): Promise<BudgetData> {
     try {
       const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
         await Promise.all([
@@ -425,17 +474,17 @@ class CloudSyncService {
         debts: debts || [],
         savingsGoals: savingsGoals || [],
         paycheckHistory: paycheckHistory || [],
-        unassignedCash: metadata?.unassignedCash || 0,
-        actualBalance: metadata?.actualBalance || 0,
+        unassignedCash: typeof metadata?.unassignedCash === "number" ? metadata.unassignedCash : 0,
+        actualBalance: typeof metadata?.actualBalance === "number" ? metadata.actualBalance : 0,
         lastModified: Date.now(),
       };
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to fetch data from Dexie:", error);
       throw error;
     }
   }
 
-  async saveToDexie(data) {
+  async saveToDexie(data: BudgetData): Promise<void> {
     try {
       logger.debug("💾 Saving cloud data to Dexie...");
 
@@ -462,22 +511,22 @@ class CloudSyncService {
 
           // Save new data
           if (data.envelopes?.length) {
-            await budgetDb.envelopes.bulkAdd(data.envelopes);
+            await budgetDb.envelopes.bulkAdd(data.envelopes as Envelope[]);
           }
           if (data.bills?.length) {
-            await budgetDb.bills.bulkAdd(data.bills);
+            await budgetDb.bills.bulkAdd(data.bills as Bill[]);
           }
           if (data.transactions?.length) {
-            await budgetDb.transactions.bulkAdd(data.transactions);
+            await budgetDb.transactions.bulkAdd(data.transactions as Transaction[]);
           }
           if (data.savingsGoals?.length) {
-            await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
+            await budgetDb.savingsGoals.bulkAdd(data.savingsGoals as SavingsGoal[]);
           }
           if (data.debts?.length) {
-            await budgetDb.debts.bulkAdd(data.debts);
+            await budgetDb.debts.bulkAdd(data.debts as Debt[]);
           }
           if (data.paycheckHistory?.length) {
-            await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
+            await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory as PaycheckHistory[]);
           }
 
           // Save metadata
@@ -493,13 +542,16 @@ class CloudSyncService {
       );
 
       logger.info("✅ Cloud data saved to Dexie successfully");
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to save cloud data to Dexie:", error);
       throw error;
     }
   }
 
-  determineSyncDirection(localData, cloudData) {
+  determineSyncDirection(
+    localData: BudgetData | null,
+    cloudData: BudgetData | null
+  ): { direction: string } {
     // Check if cloud has meaningful data vs local (include all data types)
     const hasCloudData = !!(
       cloudData?.envelopes?.length ||
@@ -583,9 +635,9 @@ class CloudSyncService {
 
   /**
    * Check if current user is a shared budget user
-   * @returns {boolean} True if user joined via share code
+   * @returns True if user joined via share code
    */
-  isSharedBudgetUser() {
+  isSharedBudgetUser(): boolean {
     const currentUser = this.config?.currentUser;
     logger.debug("🔍 [SYNC] Checking if shared budget user", {
       hasConfig: !!this.config,
@@ -610,7 +662,14 @@ class CloudSyncService {
     return isSharedUser;
   }
 
-  getStatus() {
+  getStatus(): {
+    isSyncing: boolean;
+    isRunning: boolean;
+    lastSyncTime: number;
+    syncIntervalMs: number;
+    syncType: string;
+    hasConfig: boolean;
+  } {
     return {
       isSyncing: this.isSyncing,
       isRunning: this.isRunning,
@@ -621,7 +680,9 @@ class CloudSyncService {
     };
   }
 
-  async forcePushToCloud(overrideConfig = null) {
+  async forcePushToCloud(
+    overrideConfig: SyncConfig | null = null
+  ): Promise<{ success: boolean; error?: string }> {
     // Force push local data to Firebase without pulling from Firebase first
     // This is used after backup imports to ensure imported data overwrites cloud data
     // overrideConfig allows passing auth data when service config is null (e.g., during import)
@@ -655,28 +716,27 @@ class CloudSyncService {
       );
 
       // Use chunked Firebase sync to save data (one-way)
-      const result = (await chunkedSyncService.saveToCloud(
+      const success = await chunkedSyncService.saveToCloud(
         localData,
-        config.currentUser
-      )) as unknown as {
-        success: boolean;
-      };
+        config.currentUser as CloudSyncConfig["currentUser"]
+      );
 
-      if (result.success) {
+      if (success) {
         logger.info("✅ Force push to Firebase completed successfully");
         return { success: true };
       } else {
         throw new Error("Failed to push data to Firebase");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("❌ Force push to Firebase failed:", error);
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return { success: false, error: errorMessage };
     } finally {
       this.isSyncing = false;
     }
   }
 
-  async clearAllData() {
+  async clearAllData(): Promise<void> {
     // Clear all data from Firebase/cloud storage
     // This method should be called before importing backup data to prevent sync conflicts
     try {
@@ -698,7 +758,7 @@ class CloudSyncService {
       // Clear local sync metadata
       await budgetDb.clearCacheCategory("sync");
       logger.info("Local sync metadata cleared");
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to clear cloud data:", error);
       throw error;
     }
