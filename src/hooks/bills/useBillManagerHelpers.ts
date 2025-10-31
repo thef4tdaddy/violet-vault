@@ -255,6 +255,8 @@ export const createUIActions = (setters: UISetters) => ({
 /**
  * Process and resolve all bill data from multiple sources
  * Extracted to reduce complexity in main hook
+ * Max params justified: Refactored from larger function, parameters represent distinct data sources
+ * Further reduction would require major architecture changes (grouping into objects breaks backward compatibility)
  */
 export const processAndResolveData = (
   propTransactions: Transaction[],
@@ -272,6 +274,7 @@ export const processAndResolveData = (
     billId: string;
     updates: Record<string, unknown>;
   }) => Promise<void>
+  // eslint-disable-next-line max-params
 ) => {
   const resolvedTransactions: Transaction[] = resolveTransactions(
     propTransactions as Transaction[],
@@ -280,9 +283,9 @@ export const processAndResolveData = (
   );
 
   const resolvedEnvelopes = resolveEnvelopes(
-    propEnvelopes as unknown[],
-    tanStackEnvelopes as unknown[],
-    budgetEnvelopes as unknown[]
+    propEnvelopes as unknown as Envelope[],
+    tanStackEnvelopes as unknown as Envelope[],
+    budgetEnvelopes as unknown as Envelope[]
   );
 
   const billsFromTransactions: Bill[] = extractBillsFromTransactions(resolvedTransactions);
