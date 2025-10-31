@@ -2,44 +2,51 @@
  * UI Store Actions - Helper functions to build store actions
  * Extracted from uiStore.ts to reduce function size
  */
-import logger from "../../utils/common/logger.ts";
+import logger from "@/utils/common/logger";
+import type {
+  UIStoreSet,
+  PaycheckHistory,
+  PatchNotesData,
+  BeforeInstallPromptEvent,
+  UIStore,
+} from "./uiStoreTypes";
 
 /**
  * Create basic state management actions
  */
-export const createBasicActions = (set) => ({
-  setBiweeklyAllocation: (amount) =>
-    set((state) => {
+export const createBasicActions = (set: UIStoreSet) => ({
+  setBiweeklyAllocation: (amount: number) =>
+    set((state: UIStore) => {
       state.biweeklyAllocation = amount;
     }),
 
   openUnassignedCashModal: () =>
-    set((state) => {
+    set((state: UIStore) => {
       state.isUnassignedCashModalOpen = true;
     }),
 
   closeUnassignedCashModal: () =>
-    set((state) => {
+    set((state: UIStore) => {
       state.isUnassignedCashModalOpen = false;
     }),
 
-  setPaycheckHistory: (history) =>
-    set((state) => {
+  setPaycheckHistory: (history: PaycheckHistory[]) =>
+    set((state: UIStore) => {
       state.paycheckHistory = history;
     }),
 
-  setDataLoaded: (loaded) =>
-    set((state) => {
+  setDataLoaded: (loaded: boolean) =>
+    set((state: UIStore) => {
       state.dataLoaded = loaded;
     }),
 
-  setOnlineStatus: (status) =>
-    set((state) => {
+  setOnlineStatus: (status: boolean) =>
+    set((state: UIStore) => {
       state.isOnline = status;
     }),
 
-  setCloudSyncEnabled(enabled) {
-    return set((state) => {
+  setCloudSyncEnabled(enabled: boolean) {
+    return set((state: UIStore) => {
       state.cloudSyncEnabled = enabled;
       logger.info(`Cloud sync ${enabled ? "enabled" : "disabled"}`, {
         cloudSyncEnabled: enabled,
@@ -51,32 +58,32 @@ export const createBasicActions = (set) => ({
 /**
  * Create PWA update management actions
  */
-export const createPWAUpdateActions = (set) => ({
-  setUpdateAvailable: (available) =>
-    set((state) => {
+export const createPWAUpdateActions = (set: UIStoreSet) => ({
+  setUpdateAvailable: (available: boolean) =>
+    set((state: UIStore) => {
       state.updateAvailable = available;
       logger.info(`PWA update ${available ? "available" : "not available"}`, {
         updateAvailable: available,
       });
     }),
 
-  setIsUpdating: (updating) =>
-    set((state) => {
+  setIsUpdating: (updating: boolean) =>
+    set((state: UIStore) => {
       state.isUpdating = updating;
     }),
 
   showInstallModal: () =>
-    set((state) => {
+    set((state: UIStore) => {
       state.showInstallPrompt = true;
     }),
 
   hideInstallModal: () =>
-    set((state) => {
+    set((state: UIStore) => {
       state.showInstallPrompt = false;
     }),
 
-  setInstallPromptEvent: (event) =>
-    set((state) => {
+  setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) =>
+    set((state: UIStore) => {
       state.installPromptEvent = event;
     }),
 });
@@ -84,10 +91,10 @@ export const createPWAUpdateActions = (set) => ({
 /**
  * Create PWA update action
  */
-export const createUpdateAppAction = (set) => ({
+export const createUpdateAppAction = (set: UIStoreSet) => ({
   async updateApp() {
     let shouldUpdate = false;
-    set((state) => {
+    set((state: UIStore) => {
       shouldUpdate = state.updateAvailable;
       if (shouldUpdate) {
         state.isUpdating = true;
@@ -97,7 +104,7 @@ export const createUpdateAppAction = (set) => ({
     if (!shouldUpdate) return;
 
     try {
-      set((state) => {
+      set((state: UIStore) => {
         state.updateAvailable = false;
         state.isUpdating = false;
       });
@@ -114,7 +121,7 @@ export const createUpdateAppAction = (set) => ({
       }
     } catch (error) {
       logger.error("Failed to update app", error);
-      set((state) => {
+      set((state: UIStore) => {
         state.isUpdating = false;
         state.updateAvailable = true;
       });
@@ -123,11 +130,24 @@ export const createUpdateAppAction = (set) => ({
 });
 
 /**
+ * Analytics event data
+ */
+interface AnalyticsEvent extends Record<string, unknown> {
+  action: string;
+  choice?: string;
+  timestamp: string;
+  userAgent: string;
+  platform: string;
+}
+
+/**
  * Track analytics event in local storage
  */
-const trackAnalytics = (eventData) => {
+const trackAnalytics = (eventData: AnalyticsEvent): void => {
   try {
-    const existingAnalytics = JSON.parse(localStorage.getItem("pwa_analytics") || "[]");
+    const existingAnalytics: AnalyticsEvent[] = JSON.parse(
+      localStorage.getItem("pwa_analytics") || "[]"
+    );
     existingAnalytics.push(eventData);
     localStorage.setItem("pwa_analytics", JSON.stringify(existingAnalytics.slice(-50)));
   } catch (error) {
@@ -136,10 +156,18 @@ const trackAnalytics = (eventData) => {
 };
 
 /**
+ * UI Store reference type
+ */
+interface UIStoreReference {
+  getState: () => UIStore;
+  setState: never; // Type is complex, use type assertion when passing
+}
+
+/**
  * Create PWA install action
  */
-export const createInstallAppAction = (set, useUiStore) => ({
-  async installApp() {
+export const createInstallAppAction = (set: UIStoreSet, useUiStore: UIStoreReference) => ({
+  async installApp(): Promise<boolean> {
     const state = useUiStore.getState();
     if (!state.installPromptEvent) return false;
 
@@ -149,7 +177,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
 
       logger.info("PWA install prompt result", { outcome: result.outcome });
 
-      const analytics = {
+      const analytics: AnalyticsEvent = {
         action: "pwa_install_prompt",
         choice: result.outcome,
         timestamp: new Date().toISOString(),
@@ -160,7 +188,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
       trackAnalytics(analytics);
       logger.info("PWA install choice tracked", analytics);
 
-      set((state) => {
+      set((state: UIStore) => {
         state.installPromptEvent = null;
         state.showInstallPrompt = false;
       });
@@ -172,7 +200,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
     }
   },
 
-  async manualInstall() {
+  async manualInstall(): Promise<{ success: boolean; reason: string }> {
     const state = useUiStore.getState();
 
     if (window.matchMedia("(display-mode: standalone)").matches) {
@@ -191,7 +219,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
 
       logger.info("Manual PWA install result", { outcome: result.outcome });
 
-      const analytics = {
+      const analytics: AnalyticsEvent = {
         action: "pwa_manual_install",
         choice: result.outcome,
         timestamp: new Date().toISOString(),
@@ -201,7 +229,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
 
       trackAnalytics(analytics);
 
-      set((state) => {
+      set((state: UIStore) => {
         state.installPromptEvent = null;
         state.showInstallPrompt = false;
       });
@@ -214,9 +242,9 @@ export const createInstallAppAction = (set, useUiStore) => ({
     }
   },
 
-  dismissInstallPrompt() {
+  dismissInstallPrompt(): void {
     const now = Date.now();
-    const analytics = {
+    const analytics: AnalyticsEvent = {
       action: "pwa_install_prompt_dismissed",
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
@@ -227,7 +255,7 @@ export const createInstallAppAction = (set, useUiStore) => ({
     localStorage.setItem("pwa_install_last_dismissed", now.toString());
     logger.info("PWA install prompt dismissed", analytics);
 
-    set((state) => {
+    set((state: UIStore) => {
       state.showInstallPrompt = false;
     });
   },
@@ -236,9 +264,9 @@ export const createInstallAppAction = (set, useUiStore) => ({
 /**
  * Create patch notes management actions
  */
-export const createPatchNotesActions = (set) => ({
-  showPatchNotesModal: (patchNotesData) =>
-    set((state) => {
+export const createPatchNotesActions = (set: UIStoreSet) => ({
+  showPatchNotesModal: (patchNotesData: PatchNotesData) =>
+    set((state: UIStore) => {
       state.showPatchNotes = true;
       state.patchNotesData = patchNotesData;
       logger.info("Showing patch notes modal", {
@@ -247,7 +275,7 @@ export const createPatchNotesActions = (set) => ({
     }),
 
   hidePatchNotesModal: () =>
-    set((state) => {
+    set((state: UIStore) => {
       state.showPatchNotes = false;
       state.patchNotesData = null;
     }),
