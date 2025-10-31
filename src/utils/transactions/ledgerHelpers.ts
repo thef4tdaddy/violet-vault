@@ -1,11 +1,14 @@
 /**
  * Utility functions for TransactionLedger calculations and configurations
  */
+import type { Transaction, Envelope } from "@/types/finance";
 
 /**
  * Calculate transaction totals and net cash flow
  */
-export const calculateTransactionTotals = (transactions) => {
+export const calculateTransactionTotals = (
+  transactions: Transaction[]
+): { totalIncome: number; totalExpenses: number; netCashFlow: number } => {
   const totalIncome = transactions
     .filter((t) => t && typeof t.amount === "number" && t.amount > 0)
     .reduce((sum, t) => sum + t.amount, 0);
@@ -26,7 +29,14 @@ export const calculateTransactionTotals = (transactions) => {
 /**
  * Get filter configurations for StandardFilters component
  */
-export const getTransactionFilterConfigs = (envelopes) => [
+export const getTransactionFilterConfigs = (
+  envelopes: Envelope[]
+): Array<{
+  key: string;
+  type: string;
+  defaultValue: string;
+  options: Array<{ value: string | number; label: string }>;
+}> => [
   {
     key: "dateFilter",
     type: "select",
@@ -73,6 +83,6 @@ export const getTransactionFilterConfigs = (envelopes) => [
 /**
  * Format transaction count and net cash flow for display
  */
-export const formatLedgerSummary = (transactionCount, netCashFlow) => {
+export const formatLedgerSummary = (transactionCount: number, netCashFlow: number): string => {
   return `${transactionCount} transactions • Net: $${netCashFlow.toFixed(2)}`;
 };
