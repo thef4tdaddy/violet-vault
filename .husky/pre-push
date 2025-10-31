@@ -1,3 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
 echo "🔍 Running ESLint check before push..."
 npx eslint . --config configs/linting/eslint.config.js --max-warnings 25 --cache --cache-location .eslintcache
 
