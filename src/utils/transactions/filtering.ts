@@ -156,8 +156,8 @@ const getSortValue = (transaction: Transaction, sortBy: string): string | number
     case "account":
       return (transaction.account || "").toLowerCase();
     default:
-      // Return a default value for unknown sort fields
-      return transaction.date;
+      // Default to date sorting for unknown fields
+      return new Date(transaction.date);
   }
 };
 

@@ -134,7 +134,7 @@ export const performSmartSplit = (
       description: `Split ${i + 1}`,
       amount: amountPerSplit,
       category: availableCategories[i] || "",
-      envelopeId: "",
+      envelopeId: "", // Empty string represents unassigned
     });
   }
 
