@@ -2,15 +2,16 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 8 | 0 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 4517 | 0 |
+| Category                      | Current | Change |
+| ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 8       | 0      |
+| TypeScript Errors             | 0       | 0      |
+| TypeScript Strict Mode Errors | 4517    | 0      |
 
-*Last updated: 2025-10-31 00:27:57 UTC*
+_Last updated: 2025-10-31 00:27:57 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -27,6 +28,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+
 - 2 issues in `violet-vault/src/hooks/bills/useBillFormValidated.ts`
 - 1 issues in `violet-vault/src/hooks/savings/useSavingsGoals/index.ts`
 - 1 issues in `violet-vault/src/hooks/debts/useDebtManagement.ts`
@@ -36,12 +38,14 @@
 - 1 issues in `violet-vault/src/components/budgeting/paycheck/PaycheckHistory.tsx`
 
 ### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 4 | `max-lines-per-function` |
-| 4 | `complexity` |
+
+| Count | Rule ID                  |
+| ----- | ------------------------ |
+| 4     | `max-lines-per-function` |
+| 4     | `complexity`             |
 
 ### Detailed Lint Report
+
 ```
 violet-vault/src/components/budgeting/paycheck/PaycheckHistory.tsx:26:25 - 1 - Arrow function has too many lines (177). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/charts/ChartContainer.tsx:34:4 - 1 - Arrow function has a complexity of 19. Maximum allowed is 15. (complexity)
@@ -62,6 +66,7 @@ Last check: 2025-10-31 00:27:44 UTC
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
+
 - 62 errors in `src/utils/query/optimisticHelpers.ts`
 - 53 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 44 errors in `src/utils/savings/savingsCalculations.ts`
@@ -638,39 +643,41 @@ Last check: 2025-10-31 00:27:44 UTC
 - 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
 
 ### Strict Mode Error Breakdown
+
 | Count | Error Code |
-|---|---|
-| 1691 | `TS7006` |
-| 1319 | `TS7031` |
-| 336 | `TS2339` |
-| 255 | `TS2345` |
-| 219 | `TS18046` |
-| 184 | `TS7053` |
-| 133 | `TS2322` |
-| 95 | `TS18048` |
-| 92 | `TS7005` |
-| 59 | `TS7034` |
-| 52 | `TS18047` |
-| 24 | `TS2769` |
-| 8 | `TS2353` |
-| 7 | `TS2722` |
-| 6 | `TS2698` |
-| 6 | `TS2531` |
-| 6 | `TS2411` |
-| 4 | `TS7019` |
-| 4 | `TS2783` |
-| 4 | `TS2538` |
-| 4 | `TS2352` |
-| 2 | `TS7022` |
-| 1 | `TS7023` |
-| 1 | `TS7016` |
-| 1 | `TS2774` |
-| 1 | `TS2683` |
-| 1 | `TS2532` |
-| 1 | `TS2349` |
-| 1 | `TS18049` |
+| ----- | ---------- |
+| 1691  | `TS7006`   |
+| 1319  | `TS7031`   |
+| 336   | `TS2339`   |
+| 255   | `TS2345`   |
+| 219   | `TS18046`  |
+| 184   | `TS7053`   |
+| 133   | `TS2322`   |
+| 95    | `TS18048`  |
+| 92    | `TS7005`   |
+| 59    | `TS7034`   |
+| 52    | `TS18047`  |
+| 24    | `TS2769`   |
+| 8     | `TS2353`   |
+| 7     | `TS2722`   |
+| 6     | `TS2698`   |
+| 6     | `TS2531`   |
+| 6     | `TS2411`   |
+| 4     | `TS7019`   |
+| 4     | `TS2783`   |
+| 4     | `TS2538`   |
+| 4     | `TS2352`   |
+| 2     | `TS7022`   |
+| 1     | `TS7023`   |
+| 1     | `TS7016`   |
+| 1     | `TS2774`   |
+| 1     | `TS2683`   |
+| 1     | `TS2532`   |
+| 1     | `TS2349`   |
+| 1     | `TS18049`  |
 
 ### Detailed Strict Mode Report
+
 ```
 src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/App.tsx(28,35): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
@@ -5857,4 +5864,3 @@ src/utils/ui/touchFeedback.ts(141,13): error TS7006: Parameter 'event' implicitl
 src/utils/ui/touchFeedback.ts(157,16): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ primary: string; secondary: string; card: string; small: string; tab: string; destructive: string; success: string; fab: string; envelope: string; navigation: string; comprehensive: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ primary: string; secondary: string; card: string; small: string; tab: string; destructive: string; success: string; fab: string; envelope: string; navigation: string; comprehensive: string; }'.
 ```
-

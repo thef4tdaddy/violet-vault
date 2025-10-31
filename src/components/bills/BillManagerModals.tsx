@@ -2,14 +2,56 @@
  * BillManagerModals - Extracted modal components from BillManager
  * Reduces BillManager line count
  */
+import React from "react";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
 import BillDetailModal from "./modals/BillDetailModal";
-import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-import logger from "../../utils/common/logger";
+import ObjectHistoryViewer from "@/components/history/ObjectHistoryViewer";
+import logger from "@/utils/common/logger";
+import type { Bill, Envelope } from "@/types/bills";
 
-const BillManagerModals = ({
+/**
+ * Props for BillManagerModals component
+ */
+interface BillManagerModalsProps {
+  // Modal state
+  showAddBillModal: boolean;
+  showBulkUpdateModal: boolean;
+  showDiscoveryModal: boolean;
+  showBillDetail: Bill | null;
+  historyBill: Bill | null;
+  editingBill: Bill | null;
+
+  // Data
+  bills: Bill[];
+  envelopes: Envelope[];
+  selectedBills: Set<string>;
+  discoveredBills: Bill[];
+
+  // Handlers
+  handleCloseModal: () => void;
+  setShowBulkUpdateModal: (show: boolean) => void;
+  setShowDiscoveryModal: (show: boolean) => void;
+  setShowBillDetail: (bill: Bill | null) => void;
+  setHistoryBill: (bill: Bill | null) => void;
+  handleEditBill: (bill: Bill) => void;
+
+  // Operations
+  addBill: (bill: Bill) => Promise<void>;
+  updateBill: (bill: Bill) => Promise<void>;
+  deleteBill: (billId: string, deleteEnvelope?: boolean) => Promise<void>;
+  handleBulkUpdate: (updates: Bill[]) => Promise<void>;
+  handleAddDiscoveredBills: (bills: Bill[]) => Promise<void>;
+  billOperations: {
+    handlePayBill: (billId: string) => Promise<void>;
+  };
+
+  // Callbacks
+  onError: (error: string) => void;
+}
+
+const BillManagerModals: React.FC<BillManagerModalsProps> = ({
   // Modal state
   showAddBillModal,
   showBulkUpdateModal,

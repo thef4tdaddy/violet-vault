@@ -1,14 +1,32 @@
 import React from "react";
 import { Select, TextInput, Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { getIconByName } from "../../utils/common/billIcons";
-import { getFrequencyOptions } from "../../utils/common/frequencyCalculations";
+import { getIcon } from "@/utils";
+import { getIconByName } from "@/utils/common/billIcons";
+import { getFrequencyOptions } from "@/utils/common/frequencyCalculations";
+import type { Bill, BillFormData } from "@/types/bills";
+
+/**
+ * Props for BillBasicFields component
+ */
+interface BillBasicFieldsProps {
+  formData: BillFormData;
+  updateField: (field: keyof BillFormData, value: string | boolean) => void;
+  canEdit: boolean;
+  editingBill: Bill | null | undefined;
+  categories: string[];
+}
 
 /**
  * Basic information fields for BillFormFields
  * Extracted to reduce complexity
  */
-export const BillBasicFields = ({ formData, updateField, canEdit, editingBill, categories }) => {
+export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
+  formData,
+  updateField,
+  canEdit,
+  editingBill,
+  categories,
+}) => {
   const frequencyOptions = getFrequencyOptions();
 
   return (
@@ -106,10 +124,22 @@ export const BillBasicFields = ({ formData, updateField, canEdit, editingBill, c
 };
 
 /**
+ * Props for BillIconSelector component
+ */
+interface BillIconSelectorProps {
+  formData: BillFormData;
+  updateField: (field: keyof BillFormData, value: string | boolean) => void;
+  canEdit: boolean;
+  editingBill: Bill | null | undefined;
+  suggestedIconName: string;
+  iconSuggestions: string[];
+}
+
+/**
  * Icon selection section for BillFormFields
  * Extracted to reduce complexity
  */
-export const BillIconSelector = ({
+export const BillIconSelector: React.FC<BillIconSelectorProps> = ({
   formData,
   updateField,
   canEdit,
@@ -157,10 +187,24 @@ export const BillIconSelector = ({
 };
 
 /**
+ * Props for BillFormActions component
+ */
+interface BillFormActionsProps {
+  formData: BillFormData;
+  editingBill: Bill | null | undefined;
+  canEdit: boolean;
+  isSubmitting: boolean;
+  onClose: () => void;
+  calculateBiweeklyAmount: () => string | number;
+  calculateMonthlyAmount: () => string | number;
+  getNextDueDate: () => string;
+}
+
+/**
  * Form action buttons for BillFormFields
  * Extracted to reduce complexity
  */
-export const BillFormActions = ({
+export const BillFormActions: React.FC<BillFormActionsProps> = ({
   formData,
   editingBill,
   canEdit,
