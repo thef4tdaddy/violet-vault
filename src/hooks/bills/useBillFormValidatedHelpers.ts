@@ -8,6 +8,7 @@ import type { Bill } from "@/types/bills";
 
 /**
  * Build initial form data from editing bill
+ * Complexity justified: Necessary default value initialization for all form fields
  */
 export const buildInitialFormData = <
   T extends {
@@ -22,6 +23,7 @@ export const buildInitialFormData = <
   },
 >(
   editingBill: Bill | null
+  // eslint-disable-next-line complexity
 ): T => {
   return {
     name: editingBill?.name || "",

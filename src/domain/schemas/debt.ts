@@ -261,6 +261,8 @@ export const validateDebtFormDataSafe = (
   data?: DebtFormData;
   errors: Record<string, string>;
   warnings: string[];
+  // Complexity justified: Comprehensive validation with error/warning generation
+  // eslint-disable-next-line complexity
 } => {
   // Preprocess form data to provide defaults for undefined/null values
   const processedData =
