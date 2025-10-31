@@ -2,6 +2,21 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
+import type { Bill } from "@/types/bills";
+
+// Type definitions
+interface Envelope {
+  envelopeType: string;
+  available: number;
+  status: string;
+  [key: string]: unknown;
+}
+
+interface EnvelopeStatusDisplayProps {
+  envelope: Envelope;
+  bills: Bill[];
+  utilizationColorClass: string;
+}
 
 /**
  * Envelope status display component
@@ -10,8 +25,8 @@ import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelop
  * Part of EnvelopeItem refactoring for ESLint compliance
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
-const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
-  const getStatusIcon = (status) => {
+const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }: EnvelopeStatusDisplayProps) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "overdue":
       case "overspent":

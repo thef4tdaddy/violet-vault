@@ -3,6 +3,25 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 
+// Type definitions
+interface Lock {
+  userId: string;
+  timestamp: number;
+  [key: string]: unknown;
+}
+
+interface EnvelopeModalHeaderProps {
+  title?: string;
+  subtitle?: string;
+  lockLoading?: boolean;
+  isLocked?: boolean;
+  isOwnLock?: boolean;
+  isExpired?: boolean;
+  lock?: Lock | null;
+  onBreakLock?: () => void;
+  onClose: () => void;
+}
+
 const EnvelopeModalHeader = ({
   title = "Edit Envelope",
   subtitle = "Modify envelope settings",
@@ -13,7 +32,7 @@ const EnvelopeModalHeader = ({
   lock = null,
   onBreakLock,
   onClose,
-}) => {
+}: EnvelopeModalHeaderProps) => {
   return (
     <>
       {/* Header */}

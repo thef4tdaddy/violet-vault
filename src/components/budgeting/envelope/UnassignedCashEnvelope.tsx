@@ -3,14 +3,28 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
 
-const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
+// Type definitions
+interface UnassignedCashEnvelopeProps {
+  unassignedCash: number;
+  onViewHistory?: (envelope: {
+    id: string;
+    name: string;
+    currentBalance: number;
+    category: string;
+    color: string;
+    description: string;
+    envelopeType: string;
+  }) => void;
+}
+
+const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }: UnassignedCashEnvelopeProps) => {
   const openUnassignedCashModal = useBudgetStore((state) => state.openUnassignedCashModal);
 
   const handleClick = () => {
     openUnassignedCashModal();
   };
 
-  const handleHistoryClick = (e) => {
+  const handleHistoryClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     // Create a virtual unassigned envelope for history viewing
     const unassignedEnvelope = {
