@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 import BillTableHeader from "./BillTableHeader";
 import BillTableEmptyState from "./BillTableEmptyState";
 import BillTableBulkActions from "./BillTableBulkActions";
@@ -8,10 +8,60 @@ import { validateComponentProps } from "@/utils/validation/propValidator";
 import { BillTablePropsSchema } from "@/domain/schemas/component-props";
 
 /**
+ * Bill entity type - flexible structure to accept any bill-like object
+ */
+type BillEntity = Record<string, unknown> & {
+  id: string;
+  name: string;
+  category?: string;
+  isPaid?: boolean;
+};
+
+/**
+ * Selection state interface
+ */
+interface SelectionState {
+  hasSelection: boolean;
+  selectedCount: number;
+}
+
+/**
+ * Bill display data interface
+ */
+interface BillDisplayData {
+  isSelected: boolean;
+  Icon: React.ComponentType<{ className?: string }>;
+  amount: string;
+  dueDateDisplay: string;
+  daysDisplay?: string;
+  urgencyColors: string;
+  statusText: string;
+}
+
+/**
+ * Props for BillTable component
+ */
+interface BillTableProps {
+  filteredBills: BillEntity[];
+  selectionState: SelectionState;
+  clearSelection: () => void;
+  selectAllBills: () => void;
+  toggleBillSelection: (billId: string) => void;
+  setShowBulkUpdateModal: (show: boolean) => void;
+  setShowBillDetail: (bill: BillEntity) => void;
+  getBillDisplayData: (bill: BillEntity) => BillDisplayData;
+  billOperations: {
+    handlePayBill: (billId: string) => Promise<void>;
+  };
+  categorizedBills: Record<string, BillEntity[]>;
+  viewMode: string;
+}
+
+/**
  * Bill table with bulk actions and selection
  * Pure UI component that preserves exact visual appearance
  */
-const BillTable = ({
+const BillTable: React.FC<BillTableProps> = ({
   filteredBills,
   selectionState,
   clearSelection,
