@@ -238,6 +238,15 @@ export const useLoginMutation = () => {
     },
     onSuccess: async (result: LoginResult) => {
       if (result.success && result.user) {
+        // DEBUG: Log what we're about to pass
+        logger.auth("🔍 DEBUG: About to call setAuthenticated with:", {
+          hasSessionData: !!result.sessionData,
+          hasEncryptionKey: !!result.sessionData?.encryptionKey,
+          encryptionKeyType: result.sessionData?.encryptionKey?.constructor?.name || "undefined",
+          hasSalt: !!result.sessionData?.salt,
+          saltType: result.sessionData?.salt?.constructor?.name || "undefined",
+        });
+
         // Pass the encryption key and salt from login result to auth context
         setAuthenticated(
           result.user as unknown as import("@/types/auth").UserData,
