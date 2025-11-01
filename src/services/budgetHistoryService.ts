@@ -21,13 +21,6 @@ interface CreateCommitOptions {
 /**
  * Options for queries
  */
-interface QueryOptions {
-  limit?: number;
-  startDate?: number;
-  endDate?: number;
-  entityType?: string;
-  author?: string;
-}
 
 /**
  * Budget History Service
@@ -96,13 +89,7 @@ class BudgetHistoryService {
       // Generate commit hash
       const hash = encryptionUtils.generateHash(JSON.stringify(commitData));
 
-      // Create snapshot of the change
-      const snapshot = {
-        [entityType]: {
-          [entityId || "main"]: afterData,
-        },
-        timestamp,
-      };
+      // Snapshot creation removed as it's not currently used in storage
 
       // Create commit record
       const commit = {
@@ -110,8 +97,7 @@ class BudgetHistoryService {
         timestamp,
         message: description,
         author,
-        parentHash,
-        snapshotData: JSON.stringify(snapshot),
+        ...(parentHash ? { parentHash } : {}),
         deviceFingerprint: fingerprint,
       };
 
@@ -309,7 +295,7 @@ class BudgetHistoryService {
     branchName: string;
     description?: string;
     author?: string;
-  }): Promise<void> {
+  }): Promise<unknown> {
     const { fromCommitHash, branchName, description = "", author = "Unknown User" } = options;
 
     try {
@@ -358,7 +344,7 @@ class BudgetHistoryService {
     }
   }
 
-  async switchBranch(branchName: string): Promise<void> {
+  async switchBranch(branchName: string): Promise<boolean> {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
@@ -404,14 +390,14 @@ class BudgetHistoryService {
     commitHash: string;
     tagName: string;
     description?: string;
-    tagType?: string;
+    tagType?: "release" | "milestone" | "backup";
     author?: string;
   }): Promise<unknown> {
     const {
       commitHash,
       tagName,
       description = "",
-      tagType = "milestone",
+      tagType = "milestone" as "release" | "milestone" | "backup",
       author = "Unknown User",
     } = options;
 
@@ -486,8 +472,9 @@ class BudgetHistoryService {
         JSON.stringify(signaturePayload) + deviceFingerprint
       );
 
-      const isDeviceConsistent = await this.verifyDeviceConsistency(
-        commitData.author,
+      // Verify device consistency (not used currently but may be useful for logging)
+      await this.verifyDeviceConsistency(
+        (commitData.author as string) || "Unknown",
         deviceFingerprint
       );
 
@@ -548,16 +535,16 @@ class BudgetHistoryService {
 
       const patterns = {
         totalChanges: recentChanges.length,
-        changesByType: {},
-        changesByEntity: {},
-        authorActivity: {},
-        dailyActivity: {},
-        mostActiveHour: null,
+        changesByType: {} as Record<string, number>,
+        changesByEntity: {} as Record<string, number>,
+        authorActivity: {} as Record<string, number>,
+        dailyActivity: {} as Record<string, number>,
+        mostActiveHour: null as string | null,
         averageChangesPerDay: 0,
       };
 
       // Analyze change patterns
-      recentChanges.forEach((change) => {
+      recentChanges.forEach((change: any) => {
         patterns.changesByType[change.changeType] =
           (patterns.changesByType[change.changeType] || 0) + 1;
         patterns.changesByEntity[change.entityType] =
@@ -565,12 +552,12 @@ class BudgetHistoryService {
       });
 
       // Author activity
-      commits.forEach((commit) => {
+      commits.forEach((commit: any) => {
         patterns.authorActivity[commit.author] = (patterns.authorActivity[commit.author] || 0) + 1;
       });
 
       // Daily activity
-      commits.forEach((commit) => {
+      commits.forEach((commit: any) => {
         const date = new Date(commit.timestamp).toDateString();
         patterns.dailyActivity[date] = (patterns.dailyActivity[date] || 0) + 1;
       });
@@ -580,20 +567,25 @@ class BudgetHistoryService {
       patterns.averageChangesPerDay = days > 0 ? recentChanges.length / days : 0;
 
       // Most active hour
-      const hourCounts = {};
-      commits.forEach((commit) => {
+      const hourCounts: Record<number, number> = {};
+      commits.forEach((commit: any) => {
         const hour = new Date(commit.timestamp).getHours();
         hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       });
 
-      patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
-        null
-      );
+      const hourKeys = Object.keys(hourCounts);
+      patterns.mostActiveHour =
+        hourKeys.length > 0
+          ? hourKeys.reduce((maxHour, hour) =>
+              hourCounts[Number(hour)] > (hourCounts[Number(maxHour)] || 0) ? hour : maxHour
+            )
+          : null;
 
       return patterns;
-    } catch (error) {
-      logger.error("Failed to analyze change patterns", error);
+    } catch (error: unknown) {
+      logger.error("Failed to analyze change patterns", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return null;
     }
   }
@@ -601,7 +593,7 @@ class BudgetHistoryService {
   /**
    * Utility methods
    */
-  _formatCurrency(amount) {
+  _formatCurrency(amount: number): string {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
