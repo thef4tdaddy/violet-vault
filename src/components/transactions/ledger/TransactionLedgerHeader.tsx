@@ -1,9 +1,16 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
-import { formatLedgerSummary } from "../../../utils/transactions/ledgerHelpers";
+import { getIcon } from "@/utils";
+import { formatLedgerSummary } from "@/utils/transactions/ledgerHelpers";
 
-const TransactionLedgerHeader = ({
+interface TransactionLedgerHeaderProps {
+  transactionCount: number;
+  netCashFlow: number;
+  onAddTransaction: () => void;
+  onImportTransactions: () => void;
+}
+
+const TransactionLedgerHeader: React.FC<TransactionLedgerHeaderProps> = ({
   transactionCount,
   netCashFlow,
   onAddTransaction,

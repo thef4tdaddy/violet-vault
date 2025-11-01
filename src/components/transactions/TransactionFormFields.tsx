@@ -1,3 +1,4 @@
+import React from "react";
 import {
   TransactionBasicFields,
   TransactionDetailsFields,
@@ -6,31 +7,37 @@ import {
   TransactionReceiptSection,
   TransactionFormActions,
 } from "./TransactionFormSections";
+import type { Transaction, Envelope } from "@/types/finance";
+import type { TransactionFormData } from "@/domain/schemas/transaction";
+
+interface TransactionFormFieldsProps {
+  transactionForm: TransactionFormData;
+  setTransactionForm: (form: TransactionFormData) => void;
+  handleFormSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onClose: () => void;
+  canEdit: boolean;
+  editingTransaction?: Transaction | null;
+  lockedBy?: string;
+  envelopes?: Envelope[];
+  categories?: string[];
+  suggestEnvelope?: (description: string) => { id: string; name: string } | null;
+}
 
 /**
  * Form fields section for TransactionForm
  * Pure UI component that preserves exact visual appearance
  * Refactored to reduce complexity by extracting sub-components
  */
-const TransactionFormFields = ({
-  // Form data and handlers
+const TransactionFormFields: React.FC<TransactionFormFieldsProps> = ({
   transactionForm,
   setTransactionForm,
-
-  // Form submission
   handleFormSubmit,
   onClose,
-
-  // UI state
   canEdit,
   editingTransaction,
   lockedBy,
-
-  // Data
-  envelopes,
-  categories,
-
-  // Optional features
+  envelopes = [],
+  categories = [],
   suggestEnvelope,
 }) => {
   return (

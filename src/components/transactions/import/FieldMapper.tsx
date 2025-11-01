@@ -1,7 +1,36 @@
+import React from "react";
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 
-const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImport }) => {
+interface FieldMapping {
+  date?: string;
+  description?: string;
+  amount?: string;
+  category?: string;
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
+interface ImportData {
+  data?: Record<string, string | number>[];
+  [key: string]: unknown;
+}
+
+interface FieldMapperProps {
+  importData: ImportData | Record<string, string | number>[];
+  fieldMapping: FieldMapping;
+  setFieldMapping: (mapping: FieldMapping) => void;
+  onBack: () => void;
+  onImport: () => void;
+}
+
+const FieldMapper: React.FC<FieldMapperProps> = ({
+  importData,
+  fieldMapping,
+  setFieldMapping,
+  onBack,
+  onImport,
+}) => {
   const isValid = fieldMapping.date && fieldMapping.description && fieldMapping.amount;
 
   return (

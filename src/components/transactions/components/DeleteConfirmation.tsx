@@ -1,11 +1,30 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import type { Transaction } from "@/types/finance";
+
+interface VirtualRow {
+  index: number;
+  start: number;
+  size: number;
+}
+
+interface DeleteConfirmationProps {
+  transaction: Transaction;
+  onConfirm: () => void;
+  onCancel: () => void;
+  virtualRow: VirtualRow;
+}
 
 /**
  * Inline delete confirmation component
  */
-const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) => {
+const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
+  transaction,
+  onConfirm,
+  onCancel,
+  virtualRow,
+}) => {
   return (
     <tr
       className="bg-red-50 border border-red-200"

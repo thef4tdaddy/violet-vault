@@ -1,7 +1,12 @@
 import React from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
+import type { Transaction } from "@/types/finance";
 
-const TransactionSummary = ({ transactions = [] }) => {
+interface TransactionSummaryProps {
+  transactions?: Transaction[];
+}
+
+const TransactionSummary: React.FC<TransactionSummaryProps> = ({ transactions = [] }) => {
   const totalIncome = transactions
     .filter((t) => t && typeof t.amount === "number" && t.amount > 0)
     .reduce((sum, t) => sum + t.amount, 0);

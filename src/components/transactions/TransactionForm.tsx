@@ -6,8 +6,31 @@ import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
+import type { Transaction, Envelope } from "@/types/finance";
+import type { TransactionFormData } from "@/domain/schemas/transaction";
 
-const TransactionForm = ({
+interface BillPayment {
+  billId: string | number;
+  amount: number;
+  paidDate: string;
+  transactionId: number;
+  notes: string;
+}
+
+interface TransactionFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  editingTransaction?: Transaction | null;
+  transactionForm: TransactionFormData;
+  setTransactionForm: (data: TransactionFormData) => void;
+  envelopes?: Envelope[];
+  categories?: string[];
+  onSubmit: () => void;
+  suggestEnvelope?: (description: string) => { id: string; name: string } | null;
+  onPayBill?: (payment: BillPayment) => void;
+}
+
+const TransactionForm: React.FC<TransactionFormProps> = ({
   isOpen,
   onClose,
   editingTransaction,
@@ -17,7 +40,7 @@ const TransactionForm = ({
   categories = [],
   onSubmit,
   suggestEnvelope,
-  onPayBill, // Optional callback for handling bill payments
+  onPayBill,
 }) => {
   // Get auth context for edit locking
   const {

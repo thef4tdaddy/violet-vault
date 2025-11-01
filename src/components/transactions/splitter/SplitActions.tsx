@@ -1,8 +1,23 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
+import type { SplitTotals } from "@/types/finance";
 
-const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel }) => {
+interface SplitActionsProps {
+  totals: SplitTotals;
+  hasUnsavedChanges: boolean;
+  isSaving: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+}
+
+const SplitActions: React.FC<SplitActionsProps> = ({
+  totals,
+  hasUnsavedChanges,
+  isSaving,
+  onSave,
+  onCancel,
+}) => {
   const { isValid, isOverAllocated, remaining } = totals;
 
   const getValidationMessage = () => {

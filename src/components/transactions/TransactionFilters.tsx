@@ -1,9 +1,26 @@
 import React, { useState } from "react";
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
+import type { Envelope } from "@/types/finance";
 
-const TransactionFilters = ({
+interface TransactionFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  dateFilter: string;
+  setDateFilter: (filter: string) => void;
+  typeFilter: string;
+  setTypeFilter: (filter: string) => void;
+  envelopeFilter: string;
+  setEnvelopeFilter: (filter: string) => void;
+  sortBy: string;
+  setSortBy: (sort: string) => void;
+  sortOrder: string;
+  setSortOrder: (order: string) => void;
+  envelopes?: Envelope[];
+}
+
+const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   searchTerm,
   setSearchTerm,
   dateFilter,
