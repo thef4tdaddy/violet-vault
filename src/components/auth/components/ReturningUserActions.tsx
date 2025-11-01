@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui";
+import StylizedButtonText from "@/components/ui/StylizedButtonText";
 
 /**
  * Returning User Actions Component
@@ -21,13 +22,9 @@ const ReturningUserActions = ({
         className="w-full btn btn-primary py-4 text-lg font-black rounded-lg border-2 border-black uppercase tracking-wider"
       >
         {isLoading ? (
-          <span>
-            <span className="text-xl">U</span>NLOCKING...
-          </span>
+          <StylizedButtonText firstLetterClassName="text-xl">UNLOCKING...</StylizedButtonText>
         ) : (
-          <span>
-            <span className="text-xl">L</span>OGIN
-          </span>
+          <StylizedButtonText firstLetterClassName="text-xl">LOGIN</StylizedButtonText>
         )}
       </Button>
 
@@ -38,10 +35,7 @@ const ReturningUserActions = ({
           disabled={isLoading}
           className="flex-1 py-3 text-sm font-black rounded-lg border-2 border-black bg-orange-600 hover:bg-orange-700 text-white uppercase tracking-wider"
         >
-          <span>
-            <span className="text-base">C</span>HANGE{" "}
-            <span className="text-base">P</span>ROFILE
-          </span>
+          <StylizedButtonText>CHANGE PROFILE</StylizedButtonText>
         </Button>
         <Button
           type="button"
@@ -49,10 +43,7 @@ const ReturningUserActions = ({
           disabled={isLoading}
           className="flex-1 py-3 text-sm font-black rounded-lg border-2 border-black bg-red-600 hover:bg-red-700 text-white uppercase tracking-wider"
         >
-          <span>
-            <span className="text-base">S</span>TART{" "}
-            <span className="text-base">F</span>RESH
-          </span>
+          <StylizedButtonText>START FRESH</StylizedButtonText>
         </Button>
       </div>
     </div>
