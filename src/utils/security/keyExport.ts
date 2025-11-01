@@ -12,7 +12,7 @@ export const keyExportUtils = {
    * @param {CryptoKey} key - The encryption key to fingerprint
    * @returns {Promise<string>} SHA-256 hash of the key as hex string
    */
-  async generateKeyFingerprint(key) {
+  async generateKeyFingerprint(key: CryptoKey): Promise<string> {
     try {
       // Export key to get the raw key material
       const keyData = await crypto.subtle.exportKey("raw", key);
@@ -22,7 +22,8 @@ export const keyExportUtils = {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
     } catch (error) {
-      throw new Error(`Failed to generate key fingerprint: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to generate key fingerprint: ${err.message}`);
     }
   },
 
@@ -33,7 +34,20 @@ export const keyExportUtils = {
    * @param {string} budgetId - The budget identifier
    * @returns {Promise<Object>} Exportable key data
    */
-  async exportKeyData(key, salt, budgetId) {
+  async exportKeyData(
+    key: CryptoKey,
+    salt: Uint8Array,
+    budgetId: string
+  ): Promise<{
+    version: string;
+    type: string;
+    keyData: number[];
+    salt: number[];
+    budgetId: string;
+    fingerprint: string;
+    exportedAt: string;
+    deviceFingerprint: string;
+  }> {
     try {
       const keyData = await crypto.subtle.exportKey("raw", key);
       const fingerprint = await this.generateKeyFingerprint(key);
@@ -49,7 +63,8 @@ export const keyExportUtils = {
         deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
       };
     } catch (error) {
-      throw new Error(`Failed to export key data: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to export key data: ${err.message}`);
     }
   },
 
@@ -59,7 +74,16 @@ export const keyExportUtils = {
    * @param {string} exportPassword - Password to encrypt the export file
    * @returns {Promise<Object>} Encrypted key file data
    */
-  async createProtectedKeyFile(keyData, exportPassword) {
+  async createProtectedKeyFile(
+    keyData: Record<string, unknown>,
+    exportPassword: string
+  ): Promise<{
+    version: string;
+    type: string;
+    encryptedKeyData: { data: number[]; iv: number[] };
+    exportSalt: number[];
+    createdAt: string;
+  }> {
     try {
       // Generate a new salt for the export file encryption
       const exportSalt = crypto.getRandomValues(new Uint8Array(16));
@@ -78,7 +102,8 @@ export const keyExportUtils = {
         createdAt: new Date().toISOString(),
       };
     } catch (error) {
-      throw new Error(`Failed to create protected key file: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to create protected key file: ${err.message}`);
     }
   },
 
@@ -87,7 +112,23 @@ export const keyExportUtils = {
    * @param {Object} keyData - The exported key data
    * @returns {Promise<{key: CryptoKey, salt: Uint8Array, budgetId: string, fingerprint: string}>}
    */
-  async importKeyData(keyData) {
+  async importKeyData(keyData: {
+    type: string;
+    version: string;
+    keyData: number[];
+    salt: number[];
+    budgetId: string;
+    fingerprint: string;
+    exportedAt: string;
+    deviceFingerprint: string;
+  }): Promise<{
+    key: CryptoKey;
+    salt: Uint8Array;
+    budgetId: string;
+    fingerprint: string;
+    exportedAt: string;
+    deviceFingerprint: string;
+  }> {
     try {
       if (!keyData || keyData.type !== "violet-vault-key") {
         throw new Error("Invalid key file format");
@@ -121,7 +162,8 @@ export const keyExportUtils = {
         deviceFingerprint: keyData.deviceFingerprint,
       };
     } catch (error) {
-      throw new Error(`Failed to import key data: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to import key data: ${err.message}`);
     }
   },
 
@@ -131,7 +173,22 @@ export const keyExportUtils = {
    * @param {string} exportPassword - Password to decrypt the file
    * @returns {Promise<Object>} Imported key data
    */
-  async importProtectedKeyFile(protectedKeyFile, exportPassword) {
+  async importProtectedKeyFile(
+    protectedKeyFile: {
+      type: string;
+      version: string;
+      encryptedKeyData: { data: number[]; iv: number[] };
+      exportSalt: number[];
+    },
+    exportPassword: string
+  ): Promise<{
+    key: CryptoKey;
+    salt: Uint8Array;
+    budgetId: string;
+    fingerprint: string;
+    exportedAt: string;
+    deviceFingerprint: string;
+  }> {
     try {
       if (!protectedKeyFile || protectedKeyFile.type !== "violet-vault-protected-key") {
         throw new Error("Invalid protected key file format");
@@ -146,16 +203,26 @@ export const keyExportUtils = {
       const exportKey = await encryptionUtils.deriveKeyFromSalt(exportPassword, exportSalt);
 
       // Decrypt the key data
-      const keyData = await encryptionUtils.decrypt(
+      const keyData = (await encryptionUtils.decrypt(
         protectedKeyFile.encryptedKeyData.data,
         exportKey,
         protectedKeyFile.encryptedKeyData.iv
-      );
+      )) as {
+        type: string;
+        version: string;
+        keyData: number[];
+        salt: number[];
+        budgetId: string;
+        fingerprint: string;
+        exportedAt: string;
+        deviceFingerprint: string;
+      };
 
       // Import the decrypted key data
       return await this.importKeyData(keyData);
     } catch (error) {
-      throw new Error(`Failed to import protected key file: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to import protected key file: ${err.message}`);
     }
   },
 
@@ -164,7 +231,10 @@ export const keyExportUtils = {
    * @param {Object} keyData - The key data to copy
    * @param {number} clearAfterMs - Clear clipboard after this many milliseconds (default 30s)
    */
-  async exportToClipboard(keyData, clearAfterMs = 30000) {
+  async exportToClipboard(
+    keyData: Record<string, unknown>,
+    clearAfterMs = 30000
+  ): Promise<boolean> {
     try {
       const keyString = JSON.stringify(keyData, null, 2);
       await navigator.clipboard.writeText(keyString);
@@ -177,13 +247,14 @@ export const keyExportUtils = {
             await navigator.clipboard.writeText("");
           }
         } catch (error) {
-          logger.warn("Could not auto-clear clipboard:", error);
+          logger.warn("Could not auto-clear clipboard:", error as Record<string, unknown>);
         }
       }, clearAfterMs);
 
       return true;
     } catch (error) {
-      throw new Error(`Failed to copy to clipboard: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to copy to clipboard: ${err.message}`);
     }
   },
 
@@ -193,7 +264,11 @@ export const keyExportUtils = {
    * @param {string} filename - The filename (without extension)
    * @param {boolean} isProtected - Whether this is a password-protected file
    */
-  downloadKeyFile(keyData, filename = "violet-vault-key", isProtected = false) {
+  downloadKeyFile(
+    keyData: Record<string, unknown>,
+    filename = "violet-vault-key",
+    isProtected = false
+  ): boolean {
     try {
       const extension = isProtected ? ".vaultkey" : ".json";
       const blob = new Blob([JSON.stringify(keyData, null, 2)], {
@@ -211,7 +286,8 @@ export const keyExportUtils = {
 
       return true;
     } catch (error) {
-      throw new Error(`Failed to download key file: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to download key file: ${err.message}`);
     }
   },
 
@@ -220,7 +296,7 @@ export const keyExportUtils = {
    * @param {Object} keyData - The key data to encode
    * @returns {Promise<string>} Data URL for QR code image
    */
-  async generateQRCode(keyData) {
+  async generateQRCode(keyData: Record<string, unknown>): Promise<string> {
     try {
       const QRCode = await import("qrcode");
       const keyString = JSON.stringify(keyData);
@@ -242,7 +318,8 @@ export const keyExportUtils = {
         },
       });
     } catch (error) {
-      throw new Error(`Failed to generate QR code: ${error.message}`);
+      const err = error as Error;
+      throw new Error(`Failed to generate QR code: ${err.message}`);
     }
   },
 
@@ -251,7 +328,13 @@ export const keyExportUtils = {
    * @param {Object} keyFileData - The key file data to validate
    * @returns {Object} Validation result
    */
-  validateKeyFile(keyFileData) {
+  validateKeyFile(keyFileData: Record<string, unknown>): {
+    valid: boolean;
+    error?: string;
+    type?: string;
+    version?: string;
+    exportedAt?: string;
+  } {
     try {
       if (!keyFileData) {
         return { valid: false, error: "No key data provided" };
@@ -292,11 +375,12 @@ export const keyExportUtils = {
       return {
         valid: true,
         type: isProtected ? "protected" : "unprotected",
-        version: keyFileData.version,
-        exportedAt: keyFileData.exportedAt || keyFileData.createdAt,
+        version: keyFileData.version as string,
+        exportedAt: (keyFileData.exportedAt || keyFileData.createdAt) as string,
       };
     } catch (error) {
-      return { valid: false, error: `Validation failed: ${error.message}` };
+      const err = error as Error;
+      return { valid: false, error: `Validation failed: ${err.message}` };
     }
   },
 };
