@@ -30,8 +30,8 @@ interface ModalHeaderProps {
 }
 
 interface ModalActionsProps {
-  cancelButtonRef: React.RefObject<HTMLButtonElement>;
-  confirmButtonRef: React.RefObject<HTMLButtonElement>;
+  cancelButtonRef: React.RefObject<HTMLButtonElement | null>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement | null>;
   cancelLabel: string;
   confirmLabel: string;
   destructive: boolean;
@@ -45,8 +45,8 @@ interface KeyboardHandlingProps {
   isLoading: boolean;
   onCancel?: () => void;
   onConfirm?: () => void;
-  cancelButtonRef: React.RefObject<HTMLButtonElement>;
-  confirmButtonRef: React.RefObject<HTMLButtonElement>;
+  cancelButtonRef: React.RefObject<HTMLButtonElement | null>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 /**

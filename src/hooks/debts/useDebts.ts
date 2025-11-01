@@ -159,24 +159,43 @@ const useDebts = () => {
   const addDebtMutation = useMutation({
     mutationKey: ["debts", "add"],
     mutationFn: addDebtToDb,
-    onSuccess: () => {
+    onSuccess: (debt) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
+      
+      // Log successful debt addition
+      logger.info("✅ Debt added", {
+        name: debt.name,
+        type: debt.type,
+        currentBalance: debt.currentBalance,
+        interestRate: debt.interestRate,
+      });
     },
   });
 
   const updateDebtMutation = useMutation({
     mutationKey: ["debts", "update"],
     mutationFn: updateDebtInDb,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
+      
+      // Log successful debt update
+      logger.info("✅ Debt updated", {
+        debtId: variables.id,
+        updates: Object.keys(variables.updates || {}),
+      });
     },
   });
 
   const deleteDebtMutation = useMutation({
     mutationKey: ["debts", "delete"],
     mutationFn: deleteDebtFromDb,
-    onSuccess: () => {
+    onSuccess: (_, debtId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
+      
+      // Log successful debt deletion
+      logger.info("✅ Debt deleted", {
+        debtId: debtId,
+      });
     },
   });
 
@@ -185,6 +204,9 @@ const useDebts = () => {
     mutationFn: recordPaymentInDb,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
+      
+      // Log successful debt payment
+      logger.info("✅ Debt payment recorded");
     },
   });
 

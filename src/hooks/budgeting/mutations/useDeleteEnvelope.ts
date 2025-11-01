@@ -82,15 +82,24 @@ export const useDeleteEnvelope = () => {
 
       return {
         envelopeId,
+        envelopeName: envelope?.name || "Unknown",
         deleteBillsToo,
         transferredAmount: envelope?.currentBalance || 0,
       };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      
+      // Log successful envelope deletion
+      logger.info("✅ Envelope deleted", {
+        envelopeName: data.envelopeName,
+        balanceTransferredToUnassigned: data.transferredAmount,
+        billsDeleted: data.deleteBillsToo,
+      });
+      
       triggerEnvelopeSync("deleted");
     },
     onError: (error) => {

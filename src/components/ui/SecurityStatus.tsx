@@ -1,6 +1,22 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
+interface StatusItem {
+  label: string;
+  value: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  color: string;
+}
+
+interface SecurityStatusProps {
+  isLocked: boolean;
+  eventCount?: number;
+  autoLockStatus?: string;
+  statusItems?: StatusItem[];
+  variant?: "detailed" | "compact";
+  className?: string;
+}
+
 /**
  * Shared security status component for displaying security state information
  * Provides consistent status indicators across security interfaces
@@ -18,11 +34,11 @@ const SecurityStatus = ({
   statusItems = [],
   variant = "detailed",
   className = "",
-}) => {
+}: SecurityStatusProps) => {
   const isDetailed = variant === "detailed";
 
   // Standard status items that are always shown
-  const defaultStatusItems = [
+  const defaultStatusItems: StatusItem[] = [
     {
       label: "Session Status",
       value: isLocked ? "Locked" : "Active",
