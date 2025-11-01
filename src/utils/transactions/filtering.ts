@@ -3,8 +3,8 @@
  * Pure functions for transaction data processing
  * Extracted from useTransactions.js for Issue #508
  */
-import logger from "../common/logger.ts";
-import type { Transaction } from "../../types/finance";
+import logger from "@/utils/common/logger";
+import type { Transaction } from "@/types/finance";
 
 interface DateRange {
   start?: string;
@@ -156,7 +156,8 @@ const getSortValue = (transaction: Transaction, sortBy: string): string | number
     case "account":
       return (transaction.account || "").toLowerCase();
     default:
-      return transaction[sortBy];
+      // Default to date sorting for unknown fields
+      return new Date(transaction.date);
   }
 };
 
@@ -281,13 +282,13 @@ export const processTransactions = (
 export const groupTransactionsByDate = (
   transactions: Transaction[] = [],
   groupBy: string = "month"
-) => {
+): Record<string, Transaction[]> => {
   try {
-    const groups = {};
+    const groups: Record<string, Transaction[]> = {};
 
     transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
-      let groupKey;
+      let groupKey: string;
 
       switch (groupBy) {
         case "day":
@@ -328,9 +329,11 @@ export const groupTransactionsByDate = (
  * @param {Array} transactions - Transactions to group
  * @returns {Object} Grouped transactions by category
  */
-export const groupTransactionsByCategory = (transactions: Transaction[] = []) => {
+export const groupTransactionsByCategory = (
+  transactions: Transaction[] = []
+): Record<string, Transaction[]> => {
   try {
-    const groups = {};
+    const groups: Record<string, Transaction[]> = {};
 
     transactions.forEach((transaction) => {
       const category = transaction.category || "Uncategorized";
@@ -349,14 +352,29 @@ export const groupTransactionsByCategory = (transactions: Transaction[] = []) =>
   }
 };
 
+interface TransactionStats {
+  total: number;
+  totalIncome: number;
+  totalExpenses: number;
+  netAmount: number;
+  averageTransaction: number;
+  categories: Record<string, { count: number; total: number }>;
+  accounts: Record<string, { count: number; total: number }>;
+  dateRange: {
+    earliest: Date | null;
+    latest: Date | null;
+  };
+  error?: string;
+}
+
 /**
  * Calculate transaction statistics
  * @param {Array} transactions - Transactions to analyze
  * @returns {Object} Transaction statistics
  */
-export const calculateTransactionStats = (transactions: Transaction[] = []) => {
+export const calculateTransactionStats = (transactions: Transaction[] = []): TransactionStats => {
   try {
-    const stats = {
+    const stats: TransactionStats = {
       total: transactions.length,
       totalIncome: 0,
       totalExpenses: 0,
@@ -373,7 +391,7 @@ export const calculateTransactionStats = (transactions: Transaction[] = []) => {
     if (transactions.length === 0) return stats;
 
     let totalAmount = 0;
-    const dates = [];
+    const dates: Date[] = [];
 
     transactions.forEach((transaction) => {
       const amount = transaction.amount;
@@ -408,13 +426,14 @@ export const calculateTransactionStats = (transactions: Transaction[] = []) => {
     stats.averageTransaction = totalAmount / transactions.length;
 
     if (dates.length > 0) {
-      dates.sort((a, b) => a - b);
+      dates.sort((a, b) => a.getTime() - b.getTime());
       stats.dateRange.earliest = dates[0];
       stats.dateRange.latest = dates[dates.length - 1];
     }
 
     return stats;
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     logger.error("Error calculating transaction statistics", error);
     return {
       total: 0,
@@ -425,7 +444,7 @@ export const calculateTransactionStats = (transactions: Transaction[] = []) => {
       categories: {},
       accounts: {},
       dateRange: { earliest: null, latest: null },
-      error: error.message,
+      error: errorMessage,
     };
   }
 };

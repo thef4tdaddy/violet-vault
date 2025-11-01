@@ -1,11 +1,22 @@
 import React from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
+
+/**
+ * Props for PullToRefreshIndicator component
+ */
+interface PullToRefreshIndicatorProps {
+  isVisible: boolean;
+  isRefreshing: boolean;
+  pullProgress: number;
+  pullRotation: number;
+  isReady: boolean;
+}
 
 /**
  * Pull-to-refresh indicator component
  * Shows visual feedback during pull-to-refresh interaction
  */
-const PullToRefreshIndicator = ({
+const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
   isVisible,
   isRefreshing,
   pullProgress,

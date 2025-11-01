@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
 import { renderIcon } from "@/utils/icons";
 
-const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
+type ToastType = "success" | "error" | "warning" | "info" | "payday";
+
+interface ToastProps {
+  type?: ToastType;
+  title?: string;
+  message?: string;
+  duration?: number;
+  onClose: () => void;
+}
+
+const Toast = ({ type = "info", title, message, duration = 5000, onClose }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -26,7 +36,7 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
 
     const visibilityStyles = isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0";
 
-    const typeStyles = {
+    const typeStyles: Record<ToastType, string> = {
       success: "bg-emerald-50/90 border-emerald-200/50",
       error: "bg-red-50/90 border-red-200/50",
       warning: "bg-amber-50/90 border-amber-200/50",
@@ -34,7 +44,7 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
       payday: "bg-purple-50/90 border-purple-200/50",
     };
 
-    return `${baseStyles} ${visibilityStyles} ${typeStyles[type] || typeStyles.info}`;
+    return `${baseStyles} ${visibilityStyles} ${typeStyles[type]}`;
   };
 
   const getIcon = () => {
@@ -102,7 +112,7 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
 
 interface ToastItem {
   id: string | number;
-  type?: string;
+  type?: ToastType;
   title?: string;
   message?: string;
   duration?: number;

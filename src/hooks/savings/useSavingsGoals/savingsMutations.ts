@@ -37,8 +37,6 @@ export const useAddSavingsGoalMutation = () => {
       // Then persist to Dexie (redundant as optimisticHelpers already does this)
       // await budgetDb.savingsGoals.add(newGoal);
 
-      logger.debug("✅ Added savings goal:", newGoal as unknown as Record<string, unknown>);
-
       return newGoal;
     },
     onMutate: async () => {
@@ -49,11 +47,18 @@ export const useAddSavingsGoalMutation = () => {
       const previousGoals = queryClient.getQueryData(queryKeys.savingsGoals);
       return { previousGoals };
     },
-    onSuccess: () => {
+    onSuccess: (goal) => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+
+      // Log successful savings goal addition
+      logger.info("✅ Savings goal added", {
+        name: goal.name,
+        targetAmount: goal.targetAmount,
+        currentAmount: goal.currentAmount,
+      });
 
       // Trigger cloud sync
       triggerSavingsGoalSync("add");
@@ -98,14 +103,19 @@ export const useUpdateSavingsGoalMutation = () => {
       // Update in Dexie (redundant as optimisticHelpers already does this)
       // await budgetDb.savingsGoals.update(goalId, updatedGoal);
 
-      logger.debug("✅ Updated savings goal:", updatedGoal as unknown as Record<string, unknown>);
-
       return updatedGoal;
     },
-    onSuccess: () => {
+    onSuccess: (goal, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+
+      // Log successful savings goal update
+      logger.info("✅ Savings goal updated", {
+        name: goal.name,
+        goalId: variables.goalId,
+        updates: Object.keys(variables.updates),
+      });
 
       triggerSavingsGoalSync("update");
     },
@@ -130,14 +140,17 @@ export const useDeleteSavingsGoalMutation = () => {
       // Delete from Dexie (redundant as optimisticHelpers already does this)
       // await budgetDb.savingsGoals.delete(goalId);
 
-      logger.debug("✅ Deleted savings goal:", { goalId });
-
       return goalId;
     },
-    onSuccess: () => {
+    onSuccess: (goalId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+
+      // Log successful savings goal deletion
+      logger.info("✅ Savings goal deleted", {
+        goalId: goalId,
+      });
 
       triggerSavingsGoalSync("delete");
     },

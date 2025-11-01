@@ -1,0 +1,104 @@
+name: Auto-Format PR Title (Commitlint)
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  format-pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-format PR title to commitlint convention
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const currentTitle = pr.title;
+            
+            // Check if title already follows conventional commit format
+            const conventionalPattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+?\))?!?:\s.+/;
+            
+            if (conventionalPattern.test(currentTitle)) {
+              console.log('✅ PR title already follows conventional commit format');
+              return;
+            }
+            
+            // Try to intelligently convert the title
+            let newTitle = currentTitle;
+            let type = 'feat'; // Default type
+            let scope = '';
+            
+            // Detect type from keywords in title
+            const titleLower = currentTitle.toLowerCase();
+            
+            if (titleLower.match(/\b(fix|bug|error|broken|resolve|patch)\b/)) {
+              type = 'fix';
+            } else if (titleLower.match(/\b(test|testing|spec)\b/)) {
+              type = 'test';
+            } else if (titleLower.match(/\b(doc|documentation|readme)\b/)) {
+              type = 'docs';
+            } else if (titleLower.match(/\b(refactor|cleanup|reorganize)\b/)) {
+              type = 'refactor';
+            } else if (titleLower.match(/\b(chore|maintenance|update|upgrade)\b/)) {
+              type = 'chore';
+            } else if (titleLower.match(/\b(perf|performance|optimize|speed)\b/)) {
+              type = 'perf';
+            } else if (titleLower.match(/\b(style|ui|css|design)\b/)) {
+              type = 'style';
+            } else if (titleLower.match(/\b(ci|workflow|action|pipeline)\b/)) {
+              type = 'ci';
+            } else if (titleLower.match(/\b(build|dep|dependency)\b/)) {
+              type = 'build';
+            }
+            
+            // Detect scope from keywords
+            if (titleLower.match(/\b(auth|login|password)\b/)) scope = 'auth';
+            else if (titleLower.match(/\b(bill|invoice)\b/)) scope = 'bills';
+            else if (titleLower.match(/\b(debt|loan)\b/)) scope = 'debts';
+            else if (titleLower.match(/\b(transaction|ledger)\b/)) scope = 'transactions';
+            else if (titleLower.match(/\b(budget|envelope)\b/)) scope = 'budgeting';
+            else if (titleLower.match(/\b(analytics|chart|report)\b/)) scope = 'analytics';
+            else if (titleLower.match(/\b(sync|firebase)\b/)) scope = 'sync';
+            else if (titleLower.match(/\b(typescript|type)\b/)) scope = 'typescript';
+            else if (titleLower.match(/\b(lint|eslint)\b/)) scope = 'lint';
+            else if (titleLower.match(/\b(test)\b/)) scope = 'test';
+            
+            // Clean up the description part
+            let description = currentTitle
+              .replace(/^\[?WIP\]?\s*/i, '') // Remove [WIP]
+              .replace(/^(fix|bug|feature|refactor|chore|docs|test|perf|style|ci|build):\s*/i, '') // Remove existing type if present
+              .replace(/^(fix|add|update|improve|remove|create|implement)\s+/i, (match) => match.toLowerCase()) // Lowercase first verb
+              .trim();
+            
+            // Ensure description starts with lowercase (imperative mood)
+            description = description.charAt(0).toLowerCase() + description.slice(1);
+            
+            // Build new title
+            const scopePart = scope ? `(${scope})` : '';
+            newTitle = `${type}${scopePart}: ${description}`;
+            
+            // Only update if title changed
+            if (newTitle !== currentTitle) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                title: newTitle
+              });
+              
+              // Leave a helpful comment
+              const eventType = context.payload.action === 'ready_for_review' ? 'marked ready for review' : 'opened';
+              await github.rest.issues.createComment({
+                issue_number: pr.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `🤖 **Auto-formatted PR title to follow conventional commits**\n\n**Before:** \`${currentTitle}\`\n**After:** \`${newTitle}\`\n\nThis helps maintain a clean git history and ensures commitlint passes. If this isn't quite right, feel free to edit the PR title! ✍️\n\n[Learn more about conventional commits](https://www.conventionalcommits.org/)`
+              });
+              
+              console.log(`✅ Renamed PR (${eventType}) from: "${currentTitle}" to: "${newTitle}"`);
+            }
+

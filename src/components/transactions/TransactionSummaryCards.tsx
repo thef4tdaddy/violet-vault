@@ -1,11 +1,21 @@
+import React from "react";
 import PageSummaryCard from "../ui/PageSummaryCard";
 import { getIcon } from "../../utils";
+
+// Minimal transaction interface for summary calculations
+interface TransactionForSummary {
+  amount: number;
+}
+
+interface TransactionSummaryCardsProps {
+  transactions?: TransactionForSummary[];
+}
 
 /**
  * Transaction summary cards using standardized PageSummaryCard component
  * Replaces custom gradient cards with standardized pattern
  */
-const TransactionSummaryCards = ({ transactions = [] }) => {
+const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ transactions = [] }) => {
   // Calculate metrics
   const totalIncome = transactions
     .filter((t) => t && typeof t.amount === "number" && t.amount > 0)

@@ -128,6 +128,13 @@ export const useJoinBudgetMutation = () => {
       if (result.success && result.user) {
         setAuthenticated(result.user, result.sessionData);
 
+        // Log successful budget join
+        logger.info("✅ User joined shared budget", {
+          userName: result.user.userName,
+          budgetId: result.user.budgetId?.substring(0, 8) + "...",
+          sharedBy: result.user.sharedBy,
+        });
+
         // Start background sync
         try {
           const syncDelay = 2500;

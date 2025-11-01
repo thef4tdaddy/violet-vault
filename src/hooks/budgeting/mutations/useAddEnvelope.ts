@@ -56,9 +56,18 @@ export const useAddEnvelope = () => {
 
       return newEnvelope;
     },
-    onSuccess: () => {
+    onSuccess: (envelope) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      
+      // Log successful envelope addition
+      logger.info("✅ Envelope added", {
+        name: envelope.name,
+        category: envelope.category,
+        envelopeType: envelope.envelopeType,
+        targetAmount: envelope.targetAmount,
+      });
+      
       triggerEnvelopeSync("added");
     },
     onError: (error) => {
