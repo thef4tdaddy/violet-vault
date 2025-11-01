@@ -85,8 +85,12 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     deleteTransaction,
   } = useTransactionLedger(currentUser);
 
-  const { netCashFlow } = calculateTransactionTotals(transactions);
-  const filterConfigs = getTransactionFilterConfigs(envelopes) as FilterConfig[];
+  const { netCashFlow } = calculateTransactionTotals(
+    transactions as unknown as import("@/types/finance").Transaction[]
+  );
+  const filterConfigs = getTransactionFilterConfigs(
+    envelopes as unknown as import("@/types/finance").Envelope[]
+  ) as FilterConfig[];
 
   // Show loading state while data is fetching
   if (isLoading) {
@@ -147,7 +151,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         envelopes={envelopes as never}
         categories={[...TRANSACTION_CATEGORIES]}
         onSubmit={handleSubmitTransaction}
-        suggestEnvelope={handleSuggestEnvelope}
+        suggestEnvelope={
+          handleSuggestEnvelope as (description: string) => { id: string; name: string }
+        }
         onPayBill={handlePayBill}
       />
 

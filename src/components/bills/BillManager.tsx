@@ -153,9 +153,9 @@ const BillManager = ({
         toggleBillSelection={toggleBillSelection}
         setShowBulkUpdateModal={setShowBulkUpdateModal}
         setShowBillDetail={setShowBillDetail}
-        getBillDisplayData={getBillDisplayData}
-        billOperations={billOperations}
-        categorizedBills={categorizedBills}
+        getBillDisplayData={getBillDisplayData as never}
+        billOperations={billOperations as never}
+        categorizedBills={categorizedBills as never}
         viewMode={viewMode}
       />
 
@@ -177,9 +177,9 @@ const BillManager = ({
         setShowBillDetail={setShowBillDetail}
         setHistoryBill={setHistoryBill}
         handleEditBill={handleEditBill}
-        addBill={addBill}
-        updateBill={updateBill}
-        deleteBill={deleteBill}
+        addBill={addBill as never}
+        updateBill={updateBill as never}
+        deleteBill={deleteBill as never}
         handleBulkUpdate={handleBulkUpdate}
         handleAddDiscoveredBills={handleAddDiscoveredBills}
         billOperations={billOperations}
