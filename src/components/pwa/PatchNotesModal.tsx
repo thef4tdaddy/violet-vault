@@ -1,14 +1,16 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import useUiStore from "../../stores/ui/uiStore";
-import { markVersionAsSeen } from "../../utils/common/version";
+import { getIcon } from "@/utils";
+import useUiStore from "@/stores/ui/uiStore";
+import { markVersionAsSeen } from "@/utils/common/version";
+
+type ChangeType = "feature" | "fix" | "breaking" | "other";
 
 /**
  * Patch Notes Modal
  * Shows what's new after app updates
  */
-const PatchNotesModal = () => {
+const PatchNotesModal: React.FC = () => {
   const showPatchNotes = useUiStore((state) => state.showPatchNotes);
   const patchNotesData = useUiStore((state) => state.patchNotesData);
   const loadingPatchNotes = useUiStore((state) => state.loadingPatchNotes);
@@ -16,20 +18,20 @@ const PatchNotesModal = () => {
 
   if (!showPatchNotes || !patchNotesData) return null;
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     // Mark the current version as seen so this doesn't show again
     markVersionAsSeen();
     hidePatchNotesModal();
   };
 
-  const handleViewFullNotes = () => {
+  const handleViewFullNotes = (): void => {
     // Open GitHub releases page in new tab
     const repoUrl = "https://github.com/thef4tdaddy/violet-vault";
     const releaseUrl = `${repoUrl}/releases/tag/v${patchNotesData.version}`;
     window.open(releaseUrl, "_blank");
   };
 
-  const getChangeIcon = (type) => {
+  const getChangeIcon = (type: ChangeType): React.ReactElement => {
     switch (type) {
       case "feature":
         return React.createElement(getIcon("PlusCircle"), {
@@ -50,7 +52,7 @@ const PatchNotesModal = () => {
     }
   };
 
-  const getChangeColor = (type) => {
+  const getChangeColor = (type: ChangeType): string => {
     switch (type) {
       case "feature":
         return "text-green-700";
@@ -64,12 +66,12 @@ const PatchNotesModal = () => {
   };
 
   // Get top highlights for display
-  const highlights = [];
+  const highlights: Array<{ type: ChangeType; text: string }> = [];
 
   // Add features first
   if (patchNotesData.features?.length > 0) {
     highlights.push(
-      ...patchNotesData.features.slice(0, 3).map((text) => ({ type: "feature", text }))
+      ...patchNotesData.features.slice(0, 3).map((text) => ({ type: "feature" as const, text }))
     );
   }
 
@@ -77,7 +79,7 @@ const PatchNotesModal = () => {
   if (highlights.length < 4 && patchNotesData.fixes?.length > 0) {
     const remaining = 4 - highlights.length;
     highlights.push(
-      ...patchNotesData.fixes.slice(0, remaining).map((text) => ({ type: "fix", text }))
+      ...patchNotesData.fixes.slice(0, remaining).map((text) => ({ type: "fix" as const, text }))
     );
   }
 
@@ -85,7 +87,7 @@ const PatchNotesModal = () => {
   if (highlights.length < 4 && patchNotesData.other?.length > 0) {
     const remaining = 4 - highlights.length;
     highlights.push(
-      ...patchNotesData.other.slice(0, remaining).map((text) => ({ type: "other", text }))
+      ...patchNotesData.other.slice(0, remaining).map((text) => ({ type: "other" as const, text }))
     );
   }
 

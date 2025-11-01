@@ -1,13 +1,13 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import useUiStore from "../../stores/ui/uiStore";
+import { getIcon } from "@/utils";
+import useUiStore from "@/stores/ui/uiStore";
 
 /**
  * Update Available Modal
  * Shows when a new version of the PWA is available
  */
-const UpdateAvailableModal = () => {
+const UpdateAvailableModal: React.FC = () => {
   const updateAvailable = useUiStore((state) => state.updateAvailable);
   const isUpdating = useUiStore((state) => state.isUpdating);
   const setUpdateAvailable = useUiStore((state) => state.setUpdateAvailable);
@@ -15,11 +15,11 @@ const UpdateAvailableModal = () => {
 
   if (!updateAvailable) return null;
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (): Promise<void> => {
     await updateApp();
   };
 
-  const handleDismiss = () => {
+  const handleDismiss = (): void => {
     setUpdateAvailable(false);
   };
 

@@ -1,21 +1,47 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { useFABSelectors, useFABActions } from "../../stores/ui/fabStore";
-import { useFABLoadingStates } from "../../hooks/mobile/useFABLoadingStates";
-import { hapticFeedback } from "../../utils/ui/touchFeedback";
+import { getIcon } from "@/utils";
+import { useFABSelectors, useFABActions } from "@/stores/ui/fabStore";
+import { useFABLoadingStates } from "@/hooks/mobile/useFABLoadingStates";
+import { hapticFeedback } from "@/utils/ui/touchFeedback";
+
+/**
+ * FAB Action interface
+ */
+interface FABAction {
+  id?: string;
+  label: string;
+  icon: string;
+  action?: () => void;
+  color: string;
+}
+
+/**
+ * Props for FABActionButton
+ */
+interface FABActionButtonProps {
+  action: FABAction;
+  index: number;
+  onActionClick: () => void;
+  isLoading: boolean;
+}
 
 /**
  * Individual action button in the menu
  */
-const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
-  const handleClick = () => {
+const FABActionButton: React.FC<FABActionButtonProps> = ({
+  action,
+  index,
+  onActionClick,
+  isLoading,
+}) => {
+  const handleClick = (): void => {
     hapticFeedback(15, "medium");
     action.action?.();
     onActionClick();
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       action.action?.();
@@ -73,7 +99,7 @@ const FABActionButton = ({ action, index, onActionClick, isLoading }) => {
  * Expandable action menu for FAB
  * Shows secondary actions when FAB is expanded
  */
-const FABActionMenu = () => {
+const FABActionMenu: React.FC = () => {
   const { isExpanded, secondaryActions } = useFABSelectors();
   const { setExpanded } = useFABActions();
   const { isActionLoading } = useFABLoadingStates();
@@ -82,7 +108,7 @@ const FABActionMenu = () => {
     return null;
   }
 
-  const handleActionClick = () => {
+  const handleActionClick = (): void => {
     setExpanded(false);
   };
 

@@ -1,10 +1,32 @@
+import React from "react";
 import { Button } from "@/components/ui";
+
+/**
+ * Selection state interface
+ */
+interface SelectionState {
+  hasSelection: boolean;
+  selectedCount: number;
+}
+
+/**
+ * Props for BillTableBulkActions component
+ */
+interface BillTableBulkActionsProps {
+  selectionState: SelectionState;
+  setShowBulkUpdateModal: (show: boolean) => void;
+  clearSelection: () => void;
+}
 
 /**
  * Bulk actions bar for BillTable
  * Extracted to reduce BillTable complexity
  */
-const BillTableBulkActions = ({ selectionState, setShowBulkUpdateModal, clearSelection }) => {
+const BillTableBulkActions: React.FC<BillTableBulkActionsProps> = ({
+  selectionState,
+  setShowBulkUpdateModal,
+  clearSelection,
+}) => {
   if (!selectionState.hasSelection) {
     return null;
   }
