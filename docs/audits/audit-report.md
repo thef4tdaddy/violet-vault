@@ -4,6 +4,11 @@
 
 | Category                      | Current | Change |
 | ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 4       | -4     |
+| TypeScript Errors             | 2       | +2     |
+| TypeScript Strict Mode Errors | 4510    | -7     |
+
+_Last updated: 2025-10-31 00:41:22 UTC_
 | ESLint Issues                 | 8       | 0      |
 | TypeScript Errors             | 0       | 0      |
 | TypeScript Strict Mode Errors | 4517    | 0      |
@@ -46,6 +51,11 @@ _Last updated: 2025-10-31 00:27:57 UTC_
 
 ### Issue Count by Category
 
+| Count | Rule ID                                                 |
+| ----- | ------------------------------------------------------- |
+| 2     | `complexity`                                            |
+| 1     | `zustand-safe-patterns/zustand-selective-subscriptions` |
+| 1     | `max-params`                                            |
 | Count | Rule ID                  |
 | ----- | ------------------------ |
 | 4     | `max-lines-per-function` |
@@ -68,15 +78,18 @@ violet-vault/src/hooks/bills/useBillManagerHelpers.ts:275:3 - 1 - Arrow function
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+
 - 1 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 1 errors in `src/hooks/bills/useBillManager.ts`
 
 ### Type Error Breakdown by Category
+
 | Count | Error Code |
-|---|---|
-| 2 | `TS2345` |
+| ----- | ---------- |
+| 2     | `TS2345`   |
 
 ### Detailed Type Error Report
+
 ```
 src/hooks/bills/useBillManager.ts(108,9): error TS2345: Argument of type 'FilterOptions' is not assignable to parameter of type 'import("violet-vault/src/hooks/bills/useBillManagerHelpers").FilterOptions'.
   Index signature for type 'string' is missing in type 'FilterOptions'.
@@ -667,6 +680,14 @@ src/hooks/bills/useBillManagerHelpers.ts(283,5): error TS2345: Argument of type 
 
 | Count | Error Code |
 | ----- | ---------- |
+| 1688  | `TS7006`   |
+| 1319  | `TS7031`   |
+| 336   | `TS2339`   |
+| 253   | `TS2345`   |
+| 219   | `TS18046`  |
+| 184   | `TS7053`   |
+| 133   | `TS2322`   |
+| 93    | `TS18048`  |
 | 1691  | `TS7006`   |
 | 1319  | `TS7031`   |
 | 336   | `TS2339`   |
