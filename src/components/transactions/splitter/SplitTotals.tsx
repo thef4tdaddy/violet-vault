@@ -1,8 +1,13 @@
 import React from "react";
-import { getIcon } from "../../../utils/icons";
-import { formatCurrency } from "../../../utils/transactions/splitterHelpers";
+import { getIcon } from "@/utils/icons";
+import { formatCurrency } from "@/utils/transactions/splitterHelpers";
+import type { SplitTotals as SplitTotalsType } from "@/types/finance";
 
-const SplitTotals = ({ totals }) => {
+interface SplitTotalsProps {
+  totals: SplitTotalsType;
+}
+
+const SplitTotals: React.FC<SplitTotalsProps> = ({ totals }) => {
   const {
     original,
     allocated,
