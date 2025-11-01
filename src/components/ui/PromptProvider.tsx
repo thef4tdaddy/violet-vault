@@ -1,3 +1,4 @@
+import React from "react";
 import PromptModal from "./PromptModal";
 import { usePromptModal } from "../../hooks/common/usePrompt";
 
@@ -23,7 +24,9 @@ const PromptProvider = () => {
       cancelLabel={config.cancelLabel}
       inputType={config.inputType}
       isRequired={config.isRequired}
-      validation={config.validation as ((value: string) => { valid: boolean; error: string }) | null}
+      validation={
+        config.validation as ((value: string) => { valid: boolean; error: string }) | null
+      }
       icon={config.icon as unknown as React.ComponentType<{ className?: string }> | null}
       isLoading={isLoading}
       onConfirm={onConfirm}

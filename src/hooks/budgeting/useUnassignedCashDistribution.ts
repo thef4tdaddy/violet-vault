@@ -127,19 +127,14 @@ const useUnassignedCashDistribution = () => {
     return totalDistributed > 0; // Remove restriction against going negative
   }, [totalDistributed]);
 
-  // Reset distributions (called when modal opens)
   const resetDistributions = useCallback(() => {
     setDistributions({});
     setIsProcessing(false);
   }, []);
 
-  // Update distribution amount for a specific envelope
   const updateDistribution = useCallback((envelopeId: string, amount: string | number) => {
     const numericAmount = parseFloat(String(amount)) || 0;
-    setDistributions((prev) => ({
-      ...prev,
-      [envelopeId]: Math.max(0, numericAmount),
-    }));
+    setDistributions((prev) => ({ ...prev, [envelopeId]: Math.max(0, numericAmount) }));
   }, []);
 
   // Clear all distributions
@@ -240,12 +235,11 @@ const useUnassignedCashDistribution = () => {
       }
 
       // Log successful distribution
-      const totalDistributed = Object.values(distributions).reduce(
-        (sum: number, amt: unknown) => sum + (parseFloat(String(amt)) || 0),
-        0
-      );
       logger.info("✅ Unassigned cash distributed", {
-        totalDistributed,
+        totalDistributed: Object.values(distributions).reduce(
+          (sum: number, amt: unknown) => sum + (parseFloat(String(amt)) || 0),
+          0
+        ),
         envelopesUpdated: envelopeUpdates.length,
         remainingUnassigned: remainingCash,
       });
