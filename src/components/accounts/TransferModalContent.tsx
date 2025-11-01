@@ -6,6 +6,33 @@ import {
 } from "./transfer/TransferFormFields";
 import { Button } from "@/components/ui";
 
+interface TransferForm {
+  envelopeId: string;
+  amount: string;
+  description: string;
+}
+
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentAmount?: number;
+}
+
+interface TransferringAccount {
+  id: string | number;
+  name: string;
+  currentBalance: number;
+}
+
+interface TransferModalContentProps {
+  transferringAccount: TransferringAccount;
+  transferForm: TransferForm;
+  setTransferForm: (form: TransferForm) => void;
+  envelopes: Envelope[];
+  onClose: () => void;
+  onTransfer: () => void;
+}
+
 /**
  * Extracted content component for TransferModal
  * Reduces main component complexity for ESLint compliance
@@ -17,7 +44,7 @@ const TransferModalContent = ({
   envelopes,
   onClose,
   onTransfer,
-}) => {
+}: TransferModalContentProps) => {
   const confirmFeedback = useTouchFeedback("confirm", "success");
 
   return (

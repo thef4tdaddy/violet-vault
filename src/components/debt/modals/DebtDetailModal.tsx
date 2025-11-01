@@ -11,7 +11,7 @@ import {
 } from "./DebtDetailModalComponents";
 
 interface DebtDetailModalProps {
-  debt?: Record<string, unknown>;
+  debt?: Record<string, unknown> & { id: string };
   isOpen: boolean;
   onClose: () => void;
   onDelete: (debtId: string) => Promise<void>;

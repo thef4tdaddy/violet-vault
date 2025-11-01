@@ -153,8 +153,11 @@ export const useTransactionLedger = (currentUser: unknown) => {
     resetImport();
   };
 
-  const handleSuggestEnvelope = (description) => {
-    return suggestEnvelope(description, envelopes);
+  const handleSuggestEnvelope = (description: string) => {
+    return suggestEnvelope(
+      description,
+      envelopes as unknown as import("@/types/finance").Envelope[]
+    );
   };
 
   const handlePagination = (direction) => {

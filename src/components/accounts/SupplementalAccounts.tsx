@@ -5,6 +5,38 @@ import AccountsGrid from "./AccountsGrid";
 import AccountFormModal from "./AccountFormModal";
 import TransferModal from "./TransferModal";
 
+interface Account {
+  id: string | number;
+  name: string;
+  type: string;
+  currentBalance: number;
+  annualContribution: number;
+  expirationDate: string | null;
+  description: string | null;
+  color: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  lastUpdated: string;
+  transactions: unknown[];
+}
+
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentAmount?: number;
+}
+
+interface SupplementalAccountsProps {
+  supplementalAccounts?: unknown[];
+  onAddAccount: unknown;
+  onUpdateAccount: unknown;
+  onDeleteAccount: unknown;
+  onTransferToEnvelope: unknown;
+  envelopes?: unknown[];
+  currentUser?: unknown;
+}
+
 const SupplementalAccounts = ({
   supplementalAccounts = [],
   onAddAccount,
@@ -13,7 +45,10 @@ const SupplementalAccounts = ({
   onTransferToEnvelope,
   envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
-}) => {
+}: SupplementalAccountsProps) => {
+  // Type assertions for internal use
+  const typedAccounts = supplementalAccounts as Account[];
+  const typedEnvelopes = envelopes as Envelope[];
   const {
     // UI State
     showAddModal,
@@ -47,13 +82,13 @@ const SupplementalAccounts = ({
     totalValue,
     expiringAccounts,
   } = useSupplementalAccounts({
-    supplementalAccounts,
+    supplementalAccounts: supplementalAccounts as never[],
     onAddAccount,
     onUpdateAccount,
     onDeleteAccount,
     onTransferToEnvelope,
-    envelopes,
-    currentUser,
+    envelopes: envelopes as never[],
+    currentUser: currentUser as { userName: string; userColor: string } | undefined,
   });
 
   return (
@@ -68,7 +103,7 @@ const SupplementalAccounts = ({
       <ExpirationAlert expiringAccounts={expiringAccounts} />
 
       <AccountsGrid
-        accounts={supplementalAccounts}
+        accounts={typedAccounts}
         showBalances={showBalances}
         onEdit={startEdit}
         onDelete={handleDelete}
@@ -97,7 +132,7 @@ const SupplementalAccounts = ({
         transferringAccount={transferringAccount}
         transferForm={transferForm}
         setTransferForm={setTransferForm}
-        envelopes={envelopes}
+        envelopes={typedEnvelopes}
       />
     </div>
   );

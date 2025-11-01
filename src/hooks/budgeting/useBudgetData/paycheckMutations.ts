@@ -9,15 +9,22 @@ import { processPaycheck } from "../../../utils/budgeting/paycheckProcessing";
 import { deletePaycheck } from "../../../utils/budgeting/paycheckDeletion";
 import logger from "../../../utils/common/logger.ts";
 
-export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
+interface PaycheckData {
+  amount: number;
+  payerName: string;
+  mode?: string;
+  [key: string]: unknown;
+}
+
+export const usePaycheckMutations = (envelopesQuery: unknown, savingsGoalsQuery: unknown) => {
   const queryClient = useQueryClient();
 
   const processPaycheckMutation = useMutation({
     mutationKey: ["paychecks", "process"],
-    mutationFn: async (paycheckData) => {
+    mutationFn: async (paycheckData: PaycheckData) => {
       return await processPaycheck(paycheckData, envelopesQuery, savingsGoalsQuery);
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (_result, variables) => {
       // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -43,7 +50,7 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
     mutationFn: async (paycheckId: string) => {
       return await deletePaycheck(paycheckId);
     },
-    onSuccess: (_, paycheckId) => {
+    onSuccess: (_result, paycheckId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.paychecks });

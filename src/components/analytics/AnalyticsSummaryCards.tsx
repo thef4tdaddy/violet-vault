@@ -26,7 +26,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       icon: getIcon("PieChart"),
       label: "Top Category",
       value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
-      color: "indigo",
+      color: "indigo" as const,
       subtext: "Highest spending area",
     },
     {
@@ -34,7 +34,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       icon: getIcon("Calculator"),
       label: "Avg Transaction",
       value: `$${avgTransaction.toFixed(2)}`,
-      color: "teal",
+      color: "teal" as const,
       subtext: "Per transaction",
     },
     {
@@ -45,13 +45,13 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       color: budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red",
       subtext: "Envelope adherence",
       alert: budgetAccuracy < 60,
-    },
+    } as const,
     {
       key: "savings-rate",
       icon: getIcon("TrendingUp"),
       label: "Savings Rate",
       value: `${savingsProgress.toFixed(1)}%`,
-      color: "emerald",
+      color: "emerald" as const,
       subtext: "Goal completion",
     },
   ];

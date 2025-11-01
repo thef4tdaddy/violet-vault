@@ -1,6 +1,7 @@
 /**
  * Utility functions for transaction table operations
  */
+import type { Transaction, Envelope } from "@/types/finance";
 
 // Fixed column widths for consistent table layout
 export const COLUMN_WIDTHS = {
@@ -22,14 +23,19 @@ export const TABLE_CONFIG = {
 /**
  * Find envelope by transaction envelope ID
  */
-export const findEnvelopeForTransaction = (transaction, envelopes) => {
+export const findEnvelopeForTransaction = (
+  transaction: Transaction,
+  envelopes: Envelope[]
+): Envelope | undefined => {
   return envelopes.find((e) => e.id === transaction.envelopeId);
 };
 
 /**
  * Format transaction amount for display
  */
-export const formatTransactionAmount = (amount) => {
+export const formatTransactionAmount = (
+  amount: number
+): { formatted: string; className: string; isPositive: boolean } => {
   const isPositive = amount >= 0;
   const absoluteAmount = Math.abs(amount);
 
@@ -43,14 +49,16 @@ export const formatTransactionAmount = (amount) => {
 /**
  * Format transaction date for display
  */
-export const formatTransactionDate = (dateString) => {
+export const formatTransactionDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString();
 };
 
 /**
  * Get envelope display info
  */
-export const getEnvelopeDisplay = (envelope) => {
+export const getEnvelopeDisplay = (
+  envelope: Envelope | undefined
+): { name: string; color?: string; className: string } => {
   if (!envelope) {
     return {
       name: "Unassigned",

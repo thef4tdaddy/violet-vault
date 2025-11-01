@@ -1,6 +1,34 @@
 import { Select } from "@/components/ui";
 
-const TransferEnvelopeSelect = ({ transferForm, setTransferForm, envelopes }) => (
+interface TransferForm {
+  envelopeId: string;
+  amount: string;
+  description: string;
+}
+
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentAmount?: number;
+}
+
+interface TransferringAccount {
+  id: string | number;
+  name: string;
+  currentBalance: number;
+}
+
+interface TransferEnvelopeSelectProps {
+  transferForm: TransferForm;
+  setTransferForm: (form: TransferForm) => void;
+  envelopes: Envelope[];
+}
+
+const TransferEnvelopeSelect = ({
+  transferForm,
+  setTransferForm,
+  envelopes,
+}: TransferEnvelopeSelectProps) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">Transfer to Envelope *</label>
     <Select
@@ -15,7 +43,7 @@ const TransferEnvelopeSelect = ({ transferForm, setTransferForm, envelopes }) =>
       required
     >
       <option value="">Select an envelope...</option>
-      {envelopes.map((envelope) => (
+      {envelopes.map((envelope: Envelope) => (
         <option key={envelope.id} value={envelope.id}>
           {envelope.name} ($
           {envelope.currentAmount?.toFixed(2) || "0.00"})
@@ -25,7 +53,17 @@ const TransferEnvelopeSelect = ({ transferForm, setTransferForm, envelopes }) =>
   </div>
 );
 
-const TransferAmountInput = ({ transferForm, setTransferForm, transferringAccount }) => (
+interface TransferAmountInputProps {
+  transferForm: TransferForm;
+  setTransferForm: (form: TransferForm) => void;
+  transferringAccount: TransferringAccount;
+}
+
+const TransferAmountInput = ({
+  transferForm,
+  setTransferForm,
+  transferringAccount,
+}: TransferAmountInputProps) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
     <input
@@ -41,7 +79,17 @@ const TransferAmountInput = ({ transferForm, setTransferForm, transferringAccoun
   </div>
 );
 
-const TransferDescriptionInput = ({ transferForm, setTransferForm, transferringAccount }) => (
+interface TransferDescriptionInputProps {
+  transferForm: TransferForm;
+  setTransferForm: (form: TransferForm) => void;
+  transferringAccount: TransferringAccount;
+}
+
+const TransferDescriptionInput = ({
+  transferForm,
+  setTransferForm,
+  transferringAccount,
+}: TransferDescriptionInputProps) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
     <input

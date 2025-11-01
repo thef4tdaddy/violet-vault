@@ -2,7 +2,40 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const AccountCardDetails = ({ account, expirationStatus, showBalances, onStartTransfer }) => (
+interface ExpirationStatus {
+  text: string;
+  color: string;
+}
+
+interface Account {
+  id: string | number;
+  name: string;
+  type: string;
+  currentBalance: number;
+  annualContribution: number;
+  expirationDate: string | null;
+  description: string | null;
+  color: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  lastUpdated: string;
+  transactions: unknown[];
+}
+
+interface AccountCardDetailsProps {
+  account: Account;
+  expirationStatus: ExpirationStatus;
+  showBalances: boolean;
+  onStartTransfer: (account: Account) => void;
+}
+
+const AccountCardDetails = ({
+  account,
+  expirationStatus,
+  showBalances,
+  onStartTransfer,
+}: AccountCardDetailsProps) => (
   <>
     <div className="space-y-2">
       <div className="flex justify-between items-center">

@@ -5,15 +5,16 @@ import DebtDetailModal from "./modals/DebtDetailModal";
 import UpcomingPaymentsModal from "./modals/UpcomingPaymentsModal";
 import StandardTabs from "../ui/StandardTabs";
 import { DashboardHeader, OverviewTab, StrategiesTab } from "./DebtDashboardComponents";
+import { getIcon } from "@/utils";
 
 // Tab configuration
 const tabs = [
-  { id: "overview", label: "Overview", icon: "CreditCard", color: "red" },
+  { id: "overview", label: "Overview", icon: getIcon("CreditCard"), color: "red" as const },
   {
     id: "strategies",
     label: "Payoff Strategies",
-    icon: "Target",
-    color: "purple",
+    icon: getIcon("Target"),
+    color: "purple" as const,
   },
 ];
 

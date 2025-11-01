@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../../contexts/AuthContext";
+import { SessionData } from "../../../contexts/authConstants";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
@@ -20,12 +21,6 @@ interface UserData {
   email?: string;
   budgetId?: string;
   userName?: string;
-  [key: string]: unknown;
-}
-
-interface SessionData {
-  token?: string;
-  expiresAt?: string;
   [key: string]: unknown;
 }
 
@@ -243,14 +238,10 @@ export const useLoginMutation = () => {
     },
     onSuccess: async (result: LoginResult) => {
       if (result.success && result.user) {
-        // Cast to the expected types for AuthContext
-        const authSessionData = {
-          encryptionKey: undefined,
-          salt: undefined,
-        };
+        // Pass the encryption key and salt from login result to auth context
         setAuthenticated(
           result.user as unknown as import("@/types/auth").UserData,
-          authSessionData
+          result.sessionData  // ✅ Use actual session data with encryption key!
         );
 
         // Log successful authentication
@@ -258,6 +249,7 @@ export const useLoginMutation = () => {
           userName: result.user.userName,
           budgetId: result.user.budgetId?.substring(0, 8) + "...",
           isNewUser: result.isNewUser || false,
+          hasEncryptionKey: !!result.sessionData?.encryptionKey,
         });
 
         // Start background sync for successful logins

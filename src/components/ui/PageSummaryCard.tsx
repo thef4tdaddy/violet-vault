@@ -1,5 +1,38 @@
 import React from "react";
 
+type ColorType =
+  | "red"
+  | "orange"
+  | "amber"
+  | "yellow"
+  | "green"
+  | "emerald"
+  | "teal"
+  | "cyan"
+  | "blue"
+  | "indigo"
+  | "purple"
+  | "pink"
+  | "gray";
+
+interface ColorConfig {
+  gradient: string;
+  textMain: string;
+  textValue: string;
+  textSub: string;
+}
+
+interface PageSummaryCardProps {
+  icon?: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string | number;
+  subtext?: string;
+  color?: ColorType;
+  onClick?: () => void;
+  className?: string;
+  alert?: boolean;
+}
+
 /**
  * Page-Level Summary Card Component
  * Based on the bill summary card design pattern with gradient backgrounds
@@ -23,9 +56,9 @@ const PageSummaryCard = ({
   onClick,
   className = "",
   alert = false,
-}) => {
+}: PageSummaryCardProps) => {
   // Color configurations for gradient backgrounds and text
-  const colorConfig = {
+  const colorConfig: Record<ColorType, ColorConfig> = {
     red: {
       gradient: "from-red-500 to-red-600",
       textMain: "text-red-100",
@@ -106,7 +139,7 @@ const PageSummaryCard = ({
     },
   };
 
-  const config = colorConfig[color] || colorConfig.blue;
+  const config = colorConfig[color];
 
   return (
     <div

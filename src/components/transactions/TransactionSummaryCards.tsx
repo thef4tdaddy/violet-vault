@@ -1,11 +1,21 @@
+import React from "react";
 import PageSummaryCard from "../ui/PageSummaryCard";
 import { getIcon } from "../../utils";
+
+// Minimal transaction interface for summary calculations
+interface TransactionForSummary {
+  amount: number;
+}
+
+interface TransactionSummaryCardsProps {
+  transactions?: TransactionForSummary[];
+}
 
 /**
  * Transaction summary cards using standardized PageSummaryCard component
  * Replaces custom gradient cards with standardized pattern
  */
-const TransactionSummaryCards = ({ transactions = [] }) => {
+const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ transactions = [] }) => {
   // Calculate metrics
   const totalIncome = transactions
     .filter((t) => t && typeof t.amount === "number" && t.amount > 0)
@@ -24,7 +34,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
       icon: getIcon("TrendingDown"),
       label: "Monthly Spend",
       value: `$${totalExpenses.toFixed(2)}`,
-      color: "blue",
+      color: "blue" as const,
       subtext: `${transactions.filter((t) => t.amount < 0).length} expenses`,
     },
     {
@@ -32,7 +42,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
       icon: getIcon("TrendingUp"),
       label: "Income",
       value: `$${totalIncome.toFixed(2)}`,
-      color: "green",
+      color: "green" as const,
       subtext: `${transactions.filter((t) => t.amount > 0).length} deposits`,
     },
     {
@@ -43,13 +53,13 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
       color: netCashFlow >= 0 ? "purple" : "amber",
       subtext: netCashFlow >= 0 ? "Positive flow" : "Deficit",
       alert: netCashFlow < 0,
-    },
+    } as const,
     {
       key: "transaction-count",
       icon: getIcon("Hash"),
       label: "Transactions",
       value: transactionCount.toString(),
-      color: "gray",
+      color: "gray" as const,
       subtext: "This period",
     },
   ];

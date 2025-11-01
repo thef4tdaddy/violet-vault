@@ -1,13 +1,13 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 
 /**
  * Offline Fallback Page
  * Displayed when user tries to access uncached routes while offline
  */
-const OfflinePage = () => {
-  const retryConnection = () => {
+const OfflinePage: React.FC = () => {
+  const retryConnection = (): void => {
     // Attempt to reload the page when online
     window.location.reload();
   };

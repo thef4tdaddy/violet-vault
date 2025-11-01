@@ -85,8 +85,12 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     deleteTransaction,
   } = useTransactionLedger(currentUser);
 
-  const { netCashFlow } = calculateTransactionTotals(transactions);
-  const filterConfigs = getTransactionFilterConfigs(envelopes) as FilterConfig[];
+  const { netCashFlow } = calculateTransactionTotals(
+    transactions as unknown as import("@/types/finance").Transaction[]
+  );
+  const filterConfigs = getTransactionFilterConfigs(
+    envelopes as unknown as import("@/types/finance").Envelope[]
+  ) as FilterConfig[];
 
   // Show loading state while data is fetching
   if (isLoading) {
@@ -124,9 +128,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       {/* Transactions Table */}
       <TransactionTable
         transactions={paginatedTransactions}
-        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        envelopes={envelopes as never}
         onEdit={startEdit}
-        onDelete={(id) => deleteTransaction(id as never)}
+        onDelete={(id) => deleteTransaction(id.toString())}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
 
@@ -142,12 +146,14 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         isOpen={showAddModal}
         onClose={handleCloseModal}
         editingTransaction={editingTransaction}
-        transactionForm={transactionForm}
+        transactionForm={transactionForm as never}
         setTransactionForm={setTransactionForm}
-        envelopes={envelopes}
+        envelopes={envelopes as never}
         categories={[...TRANSACTION_CATEGORIES]}
         onSubmit={handleSubmitTransaction}
-        suggestEnvelope={handleSuggestEnvelope}
+        suggestEnvelope={
+          handleSuggestEnvelope as (description: string) => { id: string; name: string }
+        }
         onPayBill={handlePayBill}
       />
 
@@ -170,8 +176,8 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       <TransactionSplitter
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
-        transaction={splittingTransaction}
-        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        transaction={splittingTransaction || null}
+        envelopes={envelopes as never}
         availableCategories={[...TRANSACTION_CATEGORIES]}
         onSave={handleSplitTransaction}
       />

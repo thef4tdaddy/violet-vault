@@ -2,7 +2,36 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const AccountCardHeader = ({ account, typeInfo, onEdit, onDelete }) => (
+interface AccountTypeInfo {
+  value: string;
+  label: string;
+  icon: string;
+}
+
+interface Account {
+  id: string | number;
+  name: string;
+  type: string;
+  currentBalance: number;
+  annualContribution: number;
+  expirationDate: string | null;
+  description: string | null;
+  color: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  lastUpdated: string;
+  transactions: unknown[];
+}
+
+interface AccountCardHeaderProps {
+  account: Account;
+  typeInfo: AccountTypeInfo;
+  onEdit: (account: Account) => void;
+  onDelete: (accountId: string | number) => void;
+}
+
+const AccountCardHeader = ({ account, typeInfo, onEdit, onDelete }: AccountCardHeaderProps) => (
   <div className="flex items-start justify-between mb-3">
     <div className="flex items-center">
       <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: account.color }} />

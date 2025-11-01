@@ -40,7 +40,6 @@ export const useTransactionMutations = () => {
   const queryClient = useQueryClient();
   const { updateBalancesForTransaction } = useTransactionBalanceUpdater();
 
-  // Add transaction mutation
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
     mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
@@ -57,26 +56,16 @@ export const useTransactionMutations = () => {
         merchant: transactionData.merchant,
         receiptUrl: transactionData.receiptUrl,
       };
-
-      // Apply optimistic update and save to Dexie
       await optimisticHelpers.addTransaction(queryClient, newTransaction);
-
-      // Save to Dexie (single source of truth for transactions)
       await budgetDb.transactions.put(newTransaction);
-
-      // Update balances based on transaction
       await updateBalancesForTransaction(newTransaction);
-
       return newTransaction;
     },
     onSuccess: (transaction) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
-      
-      // Log successful transaction addition
       logger.info("✅ Transaction added", {
         amount: transaction.amount,
         type: transaction.type,
@@ -84,19 +73,13 @@ export const useTransactionMutations = () => {
         envelope: transaction.envelopeId || "unassigned",
         category: transaction.category,
       });
-      
-      // Trigger immediate sync for transaction addition
       triggerTransactionSync("added");
     },
     onError: (error) => {
-      logger.error("Failed to add transaction", error, {
-        source: "addTransactionMutation",
-      });
-      // TODO: Implement rollback logic
+      logger.error("Failed to add transaction", error, { source: "addTransactionMutation" });
     },
   });
 
-  // Reconcile transaction mutation (for balance reconciliation)
   const reconcileTransactionMutation = useMutation({
     mutationKey: ["transactions", "reconcile"],
     mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
@@ -112,28 +95,20 @@ export const useTransactionMutations = () => {
         description: transactionData.description,
       };
 
-      // Apply optimistic update and save to Dexie
       await optimisticHelpers.addTransaction(queryClient, reconciledTransaction);
-
-      // Save to Dexie (single source of truth for transactions)
       await budgetDb.transactions.put(reconciledTransaction);
-
       return reconciledTransaction;
     },
     onSuccess: (transaction) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      
-      // Log successful reconciliation
       logger.info("✅ Balance reconciled", {
         amount: transaction.amount,
         type: transaction.type,
         description: transaction.description,
         method: "manual",
       });
-      
-      // Trigger immediate sync for transaction reconciliation
       triggerTransactionSync("reconciled");
     },
     onError: (error) => {
@@ -143,84 +118,51 @@ export const useTransactionMutations = () => {
     },
   });
 
-  // Delete transaction mutation
   const deleteTransactionMutation = useMutation({
     mutationKey: ["transactions", "delete"],
     mutationFn: async (transactionId: string): Promise<string> => {
-      // Get transaction data before deleting (needed for balance updates)
       const transaction = await budgetDb.transactions.get(transactionId);
-
-      // Apply optimistic update using helper
       await optimisticHelpers.removeTransaction(queryClient, transactionId);
-
-      // Delete from Dexie (single source of truth for transactions)
       await budgetDb.transactions.delete(transactionId);
-
-      // Reverse the balance changes
       if (transaction) {
         await updateBalancesForTransaction(transaction, true);
       }
-
       return transactionId;
     },
     onSuccess: (transactionId) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
-      
-      // Log successful transaction deletion
-      logger.info("✅ Transaction deleted", {
-        id: transactionId,
-      });
-      
-      // Trigger immediate sync for transaction deletion
+      logger.info("✅ Transaction deleted", { id: transactionId });
       triggerTransactionSync("deleted");
     },
     onError: (error) => {
-      logger.error("Failed to delete transaction", error, {
-        source: "deleteTransactionMutation",
-      });
-      // Rollback optimistic update
+      logger.error("Failed to delete transaction", error, { source: "deleteTransactionMutation" });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
     },
   });
 
-  // Update transaction mutation
   const updateTransactionMutation = useMutation({
     mutationKey: ["transactions", "update"],
     mutationFn: async ({
       id,
       updates,
     }: TransactionUpdateInput): Promise<TransactionUpdateInput> => {
-      const updatedTransaction = {
-        ...updates,
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Apply optimistic update using helper
+      const updatedTransaction = { ...updates, updatedAt: new Date().toISOString() };
       await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
-
-      // Update in Dexie (single source of truth for transactions)
       await budgetDb.transactions.update(id, updatedTransaction);
-
       return { id, updates: updatedTransaction };
     },
     onSuccess: (data) => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
-      
-      // Log successful transaction update
       logger.info("✅ Transaction updated", {
         id: data.id,
         updates: Object.keys(data.updates || {}),
       });
-      
-      // Trigger immediate sync for transaction update
       triggerTransactionSync("updated");
     },
     onError: (error) => {

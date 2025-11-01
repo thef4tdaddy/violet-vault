@@ -1,3 +1,4 @@
+import React from "react";
 import ConfirmModal from "./ConfirmModal";
 import { useConfirmModal } from "../../hooks/common/useConfirm";
 
@@ -20,7 +21,7 @@ const ConfirmProvider = () => {
       confirmLabel={config.confirmLabel}
       cancelLabel={config.cancelLabel}
       destructive={config.destructive}
-      icon={config.icon}
+      icon={config.icon as unknown as React.ComponentType<{ className?: string }> | null}
       isLoading={isLoading}
       onConfirm={onConfirm}
       onCancel={onCancel}

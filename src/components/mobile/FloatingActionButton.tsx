@@ -1,17 +1,17 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
-import { useFABSelectors } from "../../stores/ui/fabStore";
-import { useFABBehavior } from "../../hooks/mobile/useFABBehavior";
-import { useFABSmartPositioning } from "../../hooks/mobile/useFABSmartPositioning";
-import { useFABLoadingStates } from "../../hooks/mobile/useFABLoadingStates";
+import { getIcon } from "@/utils";
+import { useFABSelectors } from "@/stores/ui/fabStore";
+import { useFABBehavior } from "@/hooks/mobile/useFABBehavior";
+import { useFABSmartPositioning } from "@/hooks/mobile/useFABSmartPositioning";
+import { useFABLoadingStates } from "@/hooks/mobile/useFABLoadingStates";
 import FABActionMenu from "./FABActionMenu";
 
 /**
  * Simple Floating Action Button component
  * Just the button - behavior is handled by hooks
  */
-const FloatingActionButton = () => {
+const FloatingActionButton: React.FC = () => {
   const { shouldShowFAB, primaryAction, isExpanded } = useFABSelectors();
   const { containerRef, handlePrimaryClick, handleLongPress, handleBackdropClick } =
     useFABBehavior();
