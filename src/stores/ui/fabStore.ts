@@ -280,12 +280,12 @@ export const useFABStore = create<FABState>()(
  * Hook for easy access to FAB store selectors
  */
 export const useFABSelectors = () => {
-  const currentScreen = useFABStore((state) => state.currentScreen);
-  const isVisible = useFABStore((state) => state.isVisible);
-  const isExpanded = useFABStore((state) => state.isExpanded);
-  const shouldShowFAB = useFABStore((state) => getShouldShowFAB(state));
-  const primaryAction = useFABStore((state) => getCurrentPrimaryAction(state));
-  const secondaryActions = useFABStore((state) => getAllSecondaryActions(state));
+  const currentScreen = useFABStore((state: FABState) => state.currentScreen);
+  const isVisible = useFABStore((state: FABState) => state.isVisible);
+  const isExpanded = useFABStore((state: FABState) => state.isExpanded);
+  const shouldShowFAB = useFABStore((state: FABState) => getShouldShowFAB(state));
+  const primaryAction = useFABStore((state: FABState) => getCurrentPrimaryAction(state));
+  const secondaryActions = useFABStore((state: FABState) => getAllSecondaryActions(state));
 
   return {
     currentScreen,
@@ -301,16 +301,18 @@ export const useFABSelectors = () => {
  * Hook for FAB actions
  */
 export const useFABActions = () => {
-  const setCurrentScreen = useFABStore((state) => state.setCurrentScreen);
-  const setVisibility = useFABStore((state) => state.setVisibility);
-  const setExpanded = useFABStore((state) => state.setExpanded);
-  const toggleExpanded = useFABStore((state) => state.toggleExpanded);
-  const registerPrimaryAction = useFABStore((state) => state.registerPrimaryAction);
-  const unregisterPrimaryAction = useFABStore((state) => state.unregisterPrimaryAction);
-  const registerSecondaryAction = useFABStore((state) => state.registerSecondaryAction);
-  const unregisterSecondaryAction = useFABStore((state) => state.unregisterSecondaryAction);
-  const setDefaultActionHandler = useFABStore((state) => state.setDefaultActionHandler);
-  const clearScreenActions = useFABStore((state) => state.clearScreenActions);
+  const setCurrentScreen = useFABStore((state: FABState) => state.setCurrentScreen);
+  const setVisibility = useFABStore((state: FABState) => state.setVisibility);
+  const setExpanded = useFABStore((state: FABState) => state.setExpanded);
+  const toggleExpanded = useFABStore((state: FABState) => state.toggleExpanded);
+  const registerPrimaryAction = useFABStore((state: FABState) => state.registerPrimaryAction);
+  const unregisterPrimaryAction = useFABStore((state: FABState) => state.unregisterPrimaryAction);
+  const registerSecondaryAction = useFABStore((state: FABState) => state.registerSecondaryAction);
+  const unregisterSecondaryAction = useFABStore(
+    (state: FABState) => state.unregisterSecondaryAction
+  );
+  const setDefaultActionHandler = useFABStore((state: FABState) => state.setDefaultActionHandler);
+  const clearScreenActions = useFABStore((state: FABState) => state.clearScreenActions);
 
   return {
     setCurrentScreen,
