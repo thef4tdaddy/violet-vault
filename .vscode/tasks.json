@@ -39,6 +39,16 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "TypeScript: Restart TS Server",
+      "type": "shell",
+      "command": "echo 'Restart TypeScript server by running: Command Palette → TypeScript: Restart TS Server'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
     }
   ]
 }
