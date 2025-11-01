@@ -85,14 +85,14 @@ const getAllSecondaryActions = (state: FABState): FABAction[] => {
   const actions: FABAction[] = [];
 
   // Add default actions that have handlers
-  Object.values(defaultSecondaryActions).forEach((action) => {
+  Object.values(defaultSecondaryActions).forEach((action: FABAction) => {
     if (action.action) {
       actions.push(action);
     }
   });
 
   // Add custom secondary actions
-  secondaryActions.forEach((action) => {
+  secondaryActions.forEach((action: FABAction) => {
     actions.push(action);
   });
 
@@ -216,15 +216,9 @@ const getShouldShowFAB = (state: FABState): boolean => {
 export const useFABStore = create<FABState>()(
   subscribeWithSelector(
     devtools(
-      immer((set, get) => {
-        const storeActions = createStoreActions(
-          set as (fn: (state: FABState) => void) => void,
-          get
-        );
-        const actionManagement = createActionManagement(
-          set as (fn: (state: FABState) => void) => void,
-          get
-        );
+      immer((set: (fn: (state: FABState) => void) => void, get: () => FABState) => {
+        const storeActions = createStoreActions(set, get);
+        const actionManagement = createActionManagement(set, get);
 
         return {
           // Core state

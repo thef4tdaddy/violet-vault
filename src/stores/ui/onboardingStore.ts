@@ -29,7 +29,16 @@ interface OnboardingState {
  */
 const useOnboardingStore = create<OnboardingState>()(
   persist(
-    (_set, _get) => ({
+    (
+      _set: (
+        partial:
+          | OnboardingState
+          | Partial<OnboardingState>
+          | ((state: OnboardingState) => OnboardingState | Partial<OnboardingState>),
+        replace?: boolean
+      ) => void,
+      _get: () => OnboardingState
+    ) => ({
       // Onboarding completion status
       isOnboarded: true, // 🚨 TEMP: Set to true to skip onboarding functionality
 
@@ -58,12 +67,12 @@ const useOnboardingStore = create<OnboardingState>()(
       },
 
       // 🚨 SIMPLIFIED ACTIONS - No get() calls
-      markStepComplete: (step) => {
+      markStepComplete: (step: string) => {
         logger.info(`✅ Onboarding step completed: ${step} (TEMP DISABLED)`);
         // Do nothing - onboarding disabled
       },
 
-      startTutorialStep: (step) => {
+      startTutorialStep: (step: string) => {
         logger.info(`🎯 Starting tutorial step: ${step} (TEMP DISABLED)`);
         // Do nothing - onboarding disabled
       },
@@ -82,17 +91,17 @@ const useOnboardingStore = create<OnboardingState>()(
         // Do nothing - onboarding disabled
       },
 
-      setPreference: (key, value) => {
+      setPreference: (key: string, value: unknown) => {
         logger.info(`Setting preference ${key} = ${value} (TEMP DISABLED)`);
         // Do nothing - onboarding disabled
       },
 
       // 🚨 TEMP: Simplified helper methods that don't use get()
-      isStepComplete: (_step) => {
+      isStepComplete: (_step: string) => {
         return true; // All steps "complete"
       },
 
-      shouldShowHint: (_step) => {
+      shouldShowHint: (_step: string) => {
         return false; // No hints
       },
 

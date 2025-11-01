@@ -43,77 +43,90 @@ interface ToastState {
   showPayday: (message: string, title?: string, duration?: number) => number;
 }
 
-export const useToastStore = create<ToastState>((set, _get) => {
-  const store: ToastState = {
-    toasts: [],
+export const useToastStore = create<ToastState>(
+  (
+    set: (
+      partial:
+        | ToastState
+        | Partial<ToastState>
+        | ((state: ToastState) => ToastState | Partial<ToastState>),
+      replace?: boolean
+    ) => void,
+    _get: () => ToastState
+  ) => {
+    const store: ToastState = {
+      toasts: [],
 
-    addToast: ({ type = "info", title, message, duration = 5000 }: AddToastOptions) => {
-      const id = ++toastId;
-      const toast: Toast = {
-        id,
-        type,
-        title,
-        message,
-        duration,
-      };
+      addToast: ({ type = "info", title, message, duration = 5000 }: AddToastOptions) => {
+        const id = ++toastId;
+        const toast: Toast = {
+          id,
+          type,
+          title,
+          message,
+          duration,
+        };
 
-      set(
-        (state: ToastState): ToastState => ({
-          ...state,
-          toasts: [...state.toasts, toast],
-        })
-      );
+        set(
+          (state: ToastState): ToastState => ({
+            ...state,
+            toasts: [...state.toasts, toast],
+          })
+        );
 
-      // Auto-remove toast after duration using external store reference
-      if (duration > 0) {
-        setTimeout(() => {
-          useToastStore.getState().removeToast(id);
-        }, duration);
-      }
+        // Auto-remove toast after duration using external store reference
+        if (duration > 0) {
+          setTimeout(() => {
+            useToastStore.getState().removeToast(id);
+          }, duration);
+        }
 
-      return id;
-    },
+        return id;
+      },
 
-    removeToast: (id: number) => {
-      set(
-        (state: ToastState): ToastState => ({
-          ...state,
-          toasts: state.toasts.filter((toast) => toast.id !== id),
-        })
-      );
-    },
+      removeToast: (id: number) => {
+        set(
+          (state: ToastState): ToastState => ({
+            ...state,
+            toasts: state.toasts.filter((toast) => toast.id !== id),
+          })
+        );
+      },
 
-    clearAllToasts: () => {
-      set((state: ToastState): ToastState => ({
-        ...state,
-        toasts: [],
-      }));
-    },
+      clearAllToasts: () => {
+        set(
+          (state: ToastState): ToastState => ({
+            ...state,
+            toasts: [],
+          })
+        );
+      },
 
-    // Convenience methods for different toast types
-    showSuccess: (message: string, title: string = "Success", duration: number = 5000) => {
-      return store.addToast({ type: "success", title, message, duration });
-    },
+      // Convenience methods for different toast types
+      showSuccess: (message: string, title: string = "Success", duration: number = 5000) => {
+        return store.addToast({ type: "success", title, message, duration });
+      },
 
-    showError: (message: string, title: string = "Error", duration: number = 8000) => {
-      return store.addToast({ type: "error", title, message, duration });
-    },
+      showError: (message: string, title: string = "Error", duration: number = 8000) => {
+        return store.addToast({ type: "error", title, message, duration });
+      },
 
-    showWarning: (message: string, title: string = "Warning", duration: number = 6000) => {
-      return store.addToast({ type: "warning", title, message, duration });
-    },
+      showWarning: (message: string, title: string = "Warning", duration: number = 6000) => {
+        return store.addToast({ type: "warning", title, message, duration });
+      },
 
-    showInfo: (message: string, title: string = "Info", duration: number = 5000) => {
-      return store.addToast({ type: "info", title, message, duration });
-    },
+      showInfo: (message: string, title: string = "Info", duration: number = 5000) => {
+        return store.addToast({ type: "info", title, message, duration });
+      },
 
-    showPayday: (message: string, title: string = "Payday", duration: number = 6000) => {
-      return store.addToast({ type: "payday", title, message, duration });
-    },
-  };
+      showPayday: (message: string, title: string = "Payday", duration: number = 6000) => {
+        return store.addToast({ type: "payday", title, message, duration });
+      },
+    };
 
-  return store;
-});
+    return store;
+  }
+);
 
 // Global toast functions that can be called from anywhere
 export const globalToast = {
