@@ -88,7 +88,14 @@ const performImport = async (validatedData, showSuccessToast, authConfig) => {
   showSuccessToast("Import complete! Data synced to cloud successfully.");
 
   await queryClient.invalidateQueries();
-  logger.info("TanStack Query cache invalidated after data import");
+      logger.info("✅ Data import completed and synced to cloud", {
+        envelopes: validatedData.envelopes?.length || 0,
+        transactions: validatedData.allTransactions?.length || 0,
+        bills: validatedData.bills?.length || 0,
+        debts: validatedData.debts?.length || 0,
+        savingsGoals: validatedData.savingsGoals?.length || 0,
+      });
+      logger.info("TanStack Query cache invalidated after data import");
 };
 
 export const useImportData = () => {

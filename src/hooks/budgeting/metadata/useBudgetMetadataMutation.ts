@@ -13,12 +13,17 @@ export const useBudgetMetadataMutation = () => {
       await setBudgetMetadata(updates);
       return updates;
     },
-    onSuccess: () => {
+    onSuccess: (updates) => {
       // Invalidate queries to refresh UI
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata as readonly unknown[] });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
-      logger.debug("TanStack Query: Budget metadata updated successfully");
+      
+      // Log successful budget metadata update
+      logger.info("✅ Budget metadata updated", {
+        updates: Object.keys(updates),
+        values: updates,
+      });
     },
     onError: (error) => {
       logger.error("Failed to update budget metadata:", error);
