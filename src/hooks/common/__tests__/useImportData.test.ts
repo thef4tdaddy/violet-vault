@@ -11,7 +11,7 @@ import { clearFirebaseData, forcePushToCloud } from "../../../utils/dataManageme
 import { queryClient } from "../../../utils/common/queryClient";
 import { vi } from "vitest";
 
-vi.mock("../../../stores/auth/authStore");
+vi.mock("../../../contexts/AuthContext");
 vi.mock("../../../utils/common/toastHelpers");
 vi.mock("../useConfirm");
 vi.mock("../../../utils/dataManagement/fileUtils");

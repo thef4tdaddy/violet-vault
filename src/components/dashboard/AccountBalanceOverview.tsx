@@ -119,8 +119,8 @@ const AccountBalanceOverview = ({
 
         {!isBalanced && Math.abs(difference) > 0.01 && (
           <Button
-            onClick={onAutoReconcileDifference}
-            className="btn btn-secondary border-2 border-black flex items-center"
+            onClick={() => onAutoReconcileDifference(difference)}
+            className="btn btn-primary border-2 border-black flex items-center bg-green-600 hover:bg-green-700 text-white"
           >
             {React.createElement(getIcon("CheckCircle"), {
               className: "h-4 w-4 mr-2",
