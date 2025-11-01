@@ -352,7 +352,10 @@ export const TransactionReceiptSection = ({
         <ReceiptButton
           variant="secondary"
           onTransactionCreated={(transaction: unknown) => {
-            logger.info("Transaction created from receipt in form", transaction);
+            logger.info(
+              "Transaction created from receipt in form",
+              transaction as Record<string, unknown>
+            );
             onClose();
           }}
         />

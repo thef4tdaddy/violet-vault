@@ -1,4 +1,5 @@
 import PageSummaryCard from "../../ui/PageSummaryCard";
+import { getIcon } from "@/utils";
 
 /**
  * Debt overview summary cards
@@ -8,34 +9,34 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   const cards = [
     {
       key: "total-debt",
-      icon: "DollarSign",
+      icon: getIcon("DollarSign"),
       label: "Total Debt",
       value: `$${stats.totalDebt.toFixed(2)}`,
-      color: "red",
+      color: "red" as const,
       subtext: `${stats.activeDebtCount} active debts`,
     },
     {
       key: "monthly-payments",
-      icon: "TrendingDown",
+      icon: getIcon("TrendingDown"),
       label: "Monthly Payments",
       value: `$${stats.totalMonthlyPayments.toFixed(2)}`,
-      color: "orange",
+      color: "orange" as const,
       subtext: "Required minimum payments",
     },
     {
       key: "average-rate",
-      icon: "Percent",
+      icon: getIcon("Percent"),
       label: "Avg Interest Rate",
       value: `${stats.averageInterestRate.toFixed(2)}%`,
-      color: "purple",
+      color: "purple" as const,
       subtext: "Weighted by balance",
     },
     {
       key: "due-soon",
-      icon: "Calendar",
+      icon: getIcon("Calendar"),
       label: "Due Soon",
       value: `$${stats.dueSoonAmount.toFixed(2)}`,
-      color: "yellow",
+      color: "yellow" as const,
       subtext: `${stats.dueSoonCount} payments this week`,
       alert: stats.dueSoonCount > 0,
       onClick: stats.dueSoonCount > 0 ? onDueSoonClick : null,

@@ -3,7 +3,7 @@ import { Select } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useConnectionManager } from "../../hooks/common/useConnectionManager";
 
-type ThemeName = "purple" | "green" | "yellow";
+type ThemeName = "purple" | "green" | "yellow" | "red";
 
 interface ThemeConfig {
   container: string;
@@ -52,6 +52,11 @@ const ConnectionDisplay = ({
       container: "bg-yellow-50 border border-yellow-200",
       titleText: "text-yellow-800",
       iconColor: "text-yellow-600",
+    },
+    red: {
+      container: "bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-300",
+      titleText: "text-red-800",
+      iconColor: "text-red-600",
     },
   };
 
@@ -138,6 +143,12 @@ export const ConnectionItem = ({
       titleColor: "text-yellow-800",
       detailColor: "text-yellow-700",
     },
+    red: {
+      border: "border-red-200",
+      iconColor: "text-red-600",
+      titleColor: "text-red-800",
+      detailColor: "text-red-700",
+    },
   };
 
   const currentTheme = themes[theme];
@@ -175,6 +186,7 @@ export const ConnectionInfo = ({
     purple: "bg-purple-100 border border-purple-300 text-purple-700",
     green: "bg-green-100 border border-green-300 text-green-700",
     yellow: "bg-yellow-100 border border-yellow-300 text-yellow-700",
+    red: "bg-red-100 border border-red-300 text-red-700",
   };
 
   const themeClasses = themes[theme];

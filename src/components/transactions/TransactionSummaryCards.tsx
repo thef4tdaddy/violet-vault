@@ -34,7 +34,7 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ trans
       icon: getIcon("TrendingDown"),
       label: "Monthly Spend",
       value: `$${totalExpenses.toFixed(2)}`,
-      color: "blue",
+      color: "blue" as const,
       subtext: `${transactions.filter((t) => t.amount < 0).length} expenses`,
     },
     {
@@ -42,7 +42,7 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ trans
       icon: getIcon("TrendingUp"),
       label: "Income",
       value: `$${totalIncome.toFixed(2)}`,
-      color: "green",
+      color: "green" as const,
       subtext: `${transactions.filter((t) => t.amount > 0).length} deposits`,
     },
     {
@@ -53,13 +53,13 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ trans
       color: netCashFlow >= 0 ? "purple" : "amber",
       subtext: netCashFlow >= 0 ? "Positive flow" : "Deficit",
       alert: netCashFlow < 0,
-    },
+    } as const,
     {
       key: "transaction-count",
       icon: getIcon("Hash"),
       label: "Transactions",
       value: transactionCount.toString(),
-      color: "gray",
+      color: "gray" as const,
       subtext: "This period",
     },
   ];

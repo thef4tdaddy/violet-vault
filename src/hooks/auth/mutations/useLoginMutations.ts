@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../../contexts/AuthContext";
+import { SessionData } from "../../../contexts/authConstants";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
 import { identifyUser } from "../../../utils/common/highlight";
@@ -20,12 +21,6 @@ interface UserData {
   email?: string;
   budgetId?: string;
   userName?: string;
-  [key: string]: unknown;
-}
-
-interface SessionData {
-  token?: string;
-  expiresAt?: string;
   [key: string]: unknown;
 }
 
