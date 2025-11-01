@@ -3,6 +3,24 @@ import { Select } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useConnectionManager } from "../../hooks/common/useConnectionManager";
 
+type ThemeName = "purple" | "green" | "yellow";
+
+interface ThemeConfig {
+  container: string;
+  titleText: string;
+  iconColor: string;
+}
+
+interface ConnectionDisplayProps {
+  title?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  onDisconnect?: (() => void) | undefined | null;
+  children: React.ReactNode;
+  isVisible?: boolean;
+  className?: string;
+  theme?: ThemeName;
+}
+
 /**
  * Shared component for displaying connected entity relationships in modals
  * Provides consistent styling and behavior across debt, envelope, and bill modals
@@ -15,19 +33,11 @@ const ConnectionDisplay = ({
   isVisible = true,
   className = "",
   theme = "purple", // Default to purple theme for violet branding
-}: {
-  title?: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  onDisconnect?: (() => void) | undefined | null;
-  children: React.ReactNode;
-  isVisible?: boolean;
-  className?: string;
-  theme?: string;
-}) => {
+}: ConnectionDisplayProps) => {
   if (!isVisible) return null;
 
   // Theme configurations for different contexts
-  const themes = {
+  const themes: Record<ThemeName, ThemeConfig> = {
     purple: {
       container: "bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-300",
       titleText: "text-purple-800",
@@ -45,7 +55,7 @@ const ConnectionDisplay = ({
     },
   };
 
-  const currentTheme = themes[theme] || themes.purple;
+  const currentTheme = themes[theme];
 
   return (
     <div className={`${currentTheme.container} rounded-xl p-6 mb-4 ${className}`}>
@@ -73,6 +83,24 @@ const ConnectionDisplay = ({
   );
 };
 
+type BadgeColor = "green" | "blue" | "purple" | "yellow";
+
+interface ConnectionItemThemeConfig {
+  border: string;
+  iconColor: string;
+  titleColor: string;
+  detailColor: string;
+}
+
+interface ConnectionItemProps {
+  icon?: React.ComponentType<{ className?: string }>;
+  title: string;
+  details?: string;
+  badge?: string;
+  badgeColor?: BadgeColor;
+  theme?: ThemeName;
+}
+
 /**
  * Sub-component for displaying individual connection items
  */
@@ -83,15 +111,15 @@ export const ConnectionItem = ({
   badge,
   badgeColor = "purple",
   theme = "purple",
-}) => {
-  const badgeColors = {
+}: ConnectionItemProps) => {
+  const badgeColors: Record<BadgeColor, string> = {
     green: "text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full",
     blue: "text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full",
     purple: "text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full",
     yellow: "text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full",
   };
 
-  const themes = {
+  const themes: Record<ThemeName, ConnectionItemThemeConfig> = {
     purple: {
       border: "border-purple-200",
       iconColor: "text-purple-600",
@@ -112,7 +140,7 @@ export const ConnectionItem = ({
     },
   };
 
-  const currentTheme = themes[theme] || themes.purple;
+  const currentTheme = themes[theme];
 
   return (
     <div className={`flex items-center p-3 bg-white rounded-lg border ${currentTheme.border}`}>
@@ -124,22 +152,32 @@ export const ConnectionItem = ({
         <div className={`font-medium ${currentTheme.titleColor}`}>{title}</div>
         {details && <div className={`text-sm ${currentTheme.detailColor}`}>{details}</div>}
       </div>
-      {badge && <div className={badgeColors[badgeColor] || badgeColors.purple}>{badge}</div>}
+      {badge && <div className={badgeColors[badgeColor]}>{badge}</div>}
     </div>
   );
 };
 
+interface ConnectionInfoProps {
+  children: React.ReactNode;
+  className?: string;
+  theme?: ThemeName;
+}
+
 /**
  * Sub-component for connection info/help text
  */
-export const ConnectionInfo = ({ children, className = "", theme = "purple" }) => {
-  const themes = {
+export const ConnectionInfo = ({
+  children,
+  className = "",
+  theme = "purple",
+}: ConnectionInfoProps) => {
+  const themes: Record<ThemeName, string> = {
     purple: "bg-purple-100 border border-purple-300 text-purple-700",
     green: "bg-green-100 border border-green-300 text-green-700",
     yellow: "bg-yellow-100 border border-yellow-300 text-yellow-700",
   };
 
-  const themeClasses = themes[theme] || themes.purple;
+  const themeClasses = themes[theme];
 
   return (
     <div className={`mt-3 p-3 ${themeClasses} rounded-lg ${className}`}>
@@ -148,20 +186,42 @@ export const ConnectionInfo = ({ children, className = "", theme = "purple" }) =
   );
 };
 
-const formatConnectionDetails = (connection) => {
+interface Connection {
+  id: string;
+  name?: string;
+  provider?: string;
+  amount?: string | number;
+  frequency?: string;
+  description?: string;
+  category?: string;
+}
+
+const formatConnectionDetails = (connection: Connection): string => {
   if (connection.amount) {
-    return `$${parseFloat(connection.amount).toFixed(2)} (${connection.frequency || "monthly"})`;
+    return `$${parseFloat(String(connection.amount)).toFixed(2)} (${connection.frequency || "monthly"})`;
   }
-  return connection.description;
+  return connection.description || "";
 };
 
-const getConnectionIcon = (entityType) => {
+const getConnectionIcon = (entityType: string): React.ComponentType<{ className?: string }> => {
   return entityType === "envelope" ? getIcon("Receipt") : getIcon("Target");
 };
 
-const shouldShowSelector = (showSelector, hasConnections, entityType) => {
+const shouldShowSelector = (
+  showSelector: boolean,
+  hasConnections: boolean,
+  entityType: string
+): boolean => {
   return showSelector && (!hasConnections || entityType === "envelope");
 };
+
+interface UniversalConnectionManagerProps {
+  entityType: string;
+  entityId: string;
+  canEdit?: boolean;
+  theme?: ThemeName;
+  showSelector?: boolean;
+}
 
 /**
  * Universal Connection Manager Component
@@ -174,8 +234,11 @@ export const UniversalConnectionManager = ({
   canEdit = true,
   theme = "purple",
   showSelector = true,
-}) => {
-  const managerProps = useConnectionManager(entityType, entityId);
+}: UniversalConnectionManagerProps) => {
+  const managerProps = useConnectionManager(
+    entityType as "bill" | "envelope" | "debt",
+    entityId
+  ) as unknown as ConnectionManagerProps;
   const config = managerProps.getConnectionConfig();
 
   return (
@@ -202,7 +265,31 @@ export const UniversalConnectionManager = ({
   );
 };
 
-const ExistingConnections = ({ config, entityType, theme, canEdit, connections, onDisconnect }) => (
+interface ConnectionConfig {
+  displayTitle: string;
+  selectTitle: string;
+  selectPrompt: string;
+  connectionType: string;
+  tip: string;
+}
+
+interface ExistingConnectionsProps {
+  config: ConnectionConfig;
+  entityType: string;
+  theme: ThemeName;
+  canEdit: boolean;
+  connections: Connection[] | unknown[];
+  onDisconnect?: () => void;
+}
+
+const ExistingConnections = ({
+  config,
+  entityType,
+  theme,
+  canEdit,
+  connections,
+  onDisconnect,
+}: ExistingConnectionsProps) => (
   <ConnectionDisplay
     title={config.displayTitle}
     icon={getConnectionIcon(entityType)}
@@ -210,7 +297,7 @@ const ExistingConnections = ({ config, entityType, theme, canEdit, connections, 
     onDisconnect={canEdit ? onDisconnect : undefined}
   >
     <div className="space-y-2">
-      {connections.map((connection) => (
+      {(connections as Connection[]).map((connection: Connection) => (
         <ConnectionItem
           key={connection.id}
           icon={getIcon("CheckCircle")}
@@ -224,7 +311,28 @@ const ExistingConnections = ({ config, entityType, theme, canEdit, connections, 
   </ConnectionDisplay>
 );
 
-const ConnectionSelector = ({ config, theme, canEdit, managerProps }) => (
+interface ConnectionManagerProps {
+  currentConnections: Connection[] | unknown[];
+  availableOptions: Connection[] | unknown[];
+  selectedConnectionId: string | null;
+  hasConnections: boolean;
+  hasAvailableOptions: boolean;
+  canConnect: boolean;
+  isConnecting: boolean;
+  getConnectionConfig: () => ConnectionConfig;
+  handleConnect: () => void;
+  handleDisconnect: () => void;
+  handleSelectionChange: (value: string) => void;
+}
+
+interface ConnectionSelectorProps {
+  config: ConnectionConfig;
+  theme: ThemeName;
+  canEdit: boolean;
+  managerProps: ConnectionManagerProps;
+}
+
+const ConnectionSelector = ({ config, theme, canEdit, managerProps }: ConnectionSelectorProps) => (
   <ConnectionDisplay title={config.selectTitle} icon={getIcon("Sparkles")} theme={theme}>
     <ConnectionDropdown config={config} canEdit={canEdit} managerProps={managerProps} />
     {managerProps.selectedConnectionId && (
@@ -245,7 +353,13 @@ const ConnectionSelector = ({ config, theme, canEdit, managerProps }) => (
   </ConnectionDisplay>
 );
 
-const ConnectionDropdown = ({ config, canEdit, managerProps }) => {
+interface ConnectionDropdownProps {
+  config: ConnectionConfig;
+  canEdit: boolean;
+  managerProps: ConnectionManagerProps;
+}
+
+const ConnectionDropdown = ({ config, canEdit, managerProps }: ConnectionDropdownProps) => {
   const options = [
     {
       value: "",
@@ -253,9 +367,9 @@ const ConnectionDropdown = ({ config, canEdit, managerProps }) => {
         ? config.selectPrompt
         : `No ${config.connectionType}s available`,
     },
-    ...managerProps.availableOptions.map((option) => ({
+    ...(managerProps.availableOptions as Connection[]).map((option: Connection) => ({
       value: option.id,
-      label: `${option.name || option.provider} - $${parseFloat(option.amount || 0).toFixed(2)} (${option.frequency || "monthly"})`,
+      label: `${option.name || option.provider} - $${parseFloat(String(option.amount || 0)).toFixed(2)} (${option.frequency || "monthly"})`,
     })),
   ];
 
@@ -272,7 +386,13 @@ const ConnectionDropdown = ({ config, canEdit, managerProps }) => {
   );
 };
 
-const ConnectButton = ({ onClick, canConnect, isConnecting }) => (
+interface ConnectButtonProps {
+  onClick: () => void;
+  canConnect: boolean;
+  isConnecting: boolean;
+}
+
+const ConnectButton = ({ onClick, canConnect, isConnecting }: ConnectButtonProps) => (
   <button
     type="button"
     onClick={onClick}
