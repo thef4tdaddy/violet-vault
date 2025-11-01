@@ -4,6 +4,7 @@ import { getIcon } from "../../utils";
 // Helper functions
 interface LockData {
   expiresAt?: unknown;
+  userName?: string;
 }
 
 const getExpirationDate = (expiresAt: unknown): Date => {
@@ -28,12 +29,21 @@ const calculateTimeRemaining = (lock: unknown) => {
   };
 };
 
-const formatTimeRemaining = (seconds, minutes) => {
+const formatTimeRemaining = (seconds: number, minutes: number): string => {
   if (seconds > 60) {
     return `${minutes} minute${minutes !== 1 ? "s" : ""}`;
   }
   return `${seconds} second${seconds !== 1 ? "s" : ""}`;
 };
+
+interface EditLockIndicatorProps {
+  isLocked: boolean;
+  isOwnLock: boolean;
+  lock?: LockData | null;
+  onBreakLock?: () => void;
+  className?: string;
+  showDetails?: boolean;
+}
 
 /**
  * Standardized Edit Lock Indicator Component
@@ -46,7 +56,7 @@ const EditLockIndicator = ({
   onBreakLock,
   className = "",
   showDetails = true,
-}) => {
+}: EditLockIndicatorProps) => {
   const [, forceUpdate] = useState(0);
 
   useEffect(() => {
@@ -59,7 +69,7 @@ const EditLockIndicator = ({
 
   if (!isLocked) return null;
 
-  const isExpired = lock && getExpirationDate(lock.expiresAt) <= new Date();
+  const isExpired = !!(lock && getExpirationDate(lock.expiresAt) <= new Date());
   const { timeRemaining, secondsRemaining, minutesRemaining } = calculateTimeRemaining(lock);
 
   if (isOwnLock) {
@@ -88,13 +98,21 @@ const EditLockIndicator = ({
   );
 };
 
+interface OwnLockIndicatorProps {
+  className: string;
+  showDetails: boolean;
+  timeRemaining: number;
+  secondsRemaining: number;
+  minutesRemaining: number;
+}
+
 const OwnLockIndicator = ({
   className,
   showDetails,
   timeRemaining,
   secondsRemaining,
   minutesRemaining,
-}) => (
+}: OwnLockIndicatorProps) => (
   <div
     className={`flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg ${className}`}
   >
@@ -112,6 +130,17 @@ const OwnLockIndicator = ({
   </div>
 );
 
+interface OthersLockIndicatorProps {
+  className: string;
+  isExpired: boolean;
+  lock: LockData | null | undefined;
+  showDetails: boolean;
+  timeRemaining: number;
+  secondsRemaining: number;
+  minutesRemaining: number;
+  onBreakLock?: () => void;
+}
+
 const OthersLockIndicator = ({
   className,
   isExpired,
@@ -121,7 +150,7 @@ const OthersLockIndicator = ({
   secondsRemaining,
   minutesRemaining,
   onBreakLock,
-}) => (
+}: OthersLockIndicatorProps) => (
   <div
     className={`flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg ${className}`}
   >
@@ -155,7 +184,21 @@ const OthersLockIndicator = ({
   </div>
 );
 
-const LockDetails = ({ lock, isExpired, timeRemaining, secondsRemaining, minutesRemaining }) => (
+interface LockDetailsProps {
+  lock: LockData | null | undefined;
+  isExpired: boolean;
+  timeRemaining: number;
+  secondsRemaining: number;
+  minutesRemaining: number;
+}
+
+const LockDetails = ({
+  lock,
+  isExpired,
+  timeRemaining,
+  secondsRemaining,
+  minutesRemaining,
+}: LockDetailsProps) => (
   <div className="mt-1 space-y-1">
     <div className="flex items-center gap-2 text-xs text-red-700">
       {React.createElement(getIcon("User"), { className: "h-3 w-3" })}
@@ -170,6 +213,14 @@ const LockDetails = ({ lock, isExpired, timeRemaining, secondsRemaining, minutes
   </div>
 );
 
+interface CompactEditLockIndicatorProps {
+  isLocked: boolean;
+  isOwnLock: boolean;
+  lock?: LockData | null;
+  onBreakLock?: () => void;
+  className?: string;
+}
+
 /**
  * Compact version for smaller spaces (like table rows)
  */
@@ -179,10 +230,10 @@ export const CompactEditLockIndicator = ({
   lock,
   onBreakLock,
   className = "",
-}) => {
+}: CompactEditLockIndicatorProps) => {
   if (!isLocked) return null;
 
-  const isExpired = lock && getExpirationDate(lock.expiresAt) <= new Date();
+  const isExpired = !!(lock && getExpirationDate(lock.expiresAt) <= new Date());
 
   if (isOwnLock) {
     return <CompactOwnLockBadge className={className} />;
@@ -198,7 +249,11 @@ export const CompactEditLockIndicator = ({
   );
 };
 
-const CompactOwnLockBadge = ({ className }) => (
+interface CompactOwnLockBadgeProps {
+  className: string;
+}
+
+const CompactOwnLockBadge = ({ className }: CompactOwnLockBadgeProps) => (
   <div
     className={`inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs ${className}`}
   >
@@ -207,7 +262,19 @@ const CompactOwnLockBadge = ({ className }) => (
   </div>
 );
 
-const CompactOthersLockBadge = ({ className, isExpired, lock, onBreakLock }) => (
+interface CompactOthersLockBadgeProps {
+  className: string;
+  isExpired: boolean;
+  lock: LockData | null | undefined;
+  onBreakLock?: () => void;
+}
+
+const CompactOthersLockBadge = ({
+  className,
+  isExpired,
+  lock,
+  onBreakLock,
+}: CompactOthersLockBadgeProps) => (
   <div
     className={`inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs ${className}`}
   >

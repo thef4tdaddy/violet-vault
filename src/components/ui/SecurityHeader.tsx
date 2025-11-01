@@ -1,6 +1,14 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
+interface SecurityHeaderProps {
+  title?: string;
+  subtitle?: string;
+  onClose?: () => void;
+  variant?: "modal" | "fullscreen";
+  className?: string;
+}
+
 /**
  * Shared security header component for lock screens and security settings
  * Provides consistent branding and typography across security interfaces
@@ -16,11 +24,11 @@ const SecurityHeader = ({
   onClose,
   variant = "modal",
   className = "",
-}) => {
+}: SecurityHeaderProps) => {
   // Convert title to ALL CAPS pattern with larger first letters
-  const formatTitle = (text) => {
+  const formatTitle = (text: string): React.ReactNode => {
     const words = text.toUpperCase().split(" ");
-    return words.map((word, wordIndex) => (
+    return words.map((word: string, wordIndex: number) => (
       <React.Fragment key={wordIndex}>
         {wordIndex > 0 && " "}
         <span className={variant === "fullscreen" ? "text-3xl" : "text-xl"}>{word[0]}</span>

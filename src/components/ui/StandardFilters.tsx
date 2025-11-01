@@ -52,7 +52,7 @@ const StandardFilters = ({
 
   const config = sizeConfig[size];
 
-  const handleFilterChange = (filterKey, value) => {
+  const handleFilterChange = (filterKey: string, value: string) => {
     onFilterChange(filterKey, value);
   };
 

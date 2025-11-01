@@ -1,3 +1,4 @@
+import React from "react";
 import { hasChanges, formatAmountChange } from "@/utils/bills/billUpdateHelpers";
 import {
   AmountUpdateField,
@@ -9,10 +10,47 @@ import {
 } from "./BulkUpdateBillRowComponents";
 
 /**
+ * Bill entity type - flexible to accept any bill-like structure
+ */
+type BillEntity = Record<string, unknown> & {
+  id: string;
+  name?: string;
+};
+
+/**
+ * Bill change tracking interface
+ */
+interface BillChange {
+  originalAmount?: number;
+  amount?: number | string;
+  dueDate?: string;
+}
+
+/**
+ * Update mode type
+ */
+type UpdateMode = "amount" | "date" | "both";
+
+/**
+ * Props for BulkUpdateBillRow component
+ */
+interface BulkUpdateBillRowProps {
+  bill: BillEntity;
+  change: BillChange | undefined;
+  updateMode: UpdateMode;
+  updateChange: (billId: string, field: string, value: string | number) => void;
+}
+
+/**
  * Individual bill row component for BulkUpdateEditor
  * Extracted to reduce complexity
  */
-const BulkUpdateBillRow = ({ bill, change, updateMode, updateChange }) => {
+const BulkUpdateBillRow: React.FC<BulkUpdateBillRowProps> = ({
+  bill,
+  change,
+  updateMode,
+  updateChange,
+}) => {
   const billHasChanges = hasChanges(change);
   const amountChange = formatAmountChange(change?.originalAmount, change?.amount);
 

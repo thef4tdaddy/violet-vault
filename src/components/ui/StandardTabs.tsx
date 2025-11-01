@@ -1,7 +1,51 @@
 import React from "react";
 
+type SizeType = "sm" | "md" | "lg";
+type VariantType = "underline" | "pills" | "buttons" | "tabs" | "colored";
+type ColorType = "blue" | "green" | "red" | "amber" | "purple" | "cyan" | "gray";
+
+interface SizeConfig {
+  text: string;
+  padding: string;
+  iconSize: string;
+  countPadding: string;
+  countText: string;
+}
+
+interface ColorConfig {
+  pastel: string;
+  bright: string;
+  count: {
+    pastel: string;
+    bright: string;
+  };
+}
+
+interface VariantStyle {
+  active: string;
+  inactive: string;
+}
+
+interface Tab {
+  id: string;
+  label: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  count?: number | null;
+  disabled?: boolean;
+  color?: ColorType;
+}
+
+interface StandardTabsProps {
+  tabs?: Tab[];
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
+  size?: SizeType;
+  variant?: VariantType;
+  className?: string;
+}
+
 // Configuration constants
-const SIZE_CONFIG = {
+const SIZE_CONFIG: Record<SizeType, SizeConfig> = {
   sm: {
     text: "text-sm",
     padding: "py-1 px-2",
@@ -25,7 +69,7 @@ const SIZE_CONFIG = {
   },
 };
 
-const COLOR_CONFIG = {
+const COLOR_CONFIG: Record<ColorType, ColorConfig> = {
   blue: {
     pastel: "bg-blue-100 text-blue-700 border-blue-200",
     bright: "bg-blue-500 text-white border-blue-500",
@@ -64,8 +108,8 @@ const COLOR_CONFIG = {
 };
 
 // Helper functions
-const getVariantStyle = (variant, isActive) => {
-  const styles = {
+const getVariantStyle = (variant: VariantType, isActive: boolean): string => {
+  const styles: Record<VariantType, VariantStyle> = {
     underline: {
       active: "border-blue-500 text-blue-700 border-b-2",
       inactive:
@@ -92,8 +136,8 @@ const getVariantStyle = (variant, isActive) => {
   return isActive ? variantStyles.active : variantStyles.inactive;
 };
 
-const getCountStyle = (variant, isActive) => {
-  const styles = {
+const getCountStyle = (variant: VariantType, isActive: boolean): string => {
+  const styles: Record<VariantType, VariantStyle> = {
     underline: { active: "bg-blue-100 text-blue-700", inactive: "bg-gray-200 text-gray-800" },
     pills: { active: "bg-blue-200 text-blue-800", inactive: "bg-gray-300 text-gray-700" },
     buttons: { active: "bg-blue-500 text-blue-100", inactive: "bg-gray-100 text-gray-600" },
@@ -104,26 +148,26 @@ const getCountStyle = (variant, isActive) => {
   return isActive ? variantStyles.active : variantStyles.inactive;
 };
 
-const getContainerClass = (variant) => {
+const getContainerClass = (variant: VariantType): string => {
   return variant === "underline" || variant === "tabs" ? "border-b border-gray-200" : "";
 };
 
-const getNavClass = (variant) => {
+const getNavClass = (variant: VariantType): string => {
   if (variant === "underline") return "flex space-x-8";
   if (variant === "tabs" || variant === "colored") return "flex -mb-px space-x-1";
   return "flex space-x-1";
 };
 
-const getColoredTabStyles = (isActive, color) => {
-  const colors = COLOR_CONFIG[color] || COLOR_CONFIG.blue;
+const getColoredTabStyles = (isActive: boolean, color: ColorType): string => {
+  const colors = COLOR_CONFIG[color];
   if (isActive) {
     return `${colors.bright} rounded-t-lg shadow-sm relative z-10`;
   }
   return `${colors.pastel} rounded-t-lg relative hover:brightness-110 transition-all`;
 };
 
-const getColoredCountStyles = (isActive, color) => {
-  const colors = COLOR_CONFIG[color] || COLOR_CONFIG.blue;
+const getColoredCountStyles = (isActive: boolean, color: ColorType): string => {
+  const colors = COLOR_CONFIG[color];
   return isActive ? colors.count.bright : colors.count.pastel;
 };
 
@@ -138,15 +182,15 @@ const StandardTabs = ({
   size = "md",
   variant = "underline",
   className = "",
-}) => {
+}: StandardTabsProps) => {
   const config = SIZE_CONFIG[size];
 
-  const getVariantStyles = (isActive, isDisabled) => {
+  const getVariantStyles = (isActive: boolean, isDisabled: boolean): string => {
     if (isDisabled) return "cursor-not-allowed opacity-50 text-gray-400";
     return getVariantStyle(variant, isActive);
   };
 
-  const getCountStyles = (isActive) => getCountStyle(variant, isActive);
+  const getCountStyles = (isActive: boolean): string => getCountStyle(variant, isActive);
   const containerClass = getContainerClass(variant);
   const navClass = getNavClass(variant);
 
@@ -170,6 +214,16 @@ const StandardTabs = ({
   );
 };
 
+interface TabButtonProps {
+  tab: Tab;
+  isActive: boolean;
+  config: SizeConfig;
+  variant: VariantType;
+  getVariantStyles: (isActive: boolean, isDisabled: boolean) => string;
+  getCountStyles: (isActive: boolean) => string;
+  onTabChange: (tabId: string) => void;
+}
+
 const TabButton = ({
   tab,
   isActive,
@@ -178,7 +232,7 @@ const TabButton = ({
   getVariantStyles,
   getCountStyles,
   onTabChange,
-}) => {
+}: TabButtonProps) => {
   const isDisabled = tab.disabled || false;
   const Icon = tab.icon;
 
@@ -186,8 +240,8 @@ const TabButton = ({
   let countStyles = getCountStyles(isActive);
 
   if (variant === "colored" && tab.color && !isDisabled) {
-    tabStyles = getColoredTabStyles(isActive, tab.color);
-    countStyles = getColoredCountStyles(isActive, tab.color);
+    tabStyles = getColoredTabStyles(isActive, tab.color as ColorType);
+    countStyles = getColoredCountStyles(isActive, tab.color as ColorType);
   }
 
   return (
@@ -211,7 +265,13 @@ const TabButton = ({
   );
 };
 
-const TabCount = ({ count, config, countStyles }) => (
+interface TabCountProps {
+  count: number;
+  config: SizeConfig;
+  countStyles: string;
+}
+
+const TabCount = ({ count, config, countStyles }: TabCountProps) => (
   <span
     className={`ml-1 ${config.countPadding} rounded-full ${config.countText} ${countStyles}`.trim()}
   >
