@@ -4,6 +4,32 @@ import { encryptionUtils } from "../utils/security/encryption";
 import logger from "../utils/common/logger";
 
 /**
+ * Options for creating a history commit
+ */
+interface CreateCommitOptions {
+  entityType: string;
+  entityId?: string | null;
+  changeType: "create" | "update" | "delete";
+  description: string;
+  beforeData?: unknown;
+  afterData?: unknown;
+  author?: string;
+  deviceFingerprint?: string | null;
+  parentHash?: string | null;
+}
+
+/**
+ * Options for queries
+ */
+interface QueryOptions {
+  limit?: number;
+  startDate?: number;
+  endDate?: number;
+  entityType?: string;
+  author?: string;
+}
+
+/**
  * Budget History Service
  * Provides git-like version control for budget changes with commit history,
  * branching, tagging, and device fingerprinting for family collaboration
@@ -22,12 +48,14 @@ class BudgetHistoryService {
   /**
    * Initialize history service
    */
-  async initialize() {
+  async initialize(): Promise<boolean> {
     try {
       logger.info("Budget history service initialized");
       return true;
-    } catch (error) {
-      logger.error("Failed to initialize budget history service", error);
+    } catch (error: unknown) {
+      logger.error("Failed to initialize budget history service", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   }
@@ -35,7 +63,7 @@ class BudgetHistoryService {
   /**
    * Create a budget history commit
    */
-  async createCommit(options) {
+  async createCommit(options: CreateCommitOptions): Promise<unknown> {
     const {
       entityType,
       entityId = null,
@@ -119,7 +147,12 @@ class BudgetHistoryService {
   /**
    * Track unassigned cash changes
    */
-  async trackUnassignedCashChange(options) {
+  async trackUnassignedCashChange(options: {
+    previousAmount: number;
+    newAmount: number;
+    author?: string;
+    source?: string;
+  }): Promise<unknown> {
     const { previousAmount, newAmount, author = "Unknown User", source = "manual" } = options;
 
     const description =
@@ -130,7 +163,7 @@ class BudgetHistoryService {
     return await this.createCommit({
       entityType: "unassignedCash",
       entityId: null,
-      changeType: "modify",
+      changeType: "update",
       description,
       beforeData: { amount: previousAmount },
       afterData: { amount: newAmount },
@@ -141,7 +174,12 @@ class BudgetHistoryService {
   /**
    * Track actual balance changes
    */
-  async trackActualBalanceChange(options) {
+  async trackActualBalanceChange(options: {
+    previousBalance: number;
+    newBalance: number;
+    isManual?: boolean;
+    author?: string;
+  }): Promise<unknown> {
     const { previousBalance, newBalance, isManual = true, author = "Unknown User" } = options;
 
     const source = isManual ? "manual entry" : "automatic calculation";
@@ -150,7 +188,7 @@ class BudgetHistoryService {
     return await this.createCommit({
       entityType: "actualBalance",
       entityId: null,
-      changeType: "modify",
+      changeType: "update",
       description,
       beforeData: { balance: previousBalance, isManual: !isManual },
       afterData: { balance: newBalance, isManual },
@@ -161,33 +199,42 @@ class BudgetHistoryService {
   /**
    * Track debt changes
    */
-  async trackDebtChange(options) {
+  async trackDebtChange(options: {
+    debtId: string;
+    changeType: string;
+    previousData?: Record<string, unknown>;
+    newData?: Record<string, unknown>;
+    author?: string;
+  }): Promise<unknown> {
     const { debtId, changeType, previousData, newData, author = "Unknown User" } = options;
 
     let description = "";
 
     switch (changeType) {
       case "add":
-        description = `Added new debt: ${newData.name} (${this._formatCurrency(newData.currentBalance)})`;
+        description = `Added new debt: ${newData?.name} (${this._formatCurrency((newData?.currentBalance as number) || 0)})`;
         break;
       case "modify":
-        if (previousData.currentBalance !== newData.currentBalance) {
-          description = `Updated ${newData.name} balance from ${this._formatCurrency(previousData.currentBalance)} to ${this._formatCurrency(newData.currentBalance)}`;
+        if ((previousData?.currentBalance as number) !== (newData?.currentBalance as number)) {
+          description = `Updated ${newData?.name} balance from ${this._formatCurrency((previousData?.currentBalance as number) || 0)} to ${this._formatCurrency((newData?.currentBalance as number) || 0)}`;
         } else {
-          description = `Updated debt: ${newData.name}`;
+          description = `Updated debt: ${newData?.name}`;
         }
         break;
       case "delete":
-        description = `Deleted debt: ${previousData.name}`;
+        description = `Deleted debt: ${previousData?.name}`;
         break;
       default:
         description = `Modified debt: ${newData?.name || previousData?.name}`;
     }
 
+    const mappedChangeType: "create" | "update" | "delete" =
+      changeType === "add" ? "create" : changeType === "modify" ? "update" : "delete";
+
     return await this.createCommit({
       entityType: "debt",
       entityId: debtId,
-      changeType,
+      changeType: mappedChangeType,
       description,
       beforeData: previousData,
       afterData: newData,
@@ -198,7 +245,7 @@ class BudgetHistoryService {
   /**
    * Get recent changes for specific entity type
    */
-  async getRecentChanges(entityType, limit = 10) {
+  async getRecentChanges(entityType: string, limit = 10): Promise<unknown[]> {
     try {
       const changes = await budgetDb.budgetChanges
         .where("entityType")
@@ -208,8 +255,10 @@ class BudgetHistoryService {
         .toArray();
 
       return changes;
-    } catch (error) {
-      logger.error("Failed to get recent changes", error);
+    } catch (error: unknown) {
+      logger.error("Failed to get recent changes", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -217,7 +266,7 @@ class BudgetHistoryService {
   /**
    * Get full history for specific entity
    */
-  async getEntityHistory(entityType, entityId = null) {
+  async getEntityHistory(entityType: string, entityId: string | null = null): Promise<unknown[]> {
     try {
       let query = budgetDb.budgetChanges.where("entityType").equals(entityType);
 
@@ -255,7 +304,12 @@ class BudgetHistoryService {
   /**
    * Branch Management
    */
-  async createBranch(options) {
+  async createBranch(options: {
+    fromCommitHash: string;
+    branchName: string;
+    description?: string;
+    author?: string;
+  }): Promise<void> {
     const { fromCommitHash, branchName, description = "", author = "Unknown User" } = options;
 
     try {
@@ -296,13 +350,15 @@ class BudgetHistoryService {
       });
 
       return branch;
-    } catch (error) {
-      logger.error("Failed to create budget history branch", error);
+    } catch (error: unknown) {
+      logger.error("Failed to create budget history branch", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   }
 
-  async switchBranch(branchName) {
+  async switchBranch(branchName: string): Promise<void> {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
@@ -333,8 +389,10 @@ class BudgetHistoryService {
   async getBranches() {
     try {
       return await budgetDb.budgetBranches.orderBy("created").toArray();
-    } catch (error) {
-      logger.error("Failed to get budget history branches", error);
+    } catch (error: unknown) {
+      logger.error("Failed to get budget history branches", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -342,7 +400,13 @@ class BudgetHistoryService {
   /**
    * Tag Management
    */
-  async createTag(options) {
+  async createTag(options: {
+    commitHash: string;
+    tagName: string;
+    description?: string;
+    tagType?: string;
+    author?: string;
+  }): Promise<unknown> {
     const {
       commitHash,
       tagName,
@@ -385,17 +449,21 @@ class BudgetHistoryService {
       });
 
       return tag;
-    } catch (error) {
-      logger.error("Failed to create budget history tag", error);
+    } catch (error: unknown) {
+      logger.error("Failed to create budget history tag", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   }
 
-  async getTags() {
+  async getTags(): Promise<unknown[]> {
     try {
       return await budgetDb.budgetTags.orderBy("created").reverse().toArray();
-    } catch (error) {
-      logger.error("Failed to get budget history tags", error);
+    } catch (error: unknown) {
+      logger.error("Failed to get budget history tags", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -403,7 +471,10 @@ class BudgetHistoryService {
   /**
    * Security and Device Management
    */
-  async signCommit(commitData, deviceFingerprint) {
+  async signCommit(
+    commitData: Record<string, unknown>,
+    deviceFingerprint: string
+  ): Promise<string> {
     try {
       const signaturePayload = {
         ...commitData,
@@ -420,19 +491,16 @@ class BudgetHistoryService {
         deviceFingerprint
       );
 
-      return {
-        signature,
-        deviceFingerprint,
-        isDeviceConsistent,
-        signedAt: Date.now(),
-      };
-    } catch (error) {
-      logger.error("Failed to sign commit", error);
+      return signature;
+    } catch (error: unknown) {
+      logger.error("Failed to sign commit", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   }
 
-  async verifyDeviceConsistency(author, currentFingerprint) {
+  async verifyDeviceConsistency(author: string, currentFingerprint: string): Promise<boolean> {
     try {
       const recentCommits = await budgetDb.budgetCommits
         .where("author")
