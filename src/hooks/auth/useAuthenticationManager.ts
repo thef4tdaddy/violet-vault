@@ -129,7 +129,9 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
   const authOperations: AuthOperations = {
     // Setup & Login
     handleSetup: async (userDataOrPassword: unknown): Promise<void> => {
-      await authFlow.handleSetup(userDataOrPassword);
+      await authFlow.handleSetup(
+        userDataOrPassword as string | { password: string; budgetId?: string }
+      );
     },
     handleLogout: authFlow.handleLogout,
     handleChangePassword: authFlow.handleChangePassword,

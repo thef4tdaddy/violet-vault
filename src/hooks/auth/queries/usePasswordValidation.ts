@@ -10,13 +10,13 @@ import localStorageService from "../../../services/storage/localStorageService";
 
 // Query Keys
 export const passwordValidationQueryKeys = {
-  validation: (password) => ["auth", "validation", password],
+  validation: (password: string) => ["auth", "validation", password],
 };
 
 /**
  * Hook for password validation query
  */
-export const usePasswordValidation = (password, _options = {}) => {
+export const usePasswordValidation = (password: string, _options: Record<string, unknown> = {}) => {
   return useQuery({
     queryKey: passwordValidationQueryKeys.validation(password),
     queryFn: async () => {
@@ -59,7 +59,7 @@ export const usePasswordValidation = (password, _options = {}) => {
         return {
           isValid: false,
           reason: "unexpected_error",
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         };
       }
     },

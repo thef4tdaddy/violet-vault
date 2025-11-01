@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { securityService } from "../../services/security/securityService";
 import logger from "../../utils/common/logger";
 
@@ -215,9 +215,17 @@ export const useAutoLockManager = (
  * Hook for clipboard security management
  * Extracts clipboard clearing and protection logic
  */
-export const useClipboardSecurity = (securitySettings, clipboardTimerRef, logSecurityEvent) => {
+export const useClipboardSecurity = (
+  securitySettings: { clipboardClearTimeout: number },
+  clipboardTimerRef: React.MutableRefObject<NodeJS.Timeout | null>,
+  logSecurityEvent: (event: {
+    type: string;
+    description: string;
+    metadata?: Record<string, unknown>;
+  }) => void
+) => {
   const secureClipboardCopy = useCallback(
-    async (text, description = "Sensitive data") => {
+    async (text: string, description: string = "Sensitive data") => {
       try {
         await navigator.clipboard.writeText(text);
 
