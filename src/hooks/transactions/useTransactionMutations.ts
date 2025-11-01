@@ -69,12 +69,22 @@ export const useTransactionMutations = () => {
 
       return newTransaction;
     },
-    onSuccess: () => {
+    onSuccess: (transaction) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+      
+      // Log successful transaction addition
+      logger.info("✅ Transaction added", {
+        amount: transaction.amount,
+        type: transaction.type,
+        description: transaction.description,
+        envelope: transaction.envelopeId || "unassigned",
+        category: transaction.category,
+      });
+      
       // Trigger immediate sync for transaction addition
       triggerTransactionSync("added");
     },
@@ -110,10 +120,19 @@ export const useTransactionMutations = () => {
 
       return reconciledTransaction;
     },
-    onSuccess: () => {
+    onSuccess: (transaction) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      
+      // Log successful reconciliation
+      logger.info("✅ Balance reconciled", {
+        amount: transaction.amount,
+        type: transaction.type,
+        description: transaction.description,
+        method: "manual",
+      });
+      
       // Trigger immediate sync for transaction reconciliation
       triggerTransactionSync("reconciled");
     },
@@ -144,12 +163,18 @@ export const useTransactionMutations = () => {
 
       return transactionId;
     },
-    onSuccess: () => {
+    onSuccess: (transactionId) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+      
+      // Log successful transaction deletion
+      logger.info("✅ Transaction deleted", {
+        id: transactionId,
+      });
+      
       // Trigger immediate sync for transaction deletion
       triggerTransactionSync("deleted");
     },
@@ -182,12 +207,19 @@ export const useTransactionMutations = () => {
 
       return { id, updates: updatedTransaction };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+      
+      // Log successful transaction update
+      logger.info("✅ Transaction updated", {
+        id: data.id,
+        updates: Object.keys(data.updates || {}),
+      });
+      
       // Trigger immediate sync for transaction update
       triggerTransactionSync("updated");
     },

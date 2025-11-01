@@ -193,8 +193,8 @@ export const optimisticHelpers = {
       });
     } catch (error) {
       logger.warn("Failed to persist optimistic transaction addition", {
-        error: error.message,
-        transactionId: newTransaction.id,
+        error: error?.message || String(error),
+        transactionId: newTransaction?.id || "unknown",
         source: "optimisticHelpers",
       });
     }
