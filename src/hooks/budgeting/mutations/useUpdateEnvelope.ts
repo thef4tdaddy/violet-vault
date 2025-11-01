@@ -61,9 +61,15 @@ export const useUpdateEnvelope = () => {
 
       return { id, updates };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      
+      // Log successful envelope update (already logged in mutationFn, so just log confirmation)
+      logger.info("✅ Envelope update completed", {
+        envelopeId: data.id,
+      });
+      
       triggerEnvelopeSync("updated");
     },
     onError: (error) => {
