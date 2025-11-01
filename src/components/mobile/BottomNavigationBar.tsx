@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { useBottomNavigation } from "@/hooks/mobile/useBottomNavigation";
 import BottomNavItem from "./BottomNavItem";
 
@@ -6,12 +6,12 @@ import BottomNavItem from "./BottomNavItem";
  * Bottom Navigation Bar Component
  * Mobile-first navigation with thumb-friendly positioning and smooth animations
  */
-const BottomNavigationBar = () => {
+const BottomNavigationBar: React.FC = () => {
   const { isVisible, getVisibleItems, isItemActive, shouldShowScrollHint } = useBottomNavigation();
 
-  const navRef = useRef(null);
-  const leftFadeRef = useRef(null);
-  const rightFadeRef = useRef(null);
+  const navRef = useRef<HTMLElement>(null);
+  const leftFadeRef = useRef<HTMLDivElement>(null);
+  const rightFadeRef = useRef<HTMLDivElement>(null);
 
   // Handle scroll indicators for overflow
   useEffect(() => {
@@ -21,7 +21,7 @@ const BottomNavigationBar = () => {
 
     if (!navElement || !leftFade || !rightFade) return;
 
-    const updateScrollIndicators = () => {
+    const updateScrollIndicators = (): void => {
       const { scrollLeft, scrollWidth, clientWidth } = navElement;
       const maxScroll = scrollWidth - clientWidth;
 

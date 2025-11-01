@@ -1,12 +1,23 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { hapticFeedback } from "@/utils/ui/touchFeedback";
+
+/**
+ * Props for BottomNavItem component
+ */
+interface BottomNavItemProps {
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  isActive: boolean;
+}
 
 /**
  * Individual navigation item for bottom navigation bar
  * Touch-optimized with haptic feedback and smooth animations
  */
-const BottomNavItem = ({ to, icon: _Icon, label, isActive }) => {
-  const handleClick = () => {
+const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, isActive }) => {
+  const handleClick = (): void => {
     hapticFeedback(10, "light");
   };
 
@@ -29,7 +40,7 @@ const BottomNavItem = ({ to, icon: _Icon, label, isActive }) => {
           ${isActive ? "scale-110" : "scale-100"}
         `}
       >
-        <_Icon className="w-5 h-5" />
+        <Icon className="w-5 h-5" />
       </div>
 
       {/* Label with conditional visibility */}
