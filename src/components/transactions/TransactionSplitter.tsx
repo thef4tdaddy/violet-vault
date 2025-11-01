@@ -41,8 +41,7 @@ const TransactionSplitter = ({
   const handleSave = async () => {
     try {
       const success = await splitter.submitSplit();
-      if (success && transaction) {
-        onSave?.(splitter.splitAllocations as unknown as Transaction[], transaction);
+      if (success) {
         onClose?.();
       }
     } catch (error) {
