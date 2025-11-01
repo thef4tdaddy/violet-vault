@@ -76,12 +76,21 @@ export const useTransferFunds = () => {
 
       await optimisticHelpers.addTransaction(queryClient, transaction);
 
-      return { success: true, transaction };
+      return { success: true, transaction, fromEnvelopeId, toEnvelopeId, amount };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      
+      // Log successful fund transfer
+      logger.info("✅ Funds transferred between envelopes", {
+        amount: data.amount,
+        fromEnvelope: data.fromEnvelopeId,
+        toEnvelope: data.toEnvelopeId,
+        transactionId: data.transaction.id,
+      });
+      
       triggerEnvelopeSync("transfer");
     },
     onError: (error) => {

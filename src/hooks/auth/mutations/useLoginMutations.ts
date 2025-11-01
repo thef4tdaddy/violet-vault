@@ -253,6 +253,13 @@ export const useLoginMutation = () => {
           authSessionData
         );
 
+        // Log successful authentication
+        logger.info("✅ User authenticated", {
+          userName: result.user.userName,
+          budgetId: result.user.budgetId?.substring(0, 8) + "...",
+          isNewUser: result.isNewUser || false,
+        });
+
         // Start background sync for successful logins
         try {
           const syncDelay = 2500;
