@@ -45,7 +45,7 @@ export const TransactionBasicFields = ({
           }
           disabled={!!editingTransaction && !canEdit}
           className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-            !!!!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+            !!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           required
         />
