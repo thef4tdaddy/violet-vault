@@ -40,14 +40,12 @@ vi.mock("../../../services/cloudSyncService", () => ({
   },
 }));
 
-vi.mock("../../../stores/auth/authStore", () => ({
-  useAuth: {
-    getState: vi.fn(() => ({
-      encryptionKey: "test-key",
-      currentUser: "test-user",
-      budgetId: "test-budget",
-    })),
-  },
+vi.mock("../../../contexts/AuthContext", () => ({
+  useAuth: vi.fn(() => ({
+    encryptionKey: "test-key",
+    currentUser: { userName: "test-user" },
+    budgetId: "test-budget",
+  })),
 }));
 
 vi.mock("../../../utils/common/testBudgetHistory", () => ({
