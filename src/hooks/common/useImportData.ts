@@ -87,15 +87,18 @@ const performImport = async (validatedData, showSuccessToast, authConfig) => {
   await forcePushToCloud(authConfig);
   showSuccessToast("Import complete! Data synced to cloud successfully.");
 
+  // Force UI refresh by invalidating all queries
   await queryClient.invalidateQueries();
-      logger.info("✅ Data import completed and synced to cloud", {
-        envelopes: validatedData.envelopes?.length || 0,
-        transactions: validatedData.allTransactions?.length || 0,
-        bills: validatedData.bills?.length || 0,
-        debts: validatedData.debts?.length || 0,
-        savingsGoals: validatedData.savingsGoals?.length || 0,
-      });
-      logger.info("TanStack Query cache invalidated after data import");
+  await queryClient.refetchQueries();
+  
+  logger.info("✅ Data import completed and synced to cloud", {
+    envelopes: validatedData.envelopes?.length || 0,
+    transactions: validatedData.allTransactions?.length || 0,
+    bills: validatedData.bills?.length || 0,
+    debts: validatedData.debts?.length || 0,
+    savingsGoals: validatedData.savingsGoals?.length || 0,
+  });
+  logger.info("TanStack Query cache invalidated and refetched after data import");
 };
 
 export const useImportData = () => {

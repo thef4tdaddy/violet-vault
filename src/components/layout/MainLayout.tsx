@@ -322,7 +322,7 @@ const MainContent = ({
             onDismiss={() => setSyncConflicts(null)}
           />
 
-          <BugReportButton />
+          {!showSecurityWarning && <BugReportButton />}
           <BottomNavigationBar />
 
           <div className="mt-8 text-center">

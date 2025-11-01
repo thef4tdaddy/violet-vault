@@ -33,7 +33,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
         {/* Close Button - Top Right Corner */}
         <Button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
+          className="absolute top-4 right-4 z-10 text-black hover:text-red-600 bg-white hover:bg-red-50 rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
         >
           {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
         </Button>

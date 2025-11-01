@@ -122,7 +122,7 @@ Generated: ${new Date().toLocaleDateString()}
           type="button"
           onClick={onBack}
           disabled={isLoading}
-          className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+          className="flex-1 px-6 py-3 bg-gray-200 text-black font-semibold rounded-lg border-2 border-black hover:bg-gray-300 transition-colors disabled:opacity-50"
         >
           {renderIcon("ArrowLeft", { className: "w-4 h-4 mr-2" })}
           Back
@@ -132,7 +132,7 @@ Generated: ${new Date().toLocaleDateString()}
           type="button"
           onClick={onCreateBudget}
           disabled={isLoading}
-          className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 font-semibold"
+          className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg border-2 border-black hover:bg-purple-700 transition-colors disabled:opacity-50 font-semibold"
         >
           {isLoading ? (
             <>

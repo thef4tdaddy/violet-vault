@@ -19,23 +19,23 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
   if (hasBeenAcknowledged) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg border-2 border-black shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <WarningHeader onClose={onClose} />
+        <WarningHeader />
         <div className="p-6 space-y-6">
           <SecurityStatusSection />
           <ImplicationsSection />
           <RecommendationsSection />
           <TechnicalDetailsSection />
         </div>
-        <WarningFooter onClose={onClose} onAcknowledge={handleAcknowledge} />
+        <WarningFooter onAcknowledge={handleAcknowledge} />
       </div>
     </div>
   );
 };
 
-const WarningHeader = ({ onClose }) => (
-  <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+const WarningHeader = () => (
+  <div className="flex items-center p-6 border-b border-gray-200 dark:border-gray-700">
     <div className="flex items-center space-x-3">
       <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
         {React.createElement(getIcon("Shield"), {
@@ -47,17 +47,10 @@ const WarningHeader = ({ onClose }) => (
           LOCAL DATA SECURITY NOTICE
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          Important information about your data storage
+          Please read and acknowledge this important information
         </p>
       </div>
     </div>
-    <Button
-      onClick={onClose}
-      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-      title="Close"
-    >
-      {React.createElement(getIcon("X"), { className: "w-6 h-6" })}
-    </Button>
   </div>
 );
 
@@ -180,25 +173,23 @@ const TechnicalDetailsSection = () => (
   </details>
 );
 
-const WarningFooter = ({ onClose, onAcknowledge }) => (
-  <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-    <div className="text-sm text-gray-500 dark:text-gray-400">
-      This notice will not be shown again after you acknowledge it.
+const WarningFooter = ({ onAcknowledge }) => (
+  <div className="flex flex-col items-center p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+    <div className="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
+      Please scroll through and read the entire notice above, then click "I Understand" to continue.
+      <br />
+      <span className="text-xs text-gray-500 mt-1 block">
+        This notice will not be shown again after you acknowledge it.
+      </span>
     </div>
-    <div className="flex space-x-3">
-      <Button
-        onClick={onClose}
-        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg border-2 border-gray-300 dark:border-gray-500 transition-colors"
-      >
-        Remind Me Later
-      </Button>
-      <Button
-        onClick={onAcknowledge}
-        className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg border-2 border-blue-700 hover:border-blue-800 transition-colors"
-      >
-        I Understand
-      </Button>
-    </div>
+    <Button
+      onClick={onAcknowledge}
+      className="w-full max-w-md px-8 py-3 text-base font-black text-white bg-purple-600 hover:bg-purple-700 rounded-lg border-2 border-black shadow-lg transition-all uppercase tracking-wider"
+    >
+      <span>
+        <span className="text-lg">I</span> <span className="text-lg">U</span>NDERSTAND
+      </span>
+    </Button>
   </div>
 );
 
