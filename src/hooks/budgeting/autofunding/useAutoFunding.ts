@@ -118,7 +118,7 @@ export const useAutoFunding = () => {
   }, [historyHook, dataHook]);
 
   const undoExecution = useCallback(
-    async (executionId) => {
+    async (executionId: string) => {
       try {
         const result = await historyHook.undoExecution(executionId);
         dataHook.markUnsavedChanges();
@@ -138,7 +138,8 @@ export const useAutoFunding = () => {
 
   // Import data and update all hooks
   const importData = useCallback(
-    (importData) => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    (importData: unknown) => {
       importAndUpdateData(importData, dataHook, rulesHook);
     },
     [dataHook, rulesHook]

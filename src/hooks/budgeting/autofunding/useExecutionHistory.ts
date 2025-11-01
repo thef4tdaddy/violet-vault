@@ -1,14 +1,6 @@
 import { useState, useCallback } from "react";
-import logger from "../../../utils/common/logger";
-
-interface ExecutionRecord {
-  id: string;
-  trigger: string;
-  totalFunded?: number;
-  success?: boolean;
-  executedAt?: string;
-  [key: string]: unknown;
-}
+import logger from "@/utils/common/logger";
+import type { ExecutionHistoryEntry } from "@/hooks/budgeting/autofunding/types";
 
 export interface ExecutionFilters {
   trigger?: string;
@@ -21,13 +13,14 @@ export interface ExecutionFilters {
  * Hook for managing auto-funding execution history
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
-export const useExecutionHistory = (initialHistory: ExecutionRecord[] = []) => {
-  const [executionHistory, setExecutionHistory] = useState(initialHistory);
+export const useExecutionHistory = (initialHistory: ExecutionHistoryEntry[] = []) => {
+  const [executionHistory, setExecutionHistory] =
+    useState<ExecutionHistoryEntry[]>(initialHistory);
 
   // Add execution to history
-  const addToHistory = useCallback((executionRecord) => {
+  const addToHistory = useCallback((executionRecord: ExecutionHistoryEntry) => {
     try {
-      setExecutionHistory((prevHistory) => {
+      setExecutionHistory((prevHistory: ExecutionHistoryEntry[]) => {
         const newHistory = [executionRecord, ...prevHistory];
         // Keep only last 50 executions by default
         return newHistory.slice(0, 50);
@@ -64,16 +57,20 @@ export const useExecutionHistory = (initialHistory: ExecutionRecord[] = []) => {
 
         if (filters.dateFrom) {
           const fromDate = new Date(filters.dateFrom);
-          filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate
-          );
+          filteredHistory = filteredHistory.filter((execution) => {
+            const executionDate =
+              execution.executedAt || execution.timestamp || new Date().toISOString();
+            return new Date(executionDate) >= fromDate;
+          });
         }
 
         if (filters.dateTo) {
           const toDate = new Date(filters.dateTo);
-          filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) <= toDate
-          );
+          filteredHistory = filteredHistory.filter((execution) => {
+            const executionDate =
+              execution.executedAt || execution.timestamp || new Date().toISOString();
+            return new Date(executionDate) <= toDate;
+          });
         }
 
         // Apply limit
@@ -88,8 +85,10 @@ export const useExecutionHistory = (initialHistory: ExecutionRecord[] = []) => {
 
   // Get execution by ID
   const getExecutionById = useCallback(
-    (executionId) => {
-      return executionHistory.find((execution) => execution.id === executionId);
+    (executionId: string): ExecutionHistoryEntry | undefined => {
+      return executionHistory.find(
+        (execution: ExecutionHistoryEntry) => execution.id === executionId
+      );
     },
     [executionHistory]
   );
