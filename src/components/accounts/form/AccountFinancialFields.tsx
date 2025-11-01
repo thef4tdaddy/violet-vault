@@ -1,4 +1,31 @@
-const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingAccount }) => (
+interface AccountForm {
+  name: string;
+  type: string;
+  currentBalance: string;
+  annualContribution: string;
+  expirationDate: string;
+  description: string;
+  color: string;
+  isActive: boolean;
+}
+
+interface EditingAccount {
+  id: string | number;
+}
+
+interface AccountFinancialFieldsProps {
+  accountForm: AccountForm;
+  setAccountForm: (form: AccountForm) => void;
+  canEdit: boolean | null;
+  editingAccount: EditingAccount | null;
+}
+
+const AccountFinancialFields = ({
+  accountForm,
+  setAccountForm,
+  canEdit,
+  editingAccount,
+}: AccountFinancialFieldsProps) => (
   <>
     <div className="grid grid-cols-2 gap-3">
       <div>
@@ -15,7 +42,7 @@ const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingA
               currentBalance: e.target.value,
             })
           }
-          disabled={editingAccount && !canEdit}
+          disabled={Boolean(editingAccount && !canEdit)}
           className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           placeholder="0.00"
           required
@@ -36,7 +63,7 @@ const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingA
               annualContribution: e.target.value,
             })
           }
-          disabled={editingAccount && !canEdit}
+          disabled={Boolean(editingAccount && !canEdit)}
           className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           placeholder="0.00"
         />
@@ -56,7 +83,7 @@ const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingA
             expirationDate: e.target.value,
           })
         }
-        disabled={editingAccount && !canEdit}
+        disabled={Boolean(editingAccount && !canEdit)}
         className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
       />
     </div>
@@ -71,7 +98,7 @@ const AccountFinancialFields = ({ accountForm, setAccountForm, canEdit, editingA
             description: e.target.value,
           })
         }
-        disabled={editingAccount && !canEdit}
+        disabled={Boolean(editingAccount && !canEdit)}
         className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         placeholder="Optional account description..."
         rows={3}

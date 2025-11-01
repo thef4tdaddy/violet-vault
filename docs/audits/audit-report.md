@@ -4,6 +4,9 @@
 
 | Category                      | Current | Change |
 | ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 8       | 0      |
+| TypeScript Errors             | 0       | 0      |
+| TypeScript Strict Mode Errors | 4517    | 0      |
 | ESLint Issues                 | 4       | -4     |
 | TypeScript Errors             | 2       | +2     |
 | TypeScript Strict Mode Errors | 4510    | -7     |

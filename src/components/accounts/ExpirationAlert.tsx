@@ -2,7 +2,17 @@ import React from "react";
 import { getIcon } from "@/utils";
 import { calculateDaysUntilExpiration } from "@/utils/accounts";
 
-const ExpirationAlert = ({ expiringAccounts }) => {
+interface Account {
+  id: string | number;
+  name: string;
+  expirationDate: string | null;
+}
+
+interface ExpirationAlertProps {
+  expiringAccounts: Account[];
+}
+
+const ExpirationAlert = ({ expiringAccounts }: ExpirationAlertProps) => {
   if (expiringAccounts.length === 0) return null;
 
   return (
@@ -17,7 +27,7 @@ const ExpirationAlert = ({ expiringAccounts }) => {
             {expiringAccounts.length === 1 ? "" : "s"} expiring soon
           </p>
           <div className="text-xs text-orange-700 mt-1">
-            {expiringAccounts.map((account) => {
+            {expiringAccounts.map((account: Account) => {
               const days = calculateDaysUntilExpiration(account.expirationDate);
               return (
                 <span key={account.id} className="mr-3">
