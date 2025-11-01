@@ -132,7 +132,6 @@ export const useManualSync = (): UseManualSyncReturn => {
           direction: syncResult.direction || "download",
           changesDownloaded: syncResult.counts || {},
         });
-        logger.info("🔄 Invalidating all TanStack Query caches...");
         await queryClient.invalidateQueries();
         await Promise.all([
           queryClient.refetchQueries({ queryKey: queryKeys.envelopes }),
@@ -170,11 +169,8 @@ export const useManualSync = (): UseManualSyncReturn => {
       return { success: false, error: "Sync already in progress" };
     }
     try {
-      logger.info("🔄 Starting full bidirectional sync...");
-      // Let the cloud sync service determine the best direction
       const syncResult = await cloudSyncService.forceSync();
       if (syncResult && syncResult.success) {
-        logger.info("🔄 Invalidating all TanStack Query caches...");
         await queryClient.invalidateQueries();
         setLastSyncTime(new Date());
         logger.info("✅ Full bidirectional sync completed successfully:", syncResult);
@@ -184,9 +180,8 @@ export const useManualSync = (): UseManualSyncReturn => {
           counts: syncResult.counts,
           message: `Full sync completed (${syncResult.direction})`,
         };
-      } else {
-        throw new Error(syncResult?.error || "Full sync failed");
       }
+      throw new Error(syncResult?.error || "Full sync failed");
     } catch (error) {
       logger.error("❌ Full sync failed:", error);
       setSyncError((error as Error).message);
@@ -197,9 +192,6 @@ export const useManualSync = (): UseManualSyncReturn => {
     }
   }, [isUploadingSyncInProgress, isDownloadingSyncInProgress, queryClient]);
 
-  /**
-   * Get sync service status
-   */
   const getSyncStatus = useCallback((): SyncStatus => {
     return {
       isServiceRunning: cloudSyncService?.isRunning || false,
@@ -211,9 +203,6 @@ export const useManualSync = (): UseManualSyncReturn => {
     };
   }, [isUploadingSyncInProgress, isDownloadingSyncInProgress, lastSyncTime, syncError]);
 
-  /**
-   * Clear sync error
-   */
   const clearSyncError = useCallback((): void => {
     setSyncError(null);
   }, []);

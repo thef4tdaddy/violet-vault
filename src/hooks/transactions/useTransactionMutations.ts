@@ -149,17 +149,9 @@ export const useTransactionMutations = () => {
       id,
       updates,
     }: TransactionUpdateInput): Promise<TransactionUpdateInput> => {
-      const updatedTransaction = {
-        ...updates,
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Apply optimistic update using helper
+      const updatedTransaction = { ...updates, updatedAt: new Date().toISOString() };
       await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
-
-      // Update in Dexie (single source of truth for transactions)
       await budgetDb.transactions.update(id, updatedTransaction);
-
       return { id, updates: updatedTransaction };
     },
     onSuccess: (data) => {
