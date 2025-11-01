@@ -127,28 +127,33 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
 
   const handleAutoReconcileDifference = useCallback(
     (difference) => {
-      if (difference > 0) {
-        // Add difference to unassigned cash
-        reconcileTransaction({
-          id: Date.now(),
-          amount: difference,
-          description: "Balance reconciliation - added extra funds",
-          type: "income",
+      // Validate difference
+      if (!difference || Math.abs(difference) < 0.01) {
+        logger.warn("Auto-reconcile called with invalid difference", { difference });
+        return;
+      }
+
+      try {
+        const transaction = {
+          id: Date.now().toString(),
+          amount: Math.abs(difference),
+          description:
+            difference > 0
+              ? "Balance reconciliation - added extra funds"
+              : "Balance reconciliation - adjusted for discrepancy",
+          type: difference > 0 ? "income" : "expense",
           envelopeId: "unassigned",
+          category: "other",
           date: new Date().toISOString().split("T")[0],
           reconciledAt: new Date().toISOString(),
-        });
-      } else {
-        // Subtract difference from unassigned cash
-        reconcileTransaction({
-          id: Date.now(),
-          amount: difference,
-          description: "Balance reconciliation - adjusted for discrepancy",
-          type: "expense",
-          envelopeId: "unassigned",
-          date: new Date().toISOString().split("T")[0],
-          reconciledAt: new Date().toISOString(),
-        });
+        };
+
+        logger.info("Auto-reconciling difference", { difference, transaction });
+        reconcileTransaction(transaction);
+        globalToast.showSuccess("Balance reconciled automatically", "Reconciliation Complete", 3000);
+      } catch (error) {
+        logger.error("Auto-reconcile failed", { error, difference });
+        globalToast.showError("Failed to reconcile balance", "Error", 8000);
       }
     },
     [reconcileTransaction]

@@ -96,7 +96,12 @@ export const useManualSync = (): UseManualSyncReturn => {
 
       if (syncResult && syncResult.success) {
         setLastSyncTime(new Date());
-        logger.info("✅ Manual upload sync completed successfully:", syncResult);
+        
+        // Log successful manual sync
+        logger.info("✅ Manual sync completed (upload)", {
+          direction: syncResult.direction || "upload",
+          changesUploaded: syncResult.counts || {},
+        });
 
         return {
           success: true,
@@ -145,6 +150,12 @@ export const useManualSync = (): UseManualSyncReturn => {
       const syncResult = await cloudSyncService.forceSync();
 
       if (syncResult && syncResult.success) {
+        // Log successful manual sync
+        logger.info("✅ Manual sync completed (download)", {
+          direction: syncResult.direction || "download",
+          changesDownloaded: syncResult.counts || {},
+        });
+        
         // Invalidate all TanStack Query caches to force refresh from Dexie
         logger.info("🔄 Invalidating all TanStack Query caches...");
         await queryClient.invalidateQueries();

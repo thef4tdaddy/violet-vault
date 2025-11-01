@@ -1,0 +1,59 @@
+name: Auto-Approve Copilot Workflows
+
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review, synchronize]
+
+permissions:
+  actions: write
+  pull-requests: read
+
+jobs:
+  auto-approve-workflows:
+    runs-on: ubuntu-latest
+    # Only run for Copilot bot PRs
+    if: |
+      github.actor == 'copilot[bot]' || 
+      github.actor == 'Copilot' || 
+      contains(github.actor, 'copilot')
+    steps:
+      - name: Auto-approve workflow runs for Copilot PRs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            console.log(`🤖 Auto-approving workflows for Copilot PR #${context.issue.number}`);
+            console.log(`Actor: ${context.actor}`);
+
+            // Get pending workflow runs for this PR
+            const { data: workflowRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event: 'pull_request',
+              status: 'waiting',
+              per_page: 100
+            });
+
+            // Filter runs for this PR
+            const prRuns = workflowRuns.workflow_runs.filter(run => {
+              return run.pull_requests && run.pull_requests.some(pr => pr.number === context.issue.number);
+            });
+
+            console.log(`Found ${prRuns.length} workflow runs waiting for approval`);
+
+            // Approve each waiting run
+            for (const run of prRuns) {
+              try {
+                await github.rest.actions.approveWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id
+                });
+                console.log(`✅ Approved workflow: ${run.name} (ID: ${run.id})`);
+              } catch (error) {
+                console.log(`⚠️ Could not approve workflow ${run.id}: ${error.message}`);
+              }
+            }
+
+            if (prRuns.length > 0) {
+              console.log('✅ All Copilot PR workflows approved automatically');
+            }
