@@ -11,39 +11,38 @@ import logger from "../../utils/common/logger";
 export const createLoginOperation =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (loginMutation: any) =>
-  async (password: string, userData: unknown = null) => {
-    try {
-      logger.auth("AuthManager: Starting login", {
-        hasPassword: !!password,
-        hasUserData: !!userData,
-        isNewUser: !!userData,
-      });
-
-      const result = await loginMutation.mutateAsync({ password, userData });
-
-      if (result.success) {
-        logger.auth("AuthManager: Login successful", {
-          userName: result.user?.userName,
+    async (password: string, userData: unknown = null) => {
+      try {
+        logger.auth("AuthManager: Starting login", {
+          hasPassword: !!password,
+          hasUserData: !!userData,
           isNewUser: !!userData,
         });
-        return { success: true, data: result };
-      } else {
-        logger.auth("AuthManager: Login failed", { error: result.error });
-        return { success: false, error: result.error, ...result };
+
+        const result = await loginMutation.mutateAsync({ password, userData });
+
+        if (result.success) {
+          logger.auth("AuthManager: Login successful", {
+            userName: result.user?.userName,
+            isNewUser: !!userData,
+          });
+          return { success: true, data: result };
+        } else {
+          logger.auth("AuthManager: Login failed", { error: result.error });
+          return { success: false, error: result.error, ...result };
+        }
+      } catch (error) {
+        logger.error("AuthManager: Login error", error);
+        return { success: false, error: error instanceof Error ? error.message : "Login failed" };
       }
-    } catch (error) {
-      logger.error("AuthManager: Login error", error);
-      return { success: false, error: error instanceof Error ? error.message : "Login failed" };
-    }
-  };
+    };
 
 /**
  * Join budget with share code
  */
 export const createJoinBudgetOperation =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (joinBudgetMutation: any) =>
-  async (joinData: { budgetId?: string; sharedBy?: string }) => {
+  (joinBudgetMutation: any) => async (joinData: { budgetId?: string; sharedBy?: string }) => {
     try {
       logger.auth("AuthManager: Starting budget join", {
         budgetId: joinData.budgetId?.substring(0, 8) + "...",
@@ -72,17 +71,17 @@ export const createJoinBudgetOperation =
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createLogoutOperation = (logoutMutation: any) => async () => {
-    try {
-      logger.auth("AuthManager: Starting logout");
-      await logoutMutation.mutateAsync();
-      logger.auth("AuthManager: Logout successful");
-      return { success: true };
-    } catch (error) {
-      logger.error("AuthManager: Logout error", error);
-      // Still return success since auth state is cleared
-      return { success: true };
-    }
-  };
+  try {
+    logger.auth("AuthManager: Starting logout");
+    await logoutMutation.mutateAsync();
+    logger.auth("AuthManager: Logout successful");
+    return { success: true };
+  } catch (error) {
+    logger.error("AuthManager: Logout error", error);
+    // Still return success since auth state is cleared
+    return { success: true };
+  }
+};
 
 /**
  * Change user password
@@ -90,41 +89,40 @@ export const createLogoutOperation = (logoutMutation: any) => async () => {
 export const createChangePasswordOperation =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (changePasswordMutation: any, authContext: any) =>
-  async (oldPassword: string, newPassword: string) => {
-    try {
-      logger.auth("AuthManager: Starting password change");
-      const result = await changePasswordMutation.mutateAsync({
-        oldPassword,
-        newPassword,
-      });
-
-      if (result.success) {
-        logger.auth("AuthManager: Password change successful");
-        // Update encryption context if needed
-        authContext.setAuthenticated(authContext.user, {
-          encryptionKey: result.newKey,
-          salt: result.newSalt,
+    async (oldPassword: string, newPassword: string) => {
+      try {
+        logger.auth("AuthManager: Starting password change");
+        const result = await changePasswordMutation.mutateAsync({
+          oldPassword,
+          newPassword,
         });
-        return { success: true };
-      } else {
-        return { success: false, error: result.error };
+
+        if (result.success) {
+          logger.auth("AuthManager: Password change successful");
+          // Update encryption context if needed
+          authContext.setAuthenticated(authContext.user, {
+            encryptionKey: result.newKey,
+            salt: result.newSalt,
+          });
+          return { success: true };
+        } else {
+          return { success: false, error: result.error };
+        }
+      } catch (error) {
+        logger.error("AuthManager: Password change error", error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Failed to change password",
+        };
       }
-    } catch (error) {
-      logger.error("AuthManager: Password change error", error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to change password",
-      };
-    }
-  };
+    };
 
 /**
  * Update user profile
  */
 export const createUpdateProfileOperation =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (updateProfileMutation: any) =>
-  async (updatedProfile: { userName: string }) => {
+  (updateProfileMutation: any) => async (updatedProfile: { userName: string }) => {
     try {
       logger.auth("AuthManager: Starting profile update", {
         userName: updatedProfile.userName,

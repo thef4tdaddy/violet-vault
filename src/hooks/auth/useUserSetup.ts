@@ -87,7 +87,7 @@ export const useUserSetup = (onSetupComplete) => {
   ): Promise<T> => {
     return Promise.race([
       asyncFn(),
-      new Promise((_, reject) =>
+      new Promise<T>((_, reject) =>
         setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
       ),
     ]);
