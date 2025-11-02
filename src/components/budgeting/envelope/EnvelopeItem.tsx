@@ -43,6 +43,7 @@ interface EnvelopeItemProps {
   isSelected?: boolean;
   bills?: Bill[];
   unassignedCash?: number;
+  viewMode?: string; // "overview" or "detailed"
 }
 
 const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
@@ -54,8 +55,11 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
   isSelected = false,
   bills = [],
   unassignedCash = 0,
+  viewMode = "overview",
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Use viewMode to control collapse state: overview = collapsed, detailed = expanded
+  const [manualCollapse, setManualCollapse] = useState(false);
+  const isCollapsed = viewMode === "overview" ? true : manualCollapse;
 
   // Enhanced swipe gesture handling
   const { swipeState, swipeHandlers, swipeStyles } = useEnvelopeSwipeGestures({
@@ -87,7 +91,7 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
         onSelect={onSelect}
         onEdit={onEdit}
         onViewHistory={onViewHistory}
-        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        onToggleCollapse={() => setManualCollapse(!manualCollapse)}
       />
 
       <div className="flex items-center gap-2 ml-4">

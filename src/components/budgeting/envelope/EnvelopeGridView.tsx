@@ -154,6 +154,7 @@ function EnvelopeGridView({
             isSelected={selectedEnvelopeId === envelope.id}
             bills={bills as never}
             unassignedCash={unassignedCash}
+            viewMode={viewMode}
           />
         ))}
       </div>

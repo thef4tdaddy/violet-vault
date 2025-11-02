@@ -132,7 +132,7 @@ const EditEnvelopeModal = ({
   return (
     <>
       <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
+        <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-2 border-black">
           <EnvelopeModalHeader
             title="Edit Envelope"
             subtitle="Modify envelope settings"
