@@ -20,6 +20,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
 import { useLayoutData } from "@/hooks/layout";
 import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
+import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
 import logger from "@/utils/common/logger";
 
 /**
@@ -175,6 +176,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
   // Get paycheck operations
   const { handleDeletePaycheck } = usePaycheckOperations();
 
+  // Get savings goals operations
+  const savingsGoalsHook = useSavingsGoals();
+
   // Extract budget operations
   const budgetOps = extractBudgetOperations(budget);
 
@@ -224,12 +228,12 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     savings: (
       <SavingsGoals
-        savingsGoals={budgetOps.savingsGoals as Array<Record<string, unknown>>}
+        savingsGoals={savingsGoalsHook.savingsGoals as Array<Record<string, unknown>>}
         unassignedCash={unassignedCash}
-        onAddGoal={budgetOps.addSavingsGoal}
-        onUpdateGoal={budgetOps.updateSavingsGoal}
-        onDeleteGoal={budgetOps.deleteSavingsGoal}
-        onDistributeToGoals={() => {}}
+        onAddGoal={savingsGoalsHook.helpers.addGoal}
+        onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
+        onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
+        onDistributeToGoals={savingsGoalsHook.helpers.distributeUnassignedCash}
       />
     ),
     supplemental: (
