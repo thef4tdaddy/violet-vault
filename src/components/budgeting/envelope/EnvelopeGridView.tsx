@@ -123,7 +123,7 @@ function EnvelopeGridView({
 
       {/* Envelope Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} />
+        <UnassignedCashEnvelope unassignedCash={unassignedCash} onViewHistory={handleViewHistory} viewMode={viewMode} />
         {sortedEnvelopes.map((envelope: { id: string; [key: string]: unknown }) => (
           <EnvelopeItem
             key={envelope.id}

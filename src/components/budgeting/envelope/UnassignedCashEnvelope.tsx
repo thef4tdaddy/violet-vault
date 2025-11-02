@@ -3,8 +3,9 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
 
-const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
+const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory, viewMode = "overview" }) => {
   const openUnassignedCashModal = useBudgetStore((state) => state.openUnassignedCashModal);
+  const isCollapsed = viewMode === "overview";
 
   const handleClick = () => {
     openUnassignedCashModal();
@@ -32,7 +33,7 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
       }`}
       onClick={handleClick}
     >
-      {/* Header */}
+      {/* Header - Always visible */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <h3 className="font-semibold text-gray-900 flex items-center">
@@ -63,33 +64,36 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
         </div>
       </div>
 
-      {/* Cash Amount Display */}
-      <div className="mb-4">
-        <div className="text-center py-4">
-          <p className="text-xs text-gray-500 mb-2">Click anywhere to distribute</p>
-          <p
-            className={`text-3xl font-bold ${
-              unassignedCash < 0 ? "text-red-600" : "text-green-600"
-            }`}
-          >
-            ${Math.abs(unassignedCash).toFixed(2)}
-            {unassignedCash < 0 && <span className="text-sm text-red-500 ml-2">deficit</span>}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">
-            {unassignedCash < 0
-              ? "Address overspending by moving funds"
-              : "Distribute to envelopes"}
-          </p>
+      {/* Collapsible Content - Controlled by viewMode */}
+      <div className={`${isCollapsed ? "hidden" : "block"}`}>
+        {/* Cash Amount Display */}
+        <div className="mb-4">
+          <div className="text-center py-4">
+            <p className="text-xs text-gray-500 mb-2">Click anywhere to distribute</p>
+            <p
+              className={`text-3xl font-bold ${
+                unassignedCash < 0 ? "text-red-600" : "text-green-600"
+              }`}
+            >
+              ${Math.abs(unassignedCash).toFixed(2)}
+              {unassignedCash < 0 && <span className="text-sm text-red-500 ml-2">deficit</span>}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">
+              {unassignedCash < 0
+                ? "Address overspending by moving funds"
+                : "Distribute to envelopes"}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Visual Indicator */}
-      <div className="border-t border-gray-200 pt-3">
-        <div className="flex items-center justify-center text-xs text-gray-500">
-          {React.createElement(getIcon("DollarSign"), {
-            className: "h-3 w-3 mr-1",
-          })}
-          <span>{unassignedCash < 0 ? "Needs attention" : "Ready to allocate"}</span>
+        {/* Visual Indicator */}
+        <div className="border-t border-gray-200 pt-3">
+          <div className="flex items-center justify-center text-xs text-gray-500">
+            {React.createElement(getIcon("DollarSign"), {
+              className: "h-3 w-3 mr-1",
+            })}
+            <span>{unassignedCash < 0 ? "Needs attention" : "Ready to allocate"}</span>
+          </div>
         </div>
       </div>
     </div>

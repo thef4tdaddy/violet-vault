@@ -25,7 +25,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: getIcon("Wallet"),
       label: "Total Allocated",
       value: `$${(totals.totalAllocated || 0).toFixed(2)}`,
-      color: "emerald" as const,
+      color: "teal" as const,
       subtext: `${totals.envelopeCount || 0} envelopes`,
     },
     {
@@ -42,7 +42,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: getIcon("CreditCard"),
       label: "Total Spent",
       value: `$${(totals.totalSpent || 0).toFixed(2)}`,
-      color: "blue" as const,
+      color: "indigo" as const,
       subtext: "All envelope spending",
     },
     {
@@ -50,7 +50,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: getIcon("Calendar"),
       label: "Biweekly Need",
       value: `$${(totals.totalBiweeklyNeed || 0).toFixed(2)}`,
-      color: "purple" as const,
+      color: "amber" as const,
       subtext: `${totals.billsDueCount || 0} bills due`,
     },
   ];
@@ -66,7 +66,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
           subtext={card.subtext}
           color={card.color}
           alert={card.alert}
-          onClick={() => {}}
+          onClick={undefined}
         />
       ))}
     </div>

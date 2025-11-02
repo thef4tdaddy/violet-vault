@@ -45,11 +45,7 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
               showEmpty: !filterOptions.showEmpty,
             })
           }
-          className={`px-3 py-2 text-sm border-2 border-black rounded-lg transition-colors font-medium ${
-            filterOptions.showEmpty
-              ? "bg-purple-100 text-purple-900 hover:bg-purple-200"
-              : "bg-white text-black hover:bg-gray-50"
-          }`}
+          className="px-3 py-2 text-sm border-2 border-black rounded-lg transition-colors font-medium bg-purple-100 text-purple-900 hover:bg-purple-200 focus:outline-none focus:ring-0"
         >
           {React.createElement(getIcon(filterOptions.showEmpty ? "Eye" : "EyeOff"), { className: "h-4 w-4 mr-2" })}
           {filterOptions.showEmpty ? "Show All" : "Hide Empty"}
@@ -57,29 +53,32 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
       </div>
 
       {/* Right side - View Mode Toggle */}
-      <div className="flex gap-2 bg-white rounded-lg p-1 border-2 border-black">
-        <Button
-          onClick={() => setViewMode("overview")}
-          className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
-            viewMode === "overview"
-              ? "bg-purple-500 text-white shadow-md"
-              : "bg-purple-100 text-purple-900 hover:bg-purple-200"
-          }`}
-          title="Compact view - shows envelope names and key metrics only"
-        >
-          Overview
-        </Button>
-        <Button
-          onClick={() => setViewMode("detailed")}
-          className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
-            viewMode === "detailed"
-              ? "bg-purple-500 text-white shadow-md"
-              : "bg-purple-100 text-purple-900 hover:bg-purple-200"
-          }`}
-          title="Full view - shows all envelope details, spending, and bills"
-        >
-          Detailed
-        </Button>
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-gray-700">View Mode:</span>
+        <div className="flex gap-2 bg-white rounded-lg p-1 border-2 border-black">
+          <Button
+            onClick={() => setViewMode("overview")}
+            className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
+              viewMode === "overview"
+                ? "bg-purple-500 text-white shadow-md"
+                : "bg-purple-100 text-purple-900 hover:bg-purple-200"
+            }`}
+            title="Compact view - shows envelope names and key metrics only"
+          >
+            Overview
+          </Button>
+          <Button
+            onClick={() => setViewMode("detailed")}
+            className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
+              viewMode === "detailed"
+                ? "bg-purple-500 text-white shadow-md"
+                : "bg-purple-100 text-purple-900 hover:bg-purple-200"
+            }`}
+            title="Full view - shows all envelope details, spending, and bills"
+          >
+            Detailed
+          </Button>
+        </div>
       </div>
     </div>
   );

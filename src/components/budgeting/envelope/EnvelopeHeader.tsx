@@ -76,7 +76,7 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = ({
             onEdit?.(envelope);
           }, "light")}
           className={getButtonClasses(
-            "p-2 text-gray-400 hover:text-blue-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
+            "p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded border border-blue-200",
             "small"
           )}
           title="Edit envelope"
@@ -89,7 +89,7 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = ({
             onViewHistory?.(envelope);
           }, "light")}
           className={getButtonClasses(
-            "p-2 text-gray-400 hover:text-green-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
+            "p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded border border-amber-200",
             "small"
           )}
           title="View transaction history"
