@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import ReactDOM from "react-dom";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
@@ -14,12 +15,12 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
     }
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-black">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center">
             {React.createElement(getIcon("History"), {
@@ -52,6 +53,9 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
       </div>
     </div>
   );
+
+  // Render modal at document root to avoid z-index/overflow issues
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default EnvelopeHistoryModal;
