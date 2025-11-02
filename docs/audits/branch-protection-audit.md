@@ -10,6 +10,7 @@
 ### Repository Rulesets
 
 **Ruleset 1: "main" (ID: 7136278)**
+
 - **Status:** 🔴 DISABLED (as of Oct 31, 12:31pm)
 - **Target:** main branch
 - **Rules:**
@@ -19,12 +20,14 @@
   - ✅ Require status check: "check-commits"
 
 **Ruleset 2: "Prevent Deletion" (ID: 6958603)**
+
 - **Status:** ✅ ACTIVE
 - **Target:** develop, style, lighthouse-reports, feat*/* branches
 - **Rules:**
   - ✅ Prevent deletion only
 
 ### Branch Protection (Classic)
+
 - **main:** ❌ NOT PROTECTED (no classic branch protection)
 - **develop:** ❌ NOT PROTECTED (no classic branch protection)
 
@@ -76,7 +79,7 @@
     { "type": "deletion" },                    ← Keep
     { "type": "non_fast_forward" },            ← Keep
     { "type": "required_linear_history" },     ← Keep
-    { 
+    {
       "type": "required_status_checks",        ← Keep but update
       "parameters": {
         "required_status_checks": [
@@ -126,10 +129,7 @@
     {
       "type": "required_status_checks",
       "parameters": {
-        "required_status_checks": [
-          { "context": "check-commits" },
-          { "context": "Test Suite" }
-        ]
+        "required_status_checks": [{ "context": "check-commits" }, { "context": "Test Suite" }]
       }
     }
   ],
@@ -150,12 +150,14 @@
 ### Minimum Protection (Current + Small Improvements)
 
 **Main branch:**
+
 1. ✅ Re-enable ruleset #7136278
 2. ✅ Keep existing rules
 3. ✅ Add "Test Suite" status check
 4. ✅ Allow admin bypass
 
 **Develop branch:**
+
 1. ✅ Keep deletion prevention (active)
 2. ✅ Add "check-commits" status check (optional)
 3. ✅ Allow admin bypass
@@ -163,6 +165,7 @@
 ### Standard Protection (Recommended)
 
 **Main branch:**
+
 1. ✅ All minimum protections
 2. ✅ Require PR (no direct pushes)
 3. ✅ Require CI to pass (Test Suite, Code Quality)
@@ -170,6 +173,7 @@
 5. ✅ Block deletion
 
 **Develop branch:**
+
 1. ✅ Prevent deletion
 2. ✅ Prevent force push
 3. ✅ Require "check-commits" status check
@@ -178,6 +182,7 @@
 ### Maximum Protection (Enterprise-grade)
 
 **Main branch:**
+
 1. ✅ All standard protections
 2. ✅ Require 1+ PR review
 3. ✅ Require CODEOWNERS review
@@ -186,6 +191,7 @@
 6. ✅ Lock branch (no direct commits)
 
 **Develop branch:**
+
 1. ✅ All standard protections
 2. ✅ Require status checks to pass
 
@@ -196,15 +202,18 @@
 These workflows exist and should be status check requirements:
 
 **Critical:**
+
 - ✅ `Test Suite` (test.yml) - Must pass
 - ✅ `Track ESLint and TypeScript Issues` (code-quality-tracker.yml) - Should pass
 - ✅ `check-commits` (enforce-commit-types.yml) - Must pass
 
 **Important:**
+
 - `npm Audit` (npm-audit.yml) - Security checks
 - `Lighthouse Monitoring` (lighthouse-monitoring.yml) - Performance
 
 **Optional:**
+
 - `Bundle Size` (bundle-size.yml) - Size tracking
 - `Preview Deployment` (preview-deployment.yml) - Vercel preview
 
@@ -215,6 +224,7 @@ These workflows exist and should be status check requirements:
 ### For Main Branch:
 
 **Re-enable ruleset with these rules:**
+
 - ✅ Prevent deletion
 - ✅ Prevent force push
 - ✅ Require linear history
@@ -228,12 +238,14 @@ These workflows exist and should be status check requirements:
 ### For Develop Branch:
 
 **Create new ruleset with these rules:**
+
 - ✅ Prevent deletion
 - ✅ Prevent force push
 - ✅ Admin can bypass
 - ❌ No status check requirements (allow quick fixes)
 
 **Why minimal on develop:**
+
 - You work solo, need flexibility
 - Can fix things quickly without CI blocking
 - Main branch is the real gate
@@ -243,6 +255,7 @@ These workflows exist and should be status check requirements:
 ## ✅ Action Items
 
 ### Immediate (Do Now):
+
 1. **Re-enable "main" ruleset** (#7136278)
    - Go to: https://github.com/thef4tdaddy/violet-vault/rules/7136278
    - Change "Enforcement status" to: **Active**
@@ -259,6 +272,7 @@ These workflows exist and should be status check requirements:
    - Update `docs/setup/Branch-Protection-Rules.md` to match reality
 
 ### Optional (Nice to Have):
+
 1. Create develop branch ruleset
 2. Add PR review requirement to main (when you have team)
 3. Add CODEOWNERS file

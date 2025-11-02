@@ -250,7 +250,7 @@ export const useLoginMutation = () => {
         // Pass the encryption key and salt from login result to auth context
         setAuthenticated(
           result.user as unknown as import("@/types/auth").UserData,
-          result.sessionData  // ✅ Use actual session data with encryption key!
+          result.sessionData // ✅ Use actual session data with encryption key!
         );
 
         // Log successful authentication

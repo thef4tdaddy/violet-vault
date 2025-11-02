@@ -161,7 +161,7 @@ const useDebts = () => {
     mutationFn: addDebtToDb,
     onSuccess: (debt) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
-      
+
       // Log successful debt addition
       logger.info("✅ Debt added", {
         name: debt.name,
@@ -177,7 +177,7 @@ const useDebts = () => {
     mutationFn: updateDebtInDb,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
-      
+
       // Log successful debt update
       logger.info("✅ Debt updated", {
         debtId: variables.id,
@@ -191,7 +191,7 @@ const useDebts = () => {
     mutationFn: deleteDebtFromDb,
     onSuccess: (_, debtId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
-      
+
       // Log successful debt deletion
       logger.info("✅ Debt deleted", {
         debtId: debtId,
@@ -204,7 +204,7 @@ const useDebts = () => {
     mutationFn: recordPaymentInDb,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
-      
+
       // Log successful debt payment
       logger.info("✅ Debt payment recorded");
     },

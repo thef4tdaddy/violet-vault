@@ -15,7 +15,9 @@ const EnvelopeActivitySummary = ({ envelope }) => {
         {/* Spent Box */}
         <div className="flex xl:flex-col items-center xl:items-stretch justify-between xl:justify-start bg-rose-50 rounded-lg p-3 xl:p-4 border border-rose-200">
           <p className="text-sm font-medium text-rose-700 xl:mb-2">Spent (30d)</p>
-          <p className="text-lg xl:text-xl font-bold text-rose-700 whitespace-nowrap">${envelope.totalSpent.toFixed(2)}</p>
+          <p className="text-lg xl:text-xl font-bold text-rose-700 whitespace-nowrap">
+            ${envelope.totalSpent.toFixed(2)}
+          </p>
         </div>
         {/* Monthly Budget Box */}
         <div className="flex xl:flex-col items-center xl:items-stretch justify-between xl:justify-start bg-sky-50 rounded-lg p-3 xl:p-4 border border-sky-200">

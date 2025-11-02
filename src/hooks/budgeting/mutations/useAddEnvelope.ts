@@ -59,7 +59,7 @@ export const useAddEnvelope = () => {
     onSuccess: (envelope) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      
+
       // Log successful envelope addition
       logger.info("✅ Envelope added", {
         name: envelope.name,
@@ -67,7 +67,7 @@ export const useAddEnvelope = () => {
         envelopeType: envelope.envelopeType,
         targetAmount: envelope.targetAmount,
       });
-      
+
       triggerEnvelopeSync("added");
     },
     onError: (error) => {

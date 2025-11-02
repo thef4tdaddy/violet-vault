@@ -26,30 +26,30 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
     filterOptions.showPaidOff;
 
   return (
-    <div className="glassmorphism rounded-xl border border-white/20">
+    <div className="rounded-xl border-2 border-black bg-purple-50">
       {/* Header - Always Visible */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
           {React.createElement(getIcon("Filter"), {
-            className: "h-4 w-4 text-gray-600",
+            className: "h-4 w-4 text-purple-600",
           })}
-          <span className="text-sm font-medium text-gray-700">Filters & Sorting</span>
+          <span className="text-sm font-medium text-purple-900">Filters & Sorting</span>
           {hasActiveFilters && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900">
               Active
             </span>
           )}
         </div>
         <Button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 rounded-lg hover:bg-white/50 transition-colors"
+          className="p-1 rounded-lg bg-purple-100 hover:bg-purple-200 transition-colors"
         >
           {isExpanded
             ? React.createElement(getIcon("ChevronUp"), {
-                className: "h-4 w-4 text-gray-600",
+                className: "h-4 w-4 text-purple-600",
               })
             : React.createElement(getIcon("ChevronDown"), {
-                className: "h-4 w-4 text-gray-600",
+                className: "h-4 w-4 text-purple-600",
               })}
         </Button>
       </div>

@@ -14,9 +14,9 @@
 _Last updated: 2025-10-31 00:41:22 UTC_
 
 _Last updated: 2025-10-31 00:41:22 UTC_
-| ESLint Issues                 | 8       | 0      |
-| TypeScript Errors             | 0       | 0      |
-| TypeScript Strict Mode Errors | 4517    | 0      |
+| ESLint Issues | 8 | 0 |
+| TypeScript Errors | 0 | 0 |
+| TypeScript Strict Mode Errors | 4517 | 0 |
 
 _Last updated: 2025-10-31 00:27:57 UTC_
 | Category | Current | Change |
@@ -61,15 +61,15 @@ _Last updated: 2025-10-31 00:27:57 UTC_
 | 2     | `complexity`                                            |
 | 1     | `zustand-safe-patterns/zustand-selective-subscriptions` |
 | 1     | `max-params`                                            |
-| Count | Rule ID                  |
-| ----- | ------------------------ |
-| 4     | `max-lines-per-function` |
-| 4     | `complexity`             |
-| Count | Rule ID |
-|---|---|
-| 2 | `complexity` |
-| 1 | `zustand-safe-patterns/zustand-selective-subscriptions` |
-| 1 | `max-params` |
+| Count | Rule ID                                                 |
+| ----- | ------------------------                                |
+| 4     | `max-lines-per-function`                                |
+| 4     | `complexity`                                            |
+| Count | Rule ID                                                 |
+| ---   | ---                                                     |
+| 2     | `complexity`                                            |
+| 1     | `zustand-safe-patterns/zustand-selective-subscriptions` |
+| 1     | `max-params`                                            |
 
 ### Detailed Lint Report
 
@@ -722,36 +722,36 @@ src/hooks/bills/useBillManagerHelpers.ts(283,5): error TS2345: Argument of type 
 | 1     | `TS2532`   |
 | 1     | `TS2349`   |
 | 1     | `TS18049`  |
-|---|---|
-| 1688 | `TS7006` |
-| 1319 | `TS7031` |
-| 336 | `TS2339` |
-| 253 | `TS2345` |
-| 219 | `TS18046` |
-| 184 | `TS7053` |
-| 133 | `TS2322` |
-| 93 | `TS18048` |
-| 92 | `TS7005` |
-| 59 | `TS7034` |
-| 52 | `TS18047` |
-| 24 | `TS2769` |
-| 8 | `TS2353` |
-| 7 | `TS2722` |
-| 6 | `TS2698` |
-| 6 | `TS2531` |
-| 6 | `TS2411` |
-| 4 | `TS7019` |
-| 4 | `TS2783` |
-| 4 | `TS2538` |
-| 4 | `TS2352` |
-| 2 | `TS7022` |
-| 1 | `TS7023` |
-| 1 | `TS7016` |
-| 1 | `TS2774` |
-| 1 | `TS2683` |
-| 1 | `TS2532` |
-| 1 | `TS2349` |
-| 1 | `TS18049` |
+| ---   | ---        |
+| 1688  | `TS7006`   |
+| 1319  | `TS7031`   |
+| 336   | `TS2339`   |
+| 253   | `TS2345`   |
+| 219   | `TS18046`  |
+| 184   | `TS7053`   |
+| 133   | `TS2322`   |
+| 93    | `TS18048`  |
+| 92    | `TS7005`   |
+| 59    | `TS7034`   |
+| 52    | `TS18047`  |
+| 24    | `TS2769`   |
+| 8     | `TS2353`   |
+| 7     | `TS2722`   |
+| 6     | `TS2698`   |
+| 6     | `TS2531`   |
+| 6     | `TS2411`   |
+| 4     | `TS7019`   |
+| 4     | `TS2783`   |
+| 4     | `TS2538`   |
+| 4     | `TS2352`   |
+| 2     | `TS7022`   |
+| 1     | `TS7023`   |
+| 1     | `TS7016`   |
+| 1     | `TS2774`   |
+| 1     | `TS2683`   |
+| 1     | `TS2532`   |
+| 1     | `TS2349`   |
+| 1     | `TS18049`  |
 
 ### Detailed Strict Mode Report
 

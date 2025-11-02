@@ -12,6 +12,7 @@
 ## 🚨 IMMEDIATE DELETIONS (Outdated/Redundant)
 
 ### Root Directory
+
 1. **README-PHASE-1.md** - DELETE
    - Outdated Phase 1 conversion guide
    - Superseded by current TypeScript work
@@ -24,11 +25,13 @@
 ### Docs Directory
 
 #### Duplicate Files
+
 3. **Refactoring-Opportunities-Guide 2.md** - DELETE
    - Duplicate/backup of Refactoring-Opportunities-Guide.md
    - Same content (no diff)
 
 #### Outdated TypeScript Migration Docs
+
 4. **TYPECHECK-ERROR-REMEDIATION-PLAN.md** - ARCHIVE OR DELETE
    - 16KB old plan from when there were 3,117 errors
    - Now we have 0 errors ✅
@@ -41,6 +44,7 @@
    - **Recommendation:** Move to `docs/archive/`
 
 #### Outdated Config Migration Docs
+
 6. **CONFIG-MIGRATION-ANALYSIS.md** - ARCHIVE OR DELETE
    - 25KB from config migration work (Oct 28)
    - Already migrated
@@ -60,6 +64,7 @@
    - **Recommendation:** Move to `docs/archive/configs/`
 
 #### Completed Work - Zod
+
 10. **ZOD-IMPLENTATION.md** - TYPO + REDUNDANT
     - Typo in filename ("IMPLENTATION")
     - 2.9KB
@@ -72,6 +77,7 @@
     - **Recommendation:** Move to `docs/archive/zod/`
 
 #### Completed Work - 2.0 Release
+
 12. **2.0-AUDIT-SUMMARY.md** - ARCHIVE
     - 5.8KB summary from Oct 29
     - **Recommendation:** Move to `docs/archive/releases/2.0/`
@@ -90,6 +96,7 @@
     - **Recommendation:** Archive after 2.0 ships
 
 #### Testing Docs (Multiple Files)
+
 16. **TESTING_DOCUMENTATION.md** - CONSOLIDATE
 17. **TESTING_EPIC_GUIDE.md** - CONSOLIDATE
 18. **Testing-Checklist.md** - CONSOLIDATE
@@ -102,11 +109,13 @@
       - `docs/testing/checklist.md`
 
 #### Refactoring Docs (Multiple Files)
+
 21. **REFACTORING-ROADMAP.md** - CONSOLIDATE
 22. **Refactoring-Opportunities-Guide.md** - CONSOLIDATE
     - **Recommendation:** Consolidate into single `docs/refactoring.md` or archive both
 
 #### Zustand Docs (4 Files)
+
 23. **Zustand-Architecture-Guide.md**
 24. **Zustand-Safe-Patterns.md**
 25. **Zustand-Store-Audit-Report.md** - ARCHIVE
@@ -115,12 +124,14 @@
     - Archive the audit report
 
 #### ESLint Docs (3 Files)
+
 27. **ESLint-Rules.md**
 28. **ESLint-Warning-Resolution-Rules.md**
 29. **ESLint-Zustand-Rules.md**
     - **Recommendation:** Consolidate into `docs/linting/` folder
 
 #### Outdated/Completed
+
 30. **PHASE-3-SUMMARY.md** - ARCHIVE
     - Phase 3 summary (completed)
     - **Recommendation:** Move to `docs/archive/`
@@ -254,6 +265,7 @@ docs/
 ## 📋 REORGANIZATION ACTIONS
 
 ### Step 1: Create New Folders
+
 ```bash
 mkdir -p docs/guides
 mkdir -p docs/architecture/zustand
@@ -267,6 +279,7 @@ mkdir -p docs/archive/{configs,releases/2.0,zod,typescript,refactoring,other}
 ### Step 2: Move & Rename Files
 
 **Guides:**
+
 ```bash
 mv docs/API-Development-Guide.md docs/guides/api-development.md
 mv docs/Component-Refactoring-Standards.md docs/guides/component-refactoring.md
@@ -277,6 +290,7 @@ mv docs/VSCode-Tasks-Guide.md docs/guides/vscode-tasks.md
 ```
 
 **Architecture:**
+
 ```bash
 mv docs/TypeScript-Patterns-Guide.md docs/architecture/typescript-patterns.md
 mv docs/TypedFirebaseServices.md docs/architecture/typed-firebase-services.md
@@ -287,6 +301,7 @@ mv docs/Zustand-Store-Templates.md docs/architecture/zustand/templates.md
 ```
 
 **Linting:**
+
 ```bash
 mv docs/ESLint-Rules.md docs/linting/eslint-rules.md
 mv docs/ESLint-Warning-Resolution-Rules.md docs/linting/warning-resolution.md
@@ -294,6 +309,7 @@ mv docs/ESLint-Zustand-Rules.md docs/linting/zustand-rules.md
 ```
 
 **Testing:**
+
 ```bash
 mv docs/TESTING_DOCUMENTATION.md docs/testing/README.md
 mv docs/Testing-Strategy.md docs/testing/strategy.md
@@ -301,6 +317,7 @@ mv docs/Testing-Checklist.md docs/testing/checklist.md
 ```
 
 **Validation:**
+
 ```bash
 mv docs/ZOD-INTEGRATION-GUIDE.md docs/validation/zod-integration-guide.md
 mv docs/API-Response-Validation-Guide.md docs/validation/api-response-validation.md
@@ -308,6 +325,7 @@ mv docs/Component-Props-Validation-Guide.md docs/validation/component-props-vali
 ```
 
 **Setup:**
+
 ```bash
 mv docs/setup/Firebase-Setup-Guide.md docs/setup/firebase/setup.md
 mv docs/setup/Firebase-Auth-Domain-Setup.md docs/setup/firebase/auth-domain.md
@@ -319,6 +337,7 @@ mv "docs/setup/Sentry Rules.md" docs/setup/sentry-rules.md
 ```
 
 **Archive:**
+
 ```bash
 # Configs
 mv docs/CONFIG-MIGRATION-ANALYSIS.md docs/archive/configs/migration-analysis.md
@@ -353,6 +372,7 @@ mv docs/Zustand-Store-Audit-Report.md docs/archive/other/zustand-store-audit-rep
 ```
 
 ### Step 3: Delete Files
+
 ```bash
 # Delete from root
 rm README-PHASE-1.md
@@ -370,11 +390,13 @@ rm docs/TESTING-GAPS-ANALYSIS.md  # consolidate into testing/README.md
 ## 📊 SUMMARY STATISTICS
 
 ### Before Cleanup:
+
 - **Root Markdown Files:** 3
 - **Docs Files:** 59
 - **Total:** 76 files
 
 ### After Cleanup:
+
 - **Root Markdown Files:** 1 (README.md)
 - **Docs Files:** ~45 (organized in folders)
 - **Archived Files:** ~25
@@ -398,21 +420,25 @@ rm docs/TESTING-GAPS-ANALYSIS.md  # consolidate into testing/README.md
 ## 🎯 RECOMMENDED PRIORITY
 
 ### Phase 1 (Immediate - 30 min)
+
 1. Delete obvious duplicates and typos
 2. Move GEMINI.md from root to docs/development/
 3. Delete README-PHASE-1.md
 
 ### Phase 2 (Quick Wins - 1 hour)
+
 1. Create archive folders
 2. Move completed work to archive (2.0 release, config migration, etc)
 3. Move testing docs to `docs/testing/`
 
 ### Phase 3 (Organization - 2 hours)
+
 1. Create full folder structure
 2. Move all docs to appropriate folders
 3. Rename files to lowercase-with-dashes.md convention
 
 ### Phase 4 (Polish - 1 hour)
+
 1. Create `docs/README.md` with index
 2. Update links in moved files
 3. Update any hardcoded doc paths in code
@@ -420,4 +446,3 @@ rm docs/TESTING-GAPS-ANALYSIS.md  # consolidate into testing/README.md
 **Total Estimated Effort:** ~4-5 hours
 
 ---
-

@@ -126,9 +126,9 @@ const getVariantStyle = (variant: VariantType, isActive: boolean): string => {
     },
     tabs: {
       active:
-        "bg-white text-blue-700 border-t-2 border-l border-r border-blue-500 rounded-t-lg shadow-sm relative z-10",
+        "bg-transparent text-blue-700 border-b-2 border-blue-500 rounded-none shadow-none relative z-10",
       inactive:
-        "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 rounded-t-lg relative",
+        "bg-transparent text-gray-700 border-b-2 border-transparent hover:text-gray-900 rounded-none relative",
     },
     colored: { active: "", inactive: "" },
   };

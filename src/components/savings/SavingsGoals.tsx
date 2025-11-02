@@ -49,7 +49,9 @@ const SavingsGoals = ({
             className: "h-16 w-16 mx-auto mb-4 text-purple-400",
           })}
           <h3 className="text-xl font-bold text-gray-700 mb-2">No Savings Goals Yet</h3>
-          <p className="text-gray-500 mb-6">Create your first goal to start saving for the future!</p>
+          <p className="text-gray-500 mb-6">
+            Create your first goal to start saving for the future!
+          </p>
           <Button
             onClick={openAddForm}
             className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors mx-auto border-2 border-black"

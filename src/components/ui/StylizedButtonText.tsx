@@ -2,10 +2,10 @@ import React from "react";
 
 /**
  * StylizedButtonText Component
- * 
+ *
  * Renders text with larger first letter on each word for button labels
  * Handles spacing correctly so "CHANGE PROFILE" looks natural
- * 
+ *
  * Usage:
  *   <StylizedButtonText>CHANGE PROFILE</StylizedButtonText>
  *   <StylizedButtonText>START FRESH</StylizedButtonText>
@@ -45,4 +45,3 @@ const StylizedButtonText: React.FC<StylizedButtonTextProps> = ({
 };
 
 export default StylizedButtonText;
-

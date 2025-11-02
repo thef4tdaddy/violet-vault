@@ -30,7 +30,7 @@ export const usePaycheckMutations = (envelopesQuery: unknown, savingsGoalsQuery:
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.paychecks });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
-      
+
       // Log successful paycheck processing
       logger.info("✅ Paycheck processed", {
         amount: variables.amount,
@@ -55,7 +55,7 @@ export const usePaycheckMutations = (envelopesQuery: unknown, savingsGoalsQuery:
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.paychecks });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
-      
+
       // Log successful paycheck deletion
       logger.info("✅ Paycheck deleted", {
         paycheckId: paycheckId,

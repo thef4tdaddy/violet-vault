@@ -18,7 +18,7 @@ export const useBudgetMetadataMutation = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata as readonly unknown[] });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
-      
+
       // Log successful budget metadata update
       logger.info("✅ Budget metadata updated", {
         updates: Object.keys(updates),

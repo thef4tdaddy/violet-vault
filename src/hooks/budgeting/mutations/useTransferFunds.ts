@@ -82,7 +82,7 @@ export const useTransferFunds = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      
+
       // Log successful fund transfer
       logger.info("✅ Funds transferred between envelopes", {
         amount: data.amount,
@@ -90,7 +90,7 @@ export const useTransferFunds = () => {
         toEnvelope: data.toEnvelopeId,
         transactionId: data.transaction.id,
       });
-      
+
       triggerEnvelopeSync("transfer");
     },
     onError: (error) => {

@@ -66,13 +66,13 @@ export const OverviewTab = ({
 
       {/* Debt List */}
       {isDebtFeatureEnabled("ENABLE_DEBT_LIST") ? (
-        <div className="rounded-lg border border-gray-200">
-          <div className="p-4 border-b bg-gray-50 rounded-t-lg">
-            <h3 className="font-black text-black text-base flex items-center">
+        <div className="rounded-lg border-2 border-black">
+          <div className="p-4 border-b-2 border-black bg-gray-50 rounded-t-lg">
+            <h3 className="font-black text-black text-base flex items-center tracking-wide">
               {React.createElement(getIcon("TrendingDown"), {
                 className: "h-4 w-4 mr-2 text-red-600",
               })}
-              <span className="text-lg">Y</span>OUR <span className="text-lg">D</span>EBTS (
+              <span className="text-lg">Y</span>OUR <span className="text-lg mx-1">D</span>EBTS (
               {filteredDebts.length})
             </h3>
           </div>

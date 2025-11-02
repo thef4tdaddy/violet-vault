@@ -53,13 +53,15 @@ const DebtDashboard = () => {
       {/* Tab Content with connected navigation */}
       <div className="bg-white rounded-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10">
         {/* Tab Navigation */}
-        <StandardTabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          variant="colored"
-          className="border-b border-gray-200"
-        />
+        <div className="border-b-2 border-black">
+          <StandardTabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            variant="colored"
+            className=""
+          />
+        </div>
 
         {/* Tab Content */}
         <div className="p-6">

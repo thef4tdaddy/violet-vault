@@ -47,7 +47,9 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
           }
           className="px-3 py-2 text-sm border-2 border-black rounded-lg transition-colors font-medium bg-purple-100 text-purple-900 hover:bg-purple-200 focus:outline-none focus:ring-0"
         >
-          {React.createElement(getIcon(filterOptions.showEmpty ? "Eye" : "EyeOff"), { className: "h-4 w-4 mr-2" })}
+          {React.createElement(getIcon(filterOptions.showEmpty ? "Eye" : "EyeOff"), {
+            className: "h-4 w-4 mr-2",
+          })}
           {filterOptions.showEmpty ? "Show All" : "Hide Empty"}
         </Button>
       </div>

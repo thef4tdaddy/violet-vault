@@ -90,7 +90,7 @@ const performImport = async (validatedData, showSuccessToast, authConfig) => {
   // Force UI refresh by invalidating all queries
   await queryClient.invalidateQueries();
   await queryClient.refetchQueries();
-  
+
   logger.info("✅ Data import completed and synced to cloud", {
     envelopes: validatedData.envelopes?.length || 0,
     transactions: validatedData.allTransactions?.length || 0,

@@ -71,11 +71,10 @@ const EnvelopeView = ({
           </div>
           <span className="text-3xl">E</span>NVELOPE <span className="text-3xl">M</span>ANAGEMENT
         </h2>
-        <p className="text-purple-900 text-sm ml-12">
-          Organize and track your budget allocations
-        </p>
+        <p className="text-purple-900 text-sm ml-12">Organize and track your budget allocations</p>
         <p className="text-purple-800 text-xs ml-12 font-medium">
-          You currently have {envelopes?.length || 0} {envelopes?.length === 1 ? 'envelope' : 'envelopes'}
+          You currently have {envelopes?.length || 0}{" "}
+          {envelopes?.length === 1 ? "envelope" : "envelopes"}
         </p>
       </div>
 

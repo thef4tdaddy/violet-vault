@@ -150,7 +150,11 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
 
         logger.info("Auto-reconciling difference", { difference, transaction });
         reconcileTransaction(transaction);
-        globalToast.showSuccess("Balance reconciled automatically", "Reconciliation Complete", 3000);
+        globalToast.showSuccess(
+          "Balance reconciled automatically",
+          "Reconciliation Complete",
+          3000
+        );
       } catch (error) {
         logger.error("Auto-reconcile failed", { error, difference });
         globalToast.showError("Failed to reconcile balance", "Error", 8000);

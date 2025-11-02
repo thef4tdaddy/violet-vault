@@ -20,13 +20,13 @@
 
 ## Debts
 
-- [ ] **Tabs:**
-  - [ ] Remove the white background from the tabs.
-  - [ ] Place a hard border _below_ the tabs (above the main content area) to make them look like physical tabs.
-- [ ] **"Your Debt" Section:**
-  - [ ] Add a hard black border around this section.
-  - [ ] Fix the letter-spacing in the "Your Debt" header.
-- [ ] **Buttons:** Change the "Filters" and "Sorting" expansion buttons to the light purple color.
+- [x] **Tabs:**
+  - [x] Remove the white background from the tabs.
+  - [x] Place a hard border _below_ the tabs (above the main content area) to make them look like physical tabs.
+- [x] **"Your Debt" Section:**
+  - [x] Add a hard black border around this section.
+  - [x] Fix the letter-spacing in the "Your Debt" header.
+- [x] **Buttons:** Change the "Filters" and "Sorting" expansion buttons to the light purple color.
 
 ## Transactions
 
