@@ -45,10 +45,10 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
               showEmpty: !filterOptions.showEmpty,
             })
           }
-          className={`px-3 py-2 text-sm border-2 rounded-lg transition-colors font-medium ${
+          className={`px-3 py-2 text-sm border-2 border-black rounded-lg transition-colors font-medium ${
             filterOptions.showEmpty
-              ? "bg-red-50 border-red-600 text-red-700 hover:bg-red-100"
-              : "border-black bg-white text-gray-700 hover:bg-gray-50"
+              ? "bg-gray-100 text-black hover:bg-gray-200"
+              : "bg-white text-gray-700 hover:bg-gray-50"
           }`}
         >
           {React.createElement(getIcon(filterOptions.showEmpty ? "EyeOff" : "Eye"), { className: "h-4 w-4 mr-2" })}
@@ -57,23 +57,23 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
       </div>
 
       {/* Right side - View Mode Toggle */}
-      <div className="flex bg-gray-200 rounded-lg p-1 border-2 border-black">
+      <div className="flex gap-2 bg-white rounded-lg p-1 border-2 border-black">
         <Button
           onClick={() => setViewMode("overview")}
-          className={`px-4 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
+          className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
             viewMode === "overview"
-              ? "bg-white text-black shadow-sm"
-              : "bg-transparent text-gray-700 hover:text-gray-900"
+              ? "bg-purple-500 text-white shadow-md"
+              : "bg-purple-100 text-purple-900 hover:bg-purple-200"
           }`}
         >
           Overview
         </Button>
         <Button
           onClick={() => setViewMode("detailed")}
-          className={`px-4 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
+          className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${
             viewMode === "detailed"
-              ? "bg-white text-black shadow-sm"
-              : "bg-transparent text-gray-700 hover:text-gray-900"
+              ? "bg-purple-500 text-white shadow-md"
+              : "bg-purple-100 text-purple-900 hover:bg-purple-200"
           }`}
         >
           Detailed

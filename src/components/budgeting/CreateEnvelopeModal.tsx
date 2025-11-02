@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
@@ -89,8 +90,8 @@ const CreateEnvelopeModal = ({
     );
   }
 
-  // Desktop centered modal
-  return (
+  // Desktop centered modal - use Portal to render at document root
+  const modalContent = (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-2 border-black">
         <DesktopModalHeader onClose={handleClose} />
@@ -114,6 +115,9 @@ const CreateEnvelopeModal = ({
       </div>
     </div>
   );
+
+  // Render modal at document root to avoid z-index/overflow issues
+  return createPortal(modalContent, document.body);
 };
 
 export default CreateEnvelopeModal;

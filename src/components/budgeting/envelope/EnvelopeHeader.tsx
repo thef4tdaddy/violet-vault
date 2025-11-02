@@ -79,8 +79,9 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = ({
             "p-2 text-gray-400 hover:text-blue-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
             "small"
           )}
+          title="Edit envelope"
         >
-          {React.createElement(getIcon("Edit"), { className: "h-4 w-4" })}
+          {React.createElement(getIcon("Edit2"), { className: "h-4 w-4" })}
         </Button>
         <Button
           onClick={withHapticFeedback((e) => {
@@ -91,8 +92,9 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = ({
             "p-2 text-gray-400 hover:text-green-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
             "small"
           )}
+          title="View transaction history"
         >
-          {React.createElement(getIcon("History"), {
+          {React.createElement(getIcon("Clock"), {
             className: "h-4 w-4",
           })}
         </Button>
