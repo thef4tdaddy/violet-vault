@@ -177,7 +177,7 @@ const EditEnvelopeModal = ({
   );
 
   // Render modal at document root to avoid z-index/overflow issues
-  return createPortal(modalContent, document.body);
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default EditEnvelopeModal;

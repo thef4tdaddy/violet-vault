@@ -1,4 +1,4 @@
-import { createPortal } from "react-dom";
+import ReactDOM from "react-dom";
 import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
@@ -117,7 +117,7 @@ const CreateEnvelopeModal = ({
   );
 
   // Render modal at document root to avoid z-index/overflow issues
-  return createPortal(modalContent, document.body);
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default CreateEnvelopeModal;
