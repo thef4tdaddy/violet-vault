@@ -227,10 +227,12 @@ class CloudSyncService {
         }
       } else {
         // Upload from Dexie to Firebase (default behavior)
-        result = await chunkedSyncService.saveToCloud(
+        // saveToCloud returns boolean directly (true/false), not an object
+        const saveSuccess = await chunkedSyncService.saveToCloud(
           localData,
           this.config.currentUser as CloudSyncConfig["currentUser"]
         );
+        result = { success: saveSuccess, direction: "toFirestore" };
       }
 
       if (result.success) {
@@ -656,10 +658,7 @@ class CloudSyncService {
 
       // Use chunked Firebase sync to save data (one-way)
       // saveToCloud returns boolean directly (true/false), not an object
-      const success = await chunkedSyncService.saveToCloud(
-        localData,
-        config.currentUser
-      );
+      const success = await chunkedSyncService.saveToCloud(localData, config.currentUser);
 
       if (success) {
         logger.info("✅ Force push to Firebase completed successfully");
