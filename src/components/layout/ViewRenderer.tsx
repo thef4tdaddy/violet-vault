@@ -55,30 +55,35 @@ const EnvelopeView = ({
   updateEnvelope,
   setActiveView,
 }: EnvelopeViewProps) => (
-  <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
-    {/* Header */}
-    <div className="flex justify-between items-center">
-      <div>
-        <h2 className="font-black text-black text-base flex items-center">
-          <div className="relative mr-4">
+  <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-4">
+    {/* Header Row: Title/Subheaders (left) + Action Buttons (right) */}
+    <div className="flex justify-between items-start gap-4">
+      {/* Left: Header + Subheaders */}
+      <div className="flex-1">
+        <h2 className="font-black text-black text-2xl mb-1 flex items-center">
+          <div className="relative mr-3">
             <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
-            <div className="relative bg-purple-500 p-3 rounded-2xl">
+            <div className="relative bg-purple-500 p-2 rounded-2xl">
               {createElement(getIcon("Wallet"), {
-                className: "h-6 w-6 text-white",
+                className: "h-5 w-5 text-white",
               })}
             </div>
           </div>
-          <span className="text-lg">E</span>NVELOPE <span className="text-lg">M</span>ANAGEMENT
+          <span className="text-3xl">E</span>NVELOPE <span className="text-3xl">M</span>ANAGEMENT
         </h2>
-        <p className="text-purple-900 mt-1">
-          Organize and track your budget allocations • {envelopes?.length || 0} envelopes
+        <p className="text-purple-900 text-sm ml-12">
+          Organize and track your budget allocations
+        </p>
+        <p className="text-purple-800 text-xs ml-12 font-medium">
+          Total: {envelopes?.length || 0} {envelopes?.length === 1 ? 'envelope' : 'envelopes'}
         </p>
       </div>
 
-      <div className="flex flex-row gap-3">
+      {/* Right: Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-2">
         <Button
           onClick={() => setActiveView("automation")}
-          className="btn btn-secondary border-2 border-black flex items-center"
+          className="btn btn-secondary border-2 border-black flex items-center whitespace-nowrap"
           title="Manage automatic envelope funding rules"
         >
           {createElement(getIcon("Settings"), {
@@ -86,17 +91,17 @@ const EnvelopeView = ({
           })}
           Auto-Funding
         </Button>
+        <SmartEnvelopeSuggestions
+          transactions={safeTransactions}
+          envelopes={envelopes}
+          onCreateEnvelope={addEnvelope}
+          onUpdateEnvelope={updateEnvelope}
+          onDismissSuggestion={() => {}}
+          dateRange="6months"
+        />
       </div>
     </div>
 
-    <SmartEnvelopeSuggestions
-      transactions={safeTransactions}
-      envelopes={envelopes}
-      onCreateEnvelope={addEnvelope}
-      onUpdateEnvelope={updateEnvelope}
-      onDismissSuggestion={() => {}}
-      dateRange="6months"
-    />
     <EnvelopeGrid unassignedCash={unassignedCash} data-tour="envelope-grid" />
   </div>
 );
