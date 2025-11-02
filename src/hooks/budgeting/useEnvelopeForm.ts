@@ -44,6 +44,11 @@ const useEnvelopeForm = ({
   const updateFormField = useCallback(
     (field: string, value: unknown) => {
       setFormData((prev) => {
+        // Only mark dirty if value actually changed
+        if (prev[field as keyof typeof prev] !== value) {
+          setIsDirty(true);
+        }
+
         const newData = { ...prev, [field]: value };
 
         // Clear related errors when field is updated
@@ -70,7 +75,6 @@ const useEnvelopeForm = ({
           }
         }
 
-        setIsDirty(true);
         return newData;
       });
     },

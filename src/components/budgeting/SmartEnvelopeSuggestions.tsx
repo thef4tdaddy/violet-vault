@@ -4,6 +4,7 @@ import { Button } from "@/components/ui";
 import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
+import { globalToast } from "../../stores/ui/toastStore";
 
 // Icon badge component
 const IconBadge = ({ isCollapsed }) => (
@@ -169,10 +170,18 @@ const SmartEnvelopeSuggestions = ({
 
   // When collapsed and no suggestions, just show a button
   if (effectiveIsCollapsed && !hasSuggestions) {
+    const handleClickNoSuggestions = () => {
+      globalToast.showInfo(
+        "No suggestions available yet. Add more transactions to see smart envelope recommendations!",
+        "Smart Suggestions",
+        5000
+      );
+    };
+
     return (
       <Button
-        onClick={toggleCollapse}
-        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+        onClick={handleClickNoSuggestions}
+        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border-2 border-black hover:bg-amber-100 transition-colors"
       >
         <IconBadge isCollapsed={true} />
         <span className="text-sm font-medium text-gray-900">Smart Suggestions</span>

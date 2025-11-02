@@ -102,25 +102,6 @@ function EnvelopeGridView({
         pullRotation={pullRotation}
       />
 
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="font-black text-black text-3xl flex items-center mb-2">
-          <span className="text-4xl mr-2">E</span>nvelopes
-          <span className="text-4xl ml-4 mr-2">M</span>anagement
-        </h1>
-        <p className="text-gray-600 text-sm">
-          {sortedEnvelopes.length} {sortedEnvelopes.length === 1 ? "envelope" : "envelopes"} •{" "}
-          <span className="font-medium">
-            $
-            {(totals as Record<string, unknown>)?.totalAllocated &&
-            typeof (totals as Record<string, unknown>).totalAllocated === "number"
-              ? ((totals as Record<string, unknown>).totalAllocated as number).toFixed(2)
-              : "0.00"}{" "}
-            allocated
-          </span>
-        </p>
-      </div>
-
       {/* Action Buttons Row */}
       <EnvelopeGridHeader
         filterOptions={

@@ -75,7 +75,7 @@ const EnvelopeView = ({
           Organize and track your budget allocations
         </p>
         <p className="text-purple-800 text-xs ml-12 font-medium">
-          Total: {envelopes?.length || 0} {envelopes?.length === 1 ? 'envelope' : 'envelopes'}
+          You currently have {envelopes?.length || 0} {envelopes?.length === 1 ? 'envelope' : 'envelopes'}
         </p>
       </div>
 

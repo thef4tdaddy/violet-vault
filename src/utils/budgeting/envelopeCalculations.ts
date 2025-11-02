@@ -184,7 +184,8 @@ export const filterEnvelopes = (envelopeData, filterOptions) => {
   let filtered = [...envelopeData];
 
   if (!filterOptions.showEmpty) {
-    filtered = filtered.filter((env) => env.allocated > 0);
+    // Filter out envelopes with zero balance (empty envelopes)
+    filtered = filtered.filter((env) => (env.currentBalance || 0) > 0);
   }
 
   // Filter by envelope type
