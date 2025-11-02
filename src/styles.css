@@ -47,7 +47,7 @@
   background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
   color: white;
   box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.3);
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 2px solid #000000 !important; /* Hard black outline */
 }
 
 .btn-primary:hover {
@@ -62,7 +62,7 @@
 .btn-secondary {
   background: #f1f5f9;
   color: #334155;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 2px solid #000000; /* Hard black outline */
 }
 
 .btn-secondary:hover {
@@ -73,7 +73,7 @@
 .btn-success {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 2px solid #000000; /* Hard black outline */
 }
 
 .btn-success:hover {
