@@ -79,8 +79,8 @@ const EnvelopeView = ({
         </p>
       </div>
 
-      {/* Right: Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      {/* Right: Action Buttons - Stack vertically on mobile */}
+      <div className="flex flex-col gap-2">
         <Button
           onClick={() => setActiveView("automation")}
           className="btn btn-secondary border-2 border-black flex items-center whitespace-nowrap"

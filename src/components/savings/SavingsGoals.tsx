@@ -39,8 +39,8 @@ const SavingsGoals = ({
 
   return (
     <div className="space-y-6">
-      {/* Summary Card - Only show when there are goals */}
-      {savingsGoals.length > 0 && <SavingsSummaryCard savingsGoals={savingsGoals} />}
+      {/* Summary Card - Always show, even when empty */}
+      <SavingsSummaryCard savingsGoals={savingsGoals} />
 
       {/* Goals Grid or Empty State */}
       {savingsGoals.length === 0 ? (
