@@ -1,7 +1,7 @@
 import React from "react";
 import { getIcon } from "../../utils";
 import EditableBalance from "../ui/EditableBalance";
-import { Button } from "../ui";
+import { Button, StylizedButtonText } from "../ui";
 
 // Helper functions to reduce complexity
 const getDifferenceCardStyles = (isBalanced, difference) => {
@@ -36,8 +36,9 @@ const AccountBalanceOverview = ({
         {React.createElement(getIcon("CreditCard"), {
           className: "h-6 w-6 mr-3 text-blue-600",
         })}
-        <span className="text-2xl mr-1">V</span>iolet <span className="text-2xl mr-1">V</span>ault{" "}
-        <span className="text-2xl mr-1">A</span>pp <span className="text-2xl">D</span>ashboard
+        <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+          VIOLET VAULT APP DASHBOARD
+        </StylizedButtonText>
       </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -52,8 +53,8 @@ const AccountBalanceOverview = ({
           <EditableBalance
             value={actualBalance}
             onChange={onUpdateBalance}
-            title="Bank Balance"
-            subtitle="Click to edit your current checking account balance"
+            title="Current Balance"
+            subtitle="Click to edit your checking account balance"
             colorClass="text-blue-900"
             bgClass="bg-blue-50"
             hoverClass="hover:bg-blue-100"
