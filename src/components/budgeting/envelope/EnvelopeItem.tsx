@@ -102,8 +102,8 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
         />
       </div>
 
-      {/* Collapsible Content - Always visible on desktop, collapsible on mobile */}
-      <div className={`${isCollapsed ? "hidden md:block" : "block"}`}>
+      {/* Collapsible Content - Controlled by viewMode */}
+      <div className={`${isCollapsed ? "hidden" : "block"}`}>
         <EnvelopeFinancialSummary financialSummary={financialSummary} />
 
         {/* Activity Summary - Different display for Variable vs Bill envelopes */}
