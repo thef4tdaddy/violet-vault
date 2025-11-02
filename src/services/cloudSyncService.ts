@@ -655,14 +655,13 @@ class CloudSyncService {
       );
 
       // Use chunked Firebase sync to save data (one-way)
-      const result = (await chunkedSyncService.saveToCloud(
+      // saveToCloud returns boolean directly (true/false), not an object
+      const success = await chunkedSyncService.saveToCloud(
         localData,
         config.currentUser
-      )) as unknown as {
-        success: boolean;
-      };
+      );
 
-      if (result.success) {
+      if (success) {
         logger.info("✅ Force push to Firebase completed successfully");
         return { success: true };
       } else {
