@@ -61,7 +61,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors border-2 border-black ${
                         activeSection === section.id
                           ? "bg-purple-500 text-white"
-                          : "bg-white/60 text-purple-900 hover:bg-white/80"
+                          : "bg-white text-black hover:bg-gray-100"
                       }`}
                     >
                       {React.createElement(getIcon(section.icon), {
