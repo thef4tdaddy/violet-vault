@@ -44,17 +44,17 @@ const SavingsGoals = ({
 
       {/* Goals Grid or Empty State */}
       {savingsGoals.length === 0 ? (
-        <div className="glassmorphism rounded-2xl p-12 text-center border-2 border-purple-200">
+        <div className="bg-white rounded-xl p-12 text-center border-2 border-black shadow-sm">
           {React.createElement(getIcon("Target"), {
-            className: "h-16 w-16 mx-auto mb-4 text-purple-400",
+            className: "h-16 w-16 mx-auto mb-4 text-purple-600",
           })}
-          <h3 className="text-xl font-bold text-gray-700 mb-2">No Savings Goals Yet</h3>
-          <p className="text-gray-500 mb-6">
+          <h3 className="text-xl font-black text-black mb-2">No Savings Goals Yet</h3>
+          <p className="text-purple-900 mb-6">
             Create your first goal to start saving for the future!
           </p>
           <Button
             onClick={openAddForm}
-            className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors mx-auto border-2 border-black"
+            className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors mx-auto border-2 border-black shadow-lg"
           >
             {React.createElement(getIcon("Plus"), { className: "h-5 w-5" })}
             <span className="font-bold">Add Your First Goal</span>
@@ -67,7 +67,7 @@ const SavingsGoals = ({
             <div className="flex gap-3">
               <Button
                 onClick={openAddForm}
-                className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors border-2 border-black"
+                className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors border-2 border-black shadow-lg"
               >
                 {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
                 <span>Add Goal</span>
@@ -76,7 +76,7 @@ const SavingsGoals = ({
               {unassignedCash > 0 && (
                 <Button
                   onClick={openDistributeModal}
-                  className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors border-2 border-black"
+                  className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors border-2 border-black shadow-lg"
                 >
                   {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
                   <span>Distribute Cash (${unassignedCash.toFixed(2)})</span>
