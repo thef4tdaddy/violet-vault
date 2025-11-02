@@ -1,6 +1,8 @@
 // Buttons
 export { Button } from "./buttons";
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./buttons";
+export { default as StylizedButtonText } from "./StylizedButtonText";
+export type { default as StylizedButtonTextProps } from "./StylizedButtonText";
 
 // Cards
 export { SummaryCard, StatCard } from "./cards";
