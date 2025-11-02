@@ -119,7 +119,7 @@ const InstallPromptModal = () => {
 
           <Button
             onClick={handleDismiss}
-            className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors"
+            className="w-full bg-gray-100 text-black font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-200 transition-colors"
           >
             {isIOS ? "Got It" : "Maybe Later"}
           </Button>
