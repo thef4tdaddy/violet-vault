@@ -11,11 +11,11 @@
 
 ## Envelope
 
-- [ ] **Layout (Mobile):** Stack "Smart suggestion" and "auto funding" elements vertically on mobile screens, as they currently don't fit.
+- [x] **Layout (Mobile):** Stack "Smart suggestion" and "auto funding" elements vertically on mobile screens, as they currently don't fit. _(Fixed: 53894d3c)_
 
 ## Savings
 
-- [ ] **Bug:** Add the summary cards for savings goals back to the page (they were removed during a duplicate cleanup).
+- [x] **Bug:** Add the summary cards for savings goals back to the page (they were removed during a duplicate cleanup). _(Fixed: 53894d3c)_
 - [ ] **Theme:** Update the Savings page to the new, standardized color scheme.
 
 ## Debts
