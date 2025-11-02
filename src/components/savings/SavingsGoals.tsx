@@ -39,51 +39,62 @@ const SavingsGoals = ({
 
   return (
     <div className="space-y-6">
-      {/* Summary Card */}
-      <SavingsSummaryCard savingsGoals={savingsGoals} />
-
-      {/* Action Buttons */}
-      <div className="flex justify-between items-center">
-        <div className="flex gap-3">
-          {/* Add Goal Button */}
-          <Button
-            onClick={openAddForm}
-            className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
-            <span>Add Goal</span>
-          </Button>
-
-          {/* Distribute Cash Button */}
-          {unassignedCash > 0 && savingsGoals.length > 0 && (
-            <Button
-              onClick={openDistributeModal}
-              className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
-              <span>Distribute Cash (${unassignedCash.toFixed(2)})</span>
-            </Button>
-          )}
-        </div>
-      </div>
+      {/* Summary Card - Only show when there are goals */}
+      {savingsGoals.length > 0 && <SavingsSummaryCard savingsGoals={savingsGoals} />}
 
       {/* Goals Grid or Empty State */}
       {savingsGoals.length === 0 ? (
-        <div className="glassmorphism rounded-2xl p-8 text-center text-gray-500 border border-white/20">
-          <p>No savings goals yet. Click "Add Goal" to create your first savings goal!</p>
+        <div className="glassmorphism rounded-2xl p-12 text-center border-2 border-purple-200">
+          {React.createElement(getIcon("Target"), {
+            className: "h-16 w-16 mx-auto mb-4 text-purple-400",
+          })}
+          <h3 className="text-xl font-bold text-gray-700 mb-2">No Savings Goals Yet</h3>
+          <p className="text-gray-500 mb-6">Create your first goal to start saving for the future!</p>
+          <Button
+            onClick={openAddForm}
+            className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors mx-auto border-2 border-black"
+          >
+            {React.createElement(getIcon("Plus"), { className: "h-5 w-5" })}
+            <span className="font-bold">Add Your First Goal</span>
+          </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {savingsGoals.map((goal) => (
-            <SavingsGoalCard
-              key={goal.id}
-              goal={goal}
-              onEdit={handleEditGoal}
-              onDelete={handleDeleteGoal}
-              priorities={SAVINGS_PRIORITIES}
-            />
-          ))}
-        </div>
+        <>
+          {/* Action Buttons - Only show when there are goals */}
+          <div className="flex justify-between items-center">
+            <div className="flex gap-3">
+              <Button
+                onClick={openAddForm}
+                className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors border-2 border-black"
+              >
+                {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
+                <span>Add Goal</span>
+              </Button>
+
+              {unassignedCash > 0 && (
+                <Button
+                  onClick={openDistributeModal}
+                  className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors border-2 border-black"
+                >
+                  {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
+                  <span>Distribute Cash (${unassignedCash.toFixed(2)})</span>
+                </Button>
+              )}
+            </div>
+          </div>
+          {/* Goals Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {savingsGoals.map((goal) => (
+              <SavingsGoalCard
+                key={goal.id}
+                goal={goal}
+                onEdit={handleEditGoal}
+                onDelete={handleDeleteGoal}
+                priorities={SAVINGS_PRIORITIES}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Add/Edit Goal Modal */}

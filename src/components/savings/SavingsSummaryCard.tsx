@@ -81,15 +81,6 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
           </div>
         </div>
       </div>
-
-      {savingsGoals.length === 0 && (
-        <div className="text-center text-gray-500 mt-4">
-          {React.createElement(getIcon("Target"), {
-            className: "h-12 w-12 mx-auto mb-3 opacity-50",
-          })}
-          <p>No savings goals yet. Create your first goal to get started!</p>
-        </div>
-      )}
     </div>
   );
 };
