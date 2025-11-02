@@ -44,9 +44,9 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
           <p className="text-xs text-gray-600 mt-1">Cash Management</p>
         </div>
 
-        <div className="flex items-center gap-2 ml-4">
+        <div className="flex flex-col items-end gap-1">
           <div
-            className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+            className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${
               unassignedCash < 0 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
             }`}
           >
@@ -55,10 +55,10 @@ const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
 
           <Button
             onClick={handleHistoryClick}
-            className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+            className="p-1.5 text-gray-400 hover:text-green-600 transition-colors border border-gray-300 hover:border-green-500 rounded"
             title="View transaction history"
           >
-            {React.createElement(getIcon("History"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Clock"), { className: "h-3.5 w-3.5" })}
           </Button>
         </div>
       </div>

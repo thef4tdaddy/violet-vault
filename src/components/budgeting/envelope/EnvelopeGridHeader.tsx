@@ -65,6 +65,7 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
               ? "bg-purple-500 text-white shadow-md"
               : "bg-purple-100 text-purple-900 hover:bg-purple-200"
           }`}
+          title="Compact view - shows envelope names and key metrics only"
         >
           Overview
         </Button>
@@ -75,6 +76,7 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
               ? "bg-purple-500 text-white shadow-md"
               : "bg-purple-100 text-purple-900 hover:bg-purple-200"
           }`}
+          title="Full view - shows all envelope details, spending, and bills"
         >
           Detailed
         </Button>

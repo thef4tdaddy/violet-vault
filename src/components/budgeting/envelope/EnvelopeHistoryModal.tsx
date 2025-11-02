@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import ReactDOM from "react-dom";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
@@ -55,7 +55,7 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
   );
 
   // Render modal at document root to avoid z-index/overflow issues
-  return ReactDOM.createPortal(modalContent, document.body);
+  return createPortal(modalContent, document.body);
 };
 
 export default EnvelopeHistoryModal;
