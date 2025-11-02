@@ -19,7 +19,7 @@ import { PaycheckHistorySchema } from "./paycheck-history";
 export const EnvelopeGridPropsSchema = z.object({
   envelopes: z.array(EnvelopeSchema).optional().default([]),
   transactions: z.array(TransactionSchema).optional().default([]),
-  unassignedCash: z.number().nonnegative().optional(),
+  unassignedCash: z.number().optional(), // Can be negative when overallocated
   className: z.string().optional().default(""),
 });
 
