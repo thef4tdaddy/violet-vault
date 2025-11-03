@@ -5,6 +5,8 @@ import DebtDetailModal from "./modals/DebtDetailModal";
 import UpcomingPaymentsModal from "./modals/UpcomingPaymentsModal";
 import StandardTabs from "../ui/StandardTabs";
 import { DashboardHeader, OverviewTab, StrategiesTab } from "./DebtDashboardComponents";
+import DebtSummaryCards from "./ui/DebtSummaryCards";
+import DebtFilters from "./ui/DebtFilters";
 import { getIcon } from "@/utils";
 
 // Tab configuration
@@ -49,6 +51,22 @@ const DebtDashboard = () => {
     <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
       {/* Header */}
       <DashboardHeader debtStats={debtStats} handleAddDebt={handleAddDebt} />
+
+      {/* Summary Cards - Outside white block */}
+      {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") && (
+        <DebtSummaryCards
+          stats={debtStats}
+          onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
+        />
+      )}
+
+      {/* Filters - Outside white block */}
+      {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
+        <DebtFilters
+          filterOptions={filterOptions}
+          setFilterOptions={setFilterOptions}
+        />
+      )}
 
       {/* Tab Content with connected navigation */}
       <div className="bg-white rounded-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10">
