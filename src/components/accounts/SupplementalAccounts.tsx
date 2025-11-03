@@ -1,9 +1,12 @@
+import React from "react";
 import useSupplementalAccounts from "@/hooks/accounts/useSupplementalAccounts";
 import AccountsHeader from "./AccountsHeader";
+import AccountsSummaryCards from "./AccountsSummaryCards";
 import ExpirationAlert from "./ExpirationAlert";
 import AccountsGrid from "./AccountsGrid";
 import AccountFormModal from "./AccountFormModal";
 import TransferModal from "./TransferModal";
+import { getIcon } from "@/utils";
 
 interface Account {
   id: string | number;
@@ -102,8 +105,22 @@ const SupplementalAccounts = ({
 
       <ExpirationAlert expiringAccounts={expiringAccounts} />
 
+      {/* Summary Cards */}
+      <AccountsSummaryCards accounts={typedAccounts as never} />
+
       {/* White block with black outline for accounts area */}
       <div className="bg-white rounded-xl p-6 border-2 border-black shadow-sm">
+        {/* Sub-header for accounts section */}
+        {typedAccounts.length > 0 && (
+          <div className="mb-6">
+            <h3 className="font-black text-black text-base tracking-wide flex items-center">
+              {React.createElement(getIcon("CreditCard"), {
+                className: "h-4 w-4 mr-2 text-cyan-600",
+              })}
+              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">A</span>CCOUNTS ({typedAccounts.length})
+            </h3>
+          </div>
+        )}
         <AccountsGrid
           accounts={typedAccounts}
           showBalances={showBalances}

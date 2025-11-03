@@ -46,12 +46,13 @@ const AccountsHeader = ({
       <div className="flex gap-2 flex-shrink-0">
         <Button
           onClick={onToggleBalances}
-          className="p-2 text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50 border-2 border-transparent hover:border-cyan-200"
+          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50 border-2 border-black hover:border-cyan-200 transition-colors"
           title={showBalances ? "Hide account balances" : "Show account balances"}
         >
           {showBalances
             ? React.createElement(getIcon("Eye"), { className: "h-4 w-4" })
             : React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })}
+          <span className="hidden sm:inline">{showBalances ? "Hide" : "Show"}</span>
         </Button>
         <Button
           onClick={onAddAccount}

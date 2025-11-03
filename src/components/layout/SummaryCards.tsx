@@ -222,7 +222,7 @@ const SummaryCard = memo(
             {isNegative && <span className="ml-2 text-sm">⚠️</span>}
           </p>
         </div>
-        <div className="w-full">
+        <div className="w-full min-h-[2.5rem] flex items-end justify-center">
           {clickable && !isNegative && (
             <p className="text-xs text-gray-400">Click to distribute</p>
           )}

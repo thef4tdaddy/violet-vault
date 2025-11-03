@@ -33,7 +33,7 @@ const TransactionLedgerHeader = ({
       <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:justify-end">
         <Button
           onClick={onImportTransactions}
-          className="btn btn-primary border-2 border-black flex items-center justify-center shadow-lg"
+          className="flex items-center justify-center px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg border-2 border-black shadow-lg transition-colors"
         >
           {React.createElement(getIcon("Upload"), {
             className: "h-4 w-4 mr-2",

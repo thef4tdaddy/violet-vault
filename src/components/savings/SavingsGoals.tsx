@@ -39,37 +39,64 @@ const SavingsGoals = ({
 
   return (
     <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
-      {/* Summary Card - Always show, even when empty */}
-      <SavingsSummaryCard savingsGoals={savingsGoals} onAddGoal={openAddForm} />
+      {/* Header with Add Button */}
+      <div className="flex flex-wrap md:flex-nowrap justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="font-black text-black text-xl flex items-center">
+            <div className="relative mr-4">
+              <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
+              <div className="relative bg-purple-500 p-3 rounded-2xl">
+                {React.createElement(getIcon("Target"), {
+                  className: "h-6 w-6 text-white",
+                })}
+              </div>
+            </div>
+            <span className="text-2xl">S</span>AVINGS&nbsp;&nbsp;<span className="text-2xl">G</span>OALS
+          </h2>
+          <p className="text-purple-900 mt-1">
+            {savingsGoals.length} {savingsGoals.length === 1 ? 'goal' : 'goals'} • Track your financial targets
+          </p>
+        </div>
 
-      {/* Sub-header and Add Goal Button */}
-      <div className="flex justify-between items-center">
-        <h3 className="font-black text-black text-base tracking-wide">
-          <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">S</span>AVINGS&nbsp;&nbsp;<span className="text-lg">G</span>OALS
-        </h3>
-        <div className="flex gap-3">
+        <div className="flex flex-row gap-3">
           <Button
             onClick={openAddForm}
-            className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors border-2 border-black shadow-lg"
+            className="btn btn-primary border-2 border-black flex items-center"
           >
-            {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
-            <span>Add Savings Goal</span>
+            {React.createElement(getIcon("Plus"), {
+              className: "h-4 w-4 mr-2",
+            })}
+            Add Goal
           </Button>
-
           {unassignedCash > 0 && (
             <Button
               onClick={openDistributeModal}
               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors border-2 border-black shadow-lg"
             >
               {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
-              <span>Distribute Cash (${unassignedCash.toFixed(2)})</span>
+              <span>Distribute (${unassignedCash.toFixed(2)})</span>
             </Button>
           )}
         </div>
       </div>
 
-      {/* White block for goals */}
+      {/* Summary Cards - Page-specific cards like Debt page */}
+      <SavingsSummaryCard savingsGoals={savingsGoals} onAddGoal={openAddForm} />
+
+      {/* White block for goals list */}
       <div className="bg-white rounded-xl p-6 border-2 border-black shadow-sm">
+        {/* Sub-header for goals section */}
+        {savingsGoals.length > 0 && (
+          <div className="mb-6">
+            <h3 className="font-black text-black text-base tracking-wide flex items-center">
+              {React.createElement(getIcon("Target"), {
+                className: "h-4 w-4 mr-2 text-purple-600",
+              })}
+              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">G</span>OALS ({savingsGoals.length})
+            </h3>
+          </div>
+        )}
+        
         {/* Goals Grid or Empty State */}
         {savingsGoals.length === 0 ? (
           <div className="text-center py-12">

@@ -143,9 +143,9 @@ const PageSummaryCard = ({
 
   return (
     <div
-      className={`bg-gradient-to-br ${config.gradient} p-4 rounded-lg text-white transition-all duration-200 ${
+      className={`bg-gradient-to-br ${config.gradient} p-4 rounded-lg text-white transition-all duration-200 border-2 border-black ${
         onClick ? "cursor-pointer hover:shadow-lg hover:scale-105" : ""
-      } ${alert ? "ring-2 ring-white ring-opacity-50" : ""} ${className}`}
+      } ${alert ? "animate-pulse" : ""} ${className}`}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
