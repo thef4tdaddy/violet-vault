@@ -88,7 +88,7 @@
   - [x] **Bug:** Fix the sync status switch where the "On" text appears outside the switch boundary.
 
 - [x] **Account Settings:**
-  - [ ] **Suggestion:** Move "Profile Settings" into this section.
+  - [x] **Suggestion:** Move "Profile Settings" into this section.
   - [x] Standardize all buttons in this section (uniform size, black border, non-grey text).
 
 - [x] **Security Settings:**

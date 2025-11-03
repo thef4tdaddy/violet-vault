@@ -24,6 +24,7 @@ export const useSettingsSectionRenderer = ({
   onOpenPasswordModal,
   onLogout,
   onOpenResetConfirm,
+  onUpdateProfile,
 
   // Security Settings Props
   securityManager,
@@ -58,6 +59,7 @@ export const useSettingsSectionRenderer = ({
           onOpenPasswordModal,
           onLogout,
           onOpenResetConfirm,
+          onUpdateProfile,
         });
 
       case "security":

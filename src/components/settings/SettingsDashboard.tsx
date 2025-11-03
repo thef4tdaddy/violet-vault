@@ -37,6 +37,7 @@ const SettingsDashboard = ({
   isLocalOnlyMode = false,
   securityManager,
   initialSection = "general",
+  onUpdateProfile,
 }) => {
   // Use the reusable modal manager instead of the old hook
   const {
@@ -102,6 +103,7 @@ const SettingsDashboard = ({
     onOpenPasswordModal: openPasswordModal,
     onLogout,
     onOpenResetConfirm: openResetConfirm,
+    onUpdateProfile,
 
     // Security Settings Props
     securityManager,

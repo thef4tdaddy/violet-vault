@@ -363,6 +363,10 @@ const MainContent = ({
             currentUser={currentUser}
             isLocalOnlyMode={isLocalOnlyMode}
             securityManager={securityManager}
+            onUpdateProfile={async (updates) => {
+              // Update profile through auth manager
+              await auth.updateUserProfile?.(updates);
+            }}
           />
         )}
 

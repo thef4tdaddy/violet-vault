@@ -3,6 +3,7 @@ import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils";
 import ShareCodeModal from "../../sharing/ShareCodeModal";
 import JoinBudgetModal from "../../sharing/JoinBudgetModal";
+import ProfileSettings from "../../auth/ProfileSettings";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import logger from "@/utils/common/logger";
 
@@ -11,9 +12,11 @@ const AccountSettingsSection = ({
   onOpenPasswordModal,
   onLogout,
   onOpenResetConfirm,
+  onUpdateProfile,
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
   const { joinBudget } = useAuthManager();
 
   const handleJoinSuccess = async (joinData: unknown) => {
@@ -34,11 +37,21 @@ const AccountSettingsSection = ({
       <h3 className="text-lg font-semibold text-gray-900">Account Settings</h3>
 
       <div className="space-y-4">
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-gray-50 rounded-lg p-4 border-2 border-black shadow-sm">
           <h4 className="font-medium text-gray-900 mb-2">Current User</h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 mb-3">
             {currentUser?.userName || currentUser?.name || "User"}
           </p>
+          <Button
+            onClick={() => setShowProfileSettings(true)}
+            className="w-full flex items-center p-3 border-2 border-black bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
+          >
+            {renderIcon("Settings", "h-5 w-5 text-purple-600 mr-3")}
+            <div className="text-left">
+              <p className="font-medium text-gray-900">Edit Profile</p>
+              <p className="text-sm text-gray-700">Update name and color</p>
+            </div>
+          </Button>
         </div>
 
         {/* Budget Sharing Section */}
@@ -117,6 +130,14 @@ const AccountSettingsSection = ({
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}
         onJoinSuccess={handleJoinSuccess}
+      />
+
+      {/* Profile Settings Modal */}
+      <ProfileSettings
+        isOpen={showProfileSettings}
+        onClose={() => setShowProfileSettings(false)}
+        currentUser={currentUser}
+        onUpdateProfile={onUpdateProfile}
       />
     </div>
   );
