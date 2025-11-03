@@ -97,7 +97,7 @@ const Header = memo(
               {!isLocalOnlyMode && (
                 <SyncHealthIndicator
                   data-tour="sync-indicator"
-                  onOpenSettings={() => {}} // Passive indicator - no click action
+                  onOpenHealthDashboard={() => setShowSyncHealthDashboard(true)}
                 />
               )}
 
@@ -127,6 +127,11 @@ const Header = memo(
             }}
           />
         )}
+        
+        <SyncHealthDashboard
+          isOpen={showSyncHealthDashboard}
+          onClose={() => setShowSyncHealthDashboard(false)}
+        />
       </div>
     );
   }

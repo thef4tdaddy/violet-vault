@@ -1,4 +1,5 @@
 import { useSyncHealthIndicator } from "@/hooks/sync/useSyncHealthIndicator";
+import { Button } from "@/components/ui";
 
 /**
  * @typedef {Object} SyncHealthStatus
@@ -138,14 +139,14 @@ const SyncHealthIndicator = ({ onOpenHealthDashboard }: SyncHealthIndicatorProps
   return (
     <div className="relative">
       {/* Clickable Health Indicator - opens health dashboard */}
-      <button
+      <Button
         onClick={onOpenHealthDashboard}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${getStatusColor()} bg-white/80 backdrop-blur-sm border-2 border-black shadow-sm hover:shadow-md transition-all ${onOpenHealthDashboard ? 'cursor-pointer hover:scale-105' : ''}`}
         title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click to view details`}
       >
         {getStatusIcon()}
         <span className="text-sm font-medium">{getStatusText()}</span>
-      </button>
+      </Button>
     </div>
   );
 };
