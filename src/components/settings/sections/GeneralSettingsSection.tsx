@@ -111,7 +111,7 @@ const CloudSyncSection: React.FC<CloudSyncSectionProps> = ({
         {/* Toggle circle */}
         <span
           className={`relative inline-block h-4 w-4 transform rounded-full bg-white transition-transform border border-black z-10 ${
-            cloudSyncEnabled ? "translate-x-8" : "translate-x-0.5"
+            cloudSyncEnabled ? "translate-x-7" : "translate-x-1"
           }`}
         />
       </Button>
