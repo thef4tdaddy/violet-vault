@@ -31,7 +31,7 @@ const AccountBalanceOverview = ({
   const diffStyles = getDifferenceCardStyles(isBalanced, difference);
 
   return (
-    <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
+    <div className="rounded-2xl p-6">
       <h2 className="font-black text-black text-xl mb-6 flex items-center">
         {React.createElement(getIcon("CreditCard"), {
           className: "h-6 w-6 mr-2 sm:mr-3 text-blue-600 flex-shrink-0",
