@@ -15,14 +15,14 @@ import { useSyncHealthIndicator } from "@/hooks/sync/useSyncHealthIndicator";
  * Shows spinning indicator during sync and color-coded status based on health
  *
  * @param {Object} props - Component props
- * @param {Function} props.onOpenSettings - Callback to open sync settings/tools
+ * @param {Function} props.onOpenHealthDashboard - Callback to open sync health dashboard
  * @returns {React.ReactElement} Rendered health indicator button
  */
 interface SyncHealthIndicatorProps {
-  onOpenSettings: () => void;
+  onOpenHealthDashboard?: () => void;
 }
 
-const SyncHealthIndicator = ({ onOpenSettings: _onOpenSettings }: SyncHealthIndicatorProps) => {
+const SyncHealthIndicator = ({ onOpenHealthDashboard }: SyncHealthIndicatorProps) => {
   const { syncStatus, isBackgroundSyncing } = useSyncHealthIndicator();
 
   /**
@@ -137,14 +137,15 @@ const SyncHealthIndicator = ({ onOpenSettings: _onOpenSettings }: SyncHealthIndi
 
   return (
     <div className="relative">
-      {/* Passive Health Indicator - just shows status */}
-      <div
-        className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${getStatusColor()} bg-white/80 backdrop-blur-sm border-2 border-black shadow-sm`}
-        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""}`}
+      {/* Clickable Health Indicator - opens health dashboard */}
+      <button
+        onClick={onOpenHealthDashboard}
+        className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${getStatusColor()} bg-white/80 backdrop-blur-sm border-2 border-black shadow-sm hover:shadow-md transition-all ${onOpenHealthDashboard ? 'cursor-pointer hover:scale-105' : ''}`}
+        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click to view details`}
       >
         {getStatusIcon()}
         <span className="text-sm font-medium">{getStatusText()}</span>
-      </div>
+      </button>
     </div>
   );
 };

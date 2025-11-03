@@ -4,6 +4,7 @@ import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
 import SyncHealthIndicator from "../sync/SyncHealthIndicator";
+import SyncHealthDashboard from "../sync/SyncHealthDashboard";
 
 interface HeaderProps {
   currentUser: unknown;
@@ -24,6 +25,7 @@ const Header = memo(
     onShowDataSettings: _onShowDataSettings,
   }: HeaderProps) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
+    const [showSyncHealthDashboard, setShowSyncHealthDashboard] = useState(false);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
       setShowLocalOnlySettings((prev) => !prev);
