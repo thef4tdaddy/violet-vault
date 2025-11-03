@@ -129,7 +129,7 @@ const NavigationTabs = memo(() => {
   const activeView = getCurrentView();
 
   return (
-    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-2 left-2 right-2 lg:static z-50 overflow-hidden relative lg:mb-6 mb-0 lg:rounded-3xl rounded-2xl">
+    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 hidden sm:block lg:static z-50 overflow-hidden relative">
       <nav
         ref={navRef}
         className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-3 lg:py-2"
