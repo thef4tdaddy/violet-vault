@@ -7,7 +7,7 @@
 
 ## Onboarding
 
-- [ ] **Security Warning:** Condense the first-load security warning to fit on a single, non-scrollable page.
+- [x] **Security Warning:** Condense the first-load security warning to fit on a single, non-scrollable page.
 
 ## Envelope
 

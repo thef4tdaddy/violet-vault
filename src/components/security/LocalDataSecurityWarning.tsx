@@ -20,13 +20,11 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg border-2 border-black shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border-2 border-black shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[95vh]">
         <WarningHeader />
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-4 flex-1 overflow-y-auto">
           <SecurityStatusSection />
           <ImplicationsSection />
-          <RecommendationsSection />
-          <TechnicalDetailsSection />
         </div>
         <WarningFooter onAcknowledge={handleAcknowledge} />
       </div>
@@ -62,125 +60,72 @@ const SecurityStatusSection = () => (
 );
 
 const EncryptedDataCard = () => (
-  <div className="flex items-start space-x-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+  <div className="flex items-start space-x-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
     {React.createElement(getIcon("Lock"), {
       className: "w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0",
     })}
     <div>
-      <h3 className="font-semibold text-green-800 dark:text-green-200">✅ ENCRYPTED & SECURE</h3>
-      <ul className="mt-2 text-sm text-green-700 dark:text-green-300 space-y-1">
-        <li>
-          • <strong>Cloud Data:</strong> All data sent to Firebase is fully encrypted
-        </li>
-        <li>
-          • <strong>Authentication:</strong> Login credentials are encrypted in browser storage
-        </li>
-        <li>
-          • <strong>Cross-Device Sync:</strong> Shared budgets use strong encryption
-        </li>
-      </ul>
+      <h3 className="font-semibold text-green-800 dark:text-green-200 text-sm">✅ ENCRYPTED</h3>
+      <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+        Cloud data, authentication, and cross-device sync are fully encrypted
+      </p>
     </div>
   </div>
 );
 
 const UnencryptedDataCard = () => (
-  <div className="flex items-start space-x-4 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+  <div className="flex items-start space-x-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
     {React.createElement(getIcon("Unlock"), {
       className: "w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0",
     })}
     <div>
-      <h3 className="font-semibold text-yellow-800 dark:text-yellow-200">
-        ⚠️ UNENCRYPTED (LOCAL DEVICE ONLY)
+      <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 text-sm">
+        ⚠️ UNENCRYPTED (Local Only)
       </h3>
-      <ul className="mt-2 text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-        <li>
-          • <strong>Local Budget Data:</strong> Envelopes, bills, and transactions in browser
-          storage
-        </li>
-        <li>
-          • <strong>Basic Profile:</strong> Username and color preferences
-        </li>
-      </ul>
+      <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+        Local budget data (envelopes, bills, transactions) and profile info stored in browser
+      </p>
     </div>
   </div>
 );
 
 const ImplicationsSection = () => (
-  <div className="space-y-3">
-    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+  <div className="space-y-2">
+    <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center">
       {React.createElement(getIcon("AlertTriangle"), {
-        className: "w-5 h-5 text-orange-500 mr-2",
+        className: "w-4 h-4 text-orange-500 mr-2",
       })}
-      What This Means for You
+      Key Points
     </h3>
-    <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
-      <p>
-        <strong>✅ Your data IS protected from:</strong>
-      </p>
-      <ul className="ml-4 space-y-1 text-green-700 dark:text-green-300">
-        <li>• Network interception (all cloud sync is encrypted)</li>
-        <li>• Unauthorized cloud access (requires your password)</li>
-        <li>• Data breaches of our servers (we can't decrypt your data)</li>
-      </ul>
-      <p className="mt-3">
-        <strong>⚠️ Your data is NOT protected from:</strong>
-      </p>
-      <ul className="ml-4 space-y-1 text-yellow-700 dark:text-yellow-300">
-        <li>• Someone with physical access to your unlocked device</li>
-        <li>• Malware running on your computer with browser access</li>
-        <li>• Browser extensions with broad permissions</li>
-      </ul>
+    <div className="grid grid-cols-1 gap-3 text-xs">
+      <div className="p-3 rounded bg-green-50 dark:bg-green-900/20 border border-green-200">
+        <p className="font-semibold text-green-800 dark:text-green-200 mb-1">✅ Protected From:</p>
+        <p className="text-green-700 dark:text-green-300">
+          Network attacks, unauthorized cloud access, server breaches
+        </p>
+      </div>
+      <div className="p-3 rounded bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200">
+        <p className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+          ⚠️ NOT Protected From:
+        </p>
+        <p className="text-yellow-700 dark:text-yellow-300">
+          Physical device access, malware, malicious browser extensions
+        </p>
+      </div>
+      <div className="p-3 rounded bg-blue-50 dark:bg-blue-900/20 border border-blue-200">
+        <p className="font-semibold text-blue-800 dark:text-blue-200 mb-1">🛡️ Best Practices:</p>
+        <p className="text-blue-700 dark:text-blue-300">
+          Lock your device, use strong passwords, keep software updated, log out on shared computers
+        </p>
+      </div>
     </div>
   </div>
-);
-
-const RecommendationsSection = () => (
-  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-    <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-      🛡️ Recommended Security Practices
-    </h3>
-    <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-      <li>• Always lock your device when not in use</li>
-      <li>• Use strong device passwords/biometric locks</li>
-      <li>• Regularly review browser extensions and their permissions</li>
-      <li>• Keep your browser and operating system updated</li>
-      <li>• Log out of VioletVault when using shared computers</li>
-    </ul>
-  </div>
-);
-
-const TechnicalDetailsSection = () => (
-  <details className="text-sm text-gray-600 dark:text-gray-400">
-    <summary className="cursor-pointer font-medium hover:text-gray-800 dark:hover:text-gray-200">
-      Technical Details (Click to expand)
-    </summary>
-    <div className="mt-2 space-y-2 text-xs pl-4">
-      <p>
-        <strong>Local Storage:</strong> Unencrypted data is stored in your browser's IndexedDB for
-        performance. This allows fast access to your budget without requiring decryption for every
-        operation.
-      </p>
-      <p>
-        <strong>Cloud Storage:</strong> All data sent to Firebase is encrypted with AES-256-GCM
-        using your password-derived key. We cannot decrypt your cloud data without your password.
-      </p>
-      <p>
-        <strong>Why not encrypt everything locally?</strong> Local encryption would significantly
-        slow down the app since every operation would require encryption/decryption. The current
-        design balances security with performance.
-      </p>
-    </div>
-  </details>
 );
 
 const WarningFooter = ({ onAcknowledge }) => (
-  <div className="flex flex-col items-center p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-    <div className="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
-      Please scroll through and read the entire notice above, then click "I Understand" to continue.
-      <br />
-      <span className="text-xs text-gray-500 mt-1 block">
-        This notice will not be shown again after you acknowledge it.
-      </span>
+  <div className="flex flex-col items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+    <div className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center">
+      This notice will not be shown again after you acknowledge it.
     </div>
     <Button
       onClick={onAcknowledge}
