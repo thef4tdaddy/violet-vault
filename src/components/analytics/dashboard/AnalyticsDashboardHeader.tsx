@@ -1,6 +1,5 @@
 import React from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
+import { Select, Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "@/utils";
 
 interface AnalyticsDashboardHeaderProps {
@@ -34,7 +33,7 @@ const AnalyticsDashboardHeader: React.FC<AnalyticsDashboardHeaderProps> = ({
               })}
             </div>
           </div>
-          <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+          <StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl">
             ANALYTICS DASHBOARD
           </StylizedButtonText>
         </h1>

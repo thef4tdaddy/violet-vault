@@ -19,7 +19,7 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
               })}
             </div>
           </div>
-          <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+          <StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl">
             ANALYTICS AND REPORTS
           </StylizedButtonText>
         </h2>
