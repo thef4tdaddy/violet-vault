@@ -54,7 +54,6 @@
 
 ## Analytics
 
-- [ ] **Task:** Populate the page with test data for a proper review.
 - [x] **Header:** Update the header text.
 - [x] **Text:** Update the subtext to use the standardized text style.
 - [x] **Layout:** Add the standard white sub-section area.
@@ -105,6 +104,7 @@
   - [x] **Bug:** Fix the "Advanced Debug Info" button (it leads to a blank white screen).
 
 - [x] **Dev Tools:**
-  - [ ] **Task:** Ensure this menu is _not_ available in production builds (unless an admin mode is active).
-  - [ ] **Task:** Ensure this menu _is_ available in development builds.
+  - [x] **Task:** Ensure this menu is _not_ available in production builds (unless an admin mode is active).
+  - [x] **Task:** Ensure this menu _is_ available in development builds.
   - [x] Standardize all buttons in this section.
+  - **Note:** Already implemented via `isDevelopmentMode()` check in `useSettingsSections` hook.
