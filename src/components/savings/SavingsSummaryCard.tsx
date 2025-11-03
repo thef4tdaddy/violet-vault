@@ -2,7 +2,7 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const SavingsSummaryCard = ({ savingsGoals = [] }) => {
+const SavingsSummaryCard = ({ savingsGoals = [], onAddGoal }) => {
   // Calculate summary statistics
   const totalSaved = savingsGoals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0);
   const totalTargets = savingsGoals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0);
@@ -21,13 +21,18 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
   });
 
   return (
-    <div className="glassmorphism rounded-2xl p-6 mb-6 border border-white/20">
+    <div className="glassmorphism rounded-2xl p-6 border-2 border-black">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold flex items-center space-x-3">
-          {React.createElement(getIcon("Target"), {
-            className: "h-8 w-8 text-purple-600",
-          })}
-          <span>Savings Goals</span>
+        <h2 className="font-black text-black text-xl flex items-center tracking-wide">
+          <div className="relative mr-4">
+            <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
+            <div className="relative bg-purple-500 p-3 rounded-2xl">
+              {React.createElement(getIcon("Target"), {
+                className: "h-6 w-6 text-white",
+              })}
+            </div>
+          </div>
+          <span className="text-2xl">S</span>AVINGS&nbsp;&nbsp;<span className="text-2xl">G</span>OALS
         </h2>
         <div className="text-right">
           <div className="text-2xl font-bold text-green-600">${totalSaved.toFixed(2)}</div>
