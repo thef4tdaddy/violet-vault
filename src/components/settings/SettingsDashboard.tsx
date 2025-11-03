@@ -191,6 +191,7 @@ const SettingsDashboard = ({
           <LocalDataSecurityWarning
             onClose={() => setShowLocalDataSecurity(false)}
             onAcknowledge={() => setShowLocalDataSecurity(false)}
+            forceShow={true}
           />
         )}
       </Suspense>

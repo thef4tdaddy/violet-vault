@@ -93,7 +93,7 @@
 
 - [x] **Security Settings:**
   - [ ] **Task:** Merge settings from the "Sync Healthy" button's menu here.
-  - [ ] **Bug:** Fix the "Local Data Security" button modal (it flashes and disappears instantly).
+  - [x] **Bug:** Fix the "Local Data Security" button modal (it flashes and disappears instantly).
   - [x] Standardize all buttons in this section.
 
 - [x] **Data:**

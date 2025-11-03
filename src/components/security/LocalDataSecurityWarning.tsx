@@ -7,7 +7,7 @@ import { useSecurityAcknowledgment } from "../../hooks/security/useSecurityAckno
  * Security warning component that informs users about local data storage
  * Addresses GitHub Issue #589 - Warning about unencrypted local data
  */
-const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
+const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false }) => {
   const { hasBeenAcknowledged, acknowledge } = useSecurityAcknowledgment();
 
   const handleAcknowledge = () => {
@@ -16,7 +16,8 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
     if (onClose) onClose();
   };
 
-  if (hasBeenAcknowledged) return null;
+  // Don't auto-hide if explicitly opened from Settings (forceShow = true)
+  if (hasBeenAcknowledged && !forceShow) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
