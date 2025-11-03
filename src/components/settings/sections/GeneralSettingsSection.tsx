@@ -98,13 +98,20 @@ const CloudSyncSection: React.FC<CloudSyncSectionProps> = ({
       </div>
       <Button
         onClick={onToggleCloudSync}
-        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors border-2 border-black ${
+        className={`relative inline-flex h-6 w-14 items-center rounded-full transition-colors border-2 border-black ${
           cloudSyncEnabled ? "bg-green-600" : "bg-gray-200"
         }`}
       >
+        {/* Toggle text */}
+        <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${
+          cloudSyncEnabled ? "text-white" : "text-gray-600"
+        }`}>
+          {cloudSyncEnabled ? "ON" : "OFF"}
+        </span>
+        {/* Toggle circle */}
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform border border-black ${
-            cloudSyncEnabled ? "translate-x-5" : "translate-x-0.5"
+          className={`relative inline-block h-4 w-4 transform rounded-full bg-white transition-transform border border-black z-10 ${
+            cloudSyncEnabled ? "translate-x-8" : "translate-x-0.5"
           }`}
         />
       </Button>

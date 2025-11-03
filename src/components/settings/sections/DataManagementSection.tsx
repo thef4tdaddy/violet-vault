@@ -55,7 +55,10 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
             className="hidden"
             id="settings-import-data"
           />
-          <label htmlFor="settings-import-data" className="w-full flex items-center justify-center cursor-pointer">
+          <label
+            htmlFor="settings-import-data"
+            className="w-full flex items-center justify-center cursor-pointer"
+          >
             {React.createElement(getIcon("Upload"), {
               className: "h-5 w-5 text-green-600 mr-3",
             })}
