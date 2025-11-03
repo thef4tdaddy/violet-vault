@@ -52,8 +52,8 @@ const BottomNavigationBar: React.FC = () => {
     return null;
   }
 
-  // Get items that fit on screen
-  const visibleItems = getVisibleItems(5);
+  // Show all navigation items (make menu scrollable)
+  const visibleItems = getVisibleItems(9); // Show all 9 items
 
   return (
     <div
@@ -73,12 +73,13 @@ const BottomNavigationBar: React.FC = () => {
         <nav
           ref={navRef}
           className="
-            flex items-center justify-evenly
+            flex items-center
             h-full px-2 overflow-x-auto scrollbar-hide
             gap-1
           "
           style={{
             scrollBehavior: "smooth",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {visibleItems.map((item) => (
