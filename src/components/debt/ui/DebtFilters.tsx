@@ -8,7 +8,7 @@ import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
  * Debt filtering and sorting controls
  * Pure UI component for debt list filtering
  */
-const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }) => {
+const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByType = {} }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleFilterChange = (field, value) => {

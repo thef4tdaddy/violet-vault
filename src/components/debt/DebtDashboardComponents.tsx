@@ -27,16 +27,16 @@ interface OverviewTabProps {
 }
 
 export const OverviewTab = ({
-  debtStats,
+  debtStats: _debtStats,
   filteredDebts,
-  filterOptions,
-  setFilterOptions,
-  setShowUpcomingPaymentsModal,
+  filterOptions: _filterOptions,
+  setFilterOptions: _setFilterOptions,
+  setShowUpcomingPaymentsModal: _setShowUpcomingPaymentsModal,
   handleDebtClick,
   handleRecordPayment,
   handleAddDebt,
-  debtTypes,
-  debtsByType,
+  debtTypes: _debtTypes,
+  debtsByType: _debtsByType,
 }: OverviewTabProps) => {
   return (
     <div className="space-y-6">

@@ -2,7 +2,7 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const SavingsSummaryCard = ({ savingsGoals = [], onAddGoal }) => {
+const SavingsSummaryCard = ({ savingsGoals = [], onAddGoal: _onAddGoal }) => {
   // Calculate summary statistics
   const totalSaved = savingsGoals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0);
   const totalTargets = savingsGoals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0);
