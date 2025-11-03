@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { formatLedgerSummary } from "../../../utils/transactions/ledgerHelpers";
 
@@ -10,9 +10,9 @@ const TransactionLedgerHeader = ({
   onImportTransactions,
 }) => {
   return (
-    <div className="flex flex-wrap md:flex-nowrap justify-between items-start md:items-center gap-4">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
-        <h2 className="font-black text-black text-base flex items-center">
+        <h2 className="font-black text-black text-xl flex items-center tracking-wide">
           <div className="relative mr-4">
             <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-emerald-500 p-3 rounded-2xl">
@@ -21,15 +21,19 @@ const TransactionLedgerHeader = ({
               })}
             </div>
           </div>
-          <span className="text-lg">T</span>RANSACTION <span className="text-lg">L</span>EDGER
+          <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+            TRANSACTION LEDGER
+          </StylizedButtonText>
         </h2>
-        <p className="text-purple-900 mt-1">{formatLedgerSummary(transactionCount, netCashFlow)}</p>
+        <p className="text-purple-900 mt-2 ml-16">
+          {formatLedgerSummary(transactionCount, netCashFlow)}
+        </p>
       </div>
 
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:justify-end">
         <Button
           onClick={onImportTransactions}
-          className="btn btn-primary border-2 border-black flex items-center"
+          className="btn btn-primary border-2 border-black flex items-center justify-center shadow-lg"
         >
           {React.createElement(getIcon("Upload"), {
             className: "h-4 w-4 mr-2",
@@ -38,7 +42,7 @@ const TransactionLedgerHeader = ({
         </Button>
         <Button
           onClick={onAddTransaction}
-          className="btn btn-primary border-2 border-black flex items-center"
+          className="btn btn-primary border-2 border-black flex items-center justify-center shadow-lg"
           data-tour="add-transaction"
         >
           {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}

@@ -30,16 +30,16 @@
 
 ## Transactions
 
-- [ ] **Header:**
-  - [ ] Increase the size of the transaction ledger header.
-  - [ ] Adjust header spacing.
+- [x] **Header:**
+  - [x] Increase the size of the transaction ledger header.
+  - [x] Adjust header spacing.
   - [ ] **Task:** Define and apply a standard header size across all pages for consistency.
-- [ ] **Filters:** Implement the expandable filter UI from the "Debts" page.
-- [ ] **Buttons (Mobile):** Address button text visibility on smaller screens.
-- [ ] **Button Layout:**
-  - [ ] Move "Import File" and "Add Transaction" buttons to be right-justified.
-  - [ ] Layout (Large Screen): Place buttons side-by-side.
-  - [ ] Layout (Small Screen): Stack buttons vertically.
+- [x] **Filters:** Implement the expandable filter UI from the "Debts" page.
+- [x] **Buttons (Mobile):** Address button text visibility on smaller screens.
+- [x] **Button Layout:**
+  - [x] Move "Import File" and "Add Transaction" buttons to be right-justified.
+  - [x] Layout (Large Screen): Place buttons side-by-side.
+  - [x] Layout (Small Screen): Stack buttons vertically.
 
 ## Bill Manager
 
