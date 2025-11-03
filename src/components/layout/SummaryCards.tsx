@@ -198,7 +198,7 @@ const SummaryCard = memo(
     };
 
     const baseClasses =
-      "glassmorphism rounded-3xl p-6 transition-all duration-200 border border-white/20 ring-1 ring-gray-800/10";
+      "glassmorphism rounded-xl p-6 transition-all duration-200 border-2 border-black ring-1 ring-gray-800/10";
     const clickableClasses = clickable
       ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
       : "";

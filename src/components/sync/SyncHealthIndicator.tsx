@@ -141,7 +141,7 @@ const SyncHealthIndicator = ({ onOpenHealthDashboard }: SyncHealthIndicatorProps
       {/* Clickable Health Indicator - opens health dashboard */}
       <Button
         onClick={onOpenHealthDashboard}
-        className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${getStatusColor()} bg-white/80 backdrop-blur-sm border-2 border-black shadow-sm hover:shadow-md transition-all ${onOpenHealthDashboard ? 'cursor-pointer hover:scale-105' : ''}`}
+        className={`flex items-center space-x-2 px-3 py-2 rounded-2xl ${getStatusColor()} bg-green-500 text-white border-2 border-black shadow-lg hover:shadow-xl transition-all ${onOpenHealthDashboard ? 'cursor-pointer hover:scale-105' : ''}`}
         title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click to view details`}
       >
         {getStatusIcon()}

@@ -35,7 +35,13 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile, onOpen
       <div className="flex items-center gap-3">
         <div className="relative">
           <Button
-            onClick={() => setShowDropdown(!showDropdown)}
+            onClick={() => {
+              if (onOpenSettings) {
+                onOpenSettings();
+              } else {
+                setShowDropdown(!showDropdown);
+              }
+            }}
             className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 ring-1 ring-gray-800/10 backdrop-blur-sm hover:bg-white/20 transition-all"
           >
             <div
@@ -53,7 +59,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile, onOpen
             })}
           </Button>
 
-          {showDropdown && (
+          {showDropdown && !onOpenSettings && (
             <>
               {/* Backdrop */}
               <div className="fixed inset-0 z-[100]" onClick={() => setShowDropdown(false)} />
