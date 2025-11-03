@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../utils";
 
 /**
@@ -16,8 +16,22 @@ const BillManagerHeader = ({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Bill Manager</h2>
-        <p className="text-purple-900">Track and manage your recurring bills and payments</p>
+        <h2 className="font-black text-black text-xl flex items-center tracking-wide">
+          <div className="relative mr-4">
+            <div className="absolute inset-0 bg-blue-500 rounded-2xl blur-lg opacity-30"></div>
+            <div className="relative bg-blue-500 p-3 rounded-2xl">
+              {React.createElement(getIcon("FileText"), {
+                className: "h-6 w-6 text-white",
+              })}
+            </div>
+          </div>
+          <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+            BILL MANAGER
+          </StylizedButtonText>
+        </h2>
+        <p className="text-purple-900 mt-2 ml-16">
+          Track and manage your recurring bills and payments
+        </p>
       </div>
 
       <div className="flex items-center gap-2">

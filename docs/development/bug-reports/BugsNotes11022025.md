@@ -43,7 +43,7 @@
 
 ## Bill Manager
 
-- [ ] **Header:** Update the header text and icon.
+- [x] **Header:** Update the header text and icon.
 - [ ] **Filters:** Implement the standard collapsible filter UI.
 - [ ] **Task:** Investigate the purpose of the blue dot in the second section.
 
