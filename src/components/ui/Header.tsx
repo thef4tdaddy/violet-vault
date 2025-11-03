@@ -94,7 +94,7 @@ const Header = memo(
               {!isLocalOnlyMode && (
                 <SyncHealthIndicator
                   data-tour="sync-indicator"
-                  onOpenSettings={onShowDataSettings}
+                  onOpenSettings={() => {}} // Passive indicator - no click action
                 />
               )}
 

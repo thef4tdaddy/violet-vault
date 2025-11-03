@@ -66,10 +66,11 @@
 
 ## Header (App-wide)
 
-- [ ] **"Sync Healthy" Button:**
-  - [ ] **Task:** Re-evaluate the header menu structure, as this button's behavior (opening Security Settings) is confusing.
-  - [ ] **Suggestion:** Move the green sync status dot to be a permanent part of the header.
-  - [ ] **Suggestion:** Remove the "Sync Healthy" button and merge its options into the main "Settings" menu.
+- [x] **"Sync Healthy" Button:**
+  - [x] **Task:** Re-evaluate the header menu structure, as this button's behavior (opening Security Settings) is confusing.
+  - [x] **Suggestion:** Move the green sync status dot to be a permanent part of the header.
+  - [x] **Suggestion:** Remove the "Sync Healthy" button and merge its options into the main "Settings" menu.
+  - **Implementation:** Made sync indicator passive (non-clickable) status display. Sync tools available in Settings → Dev Tools.
 - [x] **Profile Dropdown (Bug):** Fix the z-index so the dropdown appears _in front_ of the main navigation menu.
 - [x] **Profile Dropdown (Bug):** Fix the positioning so the modal appears in the center of the screen, not in the header.
 
@@ -96,7 +97,8 @@
   - [x] Standardize all buttons in this section (uniform size, black border, non-grey text).
 
 - [x] **Security Settings:**
-  - [ ] **Task:** Merge settings from the "Sync Healthy" button's menu here.
+  - [x] **Task:** Merge settings from the "Sync Healthy" button's menu here.
+    - **Implementation:** Sync debug tools moved to Dev Tools section (already done in previous commit).
   - [x] **Bug:** Fix the "Local Data Security" button modal (it flashes and disappears instantly).
   - [x] Standardize all buttons in this section.
 
