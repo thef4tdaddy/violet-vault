@@ -18,16 +18,16 @@ const AccountsHeader = ({
   return (
     <div className="flex justify-between items-center">
       <div>
-        <h3 className="font-black text-black text-base flex items-center">
-          <div className="relative mr-3">
-            <div className="absolute inset-0 bg-cyan-500 rounded-xl blur-lg opacity-30"></div>
-            <div className="relative bg-cyan-500 p-2 rounded-xl">
+        <h3 className="font-black text-black text-xl flex items-center tracking-wide">
+          <div className="relative mr-4">
+            <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
+            <div className="relative bg-cyan-500 p-3 rounded-2xl">
               {React.createElement(getIcon("CreditCard"), {
-                className: "h-4 w-4 text-white",
+                className: "h-6 w-6 text-white",
               })}
             </div>
           </div>
-          <span className="text-lg">S</span>UPPLEMENTAL <span className="text-lg">A</span>CCOUNTS
+          <span className="text-2xl">S</span>UPPLEMENTAL&nbsp;&nbsp;<span className="text-2xl">A</span>CCOUNTS
         </h3>
         <p className="text-sm text-purple-900 mt-1 font-medium">
           Track FSA, HSA, and other non-budget accounts • Total: ${totalValue.toFixed(2)}

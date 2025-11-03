@@ -92,7 +92,7 @@ const SupplementalAccounts = ({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
       <AccountsHeader
         totalValue={totalValue}
         showBalances={showBalances}
@@ -102,13 +102,16 @@ const SupplementalAccounts = ({
 
       <ExpirationAlert expiringAccounts={expiringAccounts} />
 
-      <AccountsGrid
-        accounts={typedAccounts}
-        showBalances={showBalances}
-        onEdit={startEdit}
-        onDelete={handleDelete}
-        onStartTransfer={startTransfer}
-      />
+      {/* White block with black outline for accounts area */}
+      <div className="bg-white rounded-xl p-6 border-2 border-black shadow-sm">
+        <AccountsGrid
+          accounts={typedAccounts}
+          showBalances={showBalances}
+          onEdit={startEdit}
+          onDelete={handleDelete}
+          onStartTransfer={startTransfer}
+        />
+      </div>
 
       <AccountFormModal
         isOpen={showAddModal}
