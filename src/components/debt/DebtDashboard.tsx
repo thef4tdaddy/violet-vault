@@ -68,21 +68,18 @@ const DebtDashboard = () => {
         />
       )}
 
-      {/* Tab Content with connected navigation */}
-      <div className="bg-white rounded-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10">
-        {/* Tab Navigation */}
-        <div className="border-b-2 border-black">
-          <StandardTabs
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            variant="colored"
-            className=""
-          />
-        </div>
+      {/* Floating Tabs (no background container) */}
+      <div className="space-y-0">
+        <StandardTabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          variant="colored"
+          className="pl-4"
+        />
 
-        {/* Tab Content */}
-        <div className="p-6">
+        {/* Tab Content - White block */}
+        <div className="bg-white rounded-b-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10 p-6">
           {activeTab === "overview" && (
             <OverviewTab
               debtStats={debtStats}
