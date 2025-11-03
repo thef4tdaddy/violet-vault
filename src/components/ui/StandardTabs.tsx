@@ -153,9 +153,9 @@ const getContainerClass = (variant: VariantType): string => {
 };
 
 const getNavClass = (variant: VariantType): string => {
-  if (variant === "underline") return "flex space-x-8";
-  if (variant === "tabs" || variant === "colored") return "flex -mb-px space-x-1";
-  return "flex space-x-1";
+  if (variant === "underline") return "flex space-x-8 overflow-x-auto scrollbar-hide";
+  if (variant === "tabs" || variant === "colored") return "flex -mb-px space-x-1 overflow-x-auto scrollbar-hide";
+  return "flex space-x-1 overflow-x-auto scrollbar-hide";
 };
 
 const getColoredTabStyles = (isActive: boolean, color: ColorType): string => {
