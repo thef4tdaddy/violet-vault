@@ -33,7 +33,8 @@
 - [x] **Header:**
   - [x] Increase the size of the transaction ledger header.
   - [x] Adjust header spacing.
-  - [ ] **Task:** Define and apply a standard header size across all pages for consistency.
+  - [x] **Task:** Define and apply a standard header size across all pages for consistency.
+    - **Standard:** `font-black text-black text-xl flex items-center tracking-wide` with `StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl"` - already applied to all 5 major pages.
 - [x] **Filters:** Implement the expandable filter UI from the "Debts" page.
 - [x] **Buttons (Mobile):** Address button text visibility on smaller screens.
 - [x] **Button Layout:**
@@ -44,7 +45,8 @@
 ## Bill Manager
 
 - [x] **Header:** Update the header text and icon.
-- [ ] **Filters:** Implement the standard collapsible filter UI.
+- [x] **Filters:** Implement the standard collapsible filter UI.
+  - **Note:** Already implemented via `StandardFilters` component in `BillViewTabs.tsx`.
 - [x] **Task:** Investigate the purpose of the blue dot in the second section.
   - **Answer:** The "blue dot" is the select-all checkbox icon (CheckSquare) in the table header that appears blue when bills are selected. It's functional - indicates selection state for bulk operations.
 - [x] **Bug:** Remove debug info from empty state (or make it development-only).
