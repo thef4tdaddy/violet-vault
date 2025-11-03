@@ -55,11 +55,11 @@
 ## Analytics
 
 - [ ] **Task:** Populate the page with test data for a proper review.
-- [ ] **Header:** Update the header text.
-- [ ] **Text:** Update the subtext to use the standardized text style.
-- [ ] **Layout:** Add the standard white sub-section area.
-- [ ] **Export Button:** Update the "Export" button to use the standard button style.
-- [ ] **Filters:** Convert the "Last Month / Filter" UI into the standardized expandable filter.
+- [x] **Header:** Update the header text.
+- [x] **Text:** Update the subtext to use the standardized text style.
+- [x] **Layout:** Add the standard white sub-section area.
+- [x] **Export Button:** Update the "Export" button to use the standard button style.
+- [x] **Filters:** Convert the "Last Month / Filter" UI into the standardized expandable filter.
 
 ## Header (App-wide)
 
@@ -67,8 +67,8 @@
   - [ ] **Task:** Re-evaluate the header menu structure, as this button's behavior (opening Security Settings) is confusing.
   - [ ] **Suggestion:** Move the green sync status dot to be a permanent part of the header.
   - [ ] **Suggestion:** Remove the "Sync Healthy" button and merge its options into the main "Settings" menu.
-- [ ] **Profile Dropdown (Bug):** Fix the z-index so the dropdown appears _in front_ of the main navigation menu.
-- [ ] **Profile Dropdown (Bug):** Fix the positioning so the modal appears in the center of the screen, not in the header.
+- [x] **Profile Dropdown (Bug):** Fix the z-index so the dropdown appears _in front_ of the main navigation menu.
+- [x] **Profile Dropdown (Bug):** Fix the positioning so the modal appears in the center of the screen, not in the header.
 
 ## Summary Cards
 

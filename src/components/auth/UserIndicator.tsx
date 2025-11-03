@@ -55,9 +55,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }: User
           {showDropdown && (
             <>
               {/* Backdrop */}
-              <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+              <div className="fixed inset-0 z-[100]" onClick={() => setShowDropdown(false)} />
               {/* Dropdown Menu */}
-              <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-xl shadow-xl border border-gray-200 ring-1 ring-gray-800/10 py-2 min-w-[180px]">
+              <div className="absolute top-full mt-2 right-0 z-[110] bg-white rounded-xl shadow-xl border-2 border-black ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                 <Button
                   onClick={() => {
                     setShowProfileModal(true);

@@ -74,8 +74,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold flex items-center">
             {React.createElement(getIcon("User"), {

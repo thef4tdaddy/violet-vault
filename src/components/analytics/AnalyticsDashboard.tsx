@@ -130,7 +130,7 @@ const AnalyticsDashboard = () => {
 
       <AnalyticsTabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border-2 border-black p-6 shadow-sm">
         {activeTab === "overview" && (
           <OverviewTabContent
             transactions={transactions}

@@ -1,6 +1,5 @@
 import React from "react";
-import { Select } from "@/components/ui";
-import { Button } from "@/components/ui";
+import { Select, Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
 /**
@@ -9,9 +8,9 @@ import { getIcon } from "../../../utils";
  */
 const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => {
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
-        <h2 className="text-2xl font-bold flex items-center text-gray-900">
+        <h2 className="font-black text-black text-xl flex items-center tracking-wide">
           <div className="relative mr-4">
             <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-cyan-500 p-3 rounded-2xl">
@@ -20,16 +19,18 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
               })}
             </div>
           </div>
-          Analytics & Reports
+          <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+            ANALYTICS AND REPORTS
+          </StylizedButtonText>
         </h2>
-        <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
+        <p className="text-purple-900 mt-2 ml-16">Financial insights and spending patterns</p>
       </div>
 
       <div className="flex gap-3">
         <Select
           value={dateRange}
           onChange={handleDateRangeChange}
-          className="px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-lg"
+          className="px-4 py-2 border-2 border-black rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm"
         >
           <option value="1month">Last Month</option>
           <option value="3months">Last 3 Months</option>
@@ -40,7 +41,7 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
 
         <Button
           onClick={handleExport}
-          className="btn btn-secondary border-2 border-black flex items-center rounded-xl px-4 py-2"
+          className="btn btn-primary border-2 border-black flex items-center rounded-lg px-4 py-2 shadow-lg"
         >
           {React.createElement(getIcon("Download"), {
             className: "h-4 w-4 mr-2",
