@@ -110,9 +110,9 @@ const StandardFilters = ({
       </div>
 
       {/* Filter Controls */}
-      <div className={`flex items-center ${config.gap}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center ${config.gap}`}>
         {/* Search Input */}
-        <div className="relative flex-1 min-w-48">
+        <div className="relative flex-1 sm:min-w-48 w-full sm:w-auto">
           {React.createElement(getIcon("Search"), {
             className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
           })}
@@ -139,24 +139,26 @@ const StandardFilters = ({
         </div>
 
         {/* Filter Dropdowns */}
-        {filterConfigs.map((filterConfig) => {
-          if (filterConfig.type === "select") {
-            return (
-              <Select
-                key={filterConfig.key}
-                value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
-                onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
-                options={filterConfig.options}
-                className={`
-                  ${config.select} border border-gray-300 rounded-md
-                  focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                  bg-white text-gray-700
-                `.trim()}
-              />
-            );
-          }
-          return null;
-        })}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          {filterConfigs.map((filterConfig) => {
+            if (filterConfig.type === "select") {
+              return (
+                <Select
+                  key={filterConfig.key}
+                  value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                  onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
+                  options={filterConfig.options}
+                  className={`
+                    ${config.select} border border-gray-300 rounded-md
+                    focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                    bg-white text-gray-700 w-full sm:w-auto
+                  `.trim()}
+                />
+              );
+            }
+            return null;
+          })}
+        </div>
       </div>
     </div>
   );
