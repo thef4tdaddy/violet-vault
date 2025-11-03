@@ -34,11 +34,22 @@ const AccountBalanceOverview = ({
     <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
       <h2 className="font-black text-black text-xl mb-6 flex items-center">
         {React.createElement(getIcon("CreditCard"), {
-          className: "h-6 w-6 mr-3 text-blue-600",
+          className: "h-6 w-6 mr-2 sm:mr-3 text-blue-600 flex-shrink-0",
         })}
-        <StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl">
-          VIOLET VAULT APP DASHBOARD
-        </StylizedButtonText>
+        <div className="min-w-0">
+          {/* Mobile: shorter title */}
+          <div className="sm:hidden">
+            <StylizedButtonText firstLetterClassName="text-xl" restClassName="text-lg">
+              DASHBOARD
+            </StylizedButtonText>
+          </div>
+          {/* Desktop: full title */}
+          <div className="hidden sm:block">
+            <StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl">
+              VIOLET VAULT APP DASHBOARD
+            </StylizedButtonText>
+          </div>
+        </div>
       </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
