@@ -87,6 +87,7 @@ const Header = memo(
                 currentUser,
                 onUserChange,
                 onUpdateProfile,
+                onOpenSettings: onShowSettings,
               } as React.ComponentProps<typeof UserIndicator>)}
             />
 

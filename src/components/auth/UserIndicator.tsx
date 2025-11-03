@@ -18,9 +18,10 @@ interface UserIndicatorProps {
     budgetId?: string;
     [key: string]: unknown;
   }) => Promise<void>;
+  onOpenSettings?: () => void;
 }
 
-const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }: UserIndicatorProps) => {
+const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile, onOpenSettings }: UserIndicatorProps) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showKeyManagement, setShowKeyManagement] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -60,7 +61,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }: User
               <div className="absolute top-full mt-2 right-0 z-[110] bg-white rounded-xl shadow-xl border-2 border-black ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                 <Button
                   onClick={() => {
-                    setShowProfileModal(true);
+                    if (onOpenSettings) {
+                      onOpenSettings();
+                    }
                     setShowDropdown(false);
                   }}
                   className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -68,7 +71,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }: User
                   {React.createElement(getIcon("Settings"), {
                     className: "h-4 w-4 mr-3",
                   })}
-                  Profile Settings
+                  Account Settings
                 </Button>
                 <Button
                   onClick={() => {
