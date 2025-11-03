@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { calculatePaycheckAllocation } from "../../utils/budgeting/paycheckAllocationUtils";
 import { usePaycheckForm } from "../../hooks/budgeting/usePaycheckForm";
@@ -40,11 +40,12 @@ const PaycheckProcessor = ({
 
   return (
     <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+      {/* Header - Outside white content area */}
+      <PaycheckHeader />
+
       {/* Process New Paycheck Section */}
       <div className="glassmorphism rounded-3xl p-8">
-        <PaycheckHeader />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
           <PaycheckForm formHook={formHook} />
 
@@ -71,7 +72,7 @@ const PaycheckProcessor = ({
  * Paycheck section header component
  */
 const PaycheckHeader = () => (
-  <h2 className="font-black text-black text-base flex items-center">
+  <h2 className="font-black text-black text-xl flex items-center tracking-wide">
     <div className="relative mr-4">
       <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-lg opacity-30"></div>
       <div className="relative bg-emerald-500 p-3 rounded-2xl">
@@ -80,8 +81,9 @@ const PaycheckHeader = () => (
         })}
       </div>
     </div>
-    <span className="text-lg">A</span>DD <span className="text-lg">P</span>
-    AYCHECK
+    <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+      ADD PAYCHECK
+    </StylizedButtonText>
   </h2>
 );
 

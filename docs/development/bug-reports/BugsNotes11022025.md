@@ -49,8 +49,8 @@
 
 ## Paycheck Processor
 
-- [ ] **Header:** Move the "Add Paycheck" header outside of the main white content area.
-- [ ] **Header:** Spread out the text of the header (adjust letter-spacing or padding).
+- [x] **Header:** Move the "Add Paycheck" header outside of the main white content area.
+- [x] **Header:** Spread out the text of the header (adjust letter-spacing or padding).
 
 ## Analytics
 
