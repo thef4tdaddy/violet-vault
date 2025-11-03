@@ -37,6 +37,71 @@ interface LoginResult {
 }
 
 /**
+ * Helper function to start background sync after successful login
+ */
+const startBackgroundSyncAfterLogin = async (isNewUser: boolean) => {
+  try {
+    const syncDelay = 2500;
+    logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
+      isNewUser: isNewUser || false,
+      delayMs: syncDelay,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, syncDelay));
+
+    const { useBudgetStore } = await import("../../../stores/ui/uiStore");
+    const budgetState = useBudgetStore.getState();
+
+    if (budgetState.cloudSyncEnabled) {
+      await budgetState.startBackgroundSync();
+      logger.auth("Background sync started successfully after login");
+    }
+  } catch (error) {
+    logger.error("Failed to start background sync after login", error);
+  }
+};
+
+/**
+ * Helper function to log authentication debug info
+ */
+const logAuthenticationDebugInfo = (result: LoginResult): void => {
+  logger.auth("🔍 DEBUG: About to call setAuthenticated with:", {
+    hasSessionData: !!result.sessionData,
+    hasEncryptionKey: !!result.sessionData?.encryptionKey,
+    encryptionKeyType: result.sessionData?.encryptionKey?.constructor?.name || "undefined",
+    hasSalt: !!result.sessionData?.salt,
+    saltType: result.sessionData?.salt?.constructor?.name || "undefined",
+  });
+};
+
+/**
+ * Helper function to log successful authentication
+ */
+const logSuccessfulAuthentication = (result: LoginResult): void => {
+  logger.info("✅ User authenticated", {
+    userName: result.user?.userName,
+    budgetId: result.user?.budgetId?.substring(0, 8) + "...",
+    isNewUser: result.isNewUser || false,
+    hasEncryptionKey: !!result.sessionData?.encryptionKey,
+  });
+};
+
+/**
+ * Helper function to handle successful login authentication
+ */
+const handleSuccessfulAuthentication = (
+  result: LoginResult,
+  setAuthenticated: (user: import("@/types/auth").UserData, sessionData?: SessionData) => void
+): void => {
+  logAuthenticationDebugInfo(result);
+
+  // Pass the encryption key and salt from login result to auth context
+  setAuthenticated(result.user as unknown as import("@/types/auth").UserData, result.sessionData);
+
+  logSuccessfulAuthentication(result);
+};
+
+/**
  * Helper function for new user setup path
  */
 const handleNewUserSetup = async (userData: UserData, password: string): Promise<LoginResult> => {
@@ -238,52 +303,8 @@ export const useLoginMutation = () => {
     },
     onSuccess: async (result: LoginResult) => {
       if (result.success && result.user) {
-        // DEBUG: Log what we're about to pass
-        logger.auth("🔍 DEBUG: About to call setAuthenticated with:", {
-          hasSessionData: !!result.sessionData,
-          hasEncryptionKey: !!result.sessionData?.encryptionKey,
-          encryptionKeyType: result.sessionData?.encryptionKey?.constructor?.name || "undefined",
-          hasSalt: !!result.sessionData?.salt,
-          saltType: result.sessionData?.salt?.constructor?.name || "undefined",
-        });
-
-        // Pass the encryption key and salt from login result to auth context
-        setAuthenticated(
-          result.user as unknown as import("@/types/auth").UserData,
-          result.sessionData // ✅ Use actual session data with encryption key!
-        );
-
-        // Log successful authentication
-        logger.info("✅ User authenticated", {
-          userName: result.user.userName,
-          budgetId: result.user.budgetId?.substring(0, 8) + "...",
-          isNewUser: result.isNewUser || false,
-          hasEncryptionKey: !!result.sessionData?.encryptionKey,
-        });
-
-        // Start background sync for successful logins
-        try {
-          const syncDelay = 2500;
-          logger.auth(
-            `⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`,
-            {
-              isNewUser: result.isNewUser || false,
-              delayMs: syncDelay,
-            }
-          );
-
-          await new Promise((resolve) => setTimeout(resolve, syncDelay));
-
-          const { useBudgetStore } = await import("../../../stores/ui/uiStore");
-          const budgetState = useBudgetStore.getState();
-
-          if (budgetState.cloudSyncEnabled) {
-            await budgetState.startBackgroundSync();
-            logger.auth("Background sync started successfully after login");
-          }
-        } catch (error) {
-          logger.error("Failed to start background sync after login", error);
-        }
+        handleSuccessfulAuthentication(result, setAuthenticated);
+        await startBackgroundSyncAfterLogin(result.isNewUser || false);
       } else {
         setError(result.error);
       }

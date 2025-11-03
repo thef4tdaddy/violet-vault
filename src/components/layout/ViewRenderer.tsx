@@ -237,7 +237,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
         onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
-        onDistributeToGoals={savingsGoalsHook.helpers.distributeUnassignedCash}
+        onDistributeToGoals={savingsGoalsHook.helpers.distributeFunds}
       />
     ),
     supplemental: (

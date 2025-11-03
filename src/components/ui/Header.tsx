@@ -21,7 +21,7 @@ const Header = memo(
     onUpdateProfile,
     isLocalOnlyMode = false,
     onShowSettings,
-    onShowDataSettings,
+    onShowDataSettings: _onShowDataSettings,
   }: HeaderProps) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 

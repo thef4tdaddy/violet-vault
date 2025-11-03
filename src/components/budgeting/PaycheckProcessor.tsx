@@ -81,7 +81,7 @@ const PaycheckHeader = () => (
         })}
       </div>
     </div>
-    <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+    <StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl">
       ADD PAYCHECK
     </StylizedButtonText>
   </h2>

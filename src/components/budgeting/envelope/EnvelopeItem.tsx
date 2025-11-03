@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { getStatusStyle } from "../../../utils/budgeting";
 import { getButtonClasses } from "../../../utils/ui/touchFeedback";
 import { useEnvelopeSwipeGestures } from "../../../hooks/useEnvelopeSwipeGestures";

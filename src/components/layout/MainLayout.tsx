@@ -365,7 +365,7 @@ const MainContent = ({
             securityManager={securityManager}
             onUpdateProfile={async (updates) => {
               // Update profile through auth manager
-              await auth.updateUserProfile?.(updates);
+              (auth as { updateUser: (updates: unknown) => void }).updateUser(updates);
             }}
           />
         )}

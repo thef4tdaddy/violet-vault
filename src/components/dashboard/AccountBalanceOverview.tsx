@@ -36,7 +36,7 @@ const AccountBalanceOverview = ({
         {React.createElement(getIcon("CreditCard"), {
           className: "h-6 w-6 mr-3 text-blue-600",
         })}
-        <StylizedButtonText firstLetterClassName="text-2xl" restOfWordClassName="text-xl">
+        <StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl">
           VIOLET VAULT APP DASHBOARD
         </StylizedButtonText>
       </h2>

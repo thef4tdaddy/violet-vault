@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui";
 import { useSyncHealthIndicator } from "@/hooks/sync/useSyncHealthIndicator";
 
 /**
@@ -23,7 +22,7 @@ interface SyncHealthIndicatorProps {
   onOpenSettings: () => void;
 }
 
-const SyncHealthIndicator = ({ onOpenSettings }: SyncHealthIndicatorProps) => {
+const SyncHealthIndicator = ({ onOpenSettings: _onOpenSettings }: SyncHealthIndicatorProps) => {
   const { syncStatus, isBackgroundSyncing } = useSyncHealthIndicator();
 
   /**
