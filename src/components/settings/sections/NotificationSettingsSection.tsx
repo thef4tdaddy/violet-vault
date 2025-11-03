@@ -234,6 +234,22 @@ const NotificationSettingsSection = () => {
         </p>
       </div>
 
+      {/* Not Yet Implemented Notice */}
+      <div className="bg-blue-50 border-2 border-black rounded-lg p-4">
+        <div className="flex items-start space-x-3">
+          {React.createElement(getIcon("Info"), {
+            className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5",
+          })}
+          <div>
+            <p className="font-bold text-blue-900">Feature Under Development</p>
+            <p className="text-sm text-blue-800 mt-1">
+              Push notifications are currently being developed and will be available in a future
+              release. The settings below are for development and testing purposes only.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {!isInitialized && !isLoading && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-center space-x-2">
@@ -272,7 +288,7 @@ const NotificationSettingsSection = () => {
       <div className="pt-4 border-t border-gray-200">
         <Button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1"
+          className="text-sm text-gray-900 hover:text-purple-700 flex items-center space-x-1 font-medium"
         >
           {React.createElement(getIcon("ChevronRight"), {
             className: `w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`,
@@ -280,12 +296,18 @@ const NotificationSettingsSection = () => {
           <span>Advanced Debug Info</span>
         </Button>
         {showAdvanced && (
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border-2 border-black shadow-sm">
             <h4 className="font-medium text-gray-900 mb-3">Debug Information</h4>
-            <div className="space-y-2 text-sm font-mono">
-              <div>Service Status: {JSON.stringify(getServiceStatus(), null, 2)}</div>
-              <div>Permission Status: {JSON.stringify(permissionStatus, null, 2)}</div>
-              {error && <div className="text-red-600">Error: {error}</div>}
+            <div className="space-y-2 text-xs font-mono overflow-x-auto">
+              <div className="whitespace-pre-wrap break-all">
+                Service Status: {JSON.stringify(getServiceStatus(), null, 2)}
+              </div>
+              <div className="whitespace-pre-wrap break-all">
+                Permission Status: {JSON.stringify(permissionStatus, null, 2)}
+              </div>
+              {error && (
+                <div className="text-red-600 whitespace-pre-wrap break-all">Error: {error}</div>
+              )}
             </div>
           </div>
         )}

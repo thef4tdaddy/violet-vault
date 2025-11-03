@@ -88,23 +88,23 @@ const CloudSyncSection: React.FC<CloudSyncSectionProps> = ({
   onManualSync,
 }) => (
   <div className="glassmorphism rounded-lg p-4 border-2 border-black ring-1 ring-gray-800/10 space-y-4">
-    <h4 className="font-medium text-purple-900">Cloud Sync</h4>
+    <h4 className="font-semibold text-gray-900">Cloud Sync</h4>
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm text-purple-900">Sync your data across devices</p>
-        <p className="text-xs text-purple-700 mt-1">
+        <p className="text-sm text-gray-900">Sync your data across devices</p>
+        <p className="text-xs text-gray-700 mt-1">
           Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
         </p>
       </div>
       <Button
         onClick={onToggleCloudSync}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors border-2 border-black ${
+        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors border-2 border-black ${
           cloudSyncEnabled ? "bg-green-600" : "bg-gray-200"
         }`}
       >
         <span
           className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform border border-black ${
-            cloudSyncEnabled ? "translate-x-6" : "translate-x-1"
+            cloudSyncEnabled ? "translate-x-5" : "translate-x-0.5"
           }`}
         />
       </Button>

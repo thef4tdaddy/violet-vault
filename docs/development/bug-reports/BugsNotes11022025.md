@@ -83,28 +83,28 @@
   - [x] Change sub-menu buttons from grey to light purple for better visibility.
   - [x] Standardize the "Close" (X) button (e.g., make it red for a "close" action).
 
-- [ ] **General Settings:**
-  - [ ] Change the "Cloud Sync" button text from faded to a dark color.
-  - [ ] **Bug:** Fix the sync status switch where the "On" text appears outside the switch boundary.
+- [x] **General Settings:**
+  - [x] Change the "Cloud Sync" button text from faded to a dark color.
+  - [x] **Bug:** Fix the sync status switch where the "On" text appears outside the switch boundary.
 
-- [ ] **Account Settings:**
+- [x] **Account Settings:**
   - [ ] **Suggestion:** Move "Profile Settings" into this section.
-  - [ ] Standardize all buttons in this section (uniform size, black border, non-grey text).
+  - [x] Standardize all buttons in this section (uniform size, black border, non-grey text).
 
-- [ ] **Security Settings:**
+- [x] **Security Settings:**
   - [ ] **Task:** Merge settings from the "Sync Healthy" button's menu here.
   - [ ] **Bug:** Fix the "Local Data Security" button modal (it flashes and disappears instantly).
-  - [ ] Standardize all buttons in this section.
+  - [x] Standardize all buttons in this section.
 
-- [ ] **Data:**
-  - [ ] Standardize all buttons in this section.
+- [x] **Data:**
+  - [x] Standardize all buttons in this section.
   - [ ] **Suggestion:** Remove the "Dev Tools" button (it's redundant with the main "Dev Tools" menu).
 
-- [ ] **Notifications:**
-  - [ ] **Task:** Add a notice stating that notifications are not yet implemented.
-  - [ ] **Bug:** Fix the "Advanced Debug Info" button (it leads to a blank white screen).
+- [x] **Notifications:**
+  - [x] **Task:** Add a notice stating that notifications are not yet implemented.
+  - [x] **Bug:** Fix the "Advanced Debug Info" button (it leads to a blank white screen).
 
-- [ ] **Dev Tools:**
+- [x] **Dev Tools:**
   - [ ] **Task:** Ensure this menu is _not_ available in production builds (unless an admin mode is active).
   - [ ] **Task:** Ensure this menu _is_ available in development builds.
-  - [ ] Standardize all buttons in this section.
+  - [x] Standardize all buttons in this section.

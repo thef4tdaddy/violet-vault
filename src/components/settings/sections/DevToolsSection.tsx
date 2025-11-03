@@ -31,28 +31,28 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
         {/* Envelope Integrity Checker */}
         <Button
           onClick={onOpenEnvelopeChecker}
-          className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+          className="w-full flex items-center p-3 border-2 border-black bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
         >
           {React.createElement(getIcon("AlertTriangle"), {
             className: "h-5 w-5 text-purple-600 mr-3",
           })}
           <div className="text-left">
-            <p className="font-medium text-purple-900">🔍 Envelope Integrity Checker</p>
-            <p className="text-sm text-purple-700">Detect and fix empty/corrupted envelopes</p>
+            <p className="font-medium text-gray-900">🔍 Envelope Integrity Checker</p>
+            <p className="text-sm text-gray-700">Detect and fix empty/corrupted envelopes</p>
           </div>
         </Button>
 
         {/* Test Budget History */}
         <Button
           onClick={onCreateTestHistory}
-          className="w-full flex items-center p-3 border border-yellow-200 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
+          className="w-full flex items-center p-3 border-2 border-black bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors shadow-sm"
         >
           {React.createElement(getIcon("History"), {
             className: "h-5 w-5 text-yellow-600 mr-3",
           })}
           <div className="text-left">
-            <p className="font-medium text-yellow-900">🧪 Test Budget History</p>
-            <p className="text-sm text-yellow-700">Create test commits for family collaboration</p>
+            <p className="font-medium text-gray-900">🧪 Test Budget History</p>
+            <p className="text-sm text-gray-700">Create test commits for family collaboration</p>
           </div>
         </Button>
 

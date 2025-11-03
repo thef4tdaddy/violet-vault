@@ -51,23 +51,23 @@ const AccountSettingsSection = ({
           <div className="space-y-2">
             <Button
               onClick={() => setShowShareModal(true)}
-              className="w-full flex items-center p-3 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+              className="w-full flex items-center p-3 border-2 border-black bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors shadow-sm"
             >
               {renderIcon("Share", "h-5 w-5 text-blue-600 mr-3")}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Share Your Budget</p>
-                <p className="text-sm text-gray-500">Generate a share code for others to join</p>
+                <p className="text-sm text-gray-700">Generate a share code for others to join</p>
               </div>
             </Button>
 
             <Button
               onClick={() => setShowJoinModal(true)}
-              className="w-full flex items-center p-3 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+              className="w-full flex items-center p-3 border-2 border-black bg-green-50 rounded-lg hover:bg-green-100 transition-colors shadow-sm"
             >
               {renderIcon("UserPlus", "h-5 w-5 text-green-600 mr-3")}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Join Shared Budget</p>
-                <p className="text-sm text-gray-500">Enter a share code to join someone's budget</p>
+                <p className="text-sm text-gray-700">Enter a share code to join someone's budget</p>
               </div>
             </Button>
           </div>
@@ -75,12 +75,12 @@ const AccountSettingsSection = ({
 
         <Button
           onClick={onOpenPasswordModal}
-          className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          className="w-full flex items-center p-3 border-2 border-black bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
         >
-          {renderIcon("Key", "h-5 w-5 text-gray-600 mr-3")}
+          {renderIcon("Key", "h-5 w-5 text-purple-600 mr-3")}
           <div className="text-left">
             <p className="font-medium text-gray-900">Change Password</p>
-            <p className="text-sm text-gray-500">Update your encryption password</p>
+            <p className="text-sm text-gray-700">Update your encryption password</p>
           </div>
         </Button>
 
@@ -93,13 +93,13 @@ const AccountSettingsSection = ({
               <div className="mt-3 space-y-2">
                 <Button
                   onClick={onLogout}
-                  className="block w-full text-left px-3 py-2 text-sm border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                  className="block w-full text-left px-3 py-2 text-sm border-2 border-black bg-red-50 rounded-lg hover:bg-red-100 transition-colors text-red-900 font-medium shadow-sm"
                 >
                   Logout Only (Keep Data)
                 </Button>
                 <Button
                   onClick={onOpenResetConfirm}
-                  className="block w-full text-left px-3 py-2 text-sm bg-red-100 border border-red-300 rounded-lg hover:bg-red-200 transition-colors text-red-800"
+                  className="block w-full text-left px-3 py-2 text-sm bg-red-100 border-2 border-black rounded-lg hover:bg-red-200 transition-colors text-red-900 font-medium shadow-sm"
                 >
                   Clear All Data
                 </Button>
