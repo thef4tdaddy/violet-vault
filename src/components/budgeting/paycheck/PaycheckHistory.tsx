@@ -44,7 +44,7 @@ const PaycheckHistory = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="glassmorphism rounded-2xl p-6 border-2 border-black space-y-4">
       {/* Statistics Summary */}
       {paycheckStats && paycheckStats.count !== undefined && paycheckStats.count > 0 && (
         <PaycheckStatsDisplay paycheckStats={paycheckStats} />

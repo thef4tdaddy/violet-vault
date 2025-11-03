@@ -9,11 +9,11 @@ const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }) => {
   if (!hasAmount || !preview) {
     return (
       <div className="glassmorphism rounded-2xl p-6 border-2 border-black">
-        <h3 className="font-black text-black text-base flex items-center">
+        <h3 className="font-black text-black text-base flex items-center tracking-wide">
           {React.createElement(getIcon("Calculator"), {
             className: "h-5 w-5 mr-2 text-purple-600",
           })}
-          <span className="text-lg">A</span>LLOCATION <span className="text-lg">P</span>REVIEW
+          <span className="text-lg">A</span>LLOCATION&nbsp;&nbsp;<span className="text-lg">P</span>REVIEW
         </h3>
 
         <div className="text-center py-12 text-gray-500 mt-6">
@@ -29,11 +29,11 @@ const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }) => {
 
   return (
     <div className="glassmorphism rounded-2xl p-6 border-2 border-black">
-      <h3 className="font-black text-black text-base flex items-center">
+      <h3 className="font-black text-black text-base flex items-center tracking-wide">
         {React.createElement(getIcon("Calculator"), {
           className: "h-5 w-5 mr-2 text-purple-600",
         })}
-        <span className="text-lg">A</span>LLOCATION <span className="text-lg">P</span>REVIEW
+        <span className="text-lg">A</span>LLOCATION&nbsp;&nbsp;<span className="text-lg">P</span>REVIEW
       </h3>
 
       <div className="space-y-6 mt-6">
