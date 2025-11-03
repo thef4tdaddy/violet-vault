@@ -16,10 +16,10 @@ const AccountsHeader = ({
   onAddAccount,
 }: AccountsHeaderProps) => {
   return (
-    <div className="flex justify-between items-center">
-      <div>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex-1 min-w-0">
         <h3 className="font-black text-black text-xl flex items-center tracking-wide">
-          <div className="relative mr-4">
+          <div className="relative mr-2 sm:mr-4 flex-shrink-0">
             <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-cyan-500 p-3 rounded-2xl">
               {React.createElement(getIcon("CreditCard"), {
@@ -27,14 +27,23 @@ const AccountsHeader = ({
               })}
             </div>
           </div>
-          <span className="text-2xl">S</span>UPPLEMENTAL&nbsp;&nbsp;<span className="text-2xl">A</span>CCOUNTS
+          {/* Mobile: Shorter title */}
+          <div className="min-w-0">
+            <div className="sm:hidden">
+              <span className="text-2xl">S</span>UPP.&nbsp;&nbsp;<span className="text-2xl">A</span>CCOUNTS
+            </div>
+            {/* Desktop: Full title */}
+            <div className="hidden sm:block">
+              <span className="text-2xl">S</span>UPPLEMENTAL&nbsp;&nbsp;<span className="text-2xl">A</span>CCOUNTS
+            </div>
+          </div>
         </h3>
-        <p className="text-sm text-purple-900 mt-1 font-medium">
-          Track FSA, HSA, and other non-budget accounts • Total: ${totalValue.toFixed(2)}
+        <p className="text-sm text-purple-900 mt-1 font-medium ml-12 sm:ml-16">
+          Total: ${totalValue.toFixed(2)}
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-shrink-0">
         <Button
           onClick={onToggleBalances}
           className="p-2 text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50 border-2 border-transparent hover:border-cyan-200"
