@@ -47,6 +47,7 @@
 - [ ] **Filters:** Implement the standard collapsible filter UI.
 - [x] **Task:** Investigate the purpose of the blue dot in the second section.
   - **Answer:** The "blue dot" is the select-all checkbox icon (CheckSquare) in the table header that appears blue when bills are selected. It's functional - indicates selection state for bulk operations.
+- [x] **Bug:** Remove debug info from empty state (or make it development-only).
 
 ## Paycheck Processor
 

@@ -6,6 +6,8 @@ import { getIcon } from "../../utils";
  * Extracted to reduce BillTable complexity
  */
 const BillTableEmptyState = ({ viewMode, filteredBills, categorizedBills }) => {
+  const isDev = import.meta.env.MODE === "development";
+
   return (
     <div className="text-center py-12 text-gray-500">
       {React.createElement(getIcon("FileText"), {
@@ -17,13 +19,15 @@ const BillTableEmptyState = ({ viewMode, filteredBills, categorizedBills }) => {
           ? "Get started by adding a new bill."
           : "Try switching to a different view or adjusting filters."}
       </p>
-      <div className="mt-4 text-xs text-gray-400 font-mono">
-        DEBUG: Bills={filteredBills.length}, Categorized=
-        {JSON.stringify(
-          Object.keys(categorizedBills).map((k) => `${k}:${categorizedBills[k]?.length || 0}`)
-        )}
-        , ViewMode={viewMode}
-      </div>
+      {isDev && (
+        <div className="mt-4 text-xs text-gray-400 font-mono">
+          DEBUG: Bills={filteredBills.length}, Categorized=
+          {JSON.stringify(
+            Object.keys(categorizedBills).map((k) => `${k}:${categorizedBills[k]?.length || 0}`)
+          )}
+          , ViewMode={viewMode}
+        </div>
+      )}
     </div>
   );
 };
