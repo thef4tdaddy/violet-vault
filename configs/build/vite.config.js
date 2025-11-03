@@ -455,8 +455,10 @@ export default defineConfig(() => {
           moduleSideEffects: ["**/*.css", "**/*.scss", "**/*.sass"],
           propertyReadSideEffects: false,
         },
-        // Add external dependencies to prevent crypto issues
-        external: [],
+        // Add external dependencies to prevent bundling issues
+        external: [
+          /^swagger-ui-react/, // Dev-only API docs component - not needed in production
+        ],
       },
       // Terser options - only applied to production builds (when minify: "terser")
       terserOptions: isDevelopmentMode
