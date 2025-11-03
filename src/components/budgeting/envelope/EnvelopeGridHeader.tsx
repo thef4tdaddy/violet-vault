@@ -27,7 +27,7 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
       {/* Left side - Action buttons */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2">
         {/* Create Envelope Button */}
         <Button
           onClick={() => setShowCreateModal(true)}
