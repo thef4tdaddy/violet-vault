@@ -57,7 +57,7 @@ const EnvelopeView = ({
 }: EnvelopeViewProps) => (
   <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-4">
     {/* Header Row: Title/Subheaders (left) + Action Buttons (right) */}
-    <div className="flex justify-between items-start gap-4">
+    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
       {/* Left: Header + Subheaders */}
       <div className="flex-1">
         <h2 className="font-black text-black text-2xl mb-1 flex items-center">
@@ -78,8 +78,8 @@ const EnvelopeView = ({
         </p>
       </div>
 
-      {/* Right: Action Buttons - Stack vertically on mobile */}
-      <div className="flex flex-col gap-2">
+      {/* Right: Action Buttons - Stack vertically, full width on mobile */}
+      <div className="flex flex-col gap-2 w-full sm:w-auto">
         <Button
           onClick={() => setActiveView("automation")}
           className="btn btn-secondary border-2 border-black flex items-center whitespace-nowrap"
