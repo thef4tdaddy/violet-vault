@@ -1,11 +1,14 @@
 import { Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import ViewRendererComponent from "./ViewRenderer";
 import LandingPage from "../marketing/LandingPage";
 import OfflinePage from "../pwa/OfflinePage";
 import ShareTargetHandler from "../pwa/ShareTargetHandler";
 import DevAuthBypass from "../dev/DevAuthBypass";
-import APIDocumentation from "../api-docs/APIDocumentation";
 import { routeConfig } from "./routeConfig";
+
+// Lazy load API Documentation (dev-only)
+const APIDocumentation = lazy(() => import("../api-docs/APIDocumentation"));
 
 /**
  * Application Routes Component
@@ -34,8 +37,21 @@ const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) =>
       {/* Dev auth bypass route */}
       <Route path="/__dev_auth" element={<DevAuthBypass />} />
 
-      {/* API Documentation route */}
-      <Route path="/api-docs" element={<APIDocumentation />} />
+      {/* API Documentation route - dev only */}
+      {(import.meta.env.MODE === "development" ||
+        window.location.hostname.includes("dev.") ||
+        window.location.hostname.includes("localhost")) && (
+        <Route
+          path="/api-docs"
+          element={
+            <Suspense
+              fallback={<div className="p-8 text-center">Loading API Documentation...</div>}
+            >
+              <APIDocumentation />
+            </Suspense>
+          }
+        />
+      )}
 
       {/* App routes under /app prefix */}
       {routeConfig.map(({ path, activeView }) => (
