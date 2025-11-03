@@ -72,8 +72,8 @@
 
 ## Summary Cards
 
-- [ ] **Sizing:** Fix inconsistent sizing between cards ("Total Cash" & "Unassigned Cash" vs. "Savings Total" & "Biweekly").
-- [ ] **Text Layout:** Move the "Click to distribute" text to its own line/row on both cards.
+- [x] **Sizing:** Fix inconsistent sizing between cards ("Total Cash" & "Unassigned Cash" vs. "Savings Total" & "Biweekly").
+- [x] **Text Layout:** Move the "Click to distribute" text to its own line/row on both cards.
 - [ ] **Task:** Investigate and verify the calculation being used for the "Total Allocation" value.
 
 ## Settings Menu

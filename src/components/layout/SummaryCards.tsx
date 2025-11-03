@@ -204,8 +204,8 @@ const SummaryCard = memo(
       : "";
 
     const cardContent = (
-      <div className="flex items-center">
-        <div className="relative mr-4">
+      <div className="flex items-start min-h-[120px]">
+        <div className="relative mr-4 flex-shrink-0">
           <div
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
@@ -213,23 +213,23 @@ const SummaryCard = memo(
             <_Icon className="h-6 w-6 text-white" />
           </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-600 mb-1">
-            {label}
-            {clickable && !isNegative && (
-              <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>
-            )}
-            {isNegative && (
-              <span className="ml-1 text-xs text-red-500">(overspending - click to address)</span>
-            )}
-          </p>
+        <div className="flex-1 flex flex-col">
+          <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
           <p
-            className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
+            className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""} mb-2`}
           >
             ${value.toFixed(2)}
             {isNegative && <span className="ml-2 text-sm">⚠️</span>}
           </p>
-          {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+          <div className="mt-auto">
+            {clickable && !isNegative && (
+              <p className="text-xs text-gray-400">Click to distribute</p>
+            )}
+            {isNegative && (
+              <p className="text-xs text-red-500 font-medium">⚠️ Overspending - click to address</p>
+            )}
+            {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+          </div>
         </div>
       </div>
     );
