@@ -77,7 +77,8 @@
 
 - [x] **Sizing:** Fix inconsistent sizing between cards ("Total Cash" & "Unassigned Cash" vs. "Savings Total" & "Biweekly").
 - [x] **Text Layout:** Move the "Click to distribute" text to its own line/row on both cards.
-- [ ] **Task:** Investigate and verify the calculation being used for the "Total Allocation" value.
+- [x] **Task:** Investigate and verify the calculation being used for the "Total Allocation" value.
+  - **Verified:** Shows `envelopeSummary.totalBiweeklyNeed` calculated from `calculateEnvelopeTotals()` - sums all envelope biweekly allocations (bills + variable budgets). Calculation is correct.
 
 ## Settings Menu
 
