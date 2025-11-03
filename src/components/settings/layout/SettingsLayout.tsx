@@ -29,18 +29,18 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full max-w-4xl max-h-[90vh] shadow-2xl relative flex flex-col">
+      <div className="rounded-lg border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full max-w-4xl max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden">
         {/* Close Button - Top Right Corner */}
         <Button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-black hover:text-red-600 bg-white hover:bg-red-50 rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
+          className="absolute top-4 right-4 z-10 text-white hover:text-white bg-red-600 hover:bg-red-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
         >
           {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
         </Button>
 
         <div className="flex flex-1 min-h-0">
           {/* Sidebar */}
-          <div className="w-64 glassmorphism border-r-2 border-black flex-shrink-0 rounded-l-lg">
+          <div className="w-64 bg-white border-r-2 border-black flex-shrink-0">
             <div className="p-6">
               <div className="flex items-center mb-6">
                 <h2 className="font-black text-black text-base flex items-center">
@@ -61,7 +61,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors border-2 border-black ${
                         activeSection === section.id
                           ? "bg-purple-500 text-white"
-                          : "bg-gray-100 text-black hover:bg-gray-200"
+                          : "bg-purple-100 text-purple-900 hover:bg-purple-200"
                       }`}
                     >
                       {React.createElement(getIcon(section.icon), {
@@ -76,7 +76,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 overflow-y-auto glassmorphism rounded-r-lg min-h-0">
+          <div className="flex-1 overflow-y-auto bg-white min-h-0">
             <div className="p-6">{children}</div>
           </div>
         </div>

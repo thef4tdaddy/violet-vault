@@ -78,10 +78,10 @@
 
 ## Settings Menu
 
-- [ ] **Modal:** Remove the extra grey border around the outside of the modal.
-- [ ] **Buttons:**
-  - [ ] Change sub-menu buttons from grey to light purple for better visibility.
-  - [ ] Standardize the "Close" (X) button (e.g., make it red for a "close" action).
+- [x] **Modal:** Remove the extra grey border around the outside of the modal.
+- [x] **Buttons:**
+  - [x] Change sub-menu buttons from grey to light purple for better visibility.
+  - [x] Standardize the "Close" (X) button (e.g., make it red for a "close" action).
 
 - [ ] **General Settings:**
   - [ ] Change the "Cloud Sync" button text from faded to a dark color.
