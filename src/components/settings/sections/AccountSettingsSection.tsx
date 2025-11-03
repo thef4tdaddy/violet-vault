@@ -55,7 +55,7 @@ const AccountSettingsSection = ({
         </div>
 
         {/* Budget Sharing Section */}
-        <div className="bg-blue-50 rounded-lg p-4">
+        <div className="bg-blue-50 rounded-lg p-4 border-2 border-black shadow-sm">
           <h4 className="font-medium text-gray-900 mb-3">Budget Sharing</h4>
           <p className="text-sm text-gray-600 mb-4">
             Share your budget with family members or join someone else's budget
