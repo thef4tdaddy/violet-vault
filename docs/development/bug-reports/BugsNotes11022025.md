@@ -98,7 +98,7 @@
 
 - [x] **Data:**
   - [x] Standardize all buttons in this section.
-  - [ ] **Suggestion:** Remove the "Dev Tools" button (it's redundant with the main "Dev Tools" menu).
+  - [x] **Suggestion:** Remove the "Dev Tools" button (it's redundant with the main "Dev Tools" menu).
 
 - [x] **Notifications:**
   - [x] **Task:** Add a notice stating that notifications are not yet implemented.

@@ -227,7 +227,7 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
           </Button>
         )}
 
-        <SyncHealthTools confirm={confirm} />
+        {/* Note: Sync debug tools moved to Dev Tools section to avoid duplication */}
       </div>
     </div>
   );
