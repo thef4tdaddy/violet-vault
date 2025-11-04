@@ -20,14 +20,30 @@ const createVisibilityHandler = (
 
   return () => {
     if (document.hidden) {
-      const timeSinceUnlock = Date.now() - lastUnlockTimeRef.current;
+      const now = Date.now();
+      const lastUnlock = lastUnlockTimeRef.current;
+      const timeSinceUnlock = now - lastUnlock;
+
+      logger.debug("🔒 Visibility handler - PAGE_HIDDEN", {
+        now,
+        lastUnlock,
+        timeSinceUnlock,
+        gracePeriod: UNLOCK_GRACE_PERIOD,
+        withinGracePeriod: timeSinceUnlock < UNLOCK_GRACE_PERIOD,
+      });
+
       if (timeSinceUnlock < UNLOCK_GRACE_PERIOD) {
-        logger.debug("Skipping auto-lock - within grace period after unlock", {
+        logger.debug("✅ Skipping auto-lock - within grace period after unlock", {
           timeSinceUnlock,
           gracePeriod: UNLOCK_GRACE_PERIOD,
         });
         return;
       }
+
+      logger.debug("🔒 Locking session - outside grace period", {
+        timeSinceUnlock,
+        gracePeriod: UNLOCK_GRACE_PERIOD,
+      });
 
       logSecurityEvent({
         type: "PAGE_HIDDEN",
@@ -110,9 +126,12 @@ export const useSecurityManager = () => {
   // Update unlock timestamp when session is unlocked
   useEffect(() => {
     if (!isLocked) {
-      lastUnlockTimeRef.current = Date.now();
-      logger.debug("Unlock grace period started", {
+      const now = Date.now();
+      lastUnlockTimeRef.current = now;
+      logger.debug("🔓 Unlock grace period started", {
         duration: 2000,
+        timestamp: now,
+        willExpireAt: now + 2000,
       });
     }
   }, [isLocked]);
