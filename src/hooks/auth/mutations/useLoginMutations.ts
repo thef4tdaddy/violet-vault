@@ -211,8 +211,8 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
     };
   }
 
-  // Check if user has a shareCode in their profile (joined budget)
-  // If so, use the saved salt (which is deterministic from shareCode)
+  // Check if user has a shareCode in their profile (shared budget)
+  // If so, use deterministic salt derived from shareCode for consistency
   const savedProfile = localStorageService.getUserProfile();
   const hasShareCode = savedProfile?.shareCode;
   
@@ -220,17 +220,21 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
   let usedSalt: Uint8Array;
   
   if (hasShareCode) {
-    // For joined budgets, use the saved salt directly (it's deterministic from shareCode)
-    logger.auth("Using saved salt for joined budget login", {
+    // For shared budgets, derive deterministic salt from shareCode
+    const encoder = new TextEncoder();
+    const shareCodeBytes = encoder.encode(hasShareCode);
+    const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
+    usedSalt = new Uint8Array(deterministicSalt);
+    
+    logger.auth("Shared budget login - using deterministic salt", {
       shareCodePreview: hasShareCode.split(" ").slice(0, 2).join(" ") + " ...",
     });
-    usedSalt = new Uint8Array(savedSalt);
+    
     key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
   } else {
-    // For regular budgets, derive key normally (generates random salt)
-    const keyData = await encryptionUtils.deriveKey(password);
-    key = keyData.key;
-    usedSalt = keyData.salt;
+    // For regular budgets, use saved salt from localStorage
+    usedSalt = new Uint8Array(savedSalt);
+    key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
   }
 
   try {
