@@ -27,14 +27,20 @@ const AccountsHeader = ({
               })}
             </div>
           </div>
-          {/* Mobile: Shorter title */}
+          {/* Mobile: Two-line title */}
           <div className="min-w-0">
-            <div className="sm:hidden">
-              <span className="text-2xl">S</span>UPP.&nbsp;&nbsp;<span className="text-2xl">A</span>CCOUNTS
+            <div className="sm:hidden flex flex-col leading-tight">
+              <div>
+                <span className="text-2xl">S</span>UPPLEMENTAL
+              </div>
+              <div>
+                <span className="text-2xl">A</span>CCOUNTS
+              </div>
             </div>
-            {/* Desktop: Full title */}
+            {/* Desktop: Full title on one line */}
             <div className="hidden sm:block">
-              <span className="text-2xl">S</span>UPPLEMENTAL&nbsp;&nbsp;<span className="text-2xl">A</span>CCOUNTS
+              <span className="text-2xl">S</span>UPPLEMENTAL&nbsp;&nbsp;
+              <span className="text-2xl">A</span>CCOUNTS
             </div>
           </div>
         </h3>

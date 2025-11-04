@@ -51,10 +51,12 @@ const SavingsGoals = ({
                 })}
               </div>
             </div>
-            <span className="text-2xl">S</span>AVINGS&nbsp;&nbsp;<span className="text-2xl">G</span>OALS
+            <span className="text-2xl">S</span>AVINGS&nbsp;&nbsp;<span className="text-2xl">G</span>
+            OALS
           </h2>
           <p className="text-purple-900 mt-1">
-            {savingsGoals.length} {savingsGoals.length === 1 ? 'goal' : 'goals'} • Track your financial targets
+            {savingsGoals.length} {savingsGoals.length === 1 ? "goal" : "goals"} • Track your
+            financial targets
           </p>
         </div>
 
@@ -92,11 +94,12 @@ const SavingsGoals = ({
               {React.createElement(getIcon("Target"), {
                 className: "h-4 w-4 mr-2 text-purple-600",
               })}
-              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">G</span>OALS ({savingsGoals.length})
+              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">G</span>
+              OALS ({savingsGoals.length})
             </h3>
           </div>
         )}
-        
+
         {/* Goals Grid or Empty State */}
         {savingsGoals.length === 0 ? (
           <div className="text-center py-12">
@@ -116,7 +119,7 @@ const SavingsGoals = ({
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {savingsGoals.map((goal) => (
               <SavingsGoalCard
                 key={goal.id}

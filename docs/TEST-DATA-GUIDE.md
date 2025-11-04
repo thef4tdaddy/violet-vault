@@ -9,11 +9,13 @@ The test data provides a complete, realistic budget scenario that covers all maj
 ## Test Data Location
 
 The test data is located at:
+
 ```
 /public/test-data/violet-vault-test-budget.json
 ```
 
 This location makes it easily accessible for:
+
 - Manual testing via the import UI
 - Automated testing scripts
 - Development environment setup
@@ -24,6 +26,7 @@ This location makes it easily accessible for:
 The test budget includes comprehensive data across all Violet Vault features:
 
 ### Budget Envelopes (10 items)
+
 - Groceries ($425.50/$600 target)
 - Gas & Fuel ($180.25/$300 target)
 - Rent ($1,500/$1,500 target)
@@ -36,6 +39,7 @@ The test budget includes comprehensive data across all Violet Vault features:
 - Gifts & Donations ($50/$150 target)
 
 ### Bills (6 items)
+
 - Monthly Rent ($1,500)
 - Electric Bill ($85.50)
 - Internet Service ($79.99)
@@ -44,7 +48,9 @@ The test budget includes comprehensive data across all Violet Vault features:
 - Streaming Services ($24.99)
 
 ### Transactions (12 items)
+
 Realistic transactions with merchants including:
+
 - Grocery shopping at Kroger, Costco, Whole Foods
 - Gas purchases at Shell, Chevron
 - Entertainment at AMC Theaters, Steam
@@ -54,6 +60,7 @@ Realistic transactions with merchants including:
 - Charitable donations
 
 ### Savings Goals (5 items)
+
 - Summer Vacation: $850/$3,000 (high priority)
 - New Laptop: $600/$1,500 (medium priority)
 - Car Down Payment: $2,100/$5,000 (high priority)
@@ -61,24 +68,30 @@ Realistic transactions with merchants including:
 - Holiday Shopping: $200/$800 (low priority)
 
 ### Debts (4 items)
+
 - Chase Freedom Credit Card: $2,850 @ 18.99% APR
 - Federal Student Loan: $12,500 @ 4.53% APR
 - Auto Loan (Honda Civic): $8,750 @ 5.25% APR
 - Personal Loan: $3,200 @ 12.50% APR
 
 ### Supplemental Accounts (3 items)
+
 - Health Savings Account (HSA): $3,250.75
 - Flexible Spending Account (FSA): $875.00
 - Commuter Benefits: $150.00
 
 ### Paycheck History (3 entries)
+
 Three biweekly paychecks with:
+
 - Gross amount: $2,500 each
 - Allocations to all envelopes
 - Realistic deductions (taxes, 401k, insurance)
 
 ### Audit Log (8 entries)
+
 Sample change history showing:
+
 - Envelope creation
 - Bill setup
 - Transaction recording
@@ -110,11 +123,10 @@ Sample change history showing:
 ### Via Code (Automated Testing)
 
 ```typescript
-import { validateImportedData } from '@/utils/dataManagement/validationUtils';
+import { validateImportedData } from "@/utils/dataManagement/validationUtils";
 
 // Load test data
-const testData = await fetch('/test-data/violet-vault-test-budget.json')
-  .then(res => res.json());
+const testData = await fetch("/test-data/violet-vault-test-budget.json").then((res) => res.json());
 
 // Validate structure
 const { validatedData } = validateImportedData(testData, currentUser);
@@ -138,12 +150,14 @@ npm run import-test-data /tmp/import-test.json
 Use this test data to verify:
 
 ### 1. Import/Export Functionality
+
 - ✓ All data types import correctly
 - ✓ Relationships maintained (envelopes ↔ transactions)
 - ✓ Data can be exported and re-imported without loss
 - ✓ Encryption context changes handled properly
 
 ### 2. UI Display
+
 - ✓ Dashboard shows correct summary cards
 - ✓ Envelope list displays all envelopes
 - ✓ Bills calendar shows upcoming bills
@@ -153,6 +167,7 @@ Use this test data to verify:
 - ✓ Supplemental accounts visible
 
 ### 3. Calculations
+
 - ✓ Total budget calculations accurate
 - ✓ Envelope balances correct
 - ✓ Savings goal progress percentages
@@ -161,6 +176,7 @@ Use this test data to verify:
 - ✓ Unassigned cash calculations
 
 ### 4. Business Logic
+
 - ✓ Bill payments update envelope balances
 - ✓ Transactions deduct from envelopes
 - ✓ Recurring bills generate correctly
@@ -169,6 +185,7 @@ Use this test data to verify:
 - ✓ Paycheck allocations distribute
 
 ### 5. Edge Cases
+
 - ✓ Large number of transactions (12+)
 - ✓ Multiple debts tracked simultaneously
 - ✓ Various bill frequencies (monthly, quarterly, annually)
@@ -181,6 +198,7 @@ Use this test data to verify:
 You can customize the test data for specific testing scenarios:
 
 ### Add More Transactions
+
 ```json
 {
   "id": "txn-013",
@@ -195,20 +213,23 @@ You can customize the test data for specific testing scenarios:
 ```
 
 ### Add New Envelope
+
 ```json
 {
   "id": "env-011-new",
   "name": "New Envelope",
   "category": "Other",
   "archived": false,
-  "currentBalance": 100.00,
+  "currentBalance": 100.0,
   "targetAmount": 200,
   "lastModified": 1735995461000
 }
 ```
 
 ### Test Different Amounts
+
 Adjust `currentBalance` values to test:
+
 - Negative balances (overspending)
 - Zero balances (empty envelopes)
 - Large balances (significant savings)
@@ -217,6 +238,7 @@ Adjust `currentBalance` values to test:
 ## Data Validation
 
 The test data is validated against Zod schemas:
+
 - ✓ All required fields present
 - ✓ Correct data types
 - ✓ Valid ranges (amounts ≥ 0, etc.)
@@ -227,18 +249,21 @@ The test data is validated against Zod schemas:
 ## Best Practices
 
 ### For Developers
+
 1. **Start Fresh**: Clear existing data before importing test data
 2. **Test Scenarios**: Use test data for each feature branch
 3. **Verify Calculations**: Check that totals match expected values
 4. **Test Export**: Export after import to verify roundtrip
 
 ### For Testers
+
 1. **Multiple Imports**: Test importing multiple times
 2. **Data Modification**: Edit imported data and verify persistence
 3. **Edge Cases**: Test with modified test data (edge values)
 4. **Performance**: Measure import/load times with test data
 
 ### For Demos
+
 1. **Clean State**: Import fresh test data before demos
 2. **Realistic Scenario**: Test data represents typical budget
 3. **Visual Appeal**: Amounts and descriptions are realistic
@@ -247,18 +272,21 @@ The test data is validated against Zod schemas:
 ## Troubleshooting
 
 ### Import Fails
+
 - Verify JSON is valid: `cat test-data.json | json_pp`
 - Check console for validation errors
 - Ensure all required fields present
 - Verify envelope IDs match in transactions
 
 ### Missing Data
+
 - Check import summary for counts
 - Verify relationships (envelope IDs, etc.)
 - Look for validation errors in console
 - Check audit log for import events
 
 ### Incorrect Calculations
+
 - Verify transaction amounts
 - Check envelope target amounts
 - Validate savings goal calculations
@@ -289,6 +317,7 @@ public/test-data/
 ## Feedback
 
 If you encounter issues with the test data or have suggestions for additional test scenarios, please:
+
 1. Open an issue on GitHub
 2. Label it with `test-data` and `testing`
 3. Describe the scenario or problem
@@ -297,6 +326,7 @@ If you encounter issues with the test data or have suggestions for additional te
 ## Summary
 
 The Violet Vault test data provides a comprehensive, realistic budget scenario that:
+
 - Covers all major features (envelopes, bills, transactions, debts, savings, etc.)
 - Uses realistic amounts and descriptions
 - Includes proper relationships between entities

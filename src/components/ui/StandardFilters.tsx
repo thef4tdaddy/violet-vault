@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Select } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 
 export interface FilterConfig {
@@ -14,6 +15,232 @@ interface FilterValues {
   [key: string]: string | undefined;
 }
 
+interface CollapsibleHeaderProps {
+  isExpanded: boolean;
+  onToggle: () => void;
+  activeCount: number;
+  showClearButton: boolean;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
+}
+
+/**
+ * Collapsible filter header with toggle and clear button
+ */
+const CollapsibleFilterHeader = ({
+  isExpanded,
+  onToggle,
+  activeCount,
+  showClearButton,
+  hasActiveFilters,
+  onClearFilters,
+}: CollapsibleHeaderProps) => {
+  return (
+    <div className="flex items-center justify-between p-4">
+      <Button
+        onClick={onToggle}
+        className="flex items-center gap-2 text-sm font-semibold text-gray-800 hover:text-purple-600 transition-colors"
+      >
+        {React.createElement(getIcon(isExpanded ? "ChevronUp" : "ChevronDown"), {
+          className: "h-4 w-4",
+        })}
+        Filters
+        {activeCount > 0 && (
+          <span className="ml-1 text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full">
+            {activeCount} active
+          </span>
+        )}
+      </Button>
+
+      {showClearButton && hasActiveFilters && (
+        <Button
+          onClick={onClearFilters}
+          className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 px-3 py-1.5 border-2 border-black rounded-lg bg-white"
+        >
+          {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
+          Clear All
+        </Button>
+      )}
+    </div>
+  );
+};
+
+interface CollapsibleFilterContentProps {
+  filterConfigs: FilterConfig[];
+  filters: FilterValues;
+  handleFilterChange: (key: string, value: string) => void;
+  searchPlaceholder: string;
+  config: { input: string; select: string; gap: string };
+}
+
+/**
+ * Helper to check if any filters are active
+ */
+const hasActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]): boolean => {
+  if (filters.search && filters.search.trim() !== "") return true;
+  return filterConfigs.some((filterConfig) => {
+    if (filterConfig.type === "select") {
+      const currentValue = filters[filterConfig.key];
+      const defaultValue = filterConfig.defaultValue || "all";
+      return currentValue && currentValue !== defaultValue;
+    }
+    return false;
+  });
+};
+
+/**
+ * Helper to count active filters
+ */
+const countActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]): number => {
+  let count = 0;
+  if (filters.search && filters.search.trim() !== "") count++;
+
+  filterConfigs.forEach((filterConfig) => {
+    if (filterConfig.type === "select") {
+      const currentValue = filters[filterConfig.key];
+      const defaultValue = filterConfig.defaultValue || "all";
+      if (currentValue && currentValue !== defaultValue) count++;
+    }
+  });
+
+  return count;
+};
+
+interface StandardFilterContentProps {
+  filterConfigs: FilterConfig[];
+  filters: FilterValues;
+  handleFilterChange: (key: string, value: string) => void;
+  searchPlaceholder: string;
+  config: { input: string; select: string; gap: string };
+}
+
+/**
+ * Standard filter content - non-collapsible mode
+ */
+const StandardFilterContent = ({
+  filterConfigs,
+  filters,
+  handleFilterChange,
+  searchPlaceholder,
+  config,
+}: StandardFilterContentProps) => {
+  return (
+    <div className={`flex flex-col sm:flex-row sm:items-center ${config.gap}`}>
+      {/* Search Input */}
+      <div className="relative flex-1 sm:min-w-48 w-full sm:w-auto">
+        {React.createElement(getIcon("Search"), {
+          className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
+        })}
+        <input
+          type="text"
+          placeholder={searchPlaceholder}
+          value={filters.search || ""}
+          onChange={(e) => handleFilterChange("search", e.target.value)}
+          className={`
+            w-full pl-8 ${config.input} 
+            border border-gray-300 rounded-md
+            focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+            bg-white
+          `.trim()}
+        />
+        {filters.search && (
+          <button
+            onClick={() => handleFilterChange("search", "")}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
+          </button>
+        )}
+      </div>
+
+      {/* Filter Dropdowns */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+        {filterConfigs.map((filterConfig) => {
+          if (filterConfig.type === "select") {
+            return (
+              <Select
+                key={filterConfig.key}
+                value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
+                options={filterConfig.options}
+                className={`
+                  ${config.select} border border-gray-300 rounded-md
+                  focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                  bg-white text-gray-700 w-full sm:w-auto
+                `.trim()}
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Collapsible filter content - extracted to reduce complexity
+ */
+const CollapsibleFilterContent = ({
+  filterConfigs,
+  filters,
+  handleFilterChange,
+  searchPlaceholder,
+  config,
+}: CollapsibleFilterContentProps) => {
+  return (
+    <div className="px-4 pb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Search Input */}
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+          {React.createElement(getIcon("Search"), {
+            className: "absolute left-2.5 bottom-2 h-4 w-4 text-gray-400",
+          })}
+          <input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={filters.search || ""}
+            onChange={(e) => handleFilterChange("search", e.target.value)}
+            className={`
+              w-full pl-8 ${config.input} 
+              border border-gray-300 rounded-md
+              focus:ring-1 focus:ring-purple-500 focus:border-purple-500
+              bg-white
+            `.trim()}
+          />
+        </div>
+
+        {/* Filter Dropdowns */}
+        {filterConfigs.map((filterConfig) => {
+          if (filterConfig.type === "select") {
+            return (
+              <div key={filterConfig.key}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {filterConfig.options
+                    .find((opt) => opt.value === "all")
+                    ?.label.replace("All ", "") || "Filter"}
+                </label>
+                <Select
+                  value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                  onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
+                  options={filterConfig.options}
+                  className={`
+                    ${config.select} border border-gray-300 rounded-md
+                    focus:ring-1 focus:ring-purple-500 focus:border-purple-500
+                    bg-white text-gray-700 w-full
+                  `.trim()}
+                />
+              </div>
+            );
+          }
+          return null;
+        })}
+      </div>
+    </div>
+  );
+};
+
 interface StandardFiltersProps {
   filters?: FilterValues;
   onFilterChange: (key: string, value: string) => void;
@@ -22,6 +249,7 @@ interface StandardFiltersProps {
   searchPlaceholder?: string;
   size?: "sm" | "md";
   className?: string;
+  collapsible?: boolean;
 }
 
 /**
@@ -36,7 +264,10 @@ const StandardFilters = ({
   searchPlaceholder = "Search...",
   size = "md",
   className = "",
+  collapsible = false,
 }: StandardFiltersProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const sizeConfig = {
     sm: {
       input: "px-2 py-1 text-sm",
@@ -74,20 +305,37 @@ const StandardFilters = ({
     });
   };
 
-  // Check if any filters are active (not default values)
-  const hasActiveFilters = () => {
-    if (filters.search && filters.search.trim() !== "") return true;
+  const filtersActive = hasActiveFilters(filters, filterConfigs);
+  const activeCount = countActiveFilters(filters, filterConfigs);
 
-    return filterConfigs.some((filterConfig) => {
-      if (filterConfig.type === "select") {
-        const currentValue = filters[filterConfig.key];
-        const defaultValue = filterConfig.defaultValue || "all";
-        return currentValue && currentValue !== defaultValue;
-      }
-      return false;
-    });
-  };
+  // Collapsible mode (like Debt filters)
+  if (collapsible) {
+    return (
+      <div className={`rounded-xl border-2 border-black bg-purple-50 ${className}`}>
+        <CollapsibleFilterHeader
+          isExpanded={isExpanded}
+          onToggle={() => setIsExpanded(!isExpanded)}
+          activeCount={activeCount}
+          showClearButton={showClearButton}
+          hasActiveFilters={filtersActive}
+          onClearFilters={clearAllFilters}
+        />
 
+        {/* Collapsible Content */}
+        {isExpanded && (
+          <CollapsibleFilterContent
+            filterConfigs={filterConfigs}
+            filters={filters}
+            handleFilterChange={handleFilterChange}
+            searchPlaceholder={searchPlaceholder}
+            config={config}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Standard mode (existing design)
   return (
     <div
       className={`glassmorphism rounded-lg p-4 border border-white/20 ring-1 ring-gray-800/10 shadow-lg ${className}`}
@@ -98,7 +346,7 @@ const StandardFilters = ({
           {React.createElement(getIcon("Filter"), { className: "h-4 w-4" })}
           Filters
         </h3>
-        {showClearButton && hasActiveFilters() && (
+        {showClearButton && filtersActive && (
           <button
             onClick={clearAllFilters}
             className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
@@ -110,56 +358,13 @@ const StandardFilters = ({
       </div>
 
       {/* Filter Controls */}
-      <div className={`flex flex-col sm:flex-row sm:items-center ${config.gap}`}>
-        {/* Search Input */}
-        <div className="relative flex-1 sm:min-w-48 w-full sm:w-auto">
-          {React.createElement(getIcon("Search"), {
-            className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
-          })}
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={filters.search || ""}
-            onChange={(e) => handleFilterChange("search", e.target.value)}
-            className={`
-              w-full pl-8 ${config.input} 
-              border border-gray-300 rounded-md
-              focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-              bg-white
-            `.trim()}
-          />
-          {filters.search && (
-            <button
-              onClick={() => handleFilterChange("search", "")}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
-            </button>
-          )}
-        </div>
-
-        {/* Filter Dropdowns */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-          {filterConfigs.map((filterConfig) => {
-            if (filterConfig.type === "select") {
-              return (
-                <Select
-                  key={filterConfig.key}
-                  value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
-                  onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
-                  options={filterConfig.options}
-                  className={`
-                    ${config.select} border border-gray-300 rounded-md
-                    focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                    bg-white text-gray-700 w-full sm:w-auto
-                  `.trim()}
-                />
-              );
-            }
-            return null;
-          })}
-        </div>
-      </div>
+      <StandardFilterContent
+        filterConfigs={filterConfigs}
+        filters={filters}
+        handleFilterChange={handleFilterChange}
+        searchPlaceholder={searchPlaceholder}
+        config={config}
+      />
     </div>
   );
 };

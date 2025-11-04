@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils/icons";
 import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
@@ -127,7 +128,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
       (healthData.metrics.successfulSyncs + healthData.metrics.failedSyncs)) *
       100 || 100;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
       <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl">
         {/* Header */}
@@ -339,6 +340,8 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default SyncHealthDashboard;

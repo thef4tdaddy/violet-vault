@@ -123,6 +123,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         onFilterChange={handleFilterChange}
         filterConfigs={filterConfigs}
         searchPlaceholder="Search transactions..."
+        collapsible={true}
       />
 
       {/* Transactions Table */}

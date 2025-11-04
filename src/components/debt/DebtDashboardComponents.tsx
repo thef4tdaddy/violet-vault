@@ -4,6 +4,7 @@ import { getIcon } from "../../utils";
 import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
 import DebtList from "./ui/DebtList";
 import { DebtStats, DebtAccount } from "../../types/debt";
+import DebtStrategies from "./DebtStrategies";
 
 interface FilterOptions {
   type: string;
@@ -48,8 +49,8 @@ export const OverviewTab = ({
               {React.createElement(getIcon("TrendingDown"), {
                 className: "h-4 w-4 mr-2 text-red-600",
               })}
-              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">D</span>EBTS (
-              {filteredDebts.length})
+              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">D</span>
+              EBTS ({filteredDebts.length})
             </h3>
           </div>
 
@@ -96,9 +97,15 @@ const EmptyDebtList = ({ handleAddDebt }: EmptyDebtListProps) => {
   );
 };
 
-export const StrategiesTab = () => {
-  return (
-    <div className="text-center">
+interface StrategiesTabProps {
+  debts: DebtAccount[];
+}
+
+export const StrategiesTab = ({ debts }: StrategiesTabProps) => {
+  return isDebtFeatureEnabled("ENABLE_DEBT_STRATEGIES") ? (
+    <DebtStrategies debts={debts} />
+  ) : (
+    <div className="text-center py-12">
       <p className="text-gray-600">Debt strategies temporarily disabled for debugging</p>
     </div>
   );
@@ -122,7 +129,8 @@ export const DashboardHeader = ({ debtStats, handleAddDebt }: DashboardHeaderPro
               })}
             </div>
           </div>
-          <span className="text-2xl">D</span>EBT&nbsp;&nbsp;<span className="text-2xl">T</span>RACKING
+          <span className="text-2xl">D</span>EBT&nbsp;&nbsp;<span className="text-2xl">T</span>
+          RACKING
         </h2>
         <p className="text-purple-900 mt-1">
           {debtStats.activeDebtCount} active debts • Total: ${debtStats.totalDebt.toFixed(2)}

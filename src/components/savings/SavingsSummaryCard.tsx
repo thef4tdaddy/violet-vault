@@ -55,7 +55,7 @@ const SavingsSummaryCard = ({ savingsGoals = [], onAddGoal: _onAddGoal }) => {
         label="Target Amount"
         value={`$${totalTargets.toFixed(2)}`}
         color="cyan"
-        subtext={`Across ${savingsGoals.length} ${savingsGoals.length === 1 ? 'goal' : 'goals'}`}
+        subtext={`Across ${savingsGoals.length} ${savingsGoals.length === 1 ? "goal" : "goals"}`}
       />
     </div>
   );

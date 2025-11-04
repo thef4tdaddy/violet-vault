@@ -103,9 +103,11 @@ const CloudSyncSection: React.FC<CloudSyncSectionProps> = ({
         }`}
       >
         {/* Toggle text */}
-        <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${
-          cloudSyncEnabled ? "text-white" : "text-gray-600"
-        }`}>
+        <span
+          className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${
+            cloudSyncEnabled ? "text-white" : "text-gray-600"
+          }`}
+        >
           {cloudSyncEnabled ? "ON" : "OFF"}
         </span>
         {/* Toggle circle */}

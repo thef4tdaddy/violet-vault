@@ -86,4 +86,3 @@ const AccountsSummaryCards = ({ accounts = [] }: AccountsSummaryCardsProps) => {
 };
 
 export default AccountsSummaryCards;
-

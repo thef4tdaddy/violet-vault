@@ -117,7 +117,8 @@ const SupplementalAccounts = ({
               {React.createElement(getIcon("CreditCard"), {
                 className: "h-4 w-4 mr-2 text-cyan-600",
               })}
-              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">A</span>CCOUNTS ({typedAccounts.length})
+              <span className="text-lg">Y</span>OUR&nbsp;&nbsp;<span className="text-lg">A</span>
+              CCOUNTS ({typedAccounts.length})
             </h3>
           </div>
         )}

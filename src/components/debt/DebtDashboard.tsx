@@ -62,10 +62,7 @@ const DebtDashboard = () => {
 
       {/* Filters - Outside white block */}
       {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-        <DebtFilters
-          filterOptions={filterOptions}
-          setFilterOptions={setFilterOptions}
-        />
+        <DebtFilters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
       )}
 
       {/* Floating Tabs (no background container) */}
@@ -93,7 +90,7 @@ const DebtDashboard = () => {
             />
           )}
 
-          {activeTab === "strategies" && <StrategiesTab />}
+          {activeTab === "strategies" && <StrategiesTab debts={filteredDebts} />}
         </div>
       </div>
 

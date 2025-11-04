@@ -31,7 +31,7 @@ export const DEBT_DEBUG_CONFIG = {
   // Individual components - TDZ FIXED, RE-ENABLING ALL
   ENABLE_DEBT_DETAIL_MODAL: true, // DebtDetailModal (ENABLED)
   ENABLE_ADD_DEBT_MODAL: true, // AddDebtModal (TDZ FIXED)
-  ENABLE_DEBT_STRATEGIES: false, // DebtStrategies (already disabled)
+  ENABLE_DEBT_STRATEGIES: true, // DebtStrategies (RE-ENABLED - fixed stub component)
 };
 
 /**

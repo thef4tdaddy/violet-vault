@@ -214,18 +214,16 @@ const SummaryCard = memo(
           </div>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center">
-          <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
+          <p className="text-sm font-semibold text-gray-600">{label}</p>
           <p
-            className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""} mb-2`}
+            className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
           >
             ${value.toFixed(2)}
             {isNegative && <span className="ml-2 text-sm">⚠️</span>}
           </p>
         </div>
-        <div className="w-full min-h-[2.5rem] flex items-end justify-center">
-          {clickable && !isNegative && (
-            <p className="text-xs text-gray-400">Click to distribute</p>
-          )}
+        <div className="w-full min-h-[1.75rem] flex items-end justify-center">
+          {clickable && !isNegative && <p className="text-xs text-gray-400">Click to distribute</p>}
           {isNegative && (
             <p className="text-xs text-red-500 font-medium">⚠️ Overspending - click to address</p>
           )}

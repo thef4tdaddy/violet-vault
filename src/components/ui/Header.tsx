@@ -127,7 +127,7 @@ const Header = memo(
             }}
           />
         )}
-        
+
         <SyncHealthDashboard
           isOpen={showSyncHealthDashboard}
           onClose={() => setShowSyncHealthDashboard(false)}

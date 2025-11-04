@@ -13,7 +13,8 @@ const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }) => {
           {React.createElement(getIcon("Calculator"), {
             className: "h-5 w-5 mr-2 text-purple-600",
           })}
-          <span className="text-lg">A</span>LLOCATION&nbsp;&nbsp;<span className="text-lg">P</span>REVIEW
+          <span className="text-lg">A</span>LLOCATION&nbsp;&nbsp;<span className="text-lg">P</span>
+          REVIEW
         </h3>
 
         <div className="text-center py-12 text-gray-500 mt-6">
@@ -33,7 +34,8 @@ const PaycheckAllocationPreview = ({ preview, hasAmount, envelopes = [] }) => {
         {React.createElement(getIcon("Calculator"), {
           className: "h-5 w-5 mr-2 text-purple-600",
         })}
-        <span className="text-lg">A</span>LLOCATION&nbsp;&nbsp;<span className="text-lg">P</span>REVIEW
+        <span className="text-lg">A</span>LLOCATION&nbsp;&nbsp;<span className="text-lg">P</span>
+        REVIEW
       </h3>
 
       <div className="space-y-6 mt-6">
