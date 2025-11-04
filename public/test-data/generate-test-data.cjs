@@ -97,19 +97,19 @@ const debtEnvelopes = [
   }
 ];
 
-// Add 4 debt payment bills
+// Add 4 debt payment bills with current due dates
 const debtBills = [
   {
     id: 'bill-debt-001-cc',
     name: 'Credit Card Payment',
-    dueDate: '2025-01-28',
+    dueDate: getDateString(-3), // Due in 3 days
     amount: 85.00,
     category: 'Debt Payment',
-    isPaid: true,
+    isPaid: false,
     isRecurring: true,
     frequency: 'monthly',
     envelopeId: 'env-debt-001-cc',
-    lastModified: getTimestamp(180),
+    lastModified: getTimestamp(0),
     createdAt: getTimestamp(180),
     description: 'Chase Freedom minimum payment',
     paymentMethod: 'Auto-pay',
@@ -118,14 +118,14 @@ const debtBills = [
   {
     id: 'bill-debt-002-student',
     name: 'Student Loan Payment',
-    dueDate: '2025-01-15',
+    dueDate: getDateString(-7), // Due in 7 days
     amount: 150.00,
     category: 'Debt Payment',
-    isPaid: true,
+    isPaid: false,
     isRecurring: true,
     frequency: 'monthly',
     envelopeId: 'env-debt-002-student',
-    lastModified: getTimestamp(180),
+    lastModified: getTimestamp(0),
     createdAt: getTimestamp(180),
     description: 'Federal Student Loan monthly payment',
     paymentMethod: 'Auto-pay',
@@ -134,14 +134,14 @@ const debtBills = [
   {
     id: 'bill-debt-003-auto',
     name: 'Auto Loan Payment',
-    dueDate: '2025-01-20',
+    dueDate: getDateString(-10), // Due in 10 days
     amount: 285.00,
     category: 'Debt Payment',
-    isPaid: true,
+    isPaid: false,
     isRecurring: true,
     frequency: 'monthly',
     envelopeId: 'env-debt-003-auto',
-    lastModified: getTimestamp(180),
+    lastModified: getTimestamp(0),
     createdAt: getTimestamp(180),
     description: 'Honda Civic monthly payment',
     paymentMethod: 'Auto-pay',
@@ -150,14 +150,14 @@ const debtBills = [
   {
     id: 'bill-debt-004-personal',
     name: 'Personal Loan Payment',
-    dueDate: '2025-01-25',
+    dueDate: getDateString(-14), // Due in 14 days
     amount: 125.00,
     category: 'Debt Payment',
     isPaid: false,
     isRecurring: true,
     frequency: 'monthly',
     envelopeId: 'env-debt-004-personal',
-    lastModified: getTimestamp(180),
+    lastModified: getTimestamp(0),
     createdAt: getTimestamp(180),
     description: 'LendingClub monthly payment',
     paymentMethod: 'Bank Transfer',
@@ -441,11 +441,74 @@ const generateTransactions = () => {
   return transactions;
 };
 
-// Build enhanced data
+// Update base transactions to have recent dates (last 30 days)
+const updateBaseTransactions = () => {
+  return baseData.transactions.map((txn, index) => {
+    const daysAgo = Math.floor(Math.random() * 30) + 1; // Random day in last 30 days
+    return {
+      ...txn,
+      date: getDateString(daysAgo),
+      lastModified: getTimestamp(daysAgo),
+      createdAt: getTimestamp(daysAgo),
+    };
+  });
+};
+
+// Update base bills to have current/upcoming due dates
+const updateBaseBills = () => {
+  return baseData.bills.map((bill, index) => {
+    // Spread bills throughout the month
+    const daysOffset = (index * 3) - 15; // Range from -15 to +15 days from today
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + daysOffset);
+    
+    return {
+      ...bill,
+      dueDate: dueDate.toISOString().split('T')[0],
+      lastModified: getTimestamp(0),
+      createdAt: getTimestamp(90),
+    };
+  });
+};
+
+// Update envelopes to have recent timestamps and proper amounts
+const updateBaseEnvelopes = () => {
+  return baseData.envelopes.map((env) => ({
+    ...env,
+    lastModified: getTimestamp(0),
+    createdAt: getTimestamp(180),
+    currentBalance: env.currentBalance || 0,
+    targetAmount: env.targetAmount || env.currentBalance || 100,
+  }));
+};
+
+// Update savings goals to have current amounts and recent dates
+const updateBaseSavingsGoals = () => {
+  return baseData.savingsGoals.map((goal) => {
+    const currentAmount = goal.currentAmount || 0;
+    const targetAmount = goal.targetAmount || 1000;
+    
+    return {
+      ...goal,
+      currentAmount,
+      targetAmount,
+      lastModified: getTimestamp(0),
+      createdAt: getTimestamp(180),
+      targetDate: goal.targetDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    };
+  });
+};
+
+// Build enhanced data with updated dates
 const newTransactions = generateTransactions();
-const allEnvelopes = [...baseData.envelopes, ...debtEnvelopes];
-const allBills = [...baseData.bills, ...debtBills];
-const allTransactions = [...baseData.transactions, ...newTransactions];
+const updatedBaseTransactions = updateBaseTransactions();
+const updatedBaseBills = updateBaseBills();
+const updatedBaseEnvelopes = updateBaseEnvelopes();
+const updatedBaseSavingsGoals = updateBaseSavingsGoals();
+
+const allEnvelopes = [...updatedBaseEnvelopes, ...debtEnvelopes];
+const allBills = [...updatedBaseBills, ...debtBills];
+const allTransactions = [...updatedBaseTransactions, ...newTransactions];
 
 // Build allTransactions array (includes bill payments)
 const buildAllTransactions = () => {
@@ -474,7 +537,7 @@ const enhancedData = {
   bills: allBills,
   transactions: allTransactions,
   allTransactions: buildAllTransactions(),
-  savingsGoals: baseData.savingsGoals,
+  savingsGoals: updatedBaseSavingsGoals,
   supplementalAccounts: baseData.supplementalAccounts,
   debts: enhancedDebts,
   paycheckHistory: baseData.paycheckHistory,
