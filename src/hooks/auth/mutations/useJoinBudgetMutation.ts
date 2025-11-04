@@ -84,13 +84,23 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
 
   // Save encrypted budget data for persistence with deterministic salt
   // The salt is derived from shareCode, so it will be the same on re-login
+  // Structure must match handleNewUserSetup for consistent re-login
   const initialBudgetData = JSON.stringify({
-    ...finalUserData,
+    currentUser: {
+      ...finalUserData,
+      shareCode: joinData.shareCode, // Store shareCode for re-login salt derivation
+    },
+    envelopes: [],
     bills: [],
-    categories: [],
-    createdAt: Date.now(),
-    lastModified: Date.now(),
-    shareCode: joinData.shareCode, // Store shareCode for re-login salt derivation
+    transactions: [],
+    actualBalance: { amount: 0, isManual: false },
+    unassignedCash: 0,
+    metadata: {
+      version: "2.0.0",
+      createdAt: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+      shareCodeSystem: true,
+    },
   });
 
   const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
