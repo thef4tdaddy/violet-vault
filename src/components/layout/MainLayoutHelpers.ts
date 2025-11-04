@@ -13,6 +13,11 @@ export const getUserForSync = (currentUser: unknown) => {
   return {
     uid: (userRecord?.uid as string) || "unknown",
     email: (userRecord?.email as string) || undefined,
+    // Include shared budget fields for sync service detection
+    joinedVia: userRecord?.joinedVia as string | undefined,
+    sharedBy: userRecord?.sharedBy as string | undefined,
+    shareCode: userRecord?.shareCode as string | undefined,
+    userName: userRecord?.userName as string | undefined,
   };
 };
 
