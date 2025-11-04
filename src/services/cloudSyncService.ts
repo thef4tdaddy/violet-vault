@@ -574,6 +574,20 @@ class CloudSyncService {
       return { direction: "fromFirestore" }; // No local timestamp, download cloud
     }
 
+    // Special case: Shared budget users should prefer download if cloud has significantly more data
+    // This prevents overwriting shared data after re-login when local state is just the initial empty state
+    const isSharedBudgetUser = this.isSharedBudgetUser();
+    if (isSharedBudgetUser && cloudItemCount > localItemCount) {
+      logger.info(
+        "🔄 Shared budget user: Cloud has more data - preferring download to preserve shared state",
+        {
+          cloudItems: cloudItemCount,
+          localItems: localItemCount,
+        }
+      );
+      return { direction: "fromFirestore" };
+    }
+
     if (localData.lastModified > cloudData.lastModified) {
       return { direction: "toFirestore" }; // Local is newer
     } else if (cloudData.lastModified > localData.lastModified) {
