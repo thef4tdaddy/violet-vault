@@ -37,6 +37,7 @@ import LocalDataSecurityWarning from "@/components/security/LocalDataSecurityWar
 import AppRoutes from "./AppRoutes";
 import { viewToPathMap } from "./routeConfig";
 import BottomNavigationBar from "@/components/mobile/BottomNavigationBar";
+import { GlobalPullToRefreshProvider } from "@/components/mobile/GlobalPullToRefresh";
 import {
   getUserForSync,
   extractLayoutData,
@@ -284,7 +285,8 @@ const MainContent = ({
   usePaydayPrediction(paycheckHistory, !!currentUser);
 
   return (
-    <OnboardingTutorial>
+    <GlobalPullToRefreshProvider>
+      <OnboardingTutorial>
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
         <div className="max-w-7xl mx-auto relative">
           <div className="relative z-10">
@@ -383,6 +385,7 @@ const MainContent = ({
         )}
       </div>
     </OnboardingTutorial>
+    </GlobalPullToRefreshProvider>
   );
 };
 

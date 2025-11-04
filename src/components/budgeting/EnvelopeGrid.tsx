@@ -13,8 +13,6 @@ import {
 } from "@/utils/budgeting";
 import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
-import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
-import { useQueryClient } from "@tanstack/react-query";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 
@@ -337,23 +335,6 @@ const UnifiedEnvelopeManager = ({
 
   const totals = useMemo(() => calculateEnvelopeTotals(envelopeData), [envelopeData]);
 
-  // Pull-to-refresh
-  const queryClient = useQueryClient();
-  const refreshEnvelopeData = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["envelopes"] }),
-      queryClient.invalidateQueries({ queryKey: ["transactions"] }),
-      queryClient.invalidateQueries({ queryKey: ["bills"] }),
-      queryClient.invalidateQueries({ queryKey: ["unassignedCash"] }),
-    ]);
-  };
-
-  const pullToRefresh = usePullToRefresh(refreshEnvelopeData, {
-    threshold: 80,
-    resistance: 2.5,
-    enabled: true,
-  });
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -364,15 +345,7 @@ const UnifiedEnvelopeManager = ({
 
   return (
     <EnvelopeGridView
-      containerRef={pullToRefresh.containerRef}
-      touchHandlers={pullToRefresh.touchHandlers}
-      pullStyles={pullToRefresh.pullStyles}
       className={className}
-      isPulling={pullToRefresh.isPulling}
-      isRefreshing={pullToRefresh.isRefreshing}
-      pullProgress={pullToRefresh.pullProgress}
-      isReady={pullToRefresh.isReady}
-      pullRotation={pullToRefresh.pullRotation}
       totals={totals}
       unassignedCash={unassignedCash}
       filterOptions={uiState.filterOptions}

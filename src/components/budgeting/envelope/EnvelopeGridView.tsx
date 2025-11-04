@@ -1,5 +1,4 @@
 import React from "react";
-import PullToRefreshIndicator from "../../mobile/PullToRefreshIndicator";
 import { EnvelopeGridHeader } from "./EnvelopeGridHeader";
 import EnvelopeSummary from "./EnvelopeSummary";
 import EnvelopeItem from "./EnvelopeItem";
@@ -37,15 +36,7 @@ const EmptyStateView = ({
 
 // Main grid view component
 function EnvelopeGridView({
-  containerRef,
-  touchHandlers,
-  pullStyles,
   className,
-  isPulling,
-  isRefreshing,
-  pullProgress,
-  isReady,
-  pullRotation,
   totals,
   unassignedCash,
   filterOptions,
@@ -62,15 +53,7 @@ function EnvelopeGridView({
   bills,
   children,
 }: {
-  containerRef: React.RefObject<HTMLDivElement>;
-  touchHandlers: Record<string, unknown>;
-  pullStyles: React.CSSProperties;
   className: string;
-  isPulling: boolean;
-  isRefreshing: boolean;
-  pullProgress: number;
-  isReady: boolean;
-  pullRotation: number;
   totals: unknown;
   unassignedCash: number;
   filterOptions: unknown;
@@ -88,19 +71,7 @@ function EnvelopeGridView({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      ref={containerRef}
-      {...touchHandlers}
-      className={`space-y-6 ${className} relative`}
-      style={pullStyles}
-    >
-      <PullToRefreshIndicator
-        isVisible={isPulling}
-        isRefreshing={isRefreshing}
-        pullProgress={pullProgress}
-        isReady={isReady}
-        pullRotation={pullRotation}
-      />
+    <div className={`space-y-6 ${className} relative`}>
 
       {/* Action Buttons Row */}
       <EnvelopeGridHeader
