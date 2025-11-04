@@ -520,23 +520,27 @@ class CloudSyncService {
       localData?.debts?.length
     );
 
+    // Calculate item counts for comparison
+    const cloudItemCount =
+      (cloudData?.envelopes?.length || 0) +
+      (cloudData?.transactions?.length || 0) +
+      (cloudData?.bills?.length || 0) +
+      (cloudData?.paycheckHistory?.length || 0) +
+      (cloudData?.savingsGoals?.length || 0) +
+      (cloudData?.debts?.length || 0);
+    const localItemCount =
+      (localData?.envelopes?.length || 0) +
+      (localData?.transactions?.length || 0) +
+      (localData?.bills?.length || 0) +
+      (localData?.paycheckHistory?.length || 0) +
+      (localData?.savingsGoals?.length || 0) +
+      (localData?.debts?.length || 0);
+
     logger.info("🔄 Sync direction analysis:", {
       hasCloudData,
       hasLocalData,
-      cloudItemCount:
-        (cloudData?.envelopes?.length || 0) +
-        (cloudData?.transactions?.length || 0) +
-        (cloudData?.bills?.length || 0) +
-        (cloudData?.paycheckHistory?.length || 0) +
-        (cloudData?.savingsGoals?.length || 0) +
-        (cloudData?.debts?.length || 0),
-      localItemCount:
-        (localData?.envelopes?.length || 0) +
-        (localData?.transactions?.length || 0) +
-        (localData?.bills?.length || 0) +
-        (localData?.paycheckHistory?.length || 0) +
-        (localData?.savingsGoals?.length || 0) +
-        (localData?.debts?.length || 0),
+      cloudItemCount,
+      localItemCount,
       cloudLastModified: cloudData?.lastModified,
       localLastModified: localData?.lastModified,
     });
