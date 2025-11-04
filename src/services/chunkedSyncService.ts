@@ -344,7 +344,7 @@ class ChunkedSyncService implements IChunkedSyncService {
           if (Array.isArray(value) && value.length > 100) {
             logger.debug(`🚀 [CHUNKED SYNC] Chunking large array: ${key} (${value.length} items)`);
             // Chunk large arrays
-            const arrayChunks = this.chunkArray(value, key);
+            const arrayChunks = await this.chunkArray(value, key);
             Object.assign(chunkMap, arrayChunks);
             chunkedData[key] = { _chunked: true, _originalSize: value.length };
           } else {
