@@ -107,24 +107,30 @@ const handleSuccessfulAuthentication = (
 const handleNewUserSetup = async (userData: UserData, password: string): Promise<LoginResult> => {
   logger.auth("New user setup path.", userData);
 
-  const keyData = await encryptionUtils.deriveKey(password);
-  const newSalt = keyData.salt;
-  const key = keyData.key;
+  const shareCode = userData.shareCode;
+  if (!shareCode) {
+    throw new Error("Share code missing from user data during login");
+  }
+
+  // For shared budgets, derive deterministic salt from shareCode (same as join flow)
+  const encoder = new TextEncoder();
+  const shareCodeBytes = encoder.encode(shareCode);
+  const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
+  const newSalt = new Uint8Array(deterministicSalt);
+  
+  // Derive key using the deterministic salt
+  const key = await encryptionUtils.deriveKeyFromSalt(password, newSalt);
 
   if (import.meta?.env?.MODE === "development") {
     const saltPreview =
       Array.from(newSalt.slice(0, 8))
         .map((b: number) => b.toString(16).padStart(2, "0"))
         .join("") + "...";
-    logger.auth("Key derived deterministically for cross-browser sync", {
+    logger.auth("New user: Derived deterministic salt from share code", {
       saltPreview,
       keyType: key.constructor?.name || "unknown",
+      shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
     });
-  }
-
-  const shareCode = userData.shareCode;
-  if (!shareCode) {
-    throw new Error("Share code missing from user data during login");
   }
 
   const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
@@ -140,9 +146,12 @@ const handleNewUserSetup = async (userData: UserData, password: string): Promise
     budgetId: finalUserData.budgetId,
   });
 
-  // Create initial budget data
+  // Create initial budget data with share code
   const initialBudgetData = {
-    currentUser: finalUserData,
+    currentUser: {
+      ...finalUserData,
+      shareCode: shareCode, // Include share code in encrypted data
+    },
     envelopes: [],
     bills: [],
     transactions: [],
@@ -164,10 +173,11 @@ const handleNewUserSetup = async (userData: UserData, password: string): Promise
     iv: encrypted.iv,
   });
 
-  // Save user profile
+  // Save user profile with share code for re-login
   const profileData = {
     userName: finalUserData.userName,
     userColor: finalUserData.userColor,
+    shareCode: shareCode, // Save share code for deterministic salt on re-login
   };
   localStorageService.setUserProfile(profileData);
 
