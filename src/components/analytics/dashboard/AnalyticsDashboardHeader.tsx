@@ -9,6 +9,7 @@ interface AnalyticsDashboardHeaderProps {
 }
 
 const timeFilters = [
+  { key: "allTime", label: "All Time" },
   { key: "thisWeek", label: "This Week" },
   { key: "thisMonth", label: "This Month" },
   { key: "lastMonth", label: "Last Month" },

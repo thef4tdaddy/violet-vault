@@ -14,14 +14,14 @@ const baseData = require('./violet-vault-test-budget.json');
 
 // Helper to generate timestamps
 const getTimestamp = (daysAgo) => {
-  const now = new Date('2025-01-14'); // Reference date
+  const now = new Date('2025-11-04'); // Reference date (updated to current)
   const date = new Date(now);
   date.setDate(date.getDate() - daysAgo);
   return date.getTime();
 };
 
 const getDateString = (daysAgo) => {
-  const now = new Date('2025-01-14');
+  const now = new Date('2025-11-04');
   const date = new Date(now);
   date.setDate(date.getDate() - daysAgo);
   return date.toISOString().split('T')[0];

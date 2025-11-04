@@ -13,6 +13,8 @@ import TrendsTabContent from "./dashboard/TrendsTabContent";
 import PerformanceTabContent from "./dashboard/PerformanceTabContent";
 import EnvelopeTabContent from "./dashboard/EnvelopeTabContent";
 import logger from "@/utils/common/logger";
+import { useTransactions } from "@/hooks/common/useTransactions";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 
 /**
  * Enhanced Analytics Dashboard for v1.10.0
@@ -25,17 +27,13 @@ import logger from "@/utils/common/logger";
  */
 const AnalyticsDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [timeFilter, setTimeFilter] = useState("thisMonth");
+  const [timeFilter, setTimeFilter] = useState("allTime");
   const [customDateRange] = useState<{ start: string | Date; end: string | Date } | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
 
-  // Get budget data
-  const { transactions, envelopes } = useBudgetStore(
-    (state: { transactions: unknown; envelopes: unknown }) => ({
-      transactions: state.transactions,
-      envelopes: state.envelopes,
-    })
-  );
+  // Get budget data from TanStack Query
+  const { transactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({

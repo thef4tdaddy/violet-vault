@@ -30,6 +30,7 @@ export const getDateRangeStart = (timeFilter: string): Date => {
     thisYear: new Date(now.getFullYear(), 0, 1),
     "6months": new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()),
     all: new Date(2020, 0, 1),
+    allTime: new Date(2020, 0, 1), // Same as 'all' for backwards compatibility
   };
   return ranges[timeFilter] || ranges["thisMonth"];
 };
