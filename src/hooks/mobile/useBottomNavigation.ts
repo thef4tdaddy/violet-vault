@@ -26,6 +26,7 @@ export const useBottomNavigation = () => {
   }, []);
 
   // Define navigation items with icons and paths
+  // Order: Dashboard > Envelopes > Bills > Transactions > rest
   const navigationItems = useMemo(
     () => [
       {
@@ -43,13 +44,6 @@ export const useBottomNavigation = () => {
         priority: 1, // Always visible
       },
       {
-        key: "savings",
-        path: "/app/savings",
-        icon: getIcon("Target"),
-        label: "Savings",
-        priority: 2, // Show on medium screens
-      },
-      {
         key: "bills",
         path: "/app/bills",
         icon: getIcon("Calendar"),
@@ -61,6 +55,13 @@ export const useBottomNavigation = () => {
         path: "/app/transactions",
         icon: getIcon("BookOpen"),
         label: "Transactions",
+        priority: 2, // Show on medium screens
+      },
+      {
+        key: "savings",
+        path: "/app/savings",
+        icon: getIcon("Target"),
+        label: "Savings",
         priority: 2, // Show on medium screens
       },
       {

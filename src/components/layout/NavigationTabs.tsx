@@ -77,6 +77,18 @@ const NavigationTabs = memo(() => {
       label: "Envelopes",
     },
     {
+      key: "bills",
+      path: "/app/bills",
+      icon: getIcon("Calendar"),
+      label: "Manage Bills",
+    },
+    {
+      key: "transactions",
+      path: "/app/transactions",
+      icon: getIcon("BookOpen"),
+      label: "Transactions",
+    },
+    {
       key: "savings",
       path: "/app/savings",
       icon: getIcon("Target"),
@@ -93,18 +105,6 @@ const NavigationTabs = memo(() => {
       path: "/app/paycheck",
       icon: getIcon("DollarSign"),
       label: "Add Paycheck",
-    },
-    {
-      key: "bills",
-      path: "/app/bills",
-      icon: getIcon("Calendar"),
-      label: "Manage Bills",
-    },
-    {
-      key: "transactions",
-      path: "/app/transactions",
-      icon: getIcon("BookOpen"),
-      label: "Transactions",
     },
     {
       key: "debts",
