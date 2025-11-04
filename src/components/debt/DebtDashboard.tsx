@@ -4,9 +4,9 @@ import AddDebtModal from "./modals/AddDebtModal";
 import DebtDetailModal from "./modals/DebtDetailModal";
 import UpcomingPaymentsModal from "./modals/UpcomingPaymentsModal";
 import StandardTabs from "../ui/StandardTabs";
+import StandardFilters from "../ui/StandardFilters";
 import { DashboardHeader, OverviewTab, StrategiesTab } from "./DebtDashboardComponents";
 import DebtSummaryCards from "./ui/DebtSummaryCards";
-import DebtFilters from "./ui/DebtFilters";
 import { getIcon } from "@/utils";
 
 // Tab configuration
@@ -62,7 +62,62 @@ const DebtDashboard = () => {
 
       {/* Filters - Outside white block */}
       {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-        <DebtFilters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
+        <StandardFilters
+          filters={filterOptions}
+          onFilterChange={(key, value) =>
+            setFilterOptions((prev) => ({ ...prev, [key]: value }))
+          }
+          filterConfigs={[
+            {
+              key: "type",
+              type: "select",
+              label: "Debt Type",
+              defaultValue: "all",
+              options: [
+                { value: "all", label: "All Types" },
+                { value: "credit_card", label: "Credit Card" },
+                { value: "student_loan", label: "Student Loan" },
+                { value: "mortgage", label: "Mortgage" },
+                { value: "auto_loan", label: "Auto Loan" },
+                { value: "personal_loan", label: "Personal Loan" },
+              ],
+            },
+            {
+              key: "status",
+              type: "select",
+              label: "Status",
+              defaultValue: "all",
+              options: [
+                { value: "all", label: "All Status" },
+                { value: "active", label: "Active" },
+                { value: "paid_off", label: "Paid Off" },
+                { value: "deferred", label: "Deferred" },
+              ],
+            },
+            {
+              key: "sortBy",
+              type: "select",
+              label: "Sort By",
+              defaultValue: "balance_desc",
+              options: [
+                { value: "balance_desc", label: "Highest Balance" },
+                { value: "balance_asc", label: "Lowest Balance" },
+                { value: "payment_desc", label: "Highest Payment" },
+                { value: "rate_desc", label: "Highest Rate" },
+                { value: "name", label: "Name A-Z" },
+              ],
+            },
+          ]}
+          searchPlaceholder="Search debts..."
+          size="md"
+          collapsible={true}
+          config={{
+            showToggle: {
+              key: "showPaidOff",
+              label: "Show Paid Off",
+            },
+          }}
+        />
       )}
 
       {/* Floating Tabs (no background container) */}
