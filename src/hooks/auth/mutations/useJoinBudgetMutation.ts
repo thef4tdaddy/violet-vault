@@ -19,6 +19,7 @@ interface JoinBudgetData {
   password: string;
   userInfo: UserInfo;
   sharedBy: string;
+  shareCode?: string;
 }
 
 interface JoinBudgetResult {
@@ -44,16 +45,23 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
     sharedBy: joinData.sharedBy,
     userName: joinData.userInfo?.userName?.trim() || "Shared User",
     userColor: joinData.userInfo?.userColor || "#a855f7",
+    shareCode: joinData.shareCode, // Preserve the share code used to join
   };
 
-  // Save user profile
+  // Save user profile with share code
   const profileData = {
     userName: finalUserData.userName,
     userColor: finalUserData.userColor,
     joinedVia: "shareCode",
     sharedBy: joinData.sharedBy,
+    shareCode: joinData.shareCode, // Preserve the share code used to join
   };
   localStorageService.setUserProfile(profileData);
+
+  logger.info("Saved share code to profile during join", {
+    hasShareCode: !!joinData.shareCode,
+    shareCodePreview: joinData.shareCode?.split(" ").slice(0, 2).join(" ") + " ...",
+  });
 
   // Save encrypted budget data for persistence
   const initialBudgetData = JSON.stringify({
