@@ -197,7 +197,7 @@ const StandardTabs = ({
 
   return (
     <div className={`${containerClass} ${className}`}>
-      <nav className={navClass}>
+      <nav className={navClass} style={{ scrollSnapType: "x mandatory" }}>
         {tabs.map((tab) => (
           <TabButton
             key={tab.id}
@@ -255,7 +255,11 @@ const TabButton = ({
         ${tabStyles}
         ${isActive && variant === "colored" ? "border-2 border-black" : ""}
       `.trim()}
-      style={isActive && variant === "colored" ? { border: "2px solid black" } : {}}
+      style={
+        isActive && variant === "colored"
+          ? { border: "2px solid black", scrollSnapAlign: "start" }
+          : { scrollSnapAlign: "start" }
+      }
     >
       {Icon && React.createElement(Icon, { className: config.iconSize })}
       {tab.label}

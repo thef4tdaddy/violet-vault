@@ -31,6 +31,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
         relative transition-all duration-200 ease-out
         ${isActive ? "text-purple-600" : "text-gray-600 hover:text-gray-800"}
       `}
+      style={{ scrollSnapAlign: "start" }}
       aria-label={label}
     >
       {/* Icon with smooth scaling animation */}

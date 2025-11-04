@@ -80,6 +80,7 @@ const BottomNavigationBar: React.FC = () => {
           style={{
             scrollBehavior: "smooth",
             WebkitOverflowScrolling: "touch",
+            scrollSnapType: "x mandatory",
           }}
         >
           {visibleItems.map((item) => (
