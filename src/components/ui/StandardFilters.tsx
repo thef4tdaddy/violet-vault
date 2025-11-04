@@ -110,7 +110,6 @@ const hasActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]):
   });
 };
 
-
 interface StandardFilterContentProps {
   filterConfigs: FilterConfig[];
   filters: FilterValues;
