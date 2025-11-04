@@ -43,8 +43,25 @@ export const usePasswordValidation = (password, _options = {}) => {
           return { isValid: false, reason: "missing_encryption_components" };
         }
 
-        const keyData = await encryptionUtils.deriveKey(password);
-        const testKey = keyData.key;
+        // Check if user has a shareCode (shared budget)
+        // If so, use deterministic salt from shareCode (same logic as login)
+        const savedProfile = localStorageService.getUserProfile();
+        const hasShareCode = savedProfile?.shareCode;
+
+        let testKey: CryptoKey;
+
+        if (hasShareCode) {
+          // For shared budgets, derive deterministic salt from shareCode
+          const encoder = new TextEncoder();
+          const shareCodeBytes = encoder.encode(hasShareCode);
+          const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
+          const saltArray = new Uint8Array(deterministicSalt);
+          testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+        } else {
+          // For regular budgets, use saved salt from localStorage
+          const saltArray = new Uint8Array(savedSalt);
+          testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+        }
 
         try {
           await encryptionUtils.decrypt(encryptedData, testKey, iv);
