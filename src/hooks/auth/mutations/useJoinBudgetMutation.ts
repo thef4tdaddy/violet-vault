@@ -70,13 +70,25 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
     categories: [],
     createdAt: Date.now(),
     lastModified: Date.now(),
+    shareCode: joinData.shareCode, // Include shareCode for future logins
   });
 
   const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
-  localStorageService.setBudgetData({
+  const budgetDataToSave = {
     encryptedData: encrypted.data,
-    salt: Array.from(newSalt),
+    salt: Array.from(newSalt) as number[],
     iv: encrypted.iv,
+  };
+
+  localStorageService.setBudgetData(budgetDataToSave);
+
+  // Verify save succeeded
+  const verifyData = localStorageService.getBudgetData();
+  logger.info("Budget data saved to localStorage during join", {
+    saved: !!verifyData,
+    hasEncryptedData: !!verifyData?.encryptedData,
+    hasSalt: !!verifyData?.salt,
+    hasIv: !!verifyData?.iv,
   });
 
   // Identify shared user for tracking

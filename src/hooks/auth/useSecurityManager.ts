@@ -1,4 +1,5 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import type { MutableRefObject } from "react";
 import {
   useSecurityManagerUI,
   useSecurityEventManager,
@@ -8,10 +9,47 @@ import {
 import logger from "../../utils/common/logger";
 
 /**
+ * Helper to create visibility change handler with unlock grace period
+ */
+const createVisibilityHandler = (
+  lastUnlockTimeRef: MutableRefObject<number>,
+  logSecurityEvent: (event: unknown) => void,
+  lockSession: () => void
+) => {
+  const UNLOCK_GRACE_PERIOD = 2000;
+
+  return () => {
+    if (document.hidden) {
+      const timeSinceUnlock = Date.now() - lastUnlockTimeRef.current;
+      if (timeSinceUnlock < UNLOCK_GRACE_PERIOD) {
+        logger.debug("Skipping auto-lock - within grace period after unlock", {
+          timeSinceUnlock,
+          gracePeriod: UNLOCK_GRACE_PERIOD,
+        });
+        return;
+      }
+
+      logSecurityEvent({
+        type: "PAGE_HIDDEN",
+        description: "Page hidden, session locked for security",
+      });
+      lockSession();
+    } else {
+      logSecurityEvent({
+        type: "PAGE_VISIBLE",
+        description: "Page visible, user may need to unlock",
+      });
+    }
+  };
+};
+
+/**
  * Security Manager Hook
  * Orchestrates session expiration, auto-lock, security events, and clipboard protection
  */
 export const useSecurityManager = () => {
+  const lastUnlockTimeRef = useRef(0);
+
   const {
     isLocked,
     securitySettings,
@@ -59,24 +97,25 @@ export const useSecurityManager = () => {
   useEffect(() => {
     if (!securitySettings.lockOnPageHide) return;
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        logSecurityEvent({
-          type: "PAGE_HIDDEN",
-          description: "Page hidden, session locked for security",
-        });
-        lockSession();
-      } else {
-        logSecurityEvent({
-          type: "PAGE_VISIBLE",
-          description: "Page visible, user may need to unlock",
-        });
-      }
-    };
+    const handleVisibilityChange = createVisibilityHandler(
+      lastUnlockTimeRef,
+      logSecurityEvent,
+      lockSession
+    );
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [securitySettings.lockOnPageHide, logSecurityEvent, lockSession]);
+
+  // Update unlock timestamp when session is unlocked
+  useEffect(() => {
+    if (!isLocked) {
+      lastUnlockTimeRef.current = Date.now();
+      logger.debug("Unlock grace period started", {
+        duration: 2000,
+      });
+    }
+  }, [isLocked]);
 
   // Enhanced security functions with logging
   const enhancedLockSession = useCallback(() => {
