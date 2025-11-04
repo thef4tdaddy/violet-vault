@@ -1,0 +1,532 @@
+#!/usr/bin/env node
+
+/**
+ * Generate comprehensive test data for Violet Vault
+ * Creates 100+ transactions over 6 months with proper connections
+ * Connections: Debt → Bill → Envelope → Transactions
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Load base data
+const baseData = require('./violet-vault-test-budget.json');
+
+// Helper to generate timestamps
+const getTimestamp = (daysAgo) => {
+  const now = new Date('2025-01-14'); // Reference date
+  const date = new Date(now);
+  date.setDate(date.getDate() - daysAgo);
+  return date.getTime();
+};
+
+const getDateString = (daysAgo) => {
+  const now = new Date('2025-01-14');
+  const date = new Date(now);
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString().split('T')[0];
+};
+
+// Merchant lists for realistic transactions
+const merchants = {
+  groceries: ['Kroger', 'Whole Foods', 'Trader Joes', 'Costco', 'Walmart', 'Aldi', 'Safeway'],
+  gas: ['Shell', 'Chevron', 'BP', 'Exxon', '76 Gas', 'Arco', 'Circle K'],
+  entertainment: ['AMC Theaters', 'Netflix', 'Spotify', 'Steam', 'PlayStation Store', 'Regal Cinemas', 'Amazon Prime'],
+  restaurants: ['Chipotle', 'Olive Garden', 'Starbucks', 'McDonalds', 'Panera Bread', 'Subway', 'Taco Bell'],
+  healthcare: ['Walgreens', 'CVS Pharmacy', 'Rite Aid', 'Urgent Care Clinic', 'Dr. Smith Office'],
+  petcare: ['PetSmart', 'Petco', 'Chewy.com', 'VCA Animal Hospital'],
+  personal: ['Great Clips', 'Target', 'Ulta Beauty', 'Sephora'],
+  gifts: ['Amazon', 'Target', 'Best Buy', 'Etsy', 'Hallmark'],
+  shopping: ['Amazon', 'Target', 'Best Buy', 'HomeDepot', 'Lowes', 'IKEA']
+};
+
+// Add 4 debt payment envelopes
+const debtEnvelopes = [
+  {
+    id: 'env-debt-001-cc',
+    name: 'Credit Card Payment',
+    category: 'Debt Payment',
+    archived: false,
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    currentBalance: 85.00,
+    targetAmount: 85.00,
+    description: 'Chase Freedom Credit Card monthly payment',
+    billId: 'bill-debt-001-cc',
+    debtId: 'debt-001-credit-card'
+  },
+  {
+    id: 'env-debt-002-student',
+    name: 'Student Loan Payment',
+    category: 'Debt Payment',
+    archived: false,
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    currentBalance: 150.00,
+    targetAmount: 150.00,
+    description: 'Federal Student Loan monthly payment',
+    billId: 'bill-debt-002-student',
+    debtId: 'debt-002-student-loan'
+  },
+  {
+    id: 'env-debt-003-auto',
+    name: 'Auto Loan Payment',
+    category: 'Debt Payment',
+    archived: false,
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    currentBalance: 285.00,
+    targetAmount: 285.00,
+    description: 'Honda Civic auto loan monthly payment',
+    billId: 'bill-debt-003-auto',
+    debtId: 'debt-003-car-loan'
+  },
+  {
+    id: 'env-debt-004-personal',
+    name: 'Personal Loan Payment',
+    category: 'Debt Payment',
+    archived: false,
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    currentBalance: 125.00,
+    targetAmount: 125.00,
+    description: 'LendingClub personal loan monthly payment',
+    billId: 'bill-debt-004-personal',
+    debtId: 'debt-004-personal-loan'
+  }
+];
+
+// Add 4 debt payment bills
+const debtBills = [
+  {
+    id: 'bill-debt-001-cc',
+    name: 'Credit Card Payment',
+    dueDate: '2025-01-28',
+    amount: 85.00,
+    category: 'Debt Payment',
+    isPaid: true,
+    isRecurring: true,
+    frequency: 'monthly',
+    envelopeId: 'env-debt-001-cc',
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    description: 'Chase Freedom minimum payment',
+    paymentMethod: 'Auto-pay',
+    debtId: 'debt-001-credit-card'
+  },
+  {
+    id: 'bill-debt-002-student',
+    name: 'Student Loan Payment',
+    dueDate: '2025-01-15',
+    amount: 150.00,
+    category: 'Debt Payment',
+    isPaid: true,
+    isRecurring: true,
+    frequency: 'monthly',
+    envelopeId: 'env-debt-002-student',
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    description: 'Federal Student Loan monthly payment',
+    paymentMethod: 'Auto-pay',
+    debtId: 'debt-002-student-loan'
+  },
+  {
+    id: 'bill-debt-003-auto',
+    name: 'Auto Loan Payment',
+    dueDate: '2025-01-20',
+    amount: 285.00,
+    category: 'Debt Payment',
+    isPaid: true,
+    isRecurring: true,
+    frequency: 'monthly',
+    envelopeId: 'env-debt-003-auto',
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    description: 'Honda Civic monthly payment',
+    paymentMethod: 'Auto-pay',
+    debtId: 'debt-003-car-loan'
+  },
+  {
+    id: 'bill-debt-004-personal',
+    name: 'Personal Loan Payment',
+    dueDate: '2025-01-25',
+    amount: 125.00,
+    category: 'Debt Payment',
+    isPaid: false,
+    isRecurring: true,
+    frequency: 'monthly',
+    envelopeId: 'env-debt-004-personal',
+    lastModified: getTimestamp(180),
+    createdAt: getTimestamp(180),
+    description: 'LendingClub monthly payment',
+    paymentMethod: 'Bank Transfer',
+    debtId: 'debt-004-personal-loan'
+  }
+];
+
+// Update debts to include envelopeId
+const enhancedDebts = baseData.debts.map((debt) => {
+  const debtEnvMap = {
+    'debt-001-credit-card': 'env-debt-001-cc',
+    'debt-002-student-loan': 'env-debt-002-student',
+    'debt-003-car-loan': 'env-debt-003-auto',
+    'debt-004-personal-loan': 'env-debt-004-personal'
+  };
+  
+  return {
+    ...debt,
+    envelopeId: debtEnvMap[debt.id]
+  };
+});
+
+// Generate 100+ transactions over 6 months (Aug 2024 - Jan 2025)
+const generateTransactions = () => {
+  const transactions = [];
+  let txnCounter = 13; // Continue from existing txn-012
+  
+  // Generate transactions for each month going back 6 months
+  for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
+    const daysInMonth = 30;
+    const startDay = monthsAgo * daysInMonth;
+    
+    // Groceries - 2-3x per week (8-12 per month)
+    for (let week = 0; week < 4; week++) {
+      const count = Math.floor(Math.random() * 2) + 2; // 2-3 per week
+      for (let i = 0; i < count; i++) {
+        const daysAgo = startDay + (week * 7) + Math.floor(Math.random() * 7);
+        const amount = (Math.random() * 100 + 30).toFixed(2);
+        transactions.push({
+          id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+          date: getDateString(daysAgo),
+          amount: parseFloat(amount),
+          envelopeId: 'env-001-groceries',
+          category: 'Food & Dining',
+          type: 'expense',
+          lastModified: getTimestamp(daysAgo),
+          createdAt: getTimestamp(daysAgo),
+          description: 'Grocery shopping',
+          merchant: merchants.groceries[Math.floor(Math.random() * merchants.groceries.length)]
+        });
+      }
+    }
+    
+    // Gas - 1-2x per week (4-8 per month)
+    for (let week = 0; week < 4; week++) {
+      const count = Math.floor(Math.random() * 2) + 1; // 1-2 per week
+      for (let i = 0; i < count; i++) {
+        const daysAgo = startDay + (week * 7) + Math.floor(Math.random() * 7);
+        const amount = (Math.random() * 30 + 30).toFixed(2);
+        transactions.push({
+          id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+          date: getDateString(daysAgo),
+          amount: parseFloat(amount),
+          envelopeId: 'env-002-gas',
+          category: 'Transportation',
+          type: 'expense',
+          lastModified: getTimestamp(daysAgo),
+          createdAt: getTimestamp(daysAgo),
+          description: 'Gas fill-up',
+          merchant: merchants.gas[Math.floor(Math.random() * merchants.gas.length)]
+        });
+      }
+    }
+    
+    // Restaurants/Dining - 1-2x per week (4-8 per month)
+    for (let week = 0; week < 4; week++) {
+      const count = Math.floor(Math.random() * 2) + 1;
+      for (let i = 0; i < count; i++) {
+        const daysAgo = startDay + (week * 7) + Math.floor(Math.random() * 7);
+        const amount = (Math.random() * 40 + 10).toFixed(2);
+        transactions.push({
+          id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+          date: getDateString(daysAgo),
+          amount: parseFloat(amount),
+          envelopeId: 'env-001-groceries',
+          category: 'Food & Dining',
+          type: 'expense',
+          lastModified: getTimestamp(daysAgo),
+          createdAt: getTimestamp(daysAgo),
+          description: 'Dining out',
+          merchant: merchants.restaurants[Math.floor(Math.random() * merchants.restaurants.length)]
+        });
+      }
+    }
+    
+    // Entertainment - 2-3x per month
+    const entertainmentCount = Math.floor(Math.random() * 2) + 2;
+    for (let i = 0; i < entertainmentCount; i++) {
+      const daysAgo = startDay + Math.floor(Math.random() * daysInMonth);
+      const amount = (Math.random() * 50 + 10).toFixed(2);
+      transactions.push({
+        id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+        date: getDateString(daysAgo),
+        amount: parseFloat(amount),
+        envelopeId: 'env-005-entertainment',
+        category: 'Entertainment',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: 'Entertainment',
+        merchant: merchants.entertainment[Math.floor(Math.random() * merchants.entertainment.length)]
+      });
+    }
+    
+    // Healthcare - 1-2x per month
+    const healthcareCount = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < healthcareCount; i++) {
+      const daysAgo = startDay + Math.floor(Math.random() * daysInMonth);
+      const amount = (Math.random() * 100 + 15).toFixed(2);
+      transactions.push({
+        id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+        date: getDateString(daysAgo),
+        amount: parseFloat(amount),
+        envelopeId: 'env-006-healthcare',
+        category: 'Health & Medical',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: 'Medical expense',
+        merchant: merchants.healthcare[Math.floor(Math.random() * merchants.healthcare.length)]
+      });
+    }
+    
+    // Pet Care - 2-3x per month
+    const petCount = Math.floor(Math.random() * 2) + 2;
+    for (let i = 0; i < petCount; i++) {
+      const daysAgo = startDay + Math.floor(Math.random() * daysInMonth);
+      const amount = (Math.random() * 60 + 20).toFixed(2);
+      transactions.push({
+        id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+        date: getDateString(daysAgo),
+        amount: parseFloat(amount),
+        envelopeId: 'env-007-pet-care',
+        category: 'Pets',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: 'Pet supplies',
+        merchant: merchants.petcare[Math.floor(Math.random() * merchants.petcare.length)]
+      });
+    }
+    
+    // Personal Care - 2x per month
+    for (let i = 0; i < 2; i++) {
+      const daysAgo = startDay + Math.floor(Math.random() * daysInMonth);
+      const amount = (Math.random() * 40 + 15).toFixed(2);
+      transactions.push({
+        id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+        date: getDateString(daysAgo),
+        amount: parseFloat(amount),
+        envelopeId: 'env-009-personal-care',
+        category: 'Personal Care',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: 'Personal care',
+        merchant: merchants.personal[Math.floor(Math.random() * merchants.personal.length)]
+      });
+    }
+    
+    // Shopping/Gifts - 1-2x per month
+    const giftCount = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < giftCount; i++) {
+      const daysAgo = startDay + Math.floor(Math.random() * daysInMonth);
+      const amount = (Math.random() * 80 + 20).toFixed(2);
+      transactions.push({
+        id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+        date: getDateString(daysAgo),
+        amount: parseFloat(amount),
+        envelopeId: 'env-010-gifts',
+        category: 'Gifts & Donations',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: 'Gift purchase',
+        merchant: merchants.gifts[Math.floor(Math.random() * merchants.gifts.length)]
+      });
+    }
+    
+    // Debt payments - once per month for each debt
+    const debtPaymentDay = 15 + Math.floor(Math.random() * 5);
+    
+    // Credit card payment
+    transactions.push({
+      id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+      date: getDateString(startDay + debtPaymentDay),
+      amount: 85.00,
+      envelopeId: 'env-debt-001-cc',
+      category: 'Debt Payment',
+      type: 'bill',
+      lastModified: getTimestamp(startDay + debtPaymentDay),
+      createdAt: getTimestamp(startDay + debtPaymentDay),
+      description: 'Credit Card Payment',
+      billId: 'bill-debt-001-cc',
+      merchant: 'Chase Bank'
+    });
+    
+    // Student loan payment
+    transactions.push({
+      id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+      date: getDateString(startDay + debtPaymentDay - 5),
+      amount: 150.00,
+      envelopeId: 'env-debt-002-student',
+      category: 'Debt Payment',
+      type: 'bill',
+      lastModified: getTimestamp(startDay + debtPaymentDay - 5),
+      createdAt: getTimestamp(startDay + debtPaymentDay - 5),
+      description: 'Student Loan Payment',
+      billId: 'bill-debt-002-student',
+      merchant: 'Dept of Education'
+    });
+    
+    // Auto loan payment
+    transactions.push({
+      id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+      date: getDateString(startDay + debtPaymentDay + 5),
+      amount: 285.00,
+      envelopeId: 'env-debt-003-auto',
+      category: 'Debt Payment',
+      type: 'bill',
+      lastModified: getTimestamp(startDay + debtPaymentDay + 5),
+      createdAt: getTimestamp(startDay + debtPaymentDay + 5),
+      description: 'Auto Loan Payment',
+      billId: 'bill-debt-003-auto',
+      merchant: 'Ally Financial'
+    });
+    
+    // Personal loan payment
+    transactions.push({
+      id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+      date: getDateString(startDay + debtPaymentDay + 10),
+      amount: 125.00,
+      envelopeId: 'env-debt-004-personal',
+      category: 'Debt Payment',
+      type: 'bill',
+      lastModified: getTimestamp(startDay + debtPaymentDay + 10),
+      createdAt: getTimestamp(startDay + debtPaymentDay + 10),
+      description: 'Personal Loan Payment',
+      billId: 'bill-debt-004-personal',
+      merchant: 'LendingClub'
+    });
+    
+    // Income - 2x per month (biweekly paychecks)
+    transactions.push({
+      id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+      date: getDateString(startDay + 3),
+      amount: 2500.00,
+      envelopeId: 'env-008-emergency',
+      category: 'Income',
+      type: 'income',
+      lastModified: getTimestamp(startDay + 3),
+      createdAt: getTimestamp(startDay + 3),
+      description: 'Biweekly paycheck',
+      merchant: 'Acme Corporation'
+    });
+    
+    transactions.push({
+      id: `txn-${String(txnCounter++).padStart(3, '0')}`,
+      date: getDateString(startDay + 17),
+      amount: 2500.00,
+      envelopeId: 'env-008-emergency',
+      category: 'Income',
+      type: 'income',
+      lastModified: getTimestamp(startDay + 17),
+      createdAt: getTimestamp(startDay + 17),
+      description: 'Biweekly paycheck',
+      merchant: 'Acme Corporation'
+    });
+  }
+  
+  return transactions;
+};
+
+// Build enhanced data
+const newTransactions = generateTransactions();
+const allEnvelopes = [...baseData.envelopes, ...debtEnvelopes];
+const allBills = [...baseData.bills, ...debtBills];
+const allTransactions = [...baseData.transactions, ...newTransactions];
+
+// Build allTransactions array (includes bill payments)
+const buildAllTransactions = () => {
+  const billPayments = allBills.filter(b => b.isPaid).map(bill => ({
+    id: `${bill.id}-payment`,
+    date: bill.dueDate,
+    amount: bill.amount,
+    envelopeId: bill.envelopeId,
+    category: bill.category,
+    type: 'bill',
+    lastModified: bill.lastModified,
+    createdAt: bill.createdAt,
+    description: bill.name,
+    billId: bill.id,
+    merchant: bill.paymentMethod || 'Payment'
+  }));
+  
+  return [...allTransactions, ...billPayments].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+};
+
+// Construct final export object
+const enhancedData = {
+  envelopes: allEnvelopes,
+  bills: allBills,
+  transactions: allTransactions,
+  allTransactions: buildAllTransactions(),
+  savingsGoals: baseData.savingsGoals,
+  supplementalAccounts: baseData.supplementalAccounts,
+  debts: enhancedDebts,
+  paycheckHistory: baseData.paycheckHistory,
+  auditLog: baseData.auditLog,
+  unassignedCash: baseData.unassignedCash,
+  biweeklyAllocation: baseData.biweeklyAllocation,
+  actualBalance: baseData.actualBalance,
+  isActualBalanceManual: baseData.isActualBalanceManual,
+  exportMetadata: {
+    ...baseData.exportMetadata,
+    exportDate: new Date().toISOString(),
+    note: 'Enhanced test data with 100+ transactions and full entity connections'
+  },
+  _dataGuide: {
+    ...baseData._dataGuide,
+    connections: {
+      'Debt → Envelope': 'debts have envelopeId field',
+      'Debt → Bill': 'bills have debtId field pointing to debt',
+      'Bill → Envelope': 'bills have envelopeId field',
+      'Envelope → Bill': 'envelopes have billId field',
+      'Envelope → Debt': 'envelopes have debtId field',
+      'Transaction → Envelope': 'transactions have envelopeId field',
+      'Transaction → Bill': 'bill payment transactions have billId field'
+    },
+    stats: {
+      envelopes: allEnvelopes.length,
+      bills: allBills.length,
+      transactions: allTransactions.length,
+      allTransactions: buildAllTransactions().length,
+      debts: enhancedDebts.length,
+      savingsGoals: baseData.savingsGoals.length,
+      supplementalAccounts: baseData.supplementalAccounts.length,
+      paycheckHistory: baseData.paycheckHistory.length
+    }
+  }
+};
+
+// Write to file
+const outputPath = path.join(__dirname, 'violet-vault-test-budget-enhanced.json');
+fs.writeFileSync(outputPath, JSON.stringify(enhancedData, null, 2));
+
+console.log('✅ Enhanced test data generated!');
+console.log(`📊 Stats:`);
+console.log(`   - Envelopes: ${allEnvelopes.length} (added 4 debt payment envelopes)`);
+console.log(`   - Bills: ${allBills.length} (added 4 debt payment bills)`);
+console.log(`   - Transactions: ${allTransactions.length} (generated ${newTransactions.length} new)`);
+console.log(`   - All Transactions: ${buildAllTransactions().length}`);
+console.log(`   - Debts: ${enhancedDebts.length} (updated with envelope connections)`);
+console.log(`\n📁 Saved to: ${outputPath}`);
+console.log(`\n🔗 Connections:`);
+console.log(`   - Each debt is connected to a dedicated envelope`);
+console.log(`   - Each debt has a recurring bill for monthly payments`);
+console.log(`   - Debt payment bills are connected to debt payment envelopes`);
+console.log(`   - Transactions span 6 months (Aug 2024 - Jan 2025)`);
+console.log(`   - Multiple pages of transactions for testing pagination`);
+

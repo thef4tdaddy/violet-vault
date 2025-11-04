@@ -6,17 +6,26 @@ This directory contains comprehensive test data files for testing the import/exp
 
 ### `violet-vault-test-budget.json`
 
-A comprehensive test budget file containing realistic data for all major features of Violet Vault.
+A basic test budget file containing minimal realistic data for quick testing.
 
-**Data Included:**
-- **10 Envelopes**: Covering various categories (Groceries, Gas, Rent, Utilities, Entertainment, Healthcare, Pet Care, Emergency Fund, Personal Care, Gifts)
-- **6 Bills**: Monthly recurring bills (Rent, Electric, Internet, Car Insurance, Phone, Streaming Services)
-- **12 Transactions**: Realistic expense and income transactions with merchants
-- **5 Savings Goals**: Various priorities and target dates (Vacation, Laptop, Car Down Payment, Home Repairs, Holiday Gifts)
-- **3 Supplemental Accounts**: HSA, FSA, and Commuter Benefits accounts
-- **4 Debts**: Credit Card, Student Loan, Auto Loan, and Personal Loan
-- **3 Paycheck History Entries**: Biweekly paychecks with allocations and deductions
-- **8 Audit Log Entries**: Sample change history for tracking
+### `violet-vault-test-budget-enhanced.json` ⭐ **RECOMMENDED**
+
+A comprehensive test budget file with 236+ transactions over 6 months and full entity connections for thorough testing.
+
+**Enhanced Data Included:**
+- **14 Envelopes**: 10 regular + 4 debt payment envelopes with full connections
+- **10 Bills**: 6 regular + 4 debt payment bills (all connected to envelopes)
+- **236+ Transactions**: 6 months of realistic transactions (Aug 2024 - Jan 2025)
+- **5 Savings Goals**: Various priorities and target dates
+- **3 Supplemental Accounts**: HSA, FSA, and Commuter Benefits
+- **4 Debts**: All connected to envelopes and bills for tracking payments
+- **3 Paycheck History Entries**: Biweekly paychecks with allocations
+- **8 Audit Log Entries**: Sample change history
+
+**Basic Data (original file):**
+- **10 Envelopes**, **6 Bills**, **12 Transactions**
+- **5 Savings Goals**, **3 Supplemental Accounts**, **4 Debts**
+- **3 Paycheck History Entries**, **8 Audit Log Entries**
 
 **Budget Summary:**
 - Total envelope balances: $5,322.00
@@ -25,6 +34,28 @@ A comprehensive test budget file containing realistic data for all major feature
 - Unassigned cash: $450.25
 - Actual balance: $5,822.00
 
+## Entity Connections (Enhanced File)
+
+The enhanced test data includes proper relationships between all entities:
+
+**Debt → Envelope → Bill → Transaction Chain:**
+- `debt-001-credit-card` → `env-debt-001-cc` → `bill-debt-001-cc` → Monthly payment transactions
+- `debt-002-student-loan` → `env-debt-002-student` → `bill-debt-002-student` → Monthly payment transactions
+- `debt-003-car-loan` → `env-debt-003-auto` → `bill-debt-003-auto` → Monthly payment transactions
+- `debt-004-personal-loan` → `env-debt-004-personal` → `bill-debt-004-personal` → Monthly payment transactions
+
+**Connection Fields:**
+- **Debt**: `envelopeId` points to payment envelope
+- **Bill**: `envelopeId` points to funding envelope, `debtId` points to associated debt
+- **Envelope**: `billId` points to connected bill, `debtId` points to connected debt
+- **Transaction**: `envelopeId` points to envelope, bill payments also have `billId`
+
+This allows testing:
+- Debt payment tracking across all pages
+- Bill-to-envelope fund allocation
+- Transaction filtering by debt/bill/envelope
+- Analytics with full relationship data
+
 ## How to Use
 
 ### Testing the Import Feature
@@ -32,7 +63,9 @@ A comprehensive test budget file containing realistic data for all major feature
 1. **Navigate to Settings**: Open Violet Vault and go to the Settings menu
 2. **Find Data Management**: Navigate to the "Data Management" section
 3. **Click Import Data**: Click the "Import Data" button or file upload field
-4. **Select Test File**: Choose `violet-vault-test-budget.json` from this directory
+4. **Select Test File**: Choose either:
+   - `violet-vault-test-budget-enhanced.json` (recommended - 236+ transactions, full connections)
+   - `violet-vault-test-budget.json` (basic - 12 transactions, minimal data)
 5. **Confirm Import**: Review the import summary and confirm to load the test data
 6. **Verify Data**: Check that all envelopes, bills, transactions, debts, and savings goals loaded correctly
 
