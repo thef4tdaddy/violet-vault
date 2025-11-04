@@ -5,11 +5,95 @@ import { getIcon } from "../../../utils";
 import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
 
 /**
+ * Helper to render debt type options
+ */
+const renderDebtTypeOptions = (
+  debtTypes: Record<string, unknown>,
+  debtsByType: Record<string, unknown[]>
+) => {
+  return Object.values(debtTypes || {}).map((type) => {
+    const typeStr = String(type);
+    const config = DEBT_TYPE_CONFIG[typeStr as keyof typeof DEBT_TYPE_CONFIG];
+    const count = debtsByType?.[typeStr]?.length || 0;
+    return (
+      <option key={typeStr} value={typeStr}>
+        {config?.name || typeStr} {count > 0 && `(${count})`}
+      </option>
+    );
+  });
+};
+
+/**
+ * Filter header component
+ */
+const DebtFilterHeader = ({
+  filtersEnabled,
+  hasActiveFilters,
+  toggleFilters,
+  isExpanded,
+  setIsExpanded,
+}: {
+  filtersEnabled: boolean;
+  hasActiveFilters: boolean;
+  toggleFilters: () => void;
+  isExpanded: boolean;
+  setIsExpanded: (val: boolean) => void;
+}) => (
+  <div className="flex items-center justify-between p-4">
+    <div className="flex items-center space-x-2">
+      {React.createElement(getIcon("Filter"), {
+        className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
+      })}
+      <span className={`text-sm font-medium ${filtersEnabled ? "text-purple-900" : "text-gray-500"}`}>
+        Filters & Sorting
+      </span>
+      
+      {hasActiveFilters && filtersEnabled && (
+        <Button
+          onClick={toggleFilters}
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900 hover:bg-purple-300 transition-colors border border-purple-300"
+          title="Click to disable all filters"
+        >
+          Active
+        </Button>
+      )}
+      
+      {!filtersEnabled && (
+        <Button
+          onClick={toggleFilters}
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors border border-gray-300"
+          title="Click to enable filters"
+        >
+          Disabled
+        </Button>
+      )}
+    </div>
+    
+    <Button
+      onClick={() => setIsExpanded(!isExpanded)}
+      className={`p-1 rounded-lg transition-colors ${
+        filtersEnabled ? "bg-purple-100 hover:bg-purple-200" : "bg-gray-100 hover:bg-gray-200"
+      }`}
+      disabled={!filtersEnabled}
+    >
+      {isExpanded
+        ? React.createElement(getIcon("ChevronUp"), {
+            className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
+          })
+        : React.createElement(getIcon("ChevronDown"), {
+            className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
+          })}
+    </Button>
+  </div>
+);
+
+/**
  * Debt filtering and sorting controls
  * Pure UI component for debt list filtering
  */
 const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByType = {} }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [filtersEnabled, setFiltersEnabled] = useState(true);
 
   const handleFilterChange = (field, value) => {
     setFilterOptions((prev) => ({
@@ -25,37 +109,36 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByT
     filterOptions.sortBy !== "balance_desc" ||
     filterOptions.showPaidOff;
 
+  // Toggle all filters on/off
+  const toggleFilters = () => {
+    if (filtersEnabled) {
+      // Turn filters OFF - set to defaults
+      setFilterOptions({
+        type: "all",
+        status: "all",
+        sortBy: "balance_desc",
+        showPaidOff: false,
+      });
+      setFiltersEnabled(false);
+    } else {
+      // Turn filters ON - user can then set them
+      setFiltersEnabled(true);
+      setIsExpanded(true); // Auto-expand when enabling
+    }
+  };
+
   return (
     <div className="rounded-xl border-2 border-black bg-purple-50">
-      {/* Header - Always Visible */}
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-2">
-          {React.createElement(getIcon("Filter"), {
-            className: "h-4 w-4 text-purple-600",
-          })}
-          <span className="text-sm font-medium text-purple-900">Filters & Sorting</span>
-          {hasActiveFilters && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900">
-              Active
-            </span>
-          )}
-        </div>
-        <Button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 rounded-lg bg-purple-100 hover:bg-purple-200 transition-colors"
-        >
-          {isExpanded
-            ? React.createElement(getIcon("ChevronUp"), {
-                className: "h-4 w-4 text-purple-600",
-              })
-            : React.createElement(getIcon("ChevronDown"), {
-                className: "h-4 w-4 text-purple-600",
-              })}
-        </Button>
-      </div>
+      <DebtFilterHeader
+        filtersEnabled={filtersEnabled}
+        hasActiveFilters={hasActiveFilters}
+        toggleFilters={toggleFilters}
+        isExpanded={isExpanded}
+        setIsExpanded={setIsExpanded}
+      />
 
       {/* Collapsible Content */}
-      {isExpanded && (
+      {isExpanded && filtersEnabled && (
         <div className="px-4 pb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
@@ -66,16 +149,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByT
                 className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-purple-500"
               >
                 <option value="all">All Types</option>
-                {Object.values(debtTypes || {}).map((type) => {
-                  const typeStr = String(type);
-                  const config = DEBT_TYPE_CONFIG[typeStr as keyof typeof DEBT_TYPE_CONFIG];
-                  const count = debtsByType?.[typeStr]?.length || 0;
-                  return (
-                    <option key={typeStr} value={typeStr}>
-                      {config?.name || typeStr} {count > 0 && `(${count})`}
-                    </option>
-                  );
-                })}
+                {renderDebtTypeOptions(debtTypes, debtsByType)}
               </Select>
             </div>
 

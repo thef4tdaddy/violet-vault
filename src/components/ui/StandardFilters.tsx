@@ -18,10 +18,9 @@ interface FilterValues {
 interface CollapsibleHeaderProps {
   isExpanded: boolean;
   onToggle: () => void;
-  activeCount: number;
-  showClearButton: boolean;
   hasActiveFilters: boolean;
-  onClearFilters: () => void;
+  filtersEnabled: boolean;
+  onToggleFilters: () => void;
 }
 
 /**
@@ -30,37 +29,60 @@ interface CollapsibleHeaderProps {
 const CollapsibleFilterHeader = ({
   isExpanded,
   onToggle,
-  activeCount,
-  showClearButton,
   hasActiveFilters,
-  onClearFilters,
+  filtersEnabled,
+  onToggleFilters,
 }: CollapsibleHeaderProps) => {
   return (
     <div className="flex items-center justify-between p-4">
+      <div className="flex items-center space-x-2">
+        {React.createElement(getIcon("Filter"), {
+          className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
+        })}
+        <span
+          className={`text-sm font-medium ${filtersEnabled ? "text-purple-900" : "text-gray-500"}`}
+        >
+          Filters & Sorting
+        </span>
+
+        {/* Active badge - clickable to toggle filters */}
+        {hasActiveFilters && filtersEnabled && (
+          <Button
+            onClick={onToggleFilters}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900 hover:bg-purple-300 transition-colors border border-purple-300"
+            title="Click to disable all filters"
+          >
+            Active
+          </Button>
+        )}
+
+        {/* Disabled indicator */}
+        {!filtersEnabled && (
+          <Button
+            onClick={onToggleFilters}
+            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors border border-gray-300"
+            title="Click to enable filters"
+          >
+            Disabled
+          </Button>
+        )}
+      </div>
+
       <Button
         onClick={onToggle}
-        className="flex items-center gap-2 text-sm font-semibold text-gray-800 hover:text-purple-600 transition-colors"
+        className={`p-1 rounded-lg transition-colors ${
+          filtersEnabled ? "bg-purple-100 hover:bg-purple-200" : "bg-gray-100 hover:bg-gray-200"
+        }`}
+        disabled={!filtersEnabled}
       >
-        {React.createElement(getIcon(isExpanded ? "ChevronUp" : "ChevronDown"), {
-          className: "h-4 w-4",
-        })}
-        Filters
-        {activeCount > 0 && (
-          <span className="ml-1 text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full">
-            {activeCount} active
-          </span>
-        )}
+        {isExpanded
+          ? React.createElement(getIcon("ChevronUp"), {
+              className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
+            })
+          : React.createElement(getIcon("ChevronDown"), {
+              className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
+            })}
       </Button>
-
-      {showClearButton && hasActiveFilters && (
-        <Button
-          onClick={onClearFilters}
-          className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 px-3 py-1.5 border-2 border-black rounded-lg bg-white"
-        >
-          {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
-          Clear All
-        </Button>
-      )}
     </div>
   );
 };
@@ -88,23 +110,6 @@ const hasActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]):
   });
 };
 
-/**
- * Helper to count active filters
- */
-const countActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]): number => {
-  let count = 0;
-  if (filters.search && filters.search.trim() !== "") count++;
-
-  filterConfigs.forEach((filterConfig) => {
-    if (filterConfig.type === "select") {
-      const currentValue = filters[filterConfig.key];
-      const defaultValue = filterConfig.defaultValue || "all";
-      if (currentValue && currentValue !== defaultValue) count++;
-    }
-  });
-
-  return count;
-};
 
 interface StandardFilterContentProps {
   filterConfigs: FilterConfig[];
@@ -267,6 +272,7 @@ const StandardFilters = ({
   collapsible = false,
 }: StandardFiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [filtersEnabled, setFiltersEnabled] = useState(true);
 
   const sizeConfig = {
     sm: {
@@ -305,24 +311,36 @@ const StandardFilters = ({
     });
   };
 
-  const filtersActive = hasActiveFilters(filters, filterConfigs);
-  const activeCount = countActiveFilters(filters, filterConfigs);
+  // Toggle all filters on/off
+  const toggleFilters = () => {
+    if (filtersEnabled) {
+      // Turn filters OFF - clear all and disable
+      clearAllFilters();
+      setFiltersEnabled(false);
+      setIsExpanded(false);
+    } else {
+      // Turn filters ON - enable and auto-expand
+      setFiltersEnabled(true);
+      setIsExpanded(true);
+    }
+  };
 
-  // Collapsible mode (like Debt filters)
+  const filtersActive = hasActiveFilters(filters, filterConfigs);
+
+  // Collapsible mode (like Debt filters with purple hue and toggle)
   if (collapsible) {
     return (
       <div className={`rounded-xl border-2 border-black bg-purple-50 ${className}`}>
         <CollapsibleFilterHeader
           isExpanded={isExpanded}
           onToggle={() => setIsExpanded(!isExpanded)}
-          activeCount={activeCount}
-          showClearButton={showClearButton}
           hasActiveFilters={filtersActive}
-          onClearFilters={clearAllFilters}
+          filtersEnabled={filtersEnabled}
+          onToggleFilters={toggleFilters}
         />
 
         {/* Collapsible Content */}
-        {isExpanded && (
+        {isExpanded && filtersEnabled && (
           <CollapsibleFilterContent
             filterConfigs={filterConfigs}
             filters={filters}
