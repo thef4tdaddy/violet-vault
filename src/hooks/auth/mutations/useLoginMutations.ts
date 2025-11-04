@@ -203,6 +203,7 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
   }
 
   const { salt: savedSalt, encryptedData, iv } = savedData;
+  
   if (!savedSalt || !encryptedData || !iv) {
     return {
       success: false,
@@ -210,9 +211,27 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
     };
   }
 
-  // Validate password first
-  const keyData = await encryptionUtils.deriveKey(password);
-  const key = keyData.key;
+  // Check if user has a shareCode in their profile (joined budget)
+  // If so, use the saved salt (which is deterministic from shareCode)
+  const savedProfile = localStorageService.getUserProfile();
+  const hasShareCode = savedProfile?.shareCode;
+  
+  let key: CryptoKey;
+  let usedSalt: Uint8Array;
+  
+  if (hasShareCode) {
+    // For joined budgets, use the saved salt directly (it's deterministic from shareCode)
+    logger.auth("Using saved salt for joined budget login", {
+      shareCodePreview: hasShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+    });
+    usedSalt = new Uint8Array(savedSalt);
+    key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
+  } else {
+    // For regular budgets, derive key normally (generates random salt)
+    const keyData = await encryptionUtils.deriveKey(password);
+    key = keyData.key;
+    usedSalt = keyData.salt;
+  }
 
   try {
     const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
@@ -238,7 +257,7 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
     return {
       success: true,
       user: sanitizedUserData,
-      sessionData: { encryptionKey: key, salt: keyData.salt },
+      sessionData: { encryptionKey: key, salt: usedSalt },
       data: decryptedData,
     };
   } catch {

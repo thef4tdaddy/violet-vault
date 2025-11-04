@@ -34,9 +34,16 @@ interface JoinBudgetResult {
  * Helper function to process join budget operation
  */
 const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetResult> => {
-  const keyData = await encryptionUtils.deriveKey(joinData.password);
-  const newSalt = keyData.salt;
-  const key = keyData.key;
+  // For shared budgets, derive a DETERMINISTIC salt from the shareCode
+  // This ensures the same salt is used on re-login after refresh
+  const encoder = new TextEncoder();
+  const shareCodeBytes = encoder.encode(joinData.shareCode || "default-salt");
+  const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
+  const saltArray = new Uint8Array(deterministicSalt);
+
+  // Derive key using the deterministic salt
+  const key = await encryptionUtils.deriveKeyFromSalt(joinData.password, saltArray);
+  const newSalt = saltArray;
 
   const finalUserData = {
     ...joinData.userInfo,
@@ -63,14 +70,15 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
     shareCodePreview: joinData.shareCode?.split(" ").slice(0, 2).join(" ") + " ...",
   });
 
-  // Save encrypted budget data for persistence
+  // Save encrypted budget data for persistence with deterministic salt
+  // The salt is derived from shareCode, so it will be the same on re-login
   const initialBudgetData = JSON.stringify({
     ...finalUserData,
     bills: [],
     categories: [],
     createdAt: Date.now(),
     lastModified: Date.now(),
-    shareCode: joinData.shareCode, // Include shareCode for future logins
+    shareCode: joinData.shareCode, // Store shareCode for re-login salt derivation
   });
 
   const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
@@ -84,11 +92,11 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
 
   // Verify save succeeded
   const verifyData = localStorageService.getBudgetData();
-  logger.info("Budget data saved to localStorage during join", {
+  logger.info("Budget data saved to localStorage with deterministic salt", {
     saved: !!verifyData,
     hasEncryptedData: !!verifyData?.encryptedData,
     hasSalt: !!verifyData?.salt,
-    hasIv: !!verifyData?.iv,
+    saltDerivedFrom: "shareCode",
   });
 
   // Identify shared user for tracking
