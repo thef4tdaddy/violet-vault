@@ -28,7 +28,7 @@ const deriveValidationKey = async (
     const saltArray = new Uint8Array(deterministicSalt);
     return encryptionUtils.deriveKeyFromSalt(password, saltArray);
   }
-  
+
   const saltArray = new Uint8Array(savedSalt);
   return encryptionUtils.deriveKeyFromSalt(password, saltArray);
 };
@@ -42,7 +42,7 @@ const testPasswordDecryption = async (
   shareCode?: string
 ): Promise<{ isValid: boolean; reason?: string }> => {
   const testKey = await deriveValidationKey(password, savedData.salt, shareCode);
-  
+
   try {
     await encryptionUtils.decrypt(savedData.encryptedData, testKey, savedData.iv);
     logger.auth("TanStack: Password validation successful");

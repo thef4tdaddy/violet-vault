@@ -16,16 +16,13 @@ const GlobalPullToRefresh: React.FC = () => {
     await queryClient.invalidateQueries();
   };
 
-  const {
-    isPulling,
-    isRefreshing,
-    pullProgress,
-    pullRotation,
-    isReady,
-  } = usePullToRefresh(refreshData, {
-    threshold: 80,
-    enabled: true,
-  });
+  const { isPulling, isRefreshing, pullProgress, pullRotation, isReady } = usePullToRefresh(
+    refreshData,
+    {
+      threshold: 80,
+      enabled: true,
+    }
+  );
 
   // Only show modal if pulling or refreshing
   if (!isPulling && !isRefreshing) return null;
@@ -115,4 +112,3 @@ export const GlobalPullToRefreshProvider: React.FC<{ children: React.ReactNode }
 };
 
 export default GlobalPullToRefresh;
-

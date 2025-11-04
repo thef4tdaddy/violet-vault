@@ -13,15 +13,16 @@ const path = require('path');
 const baseData = require('./violet-vault-test-budget.json');
 
 // Helper to generate timestamps
+// Uses current date so test data is always recent when generated
 const getTimestamp = (daysAgo) => {
-  const now = new Date('2025-11-04'); // Reference date (updated to current)
+  const now = new Date(); // Always uses current date when script runs
   const date = new Date(now);
   date.setDate(date.getDate() - daysAgo);
   return date.getTime();
 };
 
 const getDateString = (daysAgo) => {
-  const now = new Date('2025-11-04');
+  const now = new Date(); // Always uses current date when script runs
   const date = new Date(now);
   date.setDate(date.getDate() - daysAgo);
   return date.toISOString().split('T')[0];
@@ -523,10 +524,15 @@ console.log(`   - Transactions: ${allTransactions.length} (generated ${newTransa
 console.log(`   - All Transactions: ${buildAllTransactions().length}`);
 console.log(`   - Debts: ${enhancedDebts.length} (updated with envelope connections)`);
 console.log(`\n📁 Saved to: ${outputPath}`);
+const endDate = new Date();
+const startDate = new Date();
+startDate.setDate(startDate.getDate() - 180);
+
 console.log(`\n🔗 Connections:`);
 console.log(`   - Each debt is connected to a dedicated envelope`);
 console.log(`   - Each debt has a recurring bill for monthly payments`);
 console.log(`   - Debt payment bills are connected to debt payment envelopes`);
-console.log(`   - Transactions span 6 months (Aug 2024 - Jan 2025)`);
+console.log(`   - Transactions span 6 months (${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]})`);
 console.log(`   - Multiple pages of transactions for testing pagination`);
+console.log(`   - Data generated on: ${endDate.toISOString()}`);
 

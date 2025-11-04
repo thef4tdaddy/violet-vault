@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import useAnalytics from "@/hooks/analytics/useAnalytics";
-import { useBudgetStore } from "@/stores/ui/uiStore";
 import ReportExporter from "./ReportExporter";
 import AnalyticsSummaryCards from "./AnalyticsSummaryCards";
 import AnalyticsDashboardHeader from "./dashboard/AnalyticsDashboardHeader";
@@ -32,8 +31,8 @@ const AnalyticsDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data from TanStack Query
-  const { transactions = [], isLoading: transactionsLoading } = useTransactions();
-  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { transactions = [] } = useTransactions();
+  const { envelopes = [] } = useEnvelopes();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
