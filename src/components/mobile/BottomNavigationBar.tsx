@@ -94,30 +94,30 @@ const BottomNavigationBar: React.FC = () => {
           ))}
         </nav>
 
-        {/* Scroll indicators for overflow */}
-        {shouldShowScrollHint && (
-          <>
-            {/* Left fade indicator */}
-            <div
-              ref={leftFadeRef}
-              className="
-                absolute left-0 top-0 bottom-0 w-6
-                bg-gradient-to-r from-white/80 via-white/40 to-transparent
-                pointer-events-none opacity-0 transition-opacity duration-300
-              "
-            />
+        {/* Scroll masks to hide partial items */}
+        <>
+          {/* Left mask - hides partial items on the left */}
+          <div
+            ref={leftFadeRef}
+            className="
+              absolute left-0 top-0 bottom-0 w-12
+              bg-gradient-to-r from-white via-white/90 to-transparent
+              pointer-events-none opacity-0 transition-opacity duration-300
+              backdrop-blur-sm
+            "
+          />
 
-            {/* Right fade indicator */}
-            <div
-              ref={rightFadeRef}
-              className="
-                absolute right-0 top-0 bottom-0 w-6
-                bg-gradient-to-l from-white/80 via-white/40 to-transparent
-                pointer-events-none opacity-0 transition-opacity duration-300
-              "
-            />
-          </>
-        )}
+          {/* Right mask - hides partial items on the right */}
+          <div
+            ref={rightFadeRef}
+            className="
+              absolute right-0 top-0 bottom-0 w-12
+              bg-gradient-to-l from-white via-white/90 to-transparent
+              pointer-events-none transition-opacity duration-300
+              backdrop-blur-sm
+            "
+          />
+        </>
       </div>
 
       {/* Hardware acceleration hint */}

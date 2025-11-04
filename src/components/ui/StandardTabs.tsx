@@ -196,7 +196,7 @@ const StandardTabs = ({
   const navClass = getNavClass(variant);
 
   return (
-    <div className={`${containerClass} ${className}`}>
+    <div className={`${containerClass} ${className} relative`}>
       <nav className={navClass} style={{ scrollSnapType: "x mandatory" }}>
         {tabs.map((tab) => (
           <TabButton
@@ -211,6 +211,10 @@ const StandardTabs = ({
           />
         ))}
       </nav>
+      
+      {/* Scroll masks to hide partial tabs on mobile */}
+      <div className="sm:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none" />
+      <div className="sm:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none" />
     </div>
   );
 };
