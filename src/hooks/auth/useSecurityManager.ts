@@ -121,7 +121,8 @@ export const useSecurityManager = () => {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [securitySettings.lockOnPageHide, logSecurityEvent, lockSession]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [securitySettings.lockOnPageHide]);
 
   // Update unlock timestamp when session is unlocked
   useEffect(() => {
