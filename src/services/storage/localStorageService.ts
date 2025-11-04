@@ -135,14 +135,26 @@ class LocalStorageService {
   /**
    * Get user profile
    */
-  getUserProfile(): { userName: string; userColor: string } | null {
+  getUserProfile(): { 
+    userName: string; 
+    userColor: string; 
+    shareCode?: string;
+    joinedVia?: string;
+    sharedBy?: string;
+  } | null {
     return this.getJSON(this.KEYS.USER_PROFILE);
   }
 
   /**
    * Set user profile
    */
-  setUserProfile(profile: { userName: string; userColor: string }): void {
+  setUserProfile(profile: { 
+    userName: string; 
+    userColor: string;
+    shareCode?: string;
+    joinedVia?: string;
+    sharedBy?: string;
+  }): void {
     this.setJSON(this.KEYS.USER_PROFILE, profile);
   }
 

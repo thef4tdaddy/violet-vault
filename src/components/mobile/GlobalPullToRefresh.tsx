@@ -22,7 +22,6 @@ const GlobalPullToRefresh: React.FC = () => {
     pullProgress,
     pullRotation,
     isReady,
-    containerRef,
   } = usePullToRefresh(refreshData, {
     threshold: 80,
     enabled: true,

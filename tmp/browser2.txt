@@ -1,0 +1,1266 @@
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [BackgroundStorage] Using browser.storage.persistent
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [BackgroundStorage] Using browser.storage.session
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 🆕 The browser was updated.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "initializeStorage" took 47.2ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "initialize-feature-flags-cache" took 0.4ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118 Uncaught (in promise) 
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:122 👋 Initializing 1Password
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 using deprecated parameters for the initialization function; pass a single object instead
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 channel: stable
+version: 8.11.16.35
+build: 81116035 (142.0.7444.60)
+browser: Chrome (142.0.7444.60)
+os: MacOSX (26.1.0)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118 Uncaught (in promise) 
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118 Uncaught (in promise) 
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118 Uncaught (in promise) 
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118 Uncaught (in promise) 
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 WASM: Initializing.  Log Level: Info
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "initializeCoreInterface" took 207ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "collectAllPreRegFeatureFlags" took 142.7ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "initializeNativeAppConnection" took 1.4ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "unlockWithContextInitCache" took 0.1ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 💫 Looking for desktop app com.1password.1password
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmRequestAccounts> message to native core <4029368186>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 👍 Finished initializing 1Password
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "initialize" took 452.4ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Performance diagnostic: "initializeXamBackend" took 9.9ms to execute.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmRequestAccounts> from native core <4029368186>. Duration: 268ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmRequestAccounts> message to native core <3647076059>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmRequestAccounts> from native core <3647076059>. Duration: 2.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Hooray!; Unlocked account 574J6MRFAND5ZH2AMZLJYFK4QY with MUK; 🎉
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 We successfully unlocked 1 account(s) from a Desktop app with 1 unlocked and 0 locked account(s).
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmRequestDelegatedSession> message to native core <2793613517>
+Unchecked runtime.lastError: The message port closed before a response was received.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [LM] Started Desktop Lock Monitor at 1762279676186 (Connected to desktop app).
+Unchecked runtime.lastError: The message port closed before a response was received.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmRequestDelegatedSession> from native core <2793613517>. Duration: 321.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2012408666>
+Unchecked runtime.lastError: The message port closed before a response was received.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2012408666>. Duration: 4.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not collect providers from all frames that were initially found.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Sync started for account 574J6MRFAND5ZH2AMZLJYFK4QY - syncing all
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Managed Apps - Feature flag is NOT enabled
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 ✅ Sync completed for account 574J6MRFAND5ZH2AMZLJYFK4QY - took 291ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3268363054>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3268363054>. Duration: 1.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Exception while handling request <get-nested-frame-configuration>: NoRelayedListener
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Exception while handling request <get-nested-frame-configuration>: NoRelayedListener
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+Unchecked runtime.lastError: The message port closed before a response was received.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3141411491>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3141411491>. Duration: 19.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 PortManager: inline-menu/178kqkn did not receive health check response - closing port
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <187040783>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <187040783>. Duration: 49.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2815997336>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2815997336>. Duration: 46.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3156950512>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3156950512>. Duration: 5.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <540163294>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <540163294>. Duration: 9.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1081275549>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1081275549>. Duration: 6.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1623341026>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1623341026>. Duration: 1.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1681653165>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1681653165>. Duration: 3.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1282166924>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1282166924>. Duration: 4.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1320731207>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1320731207>. Duration: 4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4137184500>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4137184500>. Duration: 4.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <813234207>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <813234207>. Duration: 1.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1919944074>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1919944074>. Duration: 104.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1590557932>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1590557932>. Duration: 6.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2689285911>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2689285911>. Duration: 3.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <508650065>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <508650065>. Duration: 6.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2821107855>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2821107855>. Duration: 2.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1174527533>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1174527533>. Duration: 3.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3134718538>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3134718538>. Duration: 4.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3555080324>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3555080324>. Duration: 6.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2006517453>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2006517453>. Duration: 3.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3529672242>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3529672242>. Duration: 2.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1552077450>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1552077450>. Duration: 18.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4256949917>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4256949917>. Duration: 2.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2395486604>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2395486604>. Duration: 3.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4005641069>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4005641069>. Duration: 13.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3221932808>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3221932808>. Duration: 4.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2143929219>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2143929219>. Duration: 55.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2857525794>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2857525794>. Duration: 45ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2905411515>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2905411515>. Duration: 11.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <83991400>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <83991400>. Duration: 5.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <662267664>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <662267664>. Duration: 2.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3272328999>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3272328999>. Duration: 17.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3439072946>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3439072946>. Duration: 70.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3265714090>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3265714090>. Duration: 182.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1848710950>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1848710950>. Duration: 4.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4097194759>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4097194759>. Duration: 2.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <312012771>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <312012771>. Duration: 12.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3438943831>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3438943831>. Duration: 39.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2569820323>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2569820323>. Duration: 9.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4002409616>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4002409616>. Duration: 5.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3996640075>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3996640075>. Duration: 2.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2819990796>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2819990796>. Duration: 11.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <739374201>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <739374201>. Duration: 35.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4073307426>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4073307426>. Duration: 16.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2621438344>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2621438344>. Duration: 24.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <521465039>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <521465039>. Duration: 14.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4291301285>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4291301285>. Duration: 9.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <970740543>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <970740543>. Duration: 9.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <896786963>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <896786963>. Duration: 6.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3014657568>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3014657568>. Duration: 3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3070796310>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3070796310>. Duration: 2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <585148497>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <585148497>. Duration: 4.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1510578490>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1510578490>. Duration: 3.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3843708174>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3843708174>. Duration: 25.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2812960049>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2812960049>. Duration: 6.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3274198230>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3274198230>. Duration: 3.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1449121573>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1449121573>. Duration: 12.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1367420656>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1367420656>. Duration: 2.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <735965311>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <735965311>. Duration: 2.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3727652100>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3727652100>. Duration: 3.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3040827416>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3040827416>. Duration: 2.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3105593647>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3105593647>. Duration: 3.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <4154228727>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <4154228727>. Duration: 9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <164235962>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <164235962>. Duration: 5.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1162121841>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1162121841>. Duration: 2.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1115161490>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1115161490>. Duration: 2.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <3033598636>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <3033598636>. Duration: 5.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1611794845>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1611794845>. Duration: 3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2772436239>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2772436239>. Duration: 4.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <2670976731>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <2670976731>. Duration: 2.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1123061178>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1123061178>. Duration: 2.5ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmLockState> message to native core <1530160286>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmLockState> from native core <1530160286>. Duration: 4.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:22:47 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [LM] Lock monitor alarm cleared
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [LM] Stopped.
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:22:47 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:22:47 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:41:38 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:41:38 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:41:39 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:48:19 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:48:19 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:48:20 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:53:42 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:53:43 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:53:43 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:58:55 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:58:56 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:58:56 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:59:06 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 12:59:06 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:00:06 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:00:21 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:05:58 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:06:00 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:06:00 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <655045247>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <655045247>. Duration: 63.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <181525049>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <181525049>. Duration: 29.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3476003386>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3476003386>. Duration: 30.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <2840854976>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <2840854976>. Duration: 43.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:32:19 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:32:20 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:32:20 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <1606285105>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <1606285105>. Duration: 57.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <67673286>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <67673286>. Duration: 3.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <4055709055>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <4055709055>. Duration: 40.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <2421724787>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <2421724787>. Duration: 37.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3836747584>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3836747584>. Duration: 73.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3653346440>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3653346440>. Duration: 5.2ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <1211832706>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <1211832706>. Duration: 10.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 PortManager: inline-menu/zjihxw did not receive health check response - closing port
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:55:13 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:55:14 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:55:14 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:55:24 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 13:55:24 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+loadItemCache @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+hle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+xle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+fJA @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+loadItemCache @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+hle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+xle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+fJA @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+loadItemCache @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+hle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+xle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+fJA @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+loadItemCache @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+hle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+xle @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+fJA @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <2769305504>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <2769305504>. Duration: 70.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <1323723424>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <1323723424>. Duration: 75.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <2119267349>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <2119267349>. Duration: 73.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3555727342>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3555727342>. Duration: 37.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <2880470138>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <2880470138>. Duration: 7.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <1443020615>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <1443020615>. Duration: 32.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3698124099>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3698124099>. Duration: 40.8ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3528232385>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3528232385>. Duration: 58.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <1258695702>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <1258695702>. Duration: 10.3ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <2173638068>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <2173638068>. Duration: 9.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3375670444>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3375670444>. Duration: 8.6ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ background.js:80
+oh @ background.js:83
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+loadItemCache @ background.js:118
+t1 @ background.js:83
+jce @ background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+loadItemCache @ background.js:118
+Sje @ background.js:83
+Y8 @ background.js:83
+Zle @ background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <1745815814>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <1745815814>. Duration: 79.9ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <829433727>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <829433727>. Duration: 55.7ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3869221381>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3869221381>. Duration: 33.1ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 14:17:31 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 14:17:32 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Received <LockStateChanged> from the native core
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 [OP] Locked at Tue Nov 04 2025 14:17:32 GMT-0600 (Central Standard Time)
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+loadItemCache @ background.js:118
+hle @ background.js:118
+(anonymous) @ background.js:118
+xle @ background.js:118
+fJA @ background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+loadItemCache @ background.js:118
+hle @ background.js:118
+(anonymous) @ background.js:118
+xle @ background.js:118
+fJA @ background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+loadItemCache @ background.js:118
+hle @ background.js:118
+(anonymous) @ background.js:118
+xle @ background.js:118
+fJA @ background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+loadItemCache @ background.js:118
+hle @ background.js:118
+(anonymous) @ background.js:118
+xle @ background.js:118
+fJA @ background.js:118
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+logger.ts:58 🔍 [DEV] Firebase Config Debug {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com', usingDemo: false, environment: 'development', hostname: 'dev.f4tdaddy.com'}
+logger.ts:98 ℹ️ 🔥 Firebase: Starting initialization... {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com'}
+logger.ts:98 ℹ️ ✅ Firebase: Initialization complete! {projectId: 'violetvault-3a71f'}
+logger.ts:98 ℹ️ Crypto compatibility layer initialized {supported: true, secure: true}
+errorTrackingService.ts:187 🔍 [DEV] Console interception enabled {}
+errorTrackingService.ts:187 🔍 [DEV] Error capture system initialized {}
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 DeviceTrust: access denied: [ missing backoffice permission, missing admin permission ] - aborting
+(anonymous) @ background.js:80
+errorTrackingService.ts:187 🔍 [DEV] Initializing background services {cloudSyncEnabled: true, isInitialized: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: false, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: false, hasBudgetId: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Initializing auth state from localStorage {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: No saved data - new user state {category: 'auth'}
+errorTrackingService.ts:187 ℹ️ 📱 Service Worker registration found {scope: 'https://dev.f4tdaddy.com/', state: 'activated'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ No version update, current version already seen {}
+errorTrackingService.ts:187 ℹ️ 🔧 PWA Manager initialized successfully {}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 UserSetup mounted, checking for saved profile {}
+errorTrackingService.ts:187 🔍 [DEV] 📋 No saved profile found, new user {}
+errorTrackingService.ts:187 🔍 [DEV] 🌩️ Cloud sync enabled - will start after user login {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Background services initialized {}
+errorTrackingService.ts:187 🔍 [DEV] Bills filtering debug {inputBillsCount: 0, status: 'all', today: '2025-11-04T06:00:00.000Z', firstBillData: undefined}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning filtered bills {originalBillsLength: 0, filteredBillsLength: 0, status: 'all', billsStillExist: false, filteredStillExist: false, …}
+errorTrackingService.ts:187 ℹ️ 📱 PWA install prompt available {}
+paycheck:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+errorTrackingService.ts:187 🔍 [DEV] Initializing Highlight.io {mode: 'development', projectId: 'xdn37ppe...', enabled: false, errorSampleRate: 1, sessionSampleRate: 0.1}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io initialization skipped {reason: 'Error reporting disabled or invalid project ID', environment: 'development'}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io loaded and initialized via lazy loader {}
+errorTrackingService.ts:187 ℹ️ PWA install prompt dismissed {action: 'pwa_install_prompt_dismissed', timestamp: '2025-11-04T20:26:25.763Z', userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap…KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', platform: 'MacIntel'}
+errorTrackingService.ts:187 ℹ️ PWA update not available {updateAvailable: false}
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+errorTrackingService.ts:187 ℹ️ Validating share code {code: 'case saddle long entire'}
+errorTrackingService.ts:187 🔍 [DEV] Share code validation - word split {words: Array(4), length: 4}
+errorTrackingService.ts:187 🔍 [DEV] BIP39 wordlist info {wordlistType: 'object', isArray: true, length: 2048, firstFew: Array(5), sampleWord: true}
+errorTrackingService.ts:187 🔍 [DEV] Share code validation passed {words: Array(4)}
+errorTrackingService.ts:187 ℹ️ Share code validation result {originalCode: 'case saddle long entire', normalizedCode: 'case saddle long entire', isValid: true}
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📤 Sending <NmOfflineStatus> message to native core <3133763700>
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 📥 Received message <NmOfflineStatus> from native core <3133763700>. Duration: 79.4ms
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 Could not get default saving location, resetting location.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+chrome-extension://aeblfdkhhhdcdjpifhhbdiojplfjncoa/background/background.js:80 The item cache has not been initialized yet.
+(anonymous) @ background.js:80
+errorTrackingService.ts:187 🔍 [DEV] Share code validation - word split {words: Array(4), length: 4}
+errorTrackingService.ts:187 🔍 [DEV] BIP39 wordlist info {wordlistType: 'object', isArray: true, length: 2048, firstFew: Array(5), sampleWord: true}
+errorTrackingService.ts:187 🔍 [DEV] Share code validation passed {words: Array(4)}
+errorTrackingService.ts:187 ℹ️ Generated deterministic budget ID {budgetIdPreview: 'budget_219...', shareCodePreview: 'case saddle ...'}
+errorTrackingService.ts:187 ℹ️ Generated budget ID for join {budgetIdPreview: 'budget_219...', shareCodePreview: 'case saddle ...'}
+errorTrackingService.ts:187 ℹ️ Join budget successful, setting up auth {budgetId: 'budget_219656f58cb33036', password: 'testing', userInfo: {…}, shareCode: 'case saddle long entire', sharedBy: 'Shared Budget', …}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Starting budget join {budgetId: 'budget_2...', sharedBy: 'Shared Budget', category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Join budget attempt started. {budgetId: 'budget_2...', hasPassword: true, hasUserInfo: true, sharedBy: 'Shared Budget', category: 'auth'}
+errorTrackingService.ts:187 ℹ️ Join: Derived deterministic salt from share code {saltPreview: 'fb387ca868920c25...', shareCodePreview: 'case saddle ...'}
+errorTrackingService.ts:187 ℹ️ Saved share code to profile during join {hasShareCode: true, shareCodePreview: 'case saddle ...'}
+errorTrackingService.ts:187 ℹ️ Budget data saved to localStorage with deterministic salt {saved: true, hasEncryptedData: true, hasSalt: true, saltDerivedFrom: 'shareCode'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Setting authenticated user {userName: 'Nandor', budgetId: 'budget_2...', hasEncryptionKey: true, category: 'auth'}
+errorTrackingService.ts:187 ℹ️ ✅ User joined shared budget {userName: 'Nandor', budgetId: 'budget_2...', sharedBy: 'Shared Budget'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Using git commit date: 2025-11-04T14:19:13-06:00
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762287999115, willExpireAt: 1762288001115}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching envelopes from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching savings goals from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762287999127, willExpireAt: 1762288001127}
+errorTrackingService.ts:187 ℹ️ 🔄 Auto-initializing chunked Firebase sync... {}
+errorTrackingService.ts:187 🟢 [PROD] Cloud sync service started {user: 'budget_219656f58cb33036'}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching transactions from Dexie {source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: true, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: true, hasCurrentUser: true, hasBudgetId: true}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 0}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded savings goals from Dexie {count: 0}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning processed savings goals {originalCount: 0, processedCount: 0, filteredCount: 0, finalCount: 0, status: 'all'}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 0, source: 'useTransactionQuery'}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T20:26:39.210Z', checks: Array(3)}
+errorTrackingService.ts:187 ⚠️ Cannot start background sync - missing auth data {isUnlocked: undefined, hasBudgetId: false, hasEncryptionKey: false}
+console.<computed> @ errorTrackingService.ts:187
+warn @ logger.ts:117
+startBackgroundSync @ uiStore.ts:188
+onSuccess @ useJoinBudgetMutation.ts:187
+await in onSuccess
+execute @ mutation.js:121
+await in execute
+mutate @ mutationObserver.js:61
+(anonymous) @ authOperations.ts:49
+handleJoinSuccess @ UserSetup.tsx:63
+joinBudget @ useBudgetJoining.ts:52
+await in joinBudget
+handleJoinBudget @ JoinBudgetModal.tsx:66
+handleSubmit @ UserSetupStep.tsx:25
+processDispatchQueue @ react-dom-client.production.js:12317
+(anonymous) @ react-dom-client.production.js:12867
+batchedUpdates$1 @ react-dom-client.production.js:1498
+dispatchEventForPluginEventSystem @ react-dom-client.production.js:12455
+dispatchEvent @ react-dom-client.production.js:15306
+dispatchDiscreteEvent @ react-dom-client.production.js:15274
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Budget join successful {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Shared budget join completed - auth state already set {category: 'auth'}
+errorTrackingService.ts:187 ℹ️ 🔒 User acknowledged local data security warning {}
+errorTrackingService.ts:187 ℹ️ 🔄 Starting chunked data sync... {}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Started tracking {syncId: 'sync_1762288009132_blzds8', type: 'cloud_sync', totalAttempts: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📦 Creating automatic pre-sync backup {backupId: 'auto_backup_cloud_sync_1762288009132', syncType: 'cloud_sync'}
+errorTrackingService.ts:187 🔍 [DEV] Backup stored in IndexedDB {backupId: 'auto_backup_cloud_sync_1762288009132'}
+errorTrackingService.ts:187 🟢 [PROD] 📦 Auto backup created successfully {backupId: 'auto_backup_cloud_sync_1762288009132', records: 0, size: '269 B', duration: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Progress update {syncId: 'sync_1762288009132_blzds8', stage: 'initializing', progress: null}
+errorTrackingService.ts:187 🔍 [DEV] No user found, signing in anonymously... {}
+errorTrackingService.ts:187 🔍 [DEV] User already authenticated {uid: 'VwdDFRsfTfOUQz7858SHWTLt7wD3'}
+errorTrackingService.ts:187 ℹ️ Chunked sync service initialized {budgetId: 'budget_2...', maxChunkSize: 921600}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Progress update {syncId: 'sync_1762288009132_blzds8', stage: 'fetching_local_data', progress: null}
+errorTrackingService.ts:187 ℹ️ ✅ Anonymous authentication successful {uid: 'VwdDFRsfTfOUQz7858SHWTLt7wD3'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Starting execute for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 ChunkedSync-1762287971955: loadFromCloud acquired lock {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Acquired lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: About to call function for loadFromCloud {}
+errorTrackingService.ts:187 ℹ️ Starting chunked load from cloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadMainDocument {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadMainDocument attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadMainDocument executed in 199ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 485, duration: '3ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 501, decryptedSize: 485, duration: '4ms'}
+errorTrackingService.ts:187 🔍 [DEV] Loaded manifest {version: '2.0', totalChunks: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadChunks {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadChunks attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadChunks executed in 101ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 5284, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 5300, decryptedSize: 5284, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '985269ba...'}
+errorTrackingService.ts:187 🔍 [DEV] Reassembled transactions: 241 items {}
+errorTrackingService.ts:187 ℹ️ ✅ Chunked load completed successfully {duration: '3312ms', keys: Array(9), dataStructure: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Function completed for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: About to release lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 ChunkedSync-1762287971955: loadFromCloud released (3314ms) {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Lock released for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📊 CloudSyncService received data from chunkedSyncService {hasData: true, keys: Array(9), arrayLengths: {…}}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync direction analysis: {hasCloudData: true, hasLocalData: false, cloudItemCount: 277, localItemCount: 0, cloudLastModified: 1762287872894, …}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync direction determined: fromFirestore {localLastModified: 1762288009722, cloudLastModified: 1762287872894, hasLocalData: false, hasCloudData: true}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Starting execute for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 ChunkedSync-1762287971955: loadFromCloud acquired lock {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Acquired lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: About to call function for loadFromCloud {}
+errorTrackingService.ts:187 ℹ️ Starting chunked load from cloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadMainDocument {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadMainDocument attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadMainDocument executed in 117ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 485, duration: '0ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 501, decryptedSize: 485, duration: '1ms'}
+errorTrackingService.ts:187 🔍 [DEV] Loaded manifest {version: '2.0', totalChunks: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadChunks {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadChunks attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadChunks executed in 138ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 5284, duration: '1ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 5300, decryptedSize: 5284, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '985269ba...'}
+errorTrackingService.ts:187 🔍 [DEV] Reassembled transactions: 241 items {}
+errorTrackingService.ts:187 ℹ️ ✅ Chunked load completed successfully {duration: '3263ms', keys: Array(9), dataStructure: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Function completed for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: About to release lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 ChunkedSync-1762287971955: loadFromCloud released (3263ms) {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762287971955: Lock released for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 💾 Saving cloud data to Dexie... {}
+errorTrackingService.ts:187 ℹ️ ✅ Cloud data saved to Dexie successfully {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching envelopes from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching transactions from Dexie {source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching savings goals from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Bills loaded {count: 10}
+errorTrackingService.ts:187 🔍 [DEV] Bills filtering debug {inputBillsCount: 10, status: 'all', today: '2025-11-04T06:00:00.000Z', firstBillData: {…}}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning filtered bills {originalBillsLength: 10, filteredBillsLength: 10, status: 'all', billsStillExist: true, filteredStillExist: true, …}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 14}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded savings goals from Dexie {count: 5}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning processed savings goals {originalCount: 5, processedCount: 5, filteredCount: 5, finalCount: 5, status: 'all'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 0, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 0, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 0, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 0, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 0, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 241, source: 'useTransactionQuery'}
+errorTrackingService.ts:187 ℹ️ ✅ TanStack Query cache invalidated after cloud data sync {}
+errorTrackingService.ts:187 🟢 [PROD] Data synced from cloud {direction: 'download'}
+errorTrackingService.ts:187 🟢 [PROD] Sync completed successfully {direction: 'fromFirestore', recordsProcessed: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] Updating user activity: {lastActive: '2025-11-04T20:26:56.433Z', userName: 'Nandor'}
+errorTrackingService.ts:187 🟢 [PROD] 📊 Sync health: Successful completion {syncId: 'sync_1762288009132_blzds8', duration: 7301, successRate: 1}

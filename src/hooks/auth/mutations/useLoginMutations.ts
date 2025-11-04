@@ -107,10 +107,11 @@ const handleSuccessfulAuthentication = (
 const handleNewUserSetup = async (userData: UserData, password: string): Promise<LoginResult> => {
   logger.auth("New user setup path.", userData);
 
-  const shareCode = userData.shareCode;
-  if (!shareCode) {
+  if (!userData.shareCode) {
     throw new Error("Share code missing from user data during login");
   }
+  
+  const shareCode = userData.shareCode as string;
 
   // For shared budgets, derive deterministic salt from shareCode (same as join flow)
   const encoder = new TextEncoder();
@@ -197,6 +198,40 @@ const handleNewUserSetup = async (userData: UserData, password: string): Promise
 };
 
 /**
+ * Derive encryption key for login based on whether user has a share code
+ */
+const deriveLoginEncryptionKey = async (
+  password: string,
+  savedSalt: number[],
+  shareCode?: string
+): Promise<{ key: CryptoKey; salt: Uint8Array }> => {
+  if (shareCode) {
+    const encoder = new TextEncoder();
+    const shareCodeBytes = encoder.encode(shareCode);
+    const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
+    const usedSalt = new Uint8Array(deterministicSalt);
+    
+    if (import.meta?.env?.MODE === "development") {
+      const saltPreview =
+        Array.from(usedSalt.slice(0, 8))
+          .map((b: number) => b.toString(16).padStart(2, "0"))
+          .join("") + "...";
+      logger.auth("Shared budget login - using deterministic salt", {
+        shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
+        saltPreview,
+      });
+    }
+    
+    const key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
+    return { key, salt: usedSalt };
+  }
+  
+  const usedSalt = new Uint8Array(savedSalt);
+  const key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
+  return { key, salt: usedSalt };
+};
+
+/**
  * Helper function for existing user login path
  */
 const handleExistingUserLogin = async (password: string): Promise<LoginResult> => {
@@ -213,7 +248,6 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
   }
 
   const { salt: savedSalt, encryptedData, iv } = savedData;
-  
   if (!savedSalt || !encryptedData || !iv) {
     return {
       success: false,
@@ -221,42 +255,16 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
     };
   }
 
-  // Check if user has a shareCode in their profile (shared budget)
-  // If so, use deterministic salt derived from shareCode for consistency
   const savedProfile = localStorageService.getUserProfile();
-  const hasShareCode = savedProfile?.shareCode;
-  
-  let key: CryptoKey;
-  let usedSalt: Uint8Array;
-  
-  if (hasShareCode) {
-    // For shared budgets, derive deterministic salt from shareCode
-    const encoder = new TextEncoder();
-    const shareCodeBytes = encoder.encode(hasShareCode);
-    const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
-    usedSalt = new Uint8Array(deterministicSalt);
-    
-    if (import.meta?.env?.MODE === "development") {
-      const saltPreview =
-        Array.from(usedSalt.slice(0, 8))
-          .map((b: number) => b.toString(16).padStart(2, "0"))
-          .join("") + "...";
-      logger.auth("Shared budget login - using deterministic salt", {
-        shareCodePreview: hasShareCode.split(" ").slice(0, 2).join(" ") + " ...",
-        saltPreview,
-      });
-    }
-    
-    key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
-  } else {
-    // For regular budgets, use saved salt from localStorage
-    usedSalt = new Uint8Array(savedSalt);
-    key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
-  }
+  const { key, salt: usedSalt } = await deriveLoginEncryptionKey(
+    password,
+    savedSalt,
+    savedProfile?.shareCode
+  );
 
   try {
     const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
-    let currentUserData = decryptedData.currentUser;
+    const currentUserData = decryptedData.currentUser;
 
     if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
       localStorageService.removeBudgetData();
@@ -268,7 +276,6 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
       userName: currentUserData.userName?.trim() || "User",
     };
 
-    // Identify returning user for tracking
     identifyUser(sanitizedUserData.budgetId, {
       userName: sanitizedUserData.userName,
       userColor: sanitizedUserData.userColor,

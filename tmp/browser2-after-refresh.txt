@@ -1,0 +1,974 @@
+errorTrackingService.ts:187 🔍 [DEV] 🔄 Step 1 continue clicked: {step: 1, masterPassword: true, isReturningUser: true}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 Attempting login for returning user... {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Starting login {hasPassword: true, hasUserData: false, isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack Login attempt started. {hasPassword: true, hasUserData: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Existing user login path. {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Shared budget login - using deterministic salt {shareCodePreview: 'case saddle ...', saltPreview: 'fb387ca868920c25...', category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt successful {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] 🔍 DEBUG: About to call setAuthenticated with: {hasSessionData: true, hasEncryptionKey: true, encryptionKeyType: 'CryptoKey', hasSalt: true, saltType: 'Uint8Array', …}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Setting authenticated user {userName: 'Nandor', budgetId: 'budget_2...', hasEncryptionKey: true, category: 'auth'}
+errorTrackingService.ts:187 ℹ️ ✅ User authenticated {userName: 'Nandor', budgetId: 'budget_2...', isNewUser: false, hasEncryptionKey: true}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] ⏱️ Adding universal sync delay to prevent race conditions (2500ms) {isNewUser: false, delayMs: 2500, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Using git commit date: 2025-11-04T14:41:37-06:00
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762289870822, willExpireAt: 1762289872822}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching envelopes from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching savings goals from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching transactions from Dexie {source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762289870841, willExpireAt: 1762289872841}
+errorTrackingService.ts:187 ℹ️ 🔄 Auto-initializing chunked Firebase sync... {}
+errorTrackingService.ts:187 🟢 [PROD] Cloud sync service started {user: 'budget_219656f58cb33036'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: true, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: true, hasCurrentUser: true, hasBudgetId: true}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 14}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded savings goals from Dexie {count: 5}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning processed savings goals {originalCount: 5, processedCount: 5, filteredCount: 5, finalCount: 5, status: 'all'}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T20:57:50.908Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 241, source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 ⚠️ Cannot start background sync - missing auth data {isUnlocked: undefined, hasBudgetId: false, hasEncryptionKey: false}
+console.<computed> @ errorTrackingService.ts:187
+warn @ logger.ts:117
+startBackgroundSync @ uiStore.ts:188
+startBackgroundSyncAfterLogin @ useLoginMutations.ts:56
+await in startBackgroundSyncAfterLogin
+onSuccess @ useLoginMutations.ts:347
+execute @ mutation.js:121
+await in execute
+mutate @ mutationObserver.js:61
+(anonymous) @ authOperations.ts:21
+handleStep1Continue @ useUserSetup.ts:147
+processDispatchQueue @ react-dom-client.production.js:12317
+(anonymous) @ react-dom-client.production.js:12867
+batchedUpdates$1 @ react-dom-client.production.js:1498
+dispatchEventForPluginEventSystem @ react-dom-client.production.js:12455
+dispatchEvent @ react-dom-client.production.js:15306
+dispatchDiscreteEvent @ react-dom-client.production.js:15274
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Background sync started successfully after login {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Login successful {userName: 'Nandor', isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Returning user login succeeded {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+   Promise.all([
+     window.budgetDb.envelopes.count(),
+     window.budgetDb.transactions.count(),
+     window.budgetDb.bills.count(),
+     window.budgetDb.savingsGoals.count(),
+   ]).then(([e, t, b, s]) => console.log({envelopes: e, transactions: t, bills: b, savingsGoals: s}));
+Promise {<pending>}
+errorTrackingService.ts:187 {envelopes: 14, transactions: 241, bills: 10, savingsGoals: 5}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762289877876, lastUnlock: 1762289870822, timeSinceUnlock: 7054, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 7054, gracePeriod: 2000}
+ 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+ 🔍 [DEV] Session locked {}
+ 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762289877878, lastUnlock: 1762289870841, timeSinceUnlock: 7037, gracePeriod: 2000, withinGracePeriod: false}
+ 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 7037, gracePeriod: 2000}
+ 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+ 🔍 [DEV] Session locked {}
+Navigated to https://dev.f4tdaddy.com/app/dashboard
+logger.ts:58 🔍 [DEV] Firebase Config Debug {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com', usingDemo: false, environment: 'development', hostname: 'dev.f4tdaddy.com'}
+logger.ts:98 ℹ️ 🔥 Firebase: Starting initialization... {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com'}
+logger.ts:98 ℹ️ ✅ Firebase: Initialization complete! {projectId: 'violetvault-3a71f'}
+logger.ts:98 ℹ️ Crypto compatibility layer initialized {supported: true, secure: true}
+errorTrackingService.ts:187 🔍 [DEV] Console interception enabled {}
+errorTrackingService.ts:187 🔍 [DEV] Error capture system initialized {}
+errorTrackingService.ts:187 🔍 [DEV] Initializing background services {cloudSyncEnabled: true, isInitialized: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: false, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: false, hasBudgetId: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Initializing auth state from localStorage {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Found saved profile {userName: 'Nandor', hasColor: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 UserSetup mounted, checking for saved profile {}
+errorTrackingService.ts:187 🔍 [DEV] 📋 Found saved profile: {userName: 'Nandor', userColor: '#a855f7', joinedVia: 'shareCode', sharedBy: 'Shared Budget', shareCode: 'case saddle long entire'}
+errorTrackingService.ts:187 🔍 [DEV] 👋 Returning user detected {hasProfile: true, hasLocalStorageData: true, hasDexieData: false, userName: 'Nandor'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: true, hasBudgetId: false}
+errorTrackingService.ts:187 ℹ️ 📱 Service Worker registration found {scope: 'https://dev.f4tdaddy.com/', state: 'activated'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ No version update, current version already seen {}
+errorTrackingService.ts:187 ℹ️ 🔧 PWA Manager initialized successfully {}
+errorTrackingService.ts:187 🔍 [DEV] 🌩️ Cloud sync enabled - will start after user login {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Background services initialized {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Bills loaded {count: 10}
+errorTrackingService.ts:187 🔍 [DEV] Bills filtering debug {inputBillsCount: 10, status: 'all', today: '2025-11-04T06:00:00.000Z', firstBillData: {…}}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning filtered bills {originalBillsLength: 10, filteredBillsLength: 10, status: 'all', billsStillExist: true, filteredStillExist: true, …}
+errorTrackingService.ts:187 ℹ️ 📱 PWA install prompt available {}
+errorTrackingService.ts:187 ℹ️ Install prompt dismissed recently, skipping automatic prompt {}
+dashboard:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+errorTrackingService.ts:187 🔍 [DEV] Initializing Highlight.io {mode: 'development', projectId: 'xdn37ppe...', enabled: false, errorSampleRate: 1, sessionSampleRate: 0.1}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io initialization skipped {reason: 'Error reporting disabled or invalid project ID', environment: 'development'}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io loaded and initialized via lazy loader {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 Step 1 continue clicked: {step: 1, masterPassword: true, isReturningUser: true}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 Attempting login for returning user... {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Starting login {hasPassword: true, hasUserData: false, isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack Login attempt started. {hasPassword: true, hasUserData: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Existing user login path. {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Shared budget login - using deterministic salt {shareCodePreview: 'case saddle ...', saltPreview: 'fb387ca868920c25...', category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt successful {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] 🔍 DEBUG: About to call setAuthenticated with: {hasSessionData: true, hasEncryptionKey: true, encryptionKeyType: 'CryptoKey', hasSalt: true, saltType: 'Uint8Array', …}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Setting authenticated user {userName: 'Nandor', budgetId: 'budget_2...', hasEncryptionKey: true, category: 'auth'}
+errorTrackingService.ts:187 ℹ️ ✅ User authenticated {userName: 'Nandor', budgetId: 'budget_2...', isNewUser: false, hasEncryptionKey: true}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] ⏱️ Adding universal sync delay to prevent race conditions (2500ms) {isNewUser: false, delayMs: 2500, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Using git commit date: 2025-11-04T14:41:37-06:00
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762289883468, willExpireAt: 1762289885468}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching envelopes from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching savings goals from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching transactions from Dexie {source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762289883484, willExpireAt: 1762289885484}
+errorTrackingService.ts:187 ℹ️ 🔄 Auto-initializing chunked Firebase sync... {}
+errorTrackingService.ts:187 🟢 [PROD] Cloud sync service started {user: 'budget_219656f58cb33036'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: true, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: true, hasCurrentUser: true, hasBudgetId: true}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 14}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded savings goals from Dexie {count: 5}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning processed savings goals {originalCount: 5, processedCount: 5, filteredCount: 5, finalCount: 5, status: 'all'}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T20:58:03.533Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 241, source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 ⚠️ Cannot start background sync - missing auth data {isUnlocked: undefined, hasBudgetId: false, hasEncryptionKey: false}
+console.<computed> @ errorTrackingService.ts:187
+warn @ logger.ts:117
+startBackgroundSync @ uiStore.ts:188
+startBackgroundSyncAfterLogin @ useLoginMutations.ts:56
+await in startBackgroundSyncAfterLogin
+onSuccess @ useLoginMutations.ts:347
+execute @ mutation.js:121
+await in execute
+mutate @ mutationObserver.js:61
+(anonymous) @ authOperations.ts:21
+handleStep1Continue @ useUserSetup.ts:147
+processDispatchQueue @ react-dom-client.production.js:12317
+(anonymous) @ react-dom-client.production.js:12867
+batchedUpdates$1 @ react-dom-client.production.js:1498
+dispatchEventForPluginEventSystem @ react-dom-client.production.js:12455
+dispatchEvent @ react-dom-client.production.js:15306
+dispatchDiscreteEvent @ react-dom-client.production.js:15274
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Background sync started successfully after login {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Login successful {userName: 'Nandor', isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Returning user login succeeded {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+   Promise.all([
+     window.budgetDb.envelopes.count(),
+     window.budgetDb.transactions.count(),
+     window.budgetDb.bills.count(),
+     window.budgetDb.savingsGoals.count(),
+   ]).then(([e, t, b, s]) => console.log({envelopes: e, transactions: t, bills: b, savingsGoals: s}));
+Promise {<pending>}
+errorTrackingService.ts:187 {envelopes: 14, transactions: 241, bills: 10, savingsGoals: 5}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762289888589, lastUnlock: 1762289883468, timeSinceUnlock: 5121, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 5121, gracePeriod: 2000}
+ 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+ 🔍 [DEV] Session locked {}
+ 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762289888590, lastUnlock: 1762289883484, timeSinceUnlock: 5106, gracePeriod: 2000, withinGracePeriod: false}
+ 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 5106, gracePeriod: 2000}
+ 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+ 🔍 [DEV] Session locked {}
+Navigated to https://dev.f4tdaddy.com/app/dashboard
+logger.ts:58 🔍 [DEV] Firebase Config Debug {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com', usingDemo: false, environment: 'development', hostname: 'dev.f4tdaddy.com'}
+logger.ts:98 ℹ️ 🔥 Firebase: Starting initialization... {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com'}
+logger.ts:98 ℹ️ ✅ Firebase: Initialization complete! {projectId: 'violetvault-3a71f'}
+logger.ts:98 ℹ️ Crypto compatibility layer initialized {supported: true, secure: true}
+errorTrackingService.ts:187 🔍 [DEV] Console interception enabled {}
+errorTrackingService.ts:187 🔍 [DEV] Error capture system initialized {}
+errorTrackingService.ts:187 🔍 [DEV] Initializing background services {cloudSyncEnabled: true, isInitialized: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: false, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: false, hasBudgetId: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Initializing auth state from localStorage {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Found saved profile {userName: 'Nandor', hasColor: true, category: 'auth'}
+errorTrackingService.ts:187 ℹ️ 📱 Service Worker registration found {scope: 'https://dev.f4tdaddy.com/', state: 'activated'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ No version update, current version already seen {}
+errorTrackingService.ts:187 ℹ️ 🔧 PWA Manager initialized successfully {}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 UserSetup mounted, checking for saved profile {}
+errorTrackingService.ts:187 🔍 [DEV] 📋 Found saved profile: {userName: 'Nandor', userColor: '#a855f7', joinedVia: 'shareCode', sharedBy: 'Shared Budget', shareCode: 'case saddle long entire'}
+errorTrackingService.ts:187 🔍 [DEV] 👋 Returning user detected {hasProfile: true, hasLocalStorageData: true, hasDexieData: false, userName: 'Nandor'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: true, hasBudgetId: false}
+errorTrackingService.ts:187 🔍 [DEV] 🌩️ Cloud sync enabled - will start after user login {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Background services initialized {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Bills loaded {count: 10}
+errorTrackingService.ts:187 🔍 [DEV] Bills filtering debug {inputBillsCount: 10, status: 'all', today: '2025-11-04T06:00:00.000Z', firstBillData: {…}}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning filtered bills {originalBillsLength: 10, filteredBillsLength: 10, status: 'all', billsStillExist: true, filteredStillExist: true, …}
+errorTrackingService.ts:187 ℹ️ 📱 PWA install prompt available {}
+errorTrackingService.ts:187 ℹ️ Install prompt dismissed recently, skipping automatic prompt {}
+dashboard:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+errorTrackingService.ts:187 🔍 [DEV] Initializing Highlight.io {mode: 'development', projectId: 'xdn37ppe...', enabled: false, errorSampleRate: 1, sessionSampleRate: 0.1}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io initialization skipped {reason: 'Error reporting disabled or invalid project ID', environment: 'development'}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io loaded and initialized via lazy loader {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 Step 1 continue clicked: {step: 1, masterPassword: true, isReturningUser: true}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 Attempting login for returning user... {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Starting login {hasPassword: true, hasUserData: false, isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack Login attempt started. {hasPassword: true, hasUserData: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Existing user login path. {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Shared budget login - using deterministic salt {shareCodePreview: 'case saddle ...', saltPreview: 'fb387ca868920c25...', category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt successful {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] 🔍 DEBUG: About to call setAuthenticated with: {hasSessionData: true, hasEncryptionKey: true, encryptionKeyType: 'CryptoKey', hasSalt: true, saltType: 'Uint8Array', …}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Setting authenticated user {userName: 'Nandor', budgetId: 'budget_2...', hasEncryptionKey: true, category: 'auth'}
+errorTrackingService.ts:187 ℹ️ ✅ User authenticated {userName: 'Nandor', budgetId: 'budget_2...', isNewUser: false, hasEncryptionKey: true}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] ⏱️ Adding universal sync delay to prevent race conditions (2500ms) {isNewUser: false, delayMs: 2500, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Using git commit date: 2025-11-04T14:41:37-06:00
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762289891595, willExpireAt: 1762289893595}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching envelopes from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching savings goals from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching transactions from Dexie {source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762289891605, willExpireAt: 1762289893605}
+errorTrackingService.ts:187 ℹ️ 🔄 Auto-initializing chunked Firebase sync... {}
+errorTrackingService.ts:187 🟢 [PROD] Cloud sync service started {user: 'budget_219656f58cb33036'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: true, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: true, hasCurrentUser: true, hasBudgetId: true}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 14}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded savings goals from Dexie {count: 5}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning processed savings goals {originalCount: 5, processedCount: 5, filteredCount: 5, finalCount: 5, status: 'all'}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T20:58:11.647Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 241, source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 ⚠️ Cannot start background sync - missing auth data {isUnlocked: undefined, hasBudgetId: false, hasEncryptionKey: false}
+console.<computed> @ errorTrackingService.ts:187
+warn @ logger.ts:117
+startBackgroundSync @ uiStore.ts:188
+startBackgroundSyncAfterLogin @ useLoginMutations.ts:56
+await in startBackgroundSyncAfterLogin
+onSuccess @ useLoginMutations.ts:347
+execute @ mutation.js:121
+await in execute
+mutate @ mutationObserver.js:61
+(anonymous) @ authOperations.ts:21
+handleStep1Continue @ useUserSetup.ts:147
+processDispatchQueue @ react-dom-client.production.js:12317
+(anonymous) @ react-dom-client.production.js:12867
+batchedUpdates$1 @ react-dom-client.production.js:1498
+dispatchEventForPluginEventSystem @ react-dom-client.production.js:12455
+dispatchEvent @ react-dom-client.production.js:15306
+dispatchDiscreteEvent @ react-dom-client.production.js:15274
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Background sync started successfully after login {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Login successful {userName: 'Nandor', isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Returning user login succeeded {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 ℹ️ 🔄 Starting chunked data sync... {}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Started tracking {syncId: 'sync_1762289901609_n9l0mp', type: 'cloud_sync', totalAttempts: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📦 Creating automatic pre-sync backup {backupId: 'auto_backup_cloud_sync_1762289901610', syncType: 'cloud_sync'}
+errorTrackingService.ts:187 🔍 [DEV] Backup stored in IndexedDB {backupId: 'auto_backup_cloud_sync_1762289901610'}
+errorTrackingService.ts:187 🟢 [PROD] 📦 Auto backup created successfully {backupId: 'auto_backup_cloud_sync_1762289901610', records: 277, size: '68.41 KB', duration: 10}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Progress update {syncId: 'sync_1762289901609_n9l0mp', stage: 'initializing', progress: null}
+errorTrackingService.ts:187 🔍 [DEV] User already authenticated {uid: 'xThR9UGpIUf6SjKc50pCy0KdU0z1'}
+errorTrackingService.ts:187 ℹ️ Chunked sync service initialized {budgetId: 'budget_2...', maxChunkSize: 921600}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Progress update {syncId: 'sync_1762289901609_n9l0mp', stage: 'fetching_local_data', progress: null}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Starting execute for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 ChunkedSync-1762289888924: loadFromCloud acquired lock {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Acquired lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: About to call function for loadFromCloud {}
+errorTrackingService.ts:187 ℹ️ Starting chunked load from cloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadMainDocument {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadMainDocument attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadMainDocument executed in 199ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 486, duration: '7ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 502, decryptedSize: 486, duration: '8ms'}
+errorTrackingService.ts:187 🔍 [DEV] Loaded manifest {version: '2.0', totalChunks: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadChunks {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadChunks attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadChunks executed in 98ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 5261, duration: '3ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 5277, decryptedSize: 5261, duration: '4ms'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '302c9b5d...'}
+errorTrackingService.ts:187 🔍 [DEV] Reassembled transactions: 241 items {}
+errorTrackingService.ts:187 ℹ️ ✅ Chunked load completed successfully {duration: '3318ms', keys: Array(9), dataStructure: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Function completed for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: About to release lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 ChunkedSync-1762289888924: loadFromCloud released (3319ms) {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Lock released for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📊 CloudSyncService received data from chunkedSyncService {hasData: true, keys: Array(9), arrayLengths: {…}}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync direction analysis: {hasCloudData: true, hasLocalData: true, cloudItemCount: 277, localItemCount: 277, cloudLastModified: 1762289791791, …}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 [SYNC] Checking if shared budget user {hasConfig: true, hasCurrentUser: true, joinedVia: 'shareCode', sharedBy: 'Shared Budget', userKeys: Array(6)}
+errorTrackingService.ts:187 ℹ️ 🔄 Shared budget user detection: true {joinedVia: 'shareCode', sharedBy: 'Shared Budget', isSharedViaJoinedVia: true, isSharedViaSharedBy: true}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync direction determined: toFirestore {localLastModified: 1762289901637, cloudLastModified: 1762289791791, hasLocalData: true, hasCloudData: true}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Starting execute for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 ChunkedSync-1762289888924: saveToCloud acquired lock {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Acquired lock for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: About to call function for saveToCloud {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] Starting chunked save to cloud {dataSize: Promise, userId: 'unknown'}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Processing data for chunking {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Chunking large array: transactions (241 items) {}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 69930, compressedSize: 7831, reduction: '8.93x'}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 2615, compressedSize: 616, reduction: '4.25x'}
+errorTrackingService.ts:187 🔍 [DEV] Chunking transactions: 241 items, 5000 per chunk {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Data processing complete. Total chunks: 1 {}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 57912, compressedSize: 5261, reduction: '11.01x'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '302c9b5d...'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 540, checksum: 'efe6741b...'}
+errorTrackingService.ts:187 🔍 [DEV] Created manifest {totalChunks: 1, totalSize: 5261}
+errorTrackingService.ts:187 🔍 [DEV] Compression analysis {originalSize: 674, expectedReduction: '1.39x', spaceSaved: '28%'}
+errorTrackingService.ts:187 ℹ️ Serialization complete {originalSize: 674, compressedSize: 482, finalSize: 485, compressionRatio: '1.40x', totalReduction: '1.39x', …}
+errorTrackingService.ts:187 ℹ️ Optimized encryption complete {originalSize: 674, compressedSize: 485, encryptedSize: 501, compressionRatio: '1.39x', totalReduction: '1.35x', …}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] About to save main document to Firebase {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued saveMainDocument {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing saveMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: saveMainDocument attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Calling setDoc for main document {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: saveMainDocument executed in 359ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed saveMainDocument {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] Main document saved successfully {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] About to save 1 chunks in batches of 500 {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Processing batch 1/1 {}
+errorTrackingService.ts:187 🔍 [DEV] Compression analysis {originalSize: 57912, expectedReduction: '11.01x', spaceSaved: '91%'}
+errorTrackingService.ts:187 ℹ️ Serialization complete {originalSize: 57912, compressedSize: 5258, finalSize: 5261, compressionRatio: '11.01x', totalReduction: '11.01x', …}
+errorTrackingService.ts:187 ℹ️ Optimized encryption complete {originalSize: 57912, compressedSize: 5261, encryptedSize: 5277, compressionRatio: '11.01x', totalReduction: '10.97x', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '302c9b5d...'}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] About to commit batch 1 {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued saveChunkBatch {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing saveChunkBatch {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: saveChunkBatch-1 attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Calling batch.commit() for batch 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: saveChunkBatch-1 executed in 119ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed saveChunkBatch {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] Batch 1/1 committed successfully {}
+errorTrackingService.ts:187 ℹ️ ✅ Chunked save completed successfully {totalChunks: 1, duration: '3512ms', mainDocSize: Promise}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Function completed for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: About to release lock for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 ChunkedSync-1762289888924: saveToCloud released (3514ms) {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762289888924: Lock released for saveToCloud {}
+errorTrackingService.ts:187 🟢 [PROD] Sync completed successfully {direction: 'toFirestore', recordsProcessed: 0}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 12920, compressedSize: 3387, reduction: '3.81x'}
+errorTrackingService.ts:187 🔍 [DEV] Updating user activity: {lastActive: '2025-11-04T20:58:28.482Z', userName: 'Nandor'}
+errorTrackingService.ts:187 🟢 [PROD] 📊 Sync health: Successful completion {syncId: 'sync_1762289901609_n9l0mp', duration: 6873, successRate: 1}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762289950014, lastUnlock: 1762289891595, timeSinceUnlock: 58419, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 58419, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762289950015, lastUnlock: 1762289891605, timeSinceUnlock: 58410, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 58410, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation started {hasPassword: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 ❌ Crypto operation 'decrypt' failed: OperationError
+    at safeCryptoOperation (cryptoCompat.ts:73:40)
+    at Object.decrypt (encryption.ts:106:31)
+    at queryFn (usePasswordValidation.ts:50:33) {}
+console.<computed> @ errorTrackingService.ts:187
+error @ logger.ts:131
+safeCryptoOperation @ cryptoCompat.ts:75
+await in safeCryptoOperation
+decrypt @ encryption.ts:106
+queryFn @ usePasswordValidation.ts:50
+await in queryFn
+fetchFn @ query.js:225
+run @ retryer.js:77
+start @ retryer.js:119
+fetch @ query.js:272
+#executeFetch @ queryObserver.js:179
+setOptions @ queryObserver.js:109
+(anonymous) @ useBaseQuery.js:68
+commitHookEffectListMount @ react-dom-client.production.js:8583
+commitPassiveMountOnFiber @ react-dom-client.production.js:10126
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10137
+flushPassiveEffects @ react-dom-client.production.js:11763
+flushPendingEffects @ react-dom-client.production.js:11739
+flushSpawnedWork @ react-dom-client.production.js:11718
+commitRoot @ react-dom-client.production.js:11521
+commitRootWhenReady @ react-dom-client.production.js:10920
+performWorkOnRoot @ react-dom-client.production.js:10826
+performSyncWorkOnRoot @ react-dom-client.production.js:12086
+flushSyncWorkAcrossRoots_impl @ react-dom-client.production.js:11956
+processRootScheduleInMicrotask @ react-dom-client.production.js:11990
+(anonymous) @ react-dom-client.production.js:12095
+errorTrackingService.ts:187 ❌ 🔓 Decrypt failed: {error: '', errorName: 'OperationError', errorType: 'object', stack: 'OperationError\n    at safeCryptoOperation (https:/…v.f4tdaddy.com/assets/index-YSTg-ftg.js:50478:33)'} {}
+console.<computed> @ errorTrackingService.ts:187
+error @ logger.ts:131
+decrypt @ encryption.ts:118
+await in decrypt
+queryFn @ usePasswordValidation.ts:50
+await in queryFn
+fetchFn @ query.js:225
+run @ retryer.js:77
+start @ retryer.js:119
+fetch @ query.js:272
+#executeFetch @ queryObserver.js:179
+setOptions @ queryObserver.js:109
+(anonymous) @ useBaseQuery.js:68
+commitHookEffectListMount @ react-dom-client.production.js:8583
+commitPassiveMountOnFiber @ react-dom-client.production.js:10126
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10137
+flushPassiveEffects @ react-dom-client.production.js:11763
+flushPendingEffects @ react-dom-client.production.js:11739
+flushSpawnedWork @ react-dom-client.production.js:11718
+commitRoot @ react-dom-client.production.js:11521
+commitRootWhenReady @ react-dom-client.production.js:10920
+performWorkOnRoot @ react-dom-client.production.js:10826
+performSyncWorkOnRoot @ react-dom-client.production.js:12086
+flushSyncWorkAcrossRoots_impl @ react-dom-client.production.js:11956
+processRootScheduleInMicrotask @ react-dom-client.production.js:11990
+(anonymous) @ react-dom-client.production.js:12095
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation failed - decryption failed {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation started {hasPassword: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 ❌ Crypto operation 'decrypt' failed: OperationError
+    at safeCryptoOperation (cryptoCompat.ts:73:40)
+    at Object.decrypt (encryption.ts:106:31)
+    at queryFn (usePasswordValidation.ts:50:33) {}
+console.<computed> @ errorTrackingService.ts:187
+error @ logger.ts:131
+safeCryptoOperation @ cryptoCompat.ts:75
+await in safeCryptoOperation
+decrypt @ encryption.ts:106
+queryFn @ usePasswordValidation.ts:50
+await in queryFn
+fetchFn @ query.js:225
+run @ retryer.js:77
+start @ retryer.js:119
+fetch @ query.js:272
+#executeFetch @ queryObserver.js:179
+setOptions @ queryObserver.js:109
+(anonymous) @ useBaseQuery.js:68
+commitHookEffectListMount @ react-dom-client.production.js:8583
+commitPassiveMountOnFiber @ react-dom-client.production.js:10126
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10137
+flushPassiveEffects @ react-dom-client.production.js:11763
+flushPendingEffects @ react-dom-client.production.js:11739
+flushSpawnedWork @ react-dom-client.production.js:11718
+commitRoot @ react-dom-client.production.js:11521
+commitRootWhenReady @ react-dom-client.production.js:10920
+performWorkOnRoot @ react-dom-client.production.js:10826
+performSyncWorkOnRoot @ react-dom-client.production.js:12086
+flushSyncWorkAcrossRoots_impl @ react-dom-client.production.js:11956
+processRootScheduleInMicrotask @ react-dom-client.production.js:11990
+(anonymous) @ react-dom-client.production.js:12095
+errorTrackingService.ts:187 ❌ 🔓 Decrypt failed: {error: '', errorName: 'OperationError', errorType: 'object', stack: 'OperationError\n    at safeCryptoOperation (https:/…v.f4tdaddy.com/assets/index-YSTg-ftg.js:50478:33)'} {}
+console.<computed> @ errorTrackingService.ts:187
+error @ logger.ts:131
+decrypt @ encryption.ts:118
+await in decrypt
+queryFn @ usePasswordValidation.ts:50
+await in queryFn
+fetchFn @ query.js:225
+run @ retryer.js:77
+start @ retryer.js:119
+fetch @ query.js:272
+#executeFetch @ queryObserver.js:179
+setOptions @ queryObserver.js:109
+(anonymous) @ useBaseQuery.js:68
+commitHookEffectListMount @ react-dom-client.production.js:8583
+commitPassiveMountOnFiber @ react-dom-client.production.js:10126
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10241
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10120
+recursivelyTraversePassiveMountEffects @ react-dom-client.production.js:10101
+commitPassiveMountOnFiber @ react-dom-client.production.js:10137
+flushPassiveEffects @ react-dom-client.production.js:11763
+flushPendingEffects @ react-dom-client.production.js:11739
+flushSpawnedWork @ react-dom-client.production.js:11718
+commitRoot @ react-dom-client.production.js:11521
+commitRootWhenReady @ react-dom-client.production.js:10920
+performWorkOnRoot @ react-dom-client.production.js:10826
+performSyncWorkOnRoot @ react-dom-client.production.js:12086
+flushSyncWorkAcrossRoots_impl @ react-dom-client.production.js:11956
+processRootScheduleInMicrotask @ react-dom-client.production.js:11990
+(anonymous) @ react-dom-client.production.js:12095
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation failed - decryption failed {category: 'auth'}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T21:00:11.651Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290126976, lastUnlock: 1762289891595, timeSinceUnlock: 235381, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 235381, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290126991, lastUnlock: 1762289891605, timeSinceUnlock: 235386, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 235386, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T21:02:11.901Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T21:04:11.909Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation started {hasPassword: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 ❌ Crypto operation 'decrypt' failed: OperationError
+    at safeCryptoOperation (cryptoCompat.ts:73:40)
+    at Object.decrypt (encryption.ts:106:31)
+    at queryFn (usePasswordValidation.ts:50:33) {}
+console.<computed> @ errorTrackingService.ts:187
+error @ logger.ts:131
+safeCryptoOperation @ cryptoCompat.ts:75
+await in safeCryptoOperation
+decrypt @ encryption.ts:106
+queryFn @ usePasswordValidation.ts:50
+await in queryFn
+fetchFn @ query.js:225
+run @ retryer.js:77
+start @ retryer.js:119
+fetch @ query.js:272
+#executeFetch @ queryObserver.js:179
+fetch @ queryObserver.js:169
+refetch @ queryObserver.js:159
+onFocus @ query.js:128
+(anonymous) @ queryCache.js:82
+(anonymous) @ queryCache.js:81
+batch @ notifyManager.js:41
+onFocus @ queryCache.js:80
+(anonymous) @ queryClient.js:40
+await in (anonymous)
+(anonymous) @ focusManager.js:53
+onFocus @ focusManager.js:52
+(anonymous) @ focusManager.js:39
+listener @ focusManager.js:12
+errorTrackingService.ts:187 ❌ 🔓 Decrypt failed: {error: '', errorName: 'OperationError', errorType: 'object', stack: 'OperationError\n    at safeCryptoOperation (https:/…v.f4tdaddy.com/assets/index-YSTg-ftg.js:50478:33)'} {}
+console.<computed> @ errorTrackingService.ts:187
+error @ logger.ts:131
+decrypt @ encryption.ts:118
+await in decrypt
+queryFn @ usePasswordValidation.ts:50
+await in queryFn
+fetchFn @ query.js:225
+run @ retryer.js:77
+start @ retryer.js:119
+fetch @ query.js:272
+#executeFetch @ queryObserver.js:179
+fetch @ queryObserver.js:169
+refetch @ queryObserver.js:159
+onFocus @ query.js:128
+(anonymous) @ queryCache.js:82
+(anonymous) @ queryCache.js:81
+batch @ notifyManager.js:41
+onFocus @ queryCache.js:80
+(anonymous) @ queryClient.js:40
+await in (anonymous)
+(anonymous) @ focusManager.js:53
+onFocus @ focusManager.js:52
+(anonymous) @ focusManager.js:39
+listener @ focusManager.js:12
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation failed - decryption failed {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+ 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+ 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+ 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+ 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+ 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+ 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+ 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+ 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290283906, lastUnlock: 1762289891595, timeSinceUnlock: 392311, gracePeriod: 2000, withinGracePeriod: false}
+ 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 392311, gracePeriod: 2000}
+ 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+ 🔍 [DEV] Session locked {}
+ 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290283910, lastUnlock: 1762289891605, timeSinceUnlock: 392305, gracePeriod: 2000, withinGracePeriod: false}
+ 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 392305, gracePeriod: 2000}
+ 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+ 🔍 [DEV] Session locked {}
+Navigated to https://dev.f4tdaddy.com/app/dashboard
+logger.ts:58 🔍 [DEV] Firebase Config Debug {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com', usingDemo: false, environment: 'development', hostname: 'dev.f4tdaddy.com'}
+logger.ts:98 ℹ️ 🔥 Firebase: Starting initialization... {projectId: 'violetvault-3a71f', authDomain: 'violetvault-3a71f.firebaseapp.com'}
+logger.ts:98 ℹ️ ✅ Firebase: Initialization complete! {projectId: 'violetvault-3a71f'}
+logger.ts:98 ℹ️ Crypto compatibility layer initialized {supported: true, secure: true}
+errorTrackingService.ts:187 🔍 [DEV] Console interception enabled {}
+errorTrackingService.ts:187 🔍 [DEV] Error capture system initialized {}
+errorTrackingService.ts:187 🔍 [DEV] Initializing background services {cloudSyncEnabled: true, isInitialized: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: false, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: false, hasBudgetId: false}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Initializing auth state from localStorage {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Found saved profile {userName: 'Nandor', hasColor: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 UserSetup mounted, checking for saved profile {}
+errorTrackingService.ts:187 🔍 [DEV] 📋 Found saved profile: {userName: 'Nandor', userColor: '#a855f7', joinedVia: 'shareCode', sharedBy: 'Shared Budget', shareCode: 'case saddle long entire'}
+errorTrackingService.ts:187 🔍 [DEV] 👋 Returning user detected {hasProfile: true, hasLocalStorageData: true, hasDexieData: false, userName: 'Nandor'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: false, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: false, hasCurrentUser: true, hasBudgetId: false}
+errorTrackingService.ts:187 ℹ️ 📱 Service Worker registration found {scope: 'https://dev.f4tdaddy.com/', state: 'activated'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ No version update, current version already seen {}
+errorTrackingService.ts:187 ℹ️ 🔧 PWA Manager initialized successfully {}
+errorTrackingService.ts:187 🔍 [DEV] 🌩️ Cloud sync enabled - will start after user login {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Background services initialized {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Bills loaded {count: 10}
+errorTrackingService.ts:187 🔍 [DEV] Bills filtering debug {inputBillsCount: 10, status: 'all', today: '2025-11-04T06:00:00.000Z', firstBillData: {…}}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning filtered bills {originalBillsLength: 10, filteredBillsLength: 10, status: 'all', billsStillExist: true, filteredStillExist: true, …}
+errorTrackingService.ts:187 ℹ️ 📱 PWA install prompt available {}
+errorTrackingService.ts:187 ℹ️ Install prompt dismissed recently, skipping automatic prompt {}
+dashboard:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+errorTrackingService.ts:187 🔍 [DEV] Initializing Highlight.io {mode: 'development', projectId: 'xdn37ppe...', enabled: false, errorSampleRate: 1, sessionSampleRate: 0.1}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io initialization skipped {reason: 'Error reporting disabled or invalid project ID', environment: 'development'}
+errorTrackingService.ts:187 🔍 [DEV] Highlight.io loaded and initialized via lazy loader {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 Step 1 continue clicked: {step: 1, masterPassword: true, isReturningUser: true}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 Attempting login for returning user... {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Starting login {hasPassword: true, hasUserData: false, isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack Login attempt started. {hasPassword: true, hasUserData: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Existing user login path. {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Shared budget login - using deterministic salt {shareCodePreview: 'case saddle ...', saltPreview: 'fb387ca868920c25...', category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt successful {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] 🔍 DEBUG: About to call setAuthenticated with: {hasSessionData: true, hasEncryptionKey: true, encryptionKeyType: 'CryptoKey', hasSalt: true, saltType: 'Uint8Array', …}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthContext: Setting authenticated user {userName: 'Nandor', budgetId: 'budget_2...', hasEncryptionKey: true, category: 'auth'}
+errorTrackingService.ts:187 ℹ️ ✅ User authenticated {userName: 'Nandor', budgetId: 'budget_2...', isNewUser: false, hasEncryptionKey: true}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] ⏱️ Adding universal sync delay to prevent race conditions (2500ms) {isNewUser: false, delayMs: 2500, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Using git commit date: 2025-11-04T15:01:04-06:00
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762290286997, willExpireAt: 1762290288997}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync Health: Checking sync health... {}
+errorTrackingService.ts:187 ℹ️ 🔧 Running quick sync status check... {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching envelopes from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching savings goals from Dexie {}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Fetching transactions from Dexie {source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762290287013, willExpireAt: 1762290289013}
+errorTrackingService.ts:187 ℹ️ 🔄 Auto-initializing chunked Firebase sync... {}
+errorTrackingService.ts:187 🟢 [PROD] Cloud sync service started {user: 'budget_219656f58cb33036'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Auth hook values {isUnlocked: true, hasCurrentUser: true, category: 'auth'}
+errorTrackingService.ts:187 💰 [BUDGET-SYNC] BudgetProvider state changed {hasEncryptionKey: true, hasCurrentUser: true, hasBudgetId: true}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 14}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded savings goals from Dexie {count: 5}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query returning processed savings goals {originalCount: 5, processedCount: 5, filteredCount: 5, finalCount: 5, status: 'all'}
+errorTrackingService.ts:187 ℹ️ 🔧 Quick status: HEALTHY (0 failed) {}
+errorTrackingService.ts:187 ℹ️ ✅ Sync Health: Health check completed {isHealthy: true, status: 'HEALTHY', failedTests: 0, lastChecked: '2025-11-04T21:04:47.049Z', checks: Array(3)}
+errorTrackingService.ts:187 🔍 [DEV] TanStack Query: Loaded from Dexie {count: 241, source: 'useTransactionQuery'}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 ⚠️ Cannot start background sync - missing auth data {isUnlocked: undefined, hasBudgetId: false, hasEncryptionKey: false}
+console.<computed> @ errorTrackingService.ts:187
+warn @ logger.ts:117
+startBackgroundSync @ uiStore.ts:188
+startBackgroundSyncAfterLogin @ useLoginMutations.ts:56
+await in startBackgroundSyncAfterLogin
+onSuccess @ useLoginMutations.ts:347
+execute @ mutation.js:121
+await in execute
+mutate @ mutationObserver.js:61
+(anonymous) @ authOperations.ts:21
+handleStep1Continue @ useUserSetup.ts:147
+processDispatchQueue @ react-dom-client.production.js:12317
+(anonymous) @ react-dom-client.production.js:12867
+batchedUpdates$1 @ react-dom-client.production.js:1498
+dispatchEventForPluginEventSystem @ react-dom-client.production.js:12455
+dispatchEvent @ react-dom-client.production.js:15306
+dispatchDiscreteEvent @ react-dom-client.production.js:15274
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] Background sync started successfully after login {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] AuthManager: Login successful {userName: 'Nandor', isNewUser: false, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Returning user login succeeded {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Enriching debts: {rawDebtsCount: 4, billsCount: 10, envelopesCount: 14, transactionsCount: 100, sampleDebt: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 First debt enrichment details: {originalDebt: {…}, enrichedDebt: {…}, relatedBill: {…}, relatedEnvelope: {…}, relatedTransactionsCount: 0}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 Debt enrichment complete: {enrichedCount: 4}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats input: {totalDebts: 4, debtStatuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 calculateDebtStats filtered: {activeDebts: 4, statuses: Array(4)}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290296282, lastUnlock: 1762290286997, timeSinceUnlock: 9285, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 9285, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290296285, lastUnlock: 1762290287013, timeSinceUnlock: 9272, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 9272, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 ℹ️ 🔄 Starting chunked data sync... {}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Started tracking {syncId: 'sync_1762290297017_lck2t', type: 'cloud_sync', totalAttempts: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📦 Creating automatic pre-sync backup {backupId: 'auto_backup_cloud_sync_1762290297017', syncType: 'cloud_sync'}
+errorTrackingService.ts:187 🔍 [DEV] Backup stored in IndexedDB {backupId: 'auto_backup_cloud_sync_1762290297017'}
+errorTrackingService.ts:187 🔍 [DEV] 🧹 Cleaned up old auto backups {deleted: 1, remaining: 5}
+errorTrackingService.ts:187 🟢 [PROD] 📦 Auto backup created successfully {backupId: 'auto_backup_cloud_sync_1762290297017', records: 277, size: '68.41 KB', duration: 21}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Progress update {syncId: 'sync_1762290297017_lck2t', stage: 'initializing', progress: null}
+errorTrackingService.ts:187 🔍 [DEV] User already authenticated {uid: 'xThR9UGpIUf6SjKc50pCy0KdU0z1'}
+errorTrackingService.ts:187 ℹ️ Chunked sync service initialized {budgetId: 'budget_2...', maxChunkSize: 921600}
+errorTrackingService.ts:187 🔍 [DEV] 📊 Sync health: Progress update {syncId: 'sync_1762290297017_lck2t', stage: 'fetching_local_data', progress: null}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Starting execute for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 ChunkedSync-1762290284540: loadFromCloud acquired lock {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Acquired lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: About to call function for loadFromCloud {}
+errorTrackingService.ts:187 ℹ️ Starting chunked load from cloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadMainDocument {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadMainDocument attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadMainDocument executed in 206ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 485, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 501, decryptedSize: 485, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] Loaded manifest {version: '2.0', totalChunks: 1}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued loadChunks {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation started {hasPassword: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt successful {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation successful {category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'SESSION_UNLOCKED', description: 'Session unlocked successfully'}
+errorTrackingService.ts:187 🔍 [DEV] Session unlocked {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Unlock grace period started {duration: 2000, timestamp: 1762290299146, willExpireAt: 1762290301146}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: loadChunks attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: loadChunks executed in 139ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed loadChunks {}
+errorTrackingService.ts:187 🔍 [DEV] Deserialization complete {packedSize: 5261, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] Optimized decryption complete {encryptedSize: 5277, decryptedSize: 5261, duration: '2ms'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '302c9b5d...'}
+errorTrackingService.ts:187 🔍 [DEV] Reassembled transactions: 241 items {}
+errorTrackingService.ts:187 ℹ️ ✅ Chunked load completed successfully {duration: '3355ms', keys: Array(9), dataStructure: {…}}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Function completed for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: About to release lock for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 ChunkedSync-1762290284540: loadFromCloud released (3358ms) {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Lock released for loadFromCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 📊 CloudSyncService received data from chunkedSyncService {hasData: true, keys: Array(9), arrayLengths: {…}}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync direction analysis: {hasCloudData: true, hasLocalData: true, cloudItemCount: 277, localItemCount: 277, cloudLastModified: 1762289901637, …}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 [SYNC] Checking if shared budget user {hasConfig: true, hasCurrentUser: true, joinedVia: 'shareCode', sharedBy: 'Shared Budget', userKeys: Array(6)}
+errorTrackingService.ts:187 ℹ️ 🔄 Shared budget user detection: true {joinedVia: 'shareCode', sharedBy: 'Shared Budget', isSharedViaJoinedVia: true, isSharedViaSharedBy: true}
+errorTrackingService.ts:187 ℹ️ 🔄 Sync direction determined: toFirestore {localLastModified: 1762290297097, cloudLastModified: 1762289901637, hasLocalData: true, hasCloudData: true}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Starting execute for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 ChunkedSync-1762290284540: saveToCloud acquired lock {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Acquired lock for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: About to call function for saveToCloud {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] Starting chunked save to cloud {dataSize: Promise, userId: 'unknown'}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Processing data for chunking {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Chunking large array: transactions (241 items) {}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 69930, compressedSize: 7832, reduction: '8.93x'}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 2615, compressedSize: 616, reduction: '4.25x'}
+errorTrackingService.ts:187 🔍 [DEV] Chunking transactions: 241 items, 5000 per chunk {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Data processing complete. Total chunks: 1 {}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 57912, compressedSize: 5261, reduction: '11.01x'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '302c9b5d...'}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 540, checksum: '93ebb0ca...'}
+errorTrackingService.ts:187 🔍 [DEV] Created manifest {totalChunks: 1, totalSize: 5261}
+errorTrackingService.ts:187 🔍 [DEV] Compression analysis {originalSize: 674, expectedReduction: '1.39x', spaceSaved: '28%'}
+errorTrackingService.ts:187 ℹ️ Serialization complete {originalSize: 674, compressedSize: 481, finalSize: 484, compressionRatio: '1.40x', totalReduction: '1.39x', …}
+errorTrackingService.ts:187 ℹ️ Optimized encryption complete {originalSize: 674, compressedSize: 484, encryptedSize: 500, compressionRatio: '1.39x', totalReduction: '1.35x', …}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] About to save main document to Firebase {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued saveMainDocument {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290300961, lastUnlock: 1762290299146, timeSinceUnlock: 1815, gracePeriod: 2000, withinGracePeriod: true}
+errorTrackingService.ts:187 🔍 [DEV] ✅ Skipping auto-lock - within grace period after unlock {timeSinceUnlock: 1815, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290300961, lastUnlock: 1762290287013, timeSinceUnlock: 13948, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 13948, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing saveMainDocument {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: saveMainDocument attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Calling setDoc for main document {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: saveMainDocument executed in 214ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed saveMainDocument {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] Main document saved successfully {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] About to save 1 chunks in batches of 500 {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Processing batch 1/1 {}
+errorTrackingService.ts:187 🔍 [DEV] Compression analysis {originalSize: 57912, expectedReduction: '11.01x', spaceSaved: '91%'}
+errorTrackingService.ts:187 ℹ️ Serialization complete {originalSize: 57912, compressedSize: 5258, finalSize: 5261, compressionRatio: '11.01x', totalReduction: '11.01x', …}
+errorTrackingService.ts:187 ℹ️ Optimized encryption complete {originalSize: 57912, compressedSize: 5261, encryptedSize: 5277, compressionRatio: '11.01x', totalReduction: '10.97x', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔍 Generated checksum {dataSize: 57912, checksum: '302c9b5d...'}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] About to commit batch 1 {}
+errorTrackingService.ts:187 🔍 [DEV] 📥 ChunkedSyncQueue: Enqueued saveChunkBatch {queueSize: 1, debounceMs: 1500}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290302995, lastUnlock: 1762290299146, timeSinceUnlock: 3849, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 3849, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Visibility handler - PAGE_HIDDEN {now: 1762290302996, lastUnlock: 1762290287013, timeSinceUnlock: 15983, gracePeriod: 2000, withinGracePeriod: false}
+errorTrackingService.ts:187 🔍 [DEV] 🔒 Locking session - outside grace period {timeSinceUnlock: 15983, gracePeriod: 2000}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_HIDDEN', description: 'Page hidden, session locked for security'}
+errorTrackingService.ts:187 🔍 [DEV] Session locked {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncQueue: Processing saveChunkBatch {}
+errorTrackingService.ts:187 🔍 [DEV] 🔄 ChunkedSyncRetry: saveChunkBatch-1 attempt 1/3 {}
+errorTrackingService.ts:187 🔍 [DEV] 🚀 [CHUNKED SYNC] Calling batch.commit() for batch 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncRetry: Operation succeeded on attempt 1 {}
+errorTrackingService.ts:187 🔍 [DEV] ⚡ ChunkedSyncCircuit: saveChunkBatch-1 executed in 309ms {}
+errorTrackingService.ts:187 🔍 [DEV] ✅ ChunkedSyncQueue: Completed saveChunkBatch {}
+errorTrackingService.ts:187 ℹ️ 🚀 [CHUNKED SYNC] Batch 1/1 committed successfully {}
+errorTrackingService.ts:187 ℹ️ ✅ Chunked save completed successfully {totalChunks: 1, duration: '3732ms', mainDocSize: Promise}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Function completed for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: About to release lock for saveToCloud {}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 ChunkedSync-1762290284540: saveToCloud released (3733ms) {}
+errorTrackingService.ts:187 🔍 [DEV] 🔧 ChunkedSync-1762290284540: Lock released for saveToCloud {}
+errorTrackingService.ts:187 🟢 [PROD] Sync completed successfully {direction: 'toFirestore', recordsProcessed: 0}
+errorTrackingService.ts:187 🔍 [DEV] Using compressed size estimate {originalSize: 12920, compressedSize: 3394, reduction: '3.81x'}
+errorTrackingService.ts:187 🔍 [DEV] Updating user activity: {lastActive: '2025-11-04T21:05:04.192Z', userName: 'Nandor'}
+errorTrackingService.ts:187 🟢 [PROD] 📊 Sync health: Successful completion {syncId: 'sync_1762290297017_lck2t', duration: 7175, successRate: 1}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] Security event logged: {type: 'PAGE_VISIBLE', description: 'Page visible, user may need to unlock'}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation started {hasPassword: true, category: 'auth'}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt attempt: {hasEncryptedData: true, encryptedDataType: 'object', encryptedDataLength: 496, hasKey: true, keyType: 'object', …}
+errorTrackingService.ts:187 🔍 [DEV] 🔓 Decrypt successful {}
+errorTrackingService.ts:187 🔍 [DEV] [AUTH] TanStack: Password validation successful {category: 'auth'}

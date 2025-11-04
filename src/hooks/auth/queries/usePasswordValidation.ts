@@ -14,6 +14,46 @@ export const passwordValidationQueryKeys = {
 };
 
 /**
+ * Derive encryption key for password validation
+ */
+const deriveValidationKey = async (
+  password: string,
+  savedSalt: number[],
+  shareCode?: string
+): Promise<CryptoKey> => {
+  if (shareCode) {
+    const encoder = new TextEncoder();
+    const shareCodeBytes = encoder.encode(shareCode);
+    const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
+    const saltArray = new Uint8Array(deterministicSalt);
+    return encryptionUtils.deriveKeyFromSalt(password, saltArray);
+  }
+  
+  const saltArray = new Uint8Array(savedSalt);
+  return encryptionUtils.deriveKeyFromSalt(password, saltArray);
+};
+
+/**
+ * Test password by attempting to decrypt saved data
+ */
+const testPasswordDecryption = async (
+  password: string,
+  savedData: { salt: number[]; encryptedData: number[]; iv: number[] },
+  shareCode?: string
+): Promise<{ isValid: boolean; reason?: string }> => {
+  const testKey = await deriveValidationKey(password, savedData.salt, shareCode);
+  
+  try {
+    await encryptionUtils.decrypt(savedData.encryptedData, testKey, savedData.iv);
+    logger.auth("TanStack: Password validation successful");
+    return { isValid: true };
+  } catch {
+    logger.auth("TanStack: Password validation failed - decryption failed");
+    return { isValid: false, reason: "decryption_failed" };
+  }
+};
+
+/**
  * Hook for password validation query
  */
 export const usePasswordValidation = (password, _options = {}) => {
@@ -37,40 +77,17 @@ export const usePasswordValidation = (password, _options = {}) => {
         }
 
         const { salt: savedSalt, encryptedData, iv } = savedData;
-
         if (!savedSalt || !encryptedData || !iv) {
           logger.auth("TanStack: Missing required encryption components");
           return { isValid: false, reason: "missing_encryption_components" };
         }
 
-        // Check if user has a shareCode (shared budget)
-        // If so, use deterministic salt from shareCode (same logic as login)
         const savedProfile = localStorageService.getUserProfile();
-        const hasShareCode = savedProfile?.shareCode;
-
-        let testKey: CryptoKey;
-
-        if (hasShareCode) {
-          // For shared budgets, derive deterministic salt from shareCode
-          const encoder = new TextEncoder();
-          const shareCodeBytes = encoder.encode(hasShareCode);
-          const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
-          const saltArray = new Uint8Array(deterministicSalt);
-          testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-        } else {
-          // For regular budgets, use saved salt from localStorage
-          const saltArray = new Uint8Array(savedSalt);
-          testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-        }
-
-        try {
-          await encryptionUtils.decrypt(encryptedData, testKey, iv);
-          logger.auth("TanStack: Password validation successful");
-          return { isValid: true };
-        } catch {
-          logger.auth("TanStack: Password validation failed - decryption failed");
-          return { isValid: false, reason: "decryption_failed" };
-        }
+        return testPasswordDecryption(
+          password,
+          { salt: savedSalt, encryptedData, iv },
+          savedProfile?.shareCode
+        );
       } catch (error) {
         logger.error("TanStack: Password validation error", error);
         return {
