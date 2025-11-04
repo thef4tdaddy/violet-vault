@@ -256,6 +256,7 @@ const TabButton = ({
       className={`
         font-medium ${config.text} ${config.padding} 
         flex items-center gap-2 transition-all duration-200
+        flex-[0_0_50%] sm:flex-[0_0_auto]
         ${tabStyles}
         ${isActive && variant === "colored" ? "border-2 border-black" : ""}
       `.trim()}

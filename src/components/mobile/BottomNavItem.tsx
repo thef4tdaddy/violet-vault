@@ -27,11 +27,15 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
       onClick={handleClick}
       className={`
         flex flex-col items-center justify-center
-        min-w-[60px] px-2 py-2
+        px-2 py-2
         relative transition-all duration-200 ease-out
         ${isActive ? "text-purple-600" : "text-gray-600 hover:text-gray-800"}
       `}
-      style={{ scrollSnapAlign: "start" }}
+      style={{ 
+        scrollSnapAlign: "start",
+        minWidth: "20%", // Show 5 items at a time (100% / 5 = 20%)
+        flex: "0 0 20%"
+      }}
       aria-label={label}
     >
       {/* Icon with smooth scaling animation */}
