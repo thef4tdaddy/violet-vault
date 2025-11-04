@@ -41,6 +41,18 @@ const processJoinBudget = async (joinData: JoinBudgetData): Promise<JoinBudgetRe
   const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
   const saltArray = new Uint8Array(deterministicSalt);
 
+  // Log salt for debugging
+  if (import.meta?.env?.MODE === "development") {
+    const saltPreview =
+      Array.from(saltArray.slice(0, 8))
+        .map((b: number) => b.toString(16).padStart(2, "0"))
+        .join("") + "...";
+    logger.info("Join: Derived deterministic salt from share code", {
+      saltPreview,
+      shareCodePreview: joinData.shareCode?.split(" ").slice(0, 2).join(" ") + " ...",
+    });
+  }
+
   // Derive key using the deterministic salt
   const key = await encryptionUtils.deriveKeyFromSalt(joinData.password, saltArray);
   const newSalt = saltArray;

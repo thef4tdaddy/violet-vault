@@ -226,9 +226,16 @@ const handleExistingUserLogin = async (password: string): Promise<LoginResult> =
     const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
     usedSalt = new Uint8Array(deterministicSalt);
     
-    logger.auth("Shared budget login - using deterministic salt", {
-      shareCodePreview: hasShareCode.split(" ").slice(0, 2).join(" ") + " ...",
-    });
+    if (import.meta?.env?.MODE === "development") {
+      const saltPreview =
+        Array.from(usedSalt.slice(0, 8))
+          .map((b: number) => b.toString(16).padStart(2, "0"))
+          .join("") + "...";
+      logger.auth("Shared budget login - using deterministic salt", {
+        shareCodePreview: hasShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+        saltPreview,
+      });
+    }
     
     key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
   } else {
