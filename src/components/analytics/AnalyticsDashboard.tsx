@@ -151,6 +151,19 @@ const AnalyticsDashboard = () => {
     groupBy: "envelope",
   });
 
+  // Debug: Log what analytics queries are returning
+  logger.debug("📊 Analytics Dashboard Data Check:", {
+    hasAnalyticsData: !!analyticsQuery.analytics,
+    hasBalanceData: !!balanceQuery.analytics,
+    hasVelocity: !!analyticsQuery.analytics?.velocity,
+    hasTopCategories: !!analyticsQuery.analytics?.topCategories,
+    hasHealthScore: analyticsQuery.analytics?.healthScore !== undefined,
+    analyticsKeys: analyticsQuery.analytics ? Object.keys(analyticsQuery.analytics) : [],
+    isLoading: analyticsQuery.isLoading || balanceQuery.isLoading,
+    isError: analyticsQuery.isError || balanceQuery.isError,
+    error: analyticsQuery.error || balanceQuery.error,
+  });
+
   // Summary metrics calculation
   const summaryMetrics = useMemo(
     () => calculateSummaryMetrics(analyticsQuery.analytics, balanceQuery.analytics),
@@ -203,14 +216,24 @@ const AnalyticsDashboard = () => {
         {/* Insights Sidebar - 1/3 width */}
         <div className="lg:col-span-1">
           {analyticsQuery.analytics?.velocity &&
-            analyticsQuery.analytics?.topCategories &&
-            analyticsQuery.analytics?.healthScore !== undefined && (
-              <FinancialInsights
-                velocity={analyticsQuery.analytics.velocity}
-                topCategories={analyticsQuery.analytics.topCategories}
-                healthScore={analyticsQuery.analytics.healthScore}
-              />
-            )}
+          analyticsQuery.analytics?.topCategories &&
+          analyticsQuery.analytics?.healthScore !== undefined ? (
+            <FinancialInsights
+              velocity={analyticsQuery.analytics.velocity}
+              topCategories={analyticsQuery.analytics.topCategories}
+              healthScore={analyticsQuery.analytics.healthScore}
+            />
+          ) : (
+            <div className="bg-white rounded-xl border-2 border-black p-6">
+              <p className="text-gray-500 text-sm">
+                {analyticsQuery.isLoading
+                  ? "Loading insights..."
+                  : !analyticsQuery.analytics
+                    ? "No analytics data available"
+                    : `Insights not available (velocity: ${!!analyticsQuery.analytics?.velocity}, categories: ${!!analyticsQuery.analytics?.topCategories}, health: ${analyticsQuery.analytics?.healthScore !== undefined})`}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

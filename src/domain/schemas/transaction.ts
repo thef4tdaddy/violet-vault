@@ -15,11 +15,16 @@ export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 /**
  * Zod schema for Transaction validation
  * Represents financial transactions (income, expenses, transfers)
+ * 
+ * Note: Amount convention:
+ * - Positive amounts = Income/deposits
+ * - Negative amounts = Expenses/withdrawals
+ * This allows analytics calculations to work without checking the 'type' field
  */
 export const TransactionSchema = z.object({
   id: z.string().min(1, "Transaction ID is required"),
   date: z.union([z.date(), z.string()]),
-  amount: z.number().min(0, "Amount cannot be negative"),
+  amount: z.number(), // Can be positive (income) or negative (expense)
   envelopeId: z.string().min(1, "Envelope ID is required"),
   category: z.string().min(1, "Category is required"),
   type: TransactionTypeSchema.default("expense"),
