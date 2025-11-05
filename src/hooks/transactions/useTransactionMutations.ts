@@ -37,6 +37,24 @@ const triggerTransactionSync = (changeType: string) => {
   }
 };
 
+/**
+ * Transaction Mutations Hook
+ * Provides all transaction CRUD operations with TanStack Query
+ * 
+ * Function Length: 164 lines (exceeds max 150)
+ * Justification: This hook manages 4 related mutations (add, reconcile, delete, update)
+ * that share:
+ * - Common query invalidation logic
+ * - Balance update side effects
+ * - Cloud sync triggers
+ * - Error handling patterns
+ * Splitting into separate hooks would:
+ * - Create 4 files for closely related operations
+ * - Duplicate invalidation/sync logic
+ * - Hurt developer experience (import from multiple files)
+ * - Violate cohesion principle (transaction operations belong together)
+ */
+// eslint-disable-next-line max-lines-per-function
 export const useTransactionMutations = () => {
   const queryClient = useQueryClient();
   const { updateBalancesForTransaction } = useTransactionBalanceUpdater();

@@ -55,6 +55,7 @@ export const TransactionBasicFields = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
         <div className="grid grid-cols-2 gap-3">
           {/* Expense Button - Red theme with strong visual hierarchy */}
+          {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Plain button needed to avoid Button component's conflicting base styles (border-2, rounded-lg, etc.) */}
           <button
             type="button"
             onClick={() =>
@@ -79,6 +80,7 @@ export const TransactionBasicFields = ({
           </button>
           
           {/* Income Button - Green theme with strong visual hierarchy */}
+          {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Plain button needed to avoid Button component's conflicting base styles (border-2, rounded-lg, etc.) */}
           <button
             type="button"
             onClick={() =>
