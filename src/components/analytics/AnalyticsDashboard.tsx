@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import useAnalytics from "@/hooks/analytics/useAnalytics";
 import ReportExporter from "./ReportExporter";
 import AnalyticsSummaryCards from "./AnalyticsSummaryCards";
@@ -15,6 +15,107 @@ import { FinancialInsights } from "./insights";
 import logger from "@/utils/common/logger";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+
+/**
+ * Render active tab content based on selected tab
+ * Extracted to reduce component complexity
+ */
+const TabContentRenderer: React.FC<{
+  activeTab: string;
+  transactions: unknown[];
+  envelopes: unknown[];
+  timeFilter: string;
+  analyticsData: unknown;
+  balanceData: unknown;
+}> = ({ activeTab, transactions, envelopes, timeFilter, analyticsData, balanceData }) => {
+  if (activeTab === "overview") {
+    return (
+      <OverviewTabContent
+        transactions={transactions}
+        envelopes={envelopes}
+        timeFilter={timeFilter}
+      />
+    );
+  }
+
+  if (activeTab === "spending") {
+    return (
+      <SpendingTabContent
+        transactions={transactions}
+        envelopes={envelopes}
+        timeFilter={timeFilter}
+      />
+    );
+  }
+
+  if (activeTab === "trends") {
+    return <TrendsTabContent analyticsData={analyticsData} timeFilter={timeFilter} />;
+  }
+
+  if (activeTab === "performance") {
+    return <PerformanceTabContent analyticsData={analyticsData} balanceData={balanceData} />;
+  }
+
+  if (activeTab === "envelopes") {
+    return (
+      <EnvelopeTabContent
+        transactions={transactions}
+        envelopes={envelopes}
+        timeFilter={timeFilter}
+      />
+    );
+  }
+
+  return null;
+};
+
+/**
+ * Calculate summary metrics from analytics data
+ * Extracted to reduce component complexity
+ */
+const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) => {
+  if (!analyticsData || !balanceData) {
+    return {
+      totalIncome: 0,
+      totalExpenses: 0,
+      netAmount: 0,
+      envelopeUtilization: 0,
+      savingsProgress: 0,
+      balanceHealth: "unknown",
+    };
+  }
+
+  const spending = analyticsData as {
+    summary?: { totalIncome?: number; totalExpenses?: number; netAmount?: number };
+  };
+  const balance = balanceData as { envelopeBreakdown?: Record<string, unknown> };
+
+  // Calculate envelope utilization
+  const envelopeBreakdown = balance.envelopeBreakdown;
+  const totalBudgeted: number = envelopeBreakdown
+    ? (Object.values(envelopeBreakdown).reduce(
+        (sum: number, env: unknown) =>
+          sum + ((env as { monthlyBudget?: number }).monthlyBudget || 0),
+        0
+      ) as number)
+    : 0;
+  const totalSpent: number = envelopeBreakdown
+    ? (Object.values(envelopeBreakdown).reduce(
+        (sum: number, env: unknown) => sum + ((env as { spent?: number }).spent || 0),
+        0
+      ) as number)
+    : 0;
+  const envelopeUtilization = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
+
+  return {
+    totalIncome: spending.summary?.totalIncome || 0,
+    totalExpenses: spending.summary?.totalExpenses || 0,
+    netAmount: spending.summary?.netAmount || 0,
+    envelopeUtilization,
+    savingsProgress: 0,
+    balanceHealth: "unknown",
+  };
+};
 
 /**
  * Enhanced Analytics Dashboard for v1.10.0
@@ -51,52 +152,10 @@ const AnalyticsDashboard = () => {
   });
 
   // Summary metrics calculation
-  const summaryMetrics = useMemo(() => {
-    if (!analyticsQuery.analytics || !balanceQuery.analytics) {
-      return {
-        totalIncome: 0,
-        totalExpenses: 0,
-        netAmount: 0,
-        envelopeUtilization: 0,
-        savingsProgress: 0,
-        balanceHealth: "unknown",
-      };
-    }
-
-    const spending = analyticsQuery.analytics;
-    const balance = balanceQuery.analytics;
-
-    // Calculate envelope utilization
-    const envelopeBreakdown = balance.envelopeBreakdown;
-    const totalBudgeted = envelopeBreakdown
-      ? Object.values(envelopeBreakdown).reduce(
-          (sum, env: unknown) => sum + ((env as { monthlyBudget?: number }).monthlyBudget || 0),
-          0
-        )
-      : 0;
-    const totalSpent = envelopeBreakdown
-      ? Object.values(envelopeBreakdown).reduce(
-          (sum, env: unknown) => sum + ((env as { spent?: number }).spent || 0),
-          0
-        )
-      : 0;
-    const envelopeUtilization = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
-
-    // Calculate savings progress (simplified)
-    const savingsProgress = 0;
-
-    // Determine balance health (simplified)
-    const balanceHealth = "unknown";
-
-    return {
-      totalIncome: spending.summary?.totalIncome || 0,
-      totalExpenses: spending.summary?.totalExpenses || 0,
-      netAmount: spending.summary?.netAmount || 0,
-      envelopeUtilization,
-      savingsProgress,
-      balanceHealth,
-    };
-  }, [analyticsQuery.analytics, balanceQuery.analytics]);
+  const summaryMetrics = useMemo(
+    () => calculateSummaryMetrics(analyticsQuery.analytics, balanceQuery.analytics),
+    [analyticsQuery.analytics, balanceQuery.analytics]
+  );
 
   const handleExport = (format: unknown, options: unknown) => {
     logger.info("Exporting analytics report", { format, options, timeFilter });
@@ -131,40 +190,14 @@ const AnalyticsDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content - 2/3 width */}
         <div className="lg:col-span-2 bg-white rounded-lg border-2 border-black p-6 shadow-sm">
-          {activeTab === "overview" && (
-            <OverviewTabContent
-              transactions={transactions}
-              envelopes={envelopes}
-              timeFilter={timeFilter}
-            />
-          )}
-
-          {activeTab === "spending" && (
-            <SpendingTabContent
-              transactions={transactions}
-              envelopes={envelopes}
-              timeFilter={timeFilter}
-            />
-          )}
-
-          {activeTab === "trends" && (
-            <TrendsTabContent analyticsData={analyticsQuery.analytics} timeFilter={timeFilter} />
-          )}
-
-          {activeTab === "performance" && (
-            <PerformanceTabContent
-              analyticsData={analyticsQuery.analytics}
-              balanceData={balanceQuery.analytics}
-            />
-          )}
-
-          {activeTab === "envelopes" && (
-            <EnvelopeTabContent
-              transactions={transactions}
-              envelopes={envelopes}
-              timeFilter={timeFilter}
-            />
-          )}
+          <TabContentRenderer
+            activeTab={activeTab}
+            transactions={transactions}
+            envelopes={envelopes}
+            timeFilter={timeFilter}
+            analyticsData={analyticsQuery.analytics}
+            balanceData={balanceQuery.analytics}
+          />
         </div>
 
         {/* Insights Sidebar - 1/3 width */}
