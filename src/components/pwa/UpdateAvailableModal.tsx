@@ -20,7 +20,7 @@ const usePatchNotes = (shouldFetch: boolean) => {
 
   useEffect(() => {
     if (!shouldFetch) return;
-    
+
     const fetchNotes = async () => {
       try {
         const notes = await patchNotesManager.getPatchNotesForVersion(APP_VERSION);
@@ -35,7 +35,7 @@ const usePatchNotes = (shouldFetch: boolean) => {
         setLoadingNotes(false);
       }
     };
-    
+
     fetchNotes();
   }, [shouldFetch]);
 
@@ -52,7 +52,7 @@ const UpdateAvailableModal: React.FC = () => {
   const isUpdating = useUiStore((state) => state.isUpdating);
   const setUpdateAvailable = useUiStore((state) => state.setUpdateAvailable);
   const updateApp = useUiStore((state) => state.updateApp);
-  
+
   const { patchNotes, loadingNotes } = usePatchNotes(updateAvailable);
 
   if (!updateAvailable) return null;

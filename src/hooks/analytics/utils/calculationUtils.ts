@@ -6,7 +6,6 @@
 // Constants for calculations
 const SPENDING_TREND_THRESHOLD = 5; // Percent change to consider a trend
 const VELOCITY_PROJECTION_FACTOR = 0.5; // Dampening factor for next month projection
-const DAYS_PER_MONTH_AVG = 30; // Average days in a month for approximations
 
 // Budget health score constants
 const HEALTH_SCORE_NEGATIVE_NET_PENALTY = 30;
@@ -30,7 +29,7 @@ const getMonthKey = (date: Date): string => {
 
 interface Transaction {
   id: string;
-  date: string;
+  date: string | Date;
   amount: number;
   category?: string;
   envelopeId?: string;

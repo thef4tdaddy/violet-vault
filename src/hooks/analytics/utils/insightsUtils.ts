@@ -4,7 +4,7 @@
 
 interface Transaction {
   id: string;
-  date: string;
+  date: string | Date;
   amount: number;
   category?: string;
   envelopeId?: string;
@@ -17,6 +17,8 @@ interface CategoryData {
   net: number;
   count: number;
   transactions: Transaction[];
+  avgTransactionSize: number;
+  percentOfTotal: number;
 }
 
 interface TimeSeriesData {

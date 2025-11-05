@@ -34,8 +34,8 @@ const CollapsibleFilterHeader = ({
   onToggleFilters,
 }: CollapsibleHeaderProps) => {
   return (
-    <div 
-      className={`flex items-center justify-between p-4 ${!isExpanded ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+    <div
+      className={`flex items-center justify-between p-4 ${!isExpanded ? "cursor-pointer hover:bg-gray-50" : ""}`}
       onClick={!isExpanded ? onToggle : undefined}
     >
       <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
