@@ -16,6 +16,12 @@ import {
   usePaydayManager,
   useDashboardHelpers,
 } from "@/hooks/dashboard/useMainDashboard";
+import {
+  useEnvelopeSpendingData,
+  useBiweeklyStatus,
+  useDebtTrackerData,
+  useUpcomingBills,
+} from "@/hooks/dashboard/useDashboardData";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { MainDashboardPropsSchema } from "@/domain/schemas/component-props";
 
@@ -103,84 +109,11 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
     });
   };
 
-  // Calculate envelope spending data
-  const envelopeSpendingData = useMemo(() => {
-    if (envelopes.length === 0) return [];
-
-    const totalSpent = envelopes.reduce((sum, env) => {
-      const balance =
-        typeof env?.currentBalance === "string"
-          ? parseFloat(env.currentBalance)
-          : env?.currentBalance || 0;
-      return sum + (isNaN(balance) ? 0 : balance);
-    }, 0);
-
-    const colors = [
-      "bg-blue-500",
-      "bg-green-500",
-      "bg-purple-500",
-      "bg-yellow-500",
-      "bg-pink-500",
-    ];
-
-    return envelopes
-      .map((env, index) => {
-        const balance =
-          typeof env?.currentBalance === "string"
-            ? parseFloat(env.currentBalance)
-            : env?.currentBalance || 0;
-        const amount = isNaN(balance) ? 0 : balance;
-        const percentage = totalSpent > 0 ? Math.round((amount / totalSpent) * 100) : 0;
-        return {
-          name: env.name,
-          amount,
-          percentage,
-          color: colors[index % colors.length],
-        };
-      })
-      .filter((item) => item.percentage > 0)
-      .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 5);
-  }, [envelopes]);
-
-  // Calculate biweekly status (placeholder values - should be calculated from actual data)
-  const biweeklyStatus = useMemo(() => {
-    const totalGoal = 1753.95;
-    const currentProgress = totalEnvelopeBalance + totalSavingsBalance;
-    const amountNeeded = Math.max(0, totalGoal - currentProgress);
-    return { amountNeeded, totalGoal };
-  }, [totalEnvelopeBalance, totalSavingsBalance]);
-
-  // Prepare debt data for tracker
-  const debtTrackerData = useMemo(() => {
-    return debts
-      .filter((debt) => debt.status === "active")
-      .map((debt) => ({
-        id: debt.id,
-        name: debt.name,
-        currentBalance: debt.currentBalance || 0,
-        originalBalance: debt.originalBalance || debt.currentBalance || 0,
-        percentPaid:
-          debt.originalBalance > 0
-            ? Math.round(
-                ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100
-              )
-            : 0,
-      }));
-  }, [debts]);
-
-  // Prepare upcoming bills (next 7 days)
-  const upcomingBills = useMemo(() => {
-    const today = new Date();
-    const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-    return bills
-      .filter((bill) => {
-        const dueDate = new Date(bill.dueDate);
-        return dueDate >= today && dueDate <= sevenDaysLater;
-      })
-      .slice(0, 3);
-  }, [bills]);
+  // Calculate dashboard data using extracted hooks
+  const envelopeSpendingData = useEnvelopeSpendingData(envelopes);
+  const biweeklyStatus = useBiweeklyStatus(totalEnvelopeBalance, totalSavingsBalance);
+  const debtTrackerData = useDebtTrackerData(debts);
+  const upcomingBills = useUpcomingBills(bills);
 
   // Prepare insights
   const insights = useMemo(() => {
