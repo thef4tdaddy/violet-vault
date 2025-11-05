@@ -8,12 +8,13 @@ interface PaycheckEntry {
   [key: string]: unknown;
 }
 
-interface PaydayPrediction {
+export interface PaydayPrediction {
   nextPayday: Date | null;
   confidence: number;
   pattern: string | null;
   intervalDays?: number;
   message: string;
+  estimatedAmount?: number;
 }
 
 /**
