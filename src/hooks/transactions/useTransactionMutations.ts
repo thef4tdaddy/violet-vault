@@ -4,6 +4,7 @@ import { budgetDb } from "../../db/budgetDb.ts";
 import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts";
 import logger from "../../utils/common/logger.ts";
 import type { Transaction } from "../../db/types.ts";
+import { normalizeTransactionAmount } from "@/domain/schemas/transaction";
 
 export interface TransactionInput {
   date?: string;
@@ -43,7 +44,7 @@ export const useTransactionMutations = () => {
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
     mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
-      const newTransaction: Transaction = {
+      const rawTransaction: Transaction = {
         id: Date.now().toString(),
         date: new Date(transactionData.date || new Date().toISOString().split("T")[0]),
         type: transactionData.type || "expense",
@@ -56,6 +57,31 @@ export const useTransactionMutations = () => {
         merchant: transactionData.merchant,
         receiptUrl: transactionData.receiptUrl,
       };
+      
+      // Check for sign mismatch and warn/auto-correct
+      // Note: Normal UI flow won't trigger this because forms handle sign conversion
+      // This catches: imports, API calls, programmatic creation, manual DB edits
+      const isSignMismatch = 
+        (rawTransaction.type === "expense" && rawTransaction.amount > 0) ||
+        (rawTransaction.type === "income" && rawTransaction.amount < 0);
+      
+      if (isSignMismatch) {
+        const correctedAmount = rawTransaction.type === "expense" 
+          ? -Math.abs(rawTransaction.amount) 
+          : Math.abs(rawTransaction.amount);
+        
+        logger.warn("⚠️ Transaction amount sign mismatch - auto-correcting", {
+          type: rawTransaction.type,
+          originalAmount: rawTransaction.amount,
+          correctedAmount,
+          description: rawTransaction.description,
+          context: "Auto-normalization active - expense→negative, income→positive",
+        });
+      }
+      
+      // Normalize amount sign based on type (expense=negative, income=positive)
+      const newTransaction = normalizeTransactionAmount(rawTransaction);
+      
       await optimisticHelpers.addTransaction(queryClient, newTransaction);
       await budgetDb.transactions.put(newTransaction);
       await updateBalancesForTransaction(newTransaction);
