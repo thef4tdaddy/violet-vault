@@ -180,6 +180,13 @@ const enhancedDebts = baseData.debts.map((debt) => {
   };
 });
 
+// Helper to properly format transaction amount based on type
+const formatTransactionAmount = (amount, type) => {
+  const numAmount = parseFloat(amount);
+  // Expenses should be negative, income should be positive
+  return type === 'expense' ? -Math.abs(numAmount) : Math.abs(numAmount);
+};
+
 // Generate 100+ transactions over 6 months (Aug 2024 - Jan 2025)
 const generateTransactions = () => {
   const transactions = [];
@@ -199,7 +206,7 @@ const generateTransactions = () => {
         transactions.push({
           id: `txn-${String(txnCounter++).padStart(3, '0')}`,
           date: getDateString(daysAgo),
-          amount: parseFloat(amount),
+          amount: formatTransactionAmount(amount, 'expense'),
           envelopeId: 'env-001-groceries',
           category: 'Food & Dining',
           type: 'expense',
@@ -220,7 +227,7 @@ const generateTransactions = () => {
         transactions.push({
           id: `txn-${String(txnCounter++).padStart(3, '0')}`,
           date: getDateString(daysAgo),
-          amount: parseFloat(amount),
+          amount: formatTransactionAmount(amount, 'expense'),
           envelopeId: 'env-002-gas',
           category: 'Transportation',
           type: 'expense',
@@ -241,7 +248,7 @@ const generateTransactions = () => {
         transactions.push({
           id: `txn-${String(txnCounter++).padStart(3, '0')}`,
           date: getDateString(daysAgo),
-          amount: parseFloat(amount),
+          amount: formatTransactionAmount(amount, 'expense'),
           envelopeId: 'env-001-groceries',
           category: 'Food & Dining',
           type: 'expense',
@@ -261,10 +268,10 @@ const generateTransactions = () => {
       transactions.push({
         id: `txn-${String(txnCounter++).padStart(3, '0')}`,
         date: getDateString(daysAgo),
-        amount: parseFloat(amount),
-        envelopeId: 'env-005-entertainment',
-        category: 'Entertainment',
-        type: 'expense',
+          amount: formatTransactionAmount(amount, 'expense'),
+          envelopeId: 'env-005-entertainment',
+          category: 'Entertainment',
+          type: 'expense',
         lastModified: getTimestamp(daysAgo),
         createdAt: getTimestamp(daysAgo),
         description: 'Entertainment',
@@ -280,7 +287,7 @@ const generateTransactions = () => {
       transactions.push({
         id: `txn-${String(txnCounter++).padStart(3, '0')}`,
         date: getDateString(daysAgo),
-        amount: parseFloat(amount),
+        amount: formatTransactionAmount(amount, 'expense'),
         envelopeId: 'env-006-healthcare',
         category: 'Health & Medical',
         type: 'expense',
@@ -299,7 +306,7 @@ const generateTransactions = () => {
       transactions.push({
         id: `txn-${String(txnCounter++).padStart(3, '0')}`,
         date: getDateString(daysAgo),
-        amount: parseFloat(amount),
+        amount: formatTransactionAmount(amount, 'expense'),
         envelopeId: 'env-007-pet-care',
         category: 'Pets',
         type: 'expense',
@@ -317,7 +324,7 @@ const generateTransactions = () => {
       transactions.push({
         id: `txn-${String(txnCounter++).padStart(3, '0')}`,
         date: getDateString(daysAgo),
-        amount: parseFloat(amount),
+        amount: formatTransactionAmount(amount, 'expense'),
         envelopeId: 'env-009-personal-care',
         category: 'Personal Care',
         type: 'expense',
@@ -441,7 +448,7 @@ const generateTransactions = () => {
   return transactions;
 };
 
-// Update base transactions to have recent dates (last 30 days)
+// Update base transactions to have recent dates (last 30 days) and correct amounts
 const updateBaseTransactions = () => {
   return baseData.transactions.map((txn, index) => {
     const daysAgo = Math.floor(Math.random() * 30) + 1; // Random day in last 30 days
@@ -450,6 +457,8 @@ const updateBaseTransactions = () => {
       date: getDateString(daysAgo),
       lastModified: getTimestamp(daysAgo),
       createdAt: getTimestamp(daysAgo),
+      // Ensure expenses are negative
+      amount: txn.type === 'expense' ? -Math.abs(txn.amount) : Math.abs(txn.amount),
     };
   });
 };
@@ -543,7 +552,7 @@ const buildAllTransactions = () => {
   const billPayments = allBills.filter(b => b.isPaid).map(bill => ({
     id: `${bill.id}-payment`,
     date: bill.dueDate,
-    amount: bill.amount,
+    amount: -Math.abs(bill.amount), // Bill payments are expenses (negative)
     envelopeId: bill.envelopeId,
     category: bill.category,
     type: 'bill',
