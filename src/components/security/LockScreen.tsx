@@ -79,6 +79,48 @@ const LockScreen = () => {
     }
   }, [confirm, logout]);
 
+  // Handle corrupted data
+  const handleCorruptedData = useCallback(async () => {
+    setIsUnlocking(false);
+    setPasswordToValidate("");
+    setPassword("");
+    
+    const confirmPromise = new Promise((resolve) => {
+      const originalConfirm = confirm({
+        title: "🔧 Corrupted Validation Data Detected",
+        message:
+          "The encrypted validation data in your browser is corrupted (OperationError).\n\nYour cloud data is safe, but local validation is failing.\n\nClear corrupted data and sync fresh from cloud?",
+        confirmLabel: "Clear & Sync Fresh",
+        cancelLabel: "Cancel",
+        destructive: false,
+      });
+
+      originalConfirm.then(resolve).catch(() => resolve(false));
+
+      setPendingConfirm({
+        cancel: () => {
+          resolve(false);
+        },
+      });
+    });
+
+    let shouldClear;
+    try {
+      shouldClear = await confirmPromise;
+    } finally {
+      setPendingConfirm(null);
+    }
+
+    if (shouldClear) {
+      // Clear corrupted local data - cloud data is safe
+      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed to fix corrupted validation data
+      localStorage.removeItem("envelopeBudgetData");
+      
+      // Reload to sync fresh from cloud
+      window.location.reload();
+    }
+  }, [confirm]);
+
   // Handle validation results
   useEffect(() => {
     if (passwordToValidate && validationResult !== undefined && !isValidating) {
@@ -100,13 +142,16 @@ const LockScreen = () => {
         setFailedAttempts(0);
         setError("");
         setIsUnlocking(false);
+      } else if ((validationResult as { isCorrupted?: boolean })?.isCorrupted) {
+        // Corrupted validation data detected
+        handleCorruptedData();
       } else {
         // Password is incorrect
         handleIncorrectPassword();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingConfirm intentionally excluded to prevent infinite loop from state updates
-  }, [validationResult, isValidating, passwordToValidate, unlockSession, handleIncorrectPassword]);
+  }, [validationResult, isValidating, passwordToValidate, unlockSession, handleIncorrectPassword, handleCorruptedData]);
 
   // Count recent failed attempts from security events
   useEffect(() => {

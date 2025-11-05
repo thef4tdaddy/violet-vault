@@ -40,14 +40,29 @@ const testPasswordDecryption = async (
   password: string,
   savedData: { salt: number[]; encryptedData: number[]; iv: number[] },
   shareCode?: string
-): Promise<{ isValid: boolean; reason?: string }> => {
+): Promise<{ isValid: boolean; reason?: string; isCorrupted?: boolean }> => {
   const testKey = await deriveValidationKey(password, savedData.salt, shareCode);
 
   try {
     await encryptionUtils.decrypt(savedData.encryptedData, testKey, savedData.iv);
     logger.auth("TanStack: Password validation successful");
     return { isValid: true };
-  } catch {
+  } catch (error) {
+    // Check if this is an OperationError (corrupted data) vs wrong password
+    const isOperationError = error instanceof Error && error.name === "OperationError";
+    
+    if (isOperationError) {
+      logger.error("TanStack: Corrupted encrypted data detected - OperationError", {
+        errorMessage: error.message,
+        errorName: error.name,
+      });
+      return { 
+        isValid: false, 
+        reason: "corrupted_data",
+        isCorrupted: true 
+      };
+    }
+    
     logger.auth("TanStack: Password validation failed - decryption failed");
     return { isValid: false, reason: "decryption_failed" };
   }
