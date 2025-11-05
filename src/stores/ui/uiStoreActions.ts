@@ -102,15 +102,30 @@ export const createUpdateAppAction = (set) => ({
         state.isUpdating = false;
       });
 
+      logger.info("PWA update initiated - activating new service worker");
+
       if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration && registration.waiting) {
+          // Tell the waiting service worker to activate
           registration.waiting.postMessage({ type: "SKIP_WAITING" });
-        } else {
-          window.location.reload();
+
+          // The controllerchange event will fire when the new SW takes over
+          // We don't force a reload - let the user continue using the app
+          // The new version will be active on next natural page load
+          navigator.serviceWorker.addEventListener(
+            "controllerchange",
+            () => {
+              logger.info("✅ Service worker activated! New version ready on next navigation.");
+              // Show a subtle toast notification instead of forcing reload
+              set((state) => {
+                state.updateAvailable = false;
+                state.isUpdating = false;
+              });
+            },
+            { once: true }
+          );
         }
-      } else {
-        window.location.reload();
       }
     } catch (error) {
       logger.error("Failed to update app", error);
