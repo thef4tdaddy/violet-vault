@@ -5,7 +5,6 @@
  */
 
 import React, { useEffect, useState } from "react";
-// @ts-expect-error - Optional dependency for API documentation
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import { Button } from "@/components/ui";
