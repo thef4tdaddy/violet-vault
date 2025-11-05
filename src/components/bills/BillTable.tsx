@@ -138,7 +138,7 @@ const BillTable: React.FC<BillTableProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${displayData.amount}
+                    {typeof bill.amount === 'number' ? `$${bill.amount.toFixed(2)}` : 'No amount'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {displayData.dueDateDisplay}
