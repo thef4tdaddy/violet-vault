@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/common/queryClient";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
+import { useBudgetMetadata } from "@/hooks/budgeting/useBudgetMetadata";
 
 interface Envelope {
   id: string;
@@ -16,13 +18,6 @@ interface SavingsGoal {
   targetAmount?: number;
 }
 
-interface StoreSelector {
-  envelopes?: Envelope[];
-  savingsGoals?: SavingsGoal[];
-  unassignedCash?: number;
-  actualBalance?: number;
-}
-
 interface EnvelopeAnalysis {
   id: string;
   name: string;
@@ -36,17 +31,14 @@ interface EnvelopeAnalysis {
 
 /**
  * Hook for balance analytics data fetching and calculations
+ * Updated to use TanStack Query hooks instead of Zustand store
+ * This ensures data is fetched from Dexie (single source of truth)
  */
 export const useBalanceAnalyticsQuery = () => {
-  // Get data from Zustand store
-  const { envelopes, savingsGoals, unassignedCash, actualBalance } = useBudgetStore(
-    (state: StoreSelector) => ({
-      envelopes: state.envelopes,
-      savingsGoals: state.savingsGoals,
-      unassignedCash: state.unassignedCash,
-      actualBalance: state.actualBalance,
-    })
-  );
+  // Get data from TanStack Query (Dexie as source of truth)
+  const { envelopes } = useEnvelopesQuery();
+  const { savingsGoals } = useSavingsGoals();
+  const { unassignedCash, actualBalance } = useBudgetMetadata();
 
   return useQuery({
     queryKey: queryKeys.analyticsBalance(),

@@ -11,6 +11,7 @@ import SpendingTabContent from "./dashboard/SpendingTabContent";
 import TrendsTabContent from "./dashboard/TrendsTabContent";
 import PerformanceTabContent from "./dashboard/PerformanceTabContent";
 import EnvelopeTabContent from "./dashboard/EnvelopeTabContent";
+import { FinancialInsights } from "./insights";
 import logger from "@/utils/common/logger";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
@@ -127,41 +128,57 @@ const AnalyticsDashboard = () => {
 
       <AnalyticsTabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="bg-white rounded-lg border-2 border-black p-6 shadow-sm">
-        {activeTab === "overview" && (
-          <OverviewTabContent
-            transactions={transactions}
-            envelopes={envelopes}
-            timeFilter={timeFilter}
-          />
-        )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content - 2/3 width */}
+        <div className="lg:col-span-2 bg-white rounded-lg border-2 border-black p-6 shadow-sm">
+          {activeTab === "overview" && (
+            <OverviewTabContent
+              transactions={transactions}
+              envelopes={envelopes}
+              timeFilter={timeFilter}
+            />
+          )}
 
-        {activeTab === "spending" && (
-          <SpendingTabContent
-            transactions={transactions}
-            envelopes={envelopes}
-            timeFilter={timeFilter}
-          />
-        )}
+          {activeTab === "spending" && (
+            <SpendingTabContent
+              transactions={transactions}
+              envelopes={envelopes}
+              timeFilter={timeFilter}
+            />
+          )}
 
-        {activeTab === "trends" && (
-          <TrendsTabContent analyticsData={analyticsQuery.analytics} timeFilter={timeFilter} />
-        )}
+          {activeTab === "trends" && (
+            <TrendsTabContent analyticsData={analyticsQuery.analytics} timeFilter={timeFilter} />
+          )}
 
-        {activeTab === "performance" && (
-          <PerformanceTabContent
-            analyticsData={analyticsQuery.analytics}
-            balanceData={balanceQuery.analytics}
-          />
-        )}
+          {activeTab === "performance" && (
+            <PerformanceTabContent
+              analyticsData={analyticsQuery.analytics}
+              balanceData={balanceQuery.analytics}
+            />
+          )}
 
-        {activeTab === "envelopes" && (
-          <EnvelopeTabContent
-            transactions={transactions}
-            envelopes={envelopes}
-            timeFilter={timeFilter}
-          />
-        )}
+          {activeTab === "envelopes" && (
+            <EnvelopeTabContent
+              transactions={transactions}
+              envelopes={envelopes}
+              timeFilter={timeFilter}
+            />
+          )}
+        </div>
+
+        {/* Insights Sidebar - 1/3 width */}
+        <div className="lg:col-span-1">
+          {analyticsQuery.analytics?.velocity &&
+            analyticsQuery.analytics?.topCategories &&
+            analyticsQuery.analytics?.healthScore !== undefined && (
+              <FinancialInsights
+                velocity={analyticsQuery.analytics.velocity}
+                topCategories={analyticsQuery.analytics.topCategories}
+                healthScore={analyticsQuery.analytics.healthScore}
+              />
+            )}
+        </div>
       </div>
 
       {showExportModal && (
