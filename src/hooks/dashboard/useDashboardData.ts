@@ -1,19 +1,5 @@
 import { useMemo } from "react";
-import type { Envelope } from "@/db/types";
-
-interface Debt {
-  id: string;
-  name: string;
-  currentBalance: number;
-  originalBalance?: number;
-  status?: string;
-}
-
-interface Bill {
-  id: string;
-  dueDate: Date | string;
-  [key: string]: unknown;
-}
+import type { Envelope, Bill, Debt } from "@/db/types";
 
 /**
  * Hook for calculating envelope spending data

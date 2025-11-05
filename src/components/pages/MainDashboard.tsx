@@ -1,5 +1,5 @@
 // components/Dashboard.jsx
-import React, { useMemo } from "react";
+import React from "react";
 import ReconcileTransactionModal from "../dashboard/ReconcileTransactionModal";
 import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
 import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
@@ -22,6 +22,7 @@ import {
   useDebtTrackerData,
   useUpcomingBills,
 } from "@/hooks/dashboard/useDashboardData";
+import { useDashboardInsights } from "@/hooks/dashboard/useDashboardInsights";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { MainDashboardPropsSchema } from "@/domain/schemas/component-props";
 
@@ -114,42 +115,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
   const biweeklyStatus = useBiweeklyStatus(totalEnvelopeBalance, totalSavingsBalance);
   const debtTrackerData = useDebtTrackerData(debts);
   const upcomingBills = useUpcomingBills(bills);
-
-  // Prepare insights
-  const insights = useMemo(() => {
-    const insightsList = [];
-
-    if (unassignedCash > 0) {
-      insightsList.push({
-        id: "unassigned-cash",
-        type: "info" as const,
-        message: `You have $${unassignedCash.toFixed(2)} unallocated`,
-        action: {
-          label: "Suggest Envelopes",
-          onClick: () => setActiveView("envelopes"),
-        },
-      });
-    }
-
-    if (debts.length > 0) {
-      const totalDebt = debts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
-      insightsList.push({
-        id: "debt-summary",
-        type: "info" as const,
-        message: `Total debt: $${totalDebt.toFixed(2)}. Stay on track with your payments.`,
-      });
-    }
-
-    if (paydayPrediction && paydayPrediction.confidence >= 80) {
-      insightsList.push({
-        id: "payday-confidence",
-        type: "success" as const,
-        message: "High confidence payday prediction. You're managing your budget well!",
-      });
-    }
-
-    return insightsList;
-  }, [unassignedCash, debts, paydayPrediction, setActiveView]);
+  const insights = useDashboardInsights(unassignedCash, debts, paydayPrediction, setActiveView);
 
   // Show loading state while TanStack queries are fetching
   if (
