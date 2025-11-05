@@ -3,6 +3,31 @@
  * Optimized for performance with large datasets (200+ transactions)
  */
 
+// Constants for calculations
+const SPENDING_TREND_THRESHOLD = 5; // Percent change to consider a trend
+const VELOCITY_PROJECTION_FACTOR = 0.5; // Dampening factor for next month projection
+const DAYS_PER_MONTH_AVG = 30; // Average days in a month for approximations
+
+// Budget health score constants
+const HEALTH_SCORE_NEGATIVE_NET_PENALTY = 30;
+const HEALTH_SCORE_LOW_SAVINGS_PENALTY = 20;
+const HEALTH_SCORE_MED_SAVINGS_PENALTY = 10;
+const HEALTH_SCORE_OVER_UTIL_PENALTY = 5;
+const HEALTH_SCORE_UNDER_UTIL_BONUS = 2;
+const HEALTH_SCORE_MAX_BONUS = 10;
+const SAVINGS_RATE_LOW_THRESHOLD = 10;
+const SAVINGS_RATE_MED_THRESHOLD = 20;
+const ENVELOPE_OVER_UTIL_THRESHOLD = 90;
+const ENVELOPE_UNDER_UTIL_THRESHOLD = 70;
+
+/**
+ * Generate month key from date
+ * Utility to ensure consistent month key format across calculations
+ */
+const getMonthKey = (date: Date): string => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+};
+
 interface Transaction {
   id: string;
   date: string;
@@ -204,7 +229,7 @@ export const calculateTimeSeriesData = (
   transactions.forEach((t) => {
     const tDate = new Date(t.date);
     if (tDate >= startDate && tDate <= endDate) {
-      const monthKey = `${tDate.getFullYear()}-${String(tDate.getMonth() + 1).padStart(2, "0")}`;
+      const monthKey = getMonthKey(tDate);
 
       if (!monthlyData.has(monthKey)) {
         monthlyData.set(monthKey, { income: 0, expenses: 0, count: 0 });
@@ -228,6 +253,10 @@ export const calculateTimeSeriesData = (
       const net = data.income - data.expenses;
       cumulativeNet += net;
 
+      // Calculate actual days in month for accurate daily averages
+      const [year, month] = monthKey.split("-").map(Number);
+      const daysInMonth = new Date(year, month, 0).getDate();
+
       return {
         month: monthKey,
         date: new Date(monthKey + "-01"),
@@ -236,7 +265,7 @@ export const calculateTimeSeriesData = (
         net,
         cumulativeNet,
         transactionCount: data.count,
-        avgDailyExpenses: data.expenses / 30, // Approximate
+        avgDailyExpenses: data.expenses / daysInMonth,
         savingsRate: data.income > 0 ? (net / data.income) * 100 : 0,
       };
     });
@@ -297,8 +326,8 @@ export const calculateSpendingVelocity = (
   const percentChange = avgExpenses > 0 ? (velocityChange / avgExpenses) * 100 : 0;
 
   let trendDirection: "increasing" | "decreasing" | "stable" = "stable";
-  if (percentChange > 5) trendDirection = "increasing";
-  else if (percentChange < -5) trendDirection = "decreasing";
+  if (percentChange > SPENDING_TREND_THRESHOLD) trendDirection = "increasing";
+  else if (percentChange < -SPENDING_TREND_THRESHOLD) trendDirection = "decreasing";
 
   return {
     averageMonthlyExpenses: avgExpenses,
@@ -306,7 +335,7 @@ export const calculateSpendingVelocity = (
     trendDirection,
     velocityChange,
     percentChange,
-    projectedNextMonth: lastMonth.expenses + velocityChange * 0.5, // Simple projection
+    projectedNextMonth: lastMonth.expenses + velocityChange * VELOCITY_PROJECTION_FACTOR,
   };
 };
 
@@ -343,22 +372,26 @@ export const calculateBudgetHealthScore = (
 
   // Penalty for negative net (spending more than earning)
   if (summary.netAmount < 0) {
-    score -= 30;
+    score -= HEALTH_SCORE_NEGATIVE_NET_PENALTY;
   }
 
   // Penalty for low savings rate
   const savingsRate = summary.totalIncome > 0 ? (summary.netAmount / summary.totalIncome) * 100 : 0;
-  if (savingsRate < 10) score -= 20;
-  else if (savingsRate < 20) score -= 10;
+  if (savingsRate < SAVINGS_RATE_LOW_THRESHOLD) score -= HEALTH_SCORE_LOW_SAVINGS_PENALTY;
+  else if (savingsRate < SAVINGS_RATE_MED_THRESHOLD) score -= HEALTH_SCORE_MED_SAVINGS_PENALTY;
 
-  // Penalty for over-utilized envelopes
+  // Penalty for over-utilized envelopes (overspending in categories)
   const envelopes = Object.values(envelopeBreakdown);
-  const overUtilized = envelopes.filter((env) => (env.utilizationRate || 0) > 90).length;
-  score -= overUtilized * 5;
+  const overUtilized = envelopes.filter(
+    (env) => (env.utilizationRate || 0) > ENVELOPE_OVER_UTIL_THRESHOLD
+  ).length;
+  score -= overUtilized * HEALTH_SCORE_OVER_UTIL_PENALTY;
 
-  // Bonus for under-utilized envelopes (good budgeting)
-  const underUtilized = envelopes.filter((env) => (env.utilizationRate || 0) < 70).length;
-  score += Math.min(underUtilized * 2, 10);
+  // Bonus for under-utilized envelopes (good budgeting practices)
+  const underUtilized = envelopes.filter(
+    (env) => (env.utilizationRate || 0) < ENVELOPE_UNDER_UTIL_THRESHOLD
+  ).length;
+  score += Math.min(underUtilized * HEALTH_SCORE_UNDER_UTIL_BONUS, HEALTH_SCORE_MAX_BONUS);
 
   return Math.max(0, Math.min(100, score));
 };

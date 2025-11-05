@@ -37,7 +37,9 @@ export const useSpendingAnalyticsQuery = (options: SpendingAnalyticsOptions = {}
   } = options;
 
   // Get data from TanStack Query (Dexie as source of truth)
-  const { transactions } = useTransactionQuery({ limit: 10000 }); // Get all transactions for analytics
+  // Dynamic limit based on period to optimize performance
+  const transactionLimit = period === "allTime" || period === "thisYear" ? 5000 : 2000;
+  const { transactions } = useTransactionQuery({ limit: transactionLimit });
   const { envelopes } = useEnvelopesQuery();
 
   return useQuery({

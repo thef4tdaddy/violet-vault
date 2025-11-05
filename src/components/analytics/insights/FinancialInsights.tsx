@@ -35,11 +35,23 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({
   const getTrendIcon = (direction: string) => {
     switch (direction) {
       case "increasing":
-        return "📈";
+        return (
+          <span role="img" aria-label="increasing trend">
+            📈
+          </span>
+        );
       case "decreasing":
-        return "📉";
+        return (
+          <span role="img" aria-label="decreasing trend">
+            📉
+          </span>
+        );
       default:
-        return "➡️";
+        return (
+          <span role="img" aria-label="stable trend">
+            ➡️
+          </span>
+        );
     }
   };
 
