@@ -82,7 +82,7 @@ const InsightsSection = ({ insights }: InsightsSectionProps) => {
                 {insight.action && (
                   <Button
                     onClick={insight.action.onClick}
-                    className="mt-2 text-sm font-medium underline hover:no-underline"
+                    className="mt-2 px-3 py-1 text-sm font-medium bg-white/50 hover:bg-white/70 rounded border border-gray-300 transition-colors"
                   >
                     {insight.action.label}
                   </Button>

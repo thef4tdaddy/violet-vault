@@ -1,5 +1,12 @@
 import { useMemo } from "react";
 import type { Envelope, Bill, Debt } from "@/db/types";
+import {
+  DEFAULT_BIWEEKLY_GOAL,
+  UPCOMING_BILLS_DAYS,
+  MAX_ENVELOPE_SPENDING_ITEMS,
+  MAX_DEBT_TRACKER_ITEMS,
+  MAX_RECENT_BILLS,
+} from "@/constants/budget";
 
 /**
  * Hook for calculating envelope spending data
@@ -41,7 +48,7 @@ export const useEnvelopeSpendingData = (envelopes: Envelope[]) => {
       })
       .filter((item) => item.percentage > 0)
       .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 5);
+      .slice(0, MAX_ENVELOPE_SPENDING_ITEMS);
   }, [envelopes]);
 };
 
@@ -53,7 +60,7 @@ export const useBiweeklyStatus = (
   totalSavingsBalance: number
 ) => {
   return useMemo(() => {
-    const totalGoal = 1753.95;
+    const totalGoal = DEFAULT_BIWEEKLY_GOAL;
     const currentProgress = totalEnvelopeBalance + totalSavingsBalance;
     const amountNeeded = Math.max(0, totalGoal - currentProgress);
     return { amountNeeded, totalGoal };
@@ -78,7 +85,8 @@ export const useDebtTrackerData = (debts: Debt[]) => {
                 ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100
               )
             : 0,
-      }));
+      }))
+      .slice(0, MAX_DEBT_TRACKER_ITEMS);
   }, [debts]);
 };
 
@@ -88,13 +96,13 @@ export const useDebtTrackerData = (debts: Debt[]) => {
 export const useUpcomingBills = (bills: Bill[]) => {
   return useMemo(() => {
     const today = new Date();
-    const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const daysLater = new Date(today.getTime() + UPCOMING_BILLS_DAYS * 24 * 60 * 60 * 1000);
 
     return bills
       .filter((bill) => {
         const dueDate = new Date(bill.dueDate);
-        return dueDate >= today && dueDate <= sevenDaysLater;
+        return dueDate >= today && dueDate <= daysLater;
       })
-      .slice(0, 3);
+      .slice(0, MAX_RECENT_BILLS);
   }, [bills]);
 };

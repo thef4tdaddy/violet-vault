@@ -2,6 +2,8 @@ import React from "react";
 import { getIcon } from "@/utils";
 import { Button } from "@/components/ui";
 import type { Bill, PaycheckHistory } from "@/db/types";
+import { formatDate } from "@/utils/common/dateFormatters";
+import { MAX_RECENT_TRANSACTIONS, MAX_RECENT_BILLS, MAX_RECENT_PAYCHECKS } from "@/constants/budget";
 
 interface Transaction {
   id: string;
@@ -58,7 +60,7 @@ const ActivitySnapshotSection = ({
             {recentTransactions.length === 0 ? (
               <p className="text-sm text-gray-500">No recent transactions</p>
             ) : (
-              recentTransactions.slice(0, 5).map((transaction) => (
+              recentTransactions.slice(0, MAX_RECENT_TRANSACTIONS).map((transaction) => (
                 <div
                   key={transaction.id}
                   className="flex items-center justify-between p-2 bg-white/50 rounded-lg"
@@ -97,7 +99,7 @@ const ActivitySnapshotSection = ({
             {upcomingBills.length === 0 ? (
               <p className="text-sm text-gray-500">No upcoming bills</p>
             ) : (
-              upcomingBills.slice(0, 3).map((bill) => (
+              upcomingBills.slice(0, MAX_RECENT_BILLS).map((bill) => (
                 <div
                   key={bill.id}
                   className="flex items-center justify-between p-2 bg-white/50 rounded-lg"
@@ -134,7 +136,7 @@ const ActivitySnapshotSection = ({
             {recentPaychecks.length === 0 ? (
               <p className="text-sm text-gray-500">No recent paychecks</p>
             ) : (
-              recentPaychecks.slice(0, 3).map((paycheck) => (
+              recentPaychecks.slice(0, MAX_RECENT_PAYCHECKS).map((paycheck) => (
                 <div
                   key={paycheck.id}
                   className="flex items-center justify-between p-2 bg-white/50 rounded-lg"
@@ -143,11 +145,7 @@ const ActivitySnapshotSection = ({
                     {React.createElement(getIcon("DollarSign"), {
                       className: "h-4 w-4 text-green-600",
                     })}
-                    <span className="text-sm text-gray-700">
-                      {paycheck.date instanceof Date
-                        ? paycheck.date.toLocaleDateString()
-                        : new Date(paycheck.date).toLocaleDateString()}
-                    </span>
+                    <span className="text-sm text-gray-700">{formatDate(paycheck.date)}</span>
                   </div>
                   <span className="text-sm font-bold text-green-600">
                     ${paycheck.amount.toFixed(2)}
