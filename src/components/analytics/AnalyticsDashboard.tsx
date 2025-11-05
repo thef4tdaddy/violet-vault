@@ -151,18 +151,14 @@ const AnalyticsDashboard = () => {
     groupBy: "envelope",
   });
 
-  // Debug: Log what analytics queries are returning
-  logger.debug("📊 Analytics Dashboard Data Check:", {
-    hasAnalyticsData: !!analyticsQuery.analytics,
-    hasBalanceData: !!balanceQuery.analytics,
-    hasVelocity: !!analyticsQuery.analytics?.velocity,
-    hasTopCategories: !!analyticsQuery.analytics?.topCategories,
-    hasHealthScore: analyticsQuery.analytics?.healthScore !== undefined,
-    analyticsKeys: analyticsQuery.analytics ? Object.keys(analyticsQuery.analytics) : [],
-    isLoading: analyticsQuery.isLoading || balanceQuery.isLoading,
-    isError: analyticsQuery.isError || balanceQuery.isError,
-    error: analyticsQuery.error || balanceQuery.error,
-  });
+  // Debug logging for analytics data
+  if (import.meta.env.MODE === "development") {
+    logger.debug("📊 Analytics Dashboard Data Check:", {
+      hasVelocity: !!analyticsQuery.analytics?.velocity,
+      hasTopCategories: !!analyticsQuery.analytics?.topCategories,
+      hasHealthScore: analyticsQuery.analytics?.healthScore !== undefined,
+    });
+  }
 
   // Summary metrics calculation
   const summaryMetrics = useMemo(
