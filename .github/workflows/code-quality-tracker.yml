@@ -20,6 +20,11 @@ on:
   # Manual trigger option
   workflow_dispatch:
 
+# Prevent duplicate runs for the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   issues: write
   pull-requests: write
@@ -204,7 +209,7 @@ jobs:
               console.log('❌ Failed to update issue #806:', error.message);
             }
 
-      - name: Create summary comment on PR
+      - name: Create or update summary comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v8
         with:
@@ -224,15 +229,41 @@ jobs:
             const commentBody = '## ' + statusEmoji + ' Code Quality Check\n\n' +
               '**ESLint**: ' + eslintTotal + ' issues\n' +
               '**TypeScript**: ' + tsTotal + ' compilation errors\n\n' +
-              mergeStatus;
+              mergeStatus + '\n\n' +
+              '_Last updated: ' + new Date().toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC_';
 
             try {
-              await github.rest.issues.createComment({
+              // Find existing comment from this bot
+              const comments = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: commentBody
               });
+
+              const botComment = comments.data.find(comment => 
+                comment.user.type === 'Bot' && 
+                comment.body.includes('Code Quality Check')
+              );
+
+              if (botComment) {
+                // Update existing comment
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: commentBody
+                });
+                console.log('✅ Updated existing code quality comment');
+              } else {
+                // Create new comment
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: commentBody
+                });
+                console.log('✅ Created new code quality comment');
+              }
             } catch (error) {
-              console.log('Could not create PR comment:', error.message);
+              console.log('❌ Could not create/update PR comment:', error.message);
             }
