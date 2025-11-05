@@ -1,17 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import useUiStore from "@/stores/ui/uiStore";
+import patchNotesManager from "@/utils/pwa/patchNotesManager";
+import { APP_VERSION } from "@/utils/common/version";
+import logger from "@/utils/common/logger";
+
+interface PatchNote {
+  type: "feature" | "fix" | "breaking" | "other";
+  text: string;
+}
+
+/**
+ * Hook to fetch patch notes
+ */
+const usePatchNotes = (shouldFetch: boolean) => {
+  const [patchNotes, setPatchNotes] = useState<PatchNote[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(true);
+
+  useEffect(() => {
+    if (!shouldFetch) return;
+    
+    const fetchNotes = async () => {
+      try {
+        const notes = await patchNotesManager.getPatchNotesForVersion(APP_VERSION);
+        if (notes && notes.hasContent) {
+          const highlights = patchNotesManager.getTopHighlights(notes);
+          setPatchNotes(highlights);
+          logger.info("Loaded patch notes for version popup", { version: APP_VERSION });
+        }
+      } catch (error) {
+        logger.warn("Could not load patch notes for popup", error);
+      } finally {
+        setLoadingNotes(false);
+      }
+    };
+    
+    fetchNotes();
+  }, [shouldFetch]);
+
+  return { patchNotes, loadingNotes };
+};
 
 /**
  * Update Available Modal
  * Shows when a new version of the PWA is available
+ * Displays actual patch notes when available (for release builds)
  */
 const UpdateAvailableModal: React.FC = () => {
   const updateAvailable = useUiStore((state) => state.updateAvailable);
   const isUpdating = useUiStore((state) => state.isUpdating);
   const setUpdateAvailable = useUiStore((state) => state.setUpdateAvailable);
   const updateApp = useUiStore((state) => state.updateApp);
+  
+  const { patchNotes, loadingNotes } = usePatchNotes(updateAvailable);
 
   if (!updateAvailable) return null;
 
@@ -47,26 +89,63 @@ const UpdateAvailableModal: React.FC = () => {
 
         {/* Features Preview */}
         <div className="bg-purple-50/60 rounded-lg p-4 mb-6 border border-purple-200">
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center space-x-2">
-              {React.createElement(getIcon("CheckCircle"), {
-                className: "w-4 h-4 text-green-600 flex-shrink-0",
-              })}
-              <span className="text-gray-700">Latest security updates</span>
+          {loadingNotes ? (
+            <div className="flex items-center justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+              <span className="ml-3 text-sm text-gray-600">Loading release notes...</span>
             </div>
-            <div className="flex items-center space-x-2">
-              {React.createElement(getIcon("CheckCircle"), {
-                className: "w-4 h-4 text-green-600 flex-shrink-0",
+          ) : patchNotes.length > 0 ? (
+            <div className="space-y-2 text-sm">
+              {patchNotes.map((note, index) => {
+                const iconName =
+                  note.type === "feature"
+                    ? "PlusCircle"
+                    : note.type === "fix"
+                      ? "CheckCircle"
+                      : note.type === "breaking"
+                        ? "AlertTriangle"
+                        : "CheckCircle";
+                const iconColor =
+                  note.type === "feature"
+                    ? "text-green-600"
+                    : note.type === "fix"
+                      ? "text-blue-600"
+                      : note.type === "breaking"
+                        ? "text-orange-600"
+                        : "text-purple-600";
+
+                return (
+                  <div key={index} className="flex items-start space-x-2">
+                    {React.createElement(getIcon(iconName), {
+                      className: `w-4 h-4 ${iconColor} flex-shrink-0 mt-0.5`,
+                    })}
+                    <span className="text-gray-700 flex-1">{note.text}</span>
+                  </div>
+                );
               })}
-              <span className="text-gray-700">Performance improvements</span>
             </div>
-            <div className="flex items-center space-x-2">
-              {React.createElement(getIcon("CheckCircle"), {
-                className: "w-4 h-4 text-green-600 flex-shrink-0",
-              })}
-              <span className="text-gray-700">Enhanced offline functionality</span>
+          ) : (
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center space-x-2">
+                {React.createElement(getIcon("CheckCircle"), {
+                  className: "w-4 h-4 text-green-600 flex-shrink-0",
+                })}
+                <span className="text-gray-700">Latest security updates</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                {React.createElement(getIcon("CheckCircle"), {
+                  className: "w-4 h-4 text-green-600 flex-shrink-0",
+                })}
+                <span className="text-gray-700">Performance improvements</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                {React.createElement(getIcon("CheckCircle"), {
+                  className: "w-4 h-4 text-green-600 flex-shrink-0",
+                })}
+                <span className="text-gray-700">Enhanced offline functionality</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Actions */}
