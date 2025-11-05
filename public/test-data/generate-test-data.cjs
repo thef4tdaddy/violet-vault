@@ -499,12 +499,40 @@ const updateBaseSavingsGoals = () => {
   });
 };
 
+// Update paycheck history to match component interface and have recent dates
+const updateBasePaycheckHistory = () => {
+  return baseData.paycheckHistory.map((paycheck) => {
+    const totalAllocated = Object.values(paycheck.allocations || {}).reduce((sum, amt) => sum + amt, 0);
+    
+    return {
+      ...paycheck,
+      // Map old fields to new expected fields
+      payerName: paycheck.source || paycheck.payerName || 'Employer',
+      processedAt: paycheck.date || paycheck.processedAt,
+      processedBy: 'System',
+      allocationMode: 'allocate', // or 'proportional'
+      totalAllocated,
+      remainingAmount: (paycheck.amount || 0) - totalAllocated,
+      // Update timestamps
+      lastModified: getTimestamp(Math.floor(Math.random() * 30)),
+      createdAt: getTimestamp(Math.floor(Math.random() * 90)),
+      // Convert allocations object to array format expected by component
+      allocations: Object.entries(paycheck.allocations || {}).map(([envelopeId, amount]) => ({
+        envelopeId,
+        envelopeName: baseData.envelopes.find(e => e.id === envelopeId)?.name || envelopeId,
+        amount
+      }))
+    };
+  });
+};
+
 // Build enhanced data with updated dates
 const newTransactions = generateTransactions();
 const updatedBaseTransactions = updateBaseTransactions();
 const updatedBaseBills = updateBaseBills();
 const updatedBaseEnvelopes = updateBaseEnvelopes();
 const updatedBaseSavingsGoals = updateBaseSavingsGoals();
+const updatedBasePaycheckHistory = updateBasePaycheckHistory();
 
 const allEnvelopes = [...updatedBaseEnvelopes, ...debtEnvelopes];
 const allBills = [...updatedBaseBills, ...debtBills];
@@ -540,7 +568,7 @@ const enhancedData = {
   savingsGoals: updatedBaseSavingsGoals,
   supplementalAccounts: baseData.supplementalAccounts,
   debts: enhancedDebts,
-  paycheckHistory: baseData.paycheckHistory,
+  paycheckHistory: updatedBasePaycheckHistory,
   auditLog: baseData.auditLog,
   unassignedCash: baseData.unassignedCash,
   biweeklyAllocation: baseData.biweeklyAllocation,
