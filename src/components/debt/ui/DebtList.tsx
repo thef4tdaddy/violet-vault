@@ -87,6 +87,28 @@ const FinancialDetails = ({
 );
 
 const DebtCard = ({ debt, onClick }: DebtCardProps) => {
+  // Extract actual debt data
+  const currentBalance = (debt as Record<string, unknown>).currentBalance as number || (debt as Record<string, unknown>).balance as number || 0;
+  const interestRate = (debt as Record<string, unknown>).interestRate as number || 0;
+  const minimumPayment = (debt as Record<string, unknown>).minimumPayment as number || 0;
+  const nextPaymentDate = (debt as Record<string, unknown>).nextPaymentDate as string | Date | undefined;
+  const dueDate = (debt as Record<string, unknown>).dueDate as string | Date | undefined;
+  const originalBalance = (debt as Record<string, unknown>).originalBalance as number || currentBalance;
+  
+  // Calculate progress
+  const progressPercentage = originalBalance > 0 
+    ? Math.max(0, Math.min(((originalBalance - currentBalance) / originalBalance) * 100, 100))
+    : 0;
+  
+  // Format payment display
+  const paymentDisplay = minimumPayment > 0 ? `$${minimumPayment.toFixed(2)}` : "$0.00";
+  
+  // Format next payment info
+  const paymentDate = nextPaymentDate || dueDate;
+  const nextPaymentValue = paymentDate 
+    ? new Date(paymentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : "N/A";
+  
   const {
     config,
     IconComponent,
@@ -98,21 +120,22 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     relationships,
     canQuickPay,
     handleRecordPayment,
-    currentBalance,
-    interestRate,
   } = {
     config: { bgColor: "bg-gray-50", textColor: "text-gray-600", name: "Standard" },
     IconComponent: "Clock",
     statusStyle: "text-gray-600",
     statusText: "Active",
-    progressData: { percentage: 0 },
-    paymentInfo: { display: "$0.00" },
-    nextPaymentInfo: { label: "Next Payment", hasIcon: true, type: "next_payment", value: "N/A" },
+    progressData: { percentage: progressPercentage },
+    paymentInfo: { display: paymentDisplay },
+    nextPaymentInfo: { 
+      label: "Next Payment", 
+      hasIcon: true, 
+      type: "next_payment", 
+      value: nextPaymentValue 
+    },
     relationships: { hasRelationships: false, items: [] },
     canQuickPay: false,
     handleRecordPayment: () => {},
-    currentBalance: Number(debt?.currentBalance) || 0,
-    interestRate: Number(debt?.interestRate) || 0,
   };
 
   return (
