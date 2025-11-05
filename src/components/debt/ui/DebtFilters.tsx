@@ -39,8 +39,11 @@ const DebtFilterHeader = ({
   isExpanded: boolean;
   setIsExpanded: (val: boolean) => void;
 }) => (
-  <div className="flex items-center justify-between p-4">
-    <div className="flex items-center space-x-2">
+  <div 
+    className={`flex items-center justify-between p-4 ${!isExpanded ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+    onClick={!isExpanded ? () => setIsExpanded(true) : undefined}
+  >
+    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
       {React.createElement(getIcon("Filter"), {
         className: `h-4 w-4 ${filtersEnabled ? "text-purple-600" : "text-gray-400"}`,
       })}
@@ -50,8 +53,11 @@ const DebtFilterHeader = ({
       
       {hasActiveFilters && filtersEnabled && (
         <Button
-          onClick={toggleFilters}
-          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900 hover:bg-purple-300 transition-colors border border-purple-300"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFilters();
+          }}
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900 hover:bg-purple-300 transition-colors border border-purple-300 cursor-pointer"
           title="Click to disable all filters"
         >
           Active
@@ -60,8 +66,11 @@ const DebtFilterHeader = ({
       
       {!filtersEnabled && (
         <Button
-          onClick={toggleFilters}
-          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors border border-gray-300"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFilters();
+          }}
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors border border-gray-300 cursor-pointer"
           title="Click to enable filters"
         >
           Disabled
@@ -70,11 +79,13 @@ const DebtFilterHeader = ({
     </div>
     
     <Button
-      onClick={() => setIsExpanded(!isExpanded)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsExpanded(!isExpanded);
+      }}
       className={`p-1 rounded-lg transition-colors ${
         filtersEnabled ? "bg-purple-100 hover:bg-purple-200" : "bg-gray-100 hover:bg-gray-200"
       }`}
-      disabled={!filtersEnabled}
     >
       {isExpanded
         ? React.createElement(getIcon("ChevronUp"), {
