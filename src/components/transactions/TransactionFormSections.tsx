@@ -53,8 +53,9 @@ export const TransactionBasicFields = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-        <div className="grid grid-cols-2 gap-2">
-          <Button
+        <div className="grid grid-cols-2 gap-3">
+          {/* Expense Button - Red theme with strong visual hierarchy */}
+          <button
             type="button"
             onClick={() =>
               setTransactionForm({
@@ -63,18 +64,22 @@ export const TransactionBasicFields = ({
               })
             }
             disabled={!!editingTransaction && !canEdit}
-            className={`p-2 rounded-lg border-2 transition-all ${
+            className={`p-3 rounded-lg transition-all ${
               transactionForm.type === "expense"
-                ? "border-red-500 bg-red-50 text-red-700"
-                : "border-gray-200 hover:border-red-300"
-            } ${!!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                ? "border-2 border-black bg-red-600 text-black font-bold shadow-md" // SELECTED: Hard black outline, bright red, black text
+                : "border-2 border-red-600 bg-red-100 text-gray-600 hover:bg-red-200" // UNSELECTED: Red outline, soft red, grey text
+            } ${!!editingTransaction && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            aria-pressed={transactionForm.type === "expense"}
+            aria-label="Set transaction type to expense"
           >
             {React.createElement(getIcon("TrendingDown"), {
-              className: "h-4 w-4 mx-auto mb-1",
+              className: "h-5 w-5 mx-auto mb-1",
             })}
-            <span className="text-sm">Expense</span>
-          </Button>
-          <Button
+            <span className="text-sm font-semibold">Expense</span>
+          </button>
+          
+          {/* Income Button - Green theme with strong visual hierarchy */}
+          <button
             type="button"
             onClick={() =>
               setTransactionForm({
@@ -83,18 +88,25 @@ export const TransactionBasicFields = ({
               })
             }
             disabled={!!editingTransaction && !canEdit}
-            className={`p-2 rounded-lg border-2 transition-all ${
+            className={`p-3 rounded-lg transition-all ${
               transactionForm.type === "income"
-                ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                : "border-gray-200 hover:border-emerald-300"
-            } ${!!editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                ? "border-2 border-black bg-green-600 text-black font-bold shadow-md" // SELECTED: Hard black outline, green, black text
+                : "border-2 border-green-600 bg-green-100 text-gray-600 hover:bg-green-200" // UNSELECTED: Green outline, soft green, grey text
+            } ${!!editingTransaction && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            aria-pressed={transactionForm.type === "income"}
+            aria-label="Set transaction type to income"
           >
             {React.createElement(getIcon("TrendingUp"), {
-              className: "h-4 w-4 mx-auto mb-1",
+              className: "h-5 w-5 mx-auto mb-1",
             })}
-            <span className="text-sm">Income</span>
-          </Button>
+            <span className="text-sm font-semibold">Income</span>
+          </button>
         </div>
+        <p className="text-xs text-gray-500 mt-1">
+          {transactionForm.type === "expense" 
+            ? "Negative amount (money going out)" 
+            : "Positive amount (money coming in)"}
+        </p>
       </div>
     </div>
   );
@@ -305,7 +317,8 @@ export const TransactionNotesAndReconciled = ({
         />
       </div>
 
-      <div className="flex items-center justify-start">
+      {/* Reconciled Checkbox - Using CSS Grid for proper left alignment */}
+      <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
         <Checkbox
           id="reconciled"
           checked={transactionForm.reconciled}
@@ -316,8 +329,9 @@ export const TransactionNotesAndReconciled = ({
             })
           }
           disabled={!!editingTransaction && !canEdit}
+          className="mt-0.5 justify-self-start"
         />
-        <label htmlFor="reconciled" className="ml-3 text-sm text-gray-700">
+        <label htmlFor="reconciled" className="text-sm text-gray-700 cursor-pointer">
           Mark as reconciled
         </label>
       </div>
