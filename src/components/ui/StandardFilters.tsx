@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { Select } from "@/components/ui";
+import { Select, Checkbox } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 
 export interface FilterConfig {
   key: string;
-  type: "select";
-  options: Array<{ value: string; label: string }>;
-  defaultValue?: string;
+  label?: string;
+  type: "select" | "checkbox";
+  options?: Array<{ value: string; label: string }>;
+  defaultValue?: string | boolean;
 }
 
 interface FilterValues {
   search?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | boolean | undefined;
 }
 
 interface CollapsibleHeaderProps {
@@ -50,7 +51,8 @@ const CollapsibleFilterHeader = ({
 
         {/* Active badge - clickable to toggle filters */}
         {hasActiveFilters && filtersEnabled && (
-          <Button
+          <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggleFilters();
@@ -59,12 +61,13 @@ const CollapsibleFilterHeader = ({
             title="Click to disable all filters"
           >
             Active
-          </Button>
+          </button>
         )}
 
         {/* Disabled indicator */}
         {!filtersEnabled && (
-          <Button
+          <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggleFilters();
@@ -73,7 +76,7 @@ const CollapsibleFilterHeader = ({
             title="Click to enable filters"
           >
             Disabled
-          </Button>
+          </button>
         )}
       </div>
 
@@ -101,7 +104,7 @@ const CollapsibleFilterHeader = ({
 interface CollapsibleFilterContentProps {
   filterConfigs: FilterConfig[];
   filters: FilterValues;
-  handleFilterChange: (key: string, value: string) => void;
+  handleFilterChange: (key: string, value: string | boolean) => void;
   searchPlaceholder: string;
   config: { input: string; select: string; gap: string };
 }
@@ -110,12 +113,17 @@ interface CollapsibleFilterContentProps {
  * Helper to check if any filters are active
  */
 const hasActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]): boolean => {
-  if (filters.search && filters.search.trim() !== "") return true;
+  if (filters.search && String(filters.search).trim() !== "") return true;
   return filterConfigs.some((filterConfig) => {
     if (filterConfig.type === "select") {
       const currentValue = filters[filterConfig.key];
       const defaultValue = filterConfig.defaultValue || "all";
       return currentValue && currentValue !== defaultValue;
+    }
+    if (filterConfig.type === "checkbox") {
+      const currentValue = Boolean(filters[filterConfig.key]);
+      const defaultValue = Boolean(filterConfig.defaultValue || false);
+      return currentValue !== defaultValue;
     }
     return false;
   });
@@ -124,7 +132,7 @@ const hasActiveFilters = (filters: FilterValues, filterConfigs: FilterConfig[]):
 interface StandardFilterContentProps {
   filterConfigs: FilterConfig[];
   filters: FilterValues;
-  handleFilterChange: (key: string, value: string) => void;
+  handleFilterChange: (key: string, value: string | boolean) => void;
   searchPlaceholder: string;
   config: { input: string; select: string; gap: string };
 }
@@ -168,14 +176,14 @@ const StandardFilterContent = ({
         )}
       </div>
 
-      {/* Filter Dropdowns */}
+      {/* Filter Dropdowns and Checkboxes */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
         {filterConfigs.map((filterConfig) => {
-          if (filterConfig.type === "select") {
+          if (filterConfig.type === "select" && filterConfig.options) {
             return (
               <Select
                 key={filterConfig.key}
-                value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                value={String(filters[filterConfig.key] || filterConfig.defaultValue || "all")}
                 onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
                 options={filterConfig.options}
                 className={`
@@ -184,6 +192,20 @@ const StandardFilterContent = ({
                   bg-white text-gray-700 w-full sm:w-auto
                 `.trim()}
               />
+            );
+          }
+          if (filterConfig.type === "checkbox") {
+            return (
+              <div key={filterConfig.key} className="flex items-center gap-2">
+                <Checkbox
+                  id={filterConfig.key}
+                  checked={Boolean(filters[filterConfig.key] || filterConfig.defaultValue || false)}
+                  onChange={(e) => handleFilterChange(filterConfig.key, e.target.checked)}
+                />
+                <label htmlFor={filterConfig.key} className="text-sm text-gray-700 cursor-pointer">
+                  {filterConfig.label || filterConfig.key}
+                </label>
+              </div>
             );
           }
           return null;
@@ -226,18 +248,20 @@ const CollapsibleFilterContent = ({
           />
         </div>
 
-        {/* Filter Dropdowns */}
+        {/* Filter Dropdowns and Checkboxes */}
         {filterConfigs.map((filterConfig) => {
-          if (filterConfig.type === "select") {
+          if (filterConfig.type === "select" && filterConfig.options) {
             return (
               <div key={filterConfig.key}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {filterConfig.options
-                    .find((opt) => opt.value === "all")
-                    ?.label.replace("All ", "") || "Filter"}
+                  {filterConfig.label ||
+                    filterConfig.options
+                      .find((opt) => opt.value === "all")
+                      ?.label.replace("All ", "") ||
+                    "Filter"}
                 </label>
                 <Select
-                  value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                  value={String(filters[filterConfig.key] || filterConfig.defaultValue || "all")}
                   onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
                   options={filterConfig.options}
                   className={`
@@ -246,6 +270,28 @@ const CollapsibleFilterContent = ({
                     bg-white text-gray-700 w-full
                   `.trim()}
                 />
+              </div>
+            );
+          }
+          if (filterConfig.type === "checkbox") {
+            return (
+              <div key={filterConfig.key}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+                <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
+                  <Checkbox
+                    id={filterConfig.key}
+                    checked={Boolean(
+                      filters[filterConfig.key] || filterConfig.defaultValue || false
+                    )}
+                    onChange={(e) => handleFilterChange(filterConfig.key, e.target.checked)}
+                  />
+                  <label
+                    htmlFor={filterConfig.key}
+                    className="text-sm text-gray-700 cursor-pointer"
+                  >
+                    {filterConfig.label || filterConfig.key}
+                  </label>
+                </div>
               </div>
             );
           }
@@ -258,13 +304,14 @@ const CollapsibleFilterContent = ({
 
 interface StandardFiltersProps {
   filters?: FilterValues;
-  onFilterChange: (key: string, value: string) => void;
+  onFilterChange: (key: string, value: string | boolean) => void;
   filterConfigs?: FilterConfig[];
   showClearButton?: boolean;
   searchPlaceholder?: string;
   size?: "sm" | "md";
   className?: string;
-  collapsible?: boolean;
+  mode?: "collapsible" | "inline";
+  defaultFilters?: FilterValues;
 }
 
 /**
@@ -279,7 +326,8 @@ const StandardFilters = ({
   searchPlaceholder = "Search...",
   size = "md",
   className = "",
-  collapsible = false,
+  mode = "inline",
+  defaultFilters = {},
 }: StandardFiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [filtersEnabled, setFiltersEnabled] = useState(true);
@@ -299,21 +347,25 @@ const StandardFilters = ({
 
   const config = sizeConfig[size];
 
-  const handleFilterChange = (filterKey: string, value: string) => {
+  const handleFilterChange = (filterKey: string, value: string | boolean) => {
     onFilterChange(filterKey, value);
   };
 
   const clearAllFilters = () => {
-    const clearedFilters: Record<string, string> = {};
-    // Set search to empty string
-    clearedFilters.search = "";
+    // Use provided defaultFilters or build from filterConfigs
+    const clearedFilters: Record<string, string | boolean> = { ...defaultFilters };
 
-    // Set all other filters to their default values
-    filterConfigs.forEach((filterConfig) => {
-      if (filterConfig.type === "select") {
-        clearedFilters[filterConfig.key] = filterConfig.defaultValue || "all";
-      }
-    });
+    // If no defaultFilters provided, build from filterConfigs
+    if (Object.keys(defaultFilters).length === 0) {
+      clearedFilters.search = "";
+      filterConfigs.forEach((filterConfig) => {
+        if (filterConfig.type === "select") {
+          clearedFilters[filterConfig.key] = filterConfig.defaultValue || "all";
+        } else if (filterConfig.type === "checkbox") {
+          clearedFilters[filterConfig.key] = filterConfig.defaultValue || false;
+        }
+      });
+    }
 
     // Apply all cleared filters at once
     Object.entries(clearedFilters).forEach(([key, value]) => {
@@ -338,7 +390,7 @@ const StandardFilters = ({
   const filtersActive = hasActiveFilters(filters, filterConfigs);
 
   // Collapsible mode (like Debt filters with purple hue and toggle)
-  if (collapsible) {
+  if (mode === "collapsible") {
     return (
       <div className={`rounded-xl border-2 border-black bg-purple-50 ${className}`}>
         <CollapsibleFilterHeader

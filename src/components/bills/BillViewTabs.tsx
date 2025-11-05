@@ -48,7 +48,7 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         ]}
         searchPlaceholder="Search bills..."
         size="md"
-        collapsible={true}
+        mode="collapsible"
       />
     </div>
   );
