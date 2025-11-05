@@ -264,12 +264,21 @@ export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
     statuses: activeDebts.map((d) => d.status),
   });
 
-  const totalDebt = activeDebts.reduce((sum, debt) => sum + debt.balance, 0);
-  const totalMonthlyPayments = activeDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
+  const totalDebt = activeDebts.reduce(
+    (sum, debt) =>
+      sum + ((debt as unknown as Record<string, number>).currentBalance || debt.balance || 0),
+    0
+  );
+  const totalMonthlyPayments = activeDebts.reduce(
+    (sum, debt) => sum + (debt.minimumPayment || 0),
+    0
+  );
 
   // Calculate weighted average interest rate
+  const balance = (debt: DebtAccount) =>
+    (debt as unknown as Record<string, number>).currentBalance || debt.balance || 0;
   const weightedInterestSum = activeDebts.reduce(
-    (sum, debt) => sum + debt.interestRate * debt.balance,
+    (sum, debt) => sum + (debt.interestRate || 0) * balance(debt),
     0
   );
   const averageInterestRate = totalDebt > 0 ? weightedInterestSum / totalDebt : 0;
@@ -299,7 +308,7 @@ export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
     return dueDate >= today && dueDate <= nextWeek;
   });
 
-  const dueSoonAmount = dueSoonDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
+  const dueSoonAmount = dueSoonDebts.reduce((sum, debt) => sum + (debt.minimumPayment || 0), 0);
   const dueSoonCount = dueSoonDebts.length;
 
   return {

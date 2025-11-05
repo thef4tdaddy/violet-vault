@@ -27,6 +27,7 @@ export interface DebtAccount {
   name: string;
   creditor: string;
   balance: number;
+  currentBalance?: number; // Alias for balance (used in DB schema)
   interestRate: number;
   minimumPayment: number;
 
