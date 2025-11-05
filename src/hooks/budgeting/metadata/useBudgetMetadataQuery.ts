@@ -9,6 +9,7 @@ interface BudgetMetadata {
   actualBalance?: number;
   isActualBalanceManual?: boolean;
   biweeklyAllocation?: number;
+  supplementalAccounts?: Array<unknown>;
   lastModified: number;
   [key: string]: unknown;
 }
@@ -34,6 +35,7 @@ export const useBudgetMetadataQuery = () => {
           actualBalance: 0,
           isActualBalanceManual: false,
           biweeklyAllocation: 0,
+          supplementalAccounts: [],
           lastModified: Date.now(),
         };
 
@@ -61,6 +63,7 @@ export const useBudgetMetadataQuery = () => {
   const actualBalance = metadata.actualBalance || 0;
   const isActualBalanceManual = metadata.isActualBalanceManual || false;
   const biweeklyAllocation = metadata.biweeklyAllocation || 0;
+  const supplementalAccounts = metadata.supplementalAccounts || [];
 
   return {
     metadata,
@@ -68,6 +71,7 @@ export const useBudgetMetadataQuery = () => {
     actualBalance,
     isActualBalanceManual,
     biweeklyAllocation,
+    supplementalAccounts,
     isLoading,
     error,
     refetch,

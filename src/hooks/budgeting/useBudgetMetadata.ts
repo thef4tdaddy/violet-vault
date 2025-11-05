@@ -18,6 +18,7 @@ export const useBudgetMetadata = () => {
     actualBalance,
     isActualBalanceManual,
     biweeklyAllocation,
+    supplementalAccounts,
     isLoading,
     error,
     refetch,
@@ -46,6 +47,7 @@ export const useBudgetMetadata = () => {
     actualBalance,
     isActualBalanceManual,
     biweeklyAllocation,
+    supplementalAccounts,
 
     // Loading states
     isLoading,

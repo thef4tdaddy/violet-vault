@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import useBudgetData from "../budgeting/useBudgetData";
-import { useUnassignedCash, useActualBalance } from "../budgeting/useBudgetMetadata";
+import { useUnassignedCash, useActualBalance, useBudgetMetadataQuery } from "../budgeting/useBudgetMetadata";
 import useBills from "../bills/useBills";
 import {
   calculateEnvelopeData,
@@ -20,6 +20,7 @@ export const useLayoutData = () => {
   // Core TanStack Query hooks
   const budgetData = useBudgetData();
   const { unassignedCash } = useUnassignedCash();
+  const { supplementalAccounts } = useBudgetMetadataQuery();
 
   // Called for side effects - maintains existing behavior
   useActualBalance();
@@ -62,6 +63,14 @@ export const useLayoutData = () => {
     // Additional query results
     unassignedCash,
     bills,
+
+    // Budget object with operations and state
+    budget: {
+      supplementalAccounts,
+      // Note: Operations like addSupplementalAccount, updateSupplementalAccount, etc.
+      // are handled by useBudgetStore which still exists for these operations
+      // This will be refactored in a future ticket
+    },
 
     // Calculated values using existing utilities
     totalBiweeklyNeed: envelopeSummary.totalBiweeklyNeed,
