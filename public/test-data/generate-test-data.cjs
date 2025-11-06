@@ -521,30 +521,46 @@ const updateBaseSavingsGoals = () => {
 };
 
 // Update paycheck history to match component interface and have recent dates
+// Generate realistic biweekly paycheck pattern (most recent at top)
 const updateBasePaycheckHistory = () => {
-  return baseData.paycheckHistory.map((paycheck) => {
-    const totalAllocated = Object.values(paycheck.allocations || {}).reduce((sum, amt) => sum + amt, 0);
+  // Generate 6 recent paychecks on a biweekly schedule
+  const paychecks = [];
+  
+  for (let i = 0; i < 6; i++) {
+    const daysAgo = i * 14; // Biweekly = every 14 days
+    const paycheckDate = getDateString(daysAgo);
+    const totalAllocated = 2100; // Realistic allocation amount
+    const amount = 2500;
     
-    return {
-      ...paycheck,
-      // Map old fields to new expected fields
-      payerName: paycheck.source || paycheck.payerName || 'Employer',
-      processedAt: paycheck.date || paycheck.processedAt,
+    paychecks.push({
+      id: `paycheck-${String(i + 1).padStart(3, '0')}`,
+      payerName: 'Acme Corporation',
+      processedAt: paycheckDate,
       processedBy: 'System',
-      allocationMode: 'allocate', // or 'proportional'
-      totalAllocated,
-      remainingAmount: (paycheck.amount || 0) - totalAllocated,
-      // Update timestamps
-      lastModified: getTimestamp(Math.floor(Math.random() * 30)),
-      createdAt: getTimestamp(Math.floor(Math.random() * 90)),
-      // Convert allocations object to array format expected by component
-      allocations: Object.entries(paycheck.allocations || {}).map(([envelopeId, amount]) => ({
-        envelopeId,
-        envelopeName: baseData.envelopes.find(e => e.id === envelopeId)?.name || envelopeId,
-        amount
-      }))
-    };
-  });
+      allocationMode: 'allocate',
+      amount: amount,
+      totalAllocated: totalAllocated,
+      remainingAmount: amount - totalAllocated,
+      lastModified: getTimestamp(daysAgo),
+      createdAt: getTimestamp(daysAgo),
+      allocations: [
+        { envelopeId: 'env-003-rent', envelopeName: 'Rent', amount: 750 },
+        { envelopeId: 'env-004-utilities', envelopeName: 'Utilities', amount: 125 },
+        { envelopeId: 'env-001-groceries', envelopeName: 'Groceries', amount: 300 },
+        { envelopeId: 'env-002-gas', envelopeName: 'Gas/Transportation', amount: 150 },
+        { envelopeId: 'env-008-emergency', envelopeName: 'Emergency Fund', amount: 250 },
+        { envelopeId: 'env-005-entertainment', envelopeName: 'Entertainment', amount: 100 },
+        { envelopeId: 'env-006-healthcare', envelopeName: 'Health & Medical', amount: 100 },
+        { envelopeId: 'env-007-pet-care', envelopeName: 'Pet Care', amount: 75 },
+        { envelopeId: 'env-009-personal-care', envelopeName: 'Personal Care', amount: 50 },
+        { envelopeId: 'env-010-gifts', envelopeName: 'Gifts & Donations', amount: 75 },
+        { envelopeId: 'env-debt-001-cc', envelopeName: 'Credit Card Payment', amount: 85 },
+        { envelopeId: 'env-debt-002-student', envelopeName: 'Student Loan Payment', amount: 40 },
+      ]
+    });
+  }
+  
+  return paychecks;
 };
 
 // Build enhanced data with updated dates
