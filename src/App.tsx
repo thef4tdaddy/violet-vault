@@ -5,13 +5,13 @@ import { queryClient } from "./utils/common/queryClient";
 import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
 import { cloudSyncService } from "./services/cloudSyncService";
-import BugReportButton from "./components/feedback/BugReportButton";
+// import BugReportButton from "./components/feedback/BugReportButton"; // Now in MainLayout
 import ConfirmProvider from "./components/ui/ConfirmProvider";
 import PromptProvider from "./components/ui/PromptProvider";
 import UpdateAvailableModal from "./components/pwa/UpdateAvailableModal";
 import InstallPromptModal from "./components/pwa/InstallPromptModal";
 import PatchNotesModal from "./components/pwa/PatchNotesModal";
-import OfflineStatusIndicator from "./components/pwa/OfflineStatusIndicator";
+// import OfflineStatusIndicator from "./components/pwa/OfflineStatusIndicator"; // Removed per UX cleanup
 import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
@@ -43,7 +43,6 @@ const App = () => {
         <AuthProvider>
           <div className="font-sans">
             <MainLayout firebaseSync={cloudSyncService} />
-            <BugReportButton />
             <ConfirmProvider />
             <PromptProvider />
 
@@ -52,8 +51,8 @@ const App = () => {
             <InstallPromptModal />
             <PatchNotesModal />
 
-            {/* PWA Status Indicators */}
-            <OfflineStatusIndicator />
+            {/* PWA Status Indicators - Removed per user request for cleaner UI */}
+            {/* <OfflineStatusIndicator /> */}
 
             {/* Load monitoring system after main app renders */}
             <Suspense fallback={null}>

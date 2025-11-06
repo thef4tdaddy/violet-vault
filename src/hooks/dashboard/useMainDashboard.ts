@@ -134,14 +134,16 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
       }
 
       try {
+        const isIncome = difference > 0;
         const transaction = {
           id: Date.now().toString(),
-          amount: Math.abs(difference),
+          // Ensure correct sign: positive for income, negative for expense
+          amount: isIncome ? Math.abs(difference) : -Math.abs(difference),
           description:
-            difference > 0
+            isIncome
               ? "Balance reconciliation - added extra funds"
               : "Balance reconciliation - adjusted for discrepancy",
-          type: difference > 0 ? "income" : "expense",
+          type: isIncome ? "income" : "expense",
           envelopeId: "unassigned",
           category: "other",
           date: new Date().toISOString().split("T")[0],

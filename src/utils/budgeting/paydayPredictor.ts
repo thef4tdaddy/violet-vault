@@ -4,7 +4,8 @@
  */
 
 interface PaycheckEntry {
-  date: Date | string;
+  date?: Date | string;
+  processedAt?: Date | string;
   [key: string]: unknown;
 }
 
@@ -21,6 +22,7 @@ interface PaydayPrediction {
  * @param {Array} paycheckHistory - Array of paycheck objects with date field
  * @returns {Object} Prediction data including next payday and confidence
  */
+// eslint-disable-next-line max-statements -- Complex prediction logic requires multiple steps
 export const predictNextPayday = (paycheckHistory: PaycheckEntry[]): PaydayPrediction => {
   if (!paycheckHistory || paycheckHistory.length < 2) {
     return {
@@ -31,16 +33,21 @@ export const predictNextPayday = (paycheckHistory: PaycheckEntry[]): PaydayPredi
     };
   }
 
+  // Helper to get date from either processedAt or date field
+  const getPaycheckDate = (paycheck: PaycheckEntry): Date => {
+    return new Date(paycheck.processedAt || paycheck.date || 0);
+  };
+
   // Sort paychecks by date (most recent first)
   const sortedPaychecks = paycheckHistory
     .slice()
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .sort((a, b) => getPaycheckDate(b).getTime() - getPaycheckDate(a).getTime());
 
   // Calculate intervals between consecutive paychecks
   const intervals: number[] = [];
   for (let i = 0; i < sortedPaychecks.length - 1; i++) {
-    const current = new Date(sortedPaychecks[i].date);
-    const previous = new Date(sortedPaychecks[i + 1].date);
+    const current = getPaycheckDate(sortedPaychecks[i]);
+    const previous = getPaycheckDate(sortedPaychecks[i + 1]);
     const diffInDays = Math.round((current.getTime() - previous.getTime()) / (1000 * 60 * 60 * 24));
     intervals.push(diffInDays);
   }
