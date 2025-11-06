@@ -57,8 +57,8 @@ const DebtDetailModal = ({
   if (!isOpen || !debt) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-screen sm:max-h-[90vh] overflow-y-auto shadow-2xl my-auto">
         <ModalHeader debt={debt} onClose={onClose} />
         <MainStats debt={debt} />
         <DebtProgressBar progressData={progressData} />

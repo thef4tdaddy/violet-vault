@@ -299,12 +299,15 @@ export const calculateDebtStats = (debts: DebtAccount[] = []): DebtStats => {
   const totalInterestPaid = 0; // Placeholder - would require transaction analysis
 
   // Calculate debts due soon (within 7 days)
+  // Normalize to midnight to avoid timezone issues
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
   const dueSoonDebts = activeDebts.filter((debt) => {
     if (!debt.nextPaymentDate) return false;
     const dueDate = new Date(debt.nextPaymentDate);
+    dueDate.setHours(0, 0, 0, 0); // Normalize to midnight for comparison
     return dueDate >= today && dueDate <= nextWeek;
   });
 

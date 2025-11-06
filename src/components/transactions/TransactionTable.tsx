@@ -57,7 +57,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   return (
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">
       <div ref={parentRef} className="overflow-auto" style={{ maxHeight: "70vh" }}>
-        <table className="w-full">
+        <table className="w-full table-fixed">
           {/* Table Header */}
           <thead className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm">
             <tr>
