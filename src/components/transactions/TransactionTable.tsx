@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import useTransactionTable from "../../hooks/transactions/useTransactionTable";
 import TransactionRow from "./components/TransactionRow";
 import DeleteConfirmation from "./components/DeleteConfirmation";
@@ -23,6 +23,17 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   onDelete,
   onSplit,
 }) => {
+  const columnStyleWidths = useMemo(
+    () => ({
+      date: "8rem",
+      description: "16rem",
+      category: "9rem",
+      envelope: "12rem",
+      amount: "8rem",
+      actions: "9rem",
+    }),
+    []
+  );
   // Validate props in development
   validateComponentProps(
     "TransactionTable",
@@ -58,6 +69,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">
       <div ref={parentRef} className="overflow-auto" style={{ maxHeight: "70vh" }}>
         <table className="w-full table-fixed">
+          <colgroup>
+            <col style={{ width: columnStyleWidths.date }} />
+            <col style={{ width: columnStyleWidths.description }} />
+            <col style={{ width: columnStyleWidths.category }} />
+            <col style={{ width: columnStyleWidths.envelope }} />
+            <col style={{ width: columnStyleWidths.amount }} />
+            <col style={{ width: columnStyleWidths.actions }} />
+          </colgroup>
           {/* Table Header */}
           <thead className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm">
             <tr>
