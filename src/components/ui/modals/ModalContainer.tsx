@@ -88,6 +88,27 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
+  // Auto-scroll modal to viewport center when opened
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      const scrollToCenter = () => {
+        const modal = contentRef.current;
+        if (!modal) return;
+        
+        const rect = modal.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const modalHeight = rect.height;
+        const scrollTop = window.scrollY + rect.top;
+        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
+        
+        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+      };
+      
+      // Small delay to ensure DOM is rendered
+      setTimeout(scrollToCenter, 100);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
