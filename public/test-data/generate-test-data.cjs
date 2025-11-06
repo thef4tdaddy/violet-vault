@@ -98,11 +98,12 @@ const debtEnvelopes = [
 ];
 
 // Add 4 debt payment bills with current due dates
+// NOTE: getDateString with negative offset means FUTURE dates (e.g., -3 = 3 days from now)
 const debtBills = [
   {
     id: 'bill-debt-001-cc',
     name: 'Credit Card Payment',
-    dueDate: getDateString(-3), // Due in 3 days
+    dueDate: getDateString(-3), // Due in 3 days (DUE SOON)
     amount: 85.00,
     category: 'Debt Payment',
     isPaid: false,
@@ -118,7 +119,7 @@ const debtBills = [
   {
     id: 'bill-debt-002-student',
     name: 'Student Loan Payment',
-    dueDate: getDateString(-7), // Due in 7 days
+    dueDate: getDateString(-5), // Due in 5 days (DUE SOON)
     amount: 150.00,
     category: 'Debt Payment',
     isPaid: false,
@@ -134,7 +135,7 @@ const debtBills = [
   {
     id: 'bill-debt-003-auto',
     name: 'Auto Loan Payment',
-    dueDate: getDateString(-10), // Due in 10 days
+    dueDate: getDateString(-15), // Due in 15 days
     amount: 285.00,
     category: 'Debt Payment',
     isPaid: false,
@@ -150,7 +151,7 @@ const debtBills = [
   {
     id: 'bill-debt-004-personal',
     name: 'Personal Loan Payment',
-    dueDate: getDateString(-14), // Due in 14 days
+    dueDate: getDateString(-20), // Due in 20 days
     amount: 125.00,
     category: 'Debt Payment',
     isPaid: false,
@@ -165,8 +166,8 @@ const debtBills = [
   }
 ];
 
-// Update debts to include envelopeId
-const enhancedDebts = baseData.debts.map((debt) => {
+// Update debts to include envelopeId and current dates
+const enhancedDebts = baseData.debts.map((debt, index) => {
   const debtEnvMap = {
     'debt-001-credit-card': 'env-debt-001-cc',
     'debt-002-student-loan': 'env-debt-002-student',
@@ -174,9 +175,20 @@ const enhancedDebts = baseData.debts.map((debt) => {
     'debt-004-personal-loan': 'env-debt-004-personal'
   };
   
+  // Spread due dates: some due soon (2-7 days), some later (15-25 days)
+  const daysUntilDue = index < 2 ? (index * 2) + 3 : (index * 5) + 15; // [3, 5, 15, 20 days]
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + daysUntilDue);
+  
+  const nextPaymentDate = new Date(dueDate);
+  
   return {
     ...debt,
-    envelopeId: debtEnvMap[debt.id]
+    envelopeId: debtEnvMap[debt.id],
+    dueDate: dueDate.toISOString().split('T')[0],
+    nextPaymentDate: nextPaymentDate.toISOString().split('T')[0],
+    lastModified: getTimestamp(0),
+    createdAt: getTimestamp(365), // Created a year ago
   };
 });
 
