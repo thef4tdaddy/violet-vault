@@ -26,12 +26,35 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   children,
 }) => {
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
+  // Ensure modal is visible in viewport when opened
+  React.useEffect(() => {
+    if (isOpen && modalRef.current) {
+      // Scroll to center of viewport
+      const scrollToCenter = () => {
+        const modal = modalRef.current;
+        if (!modal) return;
+        
+        const rect = modal.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const modalHeight = rect.height;
+        const scrollTop = window.scrollY + rect.top;
+        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
+        
+        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+      };
+      
+      // Small delay to ensure DOM is rendered
+      setTimeout(scrollToCenter, 100);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4">
-      <div className="rounded-none sm:rounded-lg border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl max-h-screen sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden">
+      <div ref={modalRef} className="rounded-none sm:rounded-lg border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl max-h-screen sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden">
         {/* Close Button - Top Right Corner */}
         <Button
           onClick={onClose}

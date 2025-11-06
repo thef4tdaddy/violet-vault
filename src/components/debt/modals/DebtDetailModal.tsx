@@ -1,3 +1,4 @@
+import React from "react";
 import { useDebtDetailModal } from "@/hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
@@ -31,6 +32,8 @@ const DebtDetailModal = ({
   onRecordPayment,
   onEdit,
 }: DebtDetailModalProps) => {
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  
   const {
     showPaymentForm,
     paymentAmount,
@@ -54,11 +57,31 @@ const DebtDetailModal = ({
     onEdit,
   });
 
+  // Ensure modal is visible in viewport when opened
+  React.useEffect(() => {
+    if (isOpen && modalRef.current) {
+      const scrollToCenter = () => {
+        const modal = modalRef.current;
+        if (!modal) return;
+        
+        const rect = modal.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const modalHeight = rect.height;
+        const scrollTop = window.scrollY + rect.top;
+        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
+        
+        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+      };
+      
+      setTimeout(scrollToCenter, 100);
+    }
+  }, [isOpen]);
+
   if (!isOpen || !debt) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-screen sm:max-h-[90vh] overflow-y-auto shadow-2xl my-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div ref={modalRef} className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-screen sm:max-h-[90vh] overflow-y-auto shadow-2xl">
         <ModalHeader debt={debt} onClose={onClose} />
         <MainStats debt={debt} />
         <DebtProgressBar progressData={progressData} />
