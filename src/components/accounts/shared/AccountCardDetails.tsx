@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
 interface ExpirationStatus {
@@ -27,14 +26,14 @@ interface AccountCardDetailsProps {
   account: Account;
   expirationStatus: ExpirationStatus;
   showBalances: boolean;
-  onStartTransfer: (account: Account) => void;
+  onStartTransfer?: (account: Account) => void; // DEPRECATED: No longer used - kept for backwards compatibility
 }
 
 const AccountCardDetails = ({
   account,
   expirationStatus,
   showBalances,
-  onStartTransfer,
+  onStartTransfer: _onStartTransfer, // Prefixed with _ to indicate intentionally unused
 }: AccountCardDetailsProps) => (
   <>
     <div className="space-y-2">
