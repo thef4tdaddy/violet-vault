@@ -49,7 +49,7 @@ const CollapsibleFilterHeader = ({
           Filters & Sorting
         </span>
 
-        {/* Active badge - clickable to toggle filters */}
+        {/* Active/Disabled Toggle Button - More prominent visual button */}
         {hasActiveFilters && filtersEnabled && (
           <button
             type="button"
@@ -57,14 +57,16 @@ const CollapsibleFilterHeader = ({
               e.stopPropagation();
               onToggleFilters();
             }}
-            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-900 hover:bg-purple-300 transition-colors border border-purple-300 cursor-pointer"
-            title="Click to disable all filters"
+            className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors border-2 border-purple-700 shadow-sm cursor-pointer"
+            title="Filters are active - click to disable"
+            aria-label="Disable all filters"
           >
-            Active
+            {React.createElement(getIcon("Check"), { className: "h-3 w-3 mr-1" })}
+            Filters On
           </button>
         )}
 
-        {/* Disabled indicator */}
+        {/* Disabled state - clickable to re-enable */}
         {!filtersEnabled && (
           <button
             type="button"
@@ -72,10 +74,12 @@ const CollapsibleFilterHeader = ({
               e.stopPropagation();
               onToggleFilters();
             }}
-            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors border border-gray-300 cursor-pointer"
-            title="Click to enable filters"
+            className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-300 text-gray-700 hover:bg-gray-400 transition-colors border-2 border-gray-400 shadow-sm cursor-pointer"
+            title="Filters are disabled - click to enable"
+            aria-label="Enable filters"
           >
-            Disabled
+            {React.createElement(getIcon("X"), { className: "h-3 w-3 mr-1" })}
+            Filters Off
           </button>
         )}
       </div>
