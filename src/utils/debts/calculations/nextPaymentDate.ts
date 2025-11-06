@@ -16,9 +16,13 @@ export function calculateNextPaymentDate(debt, relatedBill) {
     return relatedBill.dueDate;
   }
 
-  // Use debt payment due date
+  // Use precomputed debt payment dates when available
   if (debt.paymentDueDate) {
     return debt.paymentDueDate;
+  }
+
+  if (debt.nextPaymentDate) {
+    return debt.nextPaymentDate;
   }
 
   // Calculate based on payment frequency and last payment

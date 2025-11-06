@@ -77,15 +77,23 @@ export interface SavingsGoal {
 
 export interface PaycheckHistory {
   id: string;
-  date: Date;
+  date?: Date | string;
+  processedAt?: Date | string;
   amount: number;
-  source: string;
-  allocations?: Record<string, number>;
+  source?: string;
+  payerName?: string;
+  allocationMode?: string;
+  totalAllocated?: number;
+  remainingAmount?: number;
+  allocations?:
+    | Record<string, number>
+    | Array<{ envelopeId: string; envelopeName: string; amount: number }>;
   lastModified: number;
   createdAt?: number;
   // Additional paycheck properties
   deductions?: Record<string, number>;
   netAmount?: number;
+  processedBy?: string;
 }
 
 export interface AuditLogEntry {

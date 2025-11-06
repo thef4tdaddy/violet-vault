@@ -29,8 +29,24 @@ export type EnvelopeGridProps = z.infer<typeof EnvelopeGridPropsSchema>;
  * TransactionTable component props schema
  * Includes callback functions for table actions
  */
+const TransactionTableItemSchema = TransactionSchema.extend({
+  type: z.string().optional(),
+}).passthrough();
+
+const BillTableItemSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    name: z.string().min(1),
+    amount: z.number(),
+    dueDate: z.union([z.date(), z.string(), z.null()]).optional(),
+    category: z.string().optional(),
+    isPaid: z.boolean().optional(),
+    isRecurring: z.boolean().optional(),
+  })
+  .passthrough();
+
 export const TransactionTablePropsSchema = z.object({
-  transactions: z.array(TransactionSchema).optional().default([]),
+  transactions: z.array(TransactionTableItemSchema).optional().default([]),
   envelopes: z.array(EnvelopeSchema).optional().default([]),
   onEdit: z.function(),
   onDelete: z.function(),
@@ -44,7 +60,7 @@ export type TransactionTableProps = z.infer<typeof TransactionTablePropsSchema>;
  * Complex component with multiple state management callbacks
  */
 export const BillTablePropsSchema = z.object({
-  filteredBills: z.array(BillSchema),
+  filteredBills: z.array(BillTableItemSchema),
   selectionState: z.object({
     selectedBillIds: z.array(z.string()),
     isAllSelected: z.boolean(),

@@ -27,6 +27,15 @@ export const useLayoutData = () => {
 
   const bills = useBills();
 
+  // Filter out null/undefined transactions for safe operations
+  const safeTransactions = useMemo(() => {
+    return (budgetData.transactions || []).filter(
+      (t) => t && typeof t === "object" && typeof t.amount === "number"
+    );
+  }, [budgetData.transactions]);
+
+  const billsList = useMemo(() => bills?.bills || [], [bills?.bills]);
+
   // Calculate derived values using existing utilities
   const envelopeSummary = useMemo(() => {
     if (!budgetData.envelopes || budgetData.envelopes.length === 0) {
@@ -40,18 +49,14 @@ export const useLayoutData = () => {
       };
     }
 
-    // Use existing utility with empty arrays for transactions and bills
-    // since we're only calculating envelope-based metrics
-    const processedEnvelopeData = calculateEnvelopeData(budgetData.envelopes, [], []);
-    return calculateEnvelopeTotals(processedEnvelopeData);
-  }, [budgetData.envelopes]);
-
-  // Filter out null/undefined transactions for safe operations
-  const safeTransactions = useMemo(() => {
-    return (budgetData.transactions || []).filter(
-      (t) => t && typeof t === "object" && typeof t.amount === "number"
+    // Use actual transactions and bills so totals/spending are accurate
+    const processedEnvelopeData = calculateEnvelopeData(
+      budgetData.envelopes,
+      safeTransactions,
+      billsList
     );
-  }, [budgetData.transactions]);
+    return calculateEnvelopeTotals(processedEnvelopeData);
+  }, [budgetData.envelopes, safeTransactions, billsList]);
 
   return {
     // Original budget data
