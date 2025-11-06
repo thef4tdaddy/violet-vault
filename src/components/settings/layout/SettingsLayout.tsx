@@ -27,11 +27,18 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
 }) => {
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
 
+  // Scroll to top when modal opens so it's visible
+  React.useEffect(() => {
+    if (isOpen) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center sm:p-4 z-50 overflow-y-auto">
-      <div className="rounded-none sm:rounded-lg border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl h-full sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden my-auto">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center sm:p-4 z-50">
+      <div className="rounded-none sm:rounded-lg border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl h-full sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden">
         {/* Close Button - Top Right Corner */}
         <Button
           onClick={onClose}
