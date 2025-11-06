@@ -64,14 +64,16 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
           <Button
             onClick={() => onEdit(goal)}
             className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+            title="Edit goal"
           >
-            {React.createElement(getIcon("Edit3"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Pencil"), { className: "h-4 w-4" })}
           </Button>
           <Button
             onClick={() => onDelete(goal)}
             className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+            title="Delete goal"
           >
-            {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Trash"), { className: "h-4 w-4" })}
           </Button>
         </div>
       </div>

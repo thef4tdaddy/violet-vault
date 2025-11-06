@@ -47,11 +47,19 @@ const AccountCardHeader = ({ account, typeInfo, onEdit, onDelete }: AccountCardH
       {!account.isActive && (
         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Inactive</span>
       )}
-      <Button onClick={() => onEdit(account)} className="p-1 text-gray-400 hover:text-cyan-600">
-        {React.createElement(getIcon("Edit3"), { className: "h-3 w-3" })}
+      <Button 
+        onClick={() => onEdit(account)} 
+        className="p-1 text-gray-400 hover:text-cyan-600"
+        title="Edit account"
+      >
+        {React.createElement(getIcon("Pencil"), { className: "h-3 w-3" })}
       </Button>
-      <Button onClick={() => onDelete(account.id)} className="p-1 text-gray-400 hover:text-red-600">
-        {React.createElement(getIcon("Trash2"), { className: "h-3 w-3" })}
+      <Button 
+        onClick={() => onDelete(account.id)} 
+        className="p-1 text-gray-400 hover:text-red-600"
+        title="Delete account"
+      >
+        {React.createElement(getIcon("Trash"), { className: "h-3 w-3" })}
       </Button>
     </div>
   </div>
