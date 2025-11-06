@@ -1,7 +1,7 @@
 // components/savings/AddEditGoalModal.jsx
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getIcon } from "@/utils";
 import {
   SAVINGS_CATEGORIES,
@@ -47,6 +47,7 @@ const createGoalData = (formData) => ({
 });
 
 const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState(getInitialFormData());
 
   // Reset form when modal opens/closes or when editing goal changes
@@ -55,6 +56,26 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
       setFormData(editingGoal ? mapGoalToFormData(editingGoal) : getInitialFormData());
     }
   }, [isOpen, editingGoal]);
+
+  // Auto-scroll modal to viewport center when opened
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      const scrollToCenter = () => {
+        const modal = modalRef.current;
+        if (!modal) return;
+        
+        const rect = modal.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const modalHeight = rect.height;
+        const scrollTop = window.scrollY + rect.top;
+        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
+        
+        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+      };
+      
+      setTimeout(scrollToCenter, 100);
+    }
+  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -75,7 +96,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
+      <div ref={modalRef} className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <ModalHeader
           title={editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
           onClose={handleClose}
