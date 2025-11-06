@@ -109,11 +109,17 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     ? new Date(paymentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     : "N/A";
   
+  // Determine debt status badge styling
+  const debtStatus = (debt as Record<string, unknown>).status as string || 'active';
+  const statusBadge = debtStatus === 'paid_off' 
+    ? { text: "Paid Off", className: "bg-green-100 text-green-700 border border-green-300" }
+    : debtStatus === 'deferred' 
+    ? { text: "Deferred", className: "bg-yellow-100 text-yellow-700 border border-yellow-300" }
+    : { text: "Active", className: "bg-blue-100 text-blue-700 border border-blue-300" };
+  
   const {
     config,
     IconComponent,
-    statusStyle,
-    statusText,
     progressData,
     paymentInfo,
     nextPaymentInfo,
@@ -123,9 +129,7 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
   } = {
     config: { bgColor: "bg-gray-50", textColor: "text-gray-600", name: "Standard" },
     IconComponent: "Clock",
-    statusStyle: "text-gray-600",
-    statusText: "Active",
-    progressData: { percentage: progressPercentage },
+    progressData: { percentage: progressPercentage, hasProgress: progressPercentage > 0 },
     paymentInfo: { display: paymentDisplay },
     nextPaymentInfo: { 
       label: "Next Payment", 
@@ -163,8 +167,8 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
                   {debt.creditor} • {config.name}
                 </p>
               </div>
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyle}`}>
-                {statusText}
+              <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${statusBadge.className} shadow-sm`}>
+                {statusBadge.text}
               </span>
             </div>
 
