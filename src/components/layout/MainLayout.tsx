@@ -324,8 +324,10 @@ const MainContent = ({
             onDismiss={() => setSyncConflicts(null)}
           />
 
-          {!showSecurityWarning && <BugReportButton />}
           <BottomNavigationBar />
+          
+          {/* Bug Report Button - Floating (separate from main content flow) */}
+          {!showSecurityWarning && <BugReportButton />}
 
           <div className="mt-8 text-center">
             <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
