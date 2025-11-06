@@ -28,7 +28,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
       icon: getIcon("Percent"),
       label: "Avg Interest Rate",
       value: `${stats.averageInterestRate.toFixed(2)}%`,
-      color: "purple" as const,
+      color: "blue" as const,
       subtext: "Weighted by balance",
     },
     {
