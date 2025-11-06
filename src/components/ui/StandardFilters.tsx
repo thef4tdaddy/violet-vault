@@ -36,7 +36,9 @@ const CollapsibleFilterHeader = ({
 }: CollapsibleHeaderProps) => {
   return (
     <div
-      className={`flex items-center justify-between p-4 ${!isExpanded ? "cursor-pointer hover:bg-gray-50" : ""}`}
+      className={`flex items-center justify-between p-4 rounded-t-xl transition-colors ${
+        !isExpanded ? "cursor-pointer hover:bg-gray-100" : ""
+      }`}
       onClick={!isExpanded ? onToggle : undefined}
     >
       <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
@@ -396,7 +398,7 @@ const StandardFilters = ({
   // Collapsible mode (like Debt filters with purple hue and toggle)
   if (mode === "collapsible") {
     return (
-      <div className={`rounded-xl border-2 border-black bg-purple-50 ${className}`}>
+      <div className={`rounded-xl border-2 border-black bg-purple-50 overflow-hidden ${className}`}>
         <CollapsibleFilterHeader
           isExpanded={isExpanded}
           onToggle={() => setIsExpanded(!isExpanded)}
