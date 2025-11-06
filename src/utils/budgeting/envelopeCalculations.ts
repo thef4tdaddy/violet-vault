@@ -11,8 +11,15 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
     // Also get bills assigned to this envelope
     const envelopeBills = bills.filter((b) => b.envelopeId === envelope.id);
 
+    // Include expense/income transactions and paid bills
+    // Transaction types: "expense", "income", "transfer", "bill", "recurring_bill"
     const paidTransactions = envelopeTransactions.filter(
-      (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid)
+      (t) => 
+        t.type === "expense" || 
+        t.type === "income" || 
+        t.type === "transfer" ||
+        (t.type === "bill" && t.isPaid) ||
+        (t.type === "recurring_bill" && t.isPaid)
     );
 
     // Combine bills from transactions and the bills array, removing duplicates
