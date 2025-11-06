@@ -12,6 +12,7 @@ import TransactionPagination from "./ledger/TransactionPagination";
 import TransactionLedgerLoading from "./ledger/TransactionLedgerLoading";
 
 import { useTransactionLedger } from "../../hooks/transactions/useTransactionLedger";
+import { useLayoutData } from "../../hooks/layout/useLayoutData";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import {
   calculateTransactionTotals,
@@ -26,6 +27,14 @@ interface TransactionLedgerProps {
 const TransactionLedger: React.FC<TransactionLedgerProps> = ({
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
+  // Get supplemental accounts from layout data
+  const { budget } = useLayoutData();
+  const supplementalAccounts = (budget?.supplementalAccounts || []) as Array<{
+    id: string | number;
+    name: string;
+    type?: string;
+  }>;
+  
   const {
     // Data
     transactions,
@@ -150,6 +159,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         transactionForm={transactionForm as never}
         setTransactionForm={setTransactionForm}
         envelopes={envelopes as never}
+        supplementalAccounts={supplementalAccounts}
         categories={[...TRANSACTION_CATEGORIES]}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={

@@ -68,18 +68,13 @@ const AccountCardDetails = ({
       <p className="text-xs text-gray-500 mt-2 italic">{account.description}</p>
     )}
 
-    {/* Transfer Button */}
-    {account.currentBalance > 0 && (
-      <div className="mt-3 pt-3 border-t border-gray-200">
-        <Button
-          onClick={() => onStartTransfer(account)}
-          className="w-full btn btn-sm btn-primary border-2 border-black flex items-center justify-center"
-        >
-          {React.createElement(getIcon("Zap"), { className: "h-3 w-3 mr-1" })}
-          Transfer to Budget
-        </Button>
-      </div>
-    )}
+    {/* Note: Supplemental accounts can be used directly in transactions - no need to transfer */}
+    <div className="mt-3 pt-3 border-t border-gray-200">
+      <p className="text-xs text-gray-600 text-center italic">
+        {React.createElement(getIcon("Info"), { className: "h-3 w-3 inline mr-1" })}
+        Assign transactions to this account when adding expenses or income
+      </p>
+    </div>
 
     <div className="mt-2 text-xs text-gray-500">
       Last updated: {new Date(account.lastUpdated).toLocaleDateString()}

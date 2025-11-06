@@ -31,6 +31,7 @@ interface TransactionFormProps {
   transactionForm: TransactionFormData;
   setTransactionForm: (data: TransactionFormData) => void;
   envelopes?: Envelope[];
+  supplementalAccounts?: Array<{ id: string | number; name: string; type?: string }>;
   categories?: string[];
   onSubmit: () => void;
   suggestEnvelope?: (description: string) => { id: string; name: string } | null;
@@ -44,6 +45,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   transactionForm,
   setTransactionForm,
   envelopes = [],
+  supplementalAccounts = [],
   categories = [],
   onSubmit,
   suggestEnvelope,
@@ -142,6 +144,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           editingTransaction={editingTransaction}
           lockedBy={editLock.lockedBy}
           envelopes={envelopes as never}
+          supplementalAccounts={supplementalAccounts}
           categories={categories}
           suggestEnvelope={suggestEnvelope}
         />

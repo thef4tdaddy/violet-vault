@@ -26,6 +26,7 @@ interface TransactionFormFieldsProps {
   editingTransaction?: Transaction | null;
   lockedBy?: string;
   envelopes: Envelope[];
+  supplementalAccounts?: Array<{ id: string | number; name: string; type?: string }>;
   categories: string[];
   suggestEnvelope?: (description: string) => { id: string; name: string } | null;
 }
@@ -51,6 +52,7 @@ const TransactionFormFields: React.FC<TransactionFormFieldsProps> = ({
 
   // Data
   envelopes,
+  supplementalAccounts,
   categories,
 
   // Optional features
@@ -82,6 +84,7 @@ const TransactionFormFields: React.FC<TransactionFormFieldsProps> = ({
         canEdit={canEdit}
         editingTransaction={editingTransaction}
         envelopes={envelopes}
+        supplementalAccounts={supplementalAccounts}
         suggestEnvelope={suggestEnvelope}
       />
 

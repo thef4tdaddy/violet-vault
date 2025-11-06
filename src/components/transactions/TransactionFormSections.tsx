@@ -205,6 +205,7 @@ interface TransactionEnvelopeSelectorProps {
   canEdit: boolean;
   editingTransaction?: Transaction | null;
   envelopes: Envelope[];
+  supplementalAccounts?: Array<{ id: string | number; name: string; type?: string }>;
   suggestEnvelope?: (description: string) => { id: string; name: string } | null;
 }
 
@@ -218,6 +219,7 @@ export const TransactionEnvelopeSelector = ({
   canEdit,
   editingTransaction,
   envelopes,
+  supplementalAccounts = [],
   suggestEnvelope,
 }: TransactionEnvelopeSelectorProps) => {
   const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
@@ -229,7 +231,9 @@ export const TransactionEnvelopeSelector = ({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Envelope</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Assign to Envelope or Account
+      </label>
       <Select
         value={transactionForm.envelopeId}
         onChange={(e) =>
@@ -244,14 +248,30 @@ export const TransactionEnvelopeSelector = ({
         }`}
       >
         <option value="">Leave unassigned</option>
-        {envelopes.map((envelope) => (
-          <option key={envelope.id} value={envelope.id}>
-            {envelope.name}
-            {envelope.envelopeType === "bill" ? " 📝 (Bill)" : ""}
-            {envelope.envelopeType === "variable" ? " 🔄 (Variable)" : ""}
-            {envelope.envelopeType === "savings" ? " 💰 (Savings)" : ""}
-          </option>
-        ))}
+        
+        {envelopes.length > 0 && (
+          <optgroup label="📊 Budget Envelopes">
+            {envelopes.map((envelope) => (
+              <option key={envelope.id} value={envelope.id}>
+                {envelope.name}
+                {envelope.envelopeType === "bill" ? " 📝" : ""}
+                {envelope.envelopeType === "variable" ? " 🔄" : ""}
+                {envelope.envelopeType === "savings" ? " 💰" : ""}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        
+        {supplementalAccounts.length > 0 && (
+          <optgroup label="💼 Supplemental Accounts">
+            {supplementalAccounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.name}
+                {account.type ? ` (${account.type})` : ""}
+              </option>
+            ))}
+          </optgroup>
+        )}
       </Select>
       {transactionForm.envelopeId && isBillEnvelope && (
         <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
