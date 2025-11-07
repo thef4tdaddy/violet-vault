@@ -42,7 +42,7 @@ export const TransactionTablePropsSchema = z.object({
           type: z.string().optional(),
           description: z.string().optional(),
         })
-        .passthrough()
+        .catchall(z.unknown())
     )
     .optional()
     .default([]),
@@ -70,7 +70,7 @@ export const BillTablePropsSchema = z.object({
         isPaid: z.boolean().optional(),
         isRecurring: z.boolean().optional(),
       })
-      .passthrough()
+      .catchall(z.unknown())
   ),
   selectionState: z.object({
     selectedBillIds: z.array(z.string()),
