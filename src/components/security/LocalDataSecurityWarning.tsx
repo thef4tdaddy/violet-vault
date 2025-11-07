@@ -9,6 +9,7 @@ import { useSecurityAcknowledgment } from "../../hooks/security/useSecurityAckno
  */
 const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false }) => {
   const { hasBeenAcknowledged, acknowledge } = useSecurityAcknowledgment();
+  const modalRef = React.useRef<HTMLDivElement>(null);
 
   const handleAcknowledge = () => {
     acknowledge();
@@ -16,12 +17,32 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false })
     if (onClose) onClose();
   };
 
+  React.useEffect(() => {
+    if (!modalRef.current) return;
+    const scrollToCenter = () => {
+      const modal = modalRef.current;
+      if (!modal) return;
+      const rect = modal.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const modalHeight = rect.height;
+      const scrollTop = window.scrollY + rect.top;
+      const targetScroll = scrollTop - viewportHeight / 2 + modalHeight / 2;
+      window.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
+    };
+
+    const timer = setTimeout(scrollToCenter, 100);
+    return () => clearTimeout(timer);
+  }, [forceShow, hasBeenAcknowledged]);
+
   // Don't auto-hide if explicitly opened from Settings (forceShow = true)
   if (hasBeenAcknowledged && !forceShow) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg border-2 border-black shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[95vh]">
+    <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[60] p-4 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white dark:bg-gray-800 rounded-lg border-2 border-black shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[95vh] my-auto"
+      >
         <WarningHeader />
         <div className="p-6 space-y-4 flex-1 overflow-y-auto">
           <SecurityStatusSection />
