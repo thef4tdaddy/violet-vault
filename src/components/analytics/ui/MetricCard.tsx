@@ -46,25 +46,27 @@ const ICON_CLASSES = {
   gray: "text-gray-200",
 };
 
-const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) => {
+const MetricCard = ({ title, value, subtitle, icon, trend, color = "blue" }) => {
   const Icon = icon;
+
+  const fallbackGradient = GRADIENT_CLASSES.blue;
+  const fallbackText = TEXT_CLASSES.blue;
+  const fallbackIcon = ICON_CLASSES.blue;
 
   return (
     <div
-      className={`bg-gradient-to-br ${GRADIENT_CLASSES[color] || GRADIENT_CLASSES.purple} p-4 rounded-lg text-white`}
+      className={`bg-gradient-to-br ${GRADIENT_CLASSES[color] || fallbackGradient} p-4 rounded-lg text-white`}
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className={`${TEXT_CLASSES[color] || TEXT_CLASSES.purple} text-sm`}>{title}</p>
+          <p className={`${TEXT_CLASSES[color] || fallbackText} text-sm`}>{title}</p>
           <p className="text-2xl font-bold">{value}</p>
           {subtitle && (
-            <p className={`text-xs ${TEXT_CLASSES[color] || TEXT_CLASSES.purple} mt-2`}>
-              {subtitle}
-            </p>
+            <p className={`text-xs ${TEXT_CLASSES[color] || fallbackText} mt-2`}>{subtitle}</p>
           )}
         </div>
         {React.createElement(Icon, {
-          className: `h-8 w-8 ${ICON_CLASSES[color] || ICON_CLASSES.purple}`,
+          className: `h-8 w-8 ${ICON_CLASSES[color] || fallbackIcon}`,
         })}
       </div>
       {trend !== undefined && trend !== null && (

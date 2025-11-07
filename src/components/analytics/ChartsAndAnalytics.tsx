@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useState } from "react";
 import { useAnalyticsData } from "@/hooks/analytics/useAnalyticsData";
 import { useChartsAnalytics } from "@/hooks/analytics/useChartsAnalytics";
 import { useAnalyticsExport } from "@/hooks/analytics/useAnalyticsExport";
@@ -6,11 +7,12 @@ import MetricsGrid from "./components/MetricsGrid";
 import TabNavigation from "./components/TabNavigation";
 import TabContent from "./components/TabContent";
 
+// eslint-disable-next-line max-lines-per-function
 const ChartsAnalytics = ({
   transactions = [],
   envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
-  timeFilter = "thisMonth",
+  timeFilter = "3months",
   focus = "overview",
 }) => {
   const analyticsData = useAnalyticsData({
@@ -39,6 +41,54 @@ const ChartsAnalytics = ({
     budgetVsActual,
     metrics,
   } = analyticsData;
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const activeCategory = useMemo(() => {
+    if (!selectedCategory) {
+      return null;
+    }
+
+    if (!Array.isArray(categoryBreakdown)) {
+      return null;
+    }
+
+    return categoryBreakdown.some((entry) => entry?.name === selectedCategory)
+      ? selectedCategory
+      : null;
+  }, [selectedCategory, categoryBreakdown]);
+
+  const handleCategorySelect = useCallback((name: string | null) => {
+    setSelectedCategory((previous) => (previous === name ? null : name));
+  }, []);
+
+  const categoryTransactions = useMemo(() => {
+    if (!activeCategory) {
+      return [];
+    }
+
+    if (!Array.isArray(filteredTransactions)) {
+      return [];
+    }
+
+    return filteredTransactions.filter((transaction) => {
+      const categoryName =
+        (transaction && typeof transaction === "object" && "category" in transaction
+          ? (transaction as Record<string, unknown>).category
+          : null) || "Uncategorized";
+
+      if (categoryName !== activeCategory) {
+        return false;
+      }
+
+      const amount =
+        transaction && typeof transaction === "object" && "amount" in transaction
+          ? Number((transaction as Record<string, unknown>).amount)
+          : 0;
+
+      return amount < 0;
+    });
+  }, [filteredTransactions, activeCategory]);
 
   // Check if we have any transaction data
   const hasTransactions = Array.isArray(transactions) && transactions.length > 0;
@@ -165,6 +215,9 @@ const ChartsAnalytics = ({
         envelopeHealth={envelopeHealth}
         budgetVsActual={budgetVsActual}
         categoryBreakdown={categoryBreakdown}
+        selectedCategory={activeCategory}
+        onCategorySelect={handleCategorySelect}
+        categoryTransactions={categoryTransactions}
       />
     </div>
   );

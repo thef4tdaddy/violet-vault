@@ -43,4 +43,14 @@ if [ $ESLINT_STATUS -ne 0 ]; then
 fi
 
 echo "✅ ESLint passed for staged files"
+
+echo "📊 Running full audit (npm run audit:full)..."
+if ! npm run audit:full; then
+  echo "❌ Full audit failed. Check docs/audits for details."
+  exit 1
+fi
+
+git add docs/audits/audit-report.md >/dev/null 2>&1
+
+echo "✅ Audit report updated"
 exit 0

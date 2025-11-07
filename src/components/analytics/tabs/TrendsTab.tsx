@@ -33,7 +33,7 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
           subtitle=""
           data={(monthlyTrends || []).filter(Boolean)}
           height={400}
-          type={chartType}
+          chartType={chartType}
           actions={null}
           formatTooltip={undefined}
         />
@@ -51,6 +51,14 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
             xDataKey="day"
             actions={null}
             formatTooltip={undefined}
+            bars={[
+              {
+                dataKey: "amount",
+                name: "Spending",
+                fill: "#38bdf8",
+              },
+            ]}
+            showLegend={false}
           />
         </div>
       )}

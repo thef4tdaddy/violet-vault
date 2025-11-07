@@ -57,7 +57,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({
         subtitle="Average amount"
         icon="TrendingUp"
         trend={null}
-        color="purple"
+        color="cyan"
       />
     </div>
   );

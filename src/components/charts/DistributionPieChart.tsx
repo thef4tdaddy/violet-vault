@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   type PieLabelRenderProps,
 } from "recharts";
+import { Button } from "@/components/ui";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
@@ -53,13 +54,26 @@ const enhanceChartData = (
 };
 
 // Helper to render pie cells
-const renderPieCells = (data: Array<Record<string, unknown>>) => {
+const renderPieCells = (
+  data: Array<Record<string, unknown>>,
+  activeName: string | null | undefined,
+  nameKey: string
+) => {
   return data
     .filter((entry) => entry != null)
     .map((entry, index) => {
       const colorValue = (entry as Record<string, unknown>).color ?? "";
       const color = typeof colorValue === "string" ? colorValue : String(colorValue ?? "");
-      return <Cell key={`cell-${index}`} fill={color} />;
+      const itemName = String((entry as Record<string, unknown>)[nameKey] ?? "");
+      const isActive = activeName && itemName === activeName;
+      return (
+        <Cell
+          key={`cell-${index}`}
+          fill={color}
+          stroke={isActive ? "#111827" : color}
+          strokeWidth={isActive ? 3 : 1}
+        />
+      );
     });
 };
 
@@ -87,6 +101,8 @@ const DistributionPieChart = ({
   formatTooltip,
   labelFormatter,
   maxItems = 8,
+  activeName,
+  onSliceClick,
   ...props
 }: {
   title?: string;
@@ -107,6 +123,8 @@ const DistributionPieChart = ({
   formatTooltip?: React.ComponentType<unknown> | ((props: unknown) => React.ReactNode);
   labelFormatter?: (props: PieLabelRenderProps) => React.ReactNode;
   maxItems?: number;
+  activeName?: string | null;
+  onSliceClick?: (entry: Record<string, unknown>) => void;
   [key: string]: unknown;
 }) => {
   const { CustomTooltip, chartColors, chartTypeConfigs } = useChartConfig();
@@ -161,9 +179,17 @@ const DistributionPieChart = ({
               labelLine={false}
               startAngle={chartTypeConfigs.pie.startAngle}
               endAngle={chartTypeConfigs.pie.endAngle}
+              onClick={(_, index) => {
+                if (onSliceClick) {
+                  const entry = enhancedData[index];
+                  if (entry) {
+                    onSliceClick(entry as Record<string, unknown>);
+                  }
+                }
+              }}
               {...props}
             >
-              {renderPieCells(enhancedData)}
+              {renderPieCells(enhancedData, activeName, nameKey)}
             </Pie>
             <Tooltip content={<TooltipComponent />} />
             {showLegend && <Legend />}
@@ -183,13 +209,31 @@ export const DistributionPieChartWithDetails = ({
   nameKey = "name",
   className = "",
   maxItems = 6,
+  selectedName,
+  onSelect,
+  detailContent,
   ...chartProps
+}: {
+  title?: string;
+  subtitle?: React.ReactNode;
+  data?: Array<Record<string, unknown>>;
+  dataKey?: string;
+  nameKey?: string;
+  className?: string;
+  maxItems?: number;
+  selectedName?: string | null;
+  onSelect?: (name: string | null, entry?: Record<string, unknown>) => void;
+  detailContent?: React.ReactNode;
+  [key: string]: unknown;
 }) => {
-  const { formatters } = useChartConfig();
+  const { formatters, chartColors } = useChartConfig();
 
   // Limit and prepare data
   const chartData = Array.isArray(data) ? data.slice(0, maxItems) : [];
-  const total = chartData.reduce((sum, item) => sum + (item[dataKey] || 0), 0);
+  const total = chartData.reduce(
+    (sum, item) => sum + Number(item[dataKey] ?? 0),
+    0
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -203,35 +247,78 @@ export const DistributionPieChartWithDetails = ({
         className={className}
         showLegend={false}
         outerRadius={120}
+        activeName={selectedName || undefined}
+        onSliceClick={(entry) => {
+          const entryName = String(entry[nameKey] ?? "");
+          onSelect?.(selectedName === entryName ? null : entryName, entry);
+        }}
         {...chartProps}
       />
 
       {/* Details List */}
-      <div className="glassmorphism rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Details</h3>
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+      <div className="glassmorphism rounded-xl p-6 space-y-2">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold text-gray-900">Category Details</h3>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-gray-500">Total: {formatters.currency(total)}</span>
+            {selectedName && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onSelect?.(null)}
+                className="px-2 py-1 text-cyan-600 hover:text-cyan-800"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+        <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
           {chartData.map((item, index) => {
-            const percentage = total > 0 ? ((item[dataKey] || 0) / total) * 100 : 0;
+            const rawAmount = Number(item[dataKey] ?? 0);
+            const percentage = total > 0 ? (rawAmount / total) * 100 : 0;
+            const itemName = String(item[nameKey] || "");
+            const isActive = selectedName === itemName;
+            const transactionCount = Number(item.count || 0);
+            const fallbackColor = chartColors[index % chartColors.length] ?? "#8B5CF6";
+            const resolvedColor = (item as Record<string, unknown>).color;
+            const bulletColor =
+              typeof resolvedColor === "string" && resolvedColor.trim() !== ""
+                ? resolvedColor
+                : fallbackColor;
             return (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-white/40 rounded-lg"
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelect?.(isActive ? null : itemName, item)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect?.(isActive ? null : itemName, item);
+                  }
+                }}
+                className={`flex items-center justify-between p-3 bg-white/40 rounded-lg transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                  isActive ? "shadow-lg border-2 border-black" : ""
+                }`}
               >
                 <div className="flex items-center">
                   <div
                     className="w-4 h-4 rounded-full mr-3"
                     style={{
-                      backgroundColor: item.color || "#8B5CF6",
+                      backgroundColor: bulletColor,
                     }}
                   />
                   <div>
-                    <div className="font-medium text-gray-900">{item[nameKey]}</div>
-                    <div className="text-sm text-gray-600">{item.count || 0} transactions</div>
+                    <div className="font-medium text-gray-900">{itemName}</div>
+                    <div className="text-sm text-gray-600">
+                      {transactionCount} {transactionCount === 1 ? "transaction" : "transactions"}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-gray-900">
-                    {formatters.currency(item[dataKey])}
+                    {formatters.currency(rawAmount)}
                   </div>
                   <div className="text-sm text-gray-600">{percentage.toFixed(1)}%</div>
                 </div>
@@ -239,6 +326,7 @@ export const DistributionPieChartWithDetails = ({
             );
           })}
         </div>
+        {detailContent}
       </div>
     </div>
   );

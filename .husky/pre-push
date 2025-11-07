@@ -24,4 +24,12 @@ if [ "$ERROR_COUNT" -gt "$ERROR_THRESHOLD" ]; then
 fi
 
 echo "✅ TypeScript check passed! ($ERROR_COUNT/$ERROR_THRESHOLD errors)"
+
+echo "🏗️ Running production build before push..."
+if ! npm run build; then
+  echo "❌ Production build failed! Push aborted."
+  exit 1
+fi
+
+echo "✅ Build succeeded!"
 echo "✅ All checks passed! Push proceeding..."

@@ -1,88 +1,62 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/common/useChartConfig";
+import type { ReactNode } from "react";
+import ComposedFinancialChart from "./ComposedFinancialChart";
 
-// Helper to format currency values
-const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
-
-// Default lines configuration
-const DEFAULT_LINES = [
-  { dataKey: "income", name: "Income", color: "#10b981" },
-  { dataKey: "expenses", name: "Expenses", color: "#ef4444" },
-  { dataKey: "net", name: "Net", color: "#06b6d4" },
+const LINE_SERIES = [
+  { type: "line", dataKey: "income", name: "Income", stroke: "#10b981", strokeWidth: 3 },
+  { type: "line", dataKey: "expenses", name: "Expenses", stroke: "#ef4444", strokeWidth: 3 },
+  { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
 ];
 
-/**
- * Reusable trend line chart component
- * Extracted from ChartsAndAnalytics.jsx for better reusability
- * Issue #151 - ChartsAndAnalytics refactoring
- */
+const AREA_SERIES = [
+  { type: "area", dataKey: "income", name: "Income", stroke: "#10b981", fill: "#10b981", fillOpacity: 0.2 },
+  { type: "area", dataKey: "expenses", name: "Expenses", stroke: "#ef4444", fill: "#ef4444", fillOpacity: 0.2 },
+  { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
+];
+
+const BAR_SERIES = [
+  { type: "bar", dataKey: "income", name: "Income", fill: "#10b981" },
+  { type: "bar", dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
+  { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
+];
+
+const SERIES_BY_TYPE = {
+  line: LINE_SERIES,
+  area: AREA_SERIES,
+  bar: BAR_SERIES,
+};
+
+interface TrendLineChartProps {
+  title?: string;
+  subtitle?: ReactNode;
+  data?: Array<Record<string, unknown>>;
+  chartType?: string;
+  type?: string;
+  height?: number;
+  [key: string]: unknown;
+}
+
 const TrendLineChart = ({
   title = "Trend Analysis",
   subtitle,
   data = [],
-  lines = [],
+  chartType = "line",
+  type,
   height = 300,
-  className = "",
-  loading = false,
-  error = null,
-  emptyMessage = "No trend data available",
-  actions,
-  showGrid = true,
-  showLegend = true,
-  formatTooltip,
   ...props
-}) => {
-  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
-
-  // Use custom tooltip or default
-  const TooltipComponent = formatTooltip || CustomTooltip;
-
-  // Ensure data is valid
+}: TrendLineChartProps) => {
+  const resolvedType = type || chartType || "line";
   const chartData = Array.isArray(data) ? data : [];
-  const hasData = chartData.length > 0;
-
-  const lineConfig = lines.length > 0 ? lines : DEFAULT_LINES;
+  const series = SERIES_BY_TYPE[resolvedType] || SERIES_BY_TYPE.line;
 
   return (
-    <ChartContainer
+    <ComposedFinancialChart
       title={title}
       subtitle={subtitle}
+      data={chartData}
+      series={series}
       height={height}
-      className={className}
-      loading={loading}
-      error={error}
-      emptyMessage={emptyMessage}
-      actions={actions}
-      dataTestId="trend-line-chart"
-    >
-      {hasData && (
-        <LineChart data={chartData} {...props}>
-          {showGrid && (
-            <CartesianGrid
-              strokeDasharray={chartDefaults.cartesianGrid.strokeDasharray}
-              stroke={chartDefaults.cartesianGrid.stroke}
-            />
-          )}
-          <XAxis dataKey="month" stroke={chartDefaults.axis.stroke} fontSize={12} />
-          <YAxis stroke={chartDefaults.axis.stroke} fontSize={12} tickFormatter={formatCurrency} />
-          <Tooltip content={<TooltipComponent />} />
-          {showLegend && <Legend />}
-
-          {lineConfig.map((lineProps, index) => (
-            <Line
-              key={lineProps.dataKey}
-              type={chartTypeConfigs.line.type}
-              strokeWidth={chartTypeConfigs.line.strokeWidth}
-              dot={chartTypeConfigs.line.dot}
-              activeDot={chartTypeConfigs.line.activeDot}
-              stroke={lineProps.color || getColorByCategory(lineProps.dataKey, index)}
-              {...lineProps}
-            />
-          ))}
-        </LineChart>
-      )}
-    </ChartContainer>
+      {...props}
+    />
   );
 };
 

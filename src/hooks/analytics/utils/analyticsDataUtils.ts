@@ -136,6 +136,19 @@ interface EnvelopeSpending {
   color: string;
 }
 
+const ENVELOPE_COLOR_PALETTE = [
+  "#2563eb", // blue-600
+  "#0ea5e9", // sky-500
+  "#10b981", // emerald-500
+  "#f97316", // orange-500
+  "#ec4899", // pink-500
+  "#14b8a6", // teal-500
+  "#f59e0b", // amber-500
+  "#8b5cf6", // purple-500
+  "#6366f1", // indigo-500
+  "#ef4444", // red-500
+];
+
 /**
  * Calculate envelope spending breakdown
  */
@@ -144,18 +157,41 @@ export const calculateEnvelopeSpending = (
   envelopes: Envelope[]
 ): EnvelopeSpending[] => {
   const spending: Record<string, EnvelopeSpending> = {};
+  const colorAssignments = new Map<string, string>();
+  let paletteIndex = 0;
+
+  const getEnvelopeColor = (envelopeId: string | undefined, fallbackName: string): string => {
+    if (envelopeId) {
+      const existing = colorAssignments.get(envelopeId);
+      if (existing) {
+        return existing;
+      }
+    }
+
+    const paletteColor = ENVELOPE_COLOR_PALETTE[paletteIndex % ENVELOPE_COLOR_PALETTE.length];
+    paletteIndex += 1;
+
+    if (envelopeId) {
+      colorAssignments.set(envelopeId, paletteColor);
+    } else {
+      colorAssignments.set(fallbackName, paletteColor);
+    }
+
+    return paletteColor;
+  };
 
   transactions.forEach((transaction) => {
     if (transaction.amount && transaction.amount < 0 && transaction.envelopeId) {
       const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
       const envelopeName = envelope ? envelope.name : "Unknown Envelope";
+      const envelopeColor = envelope?.color || getEnvelopeColor(transaction.envelopeId, envelopeName);
 
       if (!spending[envelopeName]) {
         spending[envelopeName] = {
           name: envelopeName,
           amount: 0,
           count: 0,
-          color: envelope?.color || "#8B5CF6",
+          color: envelopeColor,
         };
       }
 
@@ -168,10 +204,26 @@ export const calculateEnvelopeSpending = (
   return results.length > 0 ? results : [];
 };
 
+const CATEGORY_COLORS = [
+  "#0ea5e9",
+  "#10b981",
+  "#f97316",
+  "#f59e0b",
+  "#6366f1",
+  "#ec4899",
+  "#14b8a6",
+  "#8b5cf6",
+  "#22d3ee",
+  "#64748b",
+  "#fb7185",
+  "#facc15",
+];
+
 interface CategoryData {
   name: string;
   amount: number;
   count: number;
+  color?: string;
 }
 
 /**
@@ -197,7 +249,12 @@ export const calculateCategoryBreakdown = (transactions: Transaction[]): Categor
     }
   });
 
-  return Object.values(categories).sort((a, b) => b.amount - a.amount);
+  return Object.values(categories)
+    .sort((a, b) => b.amount - a.amount)
+    .map((category, index) => ({
+      ...category,
+      color: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+    }));
 };
 
 interface WeeklyPattern {

@@ -9,6 +9,21 @@
 const fs = require('fs');
 const path = require('path');
 
+const envelopeColorPalette = [
+  '#2563eb',
+  '#0ea5e9',
+  '#10b981',
+  '#f97316',
+  '#ec4899',
+  '#14b8a6',
+  '#f59e0b',
+  '#8b5cf6',
+  '#6366f1',
+  '#ef4444',
+  '#22c55e',
+  '#9333ea'
+];
+
 // Load base data
 const baseData = require('./violet-vault-test-budget.json');
 
@@ -41,6 +56,21 @@ const merchants = {
   shopping: ['Amazon', 'Target', 'Best Buy', 'HomeDepot', 'Lowes', 'IKEA']
 };
 
+const ENVELOPE_COLORS = [
+  '#ef4444', // red
+  '#f97316', // orange
+  '#f59e0b', // amber
+  '#10b981', // emerald
+  '#14b8a6', // teal
+  '#0ea5e9', // sky
+  '#6366f1', // indigo
+  '#ec4899', // pink
+  '#22d3ee', // cyan
+  '#64748b', // slate
+  '#fb7185', // rose
+  '#facc15', // yellow
+];
+
 // Add 4 debt payment envelopes
 const debtEnvelopes = [
   {
@@ -54,7 +84,8 @@ const debtEnvelopes = [
     targetAmount: 85.00,
     description: 'Chase Freedom Credit Card monthly payment',
     billId: 'bill-debt-001-cc',
-    debtId: 'debt-001-credit-card'
+    debtId: 'debt-001-credit-card',
+    color: '#ef4444'
   },
   {
     id: 'env-debt-002-student',
@@ -67,7 +98,8 @@ const debtEnvelopes = [
     targetAmount: 150.00,
     description: 'Federal Student Loan monthly payment',
     billId: 'bill-debt-002-student',
-    debtId: 'debt-002-student-loan'
+    debtId: 'debt-002-student-loan',
+    color: '#0ea5e9'
   },
   {
     id: 'env-debt-003-auto',
@@ -80,7 +112,8 @@ const debtEnvelopes = [
     targetAmount: 285.00,
     description: 'Honda Civic auto loan monthly payment',
     billId: 'bill-debt-003-auto',
-    debtId: 'debt-003-car-loan'
+    debtId: 'debt-003-car-loan',
+    color: '#10b981'
   },
   {
     id: 'env-debt-004-personal',
@@ -93,7 +126,8 @@ const debtEnvelopes = [
     targetAmount: 125.00,
     description: 'LendingClub personal loan monthly payment',
     billId: 'bill-debt-004-personal',
-    debtId: 'debt-004-personal-loan'
+    debtId: 'debt-004-personal-loan',
+    color: '#f59e0b'
   }
 ];
 
@@ -598,13 +632,57 @@ const updateBaseBills = () => {
 
 // Update envelopes to have recent timestamps and proper amounts
 const updateBaseEnvelopes = () => {
-  return baseData.envelopes.map((env) => ({
-    ...env,
-    lastModified: getTimestamp(0),
-    createdAt: getTimestamp(180),
-    currentBalance: env.currentBalance || 0,
-    targetAmount: env.targetAmount || env.currentBalance || 100,
-  }));
+  const healthOverrides = {
+    'env-001-groceries': {
+      monthlyAmount: 750,
+      currentBalance: 110,
+      spendingHistory: [{ amount: 220 }, { amount: 205 }, { amount: 198 }],
+    },
+    'env-002-gas': {
+      monthlyAmount: 220,
+      currentBalance: 35,
+      spendingHistory: [{ amount: 70 }, { amount: 65 }, { amount: 60 }],
+    },
+    'env-003-rent': {
+      monthlyAmount: 1600,
+      currentBalance: 1650,
+      spendingHistory: [{ amount: 1600 }],
+    },
+    'env-004-utilities': {
+      monthlyAmount: 260,
+      currentBalance: 140,
+      spendingHistory: [{ amount: 95 }, { amount: 120 }],
+    },
+    'env-005-entertainment': {
+      monthlyAmount: 180,
+      currentBalance: 20,
+      spendingHistory: [{ amount: 90 }, { amount: 85 }],
+    },
+    'env-008-emergency': {
+      monthlyAmount: 500,
+      currentBalance: 2600,
+      spendingHistory: [{ amount: 0 }],
+    },
+  };
+
+  let colorIndex = 0;
+
+  return baseData.envelopes.map((env) => {
+    const override = healthOverrides[env.id] || {};
+    const assignedColor = env.color || envelopeColorPalette[colorIndex % envelopeColorPalette.length];
+    colorIndex += 1;
+
+    return {
+      ...env,
+      lastModified: getTimestamp(0),
+      createdAt: getTimestamp(180),
+      currentBalance: env.currentBalance ?? (override.currentBalance ?? 0),
+      targetAmount: env.targetAmount || env.currentBalance || 100,
+      monthlyAmount: override.monthlyAmount ?? env.monthlyAmount ?? env.targetAmount ?? 0,
+      color: assignedColor,
+      spendingHistory: override.spendingHistory || env.spendingHistory || [],
+    };
+  });
 };
 
 // Update savings goals to have current amounts and recent dates
@@ -732,12 +810,11 @@ const allTransactions = [
 ];
 const updatedSupplementalAccounts = updateSupplementalAccounts();
 
-// Build allTransactions array (includes bill payments)
 const buildAllTransactions = () => {
-  const billPayments = allBills.filter(b => b.isPaid).map(bill => ({
+  const billPayments = allBills.filter((b) => b.isPaid).map((bill) => ({
     id: `${bill.id}-payment`,
     date: bill.dueDate,
-    amount: -Math.abs(bill.amount), // Bill payments are expenses (negative)
+    amount: -Math.abs(bill.amount),
     envelopeId: bill.envelopeId,
     category: bill.category,
     type: 'bill',
@@ -745,17 +822,96 @@ const buildAllTransactions = () => {
     createdAt: bill.createdAt,
     description: bill.name,
     billId: bill.id,
-    merchant: bill.paymentMethod || 'Payment'
+    merchant: bill.paymentMethod || 'Payment',
   }));
-  
-  return [...allTransactions, ...billPayments].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+
+  return [...allTransactions, ...billPayments].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 };
 
+const buildEnvelopeSpendingHistory = (transactions) => {
+  const monthMap = {};
+
+  transactions.forEach((txn) => {
+    if (!txn || !txn.envelopeId || typeof txn.amount !== 'number' || txn.amount >= 0) {
+      return;
+    }
+
+    const monthKey = new Date(txn.date).toISOString().slice(0, 7);
+    if (!monthMap[txn.envelopeId]) {
+      monthMap[txn.envelopeId] = {};
+    }
+
+    monthMap[txn.envelopeId][monthKey] =
+      (monthMap[txn.envelopeId][monthKey] || 0) + Math.abs(Number(txn.amount));
+  });
+
+  return Object.entries(monthMap).reduce((acc, [envelopeId, monthlyTotals]) => {
+    acc[envelopeId] = Object.entries(monthlyTotals)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-6)
+      .map(([month, amount]) => ({ month, amount: Number(amount.toFixed(2)) }));
+    return acc;
+  }, {});
+};
+
+const generateFallbackHistory = (monthlyAmount) => {
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i -= 1) {
+    const date = new Date(now);
+    date.setMonth(date.getMonth() - i);
+    months.push({
+      month: date.toISOString().slice(0, 7),
+      amount: Number((monthlyAmount * (0.65 + Math.random() * 0.45)).toFixed(2)),
+    });
+  }
+  return months;
+};
+
+const envelopeSpendingHistory = buildEnvelopeSpendingHistory(allTransactions);
+
+const enhanceEnvelopesForAnalytics = (envelopes) => {
+  return envelopes.map((env, index) => {
+    const paletteColor = ENVELOPE_COLORS[index % ENVELOPE_COLORS.length];
+    const baseMonthlyAmount = env.targetAmount || env.monthlyAmount || 250;
+    const history = envelopeSpendingHistory[env.id]?.length
+      ? envelopeSpendingHistory[env.id]
+      : generateFallbackHistory(baseMonthlyAmount);
+
+    let adjustedBalance =
+      env.currentBalance !== undefined ? env.currentBalance : baseMonthlyAmount * 0.85;
+
+    switch (index % 4) {
+      case 0:
+        adjustedBalance = baseMonthlyAmount * 0.25;
+        break;
+      case 1:
+        adjustedBalance = baseMonthlyAmount * 1.45;
+        break;
+      case 2:
+        adjustedBalance = baseMonthlyAmount * 0.6;
+        break;
+      default:
+        adjustedBalance = baseMonthlyAmount * (0.85 + Math.random() * 0.1);
+    }
+
+    return {
+      ...env,
+      color: paletteColor,
+      monthlyAmount: Number(baseMonthlyAmount.toFixed(2)),
+      currentBalance: Number(adjustedBalance.toFixed(2)),
+      spendingHistory: history,
+    };
+  });
+};
+
+const enhancedEnvelopes = enhanceEnvelopesForAnalytics(allEnvelopes);
+
 // Construct final export object
 const enhancedData = {
-  envelopes: allEnvelopes,
+  envelopes: enhancedEnvelopes,
   bills: allBills,
   transactions: allTransactions,
   allTransactions: buildAllTransactions(),
@@ -771,7 +927,7 @@ const enhancedData = {
   exportMetadata: {
     ...baseData.exportMetadata,
     exportDate: new Date().toISOString(),
-    note: 'Enhanced test data with 100+ transactions and full entity connections'
+    note: 'Enhanced test data with 100+ transactions and full entity connections',
   },
   _dataGuide: {
     ...baseData._dataGuide,
@@ -784,6 +940,15 @@ const enhancedData = {
         description: 'High-volume merchants without categories for smart suggestion testing',
         merchants: Array.from(new Set(uncategorizedClusterTransactions.map((txn) => txn.merchant))),
       },
+      envelopeSpendingHistory: {
+        description: 'Monthly spending snapshots used for health scores and trends',
+        sample: enhancedEnvelopes.slice(0, 3).map((env) => ({
+          envelope: env.name,
+          monthlyAmount: env.monthlyAmount,
+          currentBalance: env.currentBalance,
+          history: env.spendingHistory,
+        })),
+      },
     },
     connections: {
       'Debt → Envelope': 'debts have envelopeId field',
@@ -792,19 +957,19 @@ const enhancedData = {
       'Envelope → Bill': 'envelopes have billId field',
       'Envelope → Debt': 'envelopes have debtId field',
       'Transaction → Envelope': 'transactions have envelopeId field',
-      'Transaction → Bill': 'bill payment transactions have billId field'
+      'Transaction → Bill': 'bill payment transactions have billId field',
     },
     stats: {
-      envelopes: allEnvelopes.length,
+      envelopes: enhancedEnvelopes.length,
       bills: allBills.length,
       transactions: allTransactions.length,
       allTransactions: buildAllTransactions().length,
       debts: enhancedDebts.length,
       savingsGoals: baseData.savingsGoals.length,
       supplementalAccounts: updatedSupplementalAccounts.length,
-      paycheckHistory: baseData.paycheckHistory.length
-    }
-  }
+      paycheckHistory: baseData.paycheckHistory.length,
+    },
+  },
 };
 
 // Write to file
@@ -813,7 +978,7 @@ fs.writeFileSync(outputPath, JSON.stringify(enhancedData, null, 2));
 
 console.log('✅ Enhanced test data generated!');
 console.log(`📊 Stats:`);
-console.log(`   - Envelopes: ${allEnvelopes.length} (added 4 debt payment envelopes)`);
+console.log(`   - Envelopes: ${enhancedEnvelopes.length} (added 4 debt payment envelopes)`);
 console.log(`   - Bills: ${allBills.length} (added 4 debt payment bills)`);
 console.log(
   `   - Transactions: ${allTransactions.length} (generated ${newTransactions.length} base + ${recurringBillTransactions.length} discovery + ${uncategorizedClusterTransactions.length} suggestion samples)`

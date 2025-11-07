@@ -26,7 +26,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       icon: getIcon("PieChart"),
       label: "Top Category",
       value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
-      color: "indigo" as const,
+      color: "blue" as const,
       subtext: "Highest spending area",
     },
     {
