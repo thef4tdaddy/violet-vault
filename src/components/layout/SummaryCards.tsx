@@ -214,7 +214,7 @@ const SummaryCard = memo(
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-3">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2">
           <p className="text-sm font-semibold text-gray-600">{label}</p>
           <p
             className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
@@ -224,7 +224,7 @@ const SummaryCard = memo(
           </p>
         </div>
 
-        <div className="mt-5 flex min-h-[1.75rem] w-full items-end justify-center text-center">
+        <div className="mt-3 flex min-h-[1.75rem] w-full items-end justify-center text-center">
           {clickable && !isNegative && <p className="text-xs text-gray-400">Click to distribute</p>}
           {isNegative && (
             <p className="text-xs font-medium text-red-500">⚠️ Overspending - click to address</p>
