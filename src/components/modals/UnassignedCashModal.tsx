@@ -9,6 +9,22 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 
+type DistributionEnvelope = {
+  id: string;
+  name: string;
+  currentBalance?: number;
+  monthlyBudget?: number;
+  monthlyAmount?: number;
+  color?: string;
+  envelopeType: string;
+};
+
+type DistributionPreview = {
+  id: string;
+  name: string;
+  distributionAmount: number;
+};
+
 // ============================================================================
 // Sub-Components
 // ============================================================================
@@ -328,7 +344,15 @@ const UnassignedCashModal = () => {
 
   if (!isUnassignedCashModalOpen) return null;
 
-  const preview = getDistributionPreview();
+  const distributionEnvelopes = Array.isArray(envelopes)
+    ? (envelopes as DistributionEnvelope[])
+    : ([] as DistributionEnvelope[]);
+
+  const typedBills = Array.isArray(bills)
+    ? (bills as Array<{ id: string; name: string }>)
+    : ([] as Array<{ id: string; name: string }>);
+
+  const preview = (getDistributionPreview() as DistributionPreview[]) || [];
   const hasDistributions = Number(totalDistributed) > 0;
   const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
 
@@ -346,10 +370,10 @@ const UnassignedCashModal = () => {
       distributeEqually={distributeEqually}
       distributeProportionally={distributeProportionally}
       clearDistributions={clearDistributions}
-      envelopes={envelopes}
+      envelopes={distributionEnvelopes}
       distributions={distributions}
       updateDistribution={updateDistribution}
-      bills={bills}
+      bills={typedBills}
       preview={preview}
       applyDistribution={applyDistribution}
       isValidDistribution={isValidDistribution}
@@ -390,11 +414,11 @@ const UnassignedCashModalContent = ({
   distributeEqually: () => void;
   distributeProportionally: () => void;
   clearDistributions: () => void;
-  envelopes: Array<{ id: string; name: string; color?: string; currentBalance?: number; monthlyBudget?: number; monthlyAmount?: number; type?: string }>;
+  envelopes: DistributionEnvelope[];
   distributions: Record<string, number>;
-  updateDistribution: (envelopeId: string, amount: string) => void;
-  bills: unknown[];
-  preview: Array<{ id: string; name: string; distributionAmount: number }>;
+  updateDistribution: (envelopeId: string, amount: string | number) => void;
+  bills: Array<{ id: string; name: string }>;
+  preview: DistributionPreview[];
   applyDistribution: () => void;
   isValidDistribution: boolean;
 }) => {

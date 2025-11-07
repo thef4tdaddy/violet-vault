@@ -11,7 +11,7 @@ interface HeaderProps {
   onUserChange: (user: unknown) => void;
   onUpdateProfile: (profile: unknown) => void;
   isLocalOnlyMode?: boolean;
-  onShowSettings: () => void;
+  onShowSettings: (section?: string) => void;
   onShowDataSettings: () => void;
 }
 
@@ -102,7 +102,7 @@ const Header = memo(
               )}
 
               <button
-                onClick={onShowSettings}
+                onClick={() => onShowSettings()}
                 className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
                 title="Open Settings Dashboard"
               >

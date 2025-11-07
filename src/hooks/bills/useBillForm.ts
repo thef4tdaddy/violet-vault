@@ -19,6 +19,7 @@ import {
   buildBillData,
 } from "./helpers/billFormHelpers";
 import { validateBillFormData } from "@/utils/validation/billFormValidation";
+import type { BillIconOption } from "@/utils/billIcons/iconOptions";
 
 /**
  * Custom hook for bill form management
@@ -67,7 +68,10 @@ export const useBillForm = ({
   }, [formData.name, formData.notes, formData.category]);
 
   // Icon suggestions for current category
-  const iconSuggestions = useMemo(() => getBillIconOptions(formData.category), [formData.category]);
+  const iconSuggestions = useMemo<BillIconOption[]>(
+    () => getBillIconOptions(formData.category),
+    [formData.category]
+  );
 
   // Available categories
   const categories = useMemo(() => getBillCategories().slice(), []);

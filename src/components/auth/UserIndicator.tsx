@@ -18,7 +18,7 @@ interface UserIndicatorProps {
     budgetId?: string;
     [key: string]: unknown;
   }) => Promise<void>;
-  onOpenSettings?: () => void;
+  onOpenSettings?: (section?: string) => void;
 }
 
 const UserIndicator = memo(
@@ -38,7 +38,7 @@ const UserIndicator = memo(
             <Button
               onClick={() => {
                 if (onOpenSettings) {
-                  onOpenSettings();
+                  onOpenSettings("account");
                 } else {
                   setShowDropdown(!showDropdown);
                 }
@@ -68,9 +68,7 @@ const UserIndicator = memo(
                 <div className="absolute top-full mt-2 right-0 z-[110] bg-white rounded-xl shadow-xl border-2 border-black ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                   <Button
                     onClick={() => {
-                      if (onOpenSettings) {
-                        onOpenSettings();
-                      }
+                      onOpenSettings?.("account");
                       setShowDropdown(false);
                     }}
                     className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ReactNode } from "react";
+import React, { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
@@ -233,12 +233,15 @@ const MainContent = ({
       (state as Record<string, unknown>).resetAllData as () => void
   );
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Onboarding state
   const isOnboarded = useOnboardingStore((state) => state.isOnboarded);
 
   // Extract layout data using helper
   const { budget, totalBiweeklyNeed, paycheckHistory } = extractLayoutData(layoutData);
+  const normalizedTotalBiweeklyNeed =
+    typeof totalBiweeklyNeed === "number" ? totalBiweeklyNeed : Number(totalBiweeklyNeed ?? 0);
 
   // Extract auth data using helper
   const { securityContext, isUnlocked: isUnlockedAuth } = extractAuthData(auth);
@@ -286,110 +289,208 @@ const MainContent = ({
   // Payday prediction
   usePaydayPrediction(paycheckHistory, !!currentUser);
 
+  const navigateToAuth = useCallback(() => {
+    navigate("/auth" + location.search);
+  }, [navigate, location.search]);
+
+  const updateUserProfile = useCallback(
+    (updates: unknown) => {
+      (auth as { updateUser: (updates: unknown) => void }).updateUser(updates);
+    },
+    [auth]
+  );
+
+  const handleHideSecurityWarning = useCallback(() => setShowSecurityWarning(false), [
+    setShowSecurityWarning,
+  ]);
+  const handleHideCorruption = useCallback(() => setShowCorruptionModal(false), [
+    setShowCorruptionModal,
+  ]);
+  const clearSyncConflicts = useCallback(() => setSyncConflicts(null), [setSyncConflicts]);
+
   return (
     <GlobalPullToRefreshProvider>
       <OnboardingTutorial>
-        <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
-          <div className="max-w-7xl mx-auto relative">
-            <div className="relative z-10">
-              <Header
-                currentUser={currentUser}
-                onUserChange={() => {}}
-                onUpdateProfile={() => {}}
-                isLocalOnlyMode={isLocalOnlyMode}
-                onShowSettings={() => modals.settings.setOpen(true)}
-                onShowDataSettings={() => modals.security.setOpen(true)}
-              />
-            </div>
-
-            {rotationDue && (
-              <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
-                Your password is over 90 days old. Please change it.
-              </div>
-            )}
-
-            <NavigationTabs />
-            <OnboardingProgress />
-            <SummaryCards />
-
-            <AppRoutes
-              budget={budget}
-              currentUser={currentUser}
-              totalBiweeklyNeed={totalBiweeklyNeed}
-              setActiveView={setActiveView}
-            />
-
-            <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
-            <ConflictResolutionModal
-              syncConflicts={syncConflicts}
-              onResolveConflict={onResolveConflict}
-              onDismiss={() => setSyncConflicts(null)}
-            />
-
-            <BottomNavigationBar />
-
-            {/* Bug Report Button - Floating (separate from main content flow) */}
-            {!showSecurityWarning && <BugReportButton />}
-
-            <div className="mt-8 text-center">
-              <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-purple-600">
-                    {getVersionInfo().displayName}
-                  </span>{" "}
-                  v{getVersionInfo().version}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Last updated: {getVersionInfo().buildDate}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
-              </div>
-            </div>
-          </div>
-
-          <SecuritySettings
-            isOpen={modals.security.isOpen}
-            onClose={() => modals.security.setOpen(false)}
-          />
-
-          {modals.settings.isOpen && (
-            <SettingsDashboard
-              isOpen={modals.settings.isOpen}
-              onClose={() => modals.settings.setOpen(false)}
-              initialSection={modals.settings.initialSection}
-              onExport={_onExport}
-              onImport={_onImport}
-              onLogout={onLogout}
-              onResetEncryption={() => {
-                resetAllData();
-                onResetEncryption();
-              }}
-              onSync={handleManualSync}
-              onChangePassword={onChangePassword}
-              currentUser={currentUser}
-              isLocalOnlyMode={isLocalOnlyMode}
-              securityManager={securityManager}
-              onUpdateProfile={async (updates) => {
-                // Update profile through auth manager
-                (auth as { updateUser: (updates: unknown) => void }).updateUser(updates);
-              }}
-            />
-          )}
-
-          <CorruptionRecoveryModal
-            isOpen={showCorruptionModal}
-            onClose={() => setShowCorruptionModal(false)}
-          />
-
-          {showSecurityWarning && (
-            <LocalDataSecurityWarning
-              onClose={() => setShowSecurityWarning(false)}
-              onAcknowledge={() => setShowSecurityWarning(false)}
-            />
-          )}
-        </div>
+        <MainContentLayoutView
+          currentUser={currentUser}
+          isLocalOnlyMode={isLocalOnlyMode}
+          isOnline={isOnline}
+          isSyncing={isSyncing}
+          rotationDue={rotationDue}
+          showSecurityWarning={showSecurityWarning}
+          onHideSecurityWarning={handleHideSecurityWarning}
+          onManualSync={handleManualSync}
+          onNavigateToAuth={navigateToAuth}
+          onUpdateProfile={updateUserProfile}
+          modals={modals}
+          showCorruptionModal={showCorruptionModal}
+          onHideCorruptionModal={handleHideCorruption}
+          budget={budget}
+          totalBiweeklyNeed={normalizedTotalBiweeklyNeed}
+          setActiveView={setActiveView}
+          syncConflicts={syncConflicts}
+          onResolveConflict={onResolveConflict}
+          onClearConflict={clearSyncConflicts}
+          onExport={_onExport}
+          onImport={_onImport}
+          onLogout={onLogout}
+          onResetEncryption={onResetEncryption}
+          resetAllData={resetAllData}
+          onChangePassword={onChangePassword}
+          securityManager={securityManager}
+        />
       </OnboardingTutorial>
     </GlobalPullToRefreshProvider>
+  );
+};
+
+type MainContentModals = ReturnType<typeof useMainContentModals>;
+
+interface MainContentLayoutViewProps {
+  currentUser: unknown;
+  isLocalOnlyMode: boolean;
+  isOnline: boolean;
+  isSyncing: boolean;
+  rotationDue: boolean;
+  showSecurityWarning: boolean;
+  onHideSecurityWarning: () => void;
+  onManualSync: () => void;
+  onNavigateToAuth: () => void;
+  onUpdateProfile: (updates: unknown) => void;
+  modals: MainContentModals;
+  showCorruptionModal: boolean;
+  onHideCorruptionModal: () => void;
+  budget: unknown;
+  totalBiweeklyNeed: number;
+  setActiveView: (view: string) => void;
+  syncConflicts: unknown;
+  onResolveConflict: () => void;
+  onClearConflict: () => void;
+  onExport: () => void;
+  onImport: MainContentProps["_onImport"];
+  onLogout: () => void;
+  onResetEncryption: () => void;
+  resetAllData: () => void;
+  onChangePassword: MainContentProps["onChangePassword"];
+  securityManager: unknown;
+}
+
+const MainContentLayoutView = ({
+  currentUser,
+  isLocalOnlyMode,
+  isOnline,
+  isSyncing,
+  rotationDue,
+  showSecurityWarning,
+  onHideSecurityWarning,
+  onManualSync,
+  onNavigateToAuth,
+  onUpdateProfile,
+  modals,
+  showCorruptionModal,
+  onHideCorruptionModal,
+  budget,
+  totalBiweeklyNeed,
+  setActiveView,
+  syncConflicts,
+  onResolveConflict,
+  onClearConflict,
+  onExport,
+  onImport,
+  onLogout,
+  onResetEncryption,
+  resetAllData,
+  onChangePassword,
+  securityManager,
+}: MainContentLayoutViewProps) => {
+  const { settings, security } = modals;
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 pb-20 sm:px-6 md:px-8 lg:pb-0">
+      <div className="relative mx-auto max-w-7xl">
+        <div className="relative z-10">
+          <Header
+            currentUser={currentUser}
+            isLocalOnlyMode={isLocalOnlyMode}
+            onUserChange={onNavigateToAuth}
+            onUpdateProfile={onUpdateProfile}
+            onShowSettings={(section) => settings.open(section)}
+            onShowDataSettings={() => settings.open("general")}
+          />
+        </div>
+
+        {rotationDue && (
+          <div className="mb-4 rounded-lg border border-amber-300 bg-amber-100 p-4 text-center text-amber-700">
+            Your password is over 90 days old. Please change it.
+          </div>
+        )}
+
+        <NavigationTabs />
+        <OnboardingProgress />
+        <SummaryCards />
+
+        <AppRoutes
+          budget={budget}
+          currentUser={currentUser}
+          totalBiweeklyNeed={totalBiweeklyNeed}
+          setActiveView={setActiveView}
+        />
+
+        <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+        <ConflictResolutionModal
+          syncConflicts={syncConflicts}
+          onResolveConflict={onResolveConflict}
+          onDismiss={onClearConflict}
+        />
+
+        <BottomNavigationBar />
+
+        {!showSecurityWarning && <BugReportButton />}
+
+        <div className="mt-8 text-center">
+          <div className="glassmorphism mx-auto max-w-md rounded-2xl border border-gray-800/20 p-4">
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
+              v{getVersionInfo().version}
+            </p>
+            <p className="mt-1 text-xs text-gray-500">Last updated: {getVersionInfo().buildDate}</p>
+            <p className="mt-1 text-xs text-gray-500">Built with ❤️ for secure budgeting</p>
+          </div>
+        </div>
+      </div>
+
+      <SecuritySettings isOpen={security.isOpen} onClose={() => security.setOpen(false)} />
+
+      {settings.isOpen && (
+        <SettingsDashboard
+          isOpen={settings.isOpen}
+          onClose={() => settings.close()}
+          initialSection={settings.initialSection}
+          onExport={onExport}
+          onImport={onImport}
+          onLogout={onLogout}
+          onResetEncryption={() => {
+            resetAllData();
+            onResetEncryption();
+          }}
+          onSync={onManualSync}
+          onChangePassword={onChangePassword}
+          currentUser={currentUser}
+          isLocalOnlyMode={isLocalOnlyMode}
+          securityManager={securityManager}
+          onUpdateProfile={onUpdateProfile}
+        />
+      )}
+
+      <CorruptionRecoveryModal isOpen={showCorruptionModal} onClose={onHideCorruptionModal} />
+
+      {showSecurityWarning && (
+        <LocalDataSecurityWarning
+          onClose={onHideSecurityWarning}
+          onAcknowledge={onHideSecurityWarning}
+        />
+      )}
+    </div>
   );
 };
 

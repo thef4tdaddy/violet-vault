@@ -5,6 +5,7 @@ import ReceiptButton from "../receipts/ReceiptButton";
 import logger from "../../utils/common/logger";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
+import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {
@@ -120,6 +121,7 @@ interface TransactionDetailsFieldsProps {
   canEdit: boolean;
   editingTransaction?: Transaction | null;
   categories: string[];
+  smartCategorySuggestion?: (description: string) => TransactionCategorySuggestion | null;
 }
 
 /**
@@ -132,7 +134,15 @@ export const TransactionDetailsFields = ({
   canEdit,
   editingTransaction,
   categories,
+  smartCategorySuggestion,
 }: TransactionDetailsFieldsProps) => {
+  const smartSuggestion = React.useMemo(() => {
+    return smartCategorySuggestion?.(transactionForm.description) ?? null;
+  }, [smartCategorySuggestion, transactionForm.description]);
+
+  const showSuggestion =
+    smartSuggestion && smartSuggestion.category && smartSuggestion.category !== transactionForm.category;
+
   return (
     <>
       <div>
@@ -193,6 +203,29 @@ export const TransactionDetailsFields = ({
               </option>
             ))}
           </Select>
+          {showSuggestion && (
+            <div className="mt-2 flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+              <div className="flex items-center text-sm text-emerald-700 font-medium">
+                {React.createElement(getIcon("Sparkles"), {
+                  className: "h-4 w-4 mr-2",
+                })}
+                Suggested: {smartSuggestion.category}
+              </div>
+              <Button
+                type="button"
+                onClick={() =>
+                  setTransactionForm({
+                    ...transactionForm,
+                    category: smartSuggestion.category,
+                  })
+                }
+                className="px-3 py-1 text-xs bg-emerald-600 text-white border-2 border-black rounded-lg hover:bg-emerald-700"
+                disabled={!!editingTransaction && !canEdit}
+              >
+                Apply
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </>

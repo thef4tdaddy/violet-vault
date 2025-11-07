@@ -86,8 +86,6 @@ const ModalContent = ({
       <AccountColorAndSettings
         accountForm={accountForm}
         setAccountForm={setAccountForm}
-        canEdit={canEdit}
-        editingAccount={editingAccount}
       />
     </div>
 

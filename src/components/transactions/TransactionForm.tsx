@@ -9,6 +9,7 @@ import TransactionFormFields from "./TransactionFormFields";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {
@@ -37,6 +38,7 @@ interface TransactionFormProps {
   onSubmit: () => void;
   suggestEnvelope?: (description: string) => { id: string; name: string } | null;
   onPayBill?: (billPayment: BillPayment) => void;
+  smartCategorySuggestion?: (description: string) => TransactionCategorySuggestion | null;
 }
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
@@ -51,6 +53,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   onSubmit,
   suggestEnvelope,
   onPayBill, // Optional callback for handling bill payments
+  smartCategorySuggestion,
 }) => {
   // Get auth context for edit locking
   const {
@@ -153,6 +156,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           supplementalAccounts={supplementalAccounts}
           categories={categories}
           suggestEnvelope={suggestEnvelope}
+          smartCategorySuggestion={smartCategorySuggestion}
         />
       </div>
     </div>

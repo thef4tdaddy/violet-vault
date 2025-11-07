@@ -19,6 +19,7 @@ import {
   getTransactionFilterConfigs,
 } from "../../utils/transactions/ledgerHelpers";
 import type { User } from "../../types/finance";
+import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
 
 interface TransactionLedgerProps {
   currentUser?: User;
@@ -28,7 +29,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
   // Get supplemental accounts from layout data
-  const { budget } = useLayoutData();
+  const { budget, bills: billsQuery, transactions: layoutTransactions = [] } = useLayoutData();
   const supplementalAccounts = (budget?.supplementalAccounts || []) as Array<{
     id: string | number;
     name: string;
@@ -101,6 +102,15 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     envelopes as unknown as import("@/types/finance").Envelope[]
   ) as FilterConfig[];
 
+  const { suggestTransactionCategory } = useSmartSuggestions({
+    transactions: (layoutTransactions.length ? layoutTransactions : transactions).map((item) => ({
+      ...(item as unknown as Record<string, unknown>),
+    })),
+    bills: (billsQuery?.bills || []).map((bill) => ({
+      ...(bill as unknown as Record<string, unknown>),
+    })),
+  });
+
   // Show loading state while data is fetching
   if (isLoading) {
     return <TransactionLedgerLoading />;
@@ -166,6 +176,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
           handleSuggestEnvelope as (description: string) => { id: string; name: string }
         }
         onPayBill={handlePayBill}
+        smartCategorySuggestion={suggestTransactionCategory}
       />
 
       {/* Import Modal */}

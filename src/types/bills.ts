@@ -1,4 +1,5 @@
 import React from "react";
+import type { BillIconOption } from "@/utils/billIcons/iconOptions";
 
 /**
  * TypeScript type definitions for bill components
@@ -83,7 +84,7 @@ export interface BillFormHookReturn {
 
   // Computed Values
   suggestedIconName: string;
-  iconSuggestions: Array<{ name: string; Icon: React.ComponentType }>;
+  iconSuggestions: BillIconOption[];
   categories: string[];
 
   // Validation

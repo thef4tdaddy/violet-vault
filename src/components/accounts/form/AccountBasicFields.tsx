@@ -1,5 +1,5 @@
 import { ACCOUNT_TYPES } from "@/utils/accounts";
-import { Select } from "@/components/ui";
+import { Select, Checkbox } from "@/components/ui";
 
 interface AccountForm {
   name: string;
@@ -57,6 +57,21 @@ const AccountBasicFields = ({
           </option>
         ))}
       </Select>
+    </div>
+
+    <div className="mt-4">
+      <Checkbox
+        id="account-is-active"
+        checked={accountForm.isActive}
+        label="Account is active"
+        disabled={Boolean(editingAccount && !canEdit)}
+        onCheckedChange={(checked) =>
+          setAccountForm({
+            ...accountForm,
+            isActive: Boolean(checked),
+          })
+        }
+      />
     </div>
   </>
 );

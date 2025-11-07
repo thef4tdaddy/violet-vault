@@ -9,6 +9,7 @@ import {
 } from "./TransactionFormSections";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
+import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {
@@ -29,6 +30,7 @@ interface TransactionFormFieldsProps {
   supplementalAccounts?: Array<{ id: string | number; name: string; type?: string }>;
   categories: string[];
   suggestEnvelope?: (description: string) => { id: string; name: string } | null;
+  smartCategorySuggestion?: (description: string) => TransactionCategorySuggestion | null;
 }
 
 /**
@@ -57,6 +59,7 @@ const TransactionFormFields: React.FC<TransactionFormFieldsProps> = ({
 
   // Optional features
   suggestEnvelope,
+  smartCategorySuggestion,
 }) => {
   return (
     <form onSubmit={handleFormSubmit} className="space-y-4">
@@ -75,6 +78,7 @@ const TransactionFormFields: React.FC<TransactionFormFieldsProps> = ({
         canEdit={canEdit}
         editingTransaction={editingTransaction}
         categories={categories}
+        smartCategorySuggestion={smartCategorySuggestion}
       />
 
       {/* Envelope Assignment */}

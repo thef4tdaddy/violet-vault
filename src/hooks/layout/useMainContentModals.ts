@@ -10,8 +10,12 @@ interface ModalState {
   setOpen: (open: boolean) => void;
 }
 
-interface SettingsModalState extends ModalState {
+interface SettingsModalState {
+  isOpen: boolean;
   initialSection: string;
+  setOpen: (open: boolean, options?: { initialSection?: string }) => void;
+  open: (section?: string) => void;
+  close: () => void;
 }
 
 interface UseMainContentModalsReturn {
@@ -22,7 +26,28 @@ interface UseMainContentModalsReturn {
 export const useMainContentModals = (): UseMainContentModalsReturn => {
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [settingsInitialSection] = useState("general");
+  const [settingsInitialSection, setSettingsInitialSection] = useState("general");
+
+  const setSettingsOpen = (open: boolean, options: { initialSection?: string } = {}) => {
+    if (open) {
+      if (options.initialSection) {
+        setSettingsInitialSection(options.initialSection);
+      }
+      setShowSettingsModal(true);
+      return;
+    }
+
+    setShowSettingsModal(false);
+    setSettingsInitialSection("general");
+  };
+
+  const openSettings = (section = "general") => {
+    setSettingsOpen(true, { initialSection: section });
+  };
+
+  const closeSettings = () => {
+    setSettingsOpen(false);
+  };
 
   return {
     security: {
@@ -31,8 +56,10 @@ export const useMainContentModals = (): UseMainContentModalsReturn => {
     },
     settings: {
       isOpen: showSettingsModal,
-      setOpen: setShowSettingsModal,
+      setOpen: setSettingsOpen,
       initialSection: settingsInitialSection,
+      open: openSettings,
+      close: closeSettings,
     },
   };
 };

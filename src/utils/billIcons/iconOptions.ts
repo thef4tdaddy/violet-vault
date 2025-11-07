@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 // Icon selection options for UI components
 import {
   Zap,
@@ -46,8 +47,13 @@ import {
   Receipt,
 } from "../icons";
 
+export type BillIconOption = {
+  name: string;
+  Icon: ComponentType;
+};
+
 // Icon options grouped by category for UI selection
-export const ICON_OPTIONS_BY_CATEGORY = {
+export const ICON_OPTIONS_BY_CATEGORY: Record<string, BillIconOption[]> = {
   utilities: [
     { name: "Zap", Icon: Zap },
     { name: "Droplets", Icon: Droplets },
@@ -133,7 +139,7 @@ export const ICON_OPTIONS_BY_CATEGORY = {
 };
 
 // Default icon options for general use
-export const DEFAULT_ICON_OPTIONS = [
+export const DEFAULT_ICON_OPTIONS: BillIconOption[] = [
   { name: "Receipt", Icon: Receipt },
   { name: "FileText", Icon: FileText },
   { name: "Zap", Icon: Zap },
@@ -153,7 +159,7 @@ export const DEFAULT_ICON_OPTIONS = [
 /**
  * Get icon options for a specific category
  */
-export const getBillIconOptions = (category = "") => {
+export const getBillIconOptions = (category = ""): BillIconOption[] => {
   const normalizedCategory = category.toLowerCase().trim();
 
   const categoryIconSets = {

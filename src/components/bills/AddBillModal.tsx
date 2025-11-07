@@ -5,7 +5,8 @@
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
  * Enhanced with mobile slide-up functionality for Issue #164
  */
-import { useEffect } from "react";
+import { useEffect, useCallback, useMemo } from "react";
+import type { FormEvent, RefObject } from "react";
 import { useBillForm } from "@/hooks/bills/useBillForm";
 import useEditLock from "@/hooks/common/useEditLock";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
@@ -17,36 +18,144 @@ import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useLayoutData } from "@/hooks/layout/useLayoutData";
+import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillFormData, Bill } from "@/types/bills";
 
-const AddBillModal = ({
+interface SmartSuggestionState {
+  smartBillDetails: BillSuggestion | null;
+  resolvedIconName: string;
+  resolvedIconSuggestions: BillIconOption[];
+  applyCategorySuggestion: () => void;
+  applyIconSuggestion: () => void;
+}
+
+const useBillSmartSuggestionState = (
+  formData: BillFormData,
+  iconSuggestions: BillIconOption[],
+  formSuggestedIconName: string,
+  updateField: (field: keyof BillFormData, value: string | boolean) => void,
+  suggestBillDetails: ReturnType<typeof useSmartSuggestions>["suggestBillDetails"]
+): SmartSuggestionState => {
+  const smartBillDetails = useMemo(
+    () =>
+      suggestBillDetails(
+        formData.name,
+        formData.notes,
+        formData.category
+      ),
+    [formData.name, formData.notes, formData.category, suggestBillDetails]
+  );
+
+  const resolvedIconSuggestions = smartBillDetails?.iconSuggestions || iconSuggestions;
+  const resolvedIconName = smartBillDetails?.iconName || formSuggestedIconName;
+
+  const applyCategorySuggestion = useCallback(() => {
+    if (!smartBillDetails) {
+      return;
+    }
+    if (smartBillDetails.category) {
+      updateField("category", smartBillDetails.category);
+    }
+    if (smartBillDetails.iconName) {
+      updateField("iconName", smartBillDetails.iconName);
+    }
+  }, [smartBillDetails, updateField]);
+
+  const applyIconSuggestion = useCallback(() => {
+    if (!smartBillDetails?.iconName) {
+      return;
+    }
+    updateField("iconName", smartBillDetails.iconName);
+  }, [smartBillDetails, updateField]);
+
+  return {
+    smartBillDetails,
+    resolvedIconName,
+    resolvedIconSuggestions,
+    applyCategorySuggestion,
+    applyIconSuggestion,
+  };
+};
+
+interface AddBillModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddBill?: (bill: unknown) => Promise<void> | void;
+  onUpdateBill?: (bill: unknown) => Promise<void> | void;
+  onDeleteBill?: (id: unknown, deleteEnvelope?: boolean) => Promise<void> | void;
+  onError?: (message: string) => void;
+  editingBill?: Bill | null;
+  _forceMobileMode?: boolean;
+}
+
+interface BillModalState {
+  isMobile: boolean;
+  modalRef: RefObject<HTMLDivElement>;
+  formData: BillFormData;
+  isSubmitting: boolean;
+  categories: string[];
+  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+  updateField: (field: keyof BillFormData, value: string | boolean) => void;
+  canEdit: boolean;
+  isLocked: boolean;
+  isOwnLock: boolean;
+  lock: unknown;
+  breakLock: () => Promise<unknown> | void;
+  smartBillDetails: BillSuggestion | null;
+  resolvedIconName: string;
+  resolvedIconSuggestions: BillIconOption[];
+  applyCategorySuggestion: () => void;
+  applyIconSuggestion: () => void;
+  computeBiweeklyAmount: () => string | number;
+  computeMonthlyAmount: () => string | number;
+  computeNextDueDate: () => string;
+}
+
+const useBillModalState = ({
   isOpen,
-  onClose,
+  editingBill,
+  _forceMobileMode = false,
   onAddBill,
   onUpdateBill,
   onDeleteBill,
+  onClose,
   onError,
-  editingBill = null,
-  _forceMobileMode = false, // Internal prop for testing
-}) => {
+}: AddBillModalProps): BillModalState => {
   const isMobile = useMobileDetection();
   const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
-  // Use the extracted form logic hook
+  const { transactions: layoutTransactions = [], bills: billsQuery } = useLayoutData();
+
+  const rawTransactions = useMemo(() => {
+    if (!Array.isArray(layoutTransactions)) {
+      return [] as Array<Record<string, unknown>>;
+    }
+    return layoutTransactions.map((transaction) => ({
+      ...(transaction as Record<string, unknown>),
+    }));
+  }, [layoutTransactions]);
+
+  const rawBills = useMemo(() => {
+    const billsArray = Array.isArray(billsQuery?.bills) ? (billsQuery?.bills as unknown[]) : [];
+    return billsArray.map((bill) => ({ ...(bill as Record<string, unknown>) }));
+  }, [billsQuery?.bills]);
+
+  const { suggestBillDetails } = useSmartSuggestions({
+    transactions: rawTransactions,
+    bills: rawBills,
+  });
+
   const {
-    // Form State
     formData,
     isSubmitting,
-
-    // Computed Values
-    suggestedIconName,
+    suggestedIconName: formSuggestedIconName,
     iconSuggestions,
     categories,
-
-    // Actions
     handleSubmit,
     updateField,
     resetForm,
-
-    // Utility Functions
     calculateBiweeklyAmount,
     calculateMonthlyAmount,
     getNextDueDate,
@@ -59,20 +168,17 @@ const AddBillModal = ({
     onError,
   });
 
-  // Get auth context for edit locking
   const {
     securityContext: { budgetId },
     user: currentUser,
   } = useAuthManager();
 
-  // Initialize edit lock service when modal opens
   useEffect(() => {
     if (isOpen && budgetId && currentUser) {
       initializeEditLocks(budgetId, currentUser);
     }
   }, [isOpen, budgetId, currentUser]);
 
-  // Edit locking for the bill (only when editing existing bill)
   const { isLocked, isOwnLock, canEdit, lock, breakLock } = useEditLock(
     editingBill ? "bill" : null,
     editingBill?.id || null,
@@ -83,26 +189,108 @@ const AddBillModal = ({
     }
   );
 
-  // Lock management is now handled by useEditLock with autoAcquire/autoRelease
-
-  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       resetForm();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- resetForm is stable Zustand action
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resetForm is a stable store action
   }, [isOpen]);
+
+  const {
+    smartBillDetails,
+    resolvedIconName,
+    resolvedIconSuggestions,
+    applyCategorySuggestion,
+    applyIconSuggestion,
+  } = useBillSmartSuggestionState(
+    formData,
+    iconSuggestions,
+    formSuggestedIconName,
+    updateField,
+    suggestBillDetails
+  );
+
+  const computeBiweeklyAmount = useCallback(() => {
+    const customFrequency = formData.customFrequency
+      ? Number(formData.customFrequency)
+      : undefined;
+    return calculateBiweeklyAmount(formData.amount, formData.frequency, customFrequency);
+  }, [calculateBiweeklyAmount, formData.amount, formData.frequency, formData.customFrequency]);
+
+  const computeMonthlyAmount = useCallback(() => {
+    const customFrequency = formData.customFrequency
+      ? Number(formData.customFrequency)
+      : undefined;
+    return calculateMonthlyAmount(formData.amount, formData.frequency, customFrequency);
+  }, [calculateMonthlyAmount, formData.amount, formData.frequency, formData.customFrequency]);
+
+  const computeNextDueDate = useCallback(() => {
+    return getNextDueDate(formData.frequency, formData.dueDate);
+  }, [getNextDueDate, formData.frequency, formData.dueDate]);
+
+  return {
+    isMobile,
+    modalRef,
+    formData,
+    isSubmitting,
+    categories,
+    handleSubmit,
+    updateField,
+    canEdit,
+    isLocked,
+    isOwnLock,
+    lock,
+    breakLock,
+    smartBillDetails,
+    resolvedIconName,
+    resolvedIconSuggestions,
+    applyCategorySuggestion,
+    applyIconSuggestion,
+    computeBiweeklyAmount,
+    computeMonthlyAmount,
+    computeNextDueDate,
+  };
+};
+
+const AddBillModal = (props: AddBillModalProps) => {
+  const {
+    isOpen,
+    onClose,
+    editingBill = null,
+    _forceMobileMode = false,
+  } = props;
+
+  const {
+    isMobile,
+    modalRef,
+    formData,
+    isSubmitting,
+    categories,
+    handleSubmit,
+    updateField,
+    canEdit,
+    isLocked,
+    isOwnLock,
+    lock,
+    breakLock,
+    smartBillDetails,
+    resolvedIconName,
+    resolvedIconSuggestions,
+    applyCategorySuggestion,
+    applyIconSuggestion,
+    computeBiweeklyAmount,
+    computeMonthlyAmount,
+    computeNextDueDate,
+  } = useBillModalState(props);
 
   if (!isOpen) return null;
 
   const modalTitle = editingBill ? "Edit Bill" : "Add Bill";
 
-  // Extract modal content for reuse between mobile and desktop
-  const ModalContent = () => (
+  const renderModalContent = () => (
     <>
-      {/* Edit Lock Indicator */}
       {editingBill && (isLocked || isOwnLock) && (
-        <div className="px-6 py-3 border-b border-gray-200">
+        <div className="border-b border-gray-200 px-6 py-3">
           <EditLockIndicator
             isLocked={isLocked}
             isOwnLock={isOwnLock}
@@ -121,12 +309,15 @@ const AddBillModal = ({
         handleSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         onClose={onClose}
-        suggestedIconName={suggestedIconName}
-        iconSuggestions={iconSuggestions}
+        suggestedIconName={resolvedIconName}
+        iconSuggestions={resolvedIconSuggestions}
         categories={categories}
-        calculateBiweeklyAmount={calculateBiweeklyAmount}
-        calculateMonthlyAmount={calculateMonthlyAmount}
-        getNextDueDate={getNextDueDate}
+        smartSuggestion={smartBillDetails}
+        onApplySmartCategory={applyCategorySuggestion}
+        onApplySmartIcon={applyIconSuggestion}
+        calculateBiweeklyAmount={computeBiweeklyAmount}
+        calculateMonthlyAmount={computeMonthlyAmount}
+        getNextDueDate={computeNextDueDate}
       />
     </>
   );
@@ -143,7 +334,7 @@ const AddBillModal = ({
         backdrop={true}
       >
         <div className="pb-6">
-          <ModalContent />
+          {renderModalContent()}
         </div>
       </SlideUpModal>
     );
@@ -157,7 +348,7 @@ const AddBillModal = ({
         className="bg-white rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl my-auto border-2 border-black"
       >
         <BillModalHeader editingBill={editingBill} formData={formData} onClose={onClose} />
-        <ModalContent />
+        {renderModalContent()}
       </div>
     </div>
   );

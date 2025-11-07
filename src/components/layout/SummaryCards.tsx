@@ -145,7 +145,7 @@ const SummaryCards = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 auto-rows-fr">
         {cards.map((card) => (
           <SummaryCard
             key={card.key}
@@ -171,7 +171,7 @@ const SummaryCards = () => {
 
 const SummaryCard = memo(
   ({
-    icon: _Icon,
+    icon: IconComponent,
     label,
     value,
     color,
@@ -181,7 +181,7 @@ const SummaryCard = memo(
     subtitle,
     dataTour,
   }: SummaryCardProps) => {
-    const colorClasses = {
+    const colorClasses: Record<string, string> = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",
       cyan: "bg-cyan-500",
@@ -189,7 +189,7 @@ const SummaryCard = memo(
       red: "bg-red-500",
     };
 
-    const textColorClasses = {
+    const textColorClasses: Record<string, string> = {
       purple: "text-gray-900",
       emerald: "text-emerald-600",
       cyan: "text-cyan-600",
@@ -198,22 +198,23 @@ const SummaryCard = memo(
     };
 
     const baseClasses =
-      "glassmorphism rounded-xl p-6 transition-all duration-200 border-2 border-black ring-1 ring-gray-800/10";
+      "glassmorphism rounded-xl p-6 transition-all duration-200 border-2 border-black ring-1 ring-gray-800/10 h-full";
     const clickableClasses = clickable
       ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
       : "";
 
     const cardContent = (
-      <div className="flex flex-col items-center text-center min-h-[140px] justify-between w-full">
+      <div className="flex h-full w-full flex-col items-center justify-between text-center">
         <div className="relative flex-shrink-0">
           <div
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <_Icon className="h-6 w-6 text-white" />
+            <IconComponent className="h-6 w-6 text-white" />
           </div>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center">
+
+        <div className="flex flex-1 flex-col items-center justify-center">
           <p className="text-sm font-semibold text-gray-600">{label}</p>
           <p
             className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
@@ -222,26 +223,31 @@ const SummaryCard = memo(
             {isNegative && <span className="ml-2 text-sm">⚠️</span>}
           </p>
         </div>
-        <div className="w-full min-h-[1.75rem] flex items-end justify-center">
+
+        <div className="flex min-h-[1.75rem] w-full items-end justify-center">
           {clickable && !isNegative && <p className="text-xs text-gray-400">Click to distribute</p>}
           {isNegative && (
-            <p className="text-xs text-red-500 font-medium">⚠️ Overspending - click to address</p>
+            <p className="text-xs font-medium text-red-500">⚠️ Overspending - click to address</p>
           )}
           {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
         </div>
       </div>
     );
 
-    return clickable ? (
-      <Button
-        onClick={onClick}
-        className={`${baseClasses} ${clickableClasses} w-full flex items-center justify-center`}
-        disabled={!onClick}
-        data-tour={dataTour}
-      >
-        {cardContent}
-      </Button>
-    ) : (
+    if (clickable) {
+      return (
+        <Button
+          onClick={onClick}
+          className={`${baseClasses} ${clickableClasses} flex w-full items-center justify-center`}
+          disabled={!onClick}
+          data-tour={dataTour}
+        >
+          {cardContent}
+        </Button>
+      );
+    }
+
+    return (
       <div className={`${baseClasses} flex items-center justify-center`} data-tour={dataTour}>
         {cardContent}
       </div>
