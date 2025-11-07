@@ -82,9 +82,11 @@ export const BillTablePropsSchema = z.object({
   setShowBulkUpdateModal: z.function(),
   setShowBillDetail: z.function(),
   getBillDisplayData: z.function(),
-  billOperations: z.object({
-    handlePayBill: z.function(),
-  }),
+  billOperations: z
+    .object({
+      handlePayBill: z.function(),
+    })
+    .catchall(z.function()),
   categorizedBills: z.unknown(),
   viewMode: z.string(),
 });

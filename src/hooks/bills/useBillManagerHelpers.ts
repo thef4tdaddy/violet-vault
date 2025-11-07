@@ -8,19 +8,22 @@ import {
   categorizeBills,
   calculateBillTotals,
   filterBills,
+  normalizeBillDate,
 } from "@/utils/bills/billCalculations";
 import { generateBillSuggestions } from "@/utils/common/billDiscovery";
 import logger from "@/utils/common/logger";
 
-interface Bill {
+interface BillRecord {
   id: string;
   name: string;
   amount: number;
-  dueDate: Date | string;
+  category?: string;
+  dueDate: Date | string | null;
+  metadata?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
-interface Transaction {
+interface TransactionRecord {
   id: string;
   date: Date | string;
   amount: number;
@@ -34,10 +37,10 @@ interface Transaction {
  * Resolve transactions from multiple sources
  */
 export const resolveTransactions = (
-  propTransactions: Transaction[],
-  tanStackTransactions: Transaction[],
-  budgetTransactions: Transaction[]
-): Transaction[] => {
+  propTransactions: TransactionRecord[],
+  tanStackTransactions: TransactionRecord[],
+  budgetTransactions: TransactionRecord[]
+): TransactionRecord[] => {
   if (propTransactions && propTransactions.length) {
     return propTransactions;
   }
@@ -73,24 +76,24 @@ export const resolveEnvelopes = (
 /**
  * Extract bills from transactions
  */
-export const extractBillsFromTransactions = (transactions: Transaction[]): Bill[] => {
+export const extractBillsFromTransactions = (transactions: TransactionRecord[]): BillRecord[] => {
   return transactions.filter(
     (t) => t.isBill || t.type === "bill" || t.category === "bill"
-  ) as unknown as Bill[];
+  ) as unknown as BillRecord[];
 };
 
 /**
  * Combine and deduplicate bills from multiple sources
  */
 export const combineBills = (
-  tanStackBills: Bill[],
-  budgetBills: Bill[],
-  billsFromTransactions: Bill[]
-): Bill[] => {
+  tanStackBills: BillRecord[],
+  budgetBills: BillRecord[],
+  billsFromTransactions: BillRecord[]
+): BillRecord[] => {
   const allBills = [...tanStackBills, ...budgetBills, ...billsFromTransactions];
 
   // Remove duplicates by ID
-  const combinedBills: Bill[] = [];
+  const combinedBills: BillRecord[] = [];
   allBills.forEach((bill) => {
     if (!combinedBills.find((b) => b.id === bill.id)) {
       combinedBills.push(bill);
@@ -100,18 +103,150 @@ export const combineBills = (
   return combinedBills;
 };
 
+const getMetadataDueDate = (bill: BillRecord): unknown => {
+  const metadata = bill.metadata;
+  if (!metadata || typeof metadata !== "object") {
+    return undefined;
+  }
+  const candidate = (metadata as Record<string, unknown>).dueDate;
+  return candidate;
+};
+
+const coerceString = (value: unknown): string | null => {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed !== "" ? trimmed : null;
+  }
+  return null;
+};
+
+const coerceNumber = (value: unknown): number | null => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "") return null;
+    const parsed = Number(trimmed);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};
+
+const resolveRawDueDate = (bill: BillRecord): string | Date | null => {
+  const candidates: unknown[] = [
+    bill.dueDate,
+    bill.nextDueDate,
+    bill.expectedDueDate,
+    bill.nextPaymentDate,
+    getMetadataDueDate(bill),
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    if (candidate instanceof Date) return candidate;
+    if (typeof candidate === "number" && Number.isFinite(candidate)) {
+      return new Date(candidate);
+    }
+    const stringCandidate = coerceString(candidate);
+    if (stringCandidate) {
+      return stringCandidate;
+    }
+  }
+
+  return null;
+};
+
+const resolveAmount = (bill: BillRecord): number => {
+  const amount = coerceNumber(bill.amount);
+  if (amount !== null) {
+    return amount;
+  }
+
+  const monthlyAmount = coerceNumber((bill as Record<string, unknown>).monthlyAmount);
+  if (monthlyAmount !== null) {
+    return monthlyAmount;
+  }
+
+  return 0;
+};
+
+const resolveName = (bill: BillRecord, index: number): string => {
+  const name = coerceString(bill.name);
+  if (name) return name;
+
+  const provider = coerceString((bill as Record<string, unknown>).provider);
+  if (provider) return provider;
+
+  const description = coerceString((bill as Record<string, unknown>).description);
+  if (description) return description;
+
+  const category = coerceString((bill as Record<string, unknown>).category);
+  if (category) return category;
+
+  return `Bill ${index + 1}`;
+};
+
+const resolveCategory = (bill: BillRecord): string => {
+  const category = coerceString((bill as Record<string, unknown>).category);
+  if (category) return category;
+
+  const type = coerceString((bill as Record<string, unknown>).type);
+  if (type) return type;
+
+  return "Uncategorized";
+};
+
+const resolveId = (bill: BillRecord, resolvedName: string, index: number): string => {
+  if (typeof bill.id === "string" && bill.id.trim() !== "") {
+    return bill.id;
+  }
+
+  if (typeof bill.id === "number") {
+    return `bill-${bill.id}`;
+  }
+
+  const slug = resolvedName.toLowerCase().replace(/\s+/g, "-");
+  return `${slug}-${index}`;
+};
+
+const normalizeBillForUI = (bill: BillRecord, index: number): BillRecord => {
+  const normalizedDueDate = (() => {
+    const rawDueDate = resolveRawDueDate(bill);
+    if (!rawDueDate) return null;
+    const normalized = normalizeBillDate(rawDueDate);
+    return normalized || null;
+  })();
+
+  const resolvedName = resolveName(bill, index);
+  const resolvedCategory = resolveCategory(bill);
+  const resolvedAmount = resolveAmount(bill);
+  const resolvedId = resolveId(bill, resolvedName, index);
+
+  return {
+    ...bill,
+    id: resolvedId,
+    name: resolvedName,
+    amount: resolvedAmount,
+    category: resolvedCategory,
+    dueDate: normalizedDueDate,
+    isPaid: Boolean(bill.isPaid),
+    isRecurring: Boolean(bill.isRecurring),
+  };
+};
+
 /**
  * Process bills with calculations and recurring logic
  */
 export const processBills = (
-  combinedBills: Bill[],
-  onUpdateBill: ((bill: Bill) => void) | undefined,
+  combinedBills: BillRecord[],
+  onUpdateBill: ((bill: BillRecord) => void) | undefined,
   updateBillMutation: (updates: {
     billId: string;
     updates: Record<string, unknown>;
   }) => Promise<void>
-): Bill[] => {
-  return combinedBills.map((bill) => {
+): BillRecord[] => {
+  return combinedBills.map((bill, index) => {
     // Handle recurring bill logic using utility
     const processedBill = processRecurringBill(bill, (updatedBill) => {
       if (onUpdateBill) {
@@ -129,25 +264,26 @@ export const processBills = (
     });
 
     // Apply calculations (days until due, urgency)
-    return processBillCalculations(processedBill) as unknown as Bill;
+    const calculatedBill = processBillCalculations(processedBill) as unknown as BillRecord;
+    return normalizeBillForUI(calculatedBill, index);
   });
 };
 
 /**
  * Categorize and calculate totals for bills
  */
-export const categorizeBillsWithTotals = (bills: Bill[]) => {
+export const categorizeBillsWithTotals = (bills: BillRecord[]) => {
   const categorizedBills = categorizeBills(bills) as unknown as ReturnType<typeof categorizeBills>;
   const totals = calculateBillTotals(categorizedBills);
   return { categorizedBills, totals };
 };
 
 export interface CategorizedBills {
-  all: Bill[];
-  upcoming: Bill[];
-  overdue: Bill[];
-  paid: Bill[];
-  [key: string]: Bill[];
+  all: BillRecord[];
+  upcoming: BillRecord[];
+  overdue: BillRecord[];
+  paid: BillRecord[];
+  [key: string]: BillRecord[];
 }
 
 export interface FilterOptions {
@@ -166,20 +302,20 @@ export const getFilteredBills = (
   categorizedBills: CategorizedBills,
   viewMode: string,
   filterOptions: FilterOptions
-): Bill[] => {
+): BillRecord[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
-  return filterBills(billsToFilter, filterOptions) as unknown as Bill[];
+  return filterBills(billsToFilter, filterOptions) as unknown as BillRecord[];
 };
 
 /**
  * Discover new bills from transactions
  */
 export const discoverNewBills = async (
-  transactions: Transaction[],
-  bills: Bill[],
+  transactions: TransactionRecord[],
+  bills: BillRecord[],
   envelopes: Envelope[],
   onSearchNewBills?: () => void | Promise<void>
-): Promise<Bill[]> => {
+): Promise<BillRecord[]> => {
   const suggestions = generateBillSuggestions(transactions, bills, envelopes);
   await onSearchNewBills?.();
   return suggestions;
@@ -189,9 +325,9 @@ export const discoverNewBills = async (
  * Add discovered bills using appropriate method
  */
 export const addDiscoveredBills = async (
-  billsToAdd: Bill[],
-  onCreateRecurringBill: ((bill: Bill) => void | Promise<void>) | undefined,
-  addBill: (bill: Bill) => Promise<void>
+  billsToAdd: BillRecord[],
+  onCreateRecurringBill: ((bill: BillRecord) => void | Promise<void>) | undefined,
+  addBill: (bill: BillRecord) => Promise<void>
 ): Promise<void> => {
   for (const bill of billsToAdd) {
     if (onCreateRecurringBill) {
@@ -228,12 +364,12 @@ export const createInitialUIState = () => ({
 interface UISetters {
   setSelectedBills: (bills: Set<string>) => void;
   setViewMode: (mode: string) => void;
-  setShowBillDetail: (bill: Bill | null) => void;
+  setShowBillDetail: (bill: BillRecord | null) => void;
   setShowAddBillModal: (show: boolean) => void;
-  setEditingBill: (bill: Bill | null) => void;
+  setEditingBill: (bill: BillRecord | null) => void;
   setShowBulkUpdateModal: (show: boolean) => void;
   setShowDiscoveryModal: (show: boolean) => void;
-  setHistoryBill: (bill: Bill | null) => void;
+  setHistoryBill: (bill: BillRecord | null) => void;
   setFilterOptions: (options: FilterOptions) => void;
 }
 
@@ -259,9 +395,9 @@ export const createUIActions = (setters: UISetters) => ({
  * Further reduction would require major architecture changes (grouping into objects breaks backward compatibility)
  */
 export const processAndResolveData = (
-  propTransactions: Transaction[],
-  tanStackTransactions: Transaction[],
-  budgetTransactions: Transaction[],
+  propTransactions: TransactionRecord[],
+  tanStackTransactions: TransactionRecord[],
+  budgetTransactions: TransactionRecord[],
   propEnvelopes: unknown[],
   tanStackEnvelopes: unknown[],
   budgetEnvelopes: unknown[],
@@ -269,17 +405,17 @@ export const processAndResolveData = (
   budgetBills: unknown[],
   viewMode: string,
   filterOptions: FilterOptions,
-  onUpdateBill?: (bill: Bill) => void | Promise<void>,
+  onUpdateBill?: (bill: BillRecord) => void | Promise<void>,
   updateBillMutation?: (updates: {
     billId: string;
     updates: Record<string, unknown>;
   }) => Promise<void>
   // eslint-disable-next-line max-params
 ) => {
-  const resolvedTransactions: Transaction[] = resolveTransactions(
-    propTransactions as Transaction[],
-    tanStackTransactions as unknown as Transaction[],
-    budgetTransactions as Transaction[]
+  const resolvedTransactions: TransactionRecord[] = resolveTransactions(
+    propTransactions as TransactionRecord[],
+    tanStackTransactions as unknown as TransactionRecord[],
+    budgetTransactions as TransactionRecord[]
   );
 
   const resolvedEnvelopes = resolveEnvelopes(
@@ -288,15 +424,15 @@ export const processAndResolveData = (
     budgetEnvelopes as unknown as Envelope[]
   );
 
-  const billsFromTransactions: Bill[] = extractBillsFromTransactions(resolvedTransactions);
+  const billsFromTransactions: BillRecord[] = extractBillsFromTransactions(resolvedTransactions);
 
-  const combinedBills: Bill[] = combineBills(
-    tanStackBills as unknown as Bill[],
-    (budgetBills as unknown as Bill[]) || [],
+  const combinedBills: BillRecord[] = combineBills(
+    tanStackBills as unknown as BillRecord[],
+    (budgetBills as unknown as BillRecord[]) || [],
     billsFromTransactions
   );
 
-  const processedBills: Bill[] = processBills(
+  const processedBills: BillRecord[] = processBills(
     combinedBills,
     onUpdateBill,
     updateBillMutation as unknown as (updates: {
@@ -308,7 +444,11 @@ export const processAndResolveData = (
   const { categorizedBills: catBills, totals: billTotals } =
     categorizeBillsWithTotals(processedBills);
 
-  const filtered: Bill[] = getFilteredBills(catBills as CategorizedBills, viewMode, filterOptions);
+  const filtered: BillRecord[] = getFilteredBills(
+    catBills as CategorizedBills,
+    viewMode,
+    filterOptions
+  );
 
   return {
     transactions: resolvedTransactions,
@@ -325,15 +465,15 @@ export const processAndResolveData = (
  */
 export const handleSearchNewBills = async (
   params: {
-    transactions: Transaction[];
-    bills: Bill[];
+    transactions: TransactionRecord[];
+    bills: BillRecord[];
     envelopes: Envelope[];
     onSearchNewBills?: () => void | Promise<void>;
     onError?: (error: string) => void;
   },
   callbacks: {
     setIsSearching: (value: boolean) => void;
-    setDiscoveredBills: (bills: Bill[]) => void;
+    setDiscoveredBills: (bills: BillRecord[]) => void;
     setShowDiscoveryModal: (show: boolean) => void;
   }
 ): Promise<void> => {
@@ -360,14 +500,14 @@ export const handleSearchNewBills = async (
  */
 export const handleAddDiscoveredBillsAction = async (
   params: {
-    billsToAdd: Bill[];
-    onCreateRecurringBill?: (bill: Bill) => void | Promise<void>;
-    addBill: (bill: Bill) => Promise<void>;
+    billsToAdd: BillRecord[];
+    onCreateRecurringBill?: (bill: BillRecord) => void | Promise<void>;
+    addBill: (bill: BillRecord) => Promise<void>;
     onError?: (error: string) => void;
   },
   callbacks: {
     setShowDiscoveryModal: (show: boolean) => void;
-    setDiscoveredBills: (bills: Bill[]) => void;
+    setDiscoveredBills: (bills: BillRecord[]) => void;
   }
 ): Promise<void> => {
   try {

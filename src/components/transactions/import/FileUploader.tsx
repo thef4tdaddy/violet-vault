@@ -20,7 +20,7 @@ const FileUploader = ({ onFileUpload }: FileUploaderProps) => {
       </div>
 
       <div className="space-y-4">
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+        <div className="border-2 border-dashed border-black rounded-xl p-6 bg-white shadow-inner">
           <input
             type="file"
             accept=".csv,.ofx"
@@ -39,27 +39,31 @@ const FileUploader = ({ onFileUpload }: FileUploaderProps) => {
           </label>
         </div>
 
-        <div className="glassmorphism rounded-lg p-4 border border-white/20">
-          <label className="flex items-center space-x-3 cursor-pointer">
+        <div className="glassmorphism rounded-xl p-4 border-2 border-black">
+          <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
             <Checkbox
+              id="import-clear-existing"
               checked={clearExisting}
-              onChange={(e) => setClearExisting(e.target.checked)}
+              onCheckedChange={(checked) => setClearExisting(Boolean(checked))}
             />
-            <div className="flex items-center space-x-2">
-              {renderIcon("Trash2", { className: "h-4 w-4 text-red-500" })}
-              <span className="text-sm font-medium text-gray-900">
+            <div>
+              <label
+                htmlFor="import-clear-existing"
+                className="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer select-none"
+              >
+                {renderIcon("Trash2", { className: "h-4 w-4 text-red-500" })}
                 Clear existing transactions and paychecks before import
-              </span>
+              </label>
+              <p className="mt-2 text-xs text-red-600">
+                Warning: This will permanently delete all existing transaction history and paycheck
+                records.
+              </p>
             </div>
-          </label>
-          <p className="ml-7 mt-1 text-xs text-red-600">
-            Warning: This will permanently delete all existing transaction history and paycheck
-            records
-          </p>
+          </div>
         </div>
       </div>
 
-      <div className="glassmorphism rounded-lg p-4 border border-white/20">
+      <div className="glassmorphism rounded-xl p-4 border-2 border-black">
         <div className="flex">
           {renderIcon("AlertCircle", { className: "h-5 w-5 text-blue-400" })}
           <div className="ml-3">
