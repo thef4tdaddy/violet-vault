@@ -243,6 +243,8 @@ for FEATURE in "${FEATURES[@]}"; do
 - [ ] Error message clarity
 - [ ] Performance check
 - [ ] Accessibility review
+- [ ] Smart suggestion banners populate for synthetic merchants (e.g., Starbucks Coffee, Amazon Marketplace)
+- [ ] Discover Bills modal surfaces recurring candidates (e.g., Brightstream Broadband, Evergreen Water Services)
 
 ## Reporting
 - Test results summary
