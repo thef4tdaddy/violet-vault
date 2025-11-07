@@ -73,8 +73,10 @@ export const BillTablePropsSchema = z.object({
       .catchall(z.unknown())
   ),
   selectionState: z.object({
+    hasSelection: z.boolean(),
     selectedBillIds: z.array(z.string()),
     isAllSelected: z.boolean(),
+    selectedCount: z.number(),
   }),
   clearSelection: z.function(),
   selectAllBills: z.function(),
