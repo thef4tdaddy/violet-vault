@@ -69,9 +69,19 @@ export const predictNextPayday = (paycheckHistory: PaycheckEntry[]): PaydayPredi
   const confidence = Math.min((intervalFrequency / intervals.length) * 100, 95);
 
   // Predict next payday
-  const lastPaycheck = new Date(sortedPaychecks[0].date);
+  const lastPaycheck = getPaycheckDate(sortedPaychecks[0]);
+  if (isNaN(lastPaycheck.getTime())) {
+    return {
+      nextPayday: null,
+      confidence: 0,
+      pattern: null,
+      intervalDays: parseInt(mostCommonInterval),
+      message: "Invalid paycheck date encountered",
+    };
+  }
+
   const nextPayday = new Date(lastPaycheck);
-  nextPayday.setDate(lastPaycheck.getDate() + parseInt(mostCommonInterval));
+  nextPayday.setDate(lastPaycheck.getDate() + parseInt(mostCommonInterval, 10));
 
   // Determine pattern type
   let pattern: string;
