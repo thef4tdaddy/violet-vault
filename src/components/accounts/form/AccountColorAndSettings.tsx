@@ -17,10 +17,7 @@ interface AccountColorAndSettingsProps {
   setAccountForm: (form: AccountForm) => void;
 }
 
-const AccountColorAndSettings = ({
-  accountForm,
-  setAccountForm,
-}: AccountColorAndSettingsProps) => (
+const AccountColorAndSettings = ({ accountForm, setAccountForm }: AccountColorAndSettingsProps) => (
   <>
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-2">Color</label>

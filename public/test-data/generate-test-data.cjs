@@ -460,6 +460,110 @@ const generateTransactions = () => {
   return transactions;
 };
 
+const createRecurringBillCandidates = () => {
+  const providers = [
+    {
+      merchant: 'Brightstream Broadband',
+      descriptionBase: 'Brightstream Broadband Invoice',
+      amount: 79.99,
+      startDaysAgo: 12,
+      intervalDays: 31,
+      occurrences: 5,
+    },
+    {
+      merchant: 'Evergreen Water Services',
+      descriptionBase: 'Evergreen Water Statement',
+      amount: 42.5,
+      startDaysAgo: 18,
+      intervalDays: 30,
+      occurrences: 4,
+    },
+    {
+      merchant: 'Metro City Waste Mgmt',
+      descriptionBase: 'Metro City Waste Mgmt Billing',
+      amount: 33.25,
+      startDaysAgo: 20,
+      intervalDays: 31,
+      occurrences: 4,
+    },
+  ];
+
+  const transactions = [];
+
+  providers.forEach((provider, providerIndex) => {
+    for (let i = 0; i < provider.occurrences; i++) {
+      const daysAgo = provider.startDaysAgo + i * provider.intervalDays;
+
+      transactions.push({
+        id: `txn-recurring-${providerIndex + 1}-${i + 1}`,
+        date: getDateString(daysAgo),
+        amount: -Math.abs(provider.amount),
+        envelopeId: '',
+        category: '',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: `${provider.descriptionBase} #${String(i + 1).padStart(2, '0')}`,
+        merchant: provider.merchant,
+        metadata: {
+          discoveryCandidate: true,
+        },
+      });
+    }
+  });
+
+  return transactions;
+};
+
+const createUncategorizedTransactionClusters = () => {
+  const clusters = [
+    {
+      merchant: 'Starbucks Coffee',
+      descriptionBase: 'Starbucks Coffee Store',
+      startDaysAgo: 4,
+      amounts: [-12.45, -9.8, -11.25, -13.1, -10.9, -12.05],
+    },
+    {
+      merchant: 'Amazon Marketplace',
+      descriptionBase: 'Amazon Marketplace Order',
+      startDaysAgo: 7,
+      amounts: [-64.55, -52.35, -71.8, -58.25, -67.4],
+    },
+    {
+      merchant: 'Fresh Harvest Grocers',
+      descriptionBase: 'Fresh Harvest Grocers',
+      startDaysAgo: 9,
+      amounts: [-48.9, -52.1, -45.75, -50.05, -47.8],
+    },
+  ];
+
+  const transactions = [];
+
+  clusters.forEach((cluster, clusterIndex) => {
+    cluster.amounts.forEach((amount, idx) => {
+      const daysAgo = cluster.startDaysAgo + idx * 6 + clusterIndex;
+
+      transactions.push({
+        id: `txn-uncat-${clusterIndex + 1}-${idx + 1}`,
+        date: getDateString(daysAgo),
+        amount: -Math.abs(amount),
+        envelopeId: '',
+        category: '',
+        type: 'expense',
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+        description: `${cluster.descriptionBase} ${100 + clusterIndex * 10 + idx}`,
+        merchant: cluster.merchant,
+        metadata: {
+          uncategorizedCluster: true,
+        },
+      });
+    });
+  });
+
+  return transactions;
+};
+
 // Update base transactions to have recent dates (last 30 days) and correct amounts
 const updateBaseTransactions = () => {
   return baseData.transactions.map((txn, index) => {
@@ -570,6 +674,8 @@ const updatedBaseBills = updateBaseBills();
 const updatedBaseEnvelopes = updateBaseEnvelopes();
 const updatedBaseSavingsGoals = updateBaseSavingsGoals();
 const updatedBasePaycheckHistory = updateBasePaycheckHistory();
+const recurringBillTransactions = createRecurringBillCandidates();
+const uncategorizedClusterTransactions = createUncategorizedTransactionClusters();
 
 const updateSupplementalAccounts = () => {
   const templates = [
@@ -618,7 +724,12 @@ const updateSupplementalAccounts = () => {
 
 const allEnvelopes = [...updatedBaseEnvelopes, ...debtEnvelopes];
 const allBills = [...updatedBaseBills, ...debtBills];
-const allTransactions = [...updatedBaseTransactions, ...newTransactions];
+const allTransactions = [
+  ...updatedBaseTransactions,
+  ...newTransactions,
+  ...recurringBillTransactions,
+  ...uncategorizedClusterTransactions,
+];
 const updatedSupplementalAccounts = updateSupplementalAccounts();
 
 // Build allTransactions array (includes bill payments)
@@ -664,6 +775,16 @@ const enhancedData = {
   },
   _dataGuide: {
     ...baseData._dataGuide,
+    fixtures: {
+      recurringBillCandidates: {
+        description: 'Synthetic recurring merchants used to populate Discover Bills modal',
+        merchants: Array.from(new Set(recurringBillTransactions.map((txn) => txn.merchant))),
+      },
+      uncategorizedClusters: {
+        description: 'High-volume merchants without categories for smart suggestion testing',
+        merchants: Array.from(new Set(uncategorizedClusterTransactions.map((txn) => txn.merchant))),
+      },
+    },
     connections: {
       'Debt → Envelope': 'debts have envelopeId field',
       'Debt → Bill': 'bills have debtId field pointing to debt',
@@ -694,7 +815,9 @@ console.log('✅ Enhanced test data generated!');
 console.log(`📊 Stats:`);
 console.log(`   - Envelopes: ${allEnvelopes.length} (added 4 debt payment envelopes)`);
 console.log(`   - Bills: ${allBills.length} (added 4 debt payment bills)`);
-console.log(`   - Transactions: ${allTransactions.length} (generated ${newTransactions.length} new)`);
+console.log(
+  `   - Transactions: ${allTransactions.length} (generated ${newTransactions.length} base + ${recurringBillTransactions.length} discovery + ${uncategorizedClusterTransactions.length} suggestion samples)`
+);
 console.log(`   - All Transactions: ${buildAllTransactions().length}`);
 console.log(`   - Debts: ${enhancedDebts.length} (updated with envelope connections)`);
 console.log(`\n📁 Saved to: ${outputPath}`);
