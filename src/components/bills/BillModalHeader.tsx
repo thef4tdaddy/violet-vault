@@ -1,7 +1,7 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { getIconByName } from "../../utils/common/billIcons";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**
  * Header section for AddBillModal
@@ -26,14 +26,7 @@ const BillModalHeader = ({ editingBill, formData, onClose }) => {
         </div>
       </div>
 
-      <Button
-        type="button"
-        onClick={onClose}
-        className="text-gray-400 hover:text-gray-600 transition-colors"
-        aria-label="Close modal"
-      >
-        {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

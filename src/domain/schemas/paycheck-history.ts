@@ -9,45 +9,52 @@ import { z } from "zod";
 /**
  * Zod schema for PaycheckHistory validation
  * Represents income deposits with allocation tracking
- * 
+ *
  * Updated to support new component interface:
  * - processedAt (preferred) or date (legacy)
  * - payerName (preferred) or source (legacy)
  * - allocations as array (preferred) or object (legacy)
  */
-export const PaycheckHistorySchema = z.object({
-  id: z.string().min(1, "Paycheck ID is required"),
-  // Support both new and legacy field names
-  date: z.union([z.date(), z.string()]).optional(),
-  processedAt: z.union([z.date(), z.string()]).optional(),
-  amount: z.number().min(0, "Amount cannot be negative"),
-  source: z.string().min(1).max(100).optional(),
-  payerName: z.string().min(1).max(100).optional(),
-  // Support both array (new) and object (legacy) allocations
-  allocations: z.union([
-    z.array(z.object({
-      envelopeId: z.string(),
-      envelopeName: z.string(),
-      amount: z.number(),
-    })),
-    z.record(z.string(), z.number().min(0)),
-  ]).optional(),
-  lastModified: z.number().int().positive("Last modified must be a positive number"),
-  createdAt: z.number().int().positive().optional(),
-  deductions: z.record(z.string(), z.number().min(0)).optional(),
-  netAmount: z.number().min(0).optional(),
-  // New fields for component interface
-  processedBy: z.string().optional(),
-  allocationMode: z.string().optional(),
-  totalAllocated: z.number().optional(),
-  remainingAmount: z.number().optional(),
-}).refine(
-  (data) => data.processedAt || data.date,
-  { message: "Either processedAt or date is required", path: ["processedAt"] }
-).refine(
-  (data) => data.payerName || data.source,
-  { message: "Either payerName or source is required", path: ["payerName"] }
-);
+export const PaycheckHistorySchema = z
+  .object({
+    id: z.string().min(1, "Paycheck ID is required"),
+    // Support both new and legacy field names
+    date: z.union([z.date(), z.string()]).optional(),
+    processedAt: z.union([z.date(), z.string()]).optional(),
+    amount: z.number().min(0, "Amount cannot be negative"),
+    source: z.string().min(1).max(100).optional(),
+    payerName: z.string().min(1).max(100).optional(),
+    // Support both array (new) and object (legacy) allocations
+    allocations: z
+      .union([
+        z.array(
+          z.object({
+            envelopeId: z.string(),
+            envelopeName: z.string(),
+            amount: z.number(),
+          })
+        ),
+        z.record(z.string(), z.number().min(0)),
+      ])
+      .optional(),
+    lastModified: z.number().int().positive("Last modified must be a positive number"),
+    createdAt: z.number().int().positive().optional(),
+    deductions: z.record(z.string(), z.number().min(0)).optional(),
+    netAmount: z.number().min(0).optional(),
+    // New fields for component interface
+    processedBy: z.string().optional(),
+    allocationMode: z.string().optional(),
+    totalAllocated: z.number().optional(),
+    remainingAmount: z.number().optional(),
+  })
+  .refine((data) => data.processedAt || data.date, {
+    message: "Either processedAt or date is required",
+    path: ["processedAt"],
+  })
+  .refine((data) => data.payerName || data.source, {
+    message: "Either payerName or source is required",
+    path: ["payerName"],
+  });
 
 /**
  * Type inference from schema

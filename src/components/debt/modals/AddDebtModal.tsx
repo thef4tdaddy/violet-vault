@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useDebtModalLogic } from "../../../hooks/debts/useDebtModalLogic";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 import DebtModalHeader from "./DebtModalHeader";
 import DebtFormFields from "./DebtFormFields";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Pure UI component for debt modal - ALL logic extracted to useDebtModalLogic hook
  * Refactored to use standardized shared components and extracted UI sections
  */
 const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  
+  const modalRef = useModalAutoScroll(isOpen);
+
   const {
     formData,
     setFormData,
@@ -40,31 +41,14 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
     });
   }, [editLock.lockedBy, editLock.timeRemaining, editLock.isExpired]);
 
-  // Auto-scroll modal to viewport center when opened
-  useEffect(() => {
-    if (isOpen && modalRef.current) {
-      const scrollToCenter = () => {
-        const modal = modalRef.current;
-        if (!modal) return;
-        
-        const rect = modal.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const modalHeight = rect.height;
-        const scrollTop = window.scrollY + rect.top;
-        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
-        
-        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
-      };
-      
-      setTimeout(scrollToCenter, 100);
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div ref={modalRef} className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-black my-auto"
+      >
         <DebtModalHeader isEditMode={isEditMode} onClose={handleClose} />
 
         {/* Standardized Edit Lock Indicator */}

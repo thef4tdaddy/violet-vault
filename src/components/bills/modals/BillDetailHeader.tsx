@@ -1,8 +1,7 @@
 import React from "react";
-import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
 import { getIconByName } from "../../../utils/common/billIcons";
 import { getFrequencyDisplayText } from "../../../utils/common/frequencyCalculations";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**
  * Header section for BillDetailModal
@@ -26,9 +25,7 @@ export const BillDetailHeader = ({ bill, statusInfo, onClose }) => {
           </p>
         </div>
       </div>
-      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-        {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

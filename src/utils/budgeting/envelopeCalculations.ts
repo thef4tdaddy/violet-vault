@@ -14,9 +14,9 @@ export const calculateEnvelopeData = (envelopes, transactions, bills) => {
     // Include expense/income transactions and paid bills
     // Transaction types: "expense", "income", "transfer", "bill", "recurring_bill"
     const paidTransactions = envelopeTransactions.filter(
-      (t) => 
-        t.type === "expense" || 
-        t.type === "income" || 
+      (t) =>
+        t.type === "expense" ||
+        t.type === "income" ||
         t.type === "transfer" ||
         (t.type === "bill" && t.isPaid) ||
         (t.type === "recurring_bill" && t.isPaid)

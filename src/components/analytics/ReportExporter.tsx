@@ -6,6 +6,8 @@ import { ExportFormatSelector } from "./report-exporter/ExportFormatSelector";
 import { ExportTemplates } from "./report-exporter/ExportTemplates";
 import { ExportOptionsForm } from "./report-exporter/ExportOptionsForm";
 import { ExportProgressIndicator } from "./report-exporter/ExportProgressIndicator";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Report Exporter for v1.10.0
@@ -24,6 +26,8 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
     applyTemplate,
   } = useReportExporter();
 
+  const modalRef = useModalAutoScroll(true);
+
   const handleTemplateSelect = (templateKey: string) => {
     applyTemplate(templateKey);
   };
@@ -40,8 +44,11 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border-2 border-black shadow-2xl my-auto"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div>
@@ -53,15 +60,14 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
             </h2>
             <p className="text-gray-600 mt-1">Generate comprehensive analytics reports</p>
           </div>
-          <Button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
-            disabled={isExporting}
-          >
-            {React.createElement(getIcon("X"), {
-              className: "h-5 w-5",
-            })}
-          </Button>
+          <ModalCloseButton
+            onClick={() => {
+              if (!isExporting) {
+                onClose();
+              }
+            }}
+            className={isExporting ? "opacity-50 pointer-events-none" : ""}
+          />
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">

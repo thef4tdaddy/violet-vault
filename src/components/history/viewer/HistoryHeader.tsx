@@ -1,8 +1,8 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import IntegrityStatusIndicator from "../IntegrityStatusIndicator";
 import HelpTooltip from "../../ui/HelpTooltip";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 const HistoryHeader = ({ onClose }) => {
   return (
@@ -26,9 +26,7 @@ const HistoryHeader = ({ onClose }) => {
           <IntegrityStatusIndicator />
         </div>
       </div>
-      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
-        ✕
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

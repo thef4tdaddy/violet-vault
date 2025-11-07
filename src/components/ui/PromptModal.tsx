@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ValidationResult {
   valid: boolean;
@@ -49,6 +51,7 @@ const PromptModal = ({
   children,
 }: PromptModalProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useModalAutoScroll(isOpen);
   const [inputValue, setInputValue] = useState(defaultValue);
   const [validationError, setValidationError] = useState("");
 
@@ -123,15 +126,23 @@ const PromptModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[60] overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="prompt-modal-title"
       aria-describedby="prompt-modal-description"
     >
-      <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-md shadow-2xl border-2 border-black my-auto"
+      >
         <div className="p-6">
-          <ModalHeader icon={Icon} title={title} />
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <ModalHeader icon={Icon} title={title} />
+            </div>
+            <ModalCloseButton onClick={handleCancel} />
+          </div>
           <ModalContent
             message={message}
             children={children}

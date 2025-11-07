@@ -110,7 +110,7 @@ const handleNewUserSetup = async (userData: UserData, password: string): Promise
   if (!userData.shareCode) {
     throw new Error("Share code missing from user data during login");
   }
-  
+
   const shareCode = userData.shareCode as string;
 
   // For shared budgets, derive deterministic salt from shareCode (same as join flow)
@@ -118,7 +118,7 @@ const handleNewUserSetup = async (userData: UserData, password: string): Promise
   const shareCodeBytes = encoder.encode(shareCode);
   const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
   const newSalt = new Uint8Array(deterministicSalt);
-  
+
   // Derive key using the deterministic salt
   const key = await encryptionUtils.deriveKeyFromSalt(password, newSalt);
 
@@ -210,7 +210,7 @@ const deriveLoginEncryptionKey = async (
     const shareCodeBytes = encoder.encode(shareCode);
     const deterministicSalt = await crypto.subtle.digest("SHA-256", shareCodeBytes);
     const usedSalt = new Uint8Array(deterministicSalt);
-    
+
     if (import.meta?.env?.MODE === "development") {
       const saltPreview =
         Array.from(usedSalt.slice(0, 8))
@@ -221,11 +221,11 @@ const deriveLoginEncryptionKey = async (
         saltPreview,
       });
     }
-    
+
     const key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
     return { key, salt: usedSalt };
   }
-  
+
   const usedSalt = new Uint8Array(savedSalt);
   const key = await encryptionUtils.deriveKeyFromSalt(password, usedSalt);
   return { key, salt: usedSalt };

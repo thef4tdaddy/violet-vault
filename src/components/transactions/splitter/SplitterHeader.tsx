@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { renderIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
   const confirm = useConfirm();
@@ -36,12 +36,7 @@ const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
             </p>
           </div>
         </div>
-        <Button
-          onClick={handleClose}
-          className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-all border-2 border-white/20 shadow-md hover:shadow-lg glassmorphism backdrop-blur-sm"
-        >
-          {renderIcon("X", "h-5 w-5")}
-        </Button>
+        <ModalCloseButton onClick={handleClose} />
       </div>
     </div>
   );

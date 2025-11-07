@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 interface LocalOnlyHeaderProps {
   onClose: () => void;
@@ -16,15 +16,14 @@ const LocalOnlyHeader: React.FC<LocalOnlyHeaderProps> = ({ onClose, loading }) =
         })}
         Local-Only Mode Settings
       </h3>
-      <Button
-        onClick={onClose}
-        className="text-gray-400 hover:text-gray-600 text-xl"
-        disabled={loading}
-      >
-        {React.createElement(getIcon("X"), {
-          className: "h-5 w-5",
-        })}
-      </Button>
+      <ModalCloseButton
+        onClick={() => {
+          if (!loading) {
+            onClose();
+          }
+        }}
+        className={loading ? "opacity-50 pointer-events-none" : ""}
+      />
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../utils/icons";
 import { useSecuritySettingsLogic } from "../../hooks/security/useSecuritySettingsLogic";
 import SecurityStatusSection from "./sections/SecurityStatusSection";
@@ -8,6 +7,8 @@ import ClipboardSecuritySection from "./sections/ClipboardSecuritySection";
 import SecurityLoggingSection from "./sections/SecurityLoggingSection";
 import SecurityActionsSection from "./sections/SecurityActionsSection";
 import ClearConfirmationModal from "./modals/ClearConfirmationModal";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface SecuritySettingsProps {
   isOpen: boolean;
@@ -35,13 +36,18 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isOpen, onClose }) 
     confirmClearEvents,
   } = useSecuritySettingsLogic();
 
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
     <>
       {/* Main Modal */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="glassmorphism rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black bg-purple-100/40 backdrop-blur-3xl">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div
+          ref={modalRef}
+          className="glassmorphism rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black bg-purple-100/40 backdrop-blur-3xl my-auto"
+        >
           <div className="p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -60,12 +66,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isOpen, onClose }) 
                   </p>
                 </div>
               </div>
-              <Button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-3 shadow-lg hover:shadow-xl transition-all border-2 border-black"
-              >
-                {React.createElement(getIcon("x"), { className: "h-6 w-6" })}
-              </Button>
+              <ModalCloseButton onClick={onClose} />
             </div>
 
             {/* Scrollable Content */}

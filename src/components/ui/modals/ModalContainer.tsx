@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 
@@ -94,16 +95,16 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
       const scrollToCenter = () => {
         const modal = contentRef.current;
         if (!modal) return;
-        
+
         const rect = modal.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         const modalHeight = rect.height;
         const scrollTop = window.scrollY + rect.top;
-        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
-        
-        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+        const targetScroll = scrollTop - viewportHeight / 2 + modalHeight / 2;
+
+        window.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
       };
-      
+
       // Small delay to ensure DOM is rendered
       setTimeout(scrollToCenter, 100);
     }
@@ -113,7 +114,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -126,7 +127,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
       ref={modalRef}
     >
       <div
-        className={`glassmorphism rounded-2xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto border-2 border-black ring-1 ring-gray-800/10 ${className}`}
+        className={`bg-white rounded-2xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto border-2 border-black ${className}`}
         onClick={(e) => e.stopPropagation()}
         ref={contentRef}
         tabIndex={-1}
@@ -136,20 +137,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
             <h2 id="modal-title" className="font-black text-black text-lg">
               {title}
             </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
-              aria-label="Close modal"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+            <ModalCloseButton onClick={onClose} />
           </div>
         )}
         <div className="p-6">{children}</div>

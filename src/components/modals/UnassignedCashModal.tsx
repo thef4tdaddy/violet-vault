@@ -4,6 +4,8 @@ import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import useUnassignedCashDistribution from "../../hooks/budgeting/useUnassignedCashDistribution";
 import { ENVELOPE_TYPES } from "../../constants/categories";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 
@@ -40,14 +42,10 @@ const ModalHeader = ({
         )}
       </p>
     </div>
-    <Button
+    <ModalCloseButton
       onClick={closeUnassignedCashModal}
-      disabled={isProcessing}
-      className="text-gray-500 hover:text-gray-900 disabled:opacity-50 p-2 ml-4 flex-shrink-0 hover:bg-gray-100 rounded transition-colors"
-      type="button"
-    >
-      {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-    </Button>
+      className={isProcessing ? "opacity-50 pointer-events-none" : ""}
+    />
   </div>
 );
 
@@ -309,29 +307,24 @@ const UnassignedCashModal = () => {
   const isUnassignedCashModalOpen = useBudgetStore((state) => state.isUnassignedCashModalOpen);
   const closeUnassignedCashModal = useBudgetStore((state) => state.closeUnassignedCashModal);
   const {
-    // State (except modal state)
     distributions,
     isProcessing,
-
-    // Calculations
     totalDistributed,
     remainingCash,
     isValidDistribution,
-
-    // Actions
     updateDistribution,
     clearDistributions,
     distributeEqually,
     distributeProportionally,
     distributeBillPriority,
     applyDistribution,
-
-    // Data
     envelopes,
     bills,
     unassignedCash,
     getDistributionPreview,
   } = useUnassignedCashDistribution();
+
+  const modalRef = useModalAutoScroll(isUnassignedCashModalOpen);
 
   if (!isUnassignedCashModalOpen) return null;
 
@@ -340,25 +333,91 @@ const UnassignedCashModal = () => {
   const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl sm:rounded-xl rounded-t-xl p-4 sm:p-6 w-full max-w-4xl h-full sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-black z-50">
-        {/* Header */}
+    <UnassignedCashModalContent
+      modalRef={modalRef}
+      unassignedCash={Number(unassignedCash)}
+      isProcessing={isProcessing}
+      closeUnassignedCashModal={closeUnassignedCashModal}
+      totalDistributed={Number(totalDistributed)}
+      remainingCash={Number(remainingCash)}
+      isOverDistributed={isOverDistributed}
+      hasDistributions={hasDistributions}
+      distributeBillPriority={distributeBillPriority}
+      distributeEqually={distributeEqually}
+      distributeProportionally={distributeProportionally}
+      clearDistributions={clearDistributions}
+      envelopes={envelopes}
+      distributions={distributions}
+      updateDistribution={updateDistribution}
+      bills={bills}
+      preview={preview}
+      applyDistribution={applyDistribution}
+      isValidDistribution={isValidDistribution}
+    />
+  );
+};
+
+const UnassignedCashModalContent = ({
+  modalRef,
+  unassignedCash,
+  isProcessing,
+  closeUnassignedCashModal,
+  totalDistributed,
+  remainingCash,
+  isOverDistributed,
+  hasDistributions,
+  distributeBillPriority,
+  distributeEqually,
+  distributeProportionally,
+  clearDistributions,
+  envelopes,
+  distributions,
+  updateDistribution,
+  bills,
+  preview,
+  applyDistribution,
+  isValidDistribution,
+}: {
+  modalRef: React.RefObject<HTMLDivElement>;
+  unassignedCash: number;
+  isProcessing: boolean;
+  closeUnassignedCashModal: () => void;
+  totalDistributed: number;
+  remainingCash: number;
+  isOverDistributed: boolean;
+  hasDistributions: boolean;
+  distributeBillPriority: () => void;
+  distributeEqually: () => void;
+  distributeProportionally: () => void;
+  clearDistributions: () => void;
+  envelopes: Array<{ id: string; name: string; color?: string; currentBalance?: number; monthlyBudget?: number; monthlyAmount?: number; type?: string }>;
+  distributions: Record<string, number>;
+  updateDistribution: (envelopeId: string, amount: string) => void;
+  bills: unknown[];
+  preview: Array<{ id: string; name: string; distributionAmount: number }>;
+  applyDistribution: () => void;
+  isValidDistribution: boolean;
+}) => {
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-xl sm:rounded-xl rounded-t-xl p-4 sm:p-6 w-full max-w-4xl h-full sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-black my-auto"
+      >
         <ModalHeader
           unassignedCash={unassignedCash}
           isProcessing={isProcessing}
           closeUnassignedCashModal={closeUnassignedCashModal}
         />
 
-        {/* Distribution Summary */}
         <DistributionSummary
-          totalDistributed={Number(totalDistributed)}
-          remainingCash={Number(remainingCash)}
+          totalDistributed={totalDistributed}
+          remainingCash={remainingCash}
           isOverDistributed={isOverDistributed}
           hasDistributions={hasDistributions}
-          unassignedCash={Number(unassignedCash)}
+          unassignedCash={unassignedCash}
         />
 
-        {/* Quick Actions */}
         <QuickActions
           distributeBillPriority={distributeBillPriority}
           distributeEqually={distributeEqually}
@@ -369,7 +428,6 @@ const UnassignedCashModal = () => {
           envelopesLength={envelopes.length}
         />
 
-        {/* Envelope List */}
         <div className="flex-1 overflow-hidden">
           <h4 className="font-medium text-gray-900 mb-3 sticky top-0 bg-white py-1 z-10">
             Select Envelopes
@@ -398,28 +456,24 @@ const UnassignedCashModal = () => {
           )}
         </div>
 
-        {/* Preview Section */}
         {preview.length > 0 && (
           <div className="mt-6 pt-4 border-t border-gray-200">
             <h4 className="font-medium text-gray-900 mb-3">Distribution Preview</h4>
             <div className="bg-blue-50 rounded-lg p-3 max-h-32 overflow-y-auto">
               <div className="space-y-1">
-                {preview.map(
-                  (envelope: { id: string; name: string; distributionAmount: number }) => (
-                    <div key={envelope.id} className="flex justify-between text-sm">
-                      <span className="text-gray-700">{envelope.name}</span>
-                      <span className="text-blue-600 font-medium">
-                        +${envelope.distributionAmount.toFixed(2)}
-                      </span>
-                    </div>
-                  )
-                )}
+                {preview.map((envelope) => (
+                  <div key={envelope.id} className="flex justify-between text-sm">
+                    <span className="text-gray-700">{envelope.name}</span>
+                    <span className="text-blue-600 font-medium">
+                      +${envelope.distributionAmount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         )}
 
-        {/* Footer Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
           <Button
             onClick={closeUnassignedCashModal}
@@ -445,26 +499,11 @@ const UnassignedCashModal = () => {
                 {React.createElement(getIcon("CheckCircle"), {
                   className: "h-4 w-4 mr-2",
                 })}
-                Distribute ${Number(totalDistributed).toFixed(2)}
+                Apply Distribution
               </>
             )}
           </Button>
         </div>
-
-        {/* Error Message */}
-        {isOverDistributed && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center text-red-700">
-              {React.createElement(getIcon("AlertTriangle"), {
-                className: "h-4 w-4 mr-2",
-              })}
-              <span className="text-sm">
-                Distribution exceeds available cash by $
-                {(Number(totalDistributed) - Number(unassignedCash)).toFixed(2)}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

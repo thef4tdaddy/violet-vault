@@ -40,21 +40,26 @@ export function usePaycheckFormValidated({
       // Convert allocations array to object if needed (for legacy form compatibility)
       let allocationsObj = {};
       if (Array.isArray(paycheck.allocations)) {
-        allocationsObj = paycheck.allocations.reduce((acc, alloc) => {
-          acc[alloc.envelopeId] = alloc.amount;
-          return acc;
-        }, {} as Record<string, number>);
+        allocationsObj = paycheck.allocations.reduce(
+          (acc, alloc) => {
+            acc[alloc.envelopeId] = alloc.amount;
+            return acc;
+          },
+          {} as Record<string, number>
+        );
       } else {
         allocationsObj = paycheck.allocations || {};
       }
-      
+
       return {
         date:
           typeof paycheck.date === "string"
             ? paycheck.date
-            : paycheck.processedAt 
-            ? (typeof paycheck.processedAt === "string" ? paycheck.processedAt : new Date(paycheck.processedAt).toISOString().split("T")[0])
-            : new Date(paycheck.date).toISOString().split("T")[0],
+            : paycheck.processedAt
+              ? typeof paycheck.processedAt === "string"
+                ? paycheck.processedAt
+                : new Date(paycheck.processedAt).toISOString().split("T")[0]
+              : new Date(paycheck.date).toISOString().split("T")[0],
         amount: paycheck.amount?.toString() || "",
         source: paycheck.payerName || paycheck.source || "",
         allocations: allocationsObj,

@@ -124,6 +124,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     setNewPassword,
     setConfirmPassword,
     handleRotationPasswordChange,
+    dismissRotation,
   } = usePasswordRotation();
 
   // Network detection
@@ -199,6 +200,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
         setNewPassword={setNewPassword}
         setConfirmPassword={setConfirmPassword}
         onSubmit={handleRotationPasswordChange}
+        onClose={dismissRotation}
       />
       <ToastContainer toasts={toasts as ToastItem[]} removeToast={removeToast} />
     </>
@@ -287,106 +289,106 @@ const MainContent = ({
   return (
     <GlobalPullToRefreshProvider>
       <OnboardingTutorial>
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
-        <div className="max-w-7xl mx-auto relative">
-          <div className="relative z-10">
-            <Header
+        <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
+          <div className="max-w-7xl mx-auto relative">
+            <div className="relative z-10">
+              <Header
+                currentUser={currentUser}
+                onUserChange={() => {}}
+                onUpdateProfile={() => {}}
+                isLocalOnlyMode={isLocalOnlyMode}
+                onShowSettings={() => modals.settings.setOpen(true)}
+                onShowDataSettings={() => modals.security.setOpen(true)}
+              />
+            </div>
+
+            {rotationDue && (
+              <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
+                Your password is over 90 days old. Please change it.
+              </div>
+            )}
+
+            <NavigationTabs />
+            <OnboardingProgress />
+            <SummaryCards />
+
+            <AppRoutes
+              budget={budget}
               currentUser={currentUser}
-              onUserChange={() => {}}
-              onUpdateProfile={() => {}}
-              isLocalOnlyMode={isLocalOnlyMode}
-              onShowSettings={() => modals.settings.setOpen(true)}
-              onShowDataSettings={() => modals.security.setOpen(true)}
+              totalBiweeklyNeed={totalBiweeklyNeed}
+              setActiveView={setActiveView}
             />
+
+            <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+            <ConflictResolutionModal
+              syncConflicts={syncConflicts}
+              onResolveConflict={onResolveConflict}
+              onDismiss={() => setSyncConflicts(null)}
+            />
+
+            <BottomNavigationBar />
+
+            {/* Bug Report Button - Floating (separate from main content flow) */}
+            {!showSecurityWarning && <BugReportButton />}
+
+            <div className="mt-8 text-center">
+              <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold text-purple-600">
+                    {getVersionInfo().displayName}
+                  </span>{" "}
+                  v{getVersionInfo().version}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Last updated: {getVersionInfo().buildDate}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+              </div>
+            </div>
           </div>
 
-          {rotationDue && (
-            <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
-              Your password is over 90 days old. Please change it.
-            </div>
+          <SecuritySettings
+            isOpen={modals.security.isOpen}
+            onClose={() => modals.security.setOpen(false)}
+          />
+
+          {modals.settings.isOpen && (
+            <SettingsDashboard
+              isOpen={modals.settings.isOpen}
+              onClose={() => modals.settings.setOpen(false)}
+              initialSection={modals.settings.initialSection}
+              onExport={_onExport}
+              onImport={_onImport}
+              onLogout={onLogout}
+              onResetEncryption={() => {
+                resetAllData();
+                onResetEncryption();
+              }}
+              onSync={handleManualSync}
+              onChangePassword={onChangePassword}
+              currentUser={currentUser}
+              isLocalOnlyMode={isLocalOnlyMode}
+              securityManager={securityManager}
+              onUpdateProfile={async (updates) => {
+                // Update profile through auth manager
+                (auth as { updateUser: (updates: unknown) => void }).updateUser(updates);
+              }}
+            />
           )}
 
-          <NavigationTabs />
-          <OnboardingProgress />
-          <SummaryCards />
-
-          <AppRoutes
-            budget={budget}
-            currentUser={currentUser}
-            totalBiweeklyNeed={totalBiweeklyNeed}
-            setActiveView={setActiveView}
+          <CorruptionRecoveryModal
+            isOpen={showCorruptionModal}
+            onClose={() => setShowCorruptionModal(false)}
           />
 
-          <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
-          <ConflictResolutionModal
-            syncConflicts={syncConflicts}
-            onResolveConflict={onResolveConflict}
-            onDismiss={() => setSyncConflicts(null)}
-          />
-
-          <BottomNavigationBar />
-          
-          {/* Bug Report Button - Floating (separate from main content flow) */}
-          {!showSecurityWarning && <BugReportButton />}
-
-          <div className="mt-8 text-center">
-            <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold text-purple-600">
-                  {getVersionInfo().displayName}
-                </span>{" "}
-                v{getVersionInfo().version}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Last updated: {getVersionInfo().buildDate}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
-            </div>
-          </div>
+          {showSecurityWarning && (
+            <LocalDataSecurityWarning
+              onClose={() => setShowSecurityWarning(false)}
+              onAcknowledge={() => setShowSecurityWarning(false)}
+            />
+          )}
         </div>
-
-        <SecuritySettings
-          isOpen={modals.security.isOpen}
-          onClose={() => modals.security.setOpen(false)}
-        />
-
-        {modals.settings.isOpen && (
-          <SettingsDashboard
-            isOpen={modals.settings.isOpen}
-            onClose={() => modals.settings.setOpen(false)}
-            initialSection={modals.settings.initialSection}
-            onExport={_onExport}
-            onImport={_onImport}
-            onLogout={onLogout}
-            onResetEncryption={() => {
-              resetAllData();
-              onResetEncryption();
-            }}
-            onSync={handleManualSync}
-            onChangePassword={onChangePassword}
-            currentUser={currentUser}
-            isLocalOnlyMode={isLocalOnlyMode}
-            securityManager={securityManager}
-            onUpdateProfile={async (updates) => {
-              // Update profile through auth manager
-              (auth as { updateUser: (updates: unknown) => void }).updateUser(updates);
-            }}
-          />
-        )}
-
-        <CorruptionRecoveryModal
-          isOpen={showCorruptionModal}
-          onClose={() => setShowCorruptionModal(false)}
-        />
-
-        {showSecurityWarning && (
-          <LocalDataSecurityWarning
-            onClose={() => setShowSecurityWarning(false)}
-            onAcknowledge={() => setShowSecurityWarning(false)}
-          />
-        )}
-      </div>
-    </OnboardingTutorial>
+      </OnboardingTutorial>
     </GlobalPullToRefreshProvider>
   );
 };

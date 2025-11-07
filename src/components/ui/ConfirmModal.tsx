@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { getIcon } from "@/utils";
 import { useTouchFeedback } from "@/utils/ui/touchFeedback";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Get appropriate icon for modal type
@@ -207,6 +209,7 @@ const ConfirmModal = ({
 }: ConfirmModalProps) => {
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useModalAutoScroll(isOpen);
 
   // Focus management - focus cancel button by default for safety
   useEffect(() => {
@@ -229,16 +232,24 @@ const ConfirmModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[10000]"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
       aria-describedby="confirm-modal-description"
     >
-      <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-md shadow-2xl border-2 border-black my-auto"
+      >
         <div className="p-6">
-          {/* Header */}
-          <ModalHeader icon={icon} destructive={destructive} title={title} />
+          <div className="flex justify-between items-start mb-4">
+            {/* Header */}
+            <div className="flex-1">
+              <ModalHeader icon={icon} destructive={destructive} title={title} />
+            </div>
+            <ModalCloseButton onClick={onCancel} />
+          </div>
 
           {/* Content */}
           <div className="mb-6">

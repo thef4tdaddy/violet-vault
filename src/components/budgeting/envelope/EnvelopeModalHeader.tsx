@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import EditLockIndicator from "../../ui/EditLockIndicator";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 const EnvelopeModalHeader = ({
   title = "Edit Envelope",
@@ -53,12 +54,7 @@ const EnvelopeModalHeader = ({
                 Break Lock
               </Button>
             )}
-            <Button
-              onClick={onClose}
-              className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
-            >
-              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </Button>
+            <ModalCloseButton onClick={onClose} />
           </div>
         </div>
       </div>

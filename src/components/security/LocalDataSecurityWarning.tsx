@@ -2,6 +2,8 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useSecurityAcknowledgment } from "../../hooks/security/useSecurityAcknowledgment";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Security warning component that informs users about local data storage
@@ -9,7 +11,7 @@ import { useSecurityAcknowledgment } from "../../hooks/security/useSecurityAckno
  */
 const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false }) => {
   const { hasBeenAcknowledged, acknowledge } = useSecurityAcknowledgment();
-  const modalRef = React.useRef<HTMLDivElement>(null);
+  const modalRef = useModalAutoScroll(true);
 
   const handleAcknowledge = () => {
     acknowledge();
@@ -17,33 +19,16 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false })
     if (onClose) onClose();
   };
 
-  React.useEffect(() => {
-    if (!modalRef.current) return;
-    const scrollToCenter = () => {
-      const modal = modalRef.current;
-      if (!modal) return;
-      const rect = modal.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const modalHeight = rect.height;
-      const scrollTop = window.scrollY + rect.top;
-      const targetScroll = scrollTop - viewportHeight / 2 + modalHeight / 2;
-      window.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
-    };
-
-    const timer = setTimeout(scrollToCenter, 100);
-    return () => clearTimeout(timer);
-  }, [forceShow, hasBeenAcknowledged]);
-
   // Don't auto-hide if explicitly opened from Settings (forceShow = true)
   if (hasBeenAcknowledged && !forceShow) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[60] p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4 overflow-y-auto">
       <div
         ref={modalRef}
-        className="bg-white dark:bg-gray-800 rounded-lg border-2 border-black shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[95vh] my-auto"
+        className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-black shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[95vh] my-auto"
       >
-        <WarningHeader />
+        <WarningHeader onClose={onClose} />
         <div className="p-6 space-y-4 flex-1 overflow-y-auto">
           <SecurityStatusSection />
           <ImplicationsSection />
@@ -54,8 +39,8 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false })
   );
 };
 
-const WarningHeader = () => (
-  <div className="flex items-center p-6 border-b border-gray-200 dark:border-gray-700">
+const WarningHeader = ({ onClose }: { onClose?: () => void }) => (
+  <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
     <div className="flex items-center space-x-3">
       <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
         {React.createElement(getIcon("Shield"), {
@@ -71,6 +56,7 @@ const WarningHeader = () => (
         </p>
       </div>
     </div>
+    <ModalCloseButton onClick={onClose || (() => undefined)} />
   </div>
 );
 

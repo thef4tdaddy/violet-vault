@@ -7,6 +7,7 @@ import { BillDetailHeader } from "./BillDetailHeader";
 import { BillDetailStats } from "./BillDetailStats";
 import { BillDetailPaymentHistory, BillDetailQuickPayment } from "./BillDetailSections";
 import { BillDetailActions } from "./BillDetailActions";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Pure UI component for viewing and managing individual bill details
@@ -35,13 +36,18 @@ const BillDetailModal = ({
     handleHidePaymentForm,
   } = useBillDetail({ bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring });
 
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen || !bill) return null;
 
   const statusIconName = getBillStatusIcon(bill.status, statusInfo.isOverdue, statusInfo.isDueSoon);
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl my-auto border-2 border-black"
+      >
         {/* Header */}
         <BillDetailHeader bill={bill} statusInfo={statusInfo} onClose={onClose} />
 

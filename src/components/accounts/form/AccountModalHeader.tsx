@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { getIcon } from "@/utils";
 import { Button } from "@/components/ui";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 interface EditingAccount {
   id: string | number;
@@ -46,9 +47,7 @@ const AccountModalHeader = ({
           Break
         </Button>
       )}
-      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-        {createElement(getIcon("X"), { className: "h-5 w-5" })}
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   </div>
 );

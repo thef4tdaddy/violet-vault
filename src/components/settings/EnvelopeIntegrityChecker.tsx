@@ -6,6 +6,8 @@ import { EnvelopeIntegrityStatusCards } from "./EnvelopeIntegrityStatusCards";
 import { EnvelopeIntegrityActions } from "./EnvelopeIntegrityActions";
 import { EnvelopeIntegrityCorruptedList } from "./EnvelopeIntegrityCorruptedList";
 import { EnvelopeIntegrityRecommendations } from "./EnvelopeIntegrityRecommendations";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Envelope Integrity Checker Component
@@ -26,6 +28,8 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
     handleRepairSelected,
   } = useEnvelopeIntegrity();
 
+  const modalRef = useModalAutoScroll(isOpen);
+
   // Auto-scan when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -36,8 +40,11 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black my-auto"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -49,11 +56,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
               <p className="text-sm text-gray-600">Detect and fix corrupted envelopes</p>
             </div>
           </div>
-          <Button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            {React.createElement(getIcon("X"), {
-              className: "h-5 w-5",
-            })}
-          </Button>
+          <ModalCloseButton onClick={onClose} />
         </div>
 
         {/* Content */}

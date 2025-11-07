@@ -48,13 +48,10 @@ export const useBalanceAnalyticsQuery = () => {
         0
       );
 
-      const totalSavingsBalance = (savingsGoals || []).reduce(
-        (sum: number, goal: unknown) => {
-          const g = goal as SavingsGoal;
-          return sum + (g.currentAmount || 0);
-        },
-        0
-      );
+      const totalSavingsBalance = (savingsGoals || []).reduce((sum: number, goal: unknown) => {
+        const g = goal as SavingsGoal;
+        return sum + (g.currentAmount || 0);
+      }, 0);
 
       const totalVirtualBalance =
         totalEnvelopeBalance + totalSavingsBalance + (unassignedCash || 0);
@@ -64,7 +61,9 @@ export const useBalanceAnalyticsQuery = () => {
       const envelopeAnalysis = (envelopes || []).map((envelope: Envelope) => ({
         ...envelope,
         utilizationRate:
-          (envelope.targetAmount || 0) > 0 ? ((envelope.currentBalance || 0) / (envelope.targetAmount || 0)) * 100 : 0,
+          (envelope.targetAmount || 0) > 0
+            ? ((envelope.currentBalance || 0) / (envelope.targetAmount || 0)) * 100
+            : 0,
         isUnderfunded: (envelope.currentBalance || 0) < (envelope.targetAmount || 0),
         isOverfunded: (envelope.currentBalance || 0) > (envelope.targetAmount || 0),
         fundingGap: Math.max(0, (envelope.targetAmount || 0) - (envelope.currentBalance || 0)),
@@ -78,7 +77,8 @@ export const useBalanceAnalyticsQuery = () => {
         const g = goal as SavingsGoal;
         return {
           ...g,
-          progressRate: (g.targetAmount || 0) > 0 ? ((g.currentAmount || 0) / (g.targetAmount || 0)) * 100 : 0,
+          progressRate:
+            (g.targetAmount || 0) > 0 ? ((g.currentAmount || 0) / (g.targetAmount || 0)) * 100 : 0,
           remainingAmount: Math.max(0, (g.targetAmount || 0) - (g.currentAmount || 0)),
           isCompleted: (g.currentAmount || 0) >= (g.targetAmount || 0),
         };
@@ -111,13 +111,10 @@ export const useBalanceAnalyticsQuery = () => {
                 ) / envelopeAnalysis.length
               : 0,
           completedSavingsGoals: savingsAnalysis.filter((goal) => goal.isCompleted).length,
-          totalSavingsTarget: savingsAnalysis.reduce(
-            (sum: number, goal: unknown) => {
-              const g = goal as SavingsGoal;
-              return sum + (g.targetAmount || 0);
-            },
-            0
-          ),
+          totalSavingsTarget: savingsAnalysis.reduce((sum: number, goal: unknown) => {
+            const g = goal as SavingsGoal;
+            return sum + (g.targetAmount || 0);
+          }, 0),
         },
       };
     },

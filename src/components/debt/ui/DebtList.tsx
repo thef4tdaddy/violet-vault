@@ -88,35 +88,44 @@ const FinancialDetails = ({
 
 const DebtCard = ({ debt, onClick }: DebtCardProps) => {
   // Extract actual debt data
-  const currentBalance = (debt as Record<string, unknown>).currentBalance as number || (debt as Record<string, unknown>).balance as number || 0;
-  const interestRate = (debt as Record<string, unknown>).interestRate as number || 0;
-  const minimumPayment = (debt as Record<string, unknown>).minimumPayment as number || 0;
-  const nextPaymentDate = (debt as Record<string, unknown>).nextPaymentDate as string | Date | undefined;
+  const currentBalance =
+    ((debt as Record<string, unknown>).currentBalance as number) ||
+    ((debt as Record<string, unknown>).balance as number) ||
+    0;
+  const interestRate = ((debt as Record<string, unknown>).interestRate as number) || 0;
+  const minimumPayment = ((debt as Record<string, unknown>).minimumPayment as number) || 0;
+  const nextPaymentDate = (debt as Record<string, unknown>).nextPaymentDate as
+    | string
+    | Date
+    | undefined;
   const dueDate = (debt as Record<string, unknown>).dueDate as string | Date | undefined;
-  const originalBalance = (debt as Record<string, unknown>).originalBalance as number || currentBalance;
-  
+  const originalBalance =
+    ((debt as Record<string, unknown>).originalBalance as number) || currentBalance;
+
   // Calculate progress
-  const progressPercentage = originalBalance > 0 
-    ? Math.max(0, Math.min(((originalBalance - currentBalance) / originalBalance) * 100, 100))
-    : 0;
-  
+  const progressPercentage =
+    originalBalance > 0
+      ? Math.max(0, Math.min(((originalBalance - currentBalance) / originalBalance) * 100, 100))
+      : 0;
+
   // Format payment display
   const paymentDisplay = minimumPayment > 0 ? `$${minimumPayment.toFixed(2)}` : "$0.00";
-  
+
   // Format next payment info
   const paymentDate = nextPaymentDate || dueDate;
-  const nextPaymentValue = paymentDate 
-    ? new Date(paymentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const nextPaymentValue = paymentDate
+    ? new Date(paymentDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "N/A";
-  
+
   // Determine debt status badge styling
-  const debtStatus = (debt as Record<string, unknown>).status as string || 'active';
-  const statusBadge = debtStatus === 'paid_off' 
-    ? { text: "Paid Off", className: "bg-green-100 text-green-700 border border-green-300" }
-    : debtStatus === 'deferred' 
-    ? { text: "Deferred", className: "bg-yellow-100 text-yellow-700 border border-yellow-300" }
-    : { text: "Active", className: "bg-blue-100 text-blue-700 border border-blue-300" };
-  
+  const debtStatus = ((debt as Record<string, unknown>).status as string) || "active";
+  const statusBadge =
+    debtStatus === "paid_off"
+      ? { text: "Paid Off", className: "bg-green-100 text-green-700 border border-green-300" }
+      : debtStatus === "deferred"
+        ? { text: "Deferred", className: "bg-yellow-100 text-yellow-700 border border-yellow-300" }
+        : { text: "Active", className: "bg-blue-100 text-blue-700 border border-blue-300" };
+
   const {
     config,
     IconComponent,
@@ -131,11 +140,11 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
     IconComponent: "Clock",
     progressData: { percentage: progressPercentage, hasProgress: progressPercentage > 0 },
     paymentInfo: { display: paymentDisplay },
-    nextPaymentInfo: { 
-      label: "Next Payment", 
-      hasIcon: true, 
-      type: "next_payment", 
-      value: nextPaymentValue 
+    nextPaymentInfo: {
+      label: "Next Payment",
+      hasIcon: true,
+      type: "next_payment",
+      value: nextPaymentValue,
     },
     relationships: { hasRelationships: false, items: [] },
     canQuickPay: false,
@@ -167,7 +176,9 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
                   {debt.creditor} • {config.name}
                 </p>
               </div>
-              <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${statusBadge.className} shadow-sm`}>
+              <span
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${statusBadge.className} shadow-sm`}
+              >
                 {statusBadge.text}
               </span>
             </div>

@@ -7,6 +7,8 @@ import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Share Code Modal - Generate and display share codes with QR codes
@@ -156,23 +158,23 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
     await generateShareCode();
   };
 
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl border-2 border-black max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl border-2 border-black max-w-md w-full max-h-[90vh] overflow-y-auto my-auto"
+      >
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-black text-black">
               <span className="text-2xl">S</span>HARE <span className="text-2xl">B</span>UDGET
             </h2>
-            <Button
-              onClick={onClose}
-              className="text-gray-500 hover:text-black transition-colors p-1"
-            >
-              {renderIcon("X", "h-6 w-6")}
-            </Button>
+            <ModalCloseButton onClick={onClose} />
           </div>
           <p className="text-sm text-purple-900 mt-2">
             Let others join your budget with a secure share code

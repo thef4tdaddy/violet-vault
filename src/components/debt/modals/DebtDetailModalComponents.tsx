@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 interface ModalHeaderProps {
   debt: Record<string, unknown>;
@@ -16,9 +17,7 @@ export const ModalHeader = ({ debt, onClose }: ModalHeaderProps) => {
           {debt.creditor as string} • {debt.type as string}
         </p>
       </div>
-      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-        {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

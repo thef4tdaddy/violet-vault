@@ -15,45 +15,48 @@ export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 /**
  * Zod schema for Transaction validation
  * Represents financial transactions (income, expenses, transfers)
- * 
+ *
  * CRITICAL CONVENTION:
  * - Positive amounts = Income/deposits
  * - Negative amounts = Expenses/withdrawals
  * This allows analytics calculations to work without checking the 'type' field
- * 
+ *
  * The schema enforces this convention with refinement rules:
  * - type='expense' MUST have negative amount
  * - type='income' MUST have positive amount
  * - type='transfer' can be either (depending on direction)
  */
-export const TransactionSchema = z.object({
-  id: z.string().min(1, "Transaction ID is required"),
-  date: z.union([z.date(), z.string()]),
-  amount: z.number(), // Can be positive (income) or negative (expense)
-  envelopeId: z.string().min(1, "Envelope ID is required"),
-  category: z.string().min(1, "Category is required"),
-  type: TransactionTypeSchema.default("expense"),
-  lastModified: z.number().int().positive("Last modified must be a positive number"),
-  createdAt: z.number().int().positive().optional(),
-  description: z.string().max(500, "Description must be 500 characters or less").optional(),
-  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
-  receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
-}).refine(
-  (data) => {
-    // Enforce sign convention based on transaction type
-    if (data.type === "expense" && data.amount > 0) {
-      return false; // Expenses MUST be negative
+export const TransactionSchema = z
+  .object({
+    id: z.string().min(1, "Transaction ID is required"),
+    date: z.union([z.date(), z.string()]),
+    amount: z.number(), // Can be positive (income) or negative (expense)
+    envelopeId: z.string().min(1, "Envelope ID is required"),
+    category: z.string().min(1, "Category is required"),
+    type: TransactionTypeSchema.default("expense"),
+    lastModified: z.number().int().positive("Last modified must be a positive number"),
+    createdAt: z.number().int().positive().optional(),
+    description: z.string().max(500, "Description must be 500 characters or less").optional(),
+    merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
+    receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
+  })
+  .refine(
+    (data) => {
+      // Enforce sign convention based on transaction type
+      if (data.type === "expense" && data.amount > 0) {
+        return false; // Expenses MUST be negative
+      }
+      if (data.type === "income" && data.amount < 0) {
+        return false; // Income MUST be positive
+      }
+      return true;
+    },
+    {
+      message:
+        "Transaction amount sign must match type: expenses must be negative, income must be positive",
+      path: ["amount"],
     }
-    if (data.type === "income" && data.amount < 0) {
-      return false; // Income MUST be positive
-    }
-    return true;
-  },
-  {
-    message: "Transaction amount sign must match type: expenses must be negative, income must be positive",
-    path: ["amount"],
-  }
-);
+  );
 
 /**
  * Type inference from schema
@@ -91,10 +94,10 @@ export const validateTransactionPartial = (data: unknown): TransactionPartial =>
  * Normalize transaction amount based on type
  * Ensures expenses are negative and income is positive
  * Use this before saving transactions to enforce the sign convention
- * 
+ *
  * @param transaction - Transaction data (can have wrong sign)
  * @returns Transaction with correct amount sign
- * 
+ *
  * @example
  * const txn = { amount: 100, type: 'expense' }; // Wrong sign
  * const normalized = normalizeTransactionAmount(txn);
@@ -104,7 +107,7 @@ export const normalizeTransactionAmount = <T extends { amount: number; type: str
   transaction: T
 ): T => {
   const absAmount = Math.abs(transaction.amount);
-  
+
   if (transaction.type === "expense") {
     return { ...transaction, amount: -absAmount };
   }
@@ -118,11 +121,11 @@ export const normalizeTransactionAmount = <T extends { amount: number; type: str
 /**
  * Validate and normalize a transaction in one step
  * Ensures correct sign convention before validation
- * 
+ *
  * @param data - Raw transaction data
  * @returns Validated transaction with correct amount sign
  * @throws ZodError if validation fails
- * 
+ *
  * @example
  * const raw = { id: 'txn-1', amount: 50, type: 'expense', ... };
  * const validated = validateAndNormalizeTransaction(raw);

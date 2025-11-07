@@ -1,12 +1,16 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Modal for displaying upcoming debt payments
  * Pure UI component - receives data as props
  */
 const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   const formatDate = (dateString) => {
@@ -20,17 +24,18 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
   const totalUpcoming = upcomingPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl border-2 border-black my-auto"
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-xl font-semibold text-gray-900">Upcoming Payments</h3>
             <p className="text-gray-600">Next 30 days</p>
           </div>
-          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </Button>
+          <ModalCloseButton onClick={onClose} />
         </div>
 
         {/* Summary */}

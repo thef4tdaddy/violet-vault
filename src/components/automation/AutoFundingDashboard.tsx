@@ -8,6 +8,7 @@ import { useAutoFunding } from "@/hooks/budgeting/autofunding";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import logger from "@/utils/common/logger";
 import { DashboardHeader, DashboardTabs, DashboardContent } from "./AutoFundingDashboardComponents";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const envelopes = useBudgetStore((state) => state.envelopes);
@@ -19,6 +20,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const [editingRule, setEditingRule] = useState(null);
   const [activeTab, setActiveTab] = useState("rules"); // 'rules' | 'history'
   const [showExecutionDetails, setShowExecutionDetails] = useState(null);
+  const modalRef = useModalAutoScroll(isOpen);
 
   // Get execution history
   const executionHistory = getHistory(20);
@@ -114,8 +116,11 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div
+          ref={modalRef}
+          className="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden border-2 border-black shadow-2xl my-auto"
+        >
           <div className="flex flex-col h-full">
             <DashboardHeader rules={rules} onClose={onClose} />
 

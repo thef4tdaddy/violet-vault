@@ -2,6 +2,8 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useUiStore from "../../stores/ui/uiStore";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Install PWA Prompt Modal
@@ -11,6 +13,7 @@ const InstallPromptModal = () => {
   const showInstallPrompt = useUiStore((state) => state.showInstallPrompt);
   const dismissInstallPrompt = useUiStore((state) => state.dismissInstallPrompt);
   const installApp = useUiStore((state) => state.installApp);
+  const modalRef = useModalAutoScroll(showInstallPrompt);
 
   if (!showInstallPrompt) return null;
 
@@ -31,7 +34,13 @@ const InstallPromptModal = () => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="glassmorphism rounded-lg max-w-md w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm">
+      <div
+        className="glassmorphism rounded-lg max-w-md w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm relative"
+        ref={modalRef}
+      >
+        <div className="absolute top-4 right-4">
+          <ModalCloseButton onClick={handleDismiss} />
+        </div>
         {/* Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-black shadow-xl">

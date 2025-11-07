@@ -1,27 +1,33 @@
-import React, { useState } from "react";
-import { Button } from "../../components/ui/buttons";
-import { getIcon } from "../../utils";
-import { globalToast } from "../../stores/ui/toastStore";
-import logger from "../../utils/common/logger";
-
-interface User {
-  userName: string;
-  userColor: string;
-  budgetId?: string;
-  [key: string]: unknown;
-}
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui";
+import { getIcon } from "@/utils";
+import logger from "@/utils/common/logger";
+import { globalToast } from "@/stores/ui/toastStore";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ProfileSettingsProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: User | null;
-  onUpdateProfile: (profile: User) => Promise<void>;
+  currentUser: Record<string, unknown> & {
+    userName?: string;
+    userColor?: string;
+  };
+  onUpdateProfile: (updates: Record<string, unknown>) => Promise<void> | void;
 }
 
-interface ColorOption {
-  name: string;
-  value: string;
-}
+const PROFILE_COLORS = [
+  { value: "#EF4444", name: "Crimson" },
+  { value: "#F97316", name: "Orange" },
+  { value: "#F59E0B", name: "Amber" },
+  { value: "#10B981", name: "Emerald" },
+  { value: "#14B8A6", name: "Teal" },
+  { value: "#0EA5E9", name: "Sky" },
+  { value: "#6366F1", name: "Indigo" },
+  { value: "#8B5CF6", name: "Purple" },
+  { value: "#EC4899", name: "Pink" },
+  { value: "#F43F5E", name: "Rose" },
+];
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   isOpen,
@@ -30,29 +36,27 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   onUpdateProfile,
 }) => {
   const [userName, setUserName] = useState(currentUser?.userName || "");
-  const [userColor, setUserColor] = useState(currentUser?.userColor || "#a855f7");
+  const [userColor, setUserColor] = useState(currentUser?.userColor || "#8b5cf6");
   const [isLoading, setIsLoading] = useState(false);
+  const modalRef = useModalAutoScroll(isOpen);
 
-  const colors: ColorOption[] = [
-    { name: "Purple", value: "#a855f7" },
-    { name: "Emerald", value: "#10b981" },
-    { name: "Cyan", value: "#06b6d4" },
-    { name: "Rose", value: "#f43f5e" },
-    { name: "Amber", value: "#f59e0b" },
-    { name: "Indigo", value: "#6366f1" },
-    { name: "Pink", value: "#ec4899" },
-    { name: "Teal", value: "#14b8a6" },
-  ];
+  useEffect(() => {
+    if (isOpen) {
+      setUserName(currentUser?.userName || "");
+      setUserColor(currentUser?.userColor || "#8b5cf6");
+    }
+  }, [isOpen, currentUser?.userName, currentUser?.userColor]);
 
   const handleSave = async () => {
     if (!userName.trim()) {
-      globalToast.showError("Please enter a name", "Name Required", 8000);
+      globalToast.showError("Please enter a name", "Missing Name");
       return;
     }
 
     setIsLoading(true);
+
     try {
-      const updatedProfile: User = {
+      const updatedProfile = {
         ...currentUser,
         userName: userName.trim(),
         userColor,
@@ -74,8 +78,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[200] overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold flex items-center">
             {React.createElement(getIcon("User"), {
@@ -83,15 +90,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             })}
             Profile Settings
           </h3>
-          <Button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            disabled={isLoading}
-          >
-            {React.createElement(getIcon("X"), {
-              className: "h-5 w-5 text-gray-500",
-            })}
-          </Button>
+          <ModalCloseButton
+            onClick={() => {
+              if (!isLoading) {
+                onClose();
+              }
+            }}
+            className={isLoading ? "opacity-50 pointer-events-none" : ""}
+          />
         </div>
 
         <div className="space-y-6">
@@ -118,7 +124,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               Profile Color
             </label>
             <div className="grid grid-cols-4 gap-3">
-              {colors.map((color) => (
+              {PROFILE_COLORS.map((color) => (
                 <Button
                   key={color.value}
                   type="button"

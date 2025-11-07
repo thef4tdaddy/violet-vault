@@ -7,6 +7,7 @@ import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
 import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent } from "./EditEnvelopeModalComponents";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface EnvelopeRef {
   id: string;
@@ -35,6 +36,7 @@ const EditEnvelopeModal = ({
 }: EditEnvelopeModalProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const isMobile = useMobileDetection();
+  const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
 
   const {
     // Form state
@@ -132,8 +134,11 @@ const EditEnvelopeModal = ({
   // Desktop centered modal - use Portal to render at document root
   const modalContent = (
     <>
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
-        <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-2 border-black">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100] overflow-y-auto">
+        <div
+          ref={modalRef}
+          className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-2 border-black my-auto"
+        >
           <EnvelopeModalHeader
             title="Edit Envelope"
             subtitle="Modify envelope settings"

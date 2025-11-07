@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**
  * Receipt Scanner Header Component
@@ -24,12 +24,7 @@ const ReceiptScannerHeader = ({ onClose }) => {
           </p>
         </div>
       </div>
-      <Button
-        onClick={onClose}
-        className="glassmorphism p-2 rounded-lg border-2 border-black hover:bg-purple-200/40 transition-colors"
-      >
-        <span className="text-black font-bold">×</span>
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

@@ -125,7 +125,7 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
  * - Trend analysis and forecasting
  * - Performance monitoring
  * - Export functionality
- * 
+ *
  * Complexity: 24 (exceeds max 15)
  * Justification: Dashboard components inherently have higher complexity due to:
  * - 5 different tab views with conditional rendering

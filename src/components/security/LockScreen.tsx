@@ -84,7 +84,7 @@ const LockScreen = () => {
     setIsUnlocking(false);
     setPasswordToValidate("");
     setPassword("");
-    
+
     const confirmPromise = new Promise((resolve) => {
       const originalConfirm = confirm({
         title: "🔧 Corrupted Validation Data Detected",
@@ -115,7 +115,7 @@ const LockScreen = () => {
       // Clear corrupted local data - cloud data is safe
       // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed to fix corrupted validation data
       localStorage.removeItem("envelopeBudgetData");
-      
+
       // Reload to sync fresh from cloud
       window.location.reload();
     }
@@ -151,7 +151,14 @@ const LockScreen = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingConfirm intentionally excluded to prevent infinite loop from state updates
-  }, [validationResult, isValidating, passwordToValidate, unlockSession, handleIncorrectPassword, handleCorruptedData]);
+  }, [
+    validationResult,
+    isValidating,
+    passwordToValidate,
+    unlockSession,
+    handleIncorrectPassword,
+    handleCorruptedData,
+  ]);
 
   // Count recent failed attempts from security events
   useEffect(() => {

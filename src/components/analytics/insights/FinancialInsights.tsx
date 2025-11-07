@@ -30,11 +30,19 @@ const getTrendIcon = (direction: string) => {
     decreasing: "📉",
     stable: "➡️",
   };
-  return <span role="img" aria-label={`${direction} trend`}>{icons[direction as keyof typeof icons] || icons.stable}</span>;
+  return (
+    <span role="img" aria-label={`${direction} trend`}>
+      {icons[direction as keyof typeof icons] || icons.stable}
+    </span>
+  );
 };
 
 const getTrendColor = (direction: string) => {
-  const colors = { increasing: "text-red-600", decreasing: "text-green-600", stable: "text-gray-600" };
+  const colors = {
+    increasing: "text-red-600",
+    decreasing: "text-green-600",
+    stable: "text-gray-600",
+  };
   return colors[direction as keyof typeof colors] || colors.stable;
 };
 
@@ -131,9 +139,7 @@ const TopSpendingCategories: React.FC<{ topCategories: TopCategory[] }> = ({ top
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
               <span className="font-bold text-black">{category.name}</span>
-              <span className="text-sm text-gray-600">
-                {category.percentOfTotal.toFixed(1)}%
-              </span>
+              <span className="text-sm text-gray-600">{category.percentOfTotal.toFixed(1)}%</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden border border-black">
@@ -142,9 +148,7 @@ const TopSpendingCategories: React.FC<{ topCategories: TopCategory[] }> = ({ top
                   style={{ width: `${category.percentOfTotal}%` }}
                 />
               </div>
-              <span className="text-sm font-bold text-black">
-                ${category.expenses.toFixed(0)}
-              </span>
+              <span className="text-sm font-bold text-black">${category.expenses.toFixed(0)}</span>
             </div>
             <div className="text-xs text-gray-500 mt-1">
               {category.count} transactions · Avg ${category.avgTransactionSize.toFixed(0)}
@@ -165,7 +169,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({
   topCategories,
   healthScore,
 }) => {
-
   return (
     <div className="space-y-6">
       <BudgetHealthScore healthScore={healthScore} />

@@ -6,6 +6,8 @@ import { StepOne } from "./steps/StepOne";
 import { StepTwo } from "./steps/StepTwo";
 import { StepThree } from "./steps/StepThree";
 import { StepFour } from "./steps/StepFour";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**
  * Floating bug report button with screenshot capability
@@ -39,27 +41,7 @@ const BugReportButton: React.FC = () => {
     removeScreenshot,
   } = useBugReportState();
 
-  const modalRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (!isModalOpen || !modalRef.current) return;
-
-    const scrollToCenter = () => {
-      const modal = modalRef.current;
-      if (!modal) return;
-
-      const rect = modal.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const modalHeight = rect.height;
-      const scrollTop = window.scrollY + rect.top;
-      const targetScroll = scrollTop - viewportHeight / 2 + modalHeight / 2;
-
-      window.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
-    };
-
-    const timer = window.setTimeout(scrollToCenter, 75);
-    return () => window.clearTimeout(timer);
-  }, [isModalOpen]);
+  const modalRef = useModalAutoScroll(isModalOpen);
 
   return (
     <>
@@ -81,7 +63,7 @@ const BugReportButton: React.FC = () => {
         >
           <div
             ref={modalRef}
-            className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-xl my-auto"
+            className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-xl my-auto border-2 border-black"
             data-bug-report="true"
           >
             <div className="flex items-center justify-between mb-4">
@@ -91,9 +73,7 @@ const BugReportButton: React.FC = () => {
                 })}
                 <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
               </div>
-              <Button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
-                {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-              </Button>
+              <ModalCloseButton onClick={closeModal} />
             </div>
 
             <div className="space-y-4">

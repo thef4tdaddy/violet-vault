@@ -50,19 +50,19 @@ const testPasswordDecryption = async (
   } catch (error) {
     // Check if this is an OperationError (corrupted data) vs wrong password
     const isOperationError = error instanceof Error && error.name === "OperationError";
-    
+
     if (isOperationError) {
       logger.error("TanStack: Corrupted encrypted data detected - OperationError", {
         errorMessage: error.message,
         errorName: error.name,
       });
-      return { 
-        isValid: false, 
+      return {
+        isValid: false,
         reason: "corrupted_data",
-        isCorrupted: true 
+        isCorrupted: true,
       };
     }
-    
+
     logger.auth("TanStack: Password validation failed - decryption failed");
     return { isValid: false, reason: "decryption_failed" };
   }

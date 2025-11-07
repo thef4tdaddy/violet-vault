@@ -2,6 +2,7 @@ import React, { createElement } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { BudgetCommit } from "@/domain/schemas";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 export const getAuthorColor = (author?: string) => {
   switch (author) {
@@ -109,9 +110,7 @@ export const ViewerHeader = ({ objectType, objectName, onClose }: HeaderProps) =
           Complete change history for this {objectType.toLowerCase()}
         </p>
       </div>
-      <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
-        {createElement(getIcon("X"), { className: "h-5 w-5" })}
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

@@ -10,6 +10,8 @@ import { renderIcon } from "@/utils/icons";
 import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
 import { useExportData } from "@/hooks/common/useExportData";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * @typedef {Object} HealthMetrics
@@ -45,9 +47,10 @@ interface SyncHealthDashboardProps {
 
 const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const { healthData, refreshHealthData } = useSyncHealthMonitor(isOpen && autoRefresh, 5000);
+  const { healthData, refreshHealthData } = useSyncHealthMonitor(autoRefresh);
   const { exportData } = useExportData();
-  const { showSuccessToast, showErrorToast } = useToastHelpers();
+  const { showErrorToast, showSuccessToast } = useToastHelpers();
+  const modalRef = useModalAutoScroll(isOpen);
 
   useEffect(() => {
     if (isOpen) {
@@ -129,8 +132,11 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
       100 || 100;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl my-auto"
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
@@ -152,7 +158,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
 
           <div className="flex items-center space-x-2">
             <Button
-              onClick={() => setAutoRefresh(!autoRefresh)}
+              onClick={() => setAutoRefresh((prev) => !prev)}
               className={`px-3 py-2 text-xs rounded-lg border-2 border-black ${
                 autoRefresh ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
               }`}
@@ -160,12 +166,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
               {autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
             </Button>
 
-            <Button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg border-2 border-black"
-            >
-              {renderIcon("X", { className: "h-4 w-4" })}
-            </Button>
+            <ModalCloseButton onClick={onClose} />
           </div>
         </div>
 

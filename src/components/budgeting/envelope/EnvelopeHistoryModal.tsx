@@ -1,13 +1,17 @@
 import React, { Suspense } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 // Lazy load the history viewer for better performance
 const ObjectHistoryViewer = React.lazy(() => import("../../history/ObjectHistoryViewer"));
 
 const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
-  if (!isOpen || !envelope) return null;
+  const shouldRender = Boolean(isOpen && envelope);
+  const modalRef = useModalAutoScroll(shouldRender);
+
+  if (!shouldRender) return null;
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -17,10 +21,13 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-black">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-black my-auto"
+      >
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center">
             {React.createElement(getIcon("History"), {
@@ -28,9 +35,7 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
             })}
             Envelope History: {envelope.name}
           </h2>
-          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-          </Button>
+          <ModalCloseButton onClick={onClose} />
         </div>
 
         <div className="p-6">

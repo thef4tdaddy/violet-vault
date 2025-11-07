@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import type { Transaction } from "@/types/finance";
 
 interface TransactionModalHeaderProps {
@@ -35,11 +35,7 @@ const TransactionModalHeader: React.FC<TransactionModalHeaderProps> = ({
           </p>
         </div>
       </div>
-      <Button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-        {React.createElement(getIcon("X"), {
-          className: "h-5 w-5 text-gray-500",
-        })}
-      </Button>
+      <ModalCloseButton onClick={onClose} />
     </div>
   );
 };

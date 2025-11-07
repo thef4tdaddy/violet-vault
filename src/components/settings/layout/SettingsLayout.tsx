@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface Section {
   id: string;
@@ -26,42 +28,20 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   children,
 }) => {
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
-  const modalRef = React.useRef<HTMLDivElement>(null);
-
-  // Ensure modal is visible in viewport when opened
-  React.useEffect(() => {
-    if (isOpen && modalRef.current) {
-      // Scroll to center of viewport
-      const scrollToCenter = () => {
-        const modal = modalRef.current;
-        if (!modal) return;
-        
-        const rect = modal.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const modalHeight = rect.height;
-        const scrollTop = window.scrollY + rect.top;
-        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
-        
-        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
-      };
-      
-      // Small delay to ensure DOM is rendered
-      setTimeout(scrollToCenter, 100);
-    }
-  }, [isOpen]);
+  const modalRef = useModalAutoScroll(isOpen);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4">
-      <div ref={modalRef} className="rounded-none sm:rounded-lg border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl max-h-screen sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="rounded-none sm:rounded-2xl border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl max-h-screen sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden my-auto"
+      >
         {/* Close Button - Top Right Corner */}
-        <Button
-          onClick={onClose}
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 text-white hover:text-white bg-red-600 hover:bg-red-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
-        >
-          {React.createElement(getIcon("X"), { className: "h-4 w-4 sm:h-5 sm:w-5" })}
-        </Button>
+        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10">
+          <ModalCloseButton onClick={onClose} />
+        </div>
 
         {/* Mobile Section Selector - Shows at top on mobile */}
         <div className="sm:hidden bg-white border-b-2 border-black p-3">
@@ -70,10 +50,15 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
             className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-purple-500 text-white border-2 border-black"
           >
             <div className="flex items-center">
-              {React.createElement(getIcon(sections.find((s) => s.id === activeSection)?.icon || "Settings"), {
-                className: "h-5 w-5 mr-2",
-              })}
-              <span className="font-semibold">{sections.find((s) => s.id === activeSection)?.label}</span>
+              {React.createElement(
+                getIcon(sections.find((s) => s.id === activeSection)?.icon || "Settings"),
+                {
+                  className: "h-5 w-5 mr-2",
+                }
+              )}
+              <span className="font-semibold">
+                {sections.find((s) => s.id === activeSection)?.label}
+              </span>
             </div>
             {React.createElement(getIcon(showMobileMenu ? "ChevronUp" : "ChevronDown"), {
               className: "h-5 w-5",

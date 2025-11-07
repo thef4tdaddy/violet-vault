@@ -16,6 +16,7 @@ import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const AddBillModal = ({
   isOpen,
@@ -28,6 +29,7 @@ const AddBillModal = ({
   _forceMobileMode = false, // Internal prop for testing
 }) => {
   const isMobile = useMobileDetection();
+  const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
   // Use the extracted form logic hook
   const {
     // Form State
@@ -149,8 +151,11 @@ const AddBillModal = ({
 
   // Desktop centered modal
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl my-auto border-2 border-black"
+      >
         <BillModalHeader editingBill={editingBill} formData={formData} onClose={onClose} />
         <ModalContent />
       </div>

@@ -72,7 +72,6 @@ function EnvelopeGridView({
 }) {
   return (
     <div className={`space-y-6 ${className} relative`}>
-
       {/* Action Buttons Row */}
       <EnvelopeGridHeader
         filterOptions={

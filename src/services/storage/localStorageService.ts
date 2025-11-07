@@ -135,9 +135,9 @@ class LocalStorageService {
   /**
    * Get user profile
    */
-  getUserProfile(): { 
-    userName: string; 
-    userColor: string; 
+  getUserProfile(): {
+    userName: string;
+    userColor: string;
     shareCode?: string;
     joinedVia?: string;
     sharedBy?: string;
@@ -148,8 +148,8 @@ class LocalStorageService {
   /**
    * Set user profile
    */
-  setUserProfile(profile: { 
-    userName: string; 
+  setUserProfile(profile: {
+    userName: string;
     userColor: string;
     shareCode?: string;
     joinedVia?: string;

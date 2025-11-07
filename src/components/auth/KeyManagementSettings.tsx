@@ -5,6 +5,7 @@ import ModalHeader from "./key-management/ModalHeader";
 import MainContent from "./key-management/MainContent";
 import Footer from "./key-management/Footer";
 import logger from "@/utils/common/logger";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface KeyManagementSettingsProps {
   isOpen: boolean;
@@ -55,6 +56,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const modalRef = useModalAutoScroll(isOpen);
 
   // Load current key fingerprint on open
   React.useEffect(() => {
@@ -141,8 +143,11 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-black my-auto"
+      >
         <ModalHeader onClose={onClose} />
 
         <MainContent

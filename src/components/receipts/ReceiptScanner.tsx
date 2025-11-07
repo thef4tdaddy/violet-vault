@@ -6,6 +6,7 @@ import ReceiptErrorState from "./components/ReceiptErrorState";
 import ReceiptImagePreview from "./components/ReceiptImagePreview";
 import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * Receipt Scanner Component (Refactored)
@@ -39,9 +40,14 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
     toggleImagePreview,
   } = useReceiptScanner(onReceiptProcessed);
 
+  const modalRef = useModalAutoScroll(true);
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-black bg-purple-100/40 backdrop-blur-3xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl bg-purple-100/60 my-auto"
+      >
         <div className="p-6">
           <ReceiptScannerHeader onClose={onClose} />
 

@@ -8,6 +8,7 @@ import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {
@@ -81,6 +82,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     [editLock.lockedBy, editLock.timeRemaining, editLock.isExpired]
   );
 
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -118,8 +121,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl my-auto border-2 border-black"
+      >
         <TransactionModalHeader editingTransaction={editingTransaction} onClose={handleClose} />
 
         {/* Standardized Edit Lock Indicator */}

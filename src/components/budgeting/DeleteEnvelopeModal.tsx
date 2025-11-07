@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Button, Radio } from "@/components/ui";
 import { getIcon } from "../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const DeleteEnvelopeModal = ({
   isOpen,
@@ -11,6 +13,7 @@ const DeleteEnvelopeModal = ({
   isDeleting = false,
 }) => {
   const [deleteBillsToo, setDeleteBillsToo] = useState(false);
+  const modalRef = useModalAutoScroll(isOpen);
 
   if (!isOpen || !envelope) return null;
 
@@ -24,19 +27,25 @@ const DeleteEnvelopeModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-      <div className="bg-white rounded-xl w-full max-w-md">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[60] overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
         <div className="p-6">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-              {React.createElement(getIcon("Trash2"), {
-                className: "h-6 w-6 text-red-600",
-              })}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                {React.createElement(getIcon("Trash2"), {
+                  className: "h-6 w-6 text-red-600",
+                })}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Envelope</h3>
+                <p className="text-sm text-gray-600">This action cannot be undone</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete Envelope</h3>
-              <p className="text-sm text-gray-600">This action cannot be undone</p>
-            </div>
+            <ModalCloseButton onClick={handleClose} />
           </div>
 
           <div className="mb-6">

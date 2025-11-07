@@ -3,6 +3,8 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { BillDiscoveryStep } from "./BillDiscoveryModal/BillDiscoveryStep";
 import { useBillDiscoveryState } from "./BillDiscoveryModal/useBillDiscoveryState";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 export interface DiscoveredBill {
   id: string;
@@ -57,6 +59,7 @@ const BillDiscoveryModal: React.FC<BillDiscoveryModalProps> = ({
     selectAll,
     clearAll,
   } = useBillDiscoveryState(discoveredBills, isOpen);
+  const modalRef = useModalAutoScroll(isOpen);
 
   const handleAddSelected = async () => {
     if (selectedBills.size === 0) {
@@ -89,8 +92,11 @@ const BillDiscoveryModal: React.FC<BillDiscoveryModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border-2 border-black my-auto"
+      >
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -106,9 +112,7 @@ const BillDiscoveryModal: React.FC<BillDiscoveryModalProps> = ({
                 history
               </p>
             </div>
-            <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </Button>
+            <ModalCloseButton onClick={onClose} />
           </div>
 
           {/* Content */}

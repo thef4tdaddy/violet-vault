@@ -1,9 +1,11 @@
 # Analytics Optimization - Implementation Summary
 
 ## Overview
+
 This document summarizes the analytics optimization work completed to fix data population issues and add enhanced insights features.
 
 ## Problem Statement
+
 - Analytics data was not populating correctly
 - Charts needed optimization for better performance
 - Request for additional insights and information
@@ -11,18 +13,22 @@ This document summarizes the analytics optimization work completed to fix data p
 ## Root Cause Analysis
 
 ### Before
+
 ```
 Analytics Queries → Zustand Store (UI State) → Empty/Stale Data ❌
 ```
+
 - Analytics queries were reading from `useBudgetStore()` (Zustand)
 - Zustand is for UI state only (modals, forms, preferences)
 - Transaction/envelope data was not being populated in Zustand
 - Result: Empty charts and missing analytics
 
 ### After
+
 ```
 Dexie (IndexedDB) → TanStack Query → Analytics Queries → Charts ✅
 ```
+
 - Analytics queries now use `useTransactionQuery()` and `useEnvelopesQuery()`
 - TanStack Query manages server state with proper caching
 - Dexie is the single source of truth for local data
@@ -33,6 +39,7 @@ Dexie (IndexedDB) → TanStack Query → Analytics Queries → Charts ✅
 ### 1. Fixed Data Sources
 
 #### useSpendingAnalyticsQuery.ts
+
 ```typescript
 // BEFORE ❌
 const { transactions, envelopes } = useBudgetStore((state) => ({
@@ -46,6 +53,7 @@ const { envelopes } = useEnvelopesQuery();
 ```
 
 #### useBalanceAnalyticsQuery.ts
+
 ```typescript
 // BEFORE ❌
 const { envelopes, savingsGoals } = useBudgetStore((state) => ({
@@ -64,12 +72,14 @@ const { unassignedCash, actualBalance } = useBudgetMetadata();
 #### Calculation Utils Improvements
 
 **Before: Multiple O(n) loops**
+
 ```typescript
 const totalIncome = transactions.filter(t => t.amount > 0).reduce(...);
 const totalExpenses = transactions.filter(t => t.amount < 0).reduce(...);
 ```
 
 **After: Single O(n) pass**
+
 ```typescript
 for (const t of transactions) {
   if (t.amount > 0) {
@@ -83,21 +93,24 @@ for (const t of transactions) {
 ```
 
 **Before: O(n) envelope lookup**
+
 ```typescript
-const envelope = envelopes.find(env => env.id === transaction.envelopeId);
+const envelope = envelopes.find((env) => env.id === transaction.envelopeId);
 ```
 
 **After: O(1) Map lookup**
+
 ```typescript
-const envelopeMap = new Map(envelopes.map(env => [env.id, env]));
+const envelopeMap = new Map(envelopes.map((env) => [env.id, env]));
 const envelope = envelopeMap.get(transaction.envelopeId);
 ```
 
 **Before: Daily time series (180 points for 6 months)**
+
 ```typescript
 while (currentDate <= endDate) {
-  const dayTransactions = transactions.filter(t => 
-    new Date(t.date).toDateString() === currentDate.toDateString()
+  const dayTransactions = transactions.filter(
+    (t) => new Date(t.date).toDateString() === currentDate.toDateString()
   );
   // ... process day
   currentDate.setDate(currentDate.getDate() + 1);
@@ -105,8 +118,9 @@ while (currentDate <= endDate) {
 ```
 
 **After: Monthly time series (6 points for 6 months)**
+
 ```typescript
-transactions.forEach(t => {
+transactions.forEach((t) => {
   const monthKey = getMonthKey(new Date(t.date));
   if (!monthlyData.has(monthKey)) {
     monthlyData.set(monthKey, { income: 0, expenses: 0, count: 0 });
@@ -120,6 +134,7 @@ transactions.forEach(t => {
 ### 3. Enhanced Metrics
 
 #### Financial Summary
+
 ```typescript
 {
   totalIncome: 12500.00,
@@ -136,6 +151,7 @@ transactions.forEach(t => {
 ```
 
 #### Category Breakdown
+
 ```typescript
 {
   "Food & Dining": {
@@ -150,6 +166,7 @@ transactions.forEach(t => {
 ```
 
 #### Envelope Breakdown
+
 ```typescript
 {
   "Groceries": {
@@ -167,6 +184,7 @@ transactions.forEach(t => {
 ```
 
 #### Time Series Data
+
 ```typescript
 {
   month: "2025-05",
@@ -184,7 +202,9 @@ transactions.forEach(t => {
 ### 4. New Analytics Features
 
 #### Spending Velocity
+
 Tracks spending trends over time with projections:
+
 ```typescript
 {
   averageMonthlyExpenses: 1633.33,
@@ -197,17 +217,21 @@ Tracks spending trends over time with projections:
 ```
 
 **Use Cases:**
+
 - "Your spending is increasing by 9.2%"
 - "If trends continue, next month will be ~$1708"
 - Early warning system for overspending
 
 #### Budget Health Score
+
 Single 0-100 metric for overall financial health:
+
 ```typescript
-healthScore: 72  // "Good"
+healthScore: 72; // "Good"
 ```
 
 **Calculation:**
+
 - Start at 100
 - -30 points if spending > income (negative net)
 - -20 points if savings rate < 10%
@@ -216,34 +240,38 @@ healthScore: 72  // "Good"
 - +2 points per envelope under 70% utilized (max +10)
 
 **Visual Indicator:**
+
 - 80-100: 🟢 Excellent (green)
-- 60-79:  🟡 Good (yellow)
-- 40-59:  🟠 Fair (orange)
-- 0-39:   🔴 Needs Attention (red)
+- 60-79: 🟡 Good (yellow)
+- 40-59: 🟠 Fair (orange)
+- 0-39: 🔴 Needs Attention (red)
 
 #### Top Spending Categories
+
 Identifies where money is going:
+
 ```typescript
 [
   {
     name: "Food & Dining",
-    expenses: 3420.00,
+    expenses: 3420.0,
     count: 56,
     percentOfTotal: 34.9,
-    avgTransactionSize: 61.07
+    avgTransactionSize: 61.07,
   },
   {
     name: "Transportation",
-    expenses: 2280.00,
+    expenses: 2280.0,
     count: 42,
     percentOfTotal: 23.3,
-    avgTransactionSize: 54.29
+    avgTransactionSize: 54.29,
   },
   // ... top 5 categories
-]
+];
 ```
 
 **Use Cases:**
+
 - Quickly identify biggest expense categories
 - See if spending patterns are reasonable
 - Compare average transaction sizes
@@ -251,7 +279,9 @@ Identifies where money is going:
 ### 5. New UI Components
 
 #### FinancialInsights Component
+
 Located in analytics sidebar, displays:
+
 1. **Budget Health Score** - Progress bar with color-coded status
 2. **Spending Velocity** - 2x2 grid with trends and projections
 3. **Top Categories** - Ranked list with progress bars
@@ -265,6 +295,7 @@ Located in analytics sidebar, displays:
 ```
 
 #### Layout Changes
+
 ```
 Before: Full-width charts
 [============ Charts ============]
@@ -276,23 +307,26 @@ After: 2/3 charts, 1/3 insights
 ## Performance Metrics
 
 ### Time Series Optimization
-| Period     | Before (Days) | After (Months) | Reduction |
-|------------|---------------|----------------|-----------|
-| 1 month    | 30 points     | 1 point        | 97%       |
-| 3 months   | 90 points     | 3 points       | 97%       |
-| 6 months   | 180 points    | 6 points       | 97%       |
-| 1 year     | 365 points    | 12 points      | 97%       |
+
+| Period   | Before (Days) | After (Months) | Reduction |
+| -------- | ------------- | -------------- | --------- |
+| 1 month  | 30 points     | 1 point        | 97%       |
+| 3 months | 90 points     | 3 points       | 97%       |
+| 6 months | 180 points    | 6 points       | 97%       |
+| 1 year   | 365 points    | 12 points      | 97%       |
 
 ### Query Optimization
-| Metric                  | Before | After  | Improvement |
-|-------------------------|--------|--------|-------------|
-| Transaction Lookup      | O(n)   | O(n)   | Single pass |
-| Envelope Lookup         | O(n)   | O(1)   | Map-based   |
-| Category Calculations   | 3 loops| 1 loop | 66% faster  |
-| Cache Duration          | 0s     | 120s   | ∞           |
-| Garbage Collection Time | 0s     | 600s   | ∞           |
+
+| Metric                  | Before  | After  | Improvement |
+| ----------------------- | ------- | ------ | ----------- |
+| Transaction Lookup      | O(n)    | O(n)   | Single pass |
+| Envelope Lookup         | O(n)    | O(1)   | Map-based   |
+| Category Calculations   | 3 loops | 1 loop | 66% faster  |
+| Cache Duration          | 0s      | 120s   | ∞           |
+| Garbage Collection Time | 0s      | 600s   | ∞           |
 
 ### Memory Optimization
+
 - Don't store transaction arrays for datasets > 1000 (saves ~100KB per category)
 - Dynamic transaction limits based on period (2000-5000 instead of 10000)
 - Proper cleanup with TanStack Query garbage collection
@@ -300,6 +334,7 @@ After: 2/3 charts, 1/3 insights
 ## Code Quality Improvements
 
 ### Named Constants
+
 ```typescript
 // All magic numbers extracted
 const SPENDING_TREND_THRESHOLD = 5;
@@ -310,6 +345,7 @@ const ENVELOPE_OVER_UTIL_THRESHOLD = 90;
 ```
 
 ### Utility Functions
+
 ```typescript
 // Eliminate duplication
 const getMonthKey = (date: Date): string => {
@@ -318,6 +354,7 @@ const getMonthKey = (date: Date): string => {
 ```
 
 ### Accessibility
+
 ```tsx
 // Before ❌
 {getTrendIcon(velocity.trendDirection)} {velocity.trendDirection}
@@ -329,6 +366,7 @@ const getMonthKey = (date: Date): string => {
 ## Test Data
 
 Enhanced test data generated:
+
 - **231 transactions** over 6 months
 - **14 envelopes** with proper connections
 - **10 bills** including debt payments
@@ -340,6 +378,7 @@ File: `public/test-data/violet-vault-test-budget-enhanced.json`
 ## Security
 
 **CodeQL Scan**: ✅ 0 alerts
+
 - No vulnerabilities detected
 - No sensitive data exposure
 - Follows OWASP best practices
@@ -357,32 +396,34 @@ File: `public/test-data/violet-vault-test-budget-enhanced.json`
 ## Usage Examples
 
 ### Getting Analytics Data
+
 ```typescript
 // In any component
 const analyticsQuery = useAnalytics({
   period: "thisMonth",
   includeTransfers: false,
-  groupBy: "category"
+  groupBy: "category",
 });
 
 // Access enhanced data
-const { 
-  analytics,           // Main analytics object
-  isLoading,          // Loading state
-  error               // Error state
+const {
+  analytics, // Main analytics object
+  isLoading, // Loading state
+  error, // Error state
 } = analyticsQuery;
 
 // Enhanced metrics available
-analytics.summary            // Financial summary with new metrics
-analytics.velocity           // Spending velocity
-analytics.topCategories      // Top 5 categories
-analytics.healthScore        // Budget health score (0-100)
-analytics.timeSeriesData     // Optimized monthly data
-analytics.categoryBreakdown  // Enhanced category data
-analytics.envelopeBreakdown  // Enhanced envelope data
+analytics.summary; // Financial summary with new metrics
+analytics.velocity; // Spending velocity
+analytics.topCategories; // Top 5 categories
+analytics.healthScore; // Budget health score (0-100)
+analytics.timeSeriesData; // Optimized monthly data
+analytics.categoryBreakdown; // Enhanced category data
+analytics.envelopeBreakdown; // Enhanced envelope data
 ```
 
 ### Displaying Insights
+
 ```typescript
 import { FinancialInsights } from "@/components/analytics/insights";
 
@@ -396,6 +437,7 @@ import { FinancialInsights } from "@/components/analytics/insights";
 ## Future Enhancements
 
 Potential additions (not included in this PR):
+
 1. **Forecast Charts**: Project future spending based on trends
 2. **Anomaly Detection**: Alert when spending is unusual
 3. **Savings Goals Integration**: Track progress toward goals
@@ -406,6 +448,7 @@ Potential additions (not included in this PR):
 ## Migration Guide
 
 No breaking changes! The updates are backward compatible:
+
 - All existing analytics queries work as before
 - New fields are additive (don't break existing code)
 - Components using analytics will get new data automatically

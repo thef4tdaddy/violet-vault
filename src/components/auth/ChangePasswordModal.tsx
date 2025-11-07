@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -8,6 +9,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const modalRef = useModalAutoScroll(isOpen);
 
   if (!isOpen) return null;
 
@@ -36,20 +38,17 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="glassmorphism rounded-2xl p-6 w-full max-w-sm border border-white/30 shadow-2xl"
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-sm border-2 border-black shadow-2xl my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-start mb-4">
           <h3 className="text-lg font-semibold">Change Password</h3>
-          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            {React.createElement(getIcon("X"), {
-              className: "h-5 w-5",
-            })}
-          </Button>
+          <ModalCloseButton onClick={onClose} />
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

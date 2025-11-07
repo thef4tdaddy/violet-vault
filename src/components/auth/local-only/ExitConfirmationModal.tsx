@@ -1,5 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ExitConfirmationModalProps {
   showConfirmExit: boolean;
@@ -14,12 +16,27 @@ const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
   onCancel,
   onConfirm,
 }) => {
+  const modalRef = useModalAutoScroll(showConfirmExit);
+
   if (!showConfirmExit) return null;
 
   return (
-    <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4 rounded-2xl">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">Switch to Standard Mode?</h4>
+    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 rounded-2xl overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
+        <div className="flex items-start justify-between mb-4">
+          <h4 className="text-lg font-semibold text-gray-900">Switch to Standard Mode?</h4>
+          <ModalCloseButton
+            onClick={() => {
+              if (!loading) {
+                onCancel();
+              }
+            }}
+            className={loading ? "opacity-50 pointer-events-none" : ""}
+          />
+        </div>
         <p className="text-sm text-gray-600 mb-6">
           This will enable password protection and cloud sync features. Your local data will be
           preserved and you can set up encryption.

@@ -5,6 +5,8 @@ import useUiStore from "@/stores/ui/uiStore";
 import patchNotesManager from "@/utils/pwa/patchNotesManager";
 import { APP_VERSION } from "@/utils/common/version";
 import logger from "@/utils/common/logger";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface PatchNote {
   type: "feature" | "fix" | "breaking" | "other";
@@ -54,6 +56,7 @@ const UpdateAvailableModal: React.FC = () => {
   const updateApp = useUiStore((state) => state.updateApp);
 
   const { patchNotes, loadingNotes } = usePatchNotes(updateAvailable);
+  const modalRef = useModalAutoScroll(updateAvailable);
 
   if (!updateAvailable) return null;
 
@@ -67,9 +70,15 @@ const UpdateAvailableModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="glassmorphism rounded-lg max-w-md w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm">
+      <div
+        ref={modalRef}
+        className="glassmorphism rounded-lg max-w-md w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm relative"
+      >
         {/* Header */}
         <div className="text-center mb-6">
+          <div className="absolute top-4 right-4">
+            <ModalCloseButton onClick={handleDismiss} />
+          </div>
           <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-black shadow-xl">
             {React.createElement(getIcon("Download"), {
               className: "w-8 h-8 text-white",

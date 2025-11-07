@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ResetConfirmModalProps {
   isOpen: boolean;
@@ -9,19 +11,27 @@ interface ResetConfirmModalProps {
 }
 
 const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({ isOpen, onClose, onConfirm }) => {
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-60">
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border-2 border-black ring-1 ring-gray-800/10">
-        <div className="flex items-center gap-3 mb-4">
-          {React.createElement(getIcon("AlertTriangle"), {
-            className: "h-6 w-6 text-red-500",
-          })}
-          <h4 className="font-black text-black text-base">
-            <span className="text-lg">C</span>ONFIRM <span className="text-lg">D</span>ATA{" "}
-            <span className="text-lg">R</span>ESET
-          </h4>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[60] overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            {React.createElement(getIcon("AlertTriangle"), {
+              className: "h-6 w-6 text-red-500",
+            })}
+            <h4 className="font-black text-black text-base">
+              <span className="text-lg">C</span>ONFIRM <span className="text-lg">D</span>ATA{" "}
+              <span className="text-lg">R</span>ESET
+            </h4>
+          </div>
+          <ModalCloseButton onClick={onClose} />
         </div>
         <p className="text-purple-900 mb-6">
           This will permanently delete all your budget data. This action cannot be undone.

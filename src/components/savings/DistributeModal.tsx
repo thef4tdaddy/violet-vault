@@ -6,6 +6,8 @@ import {
   SAVINGS_PRIORITIES,
   calculateGoalDistribution,
 } from "../../utils/savings/savingsFormUtils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface SavingsGoal {
   id: string;
@@ -58,6 +60,7 @@ const DistributeModal = ({
 }: DistributeModalProps) => {
   const [distribution, setDistribution] = useState<Record<string, string>>({});
   const [totalToDistribute, setTotalToDistribute] = useState("");
+  const modalRef = useModalAutoScroll(isOpen);
 
   const initializeDistribution = useCallback(() => {
     setDistribution(createEmptyDistribution(savingsGoals));
@@ -112,8 +115,11 @@ const DistributeModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl my-auto"
+      >
         <ModalHeader onClose={handleClose} />
         <AvailableCash amount={unassignedCash} />
         <DistributionControls
@@ -142,9 +148,7 @@ const DistributeModal = ({
 const ModalHeader = ({ onClose }: { onClose: () => void }) => (
   <div className="flex justify-between items-center mb-6">
     <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
-    <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-      {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-    </Button>
+    <ModalCloseButton onClick={onClose} />
   </div>
 );
 

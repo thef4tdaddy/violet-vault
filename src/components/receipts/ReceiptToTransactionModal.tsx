@@ -6,6 +6,8 @@ import logger from "../../utils/common/logger";
 import ReceiptDataStep from "./steps/ReceiptDataStep";
 import EnvelopeSelectionStep from "./steps/EnvelopeSelectionStep";
 import ConfirmationStep from "./steps/ConfirmationStep";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 // ModalHeader - displays title and close button
 const ModalHeader = ({ step, onClose }) => (
@@ -24,12 +26,7 @@ const ModalHeader = ({ step, onClose }) => (
         </p>
       </div>
     </div>
-    <Button
-      onClick={onClose}
-      className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
-    >
-      {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-    </Button>
+    <ModalCloseButton onClick={onClose} />
   </div>
 );
 
@@ -109,6 +106,8 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
     handleSubmit,
   } = useReceiptToTransaction(receiptData);
 
+  const modalRef = useModalAutoScroll(Boolean(receiptData));
+
   const handleFormSubmit = async () => {
     const result = await handleSubmit();
     if (result.success) {
@@ -162,8 +161,11 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
   if (!receiptData) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black my-auto"
+      >
         <div className="p-8">
           <ModalHeader step={step} onClose={onClose} />
           <ProgressBar currentStep={step} />

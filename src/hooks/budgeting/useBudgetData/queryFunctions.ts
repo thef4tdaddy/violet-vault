@@ -53,14 +53,14 @@ export const queryFunctions = {
     try {
       // Fetch all paychecks and sort by date/processedAt
       const cachedPaychecks = await budgetDb.paycheckHistory.toArray();
-      
+
       // Sort by processedAt (preferred) or date (legacy), most recent first
       const sorted = cachedPaychecks.sort((a, b) => {
         const dateA = new Date(a.processedAt || a.date || 0).getTime();
         const dateB = new Date(b.processedAt || b.date || 0).getTime();
         return dateB - dateA; // Descending order (newest first)
       });
-      
+
       return sorted || [];
     } catch (error) {
       logger.warn("Failed to fetch paycheck history from Dexie", error);

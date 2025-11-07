@@ -6,6 +6,7 @@ import AccountBasicFields from "./form/AccountBasicFields";
 import AccountFinancialFields from "./form/AccountFinancialFields";
 import AccountColorAndSettings from "./form/AccountColorAndSettings";
 import AccountFormActions from "./form/AccountFormActions";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface AccountForm {
   name: string;
@@ -132,6 +133,7 @@ const AccountFormModal = ({
   _forceMobileMode = false, // Internal prop for testing
 }: AccountFormModalProps) => {
   const isMobile = useMobileDetection();
+  const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
 
   if (!isOpen) return null;
 
@@ -168,8 +170,11 @@ const AccountFormModal = ({
 
   // Desktop centered modal
   return (
-    <div className="fixed inset-0 bg-purple-900/20 backdrop-blur-3xl flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl my-auto"
+      >
         <AccountModalHeader
           editingAccount={editingAccount}
           onClose={onClose}

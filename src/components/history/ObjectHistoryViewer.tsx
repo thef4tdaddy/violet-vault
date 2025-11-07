@@ -8,6 +8,7 @@ import {
   EmptyHistoryState,
   LoadingState,
 } from "./ObjectHistoryViewerHelpers";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ObjectHistoryViewerProps {
   objectId: string;
@@ -25,6 +26,7 @@ const ObjectHistoryViewer = ({
   const { commits: allCommits = [], isLoading } = useBudgetCommits();
 
   const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
+  const modalRef = useModalAutoScroll(true);
 
   // Compute history filtered for this specific object
   const relevantHistory = useMemo((): BudgetCommit[] => {
@@ -58,8 +60,11 @@ const ObjectHistoryViewer = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-black my-auto"
+      >
         <div className="p-6">
           {/* Header */}
           <ViewerHeader objectType={objectType} objectName={objectName} onClose={onClose} />

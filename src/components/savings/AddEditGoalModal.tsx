@@ -1,8 +1,10 @@
 // components/savings/AddEditGoalModal.jsx
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 import {
   SAVINGS_CATEGORIES,
   SAVINGS_PRIORITIES,
@@ -47,7 +49,7 @@ const createGoalData = (formData) => ({
 });
 
 const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useModalAutoScroll(isOpen);
   const [formData, setFormData] = useState(getInitialFormData());
 
   // Reset form when modal opens/closes or when editing goal changes
@@ -56,26 +58,6 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
       setFormData(editingGoal ? mapGoalToFormData(editingGoal) : getInitialFormData());
     }
   }, [isOpen, editingGoal]);
-
-  // Auto-scroll modal to viewport center when opened
-  useEffect(() => {
-    if (isOpen && modalRef.current) {
-      const scrollToCenter = () => {
-        const modal = modalRef.current;
-        if (!modal) return;
-        
-        const rect = modal.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const modalHeight = rect.height;
-        const scrollTop = window.scrollY + rect.top;
-        const targetScroll = scrollTop - (viewportHeight / 2) + (modalHeight / 2);
-        
-        window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
-      };
-      
-      setTimeout(scrollToCenter, 100);
-    }
-  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -95,8 +77,11 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div ref={modalRef} className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl my-auto"
+      >
         <ModalHeader
           title={editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
           onClose={handleClose}
@@ -113,9 +98,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
 const ModalHeader = ({ title, onClose }) => (
   <div className="flex justify-between items-center mb-6">
     <h3 className="text-xl font-semibold">{title}</h3>
-    <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-      {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
-    </Button>
+    <ModalCloseButton onClick={onClose} />
   </div>
 );
 

@@ -78,7 +78,7 @@ export const TransactionBasicFields = ({
             })}
             <span className="text-sm font-semibold">Expense</span>
           </button>
-          
+
           {/* Income Button - Green theme with strong visual hierarchy */}
           {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Plain button needed to avoid Button component's conflicting base styles (border-2, rounded-lg, etc.) */}
           <button
@@ -105,8 +105,8 @@ export const TransactionBasicFields = ({
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          {transactionForm.type === "expense" 
-            ? "Negative amount (money going out)" 
+          {transactionForm.type === "expense"
+            ? "Negative amount (money going out)"
             : "Positive amount (money coming in)"}
         </p>
       </div>
@@ -248,7 +248,7 @@ export const TransactionEnvelopeSelector = ({
         }`}
       >
         <option value="">Leave unassigned</option>
-        
+
         {envelopes.length > 0 && (
           <optgroup label="📊 Budget Envelopes">
             {envelopes.map((envelope) => (
@@ -261,7 +261,7 @@ export const TransactionEnvelopeSelector = ({
             ))}
           </optgroup>
         )}
-        
+
         {supplementalAccounts.length > 0 && (
           <optgroup label="💼 Supplemental Accounts">
             {supplementalAccounts.map((account) => (

@@ -12,6 +12,7 @@ import LoadingOverlay from "./local-only/LoadingOverlay";
 import ExitConfirmationModal from "./local-only/ExitConfirmationModal";
 import ClearDataConfirmationModal from "./local-only/ClearDataConfirmationModal";
 import logger from "@/utils/common/logger";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface LocalOnlyModeSettingsProps {
   isOpen: boolean;
@@ -48,6 +49,7 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
   const [showConfirmExit, setShowConfirmExit] = useState(false);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useModalAutoScroll(isOpen);
 
   // Load statistics when modal opens
   useEffect(() => {
@@ -141,8 +143,11 @@ const LocalOnlyModeSettings: React.FC<LocalOnlyModeSettingsProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl my-auto"
+      >
         <div className="p-6">
           <LocalOnlyHeader onClose={onClose} loading={loading} />
 

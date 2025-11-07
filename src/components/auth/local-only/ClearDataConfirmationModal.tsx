@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ClearDataConfirmationModalProps {
   showConfirmClear: boolean;
@@ -15,16 +17,31 @@ const ClearDataConfirmationModal: React.FC<ClearDataConfirmationModalProps> = ({
   onCancel,
   onConfirm,
 }) => {
+  const modalRef = useModalAutoScroll(showConfirmClear);
+
   if (!showConfirmClear) return null;
 
   return (
-    <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4 rounded-2xl">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
-        <div className="flex items-center mb-4">
-          {React.createElement(getIcon("AlertTriangle"), {
-            className: "h-6 w-6 text-red-600 mr-2",
-          })}
-          <h4 className="text-lg font-semibold text-gray-900">Clear All Data?</h4>
+    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 rounded-2xl overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center">
+            {React.createElement(getIcon("AlertTriangle"), {
+              className: "h-6 w-6 text-red-600 mr-2",
+            })}
+            <h4 className="text-lg font-semibold text-gray-900">Clear All Data?</h4>
+          </div>
+          <ModalCloseButton
+            onClick={() => {
+              if (!loading) {
+                onCancel();
+              }
+            }}
+            className={loading ? "opacity-50 pointer-events-none" : ""}
+          />
         </div>
         <p className="text-sm text-gray-600 mb-6">
           This will permanently delete all your envelopes, transactions, bills, and settings.

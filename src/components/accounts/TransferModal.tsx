@@ -1,9 +1,8 @@
-import React from "react";
-import { getIcon } from "@/utils";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "../mobile/SlideUpModal";
 import TransferModalContent from "./TransferModalContent";
-import { Button } from "@/components/ui";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface TransferForm {
   envelopeId: string;
@@ -45,6 +44,7 @@ const TransferModal = ({
   _forceMobileMode = false, // Internal prop for testing
 }: TransferModalProps) => {
   const isMobile = useMobileDetection();
+  const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
 
   if (!isOpen || !transferringAccount) return null;
 
@@ -75,13 +75,14 @@ const TransferModal = ({
 
   // Desktop centered modal
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold">Transfer from {transferringAccount.name}</h3>
-          <Button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-          </Button>
+          <ModalCloseButton onClick={onClose} />
         </div>
 
         <TransferModalContent

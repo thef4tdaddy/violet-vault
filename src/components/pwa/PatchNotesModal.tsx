@@ -1,10 +1,85 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 import useUiStore from "@/stores/ui/uiStore";
 import { markVersionAsSeen } from "@/utils/common/version";
 
 type ChangeType = "feature" | "fix" | "breaking" | "other";
+
+type PatchNotesData = {
+  version: string;
+  summary?: string;
+  features?: string[];
+  fixes?: string[];
+  breaking?: string[];
+  other?: string[];
+  isUpdate?: boolean;
+  fromVersion?: string;
+  toVersion?: string;
+  isFallback?: boolean;
+};
+
+const buildHighlightsList = (data: PatchNotesData): Array<{ type: ChangeType; text: string }> => {
+  if (!data) return [];
+
+  const highlights: Array<{ type: ChangeType; text: string }> = [];
+
+  if (data.features?.length) {
+    highlights.push(
+      ...data.features.slice(0, 4).map((text) => ({ type: "feature" as const, text }))
+    );
+  }
+
+  if (highlights.length < 4 && data.breaking?.length) {
+    const remaining = 4 - highlights.length;
+    highlights.push(
+      ...data.breaking.slice(0, remaining).map((text) => ({ type: "breaking" as const, text }))
+    );
+  }
+
+  if (highlights.length < 4 && data.fixes?.length) {
+    const remaining = 4 - highlights.length;
+    highlights.push(
+      ...data.fixes.slice(0, remaining).map((text) => ({ type: "fix" as const, text }))
+    );
+  }
+
+  if (highlights.length < 4 && data.other?.length) {
+    const remaining = 4 - highlights.length;
+    highlights.push(
+      ...data.other.slice(0, remaining).map((text) => ({ type: "other" as const, text }))
+    );
+  }
+
+  return highlights.slice(0, 4);
+};
+
+const getChangeIcon = (type: ChangeType): React.ReactNode => {
+  const iconMap: Record<ChangeType, { icon: string; color: string }> = {
+    feature: { icon: "PlusCircle", color: "text-green-600" },
+    fix: { icon: "CheckCircle", color: "text-blue-600" },
+    breaking: { icon: "AlertTriangle", color: "text-orange-600" },
+    other: { icon: "Sparkles", color: "text-purple-600" },
+  };
+
+  const { icon, color } = iconMap[type];
+  return React.createElement(getIcon(icon), {
+    className: `w-4 h-4 ${color} flex-shrink-0 mt-0.5`,
+  });
+};
+
+const getChangeColor = (type: ChangeType): string => {
+  const colorMap: Record<ChangeType, string> = {
+    feature: "text-green-700",
+    fix: "text-blue-700",
+    breaking: "text-orange-700",
+    other: "text-purple-700",
+  };
+
+  return colorMap[type];
+};
 
 /**
  * Patch Notes Modal
@@ -12,11 +87,29 @@ type ChangeType = "feature" | "fix" | "breaking" | "other";
  */
 const PatchNotesModal: React.FC = () => {
   const showPatchNotes = useUiStore((state) => state.showPatchNotes);
-  const patchNotesData = useUiStore((state) => state.patchNotesData);
+  const patchNotesData = useUiStore((state) => state.patchNotesData) as PatchNotesData | null;
   const loadingPatchNotes = useUiStore((state) => state.loadingPatchNotes);
   const hidePatchNotesModal = useUiStore((state) => state.hidePatchNotesModal);
+  const shouldRender = showPatchNotes && Boolean(patchNotesData);
+  const modalRef = useModalAutoScroll(shouldRender);
 
-  if (!showPatchNotes || !patchNotesData) return null;
+  const highlights: Array<{ type: ChangeType; text: string }> = useMemo(() => {
+    if (!patchNotesData) {
+      return [];
+    }
+    return buildHighlightsList(patchNotesData);
+  }, [patchNotesData]);
+
+  const totalChanges = useMemo(() => {
+    if (!patchNotesData) return 0;
+    return (
+      (patchNotesData.features?.length || 0) +
+      (patchNotesData.fixes?.length || 0) +
+      (patchNotesData.other?.length || 0)
+    );
+  }, [patchNotesData]);
+
+  if (!shouldRender) return null;
 
   const handleClose = (): void => {
     // Mark the current version as seen so this doesn't show again
@@ -31,75 +124,17 @@ const PatchNotesModal: React.FC = () => {
     window.open(releaseUrl, "_blank");
   };
 
-  const getChangeIcon = (type: ChangeType): React.ReactElement => {
-    switch (type) {
-      case "feature":
-        return React.createElement(getIcon("PlusCircle"), {
-          className: "w-4 h-4 text-green-600 flex-shrink-0",
-        });
-      case "fix":
-        return React.createElement(getIcon("CheckCircle"), {
-          className: "w-4 h-4 text-blue-600 flex-shrink-0",
-        });
-      case "breaking":
-        return React.createElement(getIcon("AlertTriangle"), {
-          className: "w-4 h-4 text-orange-600 flex-shrink-0",
-        });
-      default:
-        return React.createElement(getIcon("ArrowRight"), {
-          className: "w-4 h-4 text-purple-600 flex-shrink-0",
-        });
-    }
-  };
-
-  const getChangeColor = (type: ChangeType): string => {
-    switch (type) {
-      case "feature":
-        return "text-green-700";
-      case "fix":
-        return "text-blue-700";
-      case "breaking":
-        return "text-orange-700";
-      default:
-        return "text-gray-700";
-    }
-  };
-
-  // Get top highlights for display
-  const highlights: Array<{ type: ChangeType; text: string }> = [];
-
-  // Add features first
-  if (patchNotesData.features?.length > 0) {
-    highlights.push(
-      ...patchNotesData.features.slice(0, 3).map((text) => ({ type: "feature" as const, text }))
-    );
-  }
-
-  // Add fixes if we have room
-  if (highlights.length < 4 && patchNotesData.fixes?.length > 0) {
-    const remaining = 4 - highlights.length;
-    highlights.push(
-      ...patchNotesData.fixes.slice(0, remaining).map((text) => ({ type: "fix" as const, text }))
-    );
-  }
-
-  // Add other changes if we still have room
-  if (highlights.length < 4 && patchNotesData.other?.length > 0) {
-    const remaining = 4 - highlights.length;
-    highlights.push(
-      ...patchNotesData.other.slice(0, remaining).map((text) => ({ type: "other" as const, text }))
-    );
-  }
-
-  const totalChanges =
-    (patchNotesData.features?.length || 0) +
-    (patchNotesData.fixes?.length || 0) +
-    (patchNotesData.other?.length || 0);
-
   if (loadingPatchNotes) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="glassmorphism rounded-lg max-w-md w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div
+          ref={modalRef}
+          className="glassmorphism rounded-lg max-w-md w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm my-auto"
+        >
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Loading Patch Notes</h3>
+            <ModalCloseButton onClick={handleClose} />
+          </div>
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading patch notes...</p>
@@ -110,10 +145,16 @@ const PatchNotesModal: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="glassmorphism rounded-lg max-w-lg w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="glassmorphism rounded-lg max-w-lg w-full p-6 border-2 border-black bg-white/90 backdrop-blur-sm max-h-[90vh] overflow-y-auto my-auto"
+      >
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 relative">
+          <div className="absolute top-0 right-0">
+            <ModalCloseButton onClick={handleClose} />
+          </div>
           <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-black shadow-xl">
             {React.createElement(getIcon("Sparkles"), {
               className: "w-8 h-8 text-white",

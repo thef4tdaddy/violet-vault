@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
@@ -209,12 +210,7 @@ export const DesktopModalHeader = ({ onClose }: DesktopModalHeaderProps) => {
             <p className="text-green-100 text-sm">Set up a new budget envelope</p>
           </div>
         </div>
-        <Button
-          onClick={onClose}
-          className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
-        >
-          {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-        </Button>
+        <ModalCloseButton onClick={onClose} />
       </div>
     </div>
   );

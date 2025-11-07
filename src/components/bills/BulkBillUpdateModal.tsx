@@ -1,6 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Button } from "@/components/ui";
-import { getIcon } from "../../utils";
+import { useState, useMemo, useEffect } from "react";
 import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
@@ -10,6 +8,8 @@ import BulkUpdateConfirmModal from "./modals/BulkUpdateConfirmModal";
 import BulkUpdateEditor from "./BulkUpdateEditor";
 import BulkUpdateModeSelector from "./BulkUpdateModeSelector";
 import BulkUpdateSummary from "./BulkUpdateSummary";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBills, onError }) => {
   const [updateMode, setUpdateMode] = useState("amounts");
@@ -35,6 +35,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
     () => calculateUpdateSummary(selectedBills, changes),
     [selectedBills, changes]
   );
+
+  const modalRef = useModalAutoScroll(isOpen);
 
   const handleSubmit = () => {
     if (!summary.hasChanges) {
@@ -68,8 +70,11 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
       />
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glassmorphism rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black my-auto"
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -78,12 +83,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     Update amounts and due dates for {selectedBills.length} selected bills
                   </p>
                 </div>
-                <Button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
-                >
-                  {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-                </Button>
+                <ModalCloseButton onClick={onClose} />
               </div>
 
               {/* Update Mode Selector */}

@@ -31,10 +31,10 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
         relative transition-all duration-200 ease-out
         ${isActive ? "text-purple-600" : "text-gray-600 hover:text-gray-800"}
       `}
-      style={{ 
+      style={{
         scrollSnapAlign: "start",
         minWidth: "20%", // Show 5 items at a time (100% / 5 = 20%)
-        flex: "0 0 20%"
+        flex: "0 0 20%",
       }}
       aria-label={label}
     >

@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface ClearConfirmationModalProps {
   isOpen: boolean;
@@ -17,15 +19,20 @@ const ClearConfirmationModal: React.FC<ClearConfirmationModalProps> = ({
   onClose,
   onConfirm,
 }) => {
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-60">
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-md shadow-2xl border-2 border-black bg-red-50/80 backdrop-blur-3xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[60] overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border-2 border-black bg-red-50/90 my-auto"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="glassmorphism rounded-full p-2 bg-red-500/20 border border-red-400">
+            <div className="rounded-full p-2 bg-red-500/20 border border-red-400">
               {React.createElement(getIcon("AlertTriangle"), {
                 className: "h-6 w-6 text-red-600",
               })}
@@ -34,16 +41,11 @@ const ClearConfirmationModal: React.FC<ClearConfirmationModalProps> = ({
               CLEAR SECURITY EVENTS
             </h4>
           </div>
-          <Button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
-          >
-            {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-          </Button>
+          <ModalCloseButton onClick={onClose} />
         </div>
 
         {/* Warning Message */}
-        <div className="glassmorphism rounded-lg p-4 border border-red-300 bg-white/60 mb-6">
+        <div className="rounded-lg p-4 border border-red-300 bg-white/70 mb-6">
           <p className="text-purple-800 font-medium text-sm">
             ⚠️ Are you sure you want to clear all security event logs?
           </p>
@@ -56,7 +58,7 @@ const ClearConfirmationModal: React.FC<ClearConfirmationModalProps> = ({
         <div className="flex gap-3">
           <Button
             onClick={onClose}
-            className="flex-1 px-4 py-3 text-gray-800 bg-gray-200/80 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold uppercase tracking-wide"
+            className="flex-1 px-4 py-3 text-gray-800 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold uppercase tracking-wide"
           >
             ❌ CANCEL
           </Button>

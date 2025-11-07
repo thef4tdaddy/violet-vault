@@ -2,6 +2,8 @@ import React from "react";
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const ReconcileTransactionModal = ({
   isOpen,
@@ -11,14 +13,22 @@ const ReconcileTransactionModal = ({
   onReconcile,
   getEnvelopeOptions = () => [],
 }) => {
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
-        <h3 className="font-black text-black text-base mb-4">
-          <span className="text-lg">R</span>ECONCILE <span className="text-lg">T</span>RANSACTION
-        </h3>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-6 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
+        <div className="flex items-start justify-between mb-4">
+          <h3 className="font-black text-black text-base">
+            <span className="text-lg">R</span>ECONCILE <span className="text-lg">T</span>RANSACTION
+          </h3>
+          <ModalCloseButton onClick={onClose} />
+        </div>
 
         <div className="space-y-4">
           <div>

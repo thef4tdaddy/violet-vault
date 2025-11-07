@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
  * @typedef {Object} SyncConflict
@@ -22,11 +24,20 @@ import { getIcon } from "../../utils";
  * @returns {React.ReactElement|null} Modal element or null if no conflict
  */
 const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }) => {
-  if (!syncConflicts?.hasConflict) return null;
+  const shouldRender = Boolean(syncConflicts?.hasConflict);
+  const modalRef = useModalAutoScroll(shouldRender);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl p-8 w-full max-w-md border-2 border-black shadow-2xl my-auto"
+      >
+        <div className="flex justify-end mb-2">
+          <ModalCloseButton onClick={onDismiss} />
+        </div>
         <div className="text-center">
           <div className="relative mx-auto mb-6 w-16 h-16">
             <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-lg opacity-30"></div>

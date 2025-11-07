@@ -1,11 +1,11 @@
-import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
 import {
   formatAmountChange,
   formatDateChange,
   hasChanges,
 } from "../../../utils/bills/billUpdateHelpers";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const BulkUpdateConfirmModal = ({
   isOpen,
@@ -15,20 +15,20 @@ const BulkUpdateConfirmModal = ({
   changes,
   summary,
 }) => {
+  const modalRef = useModalAutoScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60">
-      <div className="glassmorphism rounded-2xl w-full max-w-2xl shadow-2xl border-2 border-black">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60 overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl border-2 border-black my-auto"
+      >
         <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-start justify-between mb-4">
             <h3 className="text-lg font-black text-black">CONFIRM BULK CHANGES</h3>
-            <Button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
-            >
-              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
-            </Button>
+            <ModalCloseButton onClick={onClose} />
           </div>
 
           <div className="space-y-4">

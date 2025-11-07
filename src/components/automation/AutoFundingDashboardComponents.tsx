@@ -1,6 +1,5 @@
-import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "@/utils";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**
  * Dashboard header component
@@ -20,14 +19,7 @@ export const DashboardHeader = ({ rules, onClose }) => {
             </span>
           </div>
         </div>
-        <Button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg"
-        >
-          {React.createElement(getIcon("X"), {
-            className: "h-5 w-5",
-          })}
-        </Button>
+        <ModalCloseButton onClick={onClose} />
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     name: string;
     type?: string;
   }>;
-  
+
   const {
     // Data
     transactions,
