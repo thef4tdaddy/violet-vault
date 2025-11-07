@@ -39,6 +39,28 @@ const BugReportButton: React.FC = () => {
     removeScreenshot,
   } = useBugReportState();
 
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!isModalOpen || !modalRef.current) return;
+
+    const scrollToCenter = () => {
+      const modal = modalRef.current;
+      if (!modal) return;
+
+      const rect = modal.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const modalHeight = rect.height;
+      const scrollTop = window.scrollY + rect.top;
+      const targetScroll = scrollTop - viewportHeight / 2 + modalHeight / 2;
+
+      window.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
+    };
+
+    const timer = window.setTimeout(scrollToCenter, 75);
+    return () => window.clearTimeout(timer);
+  }, [isModalOpen]);
+
   return (
     <>
       {/* Floating Bug Report Button */}
@@ -54,11 +76,12 @@ const BugReportButton: React.FC = () => {
       {/* Bug Report Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
           data-bug-report="true"
         >
           <div
-            className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-xl"
+            ref={modalRef}
+            className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-xl my-auto"
             data-bug-report="true"
           >
             <div className="flex items-center justify-between mb-4">

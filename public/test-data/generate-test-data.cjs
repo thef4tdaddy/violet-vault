@@ -571,9 +571,55 @@ const updatedBaseEnvelopes = updateBaseEnvelopes();
 const updatedBaseSavingsGoals = updateBaseSavingsGoals();
 const updatedBasePaycheckHistory = updateBasePaycheckHistory();
 
+const updateSupplementalAccounts = () => {
+  const templates = [
+    [
+      { daysAgo: 5, amount: -85.5, merchant: "Walgreens Pharmacy" },
+      { daysAgo: 12, amount: -45.25, merchant: "CVS Minute Clinic" },
+      { daysAgo: 18, amount: -120.0, merchant: "Urgent Care Copay" },
+      { daysAgo: 26, amount: 200.0, merchant: "Employer Contribution" },
+      { daysAgo: 34, amount: -68.75, merchant: "Specialist Visit" }
+    ],
+    [
+      { daysAgo: 3, amount: -60.0, merchant: "Transit Pass" },
+      { daysAgo: 8, amount: -32.5, merchant: "City Parking Garage" },
+      { daysAgo: 16, amount: -45.0, merchant: "Commute Shuttle" },
+      { daysAgo: 24, amount: 150.0, merchant: "Employer Contribution" },
+      { daysAgo: 29, amount: -25.0, merchant: "Metro Card Reload" }
+    ],
+    [
+      { daysAgo: 7, amount: -95.0, merchant: "Dental Cleaning" },
+      { daysAgo: 14, amount: -40.0, merchant: "Optometrist Visit" },
+      { daysAgo: 21, amount: -130.0, merchant: "Therapy Session" },
+      { daysAgo: 28, amount: 250.0, merchant: "Employer Contribution" },
+      { daysAgo: 36, amount: -55.0, merchant: "Lab Tests" }
+    ]
+  ];
+
+  return baseData.supplementalAccounts.map((account, index) => {
+    const sample = templates[index % templates.length];
+    const transactions = sample.map((entry, idx) => ({
+      id: `${account.id}-txn-${idx + 1}`,
+      date: getDateString(entry.daysAgo),
+      amount: parseFloat(entry.amount.toFixed(2)),
+      merchant: entry.merchant,
+      description: entry.merchant,
+      type: entry.amount >= 0 ? "contribution" : "spending",
+      lastModified: getTimestamp(entry.daysAgo),
+      createdAt: getTimestamp(entry.daysAgo)
+    }));
+
+    return {
+      ...account,
+      transactions
+    };
+  });
+};
+
 const allEnvelopes = [...updatedBaseEnvelopes, ...debtEnvelopes];
 const allBills = [...updatedBaseBills, ...debtBills];
 const allTransactions = [...updatedBaseTransactions, ...newTransactions];
+const updatedSupplementalAccounts = updateSupplementalAccounts();
 
 // Build allTransactions array (includes bill payments)
 const buildAllTransactions = () => {
@@ -603,7 +649,7 @@ const enhancedData = {
   transactions: allTransactions,
   allTransactions: buildAllTransactions(),
   savingsGoals: updatedBaseSavingsGoals,
-  supplementalAccounts: baseData.supplementalAccounts,
+  supplementalAccounts: updatedSupplementalAccounts,
   debts: enhancedDebts,
   paycheckHistory: updatedBasePaycheckHistory,
   auditLog: baseData.auditLog,
@@ -634,7 +680,7 @@ const enhancedData = {
       allTransactions: buildAllTransactions().length,
       debts: enhancedDebts.length,
       savingsGoals: baseData.savingsGoals.length,
-      supplementalAccounts: baseData.supplementalAccounts.length,
+      supplementalAccounts: updatedSupplementalAccounts.length,
       paycheckHistory: baseData.paycheckHistory.length
     }
   }

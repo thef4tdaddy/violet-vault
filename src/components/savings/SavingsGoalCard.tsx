@@ -70,10 +70,10 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
           </Button>
           <Button
             onClick={() => onDelete(goal)}
-            className="p-2 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all"
+            className="p-2 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 hover:border-rose-300 rounded-lg transition-all"
             title="Delete goal"
           >
-            {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("XCircle"), { className: "h-4 w-4" })}
           </Button>
         </div>
       </div>
