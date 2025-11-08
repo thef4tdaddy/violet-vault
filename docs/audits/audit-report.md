@@ -8,7 +8,7 @@
 | TypeScript Errors | 0 | 0 |
 | TypeScript Strict Mode Errors | 3923 | 0 |
 
-*Last updated: 2025-11-08 20:19:04 UTC*
+*Last updated: 2025-11-08 20:27:57 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-08 20:18:47 UTC
+Last check: 2025-11-08 20:27:40 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-08 20:18:55 UTC
+Last check: 2025-11-08 20:27:49 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -2068,10 +2068,10 @@ src/components/transactions/components/DeleteConfirmation.tsx(8,65): error TS703
 src/components/transactions/components/TransactionRow.tsx(16,3): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
 src/components/transactions/components/TransactionRow.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
 src/components/transactions/components/TransactionRow.tsx(18,3): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(19,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(20,3): error TS7031: Binding element 'onSplit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(21,3): error TS7031: Binding element 'onDeleteClick' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(22,3): error TS7031: Binding element 'onHistoryClick' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(20,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(21,3): error TS7031: Binding element 'onSplit' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(22,3): error TS7031: Binding element 'onDeleteClick' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(23,3): error TS7031: Binding element 'onHistoryClick' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,24): error TS7031: Binding element 'importData' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,36): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,50): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
@@ -2151,12 +2151,12 @@ src/components/transactions/TransactionLedger.tsx(154,59): error TS2345: Argumen
   Type 'Transaction' provides no match for the signature '(prevState: null): null'.
 src/components/transactions/TransactionSplitter.tsx(34,5): error TS2322: Type 'Transaction | null' is not assignable to type 'Transaction | undefined'.
   Type 'null' is not assignable to type 'Transaction | undefined'.
-src/components/transactions/TransactionTable.tsx(59,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
+src/components/transactions/TransactionTable.tsx(48,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
-src/components/transactions/TransactionTable.tsx(63,36): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(133,57): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(164,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(166,42): error TS2339: Property 'description' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(52,36): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(128,57): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(160,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(162,42): error TS2339: Property 'description' does not exist on type 'never'.
 src/components/ui/StandardFilters.tsx(362,11): error TS2322: Type '{ [key: string]: string | boolean | undefined; search?: string; }' is not assignable to type 'Record<string, string | boolean>'.
   'string' index signatures are incompatible.
     Type 'string | boolean | undefined' is not assignable to type 'string | boolean'.

@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import {
-  COLUMN_WIDTHS,
+  COLUMN_STYLES,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
@@ -16,6 +16,7 @@ const TransactionRow = ({
   transaction,
   envelopes,
   virtualRow,
+  columnStyles = COLUMN_STYLES,
   onEdit,
   onSplit,
   onDeleteClick,
@@ -44,25 +45,34 @@ const TransactionRow = ({
       }}
     >
       {/* Date */}
-      <td className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}>
+      <td style={columnStyles.date} className="px-4 py-4 text-sm text-gray-900 truncate">
         {formattedDate}
       </td>
 
       {/* Description */}
-      <td className={`${COLUMN_WIDTHS.description} px-4 py-4 text-sm`}>
-        <div className="font-medium text-gray-900 truncate">{transaction.description}</div>
+      <td style={columnStyles.description} className="px-4 py-4 text-sm">
+        <div className="flex flex-col gap-1 overflow-hidden">
+          <div
+            className="font-medium text-gray-900 overflow-x-auto whitespace-nowrap pr-2"
+            title={transaction.description}
+          >
+            {transaction.description}
+          </div>
+        </div>
         {transaction.notes && (
-          <div className="text-xs text-gray-500 truncate mt-1">{transaction.notes}</div>
+          <div className="text-xs text-gray-500 overflow-y-auto max-h-16 pr-2 mt-1 whitespace-pre-wrap break-words">
+            {transaction.notes}
+          </div>
         )}
       </td>
 
       {/* Category */}
-      <td className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}>
+      <td style={columnStyles.category} className="px-4 py-4 text-sm text-gray-500 truncate">
         {transaction.category || "Uncategorized"}
       </td>
 
       {/* Envelope */}
-      <td className={`${COLUMN_WIDTHS.envelope} px-4 py-4 text-sm`}>
+      <td style={columnStyles.envelope} className="px-4 py-4 text-sm">
         <div className="flex items-center min-w-0">
           <div
             className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
@@ -73,12 +83,12 @@ const TransactionRow = ({
       </td>
 
       {/* Amount */}
-      <td className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}>
+      <td style={columnStyles.amount} className="px-4 py-4 text-right text-sm font-medium">
         <span className={`${amountClassName} font-semibold`}>{formattedAmount}</span>
       </td>
 
       {/* Actions */}
-      <td className={`${COLUMN_WIDTHS.actions} px-4 py-4 text-right`}>
+      <td style={columnStyles.actions} className="px-4 py-4 text-right">
         <div className="flex items-center justify-end space-x-1">
           {onSplit && (
             <Button

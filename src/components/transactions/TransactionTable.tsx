@@ -1,9 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 import useTransactionTable from "../../hooks/transactions/useTransactionTable";
 import TransactionRow from "./components/TransactionRow";
 import DeleteConfirmation from "./components/DeleteConfirmation";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-import { COLUMN_WIDTHS } from "../../utils/transactions/tableHelpers";
+import { COLUMN_STYLES } from "../../utils/transactions/tableHelpers";
 import type { Transaction, Envelope } from "../../types/finance";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
@@ -23,17 +23,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   onDelete,
   onSplit,
 }) => {
-  const columnStyleWidths = useMemo(
-    () => ({
-      date: "8rem",
-      description: "16rem",
-      category: "9rem",
-      envelope: "12rem",
-      amount: "8rem",
-      actions: "9rem",
-    }),
-    []
-  );
   // Validate props in development
   validateComponentProps(
     "TransactionTable",
@@ -70,43 +59,49 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       <div ref={parentRef} className="overflow-auto" style={{ maxHeight: "70vh" }}>
         <table className="w-full table-fixed">
           <colgroup>
-            <col style={{ width: columnStyleWidths.date }} />
-            <col style={{ width: columnStyleWidths.description }} />
-            <col style={{ width: columnStyleWidths.category }} />
-            <col style={{ width: columnStyleWidths.envelope }} />
-            <col style={{ width: columnStyleWidths.amount }} />
-            <col style={{ width: columnStyleWidths.actions }} />
+            <col style={COLUMN_STYLES.date} />
+            <col style={COLUMN_STYLES.description} />
+            <col style={COLUMN_STYLES.category} />
+            <col style={COLUMN_STYLES.envelope} />
+            <col style={COLUMN_STYLES.amount} />
+            <col style={COLUMN_STYLES.actions} />
           </colgroup>
           {/* Table Header */}
           <thead className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm">
             <tr>
               <th
-                className={`${COLUMN_WIDTHS.date} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+                style={COLUMN_STYLES.date}
+                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Date
               </th>
               <th
-                className={`${COLUMN_WIDTHS.description} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+                style={COLUMN_STYLES.description}
+                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Description
               </th>
               <th
-                className={`${COLUMN_WIDTHS.category} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+                style={COLUMN_STYLES.category}
+                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Category
               </th>
               <th
-                className={`${COLUMN_WIDTHS.envelope} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+                style={COLUMN_STYLES.envelope}
+                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Envelope
               </th>
               <th
-                className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}
+                style={COLUMN_STYLES.amount}
+                className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Amount
               </th>
               <th
-                className={`${COLUMN_WIDTHS.actions} px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}
+                style={COLUMN_STYLES.actions}
+                className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Actions
               </th>
@@ -146,6 +141,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     transaction={transaction}
                     envelopes={envelopes}
                     virtualRow={virtualRow}
+                    columnStyles={COLUMN_STYLES}
                     onEdit={onEdit}
                     onSplit={onSplit}
                     onDeleteClick={handleDeleteClick}

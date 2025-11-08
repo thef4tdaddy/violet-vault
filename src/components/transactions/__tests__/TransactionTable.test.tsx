@@ -62,12 +62,20 @@ vi.mock("../history/ObjectHistoryViewer", () => ({
 
 vi.mock("../../utils/transactions/tableHelpers", () => ({
   COLUMN_WIDTHS: {
-    date: "w-32",
-    description: "w-64",
-    category: "w-40",
-    envelope: "w-40",
-    amount: "w-32",
-    actions: "w-48",
+    date: "8rem",
+    description: "16rem",
+    category: "9rem",
+    envelope: "12rem",
+    amount: "8rem",
+    actions: "9rem",
+  },
+  COLUMN_STYLES: {
+    date: { width: "8rem", minWidth: "8rem", maxWidth: "8rem" },
+    description: { width: "16rem", minWidth: "16rem", maxWidth: "16rem" },
+    category: { width: "9rem", minWidth: "9rem", maxWidth: "9rem" },
+    envelope: { width: "12rem", minWidth: "12rem", maxWidth: "12rem" },
+    amount: { width: "8rem", minWidth: "8rem", maxWidth: "8rem" },
+    actions: { width: "9rem", minWidth: "9rem", maxWidth: "9rem" },
   },
 }));
 

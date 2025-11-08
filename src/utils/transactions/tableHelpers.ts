@@ -5,13 +5,28 @@ import type { Transaction, Envelope } from "@/types/finance";
 
 // Fixed column widths for consistent table layout
 export const COLUMN_WIDTHS = {
-  date: "w-32",
-  description: "w-64", // fixed width for table alignment
-  category: "w-36",
-  envelope: "w-48",
-  amount: "w-32",
-  actions: "w-36",
-};
+  date: "8rem",
+  description: "16rem",
+  category: "9rem",
+  envelope: "12rem",
+  amount: "8rem",
+  actions: "9rem",
+} as const;
+
+const createColumnStyle = (width: string) => ({
+  width,
+  minWidth: width,
+  maxWidth: width,
+});
+
+export const COLUMN_STYLES = {
+  date: createColumnStyle(COLUMN_WIDTHS.date),
+  description: createColumnStyle(COLUMN_WIDTHS.description),
+  category: createColumnStyle(COLUMN_WIDTHS.category),
+  envelope: createColumnStyle(COLUMN_WIDTHS.envelope),
+  amount: createColumnStyle(COLUMN_WIDTHS.amount),
+  actions: createColumnStyle(COLUMN_WIDTHS.actions),
+} as const;
 
 // Table configuration
 export const TABLE_CONFIG = {
@@ -76,6 +91,7 @@ export const getEnvelopeDisplay = (
 
 export default {
   COLUMN_WIDTHS,
+  COLUMN_STYLES,
   TABLE_CONFIG,
   findEnvelopeForTransaction,
   formatTransactionAmount,
