@@ -236,7 +236,7 @@ export const DistributionPieChartWithDetails = ({
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] gap-8 items-start">
       {/* Pie Chart */}
       <DistributionPieChart
         title={title}
@@ -256,7 +256,7 @@ export const DistributionPieChartWithDetails = ({
       />
 
       {/* Details List */}
-      <div className="glassmorphism rounded-xl p-6 space-y-2">
+      <div className="glassmorphism rounded-xl p-6 space-y-3 min-w-0">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900">Category Details</h3>
           <div className="flex items-center gap-3 text-sm">
@@ -273,7 +273,7 @@ export const DistributionPieChartWithDetails = ({
             )}
           </div>
         </div>
-        <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-[26rem] overflow-y-auto pr-1">
           {chartData.map((item, index) => {
             const rawAmount = Number(item[dataKey] ?? 0);
             const percentage = total > 0 ? (rawAmount / total) * 100 : 0;
@@ -298,26 +298,26 @@ export const DistributionPieChartWithDetails = ({
                     onSelect?.(isActive ? null : itemName, item);
                   }
                 }}
-                className={`flex items-center justify-between p-3 bg-white/40 rounded-lg transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                className={`flex items-center justify-between p-3 bg-white/40 rounded-lg transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 gap-4 ${
                   isActive ? "shadow-lg border-2 border-black" : ""
                 }`}
               >
-                <div className="flex items-center">
+                <div className="flex items-center min-w-0">
                   <div
                     className="w-4 h-4 rounded-full mr-3"
                     style={{
                       backgroundColor: bulletColor,
                     }}
                   />
-                  <div>
-                    <div className="font-medium text-gray-900">{itemName}</div>
+                  <div className="min-w-0">
+                    <div className="font-medium text-gray-900 break-words">{itemName}</div>
                     <div className="text-sm text-gray-600">
                       {transactionCount} {transactionCount === 1 ? "transaction" : "transactions"}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-gray-900">
+                <div className="text-right flex-shrink-0">
+                  <div className="font-bold text-gray-900 whitespace-nowrap">
                     {formatters.currency(rawAmount)}
                   </div>
                   <div className="text-sm text-gray-600">{percentage.toFixed(1)}%</div>

@@ -86,6 +86,9 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
       envelopeUtilization: 0,
       savingsProgress: 0,
       balanceHealth: "unknown",
+      expenseTransactionCount: 0,
+      totalTransactionCount: 0,
+      healthScore: 0,
     };
   }
 
@@ -97,6 +100,7 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
       expenseTransactionCount?: number;
       transactionCount?: number;
     };
+    healthScore?: number;
   };
   const balance = balanceData as { envelopeBreakdown?: Record<string, unknown> };
 
@@ -126,6 +130,10 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
     totalTransactionCount: spending.summary?.transactionCount || 0,
     savingsProgress: 0,
     balanceHealth: "unknown",
+    healthScore:
+      typeof spending.healthScore === "number" && Number.isFinite(spending.healthScore)
+        ? Math.max(0, Math.min(100, spending.healthScore))
+        : 0,
   };
 };
 
@@ -248,7 +256,8 @@ const AnalyticsDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
+      <div className="rounded-3xl border-2 border-black bg-purple-100/70 backdrop-blur-md p-8 shadow-xl space-y-6">
       <AnalyticsDashboardHeader
         timeFilter={timeFilter}
         onTimeFilterChange={setTimeFilter}
@@ -259,9 +268,9 @@ const AnalyticsDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border-2 border-black shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border-2 border-black shadow-lg overflow-hidden">
             <AnalyticsTabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-            <div className="p-6">
+            <div className="px-6 pb-6 pt-5">
               <TabContentRenderer
                 activeTab={activeTab}
                 transactions={transactions}
@@ -303,6 +312,7 @@ const AnalyticsDashboard = () => {
           onClose={() => setShowExportModal(false)}
         />
       )}
+    </div>
     </div>
   );
 };

@@ -40,7 +40,7 @@ const TabNavigation = ({ activeTab, handleTabChange, className = "" }: TabNaviga
   ];
 
   return (
-    <div className={`px-6 pt-4 border-b-2 border-black bg-transparent ${className}`}>
+    <div className={`px-6 pt-5 pb-0 border-b-2 border-black bg-transparent ${className}`}>
       <StandardTabs
         tabs={tabs}
         activeTab={activeTab}

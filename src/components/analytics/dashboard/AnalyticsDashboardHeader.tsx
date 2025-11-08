@@ -38,7 +38,7 @@ const AnalyticsDashboardHeader: React.FC<AnalyticsDashboardHeaderProps> = ({
             ANALYTICS DASHBOARD
           </StylizedButtonText>
         </h1>
-        <p className="text-purple-900 mt-2 ml-16">Comprehensive financial insights and reporting</p>
+        <p className="text-purple-900 mt-1 ml-16">Comprehensive financial insights and reporting</p>
       </div>
 
       <div className="flex items-center gap-3 mt-4 lg:mt-0">

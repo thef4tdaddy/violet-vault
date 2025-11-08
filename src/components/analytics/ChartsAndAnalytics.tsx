@@ -18,6 +18,9 @@ interface ExternalEnvelopeBreakdown {
 interface ExternalAnalyticsData {
   transactions?: unknown[];
   envelopeBreakdown?: Record<string, ExternalEnvelopeBreakdown>;
+  weeklyPatterns?: Array<Record<string, unknown>>;
+  budgetVsActual?: Array<Record<string, unknown>>;
+  healthScore?: number;
 }
 
 const ChartsAnalytics = ({
@@ -96,11 +99,87 @@ const ChartsAnalytics = ({
     monthlyTrends,
     envelopeSpending,
     categoryBreakdown,
-    weeklyPatterns,
+    weeklyPatterns: computedWeeklyPatterns = [],
     envelopeHealth,
-    budgetVsActual,
-    metrics,
+    budgetVsActual: computedBudgetVsActual = [],
+    metrics: computedMetrics = {},
   } = analyticsData;
+
+  const externalWeeklyPatterns = useMemo(() => {
+    if (!externalAnalytics || !Array.isArray(externalAnalytics.weeklyPatterns)) {
+      return null;
+    }
+
+    const normalized = externalAnalytics.weeklyPatterns.map((entry) => {
+      const record = entry as Record<string, unknown>;
+      const amount = Number(record.amount ?? 0);
+      const day = String(record.day ?? record.name ?? "");
+      return {
+        ...record,
+        day,
+        amount,
+      };
+    });
+
+    const hasMeaningfulData = normalized.some(
+      (item) => typeof item.amount === "number" && item.amount !== 0
+    );
+
+    return hasMeaningfulData ? normalized : null;
+  }, [externalAnalytics]);
+
+  const externalBudgetVsActual = useMemo(() => {
+    if (!externalAnalytics || !Array.isArray(externalAnalytics.budgetVsActual)) {
+      return null;
+    }
+
+    const normalized = externalAnalytics.budgetVsActual.map((entry) => {
+      const record = entry as Record<string, unknown>;
+      const name = String(record.name ?? record.envelope ?? "Envelope");
+      const budgeted = Number(record.budgeted ?? record.planned ?? 0);
+      const actual = Number(record.actual ?? record.spent ?? 0);
+      return {
+        ...record,
+        name,
+        budgeted,
+        actual,
+      };
+    });
+
+    const hasMeaningfulData = normalized.some(
+      (item) =>
+        (typeof item.budgeted === "number" && item.budgeted !== 0) ||
+        (typeof item.actual === "number" && item.actual !== 0)
+    );
+
+    return hasMeaningfulData ? normalized : null;
+  }, [externalAnalytics]);
+
+  const weeklyPatterns = useMemo(() => {
+    if (externalWeeklyPatterns) {
+      return externalWeeklyPatterns;
+    }
+    return computedWeeklyPatterns;
+  }, [externalWeeklyPatterns, computedWeeklyPatterns]);
+
+  const budgetVsActual = useMemo(() => {
+    if (externalBudgetVsActual) {
+      return externalBudgetVsActual;
+    }
+    return computedBudgetVsActual;
+  }, [externalBudgetVsActual, computedBudgetVsActual]);
+
+  const metrics = useMemo(() => {
+    const baseMetrics = { ...(computedMetrics as Record<string, unknown>) };
+    if (
+      externalAnalytics &&
+      typeof externalAnalytics.healthScore === "number" &&
+      Number.isFinite(externalAnalytics.healthScore)
+    ) {
+      baseMetrics.healthScore = externalAnalytics.healthScore;
+    }
+    return baseMetrics as import("@/types/analytics").AnalyticsMetrics;
+  }, [computedMetrics, externalAnalytics]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 

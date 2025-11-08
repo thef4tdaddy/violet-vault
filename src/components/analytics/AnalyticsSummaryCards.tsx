@@ -7,35 +7,55 @@ interface SummaryMetrics {
   savingsProgress?: number;
   expenseTransactionCount?: number;
   totalTransactionCount?: number;
+  healthScore?: number;
 }
 
-/**
- * Analytics summary cards using standardized PageSummaryCard component
- * Displays key analytics metrics with consistent styling
- */
-const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: SummaryMetrics }) => {
-  const {
-    totalExpenses = 0,
-    envelopeUtilization = 0,
-    savingsProgress = 0,
-    expenseTransactionCount = 0,
-    totalTransactionCount = 0,
-  } = summaryMetrics;
+const deriveHealthSummary = (
+  healthScore: number
+): { color: "emerald" | "amber" | "red"; label: string } => {
+  if (healthScore >= 80) {
+    return { color: "emerald", label: "Excellent" };
+  }
+  if (healthScore >= 60) {
+    return { color: "amber", label: "Good" };
+  }
+  if (healthScore >= 40) {
+    return { color: "red", label: "Fair" };
+  }
+  return { color: "red", label: "Needs Attention" };
+};
 
-  // Calculate average transaction size if we have expense data
+const createSummaryCards = ({
+  totalExpenses,
+  expenseTransactionCount,
+  totalTransactionCount,
+  budgetAccuracy,
+  healthScore,
+}: {
+  totalExpenses: number;
+  expenseTransactionCount: number;
+  totalTransactionCount: number;
+  budgetAccuracy: number;
+  healthScore: number;
+}) => {
   const avgTransaction =
-    totalExpenses > 0 && expenseTransactionCount > 0
-      ? totalExpenses / expenseTransactionCount
-      : 0;
+    expenseTransactionCount > 0 ? totalExpenses / expenseTransactionCount : 0;
+  const { color: healthColor, label: healthLabel } = deriveHealthSummary(healthScore);
+  const budgetAccuracyColor = budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red";
 
-  // Calculate budget accuracy based on envelope utilization
-  const budgetAccuracy = Math.min(100, Math.max(0, 100 - Math.abs(envelopeUtilization - 100)));
-
-  const cards = [
+  return [
     {
-      key: "top-category",
+      key: "budget-health",
+      icon: getIcon("HeartPulse"),
+      label: "Budget Health",
+      value: `${Math.round(healthScore)} / 100`,
+      color: healthColor,
+      subtext: healthLabel,
+    },
+    {
+      key: "total-spending",
       icon: getIcon("PieChart"),
-      label: "Top Category",
+      label: "Total Spending",
       value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
       color: "blue" as const,
       subtext: `${totalTransactionCount} transactions`,
@@ -53,19 +73,35 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       icon: getIcon("Target"),
       label: "Budget Accuracy",
       value: `${budgetAccuracy.toFixed(1)}%`,
-      color: budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red",
+      color: budgetAccuracyColor,
       subtext: "Envelope adherence",
       alert: budgetAccuracy < 60,
     } as const,
-    {
-      key: "savings-rate",
-      icon: getIcon("TrendingUp"),
-      label: "Savings Rate",
-      value: `${savingsProgress.toFixed(1)}%`,
-      color: "emerald" as const,
-      subtext: "Goal completion",
-    },
   ];
+};
+
+/**
+ * Analytics summary cards using standardized PageSummaryCard component
+ * Displays key analytics metrics with consistent styling
+ */
+const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: SummaryMetrics }) => {
+  const {
+    totalExpenses = 0,
+    envelopeUtilization = 0,
+    expenseTransactionCount = 0,
+    totalTransactionCount = 0,
+    healthScore = 0,
+  } = summaryMetrics;
+
+  const budgetAccuracy = Math.min(100, Math.max(0, 100 - Math.abs(envelopeUtilization - 100)));
+
+  const cards = createSummaryCards({
+    totalExpenses,
+    expenseTransactionCount,
+    totalTransactionCount,
+    budgetAccuracy,
+    healthScore,
+  });
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
