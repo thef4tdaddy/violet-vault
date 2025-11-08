@@ -14,6 +14,8 @@ import {
   identifyTopSpendingCategories,
   calculateBudgetHealthScore,
 } from "../utils/calculationUtils";
+import { calculateWeeklyPatterns } from "../utils/analyticsDataUtils";
+import { calculateBudgetVsActual } from "../utils/envelopeAnalysisUtils";
 import { calculateSpendingTrends } from "../utils/insightsUtils";
 
 interface SpendingAnalyticsOptions {
@@ -82,6 +84,20 @@ export const useSpendingAnalyticsQuery = (options: SpendingAnalyticsOptions = {}
       const velocity = calculateSpendingVelocity(timeSeriesData);
       const topCategories = identifyTopSpendingCategories(categoryBreakdown, 5);
       const healthScore = calculateBudgetHealthScore(summary, envelopeBreakdown);
+      const normalizedTransactionsForInsights = analysisTransactions.map((transaction) => ({
+        ...transaction,
+        date:
+          transaction.date instanceof Date
+            ? transaction.date.toISOString()
+            : (transaction.date as string | undefined),
+      }));
+      const weeklyPatterns = calculateWeeklyPatterns(
+        normalizedTransactionsForInsights as Array<{ amount?: number; date?: string }>
+      );
+      const budgetVsActual = calculateBudgetVsActual(
+        normalizedTransactionsForInsights as Array<{ amount?: number; envelopeId?: string }>,
+        envelopes || []
+      );
 
       return {
         period,
@@ -96,6 +112,8 @@ export const useSpendingAnalyticsQuery = (options: SpendingAnalyticsOptions = {}
         velocity,
         topCategories,
         healthScore,
+        weeklyPatterns,
+        budgetVsActual,
         // Additional metadata for debugging
         _meta: {
           totalTransactions: transactions?.length || 0,

@@ -1,4 +1,5 @@
 import React from "react";
+import { getIcon } from "../../../utils";
 
 const GRADIENT_CLASSES = {
   red: "from-red-500 to-red-600",

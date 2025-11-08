@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | 0 |
-| TypeScript Errors | 3 | 0 |
-| TypeScript Strict Mode Errors | 3933 | 0 |
+| ESLint Issues | 0 | -5 |
+| TypeScript Errors | 0 | 0 |
+| TypeScript Strict Mode Errors | 3927 | 0 |
 
-*Last updated: 2025-11-08 14:42:29 UTC*
+*Last updated: 2025-11-08 15:24:29 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,41 +26,15 @@
 
 ## Lint Audit
 
-### Files with Most Issues
-- 2 issues in `violet-vault/src/components/analytics/ui/MetricCard.tsx`
-- 1 issues in `violet-vault/src/components/analytics/AnalyticsDashboard.tsx`
+✅ **All files passed ESLint validation!**
 
-### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 2 | `no-undef` |
-| 1 | `complexity` |
-
-### Detailed Lint Report
-```
-violet-vault/src/components/analytics/AnalyticsDashboard.tsx:76:80 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
-violet-vault/src/components/analytics/ui/MetricCard.tsx:92:35 - 1 - 'getIcon' is not defined. (no-undef)
-violet-vault/src/components/analytics/ui/MetricCard.tsx:95:35 - 1 - 'getIcon' is not defined. (no-undef)
-```
+Last check: 2025-11-08 15:24:12 UTC
 
 ## Typecheck Audit
 
-### Files with Most Type Errors
-- 2 errors in `src/components/analytics/ui/MetricCard.tsx`
-- 1 errors in `src/hooks/analytics/useChartsAnalytics.ts`
+✅ **All files passed TypeScript type checking!**
 
-### Type Error Breakdown by Category
-| Count | Error Code |
-|---|---|
-| 2 | `TS2304` |
-| 1 | `TS2345` |
-
-### Detailed Type Error Report
-```
-src/components/analytics/ui/MetricCard.tsx(92,35): error TS2304: Cannot find name 'getIcon'.
-src/components/analytics/ui/MetricCard.tsx(95,35): error TS2304: Cannot find name 'getIcon'.
-src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
-```
+Last check: 2025-11-08 15:24:20 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -175,7 +149,6 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 - 11 errors in `src/hooks/analytics/useTrendAnalysis.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
-- 11 errors in `src/components/layout/ViewRenderer.tsx`
 - 11 errors in `src/components/budgeting/suggestions/SuggestionSettings.tsx`
 - 11 errors in `src/components/budgeting/shared/BillConnectionSelector.tsx`
 - 11 errors in `src/components/bills/BillManager.tsx`
@@ -217,6 +190,7 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 - 9 errors in `src/components/transactions/splitter/SplitAllocationRow.tsx`
 - 9 errors in `src/components/savings/SavingsGoalCard.tsx`
 - 9 errors in `src/components/onboarding/components/TutorialOverlay.tsx`
+- 9 errors in `src/components/layout/ViewRenderer.tsx`
 - 9 errors in `src/components/history/viewer/HistoryList.tsx`
 - 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
 - 9 errors in `src/components/automation/tabs/RulesTab.tsx`
@@ -360,7 +334,6 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 - 4 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 4 errors in `src/hooks/analytics/useTransactionFiltering.ts`
-- 4 errors in `src/hooks/analytics/useChartsAnalytics.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
 - 4 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
@@ -408,6 +381,7 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 - 3 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
 - 3 errors in `src/hooks/analytics/useTransactionAnalysis.ts`
 - 3 errors in `src/hooks/analytics/usePerformanceMonitor.ts`
+- 3 errors in `src/hooks/analytics/useChartsAnalytics.ts`
 - 3 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 3 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
 - 3 errors in `src/components/sync/ConflictResolutionModal.tsx`
@@ -498,16 +472,13 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
 - 2 errors in `src/components/auth/components/ColorPicker.tsx`
 - 2 errors in `src/components/auth/UserIndicator.tsx`
-- 2 errors in `src/components/analytics/ui/MetricCard.tsx`
 - 2 errors in `src/components/analytics/trends/SeasonalPatternsSection.tsx`
 - 2 errors in `src/components/analytics/trends/InsightsPanel.tsx`
 - 2 errors in `src/components/analytics/trends/HistoricalTrendsChart.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
 - 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
-- 2 errors in `src/components/analytics/dashboard/SpendingTabContent.tsx`
-- 2 errors in `src/components/analytics/dashboard/OverviewTabContent.tsx`
-- 2 errors in `src/components/analytics/dashboard/EnvelopeTabContent.tsx`
 - 2 errors in `src/components/analytics/PerformanceMonitor.tsx`
+- 2 errors in `src/components/analytics/ChartsAndAnalytics.tsx`
 - 2 errors in `src/components/analytics/CategoryManagerHeader.tsx`
 - 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 2 errors in `src/App.tsx`
@@ -584,6 +555,9 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 - 1 errors in `src/components/analytics/trends/ForecastSummaryCard.tsx`
 - 1 errors in `src/components/analytics/performance/OverallScore.tsx`
 - 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
+- 1 errors in `src/components/analytics/dashboard/SpendingTabContent.tsx`
+- 1 errors in `src/components/analytics/dashboard/OverviewTabContent.tsx`
+- 1 errors in `src/components/analytics/dashboard/EnvelopeTabContent.tsx`
 - 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
 
 ### Strict Mode Error Breakdown
@@ -592,10 +566,10 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 | 1583 | `TS7006` |
 | 966 | `TS7031` |
 | 291 | `TS2339` |
-| 249 | `TS2345` |
+| 248 | `TS2345` |
 | 217 | `TS18046` |
 | 149 | `TS7053` |
-| 118 | `TS2322` |
+| 115 | `TS2322` |
 | 85 | `TS7005` |
 | 84 | `TS18048` |
 | 54 | `TS7034` |
@@ -611,7 +585,6 @@ src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type
 | 4 | `TS2722` |
 | 4 | `TS2538` |
 | 2 | `TS7022` |
-| 2 | `TS2304` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
 | 1 | `TS2774` |
@@ -633,9 +606,9 @@ src/components/activity/ActivityFeed.tsx(129,84): error TS2339: Property 'entity
 src/components/activity/ActivityFeed.tsx(147,49): error TS2339: Property 'timestamp' does not exist on type 'never'.
 src/components/activity/ActivityFeed.tsx(154,33): error TS2339: Property 'userName' does not exist on type 'never'.
 src/components/activity/ActivityFeed.tsx(158,33): error TS2339: Property 'entityType' does not exist on type 'never'.
-src/components/analytics/AnalyticsDashboard.tsx(159,5): error TS2322: Type '{ start: string | Date; end: string | Date; } | null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
+src/components/analytics/AnalyticsDashboard.tsx(145,5): error TS2322: Type '{ start: string | Date; end: string | Date; } | null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
   Type 'null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
-src/components/analytics/AnalyticsDashboard.tsx(166,5): error TS2322: Type '{ start: string | Date; end: string | Date; } | null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
+src/components/analytics/AnalyticsDashboard.tsx(152,5): error TS2322: Type '{ start: string | Date; end: string | Date; } | null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
   Type 'null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
 src/components/analytics/CategoryAdvancedTab.tsx(5,3): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
 src/components/analytics/CategoryAdvancedTab.tsx(6,3): error TS7031: Binding element 'onDateRangeChange' implicitly has an 'any' type.
@@ -660,6 +633,10 @@ src/components/analytics/CategorySuggestionsTab.tsx(5,67): error TS7031: Binding
 src/components/analytics/CategorySuggestionsTab.tsx(6,28): error TS7006: Parameter 'priority' implicitly has an 'any' type.
 src/components/analytics/CategorySuggestionsTab.tsx(27,26): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/analytics/CategorySuggestionsTab.tsx(64,25): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
+src/components/analytics/ChartsAndAnalytics.tsx(89,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
+  Type 'unknown' is not assignable to type 'never'.
+src/components/analytics/ChartsAndAnalytics.tsx(90,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
+  Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/components/AnalyticsHeader.tsx(9,28): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,39): error TS7031: Binding element 'handleDateRangeChange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,62): error TS7031: Binding element 'handleExport' implicitly has an 'any' type.
@@ -675,18 +652,9 @@ src/components/analytics/components/TabContent.tsx(19,3): error TS7031: Binding 
 src/components/analytics/components/TabContent.tsx(20,3): error TS7031: Binding element 'selectedCategory' implicitly has an 'any' type.
 src/components/analytics/components/TabContent.tsx(21,3): error TS7031: Binding element 'onCategorySelect' implicitly has an 'any' type.
 src/components/analytics/components/TabContent.tsx(22,3): error TS7031: Binding element 'categoryTransactions' implicitly has an 'any' type.
-src/components/analytics/dashboard/EnvelopeTabContent.tsx(21,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/dashboard/EnvelopeTabContent.tsx(22,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/dashboard/OverviewTabContent.tsx(21,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/dashboard/OverviewTabContent.tsx(22,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/dashboard/SpendingTabContent.tsx(21,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/dashboard/SpendingTabContent.tsx(22,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
+src/components/analytics/dashboard/EnvelopeTabContent.tsx(25,9): error TS2322: Type 'unknown' is not assignable to type 'ExternalAnalyticsData | null | undefined'.
+src/components/analytics/dashboard/OverviewTabContent.tsx(26,9): error TS2322: Type 'unknown' is not assignable to type 'ExternalAnalyticsData | null | undefined'.
+src/components/analytics/dashboard/SpendingTabContent.tsx(27,9): error TS2322: Type 'unknown' is not assignable to type 'ExternalAnalyticsData | null | undefined'.
 src/components/analytics/performance/MetricCard.tsx(9,23): error TS7031: Binding element 'title' implicitly has an 'any' type.
 src/components/analytics/performance/MetricCard.tsx(9,30): error TS7031: Binding element 'score' implicitly has an 'any' type.
 src/components/analytics/performance/MetricCard.tsx(9,37): error TS7031: Binding element 'iconName' implicitly has an 'any' type.
@@ -752,8 +720,6 @@ src/components/analytics/trends/InsightsPanel.tsx(5,26): error TS7031: Binding e
 src/components/analytics/trends/InsightsPanel.tsx(5,44): error TS7031: Binding element 'insights' implicitly has an 'any' type.
 src/components/analytics/trends/SeasonalPatternsSection.tsx(3,36): error TS7031: Binding element 'seasonalPatterns' implicitly has an 'any' type.
 src/components/analytics/trends/SeasonalPatternsSection.tsx(11,32): error TS7006: Parameter 'season' implicitly has an 'any' type.
-src/components/analytics/ui/MetricCard.tsx(92,35): error TS2304: Cannot find name 'getIcon'.
-src/components/analytics/ui/MetricCard.tsx(95,35): error TS2304: Cannot find name 'getIcon'.
 src/components/auth/AuthGateway.tsx(12,24): error TS7031: Binding element 'onSetupComplete' implicitly has an 'any' type.
 src/components/auth/AuthGateway.tsx(12,41): error TS7031: Binding element 'onLocalOnlyReady' implicitly has an 'any' type.
 src/components/auth/AuthGateway.tsx(24,23): error TS2345: Argument of type '"local-only"' is not assignable to parameter of type 'SetStateAction<null>'.
@@ -1688,13 +1654,9 @@ src/components/layout/ViewRenderer.tsx(267,9): error TS2322: Type 'Transaction[]
   Type 'Transaction' is not assignable to type 'never'.
 src/components/layout/ViewRenderer.tsx(268,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(279,11): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type 'never[]'.
-  Type 'Record<string, unknown>' is not assignable to type 'never'.
 src/components/layout/ViewRenderer.tsx(279,26): error TS2352: Conversion of type 'Transaction[]' to type 'Record<string, unknown>[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type 'Transaction' is not comparable to type 'Record<string, unknown>'.
     Index signature for type 'string' is missing in type 'Transaction'.
-src/components/layout/ViewRenderer.tsx(280,11): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
-  Type 'Envelope' is not assignable to type 'never'.
 src/components/mobile/FABActionMenu.tsx(121,30): error TS7006: Parameter 'action' implicitly has an 'any' type.
 src/components/mobile/FABActionMenu.tsx(121,38): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/components/mobile/SlideUpModal.tsx(302,5): error TS2345: Argument of type 'RefObject<HTMLDivElement | null>' is not assignable to parameter of type 'RefObject<HTMLDivElement>'.
@@ -2288,7 +2250,6 @@ src/hooks/analytics/useAnalyticsIntegration.ts(129,36): error TS7006: Parameter 
 src/hooks/analytics/useBillAnalysis.ts(11,33): error TS7006: Parameter 'bills' implicitly has an 'any' type.
 src/hooks/analytics/useBillAnalysis.ts(11,40): error TS7006: Parameter 'settings' implicitly has an 'any' type.
 src/hooks/analytics/useChartsAnalytics.ts(36,6): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/hooks/analytics/useChartsAnalytics.ts(39,43): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/hooks/analytics/useChartsAnalytics.ts(44,46): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/hooks/analytics/useChartsAnalytics.ts(48,40): error TS7006: Parameter 'tabId' implicitly has an 'any' type.
 src/hooks/analytics/usePerformanceMonitor.ts(15,39): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.

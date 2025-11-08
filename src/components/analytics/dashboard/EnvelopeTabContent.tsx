@@ -5,12 +5,14 @@ interface EnvelopeTabContentProps {
   transactions: unknown[];
   envelopes: unknown[];
   timeFilter: string;
+  analyticsData: unknown;
 }
 
 const EnvelopeTabContent: React.FC<EnvelopeTabContentProps> = ({
   transactions,
   envelopes,
   timeFilter,
+  analyticsData,
 }) => {
   return (
     <div>
@@ -20,6 +22,7 @@ const EnvelopeTabContent: React.FC<EnvelopeTabContentProps> = ({
       <ChartsAndAnalytics
         transactions={transactions}
         envelopes={envelopes}
+        analyticsData={analyticsData}
         timeFilter={timeFilter}
         focus="envelopes"
       />

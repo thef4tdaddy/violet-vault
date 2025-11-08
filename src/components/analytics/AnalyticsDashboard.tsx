@@ -12,6 +12,7 @@ import TrendsTabContent from "./dashboard/TrendsTabContent";
 import PerformanceTabContent from "./dashboard/PerformanceTabContent";
 import EnvelopeTabContent from "./dashboard/EnvelopeTabContent";
 import { FinancialInsights } from "./insights";
+import type { VelocityData, TopCategory } from "./insights/FinancialInsights";
 import logger from "@/utils/common/logger";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
@@ -34,6 +35,7 @@ const TabContentRenderer: React.FC<{
         transactions={transactions}
         envelopes={envelopes}
         timeFilter={timeFilter}
+        analyticsData={analyticsData}
       />
     );
   }
@@ -44,6 +46,7 @@ const TabContentRenderer: React.FC<{
         transactions={transactions}
         envelopes={envelopes}
         timeFilter={timeFilter}
+        analyticsData={analyticsData}
       />
     );
   }
@@ -62,6 +65,7 @@ const TabContentRenderer: React.FC<{
         transactions={transactions}
         envelopes={envelopes}
         timeFilter={timeFilter}
+        analyticsData={analyticsData}
       />
     );
   }
@@ -125,24 +129,6 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
   };
 };
 
-/**
- * Enhanced Analytics Dashboard for v1.10.0
- * Features:
- * - Comprehensive financial overview
- * - Advanced chart visualizations
- * - Trend analysis and forecasting
- * - Performance monitoring
- * - Export functionality
- *
- * Complexity: 24 (exceeds max 15)
- * Justification: Dashboard components inherently have higher complexity due to:
- * - 5 different tab views with conditional rendering
- * - Loading and error states
- * - Insights sidebar conditional logic
- * - Already extracted: TabContentRenderer, calculateSummaryMetrics
- * Further splitting would scatter related UI logic and hurt maintainability
- */
-// eslint-disable-next-line complexity
 const AnalyticsDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [timeFilter, setTimeFilter] = useState("allTime");
@@ -182,6 +168,66 @@ const AnalyticsDashboard = () => {
     () => calculateSummaryMetrics(analyticsQuery.analytics, balanceQuery.analytics),
     [analyticsQuery.analytics, balanceQuery.analytics]
   );
+
+  const resolvedVelocity: VelocityData = useMemo(() => {
+    const rawVelocity = (analyticsQuery.analytics as Record<string, unknown>)?.velocity;
+    if (rawVelocity && typeof rawVelocity === "object") {
+      const velocityRecord = rawVelocity as Record<string, unknown>;
+      return {
+        averageMonthlyExpenses: Number(velocityRecord.averageMonthlyExpenses ?? 0),
+        averageMonthlyIncome: Number(velocityRecord.averageMonthlyIncome ?? 0),
+        trendDirection:
+          (velocityRecord.trendDirection as VelocityData["trendDirection"]) || "stable",
+        velocityChange: Number(velocityRecord.velocityChange ?? 0),
+        percentChange:
+          velocityRecord.percentChange !== undefined
+            ? Number(velocityRecord.percentChange)
+            : undefined,
+        projectedNextMonth: Number(velocityRecord.projectedNextMonth ?? 0),
+      };
+    }
+
+    return {
+      averageMonthlyExpenses: 0,
+      averageMonthlyIncome: 0,
+      trendDirection: "stable",
+      velocityChange: 0,
+      projectedNextMonth: 0,
+    };
+  }, [analyticsQuery.analytics]);
+
+  const resolvedTopCategories: TopCategory[] = useMemo(() => {
+    const rawCategories = (analyticsQuery.analytics as Record<string, unknown>)?.topCategories;
+    if (!Array.isArray(rawCategories)) {
+      return [];
+    }
+
+    return rawCategories
+      .map((category) => {
+        const categoryRecord = category as Record<string, unknown>;
+        const name = String(categoryRecord.name ?? "").trim();
+        if (!name) {
+          return null;
+        }
+
+        return {
+          name,
+          expenses: Number(categoryRecord.expenses ?? 0),
+          count: Number(categoryRecord.count ?? 0),
+          percentOfTotal: Number(categoryRecord.percentOfTotal ?? 0),
+          avgTransactionSize: Number(categoryRecord.avgTransactionSize ?? 0),
+        };
+      })
+      .filter((category): category is TopCategory => category !== null);
+  }, [analyticsQuery.analytics]);
+
+  const resolvedHealthScore = useMemo(() => {
+    const healthScore = (analyticsQuery.analytics as Record<string, unknown>)?.healthScore;
+    if (typeof healthScore === "number" && Number.isFinite(healthScore)) {
+      return Math.max(0, Math.min(100, healthScore));
+    }
+    return 0;
+  }, [analyticsQuery.analytics]);
 
   const handleExport = (format: unknown, options: unknown) => {
     logger.info("Exporting analytics report", { format, options, timeFilter });
@@ -230,22 +276,18 @@ const AnalyticsDashboard = () => {
 
         {/* Insights Sidebar - 1/3 width */}
         <div className="lg:col-span-1">
-          {analyticsQuery.analytics?.velocity &&
-          analyticsQuery.analytics?.topCategories &&
-          analyticsQuery.analytics?.healthScore !== undefined ? (
+          {analyticsQuery.analytics ? (
             <FinancialInsights
-              velocity={analyticsQuery.analytics.velocity}
-              topCategories={analyticsQuery.analytics.topCategories}
-              healthScore={analyticsQuery.analytics.healthScore}
+              velocity={resolvedVelocity}
+              topCategories={resolvedTopCategories}
+              healthScore={resolvedHealthScore}
             />
           ) : (
             <div className="bg-white rounded-xl border-2 border-black p-6">
               <p className="text-gray-500 text-sm">
                 {analyticsQuery.isLoading
                   ? "Loading insights..."
-                  : !analyticsQuery.analytics
-                    ? "No analytics data available"
-                    : `Insights not available (velocity: ${!!analyticsQuery.analytics?.velocity}, categories: ${!!analyticsQuery.analytics?.topCategories}, health: ${analyticsQuery.analytics?.healthScore !== undefined})`}
+                  : "No analytics data available for the selected range."}
               </p>
             </div>
           )}

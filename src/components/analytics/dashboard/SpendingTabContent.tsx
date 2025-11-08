@@ -5,12 +5,14 @@ interface SpendingTabContentProps {
   transactions: unknown[];
   envelopes: unknown[];
   timeFilter: string;
+  analyticsData: unknown;
 }
 
 const SpendingTabContent: React.FC<SpendingTabContentProps> = ({
   transactions,
   envelopes,
   timeFilter,
+  analyticsData,
 }) => {
   return (
     <div>
@@ -22,6 +24,7 @@ const SpendingTabContent: React.FC<SpendingTabContentProps> = ({
         envelopes={envelopes}
         timeFilter={timeFilter}
         focus="spending"
+        analyticsData={analyticsData}
       />
     </div>
   );

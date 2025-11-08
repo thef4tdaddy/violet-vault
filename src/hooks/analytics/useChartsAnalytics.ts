@@ -36,7 +36,7 @@ export const useChartsAnalytics = (initialTimeFilter = "3months", initialFocus =
     (e) => {
       const nextValue = normalizeDateRange(e.target.value);
       setDateRange(nextValue);
-      logger.debug("Date range changed:", nextValue);
+      logger.debug("Date range changed:", { value: nextValue });
     },
     [normalizeDateRange]
   );

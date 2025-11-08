@@ -7,13 +7,33 @@ import MetricsGrid from "./components/MetricsGrid";
 import TabNavigation from "./components/TabNavigation";
 import TabContent from "./components/TabContent";
 
-// eslint-disable-next-line max-lines-per-function
+interface ExternalEnvelopeBreakdown {
+  envelopeId?: string;
+  monthlyBudget?: number;
+  remaining?: number;
+  color?: string;
+  spending?: number;
+}
+
+interface ExternalAnalyticsData {
+  transactions?: unknown[];
+  envelopeBreakdown?: Record<string, ExternalEnvelopeBreakdown>;
+}
+
 const ChartsAnalytics = ({
   transactions = [],
   envelopes = [],
+  analyticsData: externalAnalytics,
   currentUser = { userName: "User", userColor: "#a855f7" },
   timeFilter = "3months",
   focus = "overview",
+}: {
+  transactions?: unknown[];
+  envelopes?: unknown[];
+  analyticsData?: ExternalAnalyticsData | null;
+  currentUser?: { userName: string; userColor: string };
+  timeFilter?: string;
+  focus?: string;
 }) => {
   const { exportAnalyticsData } = useAnalyticsExport();
   const {
@@ -25,9 +45,49 @@ const ChartsAnalytics = ({
     handleTabChange,
   } = useChartsAnalytics(timeFilter, focus);
 
+  const normalizedTransactions = useMemo(() => {
+    if (Array.isArray(transactions) && transactions.length > 0) {
+      return transactions;
+    }
+
+    if (
+      externalAnalytics &&
+      Array.isArray((externalAnalytics as Record<string, unknown>).transactions)
+    ) {
+      return (externalAnalytics as Record<string, unknown>).transactions as unknown[];
+    }
+
+    return [];
+  }, [transactions, externalAnalytics]);
+
+  const normalizedEnvelopes = useMemo(() => {
+    if (Array.isArray(envelopes) && envelopes.length > 0) {
+      return envelopes;
+    }
+
+    if (
+      externalAnalytics &&
+      externalAnalytics.envelopeBreakdown &&
+      typeof externalAnalytics.envelopeBreakdown === "object"
+    ) {
+      return Object.entries(externalAnalytics.envelopeBreakdown).map(([name, data]) => {
+        const envelopeData = (data || {}) as ExternalEnvelopeBreakdown;
+        return {
+          id: envelopeData.envelopeId || name,
+          name,
+          currentBalance: envelopeData.remaining ?? 0,
+          targetAmount: envelopeData.monthlyBudget ?? 0,
+          color: envelopeData.color,
+        };
+      });
+    }
+
+    return [];
+  }, [envelopes, externalAnalytics]);
+
   const analyticsData = useAnalyticsData({
-    transactions,
-    envelopes,
+    transactions: normalizedTransactions as unknown[],
+    envelopes: normalizedEnvelopes as unknown[],
     timeFilter: dateRange || timeFilter,
   });
 
@@ -91,7 +151,44 @@ const ChartsAnalytics = ({
   }, [filteredTransactions, activeCategory]);
 
   // Check if we have any transaction data
-  const hasTransactions = Array.isArray(transactions) && transactions.length > 0;
+  const effectiveEnvelopes = useMemo(
+    () =>
+      Array.isArray(envelopes) && envelopes.length > 0 ? envelopes : normalizedEnvelopes,
+    [envelopes, normalizedEnvelopes]
+  );
+
+  const metricsEnvelopes = useMemo(
+    () =>
+      (Array.isArray(effectiveEnvelopes) ? effectiveEnvelopes : []).map((envelope) => {
+        const envelopeRecord = envelope as Record<string, unknown>;
+        const id =
+          (envelopeRecord.id as string) ||
+          (envelopeRecord.envelopeId as string) ||
+          String(envelopeRecord.name ?? "envelope");
+        return {
+          id,
+          name: String(envelopeRecord.name ?? "Envelope"),
+          balance: Number(
+            envelopeRecord.balance ??
+              envelopeRecord.currentBalance ??
+              envelopeRecord.available ??
+              envelopeRecord.remaining ??
+              0
+          ),
+          budgetedAmount: Number(
+            envelopeRecord.budgetedAmount ??
+              envelopeRecord.monthlyBudget ??
+              envelopeRecord.targetAmount ??
+              0
+          ),
+          type: (envelopeRecord.type as "bill" | "variable" | "savings") || "variable",
+        };
+      }),
+    [effectiveEnvelopes]
+  );
+
+  const hasTransactions =
+    Array.isArray(normalizedTransactions) && normalizedTransactions.length > 0;
   const hasFilteredTransactions =
     Array.isArray(filteredTransactions) && filteredTransactions.length > 0;
 
@@ -198,7 +295,7 @@ const ChartsAnalytics = ({
             : []) as unknown as import("@/types/analytics").Transaction[]
         }
         metrics={(metrics || {}) as unknown as import("@/types/analytics").AnalyticsMetrics}
-        envelopes={envelopes}
+        envelopes={metricsEnvelopes as import("@/types/analytics").Envelope[]}
       />
 
       {/* Tab Navigation */}

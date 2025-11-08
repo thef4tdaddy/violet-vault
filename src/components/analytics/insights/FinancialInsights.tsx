@@ -1,6 +1,6 @@
 import React from "react";
 
-interface VelocityData {
+export interface VelocityData {
   averageMonthlyExpenses: number;
   averageMonthlyIncome: number;
   trendDirection: "increasing" | "decreasing" | "stable";
@@ -9,7 +9,7 @@ interface VelocityData {
   projectedNextMonth: number;
 }
 
-interface TopCategory {
+export interface TopCategory {
   name: string;
   expenses: number;
   count: number;

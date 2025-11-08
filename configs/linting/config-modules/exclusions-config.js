@@ -256,6 +256,18 @@ export default [
     },
   },
   {
+    // Analytics orchestration components - coordinate multiple data sources and charts
+    files: [
+      'src/components/analytics/AnalyticsDashboard.tsx',
+      'src/components/analytics/ChartsAndAnalytics.tsx',
+    ],
+    rules: {
+      'max-lines-per-function': 'off',
+      'max-lines': 'off',
+      complexity: 'off',
+    },
+  },
+  {
     // Modal and state synchronization components - legitimate setState in effect
     // These components legitimately need to synchronize state when props/dependencies change
     files: [

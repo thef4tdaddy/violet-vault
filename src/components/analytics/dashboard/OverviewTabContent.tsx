@@ -5,12 +5,14 @@ interface OverviewTabContentProps {
   transactions: unknown[];
   envelopes: unknown[];
   timeFilter: string;
+  analyticsData: unknown;
 }
 
 const OverviewTabContent: React.FC<OverviewTabContentProps> = ({
   transactions,
   envelopes,
   timeFilter,
+  analyticsData,
 }) => {
   return (
     <div>
@@ -21,6 +23,7 @@ const OverviewTabContent: React.FC<OverviewTabContentProps> = ({
         transactions={transactions}
         envelopes={envelopes}
         timeFilter={timeFilter}
+        analyticsData={analyticsData}
       />
     </div>
   );
