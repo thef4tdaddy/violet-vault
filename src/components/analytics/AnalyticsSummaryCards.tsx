@@ -5,6 +5,8 @@ interface SummaryMetrics {
   totalExpenses?: number;
   envelopeUtilization?: number;
   savingsProgress?: number;
+  expenseTransactionCount?: number;
+  totalTransactionCount?: number;
 }
 
 /**
@@ -12,10 +14,19 @@ interface SummaryMetrics {
  * Displays key analytics metrics with consistent styling
  */
 const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: SummaryMetrics }) => {
-  const { totalExpenses = 0, envelopeUtilization = 0, savingsProgress = 0 } = summaryMetrics;
+  const {
+    totalExpenses = 0,
+    envelopeUtilization = 0,
+    savingsProgress = 0,
+    expenseTransactionCount = 0,
+    totalTransactionCount = 0,
+  } = summaryMetrics;
 
   // Calculate average transaction size if we have expense data
-  const avgTransaction = totalExpenses > 0 ? totalExpenses / (totalExpenses > 0 ? 1 : 1) : 0;
+  const avgTransaction =
+    totalExpenses > 0 && expenseTransactionCount > 0
+      ? totalExpenses / expenseTransactionCount
+      : 0;
 
   // Calculate budget accuracy based on envelope utilization
   const budgetAccuracy = Math.min(100, Math.max(0, 100 - Math.abs(envelopeUtilization - 100)));
@@ -27,7 +38,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       label: "Top Category",
       value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
       color: "blue" as const,
-      subtext: "Highest spending area",
+      subtext: `${totalTransactionCount} transactions`,
     },
     {
       key: "avg-transaction",
@@ -35,7 +46,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
       label: "Avg Transaction",
       value: `$${avgTransaction.toFixed(2)}`,
       color: "teal" as const,
-      subtext: "Per transaction",
+      subtext: `${expenseTransactionCount} expense transactions`,
     },
     {
       key: "budget-accuracy",

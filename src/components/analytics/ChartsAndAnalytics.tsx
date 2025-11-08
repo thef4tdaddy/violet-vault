@@ -15,12 +15,6 @@ const ChartsAnalytics = ({
   timeFilter = "3months",
   focus = "overview",
 }) => {
-  const analyticsData = useAnalyticsData({
-    transactions,
-    envelopes,
-    timeFilter,
-  });
-
   const { exportAnalyticsData } = useAnalyticsExport();
   const {
     activeTab,
@@ -30,6 +24,12 @@ const ChartsAnalytics = ({
     handleChartTypeChange,
     handleTabChange,
   } = useChartsAnalytics(timeFilter, focus);
+
+  const analyticsData = useAnalyticsData({
+    transactions,
+    envelopes,
+    timeFilter: dateRange || timeFilter,
+  });
 
   const {
     filteredTransactions,

@@ -78,7 +78,7 @@ const AccountsSummaryCards = ({ accounts = [] }: AccountsSummaryCardsProps) => {
         icon={getIcon("Clock")}
         label="Depletion Est."
         value={depletionEstimate}
-        color="purple"
+        color="cyan"
         subtext="At current rate"
       />
     </div>

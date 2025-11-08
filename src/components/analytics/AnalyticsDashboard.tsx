@@ -86,7 +86,13 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
   }
 
   const spending = analyticsData as {
-    summary?: { totalIncome?: number; totalExpenses?: number; netAmount?: number };
+    summary?: {
+      totalIncome?: number;
+      totalExpenses?: number;
+      netAmount?: number;
+      expenseTransactionCount?: number;
+      transactionCount?: number;
+    };
   };
   const balance = balanceData as { envelopeBreakdown?: Record<string, unknown> };
 
@@ -112,6 +118,8 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
     totalExpenses: spending.summary?.totalExpenses || 0,
     netAmount: spending.summary?.netAmount || 0,
     envelopeUtilization,
+    expenseTransactionCount: spending.summary?.expenseTransactionCount || 0,
+    totalTransactionCount: spending.summary?.transactionCount || 0,
     savingsProgress: 0,
     balanceHealth: "unknown",
   };
@@ -203,19 +211,21 @@ const AnalyticsDashboard = () => {
 
       <AnalyticsSummaryCards summaryMetrics={summaryMetrics} />
 
-      <AnalyticsTabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content - 2/3 width */}
-        <div className="lg:col-span-2 bg-white rounded-lg border-2 border-black p-6 shadow-sm">
-          <TabContentRenderer
-            activeTab={activeTab}
-            transactions={transactions}
-            envelopes={envelopes}
-            timeFilter={timeFilter}
-            analyticsData={analyticsQuery.analytics}
-            balanceData={balanceQuery.analytics}
-          />
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-2xl border-2 border-black shadow-sm overflow-hidden">
+            <AnalyticsTabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            <div className="p-6">
+              <TabContentRenderer
+                activeTab={activeTab}
+                transactions={transactions}
+                envelopes={envelopes}
+                timeFilter={timeFilter}
+                analyticsData={analyticsQuery.analytics}
+                balanceData={balanceQuery.analytics}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Insights Sidebar - 1/3 width */}

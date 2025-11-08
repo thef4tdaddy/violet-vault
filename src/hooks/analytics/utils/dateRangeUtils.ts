@@ -51,6 +51,12 @@ export const getDateRange = (
       endDate = new Date(today.getFullYear(), 11, 31);
       endDate.setHours(23, 59, 59, 999);
       break;
+    case "allTime":
+      startDate = new Date(2018, 0, 1);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
     case "custom":
       if (customDateRange) {
         startDate = new Date(customDateRange.start);

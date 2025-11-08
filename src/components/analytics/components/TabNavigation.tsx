@@ -1,11 +1,17 @@
 import StandardTabs from "@/components/ui/StandardTabs";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
+
+interface TabNavigationProps {
+  activeTab: string;
+  handleTabChange: (tabId: string) => void;
+  className?: string;
+}
 
 /**
  * Tab navigation component for analytics
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const TabNavigation = ({ activeTab, handleTabChange }) => {
+const TabNavigation = ({ activeTab, handleTabChange, className = "" }: TabNavigationProps) => {
   const tabs = [
     {
       id: "overview",
@@ -34,13 +40,15 @@ const TabNavigation = ({ activeTab, handleTabChange }) => {
   ];
 
   return (
-    <StandardTabs
-      tabs={tabs}
-      activeTab={activeTab}
-      onTabChange={handleTabChange}
-      variant="colored"
-      className="border-2 border-black ring-1 ring-gray-800/10"
-    />
+    <div className={`bg-slate-100 px-4 pt-4 border-b-2 border-black ${className}`}>
+      <StandardTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        variant="colored"
+        className="bg-transparent"
+      />
+    </div>
   );
 };
 

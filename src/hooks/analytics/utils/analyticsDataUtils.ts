@@ -18,21 +18,50 @@ export const safeDivision = (numerator: number, denominator: number, fallback = 
  */
 export const getDateRangeStart = (timeFilter: string): Date => {
   const now = new Date();
-  const ranges: Record<string, Date> = {
-    thisWeek: (() => {
+  const endOfToday = new Date(now);
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const createRelativeDate = (monthsBack: number, daysBack = 0) => {
+    const date = new Date(now);
+    if (monthsBack !== 0) {
+      date.setMonth(date.getMonth() - monthsBack);
+    }
+    if (daysBack !== 0) {
+      date.setDate(date.getDate() - daysBack);
+    }
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const mapping: Record<string, () => Date> = {
+    thisWeek: () => {
       const startOfWeek = new Date(now);
       startOfWeek.setDate(now.getDate() - now.getDay());
       startOfWeek.setHours(0, 0, 0, 0);
       return startOfWeek;
-    })(),
-    thisMonth: new Date(now.getFullYear(), now.getMonth(), 1),
-    lastMonth: new Date(now.getFullYear(), now.getMonth() - 1, 1),
-    thisYear: new Date(now.getFullYear(), 0, 1),
-    "6months": new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()),
-    all: new Date(2020, 0, 1),
-    allTime: new Date(2020, 0, 1), // Same as 'all' for backwards compatibility
+    },
+    thisMonth: () => new Date(now.getFullYear(), now.getMonth(), 1),
+    lastMonth: () => new Date(now.getFullYear(), now.getMonth() - 1, 1),
+    thisYear: () => new Date(now.getFullYear(), 0, 1),
+    "1month": () => createRelativeDate(1),
+    "3months": () => createRelativeDate(3),
+    "6months": () => createRelativeDate(6),
+    "1year": () => createRelativeDate(12),
+    all: () => new Date(2018, 0, 1),
+    allTime: () => new Date(2018, 0, 1),
+    default: () => createRelativeDate(3),
   };
-  return ranges[timeFilter] || ranges["thisMonth"];
+
+  const selector = mapping[timeFilter] || mapping.default;
+  const startDate = selector();
+
+  // Ensure start date is not after today
+  if (startDate > endOfToday) {
+    startDate.setTime(endOfToday.getTime());
+    startDate.setHours(0, 0, 0, 0);
+  }
+
+  return startDate;
 };
 
 interface Transaction {

@@ -25,7 +25,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: getIcon("Wallet"),
       label: "Total Allocated",
       value: `$${(totals.totalAllocated || 0).toFixed(2)}`,
-      color: "teal" as const,
+      color: "orange" as const,
       subtext: `${totals.envelopeCount || 0} envelopes`,
     },
     {

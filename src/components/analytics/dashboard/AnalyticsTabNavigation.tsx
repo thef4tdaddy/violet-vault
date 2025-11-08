@@ -5,11 +5,13 @@ import { getIcon } from "@/utils";
 interface AnalyticsTabNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  className?: string;
 }
 
 const AnalyticsTabNavigation: React.FC<AnalyticsTabNavigationProps> = ({
   activeTab,
   onTabChange,
+  className = "",
 }) => {
   const tabs = [
     {
@@ -45,13 +47,15 @@ const AnalyticsTabNavigation: React.FC<AnalyticsTabNavigationProps> = ({
   ];
 
   return (
-    <StandardTabs
-      tabs={tabs}
-      activeTab={activeTab}
-      onTabChange={onTabChange}
-      variant="colored"
-      className="border-2 border-black ring-1 ring-gray-800/10"
-    />
+    <div className={`bg-slate-100 px-4 pt-4 border-b-2 border-black ${className}`}>
+      <StandardTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        variant="colored"
+        className="bg-transparent"
+      />
+    </div>
   );
 };
 

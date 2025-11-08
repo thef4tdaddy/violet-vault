@@ -1,6 +1,7 @@
 import React from "react";
 import MetricCard from "../ui/MetricCard";
 import { MetricsGridProps } from "../../../types/analytics";
+import { getIcon } from "@/utils";
 
 /**
  * Metrics grid component for analytics overview
@@ -31,31 +32,31 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({
         title="Total Transactions"
         value={(filteredTransactions || []).length}
         subtitle="Transactions in period"
-        icon="Activity"
+        icon={getIcon("Activity")}
         trend={null}
-        color="blue"
+        color="indigo"
       />
       <MetricCard
         title="Total Spending"
         value={`$${totalSpending.toFixed(2)}`}
         subtitle="Total expenses"
-        icon="DollarSign"
+        icon={getIcon("DollarSign")}
         trend={null}
-        color="red"
+        color="orange"
       />
       <MetricCard
         title="Active Envelopes"
         value={(envelopes || []).length}
         subtitle="Envelope count"
-        icon="Package"
+        icon={getIcon("Package")}
         trend={null}
-        color="green"
+        color="emerald"
       />
       <MetricCard
         title="Avg. per Transaction"
         value={`$${averageTransactionAmount.toFixed(2)}`}
         subtitle="Average amount"
-        icon="TrendingUp"
+        icon={getIcon("TrendingUp")}
         trend={null}
         color="cyan"
       />

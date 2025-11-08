@@ -194,7 +194,7 @@ const SmartEnvelopeSuggestions = ({
 
   return (
     <div
-      className={`glassmorphism rounded-xl transition-all duration-200 ${containerPadding} ${className}`}
+      className={`glassmorphism border-0 ring-1 ring-gray-800/10 rounded-xl transition-all duration-200 ${containerPadding} ${className}`}
     >
       <SuggestionsHeader
         isCollapsed={effectiveIsCollapsed}

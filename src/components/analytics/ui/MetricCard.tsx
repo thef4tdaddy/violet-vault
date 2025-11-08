@@ -1,5 +1,4 @@
 import React from "react";
-import { getIcon } from "../../../utils";
 
 const GRADIENT_CLASSES = {
   red: "from-red-500 to-red-600",
@@ -46,7 +45,25 @@ const ICON_CLASSES = {
   gray: "text-gray-200",
 };
 
-const MetricCard = ({ title, value, subtitle, icon, trend, color = "blue" }) => {
+type MetricColor = keyof typeof GRADIENT_CLASSES;
+
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  trend?: number | null;
+  color?: MetricColor;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  trend,
+  color = "blue",
+}) => {
   const Icon = icon;
 
   const fallbackGradient = GRADIENT_CLASSES.blue;

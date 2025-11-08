@@ -45,7 +45,7 @@ const SavingsSummaryCard = ({ savingsGoals = [], onAddGoal: _onAddGoal }) => {
         icon={getIcon("Target")}
         label="Goals"
         value={savingsGoals.length}
-        color="purple"
+        color="pink"
         subtext={`${completedGoals.length} completed, ${activeGoals.length} active`}
       />
 
