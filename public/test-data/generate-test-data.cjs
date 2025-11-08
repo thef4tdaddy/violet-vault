@@ -85,7 +85,11 @@ const debtEnvelopes = [
     description: 'Chase Freedom Credit Card monthly payment',
     billId: 'bill-debt-001-cc',
     debtId: 'debt-001-credit-card',
-    color: '#ef4444'
+    color: '#ef4444',
+    metadata: {
+      preserveBalance: true,
+      lender: 'Chase Bank',
+    },
   },
   {
     id: 'env-debt-002-student',
@@ -99,7 +103,11 @@ const debtEnvelopes = [
     description: 'Federal Student Loan monthly payment',
     billId: 'bill-debt-002-student',
     debtId: 'debt-002-student-loan',
-    color: '#0ea5e9'
+    color: '#0ea5e9',
+    metadata: {
+      preserveBalance: true,
+      lender: 'US Department of Education',
+    },
   },
   {
     id: 'env-debt-003-auto',
@@ -113,7 +121,11 @@ const debtEnvelopes = [
     description: 'Honda Civic auto loan monthly payment',
     billId: 'bill-debt-003-auto',
     debtId: 'debt-003-car-loan',
-    color: '#10b981'
+    color: '#10b981',
+    metadata: {
+      preserveBalance: true,
+      lender: 'Ally Financial',
+    },
   },
   {
     id: 'env-debt-004-personal',
@@ -127,8 +139,100 @@ const debtEnvelopes = [
     description: 'LendingClub personal loan monthly payment',
     billId: 'bill-debt-004-personal',
     debtId: 'debt-004-personal-loan',
-    color: '#f59e0b'
+    color: '#f59e0b',
+    metadata: {
+      preserveBalance: true,
+      lender: 'LendingClub',
+    },
   }
+];
+
+const serviceEnvelopes = [
+  {
+    id: 'env-011-connectivity',
+    name: 'Internet & Streaming',
+    category: 'Bills & Utilities',
+    archived: false,
+    lastModified: getTimestamp(45),
+    createdAt: getTimestamp(220),
+    currentBalance: 135.5,
+    targetAmount: 140,
+    monthlyAmount: 140,
+    description: 'Home internet, Wi-Fi, and streaming bundles',
+    color: '#4c1d95',
+    metadata: {
+      icon: 'Wifi',
+      preserveBalance: true,
+    },
+  },
+  {
+    id: 'env-012-mobile-plan',
+    name: 'Mobile Service',
+    category: 'Bills & Utilities',
+    archived: false,
+    lastModified: getTimestamp(30),
+    createdAt: getTimestamp(220),
+    currentBalance: 98.75,
+    targetAmount: 110,
+    monthlyAmount: 110,
+    description: 'Family mobile data and device protection plan',
+    color: '#4338ca',
+    metadata: {
+      icon: 'Smartphone',
+      preserveBalance: true,
+    },
+  },
+  {
+    id: 'env-013-insurance',
+    name: 'Insurance Premiums',
+    category: 'Insurance',
+    archived: false,
+    lastModified: getTimestamp(12),
+    createdAt: getTimestamp(260),
+    currentBalance: 285.0,
+    targetAmount: 300,
+    monthlyAmount: 300,
+    description: 'Auto, renters, and umbrella insurance premiums',
+    color: '#2563eb',
+    metadata: {
+      icon: 'Shield',
+      preserveBalance: true,
+    },
+  },
+  {
+    id: 'env-014-home-services',
+    name: 'Home & Security',
+    category: 'Home',
+    archived: false,
+    lastModified: getTimestamp(20),
+    createdAt: getTimestamp(210),
+    currentBalance: 170.0,
+    targetAmount: 185,
+    monthlyAmount: 185,
+    description: 'Home security, pest control, and maintenance plans',
+    color: '#0f766e',
+    metadata: {
+      icon: 'Home',
+      preserveBalance: true,
+    },
+  },
+  {
+    id: 'env-015-childcare',
+    name: 'Childcare & Activities',
+    category: 'Family',
+    archived: false,
+    lastModified: getTimestamp(10),
+    createdAt: getTimestamp(210),
+    currentBalance: 210.0,
+    targetAmount: 250,
+    monthlyAmount: 250,
+    description: 'After-school programs, daycare, and lessons',
+    color: '#dc2626',
+    metadata: {
+      icon: 'Users',
+      preserveBalance: true,
+    },
+  },
 ];
 
 // Add 4 debt payment bills with current due dates
@@ -615,17 +719,175 @@ const updateBaseTransactions = () => {
 
 // Update base bills to have current/upcoming due dates
 const updateBaseBills = () => {
-  return baseData.bills.map((bill, index) => {
-    // Spread bills throughout the month
-    const daysOffset = (index * 3) - 15; // Range from -15 to +15 days from today
+  const curatedBillTemplates = [
+    {
+      id: 'bill-housing-rent',
+      name: 'Maple Street Apartments',
+      provider: 'Maple Street Properties',
+      category: 'Housing',
+      amount: 1650,
+      envelopeId: 'env-003-rent',
+      dueInDays: 3,
+      frequency: 'monthly',
+      autopay: true,
+      description: 'Monthly rent for Unit 3B at Maple Street Apartments',
+      supportPhone: '(555) 739-1120',
+      accountNumber: 'APT-3B-2025',
+    },
+    {
+      id: 'bill-utilities-electric',
+      name: 'Northwind Electric Service',
+      provider: 'Northwind Power & Light',
+      category: 'Utilities',
+      amount: 96.42,
+      envelopeId: 'env-004-utilities',
+      dueInDays: 6,
+      frequency: 'monthly',
+      autopay: true,
+      description: 'Residential electric service - 15% renewable mix',
+      supportPhone: '(555) 118-4420',
+      accountNumber: 'ELEC-54821-09',
+    },
+    {
+      id: 'bill-utilities-water',
+      name: 'Evergreen Water & Sewer',
+      provider: 'Evergreen Municipal Utilities',
+      category: 'Utilities',
+      amount: 58.37,
+      envelopeId: 'env-004-utilities',
+      dueInDays: 12,
+      frequency: 'monthly',
+      autopay: false,
+      description: 'Water, sewer, and storm services',
+      supportPhone: '(555) 664-7721',
+      accountNumber: 'H2O-090-334',
+    },
+    {
+      id: 'bill-connectivity-internet',
+      name: 'Brightstream Fiber 1G',
+      provider: 'Brightstream Communications',
+      category: 'Bills & Utilities',
+      amount: 84.99,
+      envelopeId: 'env-011-connectivity',
+      dueInDays: 2,
+      frequency: 'monthly',
+      autopay: true,
+      description: 'Gigabit fiber internet with WholeHome Wi-Fi',
+      supportPhone: '(555) 220-8888',
+      accountNumber: 'BST-801-112-AX',
+    },
+    {
+      id: 'bill-mobile-family-plan',
+      name: 'Nimbus Mobile Unlimited',
+      provider: 'Nimbus Wireless',
+      category: 'Bills & Utilities',
+      amount: 128.15,
+      envelopeId: 'env-012-mobile-plan',
+      dueInDays: 9,
+      frequency: 'monthly',
+      autopay: true,
+      description: 'Family mobile plan with four lines and device protection',
+      supportPhone: '(555) 403-4450',
+      accountNumber: 'MBL-44810-55',
+    },
+    {
+      id: 'bill-insurance-auto',
+      name: 'ShieldSure Auto Insurance',
+      provider: 'ShieldSure Insurance Group',
+      category: 'Insurance',
+      amount: 212.6,
+      envelopeId: 'env-013-insurance',
+      dueInDays: 18,
+      frequency: 'monthly',
+      autopay: false,
+      description: 'Auto insurance premium for two vehicles',
+      supportPhone: '(555) 900-2212',
+      accountNumber: 'AUTO-INS-8810',
+    },
+    {
+      id: 'bill-subscription-streaming',
+      name: 'Cinematic+ Annual Bundle',
+      provider: 'Cinematic Media Group',
+      category: 'Entertainment',
+      amount: 139.99,
+      envelopeId: 'env-011-connectivity',
+      dueInDays: -2,
+      frequency: 'annually',
+      autopay: true,
+      description: 'Annual streaming bundle with sports and originals',
+      supportPhone: '(555) 660-1250',
+      accountNumber: 'STRM-2025-338',
+      isPaid: true,
+      paidDateOffset: 1,
+    },
+    {
+      id: 'bill-home-security',
+      name: 'Sentinel Home Security',
+      provider: 'Sentinel Secure',
+      category: 'Home',
+      amount: 54.5,
+      envelopeId: 'env-014-home-services',
+      dueInDays: 25,
+      frequency: 'monthly',
+      autopay: false,
+      description: 'Smart home monitoring and equipment lease',
+      supportPhone: '(555) 784-9900',
+      accountNumber: 'SEC-7765-20',
+    },
+    {
+      id: 'bill-childcare-activities',
+      name: 'Little Explorers Learning',
+      provider: 'Little Explorers Academy',
+      category: 'Family',
+      amount: 235.0,
+      envelopeId: 'env-015-childcare',
+      dueInDays: 4,
+      frequency: 'biweekly',
+      autopay: false,
+      description: 'After-school program and enrichment classes',
+      supportPhone: '(555) 415-7830',
+      accountNumber: 'LEA-204-119',
+    },
+  ];
+
+  return curatedBillTemplates.map((bill, index) => {
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + daysOffset);
-    
+    dueDate.setDate(dueDate.getDate() + bill.dueInDays);
+
+    const statementDate = new Date(dueDate);
+    statementDate.setDate(statementDate.getDate() - 20);
+
+    const lastPaidDate =
+      typeof bill.paidDateOffset === 'number'
+        ? getDateString(bill.paidDateOffset)
+        : getDateString(35);
+
     return {
-      ...bill,
+      id: bill.id || `bill-curated-${index + 1}`,
+      name: bill.name,
+      provider: bill.provider,
+      amount: Number(bill.amount.toFixed(2)),
+      category: bill.category,
       dueDate: dueDate.toISOString().split('T')[0],
+      createdAt: getTimestamp(120),
       lastModified: getTimestamp(0),
-      createdAt: getTimestamp(90),
+      envelopeId: bill.envelopeId,
+      frequency: bill.frequency || 'monthly',
+      paymentMethod: bill.autopay ? 'Auto-pay' : 'Manual',
+      isRecurring: true,
+      isPaid: Boolean(bill.isPaid),
+      paidDate: bill.isPaid ? lastPaidDate : null,
+      lastStatementDate: statementDate.toISOString().split('T')[0],
+      autopay: bill.autopay,
+      description: bill.description,
+      contactPhone: bill.supportPhone,
+      accountNumber: bill.accountNumber,
+      metadata: {
+        serviceWindow: bill.serviceWindow || '08:00 - 18:00',
+        website: bill.website || null,
+        notes: bill.notes || '',
+        preserveBalance: true,
+      },
     };
   });
 };
@@ -800,7 +1062,7 @@ const updateSupplementalAccounts = () => {
   });
 };
 
-const allEnvelopes = [...updatedBaseEnvelopes, ...debtEnvelopes];
+const allEnvelopes = [...updatedBaseEnvelopes, ...serviceEnvelopes, ...debtEnvelopes];
 const allBills = [...updatedBaseBills, ...debtBills];
 const allTransactions = [
   ...updatedBaseTransactions,
@@ -875,34 +1137,49 @@ const envelopeSpendingHistory = buildEnvelopeSpendingHistory(allTransactions);
 const enhanceEnvelopesForAnalytics = (envelopes) => {
   return envelopes.map((env, index) => {
     const paletteColor = ENVELOPE_COLORS[index % ENVELOPE_COLORS.length];
-    const baseMonthlyAmount = env.targetAmount || env.monthlyAmount || 250;
+    const baseMonthlyAmount =
+      typeof env.monthlyAmount === 'number' && Number.isFinite(env.monthlyAmount)
+        ? env.monthlyAmount
+        : env.targetAmount || 250;
     const history = envelopeSpendingHistory[env.id]?.length
       ? envelopeSpendingHistory[env.id]
       : generateFallbackHistory(baseMonthlyAmount);
 
-    let adjustedBalance =
-      env.currentBalance !== undefined ? env.currentBalance : baseMonthlyAmount * 0.85;
+    const hasExplicitBalance =
+      typeof env.currentBalance === 'number' && Number.isFinite(env.currentBalance);
+    const preserveBalance =
+      (env.metadata && env.metadata.preserveBalance === true) || hasExplicitBalance;
 
-    switch (index % 4) {
-      case 0:
-        adjustedBalance = baseMonthlyAmount * 0.25;
-        break;
-      case 1:
-        adjustedBalance = baseMonthlyAmount * 1.45;
-        break;
-      case 2:
-        adjustedBalance = baseMonthlyAmount * 0.6;
-        break;
-      default:
-        adjustedBalance = baseMonthlyAmount * (0.85 + Math.random() * 0.1);
+    let adjustedBalance = hasExplicitBalance ? env.currentBalance : baseMonthlyAmount * 0.9;
+
+    if (!preserveBalance) {
+      switch (index % 4) {
+        case 0:
+          adjustedBalance = baseMonthlyAmount * 0.25;
+          break;
+        case 1:
+          adjustedBalance = baseMonthlyAmount * 1.45;
+          break;
+        case 2:
+          adjustedBalance = baseMonthlyAmount * 0.6;
+          break;
+        default:
+          adjustedBalance = baseMonthlyAmount * (0.85 + Math.random() * 0.1);
+      }
     }
 
     return {
       ...env,
-      color: paletteColor,
+      color: env.color || paletteColor,
       monthlyAmount: Number(baseMonthlyAmount.toFixed(2)),
-      currentBalance: Number(adjustedBalance.toFixed(2)),
+      currentBalance: Number((adjustedBalance ?? 0).toFixed(2)),
       spendingHistory: history,
+      metadata: {
+        ...(env.metadata || {}),
+        analytics: {
+          paletteIndex: index % ENVELOPE_COLORS.length,
+        },
+      },
     };
   });
 };

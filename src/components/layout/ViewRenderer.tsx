@@ -22,6 +22,7 @@ import { useLayoutData } from "@/hooks/layout";
 import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
 import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
 import logger from "@/utils/common/logger";
+import { globalToast } from "@/stores/ui/toastStore";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -218,6 +219,14 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     });
   }
 
+  const handleBillManagerError = useCallback((message?: string) => {
+    if (!message) {
+      return;
+    }
+    globalToast.showError(message, "Bill Manager");
+    logger.error("Bill manager error", { message });
+  }, []);
+
   const views: Record<string, ReactNode> = {
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
@@ -269,7 +278,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         onUpdateBill={handleUpdateBill}
         onCreateRecurringBill={() => {}}
         onSearchNewBills={async () => {}}
-        onError={() => {}}
+        onError={handleBillManagerError}
       />
     ),
     transactions: <TransactionLedger currentUser={user} />,
