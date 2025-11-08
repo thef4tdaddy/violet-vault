@@ -204,8 +204,8 @@ const SummaryCard = memo(
       : "";
 
     const cardContent = (
-      <div className="flex h-full w-full flex-col items-center text-center gap-4">
-        <div className="relative flex-shrink-0">
+      <div className="grid h-full w-full grid-rows-[auto_1fr_auto] justify-items-center gap-4 text-center">
+        <div className="relative flex items-center justify-center">
           <div
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
@@ -214,7 +214,7 @@ const SummaryCard = memo(
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center gap-2">
           <p className="text-sm font-semibold text-gray-600">{label}</p>
           <p
             className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
@@ -224,7 +224,7 @@ const SummaryCard = memo(
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-1 text-center">
+        <div className="flex flex-col items-center gap-1">
           {clickable && !isNegative && <p className="text-xs text-gray-400">Click to distribute</p>}
           {isNegative && (
             <p className="text-xs font-medium text-red-500">⚠️ Overspending - click to address</p>

@@ -9,7 +9,7 @@ import SupplementalAccounts from "../accounts/SupplementalAccounts";
 import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
+const AnalyticsDashboard = lazy(() => import("../analytics/AnalyticsDashboard"));
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
@@ -275,11 +275,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     transactions: <TransactionLedger currentUser={user} />,
     analytics: (
       <Suspense fallback={<LoadingSpinner />}>
-        <ChartsAndAnalytics
-          transactions={(safeTransactions as Array<Record<string, unknown>>) || []}
-          envelopes={envelopes || []}
-          currentUser={user}
-        />
+        <AnalyticsDashboard />
       </Suspense>
     ),
     debts: isDebtFeatureEnabled("ENABLE_DEBT_DASHBOARD") ? (

@@ -71,7 +71,7 @@ vi.mock("../transactions/TransactionLedger", () => ({
   default: () => <div data-testid="transactions-view">Transactions</div>,
 }));
 
-vi.mock("../analytics/ChartsAndAnalytics", () => ({
+vi.mock("../analytics/AnalyticsDashboard", () => ({
   default: () => <div data-testid="analytics-view">Analytics</div>,
 }));
 

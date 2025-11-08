@@ -707,7 +707,7 @@ All page-specific summary cards follow the **bill card design pattern** with gra
 - **Envelope System**: `src/components/budgeting/envelope/EnvelopeSummary.jsx`
 - **Debt Dashboard**: `src/components/debt/ui/DebtSummaryCards.jsx`
 - **Transaction Ledger**: `src/components/transactions/TransactionSummary.jsx`
-- **Analytics Dashboard**: `src/components/analytics/ChartsAndAnalytics.jsx`
+- **Analytics Dashboard**: `src/components/analytics/AnalyticsDashboard.tsx`
 - **Bill Management**: `src/components/bills/BillManager.jsx` (reference pattern)
 
 ### Design Goals
