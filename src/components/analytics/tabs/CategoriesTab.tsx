@@ -48,9 +48,7 @@ const CategoriesTab: React.FC<CategoriesTabProps> = ({
   categoryTransactions = [],
 }) => {
   const transactionsPreview = useMemo(() => {
-    return categoryTransactions
-      .filter((txn) => typeof txn.amount === "number")
-      .slice(0, 15);
+    return categoryTransactions.filter((txn) => typeof txn.amount === "number").slice(0, 15);
   }, [categoryTransactions]);
 
   const detailContent = (
@@ -80,7 +78,8 @@ const CategoriesTab: React.FC<CategoriesTabProps> = ({
             ))}
             {categoryTransactions.length > transactionsPreview.length && (
               <p className="text-xs text-gray-500">
-                Showing first {transactionsPreview.length} of {categoryTransactions.length} transactions
+                Showing first {transactionsPreview.length} of {categoryTransactions.length}{" "}
+                transactions
               </p>
             )}
           </div>
@@ -109,3 +108,4 @@ const CategoriesTab: React.FC<CategoriesTabProps> = ({
 };
 
 export default CategoriesTab;
+export type { CategoriesTabProps, CategoryEntry, TransactionSummary };

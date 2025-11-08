@@ -246,6 +246,7 @@ export default [
       // Security & Data Integrity
       "src/components/security/LockScreen.tsx", // Multi-mode security state machine (260 lines)
       "src/utils/budgeting/envelopeIntegrityChecker.ts", // Comprehensive data validation
+      "src/hooks/bills/useBillManager.ts", // Bill orchestration hook coordinating queries and bulk operations
     ],
     rules: {
       "max-lines": "off", // Infrastructure needs comprehensive logic

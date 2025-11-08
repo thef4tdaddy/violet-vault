@@ -3,7 +3,7 @@ import useTransactionTable from "../../hooks/transactions/useTransactionTable";
 import TransactionRow from "./components/TransactionRow";
 import DeleteConfirmation from "./components/DeleteConfirmation";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-import { COLUMN_STYLES } from "../../utils/transactions/tableHelpers";
+import { COLUMN_STYLES, COLUMN_WIDTHS } from "../../utils/transactions/tableHelpers";
 import type { Transaction, Envelope } from "../../types/finance";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
@@ -54,62 +54,46 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     }
   };
 
+  const gridTemplate = [
+    COLUMN_WIDTHS.date,
+    COLUMN_WIDTHS.description,
+    COLUMN_WIDTHS.category,
+    COLUMN_WIDTHS.envelope,
+    COLUMN_WIDTHS.amount,
+    COLUMN_WIDTHS.actions,
+  ].join(" ");
+
+  const minTableWidth = "62rem";
+
   return (
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">
       <div ref={parentRef} className="overflow-auto" style={{ maxHeight: "70vh" }}>
-        <table className="w-full table-fixed">
-          <colgroup>
-            <col style={COLUMN_STYLES.date} />
-            <col style={COLUMN_STYLES.description} />
-            <col style={COLUMN_STYLES.category} />
-            <col style={COLUMN_STYLES.envelope} />
-            <col style={COLUMN_STYLES.amount} />
-            <col style={COLUMN_STYLES.actions} />
-          </colgroup>
-          {/* Table Header */}
-          <thead className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm">
-            <tr>
-              <th
-                style={COLUMN_STYLES.date}
-                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Date
-              </th>
-              <th
-                style={COLUMN_STYLES.description}
-                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Description
-              </th>
-              <th
-                style={COLUMN_STYLES.category}
-                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Category
-              </th>
-              <th
-                style={COLUMN_STYLES.envelope}
-                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Envelope
-              </th>
-              <th
-                style={COLUMN_STYLES.amount}
-                className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Amount
-              </th>
-              <th
-                style={COLUMN_STYLES.actions}
-                className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
+        <div style={{ minWidth: minTableWidth }}>
+          <div
+            className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm grid"
+            style={{ gridTemplateColumns: gridTemplate }}
+          >
+            <div className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date
+            </div>
+            <div className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Description
+            </div>
+            <div className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Category
+            </div>
+            <div className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Envelope
+            </div>
+            <div className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Amount
+            </div>
+            <div className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </div>
+          </div>
 
-          {/* Table Body */}
-          <tbody
+          <div
             className="divide-y divide-gray-200"
             style={{
               height: `${rowVirtualizer.getTotalSize()}px`,
@@ -117,11 +101,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             }}
           >
             {transactions.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  No transactions found
-                </td>
-              </tr>
+              <div className="px-4 py-8 text-center text-gray-500">No transactions found</div>
             ) : (
               rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const transaction = transactions[virtualRow.index];
@@ -134,6 +114,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     onConfirm={confirmDelete}
                     onCancel={cancelDelete}
                     virtualRow={virtualRow}
+                    gridTemplate={gridTemplate}
                   />
                 ) : (
                   <TransactionRow
@@ -146,12 +127,13 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     onSplit={onSplit}
                     onDeleteClick={handleDeleteClick}
                     onHistoryClick={handleHistoryClick}
+                    gridTemplate={gridTemplate}
                   />
                 );
               })
             )}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
 
       {/* Transaction History Modal */}

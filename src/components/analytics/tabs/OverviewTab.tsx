@@ -29,6 +29,7 @@ const OverviewTab = ({ monthlyTrends, envelopeSpending }) => {
         actions={null}
         formatTooltip={undefined}
         labelFormatter={undefined}
+        showLabels={false}
       />
     </div>
   );

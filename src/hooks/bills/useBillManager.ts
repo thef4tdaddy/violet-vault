@@ -69,13 +69,25 @@ export const useBillManager = ({
   const {
     bills: tanStackBills = [],
     addBill,
-    updateBill: updateBillFromHook,
+    updateBillAsync,
     deleteBill,
-    markBillPaid,
+    markBillPaidAsync,
     isLoading: billsLoading,
   } = useBills();
 
-  const updateBillMutation = updateBillFromHook as unknown as (bill: Bill) => Promise<void>;
+  const updateBillWithFullRecord = useCallback(
+    async (bill: Bill) => {
+      await updateBillAsync({ billId: bill.id, updates: bill as Record<string, unknown> });
+    },
+    [updateBillAsync]
+  );
+
+  const updateBillForOperations = useCallback(
+    async (options: { id: string; updates: Record<string, unknown> }) => {
+      await updateBillAsync({ billId: options.id, updates: options.updates });
+    },
+    [updateBillAsync]
+  );
 
   interface BudgetState {
     allTransactions: Transaction[];
@@ -109,7 +121,7 @@ export const useBillManager = ({
         uiState.viewMode,
         uiState.filterOptions,
         onUpdateBill,
-        updateBillMutation as unknown as (updates: {
+        updateBillAsync as unknown as (updates: {
           billId: string;
           updates: Record<string, unknown>;
         }) => Promise<void>
@@ -124,7 +136,7 @@ export const useBillManager = ({
       tanStackBills,
       budget.bills,
       onUpdateBill,
-      updateBillMutation,
+      updateBillAsync,
       uiState.viewMode,
       uiState.filterOptions,
     ]);
@@ -132,10 +144,11 @@ export const useBillManager = ({
   const billOperations = useBillOperations({
     bills,
     envelopes,
-    updateBill: updateBillMutation,
+    updateBill: updateBillForOperations,
     onUpdateBill,
     onError,
     budget,
+    markBillPaid: markBillPaidAsync,
   });
 
   const searchNewBills = useCallback(
@@ -210,8 +223,7 @@ export const useBillManager = ({
     ...uiActions,
     billOperations,
     addBill,
-    updateBill: updateBillMutation,
+    updateBill: updateBillWithFullRecord,
     deleteBill,
-    markBillPaid,
   };
 };

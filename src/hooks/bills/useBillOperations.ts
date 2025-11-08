@@ -14,6 +14,20 @@ export const useBillOperations = ({
   onUpdateBill,
   onError,
   budget,
+  markBillPaid,
+}: {
+  bills?: Array<Record<string, unknown>>;
+  envelopes?: Array<Record<string, unknown>>;
+  updateBill: (payload: { id: string; updates: Record<string, unknown> }) => Promise<void>;
+  onUpdateBill?: (bill: Record<string, unknown>) => void | Promise<void>;
+  onError?: (error: string) => void;
+  budget?: Record<string, unknown>;
+  markBillPaid?: (params: {
+    billId: string;
+    paidAmount: number;
+    paidDate?: string;
+    envelopeId?: string;
+  }) => Promise<unknown>;
 }) => {
   // Use focused sub-hooks
   const { validateBillData, createModificationHistory } = useBillValidation(envelopes);
@@ -23,6 +37,7 @@ export const useBillOperations = ({
     budget,
     updateBill,
     onUpdateBill,
+    markBillPaid,
   });
   const { handleBulkUpdate, handleBulkPayment } = useBulkBillOperations({
     updateBill,

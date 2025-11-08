@@ -5,19 +5,20 @@ import { getIcon } from "@/utils";
 /**
  * Inline delete confirmation component
  */
-const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) => {
+const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow, gridTemplate }) => {
   return (
-    <tr
-      className="bg-red-50 border border-red-200"
+    <div
+      className="grid bg-red-50 border border-red-200"
       style={{
         position: "absolute",
         top: 0,
         left: 0,
         width: "100%",
         transform: `translateY(${virtualRow.start}px)`,
+        gridTemplateColumns: gridTemplate,
       }}
     >
-      <td colSpan={6} className="px-4 py-4">
+      <div className="px-4 py-4 col-span-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center text-red-700">
             {React.createElement(getIcon("AlertTriangle"), {
@@ -40,8 +41,8 @@ const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) =>
             </Button>
           </div>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 };
 

@@ -48,7 +48,6 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
             data={weeklyPatterns.filter(Boolean)}
             height={300}
             dataKey="amount"
-            xDataKey="day"
             actions={null}
             formatTooltip={undefined}
             bars={[
@@ -59,6 +58,7 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
               },
             ]}
             showLegend={false}
+            categoryKey="day"
           />
         </div>
       )}

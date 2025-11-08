@@ -33,6 +33,12 @@ const AnalyticsTabNavigation: React.FC<AnalyticsTabNavigationProps> = ({
       color: "green" as const,
     },
     {
+      id: "health",
+      label: "Budget Health",
+      icon: getIcon("Activity"),
+      color: "amber" as const,
+    },
+    {
       id: "performance",
       label: "Performance Monitor",
       icon: getIcon("Target"),

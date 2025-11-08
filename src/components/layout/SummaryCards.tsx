@@ -204,7 +204,7 @@ const SummaryCard = memo(
       : "";
 
     const cardContent = (
-      <div className="grid h-full w-full grid-rows-[auto_1fr_auto] justify-items-center gap-4 text-center">
+      <div className="grid h-full w-full grid-rows-[auto_1fr_auto] items-start justify-items-center gap-4 text-center">
         <div className="relative flex items-center justify-center">
           <div
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
@@ -237,8 +237,9 @@ const SummaryCard = memo(
     if (clickable) {
       return (
         <Button
+          type="button"
           onClick={onClick}
-          className={`${baseClasses} ${clickableClasses} flex w-full items-center justify-center`}
+          className={`${baseClasses} ${clickableClasses} !grid w-full justify-items-center`}
           disabled={!onClick}
           data-tour={dataTour}
         >
@@ -248,7 +249,7 @@ const SummaryCard = memo(
     }
 
     return (
-      <div className={`${baseClasses} flex items-center justify-center`} data-tour={dataTour}>
+      <div className={baseClasses} data-tour={dataTour}>
         {cardContent}
       </div>
     );

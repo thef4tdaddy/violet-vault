@@ -9,6 +9,12 @@ import AnalyticsErrorState from "./dashboard/AnalyticsErrorState";
 import TabContent from "./components/TabContent";
 import { FinancialInsights } from "./insights";
 import type { VelocityData, TopCategory } from "./insights/FinancialInsights";
+import type {
+  EnvelopeBalanceEntry,
+  EnvelopeSpendingEntry,
+  EnvelopeHealthEntry,
+  BudgetVsActualEntry,
+} from "./tabs/EnvelopesTab";
 import logger from "@/utils/common/logger";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
@@ -78,6 +84,14 @@ const calculateSummaryMetrics = (analyticsData: unknown, balanceData: unknown) =
   };
 };
 
+type NormalizedEnvelope = {
+  id: string;
+  name: string;
+  currentBalance: number;
+  targetAmount: number;
+  color?: unknown;
+};
+
 const AnalyticsDashboard = () => {
   const [activeTab, setActiveTab] = useState<
     "overview" | "spending" | "trends" | "health" | "performance" | "envelopes"
@@ -124,7 +138,7 @@ const AnalyticsDashboard = () => {
     return transactions;
   }, [analyticsQuery.analytics, transactions]);
 
-  const normalizedEnvelopes = useMemo(() => {
+  const normalizedEnvelopes = useMemo<NormalizedEnvelope[]>(() => {
     const breakdown = (
       analyticsQuery.analytics as {
         envelopeBreakdown?: Record<string, Record<string, unknown>>;
@@ -147,7 +161,7 @@ const AnalyticsDashboard = () => {
       });
     }
 
-    return envelopes;
+    return (envelopes as unknown as NormalizedEnvelope[]) || [];
   }, [analyticsQuery.analytics, envelopes]);
 
   const analyticsData = useAnalyticsData({
@@ -392,14 +406,25 @@ const AnalyticsDashboard = () => {
                   chartType={chartType}
                   handleChartTypeChange={handleChartTypeChange}
                   monthlyTrends={monthlyTrends}
-                  envelopeSpending={envelopeSpending}
+                  envelopeSpending={envelopeSpending as unknown as EnvelopeSpendingEntry[]}
                   weeklyPatterns={weeklyPatterns}
-                  envelopeHealth={envelopeHealth}
-                  budgetVsActual={budgetVsActual}
+                  envelopeHealth={envelopeHealth as unknown as EnvelopeHealthEntry[]}
+                  budgetVsActual={budgetVsActual as unknown as BudgetVsActualEntry[]}
                   categoryBreakdown={categoryBreakdown}
                   selectedCategory={resolvedSelectedCategory}
                   onCategorySelect={handleCategorySelect}
                   categoryTransactions={categoryTransactions}
+                  analyticsData={
+                    analyticsQuery.analytics && typeof analyticsQuery.analytics === "object"
+                      ? (analyticsQuery.analytics as Record<string, unknown>)
+                      : null
+                  }
+                  balanceData={
+                    balanceQuery.analytics && typeof balanceQuery.analytics === "object"
+                      ? (balanceQuery.analytics as Record<string, unknown>)
+                      : null
+                  }
+                  envelopes={normalizedEnvelopes as unknown as EnvelopeBalanceEntry[]}
                 />
               </div>
             </div>

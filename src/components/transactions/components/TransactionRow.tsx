@@ -17,6 +17,7 @@ const TransactionRow = ({
   envelopes,
   virtualRow,
   columnStyles = COLUMN_STYLES,
+  gridTemplate,
   onEdit,
   onSplit,
   onDeleteClick,
@@ -34,23 +35,22 @@ const TransactionRow = ({
   } = getEnvelopeDisplay(envelope);
 
   return (
-    <tr
-      className="hover:bg-white/30 transition-colors"
+    <div
+      className="grid hover:bg-white/30 transition-colors"
       style={{
         position: "absolute",
         top: 0,
         left: 0,
         width: "100%",
         transform: `translateY(${virtualRow.start}px)`,
+        gridTemplateColumns: gridTemplate,
       }}
     >
-      {/* Date */}
-      <td style={columnStyles.date} className="px-4 py-4 text-sm text-gray-900 truncate">
+      <div style={columnStyles.date} className="px-4 py-4 text-sm text-gray-900 truncate">
         {formattedDate}
-      </td>
+      </div>
 
-      {/* Description */}
-      <td style={columnStyles.description} className="px-4 py-4 text-sm">
+      <div style={columnStyles.description} className="px-4 py-4 text-sm">
         <div className="flex flex-col gap-1 overflow-hidden">
           <div
             className="font-medium text-gray-900 overflow-x-auto whitespace-nowrap pr-2"
@@ -64,15 +64,13 @@ const TransactionRow = ({
             {transaction.notes}
           </div>
         )}
-      </td>
+      </div>
 
-      {/* Category */}
-      <td style={columnStyles.category} className="px-4 py-4 text-sm text-gray-500 truncate">
+      <div style={columnStyles.category} className="px-4 py-4 text-sm text-gray-500 truncate">
         {transaction.category || "Uncategorized"}
-      </td>
+      </div>
 
-      {/* Envelope */}
-      <td style={columnStyles.envelope} className="px-4 py-4 text-sm">
+      <div style={columnStyles.envelope} className="px-4 py-4 text-sm">
         <div className="flex items-center min-w-0">
           <div
             className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
@@ -80,15 +78,13 @@ const TransactionRow = ({
           />
           <span className={`${envelopeClassName} truncate`}>{envelopeName}</span>
         </div>
-      </td>
+      </div>
 
-      {/* Amount */}
-      <td style={columnStyles.amount} className="px-4 py-4 text-right text-sm font-medium">
+      <div style={columnStyles.amount} className="px-4 py-4 text-right text-sm font-medium">
         <span className={`${amountClassName} font-semibold`}>{formattedAmount}</span>
-      </td>
+      </div>
 
-      {/* Actions */}
-      <td style={columnStyles.actions} className="px-4 py-4 text-right">
+      <div style={columnStyles.actions} className="px-4 py-4 text-right">
         <div className="flex items-center justify-end space-x-1">
           {onSplit && (
             <Button
@@ -123,8 +119,8 @@ const TransactionRow = ({
             {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
           </Button>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 };
 

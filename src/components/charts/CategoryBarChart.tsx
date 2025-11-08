@@ -1,3 +1,4 @@
+import React, { type ReactNode } from "react";
 import {
   BarChart,
   Bar,
@@ -16,11 +17,11 @@ import { useChartConfig } from "../../hooks/common/useChartConfig";
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
  */
-// Helper to format currency values
-const formatCurrency = (value) => `$${(value / 1000).toFixed(0)}K`;
-
-// Helper function to get axis configuration based on orientation
-const getAxisConfig = (isHorizontal: boolean, chartDefaults: Record<string, unknown>) => {
+const getAxisConfig = (
+  isHorizontal: boolean,
+  chartDefaults: Record<string, unknown>,
+  categoryKey: string
+) => {
   const axisStroke = (chartDefaults.axis as Record<string, unknown>)?.stroke as string;
 
   if (isHorizontal) {
@@ -29,15 +30,15 @@ const getAxisConfig = (isHorizontal: boolean, chartDefaults: Record<string, unkn
     return {
       XAxis: { type: xType, stroke: axisStroke },
       YAxis: {
-        dataKey: "name",
+        dataKey: categoryKey,
         type: yType,
         stroke: axisStroke,
-        width: 100,
+        width: 140,
       },
     };
   }
   return {
-    XAxis: { dataKey: "name", stroke: axisStroke },
+    XAxis: { dataKey: categoryKey, stroke: axisStroke },
     YAxis: { stroke: axisStroke },
   };
 };
@@ -47,6 +48,27 @@ const DEFAULT_BARS = [
   { dataKey: "income", name: "Income", fill: "#10b981" },
   { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
 ];
+
+interface CategoryBarChartProps {
+  title?: string;
+  subtitle?: ReactNode;
+  data?: Array<Record<string, unknown>>;
+  bars?: Array<Record<string, unknown>>;
+  height?: number;
+  className?: string;
+  loading?: boolean;
+  error?: unknown;
+  emptyMessage?: string;
+  actions?: ReactNode;
+  showGrid?: boolean;
+  showLegend?: boolean;
+  orientation?: "vertical" | "horizontal";
+  formatTooltip?: React.ComponentType<unknown> | ((props: unknown) => ReactNode);
+  maxBarSize?: number;
+  categoryKey?: string;
+  valueFormatter?: (value: number) => string;
+  [key: string]: unknown;
+}
 
 const CategoryBarChart = ({
   title = "Category Analysis",
@@ -61,15 +83,20 @@ const CategoryBarChart = ({
   actions,
   showGrid = true,
   showLegend = true,
-  orientation = "vertical", // "vertical" or "horizontal"
+  orientation = "vertical",
   formatTooltip,
   maxBarSize = 60,
+  categoryKey = "name",
+  valueFormatter,
   ...props
-}) => {
-  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
+}: CategoryBarChartProps) => {
+  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory, formatters } =
+    useChartConfig();
 
   // Use custom tooltip or default
-  const TooltipComponent = formatTooltip || CustomTooltip;
+  const TooltipComponent = (formatTooltip || CustomTooltip) as React.ComponentType<unknown>;
+  const tooltipRenderer = (tooltipProps: unknown) =>
+    React.createElement(TooltipComponent, tooltipProps as Record<string, unknown>);
 
   // Ensure data is valid
   const chartData = Array.isArray(data) ? data : [];
@@ -79,7 +106,13 @@ const CategoryBarChart = ({
 
   // Configure chart orientation
   const isHorizontal = orientation === "horizontal";
-  const AxisConfig = getAxisConfig(isHorizontal, chartDefaults);
+  const AxisConfig = getAxisConfig(isHorizontal, chartDefaults, categoryKey);
+  const formatValue =
+    valueFormatter ||
+    ((raw: number) => {
+      const numeric = Number(raw ?? 0);
+      return formatters.shortCurrency(numeric);
+    });
 
   return (
     <ChartContainer
@@ -105,15 +138,15 @@ const CategoryBarChart = ({
           <XAxis
             {...AxisConfig.XAxis}
             fontSize={12}
-            tickFormatter={isHorizontal ? formatCurrency : undefined}
+            tickFormatter={isHorizontal ? (value: number) => formatValue(value) : undefined}
           />
           <YAxis
             {...AxisConfig.YAxis}
             fontSize={12}
-            tickFormatter={!isHorizontal ? formatCurrency : undefined}
+            tickFormatter={!isHorizontal ? (value: number) => formatValue(value) : undefined}
           />
 
-          <Tooltip content={<TooltipComponent />} />
+          <Tooltip content={tooltipRenderer} />
           {showLegend && <Legend />}
 
           {barConfig.map((barProps, index) => (

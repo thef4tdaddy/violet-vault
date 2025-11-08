@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef, useEffect, useRef } from "react";
 
 type SizeType = "sm" | "md" | "lg";
 type VariantType = "underline" | "pills" | "buttons" | "tabs" | "colored";
@@ -185,6 +185,8 @@ const StandardTabs = ({
   className = "",
 }: StandardTabsProps) => {
   const config = SIZE_CONFIG[size];
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const getVariantStyles = (isActive: boolean, isDisabled: boolean): string => {
     if (isDisabled) return "cursor-not-allowed opacity-50 text-gray-400";
@@ -195,9 +197,28 @@ const StandardTabs = ({
   const containerClass = getContainerClass(variant);
   const navClass = getNavClass(variant);
 
+  useEffect(() => {
+    const activeElement = tabRefs.current[activeTab];
+    const navElement = containerRef.current;
+
+    if (activeElement && navElement) {
+      navElement.scrollTo({
+        left: Math.max(
+          0,
+          activeElement.offsetLeft - (navElement.clientWidth - activeElement.offsetWidth) / 2
+        ),
+        behavior: "smooth",
+      });
+    }
+  }, [activeTab]);
+
   return (
     <div className={`${containerClass} ${className} relative`}>
-      <nav className={navClass} style={{ scrollSnapType: "x mandatory" }}>
+      <nav
+        ref={containerRef}
+        className={navClass}
+        style={{ scrollSnapType: "x mandatory", scrollPaddingInline: "1.5rem" }}
+      >
         {tabs.map((tab) => (
           <TabButton
             key={tab.id}
@@ -208,6 +229,9 @@ const StandardTabs = ({
             getVariantStyles={getVariantStyles}
             getCountStyles={getCountStyles}
             onTabChange={onTabChange}
+            ref={(element) => {
+              tabRefs.current[tab.id] = element;
+            }}
           />
         ))}
       </nav>
@@ -229,51 +253,48 @@ interface TabButtonProps {
   onTabChange: (tabId: string) => void;
 }
 
-const TabButton = ({
-  tab,
-  isActive,
-  config,
-  variant,
-  getVariantStyles,
-  getCountStyles,
-  onTabChange,
-}: TabButtonProps) => {
-  const isDisabled = tab.disabled || false;
-  const Icon = tab.icon;
+const TabButton = forwardRef<HTMLButtonElement, TabButtonProps>(
+  ({ tab, isActive, config, variant, getVariantStyles, getCountStyles, onTabChange }, ref) => {
+    const isDisabled = tab.disabled || false;
+    const Icon = tab.icon;
 
-  let tabStyles = getVariantStyles(isActive, isDisabled);
-  let countStyles = getCountStyles(isActive);
+    let tabStyles = getVariantStyles(isActive, isDisabled);
+    let countStyles = getCountStyles(isActive);
 
-  if (variant === "colored" && tab.color && !isDisabled) {
-    tabStyles = getColoredTabStyles(isActive, tab.color as ColorType);
-    countStyles = getColoredCountStyles(isActive, tab.color as ColorType);
-  }
+    if (variant === "colored" && tab.color && !isDisabled) {
+      tabStyles = getColoredTabStyles(isActive, tab.color as ColorType);
+      countStyles = getColoredCountStyles(isActive, tab.color as ColorType);
+    }
 
-  return (
-    <button
-      onClick={() => !isDisabled && onTabChange(tab.id)}
-      disabled={isDisabled}
-      className={`
+    return (
+      <button
+        ref={ref}
+        onClick={() => !isDisabled && onTabChange(tab.id)}
+        disabled={isDisabled}
+        className={`
         font-medium ${config.text} ${config.padding} 
         flex items-center gap-2 transition-all duration-200
         flex-[0_0_50%] sm:flex-[0_0_auto]
         ${tabStyles}
         ${isActive && variant === "colored" ? "border-2 border-black" : ""}
       `.trim()}
-      style={
-        isActive && variant === "colored"
-          ? { border: "2px solid black", scrollSnapAlign: "start" }
-          : { scrollSnapAlign: "start" }
-      }
-    >
-      {Icon && React.createElement(Icon, { className: config.iconSize })}
-      {tab.label}
-      {tab.count !== undefined && tab.count !== null && (
-        <TabCount count={tab.count} config={config} countStyles={countStyles} />
-      )}
-    </button>
-  );
-};
+        style={
+          isActive && variant === "colored"
+            ? { border: "2px solid black", scrollSnapAlign: "center" }
+            : { scrollSnapAlign: "center" }
+        }
+      >
+        {Icon && React.createElement(Icon, { className: config.iconSize })}
+        {tab.label}
+        {tab.count !== undefined && tab.count !== null && (
+          <TabCount count={tab.count} config={config} countStyles={countStyles} />
+        )}
+      </button>
+    );
+  }
+);
+
+TabButton.displayName = "TabButton";
 
 interface TabCountProps {
   count: number;
