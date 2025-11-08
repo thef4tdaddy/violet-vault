@@ -812,7 +812,7 @@ const updateBaseBills = () => {
       amount: 139.99,
       envelopeId: 'env-011-connectivity',
       dueInDays: -2,
-      frequency: 'annually',
+      frequency: 'annual',
       autopay: true,
       description: 'Annual streaming bundle with sports and originals',
       supportPhone: '(555) 660-1250',
