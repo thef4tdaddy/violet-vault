@@ -96,6 +96,8 @@ interface PaycheckTransaction {
   processedBy: string;
   processedAt: string;
   date: string;
+  proportionalBreakdown?: Record<string, number>;
+  allocationFlag?: "partial" | "full" | "none";
 }
 
 /**
@@ -257,19 +259,40 @@ export const calculateEnvelopeAllocations = (
     };
   }
 
-  const allocations = [];
+  const allocations: AllocationItem[] = [];
   let totalAllocated = 0;
 
   if (allocationMode === "allocate") {
-    // Standard allocation based on monthly amounts and biweekly conversion
-    allocatableEnvelopes.forEach((envelope) => {
-      let allocationAmount = 0;
+    // Baseline allocation using biweekly conversion
+    const baseline = allocatableEnvelopes.map((envelope) => {
+      const biweeklyNeed =
+        typeof envelope.monthlyAmount === "number"
+          ? Math.round((envelope.monthlyAmount / BIWEEKLY_MULTIPLIER) * 100) / 100
+          : 0;
 
-      if (envelope.monthlyAmount > 0) {
-        // Convert monthly to biweekly for standard allocation
-        allocationAmount = envelope.monthlyAmount / BIWEEKLY_MULTIPLIER;
-        allocationAmount = Math.round(allocationAmount * 100) / 100;
+      return {
+        envelope,
+        biweeklyNeed,
+        outstanding: Math.max(0, biweeklyNeed - (envelope.currentBalance ?? 0)),
+      };
+    });
+
+    const totalOutstanding = baseline.reduce((sum, entry) => sum + entry.outstanding, 0);
+
+    baseline.forEach(({ envelope, biweeklyNeed, outstanding }) => {
+      if (outstanding <= 0 || biweeklyNeed <= 0) {
+        return;
       }
+
+      let allocationAmount = outstanding;
+
+      if (totalOutstanding > amount && totalOutstanding > 0) {
+        const proportion = outstanding / totalOutstanding;
+        allocationAmount = Math.round(amount * proportion * 100) / 100;
+      }
+
+      allocationAmount = Math.min(allocationAmount, Math.max(0, amount - totalAllocated));
+      allocationAmount = Math.round(allocationAmount * 100) / 100;
 
       if (allocationAmount > 0) {
         allocations.push({
@@ -284,7 +307,6 @@ export const calculateEnvelopeAllocations = (
       }
     });
   } else if (allocationMode === "leftover") {
-    // Leftover mode: distribute remaining amount proportionally
     const totalMonthlyNeeds = allocatableEnvelopes.reduce(
       (sum, env) => sum + (env.monthlyAmount || 0),
       0
@@ -310,10 +332,9 @@ export const calculateEnvelopeAllocations = (
     }
   }
 
-  // Sort allocations by priority and amount
-  const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+  const priorityOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
   allocations.sort((a, b) => {
-    const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+    const priorityDiff = (priorityOrder[b.priority] ?? 0) - (priorityOrder[a.priority] ?? 0);
     return priorityDiff !== 0 ? priorityDiff : b.amount - a.amount;
   });
 

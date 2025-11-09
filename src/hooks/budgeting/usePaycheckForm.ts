@@ -1,6 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
-import { getUniquePayers, getPayerPrediction } from "../../utils/budgeting/paycheckAllocationUtils";
+import {
+  getUniquePayers,
+  getPayerPrediction,
+  calculatePaycheckAllocation,
+} from "../../utils/budgeting/paycheckAllocationUtils";
 import logger from "../../utils/common/logger";
 
 /**
@@ -21,7 +25,12 @@ const useInitializeNewPayerState = (uniquePayersLength, setShowAddNewPayer, init
  * Custom hook for paycheck form state management
  * Handles all form-related state and logic
  */
-export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaycheck }) => {
+export const usePaycheckForm = ({
+  paycheckHistory,
+  currentUser,
+  onProcessPaycheck,
+  envelopes = [],
+}) => {
   // Form state
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
@@ -81,11 +90,38 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
     setIsProcessing(true);
 
     try {
+      const allocationPreview = calculatePaycheckAllocation(amount, allocationMode, envelopes);
+      const envelopeAllocations: Array<{ envelopeId: string; amount: number }> =
+        allocationPreview?.mode === "allocate"
+          ? Object.entries(allocationPreview.allocations || {}).map(([envelopeId, allocation]) => ({
+              envelopeId,
+              amount: Math.round(Number(allocation || 0) * 100) / 100,
+            }))
+          : [];
+
+      const totalAllocated = envelopeAllocations.reduce((sum, allocation) => {
+        return sum + allocation.amount;
+      }, 0);
+
+      const leftoverAmount =
+        allocationPreview?.mode === "allocate"
+          ? Math.max(0, amount - totalAllocated)
+          : amount;
+
+      const allocationDebug =
+        allocationPreview && allocationPreview.mode === "allocate"
+          ? (allocationPreview as { debugInfo?: unknown }).debugInfo
+          : undefined;
+
       const result = await onProcessPaycheck({
         amount,
         payerName: payerName.trim(),
         mode: allocationMode,
         date: new Date().toISOString(),
+        envelopeAllocations,
+        allocationSummary: allocationPreview?.summary,
+        allocationDebug,
+        leftoverAmount,
       });
 
       logger.debug("Paycheck processed:", result);
@@ -113,6 +149,15 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
   };
 
   // Validation
+  const allocationPreview = useMemo(() => {
+    const amount = parseFloat(paycheckAmount);
+    if (!amount || amount <= 0) {
+      return null;
+    }
+
+    return calculatePaycheckAllocation(amount, allocationMode, envelopes);
+  }, [paycheckAmount, allocationMode, envelopes]);
+
   const canSubmit = paycheckAmount && payerName.trim() && !isProcessing;
 
   return {
@@ -145,5 +190,8 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
 
     // Utilities
     getPayerPrediction: (payer) => getPayerPrediction(payer, paycheckHistory),
+
+    // Preview data
+    allocationPreview,
   };
 };

@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 3895 | 0 |
+| TypeScript Strict Mode Errors | 3890 | 0 |
 
-*Last updated: 2025-11-09 18:49:37 UTC*
+*Last updated: 2025-11-09 19:10:32 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-09 18:49:19 UTC
+Last check: 2025-11-09 19:10:18 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-09 18:49:28 UTC
+Last check: 2025-11-09 19:10:25 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -175,7 +175,6 @@ Last check: 2025-11-09 18:49:28 UTC
 - 9 errors in `src/utils/pwa/backgroundSync.ts`
 - 9 errors in `src/utils/debug/syncDiagnostic.ts`
 - 9 errors in `src/utils/debug/reactErrorDetector.ts`
-- 9 errors in `src/utils/budgeting/paycheckUtils.ts`
 - 9 errors in `src/utils/budgeting/envelopeMatching.ts`
 - 9 errors in `src/utils/analytics/trendHelpers.ts`
 - 9 errors in `src/services/bugReport/uiStateService.ts`
@@ -312,6 +311,7 @@ Last check: 2025-11-09 18:49:28 UTC
 - 4 errors in `src/utils/sync/retryPolicies.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
 - 4 errors in `src/utils/icons/index.ts`
+- 4 errors in `src/utils/budgeting/paycheckUtils.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
@@ -562,11 +562,11 @@ Last check: 2025-11-09 18:49:28 UTC
 | 290 | `TS2339` |
 | 249 | `TS2345` |
 | 217 | `TS18046` |
-| 149 | `TS7053` |
-| 111 | `TS2322` |
-| 85 | `TS7005` |
-| 84 | `TS18048` |
-| 54 | `TS7034` |
+| 147 | `TS7053` |
+| 113 | `TS2322` |
+| 83 | `TS7005` |
+| 82 | `TS18048` |
+| 53 | `TS7034` |
 | 52 | `TS18047` |
 | 26 | `TS2769` |
 | 9 | `TS2353` |
@@ -1328,11 +1328,11 @@ src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(97,3): error TS7031:
 src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(98,3): error TS7031: Binding element 'onNewPayerNameChange' implicitly has an 'any' type.
 src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(99,3): error TS7031: Binding element 'onAddNewPayer' implicitly has an 'any' type.
 src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(100,3): error TS7031: Binding element 'onToggleAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(21,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(22,3): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(23,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(93,25): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(127,32): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(20,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(21,3): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(22,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(91,25): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
+src/components/budgeting/PaycheckProcessor.tsx(125,32): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
 src/components/budgeting/PaydayPrediction.tsx(48,26): error TS7031: Binding element 'confidence' implicitly has an 'any' type.
 src/components/budgeting/PaydayPrediction.tsx(48,38): error TS7031: Binding element 'confidenceColor' implicitly has an 'any' type.
 src/components/budgeting/PaydayPrediction.tsx(67,29): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
@@ -2774,21 +2774,21 @@ src/hooks/budgeting/useEnvelopesQuery.ts(102,22): error TS7053: Element implicit
   No index signature with a parameter of type 'string' was found on type 'Envelope'.
 src/hooks/budgeting/useEnvelopesQuery.ts(103,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
   No index signature with a parameter of type 'string' was found on type 'Envelope'.
-src/hooks/budgeting/usePaycheckForm.ts(9,37): error TS7006: Parameter 'uniquePayersLength' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(9,57): error TS7006: Parameter 'setShowAddNewPayer' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(9,77): error TS7006: Parameter 'initialRender' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(24,35): error TS7031: Binding element 'paycheckHistory' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(24,52): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(24,65): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(46,30): error TS7006: Parameter 'selectedPayer' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(62,30): error TS7006: Parameter 'trimmedName' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(64,19): error TS2345: Argument of type '(prev: never[]) => any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+src/hooks/budgeting/usePaycheckForm.ts(13,37): error TS7006: Parameter 'uniquePayersLength' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(13,57): error TS7006: Parameter 'setShowAddNewPayer' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(13,77): error TS7006: Parameter 'initialRender' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(29,3): error TS7031: Binding element 'paycheckHistory' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(30,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(31,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(55,30): error TS7006: Parameter 'selectedPayer' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(71,30): error TS7006: Parameter 'trimmedName' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(73,19): error TS2345: Argument of type '(prev: never[]) => any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
   Type '(prev: never[]) => any[]' is not assignable to type '(prevState: never[]) => never[]'.
     Type 'any[]' is not assignable to type 'never[]'.
       Type 'any' is not assignable to type 'never'.
-src/hooks/budgeting/usePaycheckForm.ts(72,31): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(102,37): error TS7006: Parameter 'processedPayerName' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckForm.ts(147,26): error TS7006: Parameter 'payer' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(81,31): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(138,37): error TS7006: Parameter 'processedPayerName' implicitly has an 'any' type.
+src/hooks/budgeting/usePaycheckForm.ts(192,26): error TS7006: Parameter 'payer' implicitly has an 'any' type.
 src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
     Argument of type 'Date | undefined' is not assignable to parameter of type 'string | number | Date'.
@@ -4294,15 +4294,12 @@ src/utils/budgeting/paycheckProcessing.ts(121,39): error TS7006: Parameter 'payc
 src/utils/budgeting/paycheckProcessing.ts(121,53): error TS7006: Parameter 'envelopesQuery' implicitly has an 'any' type.
 src/utils/budgeting/paycheckProcessing.ts(121,69): error TS7006: Parameter 'savingsGoalsQuery' implicitly has an 'any' type.
 src/utils/budgeting/paycheckProcessing.ts(134,44): error TS7006: Parameter 'alloc' implicitly has an 'any' type.
-src/utils/budgeting/paycheckUtils.ts(260,9): error TS7034: Variable 'allocations' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/paycheckUtils.ts(268,11): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/paycheckUtils.ts(270,28): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/paycheckUtils.ts(295,13): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/paycheckUtils.ts(296,30): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/paycheckUtils.ts(315,3): error TS7005: Variable 'allocations' implicitly has an 'any[]' type.
-src/utils/budgeting/paycheckUtils.ts(316,26): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ critical: number; high: number; medium: number; low: number; }'.
-src/utils/budgeting/paycheckUtils.ts(316,54): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ critical: number; high: number; medium: number; low: number; }'.
-src/utils/budgeting/paycheckUtils.ts(321,5): error TS7005: Variable 'allocations' implicitly has an 'any[]' type.
+src/utils/budgeting/paycheckUtils.ts(302,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/utils/budgeting/paycheckUtils.ts(317,13): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
+src/utils/budgeting/paycheckUtils.ts(318,30): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
+src/utils/budgeting/paycheckUtils.ts(325,13): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
 src/utils/budgeting/suggestionUtils.ts(147,9): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.
 src/utils/budgeting/suggestionUtils.ts(198,10): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
 src/utils/budgeting/suggestionUtils.ts(216,9): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.

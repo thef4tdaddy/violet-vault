@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { calculatePaycheckAllocation } from "../../utils/budgeting/paycheckAllocationUtils";
 import { usePaycheckForm } from "../../hooks/budgeting/usePaycheckForm";
 import { usePaycheckHistory } from "../../hooks/budgeting/usePaycheckHistory";
 import PaycheckAmountInput from "./paycheck/PaycheckAmountInput";
@@ -27,6 +26,7 @@ const PaycheckProcessor = ({
     paycheckHistory,
     currentUser,
     onProcessPaycheck,
+    envelopes,
   });
 
   const historyHook = usePaycheckHistory({
@@ -34,9 +34,7 @@ const PaycheckProcessor = ({
   });
 
   // Calculate allocation preview
-  const preview = formHook.showPreview
-    ? calculatePaycheckAllocation(formHook.paycheckAmount, formHook.allocationMode, envelopes)
-    : null;
+  const preview = formHook.showPreview ? formHook.allocationPreview : null;
 
   return (
     <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
