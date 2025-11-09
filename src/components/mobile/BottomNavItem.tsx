@@ -32,7 +32,8 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
         ${isActive ? "text-purple-600" : "text-gray-600 hover:text-gray-800"}
       `}
       style={{
-        scrollSnapAlign: "start",
+        scrollSnapAlign: "center",
+        scrollSnapStop: "always",
         minWidth: "20%", // Show 5 items at a time (100% / 5 = 20%)
         flex: "0 0 20%",
       }}

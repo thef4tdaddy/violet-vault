@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 3896 | 0 |
+| TypeScript Strict Mode Errors | 3895 | 0 |
 
-*Last updated: 2025-11-08 22:15:55 UTC*
+*Last updated: 2025-11-09 18:49:37 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-08 22:15:38 UTC
+Last check: 2025-11-09 18:49:19 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-08 22:15:46 UTC
+Last check: 2025-11-09 18:49:28 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -285,7 +285,6 @@ Last check: 2025-11-08 22:15:46 UTC
 - 5 errors in `src/hooks/budgeting/mutations/useTransferFunds.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
-- 5 errors in `src/components/transactions/TransactionTable.tsx`
 - 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 5 errors in `src/components/settings/archiving/ArchivingConfiguration.tsx`
 - 5 errors in `src/components/savings/SavingsGoals.tsx`
@@ -331,6 +330,7 @@ Last check: 2025-11-08 22:15:46 UTC
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 4 errors in `src/hooks/analytics/useTransactionFiltering.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
+- 4 errors in `src/components/transactions/TransactionTable.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 4 errors in `src/components/sync/SyncHealthDashboard.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
@@ -559,7 +559,7 @@ Last check: 2025-11-08 22:15:46 UTC
 |---|---|
 | 1578 | `TS7006` |
 | 944 | `TS7031` |
-| 291 | `TS2339` |
+| 290 | `TS2339` |
 | 249 | `TS2345` |
 | 217 | `TS18046` |
 | 149 | `TS7053` |
@@ -2135,12 +2135,11 @@ src/components/transactions/TransactionLedger.tsx(154,59): error TS2345: Argumen
   Type 'Transaction' provides no match for the signature '(prevState: null): null'.
 src/components/transactions/TransactionSplitter.tsx(34,5): error TS2322: Type 'Transaction | null' is not assignable to type 'Transaction | undefined'.
   Type 'null' is not assignable to type 'Transaction | undefined'.
-src/components/transactions/TransactionTable.tsx(48,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
+src/components/transactions/TransactionTable.tsx(315,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
-src/components/transactions/TransactionTable.tsx(52,36): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(108,57): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(142,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(144,42): error TS2339: Property 'description' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(319,36): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(367,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(369,42): error TS2339: Property 'description' does not exist on type 'never'.
 src/components/ui/StandardFilters.tsx(362,11): error TS2322: Type '{ [key: string]: string | boolean | undefined; search?: string; }' is not assignable to type 'Record<string, string | boolean>'.
   'string' index signatures are incompatible.
     Type 'string | boolean | undefined' is not assignable to type 'string | boolean'.
