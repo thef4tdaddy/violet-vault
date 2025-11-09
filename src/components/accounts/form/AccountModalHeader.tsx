@@ -47,7 +47,7 @@ const AccountModalHeader = ({
           Break
         </Button>
       )}
-      <ModalCloseButton onClick={onClose} />
+      <ModalCloseButton onClick={onClose} variant="outlineRed" />
     </div>
   </div>
 );

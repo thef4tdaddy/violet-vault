@@ -7,6 +7,7 @@ import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import { usePasswordValidation } from "@/hooks/auth/queries/usePasswordValidation";
 import shieldLogo from "@/assets/logo-512x512.png";
 import SecurityAlert from "../ui/SecurityAlert";
+import logger from "@/utils/common/logger";
 
 const LockScreen = () => {
   const { isLocked, unlockSession, securityEvents } = useSecurityManager();
@@ -85,6 +86,29 @@ const LockScreen = () => {
     setPasswordToValidate("");
     setPassword("");
 
+    logger.warn("Validation corruption detected during unlock", {
+      location: "LockScreen",
+      bufferedLogCount: logger.getBufferedLogCount(),
+    });
+
+    const downloadLogsSection =
+      (import.meta.env.DEV || logger.getBufferedLogCount() > 0) && typeof window !== "undefined" ? (
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-left text-sm text-red-700">
+          <p className="font-medium">Need to share a debug log?</p>
+          <p className="mt-1">
+            Download the recent console buffer and attach it to your bug report. Contains the latest{" "}
+            {logger.getBufferedLogCount()} entries.
+          </p>
+          <button
+            type="button"
+            className="mt-3 inline-flex items-center rounded-md border border-red-500 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+            onClick={() => logger.downloadBufferedLogs("violet-vault-validation-debug-log.txt")}
+          >
+            Download console log
+          </button>
+        </div>
+      ) : null;
+
     const confirmPromise = new Promise((resolve) => {
       const originalConfirm = confirm({
         title: "🔧 Corrupted Validation Data Detected",
@@ -93,6 +117,7 @@ const LockScreen = () => {
         confirmLabel: "Clear & Sync Fresh",
         cancelLabel: "Cancel",
         destructive: false,
+        children: downloadLogsSection ?? undefined,
       });
 
       originalConfirm.then(resolve).catch(() => resolve(false));

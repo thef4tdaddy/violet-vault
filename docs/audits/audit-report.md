@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 3890 | 0 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 2 | 0 |
+| TypeScript Strict Mode Errors | 3892 | 0 |
 
-*Last updated: 2025-11-09 19:25:09 UTC*
+*Last updated: 2025-11-09 19:49:58 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,15 +26,34 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 1 issues in `violet-vault/src/components/security/LockScreen.tsx`
 
-Last check: 2025-11-09 19:24:53 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 1 | `enforce-ui-library/enforce-ui-library` |
+
+### Detailed Lint Report
+```
+violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+```
 
 ## Typecheck Audit
 
-✅ **All files passed TypeScript type checking!**
+### Files with Most Type Errors
+- 2 errors in `src/components/ui/ModalCloseButton.tsx`
 
-Last check: 2025-11-09 19:25:01 UTC
+### Type Error Breakdown by Category
+| Count | Error Code |
+|---|---|
+| 2 | `TS2322` |
+
+### Detailed Type Error Report
+```
+src/components/ui/ModalCloseButton.tsx(14,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
+src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
+```
 
 ## Typecheck Strict Mode Audit
 
@@ -437,6 +456,7 @@ Last check: 2025-11-09 19:25:01 UTC
 - 2 errors in `src/hooks/analytics/useBillAnalysis.ts`
 - 2 errors in `src/hooks/analytics/useAnalyticsExport.ts`
 - 2 errors in `src/contexts/authUtils.ts`
+- 2 errors in `src/components/ui/ModalCloseButton.tsx`
 - 2 errors in `src/components/transactions/import/ImportProgress.tsx`
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
 - 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
@@ -563,7 +583,7 @@ Last check: 2025-11-09 19:25:01 UTC
 | 249 | `TS2345` |
 | 217 | `TS18046` |
 | 147 | `TS7053` |
-| 113 | `TS2322` |
+| 115 | `TS2322` |
 | 83 | `TS7005` |
 | 82 | `TS18048` |
 | 53 | `TS7034` |
@@ -1870,14 +1890,14 @@ src/components/savings/SavingsSummaryCard.tsx(19,25): error TS2339: Property 'ta
 src/components/security/LocalDataSecurityWarning.tsx(12,37): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/security/LocalDataSecurityWarning.tsx(12,46): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
 src/components/security/LocalDataSecurityWarning.tsx(133,26): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
-src/components/security/LockScreen.tsx(57,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
-src/components/security/LockScreen.tsx(101,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
-src/components/security/LockScreen.tsx(131,7): error TS2322: Type '{ isValid: boolean; reason?: string | undefined; isCorrupted?: boolean | undefined; } | { isValid: boolean; reason: string; error: any; }' is not assignable to type 'null'.
+src/components/security/LockScreen.tsx(58,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
+src/components/security/LockScreen.tsx(126,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
+src/components/security/LockScreen.tsx(156,7): error TS2322: Type '{ isValid: boolean; reason?: string | undefined; isCorrupted?: boolean | undefined; } | { isValid: boolean; reason: string; error: any; }' is not assignable to type 'null'.
   Type '{ isValid: boolean; reason?: string | undefined; isCorrupted?: boolean | undefined; }' is not assignable to type 'null'.
-src/components/security/LockScreen.tsx(136,26): error TS2339: Property 'cancel' does not exist on type 'never'.
-src/components/security/LockScreen.tsx(179,35): error TS2339: Property 'focus' does not exist on type 'never'.
-src/components/security/LockScreen.tsx(192,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/security/LockScreen.tsx(207,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/security/LockScreen.tsx(161,26): error TS2339: Property 'cancel' does not exist on type 'never'.
+src/components/security/LockScreen.tsx(204,35): error TS2339: Property 'focus' does not exist on type 'never'.
+src/components/security/LockScreen.tsx(217,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/security/LockScreen.tsx(232,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(6,3): error TS7031: Binding element 'needsArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(7,3): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(8,3): error TS7031: Binding element 'showPreview' implicitly has an 'any' type.
@@ -1917,8 +1937,8 @@ src/components/settings/sections/AutoLockSettingsSection.tsx(33,36): error TS703
 src/components/settings/sections/AutoLockSettingsSection.tsx(33,54): error TS7031: Binding element 'handleSettingChange' implicitly has an 'any' type.
 src/components/settings/sections/ClipboardSecuritySection.tsx(8,37): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
 src/components/settings/sections/ClipboardSecuritySection.tsx(8,55): error TS7031: Binding element 'handleSettingChange' implicitly has an 'any' type.
-src/components/settings/sections/DevToolsSection.tsx(16,28): error TS7031: Binding element 'onOpenEnvelopeChecker' implicitly has an 'any' type.
-src/components/settings/sections/DevToolsSection.tsx(16,51): error TS7031: Binding element 'onCreateTestHistory' implicitly has an 'any' type.
+src/components/settings/sections/DevToolsSection.tsx(17,28): error TS7031: Binding element 'onOpenEnvelopeChecker' implicitly has an 'any' type.
+src/components/settings/sections/DevToolsSection.tsx(17,51): error TS7031: Binding element 'onCreateTestHistory' implicitly has an 'any' type.
 src/components/settings/sections/GeneralSettingsSection.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/settings/sections/GeneralSettingsSection.tsx(270,3): error TS7031: Binding element 'isLocalOnlyMode' implicitly has an 'any' type.
 src/components/settings/sections/GeneralSettingsSection.tsx(271,3): error TS7031: Binding element 'cloudSyncEnabled' implicitly has an 'any' type.
@@ -2140,6 +2160,8 @@ src/components/transactions/TransactionTable.tsx(315,27): error TS2345: Argument
 src/components/transactions/TransactionTable.tsx(319,36): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionTable.tsx(367,40): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionTable.tsx(369,42): error TS2339: Property 'description' does not exist on type 'never'.
+src/components/ui/ModalCloseButton.tsx(14,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
+src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
 src/components/ui/StandardFilters.tsx(362,11): error TS2322: Type '{ [key: string]: string | boolean | undefined; search?: string; }' is not assignable to type 'Record<string, string | boolean>'.
   'string' index signatures are incompatible.
     Type 'string | boolean | undefined' is not assignable to type 'string | boolean'.
@@ -4442,8 +4464,8 @@ src/utils/common/highlight.ts(285,73): error TS2345: Argument of type 'unknown' 
 src/utils/common/lazyImport.ts(4,21): error TS7006: Parameter 'factory' implicitly has an 'any' type.
 src/utils/common/lazyImport.ts(6,21): error TS7006: Parameter 'module' implicitly has an 'any' type.
 src/utils/common/logger.ts(2,5): error TS7034: Variable 'H' implicitly has type 'any' in some locations where its type cannot be determined.
-src/utils/common/logger.ts(17,10): error TS7005: Variable 'H' implicitly has an 'any' type.
-src/utils/common/logger.ts(31,12): error TS7005: Variable 'H' implicitly has an 'any' type.
+src/utils/common/logger.ts(25,10): error TS7005: Variable 'H' implicitly has an 'any' type.
+src/utils/common/logger.ts(39,12): error TS7005: Variable 'H' implicitly has an 'any' type.
 src/utils/common/ocrProcessor.ts(349,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: null; encryptedSnapshot: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.

@@ -5,11 +5,19 @@ class Logger {
   isDevelopment: boolean;
   isDevSite: boolean;
   debugThrottles: Map<string, number>;
+  logBuffer: Array<{
+    timestamp: string;
+    level: string;
+    message: string;
+    data?: Record<string, unknown>;
+    errorStack?: string;
+  }>;
 
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
     this.isDevSite = this.getIsDevSite();
     this.debugThrottles = new Map(); // For throttling frequent debug messages
+    this.logBuffer = [];
   }
 
   // Initialize H when needed
@@ -47,6 +55,74 @@ class Logger {
     );
   }
 
+  private recordLogEntry(
+    level: string,
+    message: string,
+    data: Record<string, unknown> = {},
+    error: unknown = null
+  ) {
+    if (!(this.isDevelopment || this.isDevSite)) {
+      return;
+    }
+
+    const entry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      data: Object.keys(data || {}).length > 0 ? data : undefined,
+      errorStack:
+        error instanceof Error
+          ? `${error.name}: ${error.message}\n${error.stack ?? ""}`
+          : undefined,
+    };
+
+    this.logBuffer.push(entry);
+    const MAX_BUFFER = 500;
+    if (this.logBuffer.length > MAX_BUFFER) {
+      this.logBuffer.splice(0, this.logBuffer.length - MAX_BUFFER);
+    }
+  }
+
+  private formatLogEntry(entry: {
+    timestamp: string;
+    level: string;
+    message: string;
+    data?: Record<string, unknown>;
+    errorStack?: string;
+  }) {
+    const lines = [
+      `[${entry.timestamp}] [${entry.level}] ${entry.message}`,
+      entry.data ? `DATA: ${safeStringify(entry.data)}` : null,
+      entry.errorStack ? `ERROR: ${entry.errorStack}` : null,
+    ].filter(Boolean);
+
+    return lines.join("\n");
+  }
+
+  getBufferedLogCount() {
+    return this.logBuffer.length;
+  }
+
+  downloadBufferedLogs(filename = "violet-vault-logs.txt") {
+    if (typeof window === "undefined" || this.logBuffer.length === 0) {
+      console.warn("⚠️ No buffered logs available to download.");
+      return;
+    }
+
+    const formatted = this.logBuffer.map((entry) => this.formatLogEntry(entry)).join("\n\n");
+    const blob = new Blob([formatted], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
   // Debug-level logging for development and sync issues
   debug(message: string, data: Record<string, unknown> = {}) {
     // Show debug logs only in development or on dev.* sites
@@ -60,6 +136,8 @@ class Logger {
         data
       );
     }
+
+    this.recordLogEntry("DEBUG", message, data);
 
     // Highlight.io tracking for all debug logs
     try {
@@ -110,11 +188,15 @@ class Logger {
     } catch (error) {
       console.error("Highlight.io logging failed:", error);
     }
+
+    this.recordLogEntry("INFO", message, data);
   }
 
   // Warning-level logging
   warn(message: string, data: Record<string, unknown> = {}): void {
     console.warn(`⚠️ ${message}`, data);
+
+    this.recordLogEntry("WARN", message, data);
 
     const h = this.initH();
     if (h && h.track) {
@@ -129,6 +211,8 @@ class Logger {
   // Error-level logging
   error(message: string, error: unknown = null, data: Record<string, unknown> = {}): void {
     console.error(`❌ ${message}`, error, data);
+
+    this.recordLogEntry("ERROR", message, data, error);
 
     const h = this.initH();
     if (h && h.consumeError) {
@@ -167,6 +251,8 @@ class Logger {
       ((window as unknown as Record<string, unknown>).originalConsoleLog as typeof console.log) ||
       console.log;
     consoleLog(`🟢 [PROD] ${message}`, data);
+
+    this.recordLogEntry("PRODUCTION", message, data);
 
     try {
       const h = this.initH();
@@ -212,6 +298,8 @@ class Logger {
     } catch (error) {
       console.error("Failed to log to Highlight.io:", error);
     }
+
+    this.recordLogEntry("BUDGET-SYNC", message, data);
   }
 
   auth(message: string, data: Record<string, unknown> = {}) {
@@ -282,6 +370,30 @@ class Logger {
 }
 
 export const logger = new Logger();
+
+function safeStringify(value: Record<string, unknown>) {
+  try {
+    return JSON.stringify(
+      value,
+      (_key, v) => {
+        if (typeof v === "bigint") {
+          return v.toString();
+        }
+        if (v instanceof Error) {
+          return {
+            name: v.name,
+            message: v.message,
+            stack: v.stack,
+          };
+        }
+        return v;
+      },
+      2
+    );
+  } catch (error) {
+    return `"[Unserializable data: ${(error as Error)?.message ?? "unknown"}]"`;
+  }
+}
 
 // Make logger available globally for testing
 if (typeof window !== "undefined") {

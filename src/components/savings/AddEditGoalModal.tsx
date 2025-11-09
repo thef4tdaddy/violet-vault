@@ -98,7 +98,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
 const ModalHeader = ({ title, onClose }) => (
   <div className="flex justify-between items-center mb-6">
     <h3 className="text-xl font-semibold">{title}</h3>
-    <ModalCloseButton onClick={onClose} />
+    <ModalCloseButton onClick={onClose} variant="outlineRed" />
   </div>
 );
 

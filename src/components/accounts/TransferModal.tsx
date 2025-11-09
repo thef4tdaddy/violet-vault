@@ -82,7 +82,7 @@ const TransferModal = ({
       >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold">Transfer from {transferringAccount.name}</h3>
-          <ModalCloseButton onClick={onClose} />
+          <ModalCloseButton onClick={onClose} variant="outlineRed" />
         </div>
 
         <TransferModalContent

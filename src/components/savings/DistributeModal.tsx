@@ -148,7 +148,7 @@ const DistributeModal = ({
 const ModalHeader = ({ onClose }: { onClose: () => void }) => (
   <div className="flex justify-between items-center mb-6">
     <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
-    <ModalCloseButton onClick={onClose} />
+    <ModalCloseButton onClick={onClose} variant="outlineRed" />
   </div>
 );
 

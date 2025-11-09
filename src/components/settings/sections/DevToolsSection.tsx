@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import SyncDebugToolsSection from "./SyncDebugToolsSection";
+import logger from "@/utils/common/logger";
 // Development mode detection utility
 const isDevelopmentMode = () => {
   return (
@@ -16,6 +17,19 @@ const isDevelopmentMode = () => {
 const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
   const currentMode = import.meta.env.MODE || "production";
   const isDebugMode = isDevelopmentMode();
+  const [logCount, setLogCount] = useState(() => logger.getBufferedLogCount());
+
+  useEffect(() => {
+    if (!isDebugMode) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setLogCount(logger.getBufferedLogCount());
+    }, 2000);
+
+    return () => window.clearInterval(interval);
+  }, [isDebugMode]);
 
   return (
     <div className="space-y-6">
@@ -58,6 +72,23 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
 
         {/* Sync Debug Tools */}
         <SyncDebugToolsSection isDebugMode={isDebugMode} />
+
+        {isDebugMode && (
+          <Button
+            onClick={() => logger.downloadBufferedLogs()}
+            className="w-full flex items-center p-3 border-2 border-black bg-red-50 rounded-lg hover:bg-red-100 transition-colors shadow-sm"
+          >
+            {React.createElement(getIcon("Download"), {
+              className: "h-5 w-5 text-red-600 mr-3",
+            })}
+            <div className="text-left">
+              <p className="font-medium text-gray-900">🧾 Export Console Buffer</p>
+              <p className="text-sm text-gray-700">
+                Download the latest {logCount} buffered log entries as a text file
+              </p>
+            </div>
+          </Button>
+        )}
       </div>
     </div>
   );
