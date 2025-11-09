@@ -1,0 +1,267 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:102
+SECURITY:NONE
+ENCODING:USASCII
+CHARSET:1252
+COMPRESSION:NONE
+OLDFILEUID:NONE
+NEWFILEUID:NONE
+
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <DTSERVER>20251107000000
+      <LANGUAGE>ENG
+      <FI>
+        <ORG>VIOLETVAULT
+        <FID>999999999
+      </FI>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <BANKMSGSRSV1>
+    <STMTTRNRS>
+      <TRNUID>1
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <STMTRS>
+        <CURDEF>USD
+        <BANKACCTFROM>
+          <BANKID>999999999
+          <ACCTID>VVTEST001
+          <ACCTTYPE>CHECKING
+        </BANKACCTFROM>
+        <BANKTRANLIST>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251107000000
+            <TRNAMT>-48.67
+            <FITID>txn-013
+            <NAME>Grocery shopping Walmart
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251107000000
+            <TRNAMT>-66.76
+            <FITID>txn-040
+            <NAME>Pet supplies Chewy.com
+            <MEMO>env-007-pet-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251106000000
+            <TRNAMT>-50.00
+            <FITID>txn-009
+            <NAME>Birthday gift for friend Amazon
+            <MEMO>env-010-gifts
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251106000000
+            <TRNAMT>-19.99
+            <FITID>txn-012
+            <NAME>Video game purchase Steam
+            <MEMO>env-005-entertainment
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251106000000
+            <TRNAMT>-54.22
+            <FITID>txn-039
+            <NAME>Pet supplies VCA Animal Hospital
+            <MEMO>env-007-pet-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251106000000
+            <TRNAMT>-36.06
+            <FITID>txn-041
+            <NAME>Personal care Sephora
+            <MEMO>env-009-personal-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251106000000
+            <TRNAMT>-139.99
+            <FITID>bill-subscription-streaming-payment
+            <NAME>Cinematic+ Annual Bundle Auto-pay
+            <MEMO>env-011-connectivity • bill-subscription-streaming
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251105000000
+            <TRNAMT>-115.09
+            <FITID>txn-014
+            <NAME>Grocery shopping Costco
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251105000000
+            <TRNAMT>-19.13
+            <FITID>txn-027
+            <NAME>Dining out Chipotle
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251105000000
+            <TRNAMT>-13.75
+            <FITID>txn-028
+            <NAME>Dining out McDonalds
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251105000000
+            <TRNAMT>-51.42
+            <FITID>txn-042
+            <NAME>Personal care Ulta Beauty
+            <MEMO>env-009-personal-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>CREDIT
+            <DTPOSTED>20251105000000
+            <TRNAMT>2500.00
+            <FITID>txn-048
+            <NAME>Biweekly paycheck Acme Corporation
+            <MEMO>env-008-emergency
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251104000000
+            <TRNAMT>-32.35
+            <FITID>txn-023
+            <NAME>Gas fill-up Exxon
+            <MEMO>env-002-gas
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251104000000
+            <TRNAMT>-35.98
+            <FITID>txn-035
+            <NAME>Entertainment AMC Theaters
+            <MEMO>env-005-entertainment
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251104000000
+            <TRNAMT>-75.30
+            <FITID>txn-038
+            <NAME>Pet supplies Petco
+            <MEMO>env-007-pet-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251104000000
+            <TRNAMT>-12.45
+            <FITID>txn-uncat-1-1
+            <NAME>Starbucks Coffee Store 100
+            <MEMO>Unassigned
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-62.14
+            <FITID>txn-019
+            <NAME>Grocery shopping Trader Joes
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-42.08
+            <FITID>txn-020
+            <NAME>Dining out Panera Bread
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-34.22
+            <FITID>txn-021
+            <NAME>Dining out Olive Garden
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-41.36
+            <FITID>txn-022
+            <NAME>Dining out Starbucks
+            <MEMO>env-001-groceries
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-18.60
+            <FITID>txn-033
+            <NAME>Entertainment Netflix
+            <MEMO>env-005-entertainment
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-29.45
+            <FITID>txn-034
+            <NAME>Entertainment Amazon Prime
+            <MEMO>env-005-entertainment
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-12.75
+            <FITID>txn-037
+            <NAME>Personal care Target
+            <MEMO>env-009-personal-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251103000000
+            <TRNAMT>-28.90
+            <FITID>txn-047
+            <NAME>Personal care Great Clips
+            <MEMO>env-009-personal-care
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251102000000
+            <TRNAMT>-92.88
+            <FITID>txn-024
+            <NAME>Gas fill-up Chevron
+            <MEMO>env-002-gas
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251102000000
+            <TRNAMT>-26.44
+            <FITID>txn-025
+            <NAME>Gas fill-up Shell
+            <MEMO>env-002-gas
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20251102000000
+            <TRNAMT>-33.19
+            <FITID>txn-026
+            <NAME>Gas fill-up BP
+            <MEMO>env-002-gas
+          </STMTTRN>
+        </BANKTRANLIST>
+        <LEDGERBAL>
+          <BALAMT>0.00
+          <DTASOF>20251107000000
+        </LEDGERBAL>
+      </STMTRS>
+    </STMTTRNRS>
+  </BANKMSGSRSV1>
+</OFX>
+
+

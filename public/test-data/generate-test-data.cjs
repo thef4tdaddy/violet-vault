@@ -1266,11 +1266,13 @@ const enhanceEnvelopesForAnalytics = (envelopes) => {
 const enhancedEnvelopes = enhanceEnvelopesForAnalytics(allEnvelopes);
 
 // Construct final export object
+const builtAllTransactions = buildAllTransactions();
+
 const enhancedData = {
   envelopes: enhancedEnvelopes,
   bills: allBills,
   transactions: allTransactions,
-  allTransactions: buildAllTransactions(),
+  allTransactions: builtAllTransactions,
   savingsGoals: updatedBaseSavingsGoals,
   supplementalAccounts: updatedSupplementalAccounts,
   debts: enhancedDebts,
@@ -1319,7 +1321,7 @@ const enhancedData = {
       envelopes: enhancedEnvelopes.length,
       bills: allBills.length,
       transactions: allTransactions.length,
-      allTransactions: buildAllTransactions().length,
+      allTransactions: builtAllTransactions.length,
       debts: enhancedDebts.length,
       savingsGoals: baseData.savingsGoals.length,
       supplementalAccounts: updatedSupplementalAccounts.length,
@@ -1339,7 +1341,7 @@ console.log(`   - Bills: ${allBills.length} (added 4 debt payment bills)`);
 console.log(
   `   - Transactions: ${allTransactions.length} (generated ${newTransactions.length} base + ${recurringBillTransactions.length} discovery + ${uncategorizedClusterTransactions.length} suggestion samples)`
 );
-console.log(`   - All Transactions: ${buildAllTransactions().length}`);
+console.log(`   - All Transactions: ${builtAllTransactions.length}`);
 console.log(`   - Debts: ${enhancedDebts.length} (updated with envelope connections)`);
 console.log(`\n📁 Saved to: ${outputPath}`);
 const endDate = new Date();
@@ -1355,3 +1357,205 @@ console.log(
 );
 console.log(`   - Multiple pages of transactions for testing pagination`);
 console.log(`   - Data generated on: ${endDate.toISOString()}`);
+
+const sanitizeOfxText = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return String(value)
+    .replace(/[\r\n]+/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/&/g, "and")
+    .trim();
+};
+
+const formatOfxDate = (dateString) => {
+  if (!dateString) {
+    return new Date().toISOString().slice(0, 10).replace(/-/g, "") + "000000";
+  }
+  const date = new Date(dateString);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}${month}${day}000000`;
+};
+
+const buildOfxContent = (transactions) => {
+  const header = [
+    "OFXHEADER:100",
+    "DATA:OFXSGML",
+    "VERSION:102",
+    "SECURITY:NONE",
+    "ENCODING:USASCII",
+    "CHARSET:1252",
+    "COMPRESSION:NONE",
+    "OLDFILEUID:NONE",
+    "NEWFILEUID:NONE",
+    "",
+    "<OFX>",
+    "  <SIGNONMSGSRSV1>",
+    "    <SONRS>",
+    "      <STATUS>",
+    "        <CODE>0",
+    "        <SEVERITY>INFO",
+    "      </STATUS>",
+    `      <DTSERVER>${formatOfxDate(new Date().toISOString())}`,
+    "      <LANGUAGE>ENG",
+    "      <FI>",
+    "        <ORG>VIOLETVAULT",
+    "        <FID>999999999",
+    "      </FI>",
+    "    </SONRS>",
+    "  </SIGNONMSGSRSV1>",
+    "  <BANKMSGSRSV1>",
+    "    <STMTTRNRS>",
+    "      <TRNUID>1",
+    "      <STATUS>",
+    "        <CODE>0",
+    "        <SEVERITY>INFO",
+    "      </STATUS>",
+    "      <STMTRS>",
+    "        <CURDEF>USD",
+    "        <BANKACCTFROM>",
+    "          <BANKID>999999999",
+    "          <ACCTID>VVTEST001",
+    "          <ACCTTYPE>CHECKING",
+    "        </BANKACCTFROM>",
+    "        <BANKTRANLIST>",
+  ];
+
+  const footer = [
+    "        </BANKTRANLIST>",
+    "        <LEDGERBAL>",
+    "          <BALAMT>0.00",
+    `          <DTASOF>${formatOfxDate(new Date().toISOString())}`,
+    "        </LEDGERBAL>",
+    "      </STMTRS>",
+    "    </STMTTRNRS>",
+    "  </BANKMSGSRSV1>",
+    "</OFX>",
+    "",
+  ];
+
+  const stmtTransactions = transactions.map((txn, index) => {
+    const amount = Number(txn.amount || 0);
+    const trnType = amount >= 0 ? "CREDIT" : "DEBIT";
+    const postedDate = formatOfxDate(txn.date || txn.createdAt);
+    const fitId = sanitizeOfxText(txn.id || `VV-${index + 1}`);
+    const description =
+      sanitizeOfxText(txn.description || txn.merchant || txn.category || "Transaction") ||
+      `Transaction ${index + 1}`;
+    const memo = sanitizeOfxText(
+      txn.envelopeId
+        ? `${txn.envelopeId}${txn.billId ? ` • ${txn.billId}` : ""}`
+        : txn.metadata?.note || txn.notes || ""
+    );
+
+    return [
+      "          <STMTTRN>",
+      `            <TRNTYPE>${trnType}`,
+      `            <DTPOSTED>${postedDate}`,
+      `            <TRNAMT>${amount.toFixed(2)}`,
+      `            <FITID>${fitId}`,
+      `            <NAME>${description}`,
+      memo ? `            <MEMO>${memo}` : "",
+      "          </STMTTRN>",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  });
+
+  return [...header, ...stmtTransactions, ...footer].join("\n");
+};
+
+const ofxSampleTransactions = builtAllTransactions
+  .filter((txn) => txn && typeof txn.amount === "number" && txn.date)
+  .slice(0, 120);
+
+const ofxOutputPath = path.join(__dirname, "violet-vault-transactions-sample.ofx");
+fs.writeFileSync(ofxOutputPath, buildOfxContent(ofxSampleTransactions), "utf8");
+
+const RECENT_TRANSACTION_TEMPLATES = [
+  {
+    envelopeId: "env-001-groceries",
+    category: "Food & Dining",
+    merchants: ["Whole Foods Market", "Kroger", "Trader Joes", "Walmart Neighborhood Market"],
+    description: "Grocery run",
+    amountRange: [35, 95],
+  },
+  {
+    envelopeId: "env-002-gas",
+    category: "Transportation",
+    merchants: ["Shell", "Chevron", "BP", "Costco Fuel", "76 Gas"],
+    description: "Fuel refill",
+    amountRange: [28, 78],
+  },
+  {
+    envelopeId: "env-001-groceries",
+    category: "Food & Dining",
+    merchants: ["Chipotle", "Five Guys", "Taco Bell", "Chick-fil-A", "Shake Shack"],
+    description: "Fast food stop",
+    amountRange: [12, 24],
+  },
+];
+
+const generateRecentTransactions = (count = 10) => {
+  const today = new Date();
+  const transactions = [];
+
+  for (let i = 0; i < count; i += 1) {
+    const template = RECENT_TRANSACTION_TEMPLATES[i % RECENT_TRANSACTION_TEMPLATES.length];
+    const variation = Math.floor(i / RECENT_TRANSACTION_TEMPLATES.length);
+    const merchant =
+      template.merchants[(i * 2 + variation) % template.merchants.length] || template.merchants[0];
+
+    const transactionDate = new Date(today);
+    transactionDate.setDate(today.getDate() - (i % 5));
+
+    const amountMin = template.amountRange[0];
+    const amountMax = template.amountRange[1];
+    const fraction = (variation % 4) / 3;
+    const rawAmount = amountMin + fraction * (amountMax - amountMin);
+    const amount = -Math.round(rawAmount * 100) / 100;
+
+    const timestamp = transactionDate.getTime();
+
+    transactions.push({
+      id: `txn-recent-${String(i + 1).padStart(3, "0")}`,
+      date: transactionDate.toISOString().split("T")[0],
+      amount,
+      envelopeId: template.envelopeId,
+      category: template.category,
+      type: "expense",
+      lastModified: timestamp,
+      createdAt: timestamp,
+      description: template.description,
+      merchant,
+    });
+  }
+
+  return transactions;
+};
+
+const recentTransactions = generateRecentTransactions(10);
+
+const recentJsonPath = path.join(__dirname, "violet-vault-transactions-recent.json");
+fs.writeFileSync(
+  recentJsonPath,
+  JSON.stringify(
+    {
+      generatedAt: new Date().toISOString(),
+      transactions: recentTransactions,
+    },
+    null,
+    2
+  )
+);
+
+const recentOfxPath = path.join(__dirname, "violet-vault-transactions-recent.ofx");
+fs.writeFileSync(recentOfxPath, buildOfxContent(recentTransactions), "utf8");
+
+console.log(`   - OFX Sample: ${ofxSampleTransactions.length} transactions saved to ${ofxOutputPath}`);
+console.log(
+  `   - Recent Transactions: ${recentTransactions.length} saved to ${recentJsonPath} and ${recentOfxPath}`
+);
