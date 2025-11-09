@@ -108,8 +108,14 @@ export const useImportData = () => {
 
   const importData = useCallback(
     async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+      const inputElement = event.target as HTMLInputElement;
+      const file = inputElement.files ? inputElement.files[0] : null;
+      if (!file) {
+        if (inputElement) {
+          inputElement.value = "";
+        }
+        return;
+      }
 
       try {
         logger.info("Starting import process");
@@ -150,6 +156,10 @@ export const useImportData = () => {
         logger.error("Import failed", error);
         showErrorToast(`Import failed: ${error.message}`, "Import Failed");
         throw error;
+      } finally {
+        if (inputElement) {
+          inputElement.value = "";
+        }
       }
     },
     [currentUser, budgetId, encryptionKey, confirm, showErrorToast, showSuccessToast]

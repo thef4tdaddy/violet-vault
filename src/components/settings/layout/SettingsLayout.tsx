@@ -33,10 +33,25 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
+    <div
+      className="
+        fixed inset-0 z-50 flex justify-center
+        items-start sm:items-center
+        bg-black/50 backdrop-blur-sm
+        overflow-y-auto
+        px-0 py-6 sm:p-4
+      "
+    >
       <div
         ref={modalRef}
-        className="rounded-none sm:rounded-2xl border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full sm:max-w-4xl max-h-screen sm:max-h-[90vh] shadow-2xl relative flex flex-col overflow-hidden my-auto"
+        className="
+          rounded-none sm:rounded-2xl border-2 border-black
+          bg-purple-100/40 backdrop-blur-sm
+          w-full sm:max-w-4xl
+          max-h-[calc(100vh-3rem)] sm:max-h-[90vh]
+          shadow-2xl relative flex flex-col overflow-hidden
+          my-0 sm:my-auto
+        "
       >
         {/* Close Button - Top Right Corner */}
         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10">
