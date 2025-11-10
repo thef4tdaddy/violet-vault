@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | 0 |
-| TypeScript Errors | 21 | +1 |
-| TypeScript Strict Mode Errors | 3828 | +1 |
+| ESLint Issues | 10 | +9 |
+| TypeScript Errors | 30 | +9 |
+| TypeScript Strict Mode Errors | 3850 | +22 |
 
-*Last updated: 2025-11-10 19:23:00 UTC*
+*Last updated: 2025-11-10 19:26:48 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,67 +27,88 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 8 issues in `violet-vault/src/components/analytics/SmartCategoryManager.tsx`
+- 1 issues in `violet-vault/src/stores/ui/uiStore.ts`
 - 1 issues in `violet-vault/src/components/security/LockScreen.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 7 | `@typescript-eslint/no-unused-vars` |
+| 1 | `no-console` |
 | 1 | `enforce-ui-library/enforce-ui-library` |
+| 1 | `@typescript-eslint/no-explicit-any` |
 
 ### Detailed Lint Report
 ```
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:11:8 - 1 - 'logger' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:36:3 - 1 - 'onAddCategory' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:37:3 - 1 - 'onRemoveCategory' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:38:3 - 1 - 'onApplyToTransactions' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:39:3 - 1 - 'onApplyToBills' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:55:5 - 1 - 'applySuggestion' is assigned a value but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:83:40 - 1 - 'suggestion' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/analytics/SmartCategoryManager.tsx:88:7 - 2 - Unexpected console statement. (no-console)
 violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+violet-vault/src/stores/ui/uiStore.ts:283:20 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 5 errors in `src/components/analytics/SmartCategoryManager.tsx`
+- 14 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 4 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
+- 1 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 - 1 errors in `src/components/bills/BillManager.tsx`
 - 1 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
 - 1 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
-- 1 errors in `src/components/activity/ActivityFeed.tsx`
 - 1 errors in `src/App.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 7 | `TS2322` |
-| 5 | `TS2339` |
-| 3 | `TS2345` |
+| 8 | `TS6133` |
+| 6 | `TS2345` |
+| 6 | `TS2322` |
+| 4 | `TS2339` |
+| 2 | `TS2451` |
 | 1 | `TS2740` |
-| 1 | `TS2614` |
 | 1 | `TS2551` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
-| 1 | `TS2352` |
 
 ### Detailed Type Error Report
 ```
-src/App.tsx(19,15): error TS2614: Module '"./stores/ui/uiStore"' has no exported member 'UiStore'. Did you mean to use 'import UiStore from "./stores/ui/uiStore"' instead?
-src/components/activity/ActivityFeed.tsx(155,33): error TS2339: Property 'userName' does not exist on type 'AuditLogEntry'.
+src/App.tsx(28,35): error TS2345: Argument of type 'UiStore' is not assignable to parameter of type 'UIStore'.
+  Type 'UiStore' is missing the following properties from type 'UIStore': setUpdateAvailable, getState, hideInstallModal
 src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
 src/components/analytics/CategoryAnalysisTab.tsx(68,86): error TS2339: Property 'type' does not exist on type 'CategoryStat'.
 src/components/analytics/CategorySuggestionsTab.tsx(93,29): error TS2339: Property 'category' does not exist on type 'Suggestion'.
-src/components/analytics/CategorySuggestionsTab.tsx(120,72): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
-src/components/analytics/CategorySuggestionsTab.tsx(129,25): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/analytics/CategorySuggestionsTab.tsx(132,82): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
-src/components/analytics/SmartCategoryManager.tsx(70,9): error TS2352: Conversion of type 'Suggestion[]' to type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-  Property 'suggestedAmount' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
-src/components/analytics/SmartCategoryManager.tsx(111,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
+src/components/analytics/CategorySuggestionsTab.tsx(122,73): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
+src/components/analytics/CategorySuggestionsTab.tsx(131,25): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(134,82): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/analytics/SmartCategoryManager.tsx(11,1): error TS6133: 'logger' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(36,3): error TS6133: 'onAddCategory' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(37,3): error TS6133: 'onRemoveCategory' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(38,3): error TS6133: 'onApplyToTransactions' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(39,3): error TS6133: 'onApplyToBills' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(52,5): error TS2451: Cannot redeclare block-scoped variable 'handleUndismissSuggestion'.
+src/components/analytics/SmartCategoryManager.tsx(55,5): error TS6133: 'applySuggestion' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(69,9): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Suggestion[]'.
+  Type '{}' is missing the following properties from type 'Suggestion': id, priority, impact, category, and 3 more.
+src/components/analytics/SmartCategoryManager.tsx(83,40): error TS6133: 'suggestion' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(93,9): error TS2451: Cannot redeclare block-scoped variable 'handleUndismissSuggestion'.
+src/components/analytics/SmartCategoryManager.tsx(93,44): error TS6133: 'suggestionId' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(108,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
   Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion' is not assignable to type 'Suggestion'.
     Property 'title' is optional in type 'Suggestion' but required in type 'Suggestion'.
-src/components/analytics/SmartCategoryManager.tsx(112,13): error TS2322: Type '(suggestion: Suggestion) => Promise<void>' is not assignable to type '(suggestion: Suggestion) => void'.
-  Types of parameters 'suggestion' and 'suggestion' are incompatible.
-    Property 'category' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
-src/components/analytics/SmartCategoryManager.tsx(117,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
+src/components/analytics/SmartCategoryManager.tsx(114,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
   Property 'amount' is missing in type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat' but required in type 'CategoryStat'.
-src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
+src/components/analytics/SmartCategoryManager.tsx(120,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
 src/components/bills/BillManager.tsx(185,9): error TS2322: Type '{ handleBulkUpdate: (updatedBills: any) => Promise<{ success: boolean; successCount: number; errorCount: any; errors: any[]; message: any; }>; handlePayBill: (...args: Parameters<(...args: unknown[]) => Promise<unknown>>) => Promise<...>; handleBulkPayment: (billIds: any) => Promise<...>; validateBillData: (bill: an...' is not assignable to type '{ handlePayBill: (billId: string) => Promise<void>; }'.
   The types returned by 'handlePayBill(...)' are incompatible between these types.
     Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
@@ -98,6 +119,7 @@ src/hooks/budgeting/useBudgetData/paycheckMutations.ts(25,36): error TS2345: Arg
   Property 'mode' is optional in type 'PaycheckData' but required in type '{ amount: number; mode: string; envelopeAllocations?: { envelopeId: string; amount: number; }[]; notes?: string; payerName?: string; }'.
 src/hooks/budgeting/useSmartSuggestions.ts(170,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/hooks/budgeting/useSmartSuggestions.ts(170,46): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/utils/budgeting/paycheckAllocationUtils.ts(87,36): error TS2345: Argument of type 'string' is not assignable to parameter of type '"Bills & Utilities" | "Transportation" | "Subscriptions" | "Health & Medical" | "Education"'.
 src/utils/budgeting/paycheckProcessing.ts(153,49): error TS2345: Argument of type '{ actualBalance: unknown; virtualBalance: number; unassignedCash: unknown; isActualBalanceManual: unknown; }' is not assignable to parameter of type 'CurrentBalances'.
   Types of property 'actualBalance' are incompatible.
     Type 'unknown' is not assignable to type 'number'.
@@ -111,6 +133,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 ### Files with Most Strict Mode Errors
 - 62 errors in `src/utils/query/optimisticHelpers.ts`
 - 53 errors in `src/utils/budgeting/autofunding/simulation.ts`
+- 47 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 44 errors in `src/utils/savings/savingsCalculations.ts`
 - 43 errors in `src/hooks/bills/useBills/billAnalytics.ts`
 - 41 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
@@ -121,7 +144,6 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 36 errors in `src/utils/security/encryption.ts`
 - 36 errors in `src/services/transactions/transactionSplitterService.ts`
 - 34 errors in `src/utils/query/queryKeys.ts`
-- 33 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 33 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 32 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 28 errors in `src/services/chunkedSyncService.ts`
@@ -178,6 +200,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 15 errors in `src/components/transactions/TransactionFilters.tsx`
 - 15 errors in `src/components/sharing/ShareCodeModal.tsx`
 - 15 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
+- 15 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 14 errors in `src/utils/sync/validation/encryptedDataValidator.ts`
 - 14 errors in `src/utils/pwa/patchNotesManager.ts`
 - 14 errors in `src/utils/layout/paycheckDeletionUtils.ts`
@@ -328,7 +351,6 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 6 errors in `src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
 - 6 errors in `src/components/bills/BillViewTabs.tsx`
 - 6 errors in `src/components/automation/steps/config/PriorityFillConfig.tsx`
-- 6 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 6 errors in `src/components/analytics/ReportExporter.tsx`
 - 6 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 5 errors in `src/utils/sync/validation/checksumUtils.ts`
@@ -617,39 +639,39 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
 - 1 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
 - 1 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
-- 1 errors in `src/components/activity/ActivityFeed.tsx`
 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1539 | `TS7006` |
-| 923 | `TS7031` |
-| 288 | `TS2339` |
-| 251 | `TS2345` |
+| 1544 | `TS7006` |
+| 931 | `TS7031` |
+| 287 | `TS2339` |
+| 254 | `TS2345` |
 | 216 | `TS18046` |
 | 145 | `TS7053` |
-| 119 | `TS2322` |
+| 118 | `TS2322` |
 | 80 | `TS18048` |
 | 78 | `TS7005` |
 | 52 | `TS18047` |
 | 49 | `TS7034` |
 | 26 | `TS2769` |
 | 9 | `TS2353` |
+| 8 | `TS6133` |
 | 6 | `TS2698` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
-| 5 | `TS2352` |
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
 | 4 | `TS2538` |
+| 4 | `TS2352` |
 | 2 | `TS7022` |
+| 2 | `TS2451` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
 | 1 | `TS2774` |
 | 1 | `TS2740` |
 | 1 | `TS2683` |
-| 1 | `TS2614` |
 | 1 | `TS2551` |
 | 1 | `TS2532` |
 | 1 | `TS2363` |
@@ -660,9 +682,9 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 ### Detailed Strict Mode Report
 ```
 src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/App.tsx(19,15): error TS2614: Module '"./stores/ui/uiStore"' has no exported member 'UiStore'. Did you mean to use 'import UiStore from "./stores/ui/uiStore"' instead?
-src/App.tsx(29,35): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/activity/ActivityFeed.tsx(155,33): error TS2339: Property 'userName' does not exist on type 'AuditLogEntry'.
+src/App.tsx(28,35): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/App.tsx(28,35): error TS2345: Argument of type 'UiStore' is not assignable to parameter of type 'UIStore'.
+  Type 'UiStore' is missing the following properties from type 'UIStore': setUpdateAvailable, getState, hideInstallModal
 src/components/analytics/AnalyticsDashboard.tsx(168,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
@@ -670,11 +692,11 @@ src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unkn
 src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
 src/components/analytics/CategoryAnalysisTab.tsx(68,86): error TS2339: Property 'type' does not exist on type 'CategoryStat'.
 src/components/analytics/CategorySuggestionsTab.tsx(93,29): error TS2339: Property 'category' does not exist on type 'Suggestion'.
-src/components/analytics/CategorySuggestionsTab.tsx(120,72): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
-src/components/analytics/CategorySuggestionsTab.tsx(128,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/analytics/CategorySuggestionsTab.tsx(129,25): error TS2322: Type '{}' is not assignable to type 'ReactNode'.
-src/components/analytics/CategorySuggestionsTab.tsx(131,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/analytics/CategorySuggestionsTab.tsx(132,82): error TS2339: Property 'toFixed' does not exist on type '{}'.
+src/components/analytics/CategorySuggestionsTab.tsx(122,73): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
+src/components/analytics/CategorySuggestionsTab.tsx(130,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(131,25): error TS2322: Type '{}' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(133,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(134,82): error TS2339: Property 'toFixed' does not exist on type '{}'.
 src/components/analytics/components/AnalyticsHeader.tsx(9,28): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,39): error TS7031: Binding element 'handleDateRangeChange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,62): error TS7031: Binding element 'handleExport' implicitly has an 'any' type.
@@ -714,21 +736,28 @@ src/components/analytics/ReportExporter.tsx(17,77): error TS7031: Binding elemen
 src/components/analytics/ReportExporter.tsx(87,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: null; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type 'null' is not assignable to type 'boolean'.
+src/components/analytics/SmartCategoryManager.tsx(11,1): error TS6133: 'logger' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(36,3): error TS6133: 'onAddCategory' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(37,3): error TS6133: 'onRemoveCategory' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(38,3): error TS6133: 'onApplyToTransactions' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(39,3): error TS6133: 'onApplyToBills' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(52,5): error TS2451: Cannot redeclare block-scoped variable 'handleUndismissSuggestion'.
+src/components/analytics/SmartCategoryManager.tsx(55,5): error TS6133: 'applySuggestion' is declared but its value is never read.
 src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
   Type 'TransactionForStats' is not assignable to type 'never'.
-src/components/analytics/SmartCategoryManager.tsx(70,9): error TS2352: Conversion of type 'Suggestion[]' to type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-  Property 'suggestedAmount' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
-src/components/analytics/SmartCategoryManager.tsx(111,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
+src/components/analytics/SmartCategoryManager.tsx(69,9): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Suggestion[]'.
+  Type 'unknown' is not assignable to type 'Suggestion'.
+src/components/analytics/SmartCategoryManager.tsx(83,40): error TS6133: 'suggestion' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(93,9): error TS2451: Cannot redeclare block-scoped variable 'handleUndismissSuggestion'.
+src/components/analytics/SmartCategoryManager.tsx(93,44): error TS6133: 'suggestionId' is declared but its value is never read.
+src/components/analytics/SmartCategoryManager.tsx(108,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
   Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion' is not assignable to type 'Suggestion'.
     Types of property 'title' are incompatible.
       Type 'string | undefined' is not assignable to type 'string'.
         Type 'undefined' is not assignable to type 'string'.
-src/components/analytics/SmartCategoryManager.tsx(112,13): error TS2322: Type '(suggestion: Suggestion) => Promise<void>' is not assignable to type '(suggestion: Suggestion) => void'.
-  Types of parameters 'suggestion' and 'suggestion' are incompatible.
-    Property 'category' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
-src/components/analytics/SmartCategoryManager.tsx(117,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
+src/components/analytics/SmartCategoryManager.tsx(114,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
   Property 'amount' is missing in type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat' but required in type 'CategoryStat'.
-src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
+src/components/analytics/SmartCategoryManager.tsx(120,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
 src/components/analytics/tabs/HealthTab.tsx(7,22): error TS7031: Binding element 'envelopeHealth' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(7,38): error TS7031: Binding element 'budgetVsActual' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(18,21): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
@@ -4315,39 +4344,53 @@ src/utils/budgeting/envelopeStyles.ts(20,32): error TS7006: Parameter 'envelope'
 src/utils/budgeting/envelopeStyles.ts(39,31): error TS7006: Parameter 'status' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(55,37): error TS7006: Parameter 'utilizationRate' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(55,54): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(9,45): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(9,53): error TS7006: Parameter 'allocationMode' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(9,69): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(29,39): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(29,47): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(40,26): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(43,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/utils/budgeting/paycheckAllocationUtils.ts(50,30): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(53,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/utils/budgeting/paycheckAllocationUtils.ts(73,30): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(75,6): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(84,34): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(86,6): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(96,42): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(96,52): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(114,46): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(114,56): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(134,29): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(134,40): error TS7006: Parameter 'billEnvelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(134,55): error TS7006: Parameter 'variableEnvelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(140,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(149,47): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(163,32): error TS7006: Parameter 'resultData' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(195,48): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(203,36): error TS7006: Parameter 'payer' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(203,43): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(205,14): error TS7006: Parameter 'p' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(207,11): error TS7006: Parameter 'p' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(211,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(211,47): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(224,33): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(228,28): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(236,24): error TS2339: Property 'trim' does not exist on type 'never'.
+src/utils/budgeting/paycheckAllocationUtils.ts(13,45): error TS7006: Parameter 'amount' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(13,53): error TS7006: Parameter 'allocationMode' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(13,69): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(33,39): error TS7006: Parameter 'amount' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(33,47): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(44,26): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(47,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/utils/budgeting/paycheckAllocationUtils.ts(54,30): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(57,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/utils/budgeting/paycheckAllocationUtils.ts(77,30): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(79,11): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(84,10): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(84,20): error TS7031: Binding element 'resolvedType' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(87,36): error TS2345: Argument of type 'string' is not assignable to parameter of type '"Bills & Utilities" | "Transportation" | "Subscriptions" | "Health & Medical" | "Education"'.
+src/utils/budgeting/paycheckAllocationUtils.ts(89,13): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(95,34): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(97,11): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(103,10): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(103,20): error TS7031: Binding element 'resolvedType' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(103,34): error TS7031: Binding element 'monthlyBudget' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(108,13): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(108,23): error TS7031: Binding element 'monthlyBudget' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(117,42): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(117,52): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(137,46): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(137,56): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(159,29): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(159,40): error TS7006: Parameter 'billEnvelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(159,55): error TS7006: Parameter 'variableEnvelopes' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(165,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(174,47): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(188,32): error TS7006: Parameter 'resultData' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(220,48): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(225,32): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(236,30): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(246,31): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(257,36): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(271,19): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(285,36): error TS7006: Parameter 'payer' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(285,43): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(287,14): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(289,11): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(293,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(293,47): error TS7006: Parameter 'amount' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(306,33): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(310,28): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
+src/utils/budgeting/paycheckAllocationUtils.ts(318,24): error TS2339: Property 'trim' does not exist on type 'never'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/utils/budgeting/paycheckProcessing.ts(153,49): error TS2345: Argument of type '{ actualBalance: {}; virtualBalance: number; unassignedCash: {}; isActualBalanceManual: {}; }' is not assignable to parameter of type 'CurrentBalances'.
   Types of property 'actualBalance' are incompatible.
