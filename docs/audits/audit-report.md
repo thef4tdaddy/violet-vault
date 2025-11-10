@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | -4 |
-| TypeScript Errors | 8 | +1 |
-| TypeScript Strict Mode Errors | 3850 | -15 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 9 | +1 |
+| TypeScript Strict Mode Errors | 3851 | +1 |
 
-*Last updated: 2025-11-10 19:06:14 UTC*
+*Last updated: 2025-11-10 19:09:25 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -42,19 +42,21 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 2 errors in `src/utils/common/logger.ts`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
-- 1 errors in `src/utils/common/logger.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
 | 3 | `TS2345` |
-| 3 | `TS2322` |
+| 2 | `TS2322` |
+| 1 | `TS2578` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
+| 1 | `TS2339` |
 
 ### Detailed Type Error Report
 ```
@@ -70,11 +72,8 @@ src/utils/budgeting/paycheckProcessing.ts(153,49): error TS2345: Argument of typ
 src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type '{ actualBalance: unknown; virtualBalance: number; unassignedCash: unknown; isActualBalanceManual: unknown; }' is not assignable to parameter of type '{ unassignedCash: number; actualBalance: number; }'.
   Types of property 'unassignedCash' are incompatible.
     Type 'unknown' is not assignable to type 'number'.
-src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface' is not assignable to type '{ track?: (event: string, data?: Record<string, unknown>) => void; consumeError?: (error: Error, options?: { metadata?: Record<string, unknown>; tags?: Record<string, unknown>; }) => void; }'.
-  Types of property 'consumeError' are incompatible.
-    Type '(error: Error, message?: string, payload?: { [key: string]: string; }) => void' is not assignable to type '(error: Error, options?: { metadata?: Record<string, unknown>; tags?: Record<string, unknown>; }) => void'.
-      Types of parameters 'message' and 'options' are incompatible.
-        Type '{ metadata?: Record<string, unknown>; tags?: Record<string, unknown>; }' is not assignable to type 'string'.
+src/utils/common/logger.ts(10,5): error TS2578: Unused '@ts-expect-error' directive.
+src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist on type '{}'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -448,6 +447,7 @@ src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface'
 - 2 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
+- 2 errors in `src/utils/common/logger.ts`
 - 2 errors in `src/utils/common/lazyImport.ts`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/utils/analytics/categoryPatterns.ts`
@@ -529,7 +529,6 @@ src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface'
 - 1 errors in `src/utils/common/toastHelpers.ts`
 - 1 errors in `src/utils/common/testBudgetHistory.ts`
 - 1 errors in `src/utils/common/ocrProcessor.ts`
-- 1 errors in `src/utils/common/logger.ts`
 - 1 errors in `src/utils/common/highlight.ts`
 - 1 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 1 errors in `src/utils/budgeting/paycheckDeletion.ts`
@@ -599,11 +598,11 @@ src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface'
 |---|---|
 | 1546 | `TS7006` |
 | 944 | `TS7031` |
-| 289 | `TS2339` |
+| 290 | `TS2339` |
 | 252 | `TS2345` |
 | 217 | `TS18046` |
 | 145 | `TS7053` |
-| 114 | `TS2322` |
+| 113 | `TS2322` |
 | 80 | `TS18048` |
 | 78 | `TS7005` |
 | 52 | `TS18047` |
@@ -623,6 +622,7 @@ src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface'
 | 1 | `TS7016` |
 | 1 | `TS2774` |
 | 1 | `TS2683` |
+| 1 | `TS2578` |
 | 1 | `TS2532` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
@@ -2933,8 +2933,8 @@ src/hooks/common/bug-report/useBugReportSubmission.ts(109,7): error TS2322: Type
 src/hooks/common/bug-report/useBugReportSubmission.ts(179,22): error TS18046: 'error' is of type 'unknown'.
 src/hooks/common/bug-report/useBugReportSubmission.ts(230,5): error TS2322: Type '(description: string, severity?: "low" | "medium" | "high" | "critical") => Promise<{ reportData: { title: string; hasScreenshot: boolean; systemInfo: SystemInfo | Promise<SystemInfo>; }; ... 8 more ...; screenshotStatus?: { captured: boolean; size: number; uploaded: boolean; reason?: string; }; }>' is not assignable to type '(description: string, severity?: string | undefined) => Promise<unknown>'.
   Types of parameters 'severity' and 'severity' are incompatible.
-    Type 'string | undefined' is not assignable to type '"critical" | "low" | "medium" | "high" | undefined'.
-      Type 'string' is not assignable to type '"critical" | "low" | "medium" | "high" | undefined'.
+    Type 'string | undefined' is not assignable to type '"low" | "medium" | "high" | "critical" | undefined'.
+      Type 'string' is not assignable to type '"low" | "medium" | "high" | "critical" | undefined'.
 src/hooks/common/useActualBalance.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/common/useActualBalance.ts(33,7): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/common/useActualBalance.ts(98,6): error TS7006: Parameter 'calculatedBalance' implicitly has an 'any' type.
@@ -4452,12 +4452,8 @@ src/utils/common/frequencyCalculations.ts(171,21): error TS7053: Element implici
 src/utils/common/highlight.ts(285,73): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/lazyImport.ts(4,21): error TS7006: Parameter 'factory' implicitly has an 'any' type.
 src/utils/common/lazyImport.ts(6,21): error TS7006: Parameter 'module' implicitly has an 'any' type.
-src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface' is not assignable to type '{ track?: ((event: string, data?: Record<string, unknown> | undefined) => void) | undefined; consumeError?: ((error: Error, options?: { metadata?: Record<string, unknown> | undefined; tags?: Record<...> | undefined; } | undefined) => void) | undefined; }'.
-  Types of property 'consumeError' are incompatible.
-    Type '(error: Error, message?: string | undefined, payload?: { [key: string]: string; } | undefined) => void' is not assignable to type '(error: Error, options?: { metadata?: Record<string, unknown> | undefined; tags?: Record<string, unknown> | undefined; } | undefined) => void'.
-      Types of parameters 'message' and 'options' are incompatible.
-        Type '{ metadata?: Record<string, unknown> | undefined; tags?: Record<string, unknown> | undefined; } | undefined' is not assignable to type 'string | undefined'.
-          Type '{ metadata?: Record<string, unknown> | undefined; tags?: Record<string, unknown> | undefined; }' is not assignable to type 'string'.
+src/utils/common/logger.ts(10,5): error TS2578: Unused '@ts-expect-error' directive.
+src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist on type '{}'.
 src/utils/common/ocrProcessor.ts(349,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: null; encryptedSnapshot: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
