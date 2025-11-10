@@ -109,14 +109,14 @@ const AnalyticsDashboard = () => {
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
     period: timeFilter,
-    customDateRange,
+    customDateRange: customDateRange || undefined,
     includeTransfers: false,
     groupBy: "category",
   });
 
   const balanceQuery = useAnalytics({
     period: timeFilter,
-    customDateRange,
+    customDateRange: customDateRange || undefined,
     includeTransfers: true,
     groupBy: "envelope",
   });
@@ -133,7 +133,7 @@ const AnalyticsDashboard = () => {
   const normalizedTransactions = useMemo(() => {
     const fromAnalytics = (analyticsQuery.analytics as { transactions?: unknown[] })?.transactions;
     if (Array.isArray(fromAnalytics) && fromAnalytics.length > 0) {
-      return fromAnalytics;
+      return fromAnalytics as unknown[];
     }
     return transactions;
   }, [analyticsQuery.analytics, transactions]);

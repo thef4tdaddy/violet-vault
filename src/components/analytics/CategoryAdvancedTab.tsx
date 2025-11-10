@@ -1,12 +1,19 @@
 import React from "react";
 import { Button } from "@/components/ui";
 
+interface CategoryAdvancedTabProps {
+  dateRange: string;
+  onDateRangeChange: (dateRange: string) => void;
+  dismissedSuggestions: string[];
+  onUndismissSuggestion: (suggestionId: string) => void;
+}
+
 const CategoryAdvancedTab = ({
   dateRange,
   onDateRangeChange,
   dismissedSuggestions,
   onUndismissSuggestion,
-}) => {
+}: CategoryAdvancedTabProps) => {
   const dateRangeOptions = [
     { value: "7", label: "7 Days" },
     { value: "30", label: "30 Days" },

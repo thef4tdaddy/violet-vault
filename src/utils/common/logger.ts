@@ -7,8 +7,9 @@ let H: {
 // Helper function to get import.meta.env safely
 function getImportMetaEnv() {
   try {
-    // @ts-expect-error - TypeScript doesn't properly recognize import.meta with ESNext
-    return import.meta.env;
+    // TypeScript doesn't properly recognize import.meta with ESNext
+    const meta = import.meta as { env?: { MODE?: string } };
+    return meta.env || {};
   } catch {
     return {};
   }

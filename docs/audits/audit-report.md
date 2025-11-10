@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 9 | +1 |
-| TypeScript Strict Mode Errors | 3851 | +1 |
+| TypeScript Errors | 12 | +3 |
+| TypeScript Strict Mode Errors | 3836 | -15 |
 
-*Last updated: 2025-11-10 19:09:25 UTC*
+*Last updated: 2025-11-10 19:13:41 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -42,24 +42,37 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 2 errors in `src/utils/common/logger.ts`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
+- 1 errors in `src/components/bills/BillManager.tsx`
+- 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
+- 1 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
+- 1 errors in `src/components/activity/ActivityFeed.tsx`
+- 1 errors in `src/App.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
 | 3 | `TS2345` |
-| 2 | `TS2322` |
-| 1 | `TS2578` |
+| 3 | `TS2322` |
+| 2 | `TS2339` |
+| 1 | `TS2740` |
+| 1 | `TS2614` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
-| 1 | `TS2339` |
 
 ### Detailed Type Error Report
 ```
+src/App.tsx(19,15): error TS2614: Module '"./stores/ui/uiStore"' has no exported member 'UiStore'. Did you mean to use 'import UiStore from "./stores/ui/uiStore"' instead?
+src/components/activity/ActivityFeed.tsx(155,33): error TS2339: Property 'userName' does not exist on type 'AuditLogEntry'.
+src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
+src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
+src/components/bills/BillManager.tsx(185,9): error TS2322: Type '{ handleBulkUpdate: (updatedBills: any) => Promise<{ success: boolean; successCount: number; errorCount: any; errors: any[]; message: any; }>; handlePayBill: (...args: Parameters<(...args: unknown[]) => Promise<unknown>>) => Promise<...>; handleBulkPayment: (billIds: any) => Promise<...>; validateBillData: (bill: an...' is not assignable to type '{ handlePayBill: (billId: string) => Promise<void>; }'.
+  The types returned by 'handlePayBill(...)' are incompatible between these types.
+    Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
+      Type 'unknown' is not assignable to type 'void'.
 src/components/ui/ModalCloseButton.tsx(14,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
 src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
 src/hooks/budgeting/useBudgetData/paycheckMutations.ts(25,36): error TS2345: Argument of type 'PaycheckData' is not assignable to parameter of type '{ amount: number; mode: string; envelopeAllocations?: { envelopeId: string; amount: number; }[]; notes?: string; payerName?: string; }'.
@@ -72,8 +85,6 @@ src/utils/budgeting/paycheckProcessing.ts(153,49): error TS2345: Argument of typ
 src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type '{ actualBalance: unknown; virtualBalance: number; unassignedCash: unknown; isActualBalanceManual: unknown; }' is not assignable to parameter of type '{ unassignedCash: number; actualBalance: number; }'.
   Types of property 'unassignedCash' are incompatible.
     Type 'unknown' is not assignable to type 'number'.
-src/utils/common/logger.ts(10,5): error TS2578: Unused '@ts-expect-error' directive.
-src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist on type '{}'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -176,6 +187,7 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 12 errors in `src/components/settings/SettingsDashboard.tsx`
 - 12 errors in `src/components/debt/modals/DebtFormSections.tsx`
 - 12 errors in `src/components/bills/SmartBillMatcher.tsx`
+- 12 errors in `src/components/bills/BillManager.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
 - 11 errors in `src/utils/security/shareCodeUtils.ts`
 - 11 errors in `src/utils/savings/savingsFormUtils.ts`
@@ -187,7 +199,6 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
 - 11 errors in `src/components/budgeting/suggestions/SuggestionSettings.tsx`
 - 11 errors in `src/components/budgeting/shared/BillConnectionSelector.tsx`
-- 11 errors in `src/components/bills/BillManager.tsx`
 - 10 errors in `src/utils/sync/syncHealthChecker.ts`
 - 10 errors in `src/utils/sync/RetryManager.ts`
 - 10 errors in `src/utils/services/editLockHelpers.ts`
@@ -195,7 +206,6 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 10 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 10 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 10 errors in `src/hooks/budgeting/autofunding/useExecutionStatistics.ts`
-- 10 errors in `src/hooks/bills/useBillOperationWrappers.ts`
 - 10 errors in `src/hooks/auth/useAuthCompatibility.ts`
 - 10 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
 - 10 errors in `src/components/settings/sections/SecurityLoggingSection.tsx`
@@ -280,7 +290,6 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 7 errors in `src/components/auth/components/StepButtons.tsx`
 - 7 errors in `src/components/auth/PasswordRotationModal.tsx`
 - 7 errors in `src/components/auth/KeyManagementSettings.tsx`
-- 7 errors in `src/components/activity/ActivityFeed.tsx`
 - 6 errors in `src/utils/transactions/splitting.ts`
 - 6 errors in `src/utils/transactions/fileParser.ts`
 - 6 errors in `src/utils/debts/debtDebugConfig.ts`
@@ -362,6 +371,7 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 4 errors in `src/hooks/bills/useBills/index.ts`
 - 4 errors in `src/hooks/bills/useBillValidation.ts`
+- 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
 - 4 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 4 errors in `src/hooks/analytics/useTransactionFiltering.ts`
@@ -396,8 +406,6 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 4 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 4 errors in `src/components/analytics/CategoryNavigationTabs.tsx`
 - 4 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
-- 4 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
-- 4 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
 - 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
@@ -442,12 +450,12 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 3 errors in `src/components/analytics/performance/PerformanceOverviewTab.tsx`
 - 3 errors in `src/components/analytics/components/AnalyticsHeader.tsx`
 - 3 errors in `src/components/analytics/CategorySettingsPanel.tsx`
+- 3 errors in `src/App.tsx`
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
 - 2 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
-- 2 errors in `src/utils/common/logger.ts`
 - 2 errors in `src/utils/common/lazyImport.ts`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/utils/analytics/categoryPatterns.ts`
@@ -467,6 +475,7 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts`
+- 2 errors in `src/hooks/bills/useBillOperations.ts`
 - 2 errors in `src/hooks/auth/useSecurityManager.ts`
 - 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
 - 2 errors in `src/hooks/auth/mutations/useProfileMutations.ts`
@@ -513,9 +522,10 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 2 errors in `src/components/analytics/trends/HistoricalTrendsChart.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
 - 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
+- 2 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 2 errors in `src/components/analytics/PerformanceMonitor.tsx`
 - 2 errors in `src/components/analytics/CategoryManagerHeader.tsx`
-- 2 errors in `src/App.tsx`
+- 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
 - 1 errors in `src/utils/sync/dataDetectionHelper.ts`
@@ -550,7 +560,6 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
-- 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 1 errors in `src/hooks/auth/useAuthManager.ts`
 - 1 errors in `src/hooks/analytics/utils/csvImageExportUtils.ts`
@@ -591,16 +600,17 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 - 1 errors in `src/components/analytics/trends/ForecastSummaryCard.tsx`
 - 1 errors in `src/components/analytics/performance/OverallScore.tsx`
 - 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
-- 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
+- 1 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
+- 1 errors in `src/components/activity/ActivityFeed.tsx`
 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1546 | `TS7006` |
-| 944 | `TS7031` |
-| 290 | `TS2339` |
-| 252 | `TS2345` |
-| 217 | `TS18046` |
+| 1545 | `TS7006` |
+| 936 | `TS7031` |
+| 285 | `TS2339` |
+| 251 | `TS2345` |
+| 216 | `TS18046` |
 | 145 | `TS7053` |
 | 113 | `TS2322` |
 | 80 | `TS18048` |
@@ -621,8 +631,9 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 | 1 | `TS7023` |
 | 1 | `TS7016` |
 | 1 | `TS2774` |
+| 1 | `TS2740` |
 | 1 | `TS2683` |
-| 1 | `TS2578` |
+| 1 | `TS2614` |
 | 1 | `TS2532` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
@@ -632,28 +643,14 @@ src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist 
 ### Detailed Strict Mode Report
 ```
 src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/App.tsx(28,35): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/activity/ActivityFeed.tsx(35,21): error TS2345: Argument of type 'AuditLogEntry[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type 'AuditLogEntry[]' is not assignable to type 'never[]'.
-    Type 'AuditLogEntry' is not assignable to type 'never'.
-src/components/activity/ActivityFeed.tsx(124,31): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/activity/ActivityFeed.tsx(129,67): error TS2339: Property 'action' does not exist on type 'never'.
-src/components/activity/ActivityFeed.tsx(129,84): error TS2339: Property 'entityType' does not exist on type 'never'.
-src/components/activity/ActivityFeed.tsx(147,49): error TS2339: Property 'timestamp' does not exist on type 'never'.
-src/components/activity/ActivityFeed.tsx(154,33): error TS2339: Property 'userName' does not exist on type 'never'.
-src/components/activity/ActivityFeed.tsx(158,33): error TS2339: Property 'entityType' does not exist on type 'never'.
-src/components/analytics/AnalyticsDashboard.tsx(112,5): error TS2322: Type '{ start: string | Date; end: string | Date; } | null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
-  Type 'null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
-src/components/analytics/AnalyticsDashboard.tsx(119,5): error TS2322: Type '{ start: string | Date; end: string | Date; } | null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
-  Type 'null' is not assignable to type '{ start: string | Date; end: string | Date; } | undefined'.
+src/App.tsx(19,15): error TS2614: Module '"./stores/ui/uiStore"' has no exported member 'UiStore'. Did you mean to use 'import UiStore from "./stores/ui/uiStore"' instead?
+src/App.tsx(29,35): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/components/activity/ActivityFeed.tsx(155,33): error TS2339: Property 'userName' does not exist on type 'AuditLogEntry'.
 src/components/analytics/AnalyticsDashboard.tsx(168,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/CategoryAdvancedTab.tsx(5,3): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
-src/components/analytics/CategoryAdvancedTab.tsx(6,3): error TS7031: Binding element 'onDateRangeChange' implicitly has an 'any' type.
-src/components/analytics/CategoryAdvancedTab.tsx(7,3): error TS7031: Binding element 'dismissedSuggestions' implicitly has an 'any' type.
-src/components/analytics/CategoryAdvancedTab.tsx(8,3): error TS7031: Binding element 'onUndismissSuggestion' implicitly has an 'any' type.
+src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
 src/components/analytics/CategoryAnalysisTab.tsx(4,32): error TS7031: Binding element 'categoryStats' implicitly has an 'any' type.
 src/components/analytics/CategoryAnalysisTab.tsx(5,34): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
 src/components/analytics/CategoryAnalysisTab.tsx(19,30): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
@@ -714,6 +711,7 @@ src/components/analytics/ReportExporter.tsx(87,15): error TS2322: Type '{ includ
     Type 'null' is not assignable to type 'boolean'.
 src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
   Type 'TransactionForStats' is not assignable to type 'never'.
+src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
 src/components/analytics/tabs/HealthTab.tsx(7,22): error TS7031: Binding element 'envelopeHealth' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(7,38): error TS7031: Binding element 'budgetVsActual' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(18,21): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
@@ -1040,6 +1038,10 @@ src/components/bills/BillManager.tsx(184,9): error TS2322: Type '(billsToAdd: Bi
   Types of parameters 'billsToAdd' and 'bills' are incompatible.
     Type 'BillEntity[]' is not assignable to type 'Bill[]'.
       Type 'BillEntity' is missing the following properties from type 'Bill': amount, dueDate
+src/components/bills/BillManager.tsx(185,9): error TS2322: Type '{ handleBulkUpdate: (updatedBills: any) => Promise<{ success: boolean; successCount: number; errorCount: any; errors: any[]; message: any; }>; handlePayBill: (...args: Parameters<(...args: unknown[]) => Promise<unknown>>) => Promise<...>; handleBulkPayment: (billIds: any) => Promise<...>; validateBillData: (bill: an...' is not assignable to type '{ handlePayBill: (billId: string) => Promise<void>; }'.
+  The types returned by 'handlePayBill(...)' are incompatible between these types.
+    Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
+      Type 'unknown' is not assignable to type 'void'.
 src/components/bills/BillManagerHeader.tsx(10,3): error TS7031: Binding element 'isEditLocked' implicitly has an 'any' type.
 src/components/bills/BillManagerHeader.tsx(11,3): error TS7031: Binding element 'currentEditor' implicitly has an 'any' type.
 src/components/bills/BillManagerHeader.tsx(12,3): error TS7031: Binding element 'isSearching' implicitly has an 'any' type.
@@ -2518,16 +2520,13 @@ src/hooks/bills/useBillManagerUI.ts(95,50): error TS2345: Argument of type '(bil
     Type 'unknown' is not assignable to type '{ id: string; }'.
 src/hooks/bills/useBillOperations.ts(33,77): error TS2345: Argument of type 'Record<string, unknown>[]' is not assignable to parameter of type 'never[]'.
   Type 'Record<string, unknown>' is not assignable to type 'never'.
-src/hooks/bills/useBillOperationWrappers.ts(8,3): error TS7031: Binding element 'handleBulkUpdate' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(9,3): error TS7031: Binding element 'handlePayBill' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(10,3): error TS7031: Binding element 'handleBulkPayment' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(11,3): error TS7031: Binding element 'onError' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(16,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(25,30): error TS18046: 'error' is of type 'unknown'.
-src/hooks/bills/useBillOperationWrappers.ts(42,12): error TS7006: Parameter 'billId' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(48,30): error TS18046: 'error' is of type 'unknown'.
-src/hooks/bills/useBillOperationWrappers.ts(62,12): error TS7006: Parameter 'billIds' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(71,30): error TS18046: 'error' is of type 'unknown'.
+src/hooks/bills/useBillOperations.ts(53,7): error TS2322: Type '(billId: string) => Promise<{ success: boolean; updatedBill: BillRecord; }>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+  Types of parameters 'billId' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/hooks/bills/useBillOperationWrappers.ts(35,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
+src/hooks/bills/useBillOperationWrappers.ts(44,30): error TS18046: 'error' is of type 'unknown'.
+src/hooks/bills/useBillOperationWrappers.ts(81,12): error TS7006: Parameter 'billIds' implicitly has an 'any' type.
+src/hooks/bills/useBillOperationWrappers.ts(90,30): error TS18046: 'error' is of type 'unknown'.
 src/hooks/bills/useBills/billAnalytics.ts(14,51): error TS2339: Property 'isPaid' does not exist on type 'never'.
 src/hooks/bills/useBills/billAnalytics.ts(19,16): error TS2339: Property 'isPaid' does not exist on type 'never'.
 src/hooks/bills/useBills/billAnalytics.ts(20,17): error TS2339: Property 'dueDate' does not exist on type 'never'.
@@ -4452,8 +4451,6 @@ src/utils/common/frequencyCalculations.ts(171,21): error TS7053: Element implici
 src/utils/common/highlight.ts(285,73): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/lazyImport.ts(4,21): error TS7006: Parameter 'factory' implicitly has an 'any' type.
 src/utils/common/lazyImport.ts(6,21): error TS7006: Parameter 'module' implicitly has an 'any' type.
-src/utils/common/logger.ts(10,5): error TS2578: Unused '@ts-expect-error' directive.
-src/utils/common/logger.ts(31,31): error TS2339: Property 'MODE' does not exist on type '{}'.
 src/utils/common/ocrProcessor.ts(349,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: null; encryptedSnapshot: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
