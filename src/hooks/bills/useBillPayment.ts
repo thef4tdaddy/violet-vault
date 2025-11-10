@@ -88,13 +88,9 @@ const selectBillForPayment = (
   throw new Error("Bill not found");
 };
 
-const resolvePaymentDetails = (
-  bill: BillRecord,
-  overrides?: PayBillOverrides
-) => {
+const resolvePaymentDetails = (bill: BillRecord, overrides?: PayBillOverrides) => {
   const effectiveEnvelopeId = overrides?.envelopeId ?? bill.envelopeId;
-  const normalizedAmount =
-    overrides?.amount !== undefined ? overrides.amount : bill.amount ?? 0;
+  const normalizedAmount = overrides?.amount !== undefined ? overrides.amount : (bill.amount ?? 0);
   const paymentAmount = Math.abs(Number(normalizedAmount ?? 0));
 
   if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
@@ -174,7 +170,7 @@ interface UseBillPaymentParams {
     paidAmount: number;
     paidDate?: string;
     envelopeId?: string;
-  }) => Promise<void>;
+  }) => Promise<unknown>;
 }
 
 export const useBillPayment = ({
@@ -241,10 +237,7 @@ export const useBillPayment = ({
    * Handle individual bill payment with envelope balance checking
    */
   const handlePayBill = useCallback(
-    async (
-      billInput: BillInput,
-      overrides?: PayBillOverrides
-    ): Promise<void> => {
+    async (billInput: BillInput, overrides?: PayBillOverrides): Promise<void> => {
       let normalizedBillId = "";
       try {
         const { normalizedBillId: derivedId, providedBill } = normalizeBillIdentifier(billInput);
@@ -295,7 +288,6 @@ export const useBillPayment = ({
         globalToast.showSuccess(`Paid ${bill.name} for $${formattedAmount}`, toastTitle);
 
         return;
-
       } catch (error) {
         logger.error("Error paying bill", error, { billId: normalizedBillId || billInput });
         if (error instanceof Error) {

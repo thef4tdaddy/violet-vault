@@ -25,7 +25,16 @@ const useBudgetData = () => {
 
   // Get mutations (passing query data where needed)
   const mutations = useBudgetMutations();
-  const paycheckMutations = usePaycheckMutations(queries.envelopesQuery, queries.savingsGoalsQuery);
+  const envelopesForBalances = Array.isArray(queries.envelopesQuery.data)
+    ? (queries.envelopesQuery.data as Array<{ currentBalance?: string | number }>)
+    : [];
+  const savingsForBalances = Array.isArray(queries.savingsGoalsQuery.data)
+    ? (queries.savingsGoalsQuery.data as Array<{ currentBalance?: string | number }>)
+    : [];
+  const paycheckMutations = usePaycheckMutations(
+    { data: envelopesForBalances },
+    { data: savingsForBalances }
+  );
   const utilities = useBudgetUtilities();
 
   // Maintain the same API as the original hook

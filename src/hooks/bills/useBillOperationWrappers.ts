@@ -12,7 +12,10 @@ interface UseBillOperationWrappersOptions {
     errors: string[];
     message: string;
   }>;
-  handlePayBill: (...args: unknown[]) => Promise<unknown>;
+  handlePayBill: (
+    billId: string,
+    overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+  ) => Promise<void>;
   handleBulkPayment: (billIds: string[]) => Promise<{
     success: boolean;
     successCount: number;
@@ -58,18 +61,17 @@ export const useBillOperationWrappers = ({
   );
 
   const wrappedHandlePayBill = useCallback(
-    async (...args: Parameters<typeof handlePayBill>) => {
+    async (
+      billId: string,
+      overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+    ): Promise<void> => {
       setIsProcessing(true);
       try {
-        const result = await handlePayBill(...args);
-        return result;
+        await handlePayBill(billId, overrides);
       } catch (error) {
         const errorMessage = (error as Error)?.message || "Failed to pay bill";
         onError?.(errorMessage);
-        return {
-          success: false,
-          error: errorMessage,
-        };
+        throw error;
       } finally {
         setIsProcessing(false);
       }

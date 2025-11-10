@@ -98,7 +98,12 @@ export const useTransactionLedger = (currentUser: unknown) => {
   }, [filteredTransactions.length, ledgerState]);
 
   // Use extracted operations hook
-  const operations = useLedgerOperations(addTransaction, deleteTransaction, updateBill, envelopes);
+  const operations = useLedgerOperations(
+    addTransaction,
+    deleteTransaction,
+    updateBill,
+    envelopes as unknown as Array<Record<string, unknown>>
+  );
 
   // New validated form hook
   const validatedForm = useTransactionFormValidated({

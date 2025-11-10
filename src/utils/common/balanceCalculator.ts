@@ -36,7 +36,16 @@ interface BalanceResult {
   isActualBalanceManual: boolean;
 }
 
-interface CurrentBalances {
+export interface CurrentBalancesDetailed {
+  actualBalance: number;
+  virtualBalance: number;
+  unassignedCash: number;
+  totalEnvelopeBalance: number;
+  totalSavingsBalance: number;
+  isActualBalanceManual: boolean;
+}
+
+export interface CurrentBalances {
   actualBalance: number;
   virtualBalance: number;
   unassignedCash: number;
@@ -133,7 +142,11 @@ export const calculateBalances = (data: BalanceData): BalanceResult => {
  * @param {Array} allocations - Envelope allocations (optional)
  * @returns {Object} New balance state after paycheck
  */
-export const calculatePaycheckBalances = (currentBalances: CurrentBalances, paycheck: Paycheck, allocations: Allocation[] = []): CurrentBalances => {
+export const calculatePaycheckBalances = (
+  currentBalances: CurrentBalances,
+  paycheck: Paycheck,
+  allocations: Allocation[] = []
+): CurrentBalances => {
   logger.debug("Calculating paycheck balance changes", {
     currentBalances,
     paycheck,
@@ -146,7 +159,10 @@ export const calculatePaycheckBalances = (currentBalances: CurrentBalances, payc
   const newActualBalance = actualBalance + paycheck.amount;
 
   // Calculate total allocated to envelopes
-  const totalAllocated = allocations.reduce((sum: number, allocation: Allocation) => sum + allocation.amount, 0);
+  const totalAllocated = allocations.reduce(
+    (sum: number, allocation: Allocation) => sum + allocation.amount,
+    0
+  );
 
   let newVirtualBalance = virtualBalance;
   let newUnassignedCash = unassignedCash;
@@ -189,7 +205,10 @@ export const calculatePaycheckBalances = (currentBalances: CurrentBalances, payc
  * @param {Array} distributions - Array of {envelopeId, amount} distributions
  * @returns {Object} New balance state after distribution
  */
-export const calculateDistributionBalances = (currentBalances: CurrentBalances, distributions: Distribution[]): CurrentBalances => {
+export const calculateDistributionBalances = (
+  currentBalances: CurrentBalances,
+  distributions: Distribution[]
+): CurrentBalances => {
   logger.debug("Calculating unassigned cash distribution", {
     currentBalances,
     distributionsCount: distributions.length,
@@ -198,7 +217,10 @@ export const calculateDistributionBalances = (currentBalances: CurrentBalances, 
   const { actualBalance, virtualBalance, unassignedCash } = currentBalances;
 
   // Calculate total being distributed
-  const totalDistributed = distributions.reduce((sum: number, dist: Distribution) => sum + dist.amount, 0);
+  const totalDistributed = distributions.reduce(
+    (sum: number, dist: Distribution) => sum + dist.amount,
+    0
+  );
 
   // Actual balance stays the same (money just moves between virtual allocations)
   const newActualBalance = actualBalance;

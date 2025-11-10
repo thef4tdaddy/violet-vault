@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useBillValidation } from "./useBillValidation";
 import { useBillPayment } from "./useBillPayment";
 import { useBulkBillOperations } from "./useBulkBillOperations";
@@ -39,26 +40,43 @@ export const useBillOperations = ({
     onUpdateBill,
     markBillPaid,
   });
+  type PayBillOverrides = Parameters<typeof handlePayBill>[1];
+  const payBillCore = useCallback(
+    async (billId: string, overrides?: PayBillOverrides) => {
+      await handlePayBill(billId, overrides);
+    },
+    [handlePayBill]
+  );
   const { handleBulkUpdate, handleBulkPayment } = useBulkBillOperations({
     updateBill,
     onUpdateBill,
     budget,
-    handlePayBill,
+    handlePayBill: payBillCore,
   });
 
   // Use wrapper functions with error handling and processing state
   const { wrappedHandleBulkUpdate, wrappedHandlePayBill, wrappedHandleBulkPayment, isProcessing } =
     useBillOperationWrappers({
       handleBulkUpdate,
-      handlePayBill,
+      handlePayBill: payBillCore,
       handleBulkPayment,
       onError,
     });
 
+  const executePayBill = useCallback(
+    async (
+      billId: string,
+      overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+    ): Promise<void> => {
+      await wrappedHandlePayBill(billId, overrides);
+    },
+    [wrappedHandlePayBill]
+  );
+
   return {
     // Operations
     handleBulkUpdate: wrappedHandleBulkUpdate,
-    handlePayBill: wrappedHandlePayBill,
+    handlePayBill: executePayBill,
     handleBulkPayment: wrappedHandleBulkPayment,
 
     // Validation

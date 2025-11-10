@@ -16,7 +16,14 @@ interface PaycheckData {
   [key: string]: unknown;
 }
 
-export const usePaycheckMutations = (envelopesQuery: unknown, savingsGoalsQuery: unknown) => {
+interface BalanceCollection {
+  data: Array<{ currentBalance?: string | number }>;
+}
+
+export const usePaycheckMutations = (
+  envelopesQuery: BalanceCollection,
+  savingsGoalsQuery: BalanceCollection
+) => {
   const queryClient = useQueryClient();
 
   const processPaycheckMutation = useMutation({

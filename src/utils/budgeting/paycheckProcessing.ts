@@ -4,20 +4,28 @@
  */
 
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
-import { calculatePaycheckBalances, validateBalances } from "../common/balanceCalculator";
+import {
+  calculatePaycheckBalances,
+  validateBalances,
+  type CurrentBalances,
+} from "../common/balanceCalculator";
 import logger from "../common/logger";
+
+interface BalanceCollection {
+  data?: Array<{ currentBalance?: string | number }>;
+}
 
 /**
  * Get current balances from database and queries
  */
 export const getCurrentBalances = async (
-  envelopesQuery: { data: Array<{ currentBalance: string | number }> },
-  savingsGoalsQuery: { data: Array<{ currentBalance: string | number }> }
-) => {
+  envelopesQuery: BalanceCollection,
+  savingsGoalsQuery: BalanceCollection
+): Promise<CurrentBalances> => {
   // Get current metadata from Dexie (proper data source)
   const currentMetadata = await getBudgetMetadata();
-  const currentActualBalance = currentMetadata?.actualBalance || 0;
-  const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+  const currentActualBalance = Number(currentMetadata?.actualBalance ?? 0);
+  const currentUnassignedCash = Number(currentMetadata?.unassignedCash ?? 0);
 
   // Calculate current virtual balance from envelope balances
   const currentEnvelopes = envelopesQuery.data || [];
@@ -48,7 +56,7 @@ export const getCurrentBalances = async (
     actualBalance: currentActualBalance,
     virtualBalance: currentVirtualBalance,
     unassignedCash: currentUnassignedCash,
-    isActualBalanceManual: currentMetadata?.isActualBalanceManual || false,
+    isActualBalanceManual: Boolean(currentMetadata?.isActualBalanceManual),
   };
 };
 
@@ -133,8 +141,8 @@ export const processPaycheck = async (
     notes?: string;
     payerName?: string;
   },
-  envelopesQuery: { data: Array<{ currentBalance: string | number }> },
-  savingsGoalsQuery: { data: Array<{ currentBalance: string | number }> }
+  envelopesQuery: BalanceCollection,
+  savingsGoalsQuery: BalanceCollection
 ) => {
   logger.info("Starting paycheck processing", {
     amount: paycheckData.amount,
@@ -209,13 +217,11 @@ export const processPaycheck = async (
     allocations
   );
 
-  // Update balances in state
-  updateBalances?.(newBalances);
-
   // Log the successful paycheck processing
+  const totalAllocated = allocations.reduce((sum, allocation) => sum + allocation.amount, 0);
   logger.info("Paycheck processed successfully", {
     paycheckAmount: paycheckData.amount,
-    totalAllocated: allocations?.totalAllocated || 0,
+    totalAllocated,
     unassignedCash: newBalances.unassignedCash,
     actualBalance: newBalances.actualBalance,
     virtualBalance: newBalances.virtualBalance,
