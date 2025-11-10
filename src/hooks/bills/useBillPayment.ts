@@ -38,6 +38,131 @@ interface PayBillOverrides {
   skipValidation?: boolean;
 }
 
+type BillInput = string | number | BillRecord;
+
+const normalizeBillIdentifier = (
+  billInput: BillInput
+): { normalizedBillId: string; providedBill?: BillRecord } => {
+  if (typeof billInput === "string") {
+    return { normalizedBillId: billInput };
+  }
+
+  if (typeof billInput === "number") {
+    return { normalizedBillId: String(billInput) };
+  }
+
+  if (billInput && typeof billInput === "object") {
+    const candidateId = billInput.id;
+    if (typeof candidateId === "string" && candidateId.trim() !== "") {
+      return { normalizedBillId: candidateId, providedBill: billInput };
+    }
+    if (typeof candidateId === "number") {
+      return { normalizedBillId: String(candidateId), providedBill: billInput };
+    }
+  }
+
+  return { normalizedBillId: "" };
+};
+
+const selectBillForPayment = (
+  billCollection: Array<Record<string, unknown>>,
+  normalizedBillId: string,
+  providedBill?: BillRecord
+): BillRecord => {
+  if (!normalizedBillId) {
+    throw new Error("Bill identifier is required to complete payment");
+  }
+
+  const matchedBill = billCollection.find(
+    (candidate) => (candidate as BillRecord).id === normalizedBillId
+  ) as BillRecord | undefined;
+
+  if (matchedBill) {
+    return matchedBill;
+  }
+
+  if (providedBill) {
+    return providedBill;
+  }
+
+  throw new Error("Bill not found");
+};
+
+const resolvePaymentDetails = (
+  bill: BillRecord,
+  overrides?: PayBillOverrides
+) => {
+  const effectiveEnvelopeId = overrides?.envelopeId ?? bill.envelopeId;
+  const normalizedAmount =
+    overrides?.amount !== undefined ? overrides.amount : bill.amount ?? 0;
+  const paymentAmount = Math.abs(Number(normalizedAmount ?? 0));
+
+  if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
+    throw new Error("Payment amount must be greater than zero");
+  }
+
+  const validationBill: BillRecord = {
+    ...bill,
+    amount: paymentAmount,
+    envelopeId: effectiveEnvelopeId,
+  };
+
+  const paymentDate = (() => {
+    if (!overrides?.paidDate) {
+      return new Date().toISOString().split("T")[0];
+    }
+    const parsed = new Date(overrides.paidDate);
+    return Number.isNaN(parsed.getTime())
+      ? new Date().toISOString().split("T")[0]
+      : parsed.toISOString().split("T")[0];
+  })();
+
+  return {
+    paymentAmount,
+    effectiveEnvelopeId,
+    validationBill,
+    paymentDate,
+  };
+};
+
+const buildUpdatedBillRecord = (
+  bill: BillRecord,
+  paymentAmount: number,
+  paymentDate: string,
+  effectiveEnvelopeId?: string,
+  overrides?: PayBillOverrides
+): BillRecord => {
+  const timestamp = new Date().toISOString();
+  return {
+    ...bill,
+    isPaid: true,
+    paidDate: paymentDate,
+    paidAmount: paymentAmount,
+    envelopeId: effectiveEnvelopeId,
+    lastModified: timestamp,
+    modificationHistory: [
+      ...(bill.modificationHistory || []),
+      {
+        timestamp,
+        type: "payment",
+        changes: {
+          isPaid: { from: false, to: true },
+          paidDate: {
+            from: null,
+            to: paymentDate,
+          },
+          ...(overrides?.amount !== undefined && {
+            amount: {
+              from: bill.amount ?? 0,
+              to: paymentAmount,
+            },
+          }),
+        },
+      },
+    ],
+  };
+};
+
 interface UseBillPaymentParams {
   bills: Array<Record<string, unknown>>;
   envelopes: Array<Record<string, unknown>>;
@@ -117,97 +242,29 @@ export const useBillPayment = ({
    */
   const handlePayBill = useCallback(
     async (
-      billInput: string | number | BillRecord,
+      billInput: BillInput,
       overrides?: PayBillOverrides
     ): Promise<{ success: boolean; updatedBill: BillRecord; paymentAmount: number }> => {
       let normalizedBillId = "";
       try {
-        const providedBill =
-          typeof billInput === "object" && billInput !== null
-            ? (billInput as BillRecord | undefined)
-            : undefined;
-
-        const rawBillId =
-          typeof billInput === "string" || typeof billInput === "number"
-            ? billInput
-            : providedBill?.id;
-
-        normalizedBillId =
-          typeof rawBillId === "string" ? rawBillId : rawBillId !== undefined ? String(rawBillId) : "";
-
-        if (!normalizedBillId) {
-          throw new Error("Bill identifier is required to complete payment");
-        }
-
-        const sourceBill = bills.find(
-          (b) => (b as BillRecord).id === normalizedBillId
-        ) as BillRecord | undefined;
-
-        const bill = sourceBill ?? providedBill;
-        if (!bill) {
-          throw new Error("Bill not found");
-        }
-
+        const { normalizedBillId: derivedId, providedBill } = normalizeBillIdentifier(billInput);
+        normalizedBillId = derivedId;
+        const bill = selectBillForPayment(bills, normalizedBillId, providedBill);
         if (bill.isPaid) {
           throw new Error("Bill is already paid");
         }
 
-        const effectiveEnvelopeId = overrides?.envelopeId ?? bill.envelopeId;
-        const normalizedAmount =
-          overrides?.amount !== undefined ? overrides.amount : bill.amount ?? 0;
-        const paymentAmount = Math.abs(Number(normalizedAmount ?? 0));
+        const { paymentAmount, effectiveEnvelopeId, validationBill, paymentDate } =
+          resolvePaymentDetails(bill, overrides);
 
-        if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
-          throw new Error("Payment amount must be greater than zero");
-        }
-
-        const billForValidation: BillRecord = {
-          ...bill,
-          amount: paymentAmount,
-          envelopeId: effectiveEnvelopeId,
-        };
-
-        // Validate payment funds
-        const paymentContext = validatePaymentFunds(billForValidation);
-
-        const paymentDate = (() => {
-          if (!overrides?.paidDate) {
-            return new Date().toISOString().split("T")[0];
-          }
-          const parsed = new Date(overrides.paidDate);
-          return Number.isNaN(parsed.getTime())
-            ? new Date().toISOString().split("T")[0]
-            : parsed.toISOString().split("T")[0];
-        })();
-
-        const updatedBill: BillRecord = {
-          ...bill,
-          isPaid: true,
-          paidDate: paymentDate,
-          paidAmount: paymentAmount,
-          lastModified: new Date().toISOString(),
-          envelopeId: effectiveEnvelopeId,
-          modificationHistory: [
-            ...(bill.modificationHistory || []),
-            {
-              timestamp: new Date().toISOString(),
-              type: "payment",
-              changes: {
-                isPaid: { from: false, to: true },
-                paidDate: {
-                  from: null,
-                  to: paymentDate,
-                },
-                ...(overrides?.amount !== undefined && {
-                  amount: {
-                    from: bill.amount ?? 0,
-                    to: paymentAmount,
-                  },
-                }),
-              },
-            },
-          ],
-        };
+        const paymentContext = validatePaymentFunds(validationBill);
+        const updatedBill = buildUpdatedBillRecord(
+          bill,
+          paymentAmount,
+          paymentDate,
+          effectiveEnvelopeId,
+          overrides
+        );
 
         if (markBillPaid) {
           await markBillPaid({

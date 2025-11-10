@@ -6,6 +6,10 @@ interface CategoryStat {
   amount: number;
   frequency: number;
   trend?: number;
+  totalAmount?: number;
+  transactionCount?: number;
+  avgAmount?: number;
+  lastUsed?: string;
 }
 
 interface CategoryAnalysisTabProps {

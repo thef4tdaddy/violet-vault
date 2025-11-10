@@ -1,7 +1,7 @@
-import React from "react";
-
 interface AnalysisSettings {
   minTransactionCount: number;
+  minAmount?: number;
+  unusedCategoryThreshold?: number;
 }
 
 interface CategorySettingsPanelProps {
