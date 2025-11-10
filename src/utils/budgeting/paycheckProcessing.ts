@@ -10,7 +10,10 @@ import logger from "../common/logger";
 /**
  * Get current balances from database and queries
  */
-export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
+export const getCurrentBalances = async (
+  envelopesQuery: { data: Array<{ currentBalance: string | number }> },
+  savingsGoalsQuery: { data: Array<{ currentBalance: string | number }> }
+) => {
   // Get current metadata from Dexie (proper data source)
   const currentMetadata = await getBudgetMetadata();
   const currentActualBalance = currentMetadata?.actualBalance || 0;
@@ -21,11 +24,11 @@ export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
   const currentSavings = savingsGoalsQuery.data || [];
 
   const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
-    (sum, env) => sum + (parseFloat(env.currentBalance) || 0),
+    (sum: number, env: { currentBalance: string | number }) => sum + (parseFloat(env.currentBalance.toString()) || 0),
     0
   );
   const currentTotalSavingsBalance = currentSavings.reduce(
-    (sum, saving) => sum + (parseFloat(saving.currentBalance) || 0),
+    (sum: number, saving: { currentBalance: string | number }) => sum + (parseFloat(saving.currentBalance.toString()) || 0),
     0
   );
   const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
@@ -50,7 +53,7 @@ export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
 /**
  * Process envelope allocations for a paycheck
  */
-export const processEnvelopeAllocations = async (allocations) => {
+export const processEnvelopeAllocations = async (allocations: Array<{ envelopeId: string; amount: number }>) => {
   if (allocations.length === 0) return;
 
   logger.info("Updating envelope balances", {
@@ -82,10 +85,10 @@ export const processEnvelopeAllocations = async (allocations) => {
  * Create and save paycheck history record
  */
 export const createPaycheckRecord = async (
-  paycheckData,
-  currentBalances,
-  newBalances,
-  allocations
+  paycheckData: { amount: number; payerName?: string; mode: string; notes?: string },
+  currentBalances: { unassignedCash: number; actualBalance: number },
+  newBalances: { unassignedCash: number; actualBalance: number },
+  allocations: Array<{ envelopeId: string; amount: number }>
 ) => {
   const paycheckRecord = {
     id: `paycheck_${Date.now()}`,
@@ -118,7 +121,17 @@ export const createPaycheckRecord = async (
 /**
  * Process paycheck with balance calculations and allocations
  */
-export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoalsQuery) => {
+export const processPaycheck = async (
+  paycheckData: { 
+    amount: number; 
+    mode: string; 
+    envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
+    notes?: string;
+    payerName?: string;
+  },
+  envelopesQuery: { data: Array<{ currentBalance: string | number }> },
+  savingsGoalsQuery: { data: Array<{ currentBalance: string | number }> }
+) => {
   logger.info("Starting paycheck processing", {
     amount: paycheckData.amount,
     mode: paycheckData.mode,
@@ -131,7 +144,7 @@ export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoals
 
   // Prepare allocations for calculator
   const allocations =
-    paycheckData.envelopeAllocations?.map((alloc) => ({
+    paycheckData.envelopeAllocations?.map((alloc: { envelopeId: string; amount: number }) => ({
       envelopeId: alloc.envelopeId,
       amount: alloc.amount,
     })) || [];

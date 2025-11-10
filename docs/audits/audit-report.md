@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | 0 |
-| TypeScript Errors | 2 | 0 |
-| TypeScript Strict Mode Errors | 3892 | 0 |
+| ESLint Issues | 5 | 0 |
+| TypeScript Errors | 7 | 0 |
+| TypeScript Strict Mode Errors | 3865 | 0 |
 
-*Last updated: 2025-11-09 19:49:58 UTC*
+*Last updated: 2025-11-10 19:04:38 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,32 +27,57 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 4 issues in `violet-vault/src/utils/budgeting/suggestionUtils.ts`
 - 1 issues in `violet-vault/src/components/security/LockScreen.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 4 | `null` |
 | 1 | `enforce-ui-library/enforce-ui-library` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+violet-vault/src/utils/budgeting/suggestionUtils.ts:159:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
+violet-vault/src/utils/budgeting/suggestionUtils.ts:228:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
+violet-vault/src/utils/budgeting/suggestionUtils.ts:311:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
+violet-vault/src/utils/budgeting/suggestionUtils.ts:396:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
+- 1 errors in `src/utils/common/logger.ts`
+- 1 errors in `src/utils/budgeting/paycheckProcessing.ts`
+- 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 2 | `TS2322` |
+| 3 | `TS2322` |
+| 2 | `TS2345` |
+| 1 | `TS2363` |
+| 1 | `TS2362` |
 
 ### Detailed Type Error Report
 ```
 src/components/ui/ModalCloseButton.tsx(14,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
 src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not assignable to type '{ button: string; icon: string; }'.
+src/hooks/budgeting/useBudgetData/paycheckMutations.ts(25,36): error TS2345: Argument of type 'PaycheckData' is not assignable to parameter of type '{ amount: number; mode: string; envelopeAllocations?: { envelopeId: string; amount: number; }[]; notes?: string; payerName?: string; }'.
+  Property 'mode' is optional in type 'PaycheckData' but required in type '{ amount: number; mode: string; envelopeAllocations?: { envelopeId: string; amount: number; }[]; notes?: string; payerName?: string; }'.
+src/hooks/budgeting/useSmartSuggestions.ts(170,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/budgeting/useSmartSuggestions.ts(170,46): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type '{ actualBalance: unknown; virtualBalance: number; unassignedCash: unknown; isActualBalanceManual: unknown; }' is not assignable to parameter of type '{ unassignedCash: number; actualBalance: number; }'.
+  Types of property 'unassignedCash' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface' is not assignable to type '{ track?: (event: string, data?: Record<string, unknown>) => void; consumeError?: (error: Error, options?: { metadata?: Record<string, unknown>; tags?: Record<string, unknown>; }) => void; }'.
+  Types of property 'consumeError' are incompatible.
+    Type '(error: Error, message?: string, payload?: { [key: string]: string; }) => void' is not assignable to type '(error: Error, options?: { metadata?: Record<string, unknown>; tags?: Record<string, unknown>; }) => void'.
+      Types of parameters 'message' and 'options' are incompatible.
+        Type '{ metadata?: Record<string, unknown>; tags?: Record<string, unknown>; }' is not assignable to type 'string'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -119,9 +144,9 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 17 errors in `src/hooks/auth/authOperations.ts`
 - 16 errors in `src/utils/sync/autoBackupService.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
+- 16 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
 - 15 errors in `src/utils/common/balanceCalculator.ts`
-- 15 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 15 errors in `src/hooks/transactions/useTransactionBalanceUpdater.ts`
 - 15 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
 - 15 errors in `src/hooks/bills/useSmartBillSuggestions.ts`
@@ -138,7 +163,6 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 14 errors in `src/components/dashboard/AccountBalanceOverview.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
-- 13 errors in `src/utils/budgeting/suggestionUtils.ts`
 - 13 errors in `src/services/bugReport/performanceInfoService.ts`
 - 13 errors in `src/services/authService.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
@@ -151,7 +175,6 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 12 errors in `src/utils/accounts/accountHelpers.ts`
 - 12 errors in `src/hooks/transactions/useTransactionImportProcessing.ts`
 - 12 errors in `src/hooks/mobile/useFABLoadingStates.ts`
-- 12 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 12 errors in `src/hooks/budgeting/usePaycheckForm.ts`
 - 12 errors in `src/hooks/analytics/useReportExporter.ts`
 - 12 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
@@ -330,7 +353,6 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 4 errors in `src/utils/sync/retryPolicies.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
 - 4 errors in `src/utils/icons/index.ts`
-- 4 errors in `src/utils/budgeting/paycheckUtils.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
@@ -382,7 +404,6 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 4 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
 - 4 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
-- 3 errors in `src/utils/common/logger.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
 - 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
 - 3 errors in `src/hooks/sync/useFirebaseSync.ts`
@@ -432,6 +453,7 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
 - 2 errors in `src/utils/common/lazyImport.ts`
+- 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/utils/analytics/categoryPatterns.ts`
 - 2 errors in `src/services/firebaseMessaging.ts`
 - 2 errors in `src/services/bugReport/errorTrackingService.ts`
@@ -511,6 +533,7 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 1 errors in `src/utils/common/toastHelpers.ts`
 - 1 errors in `src/utils/common/testBudgetHistory.ts`
 - 1 errors in `src/utils/common/ocrProcessor.ts`
+- 1 errors in `src/utils/common/logger.ts`
 - 1 errors in `src/utils/common/highlight.ts`
 - 1 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 1 errors in `src/utils/budgeting/paycheckDeletion.ts`
@@ -529,6 +552,7 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
 - 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
+- 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
@@ -577,17 +601,17 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1578 | `TS7006` |
+| 1560 | `TS7006` |
 | 944 | `TS7031` |
 | 290 | `TS2339` |
-| 249 | `TS2345` |
+| 252 | `TS2345` |
 | 217 | `TS18046` |
-| 147 | `TS7053` |
-| 115 | `TS2322` |
-| 83 | `TS7005` |
-| 82 | `TS18048` |
-| 53 | `TS7034` |
+| 145 | `TS7053` |
+| 114 | `TS2322` |
+| 80 | `TS18048` |
+| 78 | `TS7005` |
 | 52 | `TS18047` |
+| 49 | `TS7034` |
 | 26 | `TS2769` |
 | 9 | `TS2353` |
 | 6 | `TS2698` |
@@ -604,6 +628,8 @@ src/components/ui/ModalCloseButton.tsx(16,3): error TS2322: Type 'string' is not
 | 1 | `TS2774` |
 | 1 | `TS2683` |
 | 1 | `TS2532` |
+| 1 | `TS2363` |
+| 1 | `TS2362` |
 | 1 | `TS2349` |
 | 1 | `TS18049` |
 
@@ -2751,6 +2777,10 @@ src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(105,49): error TS2345: Arg
   Type 'null' is not assignable to type 'BudgetMetadata'.
 src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(106,36): error TS2345: Argument of type 'EnvelopeAllocation[] | undefined' is not assignable to parameter of type 'EnvelopeAllocation[]'.
   Type 'undefined' is not assignable to type 'EnvelopeAllocation[]'.
+src/hooks/budgeting/useBudgetData/paycheckMutations.ts(25,36): error TS2345: Argument of type 'PaycheckData' is not assignable to parameter of type '{ amount: number; mode: string; envelopeAllocations?: { envelopeId: string; amount: number; }[] | undefined; notes?: string | undefined; payerName?: string | undefined; }'.
+  Types of property 'mode' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
 src/hooks/budgeting/useBudgetData/queries.ts(9,30): error TS7006: Parameter 'queries' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/queries.ts(10,24): error TS7006: Parameter 'query' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/queries.ts(13,28): error TS7006: Parameter 'queries' implicitly has an 'any' type.
@@ -2856,6 +2886,12 @@ src/hooks/budgeting/useSmartSuggestions.ts(78,47): error TS7006: Parameter 'newS
 src/hooks/budgeting/useSmartSuggestions.ts(89,6): error TS7006: Parameter 'suggestionId' implicitly has an 'any' type.
 src/hooks/budgeting/useSmartSuggestions.ts(100,12): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
 src/hooks/budgeting/useSmartSuggestions.ts(125,11): error TS18046: 'error' is of type 'unknown'.
+src/hooks/budgeting/useSmartSuggestions.ts(164,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/hooks/budgeting/useSmartSuggestions.ts(164,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/hooks/budgeting/useSmartSuggestions.ts(170,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/budgeting/useSmartSuggestions.ts(170,46): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/hooks/budgeting/useUnassignedCashDistribution.ts(17,33): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
 src/hooks/budgeting/useUnassignedCashDistribution.ts(32,31): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
 src/hooks/budgeting/useUnassignedCashDistribution.ts(33,28): error TS7006: Parameter 'sum' implicitly has an 'any' type.
@@ -2901,8 +2937,8 @@ src/hooks/common/bug-report/useBugReportSubmission.ts(109,7): error TS2322: Type
 src/hooks/common/bug-report/useBugReportSubmission.ts(179,22): error TS18046: 'error' is of type 'unknown'.
 src/hooks/common/bug-report/useBugReportSubmission.ts(230,5): error TS2322: Type '(description: string, severity?: "low" | "medium" | "high" | "critical") => Promise<{ reportData: { title: string; hasScreenshot: boolean; systemInfo: SystemInfo | Promise<SystemInfo>; }; ... 8 more ...; screenshotStatus?: { captured: boolean; size: number; uploaded: boolean; reason?: string; }; }>' is not assignable to type '(description: string, severity?: string | undefined) => Promise<unknown>'.
   Types of parameters 'severity' and 'severity' are incompatible.
-    Type 'string | undefined' is not assignable to type '"low" | "medium" | "high" | "critical" | undefined'.
-      Type 'string' is not assignable to type '"low" | "medium" | "high" | "critical" | undefined'.
+    Type 'string | undefined' is not assignable to type '"critical" | "low" | "medium" | "high" | undefined'.
+      Type 'string' is not assignable to type '"critical" | "low" | "medium" | "high" | undefined'.
 src/hooks/common/useActualBalance.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/common/useActualBalance.ts(33,7): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/common/useActualBalance.ts(98,6): error TS7006: Parameter 'calculatedBalance' implicitly has an 'any' type.
@@ -4301,40 +4337,11 @@ src/utils/budgeting/paycheckAllocationUtils.ts(224,33): error TS7006: Parameter 
 src/utils/budgeting/paycheckAllocationUtils.ts(228,28): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
 src/utils/budgeting/paycheckAllocationUtils.ts(236,24): error TS2339: Property 'trim' does not exist on type 'never'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
-src/utils/budgeting/paycheckProcessing.ts(13,42): error TS7006: Parameter 'envelopesQuery' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(13,58): error TS7006: Parameter 'savingsGoalsQuery' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(24,6): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(24,11): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(28,6): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(28,11): error TS7006: Parameter 'saving' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(53,50): error TS7006: Parameter 'allocations' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(85,3): error TS7006: Parameter 'paycheckData' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(86,3): error TS7006: Parameter 'currentBalances' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(87,3): error TS7006: Parameter 'newBalances' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(88,3): error TS7006: Parameter 'allocations' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(121,39): error TS7006: Parameter 'paycheckData' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(121,53): error TS7006: Parameter 'envelopesQuery' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(121,69): error TS7006: Parameter 'savingsGoalsQuery' implicitly has an 'any' type.
-src/utils/budgeting/paycheckProcessing.ts(134,44): error TS7006: Parameter 'alloc' implicitly has an 'any' type.
-src/utils/budgeting/paycheckUtils.ts(302,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/utils/budgeting/paycheckUtils.ts(317,13): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/paycheckUtils.ts(318,30): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/paycheckUtils.ts(325,13): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/utils/budgeting/suggestionUtils.ts(147,9): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/suggestionUtils.ts(198,10): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/utils/budgeting/suggestionUtils.ts(216,9): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/suggestionUtils.ts(281,10): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/utils/budgeting/suggestionUtils.ts(299,9): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/suggestionUtils.ts(364,10): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/utils/budgeting/suggestionUtils.ts(399,11): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: number; medium: number; low: number; }'.
-src/utils/budgeting/suggestionUtils.ts(399,41): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: number; medium: number; low: number; }'.
-src/utils/budgeting/suggestionUtils.ts(400,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: number; medium: number; low: number; }'.
-src/utils/budgeting/suggestionUtils.ts(400,44): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: number; medium: number; low: number; }'.
-src/utils/budgeting/suggestionUtils.ts(412,39): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/utils/budgeting/suggestionUtils.ts(431,43): error TS7006: Parameter 'priority' implicitly has an 'any' type.
-src/utils/budgeting/suggestionUtils.ts(449,44): error TS7006: Parameter 'priority' implicitly has an 'any' type.
+src/utils/budgeting/paycheckProcessing.ts(153,80): error TS2345: Argument of type '{ envelopeId: string; amount: number; }[]' is not assignable to parameter of type 'never[]'.
+  Type '{ envelopeId: string; amount: number; }' is not assignable to type 'never'.
+src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type '{ actualBalance: {}; virtualBalance: number; unassignedCash: {}; isActualBalanceManual: {}; }' is not assignable to parameter of type '{ unassignedCash: number; actualBalance: number; }'.
+  Types of property 'unassignedCash' are incompatible.
+    Type '{}' is not assignable to type 'number'.
 src/utils/common/balanceCalculator.ts(18,35): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(29,50): error TS7006: Parameter 'sum' implicitly has an 'any' type.
 src/utils/common/balanceCalculator.ts(29,55): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
@@ -4463,9 +4470,12 @@ src/utils/common/frequencyCalculations.ts(171,21): error TS7053: Element implici
 src/utils/common/highlight.ts(285,73): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/lazyImport.ts(4,21): error TS7006: Parameter 'factory' implicitly has an 'any' type.
 src/utils/common/lazyImport.ts(6,21): error TS7006: Parameter 'module' implicitly has an 'any' type.
-src/utils/common/logger.ts(2,5): error TS7034: Variable 'H' implicitly has type 'any' in some locations where its type cannot be determined.
-src/utils/common/logger.ts(25,10): error TS7005: Variable 'H' implicitly has an 'any' type.
-src/utils/common/logger.ts(39,12): error TS7005: Variable 'H' implicitly has an 'any' type.
+src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface' is not assignable to type '{ track?: ((event: string, data?: Record<string, unknown> | undefined) => void) | undefined; consumeError?: ((error: Error, options?: { metadata?: Record<string, unknown> | undefined; tags?: Record<...> | undefined; } | undefined) => void) | undefined; }'.
+  Types of property 'consumeError' are incompatible.
+    Type '(error: Error, message?: string | undefined, payload?: { [key: string]: string; } | undefined) => void' is not assignable to type '(error: Error, options?: { metadata?: Record<string, unknown> | undefined; tags?: Record<string, unknown> | undefined; } | undefined) => void'.
+      Types of parameters 'message' and 'options' are incompatible.
+        Type '{ metadata?: Record<string, unknown> | undefined; tags?: Record<string, unknown> | undefined; } | undefined' is not assignable to type 'string | undefined'.
+          Type '{ metadata?: Record<string, unknown> | undefined; tags?: Record<string, unknown> | undefined; }' is not assignable to type 'string'.
 src/utils/common/ocrProcessor.ts(349,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: null; encryptedSnapshot: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
