@@ -156,7 +156,6 @@ export const analyzeUnassignedTransactions = (
   transactions: Transaction[],
   monthsOfData: number,
   settings: AnalysisSettings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
@@ -225,7 +224,6 @@ export const analyzeMerchantPatterns = (
   envelopes: Envelope[],
   monthsOfData: number,
   settings: AnalysisSettings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
@@ -308,7 +306,6 @@ export const analyzeEnvelopeOptimization = (
   envelopes: Envelope[],
   monthsOfData: number,
   settings: AnalysisSettings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
   const { overspendingThreshold = 1.2, overfundingThreshold = 3.0, bufferPercentage } = settings;
@@ -393,7 +390,6 @@ export const generateAllSuggestions = (
   settings: AnalysisSettings,
   dateRange: string | number,
   options: GenerateSuggestionsOptions = {}
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Suggestion[] => {
   const { dismissedSuggestions = new Set(), showDismissed = false } = options;
   const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);

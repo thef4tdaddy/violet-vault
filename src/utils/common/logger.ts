@@ -1,7 +1,10 @@
 // Dynamic import to avoid circular dependency with highlight.js
 let H: {
   track?: (event: string, data?: Record<string, unknown>) => void;
-  consumeError?: (error: Error, options?: { metadata?: Record<string, unknown>; tags?: Record<string, unknown> }) => void;
+  consumeError?: (
+    error: Error,
+    options?: { metadata?: Record<string, unknown>; tags?: Record<string, unknown> }
+  ) => void;
 } | null = null;
 
 class Logger {

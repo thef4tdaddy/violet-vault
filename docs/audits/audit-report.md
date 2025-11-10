@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | 0 |
-| TypeScript Errors | 7 | 0 |
-| TypeScript Strict Mode Errors | 3865 | 0 |
+| ESLint Issues | 1 | -4 |
+| TypeScript Errors | 8 | +1 |
+| TypeScript Strict Mode Errors | 3850 | -15 |
 
-*Last updated: 2025-11-10 19:04:38 UTC*
+*Last updated: 2025-11-10 19:06:14 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,38 +27,32 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 4 issues in `violet-vault/src/utils/budgeting/suggestionUtils.ts`
 - 1 issues in `violet-vault/src/components/security/LockScreen.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 4 | `null` |
 | 1 | `enforce-ui-library/enforce-ui-library` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
-violet-vault/src/utils/budgeting/suggestionUtils.ts:159:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
-violet-vault/src/utils/budgeting/suggestionUtils.ts:228:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
-violet-vault/src/utils/budgeting/suggestionUtils.ts:311:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
-violet-vault/src/utils/budgeting/suggestionUtils.ts:396:3 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
 - 1 errors in `src/utils/common/logger.ts`
-- 1 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
+| 3 | `TS2345` |
 | 3 | `TS2322` |
-| 2 | `TS2345` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
 
@@ -70,6 +64,9 @@ src/hooks/budgeting/useBudgetData/paycheckMutations.ts(25,36): error TS2345: Arg
   Property 'mode' is optional in type 'PaycheckData' but required in type '{ amount: number; mode: string; envelopeAllocations?: { envelopeId: string; amount: number; }[]; notes?: string; payerName?: string; }'.
 src/hooks/budgeting/useSmartSuggestions.ts(170,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 src/hooks/budgeting/useSmartSuggestions.ts(170,46): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/utils/budgeting/paycheckProcessing.ts(153,49): error TS2345: Argument of type '{ actualBalance: unknown; virtualBalance: number; unassignedCash: unknown; isActualBalanceManual: unknown; }' is not assignable to parameter of type 'CurrentBalances'.
+  Types of property 'actualBalance' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
 src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type '{ actualBalance: unknown; virtualBalance: number; unassignedCash: unknown; isActualBalanceManual: unknown; }' is not assignable to parameter of type '{ unassignedCash: number; actualBalance: number; }'.
   Types of property 'unassignedCash' are incompatible.
     Type 'unknown' is not assignable to type 'number'.
@@ -146,7 +143,6 @@ src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface'
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
-- 15 errors in `src/utils/common/balanceCalculator.ts`
 - 15 errors in `src/hooks/transactions/useTransactionBalanceUpdater.ts`
 - 15 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
 - 15 errors in `src/hooks/bills/useSmartBillSuggestions.ts`
@@ -601,9 +597,9 @@ src/utils/common/logger.ts(36,13): error TS2322: Type 'HighlightPublicInterface'
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1560 | `TS7006` |
+| 1546 | `TS7006` |
 | 944 | `TS7031` |
-| 290 | `TS2339` |
+| 289 | `TS2339` |
 | 252 | `TS2345` |
 | 217 | `TS18046` |
 | 145 | `TS7053` |
@@ -4337,26 +4333,12 @@ src/utils/budgeting/paycheckAllocationUtils.ts(224,33): error TS7006: Parameter 
 src/utils/budgeting/paycheckAllocationUtils.ts(228,28): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
 src/utils/budgeting/paycheckAllocationUtils.ts(236,24): error TS2339: Property 'trim' does not exist on type 'never'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
-src/utils/budgeting/paycheckProcessing.ts(153,80): error TS2345: Argument of type '{ envelopeId: string; amount: number; }[]' is not assignable to parameter of type 'never[]'.
-  Type '{ envelopeId: string; amount: number; }' is not assignable to type 'never'.
+src/utils/budgeting/paycheckProcessing.ts(153,49): error TS2345: Argument of type '{ actualBalance: {}; virtualBalance: number; unassignedCash: {}; isActualBalanceManual: {}; }' is not assignable to parameter of type 'CurrentBalances'.
+  Types of property 'actualBalance' are incompatible.
+    Type '{}' is not assignable to type 'number'.
 src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type '{ actualBalance: {}; virtualBalance: number; unassignedCash: {}; isActualBalanceManual: {}; }' is not assignable to parameter of type '{ unassignedCash: number; actualBalance: number; }'.
   Types of property 'unassignedCash' are incompatible.
     Type '{}' is not assignable to type 'number'.
-src/utils/common/balanceCalculator.ts(18,35): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(29,50): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(29,55): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(34,52): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(34,57): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(43,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(43,47): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(79,43): error TS7006: Parameter 'currentBalances' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(79,60): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(92,83): error TS2339: Property 'amount' does not exist on type 'never'.
-src/utils/common/balanceCalculator.ts(135,47): error TS7006: Parameter 'currentBalances' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(135,64): error TS7006: Parameter 'distributions' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(144,50): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(144,55): error TS7006: Parameter 'dist' implicitly has an 'any' type.
-src/utils/common/balanceCalculator.ts(178,34): error TS7006: Parameter 'balances' implicitly has an 'any' type.
 src/utils/common/BaseMutex.ts(62,35): error TS2531: Object is possibly 'null'.
 src/utils/common/BaseMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
 src/utils/common/BaseMutex.ts(71,24): error TS2339: Property 'operationName' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
