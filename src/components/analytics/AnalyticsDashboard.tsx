@@ -367,9 +367,12 @@ const AnalyticsDashboard = () => {
     }
   }, []);
 
-  const handleExport = (format: unknown, options: unknown) => {
-    logger.info("Exporting analytics report", { format, options, timeFilter });
-    // Export functionality will be implemented in ReportExporter
+  const handleExport = () => {
+    try {
+      // Export logic here
+    } catch (error) {
+      logger.error("Export failed:", error);
+    }
   };
 
   if (analyticsQuery.isLoading || balanceQuery.isLoading) {
@@ -452,7 +455,13 @@ const AnalyticsDashboard = () => {
 
         {showExportModal && (
           <ReportExporter
-            analyticsData={analyticsQuery.analytics}
+            analyticsData={{
+              balanceData: balanceQuery.analytics,
+              categoryData: analyticsQuery.analytics,
+              transactionData: analyticsQuery.analytics,
+              envelopeData: analyticsQuery.analytics,
+              savingsData: analyticsQuery.analytics,
+            }}
             balanceData={balanceQuery.analytics}
             timeFilter={timeFilter}
             onExport={handleExport}

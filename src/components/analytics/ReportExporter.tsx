@@ -1,20 +1,40 @@
 import React from "react";
-import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
+import { Button } from "@/components/ui";
+import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 import { useReportExporter } from "@/hooks/analytics/useReportExporter";
 import { ExportFormatSelector } from "./report-exporter/ExportFormatSelector";
 import { ExportTemplates } from "./report-exporter/ExportTemplates";
 import { ExportOptionsForm } from "./report-exporter/ExportOptionsForm";
 import { ExportProgressIndicator } from "./report-exporter/ExportProgressIndicator";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+
+interface ReportExporterProps {
+  analyticsData: {
+    balanceData: Record<string, unknown>;
+    categoryData: Record<string, unknown>;
+    transactionData: Record<string, unknown>;
+    envelopeData: Record<string, unknown>;
+    savingsData: Record<string, unknown>;
+  };
+  balanceData: Record<string, unknown>;
+  timeFilter: string;
+  onExport: () => void;
+  onClose: () => void;
+}
 
 /**
  * Report Exporter for v1.10.0
  * Refactored using extracted components for better maintainability
  * All logic extracted to useReportExporter hook
  */
-const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onClose }) => {
+const ReportExporter = ({
+  analyticsData,
+  balanceData,
+  timeFilter,
+  onExport,
+  onClose,
+}: ReportExporterProps) => {
   const {
     exportFormat,
     exportOptions,

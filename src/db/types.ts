@@ -104,6 +104,7 @@ export interface AuditLogEntry {
   entityId: string;
   // Additional audit properties
   userId?: string;
+  userName?: string;
   changes?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }

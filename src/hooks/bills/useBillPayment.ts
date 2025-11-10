@@ -174,7 +174,7 @@ interface UseBillPaymentParams {
     paidAmount: number;
     paidDate?: string;
     envelopeId?: string;
-  }) => Promise<unknown>;
+  }) => Promise<void>;
 }
 
 export const useBillPayment = ({
@@ -244,7 +244,7 @@ export const useBillPayment = ({
     async (
       billInput: BillInput,
       overrides?: PayBillOverrides
-    ): Promise<{ success: boolean; updatedBill: BillRecord; paymentAmount: number }> => {
+    ): Promise<void> => {
       let normalizedBillId = "";
       try {
         const { normalizedBillId: derivedId, providedBill } = normalizeBillIdentifier(billInput);
@@ -294,7 +294,8 @@ export const useBillPayment = ({
             : "Unassigned Cash";
         globalToast.showSuccess(`Paid ${bill.name} for $${formattedAmount}`, toastTitle);
 
-        return { success: true, updatedBill, paymentAmount };
+        return;
+
       } catch (error) {
         logger.error("Error paying bill", error, { billId: normalizedBillId || billInput });
         if (error instanceof Error) {

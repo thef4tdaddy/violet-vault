@@ -16,7 +16,6 @@ import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
 import { initializeStoreRegistry } from "./utils/stores/storeRegistry";
-import type { UiStore } from "./stores/ui/uiStore";
 
 // Lazy load monitoring to reduce main bundle size
 const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
@@ -26,7 +25,7 @@ const App = () => {
   useEffect(() => {
     const initializePWA = async () => {
       // Pass the actual store, not just state data
-      await pwaManager.initialize(useUiStore as UiStore);
+      await pwaManager.initialize(useUiStore as any);
     };
 
     initializePWA();

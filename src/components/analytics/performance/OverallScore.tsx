@@ -8,7 +8,7 @@ const OverallScore = ({ score }) => {
   return (
     <div className="mb-8">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-600 text-white mb-4">
+        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-linear-to-r from-purple-500 to-blue-600 text-white mb-4">
           <span className="text-2xl font-bold">{score}</span>
         </div>
         <h4 className="text-lg font-semibold text-gray-900 mb-2">Overall Financial Health</h4>

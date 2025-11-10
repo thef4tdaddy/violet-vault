@@ -14,7 +14,7 @@ const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }
   if (!isVisible) return null;
 
   return (
-    <div className="mb-6 p-4 bg-gradient-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm rounded-xl border-2 border-black shadow-lg">
+    <div className="mb-6 p-4 bg-linear-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm rounded-xl border-2 border-black shadow-lg">
       <h4 className="font-black text-gray-900 mb-4">ANALYSIS SETTINGS</h4>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         <div>

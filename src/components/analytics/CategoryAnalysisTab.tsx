@@ -65,7 +65,7 @@ const CategoryAnalysisTab = ({ categoryStats }: CategoryAnalysisTabProps) => {
               </div>
               <div className="flex items-center gap-1">
                 {getFrequencyIndicator(stat.frequency)}
-                <span className="text-xs text-purple-800 font-bold capitalize">{stat.type}</span>
+                <span className="text-xs text-purple-800 font-bold capitalize">{stat.name}</span>
               </div>
             </div>
 

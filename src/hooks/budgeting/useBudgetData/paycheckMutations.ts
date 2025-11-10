@@ -12,7 +12,7 @@ import logger from "../../../utils/common/logger.ts";
 interface PaycheckData {
   amount: number;
   payerName: string;
-  mode?: string;
+  mode: string;
   [key: string]: unknown;
 }
 
@@ -21,7 +21,7 @@ export const usePaycheckMutations = (envelopesQuery: unknown, savingsGoalsQuery:
 
   const processPaycheckMutation = useMutation({
     mutationKey: ["paychecks", "process"],
-    mutationFn: async (paycheckData: PaycheckData) => {
+    mutationFn: async (paycheckData: PaycheckData & { mode: string }) => {
       return await processPaycheck(paycheckData, envelopesQuery, savingsGoalsQuery);
     },
     onSuccess: (_result, variables) => {

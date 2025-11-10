@@ -82,7 +82,6 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByT
 
   return (
     <StandardFilters
-      filterConfigs={filterConfigs}
       filters={filterOptions}
       onFilterChange={(key, value) => {
         setFilterOptions((prev) => ({
@@ -90,6 +89,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByT
           [key]: value,
         }));
       }}
+      onToggleFilters={() => setFilterOptions(defaultFilters)}
       defaultFilters={defaultFilters}
       mode="collapsible"
     />

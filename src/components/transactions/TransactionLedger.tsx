@@ -140,7 +140,6 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
           sortOrder,
         }}
         onFilterChange={handleFilterChange}
-        filterConfigs={filterConfigs}
         searchPlaceholder="Search transactions..."
         mode="collapsible"
       />

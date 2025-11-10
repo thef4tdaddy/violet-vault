@@ -44,7 +44,7 @@ const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categ
           <tab.icon className="h-4 w-4" />
           {tab.name}
           {tab.count !== undefined && (
-            <span className="bg-gradient-to-r from-gray-100 to-purple-100 text-purple-900 px-2 py-1 rounded-full text-xs font-bold border border-gray-300 shadow-sm">
+            <span className="bg-linear-to-r from-gray-100 to-purple-100 text-purple-900 px-2 py-1 rounded-full text-xs font-bold border border-gray-300 shadow-sm">
               {tab.count}
             </span>
           )}

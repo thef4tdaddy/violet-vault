@@ -167,7 +167,7 @@ const useSmartSuggestions = ({
 
     const potentialSavings = suggestions.reduce((sum, s) => {
       if (s.type === "decrease_envelope" && s.data.currentAmount && s.data.suggestedAmount) {
-        return sum + (s.data.currentAmount - s.data.suggestedAmount);
+        return sum + (Number(s.data.currentAmount) - Number(s.data.suggestedAmount));
       }
       return sum;
     }, 0);

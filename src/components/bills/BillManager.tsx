@@ -154,7 +154,9 @@ const BillManager = ({
         setShowBulkUpdateModal={setShowBulkUpdateModal}
         setShowBillDetail={setShowBillDetail}
         getBillDisplayData={getBillDisplayData as never}
-        billOperations={{ handlePayBill: billOperations.handlePayBill } as never}
+        billOperations={{
+          handlePayBill: billOperations.handlePayBill as (billId: string) => Promise<void>
+        }} as any
         categorizedBills={categorizedBills as never}
         viewMode={viewMode}
       />

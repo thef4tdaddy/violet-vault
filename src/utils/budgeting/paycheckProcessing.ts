@@ -24,11 +24,13 @@ export const getCurrentBalances = async (
   const currentSavings = savingsGoalsQuery.data || [];
 
   const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
-    (sum: number, env: { currentBalance: string | number }) => sum + (parseFloat(env.currentBalance.toString()) || 0),
+    (sum: number, env: { currentBalance: string | number }) =>
+      sum + (parseFloat(env.currentBalance.toString()) || 0),
     0
   );
   const currentTotalSavingsBalance = currentSavings.reduce(
-    (sum: number, saving: { currentBalance: string | number }) => sum + (parseFloat(saving.currentBalance.toString()) || 0),
+    (sum: number, saving: { currentBalance: string | number }) =>
+      sum + (parseFloat(saving.currentBalance.toString()) || 0),
     0
   );
   const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
@@ -53,7 +55,9 @@ export const getCurrentBalances = async (
 /**
  * Process envelope allocations for a paycheck
  */
-export const processEnvelopeAllocations = async (allocations: Array<{ envelopeId: string; amount: number }>) => {
+export const processEnvelopeAllocations = async (
+  allocations: Array<{ envelopeId: string; amount: number }>
+) => {
   if (allocations.length === 0) return;
 
   logger.info("Updating envelope balances", {
@@ -122,9 +126,9 @@ export const createPaycheckRecord = async (
  * Process paycheck with balance calculations and allocations
  */
 export const processPaycheck = async (
-  paycheckData: { 
-    amount: number; 
-    mode: string; 
+  paycheckData: {
+    amount: number;
+    mode: string;
     envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
     notes?: string;
     payerName?: string;
@@ -150,7 +154,22 @@ export const processPaycheck = async (
     })) || [];
 
   // Use centralized balance calculator to ensure consistency
-  const newBalances = calculatePaycheckBalances(currentBalances, paycheckData, allocations);
+  const newBalances = calculatePaycheckBalances(
+    currentBalances as {
+      actualBalance: number;
+      virtualBalance: number;
+      unassignedCash: number;
+      isActualBalanceManual: boolean;
+    },
+    paycheckData as {
+      amount: number;
+      mode: string;
+      envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
+      notes?: string;
+      payerName?: string;
+    },
+    allocations
+  );
 
   // Validate the calculation
   const validation = validateBalances(newBalances);
@@ -189,6 +208,18 @@ export const processPaycheck = async (
     newBalances,
     allocations
   );
+
+  // Update balances in state
+  updateBalances?.(newBalances);
+
+  // Log the successful paycheck processing
+  logger.info("Paycheck processed successfully", {
+    paycheckAmount: paycheckData.amount,
+    totalAllocated: allocations?.totalAllocated || 0,
+    unassignedCash: newBalances.unassignedCash,
+    actualBalance: newBalances.actualBalance,
+    virtualBalance: newBalances.virtualBalance,
+  });
 
   return paycheckRecord;
 };

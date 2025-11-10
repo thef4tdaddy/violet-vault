@@ -277,6 +277,26 @@ import { createUpdateAppAction, createInstallAppAction } from "./uiStoreActions.
 Object.assign(useUiStore.getState(), createUpdateAppAction(useUiStore.setState));
 Object.assign(useUiStore.getState(), createInstallAppAction(useUiStore.setState, useUiStore));
 
+// Create and export the store type
+export interface UiStore {
+  biweeklyAllocation: number;
+  paycheckHistory: Array<{
+    id: string;
+    amount: number;
+    date: string;
+    payerName?: string;
+    notes?: string;
+  }>;
+  isActualBalanceManual: boolean;
+  cloudSyncEnabled: boolean;
+  isOnline: boolean;
+  isUnassignedCashModalOpen: boolean;
+  dataLoaded: boolean;
+  updateAvailable: boolean;
+  showInstallPrompt: boolean;
+  showPatchNotes: boolean;
+}
+
 export default useUiStore;
 
 // Legacy compatibility export
