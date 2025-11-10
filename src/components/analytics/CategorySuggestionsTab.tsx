@@ -2,8 +2,27 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 
-const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSuggestion }) => {
-  const getPriorityIcon = (priority) => {
+interface Suggestion {
+  id: string;
+  type: string;
+  priority: "high" | "medium" | "low";
+  title: string;
+  description: string;
+  suggestedAmount: number;
+  reasoning: string;
+  action: string;
+  impact: string;
+  data: Record<string, unknown>;
+}
+
+interface CategorySuggestionsTabProps {
+  suggestions: Suggestion[];
+  onApplySuggestion: (suggestion: Suggestion) => void;
+  onDismissSuggestion: (suggestionId: string) => void;
+}
+
+const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSuggestion }: CategorySuggestionsTabProps) => {
+  const getPriorityIcon = (priority: "high" | "medium" | "low") => {
     switch (priority) {
       case "high":
         return React.createElement(getIcon("AlertCircle"), {
@@ -24,7 +43,7 @@ const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSugge
     }
   };
 
-  const getActionIcon = (type) => {
+  const getActionIcon = (type: string) => {
     switch (type) {
       case "add_category":
         return React.createElement(getIcon("Plus"), {

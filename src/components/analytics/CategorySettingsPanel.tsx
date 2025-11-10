@@ -7,7 +7,7 @@ interface AnalysisSettings {
 interface CategorySettingsPanelProps {
   isVisible: boolean;
   analysisSettings: AnalysisSettings;
-  onSettingsChange: (settings: AnalysisSettings) => void;
+  onSettingsChange: (settings: Partial<AnalysisSettings>) => void;
 }
 
 const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }: CategorySettingsPanelProps) => {

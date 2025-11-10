@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | -3 |
-| TypeScript Errors | 16 | -8 |
-| TypeScript Strict Mode Errors | 3829 | -10 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 20 | +4 |
+| TypeScript Strict Mode Errors | 3827 | -2 |
 
-*Last updated: 2025-11-10 19:18:20 UTC*
+*Last updated: 2025-11-10 19:19:36 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -42,11 +42,11 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 4 errors in `src/components/analytics/SmartCategoryManager.tsx`
+- 4 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
-- 2 errors in `src/components/analytics/SmartCategoryManager.tsx`
-- 2 errors in `src/components/analytics/CategorySettingsPanel.tsx`
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 - 1 errors in `src/components/bills/BillManager.tsx`
 - 1 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
@@ -57,11 +57,12 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 5 | `TS2345` |
-| 4 | `TS2322` |
-| 3 | `TS2339` |
+| 7 | `TS2322` |
+| 5 | `TS2339` |
+| 3 | `TS2345` |
 | 1 | `TS2740` |
 | 1 | `TS2614` |
+| 1 | `TS2551` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
 
@@ -71,10 +72,15 @@ src/App.tsx(19,15): error TS2614: Module '"./stores/ui/uiStore"' has no exported
 src/components/activity/ActivityFeed.tsx(155,33): error TS2339: Property 'userName' does not exist on type 'AuditLogEntry'.
 src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
 src/components/analytics/CategoryAnalysisTab.tsx(68,86): error TS2339: Property 'type' does not exist on type 'CategoryStat'.
-src/components/analytics/CategorySettingsPanel.tsx(41,32): error TS2345: Argument of type '{ minAmount: number; }' is not assignable to parameter of type 'AnalysisSettings'.
-  Property 'minTransactionCount' is missing in type '{ minAmount: number; }' but required in type 'AnalysisSettings'.
-src/components/analytics/CategorySettingsPanel.tsx(56,32): error TS2345: Argument of type '{ unusedCategoryThreshold: number; }' is not assignable to parameter of type 'AnalysisSettings'.
-  Property 'minTransactionCount' is missing in type '{ unusedCategoryThreshold: number; }' but required in type 'AnalysisSettings'.
+src/components/analytics/CategorySuggestionsTab.tsx(93,29): error TS2339: Property 'category' does not exist on type 'Suggestion'.
+src/components/analytics/CategorySuggestionsTab.tsx(120,72): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
+src/components/analytics/CategorySuggestionsTab.tsx(129,25): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(132,82): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/analytics/SmartCategoryManager.tsx(111,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
+  Type 'Suggestion' is missing the following properties from type 'Suggestion': type, suggestedAmount, reasoning
+src/components/analytics/SmartCategoryManager.tsx(112,13): error TS2322: Type '(suggestion: Suggestion) => Promise<void>' is not assignable to type '(suggestion: Suggestion) => void'.
+  Types of parameters 'suggestion' and 'suggestion' are incompatible.
+    Property 'category' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
 src/components/analytics/SmartCategoryManager.tsx(117,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
   Property 'amount' is missing in type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat' but required in type 'CategoryStat'.
 src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
@@ -361,6 +367,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 5 errors in `src/components/auth/components/ReturningUserActions.tsx`
 - 5 errors in `src/components/auth/ChangePasswordModal.tsx`
+- 5 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 4 errors in `src/utils/sync/syncFlowValidator.ts`
 - 4 errors in `src/utils/sync/retryUtils.ts`
 - 4 errors in `src/utils/sync/retryPolicies.ts`
@@ -456,8 +463,6 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 3 errors in `src/components/analytics/performance/PerformanceTabContent.tsx`
 - 3 errors in `src/components/analytics/performance/PerformanceOverviewTab.tsx`
 - 3 errors in `src/components/analytics/components/AnalyticsHeader.tsx`
-- 3 errors in `src/components/analytics/SmartCategoryManager.tsx`
-- 3 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
 - 3 errors in `src/App.tsx`
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
@@ -531,7 +536,6 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
 - 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
 - 2 errors in `src/components/analytics/PerformanceMonitor.tsx`
-- 2 errors in `src/components/analytics/CategorySettingsPanel.tsx`
 - 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
@@ -607,20 +611,21 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 1 errors in `src/components/analytics/trends/ForecastSummaryCard.tsx`
 - 1 errors in `src/components/analytics/performance/OverallScore.tsx`
 - 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
+- 1 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
 - 1 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
 - 1 errors in `src/components/activity/ActivityFeed.tsx`
 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1542 | `TS7006` |
-| 926 | `TS7031` |
-| 286 | `TS2339` |
-| 253 | `TS2345` |
+| 1539 | `TS7006` |
+| 923 | `TS7031` |
+| 288 | `TS2339` |
+| 251 | `TS2345` |
 | 216 | `TS18046` |
 | 145 | `TS7053` |
-| 114 | `TS2322` |
-| 82 | `TS18048` |
+| 119 | `TS2322` |
+| 80 | `TS18048` |
 | 78 | `TS7005` |
 | 52 | `TS18047` |
 | 49 | `TS7034` |
@@ -641,6 +646,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 | 1 | `TS2740` |
 | 1 | `TS2683` |
 | 1 | `TS2614` |
+| 1 | `TS2551` |
 | 1 | `TS2532` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
@@ -659,18 +665,12 @@ src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unkn
   Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
 src/components/analytics/CategoryAnalysisTab.tsx(68,86): error TS2339: Property 'type' does not exist on type 'CategoryStat'.
-src/components/analytics/CategoryAnalysisTab.tsx(75,62): error TS18048: 'stat.totalAmount' is possibly 'undefined'.
-src/components/analytics/CategoryAnalysisTab.tsx(83,61): error TS18048: 'stat.avgAmount' is possibly 'undefined'.
-src/components/analytics/CategorySettingsPanel.tsx(41,32): error TS2345: Argument of type '{ minAmount: number; }' is not assignable to parameter of type 'AnalysisSettings'.
-  Property 'minTransactionCount' is missing in type '{ minAmount: number; }' but required in type 'AnalysisSettings'.
-src/components/analytics/CategorySettingsPanel.tsx(56,32): error TS2345: Argument of type '{ unusedCategoryThreshold: number; }' is not assignable to parameter of type 'AnalysisSettings'.
-  Property 'minTransactionCount' is missing in type '{ unusedCategoryThreshold: number; }' but required in type 'AnalysisSettings'.
-src/components/analytics/CategorySuggestionsTab.tsx(5,35): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
-src/components/analytics/CategorySuggestionsTab.tsx(5,48): error TS7031: Binding element 'onApplySuggestion' implicitly has an 'any' type.
-src/components/analytics/CategorySuggestionsTab.tsx(5,67): error TS7031: Binding element 'onDismissSuggestion' implicitly has an 'any' type.
-src/components/analytics/CategorySuggestionsTab.tsx(6,28): error TS7006: Parameter 'priority' implicitly has an 'any' type.
-src/components/analytics/CategorySuggestionsTab.tsx(27,26): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/components/analytics/CategorySuggestionsTab.tsx(64,25): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
+src/components/analytics/CategorySuggestionsTab.tsx(93,29): error TS2339: Property 'category' does not exist on type 'Suggestion'.
+src/components/analytics/CategorySuggestionsTab.tsx(120,72): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
+src/components/analytics/CategorySuggestionsTab.tsx(128,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(129,25): error TS2322: Type '{}' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(131,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/analytics/CategorySuggestionsTab.tsx(132,82): error TS2339: Property 'toFixed' does not exist on type '{}'.
 src/components/analytics/components/AnalyticsHeader.tsx(9,28): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,39): error TS7031: Binding element 'handleDateRangeChange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,62): error TS7031: Binding element 'handleExport' implicitly has an 'any' type.
@@ -712,6 +712,11 @@ src/components/analytics/ReportExporter.tsx(87,15): error TS2322: Type '{ includ
     Type 'null' is not assignable to type 'boolean'.
 src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
   Type 'TransactionForStats' is not assignable to type 'never'.
+src/components/analytics/SmartCategoryManager.tsx(111,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
+  Type 'Suggestion' is missing the following properties from type 'Suggestion': type, suggestedAmount, reasoning
+src/components/analytics/SmartCategoryManager.tsx(112,13): error TS2322: Type '(suggestion: Suggestion) => Promise<void>' is not assignable to type '(suggestion: Suggestion) => void'.
+  Types of parameters 'suggestion' and 'suggestion' are incompatible.
+    Property 'category' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
 src/components/analytics/SmartCategoryManager.tsx(117,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
   Property 'amount' is missing in type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat' but required in type 'CategoryStat'.
 src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
