@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 20 | +4 |
-| TypeScript Strict Mode Errors | 3827 | -2 |
+| TypeScript Errors | 21 | +1 |
+| TypeScript Strict Mode Errors | 3828 | +1 |
 
-*Last updated: 2025-11-10 19:19:36 UTC*
+*Last updated: 2025-11-10 19:23:00 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -42,7 +42,7 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 4 errors in `src/components/analytics/SmartCategoryManager.tsx`
+- 5 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 4 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
@@ -65,6 +65,7 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 | 1 | `TS2551` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
+| 1 | `TS2352` |
 
 ### Detailed Type Error Report
 ```
@@ -76,8 +77,11 @@ src/components/analytics/CategorySuggestionsTab.tsx(93,29): error TS2339: Proper
 src/components/analytics/CategorySuggestionsTab.tsx(120,72): error TS2551: Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?
 src/components/analytics/CategorySuggestionsTab.tsx(129,25): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
 src/components/analytics/CategorySuggestionsTab.tsx(132,82): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/analytics/SmartCategoryManager.tsx(70,9): error TS2352: Conversion of type 'Suggestion[]' to type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'suggestedAmount' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
 src/components/analytics/SmartCategoryManager.tsx(111,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
-  Type 'Suggestion' is missing the following properties from type 'Suggestion': type, suggestedAmount, reasoning
+  Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion' is not assignable to type 'Suggestion'.
+    Property 'title' is optional in type 'Suggestion' but required in type 'Suggestion'.
 src/components/analytics/SmartCategoryManager.tsx(112,13): error TS2322: Type '(suggestion: Suggestion) => Promise<void>' is not assignable to type '(suggestion: Suggestion) => void'.
   Types of parameters 'suggestion' and 'suggestion' are incompatible.
     Property 'category' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
@@ -324,6 +328,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 6 errors in `src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
 - 6 errors in `src/components/bills/BillViewTabs.tsx`
 - 6 errors in `src/components/automation/steps/config/PriorityFillConfig.tsx`
+- 6 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 6 errors in `src/components/analytics/ReportExporter.tsx`
 - 6 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 5 errors in `src/utils/sync/validation/checksumUtils.ts`
@@ -367,7 +372,6 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 5 errors in `src/components/auth/components/ReturningUserActions.tsx`
 - 5 errors in `src/components/auth/ChangePasswordModal.tsx`
-- 5 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 4 errors in `src/utils/sync/syncFlowValidator.ts`
 - 4 errors in `src/utils/sync/retryUtils.ts`
 - 4 errors in `src/utils/sync/retryPolicies.ts`
@@ -634,11 +638,11 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 | 6 | `TS2698` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
+| 5 | `TS2352` |
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
 | 4 | `TS2538` |
-| 4 | `TS2352` |
 | 2 | `TS7022` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
@@ -712,8 +716,13 @@ src/components/analytics/ReportExporter.tsx(87,15): error TS2322: Type '{ includ
     Type 'null' is not assignable to type 'boolean'.
 src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
   Type 'TransactionForStats' is not assignable to type 'never'.
+src/components/analytics/SmartCategoryManager.tsx(70,9): error TS2352: Conversion of type 'Suggestion[]' to type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'suggestedAmount' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.
 src/components/analytics/SmartCategoryManager.tsx(111,13): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion[]' is not assignable to type 'Suggestion[]'.
-  Type 'Suggestion' is missing the following properties from type 'Suggestion': type, suggestedAmount, reasoning
+  Type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion' is not assignable to type 'Suggestion'.
+    Types of property 'title' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
 src/components/analytics/SmartCategoryManager.tsx(112,13): error TS2322: Type '(suggestion: Suggestion) => Promise<void>' is not assignable to type '(suggestion: Suggestion) => void'.
   Types of parameters 'suggestion' and 'suggestion' are incompatible.
     Property 'category' is missing in type 'Suggestion' but required in type 'import("violet-vault/src/utils/analytics/categoryHelpers").Suggestion'.

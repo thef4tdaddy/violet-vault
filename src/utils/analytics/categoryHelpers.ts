@@ -76,6 +76,9 @@ export interface Suggestion {
   title?: string;
   description?: string;
   action?: string;
+  type: string;
+  suggestedAmount: number;
+  reasoning: string;
   data?: {
     totalAmount?: number;
     transactionCount?: number;

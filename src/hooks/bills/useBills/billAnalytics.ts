@@ -11,12 +11,12 @@ export const useBillAnalytics = (bills = []) => {
 
     // Basic counts
     const totalBills = bills.length;
-    const paidBills = bills.filter((bill) => bill.isPaid).length;
+    const paidBills = bills.filter((bill) => bill.isPaid === true).length;
     const unpaidBills = totalBills - paidBills;
 
     // Overdue bills
     const overdueBills = bills.filter((bill) => {
-      if (bill.isPaid) return false;
+      if (bill.isPaid === true) return false;
       if (!bill.dueDate) return false;
       const dueDate = new Date(bill.dueDate);
       return dueDate < now;
@@ -24,7 +24,7 @@ export const useBillAnalytics = (bills = []) => {
 
     // Upcoming bills (next 30 days)
     const upcomingBills = bills.filter((bill) => {
-      if (bill.isPaid) return false;
+      if (bill.isPaid === true) return false;
       if (!bill.dueDate) return false;
       const dueDate = new Date(bill.dueDate);
       return dueDate >= now && dueDate <= thirtyDaysFromNow;
