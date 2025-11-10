@@ -1,8 +1,19 @@
 import React from "react";
 import { getIcon } from "@/utils";
 
-const CategoryAnalysisTab = ({ categoryStats }) => {
-  const getFrequencyIndicator = (frequency) => {
+interface CategoryStat {
+  name: string;
+  amount: number;
+  frequency: number;
+  trend?: number;
+}
+
+interface CategoryAnalysisTabProps {
+  categoryStats: CategoryStat[];
+}
+
+const CategoryAnalysisTab = ({ categoryStats }: CategoryAnalysisTabProps) => {
+  const getFrequencyIndicator = (frequency: number) => {
     if (frequency > 2)
       return React.createElement(getIcon("TrendingUp"), {
         className: "h-4 w-4 text-green-500",
@@ -16,7 +27,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
     });
   };
 
-  const getFrequencyColor = (frequency) => {
+  const getFrequencyColor = (frequency: number) => {
     if (frequency > 2) return "border-green-200 bg-green-50/80";
     if (frequency < 0.5) return "border-red-200 bg-red-50/80";
     return "border-blue-200 bg-blue-50/80";
@@ -36,7 +47,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {categoryStats.map((stat) => (
+        {categoryStats.map((stat: CategoryStat) => (
           <div
             key={stat.name}
             className={`glassmorphism backdrop-blur-sm rounded-xl p-4 border-2 border-black shadow-md hover:shadow-lg transition-all ${getFrequencyColor(stat.frequency)}`}

@@ -1,4 +1,16 @@
-const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }) => {
+import React from "react";
+
+interface AnalysisSettings {
+  minTransactionCount: number;
+}
+
+interface CategorySettingsPanelProps {
+  isVisible: boolean;
+  analysisSettings: AnalysisSettings;
+  onSettingsChange: (settings: AnalysisSettings) => void;
+}
+
+const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }: CategorySettingsPanelProps) => {
   if (!isVisible) return null;
 
   return (

@@ -22,7 +22,9 @@ type BillEntity = Record<string, unknown> & {
  */
 interface SelectionState {
   hasSelection: boolean;
+  isAllSelected: boolean;
   selectedCount: number;
+  selectedBillIds: string[];
 }
 
 /**
@@ -51,7 +53,14 @@ interface BillTableProps {
   setShowBillDetail: (bill: BillEntity) => void;
   getBillDisplayData: (bill: BillEntity) => BillDisplayData;
   billOperations: {
-    handlePayBill: (billId: string) => Promise<void>;
+    handlePayBill: (
+      billOrId: string | BillEntity,
+      overrides?: {
+        amount?: number;
+        paidDate?: string;
+        envelopeId?: string;
+      }
+    ) => Promise<unknown>;
   };
   categorizedBills: Record<string, BillEntity[]>;
   viewMode: string;

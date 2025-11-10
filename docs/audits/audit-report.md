@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | 0 |
-| TypeScript Errors | 12 | +3 |
-| TypeScript Strict Mode Errors | 3836 | -15 |
+| ESLint Issues | 4 | +3 |
+| TypeScript Errors | 24 | +12 |
+| TypeScript Strict Mode Errors | 3839 | +3 |
 
-*Last updated: 2025-11-10 19:13:41 UTC*
+*Last updated: 2025-11-10 19:16:30 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,27 +27,36 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 3 issues in `violet-vault/src/hooks/bills/useBillPayment.ts`
 - 1 issues in `violet-vault/src/components/security/LockScreen.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 1 | `max-statements` |
+| 1 | `max-lines-per-function` |
 | 1 | `enforce-ui-library/enforce-ui-library` |
+| 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+violet-vault/src/hooks/bills/useBillPayment.ts:55:31 - 1 - Arrow function has too many lines (173). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/bills/useBillPayment.ts:119:5 - 1 - Async arrow function has too many statements (35). Maximum allowed is 25. (max-statements)
+violet-vault/src/hooks/bills/useBillPayment.ts:122:86 - 1 - Async arrow function has a complexity of 31. Maximum allowed is 15. (complexity)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 6 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
+- 5 errors in `src/components/analytics/CategorySettingsPanel.tsx`
 - 2 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 2 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 2 errors in `src/components/ui/ModalCloseButton.tsx`
+- 2 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 1 errors in `src/hooks/budgeting/useBudgetData/paycheckMutations.ts`
 - 1 errors in `src/components/bills/BillManager.tsx`
-- 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 1 errors in `src/components/analytics/CategoryAdvancedTab.tsx`
 - 1 errors in `src/components/activity/ActivityFeed.tsx`
 - 1 errors in `src/App.tsx`
@@ -55,11 +64,14 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
+| 9 | `TS2339` |
+| 4 | `TS2322` |
 | 3 | `TS2345` |
-| 3 | `TS2322` |
-| 2 | `TS2339` |
+| 2 | `TS2353` |
+| 1 | `TS6133` |
 | 1 | `TS2740` |
 | 1 | `TS2614` |
+| 1 | `TS2551` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
 
@@ -68,6 +80,19 @@ violet-vault/src/components/security/LockScreen.tsx:102:11 - 1 - Use <Button> fr
 src/App.tsx(19,15): error TS2614: Module '"./stores/ui/uiStore"' has no exported member 'UiStore'. Did you mean to use 'import UiStore from "./stores/ui/uiStore"' instead?
 src/components/activity/ActivityFeed.tsx(155,33): error TS2339: Property 'userName' does not exist on type 'AuditLogEntry'.
 src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
+src/components/analytics/CategoryAnalysisTab.tsx(64,86): error TS2339: Property 'type' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(71,67): error TS2339: Property 'totalAmount' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(75,65): error TS2339: Property 'transactionCount' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(79,66): error TS2551: Property 'avgAmount' does not exist on type 'CategoryStat'. Did you mean 'amount'?
+src/components/analytics/CategoryAnalysisTab.tsx(81,21): error TS2339: Property 'lastUsed' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(85,36): error TS2339: Property 'lastUsed' does not exist on type 'CategoryStat'.
+src/components/analytics/CategorySettingsPanel.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/analytics/CategorySettingsPanel.tsx(39,37): error TS2339: Property 'minAmount' does not exist on type 'AnalysisSettings'.
+src/components/analytics/CategorySettingsPanel.tsx(42,17): error TS2353: Object literal may only specify known properties, and 'minAmount' does not exist in type 'AnalysisSettings'.
+src/components/analytics/CategorySettingsPanel.tsx(54,37): error TS2339: Property 'unusedCategoryThreshold' does not exist on type 'AnalysisSettings'.
+src/components/analytics/CategorySettingsPanel.tsx(57,17): error TS2353: Object literal may only specify known properties, and 'unusedCategoryThreshold' does not exist in type 'AnalysisSettings'.
+src/components/analytics/SmartCategoryManager.tsx(117,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
+  Property 'amount' is missing in type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat' but required in type 'CategoryStat'.
 src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
 src/components/bills/BillManager.tsx(185,9): error TS2322: Type '{ handleBulkUpdate: (updatedBills: any) => Promise<{ success: boolean; successCount: number; errorCount: any; errors: any[]; message: any; }>; handlePayBill: (...args: Parameters<(...args: unknown[]) => Promise<unknown>>) => Promise<...>; handleBulkPayment: (billIds: any) => Promise<...>; validateBillData: (bill: an...' is not assignable to type '{ handlePayBill: (billId: string) => Promise<void>; }'.
   The types returned by 'handlePayBill(...)' are incompatible between these types.
@@ -311,6 +336,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 6 errors in `src/components/automation/steps/config/PriorityFillConfig.tsx`
 - 6 errors in `src/components/analytics/ReportExporter.tsx`
 - 6 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
+- 6 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
 - 5 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 5 errors in `src/utils/sync/syncEdgeCaseTester.ts`
 - 5 errors in `src/utils/pwa/offlineDataValidator.ts`
@@ -352,6 +378,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 5 errors in `src/components/auth/components/ReturningUserActions.tsx`
 - 5 errors in `src/components/auth/ChangePasswordModal.tsx`
+- 5 errors in `src/components/analytics/CategorySettingsPanel.tsx`
 - 4 errors in `src/utils/sync/syncFlowValidator.ts`
 - 4 errors in `src/utils/sync/retryUtils.ts`
 - 4 errors in `src/utils/sync/retryPolicies.ts`
@@ -371,6 +398,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 4 errors in `src/hooks/bills/useBills/index.ts`
 - 4 errors in `src/hooks/bills/useBillValidation.ts`
+- 4 errors in `src/hooks/bills/useBillPayment.ts`
 - 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
 - 4 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
@@ -404,8 +432,6 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 4 errors in `src/components/analytics/performance/PerformanceAlertsTab.tsx`
 - 4 errors in `src/components/analytics/performance/MetricCard.tsx`
 - 4 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
-- 4 errors in `src/components/analytics/CategoryNavigationTabs.tsx`
-- 4 errors in `src/components/analytics/CategoryAnalysisTab.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
 - 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
@@ -449,7 +475,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 3 errors in `src/components/analytics/performance/PerformanceTabContent.tsx`
 - 3 errors in `src/components/analytics/performance/PerformanceOverviewTab.tsx`
 - 3 errors in `src/components/analytics/components/AnalyticsHeader.tsx`
-- 3 errors in `src/components/analytics/CategorySettingsPanel.tsx`
+- 3 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 3 errors in `src/App.tsx`
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
@@ -522,9 +548,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 - 2 errors in `src/components/analytics/trends/HistoricalTrendsChart.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
 - 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
-- 2 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 2 errors in `src/components/analytics/PerformanceMonitor.tsx`
-- 2 errors in `src/components/analytics/CategoryManagerHeader.tsx`
 - 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
@@ -606,22 +630,23 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1545 | `TS7006` |
-| 936 | `TS7031` |
-| 285 | `TS2339` |
+| 1542 | `TS7006` |
+| 926 | `TS7031` |
+| 292 | `TS2339` |
 | 251 | `TS2345` |
 | 216 | `TS18046` |
 | 145 | `TS7053` |
-| 113 | `TS2322` |
+| 114 | `TS2322` |
 | 80 | `TS18048` |
 | 78 | `TS7005` |
 | 52 | `TS18047` |
 | 49 | `TS7034` |
 | 26 | `TS2769` |
-| 9 | `TS2353` |
+| 11 | `TS2353` |
 | 6 | `TS2698` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
+| 5 | `TS6133` |
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
@@ -634,6 +659,7 @@ src/utils/budgeting/paycheckProcessing.ts(188,5): error TS2345: Argument of type
 | 1 | `TS2740` |
 | 1 | `TS2683` |
 | 1 | `TS2614` |
+| 1 | `TS2551` |
 | 1 | `TS2532` |
 | 1 | `TS2363` |
 | 1 | `TS2362` |
@@ -651,19 +677,17 @@ src/components/analytics/AnalyticsDashboard.tsx(168,5): error TS2322: Type 'unkn
 src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/CategoryAdvancedTab.tsx(47,31): error TS2339: Property 'size' does not exist on type 'string[]'.
-src/components/analytics/CategoryAnalysisTab.tsx(4,32): error TS7031: Binding element 'categoryStats' implicitly has an 'any' type.
-src/components/analytics/CategoryAnalysisTab.tsx(5,34): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/components/analytics/CategoryAnalysisTab.tsx(19,30): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/components/analytics/CategoryAnalysisTab.tsx(39,29): error TS7006: Parameter 'stat' implicitly has an 'any' type.
-src/components/analytics/CategoryManagerHeader.tsx(5,34): error TS7031: Binding element 'suggestionCount' implicitly has an 'any' type.
-src/components/analytics/CategoryManagerHeader.tsx(5,51): error TS7031: Binding element 'onToggleSettings' implicitly has an 'any' type.
-src/components/analytics/CategoryNavigationTabs.tsx(4,35): error TS7031: Binding element 'activeTab' implicitly has an 'any' type.
-src/components/analytics/CategoryNavigationTabs.tsx(4,46): error TS7031: Binding element 'onTabChange' implicitly has an 'any' type.
-src/components/analytics/CategoryNavigationTabs.tsx(4,59): error TS7031: Binding element 'suggestionCount' implicitly has an 'any' type.
-src/components/analytics/CategoryNavigationTabs.tsx(4,76): error TS7031: Binding element 'categoryCount' implicitly has an 'any' type.
-src/components/analytics/CategorySettingsPanel.tsx(1,34): error TS7031: Binding element 'isVisible' implicitly has an 'any' type.
-src/components/analytics/CategorySettingsPanel.tsx(1,45): error TS7031: Binding element 'analysisSettings' implicitly has an 'any' type.
-src/components/analytics/CategorySettingsPanel.tsx(1,63): error TS7031: Binding element 'onSettingsChange' implicitly has an 'any' type.
+src/components/analytics/CategoryAnalysisTab.tsx(64,86): error TS2339: Property 'type' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(71,67): error TS2339: Property 'totalAmount' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(75,65): error TS2339: Property 'transactionCount' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(79,66): error TS2551: Property 'avgAmount' does not exist on type 'CategoryStat'. Did you mean 'amount'?
+src/components/analytics/CategoryAnalysisTab.tsx(81,21): error TS2339: Property 'lastUsed' does not exist on type 'CategoryStat'.
+src/components/analytics/CategoryAnalysisTab.tsx(85,36): error TS2339: Property 'lastUsed' does not exist on type 'CategoryStat'.
+src/components/analytics/CategorySettingsPanel.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/analytics/CategorySettingsPanel.tsx(39,37): error TS2339: Property 'minAmount' does not exist on type 'AnalysisSettings'.
+src/components/analytics/CategorySettingsPanel.tsx(42,17): error TS2353: Object literal may only specify known properties, and 'minAmount' does not exist in type 'AnalysisSettings'.
+src/components/analytics/CategorySettingsPanel.tsx(54,37): error TS2339: Property 'unusedCategoryThreshold' does not exist on type 'AnalysisSettings'.
+src/components/analytics/CategorySettingsPanel.tsx(57,17): error TS2353: Object literal may only specify known properties, and 'unusedCategoryThreshold' does not exist in type 'AnalysisSettings'.
 src/components/analytics/CategorySuggestionsTab.tsx(5,35): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
 src/components/analytics/CategorySuggestionsTab.tsx(5,48): error TS7031: Binding element 'onApplySuggestion' implicitly has an 'any' type.
 src/components/analytics/CategorySuggestionsTab.tsx(5,67): error TS7031: Binding element 'onDismissSuggestion' implicitly has an 'any' type.
@@ -711,6 +735,8 @@ src/components/analytics/ReportExporter.tsx(87,15): error TS2322: Type '{ includ
     Type 'null' is not assignable to type 'boolean'.
 src/components/analytics/SmartCategoryManager.tsx(59,5): error TS2345: Argument of type 'TransactionForStats[]' is not assignable to parameter of type 'never[]'.
   Type 'TransactionForStats' is not assignable to type 'never'.
+src/components/analytics/SmartCategoryManager.tsx(117,37): error TS2322: Type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat[]' is not assignable to type 'CategoryStat[]'.
+  Property 'amount' is missing in type 'import("violet-vault/src/utils/analytics/categoryHelpers").CategoryStat' but required in type 'CategoryStat'.
 src/components/analytics/SmartCategoryManager.tsx(123,13): error TS2740: Type 'Set<unknown>' is missing the following properties from type 'string[]': length, pop, push, concat, and 24 more.
 src/components/analytics/tabs/HealthTab.tsx(7,22): error TS7031: Binding element 'envelopeHealth' implicitly has an 'any' type.
 src/components/analytics/tabs/HealthTab.tsx(7,38): error TS7031: Binding element 'budgetVsActual' implicitly has an 'any' type.
@@ -2520,13 +2546,17 @@ src/hooks/bills/useBillManagerUI.ts(95,50): error TS2345: Argument of type '(bil
     Type 'unknown' is not assignable to type '{ id: string; }'.
 src/hooks/bills/useBillOperations.ts(33,77): error TS2345: Argument of type 'Record<string, unknown>[]' is not assignable to parameter of type 'never[]'.
   Type 'Record<string, unknown>' is not assignable to type 'never'.
-src/hooks/bills/useBillOperations.ts(53,7): error TS2322: Type '(billId: string) => Promise<{ success: boolean; updatedBill: BillRecord; }>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
-  Types of parameters 'billId' and 'args' are incompatible.
-    Type 'unknown' is not assignable to type 'string'.
+src/hooks/bills/useBillOperations.ts(53,7): error TS2322: Type '(billInput: string | number | BillRecord, overrides?: PayBillOverrides) => Promise<{ success: boolean; updatedBill: BillRecord; paymentAmount: number; }>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+  Types of parameters 'billInput' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string | number | BillRecord'.
 src/hooks/bills/useBillOperationWrappers.ts(35,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(44,30): error TS18046: 'error' is of type 'unknown'.
 src/hooks/bills/useBillOperationWrappers.ts(81,12): error TS7006: Parameter 'billIds' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(90,30): error TS18046: 'error' is of type 'unknown'.
+src/hooks/bills/useBillPayment.ts(43,7): error TS6133: 'normalizeBillIdentifier' is declared but its value is never read.
+src/hooks/bills/useBillPayment.ts(67,7): error TS6133: 'selectBillForPayment' is declared but its value is never read.
+src/hooks/bills/useBillPayment.ts(91,7): error TS6133: 'resolvePaymentDetails' is declared but its value is never read.
+src/hooks/bills/useBillPayment.ts(128,7): error TS6133: 'buildUpdatedBillRecord' is declared but its value is never read.
 src/hooks/bills/useBills/billAnalytics.ts(14,51): error TS2339: Property 'isPaid' does not exist on type 'never'.
 src/hooks/bills/useBills/billAnalytics.ts(19,16): error TS2339: Property 'isPaid' does not exist on type 'never'.
 src/hooks/bills/useBills/billAnalytics.ts(20,17): error TS2339: Property 'dueDate' does not exist on type 'never'.

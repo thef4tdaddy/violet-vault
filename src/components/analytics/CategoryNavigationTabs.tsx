@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils/icons";
 
-const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categoryCount }) => {
+interface CategoryNavigationTabsProps {
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
+  suggestionCount: number;
+  categoryCount: number;
+}
+
+const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categoryCount }: CategoryNavigationTabsProps) => {
   const tabs = [
     {
       id: "suggestions",

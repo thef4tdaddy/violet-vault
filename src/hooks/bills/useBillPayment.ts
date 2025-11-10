@@ -31,6 +31,13 @@ interface BudgetRecord {
   [key: string]: unknown;
 }
 
+interface PayBillOverrides {
+  amount?: number;
+  paidDate?: string;
+  envelopeId?: string;
+  skipValidation?: boolean;
+}
+
 interface UseBillPaymentParams {
   bills: Array<Record<string, unknown>>;
   envelopes: Array<Record<string, unknown>>;
@@ -109,9 +116,34 @@ export const useBillPayment = ({
    * Handle individual bill payment with envelope balance checking
    */
   const handlePayBill = useCallback(
-    async (billId: string) => {
+    async (
+      billInput: string | number | BillRecord,
+      overrides?: PayBillOverrides
+    ): Promise<{ success: boolean; updatedBill: BillRecord; paymentAmount: number }> => {
+      let normalizedBillId = "";
       try {
-        const bill = bills.find((b) => (b as BillRecord).id === billId) as BillRecord | undefined;
+        const providedBill =
+          typeof billInput === "object" && billInput !== null
+            ? (billInput as BillRecord | undefined)
+            : undefined;
+
+        const rawBillId =
+          typeof billInput === "string" || typeof billInput === "number"
+            ? billInput
+            : providedBill?.id;
+
+        normalizedBillId =
+          typeof rawBillId === "string" ? rawBillId : rawBillId !== undefined ? String(rawBillId) : "";
+
+        if (!normalizedBillId) {
+          throw new Error("Bill identifier is required to complete payment");
+        }
+
+        const sourceBill = bills.find(
+          (b) => (b as BillRecord).id === normalizedBillId
+        ) as BillRecord | undefined;
+
+        const bill = sourceBill ?? providedBill;
         if (!bill) {
           throw new Error("Bill not found");
         }
@@ -120,16 +152,41 @@ export const useBillPayment = ({
           throw new Error("Bill is already paid");
         }
 
-        // Validate payment funds
-        const paymentContext = validatePaymentFunds(bill);
+        const effectiveEnvelopeId = overrides?.envelopeId ?? bill.envelopeId;
+        const normalizedAmount =
+          overrides?.amount !== undefined ? overrides.amount : bill.amount ?? 0;
+        const paymentAmount = Math.abs(Number(normalizedAmount ?? 0));
 
-        const paymentDate = new Date().toISOString().split("T")[0];
+        if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
+          throw new Error("Payment amount must be greater than zero");
+        }
+
+        const billForValidation: BillRecord = {
+          ...bill,
+          amount: paymentAmount,
+          envelopeId: effectiveEnvelopeId,
+        };
+
+        // Validate payment funds
+        const paymentContext = validatePaymentFunds(billForValidation);
+
+        const paymentDate = (() => {
+          if (!overrides?.paidDate) {
+            return new Date().toISOString().split("T")[0];
+          }
+          const parsed = new Date(overrides.paidDate);
+          return Number.isNaN(parsed.getTime())
+            ? new Date().toISOString().split("T")[0]
+            : parsed.toISOString().split("T")[0];
+        })();
 
         const updatedBill: BillRecord = {
           ...bill,
           isPaid: true,
           paidDate: paymentDate,
+          paidAmount: paymentAmount,
           lastModified: new Date().toISOString(),
+          envelopeId: effectiveEnvelopeId,
           modificationHistory: [
             ...(bill.modificationHistory || []),
             {
@@ -141,6 +198,12 @@ export const useBillPayment = ({
                   from: null,
                   to: paymentDate,
                 },
+                ...(overrides?.amount !== undefined && {
+                  amount: {
+                    from: bill.amount ?? 0,
+                    to: paymentAmount,
+                  },
+                }),
               },
             },
           ],
@@ -148,10 +211,10 @@ export const useBillPayment = ({
 
         if (markBillPaid) {
           await markBillPaid({
-            billId: bill.id,
-            paidAmount: paymentContext.billAmount,
+            billId: normalizedBillId,
+            paidAmount: paymentAmount,
             paidDate: paymentDate,
-            envelopeId: bill.envelopeId,
+            envelopeId: effectiveEnvelopeId,
           });
         }
 
@@ -162,21 +225,21 @@ export const useBillPayment = ({
         });
 
         logger.info("Bill payment completed", {
-          billId: bill.id,
-          amount: bill.amount,
-          envelopeId: bill.envelopeId,
+          billId: normalizedBillId,
+          amount: paymentAmount,
+          envelopeId: effectiveEnvelopeId,
         });
 
-        const formattedAmount = Math.abs(Number(bill.amount ?? 0)).toFixed(2);
+        const formattedAmount = paymentAmount.toFixed(2);
         const toastTitle =
           paymentContext.paymentSource === "envelope"
             ? `Envelope • ${paymentContext.envelope?.name ?? "Assigned"}`
             : "Unassigned Cash";
         globalToast.showSuccess(`Paid ${bill.name} for $${formattedAmount}`, toastTitle);
 
-        return { success: true, updatedBill };
+        return { success: true, updatedBill, paymentAmount };
       } catch (error) {
-        logger.error("Error paying bill", error, { billId });
+        logger.error("Error paying bill", error, { billId: normalizedBillId || billInput });
         if (error instanceof Error) {
           globalToast.showError(error.message, "Bill Payment Failed");
         } else {

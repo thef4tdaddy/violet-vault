@@ -2,7 +2,12 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 
-const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }) => {
+interface CategoryManagerHeaderProps {
+  suggestionCount: number;
+  onToggleSettings: () => void;
+}
+
+const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }: CategoryManagerHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
