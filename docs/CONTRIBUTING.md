@@ -101,7 +101,7 @@ VioletVault uses **JavaScript with JSDoc annotations** for type safety. Follow t
 - **Provide fallback values**: Handle `undefined`/`null` cases gracefully
 - **Validate critical inputs**: Add runtime checks for enum/union values
 
-See the **[TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** for comprehensive documentation on typing props, hooks, Dexie queries, and decision logs for type-related compromises.
+See the **[Documentation Index](docs/DOCUMENTATION_INDEX.md)** for a complete overview of all documentation, including TypeScript patterns and typing guidelines.
 
 ### Getting Started
 
