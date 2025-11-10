@@ -294,4 +294,5 @@ if (typeof window !== "undefined") {
   (window as unknown as Record<string, unknown>).pwaManager = pwaManager;
 }
 
+export type { UIStore as PWAManagerUiStore };
 export default pwaManager;

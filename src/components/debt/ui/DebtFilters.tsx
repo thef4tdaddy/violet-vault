@@ -8,15 +8,18 @@
  * Debt, Transactions, and Bills pages. This approach follows DRY principles and makes
  * filter behavior updates apply universally.
  */
+import type { Dispatch, SetStateAction } from "react";
 import StandardFilters from "../../ui/StandardFilters";
 import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
 
-/**
- * Debt filtering and sorting controls
- * Configures StandardFilters with debt-specific options
- */
-const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByType = {} }) => {
-  // Build debt type options dynamically
+interface DebtFiltersProps {
+  filterOptions: Record<string, string | boolean>;
+  setFilterOptions: Dispatch<SetStateAction<Record<string, string | boolean>>>;
+  debtTypes?: Record<string, string>;
+  debtsByType?: Record<string, unknown[]>;
+}
+
+const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByType = {} }: DebtFiltersProps) => {
   const debtTypeOptions = [
     { value: "all", label: "All Types" },
     ...Object.values(debtTypes || {}).map((type) => {
@@ -30,7 +33,6 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByT
     }),
   ];
 
-  // Configure filters for debt dashboard
   const filterConfigs = [
     {
       key: "type",
@@ -72,25 +74,31 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByT
     },
   ];
 
-  // Default filter values when disabled
   const defaultFilters = {
     type: "all",
     status: "all",
     sortBy: "balance_desc",
     showPaidOff: false,
+  } as const;
+
+  const handleFilterChange = (key: string, value: string | boolean) => {
+    setFilterOptions((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleResetFilters = () => {
+    setFilterOptions({ ...defaultFilters });
   };
 
   return (
     <StandardFilters
       filters={filterOptions}
-      onFilterChange={(key, value) => {
-        setFilterOptions((prev) => ({
-          ...prev,
-          [key]: value,
-        }));
-      }}
-      onToggleFilters={() => setFilterOptions(defaultFilters)}
+      filterConfigs={filterConfigs}
       defaultFilters={defaultFilters}
+      onFilterChange={handleFilterChange}
+      onResetFilters={handleResetFilters}
       mode="collapsible"
     />
   );

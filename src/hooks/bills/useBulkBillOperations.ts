@@ -40,10 +40,7 @@ export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handle
   const handleBulkPayment = useCallback(
     async (billIds) => {
       const paySingleBill = async (billId) => {
-        const result = await handlePayBill(billId);
-        if (!result.success) {
-          throw new Error(result.error);
-        }
+        await handlePayBill(billId);
       };
 
       const result = await processBulkOperation(billIds, "bill payment", paySingleBill);

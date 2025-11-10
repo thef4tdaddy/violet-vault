@@ -54,13 +54,9 @@ interface BillTableProps {
   getBillDisplayData: (bill: BillEntity) => BillDisplayData;
   billOperations: {
     handlePayBill: (
-      billOrId: string | BillEntity,
-      overrides?: {
-        amount?: number;
-        paidDate?: string;
-        envelopeId?: string;
-      }
-    ) => Promise<unknown>;
+      billId: string,
+      overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+    ) => Promise<void>;
   };
   categorizedBills: Record<string, BillEntity[]>;
   viewMode: string;

@@ -5,6 +5,7 @@
 import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
 import type { Transaction } from "../../db/types";
+import type { Suggestion } from "./categoryHelpers";
 
 interface MerchantPattern {
   merchant: string;
@@ -22,8 +23,11 @@ interface AnalysisSettings {
 /**
  * Analyze uncategorized transactions and suggest categories
  */
-export const analyzeUncategorizedTransactions = (transactions, settings: AnalysisSettings) => {
-  const suggestions = [];
+export const analyzeUncategorizedTransactions = (
+  transactions: Transaction[],
+  settings: AnalysisSettings
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { minTransactionCount, minAmount } = settings;
 
   // Group uncategorized transactions by merchant
@@ -75,6 +79,7 @@ export const analyzeUncategorizedTransactions = (transactions, settings: Analysi
         affectedTransactions: pattern.transactions.length,
         impact: pattern.totalAmount,
         action: "categorize_transactions",
+        suggestedAmount: pattern.avgAmount,
         data: {
           merchant: pattern.merchant,
           transactionIds: pattern.transactions.map((t) => t.id),
@@ -91,11 +96,11 @@ export const analyzeUncategorizedTransactions = (transactions, settings: Analysi
  * Analyze unused categories and suggest removal
  */
 export const analyzeUnusedCategories = (
-  transactions,
-  filteredTransactions,
+  transactions: Transaction[],
+  filteredTransactions: Transaction[],
   settings: AnalysisSettings
-) => {
-  const suggestions = [];
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { unusedCategoryThreshold } = settings;
 
   const recentDate = new Date();
@@ -120,6 +125,7 @@ export const analyzeUnusedCategories = (
         affectedTransactions: totalUsage.length,
         impact: totalUsage.reduce((sum, t) => sum + Math.abs(t.amount), 0),
         action: "remove_transaction_category",
+        suggestedAmount: 0,
         data: {
           categoryName: category,
           transactionIds: totalUsage.map((t) => t.id),

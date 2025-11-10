@@ -4,6 +4,7 @@
  * UI-only component using useBillManager hook for business logic
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
+import { useMemo } from "react";
 import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
@@ -80,6 +81,19 @@ const BillManager = ({
     propEnvelopes,
   });
 
+  const payBillHandler = billOperations.handlePayBill;
+  const billTableOperations = useMemo<{
+    handlePayBill: (
+      billId: string,
+      overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+    ) => Promise<void>;
+  }>(
+    () => ({
+      handlePayBill: (billId, overrides) => payBillHandler(billId, overrides),
+    }),
+    [payBillHandler]
+  );
+
   // UI logic hook
   const {
     viewModes,
@@ -142,6 +156,7 @@ const BillManager = ({
         setViewMode={setViewMode}
         filterOptions={filterOptions}
         setFilterOptions={setFilterOptions}
+        envelopes={_envelopes as Array<{ id: string | number; name?: string }>}
       />
 
       {/* Bills Table */}
@@ -154,9 +169,7 @@ const BillManager = ({
         setShowBulkUpdateModal={setShowBulkUpdateModal}
         setShowBillDetail={setShowBillDetail}
         getBillDisplayData={getBillDisplayData as never}
-        billOperations={{
-          handlePayBill: billOperations.handlePayBill as (billId: string) => Promise<void>
-        }} as any
+        billOperations={billTableOperations}
         categorizedBills={categorizedBills as never}
         viewMode={viewMode}
       />

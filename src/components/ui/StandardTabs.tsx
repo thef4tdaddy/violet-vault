@@ -311,3 +311,4 @@ const TabCount = ({ count, config, countStyles }: TabCountProps) => (
 );
 
 export default StandardTabs;
+export type { Tab };

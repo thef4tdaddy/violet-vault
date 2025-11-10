@@ -1,20 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-
-interface Suggestion {
-  id: string;
-  type: string;
-  priority: "high" | "medium" | "low";
-  title: string;
-  description: string;
-  suggestedAmount: number;
-  reasoning: string;
-  action: string;
-  impact: number;
-  category: string;
-  data: Record<string, unknown>;
-}
+import type { Suggestion } from "@/utils/analytics/categoryHelpers";
 
 interface CategorySuggestionsTabProps {
   suggestions: Suggestion[];

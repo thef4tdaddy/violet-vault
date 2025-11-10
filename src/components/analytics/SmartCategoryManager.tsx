@@ -6,7 +6,6 @@ import {
   processSuggestions,
   Suggestion,
   TransactionForStats,
-  CategoryStat,
 } from "@/utils/analytics/categoryHelpers";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
@@ -34,8 +33,8 @@ const SmartCategoryManager = ({
   bills = [],
   onAddCategory: _onAddCategory,
   onRemoveCategory: _onRemoveCategory,
-  onApplyToTransactions: _onApplyToTransactions,
-  onApplyToBills: _onApplyToBills,
+  onApplyToTransactions,
+  onApplyToBills,
   dateRange: initialDateRange = "6months",
   className = "",
 }: SmartCategoryManagerProps) => {
@@ -51,7 +50,7 @@ const SmartCategoryManager = ({
     handleUndismissSuggestion,
     handleSettingsChange,
     toggleSettings,
-    applySuggestion: _applySuggestion,
+    applySuggestion,
   } = useSmartCategoryManager(initialDateRange);
 
   const { filteredTransactions, transactionAnalysis, billAnalysis } = useSmartCategoryAnalysis(
@@ -61,32 +60,18 @@ const SmartCategoryManager = ({
     analysisSettings
   );
 
-  // Process all suggestions
-  const allSuggestions = useMemo(
-    () =>
-      processSuggestions(
-        transactionAnalysis as any[],
-        billAnalysis as any[],
-        dismissedSuggestions as any,
-        12
-      ) as any[],
+  const allSuggestions = useMemo<Suggestion[]>(
+    () => processSuggestions(transactionAnalysis, billAnalysis, dismissedSuggestions, 12),
     [transactionAnalysis, billAnalysis, dismissedSuggestions]
   );
 
-  // Calculate category statistics
   const categoryStats = useMemo(
-    () => calculateCategoryStats(filteredTransactions as any[]),
+    () => calculateCategoryStats(filteredTransactions),
     [filteredTransactions]
   );
 
-  const handleApplySuggestion = async (_suggestion: unknown) => {
-    try {
-      // Apply suggestion logic here
-      return await Promise.resolve();
-    } catch {
-      // Use logger instead of console.error
-      return await Promise.resolve();
-    }
+  const handleApplySuggestion = (suggestion: Suggestion) => {
+    void applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
   };
 
   const renderTabContent = () => {
@@ -106,7 +91,7 @@ const SmartCategoryManager = ({
           <CategoryAdvancedTab
             dateRange={dateRange}
             onDateRangeChange={handleDateRangeChange}
-            dismissedSuggestions={dismissedSuggestions as any}
+            dismissedSuggestions={Array.from(dismissedSuggestions)}
             onUndismissSuggestion={handleUndismissSuggestion}
           />
         );

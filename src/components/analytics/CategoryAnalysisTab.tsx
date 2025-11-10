@@ -1,16 +1,6 @@
 import React from "react";
 import { getIcon } from "@/utils";
-
-interface CategoryStat {
-  name: string;
-  amount: number;
-  frequency: number;
-  trend?: number;
-  totalAmount?: number;
-  transactionCount?: number;
-  avgAmount?: number;
-  lastUsed?: string;
-}
+import type { CategoryStat } from "@/utils/analytics/categoryHelpers";
 
 interface CategoryAnalysisTabProps {
   categoryStats: CategoryStat[];
@@ -86,7 +76,9 @@ const CategoryAnalysisTab = ({ categoryStats }: CategoryAnalysisTabProps) => {
                 <div className="flex justify-between">
                   <span className="text-purple-700 font-medium">Last Used:</span>
                   <span className="font-bold text-gray-900">
-                    {new Date(stat.lastUsed).toLocaleDateString()}
+                    {(
+                      stat.lastUsed instanceof Date ? stat.lastUsed : new Date(stat.lastUsed)
+                    ).toLocaleDateString()}
                   </span>
                 </div>
               )}

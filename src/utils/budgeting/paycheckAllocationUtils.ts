@@ -84,7 +84,9 @@ const filterBillEnvelopes = (envelopes) => {
       ({ envelope, resolvedType }) =>
         isAutoAllocateEnabled(envelope) &&
         (resolvedType === ENVELOPE_TYPES.BILL ||
-          BILL_CATEGORIES.includes(String(envelope.category || "").trim() as any))
+          (BILL_CATEGORIES as readonly string[]).includes(
+            String(envelope.category || "").trim()
+          ))
     )
     .map(({ envelope }) => envelope);
 };
