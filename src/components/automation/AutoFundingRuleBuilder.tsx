@@ -73,9 +73,7 @@ const mapValidationErrors = (messages: string[]): RuleValidationErrors => {
       return;
     }
 
-    mapped.general = mapped.general
-      ? `${mapped.general}\n${message}`
-      : message;
+    mapped.general = mapped.general ? `${mapped.general}\n${message}` : message;
   });
 
   return mapped;
@@ -91,8 +89,7 @@ const cloneRule = (rule: AutoFundingRule): AutoFundingRule => ({
   },
 });
 
-const buildDefaultRule = (): AutoFundingRule =>
-  cloneRule(createDefaultRule() as AutoFundingRule);
+const buildDefaultRule = (): AutoFundingRule => cloneRule(createDefaultRule() as AutoFundingRule);
 
 interface RuleBuilderHeaderProps {
   editingRule: AutoFundingRule | null;
@@ -145,22 +142,11 @@ const RuleBuilderStepContent: React.FC<RuleBuilderStepContentProps> = ({
   toggleTargetEnvelope,
 }) => {
   if (step === 1) {
-    return (
-      <RuleTypeStep
-        ruleData={ruleData}
-        updateRuleData={updateRuleData}
-        errors={errors}
-      />
-    );
+    return <RuleTypeStep ruleData={ruleData} updateRuleData={updateRuleData} errors={errors} />;
   }
 
   if (step === 2) {
-    return (
-      <TriggerScheduleStep
-        ruleData={ruleData}
-        updateRuleData={updateRuleData}
-      />
-    );
+    return <TriggerScheduleStep ruleData={ruleData} updateRuleData={updateRuleData} />;
   }
 
   if (step === 3) {
@@ -270,37 +256,27 @@ const useRuleBuilder = ({
     }
   }, [isOpen, editingRule]);
 
-  const handleUpdateRuleData = useCallback(
-    (updates: Partial<AutoFundingRule>) => {
-      setRuleData((prev) => ({
-        ...prev,
-        ...updates,
-        config: updates.config
-          ? { ...prev.config, ...updates.config }
-          : { ...prev.config },
-      }));
-    },
-    []
-  );
+  const handleUpdateRuleData = useCallback((updates: Partial<AutoFundingRule>) => {
+    setRuleData((prev) => ({
+      ...prev,
+      ...updates,
+      config: updates.config ? { ...prev.config, ...updates.config } : { ...prev.config },
+    }));
+  }, []);
 
-  const handleUpdateConfig = useCallback(
-    (configUpdates: Partial<AutoFundingRule["config"]>) => {
-      setRuleData((prev) => ({
-        ...prev,
-        config: {
-          ...prev.config,
-          ...configUpdates,
-        },
-      }));
-    },
-    []
-  );
+  const handleUpdateConfig = useCallback((configUpdates: Partial<AutoFundingRule["config"]>) => {
+    setRuleData((prev) => ({
+      ...prev,
+      config: {
+        ...prev.config,
+        ...configUpdates,
+      },
+    }));
+  }, []);
 
   const handleToggleTargetEnvelope = useCallback((envelopeId: string) => {
     setRuleData((prev) => {
-      const currentIds = new Set(
-        prev.config?.targetIds?.map((id) => id.toString()) ?? []
-      );
+      const currentIds = new Set(prev.config?.targetIds?.map((id) => id.toString()) ?? []);
       if (currentIds.has(envelopeId)) {
         currentIds.delete(envelopeId);
       } else {

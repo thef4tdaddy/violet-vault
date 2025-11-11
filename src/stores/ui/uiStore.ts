@@ -293,8 +293,18 @@ export interface UiStore {
   isUnassignedCashModalOpen: boolean;
   dataLoaded: boolean;
   updateAvailable: boolean;
+  isUpdating: boolean;
   showInstallPrompt: boolean;
+  installPromptEvent: BeforeInstallPromptEvent | null;
   showPatchNotes: boolean;
+  patchNotesData: {
+    version: string;
+    notes: string[];
+    fromVersion?: string;
+    toVersion?: string;
+    isUpdate?: boolean;
+  } | null;
+  loadingPatchNotes: boolean;
 }
 
 export default useUiStore;

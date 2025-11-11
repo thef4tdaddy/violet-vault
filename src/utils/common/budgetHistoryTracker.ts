@@ -118,7 +118,10 @@ export class BudgetHistoryTracker {
 
       return { commit, changes: [change] };
     } catch (error) {
-      logger.error("Failed to create budget history commit:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to create budget history commit:",
+        error instanceof Error ? error.message : String(error)
+      );
       throw error;
     }
   }
@@ -242,7 +245,10 @@ export class BudgetHistoryTracker {
 
       return changes;
     } catch (error) {
-      logger.error("Failed to get recent changes:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to get recent changes:",
+        error instanceof Error ? error.message : String(error)
+      );
       return [];
     }
   }
@@ -261,7 +267,10 @@ export class BudgetHistoryTracker {
       const changes = await query.reverse().toArray();
       return changes;
     } catch (error) {
-      logger.error("Failed to get entity history:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to get entity history:",
+        error instanceof Error ? error.message : String(error)
+      );
       return [];
     }
   }
@@ -280,7 +289,10 @@ export class BudgetHistoryTracker {
 
       return changes;
     } catch (error) {
-      logger.error("Failed to get recent activity:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to get recent activity:",
+        error instanceof Error ? error.message : String(error)
+      );
       return [];
     }
   }
@@ -345,7 +357,10 @@ export class BudgetHistoryTracker {
 
       return branch;
     } catch (error) {
-      logger.error("Failed to create budget history branch:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to create budget history branch:",
+        error instanceof Error ? error.message : String(error)
+      );
       throw error;
     }
   }
@@ -405,7 +420,10 @@ export class BudgetHistoryTracker {
 
       return tag;
     } catch (error) {
-      logger.error("Failed to create budget history tag:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to create budget history tag:",
+        error instanceof Error ? error.message : String(error)
+      );
       throw error;
     }
   }
@@ -437,7 +455,10 @@ export class BudgetHistoryTracker {
       logger.info("Switched to budget history branch", { branchName });
       return true;
     } catch (error) {
-      logger.error("Failed to switch budget history branch:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to switch budget history branch:",
+        error instanceof Error ? error.message : String(error)
+      );
       throw error;
     }
   }
@@ -450,7 +471,10 @@ export class BudgetHistoryTracker {
       const branches = await budgetDb.budgetBranches.orderBy("created").toArray();
       return branches;
     } catch (error) {
-      logger.error("Failed to get budget history branches:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to get budget history branches:",
+        error instanceof Error ? error.message : String(error)
+      );
       return [];
     }
   }
@@ -463,7 +487,10 @@ export class BudgetHistoryTracker {
       const tags = await budgetDb.budgetTags.orderBy("created").reverse().toArray();
       return tags;
     } catch (error) {
-      logger.error("Failed to get budget history tags:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to get budget history tags:",
+        error instanceof Error ? error.message : String(error)
+      );
       return [];
     }
   }
@@ -511,7 +538,10 @@ export class BudgetHistoryTracker {
         signedAt: Date.now(),
       };
     } catch (error) {
-      logger.error("Failed to sign commit:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to sign commit:",
+        error instanceof Error ? error.message : String(error)
+      );
       throw error;
     }
   }
@@ -543,7 +573,10 @@ export class BudgetHistoryTracker {
 
       return false;
     } catch (error) {
-      logger.error("Failed to verify device consistency:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to verify device consistency:",
+        error instanceof Error ? error.message : String(error)
+      );
       return false;
     }
   }
@@ -616,7 +649,10 @@ export class BudgetHistoryTracker {
 
       return patterns;
     } catch (error) {
-      logger.error("Failed to analyze change patterns:", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to analyze change patterns:",
+        error instanceof Error ? error.message : String(error)
+      );
       return null;
     }
   }

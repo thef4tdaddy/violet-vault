@@ -3,11 +3,11 @@ import { optimizedSerialization } from "./optimizedSerialization";
 import { safeCryptoOperation, getRandomBytes } from "./cryptoCompat";
 
 export const encryptionUtils = {
-  async deriveKey(password) {
+  async deriveKey(password: string) {
     return this.generateKey(password);
   },
 
-  async deriveKeyFromSalt(password, salt) {
+  async deriveKeyFromSalt(password: string, salt: Uint8Array) {
     const encoder = new TextEncoder();
     const keyMaterial = await safeCryptoOperation(
       "importKey",
@@ -35,7 +35,7 @@ export const encryptionUtils = {
     return key;
   },
 
-  async generateKey(password) {
+  async generateKey(password: string) {
     const encoder = new TextEncoder();
     const keyMaterial = await safeCryptoOperation(
       "importKey",
@@ -68,7 +68,7 @@ export const encryptionUtils = {
     return { key, salt };
   },
 
-  async encrypt(data, key) {
+  async encrypt(data: unknown, key: unknown) {
     const encoder = new TextEncoder();
     const iv = getRandomBytes(12);
 
@@ -88,26 +88,26 @@ export const encryptionUtils = {
     };
   },
 
-  async decrypt(encryptedData, key, iv) {
+  async decrypt(encryptedData: unknown, key: unknown, iv: unknown) {
     try {
       // Add validation logging for debug
       // Debug logging for decrypt attempts
       logger.debug("🔓 Decrypt attempt:", {
         hasEncryptedData: !!encryptedData,
         encryptedDataType: typeof encryptedData,
-        encryptedDataLength: encryptedData?.length,
+        encryptedDataLength: (encryptedData as any[])?.length,
         hasKey: !!key,
         keyType: typeof key,
         hasIv: !!iv,
         ivType: typeof iv,
-        ivLength: iv?.length,
+        ivLength: (iv as any[])?.length,
       });
 
       const decrypted = await safeCryptoOperation(
         "decrypt",
-        { name: "AES-GCM", iv: new Uint8Array(iv) },
+        { name: "AES-GCM", iv: new Uint8Array(iv as any[]) },
         key,
-        new Uint8Array(encryptedData)
+        new Uint8Array(encryptedData as any[])
       );
 
       const decoder = new TextDecoder();
@@ -116,21 +116,21 @@ export const encryptionUtils = {
       return result;
     } catch (error) {
       logger.error("🔓 Decrypt failed:", {
-        error: error.message,
-        errorName: error.name,
+        error: error instanceof Error ? error.message : String(error),
+        errorName: error instanceof Error ? error.name : String(error),
         errorType: typeof error,
-        stack: error.stack,
+        stack: error instanceof Error ? error.stack : undefined,
       });
       throw error;
     }
   },
 
-  async decryptRaw(encryptedData, key, iv) {
+  async decryptRaw(encryptedData: unknown, key: unknown, iv: unknown) {
     const decrypted = await safeCryptoOperation(
       "decrypt",
-      { name: "AES-GCM", iv: new Uint8Array(iv) },
+      { name: "AES-GCM", iv: new Uint8Array(iv as any[]) },
       key,
-      new Uint8Array(encryptedData)
+      new Uint8Array(encryptedData as any[])
     );
 
     const decoder = new TextDecoder();
@@ -140,6 +140,8 @@ export const encryptionUtils = {
   generateDeviceFingerprint() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
+    if (!ctx) return "no-canvas";
+
     ctx.textBaseline = "top";
     ctx.font = "14px Arial";
     ctx.fillText("Device fingerprint", 2, 2);
@@ -164,7 +166,7 @@ export const encryptionUtils = {
     return Math.abs(hash).toString(16);
   },
 
-  async generateBudgetId(masterPassword, shareCode) {
+  async generateBudgetId(masterPassword: string, shareCode: string) {
     // NEW: Deterministic budget ID using password + share code
     // Replaces device-specific system with user-controlled share codes
     if (!shareCode) {
@@ -209,16 +211,16 @@ export const encryptionUtils = {
    * Pipeline: Object → Compress → Encrypt → Base64
    * Reduces storage overhead from 12x to 4-6x
    */
-  async encryptOptimized(data, key) {
+  async encryptOptimized(data: unknown, key: unknown) {
     try {
       const startTime = performance.now();
 
       // Step 1: Analyze compression potential
       const analysis = optimizedSerialization.analyzeCompression(data);
       logger.debug("Compression analysis", {
-        originalSize: analysis.originalSize,
-        expectedReduction: analysis.totalReduction.toFixed(2) + "x",
-        spaceSaved: analysis.spaceSavedPercent + "%",
+        originalSize: analysis?.originalSize || 0,
+        expectedReduction: analysis?.totalReduction?.toFixed(2) + "x" || "0x",
+        spaceSaved: analysis?.spaceSavedPercent + "%" || "0%",
       });
 
       // Step 2: Serialize with compression and MessagePack
@@ -236,11 +238,11 @@ export const encryptionUtils = {
       const duration = performance.now() - startTime;
 
       logger.info("Optimized encryption complete", {
-        originalSize: analysis.originalSize,
+        originalSize: analysis?.originalSize || 0,
         compressedSize: compressedData.length,
         encryptedSize: encrypted.byteLength,
-        compressionRatio: (analysis.originalSize / compressedData.length).toFixed(2) + "x",
-        totalReduction: (analysis.originalSize / encrypted.byteLength).toFixed(2) + "x",
+        compressionRatio: ((analysis?.originalSize || 0) / compressedData.length).toFixed(2) + "x",
+        totalReduction: ((analysis?.originalSize || 0) / encrypted.byteLength).toFixed(2) + "x",
         duration: Math.round(duration) + "ms",
       });
 
@@ -248,16 +250,16 @@ export const encryptionUtils = {
         data: Array.from(new Uint8Array(encrypted)),
         iv: Array.from(iv),
         metadata: {
-          compressionRatio: analysis.totalReduction,
-          originalSize: analysis.originalSize,
+          compressionRatio: analysis?.totalReduction || 0,
+          originalSize: analysis?.originalSize || 0,
           compressedSize: compressedData.length,
           encryptedSize: encrypted.byteLength,
           optimized: true,
         },
       };
     } catch (error) {
-      logger.error("Optimized encryption failed", error);
-      throw new Error(`Optimized encryption failed: ${error.message}`);
+      logger.error("Optimized encryption failed", error as Record<string, unknown>);
+      throw error;
     }
   },
 
@@ -265,37 +267,42 @@ export const encryptionUtils = {
    * Optimized decryption for compressed data
    * Pipeline: Base64 → Decrypt → Decompress → Object
    */
-  async decryptOptimized(encryptedData, key, iv) {
+  async decryptOptimized(encryptedData: unknown, key: unknown) {
     try {
-      const startTime = performance.now();
+      // Step 1: Decrypt data
+      const iv = (encryptedData as any)?.iv || [];
+      const data = (encryptedData as any)?.data || [];
+      const encrypted = new Uint8Array(data);
 
-      // Step 1: Decrypt to get compressed binary data
       const decrypted = await safeCryptoOperation(
         "decrypt",
         { name: "AES-GCM", iv: new Uint8Array(iv) },
         key,
-        new Uint8Array(encryptedData)
+        encrypted
       );
 
-      // Step 2: Deserialize (decompress + MessagePack decode + JSON parse)
-      const data = optimizedSerialization.deserialize(new Uint8Array(decrypted));
+      // Step 2: Decompress using MessagePack
+      const decompressedData = optimizedSerialization.deserialize(decrypted);
 
-      const duration = performance.now() - startTime;
+      // Check for compression metadata
+      const metadata = (encryptedData as any)?.metadata || {};
+      const wasOptimized = metadata?.optimized || false;
 
-      logger.debug("Optimized decryption complete", {
-        encryptedSize: encryptedData.length,
-        decryptedSize: decrypted.byteLength,
-        duration: Math.round(duration) + "ms",
+      logger.info("Optimized decryption complete", {
+        wasOptimized,
+        compressedSize: encrypted.length,
+        decompressedSize: decompressedData?.length || 0,
+        compressionRatio: metadata?.compressionRatio || 1,
       });
 
-      return data;
+      return decompressedData;
     } catch (error) {
-      logger.error("Optimized decryption failed", error);
-      throw new Error(`Optimized decryption failed: ${error.message}`);
+      logger.error("Optimized decryption failed", error as Record<string, unknown>);
+      throw error;
     }
   },
 
-  generateHash(data) {
+  generateHash(data: unknown) {
     let hash = 0;
     const str = typeof data === "string" ? data : JSON.stringify(data);
     for (let i = 0; i < str.length; i++) {
@@ -303,6 +310,7 @@ export const encryptionUtils = {
       hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
+
     return Math.abs(hash).toString(16);
   },
 };

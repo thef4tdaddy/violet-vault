@@ -39,9 +39,11 @@ const useTransactionSplitter = (options: UseTransactionSplitterOptions = {}) => 
       return;
     }
 
-    Promise.resolve().then(task).catch((error) => {
-      logger.error("Failed to schedule microtask for transaction splitter", { error });
-    });
+    Promise.resolve()
+      .then(task)
+      .catch((error) => {
+        logger.error("Failed to schedule microtask for transaction splitter", { error });
+      });
   }, []);
 
   // Core state
@@ -111,12 +113,16 @@ const useTransactionSplitter = (options: UseTransactionSplitterOptions = {}) => 
    * Add a new split allocation
    */
   const addSplit = useCallback(() => {
-    addSplitHandler(transaction, (updater) => {
-      setSplitAllocations((current) => {
-        const next = updater(current);
-        return next;
-      });
-    }, setErrors);
+    addSplitHandler(
+      transaction,
+      (updater) => {
+        setSplitAllocations((current) => {
+          const next = updater(current);
+          return next;
+        });
+      },
+      setErrors
+    );
   }, [transaction]);
 
   /**

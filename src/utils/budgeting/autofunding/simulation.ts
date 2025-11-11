@@ -14,7 +14,7 @@ import type { ExecutionContext } from "./conditions.ts";
  * Simulates execution of all applicable rules without making changes
  */
 export const simulateRuleExecution = (
-  rules: AutoFundingRule[], 
+  rules: AutoFundingRule[],
   context: AutoFundingContext & { trigger: string }
 ) => {
   const simulation = {
@@ -54,7 +54,9 @@ export const simulateRuleExecution = (
 
   try {
     // Filter and sort rules by priority
-    const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context as ExecutionContext));
+    const executableRules = rules.filter((rule) =>
+      shouldRuleExecute(rule, context as ExecutionContext)
+    );
     const sortedRules = sortRulesByPriority(executableRules);
 
     let availableCash = context.data.unassignedCash;
@@ -127,8 +129,8 @@ export const simulateRuleExecution = (
  * Simulates execution of a single rule
  */
 export const simulateSingleRule = (
-  rule: AutoFundingRule, 
-  context: AutoFundingContext, 
+  rule: AutoFundingRule,
+  context: AutoFundingContext,
   availableCash: number
 ) => {
   try {
@@ -190,10 +192,7 @@ export const simulateSingleRule = (
 /**
  * Plans transfers for a rule execution
  */
-export const planRuleTransfers = (
-  rule: AutoFundingRule, 
-  totalAmount: number
-) => {
+export const planRuleTransfers = (rule: AutoFundingRule, totalAmount: number) => {
   const transfers = [] as Array<{
     fromEnvelopeId: string;
     toEnvelopeId: string;
@@ -252,7 +251,7 @@ export const planRuleTransfers = (
  * Creates an execution plan without executing
  */
 export const createExecutionPlan = (
-  rules: AutoFundingRule[], 
+  rules: AutoFundingRule[],
   context: AutoFundingContext & { trigger: string }
 ) => {
   const simulation = simulateRuleExecution(rules, context);
@@ -289,7 +288,7 @@ export const generatePlanWarnings = (
     errors: Array<{ error: string }>;
     rulesExecuted: number;
     remainingCash: number;
-  }, 
+  },
   context: AutoFundingContext
 ) => {
   const warnings = [] as Array<{
@@ -337,7 +336,7 @@ export const validateTransfers = (
   transfers: Array<{
     toEnvelopeId: string;
     amount: number;
-  }>, 
+  }>,
   context: AutoFundingContext
 ) => {
   const errors = [] as Array<{
@@ -404,21 +403,24 @@ export const calculateTransferImpact = (
   transfers: Array<{
     toEnvelopeId: string;
     amount: number;
-  }>, 
+  }>,
   context: AutoFundingContext
 ) => {
   const { envelopes } = context.data;
   const impact = {
-    envelopes: new Map<string, {
-      id: string;
-      name: string;
-      currentBalance: number;
-      change: number;
-      newBalance: number;
-      monthlyAmount?: number;
-      fillPercentage: number;
-      newFillPercentage: number;
-    }>(),
+    envelopes: new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        currentBalance: number;
+        change: number;
+        newBalance: number;
+        monthlyAmount?: number;
+        fillPercentage: number;
+        newFillPercentage: number;
+      }
+    >(),
     unassignedChange: 0,
     totalTransferred: 0,
   };
@@ -433,8 +435,8 @@ export const calculateTransferImpact = (
       newBalance: envelope.currentBalance || 0,
       monthlyAmount: envelope.monthlyAmount,
       fillPercentage:
-        envelope.monthlyAmount && envelope.monthlyAmount > 0 
-          ? ((envelope.currentBalance || 0) / envelope.monthlyAmount) * 100 
+        envelope.monthlyAmount && envelope.monthlyAmount > 0
+          ? ((envelope.currentBalance || 0) / envelope.monthlyAmount) * 100
           : 0,
       newFillPercentage: 0,
     });
@@ -484,7 +486,7 @@ export const generatePlanSummary = (
       amount: number;
       description: string;
     }>;
-  }, 
+  },
   envelopes: EnvelopeData[] = []
 ) => {
   const envelopeMap = new Map(envelopes.map((e) => [e.id, e]));

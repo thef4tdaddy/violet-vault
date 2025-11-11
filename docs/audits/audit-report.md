@@ -8,7 +8,7 @@
 | TypeScript Errors | 21 | 0 |
 | TypeScript Strict Mode Errors | 3234 | 0 |
 
-*Last updated: 2025-11-11 21:47:35 UTC*
+*Last updated: 2025-11-11 21:55:20 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -108,7 +108,7 @@ src/hooks/transactions/useTransactionSplitter.ts(19,10): error TS2305: Module '"
 src/hooks/transactions/useTransactionSplitterHelpers.ts(18,3): error TS2305: Module '"@/utils/transactions/splitting"' has no exported member 'hasUnsavedChanges'.
 src/services/chunkedSyncService.ts(567,15): error TS2554: Expected 2 arguments, but got 3.
 src/services/chunkedSyncService.ts(662,17): error TS2554: Expected 2 arguments, but got 3.
-src/services/cloudSyncService.ts(867,4): error TS2352: Conversion of type 'Window & typeof globalThis' to type 'CloudSyncWindow' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/services/cloudSyncService.ts(858,4): error TS2352: Conversion of type 'Window & typeof globalThis' to type 'CloudSyncWindow' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Types of property 'cloudSyncService' are incompatible.
     Type '{ triggerSyncForCriticalChange: (changeType: string) => void; }' is missing the following properties from type 'CloudSyncService': syncIntervalId, isSyncing, config, debounceTimer, and 18 more.
 src/stores/ui/uiStore.ts(205,30): error TS2345: Argument of type '{ budgetId: string; encryptionKey: CryptoKey | Uint8Array<ArrayBufferLike>; currentUser: string; }' is not assignable to parameter of type 'SyncConfig'.

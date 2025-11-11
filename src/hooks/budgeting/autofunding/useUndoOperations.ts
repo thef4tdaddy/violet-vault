@@ -146,7 +146,9 @@ const extractUndoableTransfers = (
     if (targetEnvelopeIds.length === 1) {
       transfers.push(createSingleTransfer(executionRecord, result, targetEnvelopeIds[0], amount));
     } else {
-      transfers.push(...createMultipleTransfers(executionRecord, result, targetEnvelopeIds, amount));
+      transfers.push(
+        ...createMultipleTransfers(executionRecord, result, targetEnvelopeIds, amount)
+      );
     }
   });
 
@@ -310,7 +312,9 @@ export const useUndoOperations = (
           executionId,
           error: error instanceof Error ? error.message : String(error),
         });
-        throw new Error(`Failed to undo execution: ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error(
+          `Failed to undo execution: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
     },
     [undoStack, addToHistory, reverseTransfer]

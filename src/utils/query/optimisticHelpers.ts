@@ -15,7 +15,11 @@ export const optimisticHelpers = {
   /**
    * Update envelope optimistically
    */
-  updateEnvelope: async (queryClient: QueryClient, envelopeId: string, updates: Partial<Envelope>) => {
+  updateEnvelope: async (
+    queryClient: QueryClient,
+    envelopeId: string,
+    updates: Partial<Envelope>
+  ) => {
     try {
       // Update TanStack Query cache - single envelope
       queryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old: Envelope | undefined) => ({
@@ -61,7 +65,10 @@ export const optimisticHelpers = {
   /**
    * Add new envelope optimistically
    */
-  addEnvelope: async (queryClient: QueryClient, newEnvelope: Omit<Envelope, 'lastModified' | 'createdAt'>) => {
+  addEnvelope: async (
+    queryClient: QueryClient,
+    newEnvelope: Omit<Envelope, "lastModified" | "createdAt">
+  ) => {
     try {
       const envelopeWithTimestamp = {
         ...newEnvelope,
@@ -127,24 +134,34 @@ export const optimisticHelpers = {
   /**
    * Update transaction optimistically
    */
-  updateTransaction: async (queryClient: QueryClient, transactionId: string, updates: Partial<Transaction>) => {
+  updateTransaction: async (
+    queryClient: QueryClient,
+    transactionId: string,
+    updates: Partial<Transaction>
+  ) => {
     try {
       // Update TanStack Query cache - single transaction
-      queryClient.setQueryData(queryKeys.transactionById(transactionId), (old: Transaction | undefined) => ({
-        ...old,
-        ...updates,
-        lastModified: Date.now(),
-      }));
+      queryClient.setQueryData(
+        queryKeys.transactionById(transactionId),
+        (old: Transaction | undefined) => ({
+          ...old,
+          ...updates,
+          lastModified: Date.now(),
+        })
+      );
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old: Transaction[] | undefined) => {
-        if (!old) return old;
-        return old.map((transaction: Transaction) =>
-          transaction.id === transactionId
-            ? { ...transaction, ...updates, lastModified: Date.now() }
-            : transaction
-        );
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old: Transaction[] | undefined) => {
+          if (!old) return old;
+          return old.map((transaction: Transaction) =>
+            transaction.id === transactionId
+              ? { ...transaction, ...updates, lastModified: Date.now() }
+              : transaction
+          );
+        }
+      );
 
       // Update database
       await budgetDb.transactions.update(transactionId, {
@@ -168,7 +185,10 @@ export const optimisticHelpers = {
   /**
    * Add new transaction optimistically
    */
-  addTransaction: async (queryClient: QueryClient, newTransaction: Omit<Transaction, 'lastModified' | 'createdAt'>) => {
+  addTransaction: async (
+    queryClient: QueryClient,
+    newTransaction: Omit<Transaction, "lastModified" | "createdAt">
+  ) => {
     try {
       const transactionWithTimestamp = {
         ...newTransaction,
@@ -177,10 +197,13 @@ export const optimisticHelpers = {
       };
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old: Transaction[] | undefined) => {
-        if (!old) return [transactionWithTimestamp];
-        return [transactionWithTimestamp, ...old];
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old: Transaction[] | undefined) => {
+          if (!old) return [transactionWithTimestamp];
+          return [transactionWithTimestamp, ...old];
+        }
+      );
 
       // Add to database
       await budgetDb.transactions.add(transactionWithTimestamp);
@@ -207,10 +230,13 @@ export const optimisticHelpers = {
   removeTransaction: async (queryClient: QueryClient, transactionId: string) => {
     try {
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old: Transaction[] | undefined) => {
-        if (!old) return old;
-        return old.filter((transaction: Transaction) => transaction.id !== transactionId);
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old: Transaction[] | undefined) => {
+          if (!old) return old;
+          return old.filter((transaction: Transaction) => transaction.id !== transactionId);
+        }
+      );
 
       // Remove from cache - single transaction
       queryClient.removeQueries({
@@ -276,7 +302,7 @@ export const optimisticHelpers = {
   /**
    * Add new savings goal optimistically
    */
-  addSavingsGoal: async (newGoal: Omit<SavingsGoal, 'lastModified' | 'createdAt'>) => {
+  addSavingsGoal: async (newGoal: Omit<SavingsGoal, "lastModified" | "createdAt">) => {
     try {
       const goalWithTimestamp = {
         ...newGoal,
@@ -362,11 +388,14 @@ export const optimisticHelpers = {
   updateBudgetMetadata: async (queryClient: QueryClient, updates: Record<string, unknown>) => {
     try {
       // Update TanStack Query cache
-      queryClient.setQueryData(queryKeys.budgetMetadata, (old: Record<string, unknown> | undefined) => ({
-        ...old,
-        ...updates,
-        lastModified: Date.now(),
-      }));
+      queryClient.setQueryData(
+        queryKeys.budgetMetadata,
+        (old: Record<string, unknown> | undefined) => ({
+          ...old,
+          ...updates,
+          lastModified: Date.now(),
+        })
+      );
 
       // Update specific metadata queries
       if (updates.unassignedCash !== undefined) {
@@ -396,11 +425,14 @@ export const optimisticHelpers = {
   /**
    * Batch update multiple entities optimistically
    */
-  batchUpdate: async (queryClient: QueryClient, updates: {
-    envelopes?: Partial<Envelope>[];
-    transactions?: Partial<Transaction>[];
-    bills?: Partial<Bill>[];
-  }) => {
+  batchUpdate: async (
+    queryClient: QueryClient,
+    updates: {
+      envelopes?: Partial<Envelope>[];
+      transactions?: Partial<Transaction>[];
+      bills?: Partial<Bill>[];
+    }
+  ) => {
     try {
       const { envelopes = [], transactions = [], bills = [] } = updates;
 
@@ -435,7 +467,10 @@ export const optimisticHelpers = {
         billCount: bills.length,
       });
     } catch (error) {
-      logger.error("Failed to complete batch optimistic update", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "Failed to complete batch optimistic update",
+        error instanceof Error ? error.message : String(error)
+      );
     }
   },
 
@@ -463,12 +498,12 @@ export const optimisticHelpers = {
    * Create mutation config with automatic optimistic updates
    */
   createOptimisticMutation: (
-    queryClient: QueryClient, 
-    { 
-      mutationKey, 
-      queryKey, 
-      updateFn, 
-      rollbackFn 
+    queryClient: QueryClient,
+    {
+      mutationKey,
+      queryKey,
+      updateFn,
+      rollbackFn,
     }: {
       mutationKey: unknown[];
       queryKey: unknown[];

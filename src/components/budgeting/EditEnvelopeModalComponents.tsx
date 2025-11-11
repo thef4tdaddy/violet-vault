@@ -49,15 +49,15 @@ export const AdditionalSettings = ({
 
         {/* Auto Allocate */}
         <div className="flex items-center pt-8">
-        <input
-          type="checkbox"
-          id="autoAllocate"
-          checked={formData.autoAllocate !== false}
-          onChange={(e) => onUpdateField("autoAllocate", e.target.checked)}
-          disabled={!canEdit}
-          className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded disabled:cursor-not-allowed"
-        />
-        <label htmlFor="autoAllocate" className="ml-3 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            id="autoAllocate"
+            checked={formData.autoAllocate !== false}
+            onChange={(e) => onUpdateField("autoAllocate", e.target.checked)}
+            disabled={!canEdit}
+            className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded disabled:cursor-not-allowed"
+          />
+          <label htmlFor="autoAllocate" className="ml-3 text-sm text-gray-700">
             Auto-allocate funds
           </label>
         </div>
