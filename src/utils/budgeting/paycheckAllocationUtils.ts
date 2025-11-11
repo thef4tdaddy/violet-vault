@@ -278,7 +278,7 @@ const resolveMonthlyBudget = (envelope: Envelope) => {
 };
 
 const resolveBiweeklyAllocation = (envelope: Envelope) => {
-  const directValue = toNumber((envelope as any).biweeklyAllocation);
+  const directValue = toNumber((envelope as Envelope & { biweeklyAllocation?: number }).biweeklyAllocation);
   if (directValue !== undefined && directValue > 0) {
     return directValue;
   }

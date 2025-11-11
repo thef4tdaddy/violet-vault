@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | +1 |
-| TypeScript Errors | 12 | +4 |
-| TypeScript Strict Mode Errors | 3648 | -42 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 14 | +2 |
+| TypeScript Strict Mode Errors | 3649 | +1 |
 
-*Last updated: 2025-11-11 17:59:08 UTC*
+*Last updated: 2025-11-11 18:00:56 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -32,17 +32,17 @@
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 1 | `@typescript-eslint/no-explicit-any` |
+| 1 | `no-redeclare` |
 
 ### Detailed Lint Report
 ```
-violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:281:45 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:359:14 - 2 - 'getUniquePayers' is already defined. (no-redeclare)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 4 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
+- 6 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 4 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
@@ -53,6 +53,7 @@ violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:281:45 - 1 - Unexpec
 |---|---|
 | 7 | `TS2339` |
 | 5 | `TS2345` |
+| 2 | `TS2451` |
 
 ### Detailed Type Error Report
 ```
@@ -77,6 +78,8 @@ src/utils/budgeting/paycheckAllocationUtils.ts(260,23): error TS2339: Property '
 src/utils/budgeting/paycheckAllocationUtils.ts(260,61): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
 src/utils/budgeting/paycheckAllocationUtils.ts(261,21): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
 src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property 'monthlyBudget' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(332,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
+src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -283,6 +286,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property '
 - 6 errors in `src/utils/debts/debtDebugConfig.ts`
 - 6 errors in `src/utils/dataManagement/validationUtils.ts`
 - 6 errors in `src/utils/common/BaseMutex.ts`
+- 6 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
 - 6 errors in `src/services/firebaseSyncService.ts`
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
@@ -345,7 +349,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property '
 - 4 errors in `src/utils/sync/retryPolicies.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
 - 4 errors in `src/utils/icons/index.ts`
-- 4 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
@@ -443,7 +446,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property '
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
 - 2 errors in `src/utils/common/lazyImport.ts`
-- 2 errors in `src/utils/analytics/categoryPatterns.ts`
 - 2 errors in `src/services/firebaseMessaging.ts`
 - 2 errors in `src/services/bugReport/errorTrackingService.ts`
 - 2 errors in `src/hooks/transactions/useTransactionTable.ts`
@@ -523,6 +525,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property '
 - 1 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 1 errors in `src/utils/budgeting/paycheckDeletion.ts`
 - 1 errors in `src/utils/billIcons/iconOptions.ts`
+- 1 errors in `src/utils/analytics/categoryPatterns.ts`
 - 1 errors in `src/stores/ui/toastStore.ts`
 - 1 errors in `src/services/typedChunkedSyncService.ts`
 - 1 errors in `src/services/bugReport/apiService.ts`
@@ -585,7 +588,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property '
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1404 | `TS7006` |
+| 1403 | `TS7006` |
 | 907 | `TS7031` |
 | 284 | `TS2339` |
 | 247 | `TS2345` |
@@ -607,6 +610,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property '
 | 4 | `TS2538` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
+| 2 | `TS2451` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
 | 1 | `TS2774` |
@@ -3986,8 +3990,7 @@ src/utils/accounts/accountValidation.ts(205,37): error TS7006: Parameter 'daysUn
 src/utils/accounts/accountValidation.ts(220,39): error TS7006: Parameter 'currentBalance' implicitly has an 'any' type.
 src/utils/accounts/accountValidation.ts(220,55): error TS7006: Parameter 'changeAmount' implicitly has an 'any' type.
 src/utils/accounts/accountValidation.ts(251,42): error TS7006: Parameter 'account' implicitly has an 'any' type.
-src/utils/analytics/categoryPatterns.ts(20,37): error TS7006: Parameter 'description' implicitly has an 'any' type.
-src/utils/analytics/categoryPatterns.ts(30,37): error TS7006: Parameter 'billName' implicitly has an 'any' type.
+src/utils/analytics/categoryPatterns.ts(36,37): error TS7006: Parameter 'billName' implicitly has an 'any' type.
 src/utils/analytics/transactionAnalyzer.ts(58,40): error TS18048: 'minTransactionCount' is possibly 'undefined'.
 src/utils/analytics/transactionAnalyzer.ts(58,86): error TS18048: 'minAmount' is possibly 'undefined'.
 src/utils/analytics/transactionAnalyzer.ts(107,47): error TS18048: 'unusedCategoryThreshold' is possibly 'undefined'.
@@ -4194,6 +4197,8 @@ src/utils/budgeting/paycheckAllocationUtils.ts(260,23): error TS2339: Property '
 src/utils/budgeting/paycheckAllocationUtils.ts(260,61): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
 src/utils/budgeting/paycheckAllocationUtils.ts(261,21): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
 src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property 'monthlyBudget' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(332,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
+src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/utils/budgeting/paycheckProcessing.ts(35,5): error TS2769: No overload matches this call.
   Overload 1 of 3, '(callbackfn: (previousValue: { currentBalance?: string | number | undefined; }, currentValue: { currentBalance?: string | number | undefined; }, currentIndex: number, array: { currentBalance?: string | ... 1 more ... | undefined; }[]) => { ...; }, initialValue: { ...; }): { ...; }', gave the following error.

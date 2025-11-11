@@ -10,11 +10,16 @@ interface ModalCloseButtonProps {
   children?: React.ReactNode;
 }
 
+const BASE_BUTTON_CLASSES =
+  "inline-flex h-10 w-10 items-center justify-center rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+
+const DEFAULT_ICON_BASE_CLASSES = "text-base font-semibold leading-none";
+
 const VARIANT_STYLES: Record<ModalCloseVariant, { button: string; icon: string }> = {
   filledRed: {
     button:
       "bg-red-600 hover:bg-red-700 text-white border-2 border-black shadow-lg hover:shadow-xl focus:ring-red-500",
-    icon: "",
+    icon: "text-white",
   },
   outlineRed: {
     button: "bg-white hover:bg-red-50 text-black border-2 border-red-600 focus:ring-red-600",
@@ -29,14 +34,23 @@ const ModalCloseButton = ({
   variant = "outlineRed",
   children,
 }: ModalCloseButtonProps) => {
+  const { button: variantButtonClasses, icon: variantIconClasses } = VARIANT_STYLES[variant];
+  const content =
+    children ??
+    (
+      <span className={`${DEFAULT_ICON_BASE_CLASSES} ${variantIconClasses}`} aria-hidden="true">
+        X
+      </span>
+    );
+
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={ariaLabel}
-      className={`${VARIANT_STYLES[variant].button} ${className || ""}`}
+      aria-label={ariaLabel ?? "Close modal"}
+      className={`${BASE_BUTTON_CLASSES} ${variantButtonClasses} ${className || ""}`}
     >
-      {children}
+      {content}
     </button>
   );
 };

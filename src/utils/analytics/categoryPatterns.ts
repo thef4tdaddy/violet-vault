@@ -17,8 +17,14 @@ export const BILL_CATEGORY_PATTERNS = {
 /**
  * Extract merchant name from transaction description
  */
-export const extractMerchantName = (description) => {
-  const desc = description.toLowerCase();
+export const extractMerchantName = (description: string | null | undefined): string => {
+  const sanitizedDescription = description?.trim();
+
+  if (!sanitizedDescription) {
+    return "";
+  }
+
+  const desc = sanitizedDescription.toLowerCase();
   const merchantMatch = desc.match(/^([a-zA-Z\s&'-]+)/);
   return merchantMatch ? merchantMatch[1].trim() : desc;
 };
