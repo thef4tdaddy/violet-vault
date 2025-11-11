@@ -10,7 +10,11 @@ interface CategorySettingsPanelProps {
   onSettingsChange: (settings: Partial<AnalysisSettings>) => void;
 }
 
-const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }: CategorySettingsPanelProps) => {
+const CategorySettingsPanel = ({
+  isVisible,
+  analysisSettings,
+  onSettingsChange,
+}: CategorySettingsPanelProps) => {
   if (!isVisible) return null;
 
   return (

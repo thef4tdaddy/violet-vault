@@ -43,7 +43,10 @@ export const isGoalCompleted = (currentAmount: number, targetAmount: number) => 
 /**
  * Calculate days remaining until target date
  */
-export const calculateDaysRemaining = (targetDate: Date | string | undefined, fromDate: Date = new Date()) => {
+export const calculateDaysRemaining = (
+  targetDate: Date | string | undefined,
+  fromDate: Date = new Date()
+) => {
   if (!targetDate) return null;
 
   try {
@@ -57,7 +60,10 @@ export const calculateDaysRemaining = (targetDate: Date | string | undefined, fr
     const timeDiff = target.getTime() - from.getTime();
     return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   } catch (error) {
-    logger.warn("Invalid target date for savings goal:", { targetDate, error: error instanceof Error ? error.message : String(error) });
+    logger.warn("Invalid target date for savings goal:", {
+      targetDate,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 };
@@ -65,7 +71,10 @@ export const calculateDaysRemaining = (targetDate: Date | string | undefined, fr
 /**
  * Calculate monthly savings needed to reach goal by target date
  */
-export const calculateMonthlySavingsNeeded = (remainingAmount: number, daysRemaining: number | null) => {
+export const calculateMonthlySavingsNeeded = (
+  remainingAmount: number,
+  daysRemaining: number | null
+) => {
   if (!daysRemaining || daysRemaining <= 0) return 0;
 
   const monthsRemaining = Math.max(1, daysRemaining / 30);
@@ -238,7 +247,7 @@ const compareSortValues = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "des
  */
 export const sortSavingsGoals = (
   goals: ProcessedSavingsGoal[],
-  sortBy = "targetDate", 
+  sortBy = "targetDate",
   sortOrder: "asc" | "desc" = "asc"
 ) => {
   return [...goals].sort((a, b) => {

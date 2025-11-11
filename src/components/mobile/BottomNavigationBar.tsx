@@ -72,60 +72,60 @@ const BottomNavigationBar: React.FC = () => {
         "
         style={{ minHeight: "76px" }}
       >
-      {/* Main navigation container */}
-      <div className="relative h-full overflow-hidden">
-        {/* Scrollable navigation */}
-        <nav
-          ref={navRef}
-          className="
+        {/* Main navigation container */}
+        <div className="relative h-full overflow-hidden">
+          {/* Scrollable navigation */}
+          <nav
+            ref={navRef}
+            className="
             flex items-center
             h-full px-3 overflow-x-auto scrollbar-hide
             gap-1
             snap-x snap-mandatory
           "
-          style={{
-            scrollBehavior: "smooth",
-            WebkitOverflowScrolling: "touch",
-            scrollSnapType: "x mandatory",
-            scrollPaddingInline: "16px",
-          }}
-        >
-          {visibleItems.map((item) => (
-            <BottomNavItem
-              key={item.key}
-              to={item.path}
-              icon={item.icon}
-              label={item.label}
-              isActive={isItemActive(item.key)}
-            />
-          ))}
-        </nav>
+            style={{
+              scrollBehavior: "smooth",
+              WebkitOverflowScrolling: "touch",
+              scrollSnapType: "x mandatory",
+              scrollPaddingInline: "16px",
+            }}
+          >
+            {visibleItems.map((item) => (
+              <BottomNavItem
+                key={item.key}
+                to={item.path}
+                icon={item.icon}
+                label={item.label}
+                isActive={isItemActive(item.key)}
+              />
+            ))}
+          </nav>
 
-        {/* Scroll masks to hide partial items */}
-        <>
-          {/* Left mask - hides partial items on the left */}
-          <div
-            ref={leftFadeRef}
-            className="
+          {/* Scroll masks to hide partial items */}
+          <>
+            {/* Left mask - hides partial items on the left */}
+            <div
+              ref={leftFadeRef}
+              className="
               absolute left-0 top-0 bottom-0 w-12
               bg-gradient-to-r from-violet-100 via-violet-100/80 to-transparent
               pointer-events-none opacity-0 transition-opacity duration-300
               backdrop-blur-sm
             "
-          />
+            />
 
-          {/* Right mask - hides partial items on the right */}
-          <div
-            ref={rightFadeRef}
-            className="
+            {/* Right mask - hides partial items on the right */}
+            <div
+              ref={rightFadeRef}
+              className="
               absolute right-0 top-0 bottom-0 w-12
               bg-gradient-to-l from-violet-100 via-violet-100/80 to-transparent
               pointer-events-none transition-opacity duration-300
               backdrop-blur-sm
             "
-          />
-        </>
-      </div>
+            />
+          </>
+        </div>
 
         {/* Hardware acceleration hint */}
         <div className="hidden" style={{ transform: "translateZ(0)" }} />

@@ -8,7 +8,12 @@ interface CategoryNavigationTabsProps {
   categoryCount: number;
 }
 
-const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categoryCount }: CategoryNavigationTabsProps) => {
+const CategoryNavigationTabs = ({
+  activeTab,
+  onTabChange,
+  suggestionCount,
+  categoryCount,
+}: CategoryNavigationTabsProps) => {
   const tabs = [
     {
       id: "suggestions",

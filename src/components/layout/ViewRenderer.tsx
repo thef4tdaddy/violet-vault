@@ -241,9 +241,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     savings: (
       <SavingsGoals
-        savingsGoals={
-          savingsGoalsHook.savingsGoals as unknown as Array<Record<string, unknown>>
-        }
+        savingsGoals={savingsGoalsHook.savingsGoals as unknown as Array<Record<string, unknown>>}
         unassignedCash={unassignedCash}
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}

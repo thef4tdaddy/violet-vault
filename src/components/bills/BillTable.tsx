@@ -76,7 +76,11 @@ type BillTableDesktopProps = Pick<
 
 type BillTableMobileProps = Pick<
   BillTableProps,
-  "filteredBills" | "toggleBillSelection" | "setShowBillDetail" | "getBillDisplayData" | "billOperations"
+  | "filteredBills"
+  | "toggleBillSelection"
+  | "setShowBillDetail"
+  | "getBillDisplayData"
+  | "billOperations"
 >;
 
 const BillTableDesktop = ({

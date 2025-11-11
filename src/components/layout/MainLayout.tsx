@@ -300,12 +300,14 @@ const MainContent = ({
     [auth]
   );
 
-  const handleHideSecurityWarning = useCallback(() => setShowSecurityWarning(false), [
-    setShowSecurityWarning,
-  ]);
-  const handleHideCorruption = useCallback(() => setShowCorruptionModal(false), [
-    setShowCorruptionModal,
-  ]);
+  const handleHideSecurityWarning = useCallback(
+    () => setShowSecurityWarning(false),
+    [setShowSecurityWarning]
+  );
+  const handleHideCorruption = useCallback(
+    () => setShowCorruptionModal(false),
+    [setShowCorruptionModal]
+  );
   const clearSyncConflicts = useCallback(() => setSyncConflicts(null), [setSyncConflicts]);
 
   return (

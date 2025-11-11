@@ -36,7 +36,8 @@ export const useBillAnalytics = (bills: Bill[] = []) => {
     const paidAmount = bills
       .filter((bill) => bill.isPaid)
       .reduce(
-        (sum, bill) => sum + ((bill as Bill & { paidAmount?: number }).paidAmount || bill.amount || 0),
+        (sum, bill) =>
+          sum + ((bill as Bill & { paidAmount?: number }).paidAmount || bill.amount || 0),
         0
       );
     const unpaidAmount = bills
@@ -44,32 +45,29 @@ export const useBillAnalytics = (bills: Bill[] = []) => {
       .reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
     // Overdue amount
-    const overdueAmount = overdueBills.reduce(
-      (sum, bill) => sum + (bill.amount || 0),
-      0
-    );
+    const overdueAmount = overdueBills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
     // Upcoming amount (next 30 days)
-    const upcomingAmount = upcomingBills.reduce(
-      (sum, bill) => sum + (bill.amount || 0),
-      0
-    );
+    const upcomingAmount = upcomingBills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
     // Category breakdown
-    const categoryBreakdown = bills.reduce((acc, bill) => {
-      const category = bill.category || "Other";
-      if (!acc[category]) {
-        acc[category] = { count: 0, amount: 0, paid: 0, unpaid: 0 };
-      }
-      acc[category].count++;
-      acc[category].amount += bill.amount || 0;
-      if (bill.isPaid) {
-        acc[category].paid++;
-      } else {
-        acc[category].unpaid++;
-      }
-      return acc;
-    }, {} as Record<string, { count: number; amount: number; paid: number; unpaid: number }>);
+    const categoryBreakdown = bills.reduce(
+      (acc, bill) => {
+        const category = bill.category || "Other";
+        if (!acc[category]) {
+          acc[category] = { count: 0, amount: 0, paid: 0, unpaid: 0 };
+        }
+        acc[category].count++;
+        acc[category].amount += bill.amount || 0;
+        if (bill.isPaid) {
+          acc[category].paid++;
+        } else {
+          acc[category].unpaid++;
+        }
+        return acc;
+      },
+      {} as Record<string, { count: number; amount: number; paid: number; unpaid: number }>
+    );
 
     return {
       totalBills,

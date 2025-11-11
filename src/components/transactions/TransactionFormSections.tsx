@@ -141,7 +141,9 @@ export const TransactionDetailsFields = ({
   }, [smartCategorySuggestion, transactionForm.description]);
 
   const showSuggestion =
-    smartSuggestion && smartSuggestion.category && smartSuggestion.category !== transactionForm.category;
+    smartSuggestion &&
+    smartSuggestion.category &&
+    smartSuggestion.category !== transactionForm.category;
 
   return (
     <>

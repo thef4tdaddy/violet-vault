@@ -213,7 +213,8 @@ export const calculateEnvelopeSpending = (
     if (transaction.amount && transaction.amount < 0 && transaction.envelopeId) {
       const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
       const envelopeName = envelope ? envelope.name : "Unknown Envelope";
-      const envelopeColor = envelope?.color || getEnvelopeColor(transaction.envelopeId, envelopeName);
+      const envelopeColor =
+        envelope?.color || getEnvelopeColor(transaction.envelopeId, envelopeName);
 
       if (!spending[envelopeName]) {
         spending[envelopeName] = {

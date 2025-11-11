@@ -12,8 +12,14 @@ interface AnalysisSettings {
   consolidationThreshold: number;
 }
 
-type ApplyToTransactionsHandler = (suggestion: Suggestion, updates?: Record<string, unknown>) => Promise<void>;
-type ApplyToBillsHandler = (suggestion: Suggestion, updates?: Record<string, unknown>) => Promise<void>;
+type ApplyToTransactionsHandler = (
+  suggestion: Suggestion,
+  updates?: Record<string, unknown>
+) => Promise<void>;
+type ApplyToBillsHandler = (
+  suggestion: Suggestion,
+  updates?: Record<string, unknown>
+) => Promise<void>;
 
 /**
  * Hook for managing Smart Category Manager UI state and interactions

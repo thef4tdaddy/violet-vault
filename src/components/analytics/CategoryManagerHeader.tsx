@@ -7,7 +7,10 @@ interface CategoryManagerHeaderProps {
   onToggleSettings: () => void;
 }
 
-const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }: CategoryManagerHeaderProps) => {
+const CategoryManagerHeader = ({
+  suggestionCount,
+  onToggleSettings,
+}: CategoryManagerHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>

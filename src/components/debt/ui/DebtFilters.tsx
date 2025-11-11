@@ -19,7 +19,12 @@ interface DebtFiltersProps {
   debtsByType?: Record<string, unknown[]>;
 }
 
-const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes = {}, debtsByType = {} }: DebtFiltersProps) => {
+const DebtFilters = ({
+  filterOptions,
+  setFilterOptions,
+  debtTypes = {},
+  debtsByType = {},
+}: DebtFiltersProps) => {
   const debtTypeOptions = [
     { value: "all", label: "All Types" },
     ...Object.values(debtTypes || {}).map((type) => {

@@ -230,10 +230,7 @@ export const DistributionPieChartWithDetails = ({
 
   // Limit and prepare data
   const chartData = Array.isArray(data) ? data.slice(0, maxItems) : [];
-  const total = chartData.reduce(
-    (sum, item) => sum + Number(item[dataKey] ?? 0),
-    0
-  );
+  const total = chartData.reduce((sum, item) => sum + Number(item[dataKey] ?? 0), 0);
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] gap-8 items-start">

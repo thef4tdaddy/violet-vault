@@ -13,8 +13,8 @@ import type { PaycheckHistory } from "@/db/types";
  * Pure function for calculating how to distribute paycheck funds
  */
 export const calculatePaycheckAllocation = (
-  amount: string | number, 
-  allocationMode: string, 
+  amount: string | number,
+  allocationMode: string,
   envelopes: Envelope[]
 ) => {
   const numAmount = parseFloat(String(amount)) || 0;
@@ -36,10 +36,7 @@ export const calculatePaycheckAllocation = (
 /**
  * Calculate allocations to envelopes based on their funding needs
  */
-const calculateEnvelopeAllocations = (
-  amount: number, 
-  envelopes: Envelope[]
-) => {
+const calculateEnvelopeAllocations = (amount: number, envelopes: Envelope[]) => {
   let remainingAmount = amount;
   const allocations = {} as Record<string, number>;
   let totalAllocated = 0;
@@ -93,9 +90,7 @@ const filterBillEnvelopes = (envelopes: Envelope[]) => {
       ({ envelope, resolvedType }) =>
         isAutoAllocateEnabled(envelope) &&
         (resolvedType === ENVELOPE_TYPES.BILL ||
-          (BILL_CATEGORIES as readonly string[]).includes(
-            String(envelope.category || "").trim()
-          ))
+          (BILL_CATEGORIES as readonly string[]).includes(String(envelope.category || "").trim()))
     )
     .map(({ envelope }) => envelope);
 };
@@ -145,7 +140,10 @@ const calculateBillEnvelopeAllocation = (envelope: Envelope, remainingAmount: nu
 /**
  * Calculate allocation for a variable expense envelope
  */
-const calculateVariableEnvelopeAllocation = (envelope: Envelope & { monthlyBudget?: number }, remainingAmount: number) => {
+const calculateVariableEnvelopeAllocation = (
+  envelope: Envelope & { monthlyBudget?: number },
+  remainingAmount: number
+) => {
   const monthlyBudget = resolveMonthlyBudget(envelope);
   const biweeklyTarget = monthlyBudget / BIWEEKLY_MULTIPLIER;
   const currentBalance = toNumber(envelope.currentBalance) || 0;
@@ -168,8 +166,8 @@ const calculateVariableEnvelopeAllocation = (envelope: Envelope & { monthlyBudge
  * Log debug information for allocation process
  */
 const logAllocationDebug = (
-  envelopes: Envelope[], 
-  billEnvelopes: Envelope[], 
+  envelopes: Envelope[],
+  billEnvelopes: Envelope[],
   variableEnvelopes: (Envelope & { monthlyBudget?: number })[]
 ) => {
   logger.debug("Paycheck allocation debug", {
@@ -278,7 +276,9 @@ const resolveMonthlyBudget = (envelope: Envelope) => {
 };
 
 const resolveBiweeklyAllocation = (envelope: Envelope) => {
-  const directValue = toNumber((envelope as Envelope & { biweeklyAllocation?: number }).biweeklyAllocation);
+  const directValue = toNumber(
+    (envelope as Envelope & { biweeklyAllocation?: number }).biweeklyAllocation
+  );
   if (directValue !== undefined && directValue > 0) {
     return directValue;
   }
@@ -305,10 +305,7 @@ const toNumber = (value: unknown): number | undefined => {
 /**
  * Get smart prediction for a specific payer based on history
  */
-export const getPayerPrediction = (
-  payer: string, 
-  paycheckHistory: PaycheckHistory[]
-) => {
+export const getPayerPrediction = (payer: string, paycheckHistory: PaycheckHistory[]) => {
   const payerPaychecks = paycheckHistory
     .filter((p) => p.payerName === payer && p.amount > 0)
     .slice(0, 5) // Last 5 paychecks
@@ -329,10 +326,7 @@ export const getPayerPrediction = (
 /**
  * Get unique payers from paycheck history and temporary payers
  */
-export const getUniquePayers = (
-  paycheckHistory: PaycheckHistory[],
-  tempPayers: string[] = []
-) => {
+export const getUniquePayers = (paycheckHistory: PaycheckHistory[], tempPayers: string[] = []) => {
   const payers = new Set<string>();
 
   // Add payers from history (permanently saved and synced)

@@ -340,12 +340,38 @@ export const processReceiptImage = async (
   return await ocrProcessor.processReceipt(imageSource);
 };
 
-// Utility function to preload OCR worker (call on app init)
+// Utility function to preload OCR worker (call on app init or idle)
 export const preloadOCR = async (): Promise<void> => {
   try {
     await ocrProcessor.initialize();
     logger.info("🔍 OCR preloaded successfully");
   } catch (error) {
     logger.warn("Failed to preload OCR:", error);
+  }
+};
+
+/**
+ * Preload OCR worker during idle time to improve first-use performance
+ * Uses requestIdleCallback for non-blocking initialization
+ */
+export const preloadOCROnIdle = (): void => {
+  if (typeof window === "undefined") return;
+
+  const preload = () => {
+    preloadOCR().catch((error) => {
+      logger.debug("OCR idle preload skipped:", error);
+    });
+  };
+
+  // Use requestIdleCallback for browsers that support it
+  if ("requestIdleCallback" in window) {
+    (
+      window as Window & {
+        requestIdleCallback: (callback: () => void, options?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback(preload, { timeout: 5000 });
+  } else {
+    // Fallback: use setTimeout with delay for browsers without requestIdleCallback
+    setTimeout(preload, 3000);
   }
 };

@@ -103,6 +103,13 @@ import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefine
 // Initialize crypto compatibility layer
 initializeCrypto();
 
+// Preload OCR worker on idle for better receipt scanning performance
+if (typeof window !== "undefined") {
+  import("./utils/common/ocrProcessor.ts").then(({ preloadOCROnIdle }) => {
+    preloadOCROnIdle();
+  });
+}
+
 // Initialize app after DOM is ready
 const initializeApp = () => {
   // Initialize console log and error capture for bug reports

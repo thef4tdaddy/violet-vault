@@ -134,4 +134,3 @@ describe("AnalyticsDashboard", () => {
     expect(await screen.findByText(/Failed to load data/i)).toBeInTheDocument();
   });
 });
-

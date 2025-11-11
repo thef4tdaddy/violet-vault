@@ -62,7 +62,9 @@ const CategoryAnalysisTab = ({ categoryStats }: CategoryAnalysisTabProps) => {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Total Amount:</span>
-                <span className="font-black text-gray-900">${stat.totalAmount?.toFixed(2) || "0.00"}</span>
+                <span className="font-black text-gray-900">
+                  ${stat.totalAmount?.toFixed(2) || "0.00"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Transactions:</span>
@@ -70,14 +72,17 @@ const CategoryAnalysisTab = ({ categoryStats }: CategoryAnalysisTabProps) => {
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Avg Amount:</span>
-                <span className="font-bold text-gray-900">${stat.avgAmount?.toFixed(2) || "0.00"}</span>
+                <span className="font-bold text-gray-900">
+                  ${stat.avgAmount?.toFixed(2) || "0.00"}
+                </span>
               </div>
               {stat.lastUsed && (
                 <div className="flex justify-between">
                   <span className="text-purple-700 font-medium">Last Used:</span>
                   <span className="font-bold text-gray-900">
-                    {(
-                      stat.lastUsed instanceof Date ? stat.lastUsed : new Date(stat.lastUsed)
+                    {(stat.lastUsed instanceof Date
+                      ? stat.lastUsed
+                      : new Date(stat.lastUsed)
                     ).toLocaleDateString()}
                   </span>
                 </div>

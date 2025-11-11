@@ -5,7 +5,12 @@ import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
 const buildUncategorizedTransactions = () => {
   const baseDate = new Date();
 
-  const createEntry = (merchant: string, descriptionSuffix: string, daysAgo: number, amount: number) => {
+  const createEntry = (
+    merchant: string,
+    descriptionSuffix: string,
+    daysAgo: number,
+    amount: number
+  ) => {
     const entryDate = new Date(baseDate);
     entryDate.setDate(entryDate.getDate() - daysAgo);
 
@@ -41,7 +46,9 @@ describe("useSmartSuggestions", () => {
 
     const { result } = renderHook(() => useSmartSuggestions({ transactions, bills: [] }));
 
-    const starbucksSuggestion = result.current.suggestTransactionCategory("Starbucks Coffee Store 512");
+    const starbucksSuggestion = result.current.suggestTransactionCategory(
+      "Starbucks Coffee Store 512"
+    );
     expect(starbucksSuggestion).not.toBeNull();
     expect(starbucksSuggestion?.category).toBe("Food & Dining");
     expect(starbucksSuggestion?.source).toBeDefined();
@@ -65,4 +72,3 @@ describe("useSmartSuggestions", () => {
     expect(suggestion?.iconName).toBeTruthy();
   });
 });
-

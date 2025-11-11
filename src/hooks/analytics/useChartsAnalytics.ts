@@ -23,7 +23,10 @@ export const useChartsAnalytics = (initialTimeFilter = "3months", initialFocus =
     return mapping[value] || value || "3months";
   }, []);
 
-  const initialRange = useMemo(() => normalizeDateRange(initialTimeFilter), [initialTimeFilter, normalizeDateRange]);
+  const initialRange = useMemo(
+    () => normalizeDateRange(initialTimeFilter),
+    [initialTimeFilter, normalizeDateRange]
+  );
   const [activeTab, setActiveTab] = useState(initialFocus);
   const [chartType, setChartType] = useState("line");
   const [dateRange, setDateRange] = useState(initialRange);
