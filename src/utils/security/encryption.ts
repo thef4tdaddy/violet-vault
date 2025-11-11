@@ -1,6 +1,103 @@
 import logger from "../common/logger";
 import { optimizedSerialization } from "./optimizedSerialization";
 import { safeCryptoOperation, getRandomBytes } from "./cryptoCompat";
+type CompressionAnalysis = ReturnType<typeof optimizedSerialization.analyzeCompression>;
+
+const toUint8Array = (value: unknown, debugLabel?: string): Uint8Array => {
+  if (value instanceof Uint8Array) {
+    return value;
+  }
+
+  if (value instanceof ArrayBuffer) {
+    return new Uint8Array(value);
+  }
+
+  if (ArrayBuffer.isView(value)) {
+    return new Uint8Array(
+      value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength)
+    );
+  }
+
+  if (Array.isArray(value)) {
+    return new Uint8Array(value);
+  }
+
+  if (typeof value === "object" && value !== null && "length" in (value as ArrayLike<number>)) {
+    return new Uint8Array(Array.from(value as ArrayLike<number>));
+  }
+
+  logger.warn("Received unsupported byte structure for Uint8Array conversion", {
+    label: debugLabel,
+    valueType: typeof value,
+  });
+  throw new TypeError("Unsupported byte structure");
+};
+
+const describeByteSource = (value: unknown) => {
+  if (value instanceof Uint8Array) {
+    return { length: value.length, type: "Uint8Array" };
+  }
+  if (ArrayBuffer.isView(value)) {
+    return { length: value.byteLength, type: value.constructor.name };
+  }
+  if (value instanceof ArrayBuffer) {
+    return { length: value.byteLength, type: "ArrayBuffer" };
+  }
+  if (Array.isArray(value)) {
+    return { length: value.length, type: "Array<number>" };
+  }
+  return { length: undefined, type: typeof value };
+};
+
+const runCompressionPipeline = (data: unknown) => {
+  const analysis = optimizedSerialization.analyzeCompression(data);
+  const serializedData = optimizedSerialization.serialize(data);
+  return { analysis, serializedData };
+};
+
+const logCompressionAnalysis = (analysis: CompressionAnalysis) => {
+  if (!analysis) {
+    return;
+  }
+  logger.debug("Compression analysis", {
+    originalSize: analysis.originalSize || 0,
+    expectedReduction: `${analysis.totalReduction?.toFixed(2) ?? "0"}x`,
+    spaceSaved: `${analysis.spaceSavedPercent ?? 0}%`,
+  });
+};
+
+const buildOptimizedEncryptionMetadata = (
+  analysis: CompressionAnalysis,
+  compressedLength: number,
+  encryptedLength: number
+) => ({
+  compressionRatio: analysis?.totalReduction || 0,
+  originalSize: analysis?.originalSize || 0,
+  compressedSize: compressedLength,
+  encryptedSize: encryptedLength,
+  optimized: true,
+});
+
+const logOptimizedEncryptionSummary = (
+  analysis: CompressionAnalysis,
+  compressedLength: number,
+  encryptedLength: number,
+  durationMs: number
+) => {
+  const originalSize = analysis?.originalSize || 0;
+  const compressionRatio =
+    compressedLength > 0 ? (originalSize / compressedLength).toFixed(2) : "0.00";
+  const totalReduction = encryptedLength > 0 ? (originalSize / encryptedLength).toFixed(2) : "0.00";
+
+  logger.info("Optimized encryption complete", {
+    originalSize,
+    compressedSize: compressedLength,
+    encryptedSize: encryptedLength,
+    compressionRatio: `${compressionRatio}x`,
+    totalReduction: `${totalReduction}x`,
+    duration: `${Math.round(durationMs)}ms`,
+  });
+};
 
 export const encryptionUtils = {
   async deriveKey(password: string) {
@@ -94,20 +191,23 @@ export const encryptionUtils = {
       // Debug logging for decrypt attempts
       logger.debug("🔓 Decrypt attempt:", {
         hasEncryptedData: !!encryptedData,
-        encryptedDataType: typeof encryptedData,
-        encryptedDataLength: (encryptedData as any[])?.length,
+        encryptedDataType: describeByteSource(encryptedData).type,
+        encryptedDataLength: describeByteSource(encryptedData).length,
         hasKey: !!key,
         keyType: typeof key,
         hasIv: !!iv,
-        ivType: typeof iv,
-        ivLength: (iv as any[])?.length,
+        ivType: describeByteSource(iv).type,
+        ivLength: describeByteSource(iv).length,
       });
+
+      const ivBytes = toUint8Array(iv, "decrypt-iv");
+      const encryptedBytes = toUint8Array(encryptedData, "decrypt-payload");
 
       const decrypted = await safeCryptoOperation(
         "decrypt",
-        { name: "AES-GCM", iv: new Uint8Array(iv as any[]) },
+        { name: "AES-GCM", iv: ivBytes },
         key,
-        new Uint8Array(encryptedData as any[])
+        encryptedBytes
       );
 
       const decoder = new TextDecoder();
@@ -126,11 +226,14 @@ export const encryptionUtils = {
   },
 
   async decryptRaw(encryptedData: unknown, key: unknown, iv: unknown) {
+    const ivBytes = toUint8Array(iv, "decrypt-raw-iv");
+    const encryptedBytes = toUint8Array(encryptedData, "decrypt-raw-payload");
+
     const decrypted = await safeCryptoOperation(
       "decrypt",
-      { name: "AES-GCM", iv: new Uint8Array(iv as any[]) },
+      { name: "AES-GCM", iv: ivBytes },
       key,
-      new Uint8Array(encryptedData as any[])
+      encryptedBytes
     );
 
     const decoder = new TextDecoder();
@@ -215,47 +318,33 @@ export const encryptionUtils = {
     try {
       const startTime = performance.now();
 
-      // Step 1: Analyze compression potential
-      const analysis = optimizedSerialization.analyzeCompression(data);
-      logger.debug("Compression analysis", {
-        originalSize: analysis?.originalSize || 0,
-        expectedReduction: analysis?.totalReduction?.toFixed(2) + "x" || "0x",
-        spaceSaved: analysis?.spaceSavedPercent + "%" || "0%",
-      });
+      const { analysis, serializedData } = runCompressionPipeline(data);
+      logCompressionAnalysis(analysis);
 
-      // Step 2: Serialize with compression and MessagePack
-      const compressedData = optimizedSerialization.serialize(data);
-
-      // Step 3: Encrypt the compressed binary data
       const iv = getRandomBytes(12);
       const encrypted = await safeCryptoOperation(
         "encrypt",
         { name: "AES-GCM", iv: iv },
         key,
-        compressedData
+        serializedData
       );
 
       const duration = performance.now() - startTime;
-
-      logger.info("Optimized encryption complete", {
-        originalSize: analysis?.originalSize || 0,
-        compressedSize: compressedData.length,
-        encryptedSize: encrypted.byteLength,
-        compressionRatio: ((analysis?.originalSize || 0) / compressedData.length).toFixed(2) + "x",
-        totalReduction: ((analysis?.originalSize || 0) / encrypted.byteLength).toFixed(2) + "x",
-        duration: Math.round(duration) + "ms",
-      });
+      logOptimizedEncryptionSummary(
+        analysis,
+        serializedData.length,
+        encrypted.byteLength,
+        duration
+      );
 
       return {
         data: Array.from(new Uint8Array(encrypted)),
         iv: Array.from(iv),
-        metadata: {
-          compressionRatio: analysis?.totalReduction || 0,
-          originalSize: analysis?.originalSize || 0,
-          compressedSize: compressedData.length,
-          encryptedSize: encrypted.byteLength,
-          optimized: true,
-        },
+        metadata: buildOptimizedEncryptionMetadata(
+          analysis,
+          serializedData.length,
+          encrypted.byteLength
+        ),
       };
     } catch (error) {
       logger.error("Optimized encryption failed", error as Record<string, unknown>);
@@ -273,24 +362,11 @@ export const encryptionUtils = {
     legacyIv?: Uint8Array | ArrayBuffer | number[]
   ) {
     try {
-      const toUint8Array = (value: unknown): Uint8Array => {
-        if (value instanceof Uint8Array) {
-          return value;
-        }
-        if (value instanceof ArrayBuffer) {
-          return new Uint8Array(value);
-        }
-        if (Array.isArray(value)) {
-          return new Uint8Array(value as number[]);
-        }
-        throw new Error("Unsupported byte structure");
-      };
-
       const payload =
         legacyIv !== undefined
           ? {
-              iv: toUint8Array(legacyIv),
-              data: toUint8Array(encryptedData),
+              iv: toUint8Array(legacyIv, "decrypt-optimized-legacy-iv"),
+              data: toUint8Array(encryptedData, "decrypt-optimized-legacy-data"),
               metadata: {},
             }
           : (encryptedData as {
@@ -304,8 +380,8 @@ export const encryptionUtils = {
       }
 
       // Step 1: Decrypt data
-      const iv = toUint8Array(payload.iv);
-      const encrypted = toUint8Array(payload.data);
+      const iv = toUint8Array(payload.iv, "decrypt-optimized-iv");
+      const encrypted = toUint8Array(payload.data, "decrypt-optimized-data");
 
       const decrypted = await safeCryptoOperation(
         "decrypt",

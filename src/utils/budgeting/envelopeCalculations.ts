@@ -91,6 +91,224 @@ interface TotalsAccumulator {
   envelopeCount: number;
 }
 
+interface EnvelopeTotals {
+  totalSpent: number;
+  totalUpcoming: number;
+  totalOverdue: number;
+}
+
+interface EnvelopeBalanceMetrics {
+  allocated: number;
+  currentBalance: number;
+  committed: number;
+  available: number;
+}
+
+const BILL_LOOKAHEAD_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+const getEnvelopeType = (envelope: Pick<Envelope, "envelopeType" | "category">): string => {
+  return envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+};
+
+const collectEnvelopeTransactions = (
+  envelope: Envelope,
+  transactions: Transaction[]
+): Transaction[] => transactions.filter((transaction) => transaction.envelopeId === envelope.id);
+
+const collectEnvelopeBills = (envelope: Envelope, bills: Bill[]): Bill[] =>
+  bills.filter((bill) => bill.envelopeId === envelope.id);
+
+const selectPaidTransactions = (transactions: Transaction[]): Transaction[] =>
+  transactions.filter(
+    (transaction) =>
+      transaction.type === "expense" ||
+      transaction.type === "income" ||
+      transaction.type === "transfer" ||
+      ((transaction.type === "bill" || transaction.type === "recurring_bill") && transaction.isPaid)
+  );
+
+const collectUnpaidBills = (envelopeTransactions: Transaction[], envelopeBills: Bill[]): Bill[] => {
+  const transactionBills = envelopeTransactions.filter(
+    (transaction) =>
+      (transaction.type === "bill" || transaction.type === "recurring_bill") && !transaction.isPaid
+  );
+
+  const normalizedTransactionBills: Bill[] = transactionBills.map((transaction) => ({
+    id: transaction.id,
+    envelopeId: transaction.envelopeId,
+    isPaid: transaction.isPaid,
+    amount: transaction.amount,
+    dueDate: transaction.dueDate || transaction.date,
+    name: transaction.description,
+    type: transaction.type,
+    provider: transaction.provider,
+    description: transaction.description,
+    date: transaction.date,
+  }));
+
+  const unpaidBills = [
+    ...normalizedTransactionBills,
+    ...envelopeBills.filter((bill) => !bill.isPaid),
+  ];
+
+  const deduped = new Map<string, Bill>();
+  unpaidBills.forEach((bill) => {
+    const key = `${bill.provider || bill.name || bill.description}-${bill.dueDate}`;
+    if (!deduped.has(key) || !bill.type) {
+      deduped.set(key, bill);
+    }
+  });
+
+  return Array.from(deduped.values()).sort((a, b) => {
+    const dateA = a.dueDate ? new Date(a.dueDate) : new Date("9999-12-31");
+    const dateB = b.dueDate ? new Date(b.dueDate) : new Date("9999-12-31");
+    return dateA.getTime() - dateB.getTime();
+  });
+};
+
+const partitionBillsByDueDate = (unpaidBills: Bill[], referenceDate: Date = new Date()) => {
+  const upcoming: Bill[] = [];
+  const overdue: Bill[] = [];
+
+  unpaidBills.forEach((bill) => {
+    if (!bill.dueDate) {
+      return;
+    }
+    const dueDate = new Date(bill.dueDate);
+    if (dueDate > referenceDate) {
+      upcoming.push(bill);
+    } else if (dueDate < referenceDate) {
+      overdue.push(bill);
+    }
+  });
+
+  return { upcoming, overdue };
+};
+
+const calculateEnvelopeTotalsFromCollections = (
+  paidTransactions: Transaction[],
+  upcomingBills: Bill[],
+  overdueBills: Bill[]
+): EnvelopeTotals => {
+  const totalSpent = paidTransactions.reduce(
+    (sum, transaction) => sum + Math.abs(transaction.amount),
+    0
+  );
+  const totalUpcoming = upcomingBills.reduce((sum, bill) => sum + Math.abs(bill.amount), 0);
+  const totalOverdue = overdueBills.reduce((sum, bill) => sum + Math.abs(bill.amount), 0);
+
+  return { totalSpent, totalUpcoming, totalOverdue };
+};
+
+const calculateBalanceMetrics = (
+  envelope: Envelope,
+  totals: EnvelopeTotals
+): EnvelopeBalanceMetrics => {
+  const allocated = envelope.budget || 0;
+  const currentBalance = envelope.currentBalance || 0;
+  const committed = totals.totalUpcoming + totals.totalOverdue;
+  const available = currentBalance - committed;
+
+  return { allocated, currentBalance, committed, available };
+};
+
+const countBillsDueWithinWindow = (
+  envelope: EnvelopeData,
+  windowStart: Date,
+  windowEnd: Date
+): number => {
+  return (envelope.upcomingBills || []).reduce((count, bill) => {
+    if (!bill.dueDate) {
+      return count;
+    }
+    const dueDate = new Date(bill.dueDate);
+    if (dueDate >= windowStart && dueDate <= windowEnd) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
+};
+
+const calculateBiweeklyNeed = (envelope: EnvelopeData, envelopeType: string): number => {
+  if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
+    return envelope.biweeklyAllocation;
+  }
+  if (envelope.monthlyBudget) {
+    return envelope.monthlyBudget / BIWEEKLY_MULTIPLIER;
+  }
+  if (envelope.monthlyAmount) {
+    return envelope.monthlyAmount / BIWEEKLY_MULTIPLIER;
+  }
+  if (envelope.targetAmount) {
+    const remainingToTarget = Math.max(
+      0,
+      (envelope.targetAmount || 0) - (envelope.currentBalance || 0)
+    );
+    return Math.min(remainingToTarget, envelope.biweeklyAllocation || 0);
+  }
+  return 0;
+};
+
+const getEntryTimestamp = (entry: Bill | Transaction): number => {
+  const candidate = "date" in entry && entry.date ? entry.date : entry.dueDate;
+  if (!candidate) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+  return new Date(candidate).getTime();
+};
+
+const selectNextBillAmount = (
+  upcomingBills: Bill[] = [],
+  paidTransactions: Transaction[] = [],
+  envelope: Envelope
+): number => {
+  if (upcomingBills.length > 0) {
+    return Math.abs(upcomingBills[0].amount);
+  }
+
+  const historicalEntries: Array<Bill | Transaction> = [...paidTransactions];
+  if (historicalEntries.length > 0) {
+    const [mostRecent] = [...historicalEntries].sort(
+      (a, b) => getEntryTimestamp(a) - getEntryTimestamp(b)
+    );
+    return Math.abs(mostRecent.amount);
+  }
+
+  return (envelope.biweeklyAllocation || 0) * 2;
+};
+
+const calculateBillEnvelopeUtilization = (
+  envelope: Envelope,
+  upcomingBills: Bill[],
+  paidTransactions: Transaction[],
+  currentBalance: number
+): number => {
+  const nextBillAmount = selectNextBillAmount(upcomingBills, paidTransactions, envelope);
+  if (nextBillAmount <= 0) {
+    return 0;
+  }
+  return currentBalance / nextBillAmount;
+};
+
+const calculateSavingsUtilization = (envelope: Envelope, currentBalance: number): number => {
+  if (!envelope.targetAmount || envelope.targetAmount <= 0) {
+    return 0;
+  }
+  return currentBalance / envelope.targetAmount;
+};
+
+const calculateVariableEnvelopeUtilization = (
+  envelope: Envelope,
+  totalSpent: number,
+  committed: number
+): number => {
+  const budgetAmount = envelope.monthlyBudget || envelope.budget || envelope.monthlyAmount || 0;
+  if (budgetAmount <= 0) {
+    return 0;
+  }
+  return (totalSpent + committed) / budgetAmount;
+};
+
 /**
  * Calculate comprehensive envelope data including transactions, bills, and metrics
  */
@@ -100,91 +318,39 @@ export const calculateEnvelopeData = (
   bills: Bill[]
 ): EnvelopeData[] => {
   return envelopes.map((envelope: Envelope) => {
-    const envelopeTransactions = transactions.filter(
-      (t: Transaction) => t.envelopeId === envelope.id
+    const envelopeTransactions = collectEnvelopeTransactions(envelope, transactions);
+    const envelopeBills = collectEnvelopeBills(envelope, bills);
+    const paidTransactions = selectPaidTransactions(envelopeTransactions);
+    const unpaidBills = collectUnpaidBills(envelopeTransactions, envelopeBills);
+    const { upcoming: upcomingBills, overdue: overdueBills } = partitionBillsByDueDate(unpaidBills);
+    const totals = calculateEnvelopeTotalsFromCollections(
+      paidTransactions,
+      upcomingBills,
+      overdueBills
     );
-
-    // Also get bills assigned to this envelope
-    const envelopeBills = bills.filter((b: Bill) => b.envelopeId === envelope.id);
-
-    // Include expense/income transactions and paid bills
-    // Transaction types: "expense", "income", "transfer", "bill", "recurring_bill"
-    const paidTransactions = envelopeTransactions.filter(
-      (t: Transaction) =>
-        t.type === "expense" ||
-        t.type === "income" ||
-        t.type === "transfer" ||
-        (t.type === "bill" && t.isPaid) ||
-        (t.type === "recurring_bill" && t.isPaid)
-    );
-
-    // Combine bills from transactions and bills array, removing duplicates
-    const allUnpaidBills = [
-      ...envelopeTransactions.filter(
-        (t: Transaction) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
-      ),
-      ...envelopeBills.filter((b: Bill) => !b.isPaid),
-    ];
-
-    // Deduplicate bills based on provider/name and due date to prevent showing same bill twice
-    const unpaidBillsMap = new Map<string, Bill>();
-    allUnpaidBills.forEach((bill: Bill) => {
-      const key = `${bill.provider || bill.name || bill.description}-${bill.dueDate}`;
-      // Keep first occurrence, or prefer bills array over transaction bills
-      if (!unpaidBillsMap.has(key) || !bill.type) {
-        unpaidBillsMap.set(key, bill);
-      }
-    });
-
-    const unpaidBills = Array.from(unpaidBillsMap.values()).sort((a: Bill, b: Bill) => {
-      // Sort by due date (earliest first)
-      const dateA = a.dueDate ? new Date(a.dueDate) : new Date("9999-12-31");
-      const dateB = b.dueDate ? new Date(b.dueDate) : new Date("9999-12-31");
-      return dateA.getTime() - dateB.getTime();
-    });
-
-    const upcomingBills = unpaidBills.filter(
-      (t: Bill) => t.dueDate && new Date(t.dueDate) > new Date()
-    );
-
-    const overdueBills = unpaidBills.filter(
-      (t: Bill) => t.dueDate && new Date(t.dueDate) < new Date()
-    );
-
-    const totalSpent = paidTransactions.reduce(
-      (sum: number, t: Transaction) => sum + Math.abs(t.amount),
-      0
-    );
-    const totalUpcoming = upcomingBills.reduce(
-      (sum: number, t: Bill) => sum + Math.abs(t.amount),
-      0
-    );
-    const totalOverdue = overdueBills.reduce((sum: number, t: Bill) => sum + Math.abs(t.amount), 0);
-
-    const allocated = envelope.budget || 0;
-    const currentBalance = envelope.currentBalance || 0;
-    const committed = totalUpcoming + totalOverdue;
-
-    // Use actual current balance instead of budget allocation for availability
-    const available = currentBalance - committed;
+    const balances = calculateBalanceMetrics(envelope, totals);
 
     // Calculate utilization rate based on envelope type and purpose
     const utilizationRate = calculateUtilizationRate(
       envelope,
       { upcomingBills, paidTransactions } as BillsAndTransactions,
-      { currentBalance, totalSpent, committed } as BalanceInfo
+      {
+        currentBalance: balances.currentBalance,
+        totalSpent: totals.totalSpent,
+        committed: balances.committed,
+      } as BalanceInfo
     );
 
-    const status = determineEnvelopeStatus(totalOverdue, available, envelope);
+    const status = determineEnvelopeStatus(totals.totalOverdue, balances.available, envelope);
 
     return {
       ...envelope,
-      totalSpent,
-      totalUpcoming,
-      totalOverdue,
-      allocated,
-      available,
-      committed,
+      totalSpent: totals.totalSpent,
+      totalUpcoming: totals.totalUpcoming,
+      totalOverdue: totals.totalOverdue,
+      allocated: balances.allocated,
+      available: balances.available,
+      committed: balances.committed,
       utilizationRate,
       status,
       upcomingBills,
@@ -205,44 +371,22 @@ export const calculateUtilizationRate = (
 ): number => {
   const { upcomingBills, paidTransactions } = billsAndTransactions;
   const { currentBalance, totalSpent, committed } = balanceInfo;
-  let utilizationRate = 0;
-  const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+  const envelopeType = getEnvelopeType(envelope);
 
   if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
-    // For bill envelopes, show progress toward next bill payment
-    let nextBillAmount = 0;
-
-    if (upcomingBills && upcomingBills.length > 0) {
-      // Use actual upcoming bill amount
-      nextBillAmount = Math.abs(upcomingBills[0].amount);
-    } else {
-      // No upcoming bills, check if there are ANY bills for this envelope
-      const allEnvelopeBills = [...(upcomingBills || []), ...(paidTransactions || [])];
-      if (allEnvelopeBills.length > 0) {
-        // Use most recent bill amount as reference
-        const mostRecentBill = allEnvelopeBills.sort(
-          (a: Bill | Transaction, b: Bill | Transaction) =>
-            new Date(a.date || a.dueDate || "").getTime() -
-            new Date(b.date || b.dueDate || "").getTime()
-        )[0];
-        nextBillAmount = Math.abs(mostRecentBill.amount);
-      } else {
-        // Fallback to biweekly calculation (monthly equivalent)
-        nextBillAmount = (envelope.biweeklyAllocation || 0) * 2;
-      }
-    }
-
-    utilizationRate = nextBillAmount > 0 ? (currentBalance || 0) / nextBillAmount : 0;
-  } else if (envelopeType === ENVELOPE_TYPES.SAVINGS && envelope.targetAmount) {
-    // For savings envelopes, show progress toward target
-    utilizationRate = envelope.targetAmount > 0 ? (currentBalance || 0) / envelope.targetAmount : 0;
-  } else {
-    // For variable envelopes, use traditional spending-based calculation
-    const budgetAmount = envelope.monthlyBudget || envelope.budget || envelope.monthlyAmount || 0;
-    utilizationRate = budgetAmount > 0 ? ((totalSpent || 0) + (committed || 0)) / budgetAmount : 0;
+    return calculateBillEnvelopeUtilization(
+      envelope,
+      upcomingBills || [],
+      paidTransactions || [],
+      currentBalance || 0
+    );
   }
 
-  return utilizationRate;
+  if (envelopeType === ENVELOPE_TYPES.SAVINGS && envelope.targetAmount) {
+    return calculateSavingsUtilization(envelope, currentBalance || 0);
+  }
+
+  return calculateVariableEnvelopeUtilization(envelope, totalSpent || 0, committed || 0);
 };
 
 /**
@@ -259,10 +403,7 @@ export const determineEnvelopeStatus = (
   else if (envelope.envelopeType === ENVELOPE_TYPES.BILL) {
     // For bill envelopes, check if we have enough for upcoming bills
     const upcomingAmount =
-      (envelope.upcomingBills || []).reduce(
-        (sum: number, b: Bill) => sum + Math.abs(b.amount),
-        0
-      ) || 0;
+      (envelope.upcomingBills || []).reduce((sum, bill) => sum + Math.abs(bill.amount), 0) || 0;
     if ((envelope.currentBalance || 0) < upcomingAmount) {
       status = "underfunded";
     }
@@ -330,8 +471,7 @@ export const filterEnvelopes = (
   // Filter by envelope type
   if (filterOptions.envelopeType !== "all") {
     filtered = filtered.filter((env: EnvelopeData) => {
-      const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category || "");
-      return envelopeType === filterOptions.envelopeType;
+      return getEnvelopeType(env) === filterOptions.envelopeType;
     });
   }
 
@@ -342,56 +482,32 @@ export const filterEnvelopes = (
  * Calculate totals across all envelopes
  */
 export const calculateEnvelopeTotals = (envelopeData: EnvelopeData[]): TotalsAccumulator => {
-  return envelopeData.reduce(
-    (acc: TotalsAccumulator, env: EnvelopeData) => {
-      const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category || "");
+  const windowStart = new Date();
+  const windowEnd = new Date(windowStart.getTime() + BILL_LOOKAHEAD_WINDOW_MS);
 
-      acc.totalAllocated += env.currentBalance || 0;
-      acc.totalSpent += env.totalSpent || 0;
-      acc.totalBalance += env.currentBalance || 0;
-      acc.totalUpcoming += env.totalUpcoming || 0;
+  const initialTotals: TotalsAccumulator = {
+    totalAllocated: 0,
+    totalSpent: 0,
+    totalBalance: 0,
+    totalUpcoming: 0,
+    totalBiweeklyNeed: 0,
+    billsDueCount: 0,
+    envelopeCount: 0,
+  };
 
-      // Count bills due within 30 days
-      const today = new Date();
-      const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+  return envelopeData.reduce((acc, env) => {
+    const envelopeType = getEnvelopeType(env);
 
-      const billsDueWithin30Days = (env.upcomingBills || []).filter((bill: Bill) => {
-        if (!bill.dueDate) return false;
-        const dueDate = new Date(bill.dueDate);
-        return dueDate >= today && dueDate <= thirtyDaysFromNow;
-      });
+    acc.totalAllocated += env.currentBalance || 0;
+    acc.totalSpent += env.totalSpent || 0;
+    acc.totalBalance += env.currentBalance || 0;
+    acc.totalUpcoming += env.totalUpcoming || 0;
+    acc.billsDueCount += countBillsDueWithinWindow(env, windowStart, windowEnd);
+    acc.totalBiweeklyNeed += calculateBiweeklyNeed(env, envelopeType);
+    acc.envelopeCount += 1;
 
-      acc.billsDueCount += billsDueWithin30Days.length;
-
-      // Calculate biweekly needs based on envelope type
-      let biweeklyNeed = 0;
-      if (envelopeType === ENVELOPE_TYPES.BILL && env.biweeklyAllocation) {
-        biweeklyNeed = env.biweeklyAllocation || 0;
-      } else if (env.monthlyBudget) {
-        biweeklyNeed = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
-      } else if (env.monthlyAmount) {
-        biweeklyNeed = env.monthlyAmount / BIWEEKLY_MULTIPLIER;
-      } else if (env.targetAmount) {
-        // For savings, calculate a reasonable biweekly contribution
-        const remainingToTarget = Math.max(0, (env.targetAmount || 0) - (env.currentBalance || 0));
-        biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
-      }
-
-      acc.totalBiweeklyNeed += biweeklyNeed;
-      acc.envelopeCount += 1;
-
-      return acc;
-    },
-    {
-      totalAllocated: 0,
-      totalSpent: 0,
-      totalBalance: 0,
-      totalUpcoming: 0,
-      totalBiweeklyNeed: 0,
-      billsDueCount: 0,
-      envelopeCount: 0,
-    }
-  );
+    return acc;
+  }, initialTotals);
 };
 
 /**
