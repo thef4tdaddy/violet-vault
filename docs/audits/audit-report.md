@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 17 | +3 |
-| TypeScript Strict Mode Errors | 3617 | -32 |
+| TypeScript Errors | 17 | 0 |
+| TypeScript Strict Mode Errors | 3571 | -46 |
 
-*Last updated: 2025-11-11 18:01:54 UTC*
+*Last updated: 2025-11-11 18:03:32 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -94,7 +94,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 43 errors in `src/hooks/bills/useBills/billAnalytics.ts`
 - 41 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 39 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 39 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
@@ -369,7 +368,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 4 errors in `src/hooks/budgeting/useBudgetData/queries.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
-- 4 errors in `src/hooks/bills/useBills/index.ts`
 - 4 errors in `src/hooks/bills/useBillValidation.ts`
 - 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
 - 4 errors in `src/hooks/bills/useBillManagerHelpers.ts`
@@ -554,6 +552,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
+- 1 errors in `src/hooks/bills/useBills/index.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 1 errors in `src/hooks/auth/useAuthManager.ts`
@@ -599,12 +598,12 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1365 | `TS7006` |
+| 1361 | `TS7006` |
 | 907 | `TS7031` |
-| 284 | `TS2339` |
-| 250 | `TS2345` |
+| 251 | `TS2339` |
+| 247 | `TS2345` |
 | 209 | `TS18046` |
-| 138 | `TS7053` |
+| 132 | `TS7053` |
 | 122 | `TS2322` |
 | 80 | `TS18048` |
 | 78 | `TS7005` |
@@ -2488,55 +2487,6 @@ src/hooks/bills/useBillOperationWrappers.ts(38,12): error TS7006: Parameter 'upd
 src/hooks/bills/useBillOperationWrappers.ts(47,30): error TS18046: 'error' is of type 'unknown'.
 src/hooks/bills/useBillOperationWrappers.ts(83,12): error TS7006: Parameter 'billIds' implicitly has an 'any' type.
 src/hooks/bills/useBillOperationWrappers.ts(92,30): error TS18046: 'error' is of type 'unknown'.
-src/hooks/bills/useBills/billAnalytics.ts(14,51): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(19,16): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(20,17): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(21,37): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(27,16): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(28,17): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(29,37): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(34,76): error TS2339: Property 'amount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(36,30): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(38,47): error TS2339: Property 'paidAmount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(38,78): error TS2339: Property 'amount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(42,31): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(43,53): error TS2339: Property 'amount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(47,45): error TS2339: Property 'amount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(53,45): error TS2339: Property 'amount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(59,29): error TS2339: Property 'category' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(60,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/bills/useBills/billAnalytics.ts(61,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/bills/useBills/billAnalytics.ts(63,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/bills/useBills/billAnalytics.ts(64,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/bills/useBills/billAnalytics.ts(64,47): error TS2339: Property 'amount' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(65,16): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(66,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/bills/useBills/billAnalytics.ts(68,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/bills/useBills/billAnalytics.ts(96,61): error TS2339: Property 'category' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(106,26): error TS7006: Parameter 'billId' implicitly has an 'any' type.
-src/hooks/bills/useBills/billAnalytics.ts(107,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(110,33): error TS7006: Parameter 'category' implicitly has an 'any' type.
-src/hooks/bills/useBills/billAnalytics.ts(111,42): error TS2339: Property 'category' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(114,31): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/hooks/bills/useBills/billAnalytics.ts(118,46): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(120,47): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(123,22): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(124,23): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(125,43): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(131,22): error TS2339: Property 'isPaid' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(132,23): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(133,43): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(142,29): error TS7006: Parameter 'billId' implicitly has an 'any' type.
-src/hooks/bills/useBills/billAnalytics.ts(144,26): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(146,37): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(153,16): error TS2339: Property 'frequency' does not exist on type 'never'.
-src/hooks/bills/useBills/billAnalytics.ts(158,22): error TS2339: Property 'frequency' does not exist on type 'never'.
-src/hooks/bills/useBills/index.ts(32,38): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
-  Type 'Bill' is not assignable to type 'never'.
-src/hooks/bills/useBills/index.ts(33,54): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
-  Type 'Bill' is not assignable to type 'never'.
-src/hooks/bills/useBills/index.ts(34,38): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type 'never[]'.
-  Type 'Bill' is not assignable to type 'never'.
 src/hooks/bills/useBills/index.ts(43,5): error TS2783: 'upcomingBills' is specified more than once, so this usage will be overwritten.
 src/hooks/bills/useBillValidation.ts(15,6): error TS7006: Parameter 'bill' implicitly has an 'any' type.
 src/hooks/bills/useBillValidation.ts(32,59): error TS2339: Property 'id' does not exist on type 'never'.

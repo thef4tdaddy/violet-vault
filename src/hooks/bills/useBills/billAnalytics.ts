@@ -1,10 +1,11 @@
 // Bill Analytics and Utility Functions
 import { useMemo } from "react";
+import type { Bill } from "@/db/types";
 
 /**
  * Calculate bill analytics from bill data
  */
-export const useBillAnalytics = (bills = []) => {
+export const useBillAnalytics = (bills: Bill[] = []) => {
   return useMemo(() => {
     const now = new Date();
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -31,26 +32,26 @@ export const useBillAnalytics = (bills = []) => {
     });
 
     // Amount calculations
-    const totalAmount = bills.reduce((sum, bill) => sum + (parseFloat(bill.amount) || 0), 0);
+    const totalAmount = bills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
     const paidAmount = bills
       .filter((bill) => bill.isPaid)
       .reduce(
-        (sum, bill) => sum + (parseFloat(bill.paidAmount) || parseFloat(bill.amount) || 0),
+        (sum, bill) => sum + ((bill as Bill & { paidAmount?: number }).paidAmount || bill.amount || 0),
         0
       );
     const unpaidAmount = bills
       .filter((bill) => !bill.isPaid)
-      .reduce((sum, bill) => sum + (parseFloat(bill.amount) || 0), 0);
+      .reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
     // Overdue amount
     const overdueAmount = overdueBills.reduce(
-      (sum, bill) => sum + (parseFloat(bill.amount) || 0),
+      (sum, bill) => sum + (bill.amount || 0),
       0
     );
 
     // Upcoming amount (next 30 days)
     const upcomingAmount = upcomingBills.reduce(
-      (sum, bill) => sum + (parseFloat(bill.amount) || 0),
+      (sum, bill) => sum + (bill.amount || 0),
       0
     );
 
@@ -61,14 +62,14 @@ export const useBillAnalytics = (bills = []) => {
         acc[category] = { count: 0, amount: 0, paid: 0, unpaid: 0 };
       }
       acc[category].count++;
-      acc[category].amount += parseFloat(bill.amount) || 0;
+      acc[category].amount += bill.amount || 0;
       if (bill.isPaid) {
         acc[category].paid++;
       } else {
         acc[category].unpaid++;
       }
       return acc;
-    }, {});
+    }, {} as Record<string, { count: number; amount: number; paid: number; unpaid: number }>);
 
     return {
       totalBills,
@@ -91,7 +92,7 @@ export const useBillAnalytics = (bills = []) => {
 /**
  * Get available categories from bills
  */
-export const useAvailableCategories = (bills = []) => {
+export const useAvailableCategories = (bills: Bill[] = []) => {
   return useMemo(() => {
     const categories = [...new Set(bills.map((bill) => bill.category).filter(Boolean))];
     return categories.sort();
@@ -101,17 +102,17 @@ export const useAvailableCategories = (bills = []) => {
 /**
  * Utility functions for bill operations
  */
-export const useBillUtilities = (bills = []) => {
+export const useBillUtilities = (bills: Bill[] = []) => {
   return useMemo(() => {
-    const getBillById = (billId) => {
+    const getBillById = (billId: string) => {
       return bills.find((bill) => bill.id === billId);
     };
 
-    const getBillsByCategory = (category) => {
+    const getBillsByCategory = (category: string) => {
       return bills.filter((bill) => bill.category === category);
     };
 
-    const getBillsByStatus = (status) => {
+    const getBillsByStatus = (status: "paid" | "unpaid" | "overdue" | "upcoming") => {
       const now = new Date();
       switch (status) {
         case "paid":
@@ -139,7 +140,7 @@ export const useBillUtilities = (bills = []) => {
       }
     };
 
-    const getNextDueDate = (billId) => {
+    const getNextDueDate = (billId: string) => {
       const bill = getBillById(billId);
       if (!bill || !bill.dueDate) return null;
 
@@ -156,16 +157,6 @@ export const useBillUtilities = (bills = []) => {
         const currentMonth = today.getMonth();
 
         switch (bill.frequency) {
-          case "weekly":
-            while (nextDate <= today) {
-              nextDate.setDate(nextDate.getDate() + 7);
-            }
-            break;
-          case "biweekly":
-            while (nextDate <= today) {
-              nextDate.setDate(nextDate.getDate() + 14);
-            }
-            break;
           case "monthly":
             nextDate.setFullYear(currentYear);
             nextDate.setMonth(currentMonth);
@@ -178,7 +169,7 @@ export const useBillUtilities = (bills = []) => {
               nextDate.setMonth(nextDate.getMonth() + 3);
             }
             break;
-          case "yearly":
+          case "annually":
             nextDate.setFullYear(currentYear);
             if (nextDate <= today) {
               nextDate.setFullYear(nextDate.getFullYear() + 1);
