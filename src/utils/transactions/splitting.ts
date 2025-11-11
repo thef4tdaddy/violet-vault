@@ -102,7 +102,7 @@ export const initializeSplitsFromTransaction = (
  * Calculate split totals and validation status
  */
 export const calculateSplitTotals = (
-  transaction: Transaction,
+  transaction: Transaction | null | undefined,
   splitAllocations: SplitAllocation[] = []
 ): SplitTotals => {
   try {
@@ -382,7 +382,7 @@ export const prepareSplitTransactions = (
  */
 export const getSplitSummary = (
   splitAllocations: SplitAllocation[] = [],
-  transaction: Transaction
+  transaction: Transaction | null | undefined
 ): {
   totalSplits: number;
   originalAmount: number;
@@ -394,6 +394,19 @@ export const getSplitSummary = (
   canSubmit: boolean;
 } => {
   try {
+    if (!transaction) {
+      return {
+        totalSplits: 0,
+        originalAmount: 0,
+        allocatedAmount: 0,
+        remainingAmount: 0,
+        isValid: false,
+        isBalanced: false,
+        validationErrors: ["No transaction selected"],
+        canSubmit: false,
+      };
+    }
+
     const totals = calculateSplitTotals(transaction, splitAllocations);
     const validationErrors = validateSplitAllocations(splitAllocations, transaction);
 

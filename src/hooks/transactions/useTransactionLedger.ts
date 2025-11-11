@@ -21,8 +21,9 @@ export const useTransactionLedger = (currentUser: unknown) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
   const {
     transactions = [],
-    addTransaction,
+    addTransactionAsync,
     deleteTransaction,
+    updateTransactionAsync,
     isLoading: transactionsLoading,
   } = useTransactions();
 
@@ -32,17 +33,15 @@ export const useTransactionLedger = (currentUser: unknown) => {
   const budget = useBudgetStore(
     useShallow(
       (state: {
-        updateTransaction?: (transaction: unknown) => void;
         setAllTransactions?: (transactions: unknown[]) => void;
         updateBill?: (bill: unknown) => void;
       }) => ({
-        updateTransaction: state.updateTransaction,
         setAllTransactions: state.setAllTransactions,
         updateBill: state.updateBill,
       })
     )
   );
-  const { updateTransaction, setAllTransactions, updateBill } = budget;
+  const { setAllTransactions, updateBill } = budget;
 
   // Use extracted state management hook
   const ledgerState = useLedgerState();
@@ -99,7 +98,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Use extracted operations hook
   const operations = useLedgerOperations(
-    addTransaction,
+    addTransactionAsync,
     deleteTransaction,
     updateBill,
     envelopes as unknown as Array<Record<string, unknown>>
@@ -108,8 +107,29 @@ export const useTransactionLedger = (currentUser: unknown) => {
   // New validated form hook
   const validatedForm = useTransactionFormValidated({
     editingTransaction: ledgerState.editingTransaction,
-    onAddTransaction: (transaction) => addTransaction(transaction as unknown as TransactionInput),
-    onUpdateTransaction: updateTransaction,
+    onAddTransaction: (transaction) =>
+      addTransactionAsync({
+        date: transaction.date,
+        amount: transaction.amount,
+        category: transaction.category,
+        description: transaction.description,
+        envelopeId: transaction.envelopeId,
+        type: transaction.type,
+        notes: transaction.notes,
+      } as TransactionInput),
+    onUpdateTransaction: (transaction) =>
+      updateTransactionAsync({
+        id: String(transaction.id),
+        updates: {
+          date: new Date(transaction.date),
+          amount: transaction.amount,
+          category: transaction.category,
+          description: transaction.description,
+          envelopeId: transaction.envelopeId,
+          notes: transaction.notes,
+          type: transaction.type,
+        },
+      }),
     onDeleteTransaction: async (id) => {
       await deleteTransaction(id as never);
     },
@@ -123,7 +143,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   });
 
   // Event handlers
-  const handleSubmitTransaction = () => {
+  const handleSubmitTransaction = async () => {
     const newTransaction = createTransaction(currentUser);
 
     if (ledgerState.editingTransaction) {
@@ -131,10 +151,39 @@ export const useTransactionLedger = (currentUser: unknown) => {
         ...newTransaction,
         id: ledgerState.editingTransaction.id,
       };
-      updateTransaction?.(transactionWithId);
-      ledgerState.setEditingTransaction(null);
+      try {
+        await updateTransactionAsync({
+          id: String(transactionWithId.id),
+          updates: {
+            date: new Date(transactionWithId.date),
+            amount: transactionWithId.amount,
+            category: transactionWithId.category,
+            description: transactionWithId.description,
+            envelopeId: transactionWithId.envelopeId ?? "",
+            notes: transactionWithId.notes,
+            type: transactionWithId.type,
+          },
+        });
+        logger.info("✅ Transaction updated", {
+          id: transactionWithId.id,
+          amount: transactionWithId.amount,
+        });
+        ledgerState.setEditingTransaction(null);
+      } catch (error) {
+        logger.error("Failed to update transaction", { error });
+        return;
+      }
     } else {
-      addTransaction(newTransaction as TransactionInput);
+      try {
+        await addTransactionAsync(newTransaction as TransactionInput);
+        logger.info("✅ Transaction added", {
+          amount: newTransaction.amount,
+          type: newTransaction.type,
+        });
+      } catch (error) {
+        logger.error("Failed to add transaction", { error });
+        return;
+      }
     }
 
     ledgerState.setShowAddModal(false);
