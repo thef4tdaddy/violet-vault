@@ -21,6 +21,9 @@ export interface Envelope {
   targetAmount?: number;
   description?: string;
   autoAllocate?: boolean;
+  envelopeType?: string;
+  monthlyBudget?: number;
+  biweeklyAllocation?: number;
   // Connection properties
   billId?: string;
   debtId?: string;

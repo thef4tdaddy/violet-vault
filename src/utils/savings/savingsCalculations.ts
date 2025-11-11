@@ -2,6 +2,22 @@
 import logger from "../common/logger";
 import type { SavingsGoal } from "@/db/types";
 
+export interface ProcessedSavingsGoal extends SavingsGoal {
+  progressRate: number;
+  remainingAmount: number;
+  isCompleted: boolean;
+  daysRemaining: number | null;
+  monthlyNeeded: number;
+  urgency: string;
+  milestones: Array<{
+    percentage: number;
+    amount: number;
+    isReached: boolean;
+    label: string;
+  }>;
+  recommendedContribution: number;
+}
+
 /**
  * Calculate progress rate as percentage
  */
@@ -148,7 +164,10 @@ export const calculateRecommendedContribution = (
 /**
  * Process and enrich a savings goal with calculated fields
  */
-export const processSavingsGoal = (goal: SavingsGoal, fromDate: Date = new Date()) => {
+export const processSavingsGoal = (
+  goal: SavingsGoal,
+  fromDate: Date = new Date()
+): ProcessedSavingsGoal => {
   const currentAmount = goal.currentAmount || 0;
   const targetAmount = goal.targetAmount || 0;
 
@@ -187,12 +206,7 @@ export const processSavingsGoal = (goal: SavingsGoal, fromDate: Date = new Date(
 /**
  * Get sort value from goal based on field
  */
-const getSavingsGoalSortValue = (goal: SavingsGoal & { 
-  progressRate?: number; 
-  remainingAmount?: number; 
-  monthlyNeeded?: number; 
-  urgency?: string; 
-}, sortBy: string) => {
+const getSavingsGoalSortValue = (goal: ProcessedSavingsGoal, sortBy: string) => {
   const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
 
   const valueExtractors: Record<string, () => unknown> = {
@@ -223,12 +237,7 @@ const compareSortValues = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "des
  * Sort savings goals by various criteria
  */
 export const sortSavingsGoals = (
-  goals: (SavingsGoal & { 
-    progressRate?: number; 
-    remainingAmount?: number; 
-    monthlyNeeded?: number; 
-    urgency?: string; 
-  })[], 
+  goals: ProcessedSavingsGoal[],
   sortBy = "targetDate", 
   sortOrder: "asc" | "desc" = "asc"
 ) => {
@@ -242,13 +251,7 @@ export const sortSavingsGoals = (
 /**
  * Check if goal matches status filter
  */
-const matchesStatusFilter = (
-  goal: SavingsGoal & { 
-    isCompleted?: boolean; 
-    urgency?: string; 
-  }, 
-  status: string
-) => {
+const matchesStatusFilter = (goal: ProcessedSavingsGoal, status: string) => {
   if (status === "all") return true;
 
   switch (status) {
@@ -269,10 +272,7 @@ const matchesStatusFilter = (
  * Check if goal matches attribute filters
  */
 const matchesAttributeFilters = (
-  goal: SavingsGoal & { 
-    isCompleted?: boolean; 
-    urgency?: string; 
-  }, 
+  goal: ProcessedSavingsGoal,
   filters: {
     category?: string;
     priority?: string;
@@ -298,10 +298,7 @@ const matchesAttributeFilters = (
  * Filter savings goals by status and other criteria
  */
 export const filterSavingsGoals = (
-  goals: (SavingsGoal & { 
-    isCompleted?: boolean; 
-    urgency?: string; 
-  })[],
+  goals: ProcessedSavingsGoal[],
   filters: { status?: string; includeCompleted?: boolean } = {}
 ) => {
   const { status = "all", includeCompleted = true } = filters;
@@ -316,13 +313,7 @@ export const filterSavingsGoals = (
 /**
  * Calculate savings goals summary statistics
  */
-export const calculateSavingsSummary = (
-  goals: (SavingsGoal & { 
-    isCompleted?: boolean; 
-    urgency?: string; 
-    monthlyNeeded?: number; 
-  })[]
-) => {
+export const calculateSavingsSummary = (goals: ProcessedSavingsGoal[]) => {
   const totalGoals = goals.length;
   const completedGoals = goals.filter((g) => g.isCompleted).length;
   const activeGoals = totalGoals - completedGoals;

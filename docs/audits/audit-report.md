@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | 0 |
-| TypeScript Errors | 23 | +6 |
-| TypeScript Strict Mode Errors | 3541 | -30 |
+| ESLint Issues | 0 | 0 |
+| TypeScript Errors | 0 | -21 |
+| TypeScript Strict Mode Errors | 3519 | -20 |
 
-*Last updated: 2025-11-11 18:06:04 UTC*
+*Last updated: 2025-11-11 18:28:32 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,81 +26,15 @@
 
 ## Lint Audit
 
-### Files with Most Issues
-- 1 issues in `violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts`
+✅ **All files passed ESLint validation!**
 
-### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 1 | `no-redeclare` |
-
-### Detailed Lint Report
-```
-violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:359:14 - 2 - 'getUniquePayers' is already defined. (no-redeclare)
-```
+Last check: 2025-11-11 18:28:05 UTC
 
 ## Typecheck Audit
 
-### Files with Most Type Errors
-- 6 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
-- 6 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
-- 4 errors in `src/utils/budgeting/autofunding/simulation.ts`
-- 2 errors in `src/hooks/savings/useSavingsGoals/savingsQueries.ts`
-- 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
-- 1 errors in `src/hooks/savings/useSavingsGoals/index.ts`
-- 1 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
-- 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
+✅ **All files passed TypeScript type checking!**
 
-### Type Error Breakdown by Category
-| Count | Error Code |
-|---|---|
-| 10 | `TS2339` |
-| 9 | `TS2345` |
-| 2 | `TS2451` |
-| 1 | `TS2459` |
-| 1 | `TS2362` |
-
-### Detailed Type Error Report
-```
-src/hooks/budgeting/autofunding/useUndoOperations.ts(4,15): error TS2459: Module '"./useExecutionHistory"' declares 'ExecutionRecord' locally, but it is not exported.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(18,27): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(18,66): error TS2339: Property 'length' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(19,33): error TS2339: Property 'map' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(40,34): error TS2339: Property 'length' does not exist on type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(41,24): error TS2345: Argument of type '{ fromEnvelopeId: any; toEnvelopeId: any; amount: unknown; description: unknown; executedAt: any; }' is not assignable to parameter of type '{ fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; executedAt: string; }'.
-  Types of property 'amount' are incompatible.
-    Type 'unknown' is not assignable to type 'number'.
-src/hooks/budgeting/mutations/useUpdateEnvelope.ts(57,63): error TS2345: Argument of type '{ name: unknown; category: unknown; }' is not assignable to parameter of type 'Partial<Envelope>'.
-  Types of property 'name' are incompatible.
-    Type 'unknown' is not assignable to type 'string'.
-src/hooks/budgeting/useBudgetData/mutations.ts(17,56): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Envelope, "lastModified" | "createdAt">'.
-  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Envelope, "lastModified" | "createdAt">': name, category, id, archived
-src/hooks/budgeting/useBudgetData/mutations.ts(65,59): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
-  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Transaction, "lastModified" | "createdAt">': category, id, date, amount, and 2 more.
-src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
-src/hooks/savings/useSavingsGoals/index.ts(78,36): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean; urgency?: string; monthlyNeeded?: number; })[]'.
-  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean; urgency?: string; monthlyNeeded?: number; }'.
-    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': name, targetAmount, currentAmount, isPaused, lastModified
-src/hooks/savings/useSavingsGoals/savingsQueries.ts(54,67): error TS2345: Argument of type 'string' is not assignable to parameter of type '"asc" | "desc"'.
-src/hooks/savings/useSavingsGoals/savingsQueries.ts(111,33): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean; urgency?: string; })[]'.
-  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean; urgency?: string; }'.
-    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': category, priority, targetAmount, currentAmount, and 2 more.
-src/utils/budgeting/autofunding/simulation.ts(57,70): error TS2345: Argument of type 'AutoFundingRule' is not assignable to parameter of type 'Rule'.
-  The types of 'config.conditions' are incompatible between these types.
-    Type 'RuleCondition[]' is not assignable to type 'Condition[]'.
-      Type 'RuleCondition' is not assignable to type 'Condition'.
-        Types of property 'value' are incompatible.
-          Type 'unknown' is not assignable to type 'number'.
-src/utils/budgeting/autofunding/simulation.ts(430,22): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
-src/utils/budgeting/autofunding/simulation.ts(508,38): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
-src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
-src/utils/budgeting/paycheckAllocationUtils.ts(260,23): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(260,61): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(261,21): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property 'monthlyBudget' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(332,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
-src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
-```
+Last check: 2025-11-11 18:28:21 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -185,7 +119,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 13 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
-- 12 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
 - 12 errors in `src/utils/accounts/accountHelpers.ts`
 - 12 errors in `src/hooks/transactions/useTransactionImportProcessing.ts`
@@ -202,7 +135,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 11 errors in `src/utils/bills/billDetailUtils.ts`
 - 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
 - 11 errors in `src/hooks/debts/useDebtDashboard.ts`
-- 11 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 11 errors in `src/hooks/analytics/useTrendAnalysis.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
@@ -233,6 +165,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 9 errors in `src/utils/debug/syncDiagnostic.ts`
 - 9 errors in `src/utils/debug/reactErrorDetector.ts`
 - 9 errors in `src/utils/budgeting/envelopeMatching.ts`
+- 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/utils/analytics/trendHelpers.ts`
 - 9 errors in `src/services/bugReport/uiStateService.ts`
 - 9 errors in `src/hooks/debts/useDebtDetailModal.ts`
@@ -305,7 +238,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 6 errors in `src/utils/debts/debtDebugConfig.ts`
 - 6 errors in `src/utils/dataManagement/validationUtils.ts`
 - 6 errors in `src/utils/common/BaseMutex.ts`
-- 6 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
 - 6 errors in `src/services/firebaseSyncService.ts`
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
@@ -334,6 +266,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 5 errors in `src/hooks/sync/useManualSync.ts`
 - 5 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
 - 5 errors in `src/hooks/settings/useSettingsDashboard.ts`
+- 5 errors in `src/hooks/savings/useSavingsGoals/index.ts`
 - 5 errors in `src/hooks/common/useFABActions.ts`
 - 5 errors in `src/hooks/common/useActualBalance.ts`
 - 5 errors in `src/hooks/common/bug-report/useBugReportHighlight.ts`
@@ -377,7 +310,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 4 errors in `src/hooks/common/useDataInitialization.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetHistoryQuery.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetData/queries.ts`
-- 4 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 4 errors in `src/hooks/bills/useBillValidation.ts`
 - 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
@@ -420,8 +352,8 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 3 errors in `src/hooks/common/useNetworkStatus.ts`
 - 3 errors in `src/hooks/common/bug-report/useBugReportSubmission.ts`
 - 3 errors in `src/hooks/common/bug-report/useBugReportDiagnostics.ts`
-- 3 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
 - 3 errors in `src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
+- 3 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
 - 3 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 3 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
@@ -472,15 +404,14 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
 - 2 errors in `src/hooks/security/useSecuritySettingsLogic.ts`
-- 2 errors in `src/hooks/savings/useSavingsGoals/savingsQueries.ts`
-- 2 errors in `src/hooks/savings/useSavingsGoals/index.ts`
 - 2 errors in `src/hooks/mobile/useBottomNavigation.ts`
 - 2 errors in `src/hooks/common/useTransactions.ts`
 - 2 errors in `src/hooks/common/useRouterPageDetection.ts`
 - 2 errors in `src/hooks/budgeting/usePaydayPrediction.ts`
 - 2 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
 - 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
-- 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
+- 2 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
+- 2 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts`
 - 2 errors in `src/hooks/auth/useSecurityManager.ts`
 - 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
@@ -560,7 +491,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
 - 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
-- 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
@@ -609,13 +539,13 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1347 | `TS7006` |
+| 1344 | `TS7006` |
 | 907 | `TS7031` |
-| 246 | `TS2345` |
-| 237 | `TS2339` |
-| 210 | `TS18046` |
+| 238 | `TS2345` |
+| 229 | `TS2339` |
+| 206 | `TS18046` |
 | 132 | `TS7053` |
-| 122 | `TS2322` |
+| 127 | `TS2322` |
 | 80 | `TS18048` |
 | 77 | `TS7005` |
 | 52 | `TS18047` |
@@ -629,15 +559,13 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 | 4 | `TS2783` |
 | 4 | `TS2722` |
 | 4 | `TS2538` |
-| 4 | `TS2352` |
+| 3 | `TS2352` |
 | 2 | `TS7022` |
-| 2 | `TS2451` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
 | 1 | `TS2774` |
 | 1 | `TS2683` |
 | 1 | `TS2532` |
-| 1 | `TS2459` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
 | 1 | `TS18049` |
@@ -1650,13 +1578,13 @@ src/components/layout/ViewRenderer.tsx(235,9): error TS2322: Type 'Transaction[]
     Index signature for type 'string' is missing in type 'Transaction'.
 src/components/layout/ViewRenderer.tsx(244,9): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type 'never[]'.
   Type 'Record<string, unknown>' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(265,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
+src/components/layout/ViewRenderer.tsx(267,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(266,9): error TS2322: Type 'PaycheckHistory[]' is not assignable to type 'never[]'.
+src/components/layout/ViewRenderer.tsx(268,9): error TS2322: Type 'PaycheckHistory[]' is not assignable to type 'never[]'.
   Type 'PaycheckHistory' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(276,9): error TS2322: Type 'Transaction[]' is not assignable to type 'never[]'.
+src/components/layout/ViewRenderer.tsx(278,9): error TS2322: Type 'Transaction[]' is not assignable to type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(277,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
+src/components/layout/ViewRenderer.tsx(279,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
 src/components/mobile/FABActionMenu.tsx(121,30): error TS7006: Parameter 'action' implicitly has an 'any' type.
 src/components/mobile/FABActionMenu.tsx(121,38): error TS7006: Parameter 'index' implicitly has an 'any' type.
@@ -2607,8 +2535,7 @@ src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(97,2
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(104,22): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(135,18): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(139,18): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(70,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionHistory.ts(28,37): error TS7006: Parameter 'executionRecord' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(77,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(68,37): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number | Date'.
@@ -2623,7 +2550,6 @@ src/hooks/budgeting/autofunding/useExecutionHistory.ts(75,37): error TS2769: No 
   Overload 2 of 4, '(value: string | number): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
-src/hooks/budgeting/autofunding/useExecutionHistory.ts(91,6): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(10,47): error TS7006: Parameter 'executionHistory' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(14,10): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(17,10): error TS7006: Parameter 'sum' implicitly has an 'any' type.
@@ -2635,18 +2561,8 @@ src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,50): error TS7006: 
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,55): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(35,10): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useUndoOperations.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(4,15): error TS2459: Module '"./useExecutionHistory"' declares 'ExecutionRecord' locally, but it is not exported.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(10,17): error TS18046: 'result.targetEnvelopes' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(18,27): error TS18046: 'result.amount' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(18,43): error TS18046: 'result.targetEnvelopes' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(19,10): error TS18046: 'result.targetEnvelopes' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(19,38): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(40,34): error TS2339: Property 'length' does not exist on type '{}'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(41,24): error TS2345: Argument of type '{ fromEnvelopeId: any; toEnvelopeId: any; amount: unknown; description: {}; executedAt: any; }' is not assignable to parameter of type '{ fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; executedAt: string; }'.
-  Types of property 'amount' are incompatible.
-    Type 'unknown' is not assignable to type 'number'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(77,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(77,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(188,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(188,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(27,23): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(31,59): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(36,27): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
@@ -2657,14 +2573,6 @@ src/hooks/budgeting/mutations/useTransferFunds.ts(45,25): error TS18048: 'fromEn
 src/hooks/budgeting/mutations/useTransferFunds.ts(50,25): error TS18048: 'toEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(70,25): error TS18048: 'fromEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(74,25): error TS18048: 'toEnvelope.currentBalance' is possibly 'undefined'.
-src/hooks/budgeting/mutations/useUpdateEnvelope.ts(57,63): error TS2345: Argument of type '{ name: {} | null; category: {} | null; }' is not assignable to parameter of type 'Partial<Envelope>'.
-  Types of property 'name' are incompatible.
-    Type '{} | null' is not assignable to type 'string | undefined'.
-      Type 'null' is not assignable to type 'string | undefined'.
-src/hooks/budgeting/useBudgetData/mutations.ts(17,56): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Envelope, "lastModified" | "createdAt">'.
-  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Envelope, "lastModified" | "createdAt">': category, id, archived, name
-src/hooks/budgeting/useBudgetData/mutations.ts(65,59): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
-  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Transaction, "lastModified" | "createdAt">': type, category, id, date, and 2 more.
 src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(81,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(105,49): error TS2345: Argument of type 'BudgetRecord | null' is not assignable to parameter of type 'BudgetMetadata'.
   Type 'null' is not assignable to type 'BudgetMetadata'.
@@ -2675,9 +2583,8 @@ src/hooks/budgeting/useBudgetData/queries.ts(10,24): error TS7006: Parameter 'qu
 src/hooks/budgeting/useBudgetData/queries.ts(13,28): error TS7006: Parameter 'queries' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/queries.ts(14,24): error TS7006: Parameter 'query' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/queryFunctions.ts(66,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/hooks/budgeting/useBudgetData/utilities.ts(16,17): error TS7006: Parameter 'filters' implicitly has an 'any' type.
-src/hooks/budgeting/useBudgetData/utilities.ts(18,20): error TS7006: Parameter 'dateRange' implicitly has an 'any' type.
-src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
+src/hooks/budgeting/useBudgetData/utilities.ts(17,17): error TS7006: Parameter 'filters' implicitly has an 'any' type.
+src/hooks/budgeting/useBudgetData/utilities.ts(19,20): error TS7006: Parameter 'dateRange' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(25,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(63,40): error TS2345: Argument of type '{ hash: string; message: string; author: string; parentHash: string | null; deviceFingerprint: string; encryptedSnapshot: number[]; iv: number[]; timestamp: number; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
@@ -3149,19 +3056,36 @@ src/hooks/receipts/useReceiptToTransaction.ts(108,39): error TS18046: 'error' is
 src/hooks/receipts/useReceiptToTransaction.ts(130,37): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
 src/hooks/receipts/useReceiptToTransaction.ts(130,47): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
 src/hooks/receipts/useReceiptToTransaction.ts(158,10): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoals/index.ts(53,7): error TS2352: Conversion of type 'UseQueryResult<(SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; })[], Error>' to type '{ data: SavingsGoal[]; isLoading: boolean; isError: boolean; error: Error | null; refetch: () => void; isFetching: boolean; isStale: boolean; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-  Type 'QueryObserverPlaceholderResult<(SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; })[], Error>' is not comparable to type '{ data: SavingsGoal[]; isLoading: boolean; isError: boolean; error: Error | null; refetch: () => void; isFetching: boolean; isStale: boolean; }'.
-    Types of property 'data' are incompatible.
-      Type '(SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; })[]' is not comparable to type 'SavingsGoal[]'.
-        Type 'SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; }' is not comparable to type 'SavingsGoal'.
-          Index signature for type 'string' is missing in type 'SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; }'.
-src/hooks/savings/useSavingsGoals/index.ts(78,36): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; monthlyNeeded?: number | undefined; })[]'.
-  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; monthlyNeeded?: number | undefined; }'.
-    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': name, targetAmount, currentAmount, isPaused, lastModified
-src/hooks/savings/useSavingsGoals/savingsQueries.ts(54,67): error TS2345: Argument of type 'string' is not assignable to parameter of type '"asc" | "desc" | undefined'.
-src/hooks/savings/useSavingsGoals/savingsQueries.ts(111,33): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; })[]'.
-  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; }'.
-    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': category, priority, targetAmount, currentAmount, and 2 more.
+src/hooks/savings/useSavingsGoals/index.ts(85,9): error TS2322: Type 'UseMutationResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>' is not assignable to type 'MutationHandler'.
+  Type 'Override<MutationObserverIdleResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>, { mutate: UseMutateFunction<...>; }> & { ...; }' is not assignable to type 'MutationHandler'.
+    Types of property 'mutateAsync' are incompatible.
+      Type 'UseMutateAsyncFunction<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+        Types of parameters 'variables' and 'args' are incompatible.
+          Type 'unknown' is not assignable to type 'NewSavingsGoalData'.
+src/hooks/savings/useSavingsGoals/index.ts(86,9): error TS2322: Type 'UseMutationResult<SavingsGoal, Error, { goalId: string; updates: Partial<SavingsGoal>; }, unknown>' is not assignable to type 'MutationHandler'.
+  Type 'Override<MutationObserverIdleResult<SavingsGoal, Error, { goalId: string; updates: Partial<SavingsGoal>; }, unknown>, { ...; }> & { ...; }' is not assignable to type 'MutationHandler'.
+    Types of property 'mutateAsync' are incompatible.
+      Type 'UseMutateAsyncFunction<SavingsGoal, Error, { goalId: string; updates: Partial<SavingsGoal>; }, unknown>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+        Types of parameters 'variables' and 'args' are incompatible.
+          Type 'unknown' is not assignable to type '{ goalId: string; updates: Partial<SavingsGoal>; }'.
+src/hooks/savings/useSavingsGoals/index.ts(87,9): error TS2322: Type 'UseMutationResult<string, Error, string, unknown>' is not assignable to type 'MutationHandler'.
+  Type 'Override<MutationObserverIdleResult<string, Error, string, unknown>, { mutate: UseMutateFunction<string, Error, string, unknown>; }> & { ...; }' is not assignable to type 'MutationHandler'.
+    Types of property 'mutateAsync' are incompatible.
+      Type 'UseMutateAsyncFunction<string, Error, string, unknown>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+        Types of parameters 'variables' and 'args' are incompatible.
+          Type 'unknown' is not assignable to type 'string'.
+src/hooks/savings/useSavingsGoals/index.ts(88,9): error TS2322: Type 'UseMutationResult<{ updatedGoal: SavingsGoal; contributionTransaction: { id: string; date: Date; description: string; amount: number; envelopeId: string; category: string; type: "expense"; lastModified: number; createdAt: number; }; }, Error, { ...; }, unknown>' is not assignable to type 'MutationHandler'.
+  Type 'Override<MutationObserverIdleResult<{ updatedGoal: SavingsGoal; contributionTransaction: { id: string; date: Date; description: string; amount: number; envelopeId: string; category: string; type: "expense"; lastModified: number; createdAt: number; }; }, Error, { ...; }, unknown>, { ...; }> & { ...; }' is not assignable to type 'MutationHandler'.
+    Types of property 'mutateAsync' are incompatible.
+      Type 'UseMutateAsyncFunction<{ updatedGoal: SavingsGoal; contributionTransaction: { id: string; date: Date; description: string; amount: number; envelopeId: string; category: string; type: "expense"; lastModified: number; createdAt: number; }; }, Error, { ...; }, unknown>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+        Types of parameters 'variables' and 'args' are incompatible.
+          Type 'unknown' is not assignable to type '{ goalId: string; amount: string | number; description?: string | undefined; }'.
+src/hooks/savings/useSavingsGoals/index.ts(89,9): error TS2322: Type 'UseMutationResult<{ totalAmount: number; results: { goalId: string; goalName: string; amount: number; updatedGoal: SavingsGoal; transaction: { id: string; date: Date; description: string; amount: number; ... 4 more ...; createdAt: number; }; }[]; summary: string; }, Error, { ...; }, unknown>' is not assignable to type 'MutationHandler'.
+  Type 'Override<MutationObserverIdleResult<{ totalAmount: number; results: { goalId: string; goalName: string; amount: number; updatedGoal: SavingsGoal; transaction: { id: string; date: Date; description: string; ... 5 more ...; createdAt: number; }; }[]; summary: string; }, Error, { ...; }, unknown>, { ...; }> & { ...; }' is not assignable to type 'MutationHandler'.
+    Types of property 'mutateAsync' are incompatible.
+      Type 'UseMutateAsyncFunction<{ totalAmount: number; results: { goalId: string; goalName: string; amount: number; updatedGoal: SavingsGoal; transaction: { id: string; date: Date; description: string; amount: number; ... 4 more ...; createdAt: number; }; }[]; summary: string; }, Error, { ...; }, unknown>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
+        Types of parameters 'variables' and 'args' are incompatible.
+          Type 'unknown' is not assignable to type '{ distribution: Record<string, string | number>; description?: string | undefined; }'.
 src/hooks/savings/useSavingsGoalsActions.ts(10,35): error TS7031: Binding element 'onAddGoal' implicitly has an 'any' type.
 src/hooks/savings/useSavingsGoalsActions.ts(10,46): error TS7031: Binding element 'onUpdateGoal' implicitly has an 'any' type.
 src/hooks/savings/useSavingsGoalsActions.ts(10,60): error TS7031: Binding element 'onDeleteGoal' implicitly has an 'any' type.
@@ -4056,9 +3980,6 @@ src/utils/budgeting/autofunding/simulation.ts(273,16): error TS18047: 'simulatio
 src/utils/budgeting/autofunding/simulation.ts(274,13): error TS18047: 'simulation.simulation' is possibly 'null'.
 src/utils/budgeting/autofunding/simulation.ts(275,36): error TS2345: Argument of type '{ totalPlanned: number; rulesExecuted: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; ruleId: string; ruleName: string; }[]; ruleResults: { ...; }[]; remainingCash: number; errors: { ...; }[]; } | null' is not assignable to parameter of type '{ errors: { error: string; }[]; rulesExecuted: number; remainingCash: number; }'.
   Type 'null' is not assignable to type '{ errors: { error: string; }[]; rulesExecuted: number; remainingCash: number; }'.
-src/utils/budgeting/autofunding/simulation.ts(430,22): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
-src/utils/budgeting/autofunding/simulation.ts(508,38): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
-src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
 src/utils/budgeting/billEnvelopeCalculations.ts(78,29): error TS7006: Parameter 'targetDate' implicitly has an 'any' type.
 src/utils/budgeting/billEnvelopeCalculations.ts(88,35): error TS7006: Parameter 'currentBalance' implicitly has an 'any' type.
 src/utils/budgeting/billEnvelopeCalculations.ts(88,51): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
@@ -4145,12 +4066,6 @@ src/utils/budgeting/envelopeStyles.ts(20,32): error TS7006: Parameter 'envelope'
 src/utils/budgeting/envelopeStyles.ts(39,31): error TS7006: Parameter 'status' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(55,37): error TS7006: Parameter 'utilizationRate' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(55,54): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(260,23): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(260,61): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(261,21): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property 'monthlyBudget' does not exist on type 'Envelope'.
-src/utils/budgeting/paycheckAllocationUtils.ts(332,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
-src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot redeclare block-scoped variable 'getUniquePayers'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/utils/budgeting/paycheckProcessing.ts(35,5): error TS2769: No overload matches this call.
   Overload 1 of 3, '(callbackfn: (previousValue: { currentBalance?: string | number | undefined; }, currentValue: { currentBalance?: string | number | undefined; }, currentIndex: number, array: { currentBalance?: string | ... 1 more ... | undefined; }[]) => { ...; }, initialValue: { ...; }): { ...; }', gave the following error.
@@ -4551,14 +4466,14 @@ src/utils/receipts/receiptHelpers.tsx(201,51): error TS7006: Parameter 'confiden
 src/utils/receipts/receiptHelpers.tsx(209,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
 src/utils/receipts/receiptHelpers.tsx(219,32): error TS7006: Parameter 'bytes' implicitly has an 'any' type.
 src/utils/receipts/receiptHelpers.tsx(226,41): error TS7006: Parameter 'extractedData' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(217,12): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(217,19): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(217,30): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(217,37): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(219,10): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(219,17): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(219,28): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(219,35): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(231,12): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(231,19): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(231,30): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(231,37): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(233,10): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(233,17): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(233,28): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(233,35): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsFormUtils.ts(49,25): error TS2339: Property 'name' does not exist on type 'never'.
 src/utils/savings/savingsFormUtils.ts(50,33): error TS2339: Property 'targetAmount' does not exist on type 'never'.
 src/utils/savings/savingsFormUtils.ts(51,34): error TS2339: Property 'currentAmount' does not exist on type 'never'.

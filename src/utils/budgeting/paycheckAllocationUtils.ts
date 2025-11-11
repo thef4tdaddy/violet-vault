@@ -330,7 +330,7 @@ export const getPayerPrediction = (
  * Get unique payers from paycheck history and temporary payers
  */
 export const getUniquePayers = (
-  paycheckHistory: PaycheckHistory[], 
+  paycheckHistory: PaycheckHistory[],
   tempPayers: string[] = []
 ) => {
   const payers = new Set<string>();
