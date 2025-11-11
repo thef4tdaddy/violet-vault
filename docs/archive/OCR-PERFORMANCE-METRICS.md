@@ -8,22 +8,22 @@ This document provides performance benchmarks and optimization details for the T
 
 ### Initial Load Performance
 
-| Metric | Without Preloading | With Idle Preloading |
-|--------|-------------------|---------------------|
-| First OCR Initialization | 2-5 seconds | < 1 second |
-| Tesseract Worker Load | 1.5-3 seconds | Preloaded |
-| Language Data Download | 500ms-1s | Cached |
-| Total First Scan | 4-9 seconds | 1-3 seconds |
+| Metric                   | Without Preloading | With Idle Preloading |
+| ------------------------ | ------------------ | -------------------- |
+| First OCR Initialization | 2-5 seconds        | < 1 second           |
+| Tesseract Worker Load    | 1.5-3 seconds      | Preloaded            |
+| Language Data Download   | 500ms-1s           | Cached               |
+| Total First Scan         | 4-9 seconds        | 1-3 seconds          |
 
 ### Subsequent Scan Performance
 
-| Metric | Time |
-|--------|------|
-| OCR Processing (simple receipt) | 800ms-1.5s |
-| OCR Processing (complex receipt) | 1.5s-3s |
-| Image preprocessing | 100-200ms |
-| Field extraction | 50-100ms |
-| Total Scan Time | 1-3.5 seconds |
+| Metric                           | Time          |
+| -------------------------------- | ------------- |
+| OCR Processing (simple receipt)  | 800ms-1.5s    |
+| OCR Processing (complex receipt) | 1.5s-3s       |
+| Image preprocessing              | 100-200ms     |
+| Field extraction                 | 50-100ms      |
+| Total Scan Time                  | 1-3.5 seconds |
 
 ## Optimization Strategies
 
@@ -37,6 +37,7 @@ This document provides performance benchmarks and optimization details for the T
 - Non-blocking initialization prevents impact on initial page load
 
 **Code Example**:
+
 ```typescript
 // Preload OCR worker on idle for better receipt scanning performance
 if (typeof window !== "undefined") {
@@ -55,6 +56,7 @@ if (typeof window !== "undefined") {
 - Uses React `lazy()` and `Suspense` for smooth UX
 
 **Bundle Impact**:
+
 - Main bundle: Reduced by ~2.5MB
 - Lazy chunk: Created for OCR functionality
 - Loaded on-demand when user clicks "Scan Receipt"
@@ -70,6 +72,7 @@ if (typeof window !== "undefined") {
 ### 4. Language Data Caching
 
 **Browser Caching**:
+
 - Tesseract language data cached by browser
 - Subsequent page loads reuse cached data
 - No network request after first download
@@ -85,6 +88,7 @@ if (typeof window !== "undefined") {
 5. **Stop Recording** after processing completes
 
 **Metrics to Check**:
+
 - Time to initialize worker
 - OCR processing duration
 - Total time to extracted data display
@@ -103,6 +107,7 @@ The receipt scanner store automatically tracks:
 ```
 
 **Access metrics**:
+
 ```typescript
 const { lastProcessingTime, averageProcessingTime } = useReceiptScannerStore();
 ```
@@ -110,16 +115,18 @@ const { lastProcessingTime, averageProcessingTime } = useReceiptScannerStore();
 ### Performance Debugging
 
 **Console Logs**:
+
 ```typescript
 logger.info("🔍 OCR preloaded successfully");
 logger.info("✅ OCR processing completed", {
   confidence: result.data.confidence,
   processingTimeMs: processingTime,
-  textLength: result.data.text.length
+  textLength: result.data.text.length,
 });
 ```
 
 **Check Store Metrics**:
+
 ```javascript
 // In browser console
 const store = useReceiptScannerStore.getState();
@@ -200,6 +207,7 @@ console.log("Average processing time:", store.averageProcessingTime, "ms");
 ## Conclusion
 
 The OCR receipt scanner is optimized for:
+
 - **Fast initial load**: Idle preloading reduces first-scan latency
 - **Small bundle impact**: Lazy loading keeps main bundle lean
 - **Efficient processing**: Worker reuse and caching optimize subsequent scans
