@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
-| TypeScript Errors | 6 | +6 |
-| TypeScript Strict Mode Errors | 3491 | -28 |
+| ESLint Issues | 3 | +3 |
+| TypeScript Errors | 24 | +18 |
+| TypeScript Strict Mode Errors | 3484 | -7 |
 
-*Last updated: 2025-11-11 18:43:07 UTC*
+*Last updated: 2025-11-11 18:47:08 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,24 +26,60 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 3 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
 
-Last check: 2025-11-11 18:42:45 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 3 | `@typescript-eslint/no-unused-vars` |
+
+### Detailed Lint Report
+```
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:15:10 - 1 - 'StepNavigation' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:37:7 - 1 - 'ModalFooter' is assigned a value but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:110:3 - 1 - 'setStep' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
+```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 18 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 6 errors in `src/utils/common/budgetHistoryTracker.ts`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
+| 6 | `TS2614` |
+| 6 | `TS2339` |
+| 5 | `TS2322` |
+| 3 | `TS6133` |
 | 3 | `TS2345` |
-| 2 | `TS2322` |
 | 1 | `TS2769` |
 
 ### Detailed Type Error Report
 ```
+src/components/automation/AutoFundingRuleBuilder.tsx(9,10): error TS2614: Module '"@/components/ui/ModalCloseButton"' has no exported member 'ModalCloseButton'. Did you mean to use 'import ModalCloseButton from "@/components/ui/ModalCloseButton"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(11,10): error TS2614: Module '"./steps/RuleTypeStep"' has no exported member 'RuleTypeStep'. Did you mean to use 'import RuleTypeStep from "./steps/RuleTypeStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(12,10): error TS2614: Module '"./steps/TriggerScheduleStep"' has no exported member 'TriggerScheduleStep'. Did you mean to use 'import TriggerScheduleStep from "./steps/TriggerScheduleStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(13,10): error TS2614: Module '"./steps/RuleConfigurationStep"' has no exported member 'RuleConfigurationStep'. Did you mean to use 'import RuleConfigurationStep from "./steps/RuleConfigurationStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(14,10): error TS2614: Module '"./steps/ReviewStep"' has no exported member 'ReviewStep'. Did you mean to use 'import ReviewStep from "./steps/ReviewStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(15,1): error TS6133: 'StepNavigation' is declared but its value is never read.
+src/components/automation/AutoFundingRuleBuilder.tsx(15,10): error TS2614: Module '"./components/StepNavigation"' has no exported member 'StepNavigation'. Did you mean to use 'import StepNavigation from "./components/StepNavigation"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(37,7): error TS6133: 'ModalFooter' is declared but its value is never read.
+src/components/automation/AutoFundingRuleBuilder.tsx(75,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(76,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(77,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(110,3): error TS6133: 'setStep' is declared but its value is never read.
+src/components/automation/AutoFundingRuleBuilder.tsx(111,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(112,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(113,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(141,11): error TS2322: Type '{ step: number; ruleData: any; updateRuleData: any; updateConfig: any; envelopes: { id: string; name: string; category: string; currentBalance?: number; }[]; toggleTargetEnvelope: (envelopeId: string) => void; errors: Record<...>; prevStep: () => number; nextStep: () => number; handleSave: () => void; }' is not assignable to type 'IntrinsicAttributes & RuleBuilderModalProps'.
+  Property 'ruleData' does not exist on type 'IntrinsicAttributes & RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(262,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
+  Type 'void' is not assignable to type 'number'.
+src/components/automation/AutoFundingRuleBuilder.tsx(263,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
+  Type 'void' is not assignable to type 'number'.
 src/utils/common/budgetHistoryTracker.ts(98,43): error TS2322: Type '{ commitHash: string; entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; }' is not assignable to type 'BudgetChange'.
   Types of property 'changeType' are incompatible.
     Type 'string' is not assignable to type '"create" | "update" | "delete"'.
@@ -68,7 +104,6 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 39 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 37 errors in `src/stores/ui/uiStoreActions.ts`
 - 37 errors in `src/services/cloudSyncService.ts`
 - 36 errors in `src/utils/security/encryption.ts`
@@ -76,6 +111,7 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 - 34 errors in `src/utils/query/queryKeys.ts`
 - 33 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 32 errors in `src/utils/budgeting/envelopeCalculations.ts`
+- 32 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 28 errors in `src/services/chunkedSyncService.ts`
 - 28 errors in `src/services/budgetHistoryService.ts`
 - 27 errors in `src/services/editLockService.ts`
@@ -569,11 +605,11 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 | Count | Error Code |
 |---|---|
 | 1337 | `TS7006` |
-| 890 | `TS7031` |
+| 864 | `TS7031` |
 | 241 | `TS2345` |
-| 229 | `TS2339` |
+| 235 | `TS2339` |
 | 206 | `TS18046` |
-| 132 | `TS2322` |
+| 136 | `TS2322` |
 | 121 | `TS7053` |
 | 80 | `TS18048` |
 | 77 | `TS7005` |
@@ -581,12 +617,14 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 | 44 | `TS7034` |
 | 28 | `TS2769` |
 | 9 | `TS2353` |
+| 6 | `TS2614` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
 | 5 | `TS2698` |
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
+| 3 | `TS6133` |
 | 3 | `TS2538` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
@@ -793,47 +831,46 @@ src/components/automation/AutoFundingDashboardComponents.tsx(71,3): error TS7031
 src/components/automation/AutoFundingDashboardComponents.tsx(72,3): error TS7031: Binding element 'isExecuting' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboardComponents.tsx(73,3): error TS7031: Binding element 'RulesTabComponent' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboardComponents.tsx(74,3): error TS7031: Binding element 'HistoryTabComponent' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(18,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(18,30): error TS7031: Binding element 'prevStep' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(18,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(18,49): error TS7031: Binding element 'nextStep' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(18,59): error TS7031: Binding element 'handleSave' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(18,71): error TS7031: Binding element 'editingRule' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(48,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(49,3): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(50,3): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(51,3): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(52,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(53,3): error TS7031: Binding element 'toggleTargetEnvelope' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(54,3): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(81,3): error TS7031: Binding element 'editingRule' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(82,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(83,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(84,3): error TS7031: Binding element 'setStep' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(85,3): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(86,3): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(87,3): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(88,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(89,3): error TS7031: Binding element 'toggleTargetEnvelope' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(90,3): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(91,3): error TS7031: Binding element 'prevStep' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(92,3): error TS7031: Binding element 'nextStep' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(93,3): error TS7031: Binding element 'handleSave' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(141,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(142,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(144,3): error TS7031: Binding element 'onSaveRule' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(159,25): error TS2698: Spread types may only be created from object types.
-src/components/automation/AutoFundingRuleBuilder.tsx(159,66): error TS2339: Property 'config' does not exist on type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(164,21): error TS2698: Spread types may only be created from object types.
-src/components/automation/AutoFundingRuleBuilder.tsx(164,62): error TS2339: Property 'config' does not exist on type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(168,27): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(179,25): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(192,33): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(194,48): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(221,28): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+src/components/automation/AutoFundingRuleBuilder.tsx(9,10): error TS2614: Module '"@/components/ui/ModalCloseButton"' has no exported member 'ModalCloseButton'. Did you mean to use 'import ModalCloseButton from "@/components/ui/ModalCloseButton"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(11,10): error TS2614: Module '"./steps/RuleTypeStep"' has no exported member 'RuleTypeStep'. Did you mean to use 'import RuleTypeStep from "./steps/RuleTypeStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(12,10): error TS2614: Module '"./steps/TriggerScheduleStep"' has no exported member 'TriggerScheduleStep'. Did you mean to use 'import TriggerScheduleStep from "./steps/TriggerScheduleStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(13,10): error TS2614: Module '"./steps/RuleConfigurationStep"' has no exported member 'RuleConfigurationStep'. Did you mean to use 'import RuleConfigurationStep from "./steps/RuleConfigurationStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(14,10): error TS2614: Module '"./steps/ReviewStep"' has no exported member 'ReviewStep'. Did you mean to use 'import ReviewStep from "./steps/ReviewStep"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(15,1): error TS6133: 'StepNavigation' is declared but its value is never read.
+src/components/automation/AutoFundingRuleBuilder.tsx(15,10): error TS2614: Module '"./components/StepNavigation"' has no exported member 'StepNavigation'. Did you mean to use 'import StepNavigation from "./components/StepNavigation"' instead?
+src/components/automation/AutoFundingRuleBuilder.tsx(37,7): error TS6133: 'ModalFooter' is declared but its value is never read.
+src/components/automation/AutoFundingRuleBuilder.tsx(75,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(76,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(77,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(110,3): error TS6133: 'setStep' is declared but its value is never read.
+src/components/automation/AutoFundingRuleBuilder.tsx(111,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(112,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(113,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(141,11): error TS2322: Type '{ step: number; ruleData: any; updateRuleData: any; updateConfig: any; envelopes: { id: string; name: string; category: string; currentBalance?: number | undefined; }[]; toggleTargetEnvelope: (envelopeId: string) => void; errors: Record<...>; prevStep: () => number; nextStep: () => number; handleSave: () => void; }' is not assignable to type 'IntrinsicAttributes & RuleBuilderModalProps'.
+  Property 'ruleData' does not exist on type 'IntrinsicAttributes & RuleBuilderModalProps'.
+src/components/automation/AutoFundingRuleBuilder.tsx(157,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+src/components/automation/AutoFundingRuleBuilder.tsx(158,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/automation/AutoFundingRuleBuilder.tsx(160,3): error TS7031: Binding element 'onSaveRule' implicitly has an 'any' type.
+src/components/automation/AutoFundingRuleBuilder.tsx(175,25): error TS2698: Spread types may only be created from object types.
+src/components/automation/AutoFundingRuleBuilder.tsx(175,66): error TS2339: Property 'config' does not exist on type 'never'.
+src/components/automation/AutoFundingRuleBuilder.tsx(180,21): error TS2698: Spread types may only be created from object types.
+src/components/automation/AutoFundingRuleBuilder.tsx(180,62): error TS2339: Property 'config' does not exist on type 'never'.
+src/components/automation/AutoFundingRuleBuilder.tsx(184,27): error TS7006: Parameter 'updates' implicitly has an 'any' type.
+src/components/automation/AutoFundingRuleBuilder.tsx(195,25): error TS7006: Parameter 'updates' implicitly has an 'any' type.
+src/components/automation/AutoFundingRuleBuilder.tsx(208,33): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
+src/components/automation/AutoFundingRuleBuilder.tsx(210,48): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+src/components/automation/AutoFundingRuleBuilder.tsx(237,28): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
   Type 'string[]' is not assignable to type 'never[]'.
     Type 'string' is not assignable to type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(226,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/automation/AutoFundingRuleBuilder.tsx(242,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/automation/AutoFundingRuleBuilder.tsx(261,7): error TS2322: Type 'Record<string, string | undefined>' is not assignable to type 'Record<string, string>'.
+  'string' index signatures are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/automation/AutoFundingRuleBuilder.tsx(262,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
+  Type 'void' is not assignable to type 'number'.
+src/components/automation/AutoFundingRuleBuilder.tsx(263,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
+  Type 'void' is not assignable to type 'number'.
 src/components/automation/AutoFundingView.tsx(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/automation/AutoFundingView.tsx(17,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/automation/AutoFundingView.tsx(17,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
@@ -2129,11 +2166,11 @@ src/components/transactions/TransactionLedger.tsx(479,7): error TS2322: Type '(m
     Type 'unknown' is not assignable to type 'FieldMapping'.
 src/components/transactions/TransactionSplitter.tsx(34,5): error TS2322: Type 'Transaction | null' is not assignable to type 'Transaction | undefined'.
   Type 'null' is not assignable to type 'Transaction | undefined'.
-src/components/transactions/TransactionTable.tsx(315,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
+src/components/transactions/TransactionTable.tsx(316,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
-src/components/transactions/TransactionTable.tsx(319,36): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(367,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionTable.tsx(369,42): error TS2339: Property 'description' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(320,36): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(368,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/components/transactions/TransactionTable.tsx(370,42): error TS2339: Property 'description' does not exist on type 'never'.
 src/contexts/authUtils.ts(81,18): error TS2345: Argument of type '(prev: AuthContextState) => { user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<...> | null; lastActivity: number; error: null; isLoading: boolean; }' is not assignable to parameter of type 'SetStateAction<AuthContextState>'.
   Type '(prev: AuthContextState) => { user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<...> | null; lastActivity: number; error: null; isLoading: boolean; }' is not assignable to type '(prevState: AuthContextState) => AuthContextState'.
     Call signature return types '{ user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<ArrayBufferLike> | null; lastActivity: number; error: null; isLoading: boolean; }' and 'AuthContextState' are incompatible.

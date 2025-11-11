@@ -6,16 +6,42 @@ import {
   type AutoFundingRule,
 } from "../../utils/budgeting/autofunding";
 import { Button } from "@/components/ui";
-import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { ModalCloseButton } from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import RuleTypeStep from "./steps/RuleTypeStep";
-import TriggerScheduleStep from "./steps/TriggerScheduleStep";
-import RuleConfigurationStep from "./steps/RuleConfigurationStep";
-import ReviewStep from "./steps/ReviewStep";
-import StepNavigation from "./components/StepNavigation";
+import { RuleTypeStep } from "./steps/RuleTypeStep";
+import { TriggerScheduleStep } from "./steps/TriggerScheduleStep";
+import { RuleConfigurationStep } from "./steps/RuleConfigurationStep";
+import { ReviewStep } from "./steps/ReviewStep";
+import { StepNavigation } from "./components/StepNavigation";
+
+// Type definitions for the component
+interface RuleBuilderModalProps {
+  editingRule?: AutoFundingRule | null;
+  onClose: () => void;
+  step: number;
+  setStep: (step: number) => void;
+  handleSave: () => void;
+  envelopes: Array<{
+    id: string;
+    name: string;
+    category: string;
+    currentBalance?: number;
+  }>;
+  toggleTargetEnvelope: (envelopeId: string) => void;
+  errors: Record<string, string>;
+  prevStep: () => number;
+  nextStep: () => number;
+}
 
 // Modal footer navigation component
-const ModalFooter = ({ step, prevStep, onClose, nextStep, handleSave, editingRule }) => (
+const ModalFooter = ({ 
+  step, 
+  prevStep, 
+  onClose, 
+  nextStep, 
+  handleSave, 
+  editingRule 
+}: RuleBuilderModalProps) => (
   <div className="p-6 border-t border-gray-200">
     <div className="flex justify-between">
       <Button onClick={step > 1 ? prevStep : onClose} variant="secondary">
@@ -44,20 +70,20 @@ const ModalFooter = ({ step, prevStep, onClose, nextStep, handleSave, editingRul
 );
 
 // Step content renderer
-const StepContent = ({
-  step,
-  ruleData,
-  updateRuleData,
-  updateConfig,
-  envelopes,
-  toggleTargetEnvelope,
-  errors,
-}) => {
+const StepContent = ({ 
+  step, 
+  ruleData, 
+  updateRuleData, 
+  updateConfig, 
+  envelopes, 
+  toggleTargetEnvelope, 
+  errors 
+}: RuleBuilderModalProps) => {
   if (step === 1) {
     return <RuleTypeStep ruleData={ruleData} updateRuleData={updateRuleData} errors={errors} />;
   }
   if (step === 2) {
-    return <TriggerScheduleStep ruleData={ruleData} updateRuleData={updateRuleData} />;
+    return <TriggerScheduleStep ruleData={ruleData} updateRuleData={updateRuleData} errors={errors} />;
   }
   if (step === 3) {
     return (
@@ -91,47 +117,37 @@ const RuleBuilderModal = ({
   prevStep,
   nextStep,
   handleSave,
-}) => {
+}: RuleBuilderModalProps) => {
   const modalRef = useModalAutoScroll(true);
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div
+      ref={modalRef}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
+    >
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border-2 border-black shadow-2xl my-auto"
+        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
       >
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">
-                {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
-              </h3>
-              <ModalCloseButton onClick={onClose} />
-            </div>
-            <StepNavigation currentStep={step} onStepChange={setStep} />
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-6">
-            <StepContent
-              step={step}
-              ruleData={ruleData}
-              updateRuleData={updateRuleData}
-              updateConfig={updateConfig}
-              envelopes={envelopes}
-              toggleTargetEnvelope={toggleTargetEnvelope}
-              errors={errors}
-            />
-          </div>
-
-          <ModalFooter
-            step={step}
-            prevStep={prevStep}
-            onClose={onClose}
-            nextStep={nextStep}
-            handleSave={handleSave}
-            editingRule={editingRule}
-          />
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
+          </h2>
+          <ModalCloseButton onClose={onClose} />
         </div>
+
+        <StepContent
+          step={step}
+          ruleData={ruleData}
+          updateRuleData={updateRuleData}
+          updateConfig={updateConfig}
+          envelopes={envelopes}
+          toggleTargetEnvelope={toggleTargetEnvelope}
+          errors={errors}
+          prevStep={prevStep}
+          nextStep={nextStep}
+          handleSave={handleSave}
+        />
       </div>
     </div>
   );
