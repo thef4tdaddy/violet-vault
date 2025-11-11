@@ -1,16 +1,17 @@
 // Transaction Splitter Service Tests
 import { describe, it, expect, vi } from "vitest";
+import type { Envelope, SplitAllocation, Transaction } from "@/types/finance";
 import { transactionSplitterService } from "../transactionSplitterService";
 
 describe("TransactionSplitterService", () => {
   // Test data
-  const mockEnvelopes = [
-    { id: "env1", name: "Groceries", category: "Food" },
-    { id: "env2", name: "Entertainment", category: "Fun" },
-    { id: "env3", name: "Gas", category: "Transportation" },
+  const mockEnvelopes: Envelope[] = [
+    { id: "env1", name: "Groceries", category: "Food", currentBalance: 0, targetAmount: 0 },
+    { id: "env2", name: "Entertainment", category: "Fun", currentBalance: 0, targetAmount: 0 },
+    { id: "env3", name: "Gas", category: "Transportation", currentBalance: 0, targetAmount: 0 },
   ];
 
-  const mockTransaction = {
+  const mockTransaction: Transaction = {
     id: "txn1",
     date: "2024-01-01",
     description: "Store Purchase",
@@ -160,7 +161,7 @@ describe("TransactionSplitterService", () => {
 
   describe("calculateSplitTotals", () => {
     it("should calculate correct totals", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 25.5, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 34.5, description: "B", category: "Fun", envelopeId: "env2" },
         { id: 3, amount: 40.0, description: "C", category: "Gas", envelopeId: "env3" },
@@ -176,7 +177,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should detect under-allocation", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 30, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 30, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -190,7 +191,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should detect over-allocation", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 60, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -204,7 +205,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should handle rounding errors", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 33.33, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 33.33, description: "B", category: "Fun", envelopeId: "env2" },
         { id: 3, amount: 33.34, description: "C", category: "Gas", envelopeId: "env3" },
@@ -227,7 +228,7 @@ describe("TransactionSplitterService", () => {
 
   describe("validateSplits", () => {
     it("should validate correct splits", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -244,7 +245,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should require description", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 100, description: "", category: "Food", envelopeId: "env1" },
       ];
 
@@ -254,7 +255,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should require valid amount", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 0, description: "Test", category: "Food", envelopeId: "env1" },
       ];
 
@@ -264,7 +265,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should require category", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 100, description: "Test", category: "", envelopeId: "env1" },
       ];
 
@@ -274,7 +275,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should detect total mismatch", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 30, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 30, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -286,7 +287,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should detect over-allocation", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 60, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -297,7 +298,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should accumulate multiple errors", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 0, description: "", category: "", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -311,7 +312,7 @@ describe("TransactionSplitterService", () => {
 
   describe("autoBalanceSplits", () => {
     it("should balance under-allocated splits", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 30, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 30, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -323,7 +324,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should balance over-allocated splits", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 60, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -335,7 +336,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should not modify already balanced splits", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -355,7 +356,7 @@ describe("TransactionSplitterService", () => {
 
   describe("splitEvenly", () => {
     it("should split amount evenly", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 10, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 20, description: "B", category: "Fun", envelopeId: "env2" },
         { id: 3, amount: 30, description: "C", category: "Gas", envelopeId: "env3" },
@@ -369,7 +370,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should handle remainder in first split", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 0, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 0, description: "B", category: "Fun", envelopeId: "env2" },
         { id: 3, amount: 0, description: "C", category: "Gas", envelopeId: "env3" },
@@ -389,7 +390,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should handle single split", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
       ];
 
@@ -401,7 +402,7 @@ describe("TransactionSplitterService", () => {
 
   describe("createSplitTransactions", () => {
     it("should create split transactions with correct structure", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "Food", category: "Groceries", envelopeId: "env1" },
         { id: 2, amount: 50, description: "Gas", category: "Transportation", envelopeId: "env2" },
       ];
@@ -425,7 +426,7 @@ describe("TransactionSplitterService", () => {
 
     it("should preserve transaction sign for negative amounts", () => {
       const transaction = { ...mockTransaction, amount: -100 };
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
       ];
 
@@ -436,7 +437,7 @@ describe("TransactionSplitterService", () => {
 
     it("should preserve transaction sign for positive amounts", () => {
       const transaction = { ...mockTransaction, amount: 100 };
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
       ];
 
@@ -446,7 +447,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should add notes with split information", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 100, description: "Test", category: "Food", envelopeId: "env1" },
       ];
 
@@ -457,7 +458,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should generate unique IDs for each split", () => {
-      const splits = [
+      const splits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -472,7 +473,7 @@ describe("TransactionSplitterService", () => {
 
   describe("createNewSplitAllocation", () => {
     it("should create new split with remaining amount", () => {
-      const existingSplits = [
+      const existingSplits: SplitAllocation[] = [
         { id: 1, amount: 30, description: "A", category: "Food", envelopeId: "env1" },
       ];
 
@@ -488,7 +489,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should handle case where everything is allocated", () => {
-      const existingSplits = [
+      const existingSplits: SplitAllocation[] = [
         { id: 1, amount: 50, description: "A", category: "Food", envelopeId: "env1" },
         { id: 2, amount: 50, description: "B", category: "Fun", envelopeId: "env2" },
       ];
@@ -502,7 +503,7 @@ describe("TransactionSplitterService", () => {
     });
 
     it("should handle over-allocation", () => {
-      const existingSplits = [
+      const existingSplits: SplitAllocation[] = [
         { id: 1, amount: 120, description: "A", category: "Food", envelopeId: "env1" },
       ];
 

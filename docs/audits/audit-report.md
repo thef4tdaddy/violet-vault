@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 61 | +2 |
-| TypeScript Errors | 23 | -6 |
-| TypeScript Strict Mode Errors | 3236 | -36 |
+| ESLint Issues | 13 | 0 |
+| TypeScript Errors | 21 | 0 |
+| TypeScript Strict Mode Errors | 3234 | 0 |
 
-*Last updated: 2025-11-11 21:24:06 UTC*
+*Last updated: 2025-11-11 21:47:35 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,69 +27,19 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 39 issues in `violet-vault/src/services/transactions/transactionSplitterService.ts`
 - 10 issues in `violet-vault/src/utils/security/encryption.ts`
-- 9 issues in `violet-vault/src/services/cloudSyncService.ts`
 - 2 issues in `violet-vault/src/utils/budgeting/envelopeCalculations.ts`
 - 1 issues in `violet-vault/src/stores/ui/uiStore.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 57 | `@typescript-eslint/no-explicit-any` |
+| 9 | `@typescript-eslint/no-explicit-any` |
 | 3 | `complexity` |
 | 1 | `no-undef` |
 
 ### Detailed Lint Report
 ```
-violet-vault/src/services/cloudSyncService.ts:505:38 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:506:37 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:507:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:543:64 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:546:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:549:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:552:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:555:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:558:76 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:13:17 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:14:17 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:21:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:25:64 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:29:28 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:29:67 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:32:26 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:33:22 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:33:61 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:40:25 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:41:27 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:45:35 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:52:27 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:56:35 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:83:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:104:36 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:148:39 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:172:33 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:177:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:187:40 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:187:63 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:188:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:191:30 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:193:54 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:193:88 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:194:27 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:195:29 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:207:35 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:208:33 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:216:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:216:62 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:238:23 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:241:12 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:244:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:245:21 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:246:40 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:250:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:251:23 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/transactions/transactionSplitterService.ts:251:67 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/stores/ui/uiStore.ts:298:23 - 1 - 'BeforeInstallPromptEvent' is not defined. (no-undef)
 violet-vault/src/utils/budgeting/envelopeCalculations.ts:204:11 - 1 - Arrow function has a complexity of 22. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/budgeting/envelopeCalculations.ts:345:49 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
@@ -112,7 +62,6 @@ violet-vault/src/utils/security/encryption.ts:288:42 - 1 - Unexpected any. Speci
 - 2 errors in `src/utils/sync/syncFlowValidator.ts`
 - 2 errors in `src/utils/query/prefetchHelpers.ts`
 - 2 errors in `src/stores/ui/uiStore.ts`
-- 2 errors in `src/services/transactions/transactionSplitterService.ts`
 - 2 errors in `src/services/chunkedSyncService.ts`
 - 1 errors in `src/utils/sync/syncHealthChecker.ts`
 - 1 errors in `src/utils/icons/index.ts`
@@ -131,7 +80,6 @@ violet-vault/src/utils/security/encryption.ts:288:42 - 1 - Unexpected any. Speci
 | 4 | `TS2322` |
 | 3 | `TS2305` |
 | 2 | `TS2554` |
-| 2 | `TS2339` |
 | 1 | `TS2352` |
 | 1 | `TS2304` |
 
@@ -160,11 +108,9 @@ src/hooks/transactions/useTransactionSplitter.ts(19,10): error TS2305: Module '"
 src/hooks/transactions/useTransactionSplitterHelpers.ts(18,3): error TS2305: Module '"@/utils/transactions/splitting"' has no exported member 'hasUnsavedChanges'.
 src/services/chunkedSyncService.ts(567,15): error TS2554: Expected 2 arguments, but got 3.
 src/services/chunkedSyncService.ts(662,17): error TS2554: Expected 2 arguments, but got 3.
-src/services/cloudSyncService.ts(808,4): error TS2352: Conversion of type 'Window & typeof globalThis' to type 'CloudSyncWindow' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/services/cloudSyncService.ts(867,4): error TS2352: Conversion of type 'Window & typeof globalThis' to type 'CloudSyncWindow' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Types of property 'cloudSyncService' are incompatible.
     Type '{ triggerSyncForCriticalChange: (changeType: string) => void; }' is missing the following properties from type 'CloudSyncService': syncIntervalId, isSyncing, config, debounceTimer, and 18 more.
-src/services/transactions/transactionSplitterService.ts(34,14): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/services/transactions/transactionSplitterService.ts(251,51): error TS2339: Property 'id' does not exist on type 'unknown'.
 src/stores/ui/uiStore.ts(205,30): error TS2345: Argument of type '{ budgetId: string; encryptionKey: CryptoKey | Uint8Array<ArrayBufferLike>; currentUser: string; }' is not assignable to parameter of type 'SyncConfig'.
   Types of property 'encryptionKey' are incompatible.
     Type 'CryptoKey | Uint8Array<ArrayBufferLike>' is not assignable to type 'string | CryptoKey'.
@@ -538,7 +484,6 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
 - 2 errors in `src/utils/common/lazyImport.ts`
 - 2 errors in `src/utils/budgeting/envelopeCalculations.ts`
-- 2 errors in `src/services/transactions/transactionSplitterService.ts`
 - 2 errors in `src/services/firebaseMessaging.ts`
 - 2 errors in `src/services/bugReport/errorTrackingService.ts`
 - 2 errors in `src/hooks/transactions/useTransactionTable.ts`
@@ -688,7 +633,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 | 1153 | `TS7006` |
 | 860 | `TS7031` |
 | 241 | `TS2345` |
-| 213 | `TS2339` |
+| 211 | `TS2339` |
 | 192 | `TS18046` |
 | 137 | `TS2322` |
 | 117 | `TS7053` |
@@ -3789,8 +3734,6 @@ src/services/security/securityService.ts(296,9): error TS7053: Element implicitl
   No index signature with a parameter of type 'string' was found on type '{}'.
 src/services/security/securityService.ts(296,37): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
-src/services/transactions/transactionSplitterService.ts(34,14): error TS2339: Property 'id' does not exist on type '{}'.
-src/services/transactions/transactionSplitterService.ts(251,51): error TS2339: Property 'id' does not exist on type '{}'.
 src/services/typedChunkedSyncService.ts(275,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/stores/ui/fabStore.ts(216,14): error TS7022: 'useFABStore' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
 src/stores/ui/fabStore.ts(249,11): error TS7023: 'getDebugInfo' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions.
