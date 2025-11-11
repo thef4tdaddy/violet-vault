@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 3788 | 0 |
+| TypeScript Errors | 4 | +4 |
+| TypeScript Strict Mode Errors | 3731 | -57 |
 
-*Last updated: 2025-11-10 23:26:12 UTC*
+*Last updated: 2025-11-11 17:55:07 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,18 +28,35 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-10 23:25:51 UTC
+Last check: 2025-11-11 17:54:49 UTC
 
 ## Typecheck Audit
 
-✅ **All files passed TypeScript type checking!**
+### Files with Most Type Errors
+- 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
+- 1 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
+- 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
 
-Last check: 2025-11-10 23:26:04 UTC
+### Type Error Breakdown by Category
+| Count | Error Code |
+|---|---|
+| 4 | `TS2345` |
+
+### Detailed Type Error Report
+```
+src/hooks/budgeting/mutations/useUpdateEnvelope.ts(57,63): error TS2345: Argument of type '{ name: unknown; category: unknown; }' is not assignable to parameter of type 'Partial<Envelope>'.
+  Types of property 'name' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/hooks/budgeting/useBudgetData/mutations.ts(17,56): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Envelope, "lastModified" | "createdAt">'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Envelope, "lastModified" | "createdAt">': name, category, id, archived
+src/hooks/budgeting/useBudgetData/mutations.ts(65,59): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Transaction, "lastModified" | "createdAt">': category, id, date, amount, and 2 more.
+src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
+```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 62 errors in `src/utils/query/optimisticHelpers.ts`
 - 53 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 46 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 44 errors in `src/utils/savings/savingsCalculations.ts`
@@ -274,6 +291,7 @@ Last check: 2025-11-10 23:26:04 UTC
 - 5 errors in `src/hooks/common/useActualBalance.ts`
 - 5 errors in `src/hooks/common/bug-report/useBugReportHighlight.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useTransferFunds.ts`
+- 5 errors in `src/hooks/budgeting/mutations/useDeleteEnvelope.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
 - 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
@@ -312,7 +330,6 @@ Last check: 2025-11-10 23:26:04 UTC
 - 4 errors in `src/hooks/common/useDataInitialization.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetHistoryQuery.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetData/queries.ts`
-- 4 errors in `src/hooks/budgeting/mutations/useDeleteEnvelope.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 4 errors in `src/hooks/bills/useBills/index.ts`
@@ -357,6 +374,7 @@ Last check: 2025-11-10 23:26:04 UTC
 - 3 errors in `src/hooks/common/useNetworkStatus.ts`
 - 3 errors in `src/hooks/common/bug-report/useBugReportSubmission.ts`
 - 3 errors in `src/hooks/common/bug-report/useBugReportDiagnostics.ts`
+- 3 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
 - 3 errors in `src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
 - 3 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
@@ -415,7 +433,7 @@ Last check: 2025-11-10 23:26:04 UTC
 - 2 errors in `src/hooks/budgeting/usePaydayPrediction.ts`
 - 2 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
 - 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
-- 2 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
+- 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts`
 - 2 errors in `src/hooks/auth/useSecurityManager.ts`
 - 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
@@ -494,6 +512,7 @@ Last check: 2025-11-10 23:26:04 UTC
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
 - 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
+- 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
@@ -541,13 +560,13 @@ Last check: 2025-11-10 23:26:04 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1515 | `TS7006` |
-| 919 | `TS7031` |
-| 283 | `TS2339` |
-| 247 | `TS2345` |
-| 216 | `TS18046` |
+| 1469 | `TS7006` |
+| 915 | `TS7031` |
+| 282 | `TS2339` |
+| 251 | `TS2345` |
+| 205 | `TS18046` |
 | 144 | `TS7053` |
-| 121 | `TS2322` |
+| 122 | `TS2322` |
 | 80 | `TS7005` |
 | 80 | `TS18048` |
 | 52 | `TS18047` |
@@ -2664,11 +2683,20 @@ src/hooks/budgeting/mutations/useDeleteEnvelope.ts(27,23): error TS18048: 'envel
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(31,59): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(36,27): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(71,52): error TS2322: Type 'null' is not assignable to type 'string | PropModification | undefined'.
+src/hooks/budgeting/mutations/useDeleteEnvelope.ts(72,72): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(39,11): error TS18048: 'fromEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(45,25): error TS18048: 'fromEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(50,25): error TS18048: 'toEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(70,25): error TS18048: 'fromEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(74,25): error TS18048: 'toEnvelope.currentBalance' is possibly 'undefined'.
+src/hooks/budgeting/mutations/useUpdateEnvelope.ts(57,63): error TS2345: Argument of type '{ name: {} | null; category: {} | null; }' is not assignable to parameter of type 'Partial<Envelope>'.
+  Types of property 'name' are incompatible.
+    Type '{} | null' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.
+src/hooks/budgeting/useBudgetData/mutations.ts(17,56): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Envelope, "lastModified" | "createdAt">'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Envelope, "lastModified" | "createdAt">': category, id, archived, name
+src/hooks/budgeting/useBudgetData/mutations.ts(65,59): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Transaction, "lastModified" | "createdAt">': type, category, id, date, and 2 more.
 src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(81,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(105,49): error TS2345: Argument of type 'BudgetRecord | null' is not assignable to parameter of type 'BudgetMetadata'.
   Type 'null' is not assignable to type 'BudgetMetadata'.
@@ -2681,6 +2709,7 @@ src/hooks/budgeting/useBudgetData/queries.ts(14,24): error TS7006: Parameter 'qu
 src/hooks/budgeting/useBudgetData/queryFunctions.ts(66,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetData/utilities.ts(16,17): error TS7006: Parameter 'filters' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/utilities.ts(18,20): error TS7006: Parameter 'dateRange' implicitly has an 'any' type.
+src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(25,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(63,40): error TS2345: Argument of type '{ hash: string; message: string; author: string; parentHash: string | null; deviceFingerprint: string; encryptedSnapshot: number[]; iv: number[]; timestamp: number; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
@@ -4549,68 +4578,6 @@ src/utils/pwa/serviceWorkerDiagnostics.ts(365,37): error TS18048: 'estimate.usag
 src/utils/pwa/serviceWorkerDiagnostics.ts(365,54): error TS18048: 'estimate.quota' is possibly 'undefined'.
 src/utils/pwa/serviceWorkerDiagnostics.ts(368,25): error TS18046: 'error' is of type 'unknown'.
 src/utils/query/backgroundSyncService.ts(92,20): error TS18046: 'restoreError' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(17,26): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(17,39): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(17,51): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(20,69): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(27,60): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(29,25): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(53,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(63,23): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(63,36): error TS7006: Parameter 'newEnvelope' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(72,60): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(90,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(100,26): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(100,39): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(103,60): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(105,28): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(119,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(129,29): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(129,42): error TS7006: Parameter 'transactionId' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(129,57): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(132,75): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(139,73): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(141,25): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(160,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(170,26): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(170,39): error TS7006: Parameter 'newTransaction' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(179,73): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(196,23): error TS2339: Property 'message' does not exist on type '{}'.
-src/utils/query/optimisticHelpers.ts(206,29): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(206,42): error TS7006: Parameter 'transactionId' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(209,73): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(211,28): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(232,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(242,22): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(242,35): error TS7006: Parameter 'billId' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(242,43): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(245,61): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(252,66): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(254,25): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(268,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(299,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(328,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(351,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(361,32): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(361,45): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(364,59): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(388,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(398,23): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(398,36): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(440,26): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(440,39): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(440,49): error TS7006: Parameter 'previousData' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(451,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(460,30): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(460,45): error TS7031: Binding element 'mutationKey' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(460,58): error TS7031: Binding element 'queryKey' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(460,68): error TS7031: Binding element 'updateFn' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(460,78): error TS7031: Binding element 'rollbackFn' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(463,24): error TS7006: Parameter 'variables' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(472,47): error TS7006: Parameter 'old' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(477,17): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(477,24): error TS7006: Parameter 'variables' implicitly has an 'any' type.
-src/utils/query/optimisticHelpers.ts(477,35): error TS7006: Parameter 'context' implicitly has an 'any' type.
 src/utils/query/prefetchHelpers.ts(54,13): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/utils/query/prefetchHelpers.ts(249,29): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
