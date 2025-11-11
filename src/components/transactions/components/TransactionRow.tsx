@@ -93,7 +93,7 @@ const TransactionRow = ({
               title="Split transaction"
               aria-label="Split transaction"
             >
-            {React.createElement(getIcon("SplitSquareHorizontal"), {
+              {React.createElement(getIcon("SplitSquareHorizontal"), {
                 className: "h-4 w-4",
               })}
               <span className="hidden xl:inline font-semibold">Split</span>

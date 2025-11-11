@@ -9,6 +9,22 @@ if [ -z "$STAGED_FILES" ]; then
   exit 0
 fi
 
+# Run Prettier on staged files that it manages
+FORMAT_FILES="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx|json|css|md)$' || true)"
+if [ -n "$FORMAT_FILES" ]; then
+  echo "🎨 Running Prettier on staged files..."
+  printf '%s\n' "$FORMAT_FILES" | xargs -r npx prettier --config ./configs/linting/prettier.config.js --write
+  printf '%s\n' "$FORMAT_FILES" | xargs -r git add
+  # Refresh staged file list after formatting
+  STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACM)"
+fi
+
+# Nothing staged after formatting? exit successfully
+if [ -z "$STAGED_FILES" ]; then
+  echo "✅ No files staged for commit after formatting, skipping hooks"
+  exit 0
+fi
+
 # If all staged files are docs/config only, skip linting
 # (matches: docs/, any .md, README.md, CHANGELOG.md, LICENSE, .husky/)
 DOCS_ONLY_PATTERNS='^\(docs/\|README\.md$\|.*\.md$\|CHANGELOG\.md$\|LICENSE$\|\.husky/\)'
@@ -21,7 +37,7 @@ if [ -z "$NON_DOCS" ]; then
 fi
 
 # Collect JS/TS files to lint (excluding config files and configs/ directory)
-CODE_FILES="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx)$' | grep -Ev '(\.config\.|commitlint|eslint|prettier|configs/)' || true)"
+CODE_FILES="$(printf '%s\n' "$NON_DOCS" | grep -E '\.(js|jsx|ts|tsx)$' | grep -Ev '(\.config\.|commitlint|eslint|prettier|configs/)' || true)"
 
 if [ -z "$CODE_FILES" ]; then
   echo "✅ No JS/TS source files staged for commit, skipping ESLint"
