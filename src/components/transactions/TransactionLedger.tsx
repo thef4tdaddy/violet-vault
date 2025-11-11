@@ -261,6 +261,8 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       envelopeId?: unknown;
       notes?: unknown;
       type?: unknown;
+      lastModified?: unknown;
+      createdAt?: unknown;
     };
 
     const rawDate = record.date;
@@ -279,26 +281,36 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       return null;
     }
 
-    const amount = Number(record.amount ?? 0);
+    const amountRaw = Number(record.amount ?? 0);
     const description = typeof record.description === "string" ? record.description : "";
-    const category = typeof record.category === "string" ? record.category : "other";
+    const category =
+      typeof record.category === "string" && record.category.trim().length > 0
+        ? record.category
+        : "uncategorized";
     const envelopeId =
       typeof record.envelopeId === "string" || typeof record.envelopeId === "number"
-        ? record.envelopeId
-        : undefined;
+        ? String(record.envelopeId)
+        : "unassigned";
     const notes = typeof record.notes === "string" ? record.notes : undefined;
-    const typeCandidate =
-      record.type === "income" || record.type === "expense" || record.type === "transfer"
-        ? record.type
-        : amount >= 0
-          ? "income"
-          : "expense";
+    let typeCandidate: Transaction["type"];
+    if (record.type === "income" || record.type === "expense" || record.type === "transfer") {
+      typeCandidate = record.type;
+    } else {
+      typeCandidate = amountRaw >= 0 ? "income" : "expense";
+    }
+
+    const signedAmount =
+      typeCandidate === "expense"
+        ? -Math.abs(amountRaw)
+        : typeCandidate === "income"
+          ? Math.abs(amountRaw)
+          : amountRaw;
 
     return {
       id: record.id as string | number,
       date,
       description,
-      amount,
+      amount: signedAmount,
       category,
       envelopeId,
       notes,
@@ -320,6 +332,9 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       color?: unknown;
       icon?: unknown;
       description?: unknown;
+      archived?: unknown;
+      lastModified?: unknown;
+      createdAt?: unknown;
     };
 
     if (record.id === undefined || typeof record.name !== "string") {
@@ -327,14 +342,18 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     }
 
     return {
-      id: record.id,
+      id: String(record.id),
       name: record.name,
-      category: typeof record.category === "string" ? record.category : undefined,
+      category:
+        typeof record.category === "string" && record.category.trim().length > 0
+          ? record.category
+          : "uncategorized",
       currentBalance: Number(record.currentBalance ?? 0),
       targetAmount: Number(record.targetAmount ?? 0),
       color: typeof record.color === "string" ? record.color : undefined,
       icon: typeof record.icon === "string" ? record.icon : undefined,
       description: typeof record.description === "string" ? record.description : undefined,
+      isArchived: Boolean(record.archived),
     };
   };
 

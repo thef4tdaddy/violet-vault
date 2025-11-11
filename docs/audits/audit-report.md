@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | +3 |
-| TypeScript Errors | 24 | +18 |
-| TypeScript Strict Mode Errors | 3484 | -7 |
+| ESLint Issues | 0 | -3 |
+| TypeScript Errors | 0 | -24 |
+| TypeScript Strict Mode Errors | 3445 | -39 |
 
-*Last updated: 2025-11-11 18:47:08 UTC*
+*Last updated: 2025-11-11 19:24:29 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,80 +26,15 @@
 
 ## Lint Audit
 
-### Files with Most Issues
-- 3 issues in `violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx`
+✅ **All files passed ESLint validation!**
 
-### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 3 | `@typescript-eslint/no-unused-vars` |
-
-### Detailed Lint Report
-```
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:15:10 - 1 - 'StepNavigation' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:37:7 - 1 - 'ModalFooter' is assigned a value but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
-violet-vault/src/components/automation/AutoFundingRuleBuilder.tsx:110:3 - 1 - 'setStep' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
-```
+Last check: 2025-11-11 19:24:14 UTC
 
 ## Typecheck Audit
 
-### Files with Most Type Errors
-- 18 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
-- 6 errors in `src/utils/common/budgetHistoryTracker.ts`
+✅ **All files passed TypeScript type checking!**
 
-### Type Error Breakdown by Category
-| Count | Error Code |
-|---|---|
-| 6 | `TS2614` |
-| 6 | `TS2339` |
-| 5 | `TS2322` |
-| 3 | `TS6133` |
-| 3 | `TS2345` |
-| 1 | `TS2769` |
-
-### Detailed Type Error Report
-```
-src/components/automation/AutoFundingRuleBuilder.tsx(9,10): error TS2614: Module '"@/components/ui/ModalCloseButton"' has no exported member 'ModalCloseButton'. Did you mean to use 'import ModalCloseButton from "@/components/ui/ModalCloseButton"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(11,10): error TS2614: Module '"./steps/RuleTypeStep"' has no exported member 'RuleTypeStep'. Did you mean to use 'import RuleTypeStep from "./steps/RuleTypeStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(12,10): error TS2614: Module '"./steps/TriggerScheduleStep"' has no exported member 'TriggerScheduleStep'. Did you mean to use 'import TriggerScheduleStep from "./steps/TriggerScheduleStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(13,10): error TS2614: Module '"./steps/RuleConfigurationStep"' has no exported member 'RuleConfigurationStep'. Did you mean to use 'import RuleConfigurationStep from "./steps/RuleConfigurationStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(14,10): error TS2614: Module '"./steps/ReviewStep"' has no exported member 'ReviewStep'. Did you mean to use 'import ReviewStep from "./steps/ReviewStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(15,1): error TS6133: 'StepNavigation' is declared but its value is never read.
-src/components/automation/AutoFundingRuleBuilder.tsx(15,10): error TS2614: Module '"./components/StepNavigation"' has no exported member 'StepNavigation'. Did you mean to use 'import StepNavigation from "./components/StepNavigation"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(37,7): error TS6133: 'ModalFooter' is declared but its value is never read.
-src/components/automation/AutoFundingRuleBuilder.tsx(75,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(76,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(77,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(110,3): error TS6133: 'setStep' is declared but its value is never read.
-src/components/automation/AutoFundingRuleBuilder.tsx(111,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(112,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(113,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(141,11): error TS2322: Type '{ step: number; ruleData: any; updateRuleData: any; updateConfig: any; envelopes: { id: string; name: string; category: string; currentBalance?: number; }[]; toggleTargetEnvelope: (envelopeId: string) => void; errors: Record<...>; prevStep: () => number; nextStep: () => number; handleSave: () => void; }' is not assignable to type 'IntrinsicAttributes & RuleBuilderModalProps'.
-  Property 'ruleData' does not exist on type 'IntrinsicAttributes & RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(262,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
-  Type 'void' is not assignable to type 'number'.
-src/components/automation/AutoFundingRuleBuilder.tsx(263,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
-  Type 'void' is not assignable to type 'number'.
-src/utils/common/budgetHistoryTracker.ts(98,43): error TS2322: Type '{ commitHash: string; entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; }' is not assignable to type 'BudgetChange'.
-  Types of property 'changeType' are incompatible.
-    Type 'string' is not assignable to type '"create" | "update" | "delete"'.
-src/utils/common/budgetHistoryTracker.ts(133,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }'.
-  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }': deviceFingerprint, parentHash
-src/utils/common/budgetHistoryTracker.ts(161,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }'.
-  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }': deviceFingerprint, parentHash
-src/utils/common/budgetHistoryTracker.ts(208,43): error TS2345: Argument of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }'.
-  Type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }': deviceFingerprint, parentHash
-src/utils/common/budgetHistoryTracker.ts(595,7): error TS2322: Type 'string' is not assignable to type 'number'.
-src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload matches this call.
-  Overload 1 of 3, '(callbackfn: (previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string, initialValue: string): string', gave the following error.
-    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string'.
-      Types of parameters 'maxHour' and 'previousValue' are incompatible.
-        Type 'string' is not assignable to type 'number'.
-  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number, initialValue: number): number', gave the following error.
-    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number'.
-      Types of parameters 'hour' and 'currentValue' are incompatible.
-        Type 'string' is not assignable to type 'number'.
-```
+Last check: 2025-11-11 19:24:21 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -111,7 +46,6 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 - 34 errors in `src/utils/query/queryKeys.ts`
 - 33 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 32 errors in `src/utils/budgeting/envelopeCalculations.ts`
-- 32 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 28 errors in `src/services/chunkedSyncService.ts`
 - 28 errors in `src/services/budgetHistoryService.ts`
 - 27 errors in `src/services/editLockService.ts`
@@ -261,11 +195,9 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 - 8 errors in `src/components/budgeting/suggestions/SuggestionCard.tsx`
 - 8 errors in `src/components/budgeting/DeleteEnvelopeModal.tsx`
 - 8 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
-- 8 errors in `src/components/automation/AutoFundingView.tsx`
 - 8 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 7 errors in `src/utils/security/errorViewer.ts`
 - 7 errors in `src/utils/security/cryptoCompat.ts`
-- 7 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 7 errors in `src/utils/billIcons/iconUtils.ts`
 - 7 errors in `src/services/bugReport/index.ts`
 - 7 errors in `src/services/bugReport/contextAnalysisService.ts`
@@ -295,6 +227,7 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 - 7 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
+- 7 errors in `src/components/automation/AutoFundingView.tsx`
 - 7 errors in `src/components/auth/components/StepButtons.tsx`
 - 7 errors in `src/components/auth/PasswordRotationModal.tsx`
 - 7 errors in `src/components/auth/KeyManagementSettings.tsx`
@@ -539,6 +472,7 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 - 1 errors in `src/utils/common/ocrProcessor.ts`
 - 1 errors in `src/utils/common/highlight.ts`
 - 1 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
+- 1 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 1 errors in `src/utils/budgeting/paycheckDeletion.ts`
 - 1 errors in `src/utils/billIcons/iconOptions.ts`
 - 1 errors in `src/utils/analytics/categoryPatterns.ts`
@@ -604,27 +538,25 @@ src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload match
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1337 | `TS7006` |
-| 864 | `TS7031` |
-| 241 | `TS2345` |
-| 235 | `TS2339` |
+| 1334 | `TS7006` |
+| 861 | `TS7031` |
+| 236 | `TS2345` |
+| 226 | `TS2339` |
 | 206 | `TS18046` |
-| 136 | `TS2322` |
+| 129 | `TS2322` |
 | 121 | `TS7053` |
 | 80 | `TS18048` |
 | 77 | `TS7005` |
 | 52 | `TS18047` |
 | 44 | `TS7034` |
-| 28 | `TS2769` |
+| 27 | `TS2769` |
 | 9 | `TS2353` |
-| 6 | `TS2614` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
-| 5 | `TS2698` |
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
-| 3 | `TS6133` |
+| 3 | `TS2698` |
 | 3 | `TS2538` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
@@ -831,46 +763,6 @@ src/components/automation/AutoFundingDashboardComponents.tsx(71,3): error TS7031
 src/components/automation/AutoFundingDashboardComponents.tsx(72,3): error TS7031: Binding element 'isExecuting' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboardComponents.tsx(73,3): error TS7031: Binding element 'RulesTabComponent' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboardComponents.tsx(74,3): error TS7031: Binding element 'HistoryTabComponent' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(9,10): error TS2614: Module '"@/components/ui/ModalCloseButton"' has no exported member 'ModalCloseButton'. Did you mean to use 'import ModalCloseButton from "@/components/ui/ModalCloseButton"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(11,10): error TS2614: Module '"./steps/RuleTypeStep"' has no exported member 'RuleTypeStep'. Did you mean to use 'import RuleTypeStep from "./steps/RuleTypeStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(12,10): error TS2614: Module '"./steps/TriggerScheduleStep"' has no exported member 'TriggerScheduleStep'. Did you mean to use 'import TriggerScheduleStep from "./steps/TriggerScheduleStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(13,10): error TS2614: Module '"./steps/RuleConfigurationStep"' has no exported member 'RuleConfigurationStep'. Did you mean to use 'import RuleConfigurationStep from "./steps/RuleConfigurationStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(14,10): error TS2614: Module '"./steps/ReviewStep"' has no exported member 'ReviewStep'. Did you mean to use 'import ReviewStep from "./steps/ReviewStep"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(15,1): error TS6133: 'StepNavigation' is declared but its value is never read.
-src/components/automation/AutoFundingRuleBuilder.tsx(15,10): error TS2614: Module '"./components/StepNavigation"' has no exported member 'StepNavigation'. Did you mean to use 'import StepNavigation from "./components/StepNavigation"' instead?
-src/components/automation/AutoFundingRuleBuilder.tsx(37,7): error TS6133: 'ModalFooter' is declared but its value is never read.
-src/components/automation/AutoFundingRuleBuilder.tsx(75,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(76,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(77,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(110,3): error TS6133: 'setStep' is declared but its value is never read.
-src/components/automation/AutoFundingRuleBuilder.tsx(111,3): error TS2339: Property 'ruleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(112,3): error TS2339: Property 'updateRuleData' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(113,3): error TS2339: Property 'updateConfig' does not exist on type 'RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(141,11): error TS2322: Type '{ step: number; ruleData: any; updateRuleData: any; updateConfig: any; envelopes: { id: string; name: string; category: string; currentBalance?: number | undefined; }[]; toggleTargetEnvelope: (envelopeId: string) => void; errors: Record<...>; prevStep: () => number; nextStep: () => number; handleSave: () => void; }' is not assignable to type 'IntrinsicAttributes & RuleBuilderModalProps'.
-  Property 'ruleData' does not exist on type 'IntrinsicAttributes & RuleBuilderModalProps'.
-src/components/automation/AutoFundingRuleBuilder.tsx(157,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(158,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(160,3): error TS7031: Binding element 'onSaveRule' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(175,25): error TS2698: Spread types may only be created from object types.
-src/components/automation/AutoFundingRuleBuilder.tsx(175,66): error TS2339: Property 'config' does not exist on type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(180,21): error TS2698: Spread types may only be created from object types.
-src/components/automation/AutoFundingRuleBuilder.tsx(180,62): error TS2339: Property 'config' does not exist on type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(184,27): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(195,25): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(208,33): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/components/automation/AutoFundingRuleBuilder.tsx(210,48): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(237,28): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type 'string[]' is not assignable to type 'never[]'.
-    Type 'string' is not assignable to type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(242,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/automation/AutoFundingRuleBuilder.tsx(261,7): error TS2322: Type 'Record<string, string | undefined>' is not assignable to type 'Record<string, string>'.
-  'string' index signatures are incompatible.
-    Type 'string | undefined' is not assignable to type 'string'.
-      Type 'undefined' is not assignable to type 'string'.
-src/components/automation/AutoFundingRuleBuilder.tsx(262,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
-  Type 'void' is not assignable to type 'number'.
-src/components/automation/AutoFundingRuleBuilder.tsx(263,7): error TS2322: Type '() => void' is not assignable to type '() => number'.
-  Type 'void' is not assignable to type 'number'.
 src/components/automation/AutoFundingView.tsx(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/automation/AutoFundingView.tsx(17,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/automation/AutoFundingView.tsx(17,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
@@ -884,8 +776,6 @@ src/components/automation/AutoFundingView.tsx(35,34): error TS2322: Type '(rule:
   Types of parameters 'rule' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'Partial<AutoFundingRule>'.
 src/components/automation/AutoFundingView.tsx(70,59): error TS18046: 'error' is of type 'unknown'.
-src/components/automation/AutoFundingView.tsx(124,9): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
 src/components/automation/AutoFundingViewComponents.tsx(6,30): error TS7031: Binding element 'rules' implicitly has an 'any' type.
 src/components/automation/AutoFundingViewComponents.tsx(18,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
 src/components/automation/AutoFundingViewComponents.tsx(32,28): error TS7031: Binding element 'activeTab' implicitly has an 'any' type.
@@ -2150,18 +2040,18 @@ src/components/transactions/TransactionFilters.tsx(18,3): error TS7031: Binding 
 src/components/transactions/TransactionFilters.tsx(115,39): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionFilters.tsx(115,59): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionFilters.tsx(116,29): error TS2339: Property 'name' does not exist on type 'never'.
-src/components/transactions/TransactionLedger.tsx(457,7): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(transaction: Transaction | null) => void'.
+src/components/transactions/TransactionLedger.tsx(476,7): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(transaction: Transaction | null) => void'.
   Types of parameters 'value' and 'transaction' are incompatible.
     Type 'Transaction | null' is not assignable to type 'SetStateAction<null>'.
       Type 'Transaction' is not assignable to type 'SetStateAction<null>'.
         Type 'Transaction' provides no match for the signature '(prevState: null): null'.
-src/components/transactions/TransactionLedger.tsx(467,7): error TS2322: Type 'Dispatch<SetStateAction<{ date: string; description: string; amount: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; }>>' is not assignable to type '(form: unknown) => void'.
+src/components/transactions/TransactionLedger.tsx(486,7): error TS2322: Type 'Dispatch<SetStateAction<{ date: string; description: string; amount: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; }>>' is not assignable to type '(form: unknown) => void'.
   Types of parameters 'value' and 'form' are incompatible.
     Type 'unknown' is not assignable to type 'SetStateAction<{ date: string; description: string; amount: string; type: string; envelopeId: string; category: string; notes: string; reconciled: boolean; }>'.
-src/components/transactions/TransactionLedger.tsx(476,7): error TS2322: Type '(step: number) => void' is not assignable to type '(step: unknown) => void'.
+src/components/transactions/TransactionLedger.tsx(495,7): error TS2322: Type '(step: number) => void' is not assignable to type '(step: unknown) => void'.
   Types of parameters 'step' and 'step' are incompatible.
     Type 'unknown' is not assignable to type 'number'.
-src/components/transactions/TransactionLedger.tsx(479,7): error TS2322: Type '(mapping: FieldMapping) => void' is not assignable to type '(mapping: unknown) => void'.
+src/components/transactions/TransactionLedger.tsx(498,7): error TS2322: Type '(mapping: FieldMapping) => void' is not assignable to type '(mapping: unknown) => void'.
   Types of parameters 'mapping' and 'mapping' are incompatible.
     Type 'unknown' is not assignable to type 'FieldMapping'.
 src/components/transactions/TransactionSplitter.tsx(34,5): error TS2322: Type 'Transaction | null' is not assignable to type 'Transaction | undefined'.
@@ -4197,29 +4087,10 @@ src/utils/common/billDiscovery.ts(364,34): error TS7006: Parameter 'bill' implic
 src/utils/common/billDiscovery.ts(364,40): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
 src/utils/common/billDiscovery.ts(396,8): error TS7006: Parameter 'word' implicitly has an 'any' type.
 src/utils/common/billDiscovery.ts(396,56): error TS7006: Parameter 'envWord' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(97,41): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: string | null; snapshotData: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
+src/utils/common/budgetHistoryTracker.ts(109,41): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: string | null; snapshotData: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
     Type 'string | null' is not assignable to type 'string | undefined'.
       Type 'null' is not assignable to type 'string | undefined'.
-src/utils/common/budgetHistoryTracker.ts(98,43): error TS2322: Type '{ commitHash: string; entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; }' is not assignable to type 'BudgetChange'.
-  Types of property 'changeType' are incompatible.
-    Type 'string' is not assignable to type '"create" | "update" | "delete"'.
-src/utils/common/budgetHistoryTracker.ts(133,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }'.
-  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }': deviceFingerprint, parentHash
-src/utils/common/budgetHistoryTracker.ts(161,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }'.
-  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }': deviceFingerprint, parentHash
-src/utils/common/budgetHistoryTracker.ts(208,43): error TS2345: Argument of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }'.
-  Type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }': deviceFingerprint, parentHash
-src/utils/common/budgetHistoryTracker.ts(595,7): error TS2322: Type 'string' is not assignable to type 'number'.
-src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload matches this call.
-  Overload 1 of 3, '(callbackfn: (previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string, initialValue: string): string', gave the following error.
-    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string'.
-      Types of parameters 'maxHour' and 'previousValue' are incompatible.
-        Type 'string' is not assignable to type 'number'.
-  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number, initialValue: number): number', gave the following error.
-    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number'.
-      Types of parameters 'hour' and 'currentValue' are incompatible.
-        Type 'string' is not assignable to type 'number'.
 src/utils/common/fixAutoAllocateUndefined.ts(66,37): error TS18046: 'error' is of type 'unknown'.
 src/utils/common/frequencyCalculations.ts(43,34): error TS7006: Parameter 'amount' implicitly has an 'any' type.
 src/utils/common/frequencyCalculations.ts(43,42): error TS7006: Parameter 'fromFrequency' implicitly has an 'any' type.

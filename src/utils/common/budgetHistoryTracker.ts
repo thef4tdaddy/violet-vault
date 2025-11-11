@@ -1,5 +1,5 @@
 import { budgetDb } from "../../db/budgetDb";
-import type { BudgetTag, Debt } from "../../db/types";
+import type { BudgetTag, BudgetChange, Debt } from "../../db/types";
 import { encryptionUtils } from "../security/encryption";
 import logger from "../common/logger";
 import { formatCurrency } from "../accounts/accountHelpers";
@@ -40,8 +40,8 @@ export class BudgetHistoryTracker {
     beforeData: unknown;
     afterData: unknown;
     author: string;
-    deviceFingerprint: string | null;
-    parentHash: string | null;
+    deviceFingerprint?: string | null;
+    parentHash?: string | null;
   }) {
     try {
       // Generate commit hash
@@ -83,14 +83,26 @@ export class BudgetHistoryTracker {
       };
 
       // Create the change record
-      const change = {
+      const normalizedChangeType: BudgetChange["changeType"] = (() => {
+        switch (changeType) {
+          case "add":
+          case "create":
+            return "create";
+          case "delete":
+            return "delete";
+          default:
+            return "update";
+        }
+      })();
+
+      const change: BudgetChange = {
         commitHash: hash,
         entityType,
         entityId: entityId || "main",
-        changeType,
+        changeType: normalizedChangeType,
         description,
-        beforeData,
-        afterData,
+        oldValue: beforeData,
+        newValue: afterData,
       };
 
       // Save to Dexie
@@ -133,7 +145,7 @@ export class BudgetHistoryTracker {
     return await this.createHistoryCommit({
       entityType: "unassignedCash",
       entityId: null,
-      changeType: "modify",
+      changeType: "update",
       description,
       beforeData: { amount: previousAmount },
       afterData: { amount: newAmount },
@@ -161,7 +173,7 @@ export class BudgetHistoryTracker {
     return await this.createHistoryCommit({
       entityType: "actualBalance",
       entityId: null,
-      changeType: "modify",
+      changeType: "update",
       description,
       beforeData: { balance: previousBalance, isManual: !isManual },
       afterData: { balance: newBalance, isManual },
@@ -592,10 +604,15 @@ export class BudgetHistoryTracker {
         hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       });
 
-      patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour: number, hour: number) => (hourCounts[hour] || 0) > (hourCounts[maxHour] || 0) ? hour : maxHour,
-        null
-      );
+      const hourKeys = Object.keys(hourCounts);
+      if (hourKeys.length > 0) {
+        const hours = hourKeys.map((key) => Number.parseInt(key, 10));
+        patterns.mostActiveHour = hours.reduce((maxHour, hour) => {
+          return (hourCounts[hour] || 0) > (hourCounts[maxHour] || 0) ? hour : maxHour;
+        }, hours[0]);
+      } else {
+        patterns.mostActiveHour = null;
+      }
 
       return patterns;
     } catch (error) {

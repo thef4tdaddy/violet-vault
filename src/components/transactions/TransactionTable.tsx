@@ -10,6 +10,7 @@ import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
 import {
   COLUMN_STYLES,
   COLUMN_WIDTHS,
+  MIN_TABLE_WIDTH,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
@@ -330,7 +331,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     COLUMN_WIDTHS.actions,
   ].join(" ");
 
-  const minTableWidth = "62rem";
+  const minTableWidth = MIN_TABLE_WIDTH;
 
   return (
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">
