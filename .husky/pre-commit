@@ -60,6 +60,12 @@ fi
 
 echo "✅ ESLint passed for staged files"
 
+echo "🏗️ Running npm run build..."
+if ! npm run build; then
+  echo "❌ Build failed. Fix build errors before committing."
+  exit 1
+fi
+
 echo "📊 Running full audit (npm run audit:full)..."
 if ! npm run audit:full; then
   echo "❌ Full audit failed. Check docs/audits for details."
