@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 17 | 0 |
-| TypeScript Strict Mode Errors | 3571 | -46 |
+| TypeScript Errors | 23 | +6 |
+| TypeScript Strict Mode Errors | 3541 | -30 |
 
-*Last updated: 2025-11-11 18:03:32 UTC*
+*Last updated: 2025-11-11 18:06:04 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -43,6 +43,7 @@ violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:359:14 - 2 - 'getUni
 
 ### Files with Most Type Errors
 - 6 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
+- 6 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 4 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 2 errors in `src/hooks/savings/useSavingsGoals/savingsQueries.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
@@ -53,12 +54,22 @@ violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:359:14 - 2 - 'getUni
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 8 | `TS2345` |
-| 7 | `TS2339` |
+| 10 | `TS2339` |
+| 9 | `TS2345` |
 | 2 | `TS2451` |
+| 1 | `TS2459` |
+| 1 | `TS2362` |
 
 ### Detailed Type Error Report
 ```
+src/hooks/budgeting/autofunding/useUndoOperations.ts(4,15): error TS2459: Module '"./useExecutionHistory"' declares 'ExecutionRecord' locally, but it is not exported.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(18,27): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(18,66): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(19,33): error TS2339: Property 'map' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(40,34): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(41,24): error TS2345: Argument of type '{ fromEnvelopeId: any; toEnvelopeId: any; amount: unknown; description: unknown; executedAt: any; }' is not assignable to parameter of type '{ fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; executedAt: string; }'.
+  Types of property 'amount' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
 src/hooks/budgeting/mutations/useUpdateEnvelope.ts(57,63): error TS2345: Argument of type '{ name: unknown; category: unknown; }' is not assignable to parameter of type 'Partial<Envelope>'.
   Types of property 'name' are incompatible.
     Type 'unknown' is not assignable to type 'string'.
@@ -94,7 +105,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 41 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 39 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 39 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 37 errors in `src/stores/ui/uiStoreActions.ts`
@@ -192,6 +202,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 11 errors in `src/utils/bills/billDetailUtils.ts`
 - 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
 - 11 errors in `src/hooks/debts/useDebtDashboard.ts`
+- 11 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 11 errors in `src/hooks/analytics/useTrendAnalysis.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
@@ -598,22 +609,22 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1361 | `TS7006` |
+| 1347 | `TS7006` |
 | 907 | `TS7031` |
-| 251 | `TS2339` |
-| 247 | `TS2345` |
-| 209 | `TS18046` |
+| 246 | `TS2345` |
+| 237 | `TS2339` |
+| 210 | `TS18046` |
 | 132 | `TS7053` |
 | 122 | `TS2322` |
 | 80 | `TS18048` |
-| 78 | `TS7005` |
+| 77 | `TS7005` |
 | 52 | `TS18047` |
-| 45 | `TS7034` |
+| 44 | `TS7034` |
 | 28 | `TS2769` |
 | 9 | `TS2353` |
-| 6 | `TS2698` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
+| 5 | `TS2698` |
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
@@ -626,6 +637,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 | 1 | `TS2774` |
 | 1 | `TS2683` |
 | 1 | `TS2532` |
+| 1 | `TS2459` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
 | 1 | `TS18049` |
@@ -2623,52 +2635,18 @@ src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,50): error TS7006: 
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,55): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(35,10): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useUndoOperations.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(6,31): error TS7006: Parameter 'executionRecord' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(6,48): error TS7006: Parameter 'result' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(15,34): error TS7006: Parameter 'executionRecord' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(15,51): error TS7006: Parameter 'result' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(17,38): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(27,35): error TS7006: Parameter 'executionRecord' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(27,52): error TS7006: Parameter 'executionResults' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(28,9): error TS7034: Variable 'transfers' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(30,29): error TS7006: Parameter 'result' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(40,10): error TS7005: Variable 'transfers' implicitly has an 'any[]' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(44,27): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(44,40): error TS7006: Parameter 'totalAmount' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(68,58): error TS7006: Parameter 'addToHistory' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(69,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(69,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(73,39): error TS7006: Parameter 'executionRecord' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(73,56): error TS7006: Parameter 'executionResults' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(91,22): error TS2345: Argument of type '(prevStack: never[]) => { executionId: any; executedAt: any; canUndo: boolean; transfers: any[]; totalAmount: any; createdAt: string; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type '(prevStack: never[]) => { executionId: any; executedAt: any; canUndo: boolean; transfers: any[]; totalAmount: any; createdAt: string; }[]' is not assignable to type '(prevState: never[]) => never[]'.
-    Type '{ executionId: any; executedAt: any; canUndo: boolean; transfers: any[]; totalAmount: any; createdAt: string; }[]' is not assignable to type 'never[]'.
-      Type '{ executionId: any; executedAt: any; canUndo: boolean; transfers: any[]; totalAmount: any; createdAt: string; }' is not assignable to type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(106,12): error TS7006: Parameter 'transfer' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(124,18): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(134,12): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(135,54): error TS2339: Property 'executionId' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(135,90): error TS2339: Property 'canUndo' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(144,40): error TS2339: Property 'transfers' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(145,33): error TS2339: Property 'totalAmount' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(149,41): error TS2339: Property 'transfers' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(154,22): error TS2345: Argument of type '(prevStack: never[]) => any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type '(prevStack: never[]) => any[]' is not assignable to type '(prevState: never[]) => never[]'.
-    Type 'any[]' is not assignable to type 'never[]'.
-      Type 'any' is not assignable to type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(156,18): error TS2339: Property 'executionId' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(157,19): error TS2698: Spread types may only be created from object types.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(163,67): error TS2339: Property 'totalAmount' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(168,36): error TS2339: Property 'totalAmount' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(174,36): error TS2339: Property 'totalAmount' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(175,39): error TS2339: Property 'transfers' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(181,18): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(183,54): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(191,44): error TS2339: Property 'canUndo' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(200,67): error TS2339: Property 'totalAmount' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(202,76): error TS2339: Property 'executedAt' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(203,67): error TS2339: Property 'executedAt' does not exist on type 'never'.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(214,54): error TS2339: Property 'executionId' does not exist on type 'never'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(4,15): error TS2459: Module '"./useExecutionHistory"' declares 'ExecutionRecord' locally, but it is not exported.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(10,17): error TS18046: 'result.targetEnvelopes' is of type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(18,27): error TS18046: 'result.amount' is of type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(18,43): error TS18046: 'result.targetEnvelopes' is of type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(19,10): error TS18046: 'result.targetEnvelopes' is of type 'unknown'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(19,38): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(40,34): error TS2339: Property 'length' does not exist on type '{}'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(41,24): error TS2345: Argument of type '{ fromEnvelopeId: any; toEnvelopeId: any; amount: unknown; description: {}; executedAt: any; }' is not assignable to parameter of type '{ fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; executedAt: string; }'.
+  Types of property 'amount' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(77,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(77,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(27,23): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(31,59): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(36,27): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.

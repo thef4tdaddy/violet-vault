@@ -1,31 +1,39 @@
 import { useState, useCallback } from "react";
 import useUiStore from "../../../stores/ui/uiStore";
 import logger from "../../../utils/common/logger";
+import type { ExecutionRecord } from "./useExecutionHistory";
+import type { RuleExecutionResult } from "./types";
 
 // Helper to create single target transfer
-const createSingleTransfer = (executionRecord, result) => ({
+const createSingleTransfer = (executionRecord: ExecutionRecord, result: RuleExecutionResult) => ({
   fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
   toEnvelopeId: result.targetEnvelopes[0].id,
   amount: result.amount,
   description: result.description || `Auto-funding: ${result.ruleName}`,
-  executedAt: executionRecord.executedAt,
+  executedAt: executionRecord.executedAt || "",
 });
 
 // Helper to create multiple target transfers
-const createMultipleTransfers = (executionRecord, result) => {
+const createMultipleTransfers = (executionRecord: ExecutionRecord, result: RuleExecutionResult) => {
   const amountPerTarget = result.amount / result.targetEnvelopes.length;
   return result.targetEnvelopes.map((envelope) => ({
     fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
     toEnvelopeId: envelope.id,
     amount: amountPerTarget,
     description: result.description || `Auto-funding: ${result.ruleName}`,
-    executedAt: executionRecord.executedAt,
+    executedAt: executionRecord.executedAt || "",
   }));
 };
 
 // Helper to extract undoable transfers from execution results
-const extractUndoableTransfers = (executionRecord, executionResults) => {
-  const transfers = [];
+const extractUndoableTransfers = (executionRecord: ExecutionRecord, executionResults: RuleExecutionResult[]) => {
+  const transfers = [] as Array<{
+    fromEnvelopeId: string;
+    toEnvelopeId: string;
+    amount: number;
+    description: string;
+    executedAt: string;
+  }>;
 
   executionResults.forEach((result) => {
     if (result.success && result.targetEnvelopes) {
@@ -41,7 +49,7 @@ const extractUndoableTransfers = (executionRecord, executionResults) => {
 };
 
 // Helper to create undo record
-const createUndoRecord = (executionId, totalAmount) => ({
+const createUndoRecord = (executionId: string, totalAmount: number) => ({
   id: `undo_${executionId}_${Date.now()}`,
   trigger: "manual_undo",
   executedAt: new Date().toISOString(),
@@ -65,14 +73,14 @@ const createUndoRecord = (executionId, totalAmount) => ({
  * Hook for managing auto-funding undo operations
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
-export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
+export const useUndoOperations = (initialUndoStack: ExecutionRecord[] = [], addToHistory: (record: unknown) => void) => {
   const budget = useUiStore((state) => state.budget);
   const [undoStack, setUndoStack] = useState(initialUndoStack);
 
   // Add execution to undo stack if it has successful transfers
-  const addToUndoStack = useCallback((executionRecord, executionResults) => {
+  const addToUndoStackCallback = useCallback((executionRecord: ExecutionRecord, executionResults: RuleExecutionResult[]) => {
     try {
-      if (executionRecord.totalFunded <= 0) {
+      if (executionRecord.totalFunded && executionRecord.totalFunded <= 0) {
         return; // No transfers to undo
       }
 
@@ -81,7 +89,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
       if (undoableTransfers.length > 0) {
         const undoItem = {
           executionId: executionRecord.id,
-          executedAt: executionRecord.executedAt,
+          executedAt: executionRecord.executedAt || "",
           canUndo: true,
           transfers: undoableTransfers,
           totalAmount: executionRecord.totalFunded,
@@ -97,13 +105,18 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
         });
       }
     } catch (error) {
-      logger.error("Failed to add execution to undo stack", error);
+      logger.error("Failed to add execution to undo stack", error instanceof Error ? error.message : String(error));
     }
   }, []);
 
   // Reverse a single transfer
   const reverseTransfer = useCallback(
-    async (transfer) => {
+    async (transfer: {
+      fromEnvelopeId: string;
+      toEnvelopeId: string;
+      amount: number;
+      description: string;
+    }) => {
       try {
         // Reverse the transfer: move money back from target to source
         await budget.transferFunds(
@@ -121,7 +134,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
       } catch (error) {
         logger.error("Failed to reverse transfer", {
           transfer,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         });
         throw error;
       }
@@ -131,7 +144,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
 
   // Undo a specific execution by ID
   const undoExecution = useCallback(
-    async (executionId) => {
+    async (executionId: string) => {
       const undoItem = undoStack.find((item) => item.executionId === executionId && item.canUndo);
 
       if (!undoItem) {
@@ -178,9 +191,9 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
       } catch (error) {
         logger.error("Undo operation failed", {
           executionId,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         });
-        throw new Error(`Failed to undo execution: ${error.message}`);
+        throw new Error(`Failed to undo execution: ${error instanceof Error ? error.message : String(error)}`);
       }
     },
     [undoStack, addToHistory, reverseTransfer]
@@ -216,7 +229,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
 
   return {
     undoStack,
-    addToUndoStack,
+    addToUndoStack: addToUndoStackCallback,
     getUndoableExecutions,
     getUndoStatistics,
     undoLastExecution,
