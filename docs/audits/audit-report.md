@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
-| TypeScript Errors | 8 | +4 |
-| TypeScript Strict Mode Errors | 3690 | -41 |
+| ESLint Issues | 1 | +1 |
+| TypeScript Errors | 12 | +4 |
+| TypeScript Strict Mode Errors | 3648 | -42 |
 
-*Last updated: 2025-11-11 17:56:53 UTC*
+*Last updated: 2025-11-11 17:59:08 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,13 +26,23 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 1 issues in `violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts`
 
-Last check: 2025-11-11 17:56:37 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 1 | `@typescript-eslint/no-explicit-any` |
+
+### Detailed Lint Report
+```
+violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:281:45 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 4 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 4 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
@@ -41,8 +51,8 @@ Last check: 2025-11-11 17:56:37 UTC
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
+| 7 | `TS2339` |
 | 5 | `TS2345` |
-| 3 | `TS2339` |
 
 ### Detailed Type Error Report
 ```
@@ -63,12 +73,15 @@ src/utils/budgeting/autofunding/simulation.ts(57,70): error TS2345: Argument of 
 src/utils/budgeting/autofunding/simulation.ts(430,22): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
 src/utils/budgeting/autofunding/simulation.ts(508,38): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
 src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
+src/utils/budgeting/paycheckAllocationUtils.ts(260,23): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(260,61): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(261,21): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property 'monthlyBudget' does not exist on type 'Envelope'.
 ```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 46 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 44 errors in `src/utils/savings/savingsCalculations.ts`
 - 43 errors in `src/hooks/bills/useBills/billAnalytics.ts`
 - 41 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
@@ -332,6 +345,7 @@ src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'n
 - 4 errors in `src/utils/sync/retryPolicies.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
 - 4 errors in `src/utils/icons/index.ts`
+- 4 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
@@ -571,12 +585,12 @@ src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'n
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1439 | `TS7006` |
-| 915 | `TS7031` |
-| 281 | `TS2339` |
+| 1404 | `TS7006` |
+| 907 | `TS7031` |
+| 284 | `TS2339` |
 | 247 | `TS2345` |
 | 201 | `TS18046` |
-| 144 | `TS7053` |
+| 142 | `TS7053` |
 | 122 | `TS2322` |
 | 80 | `TS18048` |
 | 79 | `TS7005` |
@@ -4176,52 +4190,10 @@ src/utils/budgeting/envelopeStyles.ts(20,32): error TS7006: Parameter 'envelope'
 src/utils/budgeting/envelopeStyles.ts(39,31): error TS7006: Parameter 'status' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(55,37): error TS7006: Parameter 'utilizationRate' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(55,54): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(13,45): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(13,53): error TS7006: Parameter 'allocationMode' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(13,69): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(33,39): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(33,47): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(44,26): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(47,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/utils/budgeting/paycheckAllocationUtils.ts(54,30): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(57,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/utils/budgeting/paycheckAllocationUtils.ts(77,30): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(79,11): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(84,10): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(84,20): error TS7031: Binding element 'resolvedType' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(91,13): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(97,34): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(99,11): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(105,10): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(105,20): error TS7031: Binding element 'resolvedType' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(105,34): error TS7031: Binding element 'monthlyBudget' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(110,13): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(110,23): error TS7031: Binding element 'monthlyBudget' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(119,42): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(119,52): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(139,46): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(139,56): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(161,29): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(161,40): error TS7006: Parameter 'billEnvelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(161,55): error TS7006: Parameter 'variableEnvelopes' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(167,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(176,47): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(190,32): error TS7006: Parameter 'resultData' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(222,48): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(227,32): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(238,30): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(248,31): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(259,36): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(273,19): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(287,36): error TS7006: Parameter 'payer' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(287,43): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(289,14): error TS7006: Parameter 'p' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(291,11): error TS7006: Parameter 'p' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(295,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(295,47): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(308,33): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(312,28): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
-src/utils/budgeting/paycheckAllocationUtils.ts(320,24): error TS2339: Property 'trim' does not exist on type 'never'.
+src/utils/budgeting/paycheckAllocationUtils.ts(260,23): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(260,61): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(261,21): error TS2339: Property 'envelopeType' does not exist on type 'Envelope'.
+src/utils/budgeting/paycheckAllocationUtils.ts(270,32): error TS2339: Property 'monthlyBudget' does not exist on type 'Envelope'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/utils/budgeting/paycheckProcessing.ts(35,5): error TS2769: No overload matches this call.
   Overload 1 of 3, '(callbackfn: (previousValue: { currentBalance?: string | number | undefined; }, currentValue: { currentBalance?: string | number | undefined; }, currentIndex: number, array: { currentBalance?: string | ... 1 more ... | undefined; }[]) => { ...; }, initialValue: { ...; }): { ...; }', gave the following error.
