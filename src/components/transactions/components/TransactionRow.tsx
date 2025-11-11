@@ -93,7 +93,7 @@ const TransactionRow = ({
               title="Split transaction"
               aria-label="Split transaction"
             >
-              {React.createElement(getIcon("Scissors"), {
+            {React.createElement(getIcon("SplitSquareHorizontal"), {
                 className: "h-4 w-4",
               })}
               <span className="hidden xl:inline font-semibold">Split</span>
@@ -105,7 +105,7 @@ const TransactionRow = ({
             title="View history"
             aria-label="View history"
           >
-            {React.createElement(getIcon("History"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("ClockHistory"), { className: "h-4 w-4" })}
             <span className="hidden xl:inline font-semibold">History</span>
           </Button>
           <Button
@@ -114,7 +114,7 @@ const TransactionRow = ({
             title="Edit transaction"
             aria-label="Edit transaction"
           >
-            {React.createElement(getIcon("Edit3"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("PencilLine"), { className: "h-4 w-4" })}
             <span className="hidden xl:inline font-semibold">Edit</span>
           </Button>
           <Button

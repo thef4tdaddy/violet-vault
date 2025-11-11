@@ -114,9 +114,11 @@ import {
   Receipt,
   Upload,
   Download,
+  PencilLine,
 
   // Time & Calendar
   Clock,
+  ClockHistory,
   Calendar,
   Timer,
 
@@ -149,6 +151,7 @@ import {
   Save,
   Share,
   ExternalLink,
+  SplitSquareHorizontal,
 
   // Loading & Progress
   Loader2,
@@ -280,6 +283,7 @@ export const ICON_REGISTRY = {
 
   // Time & Calendar
   Clock: Clock,
+  ClockHistory: ClockHistory,
   Calendar: Calendar,
   Timer: Timer,
 
@@ -312,6 +316,8 @@ export const ICON_REGISTRY = {
   Save: Save,
   Share: Share,
   ExternalLink: ExternalLink,
+  SplitSquareHorizontal: SplitSquareHorizontal,
+  PencilLine: PencilLine,
 
   // Loading & Progress
   Loader2: Loader2,
