@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 59 | 0 |
-| TypeScript Errors | 29 | +6 |
-| TypeScript Strict Mode Errors | 3272 | -50 |
+| ESLint Issues | 61 | +2 |
+| TypeScript Errors | 23 | -6 |
+| TypeScript Strict Mode Errors | 3236 | -36 |
 
-*Last updated: 2025-11-11 21:19:50 UTC*
+*Last updated: 2025-11-11 21:24:06 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -30,26 +30,27 @@
 - 39 issues in `violet-vault/src/services/transactions/transactionSplitterService.ts`
 - 10 issues in `violet-vault/src/utils/security/encryption.ts`
 - 9 issues in `violet-vault/src/services/cloudSyncService.ts`
+- 2 issues in `violet-vault/src/utils/budgeting/envelopeCalculations.ts`
 - 1 issues in `violet-vault/src/stores/ui/uiStore.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
 | 57 | `@typescript-eslint/no-explicit-any` |
+| 3 | `complexity` |
 | 1 | `no-undef` |
-| 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
-violet-vault/src/services/cloudSyncService.ts:489:38 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:490:37 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:491:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:527:64 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:530:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:533:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:536:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:539:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/services/cloudSyncService.ts:542:76 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:505:38 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:506:37 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:507:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:543:64 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:546:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:549:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:552:70 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:555:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/services/cloudSyncService.ts:558:76 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/services/transactions/transactionSplitterService.ts:13:17 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/services/transactions/transactionSplitterService.ts:14:17 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/services/transactions/transactionSplitterService.ts:21:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
@@ -90,6 +91,8 @@ violet-vault/src/services/transactions/transactionSplitterService.ts:250:70 - 1 
 violet-vault/src/services/transactions/transactionSplitterService.ts:251:23 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/services/transactions/transactionSplitterService.ts:251:67 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/stores/ui/uiStore.ts:298:23 - 1 - 'BeforeInstallPromptEvent' is not defined. (no-undef)
+violet-vault/src/utils/budgeting/envelopeCalculations.ts:204:11 - 1 - Arrow function has a complexity of 22. Maximum allowed is 15. (complexity)
+violet-vault/src/utils/budgeting/envelopeCalculations.ts:345:49 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
 violet-vault/src/utils/security/encryption.ts:98:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/utils/security/encryption.ts:103:26 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 violet-vault/src/utils/security/encryption.ts:108:53 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
@@ -105,40 +108,45 @@ violet-vault/src/utils/security/encryption.ts:288:42 - 1 - Unexpected any. Speci
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 8 errors in `src/utils/sync/syncFlowValidator.ts`
 - 4 errors in `src/hooks/transactions/useTransactionLedger.ts`
+- 2 errors in `src/utils/sync/syncFlowValidator.ts`
 - 2 errors in `src/utils/query/prefetchHelpers.ts`
 - 2 errors in `src/stores/ui/uiStore.ts`
 - 2 errors in `src/services/transactions/transactionSplitterService.ts`
 - 2 errors in `src/services/chunkedSyncService.ts`
-- 2 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 1 errors in `src/utils/sync/syncHealthChecker.ts`
-- 1 errors in `src/utils/sync/syncEdgeCaseTester.ts`
 - 1 errors in `src/utils/icons/index.ts`
 - 1 errors in `src/services/cloudSyncService.ts`
 - 1 errors in `src/hooks/transactions/useTransactionSplitterHelpers.ts`
 - 1 errors in `src/hooks/transactions/useTransactionSplitter.ts`
+- 1 errors in `src/hooks/layout/useLayoutData.ts`
 - 1 errors in `src/hooks/analytics/queries/useSpendingAnalyticsQuery.ts`
+- 1 errors in `src/components/budgeting/EnvelopeSystem.tsx`
+- 1 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 9 | `TS2339` |
-| 8 | `TS2345` |
+| 10 | `TS2345` |
 | 4 | `TS2322` |
 | 3 | `TS2305` |
 | 2 | `TS2554` |
-| 2 | `TS2352` |
+| 2 | `TS2339` |
+| 1 | `TS2352` |
 | 1 | `TS2304` |
 
 ### Detailed Type Error Report
 ```
-src/components/budgeting/EnvelopeGrid.tsx(376,52): error TS2352: Conversion of type 'UseMutateFunction<{ id: string; updates: Partial<Envelope>; }, Error, UpdateEnvelopeData, unknown>' to type 'UpdateEnvelopeFunction' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-  Types of parameters 'variables' and 'params' are incompatible.
-    Property 'id' is missing in type '{ envelopeId: string; updates: Partial<Envelope>; }' but required in type 'UpdateEnvelopeData'.
-src/components/budgeting/EnvelopeGrid.tsx(376,94): error TS2345: Argument of type 'UseMutateFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type 'AddEnvelopeFunction'.
-  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/budgeting/EnvelopeGrid.tsx(381,5): error TS2345: Argument of type 'EnvelopeData[]' is not assignable to parameter of type 'EnvelopeData[]'.
+  Type 'EnvelopeData' is not assignable to type 'EnvelopeData'. Two different types with this name exist, but they are unrelated.
+    Property 'allocated' is optional in type 'EnvelopeData' but required in type 'EnvelopeData'.
+src/components/budgeting/EnvelopeSystem.tsx(62,54): error TS2345: Argument of type 'import("violet-vault/src/db/types").Bill[]' is not assignable to parameter of type 'Bill[]'.
+  Type 'import("violet-vault/src/db/types").Bill' is not assignable to type 'Bill'.
+    Property 'envelopeId' is optional in type 'Bill' but required in type 'Bill'.
 src/hooks/analytics/queries/useSpendingAnalyticsQuery.ts(48,43): error TS2345: Argument of type '{ period: string; customDateRange: { start: string | Date; end: string | Date; }; includeTransfers: boolean; groupBy: string; }' is not assignable to parameter of type 'string'.
+src/hooks/layout/useLayoutData.ts(60,7): error TS2345: Argument of type 'import("violet-vault/src/db/types").Bill[]' is not assignable to parameter of type 'Bill[]'.
+  Type 'import("violet-vault/src/db/types").Bill' is not assignable to type 'Bill'.
+    Property 'envelopeId' is optional in type 'Bill' but required in type 'Bill'.
 src/hooks/transactions/useTransactionLedger.ts(111,7): error TS2322: Type 'Promise<Transaction>' is not assignable to type 'void | Promise<void>'.
   Type 'Promise<Transaction>' is not assignable to type 'Promise<void>'.
     Type 'Transaction' is not assignable to type 'void'.
@@ -152,7 +160,7 @@ src/hooks/transactions/useTransactionSplitter.ts(19,10): error TS2305: Module '"
 src/hooks/transactions/useTransactionSplitterHelpers.ts(18,3): error TS2305: Module '"@/utils/transactions/splitting"' has no exported member 'hasUnsavedChanges'.
 src/services/chunkedSyncService.ts(567,15): error TS2554: Expected 2 arguments, but got 3.
 src/services/chunkedSyncService.ts(662,17): error TS2554: Expected 2 arguments, but got 3.
-src/services/cloudSyncService.ts(792,4): error TS2352: Conversion of type 'Window & typeof globalThis' to type 'CloudSyncWindow' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/services/cloudSyncService.ts(808,4): error TS2352: Conversion of type 'Window & typeof globalThis' to type 'CloudSyncWindow' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Types of property 'cloudSyncService' are incompatible.
     Type '{ triggerSyncForCriticalChange: (changeType: string) => void; }' is missing the following properties from type 'CloudSyncService': syncIntervalId, isSyncing, config, debounceTimer, and 18 more.
 src/services/transactions/transactionSplitterService.ts(34,14): error TS2339: Property 'id' does not exist on type 'unknown'.
@@ -167,26 +175,18 @@ src/utils/query/prefetchHelpers.ts(39,43): error TS2345: Argument of type 'Envel
   Index signature for type 'string' is missing in type 'EnvelopeFilters'.
 src/utils/query/prefetchHelpers.ts(128,39): error TS2345: Argument of type 'BillOptions' is not assignable to parameter of type 'FilterParams'.
   Index signature for type 'string' is missing in type 'BillOptions'.
-src/utils/sync/syncEdgeCaseTester.ts(387,61): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(97,48): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(101,51): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(105,44): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(109,44): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(175,77): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(179,83): error TS2339: Property 'id' does not exist on type 'unknown'.
 src/utils/sync/syncFlowValidator.ts(247,11): error TS2345: Argument of type '{ lastModified: number; envelopes: { id: string; }[]; }' is not assignable to parameter of type 'DexieData'.
-  Type '{ lastModified: number; envelopes: { id: string; }[]; }' is missing the following properties from type 'DexieData': transactions, bills, debts, savingsGoals, and 3 more.
+  Type '{ lastModified: number; envelopes: { id: string; }[]; }' is missing the following properties from type 'DexieData': transactions, bills, debts, savingsGoals, and 4 more.
 src/utils/sync/syncFlowValidator.ts(286,34): error TS2345: Argument of type '{ budgetId: string; encryptionKey: ArrayBuffer; currentUser: { userName: string; userColor: string; }; }' is not assignable to parameter of type 'SyncConfig'.
   Types of property 'encryptionKey' are incompatible.
     Type 'ArrayBuffer' is not assignable to type 'string | CryptoKey'.
 src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ envelopes: { id: string; name: string; }[]; transactions: any[]; bills: any[]; debts: any[]; lastModified: number; }' is not assignable to parameter of type 'DexieData'.
-  Type '{ envelopes: { id: string; name: string; }[]; transactions: any[]; bills: any[]; debts: any[]; lastModified: number; }' is missing the following properties from type 'DexieData': savingsGoals, paycheckHistory, unassignedCash, actualBalance
+  Type '{ envelopes: { id: string; name: string; }[]; transactions: any[]; bills: any[]; debts: any[]; lastModified: number; }' is missing the following properties from type 'DexieData': savingsGoals, paycheckHistory, unassignedCash, actualBalance, supplementalAccounts
 ```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 32 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 30 errors in `src/services/chunkedSyncService.ts`
 - 28 errors in `src/services/budgetHistoryService.ts`
 - 27 errors in `src/services/editLockService.ts`
@@ -214,13 +214,13 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 20 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 20 errors in `src/hooks/auth/useUserSetup.ts`
 - 20 errors in `src/hooks/auth/useSecurityManagerUI.ts`
+- 20 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 20 errors in `src/components/automation/AutoFundingDashboardComponents.tsx`
 - 19 errors in `src/stores/ui/fabStore.ts`
 - 19 errors in `src/hooks/common/useToast.ts`
 - 19 errors in `src/hooks/common/useImportData.ts`
 - 19 errors in `src/components/sync/ActivityBanner.tsx`
 - 19 errors in `src/components/savings/AddEditGoalModal.tsx`
-- 19 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 19 errors in `src/components/automation/AutoFundingViewComponents.tsx`
 - 18 errors in `src/utils/receipts/receiptHelpers.tsx`
 - 18 errors in `src/utils/common/frequencyCalculations.ts`
@@ -255,9 +255,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
-- 13 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 13 errors in `src/components/automation/AutoFundingDashboard.tsx`
-- 12 errors in `src/utils/sync/syncFlowValidator.ts`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
@@ -270,6 +268,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 12 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
 - 12 errors in `src/components/settings/SettingsDashboard.tsx`
 - 12 errors in `src/components/debt/modals/DebtFormSections.tsx`
+- 12 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 12 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
 - 11 errors in `src/utils/sync/syncHealthChecker.ts`
@@ -377,7 +376,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 7 errors in `src/App.tsx`
 - 6 errors in `src/utils/transactions/splitting.ts`
 - 6 errors in `src/utils/transactions/fileParser.ts`
-- 6 errors in `src/utils/sync/syncEdgeCaseTester.ts`
+- 6 errors in `src/utils/sync/syncFlowValidator.ts`
 - 6 errors in `src/utils/debts/debtDebugConfig.ts`
 - 6 errors in `src/utils/dataManagement/validationUtils.ts`
 - 6 errors in `src/utils/common/BaseMutex.ts`
@@ -397,6 +396,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 6 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
 - 6 errors in `src/components/automation/steps/config/PriorityFillConfig.tsx`
 - 5 errors in `src/utils/sync/validation/checksumUtils.ts`
+- 5 errors in `src/utils/sync/syncEdgeCaseTester.ts`
 - 5 errors in `src/utils/pwa/offlineDataValidator.ts`
 - 5 errors in `src/utils/icons/index.ts`
 - 5 errors in `src/utils/debts/debtFormValidation.ts`
@@ -537,6 +537,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
 - 2 errors in `src/utils/common/lazyImport.ts`
+- 2 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 2 errors in `src/services/transactions/transactionSplitterService.ts`
 - 2 errors in `src/services/firebaseMessaging.ts`
 - 2 errors in `src/services/bugReport/errorTrackingService.ts`
@@ -628,6 +629,7 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 1 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/mobile/useSlideUpModal.ts`
+- 1 errors in `src/hooks/layout/useLayoutData.ts`
 - 1 errors in `src/hooks/debts/useDebtManagement.ts`
 - 1 errors in `src/hooks/common/usePrompt.ts`
 - 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
@@ -683,13 +685,13 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1182 | `TS7006` |
+| 1153 | `TS7006` |
 | 860 | `TS7031` |
-| 238 | `TS2345` |
+| 241 | `TS2345` |
 | 213 | `TS2339` |
-| 199 | `TS18046` |
+| 192 | `TS18046` |
 | 137 | `TS2322` |
-| 119 | `TS7053` |
+| 117 | `TS7053` |
 | 80 | `TS18048` |
 | 77 | `TS7005` |
 | 44 | `TS7034` |
@@ -700,10 +702,10 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 | 6 | `TS2411` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
-| 4 | `TS2352` |
 | 3 | `TS7019` |
 | 3 | `TS2698` |
 | 3 | `TS2538` |
+| 3 | `TS2352` |
 | 3 | `TS2305` |
 | 2 | `TS7022` |
 | 2 | `TS2554` |
@@ -1257,29 +1259,28 @@ src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,35): error TS7005
 src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,51): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(14,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeGrid.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/budgeting/EnvelopeGrid.tsx(109,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
+src/components/budgeting/EnvelopeGrid.tsx(112,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
-src/components/budgeting/EnvelopeGrid.tsx(272,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(273,30): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(274,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(275,29): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(276,28): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(376,52): error TS2352: Conversion of type 'UseMutateFunction<{ id: string; updates: Partial<Envelope>; }, Error, UpdateEnvelopeData, unknown>' to type 'UpdateEnvelopeFunction' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-  Types of parameters 'variables' and 'params' are incompatible.
-    Property 'id' is missing in type '{ envelopeId: string; updates: Partial<Envelope>; }' but required in type 'UpdateEnvelopeData'.
-src/components/budgeting/EnvelopeGrid.tsx(376,94): error TS2345: Argument of type 'UseMutateFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string | undefined; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type 'AddEnvelopeFunction'.
-  Types of parameters 'variables' and 'data' are incompatible.
-    Type 'unknown' is not assignable to type 'AddEnvelopeData'.
-src/components/budgeting/EnvelopeGrid.tsx(400,7): error TS2322: Type 'Dispatch<SetStateAction<FilterOptions>>' is not assignable to type '(opts: unknown) => void'.
+src/components/budgeting/EnvelopeGrid.tsx(276,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(277,30): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(278,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(279,29): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(280,28): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(381,5): error TS2345: Argument of type 'EnvelopeData[]' is not assignable to parameter of type 'EnvelopeData[]'.
+  Type 'EnvelopeData' is not assignable to type 'EnvelopeData'. Two different types with this name exist, but they are unrelated.
+    Types of property 'allocated' are incompatible.
+      Type 'number | undefined' is not assignable to type 'number'.
+        Type 'undefined' is not assignable to type 'number'.
+src/components/budgeting/EnvelopeGrid.tsx(408,7): error TS2322: Type 'Dispatch<SetStateAction<FilterOptions>>' is not assignable to type '(opts: unknown) => void'.
   Types of parameters 'value' and 'opts' are incompatible.
     Type 'unknown' is not assignable to type 'SetStateAction<FilterOptions>'.
-src/components/budgeting/EnvelopeGrid.tsx(404,7): error TS2322: Type '(envelope: EnvelopeRef) => void' is not assignable to type '(env: unknown) => void'.
+src/components/budgeting/EnvelopeGrid.tsx(412,7): error TS2322: Type '(envelope: EnvelopeRef) => void' is not assignable to type '(env: unknown) => void'.
   Types of parameters 'envelope' and 'env' are incompatible.
     Type 'unknown' is not assignable to type 'EnvelopeRef'.
-src/components/budgeting/EnvelopeGrid.tsx(407,7): error TS2322: Type '(envelope: EnvelopeRef) => void' is not assignable to type '(env: unknown) => void'.
+src/components/budgeting/EnvelopeGrid.tsx(415,7): error TS2322: Type '(envelope: EnvelopeRef) => void' is not assignable to type '(env: unknown) => void'.
   Types of parameters 'envelope' and 'env' are incompatible.
     Type 'unknown' is not assignable to type 'EnvelopeRef'.
-src/components/budgeting/EnvelopeGrid.tsx(421,9): error TS2322: Type '(envelopeData: { id: string; [key: string]: unknown; }) => Promise<void>' is not assignable to type '(data: unknown) => Promise<void>'.
+src/components/budgeting/EnvelopeGrid.tsx(431,9): error TS2322: Type '(envelopeData: { id: string; [key: string]: unknown; }) => Promise<void>' is not assignable to type '(data: unknown) => Promise<void>'.
   Types of parameters 'envelopeData' and 'data' are incompatible.
     Type 'unknown' is not assignable to type '{ [key: string]: unknown; id: string; }'.
 src/components/budgeting/EnvelopeSystem.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
@@ -1291,6 +1292,11 @@ src/components/budgeting/EnvelopeSystem.tsx(36,33): error TS7005: Variable 'useB
 src/components/budgeting/EnvelopeSystem.tsx(36,49): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeSystem.tsx(37,29): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeSystem.tsx(37,45): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeSystem.tsx(62,54): error TS2345: Argument of type 'import("violet-vault/src/db/types").Bill[]' is not assignable to parameter of type 'Bill[]'.
+  Type 'import("violet-vault/src/db/types").Bill' is not assignable to type 'Bill'.
+    Types of property 'envelopeId' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
 src/components/budgeting/EnvelopeSystem.tsx(72,19): error TS7006: Parameter 'currentEnvelopes' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeSystem.tsx(84,56): error TS2538: Type 'undefined' cannot be used as an index type.
 src/components/budgeting/EnvelopeSystem.tsx(134,7): error TS2322: Type 'string' is not assignable to type 'null'.
@@ -3091,6 +3097,10 @@ src/hooks/history/useBudgetHistoryViewer.ts(149,12): error TS7053: Element impli
 src/hooks/history/useBudgetHistoryViewer.ts(152,41): error TS7006: Parameter 'hash' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(156,40): error TS7006: Parameter 'timestamp' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(160,35): error TS7006: Parameter 'date' implicitly has an 'any' type.
+src/hooks/layout/useLayoutData.ts(59,7): error TS2345: Argument of type 'import("violet-vault/src/db/types").Transaction[]' is not assignable to parameter of type 'Transaction[]'.
+  Type 'import("violet-vault/src/db/types").Transaction' is not assignable to type 'Transaction'.
+    Types of property 'date' are incompatible.
+      Type 'Date' is not assignable to type 'string'.
 src/hooks/layout/usePaycheckOperations.ts(18,51): error TS7006: Parameter 'paycheckId' implicitly has an 'any' type.
 src/hooks/layout/usePaycheckOperations.ts(18,63): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/layout/usePaycheckOperations.ts(66,23): error TS18046: 'error' is of type 'unknown'.
@@ -3982,38 +3992,10 @@ src/utils/budgeting/billEnvelopeCalculations.ts(391,38): error TS18047: 'daysUnt
 src/utils/budgeting/billEnvelopeCalculations.ts(393,35): error TS18048: 'targetAmount' is possibly 'undefined'.
 src/utils/budgeting/billEnvelopeCalculations.ts(400,15): error TS18048: 'currentBalance' is possibly 'undefined'.
 src/utils/budgeting/billEnvelopeCalculations.ts(404,52): error TS18048: 'currentBalance' is possibly 'undefined'.
-src/utils/budgeting/envelopeCalculations.ts(7,39): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(7,50): error TS7006: Parameter 'transactions' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(7,64): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(8,25): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(9,55): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(12,41): error TS7006: Parameter 'b' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(17,8): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(28,10): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(30,32): error TS7006: Parameter 'b' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(54,49): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(54,54): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(95,42): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(95,52): error TS7006: Parameter 'billsAndTransactions' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(95,74): error TS7006: Parameter 'balanceInfo' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(140,41): error TS7006: Parameter 'totalOverdue' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(140,55): error TS7006: Parameter 'available' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(140,66): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(147,39): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(147,44): error TS7006: Parameter 'b' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(158,31): error TS7006: Parameter 'envelopeData' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(158,45): error TS7006: Parameter 'sortBy' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(180,29): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ overdue: number; overspent: number; underfunded: number; healthy: number; }'.
-src/utils/budgeting/envelopeCalculations.ts(180,53): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ overdue: number; overspent: number; underfunded: number; healthy: number; }'.
-src/utils/budgeting/envelopeCalculations.ts(190,33): error TS7006: Parameter 'envelopeData' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(190,47): error TS7006: Parameter 'filterOptions' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(212,41): error TS7006: Parameter 'envelopeData' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(214,6): error TS7006: Parameter 'acc' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(214,11): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(226,70): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(266,40): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(270,18): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/utils/budgeting/envelopeCalculations.ts(271,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<FrequencyType, number>'.
+src/utils/budgeting/envelopeCalculations.ts(208,77): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/utils/budgeting/envelopeCalculations.ts(404,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<FrequencyType, number>'.
+  No index signature with a parameter of type 'string' was found on type 'Record<FrequencyType, number>'.
 src/utils/budgeting/envelopeFormUtils.ts(126,5): error TS18048: 'zodResult.error' is possibly 'undefined'.
 src/utils/budgeting/envelopeFormUtils.ts(129,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
@@ -4533,11 +4515,6 @@ src/utils/sync/syncEdgeCaseTester.ts(300,32): error TS2352: Conversion of type '
     Type 'null' is not comparable to type 'string | undefined'.
 src/utils/sync/syncEdgeCaseTester.ts(359,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/sync/syncEdgeCaseTester.ts(365,57): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncEdgeCaseTester.ts(387,59): error TS18046: 't' is of type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(97,46): error TS18046: 'e' is of type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(101,49): error TS18046: 't' is of type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(105,42): error TS18046: 'b' is of type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(109,42): error TS18046: 'd' is of type 'unknown'.
 src/utils/sync/syncFlowValidator.ts(130,49): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'IndexableType'.
   Type 'undefined' is not assignable to type 'IndexableType'.
 src/utils/sync/syncFlowValidator.ts(131,52): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'IndexableType'.
@@ -4546,10 +4523,8 @@ src/utils/sync/syncFlowValidator.ts(132,45): error TS2345: Argument of type 'str
   Type 'undefined' is not assignable to type 'IndexableType'.
 src/utils/sync/syncFlowValidator.ts(133,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'IndexableType'.
   Type 'undefined' is not assignable to type 'IndexableType'.
-src/utils/sync/syncFlowValidator.ts(175,74): error TS18046: 'se' is of type 'unknown'.
-src/utils/sync/syncFlowValidator.ts(179,80): error TS18046: 'st' is of type 'unknown'.
 src/utils/sync/syncFlowValidator.ts(247,11): error TS2345: Argument of type '{ lastModified: number; envelopes: { id: string; }[]; } | { lastModified: number; envelopes: { id: string; }[]; }' is not assignable to parameter of type 'DexieData'.
-  Type '{ lastModified: number; envelopes: { id: string; }[]; }' is missing the following properties from type 'DexieData': transactions, bills, debts, savingsGoals, and 3 more.
+  Type '{ lastModified: number; envelopes: { id: string; }[]; }' is missing the following properties from type 'DexieData': transactions, bills, debts, savingsGoals, and 4 more.
 src/utils/sync/syncFlowValidator.ts(286,34): error TS2345: Argument of type '{ budgetId: string; encryptionKey: ArrayBuffer; currentUser: { userName: string; userColor: string; }; }' is not assignable to parameter of type 'SyncConfig'.
   Types of property 'encryptionKey' are incompatible.
     Type 'ArrayBuffer' is not assignable to type 'string | CryptoKey | undefined'.
@@ -4557,7 +4532,7 @@ src/utils/sync/syncHealthChecker.ts(25,40): error TS7006: Parameter 'results' im
 src/utils/sync/syncHealthChecker.ts(40,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/syncHealthChecker.ts(88,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ envelopes: { id: string; name: string; }[]; transactions: never[]; bills: never[]; debts: never[]; lastModified: number; }' is not assignable to parameter of type 'DexieData'.
-  Type '{ envelopes: { id: string; name: string; }[]; transactions: never[]; bills: never[]; debts: never[]; lastModified: number; }' is missing the following properties from type 'DexieData': savingsGoals, paycheckHistory, unassignedCash, actualBalance
+  Type '{ envelopes: { id: string; name: string; }[]; transactions: never[]; bills: never[]; debts: never[]; lastModified: number; }' is missing the following properties from type 'DexieData': savingsGoals, paycheckHistory, unassignedCash, actualBalance, supplementalAccounts
 src/utils/sync/syncHealthChecker.ts(134,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/syncHealthChecker.ts(169,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/syncHealthChecker.ts(199,14): error TS18046: 'error' is of type 'unknown'.

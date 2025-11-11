@@ -1,5 +1,5 @@
-// src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
-import { useState, useMemo, lazy, Suspense } from "react";
+// src/components/budgeting/EnvelopeGrid.tsx - Refactored with separated logic
+import { useState, useMemo, lazy, Suspense, Dispatch, SetStateAction } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
@@ -15,6 +15,44 @@ import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
+
+// Define types for our component
+interface Envelope {
+  id: string;
+  allocated?: number;
+  [key: string]: unknown;
+}
+
+interface EnvelopeData extends Envelope {
+  allocated: number;
+}
+
+interface FilterOptions {
+  timeRange: string;
+  showEmpty: boolean;
+  sortBy: string;
+  envelopeType: string;
+}
+
+interface QuickFundModalState {
+  isOpen: boolean;
+  envelope: Envelope | null;
+  suggestedAmount: number;
+}
+
+interface BudgetState {
+  envelopes: Envelope[];
+  transactions: unknown[];
+  bills: unknown[];
+  currentUser: unknown;
+  updateBill: (bill: unknown) => void;
+}
+
+type UpdateEnvelopeFunction = (params: {
+  envelopeId: string;
+  updates: Partial<Envelope>;
+}) => Promise<void>;
+type AddEnvelopeFunction = (data: unknown) => Promise<void>;
 
 // Lazy load modals for better performance
 const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));
@@ -49,7 +87,7 @@ const EnvelopeModals = ({
   showCreateModal: boolean;
   setShowCreateModal: (show: boolean) => void;
   handleCreateEnvelope: (data: unknown) => Promise<void>;
-  envelopes: unknown[];
+  envelopes: Envelope[];
   budget: { currentUser: unknown; updateBill: (bill: unknown) => void };
   unassignedCash: number;
   editingEnvelope: EnvelopeRef | null;
@@ -60,7 +98,7 @@ const EnvelopeModals = ({
   bills: unknown[];
   historyEnvelope: EnvelopeRef | null;
   setHistoryEnvelope: (env: EnvelopeRef | null) => void;
-  quickFundModal: { isOpen: boolean; envelope: EnvelopeRef | null; suggestedAmount: number };
+  quickFundModal: QuickFundModalState;
   closeQuickFundModal: () => void;
   handleQuickFundConfirm: (id: string, amount: number) => Promise<void>;
 }) => (
@@ -120,38 +158,43 @@ const EnvelopeModals = ({
 );
 
 // Hook for envelope UI state and handlers
-const useEnvelopeUIState = (envelopeData, updateEnvelope, addEnvelope) => {
-  const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
+const useEnvelopeUIState = (
+  envelopeData: EnvelopeData[],
+  updateEnvelope: UpdateEnvelopeFunction,
+  addEnvelope: AddEnvelopeFunction
+) => {
+  const [selectedEnvelopeId, setSelectedEnvelopeId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState("overview");
-  const [historyEnvelope, setHistoryEnvelope] = useState(null);
+  const [historyEnvelope, setHistoryEnvelope] = useState<EnvelopeRef | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingEnvelope, setEditingEnvelope] = useState(null);
-  const [quickFundModal, setQuickFundModal] = useState({
+  const [editingEnvelope, setEditingEnvelope] = useState<EnvelopeRef | null>(null);
+  const [quickFundModal, setQuickFundModal] = useState<QuickFundModalState>({
     isOpen: false,
     envelope: null,
     suggestedAmount: 0,
   });
-  const [filterOptions, setFilterOptions] = useState({
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     timeRange: "current_month",
     showEmpty: true,
     sortBy: "usage_desc",
     envelopeType: "all",
   });
 
-  const handleEnvelopeSelect = (envelopeId) => {
+  const handleEnvelopeSelect = (envelopeId: string) => {
     setSelectedEnvelopeId(envelopeId === selectedEnvelopeId ? null : envelopeId);
   };
 
-  const handleQuickFund = (envelopeId, suggestedAmount) => {
-    const envelope = envelopeData.find((env) => env.id === envelopeId);
+  const handleQuickFund = (envelopeId: string, suggestedAmount: number) => {
+    const envelope = envelopeData.find((env: EnvelopeData) => env.id === envelopeId);
     if (envelope) {
       setQuickFundModal({ isOpen: true, envelope, suggestedAmount });
     }
   };
 
-  const handleQuickFundConfirm = async (envelopeId, amount) => {
+  const handleQuickFundConfirm = async (envelopeId: string, amount: number) => {
     try {
-      const currentAllocated = envelopeData.find((env) => env.id === envelopeId)?.allocated || 0;
+      const currentAllocated =
+        envelopeData.find((env: EnvelopeData) => env.id === envelopeId)?.allocated || 0;
       await updateEnvelope({
         envelopeId,
         updates: { allocated: currentAllocated + amount },
@@ -166,10 +209,10 @@ const useEnvelopeUIState = (envelopeData, updateEnvelope, addEnvelope) => {
     setQuickFundModal({ isOpen: false, envelope: null, suggestedAmount: 0 });
   };
 
-  const handleEnvelopeEdit = (envelope) => setEditingEnvelope(envelope);
-  const handleViewHistory = (envelope) => setHistoryEnvelope(envelope);
+  const handleEnvelopeEdit = (envelope: EnvelopeRef) => setEditingEnvelope(envelope);
+  const handleViewHistory = (envelope: EnvelopeRef) => setHistoryEnvelope(envelope);
 
-  const handleCreateEnvelope = async (envelopeData) => {
+  const handleCreateEnvelope = async (envelopeData: unknown) => {
     try {
       await addEnvelope(envelopeData);
       setShowCreateModal(false);
@@ -178,9 +221,9 @@ const useEnvelopeUIState = (envelopeData, updateEnvelope, addEnvelope) => {
     }
   };
 
-  const handleUpdateEnvelope = async (envelopeData) => {
+  const handleUpdateEnvelope = async (envelopeData: { id: string; [key: string]: unknown }) => {
     try {
-      await updateEnvelope({ id: envelopeData.id, updates: envelopeData });
+      await updateEnvelope({ envelopeId: envelopeData.id, updates: envelopeData });
       setEditingEnvelope(null);
     } catch (error) {
       logger.error("Failed to update envelope:", error);
@@ -212,7 +255,11 @@ const useEnvelopeUIState = (envelopeData, updateEnvelope, addEnvelope) => {
 };
 
 // Hook to resolve data from multiple sources with priority
-const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) => {
+const useResolvedData = (
+  propEnvelopes: Envelope[] = [],
+  propTransactions: unknown[] = [],
+  propUnassignedCash?: number
+) => {
   const {
     envelopes: tanStackEnvelopes = [],
     addEnvelope,
@@ -226,11 +273,11 @@ const useResolvedData = (propEnvelopes, propTransactions, propUnassignedCash) =>
   const { bills: tanStackBills = [], updateBill, isLoading: billsLoading } = useBills();
   const { unassignedCash: tanStackUnassignedCash } = useUnassignedCash();
   // Selective subscriptions - only subscribe to specific properties needed
-  const budgetEnvelopes = useBudgetStore((state) => state.envelopes);
-  const budgetTransactions = useBudgetStore((state) => state.transactions);
-  const budgetBills = useBudgetStore((state) => state.bills);
-  const budgetCurrentUser = useBudgetStore((state) => state.currentUser);
-  const budgetUpdateBill = useBudgetStore((state) => state.updateBill);
+  const budgetEnvelopes = useBudgetStore((state: BudgetState) => state.envelopes);
+  const budgetTransactions = useBudgetStore((state: BudgetState) => state.transactions);
+  const budgetBills = useBudgetStore((state: BudgetState) => state.bills);
+  const budgetCurrentUser = useBudgetStore((state: BudgetState) => state.currentUser);
+  const budgetUpdateBill = useBudgetStore((state: BudgetState) => state.updateBill);
 
   const envelopes = useMemo(
     () =>
@@ -292,6 +339,11 @@ const UnifiedEnvelopeManager = ({
   transactions: propTransactions = [],
   unassignedCash: propUnassignedCash,
   className = "",
+}: {
+  envelopes?: Envelope[];
+  transactions?: unknown[];
+  unassignedCash?: number;
+  className?: string;
 }) => {
   // Validate props in development
   validateComponentProps(
@@ -325,7 +377,11 @@ const UnifiedEnvelopeManager = ({
   );
 
   // UI state and handlers
-  const uiState = useEnvelopeUIState(envelopeData, updateEnvelope, addEnvelope);
+  const uiState = useEnvelopeUIState(
+    envelopeData,
+    updateEnvelope as unknown as UpdateEnvelopeFunction,
+    addEnvelope as unknown as AddEnvelopeFunction
+  );
 
   // Computed envelope data
   const sortedEnvelopes = useMemo(() => {
@@ -349,7 +405,7 @@ const UnifiedEnvelopeManager = ({
       totals={totals}
       unassignedCash={unassignedCash}
       filterOptions={uiState.filterOptions}
-      setFilterOptions={uiState.setFilterOptions}
+      setFilterOptions={uiState.setFilterOptions as Dispatch<SetStateAction<FilterOptions>>}
       setShowCreateModal={uiState.setShowCreateModal}
       viewMode={uiState.viewMode}
       setViewMode={uiState.setViewMode}
@@ -369,7 +425,9 @@ const UnifiedEnvelopeManager = ({
         budget={budget}
         unassignedCash={unassignedCash}
         editingEnvelope={uiState.editingEnvelope}
-        setEditingEnvelope={uiState.setEditingEnvelope}
+        setEditingEnvelope={
+          uiState.setEditingEnvelope as Dispatch<SetStateAction<EnvelopeRef | null>>
+        }
         handleUpdateEnvelope={uiState.handleUpdateEnvelope}
         deleteEnvelope={(id: string) => Promise.resolve(deleteEnvelope(id))}
         updateBill={async (data: { id: string; updates: unknown }) => {
@@ -377,7 +435,9 @@ const UnifiedEnvelopeManager = ({
         }}
         bills={bills}
         historyEnvelope={uiState.historyEnvelope}
-        setHistoryEnvelope={uiState.setHistoryEnvelope}
+        setHistoryEnvelope={
+          uiState.setHistoryEnvelope as Dispatch<SetStateAction<EnvelopeRef | null>>
+        }
         quickFundModal={uiState.quickFundModal}
         closeQuickFundModal={uiState.closeQuickFundModal}
         handleQuickFundConfirm={uiState.handleQuickFundConfirm}
