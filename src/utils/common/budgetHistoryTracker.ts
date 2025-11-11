@@ -1,5 +1,5 @@
 import { budgetDb } from "../../db/budgetDb";
-import type { BudgetTag } from "../../db/types";
+import type { BudgetTag, Debt } from "../../db/types";
 import { encryptionUtils } from "../security/encryption";
 import logger from "../common/logger";
 import { formatCurrency } from "../accounts/accountHelpers";
@@ -16,8 +16,8 @@ export class BudgetHistoryTracker {
    * @param {string} options.entityId - ID of the entity (for debts)
    * @param {string} options.changeType - Type of change (modify, add, delete)
    * @param {string} options.description - Human-readable description
-   * @param {any} options.beforeData - Data before the change
-   * @param {any} options.afterData - Data after the change
+   * @param {unknown} options.beforeData - Data before the change
+   * @param {unknown} options.afterData - Data after the change
    * @param {string} options.author - User who made the change
    * @param {string} [options.deviceFingerprint] - Device identifier
    * @param {string} [options.parentHash] - Parent commit hash for linking
@@ -32,6 +32,16 @@ export class BudgetHistoryTracker {
     author = "Unknown User",
     deviceFingerprint = null,
     parentHash = null,
+  }: {
+    entityType: string;
+    entityId: string | null;
+    changeType: string;
+    description: string;
+    beforeData: unknown;
+    afterData: unknown;
+    author: string;
+    deviceFingerprint: string | null;
+    parentHash: string | null;
   }) {
     try {
       // Generate commit hash
@@ -68,7 +78,7 @@ export class BudgetHistoryTracker {
         message: description,
         author,
         parentHash,
-        snapshotData: snapshotData,
+        snapshotData,
         deviceFingerprint: commitData.deviceFingerprint,
       };
 
@@ -96,7 +106,7 @@ export class BudgetHistoryTracker {
 
       return { commit, changes: [change] };
     } catch (error) {
-      logger.error("Failed to create budget history commit:", error);
+      logger.error("Failed to create budget history commit:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -109,6 +119,11 @@ export class BudgetHistoryTracker {
     newAmount,
     author = "Unknown User",
     source = "manual",
+  }: {
+    previousAmount: number;
+    newAmount: number;
+    author: string;
+    source: string;
   }) {
     const description =
       source === "distribution"
@@ -134,6 +149,11 @@ export class BudgetHistoryTracker {
     newBalance,
     isManual = true,
     author = "Unknown User",
+  }: {
+    previousBalance: number;
+    newBalance: number;
+    isManual: boolean;
+    author: string;
   }) {
     const source = isManual ? "manual entry" : "automatic calculation";
     const description = `Updated actual balance via ${source} from ${formatCurrency(previousBalance)} to ${formatCurrency(newBalance)}`;
@@ -158,6 +178,12 @@ export class BudgetHistoryTracker {
     previousData,
     newData,
     author = "Unknown User",
+  }: {
+    debtId: string;
+    changeType: string;
+    previousData: Debt;
+    newData: Debt;
+    author: string;
   }) {
     let description = "";
 
@@ -193,7 +219,7 @@ export class BudgetHistoryTracker {
   /**
    * Get recent changes for a specific entity type
    */
-  static async getRecentChanges(entityType, limit = 10) {
+  static async getRecentChanges(entityType: string, limit = 10) {
     try {
       const changes = await budgetDb.budgetChanges
         .where("entityType")
@@ -204,7 +230,7 @@ export class BudgetHistoryTracker {
 
       return changes;
     } catch (error) {
-      logger.error("Failed to get recent changes:", error);
+      logger.error("Failed to get recent changes:", error instanceof Error ? error.message : String(error));
       return [];
     }
   }
@@ -212,7 +238,7 @@ export class BudgetHistoryTracker {
   /**
    * Get all changes for a specific entity
    */
-  static async getEntityHistory(entityType, entityId = null) {
+  static async getEntityHistory(entityType: string, entityId: string | null = null) {
     try {
       let query = budgetDb.budgetChanges.where("entityType").equals(entityType);
 
@@ -223,7 +249,7 @@ export class BudgetHistoryTracker {
       const changes = await query.reverse().toArray();
       return changes;
     } catch (error) {
-      logger.error("Failed to get entity history:", error);
+      logger.error("Failed to get entity history:", error instanceof Error ? error.message : String(error));
       return [];
     }
   }
@@ -242,7 +268,7 @@ export class BudgetHistoryTracker {
 
       return changes;
     } catch (error) {
-      logger.error("Failed to get recent activity:", error);
+      logger.error("Failed to get recent activity:", error instanceof Error ? error.message : String(error));
       return [];
     }
   }
@@ -262,6 +288,11 @@ export class BudgetHistoryTracker {
     branchName,
     description = "",
     author = "Unknown User",
+  }: {
+    fromCommitHash: string;
+    branchName: string;
+    description?: string;
+    author?: string;
   }) {
     try {
       // Check if branch name already exists
@@ -302,7 +333,7 @@ export class BudgetHistoryTracker {
 
       return branch;
     } catch (error) {
-      logger.error("Failed to create budget history branch:", error);
+      logger.error("Failed to create budget history branch:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -320,6 +351,12 @@ export class BudgetHistoryTracker {
     description = "",
     tagType = "milestone", // milestone, release, backup
     author = "Unknown User",
+  }: {
+    commitHash: string;
+    tagName: string;
+    description?: string;
+    tagType?: string;
+    author?: string;
   }) {
     try {
       // Check if tag name already exists
@@ -356,7 +393,7 @@ export class BudgetHistoryTracker {
 
       return tag;
     } catch (error) {
-      logger.error("Failed to create budget history tag:", error);
+      logger.error("Failed to create budget history tag:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -365,7 +402,7 @@ export class BudgetHistoryTracker {
    * Switch to a different branch
    * @param {string} branchName - Name of the branch to switch to
    */
-  static async switchBranch(branchName) {
+  static async switchBranch(branchName: string) {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
@@ -386,10 +423,9 @@ export class BudgetHistoryTracker {
       }
 
       logger.info("Switched to budget history branch", { branchName });
-
       return true;
     } catch (error) {
-      logger.error("Failed to switch budget history branch:", error);
+      logger.error("Failed to switch budget history branch:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -402,7 +438,7 @@ export class BudgetHistoryTracker {
       const branches = await budgetDb.budgetBranches.orderBy("created").toArray();
       return branches;
     } catch (error) {
-      logger.error("Failed to get budget history branches:", error);
+      logger.error("Failed to get budget history branches:", error instanceof Error ? error.message : String(error));
       return [];
     }
   }
@@ -415,7 +451,7 @@ export class BudgetHistoryTracker {
       const tags = await budgetDb.budgetTags.orderBy("created").reverse().toArray();
       return tags;
     } catch (error) {
-      logger.error("Failed to get budget history tags:", error);
+      logger.error("Failed to get budget history tags:", error instanceof Error ? error.message : String(error));
       return [];
     }
   }
@@ -425,7 +461,18 @@ export class BudgetHistoryTracker {
    * @param {Object} commitData - The commit data to sign
    * @param {string} deviceFingerprint - Current device fingerprint
    */
-  static async signCommit(commitData, deviceFingerprint) {
+  static async signCommit(
+    commitData: {
+      hash: string;
+      timestamp: number;
+      message: string;
+      author: string;
+      parentHash: string | null;
+      snapshotData: string;
+      deviceFingerprint: string;
+    },
+    deviceFingerprint: string
+  ) {
     try {
       // Create signature payload
       const signaturePayload = {
@@ -452,7 +499,7 @@ export class BudgetHistoryTracker {
         signedAt: Date.now(),
       };
     } catch (error) {
-      logger.error("Failed to sign commit:", error);
+      logger.error("Failed to sign commit:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -462,7 +509,7 @@ export class BudgetHistoryTracker {
    * @param {string} author - Commit author
    * @param {string} currentFingerprint - Current device fingerprint
    */
-  static async verifyDeviceConsistency(author, currentFingerprint) {
+  static async verifyDeviceConsistency(author: string, currentFingerprint: string) {
     try {
       // Get recent commits from this author
       const recentCommits = await budgetDb.budgetCommits
@@ -472,11 +519,7 @@ export class BudgetHistoryTracker {
         .limit(10)
         .toArray();
 
-      if (recentCommits.length === 0) {
-        return true; // First commit from this author
-      }
-
-      // Check fingerprint consistency
+      // Collect known fingerprints
       const knownFingerprints = [
         ...new Set(recentCommits.map((c) => c.deviceFingerprint).filter((f) => f && f !== "")),
       ];
@@ -486,9 +529,9 @@ export class BudgetHistoryTracker {
         return knownFingerprints.includes(currentFingerprint) || knownFingerprints.length < 3;
       }
 
-      return knownFingerprints.includes(currentFingerprint);
+      return false;
     } catch (error) {
-      logger.error("Failed to verify device consistency:", error);
+      logger.error("Failed to verify device consistency:", error instanceof Error ? error.message : String(error));
       return false;
     }
   }
@@ -511,11 +554,11 @@ export class BudgetHistoryTracker {
       // Analyze patterns
       const patterns = {
         totalChanges: recentChanges.length,
-        changesByType: {},
-        changesByEntity: {},
-        authorActivity: {},
-        dailyActivity: {},
-        mostActiveHour: null,
+        changesByType: {} as Record<string, number>,
+        changesByEntity: {} as Record<string, number>,
+        authorActivity: {} as Record<string, number>,
+        dailyActivity: {} as Record<string, number>,
+        mostActiveHour: null as number | null,
         averageChangesPerDay: 0,
       };
 
@@ -543,20 +586,20 @@ export class BudgetHistoryTracker {
       patterns.averageChangesPerDay = days > 0 ? recentChanges.length / days : 0;
 
       // Find most active hour
-      const hourCounts = {};
+      const hourCounts = {} as Record<number, number>;
       commits.forEach((commit) => {
         const hour = new Date(commit.timestamp).getHours();
         hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       });
 
       patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
+        (maxHour: number, hour: number) => (hourCounts[hour] || 0) > (hourCounts[maxHour] || 0) ? hour : maxHour,
         null
       );
 
       return patterns;
     } catch (error) {
-      logger.error("Failed to analyze change patterns:", error);
+      logger.error("Failed to analyze change patterns:", error instanceof Error ? error.message : String(error));
       return null;
     }
   }

@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
-| TypeScript Errors | 0 | -21 |
-| TypeScript Strict Mode Errors | 3519 | -20 |
+| TypeScript Errors | 6 | +6 |
+| TypeScript Strict Mode Errors | 3491 | -28 |
 
-*Last updated: 2025-11-11 18:28:32 UTC*
+*Last updated: 2025-11-11 18:43:07 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,18 +28,46 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-11 18:28:05 UTC
+Last check: 2025-11-11 18:42:45 UTC
 
 ## Typecheck Audit
 
-✅ **All files passed TypeScript type checking!**
+### Files with Most Type Errors
+- 6 errors in `src/utils/common/budgetHistoryTracker.ts`
 
-Last check: 2025-11-11 18:28:21 UTC
+### Type Error Breakdown by Category
+| Count | Error Code |
+|---|---|
+| 3 | `TS2345` |
+| 2 | `TS2322` |
+| 1 | `TS2769` |
+
+### Detailed Type Error Report
+```
+src/utils/common/budgetHistoryTracker.ts(98,43): error TS2322: Type '{ commitHash: string; entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; }' is not assignable to type 'BudgetChange'.
+  Types of property 'changeType' are incompatible.
+    Type 'string' is not assignable to type '"create" | "update" | "delete"'.
+src/utils/common/budgetHistoryTracker.ts(133,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }'.
+  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }': deviceFingerprint, parentHash
+src/utils/common/budgetHistoryTracker.ts(161,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }'.
+  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }': deviceFingerprint, parentHash
+src/utils/common/budgetHistoryTracker.ts(208,43): error TS2345: Argument of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }'.
+  Type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string; parentHash: string; }': deviceFingerprint, parentHash
+src/utils/common/budgetHistoryTracker.ts(595,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(callbackfn: (previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string, initialValue: string): string', gave the following error.
+    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string'.
+      Types of parameters 'maxHour' and 'previousValue' are incompatible.
+        Type 'string' is not assignable to type 'number'.
+  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number, initialValue: number): number', gave the following error.
+    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number'.
+      Types of parameters 'hour' and 'currentValue' are incompatible.
+        Type 'string' is not assignable to type 'number'.
+```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 39 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 39 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 37 errors in `src/stores/ui/uiStoreActions.ts`
 - 37 errors in `src/services/cloudSyncService.ts`
@@ -123,6 +151,7 @@ Last check: 2025-11-11 18:28:21 UTC
 - 12 errors in `src/utils/accounts/accountHelpers.ts`
 - 12 errors in `src/hooks/transactions/useTransactionImportProcessing.ts`
 - 12 errors in `src/hooks/mobile/useFABLoadingStates.ts`
+- 12 errors in `src/hooks/debts/useDebts.ts`
 - 12 errors in `src/hooks/budgeting/usePaycheckForm.ts`
 - 12 errors in `src/hooks/analytics/useReportExporter.ts`
 - 12 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
@@ -186,7 +215,6 @@ Last check: 2025-11-11 18:28:21 UTC
 - 8 errors in `src/main.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
 - 8 errors in `src/hooks/savings/useSavingsGoalsActions.ts`
-- 8 errors in `src/hooks/debts/useDebts.ts`
 - 8 errors in `src/hooks/common/useTransactionArchiving.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 8 errors in `src/hooks/bills/useBulkBillOperations.ts`
@@ -201,6 +229,7 @@ Last check: 2025-11-11 18:28:21 UTC
 - 8 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 7 errors in `src/utils/security/errorViewer.ts`
 - 7 errors in `src/utils/security/cryptoCompat.ts`
+- 7 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 7 errors in `src/utils/billIcons/iconUtils.ts`
 - 7 errors in `src/services/bugReport/index.ts`
 - 7 errors in `src/services/bugReport/contextAnalysisService.ts`
@@ -539,13 +568,13 @@ Last check: 2025-11-11 18:28:21 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1344 | `TS7006` |
-| 907 | `TS7031` |
-| 238 | `TS2345` |
+| 1337 | `TS7006` |
+| 890 | `TS7031` |
+| 241 | `TS2345` |
 | 229 | `TS2339` |
 | 206 | `TS18046` |
-| 132 | `TS7053` |
-| 127 | `TS2322` |
+| 132 | `TS2322` |
+| 121 | `TS7053` |
 | 80 | `TS18048` |
 | 77 | `TS7005` |
 | 52 | `TS18047` |
@@ -558,7 +587,7 @@ Last check: 2025-11-11 18:28:21 UTC
 | 4 | `TS7019` |
 | 4 | `TS2783` |
 | 4 | `TS2722` |
-| 4 | `TS2538` |
+| 3 | `TS2538` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
 | 1 | `TS7023` |
@@ -2952,9 +2981,15 @@ src/hooks/debts/useDebtModalLogic.ts(83,35): error TS7006: Parameter 'e' implici
 src/hooks/debts/useDebtModalLogic.ts(140,47): error TS18049: 'connectedEnvelope' is possibly 'null' or 'undefined'.
 src/hooks/debts/useDebts.ts(27,14): error TS18046: 'error' is of type 'unknown'.
 src/hooks/debts/useDebts.ts(35,28): error TS7006: Parameter 'debtData' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(45,5): error TS2322: Type 'null' is not assignable to type 'Debt'.
 src/hooks/debts/useDebts.ts(54,33): error TS7031: Binding element 'id' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(54,37): error TS7031: Binding element 'updates' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(67,5): error TS2322: Type 'Debt | undefined' is not assignable to type 'Debt'.
+  Type 'undefined' is not assignable to type 'Debt'.
+src/hooks/debts/useDebts.ts(68,5): error TS2322: Type 'Debt | undefined' is not assignable to type 'Debt'.
+  Type 'undefined' is not assignable to type 'Debt'.
 src/hooks/debts/useDebts.ts(76,35): error TS7031: Binding element 'id' implicitly has an 'any' type.
+src/hooks/debts/useDebts.ts(86,7): error TS2322: Type 'null' is not assignable to type 'Debt'.
 src/hooks/debts/useDebts.ts(95,36): error TS7031: Binding element 'id' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(95,40): error TS7031: Binding element 'payment' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(213,24): error TS7006: Parameter 'id' implicitly has an 'any' type.
@@ -4125,64 +4160,29 @@ src/utils/common/billDiscovery.ts(364,34): error TS7006: Parameter 'bill' implic
 src/utils/common/billDiscovery.ts(364,40): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
 src/utils/common/billDiscovery.ts(396,8): error TS7006: Parameter 'word' implicitly has an 'any' type.
 src/utils/common/billDiscovery.ts(396,56): error TS7006: Parameter 'envWord' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(26,5): error TS7031: Binding element 'entityType' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(28,5): error TS7031: Binding element 'changeType' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(29,5): error TS7031: Binding element 'description' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(30,5): error TS7031: Binding element 'beforeData' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(31,5): error TS7031: Binding element 'afterData' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(87,41): error TS2345: Argument of type '{ hash: string; timestamp: number; message: any; author: string; parentHash: null; snapshotData: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
+src/utils/common/budgetHistoryTracker.ts(97,41): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: string | null; snapshotData: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
-    Type 'null' is not assignable to type 'string | undefined'.
-src/utils/common/budgetHistoryTracker.ts(108,5): error TS7031: Binding element 'previousAmount' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(109,5): error TS7031: Binding element 'newAmount' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(133,5): error TS7031: Binding element 'previousBalance' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(134,5): error TS7031: Binding element 'newBalance' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(156,5): error TS7031: Binding element 'debtId' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(157,5): error TS7031: Binding element 'changeType' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(158,5): error TS7031: Binding element 'previousData' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(159,5): error TS7031: Binding element 'newData' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(196,33): error TS7006: Parameter 'entityType' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(215,33): error TS7006: Parameter 'entityType' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(261,5): error TS7031: Binding element 'fromCommitHash' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(262,5): error TS7031: Binding element 'branchName' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(318,5): error TS7031: Binding element 'commitHash' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(319,5): error TS7031: Binding element 'tagName' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(368,29): error TS7006: Parameter 'branchName' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(428,27): error TS7006: Parameter 'commitData' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(428,39): error TS7006: Parameter 'deviceFingerprint' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(465,40): error TS7006: Parameter 'author' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(465,48): error TS7006: Parameter 'currentFingerprint' implicitly has an 'any' type.
-src/utils/common/budgetHistoryTracker.ts(524,9): error TS7053: Element implicitly has an 'any' type because expression of type '"create" | "update" | "delete"' can't be used to index type '{}'.
-  Property 'create' does not exist on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(525,12): error TS7053: Element implicitly has an 'any' type because expression of type '"create" | "update" | "delete"' can't be used to index type '{}'.
-  Property 'create' does not exist on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(526,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(527,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(532,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(532,51): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(538,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(538,41): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(549,9): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{}'.
-  No index signature with a parameter of type 'number' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(549,29): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{}'.
-  No index signature with a parameter of type 'number' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(552,7): error TS2322: Type 'string' is not assignable to type 'null'.
-src/utils/common/budgetHistoryTracker.ts(553,28): error TS2769: No overload matches this call.
+    Type 'string | null' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.
+src/utils/common/budgetHistoryTracker.ts(98,43): error TS2322: Type '{ commitHash: string; entityType: string; entityId: string; changeType: string; description: string; beforeData: unknown; afterData: unknown; }' is not assignable to type 'BudgetChange'.
+  Types of property 'changeType' are incompatible.
+    Type 'string' is not assignable to type '"create" | "update" | "delete"'.
+src/utils/common/budgetHistoryTracker.ts(133,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }'.
+  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { amount: number; }; afterData: { amount: number; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }': deviceFingerprint, parentHash
+src/utils/common/budgetHistoryTracker.ts(161,43): error TS2345: Argument of type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }'.
+  Type '{ entityType: string; entityId: null; changeType: string; description: string; beforeData: { balance: number; isManual: boolean; }; afterData: { balance: number; isManual: boolean; }; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }': deviceFingerprint, parentHash
+src/utils/common/budgetHistoryTracker.ts(208,43): error TS2345: Argument of type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is not assignable to parameter of type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }'.
+  Type '{ entityType: string; entityId: string; changeType: string; description: string; beforeData: Debt; afterData: Debt; author: string; }' is missing the following properties from type '{ entityType: string; entityId: string | null; changeType: string; description: string; beforeData: unknown; afterData: unknown; author: string; deviceFingerprint: string | null; parentHash: string | null; }': deviceFingerprint, parentHash
+src/utils/common/budgetHistoryTracker.ts(595,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/utils/common/budgetHistoryTracker.ts(596,9): error TS2769: No overload matches this call.
   Overload 1 of 3, '(callbackfn: (previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string, initialValue: string): string', gave the following error.
-    Type 'string | null' is not assignable to type 'string'.
-      Type 'null' is not assignable to type 'string'.
-  Overload 2 of 3, '(callbackfn: (previousValue: null, currentValue: string, currentIndex: number, array: string[]) => null, initialValue: null): null', gave the following error.
-    Type 'string | null' is not assignable to type 'null'.
-      Type 'string' is not assignable to type 'null'.
-src/utils/common/budgetHistoryTracker.ts(553,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/common/budgetHistoryTracker.ts(553,60): error TS2538: Type 'null' cannot be used as an index type.
+    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: string, currentValue: string, currentIndex: number, array: string[]) => string'.
+      Types of parameters 'maxHour' and 'previousValue' are incompatible.
+        Type 'string' is not assignable to type 'number'.
+  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number, initialValue: number): number', gave the following error.
+    Argument of type '(maxHour: number, hour: number) => number' is not assignable to parameter of type '(previousValue: number, currentValue: string, currentIndex: number, array: string[]) => number'.
+      Types of parameters 'hour' and 'currentValue' are incompatible.
+        Type 'string' is not assignable to type 'number'.
 src/utils/common/fixAutoAllocateUndefined.ts(66,37): error TS18046: 'error' is of type 'unknown'.
 src/utils/common/frequencyCalculations.ts(43,34): error TS7006: Parameter 'amount' implicitly has an 'any' type.
 src/utils/common/frequencyCalculations.ts(43,42): error TS7006: Parameter 'fromFrequency' implicitly has an 'any' type.
