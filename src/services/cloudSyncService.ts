@@ -26,8 +26,7 @@ const isSupplementalAccountRecord = (value: unknown): value is SupplementalAccou
   }
 
   const { id, name, type, balance } = value;
-  const isValidId =
-    typeof id === "undefined" || typeof id === "string" || typeof id === "number";
+  const isValidId = typeof id === "undefined" || typeof id === "string" || typeof id === "number";
   const isValidName = typeof name === "undefined" || typeof name === "string";
   const isValidType = typeof type === "undefined" || typeof type === "string";
   const isValidBalance = typeof balance === "undefined" || typeof balance === "number";
@@ -528,22 +527,14 @@ class CloudSyncService {
 
   async fetchDexieData(): Promise<DexieData> {
     try {
-      const [
-        envelopes,
-        transactions,
-        bills,
-        debts,
-        savingsGoals,
-        paycheckHistory,
-        metadata,
-      ]: [
+      const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata]: [
         Envelope[],
         Transaction[],
         Bill[],
         Debt[],
         SavingsGoal[],
         PaycheckHistory[],
-        BudgetRecord | undefined
+        BudgetRecord | undefined,
       ] = await Promise.all([
         budgetDb.envelopes.toArray(),
         budgetDb.transactions.toArray(),

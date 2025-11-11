@@ -8,7 +8,7 @@
 | TypeScript Errors | 21 | 0 |
 | TypeScript Strict Mode Errors | 3234 | 0 |
 
-*Last updated: 2025-11-11 21:58:32 UTC*
+*Last updated: 2025-11-11 21:59:54 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -316,9 +316,9 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 7 errors in `src/components/automation/AutoFundingView.tsx`
-- 7 errors in `src/components/auth/components/StepButtons.tsx`
 - 7 errors in `src/components/auth/PasswordRotationModal.tsx`
 - 7 errors in `src/components/auth/KeyManagementSettings.tsx`
+- 7 errors in `src/components/auth/components/StepButtons.tsx`
 - 7 errors in `src/App.tsx`
 - 6 errors in `src/utils/transactions/splitting.ts`
 - 6 errors in `src/utils/transactions/fileParser.ts`
@@ -367,21 +367,21 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 5 errors in `src/components/savings/SavingsGoals.tsx`
 - 5 errors in `src/components/receipts/steps/ReceiptDataStep.tsx`
 - 5 errors in `src/components/receipts/steps/EnvelopeSelectionStep.tsx`
+- 5 errors in `src/components/receipts/ReceiptButton.tsx`
 - 5 errors in `src/components/receipts/components/ReceiptUploadArea.tsx`
 - 5 errors in `src/components/receipts/components/ExtractedDataField.tsx`
-- 5 errors in `src/components/receipts/ReceiptButton.tsx`
 - 5 errors in `src/components/pages/MainDashboard.tsx`
 - 5 errors in `src/components/layout/SummaryCards.tsx`
-- 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
 - 5 errors in `src/components/budgeting/PaycheckProcessor.tsx`
+- 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
 - 5 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 5 errors in `src/components/bills/modals/BillDetailActions.tsx`
 - 5 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 5 errors in `src/components/bills/BillManagerHeader.tsx`
+- 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 5 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
 - 5 errors in `src/components/automation/steps/config/PercentageConfig.tsx`
 - 5 errors in `src/components/automation/steps/config/FixedAmountConfig.tsx`
-- 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 5 errors in `src/components/auth/components/ReturningUserActions.tsx`
 - 5 errors in `src/components/auth/ChangePasswordModal.tsx`
 - 4 errors in `src/utils/sync/retryUtils.ts`
@@ -401,11 +401,11 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
 - 4 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
-- 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
 - 4 errors in `src/components/transactions/TransactionTable.tsx`
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
-- 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
+- 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
 - 4 errors in `src/components/sync/SyncHealthDashboard.tsx`
+- 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingStatusOverview.tsx`
 - 4 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
@@ -418,16 +418,16 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 4 errors in `src/components/budgeting/shared/EnvelopeTypeSelector.tsx`
 - 4 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 4 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
+- 4 errors in `src/components/auth/LocalOnlySetup.tsx`
 - 4 errors in `src/components/auth/components/UserSetupHeader.tsx`
 - 4 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
-- 4 errors in `src/components/auth/LocalOnlySetup.tsx`
 - 4 errors in `src/components/analytics/trends/CategoryTrendsSection.tsx`
+- 4 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 4 errors in `src/components/analytics/tabs/TrendsTab.tsx`
 - 4 errors in `src/components/analytics/performance/PerformanceTabNavigation.tsx`
 - 4 errors in `src/components/analytics/performance/PerformanceRecommendationsTab.tsx`
 - 4 errors in `src/components/analytics/performance/PerformanceAlertsTab.tsx`
 - 4 errors in `src/components/analytics/performance/MetricCard.tsx`
-- 4 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
 - 3 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
@@ -447,9 +447,9 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 3 errors in `src/hooks/analytics/useTransactionAnalysis.ts`
 - 3 errors in `src/hooks/analytics/usePerformanceMonitor.ts`
 - 3 errors in `src/hooks/analytics/useChartsAnalytics.ts`
+- 3 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 3 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
-- 3 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/components/sync/ConflictResolutionModal.tsx`
 - 3 errors in `src/components/sharing/JoinBudgetModal.tsx`
 - 3 errors in `src/components/settings/sections/SecuritySettingsSection.tsx`
@@ -511,12 +511,12 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 2 errors in `src/components/transactions/import/ImportProgress.tsx`
 - 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
 - 2 errors in `src/components/settings/sections/ClipboardSecuritySection.tsx`
+- 2 errors in `src/components/settings/EnvelopeIntegrityChecker.tsx`
 - 2 errors in `src/components/settings/archiving/ArchivingProgress.tsx`
 - 2 errors in `src/components/settings/archiving/ArchivingHeader.tsx`
-- 2 errors in `src/components/settings/EnvelopeIntegrityChecker.tsx`
+- 2 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
 - 2 errors in `src/components/receipts/components/ReceiptErrorState.tsx`
-- 2 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/onboarding/hooks/useTutorialPositioning.ts`
 - 2 errors in `src/components/mobile/FABActionMenu.tsx`
 - 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
@@ -538,19 +538,19 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 2 errors in `src/components/bills/BillFormFields.tsx`
 - 2 errors in `src/components/automation/steps/TriggerScheduleStep.tsx`
 - 2 errors in `src/components/automation/components/StepNavigation.tsx`
+- 2 errors in `src/components/auth/UserIndicator.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
 - 2 errors in `src/components/auth/components/ColorPicker.tsx`
-- 2 errors in `src/components/auth/UserIndicator.tsx`
 - 2 errors in `src/components/analytics/trends/SeasonalPatternsSection.tsx`
 - 2 errors in `src/components/analytics/trends/InsightsPanel.tsx`
 - 2 errors in `src/components/analytics/trends/HistoricalTrendsChart.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
-- 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
 - 2 errors in `src/components/analytics/PerformanceMonitor.tsx`
+- 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
+- 1 errors in `src/utils/sync/SyncQueue.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
 - 1 errors in `src/utils/sync/dataDetectionHelper.ts`
-- 1 errors in `src/utils/sync/SyncQueue.ts`
 - 1 errors in `src/utils/stores/createSafeStore.ts`
 - 1 errors in `src/utils/query/backgroundSyncService.ts`
 - 1 errors in `src/utils/pageDetection/pageIdentifier.ts`
@@ -617,14 +617,14 @@ src/utils/sync/syncHealthChecker.ts(114,47): error TS2345: Argument of type '{ e
 - 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 1 errors in `src/components/bills/BillFormSections.tsx`
 - 1 errors in `src/components/bills/BillDiscoveryModal.tsx`
+- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/auth/key-management/MainContent.tsx`
 - 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
-- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/analytics/trends/ForecastSummaryCard.tsx`
-- 1 errors in `src/components/analytics/performance/OverallScore.tsx`
-- 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
 - 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
+- 1 errors in `src/components/analytics/performance/OverallScore.tsx`
+- 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 
 ### Strict Mode Error Breakdown

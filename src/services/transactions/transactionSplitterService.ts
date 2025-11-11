@@ -33,7 +33,10 @@ class TransactionSplitterService {
   /**
    * Initialize splits from transaction metadata
    */
-  initializeSplitsFromTransaction(transaction: Transaction, envelopes: Envelope[]): SplitAllocation[] {
+  initializeSplitsFromTransaction(
+    transaction: Transaction,
+    envelopes: Envelope[]
+  ): SplitAllocation[] {
     const metadataItems = transaction.metadata?.items;
 
     if (metadataItems && metadataItems.length > 1) {
@@ -159,7 +162,10 @@ class TransactionSplitterService {
   /**
    * Auto-balance splits to equalizes total
    */
-  autoBalanceSplits(splitAllocations: SplitAllocation[], originalAmount: number): SplitAllocation[] {
+  autoBalanceSplits(
+    splitAllocations: SplitAllocation[],
+    originalAmount: number
+  ): SplitAllocation[] {
     const totals = this.calculateSplitTotals(splitAllocations, originalAmount);
     if (totals.isValid || splitAllocations.length === 0) return splitAllocations;
 
@@ -207,8 +213,7 @@ class TransactionSplitterService {
           ? split.envelopeId
           : undefined;
 
-      const amount =
-        transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount);
+      const amount = transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount);
 
       return {
         id: `${transaction.id}_split_${index}_${Date.now()}`,

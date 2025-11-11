@@ -53,5 +53,4 @@ next navigation, and the session eventually forces a logout.
 
 ---
 
-_Created automatically by GPT-5 Codex on behalf of the product team._ 
-
+_Created automatically by GPT-5 Codex on behalf of the product team._

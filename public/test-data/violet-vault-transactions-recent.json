@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2025-11-11T17:56:58.053Z",
+  "transactions": [
+    {
+      "id": "txn-recent-001",
+      "date": "2025-11-11",
+      "amount": -35,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762883818053,
+      "createdAt": 1762883818053,
+      "description": "Grocery run",
+      "merchant": "Whole Foods Market"
+    },
+    {
+      "id": "txn-recent-002",
+      "date": "2025-11-10",
+      "amount": -28,
+      "envelopeId": "env-002-gas",
+      "category": "Transportation",
+      "type": "expense",
+      "lastModified": 1762797418053,
+      "createdAt": 1762797418053,
+      "description": "Fuel refill",
+      "merchant": "BP"
+    },
+    {
+      "id": "txn-recent-003",
+      "date": "2025-11-09",
+      "amount": -12,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762711018053,
+      "createdAt": 1762711018053,
+      "description": "Fast food stop",
+      "merchant": "Shake Shack"
+    },
+    {
+      "id": "txn-recent-004",
+      "date": "2025-11-08",
+      "amount": -55,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762624618053,
+      "createdAt": 1762624618053,
+      "description": "Grocery run",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "txn-recent-005",
+      "date": "2025-11-07",
+      "amount": -44.67,
+      "envelopeId": "env-002-gas",
+      "category": "Transportation",
+      "type": "expense",
+      "lastModified": 1762538218053,
+      "createdAt": 1762538218053,
+      "description": "Fuel refill",
+      "merchant": "76 Gas"
+    },
+    {
+      "id": "txn-recent-006",
+      "date": "2025-11-11",
+      "amount": -16,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762883818053,
+      "createdAt": 1762883818053,
+      "description": "Fast food stop",
+      "merchant": "Five Guys"
+    },
+    {
+      "id": "txn-recent-007",
+      "date": "2025-11-10",
+      "amount": -75,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762797418053,
+      "createdAt": 1762797418053,
+      "description": "Grocery run",
+      "merchant": "Trader Joes"
+    },
+    {
+      "id": "txn-recent-008",
+      "date": "2025-11-09",
+      "amount": -61.33,
+      "envelopeId": "env-002-gas",
+      "category": "Transportation",
+      "type": "expense",
+      "lastModified": 1762711018053,
+      "createdAt": 1762711018053,
+      "description": "Fuel refill",
+      "merchant": "Chevron"
+    },
+    {
+      "id": "txn-recent-009",
+      "date": "2025-11-08",
+      "amount": -20,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762624618053,
+      "createdAt": 1762624618053,
+      "description": "Fast food stop",
+      "merchant": "Chick-fil-A"
+    },
+    {
+      "id": "txn-recent-010",
+      "date": "2025-11-07",
+      "amount": -95,
+      "envelopeId": "env-001-groceries",
+      "category": "Food & Dining",
+      "type": "expense",
+      "lastModified": 1762538218053,
+      "createdAt": 1762538218053,
+      "description": "Grocery run",
+      "merchant": "Kroger"
+    }
+  ]
+}
