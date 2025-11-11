@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 14 | +2 |
-| TypeScript Strict Mode Errors | 3649 | +1 |
+| TypeScript Errors | 17 | +3 |
+| TypeScript Strict Mode Errors | 3617 | -32 |
 
-*Last updated: 2025-11-11 18:00:56 UTC*
+*Last updated: 2025-11-11 18:01:54 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -44,15 +44,17 @@ violet-vault/src/utils/budgeting/paycheckAllocationUtils.ts:359:14 - 2 - 'getUni
 ### Files with Most Type Errors
 - 6 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 4 errors in `src/utils/budgeting/autofunding/simulation.ts`
+- 2 errors in `src/hooks/savings/useSavingsGoals/savingsQueries.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
+- 1 errors in `src/hooks/savings/useSavingsGoals/index.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
 - 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
+| 8 | `TS2345` |
 | 7 | `TS2339` |
-| 5 | `TS2345` |
 | 2 | `TS2451` |
 
 ### Detailed Type Error Report
@@ -65,6 +67,13 @@ src/hooks/budgeting/useBudgetData/mutations.ts(17,56): error TS2345: Argument of
 src/hooks/budgeting/useBudgetData/mutations.ts(65,59): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
   Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Transaction, "lastModified" | "createdAt">': category, id, date, amount, and 2 more.
 src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
+src/hooks/savings/useSavingsGoals/index.ts(78,36): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean; urgency?: string; monthlyNeeded?: number; })[]'.
+  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean; urgency?: string; monthlyNeeded?: number; }'.
+    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': name, targetAmount, currentAmount, isPaused, lastModified
+src/hooks/savings/useSavingsGoals/savingsQueries.ts(54,67): error TS2345: Argument of type 'string' is not assignable to parameter of type '"asc" | "desc"'.
+src/hooks/savings/useSavingsGoals/savingsQueries.ts(111,33): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean; urgency?: string; })[]'.
+  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean; urgency?: string; }'.
+    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': category, priority, targetAmount, currentAmount, and 2 more.
 src/utils/budgeting/autofunding/simulation.ts(57,70): error TS2345: Argument of type 'AutoFundingRule' is not assignable to parameter of type 'Rule'.
   The types of 'config.conditions' are incompatible between these types.
     Type 'RuleCondition[]' is not assignable to type 'Condition[]'.
@@ -85,7 +94,6 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 44 errors in `src/utils/savings/savingsCalculations.ts`
 - 43 errors in `src/hooks/bills/useBills/billAnalytics.ts`
 - 41 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 39 errors in `src/utils/common/budgetHistoryTracker.ts`
@@ -229,6 +237,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 9 errors in `src/components/history/viewer/HistoryList.tsx`
 - 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
 - 9 errors in `src/components/automation/tabs/RulesTab.tsx`
+- 8 errors in `src/utils/savings/savingsCalculations.ts`
 - 8 errors in `src/utils/bills/recurringBillUtils.ts`
 - 8 errors in `src/utils/auth/userSetupHelpers.tsx`
 - 8 errors in `src/main.tsx`
@@ -454,6 +463,8 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
 - 2 errors in `src/hooks/security/useSecuritySettingsLogic.ts`
+- 2 errors in `src/hooks/savings/useSavingsGoals/savingsQueries.ts`
+- 2 errors in `src/hooks/savings/useSavingsGoals/index.ts`
 - 2 errors in `src/hooks/mobile/useBottomNavigation.ts`
 - 2 errors in `src/hooks/common/useTransactions.ts`
 - 2 errors in `src/hooks/common/useRouterPageDetection.ts`
@@ -588,17 +599,17 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1403 | `TS7006` |
+| 1365 | `TS7006` |
 | 907 | `TS7031` |
 | 284 | `TS2339` |
-| 247 | `TS2345` |
-| 201 | `TS18046` |
-| 142 | `TS7053` |
+| 250 | `TS2345` |
+| 209 | `TS18046` |
+| 138 | `TS7053` |
 | 122 | `TS2322` |
 | 80 | `TS18048` |
-| 79 | `TS7005` |
+| 78 | `TS7005` |
 | 52 | `TS18047` |
-| 46 | `TS7034` |
+| 45 | `TS7034` |
 | 28 | `TS2769` |
 | 9 | `TS2353` |
 | 6 | `TS2698` |
@@ -608,7 +619,7 @@ src/utils/budgeting/paycheckAllocationUtils.ts(359,14): error TS2451: Cannot red
 | 4 | `TS2783` |
 | 4 | `TS2722` |
 | 4 | `TS2538` |
-| 3 | `TS2352` |
+| 4 | `TS2352` |
 | 2 | `TS7022` |
 | 2 | `TS2451` |
 | 1 | `TS7023` |
@@ -3210,6 +3221,19 @@ src/hooks/receipts/useReceiptToTransaction.ts(108,39): error TS18046: 'error' is
 src/hooks/receipts/useReceiptToTransaction.ts(130,37): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
 src/hooks/receipts/useReceiptToTransaction.ts(130,47): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
 src/hooks/receipts/useReceiptToTransaction.ts(158,10): error TS7006: Parameter 'env' implicitly has an 'any' type.
+src/hooks/savings/useSavingsGoals/index.ts(53,7): error TS2352: Conversion of type 'UseQueryResult<(SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; })[], Error>' to type '{ data: SavingsGoal[]; isLoading: boolean; isError: boolean; error: Error | null; refetch: () => void; isFetching: boolean; isStale: boolean; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'QueryObserverPlaceholderResult<(SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; })[], Error>' is not comparable to type '{ data: SavingsGoal[]; isLoading: boolean; isError: boolean; error: Error | null; refetch: () => void; isFetching: boolean; isStale: boolean; }'.
+    Types of property 'data' are incompatible.
+      Type '(SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; })[]' is not comparable to type 'SavingsGoal[]'.
+        Type 'SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; }' is not comparable to type 'SavingsGoal'.
+          Index signature for type 'string' is missing in type 'SavingsGoal & { progressRate?: number | undefined; remainingAmount?: number | undefined; monthlyNeeded?: number | undefined; urgency?: string | undefined; }'.
+src/hooks/savings/useSavingsGoals/index.ts(78,36): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; monthlyNeeded?: number | undefined; })[]'.
+  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; monthlyNeeded?: number | undefined; }'.
+    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': name, targetAmount, currentAmount, isPaused, lastModified
+src/hooks/savings/useSavingsGoals/savingsQueries.ts(54,67): error TS2345: Argument of type 'string' is not assignable to parameter of type '"asc" | "desc" | undefined'.
+src/hooks/savings/useSavingsGoals/savingsQueries.ts(111,33): error TS2345: Argument of type 'SavingsGoal[]' is not assignable to parameter of type '(SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; })[]'.
+  Type 'SavingsGoal' is not assignable to type 'SavingsGoal & { isCompleted?: boolean | undefined; urgency?: string | undefined; }'.
+    Type 'SavingsGoal' is missing the following properties from type 'SavingsGoal': category, priority, targetAmount, currentAmount, and 2 more.
 src/hooks/savings/useSavingsGoalsActions.ts(10,35): error TS7031: Binding element 'onAddGoal' implicitly has an 'any' type.
 src/hooks/savings/useSavingsGoalsActions.ts(10,46): error TS7031: Binding element 'onUpdateGoal' implicitly has an 'any' type.
 src/hooks/savings/useSavingsGoalsActions.ts(10,60): error TS7031: Binding element 'onDeleteGoal' implicitly has an 'any' type.
@@ -4599,52 +4623,14 @@ src/utils/receipts/receiptHelpers.tsx(201,51): error TS7006: Parameter 'confiden
 src/utils/receipts/receiptHelpers.tsx(209,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
 src/utils/receipts/receiptHelpers.tsx(219,32): error TS7006: Parameter 'bytes' implicitly has an 'any' type.
 src/utils/receipts/receiptHelpers.tsx(226,41): error TS7006: Parameter 'extractedData' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(7,39): error TS7006: Parameter 'currentAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(7,54): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(15,42): error TS7006: Parameter 'currentAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(15,57): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(22,33): error TS7006: Parameter 'currentAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(22,48): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(29,40): error TS7006: Parameter 'targetDate' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(51,47): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(51,64): error TS7006: Parameter 'daysRemaining' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(62,3): error TS7006: Parameter 'progressRate' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(63,3): error TS7006: Parameter 'daysRemaining' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(64,3): error TS7006: Parameter 'monthlyNeeded' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(92,41): error TS7006: Parameter 'currentAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(92,56): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(95,9): error TS7034: Variable 'milestones' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/savings/savingsCalculations.ts(110,10): error TS7005: Variable 'milestones' implicitly has an 'any[]' type.
-src/utils/savings/savingsCalculations.ts(117,3): error TS7006: Parameter 'remainingAmount' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(118,3): error TS7006: Parameter 'daysRemaining' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(125,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ low: number; medium: number; high: number; }'.
-  No index signature with a parameter of type 'string' was found on type '{ low: number; medium: number; high: number; }'.
-src/utils/savings/savingsCalculations.ts(132,50): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ low: number; medium: number; high: number; }'.
-  No index signature with a parameter of type 'string' was found on type '{ low: number; medium: number; high: number; }'.
-src/utils/savings/savingsCalculations.ts(145,36): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(184,34): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(184,40): error TS7006: Parameter 'sortBy' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(190,21): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: number; medium: number; low: number; }'.
-src/utils/savings/savingsCalculations.ts(197,21): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ name: () => any; targetDate: () => Date; priority: () => any; progress: () => any; targetAmount: () => any; currentAmount: () => any; remainingAmount: () => any; }'.
-src/utils/savings/savingsCalculations.ts(204,28): error TS7006: Parameter 'aVal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(204,34): error TS7006: Parameter 'bVal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(204,40): error TS7006: Parameter 'sortOrder' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(214,34): error TS7006: Parameter 'goals' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(225,30): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(225,36): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(245,34): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(245,40): error TS7006: Parameter 'filters' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(277,41): error TS7006: Parameter 'goals' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(279,40): error TS7006: Parameter 'g' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(282,43): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(282,48): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(283,44): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(283,49): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(289,37): error TS7006: Parameter 'g' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(290,38): error TS7006: Parameter 'g' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(293,14): error TS7006: Parameter 'g' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(294,14): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/savings/savingsCalculations.ts(294,19): error TS7006: Parameter 'goal' implicitly has an 'any' type.
+src/utils/savings/savingsCalculations.ts(217,12): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(217,19): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(217,30): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(217,37): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(219,10): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(219,17): error TS18046: 'bVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(219,28): error TS18046: 'aVal' is of type 'unknown'.
+src/utils/savings/savingsCalculations.ts(219,35): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsFormUtils.ts(49,25): error TS2339: Property 'name' does not exist on type 'never'.
 src/utils/savings/savingsFormUtils.ts(50,33): error TS2339: Property 'targetAmount' does not exist on type 'never'.
 src/utils/savings/savingsFormUtils.ts(51,34): error TS2339: Property 'currentAmount' does not exist on type 'never'.

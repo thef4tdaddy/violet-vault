@@ -1,10 +1,11 @@
 // Savings Goal Calculations - Pure utility functions for savings goal math
 import logger from "../common/logger";
+import type { SavingsGoal } from "@/db/types";
 
 /**
  * Calculate progress rate as percentage
  */
-export const calculateProgressRate = (currentAmount, targetAmount) => {
+export const calculateProgressRate = (currentAmount: number, targetAmount: number) => {
   if (!targetAmount || targetAmount <= 0) return 0;
   return Math.min(100, Math.max(0, (currentAmount / targetAmount) * 100));
 };
@@ -12,21 +13,21 @@ export const calculateProgressRate = (currentAmount, targetAmount) => {
 /**
  * Calculate remaining amount needed to reach goal
  */
-export const calculateRemainingAmount = (currentAmount, targetAmount) => {
+export const calculateRemainingAmount = (currentAmount: number, targetAmount: number) => {
   return Math.max(0, (targetAmount || 0) - (currentAmount || 0));
 };
 
 /**
  * Check if savings goal is completed
  */
-export const isGoalCompleted = (currentAmount, targetAmount) => {
+export const isGoalCompleted = (currentAmount: number, targetAmount: number) => {
   return (currentAmount || 0) >= (targetAmount || 0) && targetAmount > 0;
 };
 
 /**
  * Calculate days remaining until target date
  */
-export const calculateDaysRemaining = (targetDate, fromDate = new Date()) => {
+export const calculateDaysRemaining = (targetDate: Date | string | undefined, fromDate: Date = new Date()) => {
   if (!targetDate) return null;
 
   try {
@@ -40,7 +41,7 @@ export const calculateDaysRemaining = (targetDate, fromDate = new Date()) => {
     const timeDiff = target.getTime() - from.getTime();
     return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   } catch (error) {
-    logger.warn("Invalid target date for savings goal:", { targetDate, error });
+    logger.warn("Invalid target date for savings goal:", { targetDate, error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 };
@@ -48,7 +49,7 @@ export const calculateDaysRemaining = (targetDate, fromDate = new Date()) => {
 /**
  * Calculate monthly savings needed to reach goal by target date
  */
-export const calculateMonthlySavingsNeeded = (remainingAmount, daysRemaining) => {
+export const calculateMonthlySavingsNeeded = (remainingAmount: number, daysRemaining: number | null) => {
   if (!daysRemaining || daysRemaining <= 0) return 0;
 
   const monthsRemaining = Math.max(1, daysRemaining / 30);
@@ -59,9 +60,9 @@ export const calculateMonthlySavingsNeeded = (remainingAmount, daysRemaining) =>
  * Determine goal urgency level based on progress and timeline
  */
 export const determineGoalUrgency = (
-  progressRate,
-  daysRemaining,
-  monthlyNeeded,
+  progressRate: number,
+  daysRemaining: number | null,
+  monthlyNeeded: number,
   affordableMonthly = 0
 ) => {
   // Completed goals
@@ -89,10 +90,15 @@ export const determineGoalUrgency = (
 /**
  * Calculate goal timeline milestones
  */
-export const calculateGoalMilestones = (currentAmount, targetAmount) => {
+export const calculateGoalMilestones = (currentAmount: number, targetAmount: number) => {
   if (!targetAmount || targetAmount <= 0) return [];
 
-  const milestones = [];
+  const milestones = Array<{
+    percentage: number;
+    amount: number;
+    isReached: boolean;
+    label: string;
+  }>();
   const percentages = [25, 50, 75, 100];
 
   percentages.forEach((percentage) => {
@@ -114,21 +120,21 @@ export const calculateGoalMilestones = (currentAmount, targetAmount) => {
  * Calculate recommended monthly contribution
  */
 export const calculateRecommendedContribution = (
-  remainingAmount,
-  daysRemaining,
+  remainingAmount: number,
+  daysRemaining: number | null,
   availableCash = 0,
-  riskTolerance = "medium"
+  riskTolerance: "low" | "medium" | "high" = "medium"
 ) => {
   if (!daysRemaining || daysRemaining <= 0) {
     // No deadline - base on available cash and risk tolerance
-    const riskMultipliers = { low: 0.1, medium: 0.2, high: 0.3 };
+    const riskMultipliers: Record<string, number> = { low: 0.1, medium: 0.2, high: 0.3 };
     return availableCash * (riskMultipliers[riskTolerance] || 0.2);
   }
 
   const baseMonthlyNeeded = calculateMonthlySavingsNeeded(remainingAmount, daysRemaining);
 
   // Add buffer based on risk tolerance
-  const bufferMultipliers = { low: 1.2, medium: 1.1, high: 1.05 };
+  const bufferMultipliers: Record<string, number> = { low: 1.2, medium: 1.1, high: 1.05 };
   const recommendedAmount = baseMonthlyNeeded * (bufferMultipliers[riskTolerance] || 1.1);
 
   // Cap at available cash if specified
@@ -142,7 +148,7 @@ export const calculateRecommendedContribution = (
 /**
  * Process and enrich a savings goal with calculated fields
  */
-export const processSavingsGoal = (goal, fromDate = new Date()) => {
+export const processSavingsGoal = (goal: SavingsGoal, fromDate: Date = new Date()) => {
   const currentAmount = goal.currentAmount || 0;
   const targetAmount = goal.targetAmount || 0;
 
@@ -181,10 +187,15 @@ export const processSavingsGoal = (goal, fromDate = new Date()) => {
 /**
  * Get sort value from goal based on field
  */
-const getSavingsGoalSortValue = (goal, sortBy) => {
-  const priorityOrder = { high: 3, medium: 2, low: 1 };
+const getSavingsGoalSortValue = (goal: SavingsGoal & { 
+  progressRate?: number; 
+  remainingAmount?: number; 
+  monthlyNeeded?: number; 
+  urgency?: string; 
+}, sortBy: string) => {
+  const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
 
-  const valueExtractors = {
+  const valueExtractors: Record<string, () => unknown> = {
     name: () => goal.name?.toLowerCase() || "",
     targetDate: () => (goal.targetDate ? new Date(goal.targetDate) : new Date("2099-12-31")),
     priority: () => priorityOrder[goal.priority] || 2,
@@ -201,7 +212,7 @@ const getSavingsGoalSortValue = (goal, sortBy) => {
 /**
  * Compare two values for sorting
  */
-const compareSortValues = (aVal, bVal, sortOrder) => {
+const compareSortValues = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc") => {
   if (sortOrder === "desc") {
     return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
   }
@@ -211,7 +222,16 @@ const compareSortValues = (aVal, bVal, sortOrder) => {
 /**
  * Sort savings goals by various criteria
  */
-export const sortSavingsGoals = (goals, sortBy = "targetDate", sortOrder = "asc") => {
+export const sortSavingsGoals = (
+  goals: (SavingsGoal & { 
+    progressRate?: number; 
+    remainingAmount?: number; 
+    monthlyNeeded?: number; 
+    urgency?: string; 
+  })[], 
+  sortBy = "targetDate", 
+  sortOrder: "asc" | "desc" = "asc"
+) => {
   return [...goals].sort((a, b) => {
     const aVal = getSavingsGoalSortValue(a, sortBy);
     const bVal = getSavingsGoalSortValue(b, sortBy);
@@ -222,7 +242,13 @@ export const sortSavingsGoals = (goals, sortBy = "targetDate", sortOrder = "asc"
 /**
  * Check if goal matches status filter
  */
-const matchesStatusFilter = (goal, status) => {
+const matchesStatusFilter = (
+  goal: SavingsGoal & { 
+    isCompleted?: boolean; 
+    urgency?: string; 
+  }, 
+  status: string
+) => {
   if (status === "all") return true;
 
   switch (status) {
@@ -242,7 +268,20 @@ const matchesStatusFilter = (goal, status) => {
 /**
  * Check if goal matches attribute filters
  */
-const matchesAttributeFilters = (goal, filters) => {
+const matchesAttributeFilters = (
+  goal: SavingsGoal & { 
+    isCompleted?: boolean; 
+    urgency?: string; 
+  }, 
+  filters: {
+    category?: string;
+    priority?: string;
+    urgency?: string;
+    includeCompleted?: boolean;
+    minAmount?: string;
+    maxAmount?: string;
+  }
+) => {
   const { category, priority, urgency, includeCompleted, minAmount, maxAmount } = filters;
 
   if (!includeCompleted && goal.isCompleted) return false;
@@ -259,7 +298,10 @@ const matchesAttributeFilters = (goal, filters) => {
  * Filter savings goals by status and other criteria
  */
 export const filterSavingsGoals = (
-  goals: unknown[],
+  goals: (SavingsGoal & { 
+    isCompleted?: boolean; 
+    urgency?: string; 
+  })[],
   filters: { status?: string; includeCompleted?: boolean } = {}
 ) => {
   const { status = "all", includeCompleted = true } = filters;
@@ -274,7 +316,13 @@ export const filterSavingsGoals = (
 /**
  * Calculate savings goals summary statistics
  */
-export const calculateSavingsSummary = (goals) => {
+export const calculateSavingsSummary = (
+  goals: (SavingsGoal & { 
+    isCompleted?: boolean; 
+    urgency?: string; 
+    monthlyNeeded?: number; 
+  })[]
+) => {
   const totalGoals = goals.length;
   const completedGoals = goals.filter((g) => g.isCompleted).length;
   const activeGoals = totalGoals - completedGoals;
