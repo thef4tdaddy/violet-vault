@@ -11,21 +11,17 @@ import {
   filterEnvelopes,
   calculateEnvelopeTotals,
 } from "@/utils/budgeting";
+import type {
+  Envelope as BudgetEnvelope,
+  EnvelopeData as BudgetEnvelopeData,
+} from "@/utils/budgeting/envelopeCalculations";
 import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 
-// Define types for our component
-interface Envelope {
-  id: string;
-  allocated?: number;
-  [key: string]: unknown;
-}
-
-interface EnvelopeData extends Envelope {
-  allocated: number;
-}
+type Envelope = BudgetEnvelope;
+type EnvelopeData = BudgetEnvelopeData;
 
 interface FilterOptions {
   timeRange: string;
@@ -49,9 +45,9 @@ interface BudgetState {
 }
 
 type UpdateEnvelopeFunction = (params: {
-  envelopeId: string;
+  id: string;
   updates: Partial<Envelope>;
-}) => Promise<void>;
+}) => Promise<unknown>;
 type AddEnvelopeFunction = (data: unknown) => Promise<void>;
 
 // Lazy load modals for better performance
@@ -196,7 +192,7 @@ const useEnvelopeUIState = (
       const currentAllocated =
         envelopeData.find((env: EnvelopeData) => env.id === envelopeId)?.allocated || 0;
       await updateEnvelope({
-        envelopeId,
+        id: envelopeId,
         updates: { allocated: currentAllocated + amount },
       });
       logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
@@ -223,7 +219,7 @@ const useEnvelopeUIState = (
 
   const handleUpdateEnvelope = async (envelopeData: { id: string; [key: string]: unknown }) => {
     try {
-      await updateEnvelope({ envelopeId: envelopeData.id, updates: envelopeData });
+      await updateEnvelope({ id: envelopeData.id, updates: envelopeData });
       setEditingEnvelope(null);
     } catch (error) {
       logger.error("Failed to update envelope:", error);
@@ -263,7 +259,7 @@ const useResolvedData = (
   const {
     envelopes: tanStackEnvelopes = [],
     addEnvelope,
-    updateEnvelope,
+    updateEnvelopeAsync,
     deleteEnvelope,
     isLoading: envelopesLoading,
   } = useEnvelopes();
@@ -328,7 +324,7 @@ const useResolvedData = (
     },
     isLoading,
     addEnvelope,
-    updateEnvelope,
+    updateEnvelope: updateEnvelopeAsync,
     deleteEnvelope,
     updateBill,
   };

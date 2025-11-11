@@ -15,8 +15,8 @@ import {
   removeSplit,
   autoBalanceSplits,
   splitEvenly,
-  hasUnsavedChanges as compareSplitSets,
 } from "@/utils/transactions/splitting";
+import { hasUnsavedChanges as compareSplitSets } from "@/utils/transactions/splitterHelpers";
 
 /**
  * Initialize splits from a transaction

@@ -267,16 +267,49 @@ export const encryptionUtils = {
    * Optimized decryption for compressed data
    * Pipeline: Base64 → Decrypt → Decompress → Object
    */
-  async decryptOptimized(encryptedData: unknown, key: unknown) {
+  async decryptOptimized(
+    encryptedData: unknown,
+    key: unknown,
+    legacyIv?: Uint8Array | ArrayBuffer | number[]
+  ) {
     try {
+      const toUint8Array = (value: unknown): Uint8Array => {
+        if (value instanceof Uint8Array) {
+          return value;
+        }
+        if (value instanceof ArrayBuffer) {
+          return new Uint8Array(value);
+        }
+        if (Array.isArray(value)) {
+          return new Uint8Array(value as number[]);
+        }
+        throw new Error("Unsupported byte structure");
+      };
+
+      const payload =
+        legacyIv !== undefined
+          ? {
+              iv: toUint8Array(legacyIv),
+              data: toUint8Array(encryptedData),
+              metadata: {},
+            }
+          : (encryptedData as {
+              iv?: Uint8Array | number[] | ArrayBuffer;
+              data?: Uint8Array | number[] | ArrayBuffer;
+              metadata?: unknown;
+            });
+
+      if (!payload.iv || !payload.data) {
+        throw new Error("Invalid encrypted payload structure");
+      }
+
       // Step 1: Decrypt data
-      const iv = (encryptedData as any)?.iv || [];
-      const data = (encryptedData as any)?.data || [];
-      const encrypted = new Uint8Array(data);
+      const iv = toUint8Array(payload.iv);
+      const encrypted = toUint8Array(payload.data);
 
       const decrypted = await safeCryptoOperation(
         "decrypt",
-        { name: "AES-GCM", iv: new Uint8Array(iv) },
+        { name: "AES-GCM", iv },
         key,
         encrypted
       );
@@ -285,7 +318,7 @@ export const encryptionUtils = {
       const decompressedData = optimizedSerialization.deserialize(decrypted);
 
       // Check for compression metadata
-      const metadata = (encryptedData as any)?.metadata || {};
+      const metadata = (payload.metadata as Record<string, unknown>) || {};
       const wasOptimized = metadata?.optimized || false;
 
       logger.info("Optimized decryption complete", {

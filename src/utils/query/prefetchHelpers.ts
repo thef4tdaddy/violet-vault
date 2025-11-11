@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
+import type { FilterParams } from "./queryKeys";
 import logger from "@/utils/common/logger";
 import type { DateRange } from "@/db/types";
 
@@ -36,7 +37,7 @@ export const prefetchHelpers = {
   prefetchEnvelopes: async (queryClient: QueryClient, filters: EnvelopeFilters = {}) => {
     try {
       return await queryClient.prefetchQuery({
-        queryKey: queryKeys.envelopesList(filters),
+        queryKey: queryKeys.envelopesList(filters as FilterParams),
         queryFn: async () => {
           // Try to get from database service first
           const envelopes = await budgetDatabaseService.getEnvelopes({
@@ -125,7 +126,7 @@ export const prefetchHelpers = {
       const { category, isPaid, daysAhead = 30 } = options;
 
       return await queryClient.prefetchQuery({
-        queryKey: queryKeys.billsList(options),
+        queryKey: queryKeys.billsList(options as FilterParams),
         queryFn: async () => {
           // Use database service for bill queries
           const bills = await budgetDatabaseService.getBills({

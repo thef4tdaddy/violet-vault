@@ -42,6 +42,7 @@ export interface Transaction {
   description?: string;
   merchant?: string;
   receiptUrl?: string;
+  notes?: string;
 }
 
 export interface Bill {

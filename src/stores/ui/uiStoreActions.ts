@@ -7,7 +7,7 @@ import type { UiStore } from "./uiStore";
 import type { Draft } from "immer";
 
 // Define BeforeInstallPromptEvent interface since it's not in standard TypeScript types
-interface BeforeInstallPromptEvent extends Event {
+export interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
     outcome: "accepted" | "dismissed";

@@ -118,7 +118,7 @@ import {
 
   // Time & Calendar
   Clock,
-  ClockHistory,
+  History,
   Calendar,
   Timer,
 
@@ -283,7 +283,9 @@ export const ICON_REGISTRY = {
 
   // Time & Calendar
   Clock: Clock,
-  ClockHistory: ClockHistory,
+  history: History,
+  History: History,
+  "clock-history": History,
   Calendar: Calendar,
   Timer: Timer,
 

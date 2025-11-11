@@ -2,9 +2,10 @@ import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/cat
 import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";
 
 // Define types for our functions
-interface Envelope {
+export interface Envelope {
   id: string;
   budget?: number;
+  allocated?: number;
   currentBalance?: number;
   envelopeType?: string;
   category?: string;
@@ -16,7 +17,7 @@ interface Envelope {
   name?: string;
 }
 
-interface Transaction {
+export interface Transaction {
   id: string;
   envelopeId: string;
   type: string;
@@ -28,12 +29,12 @@ interface Transaction {
   description?: string;
 }
 
-interface Bill {
+export interface Bill {
   id: string;
-  envelopeId: string;
+  envelopeId?: string;
   isPaid?: boolean;
   amount: number;
-  dueDate?: string;
+  dueDate?: string | Date;
   name?: string;
   type?: string;
   frequency?: string;
@@ -42,7 +43,7 @@ interface Bill {
   date?: string; // For bills that come from transactions
 }
 
-interface EnvelopeData extends Envelope {
+export interface EnvelopeData extends Envelope {
   totalSpent?: number;
   totalUpcoming?: number;
   totalOverdue?: number;

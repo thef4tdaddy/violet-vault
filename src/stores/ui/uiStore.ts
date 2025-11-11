@@ -88,6 +88,7 @@ import {
   createBasicActions,
   createPWAUpdateActions,
   createPatchNotesActions,
+  type BeforeInstallPromptEvent,
 } from "./uiStoreActions.ts";
 
 // UI Store configuration - handles UI state, settings, and app preferences
@@ -173,8 +174,14 @@ const storeInitializer = (set, _get) => ({
   async startBackgroundSync(authData?: {
     isUnlocked: boolean;
     budgetId: string;
-    encryptionKey: CryptoKey | Uint8Array;
-    currentUser?: string;
+    encryptionKey: CryptoKey | Uint8Array<ArrayBufferLike>;
+    currentUser?:
+      | {
+          uid?: string;
+          userName?: string;
+          userColor?: string;
+        }
+      | string;
   }) {
     try {
       // Safe external store access (prevents React error #185)
@@ -196,10 +203,15 @@ const storeInitializer = (set, _get) => ({
       // Import and start the cloud sync service
       const { cloudSyncService } = await import("../../services/cloudSyncService");
 
+      const normalizedUser =
+        typeof authData.currentUser === "string"
+          ? { userName: authData.currentUser }
+          : authData.currentUser;
+
       const syncConfig = {
         budgetId: authData.budgetId,
         encryptionKey: authData.encryptionKey,
-        currentUser: authData.currentUser,
+        currentUser: normalizedUser,
       };
 
       cloudSyncService.start(syncConfig);

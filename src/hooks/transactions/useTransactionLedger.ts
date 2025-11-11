@@ -12,6 +12,7 @@ import logger from "@/utils/common/logger";
 import { useLedgerState } from "./helpers/useLedgerState";
 import { useLedgerOperations } from "./helpers/useLedgerOperations";
 import type { TransactionInput } from "./useTransactionMutations";
+import type { Transaction as FinanceTransaction } from "@/types/finance";
 
 /**
  * Custom hook for TransactionLedger component
@@ -107,29 +108,32 @@ export const useTransactionLedger = (currentUser: unknown) => {
   // New validated form hook
   const validatedForm = useTransactionFormValidated({
     editingTransaction: ledgerState.editingTransaction,
-    onAddTransaction: (transaction) =>
-      addTransactionAsync({
+    onAddTransaction: async (transaction) => {
+      await addTransactionAsync({
         date: transaction.date,
         amount: transaction.amount,
         category: transaction.category,
         description: transaction.description,
-        envelopeId: transaction.envelopeId,
+        envelopeId: transaction.envelopeId !== undefined ? String(transaction.envelopeId) : "",
         type: transaction.type,
         notes: transaction.notes,
-      } as TransactionInput),
-    onUpdateTransaction: (transaction) =>
-      updateTransactionAsync({
+      } as TransactionInput);
+    },
+    onUpdateTransaction: async (transaction) => {
+      await updateTransactionAsync({
         id: String(transaction.id),
         updates: {
           date: new Date(transaction.date),
           amount: transaction.amount,
           category: transaction.category,
           description: transaction.description,
-          envelopeId: transaction.envelopeId,
+          envelopeId:
+            transaction.envelopeId !== undefined ? String(transaction.envelopeId) : undefined,
           notes: transaction.notes,
           type: transaction.type,
         },
-      }),
+      });
+    },
     onDeleteTransaction: async (id) => {
       await deleteTransaction(id as never);
     },
@@ -159,9 +163,12 @@ export const useTransactionLedger = (currentUser: unknown) => {
             amount: transactionWithId.amount,
             category: transactionWithId.category,
             description: transactionWithId.description,
-            envelopeId: transactionWithId.envelopeId ?? "",
+            envelopeId:
+              transactionWithId.envelopeId !== undefined
+                ? String(transactionWithId.envelopeId)
+                : undefined,
             notes: transactionWithId.notes,
-            type: transactionWithId.type,
+            type: transactionWithId.type as FinanceTransaction["type"] | undefined,
           },
         });
         logger.info("✅ Transaction updated", {

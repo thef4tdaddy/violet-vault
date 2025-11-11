@@ -63,9 +63,9 @@ const extractSupplementalAccounts = (
 /**
  * Configuration interface for cloud sync service
  */
-interface SyncConfig {
+export interface SyncConfig {
   budgetId?: string;
-  encryptionKey?: string | CryptoKey;
+  encryptionKey?: string | CryptoKey | Uint8Array<ArrayBufferLike>;
   currentUser?: {
     readonly uid?: string;
     readonly userName?: string;
@@ -76,7 +76,7 @@ interface SyncConfig {
 }
 
 // Define interface for data objects
-interface DataCollection {
+export interface DataCollection {
   envelopes?: unknown[];
   transactions?: unknown[];
   bills?: unknown[];
@@ -98,7 +98,7 @@ type SupplementalAccountRecord = {
 };
 
 // Define interface for the specific return type of fetchDexieData
-interface DexieData {
+export interface DexieData {
   envelopes: Envelope[];
   transactions: Transaction[];
   bills: Bill[];
@@ -855,5 +855,5 @@ export const cloudSyncService = new CloudSyncService();
 
 // Expose to window for critical sync triggers from other modules
 if (typeof window !== "undefined") {
-  (window as CloudSyncWindow).cloudSyncService = cloudSyncService;
+  (window as unknown as CloudSyncWindow).cloudSyncService = cloudSyncService;
 }

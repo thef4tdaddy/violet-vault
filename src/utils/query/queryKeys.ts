@@ -8,7 +8,7 @@
 type QueryKey = readonly unknown[];
 type EntityId = string | number;
 type EntityType = string;
-type FilterParams = Record<string, unknown>;
+export type FilterParams = Record<string, unknown>;
 type Timestamp = number;
 type UserId = string;
 
