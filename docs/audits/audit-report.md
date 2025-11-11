@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
-| TypeScript Errors | 4 | +4 |
-| TypeScript Strict Mode Errors | 3731 | -57 |
+| TypeScript Errors | 8 | +4 |
+| TypeScript Strict Mode Errors | 3690 | -41 |
 
-*Last updated: 2025-11-11 17:55:07 UTC*
+*Last updated: 2025-11-11 17:56:53 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,11 +28,12 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-11 17:54:49 UTC
+Last check: 2025-11-11 17:56:37 UTC
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 4 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/mutations.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
 - 1 errors in `src/hooks/budgeting/mutations/useUpdateEnvelope.ts`
@@ -40,7 +41,8 @@ Last check: 2025-11-11 17:54:49 UTC
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 4 | `TS2345` |
+| 5 | `TS2345` |
+| 3 | `TS2339` |
 
 ### Detailed Type Error Report
 ```
@@ -52,12 +54,20 @@ src/hooks/budgeting/useBudgetData/mutations.ts(17,56): error TS2345: Argument of
 src/hooks/budgeting/useBudgetData/mutations.ts(65,59): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
   Type 'Record<string, unknown>' is missing the following properties from type 'Omit<Transaction, "lastModified" | "createdAt">': category, id, date, amount, and 2 more.
 src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Omit<Transaction, "lastModified" | "createdAt">'.
+src/utils/budgeting/autofunding/simulation.ts(57,70): error TS2345: Argument of type 'AutoFundingRule' is not assignable to parameter of type 'Rule'.
+  The types of 'config.conditions' are incompatible between these types.
+    Type 'RuleCondition[]' is not assignable to type 'Condition[]'.
+      Type 'RuleCondition' is not assignable to type 'Condition'.
+        Types of property 'value' are incompatible.
+          Type 'unknown' is not assignable to type 'number'.
+src/utils/budgeting/autofunding/simulation.ts(430,22): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
+src/utils/budgeting/autofunding/simulation.ts(508,38): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
+src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
 ```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 53 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 46 errors in `src/utils/budgeting/paycheckAllocationUtils.ts`
 - 44 errors in `src/utils/savings/savingsCalculations.ts`
 - 43 errors in `src/hooks/bills/useBills/billAnalytics.ts`
@@ -142,6 +152,7 @@ src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of
 - 13 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
+- 12 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
 - 12 errors in `src/utils/accounts/accountHelpers.ts`
 - 12 errors in `src/hooks/transactions/useTransactionImportProcessing.ts`
@@ -560,17 +571,17 @@ src/hooks/budgeting/useBudgetData/utilities.ts(56,59): error TS2345: Argument of
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1469 | `TS7006` |
+| 1439 | `TS7006` |
 | 915 | `TS7031` |
-| 282 | `TS2339` |
-| 251 | `TS2345` |
-| 205 | `TS18046` |
+| 281 | `TS2339` |
+| 247 | `TS2345` |
+| 201 | `TS18046` |
 | 144 | `TS7053` |
 | 122 | `TS2322` |
-| 80 | `TS7005` |
 | 80 | `TS18048` |
+| 79 | `TS7005` |
 | 52 | `TS18047` |
-| 47 | `TS7034` |
+| 46 | `TS7034` |
 | 28 | `TS2769` |
 | 9 | `TS2353` |
 | 6 | `TS2698` |
@@ -4063,61 +4074,22 @@ src/utils/budgeting/autofunding/conditions.ts(378,32): error TS2769: No overload
     Argument of type 'string | null | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
 src/utils/budgeting/autofunding/conditions.ts(390,34): error TS2538: Type 'undefined' cannot be used as an index type.
-src/utils/budgeting/autofunding/simulation.ts(17,39): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(17,46): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(29,43): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(40,39): error TS2345: Argument of type '{ ruleId: any; ruleName: any; success: boolean; amount: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: any; amount: any; description: string; ruleId: any; ruleName: any; }[]; targetEnvelopes: any[]; error?: undefined; } | { ...; }' is not assignable to parameter of type 'never'.
-  Type '{ ruleId: any; ruleName: any; success: boolean; amount: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: any; amount: any; description: string; ruleId: any; ruleName: any; }[]; targetEnvelopes: any[]; error?: undefined; }' is not assignable to type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(41,44): error TS2345: Argument of type '{ fromEnvelopeId: string; toEnvelopeId: any; amount: any; description: string; ruleId: any; ruleName: any; }' is not assignable to parameter of type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(46,39): error TS2345: Argument of type '{ ruleId: any; ruleName: any; success: boolean; amount: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: any; amount: any; description: string; ruleId: any; ruleName: any; }[]; targetEnvelopes: any[]; error?: undefined; } | { ...; }' is not assignable to parameter of type 'never'.
-  Type '{ ruleId: any; ruleName: any; success: boolean; amount: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: any; amount: any; description: string; ruleId: any; ruleName: any; }[]; targetEnvelopes: any[]; error?: undefined; }' is not assignable to type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(48,36): error TS2345: Argument of type '{ ruleId: string; ruleName: string; error: any; }' is not assignable to parameter of type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(60,18): error TS18046: 'error' is of type 'unknown'.
-src/utils/budgeting/autofunding/simulation.ts(65,37): error TS2345: Argument of type '{ ruleId: string; ruleName: string; success: boolean; error: any; amount: number; plannedTransfers: never[]; }' is not assignable to parameter of type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(66,32): error TS2345: Argument of type '{ ruleId: string; ruleName: string; error: any; }' is not assignable to parameter of type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(69,18): error TS18046: 'error' is of type 'unknown'.
-src/utils/budgeting/autofunding/simulation.ts(83,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/budgeting/autofunding/simulation.ts(96,36): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(96,42): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(96,51): error TS7006: Parameter 'availableCash' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(131,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/budgeting/autofunding/simulation.ts(144,35): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(144,41): error TS7006: Parameter 'totalAmount' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(169,40): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(169,52): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(198,37): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(198,44): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(209,16): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(210,22): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(211,17): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(212,21): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(213,12): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(213,62): error TS2339: Property 'success' does not exist on type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(214,16): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(215,13): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(231,38): error TS7006: Parameter 'simulation' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(231,50): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(236,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(272,35): error TS7006: Parameter 'transfers' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(272,46): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(274,9): error TS7034: Variable 'warnings' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/autofunding/simulation.ts(279,22): error TS7006: Parameter 'transfer' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(279,32): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(282,46): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(316,5): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
-src/utils/budgeting/autofunding/simulation.ts(327,41): error TS7006: Parameter 'transfers' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(327,52): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(336,22): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(351,48): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(351,53): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(355,22): error TS7006: Parameter 'transfer' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(377,37): error TS7006: Parameter 'plan' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(378,55): error TS2339: Property 'id' does not exist on type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(389,35): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(394,36): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(396,38): error TS2339: Property 'name' does not exist on type 'never'.
-src/utils/budgeting/autofunding/simulation.ts(399,43): error TS7006: Parameter 'transfer' implicitly has an 'any' type.
-src/utils/budgeting/autofunding/simulation.ts(401,51): error TS2339: Property 'name' does not exist on type 'never'.
+src/utils/budgeting/autofunding/simulation.ts(57,70): error TS2345: Argument of type 'AutoFundingRule' is not assignable to parameter of type 'Rule'.
+  Types of property 'lastExecuted' are incompatible.
+    Type 'string | null' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.
+src/utils/budgeting/autofunding/simulation.ts(268,16): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(269,22): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(270,17): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(271,21): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(272,12): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(273,16): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(274,13): error TS18047: 'simulation.simulation' is possibly 'null'.
+src/utils/budgeting/autofunding/simulation.ts(275,36): error TS2345: Argument of type '{ totalPlanned: number; rulesExecuted: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; ruleId: string; ruleName: string; }[]; ruleResults: { ...; }[]; remainingCash: number; errors: { ...; }[]; } | null' is not assignable to parameter of type '{ errors: { error: string; }[]; rulesExecuted: number; remainingCash: number; }'.
+  Type 'null' is not assignable to type '{ errors: { error: string; }[]; rulesExecuted: number; remainingCash: number; }'.
+src/utils/budgeting/autofunding/simulation.ts(430,22): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
+src/utils/budgeting/autofunding/simulation.ts(508,38): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
+src/utils/budgeting/autofunding/simulation.ts(513,51): error TS2339: Property 'name' does not exist on type 'EnvelopeData'.
 src/utils/budgeting/billEnvelopeCalculations.ts(78,29): error TS7006: Parameter 'targetDate' implicitly has an 'any' type.
 src/utils/budgeting/billEnvelopeCalculations.ts(88,35): error TS7006: Parameter 'currentBalance' implicitly has an 'any' type.
 src/utils/budgeting/billEnvelopeCalculations.ts(88,51): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
