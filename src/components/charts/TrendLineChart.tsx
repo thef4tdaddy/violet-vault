@@ -8,8 +8,22 @@ const LINE_SERIES = [
 ];
 
 const AREA_SERIES = [
-  { type: "area", dataKey: "income", name: "Income", stroke: "#10b981", fill: "#10b981", fillOpacity: 0.2 },
-  { type: "area", dataKey: "expenses", name: "Expenses", stroke: "#ef4444", fill: "#ef4444", fillOpacity: 0.2 },
+  {
+    type: "area",
+    dataKey: "income",
+    name: "Income",
+    stroke: "#10b981",
+    fill: "#10b981",
+    fillOpacity: 0.2,
+  },
+  {
+    type: "area",
+    dataKey: "expenses",
+    name: "Expenses",
+    stroke: "#ef4444",
+    fill: "#ef4444",
+    fillOpacity: 0.2,
+  },
   { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
 ];
 

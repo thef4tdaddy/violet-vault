@@ -304,6 +304,90 @@ The test data is validated against Zod schemas:
 ```
 public/test-data/
 ├── violet-vault-test-budget.json  # Main test data file
+├── sample-receipts/                # Sample receipt images for OCR testing
+│   ├── grocery-receipt-1.jpg      # Standard grocery store receipt
+│   ├── gas-station-receipt.jpg    # Gas station receipt
+│   ├── restaurant-receipt.jpg     # Restaurant receipt with tip
+│   └── README.md                  # Receipt samples documentation
+└── README.md                       # Test data documentation
+```
+
+## Sample Receipt Images
+
+Sample receipt images are provided in the `/public/test-data/sample-receipts/` directory for testing the OCR receipt scanning workflow.
+
+### Available Sample Receipts
+
+1. **grocery-receipt-1.jpg** - Standard grocery store receipt
+   - Merchant: Local Supermarket
+   - Total: $67.42
+   - Multiple line items with clear text
+   - Good for testing multi-item extraction
+
+2. **gas-station-receipt.jpg** - Gas station receipt
+   - Merchant: Shell Gas Station
+   - Total: $45.89
+   - Simple format, single item
+   - Good for testing basic OCR accuracy
+
+3. **restaurant-receipt.jpg** - Restaurant receipt with tip
+   - Merchant: Local Restaurant
+   - Subtotal, tax, and tip breakdown
+   - Good for testing field extraction
+
+### Using Sample Receipts
+
+#### Via Import Modal
+
+1. **Open Import Modal** → Navigate to Transactions and click "Import"
+2. **Click "Scan Receipt"** → Opens receipt scanner interface
+3. **Upload Sample Receipt** → Choose one of the sample images
+4. **Review Extracted Data** → Verify OCR results with confidence indicators
+5. **Adjust if Needed** → Manual entry fallback available
+6. **Confirm Import** → Transaction created from receipt data
+
+#### Via Receipt Scanner Directly
+
+1. **Open Transaction Form** → Click "+" to add new transaction
+2. **Click Receipt Icon** → Opens receipt scanner
+3. **Upload Sample** → Select a sample receipt image
+4. **Processing** → OCR extracts merchant, total, date, items
+5. **Review & Confirm** → Check confidence scores and edit if needed
+
+### OCR Testing Scenarios
+
+Use sample receipts to test:
+
+- ✓ Image upload and preview
+- ✓ OCR accuracy for different receipt formats
+- ✓ Confidence indicator display
+- ✓ Manual correction workflow
+- ✓ Field mapping to transaction data
+- ✓ Performance metrics (processing time)
+- ✓ Privacy settings (save raw text, encryption)
+- ✓ Idle preloading performance
+
+### Performance Expectations
+
+- **First Scan**: 2-5 seconds (includes Tesseract initialization)
+- **Subsequent Scans**: 1-3 seconds (worker already initialized)
+- **With Preloading**: < 2 seconds (optimal performance)
+
+### Creating Custom Test Receipts
+
+To add your own test receipts:
+
+1. Use clear, high-contrast images (JPG or PNG)
+2. Ensure text is legible and not blurry
+3. Keep file size under 5MB
+4. Name descriptively: `merchant-type-description.jpg`
+5. Add to `/public/test-data/sample-receipts/`
+
+## File Structure Reference
+
+```
+public/test-data/
+├── violet-vault-test-budget.json  # Main test data file
 └── README.md                       # Test data documentation
 ```
 

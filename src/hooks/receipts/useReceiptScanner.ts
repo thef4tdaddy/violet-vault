@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { processReceiptImage } from "../../utils/common/ocrProcessor";
+import { useReceiptScannerStore } from "../../stores/ui/receiptScannerStore";
 import logger from "../../utils/common/logger";
 
 /**
@@ -14,6 +15,10 @@ export const useReceiptScanner = (onReceiptProcessed) => {
   const [extractedData, setExtractedData] = useState(null);
   const [error, setError] = useState(null);
   const [showImagePreview, setShowImagePreview] = useState(false);
+
+  // Get privacy preferences from store
+  const saveRawText = useReceiptScannerStore((state) => state.saveRawText);
+  const recordScan = useReceiptScannerStore((state) => state.recordScan);
 
   // Refs for file inputs
   const fileInputRef = useRef(null);
@@ -71,11 +76,21 @@ export const useReceiptScanner = (onReceiptProcessed) => {
         // Process with OCR
         const result = await processReceiptImage(file);
 
-        setExtractedData(result);
+        // Record performance metrics
+        recordScan(result.processingTime);
+
+        // Filter raw text based on privacy settings
+        const processedResult = {
+          ...result,
+          rawText: saveRawText ? result.rawText : undefined,
+        };
+
+        setExtractedData(processedResult);
         logger.info("✅ Receipt processing completed", {
           merchant: result.merchant,
           total: result.total,
           confidence: result.confidence,
+          processingTime: result.processingTime,
         });
       } catch (error) {
         logger.error("❌ Receipt processing failed:", error);
@@ -85,7 +100,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
         setIsProcessing(false);
       }
     },
-    [validateFile]
+    [validateFile, recordScan, saveRawText]
   );
 
   // Handle drag and drop

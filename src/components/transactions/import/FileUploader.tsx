@@ -1,25 +1,52 @@
 import React, { useState } from "react";
 import { renderIcon } from "@/utils/icons";
 import Checkbox from "@/components/ui/forms/Checkbox";
+import { Button } from "@/components/ui";
 
 interface FileUploaderProps {
   onFileUpload: (
     event: React.ChangeEvent<HTMLInputElement>,
     options: { clearExisting: boolean }
   ) => void;
+  onScanReceipt?: () => void;
 }
 
-const FileUploader = ({ onFileUpload }: FileUploaderProps) => {
+const FileUploader = ({ onFileUpload, onScanReceipt }: FileUploaderProps) => {
   const [clearExisting, setClearExisting] = useState(false);
   return (
     <div className="space-y-6">
       <div className="text-center">
         {renderIcon("Upload", { className: "mx-auto h-12 w-12 text-gray-400" })}
-        <h4 className="mt-4 text-lg font-medium text-gray-900">Upload Transaction File</h4>
-        <p className="mt-2 text-sm text-gray-600">Support for CSV and OFX files from your bank</p>
+        <h4 className="mt-4 text-lg font-medium text-gray-900">Import Transactions</h4>
+        <p className="mt-2 text-sm text-gray-600">
+          Upload CSV/OFX files or scan receipts to import transactions
+        </p>
       </div>
 
       <div className="space-y-4">
+        {/* Scan Receipt Button */}
+        {onScanReceipt && (
+          <Button
+            type="button"
+            onClick={onScanReceipt}
+            variant="secondary"
+            className="w-full glassmorphism rounded-xl p-6 border-2 border-purple-500 hover:border-purple-600 transition-colors group"
+          >
+            <div className="flex items-center justify-center gap-3">
+              {renderIcon("Camera", {
+                className: "h-8 w-8 text-purple-600 group-hover:text-purple-700",
+              })}
+              <div className="text-left">
+                <span className="block text-lg font-semibold text-purple-900">SCAN RECEIPT</span>
+                <span className="block text-sm text-purple-700">
+                  Use camera or upload receipt image
+                </span>
+              </div>
+            </div>
+          </Button>
+        )}
+
+        {/* CSV/OFX Upload */}
         <div className="border-2 border-dashed border-black rounded-xl p-6 bg-white shadow-inner">
           <input
             type="file"
@@ -33,9 +60,9 @@ const FileUploader = ({ onFileUpload }: FileUploaderProps) => {
               className: "mx-auto h-12 w-12 text-gray-400",
             })}
             <span className="mt-2 block text-sm font-medium text-gray-900">
-              Click to upload or drag and drop
+              Upload CSV or OFX file
             </span>
-            <span className="block text-sm text-gray-600">CSV or OFX files only</span>
+            <span className="block text-sm text-gray-600">Click to upload or drag and drop</span>
           </label>
         </div>
 

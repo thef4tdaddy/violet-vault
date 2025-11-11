@@ -38,8 +38,7 @@ const createSummaryCards = ({
   budgetAccuracy: number;
   healthScore: number;
 }) => {
-  const avgTransaction =
-    expenseTransactionCount > 0 ? totalExpenses / expenseTransactionCount : 0;
+  const avgTransaction = expenseTransactionCount > 0 ? totalExpenses / expenseTransactionCount : 0;
   const { color: healthColor, label: healthLabel } = deriveHealthSummary(healthScore);
   const budgetAccuracyColor = budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red";
 

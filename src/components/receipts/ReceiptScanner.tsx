@@ -6,6 +6,7 @@ import ReceiptErrorState from "./components/ReceiptErrorState";
 import ReceiptImagePreview from "./components/ReceiptImagePreview";
 import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
+import ReceiptPrivacySettings from "./components/ReceiptPrivacySettings";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
@@ -52,13 +53,18 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
           <ReceiptScannerHeader onClose={onClose} />
 
           {!uploadedImage && (
-            <ReceiptUploadArea
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              fileInputRef={fileInputRef}
-              cameraInputRef={cameraInputRef}
-              onFileInputChange={handleFileInputChange}
-            />
+            <>
+              <ReceiptUploadArea
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                fileInputRef={fileInputRef}
+                cameraInputRef={cameraInputRef}
+                onFileInputChange={handleFileInputChange}
+              />
+              <div className="mt-6">
+                <ReceiptPrivacySettings />
+              </div>
+            </>
           )}
 
           {isProcessing && <ReceiptProcessingState />}

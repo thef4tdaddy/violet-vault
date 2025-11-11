@@ -35,13 +35,11 @@ const ModalCloseButton = ({
   children,
 }: ModalCloseButtonProps) => {
   const { button: variantButtonClasses, icon: variantIconClasses } = VARIANT_STYLES[variant];
-  const content =
-    children ??
-    (
-      <span className={`${DEFAULT_ICON_BASE_CLASSES} ${variantIconClasses}`} aria-hidden="true">
-        X
-      </span>
-    );
+  const content = children ?? (
+    <span className={`${DEFAULT_ICON_BASE_CLASSES} ${variantIconClasses}`} aria-hidden="true">
+      X
+    </span>
+  );
 
   return (
     <button

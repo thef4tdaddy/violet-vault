@@ -67,63 +67,67 @@ When an entity (debt, envelope, bill, etc.) is linked to another, use the standa
 ### Connected State Display
 
 ```jsx
-{isEditMode && hasConnections && (
-  <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4">
-    <div className="flex items-center justify-between mb-4">
-      <label className="block text-lg font-bold text-green-800 flex items-center">
-        <IconComponent className="h-6 w-6 mr-3" />
-        🔗 Connected to [Connection Type]
-      </label>
-      <button
-        type="button"
-        onClick={handleDisconnect}
-        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transition-colors flex items-center"
-      >
-        <X className="h-3 w-3 mr-1" />
-        Disconnect
-      </button>
-    </div>
-
-    <div className="space-y-3">
-      {connections.map((connection) => (
-        <div
-          key={connection.id}
-          className="flex items-center p-3 bg-white rounded-lg border border-green-200"
+{
+  isEditMode && hasConnections && (
+    <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <label className="block text-lg font-bold text-green-800 flex items-center">
+          <IconComponent className="h-6 w-6 mr-3" />
+          🔗 Connected to [Connection Type]
+        </label>
+        <button
+          type="button"
+          onClick={handleDisconnect}
+          className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transition-colors flex items-center"
         >
-          <ConnectionIcon className="h-5 w-5 mr-3 text-green-600" />
-          <div className="flex-1">
-            <div className="font-medium text-green-800">{connection.type}</div>
-            <div className="text-sm text-green-700">{connection.details}</div>
-          </div>
-          <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-            {connection.syncStatus}
-          </div>
-        </div>
-      ))}
-    </div>
+          <X className="h-3 w-3 mr-1" />
+          Disconnect
+        </button>
+      </div>
 
-    <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
-      <p className="text-sm text-green-700 font-medium">
-        📝 <strong>Connected!</strong> [Explain implications + auto-sync behavior]
-      </p>
+      <div className="space-y-3">
+        {connections.map((connection) => (
+          <div
+            key={connection.id}
+            className="flex items-center p-3 bg-white rounded-lg border border-green-200"
+          >
+            <ConnectionIcon className="h-5 w-5 mr-3 text-green-600" />
+            <div className="flex-1">
+              <div className="font-medium text-green-800">{connection.type}</div>
+              <div className="text-sm text-green-700">{connection.details}</div>
+            </div>
+            <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+              {connection.syncStatus}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
+        <p className="text-sm text-green-700 font-medium">
+          📝 <strong>Connected!</strong> [Explain implications + auto-sync behavior]
+        </p>
+      </div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 ### Available to Connect State
 
 ```jsx
-{!(isEditMode && hasConnections) && (
-  <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl p-6 mb-4">
-    <label className="block text-lg font-bold text-purple-800 mb-4 flex items-center">
-      <IconComponent className="h-6 w-6 mr-3" />
-      🔗 Connect to [Connection Type]
-    </label>
+{
+  !(isEditMode && hasConnections) && (
+    <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl p-6 mb-4">
+      <label className="block text-lg font-bold text-purple-800 mb-4 flex items-center">
+        <IconComponent className="h-6 w-6 mr-3" />
+        🔗 Connect to [Connection Type]
+      </label>
 
-    {/* Connection options (dropdowns, radio buttons, etc.) */}
-  </div>
-)}
+      {/* Connection options (dropdowns, radio buttons, etc.) */}
+    </div>
+  );
+}
 ```
 
 ### Color Coding
