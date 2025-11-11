@@ -1,0 +1,100 @@
+---
+alwaysApply: true
+---
+# Quick Start Commands
+
+:::rule{priority="medium"}
+- Run Prettier before every commit: `npm run format`
+- Stage and commit after formatting: `npm run format && git add . && git commit -m "..."`  
+- Open GitHub issues for reported errors and link commits to issues
+- Only push directly to `main` for docs updates or urgent error fixes; otherwise branch and PR
+:::
+
+# Git & GitHub Workflow
+
+:::rule{priority="high"}
+- Follow conventional commits in imperative mood (`type: description`)
+- Create feature branches for non-hotfix work, keep PRs focused, and connect to issues
+- Rebase onto `develop` before merge; delete feature branches after merge
+- Never commit secrets (e.g. `.env`, credentials)
+- Run Prettier, lint, and typecheck before committing
+:::
+
+# Architecture & State Management
+
+:::rule{priority="high"}
+- Data flow: Firebase ↔ Dexie ↔ TanStack Query ↔ React Components
+- Server/Firebase state lives in TanStack Query; UI state belongs in Zustand only
+- React Context is reserved for auth or global app state (not UI toggles)
+- Components must never call Firebase or make HTTP requests directly
+- All external data is validated via Zod schemas located in `/src/domain/schemas/`
+:::
+
+# Directory Ownership
+
+:::rule{priority="medium"}
+- `/src/components/`: presentation-only React components
+- `/src/services/`: business logic, Firebase, and Dexie operations
+- `/src/hooks/api/`: TanStack Query hooks (useQuery/useMutation)
+- `/src/hooks/state/` & `/src/stores/`: Zustand UI state management
+- `/src/utils/`: pure utilities and helpers (no side effects)
+- `/src/types/`: TypeScript definitions and shared interfaces
+:::
+
+# 🚫 Zero Tolerance Rules
+
+:::rule{priority="critical"}
+- Absolutely no `any` types; prefer proper interfaces, `unknown`, or `z.infer`
+- All imports must use the `@` alias (e.g. `@/utils/foo`), never relative `../`
+- Replace `console.log` with the shared `logger` utility
+- No business logic or data fetching inside components
+- Do not mix server state into Zustand or UI state into Context
+- Avoid `eslint-disable` comments unless explicitly justified
+:::
+
+# Code Quality Standards
+
+:::rule{priority="high"}
+- Keep components ≤200 lines; extract hooks/utilities as needed
+- Keep services ≤300 lines and focused on a single responsibility
+- Eliminate unused variables/imports (prefix intentional unused with `_`)
+- Format with Prettier and ensure ESLint passes with zero errors
+- Use `React.memo`, `useMemo`, and `useCallback` for expensive operations
+- Avoid hardcoded magic values—centralize via constants
+:::
+
+# Type Safety & Validation
+
+:::rule{priority="high"}
+- Validate all API/Firebase responses with the appropriate Zod schema
+- Derive TypeScript types via `z.infer<typeof Schema>`
+- Prefer `.safeParse` when handling user-supplied data to surface validation errors gracefully
+- Service methods must return validated types; never return raw, unchecked data
+:::
+
+# Form & Mutation Patterns
+
+:::rule{priority="medium"}
+- Use Zod schemas for form validation and surface errors inline
+- Store form UI state in Zustand; submit handlers use TanStack Query mutations
+- Log errors with context using `logger.error`
+- For critical mutations, trigger sync mechanisms as required (e.g. cloud sync service hooks)
+:::
+
+# Testing & Tooling
+
+:::rule{priority="medium"}
+- Use Vitest for unit tests (`npm run test` / `npm run test:run`)
+- Mock Firebase with `vi.mock` and type helpers (e.g. `Mock`)
+- Aim for >80% coverage on critical flows; include regression tests for bug fixes
+- Provide JSDoc or inline comments for complex logic pathways
+:::
+
+# Security & Performance
+
+:::rule{priority="high"}
+- Never store sensitive data in `localStorage`; prefer secure storage patterns
+- Ensure HTTPS-only communication and follow OWASP best practices
+- Profile bundle size and use lazy loading/virtualization for large UI lists
+- Debounce rapid-fire inputs and cache expensive derived data via TanStack Query or memoization
+:::
