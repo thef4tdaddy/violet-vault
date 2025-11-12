@@ -3,6 +3,9 @@ import { getIcon } from "../../utils";
 import { useDebtStrategies } from "../../hooks/debts/useDebtStrategies";
 import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
+import TipContainer from "../tips/TipContainer";
+import { TipContext } from "@/domain/schemas/tip";
+import { useUserStateForTips } from "@/hooks/tips/useUserStateForTips";
 
 /**
  * Debt Payment Strategies Component
@@ -18,6 +21,9 @@ const DebtStrategies = ({ debts }) => {
     recommendationText,
     hasDebts,
   } = useDebtStrategies(debts);
+
+  // Get user state for tip filtering
+  const userState = useUserStateForTips();
 
   if (!hasDebts) {
     return (
@@ -106,6 +112,9 @@ const DebtStrategies = ({ debts }) => {
 
       {/* Payment Impact Analysis */}
       <PaymentImpactTable paymentImpact={paymentImpact} />
+
+      {/* Tips and Hints */}
+      <TipContainer context={TipContext.DEBT} userState={userState} maxTips={2} />
     </div>
   );
 };
