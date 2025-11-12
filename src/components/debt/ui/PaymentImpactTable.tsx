@@ -111,15 +111,6 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
           </tbody>
         </table>
       </div>
-
-      {/* Footer */}
-      <div className="p-4 bg-blue-50 border-t border-blue-200">
-        <p className="text-xs text-blue-700">
-          💡 <strong>Pro Tip:</strong> Even small extra payments can significantly reduce your debt
-          payoff time and interest costs. Consider rounding up payments or applying windfalls to
-          accelerate your debt freedom.
-        </p>
-      </div>
     </div>
   );
 };
