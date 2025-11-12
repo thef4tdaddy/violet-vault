@@ -29,24 +29,36 @@ export type EnvelopeGridProps = z.infer<typeof EnvelopeGridPropsSchema>;
  * TransactionTable component props schema
  * Includes callback functions for table actions
  */
+const TransactionTableTransactionSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    date: z.string().min(1),
+    amount: z.number(),
+    envelopeId: z.union([z.string(), z.number()]).optional(),
+    category: z.string().optional(),
+    type: z.enum(["income", "expense", "transfer"]).optional(),
+    description: z.string().optional(),
+    notes: z.string().optional(),
+  })
+  .catchall(z.unknown());
+
+const TransactionTableEnvelopeSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    name: z.string().min(1),
+    category: z.string().optional(),
+    currentBalance: z.number().optional(),
+    targetAmount: z.number().optional(),
+    color: z.string().optional(),
+    icon: z.string().optional(),
+    description: z.string().optional(),
+    isArchived: z.boolean().optional(),
+  })
+  .catchall(z.unknown());
+
 export const TransactionTablePropsSchema = z.object({
-  transactions: z
-    .array(
-      z
-        .object({
-          id: z.union([z.string(), z.number()]),
-          date: z.union([z.date(), z.string()]),
-          amount: z.number(),
-          envelopeId: z.string().optional(),
-          category: z.string().optional(),
-          type: z.string().optional(),
-          description: z.string().optional(),
-        })
-        .catchall(z.unknown())
-    )
-    .optional()
-    .default([]),
-  envelopes: z.array(EnvelopeSchema).optional().default([]),
+  transactions: z.array(TransactionTableTransactionSchema).optional().default([]),
+  envelopes: z.array(TransactionTableEnvelopeSchema).optional().default([]),
   onEdit: z.function(),
   onDelete: z.function(),
   onSplit: z.function(),

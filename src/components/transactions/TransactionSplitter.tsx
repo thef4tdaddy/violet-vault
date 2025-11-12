@@ -102,6 +102,7 @@ const TransactionSplitter = ({
                   splitAllocations={splitter.splitAllocations}
                   availableCategories={categoryOptions}
                   envelopes={envelopes}
+                  errors={splitter.errors}
                   onUpdateSplit={splitter.updateSplit}
                   onRemoveSplit={splitter.removeSplit}
                   onAddSplit={splitter.addSplit}
@@ -122,6 +123,7 @@ const TransactionSplitter = ({
             totals={totals}
             hasUnsavedChanges={splitter.hasUnsavedChanges}
             isSaving={splitter.isProcessing}
+            errors={splitter.errors}
             onSave={handleSave}
             onCancel={handleCancel}
           />

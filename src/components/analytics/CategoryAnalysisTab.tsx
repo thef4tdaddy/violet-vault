@@ -1,8 +1,13 @@
 import React from "react";
 import { getIcon } from "@/utils";
+import type { CategoryStat } from "@/utils/analytics/categoryHelpers";
 
-const CategoryAnalysisTab = ({ categoryStats }) => {
-  const getFrequencyIndicator = (frequency) => {
+interface CategoryAnalysisTabProps {
+  categoryStats: CategoryStat[];
+}
+
+const CategoryAnalysisTab = ({ categoryStats }: CategoryAnalysisTabProps) => {
+  const getFrequencyIndicator = (frequency: number) => {
     if (frequency > 2)
       return React.createElement(getIcon("TrendingUp"), {
         className: "h-4 w-4 text-green-500",
@@ -16,7 +21,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
     });
   };
 
-  const getFrequencyColor = (frequency) => {
+  const getFrequencyColor = (frequency: number) => {
     if (frequency > 2) return "border-green-200 bg-green-50/80";
     if (frequency < 0.5) return "border-red-200 bg-red-50/80";
     return "border-blue-200 bg-blue-50/80";
@@ -36,7 +41,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {categoryStats.map((stat) => (
+        {categoryStats.map((stat: CategoryStat) => (
           <div
             key={stat.name}
             className={`glassmorphism backdrop-blur-sm rounded-xl p-4 border-2 border-black shadow-md hover:shadow-lg transition-all ${getFrequencyColor(stat.frequency)}`}
@@ -50,14 +55,16 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
               </div>
               <div className="flex items-center gap-1">
                 {getFrequencyIndicator(stat.frequency)}
-                <span className="text-xs text-purple-800 font-bold capitalize">{stat.type}</span>
+                <span className="text-xs text-purple-800 font-bold capitalize">{stat.name}</span>
               </div>
             </div>
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Total Amount:</span>
-                <span className="font-black text-gray-900">${stat.totalAmount.toFixed(2)}</span>
+                <span className="font-black text-gray-900">
+                  ${stat.totalAmount?.toFixed(2) || "0.00"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Transactions:</span>
@@ -65,13 +72,18 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Avg Amount:</span>
-                <span className="font-bold text-gray-900">${stat.avgAmount.toFixed(2)}</span>
+                <span className="font-bold text-gray-900">
+                  ${stat.avgAmount?.toFixed(2) || "0.00"}
+                </span>
               </div>
               {stat.lastUsed && (
                 <div className="flex justify-between">
                   <span className="text-purple-700 font-medium">Last Used:</span>
                   <span className="font-bold text-gray-900">
-                    {new Date(stat.lastUsed).toLocaleDateString()}
+                    {(stat.lastUsed instanceof Date
+                      ? stat.lastUsed
+                      : new Date(stat.lastUsed)
+                    ).toLocaleDateString()}
                   </span>
                 </div>
               )}

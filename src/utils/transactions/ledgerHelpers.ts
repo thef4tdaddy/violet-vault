@@ -2,6 +2,7 @@
  * Utility functions for TransactionLedger calculations and configurations
  */
 import type { Transaction, Envelope } from "@/types/finance";
+import type { FilterConfig } from "@/components/ui/StandardFilters";
 
 /**
  * Calculate transaction totals and net cash flow
@@ -29,14 +30,7 @@ export const calculateTransactionTotals = (
 /**
  * Get filter configurations for StandardFilters component
  */
-export const getTransactionFilterConfigs = (
-  envelopes: Envelope[]
-): Array<{
-  key: string;
-  type: string;
-  defaultValue: string;
-  options: Array<{ value: string | number; label: string }>;
-}> => [
+export const getTransactionFilterConfigs = (envelopes: Envelope[]): FilterConfig[] => [
   {
     key: "dateFilter",
     type: "select",
@@ -65,7 +59,7 @@ export const getTransactionFilterConfigs = (
     options: [
       { value: "all", label: "All Envelopes" },
       { value: "", label: "Unassigned" },
-      ...envelopes.map((env) => ({ value: env.id, label: env.name })),
+      ...envelopes.map((env) => ({ value: String(env.id), label: env.name })),
     ],
   },
   {
@@ -76,6 +70,15 @@ export const getTransactionFilterConfigs = (
       { value: "date", label: "Date" },
       { value: "amount", label: "Amount" },
       { value: "description", label: "Description" },
+    ],
+  },
+  {
+    key: "sortOrder",
+    type: "select",
+    defaultValue: "desc",
+    options: [
+      { value: "desc", label: "Descending" },
+      { value: "asc", label: "Ascending" },
     ],
   },
 ];

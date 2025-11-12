@@ -21,6 +21,9 @@ export interface Envelope {
   targetAmount?: number;
   description?: string;
   autoAllocate?: boolean;
+  envelopeType?: string;
+  monthlyBudget?: number;
+  biweeklyAllocation?: number;
   // Connection properties
   billId?: string;
   debtId?: string;
@@ -39,6 +42,7 @@ export interface Transaction {
   description?: string;
   merchant?: string;
   receiptUrl?: string;
+  notes?: string;
 }
 
 export interface Bill {
@@ -104,6 +108,7 @@ export interface AuditLogEntry {
   entityId: string;
   // Additional audit properties
   userId?: string;
+  userName?: string;
   changes?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }

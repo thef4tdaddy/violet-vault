@@ -7,10 +7,10 @@ import type { Transaction, Envelope } from "@/types/finance";
 export const COLUMN_WIDTHS = {
   date: "8rem",
   description: "16rem",
-  category: "9rem",
-  envelope: "12rem",
-  amount: "8rem",
-  actions: "9rem",
+  category: "10rem",
+  envelope: "14rem",
+  amount: "10rem",
+  actions: "12rem",
 } as const;
 
 const createColumnStyle = (width: string) => ({
@@ -27,6 +27,15 @@ export const COLUMN_STYLES = {
   amount: createColumnStyle(COLUMN_WIDTHS.amount),
   actions: createColumnStyle(COLUMN_WIDTHS.actions),
 } as const;
+
+const parseRemWidth = (width: string): number => {
+  const numeric = Number.parseFloat(width.replace("rem", ""));
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
+export const MIN_TABLE_WIDTH = `${Object.values(COLUMN_WIDTHS)
+  .map(parseRemWidth)
+  .reduce((total, value) => total + value, 0)}rem`;
 
 // Table configuration
 export const TABLE_CONFIG = {

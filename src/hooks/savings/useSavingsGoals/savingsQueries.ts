@@ -8,19 +8,23 @@ import {
   processSavingsGoal,
   sortSavingsGoals,
   filterSavingsGoals,
+  type ProcessedSavingsGoal,
 } from "../../../utils/savings/savingsCalculations";
+import type { SavingsGoal } from "@/db/types";
 
-interface SavingsGoalsQueryOptions {
+export interface SavingsGoalsQueryOptions {
   status?: string;
   sortBy?: string;
-  sortOrder?: string;
+  sortOrder?: "asc" | "desc";
   includeCompleted?: boolean;
 }
 
 /**
  * Core savings goals data fetching query function
  */
-export const useSavingsGoalsQueryFunction = (options: SavingsGoalsQueryOptions = {}) => {
+export const useSavingsGoalsQueryFunction = (
+  options: SavingsGoalsQueryOptions = {}
+): (() => Promise<ProcessedSavingsGoal[]>) => {
   const {
     status = "all",
     sortBy = "targetDate",
@@ -32,10 +36,9 @@ export const useSavingsGoalsQueryFunction = (options: SavingsGoalsQueryOptions =
     logger.debug("TanStack Query: Fetching savings goals from Dexie");
 
     try {
-      let goals = [];
+      const goals: SavingsGoal[] = await budgetDb.savingsGoals.toArray();
 
       // Always fetch from Dexie (single source of truth for local data)
-      goals = await budgetDb.savingsGoals.toArray();
 
       logger.debug("TanStack Query: Loaded savings goals from Dexie", {
         count: goals.length,
@@ -82,7 +85,7 @@ export const useSavingsGoalsQuery = (options: SavingsGoalsQueryOptions = {}) => 
 
   const queryFunction = useSavingsGoalsQueryFunction(options);
 
-  return useQuery({
+  return useQuery<ProcessedSavingsGoal[]>({
     queryKey: [...queryKeys.savingsGoalsList(), status, sortBy, sortOrder, includeCompleted],
     queryFn: queryFunction,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -94,18 +97,11 @@ export const useSavingsGoalsQuery = (options: SavingsGoalsQueryOptions = {}) => 
   });
 };
 
-interface SavingsGoal {
-  id: string;
-  name: string;
-  isCompleted?: boolean;
-  [key: string]: unknown;
-}
-
 /**
  * Active savings goals query (non-completed goals for dashboard)
  */
-export const useActiveSavingsGoalsQuery = (savingsData: SavingsGoal[] = []) => {
-  return useQuery({
+export const useActiveSavingsGoalsQuery = (savingsData: ProcessedSavingsGoal[] = []) => {
+  return useQuery<ProcessedSavingsGoal[]>({
     queryKey: queryKeys.activeSavingsGoals(),
     queryFn: async () => {
       return filterSavingsGoals(savingsData, {

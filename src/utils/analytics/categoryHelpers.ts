@@ -76,11 +76,19 @@ export interface Suggestion {
   title?: string;
   description?: string;
   action?: string;
+  type: string;
+  suggestedAmount: number;
+  reasoning: string;
+  suggestedCategory?: string;
+  affectedTransactions?: number;
   data?: {
     totalAmount?: number;
     transactionCount?: number;
     categoryName?: string;
     billIds?: (string | undefined)[];
+    merchant?: string;
+    transactionIds?: string[];
+    suggestedCategory?: string;
   };
 }
 

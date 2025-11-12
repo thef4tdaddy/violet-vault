@@ -6,6 +6,72 @@
 
 import logger from "./logger.ts";
 
+// Type definitions
+interface Envelope {
+  currentBalance?: number;
+}
+
+interface Transaction {
+  amount: number;
+  type?: string;
+}
+
+interface SavingsGoal {
+  currentAmount?: number;
+}
+
+interface BalanceData {
+  envelopes?: Envelope[];
+  transactions?: Transaction[];
+  savingsGoals?: SavingsGoal[];
+  manualActualBalance?: number | null;
+}
+
+interface BalanceResult {
+  actualBalance: number;
+  virtualBalance: number;
+  unassignedCash: number;
+  totalEnvelopeBalance: number;
+  totalSavingsBalance: number;
+  isActualBalanceManual: boolean;
+}
+
+export interface CurrentBalancesDetailed {
+  actualBalance: number;
+  virtualBalance: number;
+  unassignedCash: number;
+  totalEnvelopeBalance: number;
+  totalSavingsBalance: number;
+  isActualBalanceManual: boolean;
+}
+
+export interface CurrentBalances {
+  actualBalance: number;
+  virtualBalance: number;
+  unassignedCash: number;
+  isActualBalanceManual: boolean;
+}
+
+interface Paycheck {
+  amount: number;
+  mode: string;
+}
+
+interface Allocation {
+  amount: number;
+}
+
+interface Distribution {
+  amount: number;
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  warnings: Array<{ type: string; message: string; amount?: number }>;
+  errors: Array<{ type: string; message: string; difference?: number }>;
+  difference?: number;
+}
+
 /**
  * Calculate all balances from raw data
  * @param {Object} data - Raw data from database
@@ -15,7 +81,7 @@ import logger from "./logger.ts";
  * @param {number} data.manualActualBalance - Manual actual balance override (optional)
  * @returns {Object} Complete balance calculations
  */
-export const calculateBalances = (data) => {
+export const calculateBalances = (data: BalanceData): BalanceResult => {
   const { envelopes = [], transactions = [], savingsGoals = [], manualActualBalance = null } = data;
 
   logger.debug("Balance calculation input", {
@@ -26,21 +92,21 @@ export const calculateBalances = (data) => {
   });
 
   // Calculate envelope balances
-  const totalEnvelopeBalance = envelopes.reduce((sum, envelope) => {
+  const totalEnvelopeBalance = envelopes.reduce((sum: number, envelope: Envelope) => {
     return sum + (envelope.currentBalance || 0);
   }, 0);
 
   // Calculate savings balances
-  const totalSavingsBalance = savingsGoals.reduce((sum, goal) => {
+  const totalSavingsBalance = savingsGoals.reduce((sum: number, goal: SavingsGoal) => {
     return sum + (goal.currentAmount || 0);
   }, 0);
 
   // Calculate actual balance from transactions (unless manually overridden)
-  let actualBalance;
+  let actualBalance: number;
   if (manualActualBalance !== null) {
     actualBalance = manualActualBalance;
   } else {
-    actualBalance = transactions.reduce((sum, transaction) => {
+    actualBalance = transactions.reduce((sum: number, transaction: Transaction) => {
       // Only count income/expense transactions, not transfers between envelopes
       if (transaction.type !== "transfer") {
         return sum + transaction.amount;
@@ -76,7 +142,11 @@ export const calculateBalances = (data) => {
  * @param {Array} allocations - Envelope allocations (optional)
  * @returns {Object} New balance state after paycheck
  */
-export const calculatePaycheckBalances = (currentBalances, paycheck, allocations = []) => {
+export const calculatePaycheckBalances = (
+  currentBalances: CurrentBalances,
+  paycheck: Paycheck,
+  allocations: Allocation[] = []
+): CurrentBalances => {
   logger.debug("Calculating paycheck balance changes", {
     currentBalances,
     paycheck,
@@ -89,7 +159,10 @@ export const calculatePaycheckBalances = (currentBalances, paycheck, allocations
   const newActualBalance = actualBalance + paycheck.amount;
 
   // Calculate total allocated to envelopes
-  const totalAllocated = allocations.reduce((sum, allocation) => sum + allocation.amount, 0);
+  const totalAllocated = allocations.reduce(
+    (sum: number, allocation: Allocation) => sum + allocation.amount,
+    0
+  );
 
   let newVirtualBalance = virtualBalance;
   let newUnassignedCash = unassignedCash;
@@ -132,7 +205,10 @@ export const calculatePaycheckBalances = (currentBalances, paycheck, allocations
  * @param {Array} distributions - Array of {envelopeId, amount} distributions
  * @returns {Object} New balance state after distribution
  */
-export const calculateDistributionBalances = (currentBalances, distributions) => {
+export const calculateDistributionBalances = (
+  currentBalances: CurrentBalances,
+  distributions: Distribution[]
+): CurrentBalances => {
   logger.debug("Calculating unassigned cash distribution", {
     currentBalances,
     distributionsCount: distributions.length,
@@ -141,7 +217,10 @@ export const calculateDistributionBalances = (currentBalances, distributions) =>
   const { actualBalance, virtualBalance, unassignedCash } = currentBalances;
 
   // Calculate total being distributed
-  const totalDistributed = distributions.reduce((sum, dist) => sum + dist.amount, 0);
+  const totalDistributed = distributions.reduce(
+    (sum: number, dist: Distribution) => sum + dist.amount,
+    0
+  );
 
   // Actual balance stays the same (money just moves between virtual allocations)
   const newActualBalance = actualBalance;
@@ -175,11 +254,11 @@ export const calculateDistributionBalances = (currentBalances, distributions) =>
  * @param {Object} balances - Balance data to validate
  * @returns {Object} Validation result with warnings/errors
  */
-export const validateBalances = (balances) => {
+export const validateBalances = (balances: CurrentBalances): ValidationResult => {
   const { actualBalance, virtualBalance, unassignedCash } = balances;
 
-  const warnings = [];
-  const errors = [];
+  const warnings: Array<{ type: string; message: string; amount?: number }> = [];
+  const errors: Array<{ type: string; message: string; difference?: number }> = [];
 
   // Check if actual balance equals virtual balance + unassigned cash
   const calculatedActual = virtualBalance + unassignedCash;

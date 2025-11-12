@@ -7,21 +7,28 @@ import type {
   AutoFundingRule,
   RuleStatistics,
   RuleSummary,
+  RuleCondition,
 } from "@/utils/budgeting/autofunding/rules";
 import type { Transaction, Envelope } from "@/types/finance";
-import type { ExecutionFilters } from "./useExecutionHistory";
+import type { ExecutionRecord, ExecutionFilters } from "./useExecutionHistory";
 
 // Re-export commonly used types from rules.ts for convenience
-export type { AutoFundingRule, RuleStatistics, RuleSummary };
+export type { AutoFundingRule, RuleStatistics, RuleSummary, RuleCondition, ExecutionRecord };
 
 /**
  * Execution result types
  */
 export interface RuleExecutionResult {
   ruleId: string;
+  ruleName: string;
   success: boolean;
-  amountMoved: number;
+  amount?: number;
+  amountMoved?: number;
   error?: string;
+  executedAt?: string;
+  description?: string;
+  targetEnvelopes?: Array<string | { id: string; name?: string }>;
+  transfers?: number;
   [key: string]: unknown;
 }
 

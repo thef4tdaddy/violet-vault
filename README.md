@@ -174,11 +174,16 @@ VioletVault takes your financial privacy seriously:
 
 ## 📚 Documentation
 
+### Documentation Index
+
+For a complete overview of all documentation in the repository, see the **[Documentation Index](docs/DOCUMENTATION_INDEX.md)**, which provides a comprehensive listing of all documentation files organized by category and location.
+
 ### Core Documentation
 
-- **[📋 Roadmap](ROADMAP.md)** - See what's coming next and help shape VioletVault's future
-- **[🤝 Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
-- **[📝 Changelog](CHANGELOG.md)** - Complete version history and changes
+- **[📋 Documentation Index](docs/DOCUMENTATION_INDEX.md)** - Complete listing of all documentation
+- **[📋 Roadmap](docs/ROADMAP.md)** - See what's coming next and help shape VioletVault's future
+- **[🤝 Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
+- **[📝 Changelog](docs/CHANGELOG.md)** - Complete version history and changes
 
 ### Technical Documentation
 

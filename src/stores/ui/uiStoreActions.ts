@@ -2,13 +2,31 @@
  * UI Store Actions - Helper functions to build store actions
  * Extracted from uiStore.ts to reduce function size
  */
-import logger from "../../utils/common/logger.ts";
+import logger from "../../utils/common/logger";
+import type { UiStore } from "./uiStore";
+import type { Draft } from "immer";
+
+// Define BeforeInstallPromptEvent interface since it's not in standard TypeScript types
+export interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
+  prompt(): Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
+}
+
+// Type for the set function when using immer middleware
+type ImmerSet<T> = (updater: (draft: Draft<T>) => void) => void;
 
 /**
  * Create basic state management actions
  */
-export const createBasicActions = (set) => ({
-  setBiweeklyAllocation: (amount) =>
+export const createBasicActions = (set: ImmerSet<UiStore>) => ({
+  setBiweeklyAllocation: (amount: number) =>
     set((state) => {
       state.biweeklyAllocation = amount;
     }),
@@ -23,22 +41,22 @@ export const createBasicActions = (set) => ({
       state.isUnassignedCashModalOpen = false;
     }),
 
-  setPaycheckHistory: (history) =>
+  setPaycheckHistory: (history: UiStore["paycheckHistory"]) =>
     set((state) => {
       state.paycheckHistory = history;
     }),
 
-  setDataLoaded: (loaded) =>
+  setDataLoaded: (loaded: boolean) =>
     set((state) => {
       state.dataLoaded = loaded;
     }),
 
-  setOnlineStatus: (status) =>
+  setOnlineStatus: (status: boolean) =>
     set((state) => {
       state.isOnline = status;
     }),
 
-  setCloudSyncEnabled(enabled) {
+  setCloudSyncEnabled(enabled: boolean) {
     return set((state) => {
       state.cloudSyncEnabled = enabled;
       logger.info(`Cloud sync ${enabled ? "enabled" : "disabled"}`, {
@@ -51,8 +69,8 @@ export const createBasicActions = (set) => ({
 /**
  * Create PWA update management actions
  */
-export const createPWAUpdateActions = (set) => ({
-  setUpdateAvailable: (available) =>
+export const createPWAUpdateActions = (set: ImmerSet<UiStore>) => ({
+  setUpdateAvailable: (available: boolean) =>
     set((state) => {
       state.updateAvailable = available;
       logger.info(`PWA update ${available ? "available" : "not available"}`, {
@@ -60,7 +78,7 @@ export const createPWAUpdateActions = (set) => ({
       });
     }),
 
-  setIsUpdating: (updating) =>
+  setIsUpdating: (updating: boolean) =>
     set((state) => {
       state.isUpdating = updating;
     }),
@@ -75,7 +93,7 @@ export const createPWAUpdateActions = (set) => ({
       state.showInstallPrompt = false;
     }),
 
-  setInstallPromptEvent: (event) =>
+  setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) =>
     set((state) => {
       state.installPromptEvent = event;
     }),
@@ -84,7 +102,7 @@ export const createPWAUpdateActions = (set) => ({
 /**
  * Create PWA update action
  */
-export const createUpdateAppAction = (set) => ({
+export const createUpdateAppAction = (set: ImmerSet<UiStore>) => ({
   async updateApp() {
     let shouldUpdate = false;
     set((state) => {
@@ -110,7 +128,7 @@ export const createUpdateAppAction = (set) => ({
           // Tell the waiting service worker to activate
           registration.waiting.postMessage({ type: "SKIP_WAITING" });
 
-          // The controllerchange event will fire when the new SW takes over
+          // The controllerchange event will fire when new SW takes over
           // We don't force a reload - let the user continue using the app
           // The new version will be active on next natural page load
           navigator.serviceWorker.addEventListener(
@@ -140,7 +158,7 @@ export const createUpdateAppAction = (set) => ({
 /**
  * Track analytics event in local storage
  */
-const trackAnalytics = (eventData) => {
+const trackAnalytics = (eventData: Record<string, unknown>) => {
   try {
     const existingAnalytics = JSON.parse(localStorage.getItem("pwa_analytics") || "[]");
     existingAnalytics.push(eventData);
@@ -153,7 +171,10 @@ const trackAnalytics = (eventData) => {
 /**
  * Create PWA install action
  */
-export const createInstallAppAction = (set, useUiStore) => ({
+export const createInstallAppAction = (
+  set: ImmerSet<UiStore>,
+  useUiStore: { getState: () => UiStore }
+) => ({
   async installApp() {
     const state = useUiStore.getState();
     if (!state.installPromptEvent) return false;
@@ -251,8 +272,8 @@ export const createInstallAppAction = (set, useUiStore) => ({
 /**
  * Create patch notes management actions
  */
-export const createPatchNotesActions = (set) => ({
-  showPatchNotesModal: (patchNotesData) =>
+export const createPatchNotesActions = (set: ImmerSet<UiStore>) => ({
+  showPatchNotesModal: (patchNotesData: { version: string; notes: string[] }) =>
     set((state) => {
       state.showPatchNotes = true;
       state.patchNotesData = patchNotesData;

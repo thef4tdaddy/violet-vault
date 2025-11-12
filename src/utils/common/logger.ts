@@ -1,5 +1,19 @@
 // Dynamic import to avoid circular dependency with highlight.js
-let H = null;
+let H: {
+  track?: (event: string, data?: Record<string, unknown>) => void;
+  consumeError?: (error: Error, message?: string, payload?: Record<string, string>) => void;
+} | null = null;
+
+// Helper function to get import.meta.env safely
+function getImportMetaEnv() {
+  try {
+    // TypeScript doesn't properly recognize import.meta with ESNext
+    const meta = import.meta as { env?: { MODE?: string } };
+    return meta.env || {};
+  } catch {
+    return {};
+  }
+}
 
 class Logger {
   isDevelopment: boolean;
@@ -14,7 +28,8 @@ class Logger {
   }>;
 
   constructor() {
-    this.isDevelopment = import.meta.env.MODE === "development";
+    const env = getImportMetaEnv();
+    this.isDevelopment = env?.MODE === "development";
     this.isDevSite = this.getIsDevSite();
     this.debugThrottles = new Map(); // For throttling frequent debug messages
     this.logBuffer = [];
@@ -217,14 +232,14 @@ class Logger {
     const h = this.initH();
     if (h && h.consumeError) {
       if (error instanceof Error) {
-        h.consumeError(error, {
-          metadata: { message, ...data },
-          tags: { component: "app" },
+        h.consumeError(error, "Error occurred", {
+          metadata: JSON.stringify({ message, ...data }),
+          tags: JSON.stringify({ component: "app" }),
         });
       } else {
-        h.consumeError(new Error(message), {
-          metadata: data,
-          tags: { component: "app" },
+        h.consumeError(new Error(message), "Error occurred", {
+          metadata: JSON.stringify(data),
+          tags: JSON.stringify({ component: "app" }),
         });
       }
     }
@@ -288,9 +303,9 @@ class Logger {
         // For critical budget sync issues, also send as error to ensure visibility
         if (message.includes("budgetId value") || message.includes("sync issue")) {
           if (h.consumeError) {
-            h.consumeError(new Error(`Budget Sync: ${message}`), {
-              metadata: data,
-              tags: { category: "budget-sync", critical: "true" },
+            h.consumeError(new Error(`Budget Sync: ${message}`), "Budget sync error", {
+              metadata: JSON.stringify(data),
+              tags: JSON.stringify({ category: "budget-sync", critical: "true" }),
             });
           }
         }
@@ -358,9 +373,9 @@ class Logger {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
       if (h && h.consumeError) {
-        h.consumeError(error as Error, {
-          metadata: { test: true, source: "logger" },
-          tags: { category: "test" },
+        h.consumeError(error as Error, "Test error from logger", {
+          metadata: JSON.stringify({ test: true, source: "logger" }),
+          tags: JSON.stringify({ category: "test" }),
         });
       }
     }

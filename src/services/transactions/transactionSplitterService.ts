@@ -1,3 +1,11 @@
+import type {
+  Envelope,
+  SplitAllocation,
+  SplitTotals,
+  Transaction,
+  TransactionMetadata,
+} from "@/types/finance";
+
 /**
  * Transaction Splitting Service
  * Handles all business logic for transaction splitting operations
@@ -6,52 +14,66 @@ class TransactionSplitterService {
   /**
    * Find envelope by category name
    */
-  findEnvelopeForCategory(envelopes, categoryName) {
+  findEnvelopeForCategory(
+    envelopes: Envelope[],
+    categoryName: string | null | undefined
+  ): Envelope | null {
     if (!categoryName) return null;
-    return envelopes.find(
-      (env) =>
-        env.name.toLowerCase() === categoryName.toLowerCase() ||
-        env.category?.toLowerCase() === categoryName.toLowerCase()
+    const normalizedCategory = categoryName.toLowerCase();
+
+    return (
+      envelopes.find((env) => {
+        const envelopeName = env.name.toLowerCase();
+        const envelopeCategory = env.category?.toLowerCase();
+        return envelopeName === normalizedCategory || envelopeCategory === normalizedCategory;
+      }) || null
     );
   }
 
   /**
    * Initialize splits from transaction metadata
    */
-  initializeSplitsFromTransaction(transaction, envelopes) {
-    // Check if transaction has itemized metadata (like Amazon orders)
-    if (transaction.metadata?.items && transaction.metadata.items.length > 1) {
-      // Initialize with individual items
-      const itemSplits = transaction.metadata.items.map((item, index) => ({
-        id: Date.now() + index,
-        description: item.name || `Item ${index + 1}`,
-        amount: Math.abs(item.totalPrice || item.price || 0),
-        category: item.category?.name || transaction.category || "",
-        envelopeId:
-          this.findEnvelopeForCategory(envelopes, item.category?.name || transaction.category || "")
-            ?.id || "",
-        isOriginalItem: true,
-        originalItem: item,
-      }));
+  initializeSplitsFromTransaction(
+    transaction: Transaction,
+    envelopes: Envelope[]
+  ): SplitAllocation[] {
+    const metadataItems = transaction.metadata?.items;
 
-      // Add shipping/tax if present
-      const extraItems = [];
-      if (transaction.metadata.shipping > 0) {
+    if (metadataItems && metadataItems.length > 1) {
+      const itemSplits: SplitAllocation[] = metadataItems.map((item, index) => {
+        const categoryFromItem = item.category?.name ?? transaction.category;
+        const matchingEnvelope = this.findEnvelopeForCategory(envelopes, categoryFromItem);
+
+        return {
+          id: Date.now() + index,
+          description: item.name || `Item ${index + 1}`,
+          amount: Math.abs(item.totalPrice ?? item.price ?? 0),
+          category: categoryFromItem,
+          envelopeId: matchingEnvelope?.id ?? "",
+          isOriginalItem: true,
+          originalItem: item,
+        };
+      });
+
+      const extraItems: SplitAllocation[] = [];
+      const shippingAmount = Number(transaction.metadata?.shipping ?? 0);
+      if (shippingAmount > 0) {
         extraItems.push({
           id: Date.now() + 1000,
           description: "Shipping & Handling",
-          amount: transaction.metadata.shipping,
+          amount: shippingAmount,
           category: "Shipping",
           envelopeId: "",
           isOriginalItem: false,
         });
       }
 
-      if (transaction.metadata.tax > 0) {
+      const taxAmount = Number(transaction.metadata?.tax ?? 0);
+      if (taxAmount > 0) {
         extraItems.push({
           id: Date.now() + 2000,
           description: "Sales Tax",
-          amount: transaction.metadata.tax,
+          amount: taxAmount,
           category: "Tax",
           envelopeId: "",
           isOriginalItem: false,
@@ -59,32 +81,29 @@ class TransactionSplitterService {
       }
 
       return [...itemSplits, ...extraItems];
-    } else {
-      // Initialize with single split for the full amount
-      return [
-        {
-          id: Date.now(),
-          description: transaction.description || "Transaction Split",
-          amount: Math.abs(transaction.amount),
-          category: transaction.category || "",
-          envelopeId: transaction.envelopeId || "",
-          isOriginalItem: false,
-        },
-      ];
     }
+
+    return [
+      {
+        id: Date.now(),
+        description: transaction.description || "Transaction Split",
+        amount: Math.abs(transaction.amount),
+        category: transaction.category,
+        envelopeId: transaction.envelopeId ?? "",
+        isOriginalItem: false,
+      },
+    ];
   }
 
   /**
    * Calculate split totals and validation
    */
-  calculateSplitTotals(splitAllocations, originalAmount) {
-    const allocated = splitAllocations.reduce(
-      (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
-    );
+  calculateSplitTotals(splitAllocations: SplitAllocation[], originalAmount: number): SplitTotals {
+    const allocated = splitAllocations.reduce((sum, split) => sum + (split.amount ?? 0), 0);
     const remaining = originalAmount - allocated;
-    const isValid = Math.abs(remaining) < 0.01; // Account for rounding errors
+    const isValid = Math.abs(remaining) < 0.01;
     const isOverAllocated = remaining < -0.01;
+    const isUnderAllocated = remaining > 0.01;
 
     return {
       original: originalAmount,
@@ -92,22 +111,21 @@ class TransactionSplitterService {
       remaining: Math.round(remaining * 100) / 100,
       isValid,
       isOverAllocated,
+      isUnderAllocated,
     };
   }
 
   /**
    * Validate splits and return errors
    */
-  validateSplits(splitAllocations, originalAmount) {
-    const errors = [];
+  validateSplits(splitAllocations: SplitAllocation[], originalAmount: number): string[] {
+    const errors: string[] = [];
 
-    // Check if any splits exist
     if (splitAllocations.length === 0) {
       errors.push("At least one split allocation is required");
       return errors;
     }
 
-    // Validate each split
     splitAllocations.forEach((split, index) => {
       if (!split.description || split.description.trim() === "") {
         errors.push(`Split ${index + 1}: Description is required`);
@@ -122,16 +140,18 @@ class TransactionSplitterService {
       }
     });
 
-    // Check totals
     const totals = this.calculateSplitTotals(splitAllocations, originalAmount);
     if (!totals.isValid) {
+      const formattedAllocated = totals.allocated.toFixed(2);
+      const formattedOriginal = totals.original.toFixed(2);
+
       if (totals.isOverAllocated) {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`
+          `Total splits ($${formattedAllocated}) exceed original amount ($${formattedOriginal})`
         );
       } else {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`
+          `Total splits ($${formattedAllocated}) are less than original amount ($${formattedOriginal})`
         );
       }
     }
@@ -140,82 +160,109 @@ class TransactionSplitterService {
   }
 
   /**
-   * Auto-balance splits to equal the total
+   * Auto-balance splits to equalizes total
    */
-  autoBalanceSplits(splitAllocations, originalAmount) {
+  autoBalanceSplits(
+    splitAllocations: SplitAllocation[],
+    originalAmount: number
+  ): SplitAllocation[] {
     const totals = this.calculateSplitTotals(splitAllocations, originalAmount);
     if (totals.isValid || splitAllocations.length === 0) return splitAllocations;
 
-    const difference = totals.remaining;
-    const adjustmentPerSplit = difference / splitAllocations.length;
+    const remainder = Math.abs(totals.allocated - originalAmount);
+    const remainderSplit: SplitAllocation = {
+      id: `${Date.now()}`,
+      description: "Balance Adjustment",
+      amount: remainder,
+      category: "Balance Adjustment",
+      envelopeId: "",
+      isOriginalItem: false,
+    };
 
-    return splitAllocations.map((split) => ({
-      ...split,
-      amount: Math.round((split.amount + adjustmentPerSplit) * 100) / 100,
-    }));
+    return [...splitAllocations, remainderSplit];
   }
 
   /**
    * Split evenly across all allocations
    */
-  splitEvenly(splitAllocations, originalAmount) {
+  splitEvenly(splitAllocations: SplitAllocation[], originalAmount: number): SplitAllocation[] {
     if (splitAllocations.length === 0) return splitAllocations;
 
-    const amountPerSplit = Math.round((originalAmount / splitAllocations.length) * 100) / 100;
+    const amountPerSplit = Math.abs(originalAmount) / splitAllocations.length;
 
-    return splitAllocations.map((split, index) => ({
+    return splitAllocations.map((split) => ({
       ...split,
-      amount:
-        index === 0
-          ? originalAmount - amountPerSplit * (splitAllocations.length - 1) // First split gets remainder
-          : amountPerSplit,
+      amount: amountPerSplit,
+      description: `${split.description} (evenly split)`,
     }));
   }
 
   /**
    * Create split transactions from allocations
    */
-  createSplitTransactions(transaction, splitAllocations) {
-    return splitAllocations.map((split, index) => ({
-      id: `${transaction.id}_split_${index}_${Date.now()}`,
-      date: transaction.date,
-      description: split.description.trim(),
-      amount: transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount), // Preserve original sign
-      category: split.category.trim(),
-      envelopeId: split.envelopeId || null,
-      notes: `Split ${index + 1}/${splitAllocations.length} from: ${transaction.description}`,
-      source: transaction.source ? `${transaction.source}_split` : "manual_split",
-      reconciled: transaction.reconciled || false,
-      createdBy: transaction.createdBy || "User",
-      createdAt: new Date().toISOString(),
-      metadata: {
-        parentTransactionId: transaction.id,
+  createSplitTransactions(
+    transaction: Transaction,
+    splitAllocations: SplitAllocation[]
+  ): Transaction[] {
+    const totalSplits = splitAllocations.length;
+    const baseMetadata: TransactionMetadata = transaction.metadata ?? {};
+
+    return splitAllocations.map((split, index) => {
+      const normalizedEnvelopeId =
+        typeof split.envelopeId === "string" || typeof split.envelopeId === "number"
+          ? split.envelopeId
+          : undefined;
+
+      const amount = transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount);
+
+      return {
+        id: `${transaction.id}_split_${index}_${Date.now()}`,
+        date: transaction.date,
+        description: split.description.trim(),
+        amount,
+        category: split.category.trim(),
+        envelopeId: normalizedEnvelopeId,
+        notes: `Split ${index + 1}/${totalSplits} from: ${transaction.description}`,
+        source: transaction.source ? `${transaction.source}_split` : "manual_split",
+        reconciled: transaction.reconciled ?? false,
+        createdBy: transaction.createdBy ?? "User",
+        createdAt: new Date().toISOString(),
+        type: transaction.type,
+        isSplit: true,
         splitIndex: index,
-        totalSplits: splitAllocations.length,
+        splitTotal: totalSplits,
+        parentTransactionId: transaction.id,
         originalAmount: Math.abs(transaction.amount),
-        originalDescription: transaction.description,
-        isOriginalItem: split.isOriginalItem,
-        originalItem: split.originalItem || null,
-      },
-    }));
+        metadata: {
+          ...baseMetadata,
+          splitData: {
+            splitIndex: index,
+            totalSplits,
+            originalTransactionId: transaction.id,
+            isOriginalItem: split.isOriginalItem,
+            originalItem: split.originalItem ?? null,
+          },
+        },
+      };
+    });
   }
 
   /**
    * Create a new split allocation
    */
-  createNewSplitAllocation(transaction, existingSplits) {
+  createNewSplitAllocation(
+    transaction: Transaction,
+    existingSplits: SplitAllocation[]
+  ): SplitAllocation {
     const totalAmount = Math.abs(transaction.amount);
-    const allocated = existingSplits.reduce(
-      (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
-    );
+    const allocated = existingSplits.reduce((sum, split) => sum + (split.amount ?? 0), 0);
     const remaining = totalAmount - allocated;
 
     return {
       id: Date.now(),
       description: "",
-      amount: Math.max(0, Math.round(remaining * 100) / 100), // Round to 2 decimal places
-      category: transaction.category || "",
+      amount: Math.max(0, Math.round(remaining * 100) / 100),
+      category: transaction.category,
       envelopeId: "",
       isOriginalItem: false,
     };
@@ -224,19 +271,28 @@ class TransactionSplitterService {
   /**
    * Update a split allocation field
    */
-  updateSplitAllocation(splitAllocations, id, field, value, envelopes) {
+  updateSplitAllocation<K extends keyof SplitAllocation>(
+    splitAllocations: SplitAllocation[],
+    id: SplitAllocation["id"],
+    field: K,
+    value: SplitAllocation[K],
+    envelopes: Envelope[]
+  ): SplitAllocation[] {
     return splitAllocations.map((split) => {
       if (split.id === id) {
-        const updated = { ...split, [field]: value };
+        const updatedSplit: SplitAllocation = {
+          ...split,
+          [field]: value,
+        } as SplitAllocation;
 
-        // If category changes, try to find matching envelope
-        if (field === "category") {
-          const envelope = this.findEnvelopeForCategory(envelopes, value);
-          updated.envelopeId = envelope?.id || split.envelopeId;
+        if (field === "category" && typeof value === "string") {
+          const matchingEnvelope = this.findEnvelopeForCategory(envelopes, value);
+          updatedSplit.envelopeId = matchingEnvelope?.id ?? split.envelopeId;
         }
 
-        return updated;
+        return updatedSplit;
       }
+
       return split;
     });
   }

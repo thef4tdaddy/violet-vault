@@ -334,4 +334,17 @@ export default [
       "no-redeclare": "off", // Function overloads require multiple declarations
     },
   },
+  {
+    // Financial orchestration components/hooks coordinating multiple subsystems
+    files: [
+      "src/components/bills/BillManager.tsx",
+      "src/components/transactions/TransactionLedger.tsx",
+      "src/hooks/transactions/useTransactionLedger.ts",
+    ],
+    rules: {
+      "max-lines-per-function": "off", // Coordinator components must orchestrate many UI states
+      "max-statements": "off", // Numerous sequential operations for data orchestration
+      complexity: "off", // Cross-domain coordination inherently complex (TanStack Query + Dexie + services)
+    },
+  },
 ];

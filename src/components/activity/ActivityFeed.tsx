@@ -9,6 +9,7 @@ import logger from "@/utils/common/logger";
 import { formatActivityDescription } from "@/utils/activity/activityFormatters";
 import { getActivityIconInfo } from "@/utils/activity/activityIcons";
 import { formatTimestamp } from "@/utils/activity/timeFormatters";
+import type { AuditLogEntry } from "@/db/types";
 
 /**
  * Activity Feed Component - Level 1 Budget History UI
@@ -17,7 +18,7 @@ import { formatTimestamp } from "@/utils/activity/timeFormatters";
  */
 const ActivityFeed = () => {
   const { getRecentActivity } = useActivityLogger();
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, envelope, transaction, bill, paycheck, debt
   const [limit, setLimit] = useState(20);

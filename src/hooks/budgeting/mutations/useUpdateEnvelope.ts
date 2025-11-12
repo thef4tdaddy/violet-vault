@@ -2,10 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
+import type { Envelope } from "@/db/types";
 
 interface UpdateEnvelopeData {
   id: string;
-  updates: Record<string, unknown>;
+  updates: Partial<Envelope>;
 }
 
 // Helper to trigger sync for envelope changes
@@ -28,19 +29,24 @@ export const useUpdateEnvelope = () => {
       }
 
       // Ensure critical fields aren't accidentally cleared
-      const safeUpdates = {
+      const safeName =
+        typeof updates.name === "string" && updates.name.trim().length > 0
+          ? updates.name
+          : existingEnvelope.name;
+      const safeCategory =
+        typeof updates.category === "string" && updates.category.trim().length > 0
+          ? updates.category
+          : existingEnvelope.category;
+
+      const safeUpdates: Partial<Envelope> = {
         ...updates,
-        name: updates.name !== undefined ? updates.name : existingEnvelope.name,
-        category: updates.category !== undefined ? updates.category : existingEnvelope.category,
+        name: safeName,
+        category: safeCategory,
       };
 
       // Create properly typed update object for Dexie
-      const dbUpdates: Partial<
-        Pick<typeof existingEnvelope, "name" | "category" | "lastModified">
-      > &
-        Record<string, unknown> = {
-        name: safeUpdates.name as string,
-        category: safeUpdates.category as string,
+      const dbUpdates: Partial<Envelope> = {
+        ...safeUpdates,
         lastModified: Date.now(),
       };
 

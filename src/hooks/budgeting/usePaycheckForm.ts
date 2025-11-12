@@ -104,9 +104,7 @@ export const usePaycheckForm = ({
       }, 0);
 
       const leftoverAmount =
-        allocationPreview?.mode === "allocate"
-          ? Math.max(0, amount - totalAllocated)
-          : amount;
+        allocationPreview?.mode === "allocate" ? Math.max(0, amount - totalAllocated) : amount;
 
       const allocationDebug =
         allocationPreview && allocationPreview.mode === "allocate"

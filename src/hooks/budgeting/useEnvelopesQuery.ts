@@ -3,7 +3,7 @@ import type { UseQueryOptions } from "@tanstack/react-query";
 import { useMemo, useCallback, useEffect } from "react";
 import { queryKeys } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import type { Envelope as DbEnvelope } from "@/db/types";
 
@@ -96,6 +96,13 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
       if (!includeArchived) {
         filteredEnvelopes = filteredEnvelopes.filter((env) => !env.archived);
       }
+
+      // Savings goals and sinking funds live in their own modules
+      filteredEnvelopes = filteredEnvelopes.filter(
+        (env) =>
+          env.envelopeType !== ENVELOPE_TYPES.SAVINGS &&
+          env.envelopeType !== ENVELOPE_TYPES.SINKING_FUND
+      );
 
       // Apply sorting
       filteredEnvelopes.sort((a, b) => {

@@ -16,12 +16,13 @@ import {
   autoBalanceSplits,
   splitEvenly,
 } from "@/utils/transactions/splitting";
+import { hasUnsavedChanges as compareSplitSets } from "@/utils/transactions/splitterHelpers";
 
 /**
  * Initialize splits from a transaction
  */
 export const initializeSplitsHandler = (
-  transaction: Transaction,
+  transaction: Transaction | null | undefined,
   envelopes: Envelope[],
   setSplitAllocations: (splits: SplitAllocation[]) => void,
   setErrors: (errors: string[]) => void
@@ -266,15 +267,26 @@ export const submitSplitHandler = async (
  */
 export const calculateSplitComputedProperties = (
   splitAllocations: SplitAllocation[],
-  transaction: Transaction,
+  transaction: Transaction | null | undefined,
   errors: string[],
-  isProcessing: boolean
+  isProcessing: boolean,
+  initialSplits: SplitAllocation[]
 ) => {
+  if (!transaction) {
+    return {
+      totals: calculateSplitTotals(null, []),
+      summary: getSplitSummary([], null),
+      hasValidSplits: false,
+      canSubmit: false,
+      hasUnsavedChanges: false,
+    };
+  }
+
   const totals = calculateSplitTotals(transaction, splitAllocations);
   const summary = getSplitSummary(splitAllocations, transaction);
   const hasValidSplits = errors.length === 0 && totals.isValid && splitAllocations.length > 0;
   const canSubmit = hasValidSplits && !isProcessing;
-  const hasUnsavedChanges = splitAllocations.length > 0;
+  const hasUnsavedChanges = compareSplitSets(splitAllocations, initialSplits);
 
   return {
     totals,

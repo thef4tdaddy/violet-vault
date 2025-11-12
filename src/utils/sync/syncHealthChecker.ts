@@ -3,11 +3,12 @@
  * Runs critical validation tests to ensure sync is working
  */
 
-import { budgetDb } from "../../db/budgetDb";
-import { cloudSyncService } from "../../services/cloudSyncService";
-import chunkedSyncService from "../../services/chunkedSyncService";
-import { detectLocalData } from "./dataDetectionHelper";
-import logger from "../common/logger";
+import { budgetDb } from "@/db/budgetDb";
+import { cloudSyncService, type DexieData, type DataCollection } from "@/services/cloudSyncService";
+import chunkedSyncService from "@/services/chunkedSyncService";
+import { detectLocalData } from "@/utils/sync/dataDetectionHelper";
+import logger from "@/utils/common/logger";
+import type { Envelope } from "@/db/types";
 
 export const runImmediateSyncHealthCheck = async () => {
   logger.info("🔧 RUNNING IMMEDIATE SYNC HEALTH CHECK (WITH TIMEOUT)...");
@@ -23,6 +24,45 @@ export const runImmediateSyncHealthCheck = async () => {
 };
 
 async function runHealthChecksInternal(results) {
+  const createDexieSnapshot = (overrides: Partial<DexieData> = {}): DexieData => ({
+    envelopes: [],
+    transactions: [],
+    bills: [],
+    debts: [],
+    savingsGoals: [],
+    paycheckHistory: [],
+    supplementalAccounts: [],
+    unassignedCash: 0,
+    actualBalance: 0,
+    lastModified: Date.now(),
+    ...overrides,
+  });
+
+  const createTestEnvelope = (overrides: Partial<Envelope> = {}): Envelope => ({
+    id: "test-envelope",
+    name: "Test Envelope",
+    category: "Test",
+    archived: false,
+    lastModified: Date.now(),
+    ...overrides,
+  });
+
+  const createDataCollectionSnapshot = (
+    overrides: Partial<DataCollection> = {}
+  ): DataCollection => ({
+    envelopes: [],
+    transactions: [],
+    bills: [],
+    debts: [],
+    savingsGoals: [],
+    paycheckHistory: [],
+    supplementalAccounts: [],
+    unassignedCash: 0,
+    actualBalance: 0,
+    lastModified: Date.now(),
+    ...overrides,
+  });
+
   // Test 1: Database Connection
   try {
     logger.info("🧪 Testing database connection...");
@@ -58,15 +98,7 @@ async function runHealthChecksInternal(results) {
 
     await budgetDb.envelopes.add(testEnvelope);
     // Skip cloud sync call that hangs - just check if service exists
-    const syncData = cloudSyncService
-      ? {
-          envelopes: [],
-          lastModified: Date.now(),
-        }
-      : {
-          envelopes: [],
-          lastModified: Date.now(), // Fallback for when cloud service is not available
-        };
+    const syncData: DexieData = cloudSyncService ? createDexieSnapshot() : createDexieSnapshot();
 
     // Clean up
     await budgetDb.envelopes.where("id").equals(testEnvelope.id).delete();
@@ -94,21 +126,15 @@ async function runHealthChecksInternal(results) {
   try {
     logger.info("🧪 Testing sync direction logic...");
 
-    const mockFirestoreData = {
-      envelopes: [{ id: "test", name: "Test" }],
-      transactions: [],
-      bills: [],
-      debts: [],
+    const mockFirestoreData: DataCollection = createDataCollectionSnapshot({
+      envelopes: [createTestEnvelope()],
       lastModified: Date.now() - 5000, // 5 seconds ago
-    };
+    });
 
-    const mockDexieData = {
-      envelopes: [{ id: "test", name: "Test Updated" }],
-      transactions: [],
-      bills: [],
-      debts: [],
+    const mockDexieData: DexieData = createDexieSnapshot({
+      envelopes: [createTestEnvelope({ name: "Test Updated" })],
       lastModified: Date.now(), // Now (newer)
-    };
+    });
 
     const syncResult = (await Promise.race([
       cloudSyncService.determineSyncDirection(mockDexieData, mockFirestoreData),

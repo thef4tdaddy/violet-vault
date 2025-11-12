@@ -3,6 +3,15 @@
  * Comprehensive query key factories for consistency across the application.
  * These factories ensure that cache invalidation and data fetching work reliably.
  */
+
+// Define types for our query keys
+type QueryKey = readonly unknown[];
+type EntityId = string | number;
+type EntityType = string;
+export type FilterParams = Record<string, unknown>;
+type Timestamp = number;
+type UserId = string;
+
 export const queryKeys = {
   // Budget data
   budget: ["budget"],
@@ -16,44 +25,57 @@ export const queryKeys = {
 
   // Envelopes
   envelopes: ["envelopes"],
-  envelopesList: (filters = {}) => [...queryKeys.envelopes, "list", filters],
-  envelopeById: (id) => [...queryKeys.envelopes, "detail", id],
-  envelopesByCategory: (category) => [...queryKeys.envelopes, "category", category],
+  envelopesList: (filters: FilterParams = {}) => [...queryKeys.envelopes, "list", filters],
+  envelopeById: (id: EntityId) => [...queryKeys.envelopes, "detail", id],
+  envelopesByCategory: (category: string) => [...queryKeys.envelopes, "category", category],
   envelopeBalances: () => [...queryKeys.envelopes, "balances"],
 
   // Transactions
   transactions: ["transactions"],
-  transactionsList: (filters = {}) => [...queryKeys.transactions, "list", filters],
-  transactionById: (id) => [...queryKeys.transactions, "detail", id],
-  transactionsByDateRange: (start, end) => [...queryKeys.transactions, "dateRange", start, end],
-  transactionsByEnvelope: (envelopeId) => [...queryKeys.transactions, "envelope", envelopeId],
+  transactionsList: (filters: FilterParams = {}) => [...queryKeys.transactions, "list", filters],
+  transactionById: (id: EntityId) => [...queryKeys.transactions, "detail", id],
+  transactionsByDateRange: (start: string | Date, end: string | Date) => [
+    ...queryKeys.transactions,
+    "dateRange",
+    start,
+    end,
+  ],
+  transactionsByEnvelope: (envelopeId: EntityId) => [
+    ...queryKeys.transactions,
+    "envelope",
+    envelopeId,
+  ],
 
   // Bills
   bills: ["bills"],
-  billsList: (filters = {}) => [...queryKeys.bills, "list", filters],
-  billById: (id) => [...queryKeys.bills, "detail", id],
-  upcomingBills: (days = 30) => [...queryKeys.bills, "upcoming", days],
+  billsList: (filters: FilterParams = {}) => [...queryKeys.bills, "list", filters],
+  billById: (id: EntityId) => [...queryKeys.bills, "detail", id],
+  upcomingBills: (days: number = 30) => [...queryKeys.bills, "upcoming", days],
   overdueBills: () => [...queryKeys.bills, "overdue"],
 
   // Savings Goals
   savingsGoals: ["savingsGoals"],
   savingsGoalsList: () => [...queryKeys.savingsGoals, "list"],
-  savingsGoalById: (id) => [...queryKeys.savingsGoals, "detail", id],
+  savingsGoalById: (id: EntityId) => [...queryKeys.savingsGoals, "detail", id],
   activeSavingsGoals: () => [...queryKeys.savingsGoals, "active"],
 
   // Receipts
   receipts: ["receipts"],
-  receiptsList: (filters = {}) => [...queryKeys.receipts, "list", filters],
-  receiptById: (id) => [...queryKeys.receipts, "detail", id],
-  receiptsByTransaction: (transactionId) => [...queryKeys.receipts, "transaction", transactionId],
+  receiptsList: (filters: FilterParams = {}) => [...queryKeys.receipts, "list", filters],
+  receiptById: (id: EntityId) => [...queryKeys.receipts, "detail", id],
+  receiptsByTransaction: (transactionId: EntityId) => [
+    ...queryKeys.receipts,
+    "transaction",
+    transactionId,
+  ],
 
   // Analytics
   analytics: ["analytics"],
-  analyticsSpending: (period) => [...queryKeys.analytics, "spending", period],
-  analyticsTrends: (period) => [...queryKeys.analytics, "trends", period],
-  analyticsCategories: (period) => [...queryKeys.analytics, "categories", period],
+  analyticsSpending: (period: string) => [...queryKeys.analytics, "spending", period],
+  analyticsTrends: (period: string) => [...queryKeys.analytics, "trends", period],
+  analyticsCategories: (period: string) => [...queryKeys.analytics, "categories", period],
   analyticsBalance: () => [...queryKeys.analytics, "balance"],
-  analyticsReport: (type, params) => [...queryKeys.analytics, type, params],
+  analyticsReport: (type: string, params: FilterParams) => [...queryKeys.analytics, type, params],
 
   // Dashboard
   dashboard: ["dashboard"],
@@ -64,8 +86,8 @@ export const queryKeys = {
   // Debt tracking
   debts: ["debts"],
   debtsList: () => [...queryKeys.debts, "list"],
-  debtById: (id) => [...queryKeys.debts, "detail", id],
-  debtPaymentPlan: (id) => [...queryKeys.debts, "paymentPlan", id],
+  debtById: (id: EntityId) => [...queryKeys.debts, "detail", id],
+  debtPaymentPlan: (id: EntityId) => [...queryKeys.debts, "paymentPlan", id],
 
   // Paycheck history
   paychecks: ["paychecks"],
@@ -74,9 +96,9 @@ export const queryKeys = {
 
   // Budget History (version control)
   budgetHistory: ["budgetHistory"],
-  budgetCommits: (options = {}) => [...queryKeys.budgetHistory, "commits", options],
-  budgetCommit: (hash) => [...queryKeys.budgetHistory, "commit", hash],
-  budgetChanges: (commitHash) => [...queryKeys.budgetHistory, "changes", commitHash],
+  budgetCommits: (options: FilterParams = {}) => [...queryKeys.budgetHistory, "commits", options],
+  budgetCommit: (hash: string) => [...queryKeys.budgetHistory, "commit", hash],
+  budgetChanges: (commitHash: string) => [...queryKeys.budgetHistory, "changes", commitHash],
   budgetHistoryStats: () => [...queryKeys.budgetHistory, "stats"],
   budgetBranches: () => [...queryKeys.budgetHistory, "branches"],
   budgetTags: () => [...queryKeys.budgetHistory, "tags"],
@@ -95,8 +117,8 @@ export const queryKeyUtils = {
   /**
    * Get all query keys for a specific entity type
    */
-  getEntityKeys: (entityType) => {
-    const baseKey = queryKeys[entityType];
+  getEntityKeys: (entityType: EntityType) => {
+    const baseKey = (queryKeys as Record<string, unknown>)[entityType];
     if (!baseKey) {
       throw new Error(`Unknown entity type: ${entityType}`);
     }
@@ -106,7 +128,7 @@ export const queryKeyUtils = {
   /**
    * Check if a query key matches a pattern
    */
-  matchesPattern: (queryKey, pattern) => {
+  matchesPattern: (queryKey: QueryKey, pattern: QueryKey) => {
     if (!Array.isArray(queryKey) || !Array.isArray(pattern)) {
       return false;
     }
@@ -122,15 +144,15 @@ export const queryKeyUtils = {
   /**
    * Create a query key matcher function
    */
-  createMatcher: (pattern) => {
-    return (queryKey) => queryKeyUtils.matchesPattern(queryKey, pattern);
+  createMatcher: (pattern: QueryKey) => {
+    return (queryKey: QueryKey) => queryKeyUtils.matchesPattern(queryKey, pattern);
   },
 
   /**
    * Get all related query keys for invalidation
    */
-  getRelatedKeys: (entityType) => {
-    const related = {
+  getRelatedKeys: (entityType: EntityType) => {
+    const related: Record<string, QueryKey[]> = {
       envelopes: [queryKeys.envelopes, queryKeys.dashboard, queryKeys.budgetMetadata],
       transactions: [
         queryKeys.transactions,
@@ -149,45 +171,45 @@ export const queryKeyUtils = {
   /**
    * Validate query key structure
    */
-  isValidQueryKey: (queryKey) => {
+  isValidQueryKey: (queryKey: QueryKey) => {
     return Array.isArray(queryKey) && queryKey.length > 0;
   },
 
   /**
    * Create query key with timestamp for cache busting
    */
-  withTimestamp: (baseKey, timestamp = Date.now()) => {
+  withTimestamp: (baseKey: QueryKey, timestamp: Timestamp = Date.now()) => {
     return [...baseKey, "ts", timestamp];
   },
 
   /**
    * Create query key with user context
    */
-  withUser: (baseKey, userId) => {
+  withUser: (baseKey: QueryKey, userId: UserId) => {
     return [...baseKey, "user", userId];
   },
 
   /**
    * Extract entity type from query key
    */
-  getEntityType: (queryKey) => {
+  getEntityType: (queryKey: QueryKey) => {
     if (!Array.isArray(queryKey) || queryKey.length === 0) {
       return null;
     }
-    return queryKey[0];
+    return queryKey[0] as string;
   },
 
   /**
    * Create hierarchical query key
    */
-  createHierarchical: (...segments) => {
+  createHierarchical: (...segments: unknown[]) => {
     return segments.filter((segment) => segment !== null && segment !== undefined);
   },
 
   /**
    * Get query key depth
    */
-  getDepth: (queryKey) => {
+  getDepth: (queryKey: QueryKey) => {
     return Array.isArray(queryKey) ? queryKey.length : 0;
   },
 };

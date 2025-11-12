@@ -44,13 +44,15 @@ export const useSpendingAnalyticsQuery = (options: SpendingAnalyticsOptions = {}
   const { transactions } = useTransactionQuery({ limit: transactionLimit });
   const { envelopes } = useEnvelopesQuery();
 
+  const queryKeySeed = JSON.stringify({
+    period,
+    customDateRange,
+    includeTransfers,
+    groupBy,
+  });
+
   return useQuery({
-    queryKey: queryKeys.analyticsSpending({
-      period,
-      customDateRange,
-      includeTransfers,
-      groupBy,
-    }),
+    queryKey: queryKeys.analyticsSpending(queryKeySeed),
     queryFn: async () => {
       const dateRange = getDateRange({ period, customDateRange });
       const { startDate, endDate } = dateRange;

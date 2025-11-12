@@ -1,14 +1,77 @@
-import StandardTabs from "../ui/StandardTabs";
-import StandardFilters from "../ui/StandardFilters";
+import StandardTabs, { type Tab } from "../ui/StandardTabs";
+import StandardFilters, { type FilterConfig } from "../ui/StandardFilters";
+import type { FilterOptions } from "@/hooks/bills/useBillManagerHelpers";
 
-/**
- * View mode tabs for BillManager using standardized tabs component
- * Pure UI component that preserves exact visual appearance
- */
-const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilterOptions }) => {
+interface BillViewTabsProps {
+  viewModes: Tab[];
+  viewMode: string;
+  setViewMode: (mode: string) => void;
+  filterOptions: FilterOptions;
+  setFilterOptions: (options: FilterOptions) => void;
+  envelopes?: Array<{ id: string | number; name?: string }>;
+}
+
+const BillViewTabs = ({
+  viewModes,
+  viewMode,
+  setViewMode,
+  filterOptions,
+  setFilterOptions,
+  envelopes = [],
+}: BillViewTabsProps) => {
+  const filterConfigs: FilterConfig[] = [
+    {
+      key: "urgency",
+      label: "Urgency",
+      type: "select",
+      defaultValue: "all",
+      options: [
+        { value: "all", label: "All" },
+        { value: "overdue", label: "Overdue" },
+        { value: "due_soon", label: "Due Soon" },
+        { value: "upcoming", label: "Upcoming" },
+        { value: "paid", label: "Paid" },
+      ],
+    },
+    {
+      key: "envelope",
+      label: "Envelope",
+      type: "select",
+      defaultValue: "",
+      options: [
+        { value: "", label: "All Envelopes" },
+        ...envelopes.map((envelope) => ({
+          value: String(envelope.id),
+          label: envelope.name || String(envelope.id),
+        })),
+      ],
+    },
+    {
+      key: "amountMin",
+      label: "Min Amount",
+      type: "text",
+      placeholder: "$0.00",
+      defaultValue: "",
+    },
+    {
+      key: "amountMax",
+      label: "Max Amount",
+      type: "text",
+      placeholder: "$0.00",
+      defaultValue: "",
+    },
+  ];
+
+  const defaultFilters = filterConfigs.reduce<Record<string, string | boolean>>((acc, config) => {
+    if (typeof config.defaultValue !== "undefined") {
+      acc[config.key] = config.defaultValue;
+    }
+    return acc;
+  }, {});
+  defaultFilters.search = "";
+
   return (
     <div className="space-y-0">
-      {/* View Mode Tabs */}
       <StandardTabs
         tabs={viewModes}
         activeTab={viewMode}
@@ -18,36 +81,30 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         className="pl-4"
       />
 
-      {/* Connected Filters */}
       <StandardFilters
-        filters={filterOptions}
-        onFilterChange={(key, value) => setFilterOptions((prev) => ({ ...prev, [key]: value }))}
-        filterConfigs={[
-          {
-            key: "urgency",
-            type: "select",
-            defaultValue: "all",
-            options: [
-              { value: "all", label: "All Urgency" },
-              { value: "overdue", label: "Overdue" },
-              { value: "urgent", label: "Urgent" },
-              { value: "soon", label: "Soon" },
-              { value: "normal", label: "Normal" },
-            ],
-          },
-          {
-            key: "envelope",
-            type: "select",
-            defaultValue: "all",
-            options: [
-              { value: "all", label: "All Envelopes" },
-              { value: "connected", label: "Connected" },
-              { value: "unconnected", label: "Unconnected" },
-            ],
-          },
-        ]}
+        filters={filterOptions as Record<string, string | boolean>}
+        filterConfigs={filterConfigs}
+        defaultFilters={defaultFilters}
+        onFilterChange={(key, value) =>
+          setFilterOptions({
+            ...filterOptions,
+            [key]: value as string,
+          })
+        }
+        onResetFilters={() =>
+          setFilterOptions({
+            ...filterOptions,
+            ...defaultFilters,
+          })
+        }
         searchPlaceholder="Search bills..."
-        size="md"
+        searchValue={filterOptions.search ?? ""}
+        onSearchChange={(value) =>
+          setFilterOptions({
+            ...filterOptions,
+            search: value,
+          })
+        }
         mode="collapsible"
       />
     </div>

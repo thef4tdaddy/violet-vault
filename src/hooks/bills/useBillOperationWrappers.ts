@@ -4,12 +4,34 @@ import { useState, useCallback } from "react";
  * Hook for wrapping bill operations with error handling and processing state
  * Extracted from useBillOperations.js to reduce function size
  */
+interface UseBillOperationWrappersOptions {
+  handleBulkUpdate: (updatedBills: unknown[]) => Promise<{
+    success: boolean;
+    successCount: number;
+    errorCount: number;
+    errors: string[];
+    message: string;
+  }>;
+  handlePayBill: (
+    billId: string,
+    overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+  ) => Promise<void>;
+  handleBulkPayment: (billIds: string[]) => Promise<{
+    success: boolean;
+    successCount: number;
+    errorCount: number;
+    errors: string[];
+    message: string;
+  }>;
+  onError?: (error: string) => void;
+}
+
 export const useBillOperationWrappers = ({
   handleBulkUpdate,
   handlePayBill,
   handleBulkPayment,
   onError,
-}) => {
+}: UseBillOperationWrappersOptions) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const wrappedHandleBulkUpdate = useCallback(
@@ -39,18 +61,17 @@ export const useBillOperationWrappers = ({
   );
 
   const wrappedHandlePayBill = useCallback(
-    async (billId) => {
+    async (
+      billId: string,
+      overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+    ): Promise<void> => {
       setIsProcessing(true);
       try {
-        const result = await handlePayBill(billId);
-        return result;
+        await handlePayBill(billId, overrides);
       } catch (error) {
-        const errorMessage = error.message || "Failed to pay bill";
+        const errorMessage = (error as Error)?.message || "Failed to pay bill";
         onError?.(errorMessage);
-        return {
-          success: false,
-          error: errorMessage,
-        };
+        throw error;
       } finally {
         setIsProcessing(false);
       }

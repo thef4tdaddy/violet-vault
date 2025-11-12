@@ -56,8 +56,8 @@ export const useLayoutData = () => {
     // Use actual transactions and bills so totals/spending are accurate
     const processedEnvelopeData = calculateEnvelopeData(
       budgetData.envelopes,
-      safeTransactions,
-      billsList
+      safeTransactions as Parameters<typeof calculateEnvelopeData>[1],
+      billsList as Parameters<typeof calculateEnvelopeData>[2]
     );
     return calculateEnvelopeTotals(processedEnvelopeData);
   }, [budgetData.envelopes, safeTransactions, billsList]);

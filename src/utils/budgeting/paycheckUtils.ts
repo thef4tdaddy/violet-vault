@@ -299,7 +299,7 @@ export const calculateEnvelopeAllocations = (
           envelopeId: envelope.id,
           envelopeName: envelope.name,
           amount: allocationAmount,
-          monthlyAmount: envelope.monthlyAmount,
+          monthlyAmount: envelope.monthlyAmount || 0,
           envelopeType: envelope.envelopeType,
           priority: envelope.priority || "medium",
         });
@@ -314,15 +314,15 @@ export const calculateEnvelopeAllocations = (
 
     if (totalMonthlyNeeds > 0) {
       allocatableEnvelopes.forEach((envelope) => {
-        if (envelope.monthlyAmount > 0) {
-          const proportion = envelope.monthlyAmount / totalMonthlyNeeds;
+        if ((envelope.monthlyAmount || 0) > 0) {
+          const proportion = (envelope.monthlyAmount || 0) / totalMonthlyNeeds;
           const allocationAmount = Math.round(amount * proportion * 100) / 100;
 
           allocations.push({
             envelopeId: envelope.id,
             envelopeName: envelope.name,
             amount: allocationAmount,
-            monthlyAmount: envelope.monthlyAmount,
+            monthlyAmount: envelope.monthlyAmount || 0,
             envelopeType: envelope.envelopeType,
             priority: envelope.priority || "medium",
           });

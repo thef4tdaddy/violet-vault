@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
-interface ExecutionRecord {
+export interface ExecutionRecord {
   id: string;
   trigger: string;
   totalFunded?: number;
@@ -22,10 +22,10 @@ export interface ExecutionFilters {
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
 export const useExecutionHistory = (initialHistory: ExecutionRecord[] = []) => {
-  const [executionHistory, setExecutionHistory] = useState(initialHistory);
+  const [executionHistory, setExecutionHistory] = useState<ExecutionRecord[]>(initialHistory);
 
   // Add execution to history
-  const addToHistory = useCallback((executionRecord) => {
+  const addToHistory = useCallback((executionRecord: ExecutionRecord) => {
     try {
       setExecutionHistory((prevHistory) => {
         const newHistory = [executionRecord, ...prevHistory];
@@ -88,7 +88,7 @@ export const useExecutionHistory = (initialHistory: ExecutionRecord[] = []) => {
 
   // Get execution by ID
   const getExecutionById = useCallback(
-    (executionId) => {
+    (executionId: string) => {
       return executionHistory.find((execution) => execution.id === executionId);
     },
     [executionHistory]

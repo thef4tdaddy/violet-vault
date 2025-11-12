@@ -3,39 +3,25 @@
  * Extracted to reduce function length
  */
 import logger from "@/utils/common/logger";
+import type { ProcessedSavingsGoal } from "@/utils/savings/savingsCalculations";
 
-interface SavingsGoal {
-  id: string;
-  isCompleted: boolean;
-  urgency: string;
-  category: string;
-  priority: string;
-  [key: string]: unknown;
+interface MutationHandler {
+  mutateAsync: (...args: unknown[]) => Promise<unknown>;
 }
 
 interface MutationHelpers {
-  addSavingsGoalMutation: {
-    mutateAsync: (data: never) => Promise<unknown>;
-  };
-  updateSavingsGoalMutation: {
-    mutateAsync: (data: never) => Promise<unknown>;
-  };
-  deleteSavingsGoalMutation: {
-    mutateAsync: (data: never) => Promise<unknown>;
-  };
-  addContributionMutation: {
-    mutateAsync: (data: never) => Promise<unknown>;
-  };
-  distributeFundsMutation: {
-    mutateAsync: (data: never) => Promise<unknown>;
-  };
+  addSavingsGoalMutation: MutationHandler;
+  updateSavingsGoalMutation: MutationHandler;
+  deleteSavingsGoalMutation: MutationHandler;
+  addContributionMutation: MutationHandler;
+  distributeFundsMutation: MutationHandler;
 }
 
 /**
  * Create helper functions for savings goals operations
  */
 export const createSavingsGoalHelpers = (
-  savingsGoals: SavingsGoal[],
+  savingsGoals: ProcessedSavingsGoal[],
   mutations: MutationHelpers
 ) => ({
   // Add a new savings goal
