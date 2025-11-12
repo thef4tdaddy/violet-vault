@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "../../../components/ui";
-import { renderIcon } from "../../../utils/icons";
+import { Button } from "@/components/ui";
+import { renderIcon } from "@/utils/icons";
 
 interface HealthMetrics {
   totalAttempts: number;
@@ -22,7 +22,7 @@ interface HealthData {
 
 interface HealthDashboardButtonProps {
   healthData: HealthData | null;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export const HealthDashboardButton: React.FC<HealthDashboardButtonProps> = ({
@@ -31,7 +31,8 @@ export const HealthDashboardButton: React.FC<HealthDashboardButtonProps> = ({
 }) => {
   return (
     <Button
-      onClick={onClick}
+      onClick={onClick ?? (() => {})}
+      disabled={!onClick}
       className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 border-black transition-all ${
         healthData?.status === "healthy"
           ? "bg-green-100 text-green-700 hover:bg-green-200"

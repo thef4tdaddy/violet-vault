@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils";
+import { getIcon } from "@/utils";
 import SyncDebugToolsSection from "./SyncDebugToolsSection";
 import logger from "@/utils/common/logger";
 // Development mode detection utility
@@ -73,22 +73,31 @@ const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
         {/* Sync Debug Tools */}
         <SyncDebugToolsSection isDebugMode={isDebugMode} />
 
-        {isDebugMode && (
-          <Button
-            onClick={() => logger.downloadBufferedLogs()}
-            className="w-full flex items-center p-3 border-2 border-black bg-red-50 rounded-lg hover:bg-red-100 transition-colors shadow-sm"
-          >
-            {React.createElement(getIcon("Download"), {
-              className: "h-5 w-5 text-red-600 mr-3",
-            })}
-            <div className="text-left">
-              <p className="font-medium text-gray-900">🧾 Export Console Buffer</p>
-              <p className="text-sm text-gray-700">
-                Download the latest {logCount} buffered log entries as a text file
-              </p>
-            </div>
-          </Button>
-        )}
+        <Button
+          onClick={() => {
+            if (isDebugMode) {
+              logger.downloadBufferedLogs();
+            }
+          }}
+          disabled={!isDebugMode}
+          className={`w-full flex items-center p-3 border-2 border-black rounded-lg shadow-sm transition-colors ${
+            isDebugMode
+              ? "bg-red-50 hover:bg-red-100"
+              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-75"
+          }`}
+        >
+          {React.createElement(getIcon("Download"), {
+            className: `h-5 w-5 mr-3 ${isDebugMode ? "text-red-600" : "text-gray-400"}`,
+          })}
+          <div className="text-left">
+            <p className="font-medium text-gray-900">🧾 Export Console Buffer</p>
+            <p className="text-sm text-gray-700">
+              {isDebugMode
+                ? `Download the latest ${logCount} buffered log entries as a text file`
+                : "Available in development builds to export buffered console logs"}
+            </p>
+          </div>
+        </Button>
       </div>
     </div>
   );

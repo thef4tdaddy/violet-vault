@@ -1,10 +1,9 @@
 import React, { useState, memo, useCallback } from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "@/utils";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
 import SyncHealthIndicator from "../sync/SyncHealthIndicator";
-import SyncHealthDashboard from "../sync/SyncHealthDashboard";
 
 interface HeaderProps {
   currentUser: unknown;
@@ -25,7 +24,6 @@ const Header = memo(
     onShowDataSettings: _onShowDataSettings,
   }: HeaderProps) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
-    const [showSyncHealthDashboard, setShowSyncHealthDashboard] = useState(false);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
       setShowLocalOnlySettings((prev) => !prev);
@@ -97,7 +95,7 @@ const Header = memo(
               {!isLocalOnlyMode && (
                 <SyncHealthIndicator
                   data-tour="sync-indicator"
-                  onOpenHealthDashboard={() => setShowSyncHealthDashboard(true)}
+                  onOpenHealthDashboard={() => onShowSettings("sync-health")}
                 />
               )}
 
@@ -127,11 +125,6 @@ const Header = memo(
             }}
           />
         )}
-
-        <SyncHealthDashboard
-          isOpen={showSyncHealthDashboard}
-          onClose={() => setShowSyncHealthDashboard(false)}
-        />
       </div>
     );
   }

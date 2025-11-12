@@ -4,141 +4,93 @@
  */
 
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils/icons";
 import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
 import { useExportData } from "@/hooks/common/useExportData";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
-import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
-/**
- * @typedef {Object} HealthMetrics
- * @property {number} successfulSyncs - Count of successful syncs
- * @property {number} failedSyncs - Count of failed syncs
- * @property {number} averageSyncTime - Average sync duration in ms
- * @property {number} consecutiveFailures - Count of consecutive failures
- * @property {number} errorRate - Error rate percentage (0-1)
- * @property {number} lastSyncTime - Timestamp of last sync
- */
-
-/**
- * @typedef {Object} HealthData
- * @property {'healthy'|'slow'|'degraded'|'unhealthy'|'unknown'} status - Overall health status
- * @property {HealthMetrics} metrics - Health metrics
- * @property {Array} recentSyncs - Recent sync history
- */
-
-/**
- * SyncHealthDashboard component displays detailed sync health metrics and history
- * Provides backup export functionality and real-time health monitoring
- * GitHub Issue #576 Phase 3: Visual health monitoring and backup tools
- *
- * @param {Object} props - Component props
- * @param {boolean} props.isOpen - Whether the dashboard modal is open
- * @param {Function} props.onClose - Callback to close the dashboard
- * @returns {React.ReactElement|null} Rendered dashboard modal or null if closed
- */
 interface SyncHealthDashboardProps {
-  isOpen: boolean;
-  onClose: () => void;
+  className?: string;
 }
 
-const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "healthy":
+      return "green";
+    case "slow":
+      return "yellow";
+    case "degraded":
+      return "orange";
+    case "unhealthy":
+      return "red";
+    default:
+      return "gray";
+  }
+};
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "healthy":
+      return "CheckCircle";
+    case "slow":
+      return "Clock";
+    case "degraded":
+      return "AlertTriangle";
+    case "unhealthy":
+      return "XCircle";
+    default:
+      return "HelpCircle";
+  }
+};
+
+const formatDuration = (ms: number) => {
+  if (ms < 1000) return `${ms}ms`;
+  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+  return `${(ms / 60000).toFixed(1)}m`;
+};
+
+const SyncHealthDashboard = ({ className = "" }: SyncHealthDashboardProps) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const { healthData, refreshHealthData } = useSyncHealthMonitor(autoRefresh);
   const { exportData } = useExportData();
   const { showErrorToast, showSuccessToast } = useToastHelpers();
-  const modalRef = useModalAutoScroll(isOpen);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!autoRefresh) {
       refreshHealthData();
     }
-  }, [isOpen, refreshHealthData]);
+  }, [autoRefresh, refreshHealthData]);
 
-  if (!isOpen || !healthData) return null;
-
-  /**
-   * Get Tailwind color name for health status
-   * @param {string} status - Health status
-   * @returns {string} Tailwind color name
-   */
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "healthy":
-        return "green";
-      case "slow":
-        return "yellow";
-      case "degraded":
-        return "orange";
-      case "unhealthy":
-        return "red";
-      default:
-        return "gray";
-    }
-  };
-
-  /**
-   * Get icon name for health status
-   * @param {string} status - Health status
-   * @returns {string} Icon name for renderIcon
-   */
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "healthy":
-        return "CheckCircle";
-      case "slow":
-        return "Clock";
-      case "degraded":
-        return "AlertTriangle";
-      case "unhealthy":
-        return "XCircle";
-      default:
-        return "HelpCircle";
-    }
-  };
-
-  /**
-   * Handle backup export with toast notifications
-   * @returns {Promise<void>}
-   */
   const handleExportBackup = async () => {
     try {
       await exportData();
       showSuccessToast("Backup exported successfully", "Backup Created");
     } catch (error) {
-      showErrorToast(`Failed to export backup: ${error.message}`, "Export Failed");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      showErrorToast(`Failed to export backup: ${message}`, "Export Failed");
     }
   };
 
-  /**
-   * Format duration in milliseconds to human-readable string
-   * @param {number} ms - Duration in milliseconds
-   * @returns {string} Formatted duration string
-   */
-  const formatDuration = (ms) => {
-    if (ms < 1000) return `${ms}ms`;
-    if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
-    return `${(ms / 60000).toFixed(1)}m`;
-  };
+  if (!healthData) {
+    return (
+      <div
+        className={`bg-white rounded-2xl border-2 border-black shadow-2xl p-8 text-center ${className}`}
+      >
+        <p className="text-sm text-gray-600">Loading sync health data…</p>
+      </div>
+    );
+  }
 
   const statusColor = getStatusColor(healthData.status);
   const statusIcon = getStatusIcon(healthData.status);
-  const successRate =
-    (healthData.metrics.successfulSyncs /
-      (healthData.metrics.successfulSyncs + healthData.metrics.failedSyncs)) *
-      100 || 100;
+  const totalAttempts = healthData.metrics.successfulSyncs + healthData.metrics.failedSyncs || 1;
+  const successRate = (healthData.metrics.successfulSyncs / totalAttempts) * 100;
 
-  const modalContent = (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 overflow-y-auto">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl my-auto"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+  return (
+    <section className={`space-y-6 ${className}`}>
+      <div className="bg-white rounded-2xl border-2 border-black shadow-2xl p-6 space-y-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center space-x-3">
             <div className={`p-3 rounded-full bg-${statusColor}-100`}>
               {renderIcon(statusIcon, {
@@ -147,8 +99,8 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
             </div>
             <div>
               <h2 className="text-xl font-black text-black uppercase tracking-wider">
-                <span className="text-2xl">S</span>YNC <span className="text-2xl">H</span>EALTH{" "}
-                <span className="text-2xl">D</span>ASHBOARD
+                <span className="text-2xl">S</span>ync <span className="text-2xl">H</span>ealth{" "}
+                <span className="text-2xl">D</span>ashboard
               </h2>
               <p className={`text-sm font-medium text-${statusColor}-600 capitalize`}>
                 Status: {healthData.status}
@@ -156,7 +108,7 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               onClick={() => setAutoRefresh((prev) => !prev)}
               className={`px-3 py-2 text-xs rounded-lg border-2 border-black ${
@@ -165,19 +117,24 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
             >
               {autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
             </Button>
-
-            <ModalCloseButton onClick={onClose} />
+            <Button
+              onClick={refreshHealthData}
+              className="px-3 py-2 text-xs rounded-lg border-2 border-black bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+            >
+              Refresh Now
+            </Button>
           </div>
         </div>
 
-        {/* Status Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-black text-black uppercase">Success Rate</p>
                 <p
-                  className={`text-2xl font-black text-${successRate > 95 ? "green" : successRate > 90 ? "yellow" : "red"}-600`}
+                  className={`text-2xl font-black text-${
+                    successRate > 95 ? "green" : successRate > 90 ? "yellow" : "red"
+                  }-600`}
                 >
                   {successRate.toFixed(1)}%
                 </p>
@@ -193,7 +150,13 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
               <div>
                 <p className="text-xs font-black text-black uppercase">Avg Sync Time</p>
                 <p
-                  className={`text-2xl font-black text-${healthData.metrics.averageSyncTime < 5000 ? "green" : healthData.metrics.averageSyncTime < 10000 ? "yellow" : "red"}-600`}
+                  className={`text-2xl font-black text-${
+                    healthData.metrics.averageSyncTime < 5000
+                      ? "green"
+                      : healthData.metrics.averageSyncTime < 10000
+                        ? "yellow"
+                        : "red"
+                  }-600`}
                 >
                   {formatDuration(healthData.metrics.averageSyncTime)}
                 </p>
@@ -221,7 +184,9 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
               <div>
                 <p className="text-xs font-black text-black uppercase">Failures</p>
                 <p
-                  className={`text-2xl font-black text-${healthData.metrics.consecutiveFailures > 0 ? "red" : "green"}-600`}
+                  className={`text-2xl font-black text-${
+                    healthData.metrics.consecutiveFailures > 0 ? "red" : "green"
+                  }-600`}
                 >
                   {healthData.metrics.consecutiveFailures}
                 </p>
@@ -233,17 +198,16 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
           </div>
         </div>
 
-        {/* Issues & Actions */}
         {(healthData.issues.length > 0 || healthData.status !== "healthy") && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
             <div className="flex items-start space-x-3">
               {renderIcon("AlertTriangle", {
                 className: "h-5 w-5 text-red-600 mt-1",
               })}
               <div className="flex-1">
                 <h3 className="font-black text-red-800 text-sm uppercase mb-2">
-                  <span className="text-base">S</span>YNC <span className="text-base">I</span>SSUES{" "}
-                  <span className="text-base">D</span>ETECTED
+                  <span className="text-base">S</span>ync <span className="text-base">I</span>ssues{" "}
+                  <span className="text-base">D</span>etected
                 </h3>
                 <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
                   {healthData.issues.map((issue, index) => (
@@ -251,7 +215,6 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
                   ))}
                 </ul>
 
-                {/* Quick Actions */}
                 <div className="flex flex-wrap gap-2 mt-4">
                   <Button
                     onClick={handleExportBackup}
@@ -274,16 +237,15 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
           </div>
         )}
 
-        {/* Healthy Status Message */}
         {healthData.status === "healthy" && (
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6">
+          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
             <div className="flex items-center space-x-3">
               {renderIcon("CheckCircle", {
                 className: "h-5 w-5 text-green-600",
               })}
               <div>
                 <h3 className="font-black text-green-800 text-sm uppercase">
-                  <span className="text-base">S</span>YNC <span className="text-base">H</span>EALTHY
+                  <span className="text-base">S</span>ync <span className="text-base">H</span>ealthy
                 </h3>
                 <p className="text-sm text-green-700">
                   All sync operations are performing normally. No issues detected.
@@ -293,11 +255,10 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
           </div>
         )}
 
-        {/* Recent Sync History */}
         <div className="bg-purple-100/40 backdrop-blur-sm rounded-lg p-4 border-2 border-black">
           <h3 className="font-black text-black text-sm uppercase mb-4">
-            <span className="text-base">R</span>ECENT <span className="text-base">S</span>YNC{" "}
-            <span className="text-base">H</span>ISTORY
+            <span className="text-base">R</span>ecent <span className="text-base">S</span>ync{" "}
+            <span className="text-base">H</span>istory
           </h3>
 
           {healthData.recentSyncs.length === 0 ? (
@@ -339,10 +300,8 @@ const SyncHealthDashboard = ({ isOpen, onClose }: SyncHealthDashboardProps) => {
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
-
-  return createPortal(modalContent, document.body);
 };
 
 export default SyncHealthDashboard;

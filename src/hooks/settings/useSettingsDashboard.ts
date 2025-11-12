@@ -196,6 +196,7 @@ export const useSettingsSections = () => {
     { id: "account", label: "Account", icon: "User" },
     { id: "security", label: "Security", icon: "Shield" },
     { id: "data", label: "Data", icon: "Cloud" },
+    { id: "sync-health", label: "Sync Health", icon: "Activity" },
     { id: "notifications", label: "Notifications", icon: "Bell" },
   ];
 

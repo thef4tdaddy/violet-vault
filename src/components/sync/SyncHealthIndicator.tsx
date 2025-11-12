@@ -140,8 +140,11 @@ const SyncHealthIndicator = ({ onOpenHealthDashboard }: SyncHealthIndicatorProps
     <div className="relative">
       {/* Clickable Health Indicator - opens health dashboard */}
       <Button
-        onClick={onOpenHealthDashboard}
-        className={`flex items-center space-x-2 px-3 py-2 rounded-2xl ${getStatusColor()} bg-green-500 text-white border-2 border-black shadow-lg hover:shadow-xl transition-all ${onOpenHealthDashboard ? "cursor-pointer hover:scale-105" : ""}`}
+        onClick={onOpenHealthDashboard ?? (() => {})}
+        disabled={!onOpenHealthDashboard}
+        className={`flex items-center space-x-2 px-3 py-2 rounded-2xl ${getStatusColor()} bg-green-500 text-white border-2 border-black shadow-lg transition-all ${
+          onOpenHealthDashboard ? "hover:shadow-xl hover:scale-105 cursor-pointer" : "opacity-70"
+        }`}
         title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click to view details`}
       >
         {getStatusIcon()}

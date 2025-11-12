@@ -58,10 +58,13 @@ const BottomNavigationBar: React.FC = () => {
   return (
     <div
       className="
-        pointer-events-none fixed inset-x-0 bottom-0 z-40 sm:hidden
-        flex justify-center pb-4
+        pointer-events-none fixed inset-x-0 z-40 sm:hidden
+        flex justify-center
       "
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }}
+      style={{
+        bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+        paddingBottom: "0px",
+      }}
     >
       <div
         className="
@@ -108,7 +111,7 @@ const BottomNavigationBar: React.FC = () => {
               ref={leftFadeRef}
               className="
               absolute left-0 top-0 bottom-0 w-12
-              bg-gradient-to-r from-violet-100 via-violet-100/80 to-transparent
+              bg-gradient-to-r from-violet-200 via-violet-200/80 to-transparent
               pointer-events-none opacity-0 transition-opacity duration-300
               backdrop-blur-sm
             "
@@ -119,7 +122,7 @@ const BottomNavigationBar: React.FC = () => {
               ref={rightFadeRef}
               className="
               absolute right-0 top-0 bottom-0 w-12
-              bg-gradient-to-l from-violet-100 via-violet-100/80 to-transparent
+              bg-gradient-to-l from-violet-200 via-violet-200/80 to-transparent
               pointer-events-none transition-opacity duration-300
               backdrop-blur-sm
             "

@@ -1,47 +1,73 @@
 import React from "react";
-import GeneralSettingsSection from "../../components/settings/sections/GeneralSettingsSection";
-import AccountSettingsSection from "../../components/settings/sections/AccountSettingsSection";
-import SecuritySettingsSection from "../../components/settings/sections/SecuritySettingsSection";
-import DataManagementSection from "../../components/settings/sections/DataManagementSection";
-import NotificationSettingsSection from "../../components/settings/sections/NotificationSettingsSection";
-import DevToolsSection from "../../components/settings/sections/DevToolsSection";
+import GeneralSettingsSection from "@/components/settings/sections/GeneralSettingsSection";
+import AccountSettingsSection from "@/components/settings/sections/AccountSettingsSection";
+import SecuritySettingsSection from "@/components/settings/sections/SecuritySettingsSection";
+import DataManagementSection from "@/components/settings/sections/DataManagementSection";
+import NotificationSettingsSection from "@/components/settings/sections/NotificationSettingsSection";
+import DevToolsSection from "@/components/settings/sections/DevToolsSection";
+import SyncHealthDashboard from "@/components/sync/SyncHealthDashboard";
 
-/**
- * Hook to handle settings section rendering logic
- * Extracts the switch statement and section component mapping from the main component
- */
-export const useSettingsSectionRenderer = ({
+interface SettingsSectionRendererProps {
   // General Settings Props
-  isLocalOnlyMode,
-  cloudSyncEnabled,
-  isSyncing,
-  onOpenLocalOnlySettings,
-  onToggleCloudSync,
-  onManualSync,
+  isLocalOnlyMode?: boolean;
+  cloudSyncEnabled?: boolean;
+  isSyncing?: boolean;
+  onOpenLocalOnlySettings?: () => void;
+  onToggleCloudSync?: () => void;
+  onManualSync?: () => void;
 
   // Account Settings Props
-  currentUser,
-  onOpenPasswordModal,
-  onLogout,
-  onOpenResetConfirm,
-  onUpdateProfile,
+  currentUser?: unknown;
+  onOpenPasswordModal?: () => void;
+  onLogout?: () => void;
+  onOpenResetConfirm?: () => void;
+  onUpdateProfile?: (profile: unknown) => void;
 
   // Security Settings Props
-  securityManager,
-  onOpenSecuritySettings,
-  onShowLocalDataSecurity,
+  securityManager?: unknown;
+  onOpenSecuritySettings?: () => void;
+  onShowLocalDataSecurity?: () => void;
 
   // Data Management Props
-  onOpenActivityFeed,
-  onExport,
-  onImport,
-  onSync,
+  onOpenActivityFeed?: () => void;
+  onExport?: () => void;
+  onImport?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSync?: () => void;
 
   // Dev Tools Props
-  onOpenEnvelopeChecker,
-  onCreateTestHistory,
-}) => {
-  const renderSectionContent = (activeSection) => {
+  onOpenEnvelopeChecker?: () => void;
+  onCreateTestHistory?: () => void;
+}
+
+/**
+ * Hook to handle settings section rendering logic.
+ * Extracts the switch statement and section component mapping from the main dashboard.
+ */
+const useSettingsSectionRenderer = (props: SettingsSectionRendererProps) => {
+  const {
+    isLocalOnlyMode,
+    cloudSyncEnabled,
+    isSyncing,
+    onOpenLocalOnlySettings,
+    onToggleCloudSync,
+    onManualSync,
+    currentUser,
+    onOpenPasswordModal,
+    onLogout,
+    onOpenResetConfirm,
+    onUpdateProfile,
+    securityManager,
+    onOpenSecuritySettings,
+    onShowLocalDataSecurity,
+    onOpenActivityFeed,
+    onExport,
+    onImport,
+    onSync,
+    onOpenEnvelopeChecker,
+    onCreateTestHistory,
+  } = props;
+
+  const renderSectionContent = (activeSection: string) => {
     switch (activeSection) {
       case "general":
         return React.createElement(GeneralSettingsSection, {
@@ -79,6 +105,9 @@ export const useSettingsSectionRenderer = ({
 
       case "notifications":
         return React.createElement(NotificationSettingsSection);
+
+      case "sync-health":
+        return React.createElement(SyncHealthDashboard);
 
       case "devtools":
         return React.createElement(DevToolsSection, {

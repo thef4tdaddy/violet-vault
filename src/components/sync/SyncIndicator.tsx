@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { renderIcon } from "../../utils/icons";
-import SyncHealthDashboard from "./SyncHealthDashboard";
+import React from "react";
+import { renderIcon } from "@/utils/icons";
 import { useSyncStatus } from "./hooks/useSyncStatus";
 import { SyncingStatus } from "./status/SyncingStatus";
 import { SyncedStatus } from "./status/SyncedStatus";
@@ -24,6 +23,7 @@ interface SyncIndicatorProps {
   currentUser?: User | null;
   syncProgress?: number | null;
   syncStage?: string | null;
+  onOpenHealthDashboard?: () => void;
 }
 
 /**
@@ -40,8 +40,8 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({
   currentUser = null,
   syncProgress = null, // GitHub Issue #576: Enhanced progress tracking
   syncStage = null, // Current sync stage (validating, encrypting, uploading, etc.)
+  onOpenHealthDashboard,
 }) => {
-  const [showHealthDashboard, setShowHealthDashboard] = useState(false);
   const { status, otherActiveUsers, healthData, formatLastSync } = useSyncStatus({
     isOnline,
     isSyncing,
@@ -111,10 +111,7 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({
         {/* Sync Status */}
         {renderStatusComponent()}
 
-        <HealthDashboardButton
-          healthData={healthData}
-          onClick={() => setShowHealthDashboard(true)}
-        />
+        <HealthDashboardButton healthData={healthData} onClick={onOpenHealthDashboard} />
 
         <ActiveUsers otherActiveUsers={otherActiveUsers} />
 
@@ -126,12 +123,6 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({
           </div>
         )}
       </div>
-
-      {/* GitHub Issue #576: Sync Health Dashboard Modal */}
-      <SyncHealthDashboard
-        isOpen={showHealthDashboard}
-        onClose={() => setShowHealthDashboard(false)}
-      />
     </div>
   );
 };
