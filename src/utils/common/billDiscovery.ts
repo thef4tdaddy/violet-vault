@@ -4,6 +4,13 @@
  */
 
 import { getBillIcon } from "./billIcons.ts";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
+
+type Envelope = DbEnvelope;
+type Bill = DbBill & {
+  provider?: string;
+  description?: string;
+};
 
 interface Transaction {
   date: string;
@@ -22,13 +29,52 @@ interface BillPattern {
   iconName?: string;
 }
 
+interface BillSuggestion {
+  id: string;
+  provider: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+  category: string;
+  frequency: string;
+  confidence: number;
+  source: string;
+  discoveryData: {
+    transactionCount: number;
+    avgInterval: number;
+    amountRange: number[];
+    lastTransactionDate: string;
+    sampleTransactions: Array<{
+      date: string;
+      amount: number;
+      description: string;
+    }>;
+  };
+  iconName?: string;
+  metadata: {
+    detectedPattern: string[];
+    confidence: number;
+    discoveryMethod: string;
+  };
+}
+
+interface EnhancedBillSuggestion extends BillSuggestion {
+  suggestedEnvelopeId?: string;
+  suggestedEnvelopeName?: string;
+  envelopeConfidence?: number;
+}
+
+interface EnvelopeMatch extends Envelope {
+  confidence: number;
+}
+
 // Constants
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 
 /**
  * Common bill patterns and their characteristics
  */
-export const BILL_PATTERNS = {
+export const BILL_PATTERNS: Record<string, BillPattern> = {
   utilities: {
     keywords: ["electric", "electricity", "power", "gas", "water", "sewer", "utility", "energy"],
     category: "Utilities",
@@ -76,8 +122,11 @@ export const BILL_PATTERNS = {
 /**
  * Analyze transactions to find potential recurring bills
  */
-export const analyzeTransactionsForBills = (transactions, existingBills = []) => {
-  const potentialBills = [];
+export const analyzeTransactionsForBills = (
+  transactions: Transaction[],
+  existingBills: Bill[] = []
+): BillSuggestion[] => {
+  const potentialBills: BillSuggestion[] = [];
   const existingBillDescriptions = new Set(
     existingBills.map((bill) => bill.description?.toLowerCase() || bill.provider?.toLowerCase())
   );
@@ -91,7 +140,7 @@ export const analyzeTransactionsForBills = (transactions, existingBills = []) =>
       continue;
     }
 
-    const billSuggestion = analyzeTransactionGroup(transactionGroup, groupKey);
+    const billSuggestion = analyzeTransactionGroup(transactionGroup as Transaction[], groupKey);
 
     if (billSuggestion && billSuggestion.confidence > 0.6) {
       potentialBills.push(billSuggestion);
@@ -105,8 +154,8 @@ export const analyzeTransactionsForBills = (transactions, existingBills = []) =>
 /**
  * Group similar transactions by normalized description
  */
-const groupSimilarTransactions = (transactions) => {
-  const groups = {};
+const groupSimilarTransactions = (transactions: Transaction[]): Record<string, Transaction[]> => {
+  const groups: Record<string, Transaction[]> = {};
 
   transactions.forEach((transaction) => {
     if (!transaction.amount || transaction.amount >= 0) return; // Only negative amounts (expenses)
@@ -121,9 +170,9 @@ const groupSimilarTransactions = (transactions) => {
   });
 
   // Only return groups with multiple transactions (indicating recurring)
-  const recurringGroups = {};
+  const recurringGroups: Record<string, Transaction[]> = {};
   for (const [key, group] of Object.entries(groups)) {
-    if ((group as unknown[]).length >= 2) {
+    if (group.length >= 2) {
       recurringGroups[key] = group;
     }
   }
@@ -134,7 +183,7 @@ const groupSimilarTransactions = (transactions) => {
 /**
  * Normalize transaction descriptions for grouping
  */
-const normalizeTransactionDescription = (description) => {
+const normalizeTransactionDescription = (description: string): string | null => {
   if (!description) return null;
 
   return description
@@ -149,7 +198,7 @@ const normalizeTransactionDescription = (description) => {
  * Calculate transaction intervals in days
  */
 const calculateTransactionIntervals = (dates: Date[]): number[] => {
-  const intervals = [];
+  const intervals: number[] = [];
   for (let i = 1; i < dates.length; i++) {
     const daysDiff = Math.abs(dates[i].getTime() - dates[i - 1].getTime()) / MILLISECONDS_PER_DAY;
     intervals.push(daysDiff);
@@ -220,7 +269,7 @@ const createBillSuggestion = (options: {
   amounts: number[];
   avgInterval: number;
   lastTransaction: Date;
-}) => {
+}): BillSuggestion => {
   const {
     groupKey,
     avgAmount,
@@ -268,7 +317,10 @@ const createBillSuggestion = (options: {
 /**
  * Analyze a group of similar transactions to determine bill characteristics
  */
-const analyzeTransactionGroup = (transactions, groupKey) => {
+const analyzeTransactionGroup = (
+  transactions: Transaction[],
+  groupKey: string
+): BillSuggestion | null => {
   if (transactions.length < 2) return null;
 
   // Calculate transaction frequency
@@ -318,7 +370,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
 /**
  * Detect bill pattern from transaction description
  */
-const detectBillPattern = (description) => {
+const detectBillPattern = (description: string): BillPattern | null => {
   const lowerDesc = description.toLowerCase();
 
   for (const [patternName, pattern] of Object.entries(BILL_PATTERNS)) {
@@ -340,7 +392,11 @@ const detectBillPattern = (description) => {
 /**
  * Generate smart bill suggestions based on existing data
  */
-export const generateBillSuggestions = (transactions, bills, envelopes) => {
+export const generateBillSuggestions = (
+  transactions: Transaction[],
+  bills: Bill[],
+  envelopes: Envelope[]
+): EnhancedBillSuggestion[] => {
   const discoveredBills = analyzeTransactionsForBills(transactions, bills);
 
   // Enhance suggestions with envelope recommendations
@@ -359,10 +415,13 @@ export const generateBillSuggestions = (transactions, bills, envelopes) => {
 };
 
 /**
- * Find the best matching envelope for a discovered bill
+ * Find best matching envelope for a discovered bill
  */
-const findBestEnvelopeForBill = (bill, envelopes) => {
-  let bestMatch = null;
+const findBestEnvelopeForBill = (
+  bill: BillSuggestion,
+  envelopes: Envelope[]
+): EnvelopeMatch | null => {
+  let bestMatch: EnvelopeMatch | null = null;
   let highestScore = 0;
 
   for (const envelope of envelopes) {

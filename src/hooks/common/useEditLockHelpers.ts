@@ -1,4 +1,5 @@
 import logger from "../../utils/common/logger";
+import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
 
 interface EditLockServiceUser {
   id?: string;
@@ -6,12 +7,24 @@ interface EditLockServiceUser {
   userName?: string;
 }
 
-interface LockDocument {
-  userId?: string;
-  userName?: string;
-  expiresAt?: number;
-  [key: string]: unknown;
-}
+type LockDocument = ServiceLockDocument;
+
+type ExpirationInput = number | string | Date | { toDate: () => Date };
+
+const resolveExpirationDate = (expiresAt?: ExpirationInput): Date | undefined => {
+  if (!expiresAt) return undefined;
+  if (expiresAt instanceof Date) return expiresAt;
+  if (typeof expiresAt === "number") return new Date(expiresAt);
+  if (typeof expiresAt === "string") return new Date(expiresAt);
+  if (
+    typeof expiresAt === "object" &&
+    "toDate" in expiresAt &&
+    typeof expiresAt.toDate === "function"
+  ) {
+    return expiresAt.toDate();
+  }
+  return undefined;
+};
 
 /**
  * Get current user ID with fallback logic
@@ -37,27 +50,24 @@ export function isOwnLock(lockDoc: LockDocument | null, currentUserId: string): 
  */
 export function isLockExpired(lock: LockDocument | null): boolean {
   if (!lock?.expiresAt) return false;
-  const expiireDate =
-    typeof lock.expiresAt === "number" ? new Date(lock.expiresAt) : new Date(lock.expiresAt);
-  return expiireDate <= new Date();
+  const expiryDate = resolveExpirationDate(lock.expiresAt);
+  return expiryDate ? expiryDate <= new Date() : false;
 }
 
 /**
  * Convert lock expiration to Date object
  */
-export function getLockExpiresDate(expiresAt?: number | string | Date): Date | undefined {
-  if (!expiresAt) return undefined;
-  if (typeof expiresAt === "number") return new Date(expiresAt);
-  return new Date(expiresAt);
+export function getLockExpiresDate(expiresAt?: ExpirationInput): Date | undefined {
+  return resolveExpirationDate(expiresAt);
 }
 
 /**
  * Calculate time remaining in milliseconds
  */
-export function calculateTimeRemaining(expiresAt?: number | string | Date): number {
-  if (!expiresAt) return 0;
-  const expiireTime = typeof expiresAt === "number" ? expiresAt : new Date(expiresAt).getTime();
-  return Math.max(0, expiireTime - new Date().getTime());
+export function calculateTimeRemaining(expiresAt?: ExpirationInput): number {
+  const expiryDate = resolveExpirationDate(expiresAt);
+  if (!expiryDate) return 0;
+  return Math.max(0, expiryDate.getTime() - Date.now());
 }
 
 /**

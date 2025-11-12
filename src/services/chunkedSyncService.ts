@@ -74,7 +74,9 @@ function bytesFromBase64(str: string): Uint8Array {
     }
     return bytes;
   } catch (error) {
-    throw new Error(`Failed to decode base64 string (length: ${str.length}): ${error.message}`);
+    logger.error("Failed to decode base64 string", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to decode base64 string (length: ${str.length}): ${errorMessage}`);
   }
 }
 
@@ -141,13 +143,17 @@ class ChunkedSyncService implements IChunkedSyncService {
    * Get database reference
    */
   _getDb() {
-    return getFirestore(firebaseSyncService.app);
+    const app = firebaseSyncService.app;
+    if (!app) {
+      throw new Error("Firebase app not initialized");
+    }
+    return getFirestore(app);
   }
 
   /**
    * Safe JSON stringify with error handling
    */
-  safeStringify(data) {
+  safeStringify(data: unknown) {
     try {
       return JSON.stringify(data, (_key, value) => {
         if (value === undefined) return null;
@@ -165,7 +171,7 @@ class ChunkedSyncService implements IChunkedSyncService {
    * Calculate estimated compressed data size in bytes
    * Uses compression analysis to get realistic size estimates
    */
-  async calculateSize(data) {
+  async calculateSize(data: unknown) {
     try {
       // Dynamic import for optimization utilities
       const { optimizedSerialization } = await import(
@@ -197,12 +203,12 @@ class ChunkedSyncService implements IChunkedSyncService {
   /**
    * Chunk large arrays into smaller pieces
    */
-  async chunkArray(array, arrayName) {
+  async chunkArray(array: unknown, arrayName: string): Promise<Record<string, unknown>> {
     if (!Array.isArray(array)) {
       return { [arrayName]: array };
     }
 
-    const chunks = {};
+    const chunks: Record<string, unknown> = {};
     const totalItems = array.length;
 
     if (totalItems === 0) {
@@ -236,7 +242,7 @@ class ChunkedSyncService implements IChunkedSyncService {
   /**
    * Generate consistent chunk ID
    */
-  generateChunkId(arrayName, chunkIndex) {
+  generateChunkId(arrayName: string, chunkIndex: number): string {
     return `${arrayName}_chunk_${chunkIndex.toString().padStart(3, "0")}`;
   }
 
@@ -244,7 +250,7 @@ class ChunkedSyncService implements IChunkedSyncService {
    * Create manifest with chunk information and validation checksums
    * GitHub Issue #576 Phase 1: Enhanced data validation
    */
-  async createManifest(chunkMap, metadata = {}) {
+  async createManifest(chunkMap: Record<string, unknown>, metadata: Record<string, unknown> = {}) {
     const manifest = {
       version: "2.0",
       timestamp: Date.now(),
@@ -337,19 +343,24 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Identify large arrays to chunk
         logger.debug("🚀 [CHUNKED SYNC] Processing data for chunking");
-        const chunkedData = {};
-        const chunkMap = {};
+        const chunkedData: Record<string, unknown> = {};
+        const chunkMap: Record<string, unknown> = {};
 
-        for (const [key, value] of Object.entries(data)) {
-          if (Array.isArray(value) && value.length > 100) {
-            logger.debug(`🚀 [CHUNKED SYNC] Chunking large array: ${key} (${value.length} items)`);
-            // Chunk large arrays
-            const arrayChunks = await this.chunkArray(value, key);
-            Object.assign(chunkMap, arrayChunks);
-            chunkedData[key] = { _chunked: true, _originalSize: value.length };
-          } else {
-            // Keep small data in main document
-            chunkedData[key] = value;
+        // Ensure data is an object before using Object.entries
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+          for (const [key, value] of Object.entries(data)) {
+            if (Array.isArray(value) && value.length > 100) {
+              logger.debug(
+                `🚀 [CHUNKED SYNC] Chunking large array: ${key} (${value.length} items)`
+              );
+              // Chunk large arrays
+              const arrayChunks = await this.chunkArray(value, key);
+              Object.assign(chunkMap, arrayChunks);
+              chunkedData[key] = { _chunked: true, _originalSize: value.length };
+            } else {
+              // Keep small data in main document
+              chunkedData[key] = value;
+            }
           }
         }
         logger.debug(
@@ -360,7 +371,8 @@ class ChunkedSyncService implements IChunkedSyncService {
         const manifest = await this.createManifest(chunkMap, {
           userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
           userAgent: navigator.userAgent,
-          originalKeys: Object.keys(data),
+          originalKeys:
+            data && typeof data === "object" && !Array.isArray(data) ? Object.keys(data) : [],
         });
 
         // Encrypt and save manifest with optimization
@@ -395,9 +407,15 @@ class ChunkedSyncService implements IChunkedSyncService {
             version: "2.0",
             lastSync: Date.now(),
             userId: userObj?.budgetId || userObj?.uid || userObj?.id || "anonymous",
-            chunkedKeys: Object.keys(data).filter(
-              (key) => Array.isArray(data[key]) && data[key].length > 100
-            ),
+            chunkedKeys:
+              data && typeof data === "object" && !Array.isArray(data)
+                ? Object.keys(data).filter(
+                    (key) =>
+                      Array.isArray((data as Record<string, unknown>)[key]) &&
+                      Array.isArray((data as Record<string, unknown>)[key]) &&
+                      ((data as Record<string, unknown>)[key] as unknown[]).length > 100
+                  )
+                : [],
           },
         };
 
@@ -568,14 +586,15 @@ class ChunkedSyncService implements IChunkedSyncService {
             );
           } catch (decryptError) {
             logger.error("❌ Failed to decrypt manifest - may be corrupted or key mismatch", {
-              error: decryptError.message,
-              errorType: decryptError.name,
-              budgetId: this.budgetId.substring(0, 8) + "...",
+              error: decryptError instanceof Error ? decryptError.message : String(decryptError),
+              errorType:
+                decryptError instanceof Error ? decryptError.name : String(typeof decryptError),
+              budgetId: this.budgetId?.substring(0, 8) + "...",
             });
 
             // NEVER automatically clear data - this is too destructive and causes data loss
             // Smart detection: avoid repeatedly trying to decrypt the same bad data
-            const errorSignature = `${this.budgetId}_${decryptError.message}`;
+            const errorSignature = `${this.budgetId}_${decryptError instanceof Error ? decryptError.message : String(decryptError)}`;
             const now = Date.now();
 
             // Track failed decryption attempts to avoid repeated attempts
@@ -677,8 +696,14 @@ class ChunkedSyncService implements IChunkedSyncService {
             } catch (chunkDecryptError) {
               logger.error("❌ Failed to decrypt chunk - skipping corrupted chunk", {
                 chunkId: chunkData.chunkId,
-                error: chunkDecryptError.message,
-                errorType: chunkDecryptError.name,
+                error:
+                  chunkDecryptError instanceof Error
+                    ? chunkDecryptError.message
+                    : String(chunkDecryptError),
+                errorType:
+                  chunkDecryptError instanceof Error
+                    ? chunkDecryptError.name
+                    : String(typeof chunkDecryptError),
               });
               // Skip this chunk but continue with others
               continue;
@@ -711,10 +736,13 @@ class ChunkedSyncService implements IChunkedSyncService {
         logger.info("✅ Chunked load completed successfully", {
           duration: `${duration}ms`,
           keys: Object.keys(reconstructedData),
-          dataStructure: Object.entries(reconstructedData).reduce((acc, [key, value]) => {
-            acc[key] = Array.isArray(value) ? `array[${value.length}]` : typeof value;
-            return acc;
-          }, {}),
+          dataStructure: Object.entries(reconstructedData).reduce(
+            (acc, [key, value]) => {
+              acc[key] = Array.isArray(value) ? `array[${value.length}]` : typeof value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
 
         return reconstructedData;

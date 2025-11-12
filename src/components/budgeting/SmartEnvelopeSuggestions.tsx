@@ -5,9 +5,59 @@ import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
 import { globalToast } from "../../stores/ui/toastStore";
+import type { Envelope, Transaction } from "../../db/types";
+import type { Suggestion } from "@/utils/budgeting/suggestionUtils";
+
+interface IconBadgeProps {
+  isCollapsed: boolean;
+}
+
+interface SuggestionBadgeProps {
+  count: number;
+  hasSuggestions: boolean;
+}
+
+interface SettingsButtonProps {
+  onClick: () => void;
+}
+
+interface SuggestionsHeaderProps {
+  isCollapsed: boolean;
+  toggleCollapse: () => void;
+  hasSuggestions: boolean;
+  suggestions: Suggestion[];
+  toggleSettings: () => void;
+}
+
+interface CollapsedViewProps {
+  suggestions: Suggestion[];
+}
+
+interface ExpandedViewProps {
+  showSettings: boolean;
+  analysisSettings: unknown;
+  updateAnalysisSettings: (settings: unknown) => void;
+  resetAnalysisSettings: () => void;
+  refreshSuggestions: () => void;
+  suggestionStats: unknown;
+  suggestions: Suggestion[];
+  handleApplySuggestion: (suggestion: unknown) => void;
+  handleDismissSuggestion: (suggestion: unknown) => void;
+}
+
+interface SmartEnvelopeSuggestionsProps {
+  transactions?: Transaction[];
+  envelopes?: Envelope[];
+  onCreateEnvelope: (envelope: Partial<Envelope>) => void;
+  onUpdateEnvelope: (envelope: Envelope) => void;
+  onDismissSuggestion: (suggestion: unknown) => void;
+  dateRange?: string;
+  showDismissed?: boolean;
+  className?: string;
+}
 
 // Icon badge component
-const IconBadge = ({ isCollapsed }) => (
+const IconBadge = ({ isCollapsed }: IconBadgeProps) => (
   <div className={`relative ${isCollapsed ? "mr-2" : "mr-3"}`}>
     <div className="absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30"></div>
     <div className={`relative bg-amber-500 rounded-xl ${isCollapsed ? "p-1.5" : "p-2"}`}>
@@ -19,7 +69,7 @@ const IconBadge = ({ isCollapsed }) => (
 );
 
 // Suggestion count badge
-const SuggestionBadge = ({ count, hasSuggestions }) => {
+const SuggestionBadge = ({ count, hasSuggestions }: SuggestionBadgeProps) => {
   if (!hasSuggestions) return null;
 
   return (
@@ -30,7 +80,7 @@ const SuggestionBadge = ({ count, hasSuggestions }) => {
 };
 
 // Settings button component
-const SettingsButton = ({ onClick }) => {
+const SettingsButton = ({ onClick }: SettingsButtonProps) => {
   return (
     <Button onClick={onClick} variant="icon" size="sm" title="Settings">
       {React.createElement(getIcon("Settings"), {
@@ -47,7 +97,7 @@ const SuggestionsHeader = ({
   hasSuggestions,
   suggestions,
   toggleSettings,
-}) => (
+}: SuggestionsHeaderProps) => (
   <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
     <Button
       onClick={toggleCollapse}
@@ -75,7 +125,7 @@ const SuggestionsHeader = ({
 );
 
 // Collapsed view component
-const CollapsedView = ({ suggestions }) => {
+const CollapsedView = ({ suggestions }: CollapsedViewProps) => {
   const hasHighPriority = suggestions.some((s) => s.priority === "high");
   const suggestionText =
     suggestions.length === 0
@@ -109,7 +159,7 @@ const ExpandedView = ({
   suggestions,
   handleApplySuggestion,
   handleDismissSuggestion,
-}) => (
+}: ExpandedViewProps) => (
   <>
     {showSettings && (
       <div className="mb-6">
@@ -140,7 +190,7 @@ const SmartEnvelopeSuggestions = ({
   dateRange = "6months",
   showDismissed = false,
   className = "",
-}) => {
+}: SmartEnvelopeSuggestionsProps) => {
   const {
     suggestions,
     analysisSettings,
@@ -191,6 +241,7 @@ const SmartEnvelopeSuggestions = ({
 
   // When has suggestions, show full container
   const containerPadding = effectiveIsCollapsed ? "p-3" : "p-6";
+  const typedSuggestions = suggestions as Suggestion[];
 
   return (
     <div
@@ -200,12 +251,12 @@ const SmartEnvelopeSuggestions = ({
         isCollapsed={effectiveIsCollapsed}
         toggleCollapse={toggleCollapse}
         hasSuggestions={hasSuggestions}
-        suggestions={suggestions}
+        suggestions={typedSuggestions}
         toggleSettings={toggleSettings}
       />
 
       {effectiveIsCollapsed ? (
-        <CollapsedView suggestions={suggestions} />
+        <CollapsedView suggestions={typedSuggestions} />
       ) : (
         <ExpandedView
           showSettings={showSettings}
@@ -214,7 +265,7 @@ const SmartEnvelopeSuggestions = ({
           resetAnalysisSettings={resetAnalysisSettings}
           refreshSuggestions={refreshSuggestions}
           suggestionStats={suggestionStats}
-          suggestions={suggestions}
+          suggestions={typedSuggestions}
           handleApplySuggestion={handleApplySuggestion}
           handleDismissSuggestion={handleDismissSuggestion}
         />

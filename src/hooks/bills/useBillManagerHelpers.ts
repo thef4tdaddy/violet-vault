@@ -20,6 +20,10 @@ interface BillRecord {
   category?: string;
   dueDate: Date | string | null;
   metadata?: Record<string, unknown>;
+  isPaid?: boolean;
+  isRecurring?: boolean;
+  lastModified?: number;
+  envelopeId?: string;
   [key: string]: unknown;
 }
 
@@ -30,6 +34,8 @@ interface TransactionRecord {
   isBill?: boolean;
   type?: string;
   category?: string;
+  description?: string;
+  envelopeId?: string;
   [key: string]: unknown;
 }
 
@@ -53,6 +59,9 @@ export const resolveTransactions = (
 interface Envelope {
   id: string;
   name: string;
+  category?: string;
+  archived?: boolean;
+  lastModified?: number;
   [key: string]: unknown;
 }
 
@@ -316,9 +325,62 @@ export const discoverNewBills = async (
   envelopes: Envelope[],
   onSearchNewBills?: () => void | Promise<void>
 ): Promise<BillRecord[]> => {
-  const suggestions = generateBillSuggestions(transactions, bills, envelopes);
+  const normalizedTransactions = transactions.map((txn) => ({
+    id: String(txn.id),
+    date: txn.date instanceof Date ? txn.date.toISOString().split("T")[0] : String(txn.date),
+    amount: Number(txn.amount || 0),
+    description: typeof txn.description === "string" ? txn.description : "",
+    category: typeof txn.category === "string" ? txn.category : "uncategorized",
+    envelopeId: typeof txn.envelopeId === "string" ? txn.envelopeId : "",
+    type:
+      txn.type === "income" || txn.type === "expense" || txn.type === "transfer"
+        ? txn.type
+        : txn.amount >= 0
+          ? "income"
+          : "expense",
+  }));
+
+  const normalizedBills = bills.map((bill) => ({
+    id: String(bill.id),
+    name: bill.name,
+    dueDate:
+      bill.dueDate instanceof Date
+        ? bill.dueDate
+        : bill.dueDate
+          ? new Date(bill.dueDate)
+          : new Date(),
+    amount: Number(bill.amount || 0),
+    category: bill.category || "other",
+    isPaid: Boolean(bill.isPaid),
+    isRecurring: Boolean(bill.isRecurring),
+    envelopeId: bill.envelopeId ? String(bill.envelopeId) : undefined,
+    lastModified: typeof bill.lastModified === "number" ? bill.lastModified : Date.now(),
+  }));
+
+  const normalizedEnvelopes = envelopes.map((envelope) => ({
+    id: String(envelope.id),
+    name: String(envelope.name || "Envelope"),
+    category: envelope.category || "uncategorized",
+    archived: Boolean(envelope.archived),
+    lastModified: typeof envelope.lastModified === "number" ? envelope.lastModified : Date.now(),
+  }));
+
+  const suggestions = generateBillSuggestions(
+    normalizedTransactions as Parameters<typeof generateBillSuggestions>[0],
+    normalizedBills as Parameters<typeof generateBillSuggestions>[1],
+    normalizedEnvelopes as Parameters<typeof generateBillSuggestions>[2]
+  );
   await onSearchNewBills?.();
-  return suggestions;
+  return suggestions.map((suggestion) => ({
+    id: suggestion.id,
+    name: suggestion.provider || suggestion.description || "Suggested Bill",
+    amount: suggestion.amount,
+    category: suggestion.category,
+    dueDate: suggestion.dueDate,
+    metadata: {
+      suggestion,
+    },
+  }));
 };
 
 /**

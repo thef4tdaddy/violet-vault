@@ -2,6 +2,67 @@
 import { budgetDb } from "../db/budgetDb";
 import { encryptionUtils } from "../utils/security/encryption";
 import logger from "../utils/common/logger";
+import type { BudgetCommit, BudgetChange, BudgetTag } from "../db/types";
+
+// Define proper types for the service
+interface CommitOptions {
+  entityType: string;
+  entityId?: string | null;
+  changeType: "create" | "update" | "delete" | "modify";
+  description: string;
+  beforeData: unknown;
+  afterData: unknown;
+  author?: string;
+  deviceFingerprint?: string | null;
+  parentHash?: string | null;
+}
+
+interface UnassignedCashOptions {
+  previousAmount: number;
+  newAmount: number;
+  author?: string;
+  source?: string;
+}
+
+interface ActualBalanceOptions {
+  previousBalance: number;
+  newBalance: number;
+  isManual?: boolean;
+  author?: string;
+}
+
+interface DebtChangeOptions {
+  debtId: string;
+  changeType: "add" | "modify" | "delete";
+  previousData: Record<string, unknown>;
+  newData: Record<string, unknown>;
+  author?: string;
+}
+
+interface BranchOptions {
+  fromCommitHash: string;
+  branchName: string;
+  description?: string;
+  author?: string;
+}
+
+interface TagOptions {
+  commitHash: string;
+  tagName: string;
+  description?: string;
+  tagType?: "release" | "milestone" | "backup";
+  author?: string;
+}
+
+interface ChangePatterns {
+  totalChanges: number;
+  changesByType: Record<string, number>;
+  changesByEntity: Record<string, number>;
+  authorActivity: Record<string, number>;
+  dailyActivity: Record<string, number>;
+  mostActiveHour: string | null;
+  averageChangesPerDay: number;
+}
 
 /**
  * Budget History Service
@@ -22,7 +83,7 @@ class BudgetHistoryService {
   /**
    * Initialize history service
    */
-  async initialize() {
+  async initialize(): Promise<boolean> {
     try {
       logger.info("Budget history service initialized");
       return true;
@@ -35,7 +96,9 @@ class BudgetHistoryService {
   /**
    * Create a budget history commit
    */
-  async createCommit(options) {
+  async createCommit(
+    options: CommitOptions
+  ): Promise<{ commit: BudgetCommit; changes: BudgetChange[] }> {
     const {
       entityType,
       entityId = null,
@@ -68,34 +131,25 @@ class BudgetHistoryService {
       // Generate commit hash
       const hash = encryptionUtils.generateHash(JSON.stringify(commitData));
 
-      // Create snapshot of the change
-      const snapshot = {
-        [entityType]: {
-          [entityId || "main"]: afterData,
-        },
-        timestamp,
-      };
-
       // Create commit record
-      const commit = {
+      const commit: BudgetCommit = {
         hash,
         timestamp,
         message: description,
         author,
-        parentHash,
-        snapshotData: JSON.stringify(snapshot),
+        parentHash: parentHash || undefined,
         deviceFingerprint: fingerprint,
       };
 
       // Create change record
-      const change = {
+      const change: BudgetChange = {
         commitHash: hash,
         entityType,
         entityId: entityId || "main",
-        changeType,
+        changeType: changeType as "create" | "update" | "delete", // Cast to the expected type
         description,
-        beforeData,
-        afterData,
+        oldValue: beforeData,
+        newValue: afterData,
       };
 
       // Save to database
@@ -119,7 +173,7 @@ class BudgetHistoryService {
   /**
    * Track unassigned cash changes
    */
-  async trackUnassignedCashChange(options) {
+  async trackUnassignedCashChange(options: UnassignedCashOptions) {
     const { previousAmount, newAmount, author = "Unknown User", source = "manual" } = options;
 
     const description =
@@ -141,7 +195,7 @@ class BudgetHistoryService {
   /**
    * Track actual balance changes
    */
-  async trackActualBalanceChange(options) {
+  async trackActualBalanceChange(options: ActualBalanceOptions) {
     const { previousBalance, newBalance, isManual = true, author = "Unknown User" } = options;
 
     const source = isManual ? "manual entry" : "automatic calculation";
@@ -161,33 +215,33 @@ class BudgetHistoryService {
   /**
    * Track debt changes
    */
-  async trackDebtChange(options) {
+  async trackDebtChange(options: DebtChangeOptions) {
     const { debtId, changeType, previousData, newData, author = "Unknown User" } = options;
 
     let description = "";
 
     switch (changeType) {
       case "add":
-        description = `Added new debt: ${newData.name} (${this._formatCurrency(newData.currentBalance)})`;
+        description = `Added new debt: ${newData.name as string} (${this._formatCurrency(newData.currentBalance as number)})`;
         break;
       case "modify":
         if (previousData.currentBalance !== newData.currentBalance) {
-          description = `Updated ${newData.name} balance from ${this._formatCurrency(previousData.currentBalance)} to ${this._formatCurrency(newData.currentBalance)}`;
+          description = `Updated ${newData.name as string} balance from ${this._formatCurrency(previousData.currentBalance as number)} to ${this._formatCurrency(newData.currentBalance as number)}`;
         } else {
-          description = `Updated debt: ${newData.name}`;
+          description = `Updated debt: ${newData.name as string}`;
         }
         break;
       case "delete":
-        description = `Deleted debt: ${previousData.name}`;
+        description = `Deleted debt: ${previousData.name as string}`;
         break;
       default:
-        description = `Modified debt: ${newData?.name || previousData?.name}`;
+        description = `Modified debt: ${(newData?.name as string) || (previousData?.name as string)}`;
     }
 
     return await this.createCommit({
       entityType: "debt",
       entityId: debtId,
-      changeType,
+      changeType: changeType === "add" ? "create" : changeType, // Convert "add" to "create" for the database
       description,
       beforeData: previousData,
       afterData: newData,
@@ -198,7 +252,7 @@ class BudgetHistoryService {
   /**
    * Get recent changes for specific entity type
    */
-  async getRecentChanges(entityType, limit = 10) {
+  async getRecentChanges(entityType: string, limit = 10): Promise<BudgetChange[]> {
     try {
       const changes = await budgetDb.budgetChanges
         .where("entityType")
@@ -217,12 +271,15 @@ class BudgetHistoryService {
   /**
    * Get full history for specific entity
    */
-  async getEntityHistory(entityType, entityId = null) {
+  async getEntityHistory(
+    entityType: string,
+    entityId: string | null = null
+  ): Promise<BudgetChange[]> {
     try {
       let query = budgetDb.budgetChanges.where("entityType").equals(entityType);
 
       if (entityId) {
-        query = query.and((change) => change.entityId === entityId);
+        query = query.and((change: BudgetChange) => change.entityId === entityId);
       }
 
       const changes = await query.reverse().toArray();
@@ -236,7 +293,7 @@ class BudgetHistoryService {
   /**
    * Get recent activity across all tracked entities
    */
-  async getRecentActivity(limit = 20) {
+  async getRecentActivity(limit = 20): Promise<BudgetChange[]> {
     try {
       const changes = await budgetDb.budgetChanges
         .where("entityType")
@@ -255,7 +312,7 @@ class BudgetHistoryService {
   /**
    * Branch Management
    */
-  async createBranch(options) {
+  async createBranch(options: BranchOptions) {
     const { fromCommitHash, branchName, description = "", author = "Unknown User" } = options;
 
     try {
@@ -302,7 +359,7 @@ class BudgetHistoryService {
     }
   }
 
-  async switchBranch(branchName) {
+  async switchBranch(branchName: string): Promise<boolean> {
     try {
       // Deactivate current branch
       // Note: Dexie requires IndexableType, so we cast true to 1 for boolean index queries
@@ -342,7 +399,7 @@ class BudgetHistoryService {
   /**
    * Tag Management
    */
-  async createTag(options) {
+  async createTag(options: TagOptions) {
     const {
       commitHash,
       tagName,
@@ -366,7 +423,7 @@ class BudgetHistoryService {
         throw new Error(`Commit '${commitHash}' not found`);
       }
 
-      const tag = {
+      const tag: BudgetTag = {
         name: tagName,
         description,
         commitHash,
@@ -403,7 +460,7 @@ class BudgetHistoryService {
   /**
    * Security and Device Management
    */
-  async signCommit(commitData, deviceFingerprint) {
+  async signCommit(commitData: Record<string, unknown>, deviceFingerprint: string) {
     try {
       const signaturePayload = {
         ...commitData,
@@ -416,7 +473,7 @@ class BudgetHistoryService {
       );
 
       const isDeviceConsistent = await this.verifyDeviceConsistency(
-        commitData.author,
+        commitData.author as string,
         deviceFingerprint
       );
 
@@ -432,7 +489,7 @@ class BudgetHistoryService {
     }
   }
 
-  async verifyDeviceConsistency(author, currentFingerprint) {
+  async verifyDeviceConsistency(author: string, currentFingerprint: string): Promise<boolean> {
     try {
       const recentCommits = await budgetDb.budgetCommits
         .where("author")
@@ -445,18 +502,29 @@ class BudgetHistoryService {
         return true; // First commit from this author
       }
 
-      const knownFingerprints = [
-        ...new Set(recentCommits.map((c) => c.deviceFingerprint).filter((f) => f && f !== "")),
-      ];
+      const knownFingerprints: string[] = [];
+      recentCommits.forEach((c: BudgetCommit) => {
+        if (c.deviceFingerprint && c.deviceFingerprint !== "") {
+          knownFingerprints.push(c.deviceFingerprint);
+        }
+      });
 
-      if (knownFingerprints.length <= this.maxDevicesPerAuthor) {
+      // Remove duplicates using a simple loop instead of Set
+      const uniqueFingerprints: string[] = [];
+      knownFingerprints.forEach((f: string) => {
+        if (!uniqueFingerprints.includes(f)) {
+          uniqueFingerprints.push(f);
+        }
+      });
+
+      if (uniqueFingerprints.length <= this.maxDevicesPerAuthor) {
         return (
-          knownFingerprints.includes(currentFingerprint) ||
-          knownFingerprints.length < this.maxDevicesPerAuthor
+          uniqueFingerprints.includes(currentFingerprint) ||
+          uniqueFingerprints.length < this.maxDevicesPerAuthor
         );
       }
 
-      return knownFingerprints.includes(currentFingerprint);
+      return uniqueFingerprints.includes(currentFingerprint);
     } catch (error) {
       logger.error("Failed to verify device consistency", error);
       return false;
@@ -466,7 +534,7 @@ class BudgetHistoryService {
   /**
    * Analytics and Patterns
    */
-  async getChangePatterns(timeRangeMs = this.defaultAnalysisRange) {
+  async getChangePatterns(timeRangeMs = this.defaultAnalysisRange): Promise<ChangePatterns | null> {
     try {
       const cutoffTime = Date.now() - timeRangeMs;
 
@@ -475,10 +543,19 @@ class BudgetHistoryService {
         budgetDb.budgetCommits.where("timestamp").above(cutoffTime).toArray(),
       ]);
 
-      const commitHashes = new Set(commits.map((c) => c.hash));
-      const recentChanges = changes.filter((c) => commitHashes.has(c.commitHash));
+      const commitHashes: string[] = [];
+      commits.forEach((c: BudgetCommit) => {
+        commitHashes.push(c.hash);
+      });
 
-      const patterns = {
+      const recentChanges: BudgetChange[] = [];
+      changes.forEach((c: BudgetChange) => {
+        if (commitHashes.includes(c.commitHash)) {
+          recentChanges.push(c);
+        }
+      });
+
+      const patterns: ChangePatterns = {
         totalChanges: recentChanges.length,
         changesByType: {},
         changesByEntity: {},
@@ -489,7 +566,7 @@ class BudgetHistoryService {
       };
 
       // Analyze change patterns
-      recentChanges.forEach((change) => {
+      recentChanges.forEach((change: BudgetChange) => {
         patterns.changesByType[change.changeType] =
           (patterns.changesByType[change.changeType] || 0) + 1;
         patterns.changesByEntity[change.entityType] =
@@ -497,12 +574,12 @@ class BudgetHistoryService {
       });
 
       // Author activity
-      commits.forEach((commit) => {
+      commits.forEach((commit: BudgetCommit) => {
         patterns.authorActivity[commit.author] = (patterns.authorActivity[commit.author] || 0) + 1;
       });
 
       // Daily activity
-      commits.forEach((commit) => {
+      commits.forEach((commit: BudgetCommit) => {
         const date = new Date(commit.timestamp).toDateString();
         patterns.dailyActivity[date] = (patterns.dailyActivity[date] || 0) + 1;
       });
@@ -512,16 +589,19 @@ class BudgetHistoryService {
       patterns.averageChangesPerDay = days > 0 ? recentChanges.length / days : 0;
 
       // Most active hour
-      const hourCounts = {};
-      commits.forEach((commit) => {
-        const hour = new Date(commit.timestamp).getHours();
+      const hourCounts: Record<string, number> = {};
+      commits.forEach((commit: BudgetCommit) => {
+        const hour = new Date(commit.timestamp).getHours().toString();
         hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       });
 
-      patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
-        null
-      );
+      const hourKeys = Object.keys(hourCounts);
+      if (hourKeys.length > 0) {
+        patterns.mostActiveHour = hourKeys.reduce(
+          (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
+          hourKeys[0]
+        );
+      }
 
       return patterns;
     } catch (error) {
@@ -533,7 +613,7 @@ class BudgetHistoryService {
   /**
    * Utility methods
    */
-  _formatCurrency(amount) {
+  _formatCurrency(amount: number): string {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -554,7 +634,7 @@ class BudgetHistoryService {
   /**
    * Cleanup old commits to maintain performance
    */
-  async cleanup() {
+  async cleanup(): Promise<void> {
     try {
       const totalCommits = await budgetDb.budgetCommits.count();
 
@@ -564,7 +644,10 @@ class BudgetHistoryService {
           .limit(totalCommits - this.maxRecentCommits)
           .toArray();
 
-        const oldHashes = oldCommits.map((c) => c.hash);
+        const oldHashes: string[] = [];
+        oldCommits.forEach((c: BudgetCommit) => {
+          oldHashes.push(c.hash);
+        });
 
         // Clean up old commits and related changes
         await Promise.all([

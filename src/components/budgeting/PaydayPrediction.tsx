@@ -2,6 +2,9 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
+import type { PaydayPrediction as PaydayPredictionType } from "../../utils/budgeting/paydayPredictor";
+
+type FormattedPrediction = ReturnType<typeof formatPaydayPrediction>;
 
 // Helper functions moved outside component
 const getConfidenceColor = (confidence: number): string => {
@@ -17,7 +20,7 @@ const getUrgencyStyle = (daysUntil: number): string => {
   return "bg-gray-50 border-gray-200";
 };
 
-const getPaydayIcon = (daysUntil: number) => {
+const getPaydayIcon = (daysUntil: number): React.ReactElement => {
   if (daysUntil === 0) {
     return React.createElement(getIcon("Calendar"), {
       className: "h-5 w-5 text-purple-600",
@@ -45,7 +48,12 @@ const getColorClasses = (baseColor: string) => ({
 });
 
 // Sub-component: Confidence Bar
-const ConfidenceBar = ({ confidence, confidenceColor }) => {
+interface ConfidenceBarProps {
+  confidence: number;
+  confidenceColor: string;
+}
+
+const ConfidenceBar = ({ confidence, confidenceColor }: ConfidenceBarProps) => {
   const colors = getColorClasses(confidenceColor);
   return (
     <div className="flex items-center text-xs">
@@ -64,7 +72,19 @@ const ConfidenceBar = ({ confidence, confidenceColor }) => {
 };
 
 // Sub-component: Prediction Header
-const PredictionHeader = ({ prediction, daysUntil, formattedPrediction, confidenceColor }) => (
+interface PredictionHeaderProps {
+  prediction: PaydayPredictionType;
+  daysUntil: number;
+  formattedPrediction: FormattedPrediction;
+  confidenceColor: string;
+}
+
+const PredictionHeader = ({
+  prediction,
+  daysUntil,
+  formattedPrediction,
+  confidenceColor,
+}: PredictionHeaderProps) => (
   <div className="flex items-start justify-between">
     <div className="flex items-start space-x-3">
       <div className="flex-shrink-0 mt-0.5">{getPaydayIcon(daysUntil)}</div>
@@ -72,12 +92,10 @@ const PredictionHeader = ({ prediction, daysUntil, formattedPrediction, confiden
         <h4 className="font-semibold text-gray-900 text-sm">Next Payday Prediction</h4>
         <p className="text-sm text-gray-700 mt-1">{formattedPrediction.displayText}</p>
         <div className="flex items-center space-x-4 mt-2">
-          <div className="flex items-center text-xs text-gray-600">
-            <span className="font-medium">Pattern:</span>
-            <span className="ml-1">{prediction.pattern}</span>
-          </div>
-          <ConfidenceBar confidence={prediction.confidence} confidenceColor={confidenceColor} />
+          <span className="font-medium text-gray-600">Pattern:</span>
+          <span className="ml-1">{prediction.pattern}</span>
         </div>
+        <ConfidenceBar confidence={prediction.confidence} confidenceColor={confidenceColor} />
       </div>
     </div>
     {prediction.confidence < 60 && (
@@ -91,46 +109,26 @@ const PredictionHeader = ({ prediction, daysUntil, formattedPrediction, confiden
   </div>
 );
 
-const PaydayPrediction = ({
-  prediction,
-  className = "",
-  onProcessPaycheck,
-  onPrepareEnvelopes,
-}) => {
-  if (!prediction || !prediction.nextPayday) {
-    return null;
-  }
-
-  const formattedPrediction = formatPaydayPrediction(prediction);
-  const daysUntil = getDaysUntilPayday(prediction);
-  const showProactiveSuggestions = daysUntil <= 3 && daysUntil >= 0;
-  const confidenceColor = getConfidenceColor(prediction.confidence);
-
-  return (
-    <div
-      className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle(daysUntil)} ${className}`}
-    >
-      <PredictionHeader
-        prediction={prediction}
-        daysUntil={daysUntil}
-        formattedPrediction={formattedPrediction}
-        confidenceColor={confidenceColor}
-      />
-
-      {/* Proactive Funding Suggestions */}
-      {showProactiveSuggestions && (
-        <ProactiveSuggestions
-          daysUntil={daysUntil}
-          onProcessPaycheck={onProcessPaycheck}
-          onPrepareEnvelopes={onPrepareEnvelopes}
-        />
-      )}
-    </div>
-  );
-};
-
 // Sub-component: Action Card
-const ActionCard = ({ bgColor, borderColor, icon, iconColor, title, description, button }) => (
+interface ActionCardProps {
+  bgColor: string;
+  borderColor: string;
+  icon: string;
+  iconColor: string;
+  title: string;
+  description: string;
+  button: React.ReactNode;
+}
+
+const ActionCard = ({
+  bgColor,
+  borderColor,
+  icon,
+  iconColor,
+  title,
+  description,
+  button,
+}: ActionCardProps) => (
   <div className={`${bgColor} rounded-lg p-3 border ${borderColor}`}>
     <div className="flex items-center justify-between">
       <div className="flex items-center">
@@ -150,7 +148,17 @@ const ActionCard = ({ bgColor, borderColor, icon, iconColor, title, description,
 );
 
 // Sub-component: Proactive Suggestions
-const ProactiveSuggestions = ({ daysUntil, onProcessPaycheck, onPrepareEnvelopes }) => (
+interface ProactiveSuggestionsProps {
+  daysUntil: number;
+  onProcessPaycheck: () => void;
+  onPrepareEnvelopes: () => void;
+}
+
+const ProactiveSuggestions = ({
+  daysUntil,
+  onProcessPaycheck,
+  onPrepareEnvelopes,
+}: ProactiveSuggestionsProps) => (
   <div className="mt-4 pt-4 border-t border-gray-200">
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center">
@@ -229,5 +237,50 @@ const ProactiveSuggestions = ({ daysUntil, onProcessPaycheck, onPrepareEnvelopes
     </div>
   </div>
 );
+
+// Main component
+interface PaydayPredictionProps {
+  prediction: PaydayPredictionType | null;
+  className?: string;
+  onProcessPaycheck?: () => void;
+  onPrepareEnvelopes?: () => void;
+}
+
+const PaydayPrediction = ({
+  prediction,
+  className = "",
+  onProcessPaycheck,
+  onPrepareEnvelopes,
+}: PaydayPredictionProps) => {
+  if (!prediction || !prediction.nextPayday) {
+    return null;
+  }
+
+  const formattedPrediction = formatPaydayPrediction(prediction);
+  const daysUntil = getDaysUntilPayday(prediction);
+  const showProactiveSuggestions = daysUntil <= 3 && daysUntil >= 0;
+  const confidenceColor = getConfidenceColor(prediction.confidence);
+
+  return (
+    <div
+      className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle(daysUntil)} ${className}`}
+    >
+      <PredictionHeader
+        prediction={prediction}
+        daysUntil={daysUntil}
+        formattedPrediction={formattedPrediction}
+        confidenceColor={confidenceColor}
+      />
+
+      {showProactiveSuggestions && (
+        <ProactiveSuggestions
+          daysUntil={daysUntil}
+          onProcessPaycheck={onProcessPaycheck}
+          onPrepareEnvelopes={onPrepareEnvelopes}
+        />
+      )}
+    </div>
+  );
+};
 
 export default PaydayPrediction;

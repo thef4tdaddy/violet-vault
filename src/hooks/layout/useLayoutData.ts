@@ -10,6 +10,7 @@ import {
   calculateEnvelopeData,
   calculateEnvelopeTotals,
 } from "../../utils/budgeting/envelopeCalculations";
+import type { Transaction as DbTransaction, Bill as DbBill } from "@/db/types";
 
 /**
  * Centralized layout data provider hook
@@ -32,13 +33,54 @@ export const useLayoutData = () => {
   const bills = useBills();
 
   // Filter out null/undefined transactions for safe operations
-  const safeTransactions = useMemo(() => {
-    return (budgetData.transactions || []).filter(
-      (t) => t && typeof t === "object" && typeof t.amount === "number"
-    );
+  const safeTransactions = useMemo<DbTransaction[]>(() => {
+    return (budgetData.transactions || [])
+      .filter((t): t is DbTransaction => {
+        if (!t || typeof t !== "object") {
+          return false;
+        }
+
+        const record = t as Partial<DbTransaction> & { amount?: unknown };
+        return (
+          typeof record.id === "string" &&
+          (record.date instanceof Date || typeof record.date === "string") &&
+          typeof record.amount === "number" &&
+          typeof record.envelopeId === "string" &&
+          typeof record.category === "string" &&
+          (record.type === "income" || record.type === "expense" || record.type === "transfer") &&
+          typeof record.lastModified === "number"
+        );
+      })
+      .map((transaction) => ({
+        ...transaction,
+        date: transaction.date instanceof Date ? transaction.date : new Date(transaction.date),
+      }));
   }, [budgetData.transactions]);
 
-  const billsList = useMemo(() => bills?.bills || [], [bills?.bills]);
+  const billsList = useMemo<DbBill[]>(() => {
+    return (bills?.bills || [])
+      .filter((bill): bill is DbBill => {
+        if (!bill || typeof bill !== "object") {
+          return false;
+        }
+
+        const record = bill as Partial<DbBill>;
+        return (
+          typeof record.id === "string" &&
+          typeof record.name === "string" &&
+          (record.dueDate instanceof Date || typeof record.dueDate === "string") &&
+          typeof record.amount === "number" &&
+          typeof record.category === "string" &&
+          typeof record.isPaid === "boolean" &&
+          typeof record.isRecurring === "boolean" &&
+          typeof record.lastModified === "number"
+        );
+      })
+      .map((bill) => ({
+        ...bill,
+        dueDate: bill.dueDate instanceof Date ? bill.dueDate : new Date(bill.dueDate),
+      }));
+  }, [bills?.bills]);
 
   // Calculate derived values using existing utilities
   const envelopeSummary = useMemo(() => {
@@ -54,10 +96,18 @@ export const useLayoutData = () => {
     }
 
     // Use actual transactions and bills so totals/spending are accurate
+    const normalizedTransactions = safeTransactions.map((transaction) => ({
+      ...transaction,
+      date:
+        transaction.date instanceof Date
+          ? transaction.date.toISOString().split("T")[0]
+          : String(transaction.date),
+    }));
+
     const processedEnvelopeData = calculateEnvelopeData(
       budgetData.envelopes,
-      safeTransactions as Parameters<typeof calculateEnvelopeData>[1],
-      billsList as Parameters<typeof calculateEnvelopeData>[2]
+      normalizedTransactions,
+      billsList
     );
     return calculateEnvelopeTotals(processedEnvelopeData);
   }, [budgetData.envelopes, safeTransactions, billsList]);

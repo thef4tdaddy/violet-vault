@@ -7,6 +7,7 @@ import AccountsGrid from "./AccountsGrid";
 import AccountFormModal from "./AccountFormModal";
 import TransferModal from "./TransferModal";
 import { getIcon } from "@/utils";
+import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
 
 interface Account {
   id: string | number;
@@ -141,7 +142,7 @@ const SupplementalAccounts = ({
         isLocked={isLocked}
         isOwnLock={isOwnLock}
         canEdit={canEdit}
-        lock={lock}
+        lock={lock as ServiceLockDocument | null}
         breakLock={breakLock}
         lockLoading={lockLoading}
       />

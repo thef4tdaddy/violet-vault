@@ -8,8 +8,118 @@
 import { budgetDb } from "../../db/budgetDb";
 import logger from "../common/logger";
 
+// Type definitions for transaction archiving
+export interface ArchiveConfig {
+  DEFAULT_ARCHIVE_AGE_MONTHS: number;
+  BATCH_SIZE: number;
+  AGGREGATION_PERIODS: {
+    MONTHLY: string;
+    QUARTERLY: string;
+    YEARLY: string;
+  };
+  PRESERVE_CATEGORIES: string[];
+}
+
+export interface ArchivingStats {
+  processed: number;
+  archived: number;
+  aggregated: number;
+  errors: number;
+}
+
+export interface ArchiveResult {
+  success: boolean;
+  stats: ArchivingStats;
+  message?: string;
+  error?: string;
+}
+
+interface TransactionData {
+  id: string;
+  date: string;
+  amount?: number;
+  envelopeId?: string;
+  type?: string;
+  [key: string]: unknown;
+}
+
+interface GroupData {
+  period: string;
+  periodType: string;
+  category: string;
+  totalAmount: number;
+  totalTransactions: number;
+  envelopes: Set<string>;
+  incomeAmount: number;
+  expenseAmount: number;
+  transferAmount: number;
+  dateRange: { start: string; end: string };
+}
+
+interface TransactionWithTimestamp {
+  id: string;
+  date: Date;
+  amount: number;
+  description?: string;
+  category: string;
+  envelopeId: string;
+  type: "income" | "expense" | "transfer";
+  lastModified: number;
+  createdAt: number;
+  receiptUrl?: string;
+  merchant?: string;
+}
+
+interface ArchiveData {
+  id: string;
+  createdAt: string;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+  transactionCount: number;
+  totalAmount: number;
+  categories: string[];
+  envelopes: string[];
+  transactions: Array<{
+    id: string;
+    date: string;
+    amount: number;
+    description: string;
+    category: string;
+    envelopeId: string;
+    type: string;
+  }>;
+}
+
+interface PeriodInfo {
+  name: string;
+  months: number;
+  cutoffDate: string;
+  count: number;
+}
+
+export interface ArchivingInfo {
+  current: {
+    totalTransactions: number;
+    periodBreakdown: PeriodInfo[];
+    oldTransactions: number;
+    veryOldTransactions: number;
+  };
+  archived: {
+    archiveCount: number;
+    analyticsCount: number;
+  };
+  recommendations: {
+    canArchive: boolean;
+    potentialSavings: number;
+    suggestedPeriod: number;
+    suggestedAction: string;
+  };
+}
+
 // Default archiving configuration
-export const ARCHIVE_CONFIG = {
+export const ARCHIVE_CONFIG: ArchiveConfig = {
   // Archive transactions older than this (in months)
   DEFAULT_ARCHIVE_AGE_MONTHS: 6,
 
@@ -31,15 +141,10 @@ export const ARCHIVE_CONFIG = {
  * Main archiving class that handles the complete archiving workflow
  */
 export class TransactionArchiver {
-  config: typeof ARCHIVE_CONFIG;
-  stats: {
-    processed: number;
-    archived: number;
-    aggregated: number;
-    errors: number;
-  };
+  config: ArchiveConfig;
+  stats: ArchivingStats;
 
-  constructor(config = ARCHIVE_CONFIG) {
+  constructor(config: ArchiveConfig = ARCHIVE_CONFIG) {
     this.config = { ...ARCHIVE_CONFIG, ...config };
     this.stats = {
       processed: 0,
@@ -52,7 +157,9 @@ export class TransactionArchiver {
   /**
    * Execute the complete archiving process
    */
-  async archiveOldTransactions(olderThanMonths = this.config.DEFAULT_ARCHIVE_AGE_MONTHS) {
+  async archiveOldTransactions(
+    olderThanMonths: number = this.config.DEFAULT_ARCHIVE_AGE_MONTHS
+  ): Promise<ArchiveResult> {
     try {
       logger.info("Starting transaction archiving process", {
         olderThanMonths,
@@ -84,7 +191,7 @@ export class TransactionArchiver {
       // Step 4: Clean up and optimize database
       await this.optimizeDatabase();
 
-      logger.info("Transaction archiving completed successfully", this.stats);
+      logger.info("Transaction archiving completed successfully", { stats: this.stats });
 
       return {
         success: true,
@@ -92,15 +199,16 @@ export class TransactionArchiver {
         message: `Successfully archived ${this.stats.archived} transactions`,
       };
     } catch (error) {
-      logger.error("Transaction archiving failed", error);
-      throw new Error(`Archiving failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error("Transaction archiving failed", { error });
+      throw new Error(`Archiving failed: ${errorMessage}`);
     }
   }
 
   /**
    * Calculate the cutoff date for archiving
    */
-  calculateCutoffDate(months) {
+  calculateCutoffDate(months: number): string {
     const cutoffDate = new Date();
     cutoffDate.setMonth(cutoffDate.getMonth() - months);
     cutoffDate.setDate(1); // Start of month for cleaner boundaries
@@ -110,14 +218,21 @@ export class TransactionArchiver {
   /**
    * Get transactions that are eligible for archiving
    */
-  async getTransactionsForArchiving(cutoffDate) {
-    return budgetDb.transactions.where("date").below(cutoffDate).toArray();
+  async getTransactionsForArchiving(cutoffDate: string): Promise<TransactionData[]> {
+    const results = await budgetDb.transactions.where("date").below(cutoffDate).toArray();
+    return results.map((transaction) => ({
+      ...transaction,
+      date:
+        transaction.date instanceof Date
+          ? transaction.date.toISOString()
+          : String(transaction.date),
+    }));
   }
 
   /**
    * Create aggregated analytics data before archiving
    */
-  async createAnalyticsAggregations(transactions) {
+  async createAnalyticsAggregations(transactions: TransactionData[]): Promise<void> {
     logger.info("Creating analytics aggregations");
 
     const aggregations = {
@@ -128,10 +243,14 @@ export class TransactionArchiver {
 
     // Store aggregations in database
     for (const [period, data] of Object.entries(aggregations)) {
-      for (const aggregation of data) {
+      for (const aggregation of data as GroupData[]) {
+        const serializedAggregation = {
+          ...aggregation,
+          envelopes: Array.from(aggregation.envelopes),
+        };
         await budgetDb.cache.put({
           key: `analytics_${period}_${aggregation.period}_${aggregation.category}`,
-          value: aggregation,
+          value: serializedAggregation,
           category: "analytics_archive",
           expiresAt: null, // Never expires
         });
@@ -162,27 +281,28 @@ export class TransactionArchiver {
    * Create initial group data structure
    */
   private createGroupData(
-    transaction: {
-      date: string;
-      category?: string;
-      [key: string]: unknown;
-    },
+    transaction: TransactionData,
     periodKey: string,
     periodType: string
-  ) {
+  ): GroupData {
+    const category =
+      typeof transaction.category === "string" && transaction.category.trim().length > 0
+        ? transaction.category
+        : "uncategorized";
+    const transactionDate = String(transaction.date);
     return {
       period: periodKey,
-      category: transaction.category || "uncategorized",
+      category,
       periodType,
       totalAmount: 0,
       totalTransactions: 0,
       incomeAmount: 0,
       expenseAmount: 0,
       transferAmount: 0,
-      envelopes: new Set(),
+      envelopes: new Set<string>(),
       dateRange: {
-        start: transaction.date,
-        end: transaction.date,
+        start: transactionDate,
+        end: transactionDate,
       },
     };
   }
@@ -190,27 +310,12 @@ export class TransactionArchiver {
   /**
    * Update group with transaction data
    */
-  private updateGroupWithTransaction(
-    group: {
-      totalAmount: number;
-      totalTransactions: number;
-      envelopes: Set<string>;
-      incomeAmount: number;
-      expenseAmount: number;
-      transferAmount: number;
-      dateRange: { start: string; end: string };
-    },
-    transaction: {
-      amount?: number;
-      envelopeId?: string;
-      type?: string;
-      date: string;
-      [key: string]: unknown;
-    }
-  ) {
+  private updateGroupWithTransaction(group: GroupData, transaction: TransactionData): void {
     group.totalAmount += transaction.amount || 0;
     group.totalTransactions++;
-    group.envelopes.add(transaction.envelopeId);
+    if (transaction.envelopeId) {
+      group.envelopes.add(String(transaction.envelopeId));
+    }
 
     // Categorize by transaction type
     const amount = transaction.amount || 0;
@@ -225,72 +330,84 @@ export class TransactionArchiver {
     }
 
     // Update date range
-    if (transaction.date < group.dateRange.start) {
-      group.dateRange.start = transaction.date;
+    const transactionDate = String(transaction.date);
+    if (transactionDate < group.dateRange.start) {
+      group.dateRange.start = transactionDate;
     }
-    if (transaction.date > group.dateRange.end) {
-      group.dateRange.end = transaction.date;
+    if (transactionDate > group.dateRange.end) {
+      group.dateRange.end = transactionDate;
     }
   }
 
   /**
    * Aggregate transactions by time period
    */
-  aggregateByPeriod(transactions, periodType) {
-    const groups = new Map();
+  private aggregateByPeriod(transactions: TransactionData[], periodType: string): GroupData[] {
+    const groups = new Map<string, GroupData>();
 
     transactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
+      const date = new Date(String(transaction.date));
       const periodKey = this.getPeriodKey(date, periodType);
-      const key = `${periodKey}_${transaction.category || "uncategorized"}`;
+      const categoryKey =
+        typeof transaction.category === "string" && transaction.category.trim().length > 0
+          ? transaction.category
+          : "uncategorized";
+      const key = `${periodKey}_${categoryKey}`;
 
       if (!groups.has(key)) {
         groups.set(key, this.createGroupData(transaction, periodKey, periodType));
       }
 
-      this.updateGroupWithTransaction(groups.get(key), transaction);
+      this.updateGroupWithTransaction(groups.get(key)!, transaction);
     });
 
     // Convert Sets to Arrays for storage
-    return Array.from(groups.values()).map((group) => ({
-      ...group,
-      envelopes: Array.from(group.envelopes),
-      uniqueEnvelopes: group.envelopes.size,
-    }));
+    return Array.from(groups.values());
   }
 
   /**
    * Create archived transaction records (compressed format)
    */
-  async createTransactionArchives(transactions) {
+  async createTransactionArchives(transactions: TransactionData[]): Promise<void> {
     logger.info("Creating transaction archives");
 
     const batchSize = this.config.BATCH_SIZE;
-    const archives = [];
+    const archives: ArchiveData[] = [];
 
     for (let i = 0; i < transactions.length; i += batchSize) {
       const batch = transactions.slice(i, i + batchSize);
+      const timestamps = batch.map((t) => new Date(String(t.date)).getTime());
+      const startDateIso = new Date(Math.min(...timestamps)).toISOString();
+      const endDateIso = new Date(Math.max(...timestamps)).toISOString();
 
-      const archive = {
+      const archive: ArchiveData = {
         id: `archive_${Date.now()}_${i}`,
         createdAt: new Date().toISOString(),
         dateRange: {
-          start: Math.min(...batch.map((t) => t.date)),
-          end: Math.max(...batch.map((t) => t.date)),
+          start: startDateIso,
+          end: endDateIso,
         },
         transactionCount: batch.length,
         totalAmount: batch.reduce((sum, t) => sum + (t.amount || 0), 0),
-        categories: [...new Set(batch.map((t) => t.category).filter(Boolean))],
-        envelopes: [...new Set(batch.map((t) => t.envelopeId).filter(Boolean))],
+        categories: Array.from(
+          new Set(batch.map((t) => (t.category ? String(t.category) : "uncategorized")))
+        ),
+        envelopes: Array.from(
+          new Set(
+            batch
+              .map((t) => (t.envelopeId ? String(t.envelopeId) : ""))
+              .filter((value) => value !== "")
+          )
+        ),
         // Store compressed transaction data
         transactions: batch.map((t) => ({
           id: t.id,
-          date: t.date,
-          amount: t.amount,
-          description: t.description,
-          category: t.category,
-          envelopeId: t.envelopeId,
-          type: t.type,
+          date: String(t.date),
+          amount: Number(t.amount || 0),
+          description: String(t.description || ""),
+          category: String(t.category || "uncategorized"),
+          envelopeId: String(t.envelopeId || ""),
+          type: String(t.type || "expense"),
         })),
       };
 
@@ -312,7 +429,7 @@ export class TransactionArchiver {
   /**
    * Remove transactions that have been archived
    */
-  async removeArchivedTransactions(transactions) {
+  async removeArchivedTransactions(transactions: TransactionData[]): Promise<void> {
     logger.info("Removing archived transactions from active storage");
 
     const transactionIds = transactions.map((t) => t.id);
@@ -328,7 +445,7 @@ export class TransactionArchiver {
   /**
    * Optimize database after archiving
    */
-  async optimizeDatabase() {
+  async optimizeDatabase(): Promise<void> {
     logger.info("Optimizing database after archiving");
 
     // Clean up any orphaned records and optimize indexes
@@ -340,14 +457,14 @@ export class TransactionArchiver {
         await budgetDb.open();
       }
     } catch (error) {
-      logger.warn("Database optimization completed with warnings", error);
+      logger.warn("Database optimization completed with warnings", { error });
     }
   }
 
   /**
    * Get archiving statistics and recommendations
    */
-  async getArchivingInfo(customPeriods = null) {
+  async getArchivingInfo(customPeriods: PeriodInfo[] | null = null): Promise<ArchivingInfo> {
     const now = new Date();
 
     // Default periods if none specified
@@ -401,11 +518,11 @@ export class TransactionArchiver {
         analyticsCount: analyticsAggregations,
       },
       recommendations: {
-        canArchive: bestRecommendation.count > 0,
-        potentialSavings: bestRecommendation.count,
-        suggestedPeriod: bestRecommendation.months,
+        canArchive: (bestRecommendation?.count || 0) > 0,
+        potentialSavings: bestRecommendation?.count || 0,
+        suggestedPeriod: bestRecommendation?.months || 0,
         suggestedAction:
-          bestRecommendation.count > 0
+          (bestRecommendation?.count || 0) > 0
             ? `Archive ${bestRecommendation.count} transactions older than ${bestRecommendation.name}`
             : "No archiving needed at this time",
       },
@@ -415,7 +532,10 @@ export class TransactionArchiver {
   /**
    * Retrieve archived transaction data for analytics
    */
-  async getArchivedAnalytics(period = "yearly", category = null) {
+  async getArchivedAnalytics(
+    period: string = "yearly",
+    category: string | null = null
+  ): Promise<Array<Record<string, unknown>>> {
     const keyPattern = category ? `analytics_${period}_*_${category}` : `analytics_${period}_*`;
 
     const results = await budgetDb.cache
@@ -423,30 +543,27 @@ export class TransactionArchiver {
       .startsWith(keyPattern.replace("*", ""))
       .toArray();
 
-    return results.map((r) => r.value);
+    return results.map((r) => r.value as Record<string, unknown>);
   }
 
   /**
    * Emergency restore function (for testing/recovery)
    */
-  async restoreArchivedTransactions(archiveId) {
-    logger.warn(`Attempting to restore archived transactions: ${archiveId}`);
+  async restoreArchivedTransactions(archiveId: string): Promise<number> {
+    logger.warn("Attempting to restore archived transactions", { archiveId });
 
     const archive = await budgetDb.cache.get(`transaction_archive_${archiveId}`);
     if (!archive) {
       throw new Error(`Archive ${archiveId} not found`);
     }
 
-    const archiveValue = archive.value as { transactions: Array<Record<string, unknown>> };
+    const archiveValue = archive.value as { transactions: Array<TransactionData> };
 
     // Restore transactions to active storage
     for (const transaction of archiveValue.transactions) {
-      const transactionWithTimestamp: unknown = {
+      const transactionWithTimestamp: TransactionWithTimestamp = {
         id: String(transaction.id || Date.now()),
-        date:
-          transaction.date instanceof Date
-            ? transaction.date
-            : new Date(transaction.date as string),
+        date: new Date(String(transaction.date)),
         amount: Number(transaction.amount || 0),
         envelopeId: String(transaction.envelopeId || ""),
         category: String(transaction.category || "other"),
@@ -455,27 +572,28 @@ export class TransactionArchiver {
         createdAt: transaction.createdAt ? Number(transaction.createdAt) : Date.now(),
         description: transaction.description as string | undefined,
         merchant: transaction.merchant as string | undefined,
-        receiptUrl: transaction.receiptUrl as string | undefined,
       };
       await budgetDb.transactions.put(transactionWithTimestamp as never);
     }
 
-    logger.info(
-      `Restored ${archiveValue.transactions.length} transactions from archive ${archiveId}`
-    );
+    logger.info("Restored transactions from archive", {
+      archiveId,
+      restoredCount: archiveValue.transactions.length,
+    });
     return archiveValue.transactions.length;
   }
 }
 
 // Utility functions for UI components
-export const createArchiver = (config) => new TransactionArchiver(config);
+export const createArchiver = (config: ArchiveConfig = ARCHIVE_CONFIG): TransactionArchiver =>
+  new TransactionArchiver(config);
 
-export const getArchivingRecommendations = async () => {
+export const getArchivingRecommendations = async (): Promise<ArchivingInfo> => {
   const archiver = new TransactionArchiver();
   return archiver.getArchivingInfo();
 };
 
-export const archiveTransactions = async (olderThanMonths) => {
+export const archiveTransactions = async (olderThanMonths: number): Promise<ArchiveResult> => {
   const archiver = new TransactionArchiver();
   return archiver.archiveOldTransactions(olderThanMonths);
 };

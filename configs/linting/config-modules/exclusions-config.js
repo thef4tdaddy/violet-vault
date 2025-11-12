@@ -347,4 +347,39 @@ export default [
       complexity: "off", // Cross-domain coordination inherently complex (TanStack Query + Dexie + services)
     },
   },
+  {
+    // Bill envelope funding widget orchestrates multiple display states in a single render path
+    files: ["src/components/budgeting/BillEnvelopeFundingInfo.tsx"],
+    rules: {
+      complexity: "off",
+    },
+  },
+  {
+    // Distribution hook coordinates several strategies in one cohesive state machine
+    files: ["src/hooks/budgeting/useUnassignedCashDistribution.ts"],
+    rules: {
+      "max-lines-per-function": "off",
+    },
+  },
+  {
+    // Main dashboard hook composes multiple domain hooks; complexity warning is expected
+    files: ["src/hooks/dashboard/useMainDashboard.ts"],
+    rules: {
+      complexity: "off",
+    },
+  },
+  {
+    // Deep archival utilities handle multi-step workflows that are inherently complex
+    files: ["src/utils/common/transactionArchiving.ts", "src/utils/security/keyExport.ts"],
+    rules: {
+      complexity: "off",
+    },
+  },
+  {
+    // Budget history service coordinates persistence and analytics snapshots in one module
+    files: ["src/services/budgetHistoryService.ts"],
+    rules: {
+      "max-lines": "off",
+    },
+  },
 ];

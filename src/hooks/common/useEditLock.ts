@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { editLockService } from "../../services/editLockService";
+import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
 import useToast from "./useToast";
 import logger from "../../utils/common/logger";
 import {
@@ -17,12 +18,7 @@ interface UseEditLockOptions {
   showToasts?: boolean;
 }
 
-interface LockDocument {
-  userId?: string;
-  userName?: string;
-  expiresAt?: number;
-  [key: string]: unknown;
-}
+type LockDocument = ServiceLockDocument;
 
 interface EditLockServiceUser {
   id?: string;

@@ -1,7 +1,35 @@
 import { useState, useCallback, useMemo } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
-import { predictNextPayday } from "../../utils/budgeting/paydayPredictor";
+import { predictNextPayday, type PaycheckEntry } from "../../utils/budgeting/paydayPredictor";
 import logger from "../../utils/common/logger";
+import type { UseMutateFunction } from "@tanstack/react-query";
+import type {
+  Envelope as DbEnvelope,
+  SavingsGoal as DbSavingsGoal,
+  Transaction as DbTransaction,
+  PaycheckHistory,
+} from "@/db/types";
+
+// Type definitions for dashboard
+type Envelope = DbEnvelope;
+type SavingsGoal = DbSavingsGoal;
+type PaycheckHistoryItem = PaycheckHistory;
+
+interface TransactionFormState {
+  amount?: string;
+  description?: string;
+  type?: "expense" | "income";
+  envelopeId?: string;
+  category?: string;
+  date?: string;
+}
+
+type ReconcileInput = Omit<DbTransaction, "lastModified" | "createdAt">;
+
+interface EnvelopeOption {
+  id: string;
+  name: string;
+}
 
 /**
  * Hook for managing Main Dashboard UI state
@@ -9,7 +37,7 @@ import logger from "../../utils/common/logger";
  */
 export const useMainDashboardUI = () => {
   const [showReconcileModal, setShowReconcileModal] = useState(false);
-  const [newTransaction, setNewTransaction] = useState({
+  const [newTransaction, setNewTransaction] = useState<TransactionFormState>({
     amount: "",
     description: "",
     type: "expense", // 'expense' or 'income'
@@ -25,7 +53,7 @@ export const useMainDashboardUI = () => {
     setShowReconcileModal(false);
   }, []);
 
-  const updateNewTransaction = useCallback((updates) => {
+  const updateNewTransaction = useCallback((updates: Partial<TransactionFormState>) => {
     setNewTransaction((prev) => ({ ...prev, ...updates }));
   }, []);
 
@@ -57,20 +85,20 @@ export const useMainDashboardUI = () => {
  * Extracts balance calculations and difference analysis
  */
 export const useDashboardCalculations = (
-  envelopes = [],
-  savingsGoals = [],
-  unassignedCash = 0,
-  actualBalance = 0
+  envelopes: Envelope[] = [],
+  savingsGoals: SavingsGoal[] = [],
+  unassignedCash: number = 0,
+  actualBalance: number = 0
 ) => {
   const calculations = useMemo(() => {
     // Calculate totals
     const totalEnvelopeBalance = envelopes.reduce((sum, env) => {
-      const balance = parseFloat(env?.currentBalance) || 0;
+      const balance = parseFloat(String(env?.currentBalance || "0")) || 0;
       return sum + (isNaN(balance) ? 0 : balance);
     }, 0);
 
     const totalSavingsBalance = savingsGoals.reduce((sum, goal) => {
-      const amount = parseFloat(String(goal?.currentAmount)) || 0;
+      const amount = parseFloat(String(goal?.currentAmount || "0")) || 0;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 
@@ -102,24 +130,40 @@ export const useDashboardCalculations = (
  * Hook for handling transaction reconciliation process
  * Extracts reconciliation logic and validation
  */
-export const useTransactionReconciliation = (reconcileTransaction, envelopes, savingsGoals) => {
+export const useTransactionReconciliation = (
+  reconcileTransaction: UseMutateFunction<ReconcileInput, Error, ReconcileInput, unknown>,
+  envelopes: Envelope[] = [],
+  savingsGoals: SavingsGoal[] = []
+) => {
   const handleReconcileTransaction = useCallback(
-    (newTransaction, onSuccess) => {
-      if (!newTransaction.amount || !newTransaction.description.trim()) {
+    (newTransaction: TransactionFormState, onSuccess?: () => void) => {
+      if (!newTransaction.amount || !newTransaction.description?.trim()) {
         globalToast.showError("Please enter amount and description", "Required Fields", 8000);
         return false;
       }
 
-      const amount = parseFloat(newTransaction.amount);
-      const transaction = {
-        id: Date.now(),
-        ...newTransaction,
-        amount: newTransaction.type === "expense" ? -Math.abs(amount) : Math.abs(amount),
-        reconciledAt: new Date().toISOString(),
+      const amount = parseFloat(newTransaction.amount || "0");
+      const isExpense = (newTransaction.type || "expense") === "expense";
+      const transaction: ReconcileInput = {
+        id: (globalThis.crypto?.randomUUID?.() ?? Date.now().toString()) as string,
+        date: newTransaction.date ? new Date(newTransaction.date) : new Date(),
+        amount: isExpense ? -Math.abs(amount) : Math.abs(amount),
+        envelopeId: newTransaction.envelopeId || "unassigned",
+        category: newTransaction.category || "other",
+        type: newTransaction.type || (isExpense ? "expense" : "income"),
+        description: newTransaction.description?.trim() || "Reconciled transaction",
+        merchant: undefined,
+        receiptUrl: undefined,
+        notes: undefined,
       };
 
-      reconcileTransaction(transaction);
-      onSuccess?.();
+      reconcileTransaction(transaction, {
+        onSuccess,
+        onError: (error) => {
+          logger.error("Failed to reconcile transaction", { error });
+          globalToast.showError("Could not reconcile transaction", "Error", 8000);
+        },
+      });
       return true;
     },
     [reconcileTransaction]
@@ -135,9 +179,9 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
 
       try {
         const isIncome = difference > 0;
-        const transaction = {
-          id: Date.now().toString(),
-          // Ensure correct sign: positive for income, negative for expense
+        const transaction: ReconcileInput = {
+          id: (globalThis.crypto?.randomUUID?.() ?? Date.now().toString()) as string,
+          date: new Date(),
           amount: isIncome ? Math.abs(difference) : -Math.abs(difference),
           description: isIncome
             ? "Balance reconciliation - added extra funds"
@@ -145,17 +189,25 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
           type: isIncome ? "income" : "expense",
           envelopeId: "unassigned",
           category: "other",
-          date: new Date().toISOString().split("T")[0],
-          reconciledAt: new Date().toISOString(),
+          merchant: undefined,
+          receiptUrl: undefined,
+          notes: undefined,
         };
 
         logger.info("Auto-reconciling difference", { difference, transaction });
-        reconcileTransaction(transaction);
-        globalToast.showSuccess(
-          "Balance reconciled automatically",
-          "Reconciliation Complete",
-          3000
-        );
+        reconcileTransaction(transaction, {
+          onSuccess: () => {
+            globalToast.showSuccess(
+              "Balance reconciled automatically",
+              "Reconciliation Complete",
+              3000
+            );
+          },
+          onError: (error) => {
+            logger.error("Auto-reconcile failed", { error, difference });
+            globalToast.showError("Failed to reconcile balance", "Error", 8000);
+          },
+        });
       } catch (error) {
         logger.error("Auto-reconcile failed", { error, difference });
         globalToast.showError("Failed to reconcile balance", "Error", 8000);
@@ -165,10 +217,10 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
   );
 
   const getEnvelopeOptions = useCallback(() => {
-    const options = [
+    const options: EnvelopeOption[] = [
       { id: "unassigned", name: "Unassigned Cash" },
-      ...envelopes.map((env) => ({ id: env.id, name: env.name })),
-      ...savingsGoals.map((goal) => ({
+      ...envelopes.map((env: Envelope) => ({ id: env.id, name: env.name })),
+      ...savingsGoals.map((goal: SavingsGoal) => ({
         id: `savings_${goal.id}`,
         name: `💰 ${goal.name}`,
       })),
@@ -187,12 +239,23 @@ export const useTransactionReconciliation = (reconcileTransaction, envelopes, sa
  * Hook for payday prediction and related actions
  * Extracts payday prediction logic and navigation handlers
  */
-export const usePaydayManager = (paycheckHistory, setActiveView) => {
+export const usePaydayManager = (
+  paycheckHistory: PaycheckHistoryItem[] = [],
+  setActiveView: (view: string) => void
+) => {
+  const normalizedHistory = useMemo<PaycheckEntry[]>(
+    () =>
+      paycheckHistory.map((entry) => ({
+        ...entry,
+        date: entry.date ?? entry.processedAt,
+        processedAt: entry.processedAt ?? entry.date,
+      })),
+    [paycheckHistory]
+  );
+
   const paydayPrediction = useMemo(() => {
-    return paycheckHistory && paycheckHistory.length >= 2
-      ? predictNextPayday(paycheckHistory)
-      : null;
-  }, [paycheckHistory]);
+    return normalizedHistory.length >= 2 ? predictNextPayday(normalizedHistory) : null;
+  }, [normalizedHistory]);
 
   const handleProcessPaycheck = useCallback(() => {
     setActiveView("paycheck");
@@ -219,28 +282,31 @@ export const usePaydayManager = (paycheckHistory, setActiveView) => {
  * Provides utility functions for dashboard data rendering
  */
 export const useDashboardHelpers = () => {
-  const getRecentTransactions = useCallback((transactions = [], limit = 10) => {
-    return (transactions || []).slice(0, limit);
-  }, []);
+  const getRecentTransactions = useCallback(
+    (transactions: DbTransaction[] = [], limit: number = 10) => {
+      return (transactions || []).slice(0, limit);
+    },
+    []
+  );
 
-  const formatCurrency = useCallback((amount) => {
+  const formatCurrency = useCallback((amount: number) => {
     return `$${Math.abs(amount || 0).toFixed(2)}`;
   }, []);
 
-  const getTransactionIcon = useCallback((amount) => {
+  const getTransactionIcon = useCallback((amount: number) => {
     return amount > 0 ? "TrendingUp" : "TrendingDown";
   }, []);
 
-  const getTransactionColor = useCallback((amount) => {
+  const getTransactionColor = useCallback((amount: number) => {
     return amount > 0 ? "text-green-600" : "text-red-600";
   }, []);
 
-  const getBalanceStatusColor = useCallback((isBalanced, difference) => {
+  const getBalanceStatusColor = useCallback((isBalanced: boolean, difference: number) => {
     if (isBalanced) return "bg-green-50";
     return Math.abs(difference) > 10 ? "bg-red-50" : "bg-yellow-50";
   }, []);
 
-  const getBalanceStatusIcon = useCallback((isBalanced, difference) => {
+  const getBalanceStatusIcon = useCallback((isBalanced: boolean, difference: number) => {
     if (isBalanced) return "CheckCircle";
     return Math.abs(difference) > 10 ? "AlertTriangle" : "AlertTriangle";
   }, []);

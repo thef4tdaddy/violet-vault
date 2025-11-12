@@ -90,7 +90,7 @@ interface GenerateSuggestionsOptions {
 }
 
 // Suggestion interface
-interface Suggestion {
+export interface Suggestion {
   id: string;
   type: string;
   priority: "high" | "medium" | "low";

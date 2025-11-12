@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui";
 import { useUserSetup } from "@/hooks/auth/useUserSetup";
+import type { UserSetupPayload } from "@/hooks/auth/useUserSetup";
+import type { UserSetupProps as UserSetupPropsType } from "@/types/auth";
 import UserSetupLayout from "./components/UserSetupLayout";
 import UserSetupHeader from "./components/UserSetupHeader";
 import PasswordInput from "./components/PasswordInput";
@@ -19,14 +21,26 @@ import logger from "@/utils/common/logger";
  * Multi-step user onboarding and authentication flow
  * Reduced from 435 lines to ~120 lines with full UI/logic separation
  */
-interface UserSetupProps {
-  onSetupComplete?: () => void;
-}
+type UserSetupProps = Partial<UserSetupPropsType>;
 
 const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const authManager = useAuthManager();
   const joinBudget = authManager.joinBudget as (data: unknown) => Promise<{ success: boolean }>;
+
+  const handleSetupComplete = useCallback(
+    async (payload: UserSetupPayload) => {
+      if (!onSetupComplete) {
+        logger.warn("onSetupComplete handler missing during user setup", {
+          payloadType: typeof payload,
+        });
+        return;
+      }
+
+      await onSetupComplete(payload);
+    },
+    [onSetupComplete]
+  );
 
   // Removed noisy debug log - component renders on every prop change/keystroke
 
@@ -54,7 +68,7 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     goBackToStep1,
     goBackToStep2,
     setUserColor,
-  } = useUserSetup(onSetupComplete);
+  } = useUserSetup(handleSetupComplete);
 
   const handleJoinSuccess = async (joinData) => {
     logger.info("Join budget successful, setting up auth", joinData);

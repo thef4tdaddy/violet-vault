@@ -10,29 +10,16 @@ import { EnvelopeFinancialSummary } from "./EnvelopeFinancialSummary";
 import { EnvelopeProgressBar } from "./EnvelopeProgressBar";
 import { EnvelopeHeader } from "./EnvelopeHeader";
 import { BillEnvelopeStatus } from "./BillEnvelopeStatus";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
-interface Envelope {
-  id: string;
-  name: string;
-  category: string;
+type Envelope = DbEnvelope & {
   color?: string;
-  envelopeType: string;
   status: string;
   utilizationRate: number;
-  currentBalance: number;
   available: number;
-  monthlyBudget?: number;
-  monthlyAmount?: number;
-}
+};
 
-interface Bill {
-  id: string;
-  name: string;
-  envelopeId: string;
-  amount: number;
-  dueDate: string;
-  isPaid: boolean;
-}
+type Bill = DbBill;
 
 interface EnvelopeItemProps {
   envelope: Envelope;

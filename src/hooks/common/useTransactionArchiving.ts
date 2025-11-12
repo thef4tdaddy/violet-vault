@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getArchivingRecommendations,
   createArchiver,
+  type ArchivingInfo,
+  type ArchiveResult,
 } from "../../utils/common/transactionArchiving";
 import { queryKeys } from "../../utils/common/queryClient";
 import logger from "../../utils/common/logger";
@@ -13,8 +15,11 @@ import logger from "../../utils/common/logger";
  */
 const useTransactionArchiving = () => {
   const [isArchiving, setIsArchiving] = useState(false);
-  const [archivingProgress, setArchivingProgress] = useState(null);
-  const [lastArchiveResult, setLastArchiveResult] = useState(null);
+  const [archivingProgress, setArchivingProgress] = useState<{
+    stage: string;
+    progress: number;
+  } | null>(null);
+  const [lastArchiveResult, setLastArchiveResult] = useState<ArchiveResult | null>(null);
 
   // Get archiving information and recommendations
   const {
@@ -22,7 +27,7 @@ const useTransactionArchiving = () => {
     isLoading: infoLoading,
     refetch: refreshInfo,
     error: infoError,
-  } = useQuery({
+  } = useQuery<ArchivingInfo>({
     queryKey: queryKeys.analyticsBalance(),
     queryFn: getArchivingRecommendations,
     staleTime: 30 * 60 * 1000, // 30 minutes
@@ -47,7 +52,7 @@ const useTransactionArchiving = () => {
         logger.info("Starting transaction archiving", { olderThanMonths });
 
         // Create progress tracking
-        const archiver = createArchiver({});
+        const archiver = createArchiver();
 
         setArchivingProgress({ stage: "analyzing", progress: 10 });
 
@@ -60,15 +65,16 @@ const useTransactionArchiving = () => {
         // Refresh archiving info after completion
         await refreshInfo();
 
-        logger.info("Transaction archiving completed", result);
+        logger.info("Transaction archiving completed", { result });
 
         return result;
       } catch (error) {
-        logger.error("Transaction archiving failed", error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error("Transaction archiving failed", { error });
         setLastArchiveResult({
           success: false,
-          error: error.message,
-          stats: { processed: 0, archived: 0, errors: 1 },
+          error: errorMessage,
+          stats: { processed: 0, archived: 0, aggregated: 0, errors: 1 },
         });
         throw error;
       } finally {
@@ -84,10 +90,10 @@ const useTransactionArchiving = () => {
    */
   const getArchivedAnalytics = useCallback(async (period = "yearly", category = null) => {
     try {
-      const archiver = createArchiver({});
+      const archiver = createArchiver();
       return await archiver.getArchivedAnalytics(period, category);
     } catch (error) {
-      logger.error("Failed to retrieve archived analytics", error);
+      logger.error("Failed to retrieve archived analytics", { error });
       throw error;
     }
   }, []);
@@ -99,7 +105,7 @@ const useTransactionArchiving = () => {
     async (archiveId) => {
       try {
         logger.warn("Restoring archived transactions", { archiveId });
-        const archiver = createArchiver({});
+        const archiver = createArchiver();
         const restored = await archiver.restoreArchivedTransactions(archiveId);
 
         // Refresh data after restore
@@ -107,7 +113,7 @@ const useTransactionArchiving = () => {
 
         return restored;
       } catch (error) {
-        logger.error("Failed to restore archived transactions", error);
+        logger.error("Failed to restore archived transactions", { error });
         throw error;
       }
     },
@@ -122,12 +128,13 @@ const useTransactionArchiving = () => {
     const originalSize = transactionCount * 0.5; // KB
     const archivedSize = originalSize * 0.3; // KB
     const savings = originalSize - archivedSize; // KB
+    const savingsPercent = originalSize > 0 ? Math.round((savings / originalSize) * 100) : 0;
 
     return {
       originalSizeKB: Math.round(originalSize),
       archivedSizeKB: Math.round(archivedSize),
       savingsKB: Math.round(savings),
-      savingsPercent: Math.round((savings / originalSize) * 100),
+      savingsPercent,
       savingsMB: Math.round((savings / 1024) * 100) / 100,
     };
   }, []);

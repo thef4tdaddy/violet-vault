@@ -1,6 +1,8 @@
 import React, { memo } from "react";
 import { getIcon } from "../../utils";
 import { getBillEnvelopeDisplayInfo } from "../../utils/budgeting/billEnvelopeCalculations";
+import type { BillEnvelopeResult } from "../../utils/budgeting/billEnvelopeCalculations";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
 
 // Helper to get progress bar color based on funding percentage
 const getProgressBarColor = (progress) => {
@@ -108,7 +110,7 @@ const StatusDisplay = ({
 
 // Detailed info section
 const DetailedInfo = ({
-  displayInfo,
+  linkedBills,
   upcomingBillsAmount,
   remainingToFund,
   targetMonthlyAmount,
@@ -116,7 +118,7 @@ const DetailedInfo = ({
   currentBalance,
   priority,
 }: {
-  displayInfo: { linkedBills?: number };
+  linkedBills: number;
   upcomingBillsAmount: number;
   remainingToFund: number;
   targetMonthlyAmount: number;
@@ -131,8 +133,8 @@ const DetailedInfo = ({
           className: "h-3 w-3 text-gray-400",
         })}
         <span className="text-gray-600">
-          {displayInfo.linkedBills} linked bill
-          {displayInfo.linkedBills !== 1 ? "s" : ""}
+          {linkedBills} linked bill
+          {linkedBills !== 1 ? "s" : ""}
         </span>
       </div>
       {upcomingBillsAmount > 0 && (
@@ -220,6 +222,9 @@ const WellFundedAlert = ({
   </div>
 );
 
+type BillInput = Parameters<typeof getBillEnvelopeDisplayInfo>[1];
+type EnvelopeInput = Parameters<typeof getBillEnvelopeDisplayInfo>[0];
+
 /**
  * Component to display bill envelope funding information
  * Shows remaining amount needed for next bill payment and funding progress
@@ -230,11 +235,11 @@ const BillEnvelopeFundingInfo = memo(
     bills = [],
     showDetails = false,
   }: {
-    envelope: { id: string; name?: string; currentBalance?: number; [key: string]: unknown };
-    bills?: unknown[];
+    envelope: EnvelopeInput | DbEnvelope;
+    bills?: BillInput | DbBill[];
     showDetails?: boolean;
   }) => {
-    const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+    const displayInfo = getBillEnvelopeDisplayInfo(envelope as EnvelopeInput, bills as BillInput);
 
     if (!displayInfo) {
       return null;
@@ -242,29 +247,38 @@ const BillEnvelopeFundingInfo = memo(
 
     const {
       nextBill,
-      remainingToFund,
+      remainingToFund = 0,
       daysUntilNextBill,
-      fundingProgress,
-      isFullyFunded,
-      currentBalance,
-      targetMonthlyAmount,
-      upcomingBillsAmount,
-      priority,
-      status,
-      displayText,
-    } = displayInfo as {
-      nextBill?: { name: string; amount: number; frequency?: string };
-      remainingToFund: number;
-      daysUntilNextBill: number | null;
-      fundingProgress: number;
-      isFullyFunded: boolean;
-      currentBalance: number;
-      targetMonthlyAmount: number;
-      upcomingBillsAmount: number;
-      priority: { priorityLevel: string; reason?: string };
+      fundingProgress = 0,
+      isFullyFunded = false,
+      currentBalance = 0,
+      targetMonthlyAmount = 0,
+      upcomingBillsAmount = 0,
+      priority: priorityMeta,
+      status: statusMeta,
+      displayText: displayMeta,
+      linkedBills = 0,
+    } = displayInfo as BillEnvelopeResult & {
       status: { bgColor: string; textColor: string; color: string; icon?: string };
       displayText: { primaryStatus: string; secondaryStatus?: string; fundingProgress?: string };
-      linkedBills?: number;
+    };
+
+    const priority = priorityMeta ?? {
+      priorityLevel: "none",
+      reason: "No current bill priority",
+    };
+
+    const status = statusMeta ?? {
+      color: "gray",
+      icon: "DollarSign",
+      bgColor: "bg-gray-50",
+      textColor: "text-gray-700",
+    };
+
+    const displayText = displayMeta ?? {
+      primaryStatus: "No billing data",
+      secondaryStatus: undefined,
+      fundingProgress: undefined,
     };
 
     const iconName = status.icon || "DollarSign";
@@ -291,7 +305,7 @@ const BillEnvelopeFundingInfo = memo(
 
         {showDetails && (
           <DetailedInfo
-            displayInfo={displayInfo as unknown as { linkedBills?: number }}
+            linkedBills={linkedBills}
             upcomingBillsAmount={upcomingBillsAmount}
             remainingToFund={remainingToFund}
             targetMonthlyAmount={targetMonthlyAmount}

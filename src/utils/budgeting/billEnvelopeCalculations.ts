@@ -5,26 +5,22 @@
 
 import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
 
-interface Bill {
-  id: string;
+type Bill = DbBill & {
   dueDate: string | Date;
-  amount?: number;
   estimatedAmount?: number;
-  envelopeId?: string;
-  isPaid?: boolean;
-  [key: string]: unknown;
-}
+  provider?: string;
+  description?: string;
+};
 
-interface Envelope {
-  id: string;
-  envelopeType?: string;
-  currentBalance?: number;
+type Envelope = DbEnvelope & {
   monthlyAmount?: number;
-  [key: string]: unknown;
-}
+  monthlyBudget?: number;
+  biweeklyAllocation?: number;
+};
 
-interface BillEnvelopeResult {
+export interface BillEnvelopeResult {
   isValidBillEnvelope: boolean;
   nextBillAmount: number;
   remainingToFund: number;
@@ -45,6 +41,23 @@ interface BillEnvelopeResult {
     category?: string;
     frequency: string;
   } | null;
+  maxRecommended?: number;
+  isUrgent?: boolean;
+  priority?: {
+    priorityLevel: string;
+    reason: string;
+  };
+  status?: {
+    color: string;
+    icon?: string;
+    bgColor: string;
+    textColor: string;
+  };
+  displayText?: {
+    primaryStatus: string;
+    secondaryStatus?: string;
+    fundingProgress?: string;
+  };
 }
 
 /**
@@ -75,17 +88,22 @@ const getNextUpcomingBill = (linkedBills: Bill[]): Bill | null => {
 /**
  * Calculate days until a given date
  */
-const calculateDaysUntil = (targetDate) => {
+const calculateDaysUntil = (targetDate: Date | string | null): number | null => {
   if (!targetDate) return null;
   const today = new Date();
-  const diffTime = targetDate.getTime() - today.getTime();
+  const target = new Date(targetDate);
+  const diffTime = target.getTime() - today.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
 /**
  * Calculate funding progress percentage
  */
-const calculateFundingProgress = (currentBalance, targetAmount, nextBillAmount) => {
+const calculateFundingProgress = (
+  currentBalance: number,
+  targetAmount: number,
+  nextBillAmount: number
+): number => {
   if (targetAmount > 0) {
     return Math.min(100, (currentBalance / targetAmount) * 100);
   }
@@ -95,13 +113,13 @@ const calculateFundingProgress = (currentBalance, targetAmount, nextBillAmount) 
 /**
  * Calculate total amount of bills due within next 30 days
  */
-const calculateUpcomingBillsAmount = (linkedBills) => {
+const calculateUpcomingBillsAmount = (linkedBills: Bill[]): number => {
   const next30Days = new Date();
   next30Days.setDate(next30Days.getDate() + 30);
 
   return linkedBills
     .filter((bill) => new Date(bill.dueDate) <= next30Days)
-    .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0);
+    .reduce((sum: number, bill: Bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0);
 };
 
 /**
@@ -119,9 +137,9 @@ export const calculateBillEnvelopeNeeds = (
   }
 
   // Find bills linked to this envelope
-  const linkedBills = bills.filter((bill) => bill.envelopeId === envelope.id && !bill.isPaid);
+  const linkedBills = bills.filter((bill: Bill) => bill.envelopeId === envelope.id && !bill.isPaid);
 
-  // Get the next upcoming bill
+  // Get next upcoming bill
   const nextBill = getNextUpcomingBill(linkedBills);
   const nextBillAmount = nextBill ? nextBill.amount || nextBill.estimatedAmount || 0 : 0;
   const nextBillDate = nextBill ? new Date(nextBill.dueDate) : null;
@@ -179,7 +197,10 @@ export const calculateBillEnvelopeNeeds = (
  * @param {Array} bills - Array of bills linked to this envelope
  * @returns {Object} Priority information
  */
-export const calculateBillEnvelopePriority = (envelope, bills = []) => {
+export const calculateBillEnvelopePriority = (
+  envelope: Envelope,
+  bills: Bill[] = []
+): { priority: number; priorityLevel: string; reason: string } => {
   const calculations = calculateBillEnvelopeNeeds(envelope, bills);
 
   if (!calculations.isValidBillEnvelope) {
@@ -257,20 +278,32 @@ export const calculateBillEnvelopePriority = (envelope, bills = []) => {
  * @param {number} availableCash - Available unassigned cash
  * @returns {Object} Funding recommendation
  */
-export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 0) => {
+export const getRecommendedBillFunding = (
+  envelope: Envelope,
+  bills: Bill[] = [],
+  availableCash: number = 0
+): { recommendedAmount: number; reason: string; maxRecommended: number; isUrgent: boolean } => {
   const calculations = calculateBillEnvelopeNeeds(envelope, bills);
   const priority = calculateBillEnvelopePriority(envelope, bills);
 
   if (!calculations.isValidBillEnvelope) {
-    return { recommendedAmount: 0, reason: "Not a bill envelope" };
+    return {
+      recommendedAmount: 0,
+      reason: "Not a bill envelope",
+      maxRecommended: 0,
+      isUrgent: false,
+    };
   }
 
-  const { remainingToFund, biweeklyAllocation } = calculations;
+  const remainingToFund = calculations.remainingToFund ?? 0;
+  const biweeklyAllocation = calculations.biweeklyAllocation ?? 0;
 
   if (calculations.isFullyFunded) {
     return {
       recommendedAmount: 0,
       reason: "Already fully funded for next bill",
+      maxRecommended: remainingToFund,
+      isUrgent: false,
     };
   }
 
@@ -296,6 +329,7 @@ export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 
       recommendedAmount,
       reason: priority.reason,
       maxRecommended: remainingToFund,
+      isUrgent: false,
     };
   }
 
@@ -305,6 +339,7 @@ export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 
     recommendedAmount: minimalFunding,
     reason: "Low priority - minimal funding suggested",
     maxRecommended: remainingToFund,
+    isUrgent: false,
   };
 };
 
@@ -314,7 +349,10 @@ export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 
  * @param {Array} bills - Array of bills linked to this envelope
  * @returns {Object} Display information
  */
-export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
+export const getBillEnvelopeDisplayInfo = (
+  envelope: Envelope,
+  bills: Bill[] = []
+): BillEnvelopeResult | null => {
   const calculations = calculateBillEnvelopeNeeds(envelope, bills);
   const priority = calculateBillEnvelopePriority(envelope, bills);
 
@@ -355,7 +393,8 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
     },
   };
 
-  const status = statusConfig[priority.priorityLevel] || statusConfig.none;
+  const status =
+    statusConfig[priority.priorityLevel as keyof typeof statusConfig] || statusConfig.none;
 
   return {
     ...calculations,
@@ -363,8 +402,8 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
     status,
     displayText: {
       primaryStatus: (() => {
-        const currentBalance = calculations.currentBalance;
-        const targetAmount = calculations.targetMonthlyAmount;
+        const currentBalance = calculations.currentBalance || 0;
+        const targetAmount = calculations.targetMonthlyAmount || 0;
         const nextBill = calculations.nextBill;
         const daysUntilNextBill = calculations.daysUntilNextBill;
 
@@ -374,9 +413,9 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
         }
 
         // Calculate if "On Track" based on bill cycle progression
-        if (nextBill && daysUntilNextBill > 0) {
+        if (nextBill && daysUntilNextBill !== null && daysUntilNextBill > 0) {
           // Determine total cycle length based on frequency
-          const frequencyDays = {
+          const frequencyDays: Record<string, number> = {
             weekly: 7,
             biweekly: 14,
             monthly: 30,
@@ -407,13 +446,13 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
         }
 
         // Fallback - show how much is still needed, but if $0 then say On Track
-        const remaining = calculations.remainingToFund;
+        const remaining = calculations.remainingToFund || 0;
         return remaining <= 0 ? "On Track" : `Need $${remaining.toFixed(2)}`;
       })(),
       secondaryStatus: calculations.nextBill
-        ? `Next: ${calculations.nextBill.name} (${calculations.daysUntilNextBill} days)`
+        ? `Next: ${calculations.nextBill?.name || ""} (${calculations.daysUntilNextBill || 0} days)`
         : "No upcoming bills",
-      fundingProgress: `${calculations.fundingProgress}% funded`,
+      fundingProgress: `${calculations.fundingProgress || 0}% funded`,
     },
   };
 };

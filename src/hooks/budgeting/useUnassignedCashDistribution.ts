@@ -12,9 +12,19 @@ import {
   getRecommendedBillFunding,
 } from "../../utils/budgeting/billEnvelopeCalculations";
 import logger from "../../utils/common/logger";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
+
+export type EnvelopeRecord = DbEnvelope & {
+  monthlyBudget?: number;
+  monthlyAmount?: number;
+  biweeklyAllocation?: number;
+  color?: string;
+};
+
+export type BillRecord = DbBill;
 
 // Helper to calculate monthly budget for an envelope
-const calculateMonthlyBudget = (envelope) => {
+const calculateMonthlyBudget = (envelope: EnvelopeRecord): number => {
   const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
 
   if (envelopeType === ENVELOPE_TYPES.BILL) {
@@ -29,13 +39,17 @@ const calculateMonthlyBudget = (envelope) => {
 };
 
 // Helper to calculate total budget across envelopes
-const calculateTotalBudget = (envelopes) => {
+const calculateTotalBudget = (envelopes: EnvelopeRecord[]): number => {
   return envelopes.reduce((sum, env) => sum + calculateMonthlyBudget(env), 0);
 };
 
 // Helper to create proportional distributions
-const createProportionalDistributions = (envelopes, unassignedCash, totalBudget) => {
-  const newDistributions = {};
+const createProportionalDistributions = (
+  envelopes: EnvelopeRecord[],
+  unassignedCash: number,
+  totalBudget: number
+): Record<string, number> => {
+  const newDistributions: Record<string, number> = {};
 
   envelopes.forEach((envelope) => {
     const monthlyBudget = calculateMonthlyBudget(envelope);
@@ -51,7 +65,11 @@ const createProportionalDistributions = (envelopes, unassignedCash, totalBudget)
 };
 
 // Helper to create bill priority distributions
-const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) => {
+const createBillPriorityDistributions = (
+  billEnvelopes: EnvelopeRecord[],
+  bills: BillRecord[],
+  unassignedCash: number
+): Record<string, number> => {
   const envelopeRecommendations = billEnvelopes.map((envelope) => {
     const priority = calculateBillEnvelopePriority(envelope, bills);
     const recommendation = getRecommendedBillFunding(envelope, bills, unassignedCash);
@@ -69,7 +87,7 @@ const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) =
   // Sort by priority (highest first)
   envelopeRecommendations.sort((a, b) => b.priority - a.priority);
 
-  const newDistributions = {};
+  const newDistributions: Record<string, number> = {};
   let remainingCash = unassignedCash;
 
   // First pass: Fund urgent/critical envelopes fully
@@ -94,19 +112,38 @@ const createBillPriorityDistributions = (billEnvelopes, bills, unassignedCash) =
   return newDistributions;
 };
 
+// Type for distribution state
+type Distributions = Record<string, number>;
+
+// Type for distribution preview item
+export interface DistributionPreviewItem extends EnvelopeRecord {
+  distributionAmount: number;
+  newBalance: number;
+}
+
 /**
  * Custom hook for managing unassigned cash distribution logic
  * Handles distribution calculations, validation, and envelope updates
  */
 const useUnassignedCashDistribution = () => {
   const { unassignedCash, setUnassignedCash } = useUnassignedCash();
-  const { envelopes } = useEnvelopes();
+  const { envelopes: rawEnvelopes } = useEnvelopes();
   const { bills = [] } = useBills();
   const queryClient = useQueryClient();
 
+  const envelopeList = useMemo<EnvelopeRecord[]>(
+    () => (rawEnvelopes ?? []).map((env) => env as EnvelopeRecord),
+    [rawEnvelopes]
+  );
+
+  const billList = useMemo<BillRecord[]>(
+    () => (bills ?? []).map((bill) => bill as BillRecord),
+    [bills]
+  );
+
   // Distribution state (modal state now handled by budget store)
-  const [distributions, setDistributions] = useState({});
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [distributions, setDistributions] = useState<Distributions>({});
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   // Calculate total being distributed
   const totalDistributed = useMemo(() => {
@@ -144,23 +181,23 @@ const useUnassignedCashDistribution = () => {
 
   // Distribute equally among all envelopes
   const distributeEqually = useCallback(() => {
-    if (envelopes.length === 0) return;
+    if (envelopeList.length === 0) return;
 
-    const amountPerEnvelope = Math.floor((unassignedCash * 100) / envelopes.length) / 100;
-    const newDistributions = {};
+    const amountPerEnvelope = Math.floor((unassignedCash * 100) / envelopeList.length) / 100;
+    const newDistributions: Distributions = {};
 
-    envelopes.forEach((envelope) => {
+    envelopeList.forEach((envelope) => {
       newDistributions[envelope.id] = amountPerEnvelope;
     });
 
     setDistributions(newDistributions);
-  }, [envelopes, unassignedCash]);
+  }, [envelopeList, unassignedCash]);
 
   // Distribute proportionally based on envelope type-specific budgets
   const distributeProportionally = useCallback(() => {
-    if (envelopes.length === 0) return;
+    if (envelopeList.length === 0) return;
 
-    const totalBudget = calculateTotalBudget(envelopes);
+    const totalBudget = calculateTotalBudget(envelopeList);
 
     if (totalBudget === 0) {
       // Fallback to equal distribution if no budgets set
@@ -169,32 +206,35 @@ const useUnassignedCashDistribution = () => {
     }
 
     const newDistributions = createProportionalDistributions(
-      envelopes,
+      envelopeList,
       unassignedCash,
       totalBudget
     );
     setDistributions(newDistributions);
-  }, [envelopes, unassignedCash, distributeEqually]);
+  }, [envelopeList, unassignedCash, distributeEqually]);
 
   // Distribute based on bill envelope priorities
   const distributeBillPriority = useCallback(() => {
-    if (envelopes.length === 0) return;
+    if (envelopeList.length === 0) return;
 
-    const billEnvelopes = envelopes.filter(
-      (env) =>
-        env.envelopeType === ENVELOPE_TYPES.BILL ||
-        AUTO_CLASSIFY_ENVELOPE_TYPE(env.category) === ENVELOPE_TYPES.BILL
-    );
+    const billEnvelopes = envelopeList.filter((envelope) => {
+      const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+      return envelopeType === ENVELOPE_TYPES.BILL;
+    });
 
     if (billEnvelopes.length === 0) {
-      // Fallback to proportional if no bill envelopes
-      distributeProportionally();
+      logger.info("No bill envelopes found for priority distribution");
       return;
     }
 
-    const newDistributions = createBillPriorityDistributions(billEnvelopes, bills, unassignedCash);
-    setDistributions(newDistributions);
-  }, [envelopes, bills, unassignedCash, distributeProportionally]);
+    const recommendedDistributions = createBillPriorityDistributions(
+      billEnvelopes,
+      billList,
+      unassignedCash
+    );
+
+    setDistributions(recommendedDistributions);
+  }, [envelopeList, unassignedCash, billList]);
 
   // Apply the distribution to envelopes
   const applyDistribution = useCallback(async () => {
@@ -204,12 +244,12 @@ const useUnassignedCashDistribution = () => {
 
     try {
       // Prepare envelope updates
-      const envelopeUpdates = [];
+      const envelopeUpdates: EnvelopeRecord[] = [];
 
       Object.entries(distributions).forEach(([envelopeId, amount]) => {
         const distributionAmount = parseFloat(String(amount)) || 0;
         if (distributionAmount > 0) {
-          const envelope = envelopes.find((env) => env.id === envelopeId);
+          const envelope = envelopeList.find((env) => env.id === envelopeId);
           if (envelope) {
             envelopeUpdates.push({
               ...envelope,
@@ -221,7 +261,7 @@ const useUnassignedCashDistribution = () => {
 
       // Apply updates
       if (envelopeUpdates.length > 0) {
-        await budgetDb.bulkUpsertEnvelopes(envelopeUpdates);
+        await budgetDb.bulkUpsertEnvelopes(envelopeUpdates as DbEnvelope[]);
 
         // Update unassigned cash with distribution tracking
         await setUnassignedCash(remainingCash, {
@@ -254,15 +294,15 @@ const useUnassignedCashDistribution = () => {
   }, [
     isValidDistribution,
     distributions,
-    envelopes,
+    envelopeList,
     queryClient,
     setUnassignedCash,
     remainingCash,
   ]);
 
   // Get distribution preview data
-  const getDistributionPreview = useCallback(() => {
-    return envelopes
+  const getDistributionPreview = useCallback((): DistributionPreviewItem[] => {
+    return envelopeList
       .map((envelope) => {
         const distributionAmount = distributions[envelope.id] || 0;
         return {
@@ -272,7 +312,7 @@ const useUnassignedCashDistribution = () => {
         };
       })
       .filter((envelope) => envelope.distributionAmount > 0);
-  }, [envelopes, distributions]);
+  }, [envelopeList, distributions]);
 
   return {
     // State
@@ -294,8 +334,8 @@ const useUnassignedCashDistribution = () => {
     applyDistribution,
 
     // Data
-    envelopes,
-    bills,
+    envelopes: envelopeList,
+    bills: billList,
     unassignedCash,
     getDistributionPreview,
   };

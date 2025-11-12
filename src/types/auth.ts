@@ -41,6 +41,8 @@ export interface AuthResult {
   suggestion?: string;
 }
 
+export type SetupPayload = string | (UserData & { password: string; shareCode?: string });
+
 // Auth flow types
 export type AuthMode = "standard" | "local-only" | null;
 
@@ -112,13 +114,13 @@ export interface UserSetupHook {
 
 // Auth Gateway component props
 export interface AuthGatewayProps {
-  onSetupComplete: (result: AuthResult) => void;
-  onLocalOnlyReady: (user: LocalOnlyUser) => void;
+  onSetupComplete: (payload: SetupPayload) => Promise<void> | void;
+  onLocalOnlyReady: (user: LocalOnlyUser | null) => void;
 }
 
 // User Setup component props
 export interface UserSetupProps {
-  onSetupComplete: (result: AuthResult) => void;
+  onSetupComplete: (payload: SetupPayload) => Promise<void> | void;
 }
 
 // Join budget modal data

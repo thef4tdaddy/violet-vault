@@ -2,28 +2,20 @@ import React, { memo, lazy, Suspense } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";
-import useUnassignedCashDistribution from "../../hooks/budgeting/useUnassignedCashDistribution";
+import useUnassignedCashDistribution, {
+  type EnvelopeRecord,
+  type BillRecord,
+  type DistributionPreviewItem,
+} from "../../hooks/budgeting/useUnassignedCashDistribution";
 import { ENVELOPE_TYPES } from "../../constants/categories";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 
-type DistributionEnvelope = {
-  id: string;
-  name: string;
-  currentBalance?: number;
-  monthlyBudget?: number;
-  monthlyAmount?: number;
-  color?: string;
-  envelopeType: string;
-};
+type DistributionEnvelope = EnvelopeRecord;
 
-type DistributionPreview = {
-  id: string;
-  name: string;
-  distributionAmount: number;
-};
+type DistributionPreview = DistributionPreviewItem;
 
 // ============================================================================
 // Sub-Components
@@ -235,22 +227,11 @@ const QuickActions = ({
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
 interface EnvelopeItemProps {
-  envelope: {
-    id: string;
-    name: string;
-    currentBalance?: number;
-    monthlyBudget?: number;
-    monthlyAmount?: number;
-    color?: string;
-    envelopeType: string;
-  };
+  envelope: DistributionEnvelope;
   distributionAmount: number;
   updateDistribution: (envelopeId: string, amount: string | number) => void;
   isProcessing: boolean;
-  bills?: Array<{
-    id: string;
-    name: string;
-  }>;
+  bills?: BillRecord[];
 }
 
 const EnvelopeItem = memo(
@@ -344,15 +325,10 @@ const UnassignedCashModal = () => {
 
   if (!isUnassignedCashModalOpen) return null;
 
-  const distributionEnvelopes = Array.isArray(envelopes)
-    ? (envelopes as DistributionEnvelope[])
-    : ([] as DistributionEnvelope[]);
+  const distributionEnvelopes = Array.isArray(envelopes) ? envelopes : [];
+  const typedBills = Array.isArray(bills) ? (bills as BillRecord[]) : [];
 
-  const typedBills = Array.isArray(bills)
-    ? (bills as Array<{ id: string; name: string }>)
-    : ([] as Array<{ id: string; name: string }>);
-
-  const preview = (getDistributionPreview() as DistributionPreview[]) || [];
+  const preview = getDistributionPreview();
   const hasDistributions = Number(totalDistributed) > 0;
   const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
 
@@ -417,7 +393,7 @@ const UnassignedCashModalContent = ({
   envelopes: DistributionEnvelope[];
   distributions: Record<string, number>;
   updateDistribution: (envelopeId: string, amount: string | number) => void;
-  bills: Array<{ id: string; name: string }>;
+  bills: BillRecord[];
   preview: DistributionPreview[];
   applyDistribution: () => void;
   isValidDistribution: boolean;

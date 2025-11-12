@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import logger from "../../utils/common/logger";
+import { createArchiver, ARCHIVE_CONFIG } from "@/utils/common/transactionArchiving";
 
 /**
  * Hook for managing transaction archiving UI state and preview generation
@@ -43,9 +44,7 @@ export const useTransactionArchivingUI = () => {
   const handlePreview = useCallback(async () => {
     try {
       setShowPreview(true);
-      // Create a temporary archiver to get preview data
-      const { createArchiver } = await import("@/utils/common/transactionArchiving");
-      const archiver = createArchiver({});
+      const archiver = createArchiver();
       const cutoffDateStr = archiver.calculateCutoffDate(selectedPeriod);
       const cutoffDate = new Date(cutoffDateStr);
       const transactionsToArchive = await archiver.getTransactionsForArchiving(cutoffDateStr);
@@ -64,37 +63,40 @@ export const useTransactionArchivingUI = () => {
       };
 
       transactionsToArchive.forEach((transaction) => {
+        const amount = Number(transaction.amount || 0);
+        const categoryKey = transaction.category ? String(transaction.category) : "Uncategorized";
+        const envelopeKey = transaction.envelopeId ? String(transaction.envelopeId) : "None";
+        const transactionDate = new Date(String(transaction.date));
+
         // Categories
-        const category = transaction.category || "Uncategorized";
-        if (!preview.categories[category]) {
-          preview.categories[category] = { count: 0, amount: 0 };
+        if (!preview.categories[categoryKey]) {
+          preview.categories[categoryKey] = { count: 0, amount: 0 };
         }
-        preview.categories[category].count++;
-        preview.categories[category].amount += transaction.amount || 0;
+        preview.categories[categoryKey].count++;
+        preview.categories[categoryKey].amount += amount;
 
         // Envelopes
-        const envelopeId = transaction.envelopeId || "None";
-        if (!preview.envelopes[envelopeId]) {
-          preview.envelopes[envelopeId] = { count: 0, amount: 0 };
+        if (!preview.envelopes[envelopeKey]) {
+          preview.envelopes[envelopeKey] = { count: 0, amount: 0 };
         }
-        preview.envelopes[envelopeId].count++;
-        preview.envelopes[envelopeId].amount += transaction.amount || 0;
+        preview.envelopes[envelopeKey].count++;
+        preview.envelopes[envelopeKey].amount += amount;
 
         // Totals
-        preview.totalAmount += transaction.amount || 0;
+        preview.totalAmount += amount;
 
         // Date range
-        if (!preview.dateRange.earliest || transaction.date < preview.dateRange.earliest) {
-          preview.dateRange.earliest = transaction.date;
+        if (!preview.dateRange.earliest || transactionDate < preview.dateRange.earliest) {
+          preview.dateRange.earliest = transactionDate;
         }
-        if (!preview.dateRange.latest || transaction.date > preview.dateRange.latest) {
-          preview.dateRange.latest = transaction.date;
+        if (!preview.dateRange.latest || transactionDate > preview.dateRange.latest) {
+          preview.dateRange.latest = transactionDate;
         }
       });
 
       setPreviewData(preview);
     } catch (error) {
-      logger.error("Failed to generate preview:", error);
+      logger.error("Failed to generate transaction archiving preview", { error });
     }
   }, [selectedPeriod]);
 
@@ -140,7 +142,7 @@ export const useTransactionArchivingProcess = () => {
         await executeArchiving(selectedPeriod);
         onSuccess?.();
       } catch (error) {
-        logger.error("Archiving failed:", error);
+        logger.error("Archiving failed", { error });
         onError?.(error);
       }
     },
@@ -203,5 +205,6 @@ export const useArchivingUIHelpers = () => {
     getUrgencyIcon,
     formatStorageSize,
     calculateStorageImpact,
+    ARCHIVE_CONFIG,
   };
 };

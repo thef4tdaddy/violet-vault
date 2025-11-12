@@ -9,6 +9,7 @@ import { budgetDb } from "@/db/budgetDb";
 import { queryKeys } from "@/utils/common/queryClient";
 import { processTransactions, calculateTransactionStats } from "@/utils/transactions/filtering";
 import logger from "@/utils/common/logger";
+import type { Transaction } from "@/types/finance";
 import {
   fetchTransactionsFromDb,
   getRecentTransactions,
@@ -23,6 +24,31 @@ import {
   searchTransactionsHelper,
   getEmptyStats,
 } from "./helpers/transactionDataHelpers";
+
+// Type for transaction statistics
+interface TransactionStats {
+  total: number;
+  totalIncome: number;
+  totalExpenses: number;
+  netAmount: number;
+  averageTransaction: number;
+  categories: Record<string, { count: number; total: number }>;
+  accounts: Record<string, { count: number; total: number }>;
+  dateRange: { earliest: Date | null; latest: Date | null };
+  error?: string;
+}
+
+// Type for transaction filter options
+interface TransactionFilterOptions {
+  dateRange?: { start?: string; end?: string };
+  envelopeId?: string;
+  category?: string;
+  type?: string; // 'income' | 'expense' | 'transfer'
+  searchQuery?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+}
 
 interface UseTransactionDataOptions {
   // Filter options
@@ -43,10 +69,19 @@ interface UseTransactionDataOptions {
   refetchInterval?: number | null;
 }
 
+// Type for helper functions
+type GetTransactionsByDateRangeFn = (
+  startDate: Date | string,
+  endDate: Date | string
+) => Transaction[];
+type GetTransactionsByEnvelopeFn = (envelopeId: string) => Transaction[];
+type GetTransactionsByCategoryFn = (categoryName: string) => Transaction[];
+type SearchTransactionsFn = (query: string) => Transaction[];
+
 /**
  * Hook for querying and filtering transaction data
- * @param {Object} options - Query and filter options
- * @returns {Object} Query state and processed transactions
+ * @param options - Query and filter options
+ * @returns Query state and processed transactions
  */
 const useTransactionData = (options: UseTransactionDataOptions = {}) => {
   const {
@@ -91,11 +126,11 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
   /**
    * Process and filter transactions based on options
    */
-  const processedTransactions = useMemo(() => {
+  const processedTransactions = useMemo((): Transaction[] => {
     if (!transactionsQuery.data) return [];
 
     try {
-      const processed = processTransactions(transactionsQuery.data, {
+      const filterOptions: TransactionFilterOptions = {
         dateRange,
         envelopeId,
         category,
@@ -104,12 +139,14 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
         sortBy,
         sortOrder,
         limit,
-      });
+      };
+
+      const processed = processTransactions(transactionsQuery.data, filterOptions);
 
       logger.debug(`Processed ${processed.length} transactions after filtering`);
       return processed;
     } catch (error) {
-      logger.error("Error processing transactions", error);
+      logger.error("Error processing transactions", { error });
       return transactionsQuery.data || [];
     }
   }, [
@@ -127,17 +164,18 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
   /**
    * Calculate statistics for processed transactions
    */
-  const statistics = useMemo(() => {
+  const statistics = useMemo((): TransactionStats => {
     if (!processedTransactions.length) return getEmptyStats();
 
     try {
       return calculateTransactionStats(processedTransactions);
     } catch (error) {
-      logger.error("Error calculating transaction statistics", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error("Error calculating transaction statistics", { error });
       return {
         ...getEmptyStats(),
         total: processedTransactions.length,
-        error: error.message,
+        error: errorMessage,
       };
     }
   }, [processedTransactions]);
@@ -170,19 +208,22 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
 
   // Helper methods using extracted functions
   const getTransactionsByDateRange = useMemo(
-    () => (startDate, endDate) => filterByDateRange(processedTransactions, startDate, endDate),
+    (): GetTransactionsByDateRangeFn => (startDate, endDate) =>
+      filterByDateRange(processedTransactions, startDate, endDate),
     [processedTransactions]
   );
   const getTransactionsByEnvelope = useMemo(
-    () => (envelopeId) => filterByEnvelope(processedTransactions, envelopeId),
+    (): GetTransactionsByEnvelopeFn => (envelopeId) =>
+      filterByEnvelope(processedTransactions, envelopeId),
     [processedTransactions]
   );
   const getTransactionsByCategory = useMemo(
-    () => (categoryName) => filterByCategory(processedTransactions, categoryName),
+    (): GetTransactionsByCategoryFn => (categoryName) =>
+      filterByCategory(processedTransactions, categoryName),
     [processedTransactions]
   );
   const searchTransactions = useMemo(
-    () => (query) => searchTransactionsHelper(processedTransactions, query),
+    (): SearchTransactionsFn => (query) => searchTransactionsHelper(processedTransactions, query),
     [processedTransactions]
   );
 
@@ -227,7 +268,7 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
     // Query utilities
     refetch: transactionsQuery.refetch,
     invalidate: () => {
-      // This would need access to queryClient, but we'll keep the hook focused
+      // This would need access to queryClient, but we'll keep hook focused
       logger.debug("Invalidate called - implement in parent component");
     },
   };

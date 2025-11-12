@@ -5,13 +5,14 @@ import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import logger from "../../utils/common/logger";
 import UserSetup from "./UserSetup";
 import LocalOnlySetup from "./LocalOnlySetup";
+import type { AuthGatewayProps } from "@/types/auth";
 
 /**
  * AuthGateway - Decides between standard auth, local-only mode, or mode selection
  */
-const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
+const AuthGateway: React.FC<AuthGatewayProps> = ({ onSetupComplete, onLocalOnlyReady }) => {
   const { isLocalOnlyMode, localOnlyUser, checkLocalOnlyMode } = useLocalOnlyMode();
-  const [authMode, setAuthMode] = useState(null); // null, 'standard', 'local-only'
+  const [authMode, setAuthMode] = useState<"standard" | "local-only" | null>(null);
   const [isCheckingLocalMode, setIsCheckingLocalMode] = useState(true);
 
   // Check for existing local-only mode on startup
@@ -75,7 +76,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
         onModeSelected={(mode) => {
           if (mode === "local-only") {
             // Local-only setup complete, let MainLayout take over
-            onLocalOnlyReady(localOnlyUser);
+            onLocalOnlyReady(localOnlyUser ?? null);
           }
         }}
         onSwitchToAuth={() => setAuthMode("standard")}

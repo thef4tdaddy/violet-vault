@@ -23,6 +23,7 @@ import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
 import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
 import logger from "@/utils/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
+import type { Transaction as DbTransaction, Envelope as DbEnvelope } from "@/db/types";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -39,9 +40,12 @@ interface ViewRendererProps {
 // Helper Components
 // ============================================================================
 
+type SafeTransaction = DbTransaction;
+type EnvelopeWithComputed = DbEnvelope & { [key: string]: unknown };
+
 interface EnvelopeViewProps {
-  envelopes: Array<Record<string, unknown>>;
-  safeTransactions: Array<Record<string, unknown>>;
+  envelopes: EnvelopeWithComputed[];
+  safeTransactions: SafeTransaction[];
   unassignedCash: number;
   addEnvelope: () => void;
   updateEnvelope: () => void;
@@ -231,8 +235,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
       <EnvelopeView
-        envelopes={envelopes as unknown as Array<Record<string, unknown>>}
-        safeTransactions={safeTransactions}
+        envelopes={envelopes as EnvelopeWithComputed[]}
+        safeTransactions={safeTransactions as SafeTransaction[]}
         unassignedCash={unassignedCash}
         addEnvelope={budgetOps.addEnvelope as () => void}
         updateEnvelope={budgetOps.updateEnvelope as () => void}

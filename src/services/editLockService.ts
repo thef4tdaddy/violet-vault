@@ -21,21 +21,61 @@ import {
   createExtendedLock,
   handleLockError,
 } from "../utils/services/editLockHelpers";
+import type { Auth } from "firebase/auth";
+
+// Type definitions for lock service
+export interface LockDocument {
+  id?: string;
+  recordType?: string;
+  recordId?: string;
+  budgetId?: string;
+  userId?: string;
+  userName?: string;
+  acquiredAt?: unknown;
+  expiresAt?: Date | number | { toDate: () => Date };
+  lastActivity?: unknown;
+  lockId?: string;
+}
+
+interface LockResult {
+  success: boolean;
+  lockDoc?: LockDocument;
+  reason?: string;
+}
+
+interface ReleaseResult {
+  success: boolean;
+  error?: string;
+}
+
+interface LockCallback {
+  (lock: LockDocument | null): void;
+}
+
+interface CurrentUser {
+  userName: string;
+  userColor: string;
+  userId?: string;
+}
+
+interface LockOptions {
+  duration?: number;
+}
 
 // Initialize Firebase app and firestore instance
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
-const auth = getAuth(app);
+const auth: Auth = getAuth(app);
 
 /**
  * Cross-browser edit locking service
  * Prevents concurrent editing conflicts by managing distributed locks in Firebase
  */
 class EditLockService {
-  locks: Map<string, Record<string, unknown>>;
+  locks: Map<string, LockDocument>;
   lockListeners: Map<string, () => void>;
   heartbeatIntervals: Map<string, ReturnType<typeof setInterval>>;
-  currentUser: { userName: string; userColor: string; userId?: string } | null;
+  currentUser: CurrentUser | null;
   budgetId: string | null;
 
   constructor() {
@@ -49,7 +89,7 @@ class EditLockService {
   /**
    * Initialize the service with user and budget context
    */
-  initialize(budgetId, currentUser) {
+  initialize(budgetId: string | null, currentUser: CurrentUser | null): void {
     this.budgetId = budgetId;
     this.currentUser = currentUser;
     logger.debug("🔐 EditLockService initialized", {
@@ -61,7 +101,11 @@ class EditLockService {
   /**
    * Attempt to acquire an edit lock
    */
-  async acquireLock(recordType, recordId, options = {}) {
+  async acquireLock(
+    recordType: string,
+    recordId: string,
+    options: LockOptions = {}
+  ): Promise<LockResult> {
     // Validate prerequisites
     const validation = validateLockPrerequisites(this.budgetId, this.currentUser, auth);
     if (!validation.valid) {
@@ -74,8 +118,8 @@ class EditLockService {
     const lockDoc = createLockDocument(
       recordType,
       recordId,
-      this.budgetId,
-      this.currentUser,
+      this.budgetId || "",
+      this.currentUser || { userName: "Unknown", userColor: "#000000" },
       options
     );
 
@@ -87,7 +131,7 @@ class EditLockService {
       );
 
       if (lockAction.action === "blocked") {
-        return lockAction.result;
+        return lockAction.result as LockResult;
       }
 
       if (lockAction.action === "extend_existing") {
@@ -96,7 +140,7 @@ class EditLockService {
           recordType,
           recordId,
         });
-        const extendedLock = createExtendedLock(lockDoc, options);
+        const extendedLock = createExtendedLock(lockDoc, options) as LockDocument;
         await setDoc(doc(firestore, "locks", lockId), extendedLock);
         this.locks.set(lockId, extendedLock);
         this.startHeartbeat(lockId);
@@ -109,25 +153,25 @@ class EditLockService {
 
       // Acquire new lock
       await setDoc(doc(firestore, "locks", lockId), lockDoc);
-      this.locks.set(lockId, lockDoc);
+      this.locks.set(lockId, lockDoc as LockDocument);
       this.startHeartbeat(lockId);
 
       logger.info("🔒 Lock acquired", {
         recordType,
         recordId,
-        userName: this.currentUser.userName,
+        userName: this.currentUser?.userName,
       });
 
       return { success: true, lockDoc };
-    } catch (error) {
-      return handleLockError(error, this.currentUser, this.budgetId);
+    } catch (error: unknown) {
+      return handleLockError(error, this.currentUser, this.budgetId) as LockResult;
     }
   }
 
   /**
    * Release an edit lock
    */
-  async releaseLock(recordType, recordId) {
+  async releaseLock(recordType: string, recordId: string): Promise<ReleaseResult> {
     const lockId = `${recordType}_${recordId}`;
 
     try {
@@ -142,15 +186,17 @@ class EditLockService {
 
       logger.info("🔓 Lock released", { recordType, recordId });
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       // Handle Firebase permission errors gracefully
+      const firebaseError = error as { code?: string; message?: string };
       if (
-        error.code === "permission-denied" ||
-        error.message?.includes("Missing or insufficient permissions")
+        firebaseError?.code === "permission-denied" ||
+        firebaseError?.message?.includes("Missing or insufficient permissions")
       ) {
         logger.warn("❌ Failed to release lock - insufficient permissions (continuing anyway)", {
           recordType,
           recordId,
+          error,
         });
         // Remove from local cache even if Firebase failed
         this.locks.delete(lockId);
@@ -158,15 +204,17 @@ class EditLockService {
         return { success: true };
       }
 
-      logger.error("❌ Failed to release lock", error);
-      return { success: false, error: error.message };
+      const errorMessage =
+        error instanceof Error ? error.message : String(firebaseError?.message || error);
+      logger.error("❌ Failed to release lock", { error });
+      return { success: false, error: errorMessage };
     }
   }
 
   /**
    * Get current lock for a record
    */
-  async getLock(recordType, recordId) {
+  async getLock(recordType: string, recordId: string): Promise<LockDocument | null> {
     try {
       // Query locks collection - using correct path per security rules
       const q = query(
@@ -179,23 +227,25 @@ class EditLockService {
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
         const lockDoc = snapshot.docs[0];
-        return { id: lockDoc.id, ...lockDoc.data() };
+        return { id: lockDoc.id, ...lockDoc.data() } as LockDocument;
       }
       return null;
-    } catch (error) {
+    } catch (error: unknown) {
       // Handle Firebase permission errors gracefully
+      const firebaseError = error as { code?: string; message?: string };
       if (
-        error.code === "permission-denied" ||
-        error.message?.includes("Missing or insufficient permissions")
+        firebaseError?.code === "permission-denied" ||
+        firebaseError?.message?.includes("Missing or insufficient permissions")
       ) {
         logger.warn("❌ Failed to get lock - insufficient permissions", {
           recordType,
           recordId,
+          error,
         });
         return null; // No lock found (graceful degradation)
       }
 
-      logger.error("❌ Failed to get lock", error);
+      logger.error("❌ Failed to get lock", { error });
       return null;
     }
   }
@@ -203,7 +253,7 @@ class EditLockService {
   /**
    * Listen for lock changes on a record
    */
-  watchLock(recordType, recordId, callback) {
+  watchLock(recordType: string, recordId: string, callback: LockCallback): () => void {
     const lockId = `${recordType}_${recordId}`;
     // Query locks collection - using correct path per security rules
     const q = query(
@@ -219,7 +269,7 @@ class EditLockService {
         const locks = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }));
+        })) as LockDocument[];
         callback(locks[0] || null); // Only one lock per record
       },
       (error) => {
@@ -235,7 +285,7 @@ class EditLockService {
   /**
    * Stop watching lock changes
    */
-  unwatchLock(recordType, recordId) {
+  unwatchLock(recordType: string, recordId: string): void {
     const lockId = `${recordType}_${recordId}`;
     const unsubscribe = this.lockListeners.get(lockId);
     if (unsubscribe) {
@@ -247,7 +297,7 @@ class EditLockService {
   /**
    * Start heartbeat to keep lock alive
    */
-  startHeartbeat(lockId) {
+  startHeartbeat(lockId: string): void {
     // Stop existing heartbeat for this lock if any
     this.stopHeartbeat(lockId);
 
@@ -264,7 +314,7 @@ class EditLockService {
         );
 
         // Update local cache
-        const localLock = this.locks.get(lockId);
+        const localLock = this.locks.get(lockId) as LockDocument;
         if (localLock) {
           localLock.expiresAt = new Date(Date.now() + 60000);
           localLock.lastActivity = new Date();
@@ -275,40 +325,40 @@ class EditLockService {
           expiresAt: new Date(Date.now() + 60000),
         });
       } catch (error) {
-        logger.error("💓 Heartbeat failed for lock:", lockId, error);
+        logger.error("💓 Heartbeat failed for lock", { lockId, error });
         this.stopHeartbeat(lockId);
       }
     }, 5000); // Heartbeat every 5 seconds for better timer responsiveness
 
     this.heartbeatIntervals.set(lockId, heartbeatInterval);
-    logger.debug("💓 Heartbeat started for lock:", lockId);
+    logger.debug("💓 Heartbeat started for lock", { lockId });
   }
 
   /**
    * Stop heartbeat for a lock
    */
-  stopHeartbeat(lockId) {
+  stopHeartbeat(lockId: string): void {
     const heartbeatInterval = this.heartbeatIntervals.get(lockId);
     if (heartbeatInterval) {
       clearInterval(heartbeatInterval);
       this.heartbeatIntervals.delete(lockId);
-      logger.debug("💓 Heartbeat stopped for lock:", lockId);
+      logger.debug("💓 Heartbeat stopped for lock", { lockId });
     }
   }
 
   /**
    * Check if current user owns a lock
    */
-  ownsLock(recordType, recordId) {
+  ownsLock(recordType: string, recordId: string): boolean {
     const lockId = `${recordType}_${recordId}`;
-    const lock = this.locks.get(lockId);
+    const lock = this.locks.get(lockId) as LockDocument;
     return lock && lock.userId === this.currentUser?.userId;
   }
 
   /**
    * Clean up all locks and listeners
    */
-  cleanup() {
+  cleanup(): void {
     // Stop all heartbeats
     for (const [_lockId, heartbeatInterval] of this.heartbeatIntervals) {
       clearInterval(heartbeatInterval);
@@ -317,8 +367,9 @@ class EditLockService {
 
     // Release all owned locks
     for (const [, lock] of this.locks) {
-      if (lock.userId === this.currentUser?.userId) {
-        this.releaseLock(lock.recordType, lock.recordId);
+      const lockDoc = lock as LockDocument;
+      if (lockDoc.userId === this.currentUser?.userId) {
+        this.releaseLock(lockDoc.recordType, lockDoc.recordId);
       }
     }
 
@@ -338,6 +389,9 @@ class EditLockService {
 export const editLockService = new EditLockService();
 
 // Initialize when auth context is available
-export const initializeEditLocks = (budgetId, currentUser) => {
+export const initializeEditLocks = (
+  budgetId: string | null,
+  currentUser: CurrentUser | null
+): void => {
   editLockService.initialize(budgetId, currentUser);
 };

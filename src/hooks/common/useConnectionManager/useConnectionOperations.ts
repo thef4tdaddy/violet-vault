@@ -4,9 +4,30 @@
  */
 import useToast from "../useToast";
 import logger from "../../../utils/common/logger";
-import { Envelope, Bill, Debt } from "../../../db/types";
+import type { Envelope, Bill, Debt } from "../../../db/types";
 
-const connectBill = async (entityId, targetId, envelopes, updateBill, addToast) => {
+// Type for toast function
+type ToastFunction = (options: {
+  type: "success" | "error" | "info";
+  title: string;
+  message: string;
+  duration: number;
+}) => void;
+
+// Type for update functions
+type UpdateBillFunction = (id: string, updates: Partial<Bill>) => Promise<void>;
+type UpdateDebtFunction = (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
+
+// Type for operation result
+type OperationResult = { success: true } | { success: false; error?: string };
+
+const connectBill = async (
+  entityId: string,
+  targetId: string,
+  envelopes: Envelope[],
+  updateBill: UpdateBillFunction,
+  addToast: ToastFunction
+): Promise<void> => {
   const targetEnvelope = envelopes.find((e) => e.id === targetId);
   if (!targetEnvelope) throw new Error("Target envelope not found");
 
@@ -20,7 +41,13 @@ const connectBill = async (entityId, targetId, envelopes, updateBill, addToast) 
   });
 };
 
-const connectEnvelope = async (entityId, targetId, bills, updateBill, addToast) => {
+const connectEnvelope = async (
+  entityId: string,
+  targetId: string,
+  bills: Bill[],
+  updateBill: UpdateBillFunction,
+  addToast: ToastFunction
+): Promise<void> => {
   const targetBill = bills.find((b) => b.id === targetId);
   if (!targetBill) throw new Error("Target bill not found");
 
@@ -29,12 +56,18 @@ const connectEnvelope = async (entityId, targetId, bills, updateBill, addToast) 
   addToast({
     type: "success",
     title: "Connection Created",
-    message: `Connected to ${targetBill.provider}`,
+    message: `Connected to ${targetBill.name}`,
     duration: 3000,
   });
 };
 
-const connectDebt = async (entityId, targetId, envelopes, updateDebt, addToast) => {
+const connectDebt = async (
+  entityId: string,
+  targetId: string,
+  envelopes: Envelope[],
+  updateDebt: UpdateDebtFunction,
+  addToast: ToastFunction
+): Promise<void> => {
   const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
   if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
 
@@ -56,16 +89,16 @@ interface ConnectParams {
   envelopes: Envelope[];
   bills: Bill[];
   debts?: Debt[];
-  updateBill: (id: string, updates: Partial<Bill>) => Promise<void>;
-  updateDebt: (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
+  updateBill: UpdateBillFunction;
+  updateDebt: UpdateDebtFunction;
 }
 
 interface DisconnectParams {
-  entityType: string;
+  entityType: "bill" | "envelope" | "debt";
   entityId: string;
   currentConnections: Bill[];
-  updateBill: (id: string, updates: Partial<Bill>) => Promise<void>;
-  updateDebt: (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
+  updateBill: UpdateBillFunction;
+  updateDebt: UpdateDebtFunction;
 }
 
 export const useConnectionOperations = () => {
@@ -80,7 +113,7 @@ export const useConnectionOperations = () => {
     bills,
     updateBill,
     updateDebt,
-  }: ConnectParams) => {
+  }: ConnectParams): Promise<OperationResult> => {
     if (!targetId || !currentEntity) return { success: false };
 
     logger.debug("🔗 Creating connection", {
@@ -88,8 +121,7 @@ export const useConnectionOperations = () => {
       entityId,
       targetId,
       currentEntity:
-        (currentEntity as { name?: string; provider?: string }).name ||
-        (currentEntity as { provider?: string }).provider,
+        (currentEntity as { name?: string }).name || (currentEntity as { name?: string }).name,
     });
 
     try {
@@ -114,6 +146,7 @@ export const useConnectionOperations = () => {
       });
       return { success: true };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create connection";
       logger.error("❌ Failed to create connection", error, {
         entityType,
         entityId,
@@ -122,10 +155,10 @@ export const useConnectionOperations = () => {
       addToast({
         type: "error",
         title: "Connection Failed",
-        message: error.message || "Failed to create connection",
+        message: errorMessage,
         duration: 5000,
       });
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -135,7 +168,7 @@ export const useConnectionOperations = () => {
     currentConnections,
     updateBill,
     updateDebt,
-  }: DisconnectParams) => {
+  }: DisconnectParams): Promise<OperationResult> => {
     if (currentConnections.length === 0) return { success: false };
 
     logger.debug("🔗 Removing connection", {
@@ -193,6 +226,7 @@ export const useConnectionOperations = () => {
       });
       return { success: true };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to remove connection";
       logger.error("❌ Failed to remove connection", error, {
         entityType,
         entityId,
@@ -200,10 +234,10 @@ export const useConnectionOperations = () => {
       addToast({
         type: "error",
         title: "Disconnection Failed",
-        message: error.message || "Failed to remove connection",
+        message: errorMessage,
         duration: 5000,
       });
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   };
 

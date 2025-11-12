@@ -4,8 +4,42 @@ import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import { useShallow } from "zustand/react/shallow";
 
+interface HintConfig {
+  icon: string;
+  title: string;
+  message: string;
+  actions: (
+    onAction: () => void,
+    markStepComplete: (step: string) => void
+  ) => Array<{
+    label: string;
+    onClick: () => void;
+    primary: boolean;
+  }>;
+  step: string;
+  color: string;
+}
+
+interface CustomMessage {
+  title?: string;
+  description?: string;
+}
+
+interface CustomAction {
+  label: string;
+  onClick: () => void;
+  primary?: boolean;
+}
+
+interface EmptyStateHintsProps {
+  type: keyof typeof HINT_CONFIGS;
+  onAction: () => void;
+  customMessage?: CustomMessage;
+  customActions?: CustomAction[];
+}
+
 // Hint configurations for different empty states
-const HINT_CONFIGS = {
+const HINT_CONFIGS: Record<string, HintConfig> = {
   bankBalance: {
     icon: "Wallet",
     title: "Set Your Bank Balance",
@@ -161,7 +195,12 @@ const BUTTON_COLOR_CLASSES = {
 /**
  * EmptyStateHints - Provides contextual hints and guidance for empty states
  */
-const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
+const EmptyStateHints = ({
+  type,
+  onAction,
+  customMessage,
+  customActions,
+}: EmptyStateHintsProps) => {
   const { shouldShowHint, markStepComplete, preferences } = useOnboardingStore(
     useShallow((state) => ({
       shouldShowHint: state.shouldShowHint,

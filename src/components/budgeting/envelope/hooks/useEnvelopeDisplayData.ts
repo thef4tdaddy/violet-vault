@@ -2,29 +2,18 @@ import { useMemo } from "react";
 import { getUtilizationColor } from "@/utils/budgeting";
 import { ENVELOPE_TYPES } from "@/constants/categories";
 import { getBillEnvelopeDisplayInfo } from "@/utils/budgeting/billEnvelopeCalculations";
+import type { BillEnvelopeResult } from "@/utils/budgeting/billEnvelopeCalculations";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
-interface Envelope {
-  id: string;
-  name: string;
-  category: string;
-  color?: string;
-  envelopeType: string;
+type EnvelopeInput = DbEnvelope & {
   status: string;
   utilizationRate: number;
-  currentBalance: number;
   available: number;
   monthlyBudget?: number;
   monthlyAmount?: number;
-}
+};
 
-interface Bill {
-  id: string;
-  name: string;
-  envelopeId: string;
-  amount: number;
-  dueDate: string;
-  isPaid: boolean;
-}
+type BillInput = DbBill & { isPaid?: boolean };
 
 interface EnvelopeDisplayData {
   statusIcon: string;
@@ -40,8 +29,8 @@ interface EnvelopeDisplayData {
 }
 
 export const useEnvelopeDisplayData = (
-  envelope: Envelope,
-  bills: Bill[] = []
+  envelope: EnvelopeInput,
+  bills: BillInput[] = []
 ): EnvelopeDisplayData => {
   return useMemo(() => {
     const getStatusIcon = (status: string): string => {
@@ -136,14 +125,11 @@ export const useEnvelopeDisplayData = (
       const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
       if (!displayInfo) return getFallbackData();
 
-      const displayInfoTyped = displayInfo as {
-        displayText: { primaryStatus: string };
-        currentBalance: number;
-        targetMonthlyAmount: number;
-        remainingToFund: number;
-      };
-      const { displayText, currentBalance, targetMonthlyAmount, remainingToFund } =
-        displayInfoTyped;
+      const typedInfo = displayInfo as BillEnvelopeResult;
+      const displayText = typedInfo.displayText ?? { primaryStatus: "" };
+      const currentBalance = typedInfo.currentBalance ?? 0;
+      const targetMonthlyAmount = typedInfo.targetMonthlyAmount ?? 0;
+      const remainingToFund = typedInfo.remainingToFund ?? 0;
       const status = getBillStatusInfo(displayText);
 
       return {

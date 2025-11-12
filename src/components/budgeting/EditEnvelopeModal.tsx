@@ -60,6 +60,7 @@ const EditEnvelopeModal = ({
     lockLoading,
     breakLock,
     canDelete,
+    isExpired,
   } = useEnvelopeEdit({
     isOpen,
     envelope,
@@ -145,7 +146,7 @@ const EditEnvelopeModal = ({
             lockLoading={lockLoading}
             isLocked={isLocked}
             isOwnLock={isOwnLock}
-            isExpired={Boolean(lock?.isExpired)}
+            isExpired={isExpired}
             lock={lock}
             onBreakLock={breakLock}
             onClose={handleClose}

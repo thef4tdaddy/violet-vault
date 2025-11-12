@@ -3,13 +3,13 @@
  * Analyzes paycheck history to predict future payday dates
  */
 
-interface PaycheckEntry {
+export interface PaycheckEntry {
   date?: Date | string;
   processedAt?: Date | string;
   [key: string]: unknown;
 }
 
-interface PaydayPrediction {
+export interface PaydayPrediction {
   nextPayday: Date | null;
   confidence: number;
   pattern: string | null;
@@ -267,12 +267,15 @@ export const formatPaydayPrediction = (
   shortText: string;
   confidence: number;
   pattern?: string | null;
+  date: string;
 } => {
   if (!prediction.nextPayday) {
     return {
       displayText: "Unable to predict next payday",
       shortText: "Unknown",
       confidence: prediction.confidence || 0,
+      date: "Unknown",
+      pattern: prediction.pattern,
     };
   }
 
@@ -305,7 +308,8 @@ export const formatPaydayPrediction = (
   return {
     displayText,
     shortText,
-    confidence: prediction.confidence,
+    confidence: prediction.confidence ?? 0,
     pattern: prediction.pattern,
+    date,
   };
 };

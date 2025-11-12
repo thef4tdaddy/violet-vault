@@ -7,6 +7,7 @@ import AccountFinancialFields from "./form/AccountFinancialFields";
 import AccountColorAndSettings from "./form/AccountColorAndSettings";
 import AccountFormActions from "./form/AccountFormActions";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
 
 interface AccountForm {
   name: string;
@@ -23,13 +24,6 @@ interface EditingAccount {
   id: string | number;
 }
 
-interface Lock {
-  userId?: string;
-  userName?: string;
-  expiresAt?: number;
-  [key: string]: unknown;
-}
-
 interface ModalContentProps {
   editingAccount: EditingAccount | null;
   accountForm: AccountForm;
@@ -37,7 +31,7 @@ interface ModalContentProps {
   canEdit: boolean | null;
   isLocked: boolean;
   isOwnLock: boolean;
-  lock: Lock | null;
+  lock: ServiceLockDocument | null;
   breakLock: () => void;
   onClose: () => void;
   onSubmit: () => void;
@@ -105,7 +99,7 @@ interface AccountFormModalProps {
   isLocked: boolean;
   isOwnLock: boolean;
   canEdit: boolean | null;
-  lock: Lock | null;
+  lock: ServiceLockDocument | null;
   breakLock: () => void;
   lockLoading: boolean;
   _forceMobileMode?: boolean;

@@ -1,22 +1,12 @@
 import React, { Suspense } from "react";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
-
-interface Envelope {
-  id: string;
-  envelopeType: string;
-}
-
-interface Bill {
-  id: string;
-  name: string;
-  envelopeId: string;
-  dueDate: string;
-}
+import type { BillEnvelopeResult } from "../../../utils/budgeting/billEnvelopeCalculations";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 interface BillEnvelopeStatusProps {
-  envelope: Envelope;
-  bills: Bill[];
+  envelope: DbEnvelope;
+  bills: DbBill[];
 }
 
 export const BillEnvelopeStatus: React.FC<BillEnvelopeStatusProps> = ({ envelope, bills }) => {
@@ -28,33 +18,30 @@ export const BillEnvelopeStatus: React.FC<BillEnvelopeStatusProps> = ({ envelope
     <div className="mt-4 pt-3 border-t border-gray-200">
       <Suspense fallback={<div className="text-xs text-gray-500">Loading funding info...</div>}>
         {(() => {
-          // Use the imported function
           const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
 
           if (!displayInfo) return null;
 
-          const displayInfoTyped = displayInfo as {
-            nextBill: { name: string } | null;
-            daysUntilNextBill: number;
-            displayText: { primaryStatus: string };
-          };
-          const { nextBill, daysUntilNextBill, displayText } = displayInfoTyped;
+          const typedInfo = displayInfo as BillEnvelopeResult;
+          const nextBill = typedInfo.nextBill;
+          const daysUntilNextBill = typedInfo.daysUntilNextBill ?? 0;
+          const primaryStatus = typedInfo.displayText?.primaryStatus ?? "";
 
           return (
             <div className="space-y-1">
               {/* Status Text */}
               <div
                 className={`text-sm font-medium ${
-                  displayText.primaryStatus === "Fully Funded"
+                  primaryStatus === "Fully Funded"
                     ? "text-green-600"
-                    : displayText.primaryStatus === "On Track"
+                    : primaryStatus === "On Track"
                       ? "text-blue-600"
-                      : displayText.primaryStatus.startsWith("Behind")
+                      : primaryStatus.startsWith("Behind")
                         ? "text-red-600"
                         : "text-orange-600"
                 }`}
               >
-                {displayText.primaryStatus}
+                {primaryStatus}
               </div>
 
               {/* Next Bill Info */}
