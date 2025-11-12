@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
+| ESLint Issues | 6 | +6 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 3216 | +3216 |
+| TypeScript Strict Mode Errors | 3216 | 0 |
 
-*Last updated: 2025-11-12 01:51:39 UTC*
+*Last updated: 2025-11-12 02:06:42 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,15 +26,31 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 4 issues in `/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/AmazonReceiptImporter.tsx`
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/FileUploader.tsx`
 
-Last check: 2025-11-12 01:51:09 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 5 | `enforce-ui-library/enforce-ui-library` |
+| 1 | `max-lines-per-function` |
+
+### Detailed Lint Report
+```
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/AmazonReceiptImporter.tsx:20:76 - 1 - Arrow function has too many lines (162). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/AmazonReceiptImporter.tsx:90:11 - 1 - Use <Select> from @/components/ui instead of <select> element. Import: import { Select } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/AmazonReceiptImporter.tsx:104:9 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/AmazonReceiptImporter.tsx:132:15 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/FileUploader.tsx:25:9 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/FileUploader.tsx:36:9 - 1 - Use <Button> from @/components/ui instead of <button> element. Import: import { Button } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+```
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-12 01:51:23 UTC
+Last check: 2025-11-12 02:06:26 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -4048,10 +4064,10 @@ src/utils/debug/syncDiagnostic.ts(158,39): error TS18046: 'err' is of type 'unkn
 src/utils/debug/syncDiagnostic.ts(177,55): error TS18046: 'error' is of type 'unknown'.
 src/utils/debug/syncDiagnostic.ts(204,55): error TS18046: 'error' is of type 'unknown'.
 src/utils/debug/syncDiagnostic.ts(236,58): error TS18046: 'error' is of type 'unknown'.
-src/utils/icons/index.ts(334,25): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
-src/utils/icons/index.ts(336,10): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ "arrow-right": ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 123 more ...; CreditCard: ForwardRefExoticComponent<...>; }'.
-src/utils/icons/index.ts(340,29): error TS7006: Parameter 'iconComponent' implicitly has an 'any' type.
-src/utils/icons/index.ts(346,28): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
+src/utils/icons/index.ts(338,25): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
+src/utils/icons/index.ts(340,10): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ "arrow-right": ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 125 more ...; CreditCard: ForwardRefExoticComponent<...>; }'.
+src/utils/icons/index.ts(344,29): error TS7006: Parameter 'iconComponent' implicitly has an 'any' type.
+src/utils/icons/index.ts(350,28): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
 src/utils/layout/paycheckDeletionUtils.ts(10,42): error TS7006: Parameter 'paycheckId' implicitly has an 'any' type.
 src/utils/layout/paycheckDeletionUtils.ts(10,54): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/utils/layout/paycheckDeletionUtils.ts(15,50): error TS7006: Parameter 'p' implicitly has an 'any' type.

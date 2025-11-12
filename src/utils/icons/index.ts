@@ -107,6 +107,8 @@ import {
   UtensilsCrossed,
   Coffee,
   ShoppingCart,
+  ShoppingBag,
+  Package,
 
   // Documents & Files
   FileText,
@@ -273,6 +275,8 @@ export const ICON_REGISTRY = {
   UtensilsCrossed: UtensilsCrossed,
   Coffee: Coffee,
   ShoppingCart: ShoppingCart,
+  ShoppingBag: ShoppingBag,
+  Package: Package,
 
   // Documents & Files (matching debt constants)
   FileText: FileText,
