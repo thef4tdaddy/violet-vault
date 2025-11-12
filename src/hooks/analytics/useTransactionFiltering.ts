@@ -4,8 +4,12 @@
  */
 import { useMemo } from "react";
 import { getDateRanges } from "../../utils/analytics/categoryPatterns";
+import type { TransactionForStats } from "../../utils/analytics/categoryHelpers";
 
-export const useTransactionFiltering = (transactions, dateRange) => {
+export const useTransactionFiltering = (
+  transactions: TransactionForStats[],
+  dateRange: string
+): TransactionForStats[] => {
   return useMemo(() => {
     const ranges = getDateRanges();
     const startDate = ranges[dateRange];

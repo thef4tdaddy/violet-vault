@@ -109,14 +109,14 @@ const AnalyticsDashboard = () => {
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
     period: timeFilter,
-    customDateRange,
+    customDateRange: customDateRange || undefined,
     includeTransfers: false,
     groupBy: "category",
   });
 
   const balanceQuery = useAnalytics({
     period: timeFilter,
-    customDateRange,
+    customDateRange: customDateRange || undefined,
     includeTransfers: true,
     groupBy: "envelope",
   });
@@ -133,7 +133,7 @@ const AnalyticsDashboard = () => {
   const normalizedTransactions = useMemo(() => {
     const fromAnalytics = (analyticsQuery.analytics as { transactions?: unknown[] })?.transactions;
     if (Array.isArray(fromAnalytics) && fromAnalytics.length > 0) {
-      return fromAnalytics;
+      return fromAnalytics as unknown[];
     }
     return transactions;
   }, [analyticsQuery.analytics, transactions]);
@@ -367,9 +367,12 @@ const AnalyticsDashboard = () => {
     }
   }, []);
 
-  const handleExport = (format: unknown, options: unknown) => {
-    logger.info("Exporting analytics report", { format, options, timeFilter });
-    // Export functionality will be implemented in ReportExporter
+  const handleExport = () => {
+    try {
+      // Export logic here
+    } catch (error) {
+      logger.error("Export failed:", error);
+    }
   };
 
   if (analyticsQuery.isLoading || balanceQuery.isLoading) {
@@ -452,7 +455,13 @@ const AnalyticsDashboard = () => {
 
         {showExportModal && (
           <ReportExporter
-            analyticsData={analyticsQuery.analytics}
+            analyticsData={{
+              balanceData: balanceQuery.analytics,
+              categoryData: analyticsQuery.analytics,
+              transactionData: analyticsQuery.analytics,
+              envelopeData: analyticsQuery.analytics,
+              savingsData: analyticsQuery.analytics,
+            }}
             balanceData={balanceQuery.analytics}
             timeFilter={timeFilter}
             onExport={handleExport}

@@ -10,6 +10,7 @@ import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
 import {
   COLUMN_STYLES,
   COLUMN_WIDTHS,
+  MIN_TABLE_WIDTH,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
@@ -150,10 +151,7 @@ const DesktopTransactionTable = ({
 };
 
 interface MobileTransactionListProps
-  extends Pick<
-    TransactionTableProps,
-    "transactions" | "envelopes" | "onEdit" | "onSplit"
-  > {
+  extends Pick<TransactionTableProps, "transactions" | "envelopes" | "onEdit" | "onSplit"> {
   deletingTransaction: Transaction | null;
   handleDeleteClick: (transaction: Transaction) => void;
   handleHistoryClick: (transaction: Transaction) => void;
@@ -173,7 +171,9 @@ const MobileTransactionList = ({
   onSplit,
 }: MobileTransactionListProps) => {
   if (transactions.length === 0) {
-    return <div className="px-4 py-10 text-center text-sm text-gray-500">No transactions found</div>;
+    return (
+      <div className="px-4 py-10 text-center text-sm text-gray-500">No transactions found</div>
+    );
   }
 
   return (
@@ -181,8 +181,11 @@ const MobileTransactionList = ({
       <div className="divide-y divide-purple-200">
         {transactions.map((transaction) => {
           const envelope = findEnvelopeForTransaction(transaction, envelopes);
-          const { name: envelopeName, color: envelopeColor, className: envelopeClassName } =
-            getEnvelopeDisplay(envelope);
+          const {
+            name: envelopeName,
+            color: envelopeColor,
+            className: envelopeClassName,
+          } = getEnvelopeDisplay(envelope);
           const { formatted: formattedAmount, className: amountClassName } =
             formatTransactionAmount(transaction.amount);
           const formattedDate = formatTransactionDate(transaction.date);
@@ -195,14 +198,18 @@ const MobileTransactionList = ({
                   <p className="text-xs uppercase tracking-wide text-gray-500">Date</p>
                   <p className="text-sm font-semibold text-gray-900">{formattedDate}</p>
                 </div>
-                <span className={`text-sm font-semibold ${amountClassName}`}>{formattedAmount}</span>
+                <span className={`text-sm font-semibold ${amountClassName}`}>
+                  {formattedAmount}
+                </span>
               </div>
 
               <div>
                 <p className="text-xs uppercase tracking-wide text-gray-500">Description</p>
                 <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
                 {transaction.notes && (
-                  <p className="mt-1 text-xs text-gray-500 whitespace-pre-wrap">{transaction.notes}</p>
+                  <p className="mt-1 text-xs text-gray-500 whitespace-pre-wrap">
+                    {transaction.notes}
+                  </p>
                 )}
               </div>
 
@@ -330,7 +337,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     COLUMN_WIDTHS.actions,
   ].join(" ");
 
-  const minTableWidth = "62rem";
+  const minTableWidth = MIN_TABLE_WIDTH;
 
   return (
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">

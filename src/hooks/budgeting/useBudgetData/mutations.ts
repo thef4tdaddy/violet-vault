@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { processTransactionDeletion } from "@/hooks/budgeting/useBudgetData/mutationsHelpers";
 import logger from "@/utils/common/logger";
+import type { Envelope, Transaction } from "@/db/types";
 
 export const useBudgetMutations = () => {
   const queryClient = useQueryClient();
@@ -13,7 +14,7 @@ export const useBudgetMutations = () => {
   // Envelope Mutations
   const addEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "add"],
-    mutationFn: async (newEnvelope: Record<string, unknown>) => {
+    mutationFn: async (newEnvelope: Omit<Envelope, "lastModified" | "createdAt">) => {
       await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
       return newEnvelope;
     },
@@ -35,7 +36,7 @@ export const useBudgetMutations = () => {
       updates,
     }: {
       envelopeId: string;
-      updates: Record<string, unknown>;
+      updates: Partial<Envelope>;
     }) => {
       await optimisticHelpers.updateEnvelope(queryClient, envelopeId, updates);
       return { envelopeId, updates };
@@ -61,7 +62,7 @@ export const useBudgetMutations = () => {
   // Transaction Mutations
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
-    mutationFn: async (newTransaction: Record<string, unknown>) => {
+    mutationFn: async (newTransaction: Omit<Transaction, "lastModified" | "createdAt">) => {
       await optimisticHelpers.addTransaction(queryClient, newTransaction);
       return newTransaction;
     },

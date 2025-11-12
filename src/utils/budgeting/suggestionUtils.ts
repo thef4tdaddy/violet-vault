@@ -89,6 +89,20 @@ interface GenerateSuggestionsOptions {
   showDismissed?: boolean;
 }
 
+// Suggestion interface
+interface Suggestion {
+  id: string;
+  type: string;
+  priority: "high" | "medium" | "low";
+  title: string;
+  description: string;
+  suggestedAmount: number;
+  reasoning: string;
+  action: string;
+  impact: string;
+  data: Record<string, unknown>;
+}
+
 /**
  * Filters transactions by date range
  * @param {Array} transactions - All transactions
@@ -142,9 +156,8 @@ export const analyzeUnassignedTransactions = (
   transactions: Transaction[],
   monthsOfData: number,
   settings: AnalysisSettings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] => {
-  const suggestions = [];
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
   // Get unassigned outgoing transactions
@@ -211,9 +224,8 @@ export const analyzeMerchantPatterns = (
   envelopes: Envelope[],
   monthsOfData: number,
   settings: AnalysisSettings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] => {
-  const suggestions = [];
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { minAmount, minTransactions, bufferPercentage } = settings;
 
   // Get unassigned transactions
@@ -294,9 +306,8 @@ export const analyzeEnvelopeOptimization = (
   envelopes: Envelope[],
   monthsOfData: number,
   settings: AnalysisSettings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] => {
-  const suggestions = [];
+): Suggestion[] => {
+  const suggestions: Suggestion[] = [];
   const { overspendingThreshold = 1.2, overfundingThreshold = 3.0, bufferPercentage } = settings;
 
   envelopes.forEach((envelope) => {
@@ -379,8 +390,7 @@ export const generateAllSuggestions = (
   settings: AnalysisSettings,
   dateRange: string | number,
   options: GenerateSuggestionsOptions = {}
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] => {
+): Suggestion[] => {
   const { dismissedSuggestions = new Set(), showDismissed = false } = options;
   const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
   const monthsOfData = calculateMonthsOfData(filteredTransactions);
@@ -392,12 +402,14 @@ export const generateAllSuggestions = (
   ];
 
   // Sort by priority and filter dismissed
+  const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
   return allSuggestions
     .filter((s) => showDismissed || !dismissedSuggestions.has(s.id))
     .sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
-      if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      const aPriority = priorityOrder[a.priority] ?? 0;
+      const bPriority = priorityOrder[b.priority] ?? 0;
+      if (aPriority !== bPriority) {
+        return bPriority - aPriority;
       }
       return b.suggestedAmount - a.suggestedAmount;
     })
@@ -409,7 +421,7 @@ export const generateAllSuggestions = (
  * @param {string} type - Suggestion type
  * @returns {string} Icon component name
  */
-export const getSuggestionTypeIcon = (type) => {
+export const getSuggestionTypeIcon = (type: string): string => {
   switch (type) {
     case "new_envelope":
     case "merchant_pattern":
@@ -428,7 +440,7 @@ export const getSuggestionTypeIcon = (type) => {
  * @param {string} priority - Priority level
  * @returns {string} Icon component name
  */
-export const getSuggestionPriorityIcon = (priority) => {
+export const getSuggestionPriorityIcon = (priority: string): string => {
   switch (priority) {
     case "high":
       return "AlertTriangle";
@@ -446,7 +458,7 @@ export const getSuggestionPriorityIcon = (priority) => {
  * @param {string} priority - Priority level
  * @returns {string} CSS color class
  */
-export const getSuggestionPriorityColor = (priority) => {
+export const getSuggestionPriorityColor = (priority: string): string => {
   switch (priority) {
     case "high":
       return "text-red-500";

@@ -4,6 +4,8 @@
  * Extracted from autoFundingEngine.js for Issue #506
  */
 
+import type { Condition } from "./conditions.ts";
+
 // TypeScript interfaces for auto-funding rules
 export interface RuleConfig {
   sourceType: "unassigned" | "envelope" | "income";
@@ -13,14 +15,11 @@ export interface RuleConfig {
   targetIds: string[];
   amount: number;
   percentage: number;
-  conditions: RuleCondition[];
+  conditions: Condition[];
   scheduleConfig: Record<string, unknown>;
 }
 
-export interface RuleCondition {
-  type: string;
-  value: unknown;
-}
+export type RuleCondition = Condition;
 
 export interface AutoFundingRule {
   id: string;
@@ -48,6 +47,7 @@ export interface EnvelopeData {
   id: string;
   currentBalance?: number;
   monthlyAmount?: number;
+  name?: string;
 }
 
 export interface RuleStatistics {

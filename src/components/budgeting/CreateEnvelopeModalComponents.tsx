@@ -7,6 +7,7 @@ import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
 import AllocationModeSelector from "./shared/AllocationModeSelector";
 import BillConnectionSelector from "./shared/BillConnectionSelector";
+import { ENVELOPE_TYPES } from "@/constants/categories";
 
 interface ColorSelectorProps {
   selectedColor: string;
@@ -130,6 +131,7 @@ export const ModalContent = ({
       <EnvelopeTypeSelector
         selectedType={formData.envelopeType}
         onTypeChange={(type) => onUpdateField("envelopeType", type)}
+        excludeTypes={[ENVELOPE_TYPES.SAVINGS, ENVELOPE_TYPES.SINKING_FUND]}
         disabled={isLoading}
       />
 

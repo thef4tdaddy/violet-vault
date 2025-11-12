@@ -4,28 +4,41 @@
  */
 
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
-import { calculatePaycheckBalances, validateBalances } from "../common/balanceCalculator";
+import {
+  calculatePaycheckBalances,
+  validateBalances,
+  type CurrentBalances,
+} from "../common/balanceCalculator";
 import logger from "../common/logger";
+
+interface BalanceCollection {
+  data?: Array<{ currentBalance?: string | number }>;
+}
 
 /**
  * Get current balances from database and queries
  */
-export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
+export const getCurrentBalances = async (
+  envelopesQuery: BalanceCollection,
+  savingsGoalsQuery: BalanceCollection
+): Promise<CurrentBalances> => {
   // Get current metadata from Dexie (proper data source)
   const currentMetadata = await getBudgetMetadata();
-  const currentActualBalance = currentMetadata?.actualBalance || 0;
-  const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+  const currentActualBalance = Number(currentMetadata?.actualBalance ?? 0);
+  const currentUnassignedCash = Number(currentMetadata?.unassignedCash ?? 0);
 
   // Calculate current virtual balance from envelope balances
   const currentEnvelopes = envelopesQuery.data || [];
   const currentSavings = savingsGoalsQuery.data || [];
 
   const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
-    (sum, env) => sum + (parseFloat(env.currentBalance) || 0),
+    (sum: number, env: { currentBalance: string | number }) =>
+      sum + (parseFloat(env.currentBalance.toString()) || 0),
     0
   );
   const currentTotalSavingsBalance = currentSavings.reduce(
-    (sum, saving) => sum + (parseFloat(saving.currentBalance) || 0),
+    (sum: number, saving: { currentBalance: string | number }) =>
+      sum + (parseFloat(saving.currentBalance.toString()) || 0),
     0
   );
   const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
@@ -43,14 +56,16 @@ export const getCurrentBalances = async (envelopesQuery, savingsGoalsQuery) => {
     actualBalance: currentActualBalance,
     virtualBalance: currentVirtualBalance,
     unassignedCash: currentUnassignedCash,
-    isActualBalanceManual: currentMetadata?.isActualBalanceManual || false,
+    isActualBalanceManual: Boolean(currentMetadata?.isActualBalanceManual),
   };
 };
 
 /**
  * Process envelope allocations for a paycheck
  */
-export const processEnvelopeAllocations = async (allocations) => {
+export const processEnvelopeAllocations = async (
+  allocations: Array<{ envelopeId: string; amount: number }>
+) => {
   if (allocations.length === 0) return;
 
   logger.info("Updating envelope balances", {
@@ -82,10 +97,10 @@ export const processEnvelopeAllocations = async (allocations) => {
  * Create and save paycheck history record
  */
 export const createPaycheckRecord = async (
-  paycheckData,
-  currentBalances,
-  newBalances,
-  allocations
+  paycheckData: { amount: number; payerName?: string; mode: string; notes?: string },
+  currentBalances: { unassignedCash: number; actualBalance: number },
+  newBalances: { unassignedCash: number; actualBalance: number },
+  allocations: Array<{ envelopeId: string; amount: number }>
 ) => {
   const paycheckRecord = {
     id: `paycheck_${Date.now()}`,
@@ -118,7 +133,17 @@ export const createPaycheckRecord = async (
 /**
  * Process paycheck with balance calculations and allocations
  */
-export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoalsQuery) => {
+export const processPaycheck = async (
+  paycheckData: {
+    amount: number;
+    mode: string;
+    envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
+    notes?: string;
+    payerName?: string;
+  },
+  envelopesQuery: BalanceCollection,
+  savingsGoalsQuery: BalanceCollection
+) => {
   logger.info("Starting paycheck processing", {
     amount: paycheckData.amount,
     mode: paycheckData.mode,
@@ -131,13 +156,28 @@ export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoals
 
   // Prepare allocations for calculator
   const allocations =
-    paycheckData.envelopeAllocations?.map((alloc) => ({
+    paycheckData.envelopeAllocations?.map((alloc: { envelopeId: string; amount: number }) => ({
       envelopeId: alloc.envelopeId,
       amount: alloc.amount,
     })) || [];
 
   // Use centralized balance calculator to ensure consistency
-  const newBalances = calculatePaycheckBalances(currentBalances, paycheckData, allocations);
+  const newBalances = calculatePaycheckBalances(
+    currentBalances as {
+      actualBalance: number;
+      virtualBalance: number;
+      unassignedCash: number;
+      isActualBalanceManual: boolean;
+    },
+    paycheckData as {
+      amount: number;
+      mode: string;
+      envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
+      notes?: string;
+      payerName?: string;
+    },
+    allocations
+  );
 
   // Validate the calculation
   const validation = validateBalances(newBalances);
@@ -176,6 +216,16 @@ export const processPaycheck = async (paycheckData, envelopesQuery, savingsGoals
     newBalances,
     allocations
   );
+
+  // Log the successful paycheck processing
+  const totalAllocated = allocations.reduce((sum, allocation) => sum + allocation.amount, 0);
+  logger.info("Paycheck processed successfully", {
+    paycheckAmount: paycheckData.amount,
+    totalAllocated,
+    unassignedCash: newBalances.unassignedCash,
+    actualBalance: newBalances.actualBalance,
+    virtualBalance: newBalances.virtualBalance,
+  });
 
   return paycheckRecord;
 };

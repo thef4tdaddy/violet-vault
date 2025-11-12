@@ -3,6 +3,7 @@ import { useSmartCategoryAnalysis } from "@/hooks/analytics/useSmartCategoryAnal
 import { MERCHANT_CATEGORY_PATTERNS } from "@/constants/categories";
 import { suggestBillCategoryAndIcon, getBillIconOptions } from "@/utils/common/billIcons";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
 export interface TransactionCategorySuggestion {
   category: string;
@@ -21,7 +22,7 @@ export interface BillSuggestion {
 }
 
 interface UseSmartSuggestionsOptions {
-  transactions?: Array<Record<string, unknown>>;
+  transactions?: TransactionForStats[];
   bills?: Array<Record<string, unknown>>;
 }
 

@@ -7,6 +7,7 @@ import { queryKeys, optimisticHelpers, prefetchHelpers } from "../../../utils/co
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.ts";
 import localStorageService from "../../../services/storage/localStorageService";
+import type { Transaction } from "@/db/types";
 
 export const useBudgetUtilities = () => {
   const queryClient = useQueryClient();
@@ -52,7 +53,7 @@ export const useBudgetUtilities = () => {
   // Transaction reconciliation mutation
   const reconcileTransactionMutation = useMutation({
     mutationKey: ["transactions", "reconcile"],
-    mutationFn: async (transactionData) => {
+    mutationFn: async (transactionData: Omit<Transaction, "lastModified" | "createdAt">) => {
       await optimisticHelpers.addTransaction(queryClient, transactionData);
       return transactionData;
     },

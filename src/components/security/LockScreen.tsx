@@ -99,13 +99,13 @@ const LockScreen = () => {
             Download the recent console buffer and attach it to your bug report. Contains the latest{" "}
             {logger.getBufferedLogCount()} entries.
           </p>
-          <button
+          <Button
             type="button"
             className="mt-3 inline-flex items-center rounded-md border border-red-500 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
             onClick={() => logger.downloadBufferedLogs("violet-vault-validation-debug-log.txt")}
           >
             Download console log
-          </button>
+          </Button>
         </div>
       ) : null;
 

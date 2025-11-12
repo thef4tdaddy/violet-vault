@@ -6,9 +6,7 @@ import {
   processSuggestions,
   Suggestion,
   TransactionForStats,
-  CategoryStat,
 } from "@/utils/analytics/categoryHelpers";
-import logger from "@/utils/common/logger";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
 import CategoryNavigationTabs from "./CategoryNavigationTabs";
@@ -33,8 +31,8 @@ interface SmartCategoryManagerProps {
 const SmartCategoryManager = ({
   transactions = [],
   bills = [],
-  onAddCategory,
-  onRemoveCategory,
+  onAddCategory: _onAddCategory,
+  onRemoveCategory: _onRemoveCategory,
   onApplyToTransactions,
   onApplyToBills,
   dateRange: initialDateRange = "6months",
@@ -62,45 +60,18 @@ const SmartCategoryManager = ({
     analysisSettings
   );
 
-  // Process all suggestions
-  const allSuggestions = useMemo(
-    () =>
-      processSuggestions(
-        transactionAnalysis as Suggestion[],
-        billAnalysis as Suggestion[],
-        dismissedSuggestions as Set<string>,
-        12
-      ),
+  const allSuggestions = useMemo<Suggestion[]>(
+    () => processSuggestions(transactionAnalysis, billAnalysis, dismissedSuggestions, 12),
     [transactionAnalysis, billAnalysis, dismissedSuggestions]
   );
 
-  // Calculate category statistics
-  const categoryStats: CategoryStat[] = useMemo(
-    () => calculateCategoryStats(filteredTransactions as TransactionForStats[]),
+  const categoryStats = useMemo(
+    () => calculateCategoryStats(filteredTransactions),
     [filteredTransactions]
   );
 
-  const handleApplySuggestion = async (suggestion: Suggestion) => {
-    try {
-      const success = await applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
-      if (
-        success &&
-        suggestion.action &&
-        suggestion.action.includes("add") &&
-        suggestion.data?.categoryName
-      ) {
-        onAddCategory(suggestion.data.categoryName, suggestion.category);
-      } else if (
-        success &&
-        suggestion.action &&
-        suggestion.action.includes("remove") &&
-        suggestion.data?.categoryName
-      ) {
-        onRemoveCategory(suggestion.data.categoryName, suggestion.category);
-      }
-    } catch (error) {
-      logger.error("Failed to apply category suggestion:", error);
-    }
+  const handleApplySuggestion = (suggestion: Suggestion) => {
+    void applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
   };
 
   const renderTabContent = () => {
@@ -120,7 +91,7 @@ const SmartCategoryManager = ({
           <CategoryAdvancedTab
             dateRange={dateRange}
             onDateRangeChange={handleDateRangeChange}
-            dismissedSuggestions={dismissedSuggestions}
+            dismissedSuggestions={Array.from(dismissedSuggestions)}
             onUndismissSuggestion={handleUndismissSuggestion}
           />
         );

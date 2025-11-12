@@ -55,9 +55,9 @@ export const AdditionalSettings = ({
             checked={formData.autoAllocate !== false}
             onChange={(e) => onUpdateField("autoAllocate", e.target.checked)}
             disabled={!canEdit}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:cursor-not-allowed"
+            className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded disabled:cursor-not-allowed"
           />
-          <label htmlFor="autoAllocate" className="ml-2 block text-sm text-gray-900">
+          <label htmlFor="autoAllocate" className="ml-3 text-sm text-gray-700">
             Auto-allocate funds
           </label>
         </div>
@@ -177,7 +177,10 @@ export const ModalContent = ({
           selectedType={formData.envelopeType}
           onTypeChange={(type) => onUpdateField("envelopeType", type)}
           excludeTypes={
-            formData.envelopeType === ENVELOPE_TYPES.SAVINGS ? [] : [ENVELOPE_TYPES.SAVINGS]
+            formData.envelopeType === ENVELOPE_TYPES.SAVINGS ||
+            formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND
+              ? []
+              : [ENVELOPE_TYPES.SAVINGS, ENVELOPE_TYPES.SINKING_FUND]
           }
           disabled={!canEdit}
         />

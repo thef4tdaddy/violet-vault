@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useExecutionHistory } from "./useExecutionHistory";
-import { useUndoOperations } from "./useUndoOperations";
+import type { ExecutionRecord } from "./useExecutionHistory";
+import { useUndoOperations, type UndoOperationEntry } from "./useUndoOperations";
 import { useExecutionStatistics } from "./useExecutionStatistics";
 import { useHistoryExport } from "./useHistoryExport";
 import logger from "../../../utils/common/logger";
@@ -9,10 +10,16 @@ import logger from "../../../utils/common/logger";
  * Hook for managing auto-funding execution history and undo operations
  * Refactored to use focused sub-hooks for better maintainability
  */
-export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []) => {
+export const useAutoFundingHistory = (
+  initialHistory: ExecutionRecord[] = [],
+  initialUndoStack: unknown[] = []
+) => {
   // Use focused hooks for specific functionality
   const historyHook = useExecutionHistory(initialHistory);
-  const undoHook = useUndoOperations(initialUndoStack, historyHook.addToHistory);
+  const undoHook = useUndoOperations(
+    initialUndoStack as UndoOperationEntry[],
+    historyHook.addToHistory
+  );
   const statisticsHook = useExecutionStatistics();
   const exportHook = useHistoryExport();
 

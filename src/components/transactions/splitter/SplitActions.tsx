@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel }) => {
+const SplitActions = ({ totals, hasUnsavedChanges, isSaving, errors = [], onSave, onCancel }) => {
   const { isValid, isOverAllocated, remaining } = totals;
 
   const getValidationMessage = () => {
@@ -18,14 +18,23 @@ const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel })
   return (
     <div className="bg-gradient-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm border-t-2 border-black px-6 py-4">
       {/* Validation Message */}
-      {!isValid && (
+      {(!isValid || errors.length > 0) && (
         <div className="mb-4 p-3 bg-gradient-to-r from-orange-50/80 to-red-50/80 backdrop-blur-sm border-2 border-orange-300 rounded-xl shadow-md">
-          <div className="flex items-center">
-            {React.createElement(getIcon("AlertCircle"), {
-              className: "h-5 w-5 text-orange-600 mr-2",
-            })}
-            <span className="text-sm font-bold text-orange-800">{getValidationMessage()}</span>
-          </div>
+          {getValidationMessage() && (
+            <div className="flex items-center">
+              {React.createElement(getIcon("AlertCircle"), {
+                className: "h-5 w-5 text-orange-600 mr-2",
+              })}
+              <span className="text-sm font-bold text-orange-800">{getValidationMessage()}</span>
+            </div>
+          )}
+          {errors.length > 0 && (
+            <ul className="mt-2 list-disc list-inside text-xs font-semibold text-red-600 space-y-1">
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 

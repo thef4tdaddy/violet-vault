@@ -3,10 +3,10 @@
  * Tests all sync data flows and scenarios
  */
 
-import { budgetDb } from "../../db/budgetDb";
-import { cloudSyncService } from "../../services/cloudSyncService";
-import logger from "../common/logger";
-import type { Envelope, Transaction, Bill, Debt } from "../../db/types";
+import { budgetDb } from "@/db/budgetDb";
+import { cloudSyncService, type DexieData, type DataCollection } from "@/services/cloudSyncService";
+import logger from "@/utils/common/logger";
+import type { Envelope, Transaction, Bill, Debt } from "@/db/types";
 
 interface TestData {
   envelope: Partial<Envelope>;
@@ -25,6 +25,45 @@ interface ValidationResult {
 export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
   logger.info("🔄 VALIDATING ALL SYNC FLOWS...");
   const results: ValidationResult[] = [];
+
+  const createDexieSnapshot = (overrides: Partial<DexieData> = {}): DexieData => ({
+    envelopes: [],
+    transactions: [],
+    bills: [],
+    debts: [],
+    savingsGoals: [],
+    paycheckHistory: [],
+    supplementalAccounts: [],
+    unassignedCash: 0,
+    actualBalance: 0,
+    lastModified: Date.now(),
+    ...overrides,
+  });
+
+  const createDataCollectionSnapshot = (
+    overrides: Partial<DataCollection> = {}
+  ): DataCollection => ({
+    envelopes: [],
+    transactions: [],
+    bills: [],
+    paycheckHistory: [],
+    savingsGoals: [],
+    debts: [],
+    supplementalAccounts: [],
+    unassignedCash: 0,
+    actualBalance: 0,
+    lastModified: Date.now(),
+    ...overrides,
+  });
+
+  const createTestEnvelope = (overrides: Partial<Envelope> = {}): Envelope => ({
+    id: "test-envelope",
+    name: "Test Envelope",
+    category: "Test",
+    archived: false,
+    lastModified: Date.now(),
+    ...overrides,
+  });
 
   // Flow 1: Create → Sync → Validate
   try {
@@ -210,32 +249,50 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     const scenarios = [
       {
         name: "Local newer than cloud",
-        firestore: { lastModified: Date.now() - 10000, envelopes: [] },
-        dexie: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
+        firestore: createDataCollectionSnapshot({ lastModified: Date.now() - 10000 }),
+        dexie: createDexieSnapshot({
+          lastModified: Date.now(),
+          envelopes: [createTestEnvelope()],
+        }),
         expected: "toFirestore",
       },
       {
         name: "Cloud newer than local",
-        firestore: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
-        dexie: { lastModified: Date.now() - 10000, envelopes: [] },
+        firestore: createDataCollectionSnapshot({
+          lastModified: Date.now(),
+          envelopes: [createTestEnvelope()],
+        }),
+        dexie: createDexieSnapshot({ lastModified: Date.now() - 10000 }),
         expected: "fromFirestore",
       },
       {
         name: "Equal timestamps",
-        firestore: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
-        dexie: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
+        firestore: createDataCollectionSnapshot({
+          lastModified: Date.now(),
+          envelopes: [createTestEnvelope()],
+        }),
+        dexie: createDexieSnapshot({
+          lastModified: Date.now(),
+          envelopes: [createTestEnvelope()],
+        }),
         expected: "bidirectional", // Same timestamp, need full sync
       },
       {
         name: "Local only data",
         firestore: null,
-        dexie: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
+        dexie: createDexieSnapshot({
+          lastModified: Date.now(),
+          envelopes: [createTestEnvelope()],
+        }),
         expected: "toFirestore",
       },
       {
         name: "Cloud only data",
-        firestore: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
-        dexie: { lastModified: 0, envelopes: [] },
+        firestore: createDataCollectionSnapshot({
+          lastModified: Date.now(),
+          envelopes: [createTestEnvelope()],
+        }),
+        dexie: createDexieSnapshot({ lastModified: 0 }),
         expected: "fromFirestore",
       },
     ];
@@ -278,7 +335,7 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     // Test config
     const testConfig = {
       budgetId: "test-budget-" + Date.now(),
-      encryptionKey: new ArrayBuffer(32),
+      encryptionKey: "test-key",
       currentUser: { userName: "Test User", userColor: "#123456" },
     };
 

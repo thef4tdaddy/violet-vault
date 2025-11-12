@@ -59,7 +59,9 @@ const useEnvelopeSystem = () => {
     isCalculatingRef.current = true;
 
     // Use the utility function for calculation
-    const totalBiweeklyNeed = calculateBiweeklyNeeds(bills);
+    const totalBiweeklyNeed = calculateBiweeklyNeeds(
+      bills as Parameters<typeof calculateBiweeklyNeeds>[0]
+    );
 
     logger.info("Calculated total biweekly need", {
       totalBiweeklyNeed,

@@ -23,6 +23,7 @@ import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
 import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
+import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
 interface SmartSuggestionState {
   smartBillDetails: BillSuggestion | null;
@@ -40,12 +41,7 @@ const useBillSmartSuggestionState = (
   suggestBillDetails: ReturnType<typeof useSmartSuggestions>["suggestBillDetails"]
 ): SmartSuggestionState => {
   const smartBillDetails = useMemo(
-    () =>
-      suggestBillDetails(
-        formData.name,
-        formData.notes,
-        formData.category
-      ),
+    () => suggestBillDetails(formData.name, formData.notes, formData.category),
     [formData.name, formData.notes, formData.category, suggestBillDetails]
   );
 
@@ -128,13 +124,45 @@ const useBillModalState = ({
   const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
   const { transactions: layoutTransactions = [], bills: billsQuery } = useLayoutData();
 
-  const rawTransactions = useMemo(() => {
+  const transactionsForStats = useMemo(() => {
     if (!Array.isArray(layoutTransactions)) {
-      return [] as Array<Record<string, unknown>>;
+      return [] as TransactionForStats[];
     }
-    return layoutTransactions.map((transaction) => ({
-      ...(transaction as Record<string, unknown>),
-    }));
+
+    return layoutTransactions
+      .map((transaction) => {
+        if (!transaction || typeof transaction !== "object") {
+          return null;
+        }
+
+        const record = transaction as {
+          amount?: unknown;
+          date?: unknown;
+          category?: unknown;
+        };
+
+        const amount = Number(record.amount ?? 0);
+        const rawDate = record.date;
+        const date =
+          typeof rawDate === "string"
+            ? rawDate
+            : rawDate instanceof Date
+              ? rawDate.toISOString().split("T")[0]
+              : undefined;
+
+        if (!date) {
+          return null;
+        }
+
+        const category = typeof record.category === "string" ? record.category : undefined;
+
+        return {
+          amount,
+          date,
+          category,
+        } as TransactionForStats;
+      })
+      .filter((value): value is TransactionForStats => value !== null);
   }, [layoutTransactions]);
 
   const rawBills = useMemo(() => {
@@ -143,7 +171,7 @@ const useBillModalState = ({
   }, [billsQuery?.bills]);
 
   const { suggestBillDetails } = useSmartSuggestions({
-    transactions: rawTransactions,
+    transactions: transactionsForStats,
     bills: rawBills,
   });
 
@@ -211,16 +239,12 @@ const useBillModalState = ({
   );
 
   const computeBiweeklyAmount = useCallback(() => {
-    const customFrequency = formData.customFrequency
-      ? Number(formData.customFrequency)
-      : undefined;
+    const customFrequency = formData.customFrequency ? Number(formData.customFrequency) : undefined;
     return calculateBiweeklyAmount(formData.amount, formData.frequency, customFrequency);
   }, [calculateBiweeklyAmount, formData.amount, formData.frequency, formData.customFrequency]);
 
   const computeMonthlyAmount = useCallback(() => {
-    const customFrequency = formData.customFrequency
-      ? Number(formData.customFrequency)
-      : undefined;
+    const customFrequency = formData.customFrequency ? Number(formData.customFrequency) : undefined;
     return calculateMonthlyAmount(formData.amount, formData.frequency, customFrequency);
   }, [calculateMonthlyAmount, formData.amount, formData.frequency, formData.customFrequency]);
 
@@ -253,12 +277,7 @@ const useBillModalState = ({
 };
 
 const AddBillModal = (props: AddBillModalProps) => {
-  const {
-    isOpen,
-    onClose,
-    editingBill = null,
-    _forceMobileMode = false,
-  } = props;
+  const { isOpen, onClose, editingBill = null, _forceMobileMode = false } = props;
 
   const {
     isMobile,
@@ -333,9 +352,7 @@ const AddBillModal = (props: AddBillModalProps) => {
         showHandle={true}
         backdrop={true}
       >
-        <div className="pb-6">
-          {renderModalContent()}
-        </div>
+        <div className="pb-6">{renderModalContent()}</div>
       </SlideUpModal>
     );
   }

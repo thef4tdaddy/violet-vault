@@ -88,6 +88,7 @@ import {
   createBasicActions,
   createPWAUpdateActions,
   createPatchNotesActions,
+  type BeforeInstallPromptEvent,
 } from "./uiStoreActions.ts";
 
 // UI Store configuration - handles UI state, settings, and app preferences
@@ -173,8 +174,14 @@ const storeInitializer = (set, _get) => ({
   async startBackgroundSync(authData?: {
     isUnlocked: boolean;
     budgetId: string;
-    encryptionKey: CryptoKey | Uint8Array;
-    currentUser?: string;
+    encryptionKey: CryptoKey | Uint8Array<ArrayBufferLike>;
+    currentUser?:
+      | {
+          uid?: string;
+          userName?: string;
+          userColor?: string;
+        }
+      | string;
   }) {
     try {
       // Safe external store access (prevents React error #185)
@@ -196,10 +203,15 @@ const storeInitializer = (set, _get) => ({
       // Import and start the cloud sync service
       const { cloudSyncService } = await import("../../services/cloudSyncService");
 
+      const normalizedUser =
+        typeof authData.currentUser === "string"
+          ? { userName: authData.currentUser }
+          : authData.currentUser;
+
       const syncConfig = {
         budgetId: authData.budgetId,
         encryptionKey: authData.encryptionKey,
-        currentUser: authData.currentUser,
+        currentUser: normalizedUser,
       };
 
       cloudSyncService.start(syncConfig);
@@ -276,6 +288,36 @@ if (LOCAL_ONLY_MODE) {
 import { createUpdateAppAction, createInstallAppAction } from "./uiStoreActions.ts";
 Object.assign(useUiStore.getState(), createUpdateAppAction(useUiStore.setState));
 Object.assign(useUiStore.getState(), createInstallAppAction(useUiStore.setState, useUiStore));
+
+// Create and export the store type
+export interface UiStore {
+  biweeklyAllocation: number;
+  paycheckHistory: Array<{
+    id: string;
+    amount: number;
+    date: string;
+    payerName?: string;
+    notes?: string;
+  }>;
+  isActualBalanceManual: boolean;
+  cloudSyncEnabled: boolean;
+  isOnline: boolean;
+  isUnassignedCashModalOpen: boolean;
+  dataLoaded: boolean;
+  updateAvailable: boolean;
+  isUpdating: boolean;
+  showInstallPrompt: boolean;
+  installPromptEvent: BeforeInstallPromptEvent | null;
+  showPatchNotes: boolean;
+  patchNotesData: {
+    version: string;
+    notes: string[];
+    fromVersion?: string;
+    toVersion?: string;
+    isUpdate?: boolean;
+  } | null;
+  loadingPatchNotes: boolean;
+}
 
 export default useUiStore;
 

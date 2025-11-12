@@ -1,5 +1,13 @@
 import { budgetDb } from "../db/budgetDb";
-import type { BudgetRecord } from "../db/types";
+import type {
+  BudgetRecord,
+  Envelope,
+  Transaction,
+  Bill,
+  SavingsGoal,
+  PaycheckHistory,
+  Debt,
+} from "../db/types";
 import type { CloudSyncConfig } from "../types/firebase";
 import logger from "../utils/common/logger";
 import chunkedSyncService from "./chunkedSyncService";
@@ -9,12 +17,55 @@ import { syncHealthMonitor } from "../utils/sync/syncHealthMonitor";
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isSupplementalAccountRecord = (value: unknown): value is SupplementalAccountRecord => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { id, name, type, balance } = value;
+  const isValidId = typeof id === "undefined" || typeof id === "string" || typeof id === "number";
+  const isValidName = typeof name === "undefined" || typeof name === "string";
+  const isValidType = typeof type === "undefined" || typeof type === "string";
+  const isValidBalance = typeof balance === "undefined" || typeof balance === "number";
+
+  return isValidId && isValidName && isValidType && isValidBalance;
+};
+
+const extractNumericValue = (
+  record: BudgetRecord | undefined,
+  key: "unassignedCash" | "actualBalance"
+): number => {
+  const value = record?.[key];
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+};
+
+const extractSupplementalAccounts = (
+  record: BudgetRecord | undefined
+): SupplementalAccountRecord[] => {
+  const value = record?.["supplementalAccounts"];
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(isSupplementalAccountRecord);
+};
+
 /**
  * Configuration interface for cloud sync service
  */
-interface SyncConfig {
+export interface SyncConfig {
   budgetId?: string;
-  encryptionKey?: string | CryptoKey;
+  encryptionKey?: string | CryptoKey | Uint8Array<ArrayBufferLike>;
   currentUser?: {
     readonly uid?: string;
     readonly userName?: string;
@@ -22,6 +73,55 @@ interface SyncConfig {
     readonly sharedBy?: string;
   };
   clearAllData?: () => Promise<void>;
+}
+
+// Define interface for data objects
+export interface DataCollection {
+  envelopes?: unknown[];
+  transactions?: unknown[];
+  bills?: unknown[];
+  paycheckHistory?: unknown[];
+  savingsGoals?: unknown[];
+  debts?: unknown[];
+  unassignedCash?: number;
+  actualBalance?: number;
+  supplementalAccounts?: unknown[];
+  lastModified?: number;
+}
+
+type SupplementalAccountRecord = {
+  id?: string | number;
+  name?: string;
+  type?: string;
+  balance?: number;
+  [key: string]: unknown;
+};
+
+// Define interface for the specific return type of fetchDexieData
+export interface DexieData {
+  envelopes: Envelope[];
+  transactions: Transaction[];
+  bills: Bill[];
+  debts: Debt[];
+  savingsGoals: SavingsGoal[];
+  paycheckHistory: PaycheckHistory[];
+  unassignedCash: number;
+  actualBalance: number;
+  supplementalAccounts: SupplementalAccountRecord[];
+  lastModified: number;
+}
+
+// Define interface for sync result
+interface SyncResult {
+  success: boolean;
+  direction?: string;
+  error?: string;
+  recordsProcessed?: number;
+}
+
+// Define interface for window with cloudSyncService
+interface CloudSyncWindow extends Window {
+  cloudSyncService?: typeof cloudSyncService;
 }
 
 class CloudSyncService {
@@ -41,7 +141,7 @@ class CloudSyncService {
     this.syncQueue = Promise.resolve();
   }
 
-  start(config) {
+  start(config: SyncConfig) {
     if (this.isRunning) {
       logger.debug("🔄 Sync service already running.");
       return;
@@ -68,13 +168,17 @@ class CloudSyncService {
       user: this.config?.budgetId || "unknown",
     });
     // No more periodic sync interval to clear
-    clearTimeout(this.debounceTimer);
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
     this.isRunning = false;
   }
 
   // Debounced sync to avoid rapid consecutive syncs
-  scheduleSync(priority = "normal") {
-    clearTimeout(this.debounceTimer);
+  scheduleSync(priority: "normal" | "high" = "normal") {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
 
     // Use shorter delay for high-priority changes (paycheck, envelope changes, etc.)
     const delay = priority === "high" ? 2000 : DEBOUNCE_DELAY;
@@ -85,9 +189,11 @@ class CloudSyncService {
   }
 
   // Trigger sync immediately for critical changes (paycheck, imports, etc.)
-  triggerSyncForCriticalChange(changeType) {
+  triggerSyncForCriticalChange(changeType: string) {
     logger.info(`🚨 Critical change detected: ${changeType}, triggering immediate sync`);
-    clearTimeout(this.debounceTimer);
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
     this.syncQueue = this.syncQueue.then(() => this.forceSync());
   }
 
@@ -145,26 +251,29 @@ class CloudSyncService {
           keys: cloudData ? Object.keys(cloudData) : [],
           arrayLengths: cloudData
             ? {
-                envelopes: cloudData.envelopes?.length || 0,
-                transactions: cloudData.transactions?.length || 0,
-                bills: cloudData.bills?.length || 0,
-                paycheckHistory: cloudData.paycheckHistory?.length || 0,
-                savingsGoals: cloudData.savingsGoals?.length || 0,
-                debts: cloudData.debts?.length || 0,
+                envelopes: (cloudData as DataCollection).envelopes?.length || 0,
+                transactions: (cloudData as DataCollection).transactions?.length || 0,
+                bills: (cloudData as DataCollection).bills?.length || 0,
+                paycheckHistory: (cloudData as DataCollection).paycheckHistory?.length || 0,
+                savingsGoals: (cloudData as DataCollection).savingsGoals?.length || 0,
+                debts: (cloudData as DataCollection).debts?.length || 0,
               }
             : null,
         });
       } catch (error) {
         // GitHub Issue #576 Phase 2: Universal decryption error handling for all users
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorName = error instanceof Error ? error.name : String(error);
+
         if (
-          error.message?.includes("The provided data is too small") ||
-          error.message?.includes("decrypt") ||
-          error.message?.includes("key mismatch") ||
-          error.name === "OperationError"
+          errorMessage?.includes("The provided data is too small") ||
+          errorMessage?.includes("decrypt") ||
+          errorMessage?.includes("key mismatch") ||
+          errorName === "OperationError"
         ) {
           logger.warn("🔑 Decryption failed during sync - treating as no cloud data", {
-            errorMessage: error.message,
-            errorName: error.name,
+            errorMessage: errorMessage,
+            errorName: errorName,
             budgetId: (this.config?.budgetId as string | undefined)?.substring(0, 8) + "...",
             timestamp: new Date().toISOString(),
           });
@@ -173,16 +282,19 @@ class CloudSyncService {
           // This prevents crashes and allows sync to continue gracefully
           cloudData = null;
         } else {
-          logger.warn("Could not load cloud data, assuming no cloud data exists", error);
+          logger.warn(
+            "Could not load cloud data, assuming no cloud data exists",
+            error as Record<string, unknown>
+          );
           cloudData = null;
         }
       }
 
       // Determine sync direction
-      const syncDecision = this.determineSyncDirection(localData, cloudData);
+      const syncDecision = this.determineSyncDirection(localData, cloudData as DataCollection);
       logger.info(`🔄 Sync direction determined: ${syncDecision.direction}`, {
         localLastModified: localData?.lastModified,
-        cloudLastModified: cloudData?.lastModified,
+        cloudLastModified: (cloudData as DataCollection)?.lastModified,
         hasLocalData: !!(
           localData?.envelopes?.length ||
           localData?.transactions?.length ||
@@ -192,12 +304,12 @@ class CloudSyncService {
           localData?.debts?.length
         ),
         hasCloudData: !!(
-          cloudData?.envelopes?.length ||
-          cloudData?.transactions?.length ||
-          cloudData?.bills?.length ||
-          cloudData?.paycheckHistory?.length ||
-          cloudData?.savingsGoals?.length ||
-          cloudData?.debts?.length
+          (cloudData as DataCollection)?.envelopes?.length ||
+          (cloudData as DataCollection)?.transactions?.length ||
+          (cloudData as DataCollection)?.bills?.length ||
+          (cloudData as DataCollection)?.paycheckHistory?.length ||
+          (cloudData as DataCollection)?.savingsGoals?.length ||
+          (cloudData as DataCollection)?.debts?.length
         ),
       });
 
@@ -207,7 +319,7 @@ class CloudSyncService {
         const cloudResult = await chunkedSyncService.loadFromCloud();
         if (cloudResult) {
           // Save the loaded data to Dexie
-          await this.saveToDexie(cloudResult);
+          await this.saveToDexie(cloudResult as DexieData);
 
           // Invalidate TanStack Query cache to refresh UI immediately
           try {
@@ -215,7 +327,10 @@ class CloudSyncService {
             await queryClient.invalidateQueries();
             logger.info("✅ TanStack Query cache invalidated after cloud data sync");
           } catch (error) {
-            logger.warn("Failed to invalidate query cache after sync", error);
+            logger.warn(
+              "Failed to invalidate query cache after sync",
+              error as Record<string, unknown>
+            );
           }
 
           result = { success: true, direction: "fromFirestore" };
@@ -238,7 +353,7 @@ class CloudSyncService {
       if (result.success) {
         logger.production("Sync completed successfully", {
           direction: syncDecision.direction,
-          recordsProcessed: result?.recordsProcessed || 0,
+          recordsProcessed: (result as SyncResult)?.recordsProcessed || 0,
         });
         await this.updateLastSyncTime();
         await this.updateUserActivity();
@@ -246,15 +361,13 @@ class CloudSyncService {
         // GitHub Issue #576: Record successful sync
         syncHealthMonitor.recordSyncSuccess(syncId, {
           direction: syncDecision.direction,
-          recordsProcessed: result?.recordsProcessed || 0,
-          backupId,
         });
       } else {
         logger.error("❌ Chunked sync failed:", result.error);
 
         // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
-        const errorCategory = this.categorizeError(result.error);
-        syncHealthMonitor.recordSyncFailure(syncId, new Error(result.error), {
+        const errorCategory = this.categorizeError(result.error || "");
+        syncHealthMonitor.recordSyncFailure(syncId, new Error(result.error || "Unknown error"), {
           backupId,
           stage: "sync_execution",
           errorCategory,
@@ -265,14 +378,19 @@ class CloudSyncService {
       logger.error("❌ An unexpected error occurred during sync:", error);
 
       // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
-      const errorCategory = this.categorizeError(error.message);
-      syncHealthMonitor.recordSyncFailure(syncId, error, {
-        backupId,
-        stage: "unknown",
-        errorCategory,
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorCategory = this.categorizeError(errorMessage);
+      syncHealthMonitor.recordSyncFailure(
+        syncId,
+        error instanceof Error ? error : new Error(errorMessage),
+        {
+          backupId,
+          stage: "unknown",
+          errorCategory,
+        }
+      );
 
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     } finally {
       this.isSyncing = false;
     }
@@ -283,7 +401,7 @@ class CloudSyncService {
    * @param {string} errorMessage - The error message to categorize
    * @returns {string} - Error category
    */
-  categorizeError(errorMessage) {
+  categorizeError(errorMessage: string) {
     if (!errorMessage || typeof errorMessage !== "string") {
       return "unknown";
     }
@@ -407,28 +525,36 @@ class CloudSyncService {
     }
   }
 
-  async fetchDexieData() {
+  async fetchDexieData(): Promise<DexieData> {
     try {
-      const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
-        await Promise.all([
-          budgetDb.envelopes.toArray(),
-          budgetDb.transactions.toArray(),
-          budgetDb.bills.toArray(),
-          budgetDb.debts.toArray(),
-          budgetDb.savingsGoals.toArray(),
-          budgetDb.paycheckHistory.toArray(),
-          budgetDb.budget.get("metadata"),
-        ]);
+      const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata]: [
+        Envelope[],
+        Transaction[],
+        Bill[],
+        Debt[],
+        SavingsGoal[],
+        PaycheckHistory[],
+        BudgetRecord | undefined,
+      ] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.debts.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+        budgetDb.budget.get("metadata"),
+      ]);
 
       return {
-        envelopes: envelopes || [],
-        transactions: transactions || [],
-        bills: bills || [],
-        debts: debts || [],
-        savingsGoals: savingsGoals || [],
-        paycheckHistory: paycheckHistory || [],
-        unassignedCash: metadata?.unassignedCash || 0,
-        actualBalance: metadata?.actualBalance || 0,
+        envelopes,
+        transactions,
+        bills,
+        debts,
+        savingsGoals,
+        paycheckHistory,
+        unassignedCash: extractNumericValue(metadata, "unassignedCash"),
+        actualBalance: extractNumericValue(metadata, "actualBalance"),
+        supplementalAccounts: extractSupplementalAccounts(metadata),
         lastModified: Date.now(),
       };
     } catch (error) {
@@ -437,7 +563,7 @@ class CloudSyncService {
     }
   }
 
-  async saveToDexie(data) {
+  async saveToDexie(data: DexieData) {
     try {
       logger.debug("💾 Saving cloud data to Dexie...");
 
@@ -463,22 +589,22 @@ class CloudSyncService {
           await budgetDb.paycheckHistory.clear();
 
           // Save new data
-          if (data.envelopes?.length) {
+          if (data.envelopes.length) {
             await budgetDb.envelopes.bulkAdd(data.envelopes);
           }
-          if (data.bills?.length) {
+          if (data.bills.length) {
             await budgetDb.bills.bulkAdd(data.bills);
           }
-          if (data.transactions?.length) {
+          if (data.transactions.length) {
             await budgetDb.transactions.bulkAdd(data.transactions);
           }
-          if (data.savingsGoals?.length) {
+          if (data.savingsGoals.length) {
             await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
           }
-          if (data.debts?.length) {
+          if (data.debts.length) {
             await budgetDb.debts.bulkAdd(data.debts);
           }
-          if (data.paycheckHistory?.length) {
+          if (data.paycheckHistory.length) {
             await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
           }
 
@@ -487,7 +613,7 @@ class CloudSyncService {
             id: "metadata",
             unassignedCash: data.unassignedCash || 0,
             actualBalance: data.actualBalance || 0,
-            supplementalAccounts: data.supplementalAccounts || [],
+            supplementalAccounts: data.supplementalAccounts ?? [],
             lastUpdated: new Date().toISOString(),
             lastModified: Date.now(),
           } as BudgetRecord);
@@ -501,7 +627,7 @@ class CloudSyncService {
     }
   }
 
-  determineSyncDirection(localData, cloudData) {
+  determineSyncDirection(localData: DexieData, cloudData: DataCollection) {
     // Check if cloud has meaningful data vs local (include all data types)
     const hasCloudData = !!(
       cloudData?.envelopes?.length ||
@@ -641,7 +767,7 @@ class CloudSyncService {
     };
   }
 
-  async forcePushToCloud(overrideConfig = null) {
+  async forcePushToCloud(overrideConfig: SyncConfig | null = null) {
     // Force push local data to Firebase without pulling from Firebase first
     // This is used after backup imports to ensure imported data overwrites cloud data
     // overrideConfig allows passing auth data when service config is null (e.g., during import)
@@ -676,7 +802,10 @@ class CloudSyncService {
 
       // Use chunked Firebase sync to save data (one-way)
       // saveToCloud returns boolean directly (true/false), not an object
-      const success = await chunkedSyncService.saveToCloud(localData, config.currentUser);
+      const success = await chunkedSyncService.saveToCloud(
+        localData,
+        config.currentUser as { uid: string; userName: string }
+      );
 
       if (success) {
         logger.info("✅ Force push to Firebase completed successfully");
@@ -686,7 +815,8 @@ class CloudSyncService {
       }
     } catch (error) {
       logger.error("❌ Force push to Firebase failed:", error);
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return { success: false, error: errorMessage };
     } finally {
       this.isSyncing = false;
     }
@@ -699,7 +829,7 @@ class CloudSyncService {
       logger.info("Starting to clear all cloud data...");
 
       if (this.config && typeof this.config.clearAllData === "function") {
-        // If the config has a clearAllData method, use it
+        // If config has a clearAllData method, use it
         await this.config.clearAllData();
         logger.info("Cloud data cleared using config method");
       } else if (chunkedSyncService && typeof chunkedSyncService.clearAllData === "function") {
@@ -725,5 +855,5 @@ export const cloudSyncService = new CloudSyncService();
 
 // Expose to window for critical sync triggers from other modules
 if (typeof window !== "undefined") {
-  window.cloudSyncService = cloudSyncService;
+  (window as unknown as CloudSyncWindow).cloudSyncService = cloudSyncService;
 }

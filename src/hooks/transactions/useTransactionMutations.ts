@@ -15,6 +15,7 @@ export interface TransactionInput {
   envelopeId?: string;
   merchant?: string;
   receiptUrl?: string;
+  notes?: string;
   [key: string]: unknown;
 }
 

@@ -59,7 +59,10 @@ interface BillManagerModalsProps {
   handleBulkUpdate: (updates: BillEntity[]) => Promise<void>;
   handleAddDiscoveredBills: (bills: BillEntity[]) => Promise<void>;
   billOperations: {
-    handlePayBill: (billId: string) => Promise<void>;
+    handlePayBill: (
+      billId: string,
+      overrides?: { amount?: number; paidDate?: string }
+    ) => Promise<unknown>;
   };
 
   // Callbacks
@@ -147,7 +150,12 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
           isOpen={!!showBillDetail}
           onClose={() => setShowBillDetail(null)}
           onDelete={deleteBill}
-          onMarkPaid={billOperations.handlePayBill}
+          onMarkPaid={(billId, paymentData) =>
+            billOperations.handlePayBill(billId, {
+              amount: paymentData.amount,
+              paidDate: paymentData.paidDate,
+            })
+          }
           onEdit={(bill: BillEntity) => {
             setShowBillDetail(null);
             handleEditBill(bill);

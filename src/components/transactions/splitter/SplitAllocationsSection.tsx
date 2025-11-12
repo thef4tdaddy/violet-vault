@@ -13,6 +13,7 @@ const SplitAllocationsSection = ({
   onSmartSplit,
   onAutoBalance,
   canAutoBalance,
+  errors = [],
 }) => {
   return (
     <div className="space-y-4">
@@ -44,6 +45,20 @@ const SplitAllocationsSection = ({
           </Button>
         </div>
       </div>
+
+      {errors.length > 0 && (
+        <div className="rounded-xl border-2 border-red-300 bg-red-50 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-semibold text-red-700">
+            {React.createElement(getIcon("AlertTriangle"), { className: "h-4 w-4" })}
+            Issues preventing save
+          </div>
+          <ul className="mt-2 list-disc list-inside text-xs text-red-600 space-y-1">
+            {errors.map((error, index) => (
+              <li key={`${error}-${index}`}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Column Headers */}
       <div className="grid grid-cols-12 gap-3 px-4 py-2 bg-gradient-to-r from-gray-100/80 to-purple-100/80 backdrop-blur-sm rounded-xl border border-gray-300 shadow-sm">

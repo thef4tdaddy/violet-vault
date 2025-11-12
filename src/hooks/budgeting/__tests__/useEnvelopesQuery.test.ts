@@ -155,6 +155,12 @@ describe("useEnvelopesQuery", () => {
           category: "Food",
           archived: true,
         }),
+        mockDataGenerators.envelope({
+          id: "env_4",
+          name: "Emergency Fund",
+          category: "Savings",
+          archived: false,
+        }),
       ];
     });
 
@@ -184,6 +190,19 @@ describe("useEnvelopesQuery", () => {
       const envelopes = result.current.envelopes;
       expect(envelopes.length).toBe(2);
       expect(envelopes.every((env) => !env.archived)).toBe(true);
+    });
+
+    it("should exclude savings goals and sinking funds from default results", async () => {
+      // Act
+      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+
+      // Assert
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      const envelopes = result.current.envelopes;
+      expect(envelopes.some((env) => env.category === "Savings")).toBe(false);
     });
 
     it("should include archived envelopes when requested", async () => {
