@@ -1,4 +1,7 @@
 import React from "react";
+import TipContainer from "../../tips/TipContainer";
+import { TipContext } from "@/domain/schemas/tip";
+import { useUserStateForTips } from "@/hooks/tips/useUserStateForTips";
 
 export interface VelocityData {
   averageMonthlyExpenses: number;
@@ -169,11 +172,17 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({
   topCategories,
   healthScore,
 }) => {
+  // Get user state for tip filtering
+  const userState = useUserStateForTips();
+
   return (
     <div className="space-y-6">
       <BudgetHealthScore healthScore={healthScore} />
       <SpendingVelocity velocity={velocity} />
       <TopSpendingCategories topCategories={topCategories} />
+
+      {/* Tips and Hints */}
+      <TipContainer context={TipContext.INSIGHTS} userState={userState} maxTips={2} />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import SecuritySettingsSection from "../../components/settings/sections/Security
 import DataManagementSection from "../../components/settings/sections/DataManagementSection";
 import NotificationSettingsSection from "../../components/settings/sections/NotificationSettingsSection";
 import DevToolsSection from "../../components/settings/sections/DevToolsSection";
+import TipSettings from "../../components/tips/TipSettings";
 
 /**
  * Hook to handle settings section rendering logic
@@ -79,6 +80,9 @@ export const useSettingsSectionRenderer = ({
 
       case "notifications":
         return React.createElement(NotificationSettingsSection);
+
+      case "tips":
+        return React.createElement(TipSettings);
 
       case "devtools":
         return React.createElement(DevToolsSection, {
