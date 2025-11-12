@@ -80,9 +80,12 @@ const DebtFormFields = ({
           </div>
 
           <Checkbox
-            checked={Boolean(formData.shouldCreateBill)}
+            checked={Boolean(formData.createBill)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData({ shouldCreateBill: e.target.checked })
+              setFormData({
+                createBill: e.target.checked,
+                shouldCreateBill: e.target.checked,
+              })
             }
             disabled={!canEdit}
           />
@@ -98,7 +101,7 @@ const DebtFormFields = ({
         />
 
         {/* Legacy bill connection (fallback if needed) */}
-        {formData.shouldCreateBill && (
+        {formData.createBill && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Connect to Existing Bill

@@ -155,7 +155,7 @@ describe("useDebtForm", () => {
           creditor: "Test Bank",
           currentBalance: "1000",
           minimumPayment: "50",
-          paymentMethod: "connect_existing",
+          paymentMethod: "connect_existing_bill",
           existingBillId: "",
         });
       });

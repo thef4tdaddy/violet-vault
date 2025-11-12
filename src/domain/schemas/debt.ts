@@ -181,6 +181,16 @@ export const DebtFormSchema = z
     envelopeId: z.string().optional(),
     existingBillId: z.string().optional(),
     newEnvelopeName: z.string().optional(),
+    paymentDueDate: z
+      .string()
+      .refine(
+        (val) => {
+          if (!val) return true;
+          return !Number.isNaN(Date.parse(val));
+        },
+        { message: "Valid payment due date is required" }
+      )
+      .optional(),
   })
   .refine(
     (data) => {
@@ -211,7 +221,7 @@ export const DebtFormSchema = z
   .refine(
     (data) => {
       // If paymentMethod is connect_existing, existingBillId is required
-      if (data.paymentMethod === "connect_existing" && !data.existingBillId) {
+      if (data.paymentMethod === "connect_existing_bill" && !data.existingBillId) {
         return false;
       }
       return true;
@@ -232,6 +242,18 @@ export const DebtFormSchema = z
     {
       message: "Please select an envelope for payment funding",
       path: ["envelopeId"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.paymentMethod === "create_new" && data.createBill) {
+        return Boolean(data.paymentDueDate && !Number.isNaN(Date.parse(data.paymentDueDate)));
+      }
+      return true;
+    },
+    {
+      message: "Payment due date is required when creating a new bill",
+      path: ["paymentDueDate"],
     }
   )
   .transform((data) => {

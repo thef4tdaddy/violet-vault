@@ -4,8 +4,8 @@
  */
 
 import { useState, useMemo } from "react";
-import { useDebtManagement } from "./useDebtManagement";
-import logger from "../../utils/common/logger";
+import { useDebtManagement } from "@/hooks/debts/useDebtManagement";
+import logger from "@/utils/common/logger";
 
 export const useDebtDashboard = () => {
   const {
@@ -16,6 +16,7 @@ export const useDebtDashboard = () => {
     deleteDebt,
     recordPayment,
     getUpcomingPayments,
+    linkDebtToBill,
   } = useDebtManagement();
 
   // UI state
@@ -88,15 +89,52 @@ export const useDebtDashboard = () => {
     setSelectedDebt(debt);
   };
 
-  const handleModalSubmit = async (debtData) => {
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setEditingDebt(null);
+  };
+
+  const handleModalSubmit = async (
+    debtIdOrData: unknown,
+    maybeUpdates?: Record<string, unknown>
+  ) => {
     try {
-      if (editingDebt) {
-        await updateDebt(editingDebt.id, debtData);
+      const isUpdatePayload = typeof debtIdOrData === "string" || typeof debtIdOrData === "number";
+
+      if (isUpdatePayload) {
+        const debtId = String(debtIdOrData);
+        const rawUpdates = (maybeUpdates ?? {}) as Record<string, unknown>;
+
+        const {
+          connectionData,
+          paymentMethod,
+          createBill: _createBill,
+          existingBillId,
+          newEnvelopeName: _newEnvelopeName,
+          ...debtUpdates
+        } = rawUpdates;
+
+        await updateDebt(debtId, debtUpdates as Parameters<typeof updateDebt>[1]);
+
+        const connectionPayload =
+          connectionData && typeof connectionData === "object"
+            ? (connectionData as { existingBillId?: string | number; paymentMethod?: string })
+            : null;
+
+        const targetBillId = existingBillId ?? connectionPayload?.existingBillId;
+
+        if (
+          linkDebtToBill &&
+          targetBillId &&
+          (paymentMethod === "connect_existing_bill" ||
+            connectionPayload?.paymentMethod === "connect_existing_bill")
+        ) {
+          await linkDebtToBill(debtId, String(targetBillId));
+        }
       } else {
-        await createDebt(debtData);
+        await createDebt(debtIdOrData as Parameters<typeof createDebt>[0]);
       }
-      setShowAddModal(false);
-      setEditingDebt(null);
+      handleCloseModal();
     } catch (error) {
       logger.error("Failed to save debt:", error);
       throw error;
@@ -149,6 +187,7 @@ export const useDebtDashboard = () => {
     handleAddDebt,
     handleEditDebt,
     handleDebtClick,
+    handleCloseModal,
     handleModalSubmit,
     handleDeleteDebt,
     handleRecordPayment,

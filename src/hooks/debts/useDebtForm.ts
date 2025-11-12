@@ -20,7 +20,7 @@ const initialFormState = {
   paymentDueDate: "",
   notes: "",
   // Connection fields
-  paymentMethod: "create_new", // "create_new" or "connect_existing"
+  paymentMethod: "create_new", // "create_new" or "connect_existing_bill"
   createBill: true, // Don't auto-create bill when editing
   envelopeId: "", // Envelope to fund payments from
   existingBillId: "", // For connecting to existing bill
@@ -37,11 +37,26 @@ const getEnvelopeId = (debt, connectedEnvelope) => debt.envelopeId || connectedE
 
 const getExistingBillId = (connectedBill) => connectedBill?.id || "";
 
+const formatDateInput = (value: unknown): string => {
+  if (!value) return "";
+  if (value instanceof Date) {
+    return value.toISOString().split("T")[0];
+  }
+  if (typeof value === "string") {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString().split("T")[0];
+    }
+    return value;
+  }
+  return "";
+};
+
 const buildBaseFormData = (debt) => ({
   name: debt.name || "",
   creditor: debt.creditor || "",
   type: debt.type || DEBT_TYPES.PERSONAL,
-  paymentDueDate: debt.paymentDueDate || "",
+  paymentDueDate: formatDateInput(debt.paymentDueDate),
   notes: debt.notes || "",
 });
 
@@ -104,6 +119,11 @@ export const useDebtForm = (
     setIsSubmitting(true);
 
     try {
+      const paymentDueDate =
+        formData.paymentDueDate && !Number.isNaN(Date.parse(formData.paymentDueDate))
+          ? new Date(formData.paymentDueDate).toISOString()
+          : undefined;
+
       const debtData = {
         ...formData,
         currentBalance: parseFloat(formData.currentBalance),
@@ -112,6 +132,7 @@ export const useDebtForm = (
         originalBalance: formData.originalBalance
           ? parseFloat(formData.originalBalance)
           : parseFloat(formData.currentBalance), // Default to current balance if not specified
+        paymentDueDate,
         // Include connection data for the parent component to handle
         connectionData: {
           paymentMethod: formData.paymentMethod,

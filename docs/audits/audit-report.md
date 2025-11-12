@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2810 | 0 |
+| TypeScript Strict Mode Errors | 2788 | -22 |
 
-*Last updated: 2025-11-12 21:22:26 UTC*
+*Last updated: 2025-11-12 23:20:06 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-12 21:21:52 UTC
+Last check: 2025-11-12 23:19:49 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-12 21:22:11 UTC
+Last check: 2025-11-12 23:19:57 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -43,7 +43,6 @@ Last check: 2025-11-12 21:22:11 UTC
 - 22 errors in `src/utils/sync/validation/manifestValidator.ts`
 - 22 errors in `src/hooks/common/useChartConfig.tsx`
 - 21 errors in `src/utils/bills/billUpdateHelpers.ts`
-- 21 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 21 errors in `src/components/budgeting/paycheck/PaycheckForm.tsx`
 - 20 errors in `src/utils/common/version.ts`
 - 20 errors in `src/services/bugReport/githubApiService.ts`
@@ -109,7 +108,6 @@ Last check: 2025-11-12 21:22:11 UTC
 - 11 errors in `src/utils/savings/savingsFormUtils.ts`
 - 11 errors in `src/utils/bills/billDetailUtils.ts`
 - 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
-- 11 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 11 errors in `src/hooks/analytics/useTrendAnalysis.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
@@ -144,6 +142,7 @@ Last check: 2025-11-12 21:22:11 UTC
 - 9 errors in `src/utils/analytics/trendHelpers.ts`
 - 9 errors in `src/services/bugReport/uiStateService.ts`
 - 9 errors in `src/hooks/debts/useDebtDetailModal.ts`
+- 9 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 9 errors in `src/hooks/budgeting/useEnvelopeForm.ts`
 - 9 errors in `src/hooks/budgeting/useEnvelopeCalculations.ts`
 - 9 errors in `src/hooks/bills/useBillManager.ts`
@@ -279,6 +278,7 @@ Last check: 2025-11-12 21:22:11 UTC
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/chunkedSyncService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
+- 4 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 4 errors in `src/hooks/mobile/usePullToRefresh.ts`
 - 4 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 4 errors in `src/hooks/common/useDataInitialization.ts`
@@ -292,7 +292,6 @@ Last check: 2025-11-12 21:22:11 UTC
 - 4 errors in `src/components/transactions/TransactionTable.tsx`
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
-- 4 errors in `src/components/sync/SyncHealthDashboard.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingStatusOverview.tsx`
 - 4 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
@@ -416,6 +415,7 @@ Last check: 2025-11-12 21:22:11 UTC
 - 2 errors in `src/components/debt/ui/StrategyCard.tsx`
 - 2 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
 - 2 errors in `src/components/debt/modals/DebtModalHeader.tsx`
+- 2 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 2 errors in `src/components/debt/DebtStrategies.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
 - 2 errors in `src/components/debt/DebtDashboard.tsx`
@@ -499,7 +499,6 @@ Last check: 2025-11-12 21:22:11 UTC
 - 1 errors in `src/components/history/IntegrityStatusIndicator.tsx`
 - 1 errors in `src/components/debt/ui/DebtProgressBar.tsx`
 - 1 errors in `src/components/debt/ui/DebtCardProgressBar.tsx`
-- 1 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 1 errors in `src/components/debt/modals/DebtDetailModal.tsx`
 - 1 errors in `src/components/charts/TrendLineChart.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
@@ -523,18 +522,18 @@ Last check: 2025-11-12 21:22:11 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 964 | `TS7006` |
-| 807 | `TS7031` |
+| 959 | `TS7006` |
+| 787 | `TS7031` |
 | 203 | `TS2345` |
-| 170 | `TS2339` |
-| 161 | `TS18046` |
-| 136 | `TS2322` |
+| 169 | `TS2339` |
+| 160 | `TS18046` |
+| 137 | `TS2322` |
 | 76 | `TS7005` |
 | 74 | `TS7053` |
 | 72 | `TS18048` |
 | 43 | `TS7034` |
 | 39 | `TS18047` |
-| 19 | `TS2769` |
+| 23 | `TS2769` |
 | 6 | `TS2411` |
 | 5 | `TS2531` |
 | 5 | `TS2353` |
@@ -1308,11 +1307,11 @@ src/components/dashboard/ReconcileTransactionModal.tsx(13,3): error TS7031: Bind
 src/components/dashboard/ReconcileTransactionModal.tsx(103,37): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/dashboard/ReconcileTransactionModal.tsx(103,55): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/dashboard/ReconcileTransactionModal.tsx(104,27): error TS2339: Property 'name' does not exist on type 'never'.
-src/components/debt/DebtDashboard.tsx(65,52): error TS2322: Type 'Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>' is not assignable to type 'Dispatch<SetStateAction<Record<string, string | boolean>>>'.
+src/components/debt/DebtDashboard.tsx(66,52): error TS2322: Type 'Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>' is not assignable to type 'Dispatch<SetStateAction<Record<string, string | boolean>>>'.
   Type 'SetStateAction<Record<string, string | boolean>>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
     Type 'Record<string, string | boolean>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
       Type 'Record<string, string | boolean>' is missing the following properties from type '{ type: string; status: string; sortBy: string; sortOrder: string; }': type, status, sortBy, sortOrder
-src/components/debt/DebtDashboard.tsx(121,9): error TS2322: Type 'DebtAccount[]' is not assignable to type 'never[]'.
+src/components/debt/DebtDashboard.tsx(122,9): error TS2322: Type 'DebtAccount[]' is not assignable to type 'never[]'.
   Type 'DebtAccount' is not assignable to type 'never'.
 src/components/debt/DebtDashboardComponents.tsx(62,15): error TS2322: Type '(debt: DebtAccount) => void' is not assignable to type '(debt: DebtAccount | Debt) => void'.
   Types of parameters 'debt' and 'debt' are incompatible.
@@ -1332,7 +1331,8 @@ src/components/debt/modals/AddDebtModal.tsx(38,7): error TS2322: Type 'string | 
   Type 'undefined' is not assignable to type 'string'.
 src/components/debt/modals/DebtDetailModal.tsx(71,27): error TS2322: Type '{ expectedPayoff: string; totalInterest: any; payoffDate: string; } | null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
   Type 'null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
-src/components/debt/modals/DebtFormFields.tsx(94,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+src/components/debt/modals/DebtFormFields.tsx(94,9): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/debt/modals/DebtFormFields.tsx(97,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/debt/modals/DebtFormSections.tsx(8,33): error TS7031: Binding element 'formData' implicitly has an 'any' type.
 src/components/debt/modals/DebtFormSections.tsx(8,43): error TS7031: Binding element 'setFormData' implicitly has an 'any' type.
@@ -1848,10 +1848,6 @@ src/components/sync/health/SyncStatusIndicator.tsx(27,32): error TS7031: Binding
 src/components/sync/health/SyncStatusIndicator.tsx(27,44): error TS7031: Binding element 'isBackgroundSyncing' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,65): error TS7031: Binding element 'onClick' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,74): error TS7031: Binding element 'showDetails' implicitly has an 'any' type.
-src/components/sync/SyncHealthDashboard.tsx(68,27): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/components/sync/SyncHealthDashboard.tsx(88,26): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/components/sync/SyncHealthDashboard.tsx(112,50): error TS18046: 'error' is of type 'unknown'.
-src/components/sync/SyncHealthDashboard.tsx(121,27): error TS7006: Parameter 'ms' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,31): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,44): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,55): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
@@ -2625,19 +2621,17 @@ src/hooks/common/useTransactionArchiving.ts(126,41): error TS7006: Parameter 'tr
 src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
 src/hooks/dashboard/useMainDashboard.ts(173,6): error TS7006: Parameter 'difference' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(59,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
-  No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
 src/hooks/debts/useDebtDashboard.ts(60,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
   No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
-src/hooks/debts/useDebtDashboard.ts(82,27): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(87,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(91,36): error TS7006: Parameter 'debtData' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(94,38): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/debts/useDebtDashboard.ts(106,35): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(116,38): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(116,46): error TS7006: Parameter 'paymentData' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(120,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/debts/useDebtDashboard.ts(122,25): error TS2345: Argument of type 'DebtAccount | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
+src/hooks/debts/useDebtDashboard.ts(61,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
+  No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
+src/hooks/debts/useDebtDashboard.ts(83,27): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(88,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(144,35): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(154,38): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(154,46): error TS7006: Parameter 'paymentData' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(158,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/hooks/debts/useDebtDashboard.ts(160,25): error TS2345: Argument of type 'DebtAccount | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
   Type 'undefined' is not assignable to type 'SetStateAction<null>'.
 src/hooks/debts/useDebtDetailModal.ts(10,3): error TS7031: Binding element 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtDetailModal.ts(11,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
@@ -2653,20 +2647,20 @@ src/hooks/debts/useDebtForm.ts(34,23): error TS7006: Parameter 'value' implicitl
 src/hooks/debts/useDebtForm.ts(36,24): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtForm.ts(36,30): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
 src/hooks/debts/useDebtForm.ts(38,28): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(40,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(48,33): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(56,34): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(56,40): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(56,55): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(64,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(64,34): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(64,49): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(101,31): error TS7006: Parameter 'onSubmitCallback' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(127,37): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/debts/useDebtForm.ts(158,27): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(161,44): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+src/hooks/debts/useDebtForm.ts(55,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(63,33): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(71,34): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(71,40): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(71,55): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(79,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(79,34): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(79,49): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(116,31): error TS7006: Parameter 'onSubmitCallback' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(148,37): error TS2339: Property 'id' does not exist on type 'never'.
+src/hooks/debts/useDebtForm.ts(179,27): error TS7006: Parameter 'updates' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(182,44): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
-src/hooks/debts/useDebtForm.ts(165,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+src/hooks/debts/useDebtForm.ts(186,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
 src/hooks/debts/useDebtManagement.ts(78,7): error TS2345: Argument of type 'UseMutateAsyncFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string | undefined; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type '(data: unknown) => unknown'.
   Types of parameters 'variables' and 'data' are incompatible.
@@ -2836,27 +2830,46 @@ src/hooks/settings/useSettingsDashboard.ts(103,28): error TS7005: Variable 'useB
 src/hooks/settings/useSettingsDashboard.ts(103,44): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/hooks/settings/useSettingsDashboard.ts(104,31): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/settings/useSettingsDashboard.ts(104,47): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(15,3): error TS7031: Binding element 'isLocalOnlyMode' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(16,3): error TS7031: Binding element 'cloudSyncEnabled' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(17,3): error TS7031: Binding element 'isSyncing' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(18,3): error TS7031: Binding element 'onOpenLocalOnlySettings' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(19,3): error TS7031: Binding element 'onToggleCloudSync' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(20,3): error TS7031: Binding element 'onManualSync' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(23,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(24,3): error TS7031: Binding element 'onOpenPasswordModal' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(25,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(26,3): error TS7031: Binding element 'onOpenResetConfirm' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(27,3): error TS7031: Binding element 'onUpdateProfile' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(30,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(31,3): error TS7031: Binding element 'onOpenSecuritySettings' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(32,3): error TS7031: Binding element 'onShowLocalDataSecurity' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(35,3): error TS7031: Binding element 'onOpenActivityFeed' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(36,3): error TS7031: Binding element 'onExport' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(37,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(38,3): error TS7031: Binding element 'onSync' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(41,3): error TS7031: Binding element 'onOpenEnvelopeChecker' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(42,3): error TS7031: Binding element 'onCreateTestHistory' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(44,33): error TS7006: Parameter 'activeSection' implicitly has an 'any' type.
+src/hooks/settings/useSettingsSectionRenderer.ts(100,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
+            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(101,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
+            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(102,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
+            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(103,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
+            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
 src/hooks/sharing/useBudgetJoining.ts(16,5): error TS7031: Binding element 'shareCode' implicitly has an 'any' type.
 src/hooks/sharing/useBudgetJoining.ts(17,5): error TS7031: Binding element 'password' implicitly has an 'any' type.
 src/hooks/sharing/useBudgetJoining.ts(18,5): error TS7031: Binding element 'userName' implicitly has an 'any' type.

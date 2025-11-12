@@ -1,5 +1,5 @@
-import { useDebtDashboard } from "../../hooks/debts/useDebtDashboard";
-import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
+import { useDebtDashboard } from "@/hooks/debts/useDebtDashboard";
+import { isDebtFeatureEnabled } from "@/utils/debts/debtDebugConfig";
 import AddDebtModal from "./modals/AddDebtModal";
 import DebtDetailModal from "./modals/DebtDetailModal";
 import UpcomingPaymentsModal from "./modals/UpcomingPaymentsModal";
@@ -42,6 +42,7 @@ const DebtDashboard = () => {
     handleAddDebt,
     handleEditDebt,
     handleDebtClick,
+    handleCloseModal,
     handleModalSubmit,
     handleDeleteDebt,
     handleRecordPayment,
@@ -98,7 +99,7 @@ const DebtDashboard = () => {
       {isDebtFeatureEnabled("ENABLE_ADD_DEBT_MODAL") && (
         <AddDebtModal
           isOpen={showAddModal || !!editingDebt}
-          onClose={() => setSelectedDebt(null)}
+          onClose={handleCloseModal}
           onSubmit={handleModalSubmit}
           debt={editingDebt}
         />
