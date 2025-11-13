@@ -11,11 +11,44 @@ import {
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 import { validateFormAndAllocations as validateFormAndAllocationsUtil } from "../../utils/validation";
+import type { Envelope, PaycheckHistory } from "@/db/types";
+
+interface FormData {
+  amount: string;
+  payerName: string;
+  allocationMode: string;
+}
+
+interface AllocationResult {
+  allocations: unknown[];
+  totalAllocated: number;
+  remainingAmount: number;
+  allocationRate: number;
+}
+
+interface ErrorMap {
+  [key: string]: string;
+}
+
+interface User {
+  userName: string;
+}
+
+interface UsePaycheckProcessorProps {
+  envelopes?: Envelope[];
+  paycheckHistory?: PaycheckHistory[];
+  onAddPaycheck: (paycheckTransaction: unknown) => Promise<void>;
+  currentUser?: User;
+}
 
 // Helper to clear field error when updated
-const clearFieldError = (field, errors, setErrors) => {
+const clearFieldError = (
+  field: string,
+  errors: ErrorMap,
+  setErrors: React.Dispatch<React.SetStateAction<ErrorMap>>
+): void => {
   if (errors[field]) {
-    setErrors((prevErrors) => {
+    setErrors((prevErrors: ErrorMap) => {
       const { [field]: _removed, ...remainingErrors } = prevErrors;
       return remainingErrors;
     });
@@ -23,7 +56,7 @@ const clearFieldError = (field, errors, setErrors) => {
 };
 
 // Helper to reset allocations to default state
-const getDefaultAllocations = () => ({
+const getDefaultAllocations = (): AllocationResult => ({
   allocations: [],
   totalAllocated: 0,
   remainingAmount: 0,
@@ -32,7 +65,11 @@ const getDefaultAllocations = () => ({
 
 // Helper to validate form and allocations
 // eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
-const validateFormAndAllocations = (formData, currentAllocations, setErrors) => {
+const validateFormAndAllocations = (
+  formData: FormData,
+  currentAllocations: AllocationResult,
+  setErrors: React.Dispatch<React.SetStateAction<ErrorMap>>
+): boolean => {
   const validation = validateFormAndAllocationsUtil(
     formData,
     currentAllocations,
@@ -55,20 +92,20 @@ const usePaycheckProcessor = ({
   paycheckHistory = [],
   onAddPaycheck,
   currentUser = { userName: "User" },
-}) => {
+}: UsePaycheckProcessorProps) => {
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     amount: "",
     payerName: "",
     allocationMode: "allocate",
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<ErrorMap>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [tempPayers, setTempPayers] = useState([]);
+  const [tempPayers, setTempPayers] = useState<string[]>([]);
 
   // Paycheck processing state
-  const [currentAllocations, setCurrentAllocations] = useState({
+  const [currentAllocations, setCurrentAllocations] = useState<AllocationResult>({
     allocations: [],
     totalAllocated: 0,
     remainingAmount: 0,
@@ -83,7 +120,7 @@ const usePaycheckProcessor = ({
         envelopes,
         formData.allocationMode
       );
-      setCurrentAllocations(allocations);
+      setCurrentAllocations(allocations as AllocationResult);
     } else {
       setCurrentAllocations(getDefaultAllocations());
     }
@@ -91,8 +128,8 @@ const usePaycheckProcessor = ({
 
   // Form field update handler
   const updateFormField = useCallback(
-    (field, value) => {
-      setFormData((prev) => {
+    (field: string, value: string) => {
+      setFormData((prev: FormData) => {
         const newData = { ...prev, [field]: value };
         clearFieldError(field, errors, setErrors);
         return newData;
@@ -103,7 +140,7 @@ const usePaycheckProcessor = ({
 
   // Get payer prediction based on history
   const getPayerData = useCallback(
-    (payerName) => {
+    (payerName: string) => {
       if (!payerName) return null;
       return getPayerPrediction(payerName, paycheckHistory);
     },
@@ -112,7 +149,7 @@ const usePaycheckProcessor = ({
 
   // Apply payer prediction to form
   const applyPayerPrediction = useCallback(
-    (payerName) => {
+    (payerName: string) => {
       const prediction = getPayerData(payerName);
       if (prediction) {
         updateFormField("amount", prediction.amount.toString());
@@ -168,7 +205,7 @@ const usePaycheckProcessor = ({
 
       // Add payer to temp list if new
       if (formData.payerName && !getUniquePayers(paycheckHistory).includes(formData.payerName)) {
-        setTempPayers((prev) => [...prev, formData.payerName]);
+        setTempPayers((prev: string[]) => [...prev, formData.payerName]);
       }
 
       // Reset form
@@ -181,12 +218,9 @@ const usePaycheckProcessor = ({
 
       return true;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to process paycheck";
       logger.error("Error processing paycheck", error);
-      globalToast.showError(
-        error.message || "Failed to process paycheck",
-        "Processing Error",
-        8000
-      );
+      globalToast.showError(errorMessage, "Processing Error", 8000);
       return false;
     } finally {
       setIsLoading(false);

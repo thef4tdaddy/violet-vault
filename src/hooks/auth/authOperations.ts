@@ -1,5 +1,35 @@
 import logger from "../../utils/common/logger";
 
+interface LoginResult {
+  success: boolean;
+  user?: {
+    userName?: string;
+  };
+  error?: string;
+  newKey?: string;
+  newSalt?: string;
+}
+
+interface MutationResult {
+  mutateAsync: (data: unknown) => Promise<LoginResult>;
+}
+
+interface AuthContextType {
+  user: unknown;
+  setAuthenticated: (user: unknown, credentials: { encryptionKey?: string; salt?: string }) => void;
+  lockSession: () => void;
+  updateActivity: () => void;
+}
+
+interface JoinBudgetData {
+  budgetId?: string;
+  sharedBy?: string;
+}
+
+interface UserData {
+  userName?: string;
+}
+
 /**
  * Auth operation functions for useAuthManager
  * Separated to reduce function complexity and improve maintainability
@@ -9,8 +39,8 @@ import logger from "../../utils/common/logger";
  * Login with password and optional user data (for new users)
  */
 export const createLoginOperation =
-  (loginMutation) =>
-  async (password, userData = null) => {
+  (loginMutation: MutationResult) =>
+  async (password: string, userData: UserData | null = null): Promise<LoginResult> => {
     try {
       logger.auth("AuthManager: Starting login", {
         hasPassword: !!password,
@@ -25,65 +55,71 @@ export const createLoginOperation =
           userName: result.user?.userName,
           isNewUser: !!userData,
         });
-        return { success: true, data: result };
+        return result;
       } else {
         logger.auth("AuthManager: Login failed", { error: result.error });
-        return { success: false, error: result.error, ...result };
+        return result;
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Login failed";
       logger.error("AuthManager: Login error", error);
-      return { success: false, error: error.message || "Login failed" };
+      return { success: false, error: errorMessage };
     }
   };
 
 /**
  * Join budget with share code
  */
-export const createJoinBudgetOperation = (joinBudgetMutation) => async (joinData) => {
-  try {
-    logger.auth("AuthManager: Starting budget join", {
-      budgetId: joinData.budgetId?.substring(0, 8) + "...",
-      sharedBy: joinData.sharedBy,
-    });
+export const createJoinBudgetOperation =
+  (joinBudgetMutation: MutationResult) =>
+  async (joinData: JoinBudgetData): Promise<LoginResult> => {
+    try {
+      logger.auth("AuthManager: Starting budget join", {
+        budgetId: joinData.budgetId?.substring(0, 8) + "...",
+        sharedBy: joinData.sharedBy,
+      });
 
-    const result = await joinBudgetMutation.mutateAsync(joinData);
+      const result = await joinBudgetMutation.mutateAsync(joinData);
 
-    if (result.success) {
-      logger.auth("AuthManager: Budget join successful");
-      return { success: true, data: result };
-    } else {
-      return { success: false, error: result.error };
+      if (result.success) {
+        logger.auth("AuthManager: Budget join successful");
+        return result;
+      } else {
+        return { success: false, error: result.error };
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to join budget";
+      logger.error("AuthManager: Budget join error", error);
+      return {
+        success: false,
+        error: errorMessage,
+      };
     }
-  } catch (error) {
-    logger.error("AuthManager: Budget join error", error);
-    return {
-      success: false,
-      error: error.message || "Failed to join budget",
-    };
-  }
-};
+  };
 
 /**
  * Logout user and clear session
  */
-export const createLogoutOperation = (logoutMutation) => async () => {
-  try {
-    logger.auth("AuthManager: Starting logout");
-    await logoutMutation.mutateAsync();
-    logger.auth("AuthManager: Logout successful");
-    return { success: true };
-  } catch (error) {
-    logger.error("AuthManager: Logout error", error);
-    // Still return success since auth state is cleared
-    return { success: true };
-  }
-};
+export const createLogoutOperation =
+  (logoutMutation: MutationResult) => async (): Promise<LoginResult> => {
+    try {
+      logger.auth("AuthManager: Starting logout");
+      await logoutMutation.mutateAsync({});
+      logger.auth("AuthManager: Logout successful");
+      return { success: true };
+    } catch (error) {
+      logger.error("AuthManager: Logout error", error);
+      // Still return success since auth state is cleared
+      return { success: true };
+    }
+  };
 
 /**
  * Change user password
  */
 export const createChangePasswordOperation =
-  (changePasswordMutation, authContext) => async (oldPassword, newPassword) => {
+  (changePasswordMutation: MutationResult, authContext: AuthContextType) =>
+  async (oldPassword: string, newPassword: string): Promise<LoginResult> => {
     try {
       logger.auth("AuthManager: Starting password change");
       const result = await changePasswordMutation.mutateAsync({
@@ -103,10 +139,11 @@ export const createChangePasswordOperation =
         return { success: false, error: result.error };
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to change password";
       logger.error("AuthManager: Password change error", error);
       return {
         success: false,
-        error: error.message || "Failed to change password",
+        error: errorMessage,
       };
     }
   };
@@ -114,33 +151,36 @@ export const createChangePasswordOperation =
 /**
  * Update user profile
  */
-export const createUpdateProfileOperation = (updateProfileMutation) => async (updatedProfile) => {
-  try {
-    logger.auth("AuthManager: Starting profile update", {
-      userName: updatedProfile.userName,
-    });
+export const createUpdateProfileOperation =
+  (updateProfileMutation: MutationResult) =>
+  async (updatedProfile: Record<string, unknown>): Promise<LoginResult> => {
+    try {
+      logger.auth("AuthManager: Starting profile update", {
+        userName: (updatedProfile as UserData).userName,
+      });
 
-    const result = await updateProfileMutation.mutateAsync(updatedProfile);
+      const result = await updateProfileMutation.mutateAsync(updatedProfile);
 
-    if (result.success) {
-      logger.auth("AuthManager: Profile update successful");
-      return { success: true };
-    } else {
-      return { success: false, error: result.error };
+      if (result.success) {
+        logger.auth("AuthManager: Profile update successful");
+        return { success: true };
+      } else {
+        return { success: false, error: result.error };
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
+      logger.error("AuthManager: Profile update error", error);
+      return {
+        success: false,
+        error: errorMessage,
+      };
     }
-  } catch (error) {
-    logger.error("AuthManager: Profile update error", error);
-    return {
-      success: false,
-      error: error.message || "Failed to update profile",
-    };
-  }
-};
+  };
 
 /**
  * Lock the current session (keep user data but require re-auth)
  */
-export const createLockSessionOperation = (authContext) => () => {
+export const createLockSessionOperation = (authContext: AuthContextType) => (): void => {
   logger.auth("AuthManager: Locking session");
   authContext.lockSession();
 };
@@ -148,6 +188,6 @@ export const createLockSessionOperation = (authContext) => () => {
 /**
  * Update last activity timestamp
  */
-export const createUpdateActivityOperation = (authContext) => () => {
+export const createUpdateActivityOperation = (authContext: AuthContextType) => (): void => {
   authContext.updateActivity();
 };

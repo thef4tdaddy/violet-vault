@@ -33,14 +33,17 @@ export class ScreenshotService {
     const { compress = true } = options;
 
     try {
-      let screenshot = null;
+      let screenshot: string | null = null;
 
       // Try modern native screenshot API first (requires user interaction)
-      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+      if (navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === "function") {
         try {
           screenshot = await this.captureWithDisplayMedia();
         } catch (error) {
-          logger.warn("Native screen capture failed, falling back", error);
+          logger.warn(
+            "Native screen capture failed, falling back",
+            error as Record<string, unknown>
+          );
         }
       }
 
@@ -49,7 +52,10 @@ export class ScreenshotService {
         try {
           screenshot = await this.captureWithHtml2Canvas();
         } catch (error) {
-          logger.warn("html2canvas capture failed, using final fallback", error);
+          logger.warn(
+            "html2canvas capture failed, using final fallback",
+            error as Record<string, unknown>
+          );
           screenshot = await this.captureFallbackMethod();
         }
       }
@@ -109,6 +115,10 @@ export class ScreenshotService {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Failed to get canvas context");
+    }
 
     ctx.drawImage(video, 0, 0);
     const screenshotDataUrl = canvas.toDataURL("image/png", 0.8);
@@ -189,10 +199,14 @@ export class ScreenshotService {
    * Manual canvas method as last resort
    * @returns {Promise<string>}
    */
-  static async captureManualCanvas() {
+  static async captureManualCanvas(): Promise<string | null> {
     try {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
+
+      if (!ctx) {
+        throw new Error("Failed to get canvas context");
+      }
 
       canvas.width = Math.min(window.innerWidth, 1200);
       canvas.height = Math.min(window.innerHeight, 800);
@@ -216,7 +230,7 @@ export class ScreenshotService {
       // Try to capture some visual elements
       const activeTab = document.querySelector("[aria-selected='true'], .active, .selected");
       if (activeTab) {
-        ctx.fillText(`Active Tab: ${activeTab.textContent?.trim()}`, canvas.width / 2, 110);
+        ctx.fillText(`Active Tab: ${activeTab.textContent?.trim() ?? ""}`, canvas.width / 2, 110);
       }
 
       const fallbackDataUrl = canvas.toDataURL("image/png", 0.8);
@@ -279,6 +293,10 @@ export class ScreenshotService {
       canvas.height = height;
       const ctx = canvas.getContext("2d");
 
+      if (!ctx) {
+        throw new Error("Failed to get canvas context");
+      }
+
       // Improve compression quality
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
@@ -294,11 +312,12 @@ export class ScreenshotService {
       const compressedSize = this.getScreenshotInfo(compressedDataUrl);
 
       logger.info("Screenshot compressed", {
-        originalSizeKB: originalSize?.sizeKB,
-        compressedSizeKB: compressedSize?.sizeKB,
-        compressionRatio: originalSize
-          ? Math.round((1 - compressedSize.sizeKB / originalSize.sizeKB) * 100)
-          : 0,
+        originalSizeKB: originalSize?.sizeKB ?? 0,
+        compressedSizeKB: compressedSize?.sizeKB ?? 0,
+        compressionRatio:
+          originalSize && compressedSize
+            ? Math.round((1 - compressedSize.sizeKB / originalSize.sizeKB) * 100)
+            : 0,
         newDimensions: `${width}x${height}`,
       });
 

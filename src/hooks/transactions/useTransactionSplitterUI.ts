@@ -1,11 +1,30 @@
 import { useState, useCallback } from "react";
 import { transactionSplitterService } from "../../services/transactions/transactionSplitterService";
+import type { Transaction, Envelope } from "@/db/types";
+
+interface SplitAllocation {
+  id: number;
+  description: string;
+  amount: number;
+  category: string;
+  envelopeId: string | number;
+  isOriginalItem?: boolean;
+  originalItem?: {
+    name: string;
+    price?: number;
+    totalPrice?: number;
+    category?: {
+      name: string;
+      confidence: number;
+    };
+  };
+}
 
 /**
  * Hook for managing transaction splitter UI state
  */
 export const useTransactionSplitterUI = () => {
-  const [splitAllocations, setSplitAllocations] = useState([]);
+  const [splitAllocations, setSplitAllocations] = useState<SplitAllocation[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const resetState = useCallback(() => {
@@ -26,10 +45,10 @@ export const useTransactionSplitterUI = () => {
  * Hook for transaction splitting business logic
  */
 export const useTransactionSplitterLogic = (
-  splitAllocations,
-  setSplitAllocations,
-  transaction,
-  envelopes
+  splitAllocations: SplitAllocation[],
+  setSplitAllocations: React.Dispatch<React.SetStateAction<SplitAllocation[]>>,
+  transaction: Transaction | null,
+  envelopes: Envelope[]
 ) => {
   // Initialize splits when transaction changes
   const initializeSplits = useCallback(() => {
@@ -48,12 +67,12 @@ export const useTransactionSplitterLogic = (
       transaction,
       splitAllocations
     );
-    setSplitAllocations((prev) => [...prev, newSplit]);
+    setSplitAllocations((prev: SplitAllocation[]) => [...prev, newSplit]);
   }, [transaction, splitAllocations, setSplitAllocations]);
 
   // Update split allocation
   const updateSplitAllocation = useCallback(
-    (id, field, value) => {
+    (id: number, field: string, value: string | number) => {
       const updatedSplits = transactionSplitterService.updateSplitAllocation(
         splitAllocations,
         id,
@@ -68,8 +87,8 @@ export const useTransactionSplitterLogic = (
 
   // Remove split allocation
   const removeSplitAllocation = useCallback(
-    (id) => {
-      setSplitAllocations((prev) => prev.filter((split) => split.id !== id));
+    (id: number) => {
+      setSplitAllocations((prev: SplitAllocation[]) => prev.filter((split) => split.id !== id));
     },
     [setSplitAllocations]
   );
@@ -128,14 +147,17 @@ export const useTransactionSplitterLogic = (
  * Hook for handling transaction splitting operations
  */
 export const useTransactionSplitterOperations = (
-  splitAllocations,
-  transaction,
-  setIsProcessing,
-  onSplitTransaction,
-  onClose
+  splitAllocations: SplitAllocation[],
+  transaction: Transaction | null,
+  setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>,
+  onSplitTransaction?: (
+    transaction: Transaction,
+    splitTransactions: SplitAllocation[]
+  ) => Promise<void>,
+  onClose?: () => void
 ) => {
   const applySplitTransaction = useCallback(async () => {
-    if (!transaction) return;
+    if (!transaction) return { success: false, errors: ["No transaction provided"] };
 
     const errors = transactionSplitterService.validateSplits(
       splitAllocations,
@@ -163,7 +185,8 @@ export const useTransactionSplitterOperations = (
 
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      return { success: false, error: errorMessage };
     } finally {
       setIsProcessing(false);
     }
