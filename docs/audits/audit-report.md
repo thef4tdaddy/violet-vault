@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 3109 | +3109 |
+| TypeScript Strict Mode Errors | 3101 | -8 |
 
-*Last updated: 2025-11-13 23:48:40 UTC*
+*Last updated: 2025-11-13 23:58:11 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-13 23:48:11 UTC
+Last check: 2025-11-13 23:57:41 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-13 23:48:25 UTC
+Last check: 2025-11-13 23:57:56 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -289,7 +289,6 @@ Last check: 2025-11-13 23:48:25 UTC
 - 4 errors in `src/utils/icons/index.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
-- 4 errors in `src/services/bugReport/githubApiService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
 - 4 errors in `src/hooks/mobile/usePullToRefresh.ts`
 - 4 errors in `src/hooks/layout/usePaycheckOperations.ts`
@@ -415,7 +414,6 @@ Last check: 2025-11-13 23:48:25 UTC
 - 2 errors in `src/components/settings/archiving/ArchivingProgress.tsx`
 - 2 errors in `src/components/settings/archiving/ArchivingHeader.tsx`
 - 2 errors in `src/components/settings/EnvelopeIntegrityChecker.tsx`
-- 2 errors in `src/components/savings/AddEditGoalModal.tsx`
 - 2 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
 - 2 errors in `src/components/receipts/components/ReceiptErrorState.tsx`
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
@@ -476,10 +474,8 @@ Last check: 2025-11-13 23:48:25 UTC
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/mobile/useSlideUpModal.ts`
 - 1 errors in `src/hooks/layout/useLayoutData.ts`
-- 1 errors in `src/hooks/debts/useDebtStrategies.ts`
 - 1 errors in `src/hooks/debts/useDebtManagement.ts`
 - 1 errors in `src/hooks/common/usePrompt.ts`
-- 1 errors in `src/hooks/common/useImportData.ts`
 - 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
 - 1 errors in `src/hooks/common/useBugReport.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
@@ -532,15 +528,15 @@ Last check: 2025-11-13 23:48:25 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 1099 | `TS7006` |
+| 1094 | `TS7006` |
 | 847 | `TS7031` |
-| 232 | `TS2345` |
+| 231 | `TS2345` |
 | 189 | `TS18046` |
-| 188 | `TS2339` |
+| 187 | `TS2339` |
 | 134 | `TS2322` |
 | 117 | `TS7053` |
 | 77 | `TS7005` |
-| 67 | `TS18048` |
+| 66 | `TS18048` |
 | 44 | `TS7034` |
 | 41 | `TS18047` |
 | 24 | `TS2769` |
@@ -1715,8 +1711,6 @@ src/components/receipts/steps/ReceiptDataStep.tsx(6,41): error TS7031: Binding e
 src/components/receipts/steps/ReceiptDataStep.tsx(6,58): error TS7031: Binding element 'handleFormChange' implicitly has an 'any' type.
 src/components/receipts/steps/ReceiptDataStep.tsx(105,49): error TS7006: Parameter 'item' implicitly has an 'any' type.
 src/components/receipts/steps/ReceiptDataStep.tsx(105,55): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/savings/AddEditGoalModal.tsx(125,28): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/components/savings/AddEditGoalModal.tsx(125,35): error TS7006: Parameter 'value' implicitly has an 'any' type.
 src/components/savings/SavingsGoalCard.tsx(6,28): error TS7031: Binding element 'goal' implicitly has an 'any' type.
 src/components/savings/SavingsGoalCard.tsx(6,34): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
 src/components/savings/SavingsGoalCard.tsx(6,42): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
@@ -2710,7 +2704,6 @@ src/hooks/common/useFABActions.ts(47,18): error TS2339: Property 'id' does not e
 src/hooks/common/useFABActions.ts(49,31): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/common/useFABActions.ts(54,7): error TS7005: Variable 'actionIds' implicitly has an 'any[]' type.
 src/hooks/common/useFABActions.ts(90,34): error TS7006: Parameter 'screenId' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(130,26): error TS2345: Argument of type 'AuthConfig' is not assignable to parameter of type 'null | undefined'.
 src/hooks/common/useModalManager.ts(11,34): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
 src/hooks/common/useModalManager.ts(15,35): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
 src/hooks/common/useModalManager.ts(19,36): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
@@ -2813,7 +2806,6 @@ src/hooks/debts/useDebtModalLogic.ts(56,50): error TS2345: Argument of type 'Bil
   Type 'Bill' is not assignable to type 'null | undefined'.
 src/hooks/debts/useDebtModalLogic.ts(83,35): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/hooks/debts/useDebtModalLogic.ts(140,47): error TS18049: 'connectedEnvelope' is possibly 'null' or 'undefined'.
-src/hooks/debts/useDebtStrategies.ts(55,63): error TS18048: 'debt.currentBalance' is possibly 'undefined'.
 src/hooks/debts/useDebts.ts(27,14): error TS18046: 'error' is of type 'unknown'.
 src/hooks/debts/useDebts.ts(35,28): error TS7006: Parameter 'debtData' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(45,5): error TS2322: Type 'null' is not assignable to type 'Debt'.
@@ -3266,10 +3258,6 @@ src/services/bugReport/errorTrackingService.ts(106,26): error TS2322: Type '(eve
     Types of parameters 'event' and 'event' are incompatible.
       Type 'Event' is missing the following properties from type 'ErrorEvent': colno, error, filename, lineno, message
 src/services/bugReport/errorTrackingService.ts(217,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/githubApiService.ts(345,41): error TS2339: Property 'errors' does not exist on type '{ appVersion?: string | undefined; browser?: { name: string; version: string; } | undefined; viewport?: { width: number; height: number; } | undefined; userAgent?: string | undefined; performance?: { ...; } | undefined; timestamp?: string | undefined; errors?: { ...; } | undefined; } | undefined'.
-src/services/bugReport/githubApiService.ts(356,29): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/services/bugReport/githubApiService.ts(356,36): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/services/bugReport/githubApiService.ts(383,15): error TS7006: Parameter 'log' implicitly has an 'any' type.
 src/services/bugReport/index.ts(107,9): error TS2783: 'success' is specified more than once, so this usage will be overwritten.
 src/services/bugReport/index.ts(120,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
 src/services/bugReport/index.ts(158,26): error TS18046: 'error' is of type 'unknown'.

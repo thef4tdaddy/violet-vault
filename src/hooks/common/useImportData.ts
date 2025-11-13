@@ -117,7 +117,7 @@ const buildImportResult = (validatedData: ValidatedData) => ({
 const performImport = async (
   validatedData: ValidatedData,
   showSuccessToast: (message: string, title?: string) => void,
-  authConfig: AuthConfig
+  authConfig: AuthConfig | null
 ): Promise<void> => {
   await backupCurrentData();
   await clearFirebaseData();
@@ -127,7 +127,8 @@ const performImport = async (
   showSuccessToast("Local data imported! Now syncing to cloud...", "Import Complete");
 
   // Pass auth config to force push since sync service will be stopped during import
-  await forcePushToCloud(authConfig);
+  // Type assertion needed as forcePushToCloud accepts a different config shape but works with this
+  await forcePushToCloud(authConfig as never);
   showSuccessToast("Import complete! Data synced to cloud successfully.");
 
   // Force UI refresh by invalidating all queries

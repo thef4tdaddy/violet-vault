@@ -52,7 +52,7 @@ interface DebtInsight {
 export const useDebtStrategies = (debts: DebtAccount[] = []) => {
   // Filter to active debts only
   const activeDebts = useMemo(() => {
-    return debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
+    return debts.filter((debt) => debt.status === "active" && (debt.currentBalance ?? 0) > 0);
   }, [debts]);
 
   // Calculate Avalanche Strategy (highest interest rate first)

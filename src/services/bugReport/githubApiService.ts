@@ -41,33 +41,37 @@ interface BugReportData {
   screenshot?: string;
   sessionUrl?: string;
   logs?: string[];
-  systemInfo?: {
-    appVersion?: string;
-    browser?: { name: string; version: string };
-    viewport?: { width: number; height: number };
-    userAgent?: string;
-    performance?: { memory?: { usedJSHeapSize: number } };
-    timestamp?: string;
-    errors?: {
-      recentErrors?: Array<{
-        type?: string;
-        message?: string;
-        stack?: string;
-        filename?: string;
-        lineno?: number;
-        timestamp?: string;
-      }>;
-      consoleLogs?: Array<{
-        level: string;
-        message: string;
-        timestamp: number;
-      }>;
-    };
-  };
+  systemInfo?: SystemInfo;
   contextInfo?: {
     url?: string;
     userLocation?: string;
   };
+}
+
+interface SystemInfo {
+  appVersion?: string;
+  browser?: { name: string; version: string };
+  viewport?: { width: number; height: number };
+  userAgent?: string;
+  performance?: { memory?: { usedJSHeapSize: number } };
+  timestamp?: string;
+  errors?: ErrorsInfo;
+}
+
+interface ErrorsInfo {
+  recentErrors?: Array<{
+    type?: string;
+    message?: string;
+    stack?: string;
+    filename?: string;
+    lineno?: number;
+    timestamp?: string;
+  }>;
+  consoleLogs?: Array<{
+    level: string;
+    message: string;
+    timestamp: number;
+  }>;
 }
 
 /**
@@ -283,7 +287,7 @@ export class GitHubAPIService {
    * @param {Object} systemInfo - System information object
    * @returns {string} Formatted environment info
    */
-  static formatEnvironmentInfo(systemInfo: BugReportData["systemInfo"] | undefined): string {
+  static formatEnvironmentInfo(systemInfo: SystemInfo | undefined): string {
     const sections: string[] = [];
 
     // App version and environment
@@ -341,9 +345,7 @@ export class GitHubAPIService {
    * @param {Object} errors - Error object from system info
    * @returns {string} Formatted error information
    */
-  static formatConsoleLogsForGitHub(
-    errors: BugReportData["systemInfo"]["errors"] | undefined
-  ): string {
+  static formatConsoleLogsForGitHub(errors: ErrorsInfo | undefined): string {
     const sections: string[] = [];
 
     // Handle errors
@@ -353,18 +355,30 @@ export class GitHubAPIService {
       // Show last 3 errors to avoid overwhelming the issue
       const recentErrors = errors.recentErrors.slice(-3);
 
-      recentErrors.forEach((error, index) => {
-        sections.push(
-          `**Error ${index + 1}:**`,
-          "```javascript",
-          `${error?.type || "Error"}: ${error?.message || "Unknown error"}`,
-          error?.stack ? `Stack: ${error.stack}` : "",
-          error?.filename ? `File: ${error.filename} (Line: ${error?.lineno || "?"})` : "",
-          `Time: ${error?.timestamp || "Unknown"}`,
-          "```",
-          ""
-        );
-      });
+      recentErrors.forEach(
+        (
+          error: {
+            type?: string;
+            message?: string;
+            stack?: string;
+            filename?: string;
+            lineno?: number;
+            timestamp?: string;
+          },
+          index: number
+        ) => {
+          sections.push(
+            `**Error ${index + 1}:**`,
+            "```javascript",
+            `${error?.type || "Error"}: ${error?.message || "Unknown error"}`,
+            error?.stack ? `Stack: ${error.stack}` : "",
+            error?.filename ? `File: ${error.filename} (Line: ${error?.lineno || "?"})` : "",
+            `Time: ${error?.timestamp || "Unknown"}`,
+            "```",
+            ""
+          );
+        }
+      );
 
       if (errors.recentErrors.length > 3) {
         sections.push(`_... and ${errors.recentErrors.length - 3} more errors_`, "");
@@ -380,7 +394,7 @@ export class GitHubAPIService {
 
       // Detect code patterns for syntax highlighting
       const logText = recentLogs
-        .map((log) => {
+        .map((log: { level: string; message: string; timestamp: number }) => {
           const timeStr = new Date(log.timestamp).toLocaleTimeString();
           return `[${timeStr}] ${log.level.toUpperCase()}: ${log.message}`;
         })

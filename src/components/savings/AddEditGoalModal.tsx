@@ -122,7 +122,7 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
 
   if (!isOpen) return null;
 
-  const updateFormField = (field, value) => {
+  const updateFormField = (field: keyof FormData, value: string): void => {
     setFormData({ ...formData, [field]: value });
   };
 
