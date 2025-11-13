@@ -5,6 +5,25 @@ import logger from "../common/logger";
  * Handles fetching and parsing patch notes from CHANGELOG.md
  */
 
+interface PatchNotes {
+  version: string;
+  summary: string;
+  features: string[];
+  fixes: string[];
+  breaking: string[];
+  other: string[];
+  hasContent: boolean;
+}
+
+interface FallbackPatchNotes extends PatchNotes {
+  isFallback: boolean;
+}
+
+interface Highlight {
+  type: "breaking" | "feature" | "fix" | "other";
+  text: string;
+}
+
 class PatchNotesManager {
   changelogCache: string | null;
   cacheTimestamp: number | null;
@@ -49,7 +68,7 @@ class PatchNotesManager {
       logger.debug("Fetched and cached changelog", { size: content.length });
       return content;
     } catch (error) {
-      logger.warn("Failed to fetch changelog:", error);
+      logger.warn("Failed to fetch changelog:", error as Record<string, unknown>);
 
       // Return fallback content if fetch fails
       return this.getFallbackChangelog();
@@ -59,7 +78,7 @@ class PatchNotesManager {
   /**
    * Extract patch notes for a specific version
    */
-  async getPatchNotesForVersion(version) {
+  async getPatchNotesForVersion(version: string): Promise<PatchNotes> {
     try {
       const changelog = await this.fetchChangelog();
       return this.extractVersionNotes(changelog, version);
@@ -72,7 +91,7 @@ class PatchNotesManager {
   /**
    * Extract notes for a version from changelog content
    */
-  extractVersionNotes(changelog, version) {
+  extractVersionNotes(changelog: string, version: string): PatchNotes {
     // Look for version header (e.g., "## [1.9.0]" or "# v1.9.0")
     const versionRegex = new RegExp(
       `(?:^|\\n)(?:##?\\s*(?:\\[?v?${version.replace(/\./g, "\\.")}\\]?|${version.replace(/\./g, "\\.")}))(?:\\s*-[^\\n]*)?(?:\\n|$)`,
@@ -80,7 +99,7 @@ class PatchNotesManager {
     );
 
     const match = changelog.match(versionRegex);
-    if (!match) {
+    if (!match || match.index === undefined) {
       logger.warn(`No changelog entry found for version ${version}`);
       return this.getFallbackPatchNotes(version);
     }
@@ -106,14 +125,14 @@ class PatchNotesManager {
   /**
    * Parse version content into structured format
    */
-  parseVersionContent(content, version) {
-    const lines = content.split("\n").filter((line) => line.trim());
+  parseVersionContent(content: string, version: string): PatchNotes {
+    const lines = content.split("\n").filter((line: string) => line.trim());
 
     let summary = "";
-    const features = [];
-    const fixes = [];
-    const breaking = [];
-    const other = [];
+    const features: string[] = [];
+    const fixes: string[] = [];
+    const breaking: string[] = [];
+    const other: string[] = [];
 
     let currentSection = "summary";
 
@@ -191,34 +210,42 @@ class PatchNotesManager {
   /**
    * Get top highlights for the popup (first 3-5 most important items)
    */
-  getTopHighlights(patchNotes) {
-    const highlights = [];
+  getTopHighlights(patchNotes: PatchNotes): Highlight[] {
+    const highlights: Highlight[] = [];
 
     // Prioritize breaking changes, then features, then fixes
     if (patchNotes.breaking.length > 0) {
       highlights.push(
-        ...patchNotes.breaking.slice(0, 2).map((item) => ({ type: "breaking", text: item }))
+        ...patchNotes.breaking
+          .slice(0, 2)
+          .map((item: string) => ({ type: "breaking" as const, text: item }))
       );
     }
 
     if (highlights.length < 5 && patchNotes.features.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.features.slice(0, remaining).map((item) => ({ type: "feature", text: item }))
+        ...patchNotes.features
+          .slice(0, remaining)
+          .map((item: string) => ({ type: "feature" as const, text: item }))
       );
     }
 
     if (highlights.length < 5 && patchNotes.fixes.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.fixes.slice(0, remaining).map((item) => ({ type: "fix", text: item }))
+        ...patchNotes.fixes
+          .slice(0, remaining)
+          .map((item: string) => ({ type: "fix" as const, text: item }))
       );
     }
 
     if (highlights.length < 5 && patchNotes.other.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.other.slice(0, remaining).map((item) => ({ type: "other", text: item }))
+        ...patchNotes.other
+          .slice(0, remaining)
+          .map((item: string) => ({ type: "other" as const, text: item }))
       );
     }
 
@@ -228,7 +255,7 @@ class PatchNotesManager {
   /**
    * Get fallback patch notes when fetch fails
    */
-  getFallbackPatchNotes(version) {
+  getFallbackPatchNotes(version: string): FallbackPatchNotes {
     return {
       version,
       summary: `Version ${version} includes new features, improvements, and bug fixes.`,
@@ -247,7 +274,7 @@ class PatchNotesManager {
   /**
    * Get fallback changelog content
    */
-  getFallbackChangelog() {
+  getFallbackChangelog(): string {
     return `# Changelog
 
 ## [1.9.0] - 2025-01-16
@@ -284,7 +311,8 @@ class PatchNotesManager {
       hasCache: !!this.changelogCache,
       isValid,
       cacheAge: this.cacheTimestamp ? now - this.cacheTimestamp : 0,
-      timeUntilExpiry: isValid ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
+      timeUntilExpiry:
+        isValid && this.cacheTimestamp ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
     };
   }
 }

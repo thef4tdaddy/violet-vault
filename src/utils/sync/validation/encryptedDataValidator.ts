@@ -8,12 +8,28 @@ import { VALIDATION_CONSTANTS } from "./constants";
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements
  */
 
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  dataLength?: number;
+  ivLength?: number;
+}
+
+interface EncryptedData {
+  data: string | ArrayBuffer;
+  iv: string | ArrayBuffer;
+}
+
 /**
  * Validate encrypted data structure before decryption
  */
-export const validateEncryptedData = (encryptedData, operation = "unknown") => {
-  const errors = [];
-  const warnings = [];
+export const validateEncryptedData = (
+  encryptedData: EncryptedData | null | undefined,
+  operation = "unknown"
+): ValidationResult => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
 
   // Check if encrypted data exists
   if (!encryptedData) {
@@ -41,10 +57,20 @@ export const validateEncryptedData = (encryptedData, operation = "unknown") => {
  * Validate data sizes to prevent corruption errors
  * @private
  */
-const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
+const _validateDataSizes = (
+  encryptedData: EncryptedData,
+  operation: string,
+  errors: string[],
+  warnings: string[]
+): ValidationResult => {
   try {
-    const dataLength = encryptedData.data.length;
-    const ivLength = encryptedData.iv.length;
+    // Get lengths based on type
+    const dataLength =
+      typeof encryptedData.data === "string"
+        ? encryptedData.data.length
+        : encryptedData.data.byteLength;
+    const ivLength =
+      typeof encryptedData.iv === "string" ? encryptedData.iv.length : encryptedData.iv.byteLength;
 
     // Check minimum sizes (prevents "data too small" errors)
     if (dataLength < VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH) {
@@ -73,7 +99,9 @@ const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
 
     return _buildValidationResult(encryptedData, errors, warnings, operation);
   } catch (validationError) {
-    errors.push(`Data validation error: ${validationError.message}`);
+    const errorMessage =
+      validationError instanceof Error ? validationError.message : "Unknown validation error";
+    errors.push(`Data validation error: ${errorMessage}`);
     return { isValid: false, errors, warnings };
   }
 };
@@ -82,13 +110,30 @@ const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
  * Build validation result object
  * @private
  */
-const _buildValidationResult = (encryptedData, errors, warnings, operation) => {
+const _buildValidationResult = (
+  encryptedData: EncryptedData,
+  errors: string[],
+  warnings: string[],
+  operation: string
+): ValidationResult => {
+  // Get lengths based on type
+  const dataLength = encryptedData.data
+    ? typeof encryptedData.data === "string"
+      ? encryptedData.data.length
+      : encryptedData.data.byteLength
+    : 0;
+  const ivLength = encryptedData.iv
+    ? typeof encryptedData.iv === "string"
+      ? encryptedData.iv.length
+      : encryptedData.iv.byteLength
+    : 0;
+
   const result = {
     isValid: errors.length === 0,
     errors,
     warnings,
-    dataLength: encryptedData.data?.length || 0,
-    ivLength: encryptedData.iv?.length || 0,
+    dataLength,
+    ivLength,
   };
 
   // Log validation results

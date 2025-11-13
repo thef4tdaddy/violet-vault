@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react";
 import { COMPANY_MAPPINGS } from "../../components/bills/smartBillMatcherHelpers";
+import type { Bill, Envelope } from "@/types/bills";
+
+interface SmartSuggestion {
+  type: "exact" | "bill" | "category" | "partial";
+  envelope: Envelope;
+  bill?: Bill;
+  confidence: number;
+  reason: string;
+}
 
 /**
  * Hook for generating smart bill suggestions
  * Extracted from SmartBillMatcher to reduce component size
  */
-export const useSmartBillSuggestions = (bills, envelopes, searchQuery) => {
-  const [suggestions, setSuggestions] = useState([]);
+export const useSmartBillSuggestions = (
+  bills: Bill[],
+  envelopes: Envelope[],
+  searchQuery: string
+): SmartSuggestion[] => {
+  const [suggestions, setSuggestions] = useState<SmartSuggestion[]>([]);
 
   useEffect(() => {
     if (searchQuery && searchQuery.length > 2) {
@@ -17,9 +30,9 @@ export const useSmartBillSuggestions = (bills, envelopes, searchQuery) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, envelopes, bills]);
 
-  const generateSuggestions = (query) => {
+  const generateSuggestions = (query: string): void => {
     const normalizedQuery = query.toLowerCase().trim();
-    const suggestions = [];
+    const suggestions: SmartSuggestion[] = [];
 
     // Find exact envelope matches
     envelopes.forEach((envelope) => {
@@ -83,7 +96,7 @@ export const useSmartBillSuggestions = (bills, envelopes, searchQuery) => {
       const queryWords = normalizedQuery.split(" ");
 
       const matchingWords = queryWords.filter(
-        (word) => word.length > 2 && envelopeName.includes(word)
+        (word: string) => word.length > 2 && envelopeName.includes(word)
       );
 
       if (matchingWords.length > 0 && !suggestions.find((s) => s.envelope.id === envelope.id)) {

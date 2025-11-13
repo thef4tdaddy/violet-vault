@@ -3,16 +3,43 @@
  * Extracted from usePaycheckOperations for better maintainability and ESLint compliance
  */
 import logger from "../common/logger";
+import type { VioletVaultDB } from "@/db/budgetDb";
+import type { QueryClient } from "@tanstack/react-query";
+
+interface Paycheck {
+  id: string | number;
+  amount: number;
+  mode: "allocate" | "leftover";
+  envelopeAllocations?: Array<{
+    envelopeId: string | number;
+    amount: number;
+  }>;
+}
+
+interface BudgetMetadata {
+  actualBalance: number;
+  unassignedCash: number;
+}
+
+interface QueryKeys {
+  paycheckHistory: () => string[];
+  envelopes: string[];
+  budgetMetadata: string[];
+  dashboard: string[];
+}
 
 /**
  * Validate paycheck deletion parameters
  */
-export const validatePaycheckDeletion = (paycheckId, paycheckHistory) => {
+export const validatePaycheckDeletion = (
+  paycheckId: string | number,
+  paycheckHistory: Paycheck[]
+): Paycheck => {
   if (!paycheckId) {
     throw new Error("Paycheck ID is required for deletion");
   }
 
-  const paycheckToDelete = paycheckHistory.find((p) => p.id === paycheckId);
+  const paycheckToDelete = paycheckHistory.find((p: Paycheck) => p.id === paycheckId);
   if (!paycheckToDelete) {
     throw new Error(`Paycheck with ID ${paycheckId} not found in paycheckHistory`);
   }
@@ -30,7 +57,10 @@ export const validatePaycheckDeletion = (paycheckId, paycheckHistory) => {
 /**
  * Reverse envelope allocations for deleted paycheck
  */
-export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => {
+export const reverseEnvelopeAllocations = async (
+  paycheckToDelete: Paycheck,
+  budgetDb: VioletVaultDB
+): Promise<number> => {
   if (paycheckToDelete.mode !== "allocate" || !paycheckToDelete.envelopeAllocations) {
     return 0;
   }
@@ -39,9 +69,10 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => 
 
   // Subtract from envelope balances
   for (const allocation of paycheckToDelete.envelopeAllocations) {
-    const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
+    const envelopeId = String(allocation.envelopeId);
+    const envelope = await budgetDb.envelopes.get(envelopeId);
     if (envelope) {
-      await budgetDb.envelopes.update(allocation.envelopeId, {
+      await budgetDb.envelopes.update(envelopeId, {
         currentBalance: Math.max(0, (envelope.currentBalance || 0) - allocation.amount),
       });
       logger.debug("Reversed envelope allocation", {
@@ -53,7 +84,7 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => 
 
   // Calculate how much went to unassigned cash originally
   const totalAllocated = paycheckToDelete.envelopeAllocations.reduce(
-    (sum, alloc) => sum + alloc.amount,
+    (sum: number, alloc: { amount: number }) => sum + alloc.amount,
     0
   );
   return paycheckToDelete.amount - totalAllocated;
@@ -62,7 +93,16 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete, budgetDb) => 
 /**
  * Calculate new balances after paycheck deletion
  */
-export const calculateReversedBalances = async (paycheckToDelete, budgetDb, getBudgetMetadata) => {
+export const calculateReversedBalances = async (
+  paycheckToDelete: Paycheck,
+  budgetDb: VioletVaultDB,
+  getBudgetMetadata: () => Promise<BudgetMetadata | null>
+): Promise<{
+  currentActualBalance: number;
+  currentUnassignedCash: number;
+  newActualBalance: number;
+  newUnassignedCash: number;
+}> => {
   // Get current metadata
   const currentMetadata = await getBudgetMetadata();
   const currentActualBalance = currentMetadata?.actualBalance || 0;
@@ -93,20 +133,24 @@ export const calculateReversedBalances = async (paycheckToDelete, budgetDb, getB
 /**
  * Delete paycheck record from database
  */
-export const deletePaycheckRecord = async (paycheckId, budgetDb) => {
+export const deletePaycheckRecord = async (
+  paycheckId: string | number,
+  budgetDb: VioletVaultDB
+): Promise<void> => {
   logger.info("Deleting paycheck from Dexie", {
     paycheckId,
     paycheckIdType: typeof paycheckId,
   });
 
   // Verify the paycheck exists in Dexie before attempting to delete
-  const existsInDexie = await budgetDb.paycheckHistory.get(paycheckId);
+  const paycheckIdString = String(paycheckId);
+  const existsInDexie = await budgetDb.paycheckHistory.get(paycheckIdString);
   if (!existsInDexie) {
     logger.warn("Paycheck not found in Dexie database", {
       paycheckId,
     });
   } else {
-    await budgetDb.paycheckHistory.delete(paycheckId);
+    await budgetDb.paycheckHistory.delete(paycheckIdString);
     logger.info("Successfully deleted paycheck from Dexie");
   }
 };
@@ -114,7 +158,10 @@ export const deletePaycheckRecord = async (paycheckId, budgetDb) => {
 /**
  * Invalidate query caches after paycheck deletion
  */
-export const invalidatePaycheckCaches = async (queryClient, queryKeys) => {
+export const invalidatePaycheckCaches = async (
+  queryClient: QueryClient,
+  queryKeys: QueryKeys
+): Promise<void> => {
   queryClient.invalidateQueries({
     queryKey: queryKeys.paycheckHistory(),
   });
