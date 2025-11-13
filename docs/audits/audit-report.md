@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2788 | 0 |
+| TypeScript Strict Mode Errors | 2783 | -5 |
 
-*Last updated: 2025-11-12 23:21:38 UTC*
+*Last updated: 2025-11-13 01:55:47 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-12 23:21:22 UTC
+Last check: 2025-11-13 01:55:29 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-12 23:21:30 UTC
+Last check: 2025-11-13 01:55:36 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -72,7 +72,6 @@ Last check: 2025-11-12 23:21:30 UTC
 - 15 errors in `src/hooks/bills/useSmartBillSuggestions.ts`
 - 15 errors in `src/components/transactions/TransactionFilters.tsx`
 - 15 errors in `src/components/sharing/ShareCodeModal.tsx`
-- 15 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 14 errors in `src/utils/sync/validation/encryptedDataValidator.ts`
 - 14 errors in `src/utils/pwa/patchNotesManager.ts`
 - 14 errors in `src/utils/layout/paycheckDeletionUtils.ts`
@@ -89,6 +88,7 @@ Last check: 2025-11-12 23:21:30 UTC
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
+- 13 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 13 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
@@ -119,7 +119,6 @@ Last check: 2025-11-12 23:21:30 UTC
 - 10 errors in `src/utils/sync/RetryManager.ts`
 - 10 errors in `src/utils/services/editLockHelpers.ts`
 - 10 errors in `src/utils/query/queryClientConfig.ts`
-- 10 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 10 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 10 errors in `src/hooks/budgeting/autofunding/useExecutionStatistics.ts`
 - 10 errors in `src/hooks/auth/useAuthCompatibility.ts`
@@ -138,6 +137,7 @@ Last check: 2025-11-12 23:21:30 UTC
 - 9 errors in `src/utils/debug/syncDiagnostic.ts`
 - 9 errors in `src/utils/debug/reactErrorDetector.ts`
 - 9 errors in `src/utils/budgeting/envelopeMatching.ts`
+- 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/utils/analytics/trendHelpers.ts`
 - 9 errors in `src/services/bugReport/uiStateService.ts`
@@ -260,7 +260,6 @@ Last check: 2025-11-12 23:21:30 UTC
 - 5 errors in `src/components/layout/SummaryCards.tsx`
 - 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
 - 5 errors in `src/components/budgeting/PaycheckProcessor.tsx`
-- 5 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 5 errors in `src/components/bills/modals/BillDetailActions.tsx`
 - 5 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 5 errors in `src/components/bills/BillManagerHeader.tsx`
@@ -353,6 +352,7 @@ Last check: 2025-11-12 23:21:30 UTC
 - 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHeader.tsx`
+- 3 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailHeader.tsx`
 - 3 errors in `src/components/bills/BulkUpdateSummary.tsx`
 - 3 errors in `src/components/bills/BillTabs.tsx`
@@ -527,10 +527,10 @@ Last check: 2025-11-12 23:21:30 UTC
 | 203 | `TS2345` |
 | 169 | `TS2339` |
 | 160 | `TS18046` |
-| 137 | `TS2322` |
+| 133 | `TS2322` |
 | 76 | `TS7005` |
 | 74 | `TS7053` |
-| 72 | `TS18048` |
+| 71 | `TS18048` |
 | 43 | `TS7034` |
 | 39 | `TS18047` |
 | 23 | `TS2769` |
@@ -1010,10 +1010,6 @@ src/components/budgeting/CreateEnvelopeModal.tsx(54,31): error TS2339: Property 
 src/components/budgeting/CreateEnvelopeModal.tsx(55,35): error TS2339: Property 'amount' does not exist on type 'never'.
 src/components/budgeting/CreateEnvelopeModal.tsx(56,54): error TS2339: Property 'name' does not exist on type 'never'.
 src/components/budgeting/CreateEnvelopeModal.tsx(56,75): error TS2339: Property 'provider' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(82,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
-  Type 'string' is not assignable to type 'boolean'.
-src/components/budgeting/CreateEnvelopeModal.tsx(111,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
-  Type 'string' is not assignable to type 'boolean'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(133,24): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,24): error TS2322: Type '"savings"' is not assignable to type 'never'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,48): error TS2322: Type '"sinking_fund"' is not assignable to type 'never'.
@@ -1034,12 +1030,8 @@ src/components/budgeting/EditEnvelopeModal.tsx(66,5): error TS2322: Type 'Envelo
   Type 'EnvelopeRef' is not assignable to type 'null | undefined'.
 src/components/budgeting/EditEnvelopeModal.tsx(67,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
-src/components/budgeting/EditEnvelopeModal.tsx(112,15): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
-  Type 'string' is not assignable to type 'boolean'.
 src/components/budgeting/EditEnvelopeModal.tsx(150,13): error TS2322: Type 'LockDocument | null' is not assignable to type 'null | undefined'.
   Type 'LockDocument' is not assignable to type 'null | undefined'.
-src/components/budgeting/EditEnvelopeModal.tsx(163,15): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
-  Type 'string' is not assignable to type 'boolean'.
 src/components/budgeting/EditEnvelopeModalComponents.tsx(178,26): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/EditEnvelopeModalComponents.tsx(179,11): error TS2322: Type '("savings" | "sinking_fund")[]' is not assignable to type 'never[]'.
   Type '"savings" | "sinking_fund"' is not assignable to type 'never'.
@@ -2424,12 +2416,12 @@ src/hooks/budgeting/useEnvelopeForm.ts(95,46): error TS2339: Property 'id' does 
 src/hooks/budgeting/useEnvelopeForm.ts(124,30): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/budgeting/useEnvelopeForm.ts(136,29): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/useEnvelopeForm.ts(141,27): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeForm.ts(187,27): error TS2339: Property 'id' does not exist on type 'never'.
+src/hooks/budgeting/useEnvelopeForm.ts(188,27): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/budgeting/useEnvelopes.ts(17,54): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'never[]'.
   Type 'Envelope' is not assignable to type 'never'.
-src/hooks/budgeting/useEnvelopesQuery.ts(109,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
+src/hooks/budgeting/useEnvelopesQuery.ts(117,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
   No index signature with a parameter of type 'string' was found on type 'Envelope'.
-src/hooks/budgeting/useEnvelopesQuery.ts(110,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
+src/hooks/budgeting/useEnvelopesQuery.ts(118,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
   No index signature with a parameter of type 'string' was found on type 'Envelope'.
 src/hooks/budgeting/usePaycheckForm.ts(13,37): error TS7006: Parameter 'uniquePayersLength' implicitly has an 'any' type.
 src/hooks/budgeting/usePaycheckForm.ts(13,57): error TS7006: Parameter 'setShowAddNewPayer' implicitly has an 'any' type.
@@ -3417,18 +3409,17 @@ src/utils/budgeting/envelopeCalculations.ts(110,63): error TS2345: Argument of t
   Type 'undefined' is not assignable to type 'string'.
 src/utils/budgeting/envelopeCalculations.ts(521,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<FrequencyType, number>'.
   No index signature with a parameter of type 'string' was found on type 'Record<FrequencyType, number>'.
-src/utils/budgeting/envelopeFormUtils.ts(126,5): error TS18048: 'zodResult.error' is possibly 'undefined'.
-src/utils/budgeting/envelopeFormUtils.ts(129,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
+src/utils/budgeting/envelopeFormUtils.ts(133,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(164,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
+src/utils/budgeting/envelopeFormUtils.ts(186,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
   No index signature with a parameter of type 'string' was found on type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
-src/utils/budgeting/envelopeFormUtils.ts(418,22): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/envelopeFormUtils.ts(419,51): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/envelopeFormUtils.ts(467,9): error TS7034: Variable 'warnings' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/envelopeFormUtils.ts(468,9): error TS7034: Variable 'errors' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/envelopeFormUtils.ts(470,42): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
-src/utils/budgeting/envelopeFormUtils.ts(470,52): error TS7005: Variable 'errors' implicitly has an 'any[]' type.
-src/utils/budgeting/envelopeFormUtils.ts(477,9): error TS18048: 'envelope.targetAmount' is possibly 'undefined'.
+src/utils/budgeting/envelopeFormUtils.ts(440,22): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
+src/utils/budgeting/envelopeFormUtils.ts(441,51): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
+src/utils/budgeting/envelopeFormUtils.ts(489,9): error TS7034: Variable 'warnings' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/utils/budgeting/envelopeFormUtils.ts(490,9): error TS7034: Variable 'errors' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/utils/budgeting/envelopeFormUtils.ts(492,42): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
+src/utils/budgeting/envelopeFormUtils.ts(492,52): error TS7005: Variable 'errors' implicitly has an 'any[]' type.
+src/utils/budgeting/envelopeFormUtils.ts(499,9): error TS18048: 'envelope.targetAmount' is possibly 'undefined'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(78,48): error TS7006: Parameter 'envelopeIds' implicitly has an 'any' type.
 src/utils/budgeting/envelopeIntegrityChecker.ts(119,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(130,48): error TS7006: Parameter 'corruptedEnvelopes' implicitly has an 'any' type.

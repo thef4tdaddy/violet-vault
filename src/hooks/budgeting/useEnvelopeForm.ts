@@ -157,7 +157,8 @@ const useEnvelopeForm = ({
   }, [isDirty, resetForm, onClose]);
 
   // Check if form has required fields
-  const hasRequiredFields = formData.name?.trim() && formData.category;
+  const hasRequiredFields =
+    Boolean(formData.name?.trim()) && Boolean(formData.category && formData.category.trim());
 
   // Check if form is submittable (has required fields and no errors)
   const canSubmit = hasRequiredFields && Object.keys(errors).length === 0 && !isLoading;

@@ -12,11 +12,7 @@ import {
 } from "@/test/queryTestUtils";
 import { createMockDexie, mockDataGenerators } from "@/test/queryMocks";
 import { queryKeys } from "@/utils/common/queryClient";
-
-// Mock dependencies
-vi.mock("@/db/budgetDb", () => ({
-  budgetDb: null, // Will be set in beforeEach
-}));
+import logger from "@/utils/common/logger";
 
 vi.mock("@/utils/common/logger", () => ({
   default: {
@@ -27,28 +23,29 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/constants/categories", () => ({
-  AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn((category) => {
-    if (category?.toLowerCase().includes("income")) return "income";
-    if (category?.toLowerCase().includes("savings")) return "savings";
-    return "expenses";
-  }),
-}));
+vi.mock("@/constants/categories", async () => {
+  const actual =
+    await vi.importActual<typeof import("@/constants/categories")>("@/constants/categories");
+  return {
+    ...actual,
+    AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn((category?: string) => {
+      if (category?.toLowerCase().includes("income")) return actual.ENVELOPE_TYPES.INCOME;
+      if (category?.toLowerCase().includes("savings")) return actual.ENVELOPE_TYPES.SAVINGS;
+      return actual.ENVELOPE_TYPES.VARIABLE;
+    }),
+  };
+});
 
 describe("useEnvelopesQuery", () => {
   let queryClient: any;
   let mockDb: any;
   let wrapper: any;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     // Create fresh instances for each test
     queryClient = createTestQueryClient();
     mockDb = createMockDexie();
     wrapper = createQueryWrapper(queryClient);
-
-    // Mock the budgetDb module
-    const budgetDbModule = vi.mocked(await import("@/db/budgetDb"));
-    (budgetDbModule as any).budgetDb = mockDb;
   });
 
   afterEach(() => {
@@ -64,26 +61,34 @@ describe("useEnvelopesQuery", () => {
         mockDataGenerators.envelope({ id: "env_1", name: "Groceries" }),
         mockDataGenerators.envelope({ id: "env_2", name: "Entertainment" }),
       ];
-      mockDb._mockData.envelopes = mockEnvelopes;
+      mockDb._mockData.envelopes.push(...mockEnvelopes);
 
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const rawEnvelopes = await mockDb.envelopes.toArray();
+      expect(rawEnvelopes.length).toBe(2);
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.envelopes.length).toBe(2);
       expect(mockDb.envelopes.toArray).toHaveBeenCalled();
+      expect(result.current.isError).toBe(false);
+      if (result.current.isError) {
+        // Fail fast with error details
+        throw result.current.error;
+      }
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(result.current.envelopes.length).toBe(2);
     });
 
     it("should return empty array when no envelopes exist", async () => {
       // Arrange
-      mockDb._mockData.envelopes = [];
+      mockDb._mockData.envelopes.length = 0;
 
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -98,7 +103,7 @@ describe("useEnvelopesQuery", () => {
       mockDb.envelopes.toArray.mockRejectedValue(new Error("Database error"));
 
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -116,10 +121,10 @@ describe("useEnvelopesQuery", () => {
         currentBalance: 500,
         targetAmount: 1000,
       });
-      mockDb._mockData.envelopes = [mockEnvelope];
+      mockDb._mockData.envelopes.push(mockEnvelope);
 
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -136,11 +141,11 @@ describe("useEnvelopesQuery", () => {
 
   describe("Filtering", () => {
     beforeEach(() => {
-      mockDb._mockData.envelopes = [
+      mockDb._mockData.envelopes.push(
         mockDataGenerators.envelope({
           id: "env_1",
           name: "Groceries",
-          category: "Food",
+          category: "Food & Dining",
           archived: false,
         }),
         mockDataGenerators.envelope({
@@ -152,7 +157,7 @@ describe("useEnvelopesQuery", () => {
         mockDataGenerators.envelope({
           id: "env_3",
           name: "Old Envelope",
-          category: "Food",
+          category: "Food & Dining",
           archived: true,
         }),
         mockDataGenerators.envelope({
@@ -160,13 +165,18 @@ describe("useEnvelopesQuery", () => {
           name: "Emergency Fund",
           category: "Savings",
           archived: false,
-        }),
-      ];
+        })
+      );
     });
 
     it("should filter by category", async () => {
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery({ category: "Food" }), { wrapper });
+      const { result } = renderHook(
+        () => useEnvelopesQuery({ category: "Food & Dining", __db: mockDb }),
+        {
+          wrapper,
+        }
+      );
 
       // Assert
       await waitFor(() => {
@@ -174,13 +184,13 @@ describe("useEnvelopesQuery", () => {
       });
 
       expect(result.current.envelopes.length).toBe(1);
-      expect(result.current.envelopes[0].category).toBe("Food");
-      expect(mockDb.getEnvelopesByCategory).toHaveBeenCalledWith("Food");
+      expect(result.current.envelopes[0].category).toBe("Food & Dining");
+      expect(mockDb.getEnvelopesByCategory).toHaveBeenCalledWith("Food & Dining");
     });
 
     it("should exclude archived envelopes by default", async () => {
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -194,7 +204,7 @@ describe("useEnvelopesQuery", () => {
 
     it("should exclude savings goals and sinking funds from default results", async () => {
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -207,9 +217,12 @@ describe("useEnvelopesQuery", () => {
 
     it("should include archived envelopes when requested", async () => {
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery({ includeArchived: true }), {
-        wrapper,
-      });
+      const { result } = renderHook(
+        () => useEnvelopesQuery({ includeArchived: true, __db: mockDb }),
+        {
+          wrapper,
+        }
+      );
 
       // Assert
       await waitFor(() => {
@@ -222,7 +235,8 @@ describe("useEnvelopesQuery", () => {
 
   describe("Sorting", () => {
     beforeEach(() => {
-      mockDb._mockData.envelopes = [
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
         mockDataGenerators.envelope({
           id: "env_1",
           name: "Zebra",
@@ -237,13 +251,13 @@ describe("useEnvelopesQuery", () => {
           id: "env_3",
           name: "Mango",
           currentBalance: 200,
-        }),
-      ];
+        })
+      );
     });
 
     it("should sort by name ascending by default", async () => {
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -259,7 +273,7 @@ describe("useEnvelopesQuery", () => {
     it("should sort by name descending", async () => {
       // Act
       const { result } = renderHook(
-        () => useEnvelopesQuery({ sortBy: "name", sortOrder: "desc" }),
+        () => useEnvelopesQuery({ sortBy: "name", sortOrder: "desc", __db: mockDb }),
         { wrapper }
       );
 
@@ -277,7 +291,7 @@ describe("useEnvelopesQuery", () => {
     it("should sort by balance ascending", async () => {
       // Act
       const { result } = renderHook(
-        () => useEnvelopesQuery({ sortBy: "currentBalance", sortOrder: "asc" }),
+        () => useEnvelopesQuery({ sortBy: "currentBalance", sortOrder: "asc", __db: mockDb }),
         { wrapper }
       );
 
@@ -295,7 +309,7 @@ describe("useEnvelopesQuery", () => {
     it("should sort by balance descending", async () => {
       // Act
       const { result } = renderHook(
-        () => useEnvelopesQuery({ sortBy: "currentBalance", sortOrder: "desc" }),
+        () => useEnvelopesQuery({ sortBy: "currentBalance", sortOrder: "desc", __db: mockDb }),
         { wrapper }
       );
 
@@ -315,10 +329,13 @@ describe("useEnvelopesQuery", () => {
     it("should cache query results", async () => {
       // Arrange
       const mockEnvelopes = [mockDataGenerators.envelope({ id: "env_1" })];
-      mockDb._mockData.envelopes = mockEnvelopes;
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(...mockEnvelopes);
 
       // Act - First render
-      const { result, rerender } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result, rerender } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), {
+        wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -337,24 +354,31 @@ describe("useEnvelopesQuery", () => {
 
     it("should use separate cache for different filter options", async () => {
       // Arrange
-      mockDb._mockData.envelopes = [
-        mockDataGenerators.envelope({ id: "env_1", category: "Food" }),
-        mockDataGenerators.envelope({ id: "env_2", category: "Housing" }),
-      ];
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
+        mockDataGenerators.envelope({ id: "env_1", category: "Food & Dining" }),
+        mockDataGenerators.envelope({ id: "env_2", category: "Housing" })
+      );
 
-      // Act - Query with category: "Food"
-      const { result: result1 } = renderHook(() => useEnvelopesQuery({ category: "Food" }), {
-        wrapper,
-      });
+      // Act - Query with category: "Food & Dining"
+      const { result: result1 } = renderHook(
+        () => useEnvelopesQuery({ category: "Food & Dining", __db: mockDb }),
+        {
+          wrapper,
+        }
+      );
 
       await waitFor(() => {
         expect(result1.current.isLoading).toBe(false);
       });
 
       // Act - Query with category: "Housing"
-      const { result: result2 } = renderHook(() => useEnvelopesQuery({ category: "Housing" }), {
-        wrapper,
-      });
+      const { result: result2 } = renderHook(
+        () => useEnvelopesQuery({ category: "Housing", __db: mockDb }),
+        {
+          wrapper,
+        }
+      );
 
       await waitFor(() => {
         expect(result2.current.isLoading).toBe(false);
@@ -363,17 +387,18 @@ describe("useEnvelopesQuery", () => {
       // Assert - Both queries should have different results
       expect(result1.current.envelopes.length).toBeGreaterThan(0);
       expect(result2.current.envelopes.length).toBeGreaterThan(0);
-      expect(result1.current.envelopes[0].category).toBe("Food");
+      expect(result1.current.envelopes[0].category).toBe("Food & Dining");
       expect(result2.current.envelopes[0].category).toBe("Housing");
     });
 
     it("should respect staleTime configuration", async () => {
       // Arrange
       const mockEnvelopes = [mockDataGenerators.envelope({ id: "env_1" })];
-      mockDb._mockData.envelopes = mockEnvelopes;
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(...mockEnvelopes);
 
       // Act - First fetch
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -390,9 +415,10 @@ describe("useEnvelopesQuery", () => {
   describe("Query Invalidation", () => {
     it("should support manual refetch after data changes", async () => {
       // Arrange
-      mockDb._mockData.envelopes = [mockDataGenerators.envelope({ id: "env_1" })];
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(mockDataGenerators.envelope({ id: "env_1" }));
 
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -401,10 +427,11 @@ describe("useEnvelopesQuery", () => {
       expect(result.current.envelopes.length).toBe(1);
 
       // Modify mock data
-      mockDb._mockData.envelopes = [
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
         mockDataGenerators.envelope({ id: "env_1" }),
-        mockDataGenerators.envelope({ id: "env_2" }),
-      ];
+        mockDataGenerators.envelope({ id: "env_2" })
+      );
 
       // Act - Manual refetch
       await result.current.refetch();
@@ -419,19 +446,21 @@ describe("useEnvelopesQuery", () => {
   describe("Refetch and Invalidate", () => {
     it("should provide refetch function", async () => {
       // Arrange
-      mockDb._mockData.envelopes = [mockDataGenerators.envelope({ id: "env_1" })];
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(mockDataGenerators.envelope({ id: "env_1" }));
 
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       // Modify mock data
-      mockDb._mockData.envelopes = [
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
         mockDataGenerators.envelope({ id: "env_1" }),
-        mockDataGenerators.envelope({ id: "env_2" }),
-      ];
+        mockDataGenerators.envelope({ id: "env_2" })
+      );
 
       // Act - Call refetch
       await result.current.refetch();
@@ -444,9 +473,10 @@ describe("useEnvelopesQuery", () => {
 
     it("should provide invalidate function", async () => {
       // Arrange
-      mockDb._mockData.envelopes = [mockDataGenerators.envelope({ id: "env_1" })];
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(mockDataGenerators.envelope({ id: "env_1" }));
 
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -467,13 +497,14 @@ describe("useEnvelopesQuery", () => {
       // Arrange
       const logger = (await import("@/utils/common/logger")).default;
 
-      mockDb._mockData.envelopes = [
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
         { id: "env_1", currentBalance: 100 }, // Missing name and category
-        mockDataGenerators.envelope({ id: "env_2" }), // Valid
-      ];
+        mockDataGenerators.envelope({ id: "env_2" }) // Valid
+      );
 
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {
@@ -488,12 +519,11 @@ describe("useEnvelopesQuery", () => {
 
     it("should still return corrupted envelopes with defaults", async () => {
       // Arrange
-      mockDb._mockData.envelopes = [
-        { id: "env_1", currentBalance: 100 }, // Missing name and category
-      ];
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push({ id: "env_1", currentBalance: 100 }); // Missing name and category
 
       // Act
-      const { result } = renderHook(() => useEnvelopesQuery(), { wrapper });
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
 
       // Assert
       await waitFor(() => {

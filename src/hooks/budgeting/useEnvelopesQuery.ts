@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UseQueryOptions } from "@tanstack/react-query";
 import { useMemo, useCallback, useEffect } from "react";
 import { queryKeys } from "@/utils/common/queryClient";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDb, VioletVaultDB } from "@/db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import type { Envelope as DbEnvelope } from "@/db/types";
@@ -25,6 +25,7 @@ interface EnvelopesQueryOptions {
   includeArchived?: boolean;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  __db?: VioletVaultDB;
 }
 
 /**
@@ -33,7 +34,14 @@ interface EnvelopesQueryOptions {
  */
 export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
   const queryClient = useQueryClient();
-  const { category, includeArchived = false, sortBy = "name", sortOrder = "asc" } = options || {};
+  const {
+    category,
+    includeArchived = false,
+    sortBy = "name",
+    sortOrder = "asc",
+    __db,
+  } = options || {};
+  const dbInstance = __db ?? budgetDb;
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = useCallback(async (): Promise<Envelope[]> => {
@@ -44,9 +52,9 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
 
       // Always fetch from Dexie (single source of truth for local data)
       if (category) {
-        dbEnvelopes = await budgetDb.getEnvelopesByCategory(category);
+        dbEnvelopes = await dbInstance.getEnvelopesByCategory(category);
       } else {
-        dbEnvelopes = await budgetDb.envelopes.toArray();
+        dbEnvelopes = await dbInstance.envelopes.toArray();
       }
 
       // Transform database envelopes to application envelopes with computed properties
@@ -131,7 +139,7 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
       // Return empty array when Dexie fails (no fallback to Zustand)
       return [];
     }
-  }, [category, includeArchived, sortBy, sortOrder]);
+  }, [category, includeArchived, sortBy, sortOrder, dbInstance]);
 
   // Memoized query options for performance
   const queryOptions = useMemo<UseQueryOptions<Envelope[], unknown>>(

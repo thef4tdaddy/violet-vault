@@ -10,7 +10,7 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
-import { validateEnvelopeSafe } from "../../domain/schemas/envelope.ts";
+import { z } from "zod";
 
 /**
  * Form data interface
@@ -78,14 +78,17 @@ interface ValidationResult {
 /**
  * Zod result interface
  */
+interface ZodResultErrorIssue {
+  path: Array<string | number>;
+  message: string;
+}
+
 interface ZodResult {
   success: boolean;
   data?: unknown;
   error?: {
-    errors: Array<{
-      path: Array<string | number>;
-      message: string;
-    }>;
+    errors?: Array<ZodResultErrorIssue>;
+    issues?: Array<ZodResultErrorIssue>;
   };
 }
 
@@ -123,7 +126,8 @@ export const createDefaultEnvelopeForm = (): EnvelopeFormData => ({
 const convertZodErrors = (zodResult: ZodResult): Record<string, string> => {
   const errors = {};
   if (!zodResult.success) {
-    zodResult.error.errors.forEach((err) => {
+    const issues = zodResult.error?.issues ?? zodResult.error?.errors ?? [];
+    issues.forEach((err) => {
       const fieldName = err.path[0];
       if (fieldName) {
         errors[fieldName] = err.message;
@@ -132,6 +136,24 @@ const convertZodErrors = (zodResult: ZodResult): Record<string, string> => {
   }
   return errors;
 };
+
+const EnvelopeFormSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Envelope name is required")
+    .max(50, "Envelope name must be less than 50 characters"),
+  category: z.string().min(1, "Category is required"),
+  monthlyAmount: z.union([z.string(), z.number()]).optional(),
+  currentBalance: z.union([z.string(), z.number()]).optional(),
+  description: z.string().max(500, "Description must be 500 characters or less").optional(),
+  priority: z.string().optional(),
+  color: z.string().optional(),
+  frequency: z.string().optional(),
+  envelopeType: z.string(),
+  targetAmount: z.union([z.string(), z.number()]).optional(),
+  autoAllocate: z.boolean().optional(),
+  icon: z.string().optional(),
+});
 
 /**
  * Check for duplicate envelope names
@@ -239,7 +261,7 @@ export const validateEnvelopeForm = (
   editingEnvelopeId: string | number | null = null
 ): ValidationResult => {
   // Use Zod schema for base validation
-  const zodResult = validateEnvelopeSafe(formData);
+  const zodResult = EnvelopeFormSchema.safeParse(formData);
   const errors = convertZodErrors(zodResult as unknown as ZodResult);
 
   // Additional form-specific validations beyond Zod schema

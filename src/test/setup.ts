@@ -1,6 +1,18 @@
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
-import { indexedDB } from "fake-indexeddb";
+import {
+  indexedDB,
+  IDBKeyRange,
+  IDBFactory,
+  IDBDatabase,
+  IDBObjectStore,
+  IDBIndex,
+  IDBTransaction,
+  IDBOpenDBRequest,
+  IDBRequest,
+  IDBCursor,
+  IDBCursorWithValue,
+} from "fake-indexeddb";
 /// <reference types="../vite-env.d.ts" />
 
 // Type declarations for browser APIs
@@ -10,6 +22,19 @@ type BufferSource = ArrayBufferView | ArrayBuffer;
 Object.defineProperty(global, "indexedDB", {
   value: indexedDB,
   writable: true,
+});
+
+Object.assign(global, {
+  IDBKeyRange,
+  IDBFactory,
+  IDBDatabase,
+  IDBObjectStore,
+  IDBIndex,
+  IDBTransaction,
+  IDBOpenDBRequest,
+  IDBRequest,
+  IDBCursor,
+  IDBCursorWithValue,
 });
 
 // Mock crypto.getRandomValues

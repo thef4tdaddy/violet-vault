@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import useEnvelopeForm from "../useEnvelopeForm";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
+import { globalToast } from "../../../stores/ui/toastStore";
 
 // Mock the dependencies
 vi.mock("../../../stores/ui/toastStore", () => ({
@@ -50,7 +51,7 @@ describe("useEnvelopeForm", () => {
         id: "test-id",
         name: "Test Envelope",
         monthlyAmount: 100,
-        category: "Food",
+        category: "Food & Dining",
         color: "#a855f7",
       };
 
@@ -58,7 +59,7 @@ describe("useEnvelopeForm", () => {
 
       expect(result.current.formData.name).toBe("Test Envelope");
       expect(result.current.formData.monthlyAmount).toBe("100");
-      expect(result.current.formData.category).toBe("Food");
+      expect(result.current.formData.category).toBe("Food & Dining");
       expect(result.current.isEditing).toBe(true);
       expect(result.current.envelopeId).toBe("test-id");
     });
@@ -132,7 +133,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "Test Envelope",
-          category: "Food",
+          category: "Food & Dining",
           monthlyAmount: "100",
         });
       });
@@ -153,7 +154,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "", // Invalid - required
-          category: "Food",
+          category: "Food & Dining",
           monthlyAmount: "invalid", // Invalid format
         });
       });
@@ -174,7 +175,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "Existing Envelope", // Duplicate name
-          category: "Food",
+          category: "Food & Dining",
         });
       });
 
@@ -197,7 +198,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "Test Envelope",
-          category: "Food",
+          category: "Food & Dining",
           monthlyAmount: "100",
         } as any);
       });
@@ -212,7 +213,7 @@ describe("useEnvelopeForm", () => {
         expect.objectContaining({
           name: "Test Envelope",
           monthlyAmount: 100,
-          category: "Food",
+          category: "Food & Dining",
         })
       );
       expect(result.current.isDirty).toBe(false);
@@ -268,10 +269,7 @@ describe("useEnvelopeForm", () => {
       expect(mockOnClose).toHaveBeenCalled();
     });
 
-    it("should prompt for confirmation when dirty", () => {
-      const mockConfirm = vi.fn().mockReturnValue(true);
-      window.confirm = mockConfirm;
-
+    it("should show unsaved changes warning when dirty", () => {
       const mockOnClose = vi.fn();
       const { result } = renderHook(() =>
         useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
@@ -286,29 +284,10 @@ describe("useEnvelopeForm", () => {
         result.current.handleClose();
       });
 
-      expect(mockConfirm).toHaveBeenCalled();
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-
-    it("should not close when user cancels confirmation", () => {
-      const mockConfirm = vi.fn().mockReturnValue(false);
-      window.confirm = mockConfirm;
-
-      const mockOnClose = vi.fn();
-      const { result } = renderHook(() =>
-        useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
+      expect(globalToast.showError).toHaveBeenCalledWith(
+        "You have unsaved changes that will be lost if you close now.",
+        "Unsaved Changes Warning"
       );
-
-      // Make form dirty
-      act(() => {
-        result.current.updateFormField("name", "Test");
-      });
-
-      act(() => {
-        result.current.handleClose();
-      });
-
-      expect(mockConfirm).toHaveBeenCalled();
       expect(mockOnClose).not.toHaveBeenCalled();
     });
   });
@@ -321,7 +300,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "Modified",
-          category: "Food",
+          category: "Food & Dining",
         });
       });
 
@@ -342,7 +321,7 @@ describe("useEnvelopeForm", () => {
       const envelope = {
         id: "test-id",
         name: "Original Name",
-        category: "Food",
+        category: "Food & Dining",
       };
 
       const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, envelope }));
@@ -389,7 +368,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "Test Envelope",
-          category: "Food",
+          category: "Food & Dining",
         });
       });
 
@@ -402,7 +381,7 @@ describe("useEnvelopeForm", () => {
       act(() => {
         result.current.updateFormData({
           name: "Test Envelope",
-          category: "Food",
+          category: "Food & Dining",
         });
       });
 
