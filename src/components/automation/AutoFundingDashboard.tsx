@@ -1,25 +1,43 @@
 import { useState } from "react";
+import type React from "react";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import logger from "@/utils/common/logger";
 import { DashboardHeader, DashboardTabs, DashboardContent } from "./AutoFundingDashboardComponents";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
-const AutoFundingDashboard = ({ isOpen, onClose }) => {
-  const envelopes = useBudgetStore((state) => state.envelopes);
+interface AutoFundingDashboardProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface AutoFundingExecution {
+  id: string;
+  success?: boolean;
+  execution?: {
+    totalFunded?: number;
+    rulesExecuted?: number;
+  };
+  error?: string;
+  message?: string;
+}
+
+const AutoFundingDashboard: React.FC<AutoFundingDashboardProps> = ({ isOpen, onClose }) => {
+  const { envelopes = [] } = useEnvelopes();
   const confirm = useConfirm();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
   const [isExecuting, setIsExecuting] = useState(false);
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
-  const [editingRule, setEditingRule] = useState(null);
-  const [activeTab, setActiveTab] = useState("rules"); // 'rules' | 'history'
-  const [showExecutionDetails, setShowExecutionDetails] = useState(null);
+  const [editingRule, setEditingRule] = useState<AutoFundingRule | null>(null);
+  const [activeTab, setActiveTab] = useState<"rules" | "history">("rules");
+  const [showExecutionDetails, setShowExecutionDetails] = useState<string | null>(null);
   const modalRef = useModalAutoScroll(isOpen);
 
   // Get execution history
@@ -30,14 +48,14 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
     setShowRuleBuilder(true);
   };
 
-  const handleEditRule = (rule) => {
+  const handleEditRule = (rule: AutoFundingRule) => {
     setEditingRule(rule);
     setShowRuleBuilder(true);
   };
 
-  const handleSaveRule = async (ruleData) => {
+  const handleSaveRule = async (ruleData: AutoFundingRule) => {
     try {
-      if (editingRule) {
+      if (editingRule && ruleData.id === editingRule.id) {
         updateRule(editingRule.id, ruleData);
       } else {
         addRule(ruleData);
@@ -46,11 +64,12 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
       setEditingRule(null);
     } catch (error) {
       logger.error("Failed to save rule", error);
-      globalToast.showError("Failed to save rule: " + error.message, "Rule Save Failed", 8000);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      globalToast.showError("Failed to save rule: " + errorMessage, "Rule Save Failed", 8000);
     }
   };
 
-  const handleDeleteRule = async (ruleId) => {
+  const handleDeleteRule = async (ruleId: string) => {
     const confirmed = await confirm({
       title: "Delete Auto-Funding Rule",
       message: "Are you sure you want to delete this rule? This action cannot be undone.",
@@ -64,12 +83,13 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         deleteRule(ruleId);
       } catch (error) {
         logger.error("Failed to delete rule", error);
-        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed", 8000);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        globalToast.showError("Failed to delete rule: " + errorMessage, "Delete Failed", 8000);
       }
     }
   };
 
-  const handleToggleRule = (ruleId) => {
+  const handleToggleRule = (ruleId: string) => {
     try {
       toggleRule(ruleId);
     } catch (error) {
@@ -82,9 +102,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
     setIsExecuting(true);
     try {
-      const result = await executeRules("manual");
+      const result = (await executeRules("manual")) as unknown as AutoFundingExecution;
 
-      if (result.success && "execution" in result) {
+      if (result.success && "execution" in result && result.execution) {
         const totalFunded = result.execution.totalFunded || 0;
         const rulesExecuted = result.execution.rulesExecuted || 0;
 
@@ -102,11 +122,16 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
           );
         }
       } else {
-        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed", 8000);
+        globalToast.showError(
+          "Failed to execute rules: " + (result.error || "Unknown error"),
+          "Execution Failed",
+          8000
+        );
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed", 8000);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      globalToast.showError("Failed to execute rules: " + errorMessage, "Execution Failed", 8000);
     } finally {
       setIsExecuting(false);
     }

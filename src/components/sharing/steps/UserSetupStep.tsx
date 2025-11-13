@@ -1,11 +1,39 @@
 import { Button } from "@/components/ui";
 import { renderIcon } from "../../../utils";
+import React from "react";
+
+interface ShareInfo {
+  userCount: number;
+  [key: string]: unknown;
+}
+
+interface CreatorInfo {
+  userName: string;
+  userColor: string;
+  createdAt?: string;
+}
+
+interface UserSetupStepProps {
+  shareInfo: ShareInfo;
+  creatorInfo: CreatorInfo | null;
+  password: string;
+  setPassword: (password: string) => void;
+  showPassword: boolean;
+  setShowPassword: (show: boolean) => void;
+  userName: string;
+  setUserName: (name: string) => void;
+  userColor: string;
+  onGenerateRandomColor: () => void;
+  onJoin: () => void;
+  onBack: () => void;
+  isJoining: boolean;
+}
 
 /**
  * User Setup Step - Step 2 of join budget flow
  * Extracted from JoinBudgetModal to reduce complexity
  */
-const UserSetupStep = ({
+const UserSetupStep: React.FC<UserSetupStepProps> = ({
   shareInfo,
   creatorInfo,
   password,
@@ -20,7 +48,7 @@ const UserSetupStep = ({
   onBack,
   isJoining,
 }) => {
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onJoin();
   };

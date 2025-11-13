@@ -64,7 +64,7 @@ export const validatePassword = async (password: string): Promise<boolean> => {
       parsedData = JSON.parse(savedData);
     } catch (parseError) {
       logger.auth("validatePassword: Failed to parse saved data", {
-        error: parseError.message,
+        error: parseError instanceof Error ? parseError.message : "Unknown error",
       });
       return false;
     }
@@ -104,11 +104,11 @@ export const validatePassword = async (password: string): Promise<boolean> => {
     return true;
   } catch (error) {
     logger.auth("validatePassword: Validation failed", {
-      error: error.message,
-      errorType: error.constructor?.name,
+      error: error instanceof Error ? error.message : "Unknown error",
+      errorType: error instanceof Error ? error.constructor?.name : "unknown",
     });
     logger.production("Password validation failed", {
-      error: error.message,
+      error: error instanceof Error ? error.message : "Unknown error",
       method: "encrypted_data_validation",
     });
     return false;
@@ -299,8 +299,8 @@ export const login = async (password: string, userData: UserData | null = null) 
           logger.auth("Successfully decrypted local data.");
         } catch (decryptError) {
           logger.error("Unexpected decryption failure after password validation", {
-            error: decryptError.message,
-            errorType: decryptError.constructor?.name,
+            error: decryptError instanceof Error ? decryptError.message : "Unknown error",
+            errorType: decryptError instanceof Error ? decryptError.constructor?.name : "unknown",
           });
           return {
             success: false,
@@ -351,7 +351,11 @@ export const login = async (password: string, userData: UserData | null = null) 
       }
     } catch (error) {
       logger.error("Login failed.", error);
-      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+      const errorObj = error as { name?: string; message?: string };
+      if (
+        errorObj.name === "OperationError" ||
+        errorObj.message?.toLowerCase().includes("decrypt")
+      ) {
         return { success: false, error: "Invalid password." };
       }
       return { success: false, error: "Invalid password or corrupted data." };
@@ -499,7 +503,8 @@ export const updateProfile = async (updatedProfile: UserData, currentSession: Se
     return { success: true, user: updatedProfile };
   } catch (error) {
     logger.error("Failed to update profile:", error);
-    return { success: false, error: error.message };
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -544,7 +549,8 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
     };
   } catch (error) {
     logger.error("Password change failed:", error);
-    if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+    const errorObj = error as { name?: string; message?: string };
+    if (errorObj.name === "OperationError" || errorObj.message?.toLowerCase().includes("decrypt")) {
       return { success: false, error: "Current password is incorrect." };
     }
     return {
@@ -570,7 +576,13 @@ export const startBackgroundSyncAfterLogin = async (isNewUser = false) => {
     await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
     // Import UI store to access startBackgroundSync
-    const { useBudgetStore } = await import("../stores/ui/uiStore");
+    const uiStoreModule = await import("../stores/ui/uiStore");
+    const useBudgetStore = uiStoreModule.useBudgetStore as unknown as {
+      getState: () => {
+        cloudSyncEnabled: boolean;
+        startBackgroundSync: () => Promise<void>;
+      };
+    };
     const budgetState = useBudgetStore.getState();
 
     if (budgetState.cloudSyncEnabled) {

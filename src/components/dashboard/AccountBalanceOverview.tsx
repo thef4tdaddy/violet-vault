@@ -4,19 +4,32 @@ import EditableBalance from "../ui/EditableBalance";
 import { Button, StylizedButtonText } from "../ui";
 
 // Helper functions to reduce complexity
-const getDifferenceCardStyles = (isBalanced, difference) => {
+const getDifferenceCardStyles = (isBalanced: boolean, difference: number) => {
   if (isBalanced) return { bg: "bg-green-50", text: "text-green-900", icon: "text-green-600" };
   if (Math.abs(difference) > 10)
     return { bg: "bg-red-50", text: "text-red-900", icon: "text-red-600" };
   return { bg: "bg-yellow-50", text: "text-yellow-900", icon: "text-yellow-600" };
 };
 
-const getDifferenceMessage = (isBalanced, difference) => {
+const getDifferenceMessage = (isBalanced: boolean, difference: number) => {
   if (isBalanced) return "Accounts are balanced!";
   return difference > 0 ? "Extra money available" : "Virtual balance exceeds actual";
 };
 
-const AccountBalanceOverview = ({
+interface AccountBalanceOverviewProps {
+  actualBalance: number;
+  totalVirtualBalance: number;
+  totalEnvelopeBalance: number;
+  totalSavingsBalance: number;
+  unassignedCash: number;
+  difference: number;
+  isBalanced: boolean;
+  onUpdateBalance: (newBalance: number) => void;
+  onOpenReconcileModal: () => void;
+  onAutoReconcileDifference: (difference: number) => void;
+}
+
+const AccountBalanceOverview: React.FC<AccountBalanceOverviewProps> = ({
   actualBalance,
   totalVirtualBalance,
   totalEnvelopeBalance,

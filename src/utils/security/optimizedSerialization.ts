@@ -17,7 +17,7 @@ export const optimizedSerialization = {
    * @param {Object} data - Data to serialize
    * @returns {Uint8Array} Compressed and packed binary data
    */
-  serialize(data) {
+  serialize(data: Record<string, unknown>): Uint8Array {
     try {
       const startTime = performance.now();
 
@@ -47,7 +47,8 @@ export const optimizedSerialization = {
       return packed;
     } catch (error) {
       logger.error("Serialization failed", error);
-      throw new Error(`Serialization failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      throw new Error(`Serialization failed: ${errorMessage}`);
     }
   },
 
@@ -56,7 +57,7 @@ export const optimizedSerialization = {
    * @param {Uint8Array} packedData - Compressed and packed binary data
    * @returns {Object} Original data object
    */
-  deserialize(packedData) {
+  deserialize(packedData: Uint8Array): Record<string, unknown> {
     try {
       const startTime = performance.now();
 
@@ -79,7 +80,8 @@ export const optimizedSerialization = {
       return data;
     } catch (error) {
       logger.error("Deserialization failed", error);
-      throw new Error(`Deserialization failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      throw new Error(`Deserialization failed: ${errorMessage}`);
     }
   },
 
@@ -88,7 +90,7 @@ export const optimizedSerialization = {
    * @param {Object} data - Data to analyze
    * @returns {Object} Size analysis
    */
-  analyzeCompression(data) {
+  analyzeCompression(data: Record<string, unknown>) {
     try {
       const jsonString = JSON.stringify(data);
       const originalSize = new TextEncoder().encode(jsonString).length;
@@ -121,7 +123,7 @@ export const optimizedSerialization = {
    * @param {Uint8Array} binaryData - Serialized binary data
    * @returns {string} Base64 encoded string
    */
-  toBase64(binaryData) {
+  toBase64(binaryData: Uint8Array): string {
     try {
       // Convert Uint8Array to base64 string
       let binary = "";

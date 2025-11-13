@@ -2,69 +2,108 @@ import { useCallback } from "react";
 import {
   sortRulesByPriority,
   calculateFundingAmount,
+  type AutoFundingRule,
 } from "../../../../utils/budgeting/autofunding/rules.ts";
-import { shouldRuleExecute } from "../../../../utils/budgeting/autofunding/conditions.ts";
+import {
+  shouldRuleExecute,
+  type ExecutionContext,
+} from "../../../../utils/budgeting/autofunding/conditions.ts";
 import { planRuleTransfers } from "../../../../utils/budgeting/autofunding/simulation.ts";
 import logger from "../../../../utils/common/logger";
+
+interface Transfer {
+  toEnvelopeId: string;
+  amount: number;
+  [key: string]: unknown;
+}
+
+interface ExecutionResult {
+  ruleId: string;
+  ruleName: string;
+  success: boolean;
+  error?: string;
+  amount: number;
+  transfers?: number;
+  targetEnvelopes?: string[];
+  executedAt: string;
+}
+
+interface Budget {
+  [key: string]: unknown;
+}
 
 /**
  * Hook for core rule execution logic
  * Extracted from useAutoFundingExecution.js for better maintainability
  */
-export const useRuleExecution = (_budget) => {
+export const useRuleExecution = (_budget: Budget) => {
   // Execute a single rule
-  const executeSingleRule = useCallback(async (rule, context, availableCash, executeTransfer) => {
-    logger.debug("Executing single rule", {
-      ruleId: rule.id,
-      name: rule.name,
-      priority: rule.priority,
-      availableCash,
-    });
+  const executeSingleRule = useCallback(
+    async (
+      rule: AutoFundingRule,
+      context: ExecutionContext,
+      availableCash: number,
+      executeTransfer: (transfer: Transfer) => Promise<void>
+    ): Promise<ExecutionResult> => {
+      logger.debug("Executing single rule", {
+        ruleId: rule.id,
+        name: rule.name,
+        priority: rule.priority,
+        availableCash,
+      });
 
-    // Calculate funding amount considering available cash
-    const fundingAmount = calculateFundingAmount(rule, {
-      ...context,
-      data: { ...context.data, unassignedCash: availableCash },
-    });
+      // Calculate funding amount considering available cash
+      const fundingAmount = calculateFundingAmount(rule, {
+        ...context,
+        data: { ...context.data, unassignedCash: availableCash },
+      });
 
-    if (fundingAmount <= 0) {
+      if (fundingAmount <= 0) {
+        return {
+          ruleId: rule.id,
+          ruleName: rule.name,
+          success: false,
+          error: availableCash <= 0 ? "No funds available" : "Amount calculated as zero",
+          amount: 0,
+          executedAt: new Date().toISOString(),
+        };
+      }
+
+      // Plan and execute transfers
+      const plannedTransfers = planRuleTransfers(rule, fundingAmount);
+
+      for (const transfer of plannedTransfers) {
+        await executeTransfer(transfer);
+      }
+
       return {
         ruleId: rule.id,
         ruleName: rule.name,
-        success: false,
-        error: availableCash <= 0 ? "No funds available" : "Amount calculated as zero",
-        amount: 0,
+        success: true,
+        amount: fundingAmount,
+        transfers: plannedTransfers.length,
+        targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
         executedAt: new Date().toISOString(),
       };
-    }
-
-    // Plan and execute transfers
-    const plannedTransfers = planRuleTransfers(rule, fundingAmount);
-
-    for (const transfer of plannedTransfers) {
-      await executeTransfer(transfer);
-    }
-
-    return {
-      ruleId: rule.id,
-      ruleName: rule.name,
-      success: true,
-      amount: fundingAmount,
-      transfers: plannedTransfers.length,
-      targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
-      executedAt: new Date().toISOString(),
-    };
-  }, []);
+    },
+    []
+  );
 
   // Core execution logic with priority handling
   const executeRulesWithContext = useCallback(
-    async (rules, context, executeTransfer) => {
+    async (
+      rules: AutoFundingRule[],
+      context: ExecutionContext,
+      executeTransfer: (transfer: Transfer) => Promise<void>
+    ) => {
       const executionId = `execution_${Date.now()}`;
       const executionResults = [];
 
       try {
         // Filter and sort rules by priority
-        const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
+        const executableRules = rules.filter((rule: AutoFundingRule) =>
+          shouldRuleExecute(rule, context)
+        );
         const sortedRules = sortRulesByPriority(executableRules);
 
         logger.debug("Filtered executable rules", {
@@ -94,14 +133,14 @@ export const useRuleExecution = (_budget) => {
           } catch (error) {
             logger.error("Failed to execute rule", {
               ruleId: rule.id,
-              error: error.message,
+              error: error instanceof Error ? error.message : "Unknown error",
             });
 
             executionResults.push({
               ruleId: rule.id,
               ruleName: rule.name,
               success: false,
-              error: error.message,
+              error: error instanceof Error ? error.message : "Unknown error",
               amount: 0,
               executedAt: new Date().toISOString(),
             });
@@ -132,11 +171,11 @@ export const useRuleExecution = (_budget) => {
       } catch (error) {
         logger.error("Auto-funding execution failed", {
           executionId,
-          error: error.message,
+          error: error instanceof Error ? error.message : "Unknown error",
         });
         return {
           success: false,
-          error: error.message,
+          error: error instanceof Error ? error.message : "Unknown error",
           executionId,
         };
       }

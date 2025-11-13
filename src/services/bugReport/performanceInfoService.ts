@@ -172,9 +172,10 @@ export class PerformanceInfoService {
         available: true,
         timing: {
           navigationStart: navigation?.fetchStart || 0,
-          domContentLoaded: navigation?.domContentLoadedEventEnd - navigation?.fetchStart || 0,
-          loadComplete: navigation?.loadEventEnd - navigation?.fetchStart || 0,
-          domInteractive: navigation?.domInteractive - navigation?.fetchStart || 0,
+          domContentLoaded:
+            (navigation?.domContentLoadedEventEnd ?? 0) - (navigation?.fetchStart ?? 0),
+          loadComplete: (navigation?.loadEventEnd ?? 0) - (navigation?.fetchStart ?? 0),
+          domInteractive: (navigation?.domInteractive ?? 0) - (navigation?.fetchStart ?? 0),
         },
         memory: memory
           ? {
@@ -193,7 +194,7 @@ export class PerformanceInfoService {
       logger.warn("Error collecting performance info", error);
       return {
         available: false,
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -249,7 +250,7 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -281,7 +282,7 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -304,7 +305,7 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -328,7 +329,7 @@ export class PerformanceInfoService {
     } catch (error) {
       return {
         available: false,
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -350,9 +351,9 @@ export class PerformanceInfoService {
       const nav = navigator as NavigatorWithConnection;
       const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
       if (connection) {
-        networkInfo.effectiveType = connection.effectiveType;
-        networkInfo.downlink = connection.downlink;
-        networkInfo.rtt = connection.rtt;
+        networkInfo.effectiveType = connection.effectiveType ?? null;
+        networkInfo.downlink = connection.downlink ?? null;
+        networkInfo.rtt = connection.rtt ?? null;
         networkInfo.saveData = connection.saveData;
       }
 

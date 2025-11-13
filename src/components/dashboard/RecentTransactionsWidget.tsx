@@ -1,7 +1,21 @@
 import React from "react";
 import { getIcon } from "../../utils";
+import type { Transaction } from "@/types/finance";
 
-const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () => [] }) => {
+interface EnvelopeOption {
+  id: string | number;
+  name: string;
+}
+
+interface RecentTransactionsWidgetProps {
+  transactions?: Transaction[];
+  getEnvelopeOptions?: () => EnvelopeOption[];
+}
+
+const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> = ({
+  transactions = [],
+  getEnvelopeOptions = () => [],
+}) => {
   if (transactions.length === 0) {
     return null;
   }
