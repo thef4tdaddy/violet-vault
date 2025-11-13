@@ -3,7 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import useUiStore from "@/stores/ui/uiStore";
+import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import { markVersionAsSeen } from "@/utils/common/version";
 
 type ChangeType = "feature" | "fix" | "breaking" | "other";
@@ -86,10 +86,12 @@ const getChangeColor = (type: ChangeType): string => {
  * Shows what's new after app updates
  */
 const PatchNotesModal: React.FC = () => {
-  const showPatchNotes = useUiStore((state) => state.showPatchNotes);
-  const patchNotesData = useUiStore((state) => state.patchNotesData) as PatchNotesData | null;
-  const loadingPatchNotes = useUiStore((state) => state.loadingPatchNotes);
-  const hidePatchNotesModal = useUiStore((state) => state.hidePatchNotesModal);
+  const showPatchNotes = useUiStore((state: UiStore) => state.showPatchNotes);
+  const patchNotesData = useUiStore(
+    (state: UiStore) => state.patchNotesData
+  ) as PatchNotesData | null;
+  const loadingPatchNotes = useUiStore((state: UiStore) => state.loadingPatchNotes);
+  const hidePatchNotesModal = useUiStore((state: UiStore) => (state as any).hidePatchNotesModal);
   const shouldRender = showPatchNotes && Boolean(patchNotesData);
   const modalRef = useModalAutoScroll(shouldRender);
 
@@ -109,8 +111,6 @@ const PatchNotesModal: React.FC = () => {
     );
   }, [patchNotesData]);
 
-  if (!shouldRender) return null;
-
   const handleClose = (): void => {
     // Mark the current version as seen so this doesn't show again
     markVersionAsSeen();
@@ -119,10 +119,13 @@ const PatchNotesModal: React.FC = () => {
 
   const handleViewFullNotes = (): void => {
     // Open GitHub releases page in new tab
+    if (!patchNotesData) return;
     const repoUrl = "https://github.com/thef4tdaddy/violet-vault";
     const releaseUrl = `${repoUrl}/releases/tag/v${patchNotesData.version}`;
     window.open(releaseUrl, "_blank");
   };
+
+  if (!shouldRender || !patchNotesData) return null;
 
   if (loadingPatchNotes) {
     return (

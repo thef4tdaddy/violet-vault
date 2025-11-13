@@ -3,8 +3,20 @@
  * Handles fallback strategies and multiple submission providers
  * Extracted from apiService.js for Issue #513
  */
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import { GitHubAPIService } from "./githubApiService";
+
+interface Provider {
+  type: string;
+  priority: number;
+  url?: string;
+  config?: any;
+  redundant?: boolean;
+}
+
+interface ReportData {
+  [key: string]: any;
+}
 
 export class ReportSubmissionService {
   /**
@@ -13,17 +25,17 @@ export class ReportSubmissionService {
    * @param {Array} providers - Array of provider configurations
    * @returns {Promise<Object>} Submission result
    */
-  static async submitWithFallbacks(reportData, providers = []) {
+  static async submitWithFallbacks(reportData: ReportData, providers: Provider[] = []) {
     // Default providers if none specified
-    const defaultProviders = [
+    const defaultProviders: Provider[] = [
       { type: "github", priority: 1 },
       { type: "webhook", priority: 2, url: process.env.WEBHOOK_URL },
       { type: "console", priority: 3 }, // Last resort - just log it
     ];
 
     const providersToTry = providers.length > 0 ? providers : defaultProviders;
-    const results = [];
-    let successfulSubmission = null;
+    const results: any[] = [];
+    let successfulSubmission: any = null;
 
     // Sort by priority
     const sortedProviders = [...providersToTry].sort((a, b) => a.priority - b.priority);
@@ -35,15 +47,17 @@ export class ReportSubmissionService {
 
     for (const provider of sortedProviders) {
       try {
-        logger.debug(`Attempting submission with ${provider.type}`, provider);
+        logger.debug(`Attempting submission with ${provider.type}`, {
+          providerType: provider.type,
+        });
 
         let result;
         switch (provider.type) {
           case "github":
-            result = await GitHubAPIService.submitToGitHub(reportData);
+            result = await GitHubAPIService.submitToGitHub(reportData as any);
             break;
           case "webhook":
-            result = await this.submitToWebhook(reportData, provider.url);
+            result = await this.submitToWebhook(reportData, provider.url || "");
             break;
           case "email":
             result = await this.submitToEmail(reportData, provider.config);
@@ -55,13 +69,12 @@ export class ReportSubmissionService {
             result = {
               success: false,
               error: `Unknown provider type: ${provider.type}`,
-              provider: provider.type,
             };
         }
 
         results.push({
-          provider: provider.type,
           ...result,
+          provider: provider.type,
           attemptedAt: new Date().toISOString(),
         });
 
@@ -70,7 +83,9 @@ export class ReportSubmissionService {
           logger.info(`Bug report submitted successfully via ${provider.type}`, result);
 
           // Continue with remaining providers for redundancy if configured
-          if (!provider.redundant) {
+          if (provider.redundant) {
+            // Continue to next provider
+          } else {
             break;
           }
         }
@@ -78,7 +93,7 @@ export class ReportSubmissionService {
         const errorResult = {
           provider: provider.type,
           success: false,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           attemptedAt: new Date().toISOString(),
         };
 
@@ -114,7 +129,7 @@ export class ReportSubmissionService {
    * @param {string} webhookUrl - Webhook URL
    * @returns {Promise<Object>} Submission result
    */
-  static async submitToWebhook(reportData, webhookUrl) {
+  static async submitToWebhook(reportData: ReportData, webhookUrl: string) {
     try {
       if (!webhookUrl) {
         return {
@@ -158,10 +173,13 @@ export class ReportSubmissionService {
         };
       }
     } catch (error) {
-      logger.error("Webhook submission error", error);
+      logger.error(
+        "Webhook submission error",
+        error instanceof Error ? error : new Error(String(error))
+      );
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         provider: "webhook",
       };
     }
@@ -173,7 +191,7 @@ export class ReportSubmissionService {
    * @param {Object} emailConfig - Email configuration
    * @returns {Promise<Object>} Submission result
    */
-  static async submitToEmail(_reportData, emailConfig) {
+  static async submitToEmail(_reportData: ReportData, emailConfig: any) {
     try {
       logger.debug("Email submission requested", emailConfig);
 
@@ -189,7 +207,7 @@ export class ReportSubmissionService {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         provider: "email",
       };
     }
@@ -200,7 +218,7 @@ export class ReportSubmissionService {
    * @param {Object} reportData - Bug report data
    * @returns {Promise<Object>} Submission result
    */
-  static async submitToConsole(reportData) {
+  static async submitToConsole(reportData: ReportData) {
     try {
       logger.info("📋 BUG REPORT SUBMISSION (Console Fallback)", {
         title: reportData.title,
@@ -226,7 +244,10 @@ export class ReportSubmissionService {
           totalReports: recentReports.length,
         });
       } catch (storageError) {
-        logger.warn("Could not store bug report in localStorage", storageError);
+        logger.warn(
+          "Could not store bug report in localStorage",
+          storageError as Record<string, unknown>
+        );
       }
 
       return {
@@ -237,7 +258,7 @@ export class ReportSubmissionService {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         provider: "console",
       };
     }
@@ -253,7 +274,7 @@ export class ReportSubmissionService {
 
       return {
         totalReports: storedReports.length,
-        recentReports: storedReports.filter((r) => {
+        recentReports: storedReports.filter((r: any) => {
           const reportTime = new Date(r.submittedAt).getTime();
           const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
           return reportTime > oneDayAgo;
@@ -262,13 +283,13 @@ export class ReportSubmissionService {
         newestReport: storedReports[storedReports.length - 1]?.submittedAt || null,
       };
     } catch (error) {
-      logger.debug("Error getting submission stats", error);
+      logger.debug("Error getting submission stats", error as Record<string, unknown>);
       return {
         totalReports: 0,
         recentReports: 0,
         oldestReport: null,
         newestReport: null,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -282,8 +303,11 @@ export class ReportSubmissionService {
       logger.info("Stored bug reports cleared");
       return { success: true };
     } catch (error) {
-      logger.error("Error clearing stored reports", error);
-      return { success: false, error: error.message };
+      logger.error(
+        "Error clearing stored reports",
+        error instanceof Error ? error : new Error(String(error))
+      );
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 }

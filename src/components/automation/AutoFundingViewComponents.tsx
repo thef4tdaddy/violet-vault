@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui";
 
+interface ViewHeaderProps {
+  rules: Array<{ enabled: boolean }>;
+}
+
 /**
  * View header component
  */
-export const ViewHeader = ({ rules }) => {
+export const ViewHeader = ({ rules }: ViewHeaderProps) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between">
@@ -26,10 +30,17 @@ export const ViewHeader = ({ rules }) => {
   );
 };
 
+interface ViewTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  rules: any[];
+  displayHistory: any[];
+}
+
 /**
  * View tabs component
  */
-export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }) => {
+export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }: ViewTabsProps) => {
   return (
     <div className="flex space-x-8 mt-6 border-b border-gray-200">
       <Button
@@ -56,6 +67,22 @@ export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }) => 
   );
 };
 
+interface ViewContentProps {
+  activeTab: string;
+  rules: any[];
+  displayHistory: any[];
+  showExecutionDetails: any;
+  setShowExecutionDetails: (value: any) => void;
+  handleCreateRule: () => void;
+  handleEditRule: (rule: any) => void;
+  handleDeleteRule: (ruleId: string) => void;
+  handleToggleRule: (ruleId: string) => void;
+  handleExecuteRules: () => void;
+  isExecuting: boolean;
+  RulesTabComponent: React.ComponentType<any>;
+  HistoryTabComponent: React.ComponentType<any>;
+}
+
 /**
  * View content component
  */
@@ -73,7 +100,7 @@ export const ViewContent = ({
   isExecuting,
   RulesTabComponent,
   HistoryTabComponent,
-}) => {
+}: ViewContentProps) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200">
       <div className="p-6">

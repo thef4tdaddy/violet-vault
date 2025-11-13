@@ -3,12 +3,27 @@
  * Handles data validation, formatting, and common calculations
  */
 import React from "react";
-import { getIcon } from "../index";
+import { getIcon } from "@/utils";
+
+interface ReceiptData {
+  merchant?: string;
+  total?: number;
+  date?: string;
+  [key: string]: any;
+}
+
+interface TransactionForm {
+  description?: string;
+  amount?: number;
+  date?: string;
+  envelopeId?: string;
+  [key: string]: any;
+}
 
 /**
  * Validate receipt data structure
  */
-export const validateReceiptData = (receiptData) => {
+export const validateReceiptData = (receiptData: ReceiptData) => {
   const errors = [];
 
   if (!receiptData) {
@@ -37,7 +52,7 @@ export const validateReceiptData = (receiptData) => {
 /**
  * Validate transaction form data
  */
-export const validateTransactionForm = (form) => {
+export const validateTransactionForm = (form: TransactionForm) => {
   const errors = [];
 
   if (!form.description || form.description.trim() === "") {
@@ -65,7 +80,7 @@ export const validateTransactionForm = (form) => {
 /**
  * Format currency for display
  */
-export const formatCurrency = (amount) => {
+export const formatCurrency = (amount: number) => {
   if (!amount || isNaN(amount)) return "$0.00";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -76,7 +91,7 @@ export const formatCurrency = (amount) => {
 /**
  * Format date for display
  */
-export const formatDisplayDate = (dateString) => {
+export const formatDisplayDate = (dateString: string) => {
   if (!dateString) return "No date";
 
   try {
@@ -94,7 +109,7 @@ export const formatDisplayDate = (dateString) => {
 /**
  * Calculate confidence level description
  */
-export const getConfidenceDescription = (confidence) => {
+export const getConfidenceDescription = (confidence: number) => {
   if (!confidence || isNaN(confidence)) return "Unknown";
 
   if (confidence >= 0.9) return "Very High";
@@ -107,7 +122,7 @@ export const getConfidenceDescription = (confidence) => {
 /**
  * Get confidence level color for UI
  */
-export const getConfidenceColor = (confidence) => {
+export const getConfidenceColor = (confidence: number) => {
   if (!confidence || isNaN(confidence)) return "gray";
 
   if (confidence >= 0.8) return "green";
@@ -118,7 +133,7 @@ export const getConfidenceColor = (confidence) => {
 /**
  * Extract key information from OCR text
  */
-export const extractReceiptSummary = (receiptData) => {
+export const extractReceiptSummary = (receiptData: ReceiptData) => {
   const summary = {
     merchant: receiptData.merchant || "Unknown Merchant",
     total: receiptData.total || 0,
@@ -136,7 +151,7 @@ export const extractReceiptSummary = (receiptData) => {
 /**
  * Check if receipt data is complete enough for transaction creation
  */
-export const isReceiptDataComplete = (receiptData) => {
+export const isReceiptDataComplete = (receiptData: ReceiptData) => {
   return Boolean(
     receiptData &&
       receiptData.merchant &&
@@ -149,7 +164,7 @@ export const isReceiptDataComplete = (receiptData) => {
 /**
  * Generate receipt reference ID
  */
-export const generateReceiptReference = (merchant, date, total) => {
+export const generateReceiptReference = (merchant: string, date: string, total: number) => {
   const merchantCode = merchant?.substring(0, 3).toUpperCase() || "RCP";
   const dateCode =
     date?.replace(/-/g, "").substring(2) ||
@@ -164,7 +179,10 @@ export const generateReceiptReference = (merchant, date, total) => {
 /**
  * Compare receipt data with transaction form for changes
  */
-export const getReceiptFormChanges = (receiptData, transactionForm) => {
+export const getReceiptFormChanges = (
+  receiptData: ReceiptData,
+  transactionForm: TransactionForm
+) => {
   const changes = [];
 
   if (receiptData.merchant !== transactionForm.description) {
@@ -175,7 +193,11 @@ export const getReceiptFormChanges = (receiptData, transactionForm) => {
     });
   }
 
-  if (Math.abs(receiptData.total - transactionForm.amount) > 0.01) {
+  if (
+    receiptData.total &&
+    transactionForm.amount &&
+    Math.abs(receiptData.total - transactionForm.amount) > 0.01
+  ) {
     changes.push({
       field: "amount",
       original: receiptData.total,
@@ -198,8 +220,8 @@ export const getReceiptFormChanges = (receiptData, transactionForm) => {
  * Render confidence indicator for receipt data fields
  * UI utility function extracted from ReceiptScanner
  */
-export const renderConfidenceIndicator = (_field, confidence) => {
-  const confidenceMap = {
+export const renderConfidenceIndicator = (_field: string, confidence: string) => {
+  const confidenceMap: Record<string, { color: string; iconName: string }> = {
     high: { color: "text-green-600", iconName: "CheckCircle" },
     medium: { color: "text-yellow-600", iconName: "CheckCircle" },
     low: { color: "text-red-600", iconName: "XCircle" },
@@ -216,13 +238,13 @@ export const renderConfidenceIndicator = (_field, confidence) => {
 /**
  * Format file size for display
  */
-export const formatFileSize = (bytes) => {
+export const formatFileSize = (bytes: number) => {
   return `${Math.round(bytes / 1024)} KB`;
 };
 
 /**
  * Validate if extracted data has minimum required fields for transaction creation
  */
-export const hasMinimumExtractedData = (extractedData) => {
+export const hasMinimumExtractedData = (extractedData: any) => {
   return extractedData && (extractedData.total || extractedData.merchant);
 };

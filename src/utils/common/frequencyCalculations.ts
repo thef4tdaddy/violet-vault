@@ -15,7 +15,7 @@
 import logger from "../common/logger";
 
 // Precise frequency multipliers (periods per year)
-export const FREQUENCY_MULTIPLIERS = {
+export const FREQUENCY_MULTIPLIERS: Record<string, number> = {
   weekly: 52.1775, // More precise than 52
   biweekly: 26, // Use simple 26 for consistency across app
   monthly: 12,
@@ -24,7 +24,7 @@ export const FREQUENCY_MULTIPLIERS = {
 };
 
 // Legacy multipliers for compatibility (less precise)
-export const LEGACY_MULTIPLIERS = {
+export const LEGACY_MULTIPLIERS: Record<string, number> = {
   weekly: 52,
   biweekly: 26,
   monthly: 12,
@@ -40,7 +40,12 @@ export const LEGACY_MULTIPLIERS = {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Converted amount
  */
-export function convertFrequency(amount, fromFrequency, toFrequency, usePrecise = true) {
+export function convertFrequency(
+  amount: number,
+  fromFrequency: string,
+  toFrequency: string,
+  usePrecise = true
+): number {
   if (!amount || fromFrequency === toFrequency) return amount;
 
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
@@ -65,7 +70,7 @@ export function convertFrequency(amount, fromFrequency, toFrequency, usePrecise 
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Biweekly amount
  */
-export function toBiweekly(amount, fromFrequency, usePrecise = true) {
+export function toBiweekly(amount: number, fromFrequency: string, usePrecise = true): number {
   return convertFrequency(amount, fromFrequency, "biweekly", usePrecise);
 }
 
@@ -76,7 +81,7 @@ export function toBiweekly(amount, fromFrequency, usePrecise = true) {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Monthly amount
  */
-export function toMonthly(amount, fromFrequency, usePrecise = true) {
+export function toMonthly(amount: number, fromFrequency: string, usePrecise = true): number {
   return convertFrequency(amount, fromFrequency, "monthly", usePrecise);
 }
 
@@ -87,7 +92,7 @@ export function toMonthly(amount, fromFrequency, usePrecise = true) {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Yearly amount
  */
-export function toYearly(amount, fromFrequency, usePrecise = true) {
+export function toYearly(amount: number, fromFrequency: string, usePrecise = true): number {
   return convertFrequency(amount, fromFrequency, "yearly", usePrecise);
 }
 
@@ -97,7 +102,7 @@ export function toYearly(amount, fromFrequency, usePrecise = true) {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Frequency multiplier (periods per year)
  */
-export function getMultiplier(frequency, usePrecise = true) {
+export function getMultiplier(frequency: string, usePrecise = true): number {
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
   return multipliers[frequency] || 1;
 }
@@ -111,11 +116,11 @@ export function getMultiplier(frequency, usePrecise = true) {
  * @returns {number} Amount needed per paycheck
  */
 export function calculatePaycheckAmount(
-  targetAmount,
-  targetFrequency,
+  targetAmount: number,
+  targetFrequency: string,
   paycheckFrequency = "biweekly",
   usePrecise = true
-) {
+): number {
   return convertFrequency(targetAmount, targetFrequency, paycheckFrequency, usePrecise);
 }
 
@@ -124,7 +129,7 @@ export function calculatePaycheckAmount(
  * @param {string} frequency - The frequency to validate
  * @returns {boolean} Whether the frequency is valid
  */
-export function isValidFrequency(frequency) {
+export function isValidFrequency(frequency: string): boolean {
   return Object.keys(FREQUENCY_MULTIPLIERS).includes(frequency);
 }
 
@@ -154,10 +159,10 @@ export function getFrequencyOptions(usePrecise = true) {
  * @param {number} customFrequency - Custom multiplier for the frequency
  * @returns {string} Human readable frequency text
  */
-export function getFrequencyDisplayText(frequency, customFrequency = 1) {
+export function getFrequencyDisplayText(frequency: string, customFrequency = 1): string {
   if (!frequency) return "Not set";
 
-  const baseLabels = {
+  const baseLabels: Record<string, string> = {
     once: "One-time",
     weekly: "Weekly",
     biweekly: "Bi-weekly",

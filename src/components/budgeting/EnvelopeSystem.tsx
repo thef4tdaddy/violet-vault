@@ -1,10 +1,10 @@
-// src/components/budgeting/EnvelopeSystem.jsx - Refactored with separated logic
+// src/components/budgeting/EnvelopeSystem.tsx - Refactored with separated logic
 import { useEffect, useCallback, useRef } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import useBills from "../../hooks/bills/useBills";
-import { calculateBiweeklyNeeds } from "../../utils/budgeting";
-import logger from "../../utils/common/logger";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import useBills from "@/hooks/bills/useBills";
+import { calculateBiweeklyNeeds } from "@/utils/budgeting";
+import logger from "@/utils/common/logger";
 
 // Define frequency multipliers
 const FREQUENCY_MULTIPLIERS: Record<string, number> = {
@@ -31,12 +31,14 @@ const useEnvelopeSystem = () => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Keep Zustand for non-migrated operations - selective subscriptions
-  const unassignedCash = useBudgetStore((state) => state.unassignedCash);
-  const setEnvelopes = useBudgetStore((state) => state.setEnvelopes);
-  const setBiweeklyAllocation = useBudgetStore((state) => state.setBiweeklyAllocation);
-  const setUnassignedCash = useBudgetStore((state) => state.setUnassignedCash);
+  const unassignedCash = useBudgetStore((state: UiStore) => (state as any).unassignedCash ?? 0);
+  const setEnvelopes = useBudgetStore((state: UiStore) => (state as any).setEnvelopes);
+  const setBiweeklyAllocation = useBudgetStore(
+    (state: UiStore) => (state as any).setBiweeklyAllocation
+  );
+  const setUnassignedCash = useBudgetStore((state: UiStore) => (state as any).setUnassignedCash);
 
-  const lastBillsRef = useRef(null);
+  const lastBillsRef = useRef<string | null>(null);
   const isCalculatingRef = useRef(false);
 
   // Calculate biweekly allocation needs from bills using utility function
@@ -71,7 +73,7 @@ const useEnvelopeSystem = () => {
     // Set the allocation outside of setEnvelopes
     setBiweeklyAllocation(totalBiweeklyNeed);
 
-    setEnvelopes((currentEnvelopes) => {
+    setEnvelopes((currentEnvelopes: any[]) => {
       const updatedEnvelopes = [...currentEnvelopes];
       let envelopesUpdated = 0;
 
@@ -83,8 +85,8 @@ const useEnvelopeSystem = () => {
             const envelope = updatedEnvelopes[envelopeIndex];
             if (!envelope.biweeklyAllocation || envelope.biweeklyAllocation === 0) {
               // Calculate this bill's biweekly amount
-              const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency] || 12;
-              const annualAmount = bill.amount * multiplier;
+              const multiplier = bill.frequency ? FREQUENCY_MULTIPLIERS[bill.frequency] : undefined;
+              const annualAmount = bill.amount * (multiplier ?? 12);
               const monthlyAmount = annualAmount / 12;
               const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER;
 
@@ -133,7 +135,7 @@ const useEnvelopeSystem = () => {
         currentBillsCount: bills.length,
       });
       updateBiweeklyAllocations();
-      lastBillsRef.current = JSON.stringify(bills);
+      lastBillsRef.current = JSON.stringify(bills) as string;
     } else if (bills.length === 0 && lastBillsRef.current !== null) {
       logger.debug("All bills removed, clearing biweekly allocations");
       lastBillsRef.current = null;
@@ -143,39 +145,48 @@ const useEnvelopeSystem = () => {
 
   // Envelope operations with TanStack integration
   const createEnvelope = useCallback(
-    async (envelopeData) => {
+    async (envelopeData: any) => {
       try {
         await addEnvelope(envelopeData);
         return { success: true };
       } catch (error) {
-        logger.error("Failed to create envelope:", error);
-        return { success: false, error: error.message };
+        logger.error(
+          "Failed to create envelope:",
+          error instanceof Error ? error : new Error(String(error))
+        );
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
       }
     },
     [addEnvelope]
   );
 
   const modifyEnvelope = useCallback(
-    async (envelopeId, updates) => {
+    async (envelopeId: string, updates: any) => {
       try {
         await updateEnvelope({ id: envelopeId, updates });
         return { success: true };
       } catch (error) {
-        logger.error("Failed to update envelope:", error);
-        return { success: false, error: error.message };
+        logger.error(
+          "Failed to update envelope:",
+          error instanceof Error ? error : new Error(String(error))
+        );
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
       }
     },
     [updateEnvelope]
   );
 
   const removeEnvelope = useCallback(
-    async (envelopeId, deleteBillsToo = false) => {
+    async (envelopeId: string, deleteBillsToo = false) => {
       try {
         await deleteEnvelope(envelopeId, deleteBillsToo);
         return { success: true };
       } catch (error) {
-        logger.error("Failed to delete envelope:", error);
-        return { success: false, error: error.message };
+        logger.error(
+          "Failed to delete envelope:",
+          error instanceof Error ? error : new Error(String(error))
+        );
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
       }
     },
     [deleteEnvelope]
