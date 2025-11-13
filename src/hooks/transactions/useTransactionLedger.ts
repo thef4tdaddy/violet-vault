@@ -46,6 +46,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Use extracted state management hook
   const ledgerState = useLedgerState();
+  const { currentPage, setCurrentPage } = ledgerState;
 
   const pageSize = 10;
 
@@ -88,14 +89,15 @@ export const useTransactionLedger = (currentUser: unknown) => {
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
 
   const paginatedTransactions = filteredTransactions.slice(
-    (ledgerState.currentPage - 1) * pageSize,
-    ledgerState.currentPage * pageSize
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 
   // Reset pagination when filters change
   useEffect(() => {
-    ledgerState.setCurrentPage(1);
-  }, [filteredTransactions.length, ledgerState]);
+    setCurrentPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredTransactions.length]);
 
   // Use extracted operations hook
   const operations = useLedgerOperations(
@@ -223,9 +225,9 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   const handlePagination = (direction) => {
     if (direction === "prev") {
-      ledgerState.setCurrentPage((p) => Math.max(1, p - 1));
+      setCurrentPage((p) => Math.max(1, p - 1));
     } else if (direction === "next") {
-      ledgerState.setCurrentPage((p) => Math.min(totalPages, p + 1));
+      setCurrentPage((p) => Math.min(totalPages, p + 1));
     }
   };
 
@@ -241,6 +243,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
     // Modal states - from ledgerState
     ...ledgerState,
+    currentPage,
 
     // Form data (legacy - for backwards compatibility)
     transactionForm,

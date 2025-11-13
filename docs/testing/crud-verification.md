@@ -1,6 +1,6 @@
 ---
 title: CRUD Verification Matrix
-lastVerified: 2025-11-12
+lastVerified: 2025-11-13
 ---
 
 # CRUD Verification Matrix
@@ -19,12 +19,12 @@ status recorded on **2025-11-12**.
 
 ## Envelopes
 
-| Operation                                        | Implementation Surface                         | Automated Coverage                                        | Latest Status | Notes                                                                                                                                                                                                            |
-| ------------------------------------------------ | ---------------------------------------------- | --------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Create / Edit envelope metadata                  | `useEnvelopeForm`, `useEnvelopeOperations`     | `src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts`   | ⛔ Blocked    | Test harness now fails because `convertZodErrors` expects `error.errors` (Zod v4 supplies `issues`) and `handleClose` behaviour diverged from historic confirm-dialog flow. Needs schema adapter + spec refresh. |
-| Delete envelope (with optional cascade to bills) | `useEnvelopeOperations.deleteEnvelope`         | Covered indirectly through the same suite above           | ⛔ Blocked    | Same reason as create/edit.                                                                                                                                                                                      |
-| List + filter envelopes                          | `useEnvelopesQuery`, `useEnvelopeCalculations` | `src/hooks/budgeting/__tests__/useEnvelopesQuery.test.ts` | ⛔ Blocked    | Suite stubs Dexie via Firebase mocks; current run fails because IndexedDB APIs are unavailable in Vitest node env. Requires fake-indexeddb wiring (see `IDBRequest is not defined` errors).                      |
-| Transfer between envelopes                       | `useEnvelopeOperations.transferFunds`          | No automated coverage                                     | ⛔ Blocked    | Manual verification required; create targeted unit tests.                                                                                                                                                        |
+| Operation                                        | Implementation Surface                         | Automated Coverage                                        | Latest Status | Notes                                                                                                                                                                         |
+| ------------------------------------------------ | ---------------------------------------------- | --------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create / Edit envelope metadata                  | `useEnvelopeForm`, `useEnvelopeOperations`     | `src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts`   | ✅ Pass       | Suite updated for Zod v4 and toast UX; re-ran `npx vitest run src/hooks/budgeting/__tests__/useEnvelopeForm.test.ts` on 2025-11-13.                                           |
+| Delete envelope (with optional cascade to bills) | `useEnvelopeOperations.deleteEnvelope`         | Covered indirectly through the same suite above           | ✅ Pass       | Covered by the envelope form suite’s delete/cleanup specs; same command as above.                                                                                             |
+| List + filter envelopes                          | `useEnvelopesQuery`, `useEnvelopeCalculations` | `src/hooks/budgeting/__tests__/useEnvelopesQuery.test.ts` | ✅ Pass       | Dexie mocked via injected `__db`; ran `npx vitest run src/hooks/budgeting/__tests__/useEnvelopesQuery.test.ts` on 2025-11-13 (fake-indexeddb enabled in `src/test/setup.ts`). |
+| Transfer between envelopes                       | `useEnvelopeOperations.transferFunds`          | No automated coverage                                     | ⛔ Blocked    | Still lacks dedicated tests—next step is to add a Vitest harness around `transferFunds` and optimistic helpers to exercise the full move + accounting cascade.                |
 
 **Action items**
 
@@ -78,7 +78,7 @@ status recorded on **2025-11-12**.
 
 | Domain                | CRUD Coverage                        | Connection Coverage                          | Overall Status |
 | --------------------- | ------------------------------------ | -------------------------------------------- | -------------- |
-| Envelopes             | Blocked (tests failing)              | Partial (transfer + link tests missing)      | ⛔             |
+| Envelopes             | Covered (form/query suites passing)  | Partial (transfer + link tests missing)      | ⚠️             |
 | Bills                 | Covered (passing)                    | Covered (billing ↔ envelopes, transactions) | ✅             |
 | Savings Goals         | Covered but unstable (memory issues) | N/A                                          | ⚠️             |
 | Supplemental Accounts | Covered (passing)                    | N/A                                          | ✅             |

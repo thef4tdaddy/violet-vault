@@ -1,17 +1,33 @@
 import { useCallback } from "react";
-import logger from "../../utils/common/logger";
-import { executeBillUpdate, processBulkOperation } from "../../utils/bills/billUpdateHelpers";
+import logger from "@/utils/common/logger";
+import { executeBillUpdate, processBulkOperation } from "@/utils/bills/billUpdateHelpers";
+import type { Bill } from "@/types/bills";
+
+interface UseBulkBillOperationsParams {
+  updateBill: (payload: { id: string; updates: Record<string, unknown> }) => Promise<void>;
+  onUpdateBill?: (bill: Bill) => void | Promise<void>;
+  budget?: Record<string, unknown> & { updateBill?: (bill: Bill) => void | Promise<void> };
+  handlePayBill: (
+    billId: string,
+    overrides?: { amount?: number; paidDate?: string; envelopeId?: string }
+  ) => Promise<void>;
+}
 
 /**
  * Hook for bulk bill operations (updates and payments)
  * Extracted from useBillOperations.js to reduce complexity
  */
-export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handlePayBill }) => {
+export const useBulkBillOperations = ({
+  updateBill,
+  onUpdateBill,
+  budget,
+  handlePayBill,
+}: UseBulkBillOperationsParams) => {
   /**
    * Handle bulk bill updates (amounts, due dates, or both)
    */
   const handleBulkUpdate = useCallback(
-    async (updatedBills) => {
+    async (updatedBills: Bill[]) => {
       const updateSingleBill = async (bill) => {
         logger.debug("Updating bill", {
           billId: bill.id,
@@ -38,8 +54,8 @@ export const useBulkBillOperations = ({ updateBill, onUpdateBill, budget, handle
    * Handle bulk bill payments
    */
   const handleBulkPayment = useCallback(
-    async (billIds) => {
-      const paySingleBill = async (billId) => {
+    async (billIds: string[]) => {
+      const paySingleBill = async (billId: string) => {
         await handlePayBill(billId);
       };
 

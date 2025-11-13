@@ -1,5 +1,5 @@
-import { encryptionUtils } from "../security/encryption";
-import logger from "../common/logger";
+import { encryptionUtils } from "@/utils/security/encryption";
+import logger from "@/utils/common/logger";
 
 /**
  * VioletVault Key Export/Import Utilities
@@ -7,7 +7,7 @@ import logger from "../common/logger";
  */
 
 // Type definitions for key export/import operations
-interface ExportedKeyData {
+export interface ExportedKeyData {
   version: string;
   type: string;
   keyData: number[];
@@ -18,7 +18,7 @@ interface ExportedKeyData {
   deviceFingerprint: string;
 }
 
-interface ProtectedKeyFile {
+export interface ProtectedKeyFile {
   version: string;
   type: string;
   encryptedKeyData: {
@@ -29,7 +29,7 @@ interface ProtectedKeyFile {
   createdAt: string;
 }
 
-interface ImportedKeyData {
+export interface ImportedKeyData {
   key: CryptoKey;
   salt: Uint8Array;
   budgetId: string;
@@ -38,7 +38,7 @@ interface ImportedKeyData {
   deviceFingerprint: string;
 }
 
-interface ValidationResult {
+export interface ValidationResult {
   valid: boolean;
   type?: string;
   version?: string;

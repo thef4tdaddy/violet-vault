@@ -3,41 +3,92 @@ import { Button, TextInput, Radio } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
+// Type definitions for component props
+interface PayerStatsProps {
+  stats?: {
+    averageAmount: number;
+    count: number;
+    minAmount: number;
+    maxAmount: number;
+    lastPaycheckDate?: string | number;
+  };
+  payerName: string;
+}
+
+interface AllocationModeOptionProps {
+  value: string;
+  checked: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  title: string;
+  description: string;
+}
+
+interface PaycheckFormProps {
+  formData: {
+    amount: string;
+    payerName: string;
+    allocationMode: string;
+  };
+  errors: {
+    amount?: string;
+    payerName?: string;
+    allocations?: string;
+  };
+  uniquePayers: string[];
+  selectedPayerStats?: PayerStatsProps["stats"];
+  onUpdateField: (field: string, value: string) => void;
+  onApplyPrediction: (payerName: string) => void;
+  canSubmit: boolean;
+  isLoading: boolean;
+  onProcess: () => void;
+  onReset: () => void;
+}
+
 // PayerStats component - displays payer history
-const PayerStats = ({ stats, payerName }) => {
+const PayerStats = ({ stats, payerName }: PayerStatsProps) => {
   if (!stats || stats.count === 0) return null;
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-      <h4 className="font-medium text-blue-900 mb-2">Recent History for {payerName}</h4>
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <span className="text-blue-700">Average:</span>
-          <span className="font-medium ml-2">${stats.averageAmount.toFixed(2)}</span>
-        </div>
-        <div>
-          <span className="text-blue-700">Count:</span>
-          <span className="font-medium ml-2">{stats.count}</span>
-        </div>
-        <div>
-          <span className="text-blue-700">Range:</span>
-          <span className="font-medium ml-2">
-            ${stats.minAmount.toFixed(2)} - ${stats.maxAmount.toFixed(2)}
-          </span>
-        </div>
-        <div>
-          <span className="text-blue-700">Last:</span>
-          <span className="font-medium ml-2">
-            {stats.lastPaycheckDate ? new Date(stats.lastPaycheckDate).toLocaleDateString() : "N/A"}
-          </span>
+    <>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <h4 className="font-medium text-blue-900 mb-2">Recent History for {payerName}</h4>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-blue-700">Average:</span>
+            <span className="font-medium ml-2">{stats.averageAmount.toFixed(2)}</span>
+          </div>
+          <div>
+            <span className="text-blue-700">Count:</span>
+            <span className="font-medium ml-2">{stats.count}</span>
+          </div>
+          <div>
+            <span className="text-blue-700">Range:</span>
+            <span className="font-medium ml-2">
+              {stats.minAmount.toFixed(2)} - {stats.maxAmount.toFixed(2)}
+            </span>
+          </div>
+          <div>
+            <span className="text-blue-700">Last:</span>
+            <span className="font-medium ml-2">
+              {stats.lastPaycheckDate
+                ? new Date(stats.lastPaycheckDate).toLocaleDateString()
+                : "N/A"}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
 // AllocationModeOption component - single radio option
-const AllocationModeOption = ({ value, checked, onChange, title, description }) => (
+const AllocationModeOption = ({
+  value,
+  checked,
+  onChange,
+  title,
+  description,
+}: AllocationModeOptionProps) => (
   <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
     <div className="relative grid place-items-center">
       <Radio
@@ -47,12 +98,10 @@ const AllocationModeOption = ({ value, checked, onChange, title, description }) 
         onChange={onChange}
         className="sr-only"
       />
-      <div
-        className={`w-5 h-5 rounded-full border-2 border-black grid place-items-center transition-colors ${
-          checked ? "bg-green-600" : "bg-white hover:bg-gray-50"
-        }`}
-      >
-        {checked && <div className="w-2 h-2 rounded-full bg-white"></div>}
+      <div>
+        {checked && (
+          <div className="w-2 h-2 rounded-full border-2 border-black grid place-items-center transition-colors bg-green-600" />
+        )}
       </div>
     </div>
     <div className="text-sm">
@@ -73,11 +122,11 @@ const PaycheckForm = ({
   isLoading,
   onProcess,
   onReset,
-}) => {
+}: PaycheckFormProps) => {
   // Enhanced haptic feedback for success actions
   const successFeedback = useTouchFeedback("success", "success");
 
-  const handlePayerChange = (payerName) => {
+  const handlePayerChange = (payerName: string) => {
     onUpdateField("payerName", payerName);
     if (payerName && !formData.amount) {
       onApplyPrediction(payerName);
@@ -101,7 +150,9 @@ const PaycheckForm = ({
           <TextInput
             type="number"
             value={formData.amount}
-            onChange={(e) => onUpdateField("amount", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onUpdateField("amount", e.target.value)
+            }
             className={`pl-8 ${errors.amount ? "border-red-300 bg-red-50" : ""}`}
             placeholder="0.00"
             step="0.01"
@@ -125,12 +176,12 @@ const PaycheckForm = ({
             type="text"
             list="payers"
             value={formData.payerName}
-            onChange={(e) => handlePayerChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePayerChange(e.target.value)}
             placeholder="Enter payer name"
             error={errors.payerName}
           />
           <datalist id="payers">
-            {uniquePayers.map((payer) => (
+            {uniquePayers.map((payer: string) => (
               <option key={payer} value={payer} />
             ))}
           </datalist>
@@ -153,14 +204,18 @@ const PaycheckForm = ({
           <AllocationModeOption
             value="allocate"
             checked={formData.allocationMode === "allocate"}
-            onChange={(e) => onUpdateField("allocationMode", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onUpdateField("allocationMode", e.target.value)
+            }
             title="Standard Allocation"
             description="Allocate based on envelope monthly amounts (biweekly conversion)"
           />
           <AllocationModeOption
             value="leftover"
             checked={formData.allocationMode === "leftover"}
-            onChange={(e) => onUpdateField("allocationMode", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onUpdateField("allocationMode", e.target.value)
+            }
             title="Proportional Distribution"
             description="Distribute entire paycheck proportionally across envelopes"
           />

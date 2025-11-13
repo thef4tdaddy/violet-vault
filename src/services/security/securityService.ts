@@ -1,9 +1,9 @@
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 /**
  * Security settings interface
  */
-interface SecuritySettings {
+export interface SecuritySettings {
   autoLockEnabled: boolean;
   autoLockTimeout: number;
   clipboardClearTimeout: number;
@@ -14,7 +14,7 @@ interface SecuritySettings {
 /**
  * Security event interface
  */
-interface SecurityEvent {
+export interface SecurityEvent {
   id: string;
   timestamp: string;
   type: string;
@@ -25,7 +25,7 @@ interface SecurityEvent {
 /**
  * Security statistics
  */
-interface SecurityStats {
+export interface SecurityStats {
   total: number;
   today: number;
   thisWeek: number;

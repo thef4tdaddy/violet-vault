@@ -5,15 +5,17 @@ import {
   useSecurityEventManager,
   useAutoLockManager,
   useClipboardSecurity,
-} from "./useSecurityManagerUI";
-import logger from "../../utils/common/logger";
+  type SecurityEventInput,
+} from "@/hooks/auth/useSecurityManagerUI";
+import logger from "@/utils/common/logger";
+import type { SecuritySettings } from "@/services/security/securityService";
 
 /**
  * Helper to create visibility change handler with unlock grace period
  */
 const createVisibilityHandler = (
   lastUnlockTimeRef: MutableRefObject<number>,
-  logSecurityEvent: (event: unknown) => void,
+  logSecurityEvent: (event: SecurityEventInput) => void,
   lockSession: () => void
 ) => {
   const UNLOCK_GRACE_PERIOD = 2000;
@@ -159,7 +161,7 @@ export const useSecurityManager = () => {
   }, [unlockSession, logSecurityEvent, resetAutoLockTimer]);
 
   const updateSettings = useCallback(
-    (newSettings) => {
+    (newSettings: Partial<SecuritySettings>) => {
       const oldSettings = securitySettings;
       updateSecuritySettings(newSettings);
 
@@ -197,7 +199,7 @@ export const useSecurityManager = () => {
 
     // Throttle activity logging to avoid spam
     const now = Date.now();
-    const lastLog = lastActivityRef.current;
+    const lastLog = lastActivityRef.current ?? 0;
     if (now - lastLog > 60000) {
       // Log activity at most once per minute
       logSecurityEvent({

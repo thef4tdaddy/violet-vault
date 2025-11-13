@@ -1,10 +1,28 @@
 import { useMemo, useCallback } from "react";
 
+// Type definitions
+type CategoryType = "income" | "expenses" | "net" | "savings" | "budget" | "actual";
+type StatusType = "critical" | "warning" | "healthy" | "overfunded";
+type BreakpointType = "mobile" | "tablet" | "desktop";
+type ChartTypeType = "default" | "pie" | "bar";
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number;
+    color: string;
+  }>;
+  label?: string;
+}
+
+type TooltipEntry = NonNullable<TooltipProps["payload"]>[number];
+
 // Helper to format month key to readable format
-const formatMonthYear = (monthKey) => {
+const formatMonthYear = (monthKey: string): string => {
   if (!monthKey) return "";
   const [year, month] = monthKey.split("-");
-  const date = new Date(year, month - 1);
+  const date = new Date(parseInt(year), parseInt(month) - 1);
   return date.toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
@@ -12,7 +30,7 @@ const formatMonthYear = (monthKey) => {
 };
 
 // Helper to format currency values with K/M suffixes
-const formatShortCurrency = (value) => {
+const formatShortCurrency = (value: number): string => {
   const num = value || 0;
   if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
   if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
@@ -20,7 +38,7 @@ const formatShortCurrency = (value) => {
 };
 
 // Color scheme mapping
-const CATEGORY_COLORS = {
+const CATEGORY_COLORS: Record<CategoryType, string> = {
   income: "#10b981",
   expenses: "#ef4444",
   net: "#06b6d4",
@@ -30,7 +48,7 @@ const CATEGORY_COLORS = {
 };
 
 // Status color mapping
-const STATUS_COLORS = {
+const STATUS_COLORS: Record<StatusType, { text: string; bg: string }> = {
   critical: { text: "text-red-600", bg: "bg-red-100" },
   warning: { text: "text-yellow-600", bg: "bg-yellow-100" },
   healthy: { text: "text-green-600", bg: "bg-green-100" },
@@ -38,7 +56,7 @@ const STATUS_COLORS = {
 };
 
 // Responsive height mapping
-const RESPONSIVE_HEIGHTS = {
+const RESPONSIVE_HEIGHTS: Record<BreakpointType, Record<ChartTypeType, number>> = {
   mobile: { default: 250, pie: 200, bar: 300 },
   tablet: { default: 300, pie: 250, bar: 350 },
   desktop: { default: 400, pie: 350, bar: 450 },
@@ -68,14 +86,14 @@ export const useChartConfig = () => {
   );
 
   // Custom tooltip component
-  const CustomTooltip = useCallback(({ active, payload, label }) => {
+  const CustomTooltip = useCallback(({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-900 mb-2">{label}</p>
           {payload
-            .filter((entry) => entry != null)
-            .map((entry, index) => (
+            .filter((entry): entry is TooltipEntry => entry != null)
+            .map((entry, index: number) => (
               <p key={index} style={{ color: entry.color }} className="text-sm">
                 {entry.name}: ${entry.value?.toFixed(2)}
               </p>
@@ -142,15 +160,18 @@ export const useChartConfig = () => {
 
   // Color scheme utilities
   const getColorByCategory = useCallback(
-    (category, index) => {
-      return CATEGORY_COLORS[category?.toLowerCase()] || chartColors[index % chartColors.length];
+    (category: string, index: number) => {
+      return (
+        CATEGORY_COLORS[category?.toLowerCase() as CategoryType] ||
+        chartColors[index % chartColors.length]
+      );
     },
     [chartColors]
   );
 
   // Status color utilities
-  const getStatusColor = useCallback((status, type = "text") => {
-    const colorScheme = STATUS_COLORS[status];
+  const getStatusColor = useCallback((status: string, type: string = "text") => {
+    const colorScheme = STATUS_COLORS[status as StatusType];
     if (colorScheme) {
       return type === "text" ? colorScheme.text : colorScheme.bg;
     }
@@ -168,7 +189,7 @@ export const useChartConfig = () => {
   );
 
   // Export utilities
-  const getExportFilename = useCallback((chartType, timeFilter) => {
+  const getExportFilename = useCallback((chartType: string, timeFilter: string) => {
     const timestamp = new Date().toISOString().split("T")[0];
     return `VioletVault_${chartType}_${timeFilter}_${timestamp}`;
   }, []);
@@ -176,9 +197,9 @@ export const useChartConfig = () => {
   // Format utilities for display
   const formatters = useMemo(
     () => ({
-      currency: (value) => `$${(value || 0).toLocaleString()}`,
-      percentage: (value) => `${(value || 0).toFixed(1)}%`,
-      count: (value) => (value || 0).toLocaleString(),
+      currency: (value: number) => `$${(value || 0).toLocaleString()}`,
+      percentage: (value: number) => `${(value || 0).toFixed(1)}%`,
+      count: (value: number) => (value || 0).toLocaleString(),
       shortCurrency: formatShortCurrency,
       monthYear: formatMonthYear,
     }),
@@ -186,9 +207,11 @@ export const useChartConfig = () => {
   );
 
   // Responsive breakpoint utilities
-  const getResponsiveHeight = useCallback((breakpoint, chartType) => {
+  const getResponsiveHeight = useCallback((breakpoint: string, chartType: string) => {
     return (
-      RESPONSIVE_HEIGHTS[breakpoint]?.[chartType] || RESPONSIVE_HEIGHTS[breakpoint]?.default || 300
+      RESPONSIVE_HEIGHTS[breakpoint as BreakpointType]?.[chartType as ChartTypeType] ||
+      RESPONSIVE_HEIGHTS[breakpoint as BreakpointType]?.default ||
+      300
     );
   }, []);
 

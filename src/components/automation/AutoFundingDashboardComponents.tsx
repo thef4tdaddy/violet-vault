@@ -1,10 +1,57 @@
+import React from "react";
 import { Button } from "@/components/ui";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import type { ExecutionHistoryEntry } from "@/hooks/budgeting/autofunding/types";
+
+interface RulesTabProps {
+  rules: AutoFundingRule[];
+  onCreateRule: () => void;
+  onEditRule: (rule: AutoFundingRule) => void;
+  onDeleteRule: (ruleId: string) => void;
+  onToggleRule: (ruleId: string) => void;
+  onExecuteRules: () => void;
+  isExecuting: boolean;
+}
+
+interface HistoryTabProps {
+  executionHistory: ExecutionHistoryEntry[];
+  showExecutionDetails: string | null;
+  onToggleDetails: (show: string | null) => void;
+}
+
+interface DashboardHeaderProps {
+  rules: AutoFundingRule[];
+  onClose: () => void;
+}
+
+interface DashboardTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  rules: AutoFundingRule[];
+  executionHistory: ExecutionHistoryEntry[];
+}
+
+interface DashboardContentProps {
+  activeTab: string;
+  rules: AutoFundingRule[];
+  executionHistory: ExecutionHistoryEntry[];
+  showExecutionDetails: string | null;
+  setShowExecutionDetails: (show: string | null) => void;
+  handleCreateRule: () => void;
+  handleEditRule: (rule: AutoFundingRule) => void;
+  handleDeleteRule: (ruleId: string) => void;
+  handleToggleRule: (ruleId: string) => void;
+  handleExecuteRules: () => void;
+  isExecuting: boolean;
+  RulesTabComponent: React.ComponentType<RulesTabProps>;
+  HistoryTabComponent: React.ComponentType<HistoryTabProps>;
+}
 
 /**
  * Dashboard header component
  */
-export const DashboardHeader = ({ rules, onClose }) => {
+export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ rules, onClose }) => {
   return (
     <div className="p-6 border-b border-gray-200">
       <div className="flex items-center justify-between">
@@ -12,7 +59,7 @@ export const DashboardHeader = ({ rules, onClose }) => {
           <h2 className="text-xl font-semibold text-gray-900">Auto-Funding Dashboard</h2>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
-              {rules.filter((r) => r.enabled).length} Active
+              {rules.filter((rule) => rule.enabled).length} Active
             </span>
             <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
               {rules.length} Total
@@ -28,7 +75,12 @@ export const DashboardHeader = ({ rules, onClose }) => {
 /**
  * Dashboard tabs component
  */
-export const DashboardTabs = ({ activeTab, setActiveTab, rules, executionHistory }) => {
+export const DashboardTabs: React.FC<DashboardTabsProps> = ({
+  activeTab,
+  setActiveTab,
+  rules,
+  executionHistory,
+}) => {
   return (
     <div className="flex space-x-8 mt-6">
       <Button
@@ -58,7 +110,7 @@ export const DashboardTabs = ({ activeTab, setActiveTab, rules, executionHistory
 /**
  * Dashboard content component
  */
-export const DashboardContent = ({
+export const DashboardContent: React.FC<DashboardContentProps> = ({
   activeTab,
   rules,
   executionHistory,

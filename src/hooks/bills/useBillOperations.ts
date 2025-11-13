@@ -1,8 +1,29 @@
 import { useCallback } from "react";
-import { useBillValidation } from "./useBillValidation";
-import { useBillPayment } from "./useBillPayment";
-import { useBulkBillOperations } from "./useBulkBillOperations";
-import { useBillOperationWrappers } from "./useBillOperationWrappers";
+import { useBillValidation } from "@/hooks/bills/useBillValidation";
+import { useBillPayment } from "@/hooks/bills/useBillPayment";
+import { useBulkBillOperations } from "@/hooks/bills/useBulkBillOperations";
+import { useBillOperationWrappers } from "@/hooks/bills/useBillOperationWrappers";
+import type { Bill, Envelope } from "@/types/bills";
+
+interface BudgetContext extends Record<string, unknown> {
+  unassignedCash?: number;
+  updateBill?: (bill: Bill) => void | Promise<void>;
+}
+
+interface UseBillOperationsParams {
+  bills?: Bill[];
+  envelopes?: Envelope[];
+  updateBill: (payload: { id: string; updates: Record<string, unknown> }) => Promise<void>;
+  onUpdateBill?: (bill: Bill) => void | Promise<void>;
+  onError?: (error: string) => void;
+  budget?: BudgetContext;
+  markBillPaid?: (params: {
+    billId: string;
+    paidAmount: number;
+    paidDate?: string;
+    envelopeId?: string;
+  }) => Promise<unknown>;
+}
 
 /**
  * Custom hook for bill management operations
@@ -16,20 +37,7 @@ export const useBillOperations = ({
   onError,
   budget,
   markBillPaid,
-}: {
-  bills?: Array<Record<string, unknown>>;
-  envelopes?: Array<Record<string, unknown>>;
-  updateBill: (payload: { id: string; updates: Record<string, unknown> }) => Promise<void>;
-  onUpdateBill?: (bill: Record<string, unknown>) => void | Promise<void>;
-  onError?: (error: string) => void;
-  budget?: Record<string, unknown>;
-  markBillPaid?: (params: {
-    billId: string;
-    paidAmount: number;
-    paidDate?: string;
-    envelopeId?: string;
-  }) => Promise<unknown>;
-}) => {
+}: UseBillOperationsParams) => {
   // Use focused sub-hooks
   const { validateBillData, createModificationHistory } = useBillValidation(envelopes);
   const { handlePayBill } = useBillPayment({

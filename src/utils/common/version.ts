@@ -13,6 +13,28 @@ interface VersionCache {
   ttl: number;
 }
 
+// Type definitions for environment variables and branch info
+interface EnvVars {
+  appEnv: string | undefined;
+  isDev: boolean;
+  vercelEnv: string | undefined;
+  nodeEnv: string | undefined;
+}
+
+interface VercelInfo {
+  isVercelDeploy: boolean;
+  isMainBranch: boolean;
+  isPreviewBranch: boolean;
+}
+
+interface BranchInfo {
+  branch: string;
+  environment: string;
+  futureVersion: string | null;
+  isDevelopment: boolean;
+  platform: string;
+}
+
 let versionCache: VersionCache = {
   data: null,
   timestamp: null,
@@ -44,7 +66,7 @@ const initializeCache = () => {
       }
     }
   } catch (error) {
-    logger.warn("Failed to load milestone cache:", error);
+    logger.warn("Failed to load milestone cache:", error as Record<string, unknown>);
   }
   return false;
 };
@@ -60,7 +82,7 @@ const saveCache = (data: string) => {
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
     logger.debug("Cached version data", { version: data });
   } catch (error) {
-    logger.warn("Failed to save version cache:", error);
+    logger.warn("Failed to save version cache:", error as Record<string, unknown>);
   }
 };
 
@@ -115,7 +137,7 @@ export const fetchTargetVersion = async () => {
       return data.fallback.nextVersion;
     }
   } catch (error) {
-    logger.warn("Failed to fetch milestone data", error);
+    logger.warn("Failed to fetch milestone data", error as Record<string, unknown>);
   }
 
   // Fallback logic if API fails
@@ -129,7 +151,7 @@ let hasLoggedGitDate = false;
 
 // Get actual commit timestamp from git (injected at build time)
 const getActualCommitTimestamp = () => {
-  // Priority 1: Try git commit date first (injected by Vite build) - this is the actual commit timestamp
+  // Priority 1: Try git commit date first (injected by Vite build) - this is actual commit timestamp
   const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
   if (gitCommitDate && gitCommitDate !== "undefined") {
     // Only log once to prevent console spam (Issue #560)
@@ -204,7 +226,7 @@ const getActualCommitTimestamp = () => {
 };
 
 // Format commit timestamp for display
-const formatCommitTimestamp = (timestamp, environment) => {
+const formatCommitTimestamp = (timestamp: number | Date, environment: string) => {
   const date = new Date(timestamp);
 
   // For production, show just the date
@@ -244,7 +266,7 @@ const getTargetVersionFallback = () => {
 /**
  * Detect Vercel deployment information from URL
  */
-const detectVercelDeployment = () => {
+const detectVercelDeployment = (): VercelInfo => {
   if (typeof window === "undefined") {
     return { isVercelDeploy: false, isMainBranch: false, isPreviewBranch: false };
   }
@@ -262,7 +284,7 @@ const detectVercelDeployment = () => {
 /**
  * Determine environment type from various indicators
  */
-const determineEnvironment = (envVars, vercelInfo) => {
+const determineEnvironment = (envVars: EnvVars, vercelInfo: VercelInfo) => {
   const { appEnv, isDev, vercelEnv, nodeEnv } = envVars;
   const { isMainBranch, isPreviewBranch } = vercelInfo;
 
@@ -290,8 +312,13 @@ const determineEnvironment = (envVars, vercelInfo) => {
 /**
  * Get branch info object for environment
  */
-const createBranchInfo = (environment, branch, fallbackVersion, platform) => {
-  const configs = {
+const createBranchInfo = (
+  environment: string,
+  branch: string,
+  fallbackVersion: string | null,
+  platform: string
+): BranchInfo => {
+  const configs: Record<string, BranchInfo> = {
     development: {
       branch,
       environment: "development",
@@ -319,13 +346,13 @@ const createBranchInfo = (environment, branch, fallbackVersion, platform) => {
 };
 
 // Branch and environment detection with actual git branch info
-export const getBranchInfo = (targetVersion = null) => {
+export const getBranchInfo = (targetVersion: string | null = null) => {
   // Get actual git branch from build-time injection
   const actualGitBranch = import.meta.env.VITE_GIT_BRANCH;
   const branch = actualGitBranch || "unknown";
 
   // Collect environment variables
-  const envVars = {
+  const envVars: EnvVars = {
     appEnv: import.meta.env.VITE_APP_ENV,
     isDev: import.meta.env.DEV,
     vercelEnv: import.meta.env.VITE_VERCEL_ENV,
@@ -350,7 +377,7 @@ export const getBranchInfo = (targetVersion = null) => {
 };
 
 // Format version for display with branch differentiation (sync - immediate)
-export const getVersionInfo = (targetVersion = null) => {
+export const getVersionInfo = (targetVersion: string | null = null) => {
   const branchInfo = getBranchInfo(targetVersion);
 
   let displayVersion = APP_VERSION; // Always start with package.json version
@@ -405,7 +432,10 @@ export const getVersionInfoAsync = async () => {
     const targetVersion = await fetchTargetVersion();
     return getVersionInfo(targetVersion);
   } catch (error) {
-    logger.warn("Failed to fetch async version info, using fallback:", error);
+    logger.warn(
+      "Failed to fetch async version info, using fallback:",
+      error as Record<string, unknown>
+    );
     return getVersionInfo();
   }
 };
@@ -421,7 +451,7 @@ export const clearVersionCache = () => {
     };
     logger.debug("Version cache cleared");
   } catch (error) {
-    logger.warn("Failed to clear cache:", error);
+    logger.warn("Failed to clear cache:", error as Record<string, unknown>);
   }
 };
 
@@ -430,7 +460,8 @@ export const getCacheStatus = () => {
   const isValid =
     versionCache.data && versionCache.timestamp && now - versionCache.timestamp < versionCache.ttl;
 
-  const timeUntilExpiry = isValid ? versionCache.timestamp + versionCache.ttl - now : 0;
+  const timeUntilExpiry =
+    isValid && versionCache.timestamp ? versionCache.timestamp + versionCache.ttl - now : 0;
   const daysUntilExpiry = Math.round(timeUntilExpiry / (24 * 60 * 60 * 1000));
   const hoursUntilExpiry = Math.round(timeUntilExpiry / (60 * 60 * 1000));
 
@@ -452,17 +483,17 @@ export const getLastSeenVersion = () => {
   try {
     return localStorage.getItem(LAST_SEEN_VERSION_KEY);
   } catch (error) {
-    logger.warn("Failed to get last seen version:", error);
+    logger.warn("Failed to get last seen version:", error as Record<string, unknown>);
     return null;
   }
 };
 
-export const setLastSeenVersion = (version) => {
+export const setLastSeenVersion = (version: string) => {
   try {
     localStorage.setItem(LAST_SEEN_VERSION_KEY, version);
     logger.debug("Updated last seen version", { version });
   } catch (error) {
-    logger.warn("Failed to set last seen version:", error);
+    logger.warn("Failed to set last seen version:", error as Record<string, unknown>);
   }
 };
 
@@ -511,7 +542,7 @@ export const simulateVersionTransition = (newTargetVersion: string) => {
   });
   clearVersionCache();
 
-  // Temporarily override the cache with new version for testing
+  // Temporarily override cache with new version for testing
   try {
     versionCache = {
       data: newTargetVersion,
@@ -521,7 +552,7 @@ export const simulateVersionTransition = (newTargetVersion: string) => {
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
     logger.debug("Cached new target version", { version: newTargetVersion });
   } catch (error) {
-    logger.warn("Failed to save simulated cache:", error);
+    logger.warn("Failed to save simulated cache:", error as Record<string, unknown>);
   }
 
   logger.info("Simulated transition complete. Run getVersionInfoAsync() to test.");
@@ -529,13 +560,13 @@ export const simulateVersionTransition = (newTargetVersion: string) => {
 };
 
 // Development utility for testing patch notes
-export const simulatePatchNotesUpdate = (fromVersion, toVersion = APP_VERSION) => {
+export const simulatePatchNotesUpdate = (fromVersion: string, toVersion: string = APP_VERSION) => {
   logger.debug("Simulating patch notes update", {
     fromVersion,
     toVersion,
   });
 
-  // Set the last seen version to simulate an update
+  // Set last seen version to simulate an update
   setLastSeenVersion(fromVersion);
 
   // Clear version cache to force fresh data

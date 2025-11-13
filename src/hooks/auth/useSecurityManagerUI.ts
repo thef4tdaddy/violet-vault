@@ -1,6 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { securityService } from "../../services/security/securityService";
-import logger from "../../utils/common/logger";
+import type { MutableRefObject } from "react";
+import { securityService } from "@/services/security/securityService";
+import type { SecuritySettings, SecurityEvent } from "@/services/security/securityService";
+import logger from "@/utils/common/logger";
+
+export type SecurityEventInput = Partial<SecurityEvent> & {
+  type: string;
+  description: string;
+  metadata?: Record<string, unknown>;
+};
 
 /**
  * Hook for security manager UI state and session management
@@ -8,12 +16,16 @@ import logger from "../../utils/common/logger";
  */
 export const useSecurityManagerUI = () => {
   const [isLocked, setIsLocked] = useState(false);
-  const [securitySettings, setSecuritySettings] = useState(() => securityService.loadSettings());
-  const [securityEvents, setSecurityEvents] = useState(() => securityService.loadSecurityEvents());
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>(() =>
+    securityService.loadSettings()
+  );
+  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>(() =>
+    securityService.loadSecurityEvents()
+  );
 
-  const lastActivityRef = useRef(null);
-  const autoLockTimerRef = useRef(null);
-  const clipboardTimerRef = useRef(null);
+  const lastActivityRef = useRef<number | null>(null);
+  const autoLockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clipboardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initialize lastActivityRef with current time on mount
   useEffect(() => {
@@ -30,11 +42,11 @@ export const useSecurityManagerUI = () => {
     securityService.saveSecurityEvents(securityEvents);
   }, [securityEvents]);
 
-  const updateSecuritySettings = useCallback((updates) => {
+  const updateSecuritySettings = useCallback((updates: Partial<SecuritySettings>) => {
     setSecuritySettings((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const addSecurityEvent = useCallback((event) => {
+  const addSecurityEvent = useCallback((event: SecurityEventInput) => {
     const securityEvent = securityService.createSecurityEvent(event);
     setSecurityEvents((prev) => [...prev, securityEvent]);
   }, []);
@@ -55,6 +67,19 @@ export const useSecurityManagerUI = () => {
     logger.debug("Session unlocked");
   }, []);
 
+  const getActivityDescription = (activity: SecurityEvent | null) => {
+    if (!activity) return "No recent activity";
+
+    const timeAgoMinutes = Math.floor(
+      (Date.now() - new Date(activity.timestamp).getTime()) / 1000 / 60
+    );
+    const timeUnit = timeAgoMinutes === 1 ? "minute" : timeAgoMinutes < 60 ? "minutes" : "hours";
+    const timeValue =
+      timeUnit === "hours" ? Math.max(1, Math.floor(timeAgoMinutes / 60)) : timeAgoMinutes;
+
+    return `${activity.type} ${timeValue}${timeValue === 1 ? "" : "s"} ago`;
+  };
+
   return {
     // State
     isLocked,
@@ -70,7 +95,9 @@ export const useSecurityManagerUI = () => {
     clearSecurityEvents,
     lockSession,
     unlockSession,
-    setSecurityEvents,
+
+    // Utilities
+    getActivityDescription,
   };
 };
 
@@ -78,9 +105,12 @@ export const useSecurityManagerUI = () => {
  * Hook for security event logging and management
  * Extracts security event handling logic
  */
-export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
+export const useSecurityEventManager = (
+  securitySettings: SecuritySettings,
+  addSecurityEvent: (event: SecurityEventInput) => void
+) => {
   const logSecurityEvent = useCallback(
-    (event) => {
+    (event: SecurityEventInput) => {
       if (!securitySettings.securityLoggingEnabled) return;
 
       try {
@@ -90,14 +120,14 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
           description: event.description?.substring(0, 50),
         });
       } catch (error) {
-        logger.error("Failed to log security event:", error);
+        logger.error("Failed to log security event:", error as Record<string, unknown>);
       }
     },
     [securitySettings.securityLoggingEnabled, addSecurityEvent]
   );
 
   const logLoginAttempt = useCallback(
-    (success, metadata = {}) => {
+    (success: boolean, metadata: Record<string, unknown> = {}) => {
       logSecurityEvent({
         type: success ? "LOGIN_SUCCESS" : "LOGIN_FAILURE",
         description: success ? "User logged in successfully" : "Failed login attempt",
@@ -112,7 +142,7 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
   );
 
   const logSessionActivity = useCallback(
-    (activity, metadata = {}) => {
+    (activity: string, metadata: Record<string, unknown> = {}) => {
       logSecurityEvent({
         type: "SESSION_ACTIVITY",
         description: `Session activity: ${activity}`,
@@ -127,7 +157,7 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
   );
 
   const logSecurityAction = useCallback(
-    (action, metadata = {}) => {
+    (action: string, metadata: Record<string, unknown> = {}) => {
       logSecurityEvent({
         type: "SECURITY_ACTION",
         description: `Security action: ${action}`,
@@ -154,11 +184,11 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
  * Extracts automatic session locking logic
  */
 export const useAutoLockManager = (
-  securitySettings,
-  isLocked,
-  lockSession,
-  lastActivityRef,
-  autoLockTimerRef
+  securitySettings: SecuritySettings,
+  isLocked: boolean,
+  lockSession: () => void,
+  lastActivityRef: MutableRefObject<number | null>,
+  autoLockTimerRef: MutableRefObject<ReturnType<typeof setTimeout> | null>
 ) => {
   const updateActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
@@ -174,7 +204,8 @@ export const useAutoLockManager = (
     const timeoutMs = securitySettings.autoLockTimeout * 60 * 1000;
 
     autoLockTimerRef.current = setTimeout(() => {
-      const timeSinceActivity = Date.now() - lastActivityRef.current;
+      const lastActivityTimestamp = lastActivityRef.current ?? Date.now();
+      const timeSinceActivity = Date.now() - lastActivityTimestamp;
 
       if (timeSinceActivity >= timeoutMs) {
         lockSession();
@@ -215,9 +246,13 @@ export const useAutoLockManager = (
  * Hook for clipboard security management
  * Extracts clipboard clearing and protection logic
  */
-export const useClipboardSecurity = (securitySettings, clipboardTimerRef, logSecurityEvent) => {
+export const useClipboardSecurity = (
+  securitySettings: SecuritySettings,
+  clipboardTimerRef: MutableRefObject<ReturnType<typeof setTimeout> | null>,
+  logSecurityEvent: (event: SecurityEventInput) => void
+) => {
   const secureClipboardCopy = useCallback(
-    async (text, description = "Sensitive data") => {
+    async (text: string, description = "Sensitive data") => {
       try {
         await navigator.clipboard.writeText(text);
 
@@ -247,13 +282,13 @@ export const useClipboardSecurity = (securitySettings, clipboardTimerRef, logSec
               });
             }
           } catch (err) {
-            logger.warn("Could not auto-clear clipboard:", err);
+            logger.warn("Could not auto-clear clipboard:", err as Record<string, unknown>);
           }
         }, securitySettings.clipboardClearTimeout * 1000);
 
         return true;
       } catch (error) {
-        logger.error("Failed to copy to clipboard:", error);
+        logger.error("Failed to copy to clipboard:", error as Record<string, unknown>);
         return false;
       }
     },

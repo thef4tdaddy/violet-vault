@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
-import logger from "../../utils/common/logger";
+import { globalToast } from "@/stores/ui/toastStore";
+import logger from "@/utils/common/logger";
 
 /**
  * Validation result
@@ -56,12 +56,12 @@ interface KeyManagementUIState {
 interface KeyManagementOperations {
   validateExportPassword: (password: string) => boolean;
   validateImportRequirements: (
-    keyFileData: unknown,
+    keyFileData: Record<string, unknown>,
     importPassword: string,
     vaultPassword: string,
     validation: ValidationResult
   ) => boolean;
-  handleFileRead: (file: File) => Promise<unknown>;
+  handleFileRead: (file: File) => Promise<Record<string, unknown>>;
   handleImportError: (err: Error) => void;
   handleOperationError: (operation: string, err: Error) => void;
 }
@@ -193,7 +193,7 @@ export const useKeyManagementOperations = (): KeyManagementOperations => {
 
   const validateImportRequirements = useCallback(
     (
-      _keyFileData: unknown,
+      _keyFileData: Record<string, unknown>,
       importPassword: string,
       vaultPassword: string,
       validation: ValidationResult
@@ -224,12 +224,16 @@ export const useKeyManagementOperations = (): KeyManagementOperations => {
     []
   );
 
-  const handleFileRead = useCallback(async (file: File) => {
+  const handleFileRead = useCallback(async (file: File): Promise<Record<string, unknown>> => {
     try {
       const fileText = await file.text();
-      return JSON.parse(fileText);
+      const parsed = JSON.parse(fileText);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+      throw new Error("Key file is not a valid JSON object");
     } catch (err) {
-      logger.error("Failed to read key file:", err);
+      logger.error("Failed to read key file:", err as Record<string, unknown>);
       globalToast.showError(
         "Failed to read key file. Please check the file format.",
         "File Read Error"

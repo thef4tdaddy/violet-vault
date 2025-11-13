@@ -2,43 +2,43 @@ import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useTransactionLedger } from "../useTransactionLedger";
 
-// Mock dependencies
-vi.mock("../../common/useTransactions", () => ({
-  useTransactions: vi.fn(() => ({
+const mockUseTransactions = vi.hoisted(() =>
+  vi.fn(() => ({
     transactions: [],
-    addTransaction: vi.fn(),
+    addTransactionAsync: vi.fn(),
     deleteTransaction: vi.fn(),
+    updateTransactionAsync: vi.fn(),
     isLoading: false,
-  })),
-}));
+  }))
+);
 
-vi.mock("../../budgeting/useEnvelopes", () => ({
-  useEnvelopes: vi.fn(() => ({
+const mockUseEnvelopes = vi.hoisted(() =>
+  vi.fn(() => ({
     envelopes: [],
     isLoading: false,
-  })),
-}));
+  }))
+);
 
-vi.mock("../../../stores/ui/uiStore", () => ({
-  useBudgetStore: vi.fn(() => ({
+const mockUseBudgetStore = vi.hoisted(() =>
+  vi.fn(() => ({
     updateTransaction: vi.fn(),
     setAllTransactions: vi.fn(),
     updateBill: vi.fn(),
-  })),
-}));
+  }))
+);
 
-vi.mock("../useTransactionForm", () => ({
-  useTransactionForm: vi.fn(() => ({
+const mockUseTransactionForm = vi.hoisted(() =>
+  vi.fn(() => ({
     transactionForm: {},
     setTransactionForm: vi.fn(),
     resetForm: vi.fn(),
     populateForm: vi.fn(),
     createTransaction: vi.fn(),
-  })),
-}));
+  }))
+);
 
-vi.mock("../useTransactionImport", () => ({
-  useTransactionImport: vi.fn(() => ({
+const mockUseTransactionImport = vi.hoisted(() =>
+  vi.fn(() => ({
     importData: [],
     importStep: 1,
     setImportStep: vi.fn(),
@@ -48,11 +48,34 @@ vi.mock("../useTransactionImport", () => ({
     handleFileUpload: vi.fn(),
     handleImport: vi.fn(),
     resetImport: vi.fn(),
-  })),
+  }))
+);
+
+const mockUseTransactionFilters = vi.hoisted(() => vi.fn(() => []));
+
+// Mock dependencies
+vi.mock("../../common/useTransactions", () => ({
+  useTransactions: mockUseTransactions,
+}));
+
+vi.mock("../../budgeting/useEnvelopes", () => ({
+  useEnvelopes: mockUseEnvelopes,
+}));
+
+vi.mock("../../../stores/ui/uiStore", () => ({
+  useBudgetStore: mockUseBudgetStore,
+}));
+
+vi.mock("../useTransactionForm", () => ({
+  useTransactionForm: mockUseTransactionForm,
+}));
+
+vi.mock("../useTransactionImport", () => ({
+  useTransactionImport: mockUseTransactionImport,
 }));
 
 vi.mock("../useTransactionFilters", () => ({
-  useTransactionFilters: vi.fn(() => []),
+  useTransactionFilters: mockUseTransactionFilters,
 }));
 
 const createWrapper = () => {
@@ -70,6 +93,14 @@ describe("useTransactionLedger", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseTransactionFilters.mockReturnValue([]);
+    mockUseTransactions.mockReturnValue({
+      transactions: [],
+      addTransactionAsync: vi.fn(),
+      deleteTransaction: vi.fn(),
+      updateTransactionAsync: vi.fn(),
+      isLoading: false,
+    });
   });
 
   it("should initialize with default state values", () => {
@@ -120,12 +151,11 @@ describe("useTransactionLedger", () => {
   });
 
   it("should handle pagination correctly", () => {
+    mockUseTransactionFilters.mockReturnValue(new Array(25).fill({}));
+
     const { result } = renderHook(() => useTransactionLedger(mockCurrentUser), {
       wrapper: createWrapper(),
     });
-
-    // Mock totalPages to be > 1
-    result.current.totalPages = 3;
 
     act(() => {
       result.current.handlePagination("next");
@@ -178,7 +208,7 @@ describe("useTransactionLedger", () => {
 
   it("should calculate total pages correctly", () => {
     // Mock filtered transactions
-    require("../useTransactionFilters").useTransactionFilters.mockReturnValue(new Array(25)); // 25 items
+    mockUseTransactionFilters.mockReturnValue(new Array(25).fill({})); // 25 items
 
     const { result } = renderHook(() => useTransactionLedger(mockCurrentUser), {
       wrapper: createWrapper(),
@@ -190,10 +220,11 @@ describe("useTransactionLedger", () => {
 
   it("should return loading state from dependencies", () => {
     // Mock loading state
-    require("../../common/useTransactions").useTransactions.mockReturnValue({
+    mockUseTransactions.mockReturnValue({
       transactions: [],
-      addTransaction: vi.fn(),
+      addTransactionAsync: vi.fn(),
       deleteTransaction: vi.fn(),
+      updateTransactionAsync: vi.fn(),
       isLoading: true,
     });
 

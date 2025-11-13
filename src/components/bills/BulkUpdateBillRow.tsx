@@ -1,5 +1,6 @@
 import React from "react";
 import { hasChanges, formatAmountChange } from "@/utils/bills/billUpdateHelpers";
+import type { BillChange } from "@/utils/bills/billUpdateHelpers";
 import {
   AmountUpdateField,
   DateUpdateField,
@@ -16,15 +17,6 @@ type BillEntity = Record<string, unknown> & {
   id: string;
   name?: string;
 };
-
-/**
- * Bill change tracking interface
- */
-interface BillChange {
-  originalAmount?: number;
-  amount?: number | string;
-  dueDate?: string;
-}
 
 /**
  * Update mode type

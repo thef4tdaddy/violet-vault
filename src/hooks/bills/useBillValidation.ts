@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { validateBillSafe } from "../../domain/schemas/bill.ts";
+import { validateBillSafe } from "@/domain/schemas/bill.ts";
 
 /**
  * Hook for bill data validation operations

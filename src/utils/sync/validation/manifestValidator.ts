@@ -1,6 +1,22 @@
 import logger from "../../common/logger";
 import { VALIDATION_CONSTANTS } from "./constants";
 
+// Type definitions for manifest validation
+interface Manifest {
+  version?: string;
+  timestamp?: number;
+  chunks?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  chunkCount: number;
+  manifestSize: number;
+}
+
 /**
  * Validator for manifest structure and content
  * Ensures manifest integrity before processing
@@ -11,13 +27,16 @@ import { VALIDATION_CONSTANTS } from "./constants";
 /**
  * Validate manifest structure and content
  */
-export const validateManifest = (manifest, operation = "unknown") => {
-  const errors = [];
-  const warnings = [];
+export const validateManifest = (
+  manifest: Manifest | null | undefined,
+  operation: string = "unknown"
+): ValidationResult => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
 
   if (!manifest) {
     errors.push("Manifest is null or undefined");
-    return { isValid: false, errors, warnings };
+    return { isValid: false, errors, warnings, chunkCount: 0, manifestSize: 0 };
   }
 
   _validateRequiredProperties(manifest, errors);
@@ -32,7 +51,7 @@ export const validateManifest = (manifest, operation = "unknown") => {
  * Validate required manifest properties
  * @private
  */
-const _validateRequiredProperties = (manifest, errors) => {
+const _validateRequiredProperties = (manifest: Manifest, errors: string[]): void => {
   const requiredProperties = ["version", "timestamp", "chunks"];
   for (const prop of requiredProperties) {
     if (!(prop in manifest)) {
@@ -45,7 +64,7 @@ const _validateRequiredProperties = (manifest, errors) => {
  * Validate version property
  * @private
  */
-const _validateVersion = (manifest, errors) => {
+const _validateVersion = (manifest: Manifest, errors: string[]): void => {
   if (manifest.version && typeof manifest.version !== "string") {
     errors.push("Manifest version must be a string");
   }
@@ -55,7 +74,7 @@ const _validateVersion = (manifest, errors) => {
  * Validate timestamp and check for age issues
  * @private
  */
-const _validateTimestamp = (manifest, warnings) => {
+const _validateTimestamp = (manifest: Manifest, warnings: string[]): void => {
   if (!manifest.timestamp) return;
 
   if (typeof manifest.timestamp !== "number") {
@@ -78,7 +97,7 @@ const _validateTimestamp = (manifest, warnings) => {
  * Validate chunks structure
  * @private
  */
-const _validateChunks = (manifest, errors) => {
+const _validateChunks = (manifest: Manifest, errors: string[]): void => {
   if (manifest.chunks && typeof manifest.chunks !== "object") {
     errors.push("Manifest chunks must be an object");
   }
@@ -88,8 +107,13 @@ const _validateChunks = (manifest, errors) => {
  * Build validation result with logging
  * @private
  */
-const _buildValidationResult = (manifest, errors, warnings, operation) => {
-  const result = {
+const _buildValidationResult = (
+  manifest: Manifest,
+  errors: string[],
+  warnings: string[],
+  operation: string
+): ValidationResult => {
+  const result: ValidationResult = {
     isValid: errors.length === 0,
     errors,
     warnings,
@@ -99,9 +123,13 @@ const _buildValidationResult = (manifest, errors, warnings, operation) => {
 
   // Log validation results
   if (!result.isValid) {
-    logger.error(`❌ Manifest validation failed for ${operation}`, result);
+    logger.error(`❌ Manifest validation failed for ${operation}`, null, {
+      validationResult: result,
+    });
   } else if (warnings.length > 0) {
-    logger.warn(`⚠️ Manifest validation warnings for ${operation}`, result);
+    logger.warn(`⚠️ Manifest validation warnings for ${operation}`, {
+      validationResult: result,
+    });
   } else {
     logger.debug(`✅ Manifest validation passed for ${operation}`, {
       chunkCount: result.chunkCount,

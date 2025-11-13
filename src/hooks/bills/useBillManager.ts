@@ -19,18 +19,13 @@ import {
   type FilterOptions,
 } from "@/hooks/bills/useBillManagerHelpers";
 import { useBillManagerUIState } from "./useBillManagerUIState";
+import type { Bill as BillType, Envelope as EnvelopeType } from "@/types/bills";
 
-interface Bill {
-  id: string;
-  name: string;
-  amount: number;
-  dueDate: Date | string | null;
+interface Bill extends BillType {
   [key: string]: unknown;
 }
 
-interface Envelope {
-  id: string;
-  name: string;
+interface Envelope extends EnvelopeType {
   [key: string]: unknown;
 }
 
@@ -142,12 +137,15 @@ export const useBillManager = ({
     ]);
 
   const billOperations = useBillOperations({
-    bills,
-    envelopes,
+    bills: bills as Bill[],
+    envelopes: envelopes as Envelope[],
     updateBill: updateBillForOperations,
     onUpdateBill,
     onError,
-    budget,
+    budget: budget as {
+      unassignedCash?: number;
+      updateBill?: (bill: Bill) => void | Promise<void>;
+    },
     markBillPaid: markBillPaidAsync,
   });
 

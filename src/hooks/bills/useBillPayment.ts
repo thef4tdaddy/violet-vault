@@ -2,34 +2,32 @@ import { useCallback } from "react";
 import logger from "@/utils/common/logger";
 import { executeBillUpdate } from "@/utils/bills/billUpdateHelpers";
 import { globalToast } from "@/stores/ui/toastStore";
+import type { Bill, Envelope } from "@/types/bills";
 
 /**
  * Hook for individual bill payment operations
  * Extracted from useBillOperations.js to reduce complexity
  */
-interface BillRecord {
-  id: string;
-  name?: string;
-  amount?: number;
-  envelopeId?: string;
-  isPaid?: boolean;
-  paidDate?: string | null;
-  modificationHistory?: Array<Record<string, unknown>>;
-  [key: string]: unknown;
-}
+type ModificationHistoryEntry = {
+  timestamp?: string;
+  type?: string;
+  changes?: Record<string, unknown>;
+};
 
-interface EnvelopeRecord {
-  id: string;
-  name?: string;
+type BillRecord = Bill & {
+  paidAmount?: number;
+  modificationHistory?: ModificationHistoryEntry[];
+  lastModified?: string;
+};
+
+type EnvelopeRecord = Envelope & {
   currentBalance?: number;
-  [key: string]: unknown;
-}
+};
 
-interface BudgetRecord {
+type BudgetRecord = {
   unassignedCash?: number;
-  updateBill?: (bill: Record<string, unknown>) => void;
-  [key: string]: unknown;
-}
+  updateBill?: (bill: Bill) => void | Promise<void>;
+} & Record<string, unknown>;
 
 interface PayBillOverrides {
   amount?: number;
@@ -65,7 +63,7 @@ const normalizeBillIdentifier = (
 };
 
 const selectBillForPayment = (
-  billCollection: Array<Record<string, unknown>>,
+  billCollection: BillRecord[],
   normalizedBillId: string,
   providedBill?: BillRecord
 ): BillRecord => {
@@ -73,9 +71,7 @@ const selectBillForPayment = (
     throw new Error("Bill identifier is required to complete payment");
   }
 
-  const matchedBill = billCollection.find(
-    (candidate) => (candidate as BillRecord).id === normalizedBillId
-  ) as BillRecord | undefined;
+  const matchedBill = billCollection.find((candidate) => candidate.id === normalizedBillId);
 
   if (matchedBill) {
     return matchedBill;
@@ -137,7 +133,7 @@ const buildUpdatedBillRecord = (
     envelopeId: effectiveEnvelopeId,
     lastModified: timestamp,
     modificationHistory: [
-      ...(bill.modificationHistory || []),
+      ...((bill.modificationHistory ?? []) as ModificationHistoryEntry[]),
       {
         timestamp,
         type: "payment",
@@ -160,11 +156,11 @@ const buildUpdatedBillRecord = (
 };
 
 interface UseBillPaymentParams {
-  bills: Array<Record<string, unknown>>;
-  envelopes: Array<Record<string, unknown>>;
+  bills: BillRecord[];
+  envelopes: EnvelopeRecord[];
   budget?: BudgetRecord;
   updateBill: (options: { id: string; updates: Record<string, unknown> }) => Promise<void>;
-  onUpdateBill?: (bill: Record<string, unknown>) => void | Promise<void>;
+  onUpdateBill?: (bill: Bill) => void | Promise<void>;
   markBillPaid?: (params: {
     billId: string;
     paidAmount: number;

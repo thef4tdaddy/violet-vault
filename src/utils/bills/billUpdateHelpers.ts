@@ -2,12 +2,92 @@
  * Bill update utility functions
  * Extracted from useBillOperations.js to reduce complexity
  */
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
+import type { Bill } from "@/types/bills";
+
+// Type definitions for update functions
+interface UpdateFunctions {
+  updateBill: (params: { id: string; updates: Record<string, unknown> }) => Promise<void>;
+  onUpdateBill?: (bill: Bill) => void | Promise<void>;
+  budget?: {
+    updateBill?: (bill: Bill) => void | Promise<void>;
+  };
+}
+
+// Type definitions for bulk operation
+interface BulkOperationItem {
+  id: string;
+  provider?: string;
+  description?: string;
+  name?: string;
+  [key: string]: unknown;
+}
+
+interface BulkOperationResult {
+  success: boolean;
+  successCount: number;
+  errorCount: number;
+  errors: string[];
+  message: string;
+}
+
+// Type definitions for bill changes
+export interface BillChange {
+  amount?: number;
+  originalAmount?: number;
+  dueDate?: string;
+  originalDueDate?: string;
+}
+
+interface BillChanges {
+  [billId: string]: BillChange;
+}
+
+interface UpdateSummary {
+  changedBills: number;
+  totalBills: number;
+  totalAmountChange: number;
+  hasChanges: boolean;
+}
+
+interface ModificationHistoryEntry {
+  timestamp: string;
+  changes: {
+    amount?: { from: number; to: number };
+    dueDate?: { from: string; to: string };
+  };
+  source: string;
+}
+
+interface AmountChange {
+  original: string;
+  updated: string;
+  difference: string;
+  differenceFormatted: string;
+  isIncrease: boolean;
+  isDecrease: boolean;
+  hasChange: boolean;
+}
+
+interface DateChange {
+  original: string;
+  updated: string;
+  hasChange: boolean;
+}
+
+// Extended Bill interface to include modification history
+type BillWithHistory = Bill & {
+  modificationHistory?: ModificationHistoryEntry[];
+  lastModified?: string;
+};
 
 /**
  * Execute bill update with fallback to Zustand store
  */
-export const executeBillUpdate = async (bill, updateFunctions) => {
+export const executeBillUpdate = async (
+  bill: Bill,
+  updateFunctions: UpdateFunctions
+): Promise<void> => {
   const { updateBill, onUpdateBill, budget } = updateFunctions;
 
   if (onUpdateBill) {
@@ -17,9 +97,10 @@ export const executeBillUpdate = async (bill, updateFunctions) => {
 
   // Use TanStack mutation with Zustand fallback
   try {
+    const updates: Record<string, unknown> = { ...bill };
     await updateBill({
       id: bill.id,
-      updates: bill,
+      updates,
     });
   } catch (error) {
     logger.warn("TanStack updateBill failed, using Zustand fallback", error);
@@ -30,10 +111,14 @@ export const executeBillUpdate = async (bill, updateFunctions) => {
 /**
  * Process bulk operation with error tracking
  */
-export const processBulkOperation = async (items, operationName, operationFn) => {
+export const processBulkOperation = async <T extends { id: string } | string>(
+  items: T[],
+  operationName: string,
+  operationFn: (item: T) => Promise<void>
+): Promise<BulkOperationResult> => {
   let successCount = 0;
   let errorCount = 0;
-  const errors = [];
+  const errors: string[] = [];
 
   for (const item of items) {
     try {
@@ -41,10 +126,23 @@ export const processBulkOperation = async (items, operationName, operationFn) =>
       successCount++;
     } catch (error) {
       errorCount++;
-      const itemName = item.provider || item.description || `Item ${item.id}`;
-      errors.push(`${itemName}: ${error.message}`);
-      logger.error(`Failed ${operationName}`, error, {
-        itemId: item.id,
+      let itemName = "";
+      let itemId = "";
+
+      if (typeof item === "string") {
+        itemId = item;
+        itemName = `Item ${item}`;
+      } else {
+        itemId = item.id;
+        const bulkItem = item as BulkOperationItem;
+        itemName = bulkItem.provider || bulkItem.description || bulkItem.name || `Item ${itemId}`;
+      }
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`${itemName}: ${errorMessage}`);
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      logger.error(`Failed ${operationName}`, errorObj, {
+        itemId,
       });
     }
   }
@@ -64,7 +162,10 @@ export const processBulkOperation = async (items, operationName, operationFn) =>
 /**
  * Calculate summary of changes for bulk bill updates
  */
-export const calculateUpdateSummary = (selectedBills, changes) => {
+export const calculateUpdateSummary = (
+  selectedBills: Bill[],
+  changes: BillChanges
+): UpdateSummary => {
   const changedBills = selectedBills.filter((bill) => {
     const change = changes[bill.id];
     return (
@@ -73,7 +174,7 @@ export const calculateUpdateSummary = (selectedBills, changes) => {
     );
   });
 
-  const totalAmountChange = changedBills.reduce((sum, bill) => {
+  const totalAmountChange = changedBills.reduce((sum: number, bill: Bill) => {
     const change = changes[bill.id];
     return sum + (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0));
   }, 0);
@@ -89,7 +190,7 @@ export const calculateUpdateSummary = (selectedBills, changes) => {
 /**
  * Check if a change object has any modifications
  */
-export const hasChanges = (change) => {
+export const hasChanges = (change?: BillChange): boolean => {
   if (!change) return false;
   return change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate;
 };
@@ -97,15 +198,15 @@ export const hasChanges = (change) => {
 /**
  * Create modification history entry
  */
-export const createModificationHistoryEntry = (change) => {
+export const createModificationHistoryEntry = (change: BillChange): ModificationHistoryEntry => {
   return {
     timestamp: new Date().toISOString(),
     changes: {
       ...(change.amount !== change.originalAmount && {
-        amount: { from: change.originalAmount, to: change.amount },
+        amount: { from: change.originalAmount || 0, to: change.amount || 0 },
       }),
       ...(change.dueDate !== change.originalDueDate && {
-        dueDate: { from: change.originalDueDate, to: change.dueDate },
+        dueDate: { from: change.originalDueDate || "", to: change.dueDate || "" },
       }),
     },
     source: "bulk_update",
@@ -115,32 +216,38 @@ export const createModificationHistoryEntry = (change) => {
 /**
  * Transform bills for update based on changes
  */
-export const transformBillsForUpdate = (selectedBills, changes) => {
+export const transformBillsForUpdate = (selectedBills: Bill[], changes: BillChanges): Bill[] => {
   return selectedBills
-    .map((bill) => {
+    .map((bill: Bill): Bill | null => {
       const change = changes[bill.id];
       if (!change || !hasChanges(change)) return null;
 
-      return {
+      const existingHistory = Array.isArray((bill as BillWithHistory).modificationHistory)
+        ? (bill as BillWithHistory).modificationHistory!
+        : [];
+
+      const billWithHistory: BillWithHistory = {
         ...bill,
-        amount: Math.abs(change.amount), // Ensure positive amount
-        dueDate: change.dueDate || null,
+        amount: Math.abs(change.amount || 0), // Ensure positive amount
+        dueDate: change.dueDate || bill.dueDate, // Keep original due date if not changed
         lastModified: new Date().toISOString(),
-        modificationHistory: [
-          ...(bill.modificationHistory || []),
-          createModificationHistoryEntry(change),
-        ],
+        modificationHistory: [...existingHistory, createModificationHistoryEntry(change)],
       };
+
+      return billWithHistory;
     })
-    .filter(Boolean); // Remove null entries
+    .filter((item): item is Bill => item !== null); // Type guard to filter nulls
 };
 
 /**
  * Format amount change for display
  */
-export const formatAmountChange = (originalAmount, newAmount) => {
-  const original = Math.abs(originalAmount || 0);
-  const updated = Math.abs(newAmount || 0);
+export const formatAmountChange = (
+  originalAmount: number | undefined,
+  newAmount: number | undefined
+): AmountChange => {
+  const original = Math.abs(originalAmount ?? 0);
+  const updated = Math.abs(newAmount ?? 0);
   const difference = updated - original;
 
   return {
@@ -157,7 +264,7 @@ export const formatAmountChange = (originalAmount, newAmount) => {
 /**
  * Format date change for display
  */
-export const formatDateChange = (originalDate, newDate) => {
+export const formatDateChange = (originalDate: string, newDate: string): DateChange | null => {
   if (!originalDate || !newDate) return null;
 
   const original = new Date(originalDate).toLocaleDateString();
