@@ -133,9 +133,10 @@ export class GitHubAPIService {
       }
     } catch (error) {
       logger.error("GitHub API submission error", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         success: false,
-        error: error.message,
+        error: errorMessage,
         provider: "github",
       };
     }
@@ -282,25 +283,25 @@ export class GitHubAPIService {
    * @param {Object} systemInfo - System information object
    * @returns {string} Formatted environment info
    */
-  static formatEnvironmentInfo(systemInfo: BugReportData["systemInfo"]): string {
-    const sections = [];
+  static formatEnvironmentInfo(systemInfo: BugReportData["systemInfo"] | undefined): string {
+    const sections: string[] = [];
 
     // App version and environment
-    sections.push(`- **App Version:** ${systemInfo.appVersion || "unknown"}`);
+    sections.push(`- **App Version:** ${systemInfo?.appVersion || "unknown"}`);
     sections.push(`- **Environment:** ${this.detectEnvironment()}`);
 
     // Browser info
-    if (systemInfo.browser) {
+    if (systemInfo?.browser) {
       sections.push(`- **Browser:** ${systemInfo.browser.name} ${systemInfo.browser.version}`);
     }
 
     // Viewport
-    if (systemInfo.viewport) {
+    if (systemInfo?.viewport) {
       sections.push(`- **Viewport:** ${systemInfo.viewport.width}x${systemInfo.viewport.height}`);
     }
 
     // User agent (truncated)
-    if (systemInfo.userAgent) {
+    if (systemInfo?.userAgent) {
       const shortUA =
         systemInfo.userAgent.length > 100
           ? systemInfo.userAgent.substring(0, 100) + "..."
@@ -309,12 +310,12 @@ export class GitHubAPIService {
     }
 
     // Memory usage if available
-    if (systemInfo.performance?.memory) {
+    if (systemInfo?.performance?.memory) {
       const memMB = Math.round(systemInfo.performance.memory.usedJSHeapSize / 1024 / 1024);
       sections.push(`- **Memory Usage:** ${memMB}MB used`);
     }
 
-    sections.push(`- **Timestamp:** ${systemInfo.timestamp || new Date().toISOString()}`);
+    sections.push(`- **Timestamp:** ${systemInfo?.timestamp || new Date().toISOString()}`);
 
     return sections.join("\n");
   }
@@ -340,11 +341,13 @@ export class GitHubAPIService {
    * @param {Object} errors - Error object from system info
    * @returns {string} Formatted error information
    */
-  static formatConsoleLogsForGitHub(errors: BugReportData["systemInfo"]["errors"]): string {
-    const sections = [];
+  static formatConsoleLogsForGitHub(
+    errors: BugReportData["systemInfo"]["errors"] | undefined
+  ): string {
+    const sections: string[] = [];
 
     // Handle errors
-    if (errors && errors.recentErrors && errors.recentErrors.length > 0) {
+    if (errors?.recentErrors && errors.recentErrors.length > 0) {
       sections.push("### Recent JavaScript Errors", "");
 
       // Show last 3 errors to avoid overwhelming the issue
@@ -354,10 +357,10 @@ export class GitHubAPIService {
         sections.push(
           `**Error ${index + 1}:**`,
           "```javascript",
-          `${error.type || "Error"}: ${error.message || "Unknown error"}`,
-          error.stack ? `Stack: ${error.stack}` : "",
-          error.filename ? `File: ${error.filename} (Line: ${error.lineno || "?"})` : "",
-          `Time: ${error.timestamp || "Unknown"}`,
+          `${error?.type || "Error"}: ${error?.message || "Unknown error"}`,
+          error?.stack ? `Stack: ${error.stack}` : "",
+          error?.filename ? `File: ${error.filename} (Line: ${error?.lineno || "?"})` : "",
+          `Time: ${error?.timestamp || "Unknown"}`,
           "```",
           ""
         );
@@ -369,7 +372,7 @@ export class GitHubAPIService {
     }
 
     // Handle console logs
-    if (errors && errors.consoleLogs && errors.consoleLogs.length > 0) {
+    if (errors?.consoleLogs && errors.consoleLogs.length > 0) {
       sections.push("### Recent Console Logs", "");
 
       // Show last 10 console logs
@@ -434,9 +437,10 @@ export class GitHubAPIService {
       return simulatedResponse;
     } catch (error) {
       logger.error("GitHub API call failed", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         success: false,
-        error: error.message,
+        error: errorMessage,
       };
     }
   }

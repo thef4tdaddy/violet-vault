@@ -21,6 +21,35 @@ import { getIcon } from "../../utils";
  * @property {string} [entityName] - Name of affected entity
  */
 
+interface User {
+  id: string;
+  userName: string;
+  color?: string;
+}
+
+interface ActivityDetails {
+  name?: string;
+  amount?: string | number;
+}
+
+interface Activity {
+  id: string;
+  type: string;
+  timestamp: string;
+  userId: string;
+  userName?: string;
+  description?: string;
+  entityName?: string;
+  details?: ActivityDetails;
+  userColor?: string;
+}
+
+interface ActivityBannerProps {
+  activeUsers?: User[];
+  recentActivity?: Activity[];
+  currentUser?: User | null;
+}
+
 /**
  * ActivityBanner component displays real-time user activity and presence
  * Shows active users and recent activities with expandable view
@@ -31,9 +60,13 @@ import { getIcon } from "../../utils";
  * @param {User|null} [props.currentUser=null] - Current logged-in user
  * @returns {React.ReactElement} Rendered activity banner component
  */
-const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = null }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [displayedActivities, setDisplayedActivities] = useState([]);
+const ActivityBanner: React.FC<ActivityBannerProps> = ({
+  activeUsers = [],
+  recentActivity = [],
+  currentUser = null,
+}) => {
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [displayedActivities, setDisplayedActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
     // Sort activities by timestamp and get recent ones
@@ -52,7 +85,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
    * @param {string} type - Activity type
    * @returns {React.ReactElement} Icon component
    */
-  const getActivityIcon = (type) => {
+  const getActivityIcon = (type: string): React.ReactElement => {
     switch (type) {
       case "envelope_update":
       case "envelope_create":
@@ -82,7 +115,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
    * @param {string} type - Activity type
    * @returns {string} Tailwind color name
    */
-  const getActivityColor = (type) => {
+  const getActivityColor = (type: string): string => {
     switch (type) {
       case "envelope_create":
       case "bill_create":
@@ -102,7 +135,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
     }
   };
 
-  const formatActivityDescription = (activity) => {
+  const formatActivityDescription = (activity: Activity): string => {
     const userName = activity.userName || "Someone";
 
     switch (activity.type) {
@@ -125,7 +158,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
     }
   };
 
-  const formatTimeAgo = (timestamp) => {
+  const formatTimeAgo = (timestamp: string): string => {
     const now = new Date();
     const time = new Date(timestamp);
     const diffInSeconds = Math.floor((now.getTime() - time.getTime()) / 1000);

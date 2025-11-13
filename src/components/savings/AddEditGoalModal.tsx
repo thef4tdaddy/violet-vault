@@ -11,7 +11,48 @@ import {
   SAVINGS_COLORS,
 } from "@/utils/savings/savingsFormUtils";
 
-const getInitialFormData = () => ({
+interface FormData {
+  name: string;
+  targetAmount: string;
+  currentAmount: string;
+  targetDate: string;
+  category: string;
+  color: string;
+  description: string;
+  priority: string;
+}
+
+interface SavingsGoal {
+  id?: string;
+  name?: string;
+  targetAmount?: number;
+  currentAmount?: number;
+  targetDate?: string;
+  category?: string;
+  color?: string;
+  description?: string;
+  priority?: string;
+}
+
+interface GoalData {
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string | null;
+  category: string;
+  color: string;
+  description: string;
+  priority: string;
+}
+
+interface AddEditGoalModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (goalData: GoalData, goalId?: string) => void;
+  editingGoal?: SavingsGoal | null;
+}
+
+const getInitialFormData = (): FormData => ({
   name: "",
   targetAmount: "",
   currentAmount: "",
@@ -22,7 +63,7 @@ const getInitialFormData = () => ({
   priority: "medium",
 });
 
-const mapGoalToFormData = (goal) => ({
+const mapGoalToFormData = (goal: SavingsGoal): FormData => ({
   name: goal.name || "",
   targetAmount: goal.targetAmount?.toString() || "",
   currentAmount: goal.currentAmount?.toString() || "",
@@ -33,11 +74,15 @@ const mapGoalToFormData = (goal) => ({
   priority: goal.priority || "medium",
 });
 
-const validateFormData = (formData) => {
-  return formData.name.trim() && formData.targetAmount && parseFloat(formData.targetAmount) > 0;
+const validateFormData = (formData: FormData): boolean => {
+  return (
+    formData.name.trim() !== "" &&
+    formData.targetAmount !== "" &&
+    parseFloat(formData.targetAmount) > 0
+  );
 };
 
-const createGoalData = (formData) => ({
+const createGoalData = (formData: FormData): GoalData => ({
   name: formData.name.trim(),
   targetAmount: parseFloat(formData.targetAmount),
   currentAmount: parseFloat(formData.currentAmount) || 0,
@@ -48,9 +93,14 @@ const createGoalData = (formData) => ({
   priority: formData.priority,
 });
 
-const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => {
+const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  editingGoal = null,
+}) => {
   const modalRef = useModalAutoScroll(isOpen);
-  const [formData, setFormData] = useState(getInitialFormData());
+  const [formData, setFormData] = useState<FormData>(getInitialFormData());
 
   // Reset form when modal opens/closes or when editing goal changes
   useEffect(() => {
@@ -59,7 +109,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
     }
   }, [isOpen, editingGoal]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (!validateFormData(formData)) return;
     onSubmit(createGoalData(formData), editingGoal?.id);
@@ -95,14 +145,24 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
   );
 };
 
-const ModalHeader = ({ title, onClose }) => (
+interface ModalHeaderProps {
+  title: string;
+  onClose: () => void;
+}
+
+const ModalHeader: React.FC<ModalHeaderProps> = ({ title, onClose }) => (
   <div className="flex justify-between items-center mb-6">
     <h3 className="text-xl font-semibold">{title}</h3>
     <ModalCloseButton onClick={onClose} variant="outlineRed" />
   </div>
 );
 
-const GoalFormFields = ({ formData, updateFormField }) => (
+interface GoalFormFieldsProps {
+  formData: FormData;
+  updateFormField: (field: keyof FormData, value: string) => void;
+}
+
+const GoalFormFields: React.FC<GoalFormFieldsProps> = ({ formData, updateFormField }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div className="md:col-span-2">
       <label className="block text-sm font-medium text-gray-700 mb-2">Goal Name *</label>
@@ -177,7 +237,7 @@ const GoalFormFields = ({ formData, updateFormField }) => (
     </div>
     <ColorPicker
       selectedColor={formData.color}
-      onColorSelect={(color) => updateFormField("color", color)}
+      onColorSelect={(color: string) => updateFormField("color", color)}
     />
     <div className="md:col-span-2">
       <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
@@ -192,7 +252,12 @@ const GoalFormFields = ({ formData, updateFormField }) => (
   </div>
 );
 
-const ColorPicker = ({ selectedColor, onColorSelect }) => (
+interface ColorPickerProps {
+  selectedColor: string;
+  onColorSelect: (color: string) => void;
+}
+
+const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorSelect }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
     <div className="flex gap-2 flex-wrap">
@@ -211,7 +276,12 @@ const ColorPicker = ({ selectedColor, onColorSelect }) => (
   </div>
 );
 
-const FormActions = ({ onCancel, isEdit }) => (
+interface FormActionsProps {
+  onCancel: () => void;
+  isEdit: boolean;
+}
+
+const FormActions: React.FC<FormActionsProps> = ({ onCancel, isEdit }) => (
   <div className="flex justify-end space-x-3 pt-4 border-t">
     <Button
       type="button"

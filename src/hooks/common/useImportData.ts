@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { useAuthManager } from "../auth/useAuthManager";
 import { useConfirm } from "./useConfirm";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
@@ -9,8 +9,33 @@ import { backupCurrentData } from "../../utils/dataManagement/backupUtils";
 import { clearAllDexieData, importDataToDexie } from "../../utils/dataManagement/dexieUtils";
 import { clearFirebaseData, forcePushToCloud } from "../../utils/dataManagement/firebaseUtils";
 import { queryClient } from "../../utils/common/queryClient";
+import type { UserData } from "@/types/auth";
 
-const getImportCounts = (validatedData) => ({
+interface ImportCounts {
+  envelopes: number;
+  bills: number;
+  debts: number;
+  auditLog: number;
+  transactions: number;
+}
+
+interface ValidatedData {
+  envelopes?: unknown[];
+  bills?: unknown[];
+  debts?: unknown[];
+  auditLog?: unknown[];
+  allTransactions?: unknown[];
+  savingsGoals?: unknown[];
+  paycheckHistory?: unknown[];
+}
+
+interface AuthConfig {
+  budgetId?: string | null;
+  encryptionKey?: CryptoKey | null;
+  currentUser: UserData | null;
+}
+
+const getImportCounts = (validatedData: ValidatedData): ImportCounts => ({
   envelopes: validatedData.envelopes?.length || 0,
   bills: validatedData.bills?.length || 0,
   debts: validatedData.debts?.length || 0,
@@ -18,16 +43,24 @@ const getImportCounts = (validatedData) => ({
   transactions: validatedData.allTransactions?.length || 0,
 });
 
-const buildBaseMessage = (counts) =>
+const buildBaseMessage = (counts: ImportCounts): string =>
   `Import ${counts.envelopes} envelopes, ${counts.bills} bills, ${counts.debts} debts, ${counts.auditLog} audit entries, and ${counts.transactions} transactions?\n\nThis will replace your current data.`;
 
-const buildMismatchWarning = (importBudgetId, currentUser) => {
+const buildMismatchWarning = (
+  importBudgetId: string | undefined,
+  currentUser: UserData | null
+): string => {
   const backupId = importBudgetId?.substring(0, 12) || "unknown";
   const currentId = currentUser?.budgetId?.substring(0, 12) || "unknown";
   return `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${backupId}...\nCurrent budgetId: ${currentId}...\n\nImport will re-encrypt data with your current session context.`;
 };
 
-const buildConfirmMessage = (validatedData, hasBudgetIdMismatch, importBudgetId, currentUser) => {
+const buildConfirmMessage = (
+  validatedData: ValidatedData,
+  hasBudgetIdMismatch: boolean,
+  importBudgetId: string | undefined,
+  currentUser: UserData | null
+): string => {
   const counts = getImportCounts(validatedData);
   const baseMessage = buildBaseMessage(counts);
 
@@ -39,12 +72,18 @@ const buildConfirmMessage = (validatedData, hasBudgetIdMismatch, importBudgetId,
 };
 
 const handleConfirmation = async (
-  confirm,
-  validatedData,
-  hasBudgetIdMismatch,
-  importBudgetId,
-  currentUser
-) => {
+  confirm: (options: {
+    title: string;
+    message: string;
+    confirmLabel: string;
+    cancelLabel: string;
+    destructive: boolean;
+  }) => Promise<boolean>,
+  validatedData: ValidatedData,
+  hasBudgetIdMismatch: boolean,
+  importBudgetId: string | undefined,
+  currentUser: UserData | null
+): Promise<boolean> => {
   const message = buildConfirmMessage(
     validatedData,
     hasBudgetIdMismatch,
@@ -62,7 +101,7 @@ const handleConfirmation = async (
   });
 };
 
-const buildImportResult = (validatedData) => ({
+const buildImportResult = (validatedData: ValidatedData) => ({
   success: true,
   imported: {
     envelopes: validatedData.envelopes?.length || 0,
@@ -75,7 +114,11 @@ const buildImportResult = (validatedData) => ({
   },
 });
 
-const performImport = async (validatedData, showSuccessToast, authConfig) => {
+const performImport = async (
+  validatedData: ValidatedData,
+  showSuccessToast: (message: string, title?: string) => void,
+  authConfig: AuthConfig
+): Promise<void> => {
   await backupCurrentData();
   await clearFirebaseData();
   await clearAllDexieData();
@@ -107,7 +150,7 @@ export const useImportData = () => {
   const confirm = useConfirm();
 
   const importData = useCallback(
-    async (event) => {
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
       const inputElement = event.target as HTMLInputElement;
       const file = inputElement.files ? inputElement.files[0] : null;
       if (!file) {
@@ -143,7 +186,7 @@ export const useImportData = () => {
 
         // Build auth config to pass to force push
         // This ensures the sync service has access to auth data after being stopped
-        const authConfig = {
+        const authConfig: AuthConfig = {
           budgetId,
           encryptionKey,
           currentUser,
@@ -154,7 +197,8 @@ export const useImportData = () => {
         return buildImportResult(validatedData);
       } catch (error) {
         logger.error("Import failed", error);
-        showErrorToast(`Import failed: ${error.message}`, "Import Failed");
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        showErrorToast(`Import failed: ${errorMessage}`, "Import Failed");
         throw error;
       } finally {
         if (inputElement) {

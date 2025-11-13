@@ -4,15 +4,59 @@
  */
 
 import { useMemo } from "react";
+import type { DebtAccount } from "@/types/debt";
 
-export const useDebtStrategies = (debts = []) => {
+interface DebtWithStrategy extends DebtAccount {
+  priority: number;
+  monthsToPayoff: number;
+  totalInterestCost: number;
+  strategy: "avalanche" | "snowball";
+}
+
+interface StrategyResult {
+  debts: DebtWithStrategy[];
+  totalInterest: number;
+  payoffTime: number;
+  name?: string;
+  description?: string;
+}
+
+interface Recommendation {
+  strategy: "avalanche" | "snowball" | "either";
+  reason: string;
+  savings: number;
+}
+
+interface PaymentImpactScenario {
+  extraPayment: number;
+  avalanche: {
+    monthsToPayoff: number;
+    totalInterest: number;
+    timeSavings: number;
+    interestSavings: number;
+  };
+  snowball: {
+    monthsToPayoff: number;
+    totalInterest: number;
+    timeSavings: number;
+    interestSavings: number;
+  };
+}
+
+interface DebtInsight {
+  type: "warning" | "info" | "tip";
+  title: string;
+  message: string;
+}
+
+export const useDebtStrategies = (debts: DebtAccount[] = []) => {
   // Filter to active debts only
   const activeDebts = useMemo(() => {
     return debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
   }, [debts]);
 
   // Calculate Avalanche Strategy (highest interest rate first)
-  const avalancheStrategy = useMemo(() => {
+  const avalancheStrategy = useMemo((): StrategyResult => {
     if (!activeDebts.length) return { debts: [], totalInterest: 0, payoffTime: 0 };
 
     const sortedDebts = [...activeDebts].sort(
@@ -21,7 +65,7 @@ export const useDebtStrategies = (debts = []) => {
 
     let totalInterest = 0;
     let totalTime = 0;
-    const strategyDebts = sortedDebts.map((debt, index) => {
+    const strategyDebts: DebtWithStrategy[] = sortedDebts.map((debt, index) => {
       const monthsToPayoff = calculatePayoffTime(debt);
       const totalInterestCost = calculateTotalInterest(debt);
 
@@ -33,7 +77,7 @@ export const useDebtStrategies = (debts = []) => {
         priority: index + 1,
         monthsToPayoff,
         totalInterestCost,
-        strategy: "avalanche",
+        strategy: "avalanche" as const,
       };
     });
 
@@ -47,7 +91,7 @@ export const useDebtStrategies = (debts = []) => {
   }, [activeDebts]);
 
   // Calculate Snowball Strategy (lowest balance first)
-  const snowballStrategy = useMemo(() => {
+  const snowballStrategy = useMemo((): StrategyResult => {
     if (!activeDebts.length) return { debts: [], totalInterest: 0, payoffTime: 0 };
 
     const sortedDebts = [...activeDebts].sort(
@@ -56,7 +100,7 @@ export const useDebtStrategies = (debts = []) => {
 
     let totalInterest = 0;
     let totalTime = 0;
-    const strategyDebts = sortedDebts.map((debt, index) => {
+    const strategyDebts: DebtWithStrategy[] = sortedDebts.map((debt, index) => {
       const monthsToPayoff = calculatePayoffTime(debt);
       const totalInterestCost = calculateTotalInterest(debt);
 
@@ -68,7 +112,7 @@ export const useDebtStrategies = (debts = []) => {
         priority: index + 1,
         monthsToPayoff,
         totalInterestCost,
-        strategy: "snowball",
+        strategy: "snowball" as const,
       };
     });
 
@@ -82,7 +126,7 @@ export const useDebtStrategies = (debts = []) => {
   }, [activeDebts]);
 
   // Determine recommended strategy
-  const recommendation = useMemo(() => {
+  const recommendation = useMemo((): Recommendation | null => {
     if (!activeDebts.length) return null;
 
     const interestSavings = snowballStrategy.totalInterest - avalancheStrategy.totalInterest;
@@ -116,7 +160,7 @@ export const useDebtStrategies = (debts = []) => {
   }, [avalancheStrategy, snowballStrategy, activeDebts]);
 
   // Calculate payment impact scenarios
-  const paymentImpact = useMemo(() => {
+  const paymentImpact = useMemo((): PaymentImpactScenario[] => {
     if (!activeDebts.length) return [];
 
     const scenarios = [50, 100, 200, 500];
@@ -140,11 +184,11 @@ export const useDebtStrategies = (debts = []) => {
   }, [avalancheStrategy, snowballStrategy, activeDebts]);
 
   // Generate insights based on debt portfolio
-  const insights = useMemo(() => generateDebtInsights(activeDebts), [activeDebts]);
+  const insights = useMemo((): DebtInsight[] => generateDebtInsights(activeDebts), [activeDebts]);
 
   // Format recommendation text
   const recommendationText = useMemo(
-    () => formatRecommendationText(recommendation),
+    (): string => formatRecommendationText(recommendation),
     [recommendation]
   );
 
@@ -160,7 +204,7 @@ export const useDebtStrategies = (debts = []) => {
 };
 
 // Helper function to calculate payoff time in months
-function calculatePayoffTime(debt) {
+function calculatePayoffTime(debt: DebtAccount): number {
   const { currentBalance, minimumPayment, interestRate } = debt;
 
   if (!currentBalance || !minimumPayment || minimumPayment <= 0) return 0;
@@ -178,23 +222,31 @@ function calculatePayoffTime(debt) {
 }
 
 // Helper function to calculate total interest cost
-function calculateTotalInterest(debt) {
+function calculateTotalInterest(debt: DebtAccount): number {
   const months = calculatePayoffTime(debt);
-  if (months >= 999) return debt.currentBalance * 2; // Estimate for impossible payoffs
+  if (months >= 999) return debt.currentBalance! * 2; // Estimate for impossible payoffs
 
   const totalPaid = (debt.minimumPayment || 0) * months;
   return Math.max(0, totalPaid - (debt.currentBalance || 0));
 }
 
 // Helper function to calculate strategy with extra payment
-function calculateStrategyWithExtraPayment(debt, extraPayment) {
-  if (!debt) return { monthsToPayoff: 0, totalInterest: 0, savings: 0 };
+function calculateStrategyWithExtraPayment(
+  debt: DebtWithStrategy | undefined,
+  extraPayment: number
+): {
+  monthsToPayoff: number;
+  totalInterest: number;
+  timeSavings: number;
+  interestSavings: number;
+} {
+  if (!debt) return { monthsToPayoff: 0, totalInterest: 0, timeSavings: 0, interestSavings: 0 };
 
   const originalMonths = calculatePayoffTime(debt);
   const originalInterest = calculateTotalInterest(debt);
 
   // Create modified debt with extra payment
-  const modifiedDebt = {
+  const modifiedDebt: DebtAccount = {
     ...debt,
     minimumPayment: (debt.minimumPayment || 0) + extraPayment,
   };
@@ -211,10 +263,10 @@ function calculateStrategyWithExtraPayment(debt, extraPayment) {
 }
 
 // Helper function to generate insights from active debts
-function generateDebtInsights(activeDebts) {
+function generateDebtInsights(activeDebts: DebtAccount[]): DebtInsight[] {
   if (!activeDebts.length) return [];
 
-  const insights = [];
+  const insights: DebtInsight[] = [];
   const highInterestDebts = activeDebts.filter((debt) => (debt.interestRate || 0) > 15);
   const totalBalance = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
   const totalMinimumPayments = activeDebts.reduce(
@@ -252,7 +304,7 @@ function generateDebtInsights(activeDebts) {
 }
 
 // Helper function to format recommendation text
-function formatRecommendationText(recommendation) {
+function formatRecommendationText(recommendation: Recommendation | null): string {
   if (!recommendation) return "";
 
   switch (recommendation.strategy) {
