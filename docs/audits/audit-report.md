@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 10 | +10 |
-| TypeScript Errors | 26 | +26 |
-| TypeScript Strict Mode Errors | 3113 | +3113 |
+| ESLint Issues | 7 | -3 |
+| TypeScript Errors | 4 | -22 |
+| TypeScript Strict Mode Errors | 3092 | -21 |
 
-*Last updated: 2025-11-13 23:50:01 UTC*
+*Last updated: 2025-11-14 00:04:01 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,27 +27,26 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 4 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts`
-- 4 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts`
+- 4 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts`
 - 2 issues in `/home/runner/work/violet-vault/violet-vault/src/services/bugReport/screenshotService.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 8 | `no-undef` |
+| 3 | `@typescript-eslint/no-explicit-any` |
+| 1 | `null` |
 | 1 | `max-statements` |
+| 1 | `max-lines-per-function` |
 | 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
-/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:48:14 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:48:29 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:71:14 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:71:29 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:49:24 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:49:39 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:152:20 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:152:35 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts:113:1 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
+/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts:115:57 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts:177:57 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts:185:60 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:88:30 - 1 - Arrow function has too many lines (162). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/services/bugReport/screenshotService.ts:255:3 - 1 - Static async method 'compressScreenshot' has a complexity of 17. Maximum allowed is 15. (complexity)
 /home/runner/work/violet-vault/violet-vault/src/services/bugReport/screenshotService.ts:255:34 - 1 - Static async method 'compressScreenshot' has too many statements (27). Maximum allowed is 25. (max-statements)
 ```
@@ -55,17 +54,14 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 10 errors in `src/hooks/transactions/useTransactionSplitterUI.ts`
-- 9 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
-- 3 errors in `src/hooks/auth/useAuthManager.ts`
-- 2 errors in `src/hooks/transactions/useTransactionBalanceUpdater.ts`
+- 2 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
 - 1 errors in `src/hooks/auth/useKeyManagement.ts`
 - 1 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 24 | `TS2345` |
+| 2 | `TS2345` |
 | 1 | `TS2353` |
 | 1 | `TS2322` |
 
@@ -73,102 +69,14 @@
 ```
 src/components/automation/AutoFundingRuleBuilder.tsx(165,44): error TS2322: Type 'EnvelopeOption[]' is not assignable to type 'Envelope[]'.
   Type 'EnvelopeOption' is missing the following properties from type 'Envelope': archived, lastModified
-src/hooks/auth/useAuthManager.ts(50,56): error TS2345: Argument of type 'UseMutationResult<{ success: boolean; newKey: any; newSalt: Uint8Array<any>; error?: undefined; } | { success: boolean; error: any; newKey?: undefined; newSalt?: undefined; }, Error, { oldPassword: string; newPassword: string; }, unknown>' is not assignable to parameter of type 'MutationResult'.
-  Type 'Override<MutationObserverIdleResult<{ success: boolean; newKey: any; newSalt: Uint8Array<any>; error?: undefined; } | { success: boolean; error: any; newKey?: undefined; newSalt?: undefined; }, Error, { ...; }, unknown>, { ...; }> & { ...; }' is not assignable to type 'MutationResult'.
-    The types returned by 'mutateAsync(...)' are incompatible between these types.
-      Type 'Promise<{ success: boolean; newKey: any; newSalt: Uint8Array<any>; error?: undefined; } | { success: boolean; error: any; newKey?: undefined; newSalt?: undefined; }>' is not assignable to type 'Promise<LoginResult>'.
-        Type '{ success: boolean; newKey: any; newSalt: Uint8Array<any>; error?: undefined; } | { success: boolean; error: any; newKey?: undefined; newSalt?: undefined; }' is not assignable to type 'LoginResult'.
-          Type '{ success: boolean; newKey: any; newSalt: Uint8Array<any>; error?: undefined; }' is not assignable to type 'LoginResult'.
-            Types of property 'newSalt' are incompatible.
-              Type 'Uint8Array<any>' is not assignable to type 'string'.
-src/hooks/auth/useAuthManager.ts(52,50): error TS2345: Argument of type 'AuthContextValue' is not assignable to parameter of type 'AuthContextType'.
-  Types of property 'setAuthenticated' are incompatible.
-    Type '(userData: UserData, sessionData?: SessionData) => void' is not assignable to type '(user: unknown, credentials: { encryptionKey?: string; salt?: string; }) => void'.
-      Types of parameters 'sessionData' and 'credentials' are incompatible.
-        Type '{ encryptionKey?: string; salt?: string; }' is not assignable to type 'SessionData'.
-          Types of property 'encryptionKey' are incompatible.
-            Type 'string' is not assignable to type 'CryptoKey'.
-src/hooks/auth/useAuthManager.ts(53,56): error TS2345: Argument of type 'AuthContextValue' is not assignable to parameter of type 'AuthContextType'.
-  Types of property 'setAuthenticated' are incompatible.
-    Type '(userData: UserData, sessionData?: SessionData) => void' is not assignable to type '(user: unknown, credentials: { encryptionKey?: string; salt?: string; }) => void'.
-      Types of parameters 'sessionData' and 'credentials' are incompatible.
-        Type '{ encryptionKey?: string; salt?: string; }' is not assignable to type 'SessionData'.
-          Types of property 'encryptionKey' are incompatible.
-            Type 'string' is not assignable to type 'CryptoKey'.
 src/hooks/auth/useKeyManagement.ts(280,11): error TS2353: Object literal may only specify known properties, and 'budgetId' does not exist in type 'UserData'.
-src/hooks/budgeting/usePaycheckProcessor.ts(74,5): error TS2345: Argument of type 'FormData' is not assignable to parameter of type 'FormData'.
-  Index signature for type 'string' is missing in type 'FormData'.
-src/hooks/budgeting/usePaycheckProcessor.ts(82,13): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'SetStateAction<ErrorMap>'.
-src/hooks/budgeting/usePaycheckProcessor.ts(120,9): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope[]' is not assignable to parameter of type 'Envelope[]'.
+src/hooks/budgeting/usePaycheckProcessor.ts(118,9): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope[]' is not assignable to parameter of type 'Envelope[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope' is not assignable to type 'Envelope'.
     Property 'envelopeType' is optional in type 'Envelope' but required in type 'Envelope'.
-src/hooks/budgeting/usePaycheckProcessor.ts(145,44): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Property 'payerName' is optional in type 'PaycheckHistory' but required in type 'PaycheckRecord'.
-src/hooks/budgeting/usePaycheckProcessor.ts(199,9): error TS2345: Argument of type 'AllocationResult' is not assignable to parameter of type 'AllocationResult'.
+src/hooks/budgeting/usePaycheckProcessor.ts(204,9): error TS2345: Argument of type 'AllocationResult' is not assignable to parameter of type 'AllocationResult'.
   Types of property 'allocations' are incompatible.
     Type 'unknown[]' is not assignable to type 'AllocationItem[]'.
       Type '{}' is missing the following properties from type 'AllocationItem': envelopeId, envelopeName, amount, monthlyAmount, and 2 more.
-src/hooks/budgeting/usePaycheckProcessor.ts(207,50): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Property 'payerName' is optional in type 'PaycheckHistory' but required in type 'PaycheckRecord'.
-src/hooks/budgeting/usePaycheckProcessor.ts(239,40): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Property 'payerName' is optional in type 'PaycheckHistory' but required in type 'PaycheckRecord'.
-src/hooks/budgeting/usePaycheckProcessor.ts(242,47): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Property 'payerName' is optional in type 'PaycheckHistory' but required in type 'PaycheckRecord'.
-src/hooks/budgeting/usePaycheckProcessor.ts(244,29): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Property 'payerName' is optional in type 'PaycheckHistory' but required in type 'PaycheckRecord'.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(90,11): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(100,11): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(57,7): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
-  Types of property 'date' are incompatible.
-    Type 'Date' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionSplitterUI.ts(60,25): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(67,7): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
-  Types of property 'date' are incompatible.
-    Type 'Date' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionSplitterUI.ts(70,25): error TS2345: Argument of type '(prev: SplitAllocation[]) => SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type '(prev: SplitAllocation[]) => SplitAllocation[]' is not assignable to type '(prevState: SplitAllocation[]) => SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-      Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-        Types of property 'id' are incompatible.
-          Type 'string | number' is not assignable to type 'number'.
-            Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(79,9): error TS2345: Argument of type 'string' is not assignable to parameter of type 'keyof SplitAllocation'.
-src/hooks/transactions/useTransactionSplitterUI.ts(83,27): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(121,25): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(131,25): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(176,9): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
-  Types of property 'date' are incompatible.
-    Type 'Date' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'SplitAllocation[]'.
-  Type 'Transaction' is not assignable to type 'SplitAllocation'.
-    Types of property 'id' are incompatible.
-      Type 'string | number' is not assignable to type 'number'.
-        Type 'string' is not assignable to type 'number'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -266,7 +174,6 @@ src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argume
 - 10 errors in `src/utils/services/editLockHelpers.ts`
 - 10 errors in `src/utils/query/queryClientConfig.ts`
 - 10 errors in `src/utils/budgeting/envelopeFormUtils.ts`
-- 10 errors in `src/hooks/transactions/useTransactionSplitterUI.ts`
 - 10 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 10 errors in `src/hooks/budgeting/autofunding/useExecutionStatistics.ts`
 - 10 errors in `src/hooks/auth/useAuthCompatibility.ts`
@@ -290,7 +197,6 @@ src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argume
 - 9 errors in `src/utils/analytics/trendHelpers.ts`
 - 9 errors in `src/services/bugReport/uiStateService.ts`
 - 9 errors in `src/hooks/debts/useDebtDetailModal.ts`
-- 9 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
 - 9 errors in `src/hooks/budgeting/useEnvelopeForm.ts`
 - 9 errors in `src/hooks/budgeting/useEnvelopeCalculations.ts`
 - 9 errors in `src/hooks/bills/useBillManager.ts`
@@ -310,7 +216,6 @@ src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argume
 - 8 errors in `src/hooks/common/useTransactionArchiving.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 8 errors in `src/hooks/bills/useBulkBillOperations.ts`
-- 8 errors in `src/hooks/auth/useAuthManager.ts`
 - 8 errors in `src/components/transactions/components/TransactionRow.tsx`
 - 8 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 8 errors in `src/components/layout/ViewRenderer.tsx`
@@ -364,6 +269,7 @@ src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argume
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 6 errors in `src/hooks/common/useExportData.ts`
 - 6 errors in `src/hooks/bills/useBillManagerUI.ts`
+- 6 errors in `src/hooks/auth/useAuthManager.ts`
 - 6 errors in `src/hooks/auth/useAuthFlow.ts`
 - 6 errors in `src/components/sharing/steps/ShareCodeStep.tsx`
 - 6 errors in `src/components/settings/sections/AutoLockSettingsSection.tsx`
@@ -526,13 +432,13 @@ src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argume
 - 2 errors in `src/hooks/transactions/useTransactionQuery.ts`
 - 2 errors in `src/hooks/transactions/useTransactionForm.ts`
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
-- 2 errors in `src/hooks/transactions/useTransactionBalanceUpdater.ts`
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
 - 2 errors in `src/hooks/security/useSecuritySettingsLogic.ts`
 - 2 errors in `src/hooks/mobile/useBottomNavigation.ts`
 - 2 errors in `src/hooks/common/useTransactions.ts`
 - 2 errors in `src/hooks/common/useRouterPageDetection.ts`
 - 2 errors in `src/hooks/budgeting/usePaydayPrediction.ts`
+- 2 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
 - 2 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
 - 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
@@ -667,7 +573,7 @@ src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argume
 |---|---|
 | 1092 | `TS7006` |
 | 831 | `TS7031` |
-| 252 | `TS2345` |
+| 231 | `TS2345` |
 | 211 | `TS2339` |
 | 186 | `TS18046` |
 | 135 | `TS2322` |
@@ -2335,16 +2241,6 @@ src/hooks/auth/useAuthManager.ts(51,54): error TS2345: Argument of type 'UseMuta
       Type 'UseMutateAsyncFunction<{ success: boolean; error: string; profile?: undefined; } | { success: boolean; profile: UpdateProfileInput; error?: undefined; }, Error, UpdateProfileInput, unknown>' is not assignable to type '(data: unknown) => Promise<LoginResult>'.
         Types of parameters 'variables' and 'data' are incompatible.
           Type 'unknown' is not assignable to type 'UpdateProfileInput'.
-src/hooks/auth/useAuthManager.ts(52,50): error TS2345: Argument of type 'AuthContextValue' is not assignable to parameter of type 'AuthContextType'.
-  Types of property 'setAuthenticated' are incompatible.
-    Type '(userData: UserData, sessionData?: SessionData | undefined) => void' is not assignable to type '(user: unknown, credentials: { encryptionKey?: string | undefined; salt?: string | undefined; }) => void'.
-      Types of parameters 'userData' and 'user' are incompatible.
-        Type 'unknown' is not assignable to type 'UserData'.
-src/hooks/auth/useAuthManager.ts(53,56): error TS2345: Argument of type 'AuthContextValue' is not assignable to parameter of type 'AuthContextType'.
-  Types of property 'setAuthenticated' are incompatible.
-    Type '(userData: UserData, sessionData?: SessionData | undefined) => void' is not assignable to type '(user: unknown, credentials: { encryptionKey?: string | undefined; salt?: string | undefined; }) => void'.
-      Types of parameters 'userData' and 'user' are incompatible.
-        Type 'unknown' is not assignable to type 'UserData'.
 src/hooks/auth/useAuthManager.ts(95,31): error TS7006: Parameter 'password' implicitly has an 'any' type.
 src/hooks/auth/useAuthenticationManager.ts(85,45): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useAuthenticationManager.ts(86,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
@@ -2697,43 +2593,15 @@ src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overloa
       Type 'undefined' is not assignable to type 'string | number'.
 src/hooks/budgeting/usePaycheckHistory.ts(10,38): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
 src/hooks/budgeting/usePaycheckHistory.ts(14,39): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(74,5): error TS2345: Argument of type 'FormData' is not assignable to parameter of type 'FormData'.
-  Index signature for type 'string' is missing in type 'FormData'.
-src/hooks/budgeting/usePaycheckProcessor.ts(82,13): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'SetStateAction<ErrorMap>'.
-src/hooks/budgeting/usePaycheckProcessor.ts(120,9): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope[]' is not assignable to parameter of type 'Envelope[]'.
+src/hooks/budgeting/usePaycheckProcessor.ts(118,9): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope[]' is not assignable to parameter of type 'Envelope[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope' is not assignable to type 'Envelope'.
     Types of property 'envelopeType' are incompatible.
       Type 'string | undefined' is not assignable to type 'string'.
         Type 'undefined' is not assignable to type 'string'.
-src/hooks/budgeting/usePaycheckProcessor.ts(145,44): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Types of property 'payerName' are incompatible.
-      Type 'string | undefined' is not assignable to type 'string'.
-        Type 'undefined' is not assignable to type 'string'.
-src/hooks/budgeting/usePaycheckProcessor.ts(199,9): error TS2345: Argument of type 'AllocationResult' is not assignable to parameter of type 'AllocationResult'.
+src/hooks/budgeting/usePaycheckProcessor.ts(204,9): error TS2345: Argument of type 'AllocationResult' is not assignable to parameter of type 'AllocationResult'.
   Types of property 'allocations' are incompatible.
     Type 'unknown[]' is not assignable to type 'AllocationItem[]'.
       Type 'unknown' is not assignable to type 'AllocationItem'.
-src/hooks/budgeting/usePaycheckProcessor.ts(207,50): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Types of property 'payerName' are incompatible.
-      Type 'string | undefined' is not assignable to type 'string'.
-        Type 'undefined' is not assignable to type 'string'.
-src/hooks/budgeting/usePaycheckProcessor.ts(239,40): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Types of property 'payerName' are incompatible.
-      Type 'string | undefined' is not assignable to type 'string'.
-        Type 'undefined' is not assignable to type 'string'.
-src/hooks/budgeting/usePaycheckProcessor.ts(242,47): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Types of property 'payerName' are incompatible.
-      Type 'string | undefined' is not assignable to type 'string'.
-        Type 'undefined' is not assignable to type 'string'.
-src/hooks/budgeting/usePaycheckProcessor.ts(244,29): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'PaycheckRecord[]'.
-  Type 'PaycheckHistory' is not assignable to type 'PaycheckRecord'.
-    Types of property 'payerName' are incompatible.
-      Type 'string | undefined' is not assignable to type 'string'.
-        Type 'undefined' is not assignable to type 'string'.
 src/hooks/budgeting/usePaydayPrediction.ts(11,30): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,47): error TS7006: Parameter 'isUnlocked' implicitly has an 'any' type.
 src/hooks/budgeting/useSmartSuggestions.ts(11,36): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
@@ -3259,8 +3127,6 @@ src/hooks/transactions/useTransactionAnalytics.ts(41,9): error TS7053: Element i
 src/hooks/transactions/useTransactionAnalytics.ts(41,42): error TS2339: Property 'amount' does not exist on type 'never'.
 src/hooks/transactions/useTransactionAnalytics.ts(43,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
 src/hooks/transactions/useTransactionAnalytics.ts(53,52): error TS2339: Property 'date' does not exist on type 'never'.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(90,11): error TS2345: Argument of type '{}' is not assignable to parameter of type 'number'.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(100,11): error TS2345: Argument of type '{}' is not assignable to parameter of type 'number'.
 src/hooks/transactions/useTransactionData.ts(85,54): error TS2345: Argument of type 'Logger' is not assignable to parameter of type 'Logger'.
   Types of property 'debug' are incompatible.
     Type '(message: string, data?: Record<string, unknown>) => void' is not assignable to type '(msg: string, data?: unknown) => void'.
@@ -3356,52 +3222,6 @@ src/hooks/transactions/useTransactionSplitter.ts(167,49): error TS2345: Argument
   Type 'undefined' is not assignable to type 'Transaction'.
 src/hooks/transactions/useTransactionSplitter.ts(178,9): error TS2322: Type 'Transaction | undefined' is not assignable to type 'Transaction'.
   Type 'undefined' is not assignable to type 'Transaction'.
-src/hooks/transactions/useTransactionSplitterUI.ts(57,7): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
-  Types of property 'date' are incompatible.
-    Type 'Date' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionSplitterUI.ts(60,25): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(67,7): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
-  Types of property 'date' are incompatible.
-    Type 'Date' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionSplitterUI.ts(70,25): error TS2345: Argument of type '(prev: SplitAllocation[]) => SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type '(prev: SplitAllocation[]) => SplitAllocation[]' is not assignable to type '(prevState: SplitAllocation[]) => SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-      Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-        Types of property 'id' are incompatible.
-          Type 'string | number' is not assignable to type 'number'.
-            Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(79,9): error TS2345: Argument of type 'string' is not assignable to parameter of type 'keyof SplitAllocation'.
-src/hooks/transactions/useTransactionSplitterUI.ts(83,27): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(121,25): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(131,25): error TS2345: Argument of type 'SplitAllocation[]' is not assignable to parameter of type 'SetStateAction<SplitAllocation[]>'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'number'.
-          Type 'string' is not assignable to type 'number'.
-src/hooks/transactions/useTransactionSplitterUI.ts(176,9): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
-  Types of property 'date' are incompatible.
-    Type 'Date' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionSplitterUI.ts(181,47): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'SplitAllocation[]'.
-  Type 'Transaction' is not assignable to type 'SplitAllocation'.
-    Types of property 'id' are incompatible.
-      Type 'string | number' is not assignable to type 'number'.
-        Type 'string' is not assignable to type 'number'.
 src/hooks/transactions/useTransactionTable.ts(24,30): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionTable.ts(32,31): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionUtils.ts(6,6): error TS7006: Parameter 'id' implicitly has an 'any' type.

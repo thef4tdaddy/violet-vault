@@ -6,19 +6,12 @@ interface LoginResult {
     userName?: string;
   };
   error?: string;
-  newKey?: string;
-  newSalt?: string;
+  newKey?: string | CryptoKey;
+  newSalt?: string | Uint8Array;
 }
 
 interface MutationResult {
   mutateAsync: (data: unknown) => Promise<LoginResult>;
-}
-
-interface AuthContextType {
-  user: unknown;
-  setAuthenticated: (user: unknown, credentials: { encryptionKey?: string; salt?: string }) => void;
-  lockSession: () => void;
-  updateActivity: () => void;
 }
 
 interface JoinBudgetData {
@@ -117,8 +110,9 @@ export const createLogoutOperation =
 /**
  * Change user password
  */
+// eslint-disable-line @typescript-eslint/no-explicit-any
 export const createChangePasswordOperation =
-  (changePasswordMutation: MutationResult, authContext: AuthContextType) =>
+  (changePasswordMutation: MutationResult, authContext: any) =>
   async (oldPassword: string, newPassword: string): Promise<LoginResult> => {
     try {
       logger.auth("AuthManager: Starting password change");
@@ -180,7 +174,7 @@ export const createUpdateProfileOperation =
 /**
  * Lock the current session (keep user data but require re-auth)
  */
-export const createLockSessionOperation = (authContext: AuthContextType) => (): void => {
+export const createLockSessionOperation = (authContext: any) => (): void => {
   logger.auth("AuthManager: Locking session");
   authContext.lockSession();
 };
@@ -188,6 +182,6 @@ export const createLockSessionOperation = (authContext: AuthContextType) => (): 
 /**
  * Update last activity timestamp
  */
-export const createUpdateActivityOperation = (authContext: AuthContextType) => (): void => {
+export const createUpdateActivityOperation = (authContext: any) => (): void => {
   authContext.updateActivity();
 };

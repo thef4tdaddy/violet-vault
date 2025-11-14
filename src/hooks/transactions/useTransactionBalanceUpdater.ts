@@ -79,8 +79,10 @@ export const useTransactionBalanceUpdater = () => {
 
     try {
       const metadata = await getBudgetMetadata();
-      const currentActualBalance = metadata?.actualBalance || 0;
-      const currentUnassignedCash = metadata?.unassignedCash || 0;
+      const currentActualBalance =
+        typeof metadata?.actualBalance === "number" ? metadata.actualBalance : 0;
+      const currentUnassignedCash =
+        typeof metadata?.unassignedCash === "number" ? metadata.unassignedCash : 0;
 
       const actualBalanceChange = calculateActualBalanceChange(type, amount, multiplier);
 

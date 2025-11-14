@@ -1,24 +1,7 @@
 import { useState, useCallback } from "react";
+import type React from "react";
 import { transactionSplitterService } from "../../services/transactions/transactionSplitterService";
-import type { Transaction, Envelope } from "@/db/types";
-
-interface SplitAllocation {
-  id: number;
-  description: string;
-  amount: number;
-  category: string;
-  envelopeId: string | number;
-  isOriginalItem?: boolean;
-  originalItem?: {
-    name: string;
-    price?: number;
-    totalPrice?: number;
-    category?: {
-      name: string;
-      confidence: number;
-    };
-  };
-}
+import type { Transaction, Envelope, SplitAllocation } from "@/types/finance";
 
 /**
  * Hook for managing transaction splitter UI state
@@ -72,7 +55,7 @@ export const useTransactionSplitterLogic = (
 
   // Update split allocation
   const updateSplitAllocation = useCallback(
-    (id: number, field: string, value: string | number) => {
+    <K extends keyof SplitAllocation>(id: number, field: K, value: SplitAllocation[K]) => {
       const updatedSplits = transactionSplitterService.updateSplitAllocation(
         splitAllocations,
         id,
@@ -152,7 +135,7 @@ export const useTransactionSplitterOperations = (
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>,
   onSplitTransaction?: (
     transaction: Transaction,
-    splitTransactions: SplitAllocation[]
+    splitTransactions: Transaction[]
   ) => Promise<void>,
   onClose?: () => void
 ) => {

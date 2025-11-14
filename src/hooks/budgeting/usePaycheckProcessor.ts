@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import type React from "react";
 import {
   validatePaycheckForm,
   getPayerPrediction,
@@ -13,7 +14,7 @@ import logger from "../../utils/common/logger";
 import { validateFormAndAllocations as validateFormAndAllocationsUtil } from "../../utils/validation";
 import type { Envelope, PaycheckHistory } from "@/db/types";
 
-interface FormData {
+interface PaycheckFormData {
   amount: string;
   payerName: string;
   allocationMode: string;
@@ -66,20 +67,17 @@ const getDefaultAllocations = (): AllocationResult => ({
 // Helper to validate form and allocations
 // eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
 const validateFormAndAllocations = (
-  formData: FormData,
+  formData: PaycheckFormData,
   currentAllocations: AllocationResult,
   setErrors: React.Dispatch<React.SetStateAction<ErrorMap>>
 ): boolean => {
   const validation = validateFormAndAllocationsUtil(
-    formData,
-    currentAllocations,
-    validatePaycheckForm as (data: typeof formData) => ReturnType<typeof validatePaycheckForm>,
-    validateAllocations as (
-      allocations: unknown[],
-      amount: number
-    ) => { isValid: boolean; message: string; overage?: number }
+    formData as unknown as Parameters<typeof validateFormAndAllocationsUtil>[0],
+    currentAllocations as unknown as Parameters<typeof validateFormAndAllocationsUtil>[1],
+    validatePaycheckForm as unknown as Parameters<typeof validateFormAndAllocationsUtil>[2],
+    validateAllocations as unknown as Parameters<typeof validateFormAndAllocationsUtil>[3]
   );
-  setErrors(validation.errors);
+  setErrors(validation.errors as ErrorMap);
   return validation.isValid;
 };
 
@@ -94,7 +92,7 @@ const usePaycheckProcessor = ({
   currentUser = { userName: "User" },
 }: UsePaycheckProcessorProps) => {
   // Form state
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<PaycheckFormData>({
     amount: "",
     payerName: "",
     allocationMode: "allocate",
@@ -117,7 +115,7 @@ const usePaycheckProcessor = ({
     if (formData.amount && parseFloat(formData.amount) > 0) {
       const allocations = calculateEnvelopeAllocations(
         parseFloat(formData.amount),
-        envelopes,
+        envelopes as unknown as typeof envelopes,
         formData.allocationMode
       );
       setCurrentAllocations(allocations as AllocationResult);
@@ -129,7 +127,7 @@ const usePaycheckProcessor = ({
   // Form field update handler
   const updateFormField = useCallback(
     (field: string, value: string) => {
-      setFormData((prev: FormData) => {
+      setFormData((prev: PaycheckFormData) => {
         const newData = { ...prev, [field]: value };
         clearFieldError(field, errors, setErrors);
         return newData;
@@ -142,7 +140,14 @@ const usePaycheckProcessor = ({
   const getPayerData = useCallback(
     (payerName: string) => {
       if (!payerName) return null;
-      return getPayerPrediction(payerName, paycheckHistory);
+      // Convert PaycheckHistory to PaycheckRecord for compatibility
+      const paycheckRecords = paycheckHistory.map((p) => ({
+        payerName: p.payerName ?? "",
+        amount: p.amount,
+        processedAt:
+          typeof p.processedAt === "string" ? p.processedAt : p.processedAt?.toISOString(),
+      }));
+      return getPayerPrediction(payerName, paycheckRecords);
     },
     [paycheckHistory]
   );
@@ -204,7 +209,14 @@ const usePaycheckProcessor = ({
       await onAddPaycheck(paycheckTransaction);
 
       // Add payer to temp list if new
-      if (formData.payerName && !getUniquePayers(paycheckHistory).includes(formData.payerName)) {
+      const paycheckRecords = paycheckHistory.map((p) => ({
+        payerName: p.payerName ?? "",
+        amount: p.amount,
+        processedAt:
+          typeof p.processedAt === "string" ? p.processedAt : p.processedAt?.toISOString(),
+      }));
+      const uniquePayersList = getUniquePayers(paycheckRecords);
+      if (formData.payerName && !uniquePayersList.includes(formData.payerName)) {
         setTempPayers((prev: string[]) => [...prev, formData.payerName]);
       }
 
@@ -235,13 +247,20 @@ const usePaycheckProcessor = ({
     resetForm,
   ]);
 
+  // Convert PaycheckHistory to PaycheckRecord for utility functions
+  const paycheckRecords = paycheckHistory.map((p) => ({
+    payerName: p.payerName ?? "",
+    amount: p.amount,
+    processedAt: typeof p.processedAt === "string" ? p.processedAt : p.processedAt?.toISOString(),
+  }));
+
   // Get unique payers for dropdown
-  const uniquePayers = getUniquePayers(paycheckHistory, tempPayers);
+  const uniquePayers = getUniquePayers(paycheckRecords, tempPayers);
 
   // Get paycheck statistics
-  const paycheckStats = getPaycheckStatistics(paycheckHistory);
+  const paycheckStats = getPaycheckStatistics(paycheckRecords);
   const selectedPayerStats = formData.payerName
-    ? getPaycheckStatistics(paycheckHistory, formData.payerName)
+    ? getPaycheckStatistics(paycheckRecords, formData.payerName)
     : null;
 
   // Check if form can be submitted
