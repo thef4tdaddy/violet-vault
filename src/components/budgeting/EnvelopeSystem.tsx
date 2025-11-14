@@ -30,13 +30,24 @@ const useEnvelopeSystem = () => {
 
   const { bills = [], isLoading: billsLoading } = useBills();
 
-  // Keep Zustand for non-migrated operations - selective subscriptions
-  const unassignedCash = useBudgetStore((state: UiStore) => (state as any).unassignedCash ?? 0);
-  const setEnvelopes = useBudgetStore((state: UiStore) => (state as any).setEnvelopes);
-  const setBiweeklyAllocation = useBudgetStore(
-    (state: UiStore) => (state as any).setBiweeklyAllocation
+  // Legacy Zustand store methods - these don't exist in current UiStore type
+  // Using type assertion to access deprecated methods that will be migrated
+  type LegacyStore = UiStore & {
+    unassignedCash?: number;
+    setEnvelopes?: (updater: (envelopes: unknown[]) => unknown[]) => void;
+    setBiweeklyAllocation?: (amount: number) => void;
+    setUnassignedCash?: (amount: number) => void;
+  };
+
+  const unassignedCash = useBudgetStore(
+    (state: UiStore) => (state as LegacyStore).unassignedCash ?? 0
   );
-  const setUnassignedCash = useBudgetStore((state: UiStore) => (state as any).setUnassignedCash);
+  const setEnvelopes =
+    useBudgetStore((state: UiStore) => (state as LegacyStore).setEnvelopes) ?? (() => {});
+  const setBiweeklyAllocation =
+    useBudgetStore((state: UiStore) => (state as LegacyStore).setBiweeklyAllocation) ?? (() => {});
+  const setUnassignedCash =
+    useBudgetStore((state: UiStore) => (state as LegacyStore).setUnassignedCash) ?? (() => {});
 
   const lastBillsRef = useRef<string | null>(null);
   const isCalculatingRef = useRef(false);
@@ -73,7 +84,7 @@ const useEnvelopeSystem = () => {
     // Set the allocation outside of setEnvelopes
     setBiweeklyAllocation(totalBiweeklyNeed);
 
-    setEnvelopes((currentEnvelopes: any[]) => {
+    setEnvelopes((currentEnvelopes: unknown[]) => {
       const updatedEnvelopes = [...currentEnvelopes];
       let envelopesUpdated = 0;
 
@@ -145,7 +156,7 @@ const useEnvelopeSystem = () => {
 
   // Envelope operations with TanStack integration
   const createEnvelope = useCallback(
-    async (envelopeData: any) => {
+    async (envelopeData: unknown) => {
       try {
         await addEnvelope(envelopeData);
         return { success: true };
@@ -161,7 +172,7 @@ const useEnvelopeSystem = () => {
   );
 
   const modifyEnvelope = useCallback(
-    async (envelopeId: string, updates: any) => {
+    async (envelopeId: string, updates: unknown) => {
       try {
         await updateEnvelope({ id: envelopeId, updates });
         return { success: true };

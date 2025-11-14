@@ -91,7 +91,10 @@ const PatchNotesModal: React.FC = () => {
     (state: UiStore) => state.patchNotesData
   ) as PatchNotesData | null;
   const loadingPatchNotes = useUiStore((state: UiStore) => state.loadingPatchNotes);
-  const hidePatchNotesModal = useUiStore((state: UiStore) => (state as any).hidePatchNotesModal);
+  // Legacy method that doesn't exist in UiStore type
+  type LegacyUiStore = UiStore & { hidePatchNotesModal?: () => void };
+  const hidePatchNotesModal =
+    useUiStore((state: UiStore) => (state as LegacyUiStore).hidePatchNotesModal) ?? (() => {});
   const shouldRender = showPatchNotes && Boolean(patchNotesData);
   const modalRef = useModalAutoScroll(shouldRender);
 

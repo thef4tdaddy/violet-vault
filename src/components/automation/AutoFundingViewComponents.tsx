@@ -1,7 +1,13 @@
+import React from "react";
 import { Button } from "@/components/ui";
 
+interface Rule {
+  enabled: boolean;
+  [key: string]: unknown;
+}
+
 interface ViewHeaderProps {
-  rules: Array<{ enabled: boolean }>;
+  rules: Rule[];
 }
 
 /**
@@ -33,8 +39,8 @@ export const ViewHeader = ({ rules }: ViewHeaderProps) => {
 interface ViewTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  rules: any[];
-  displayHistory: any[];
+  rules: unknown[];
+  displayHistory: unknown[];
 }
 
 /**
@@ -69,18 +75,18 @@ export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }: Vie
 
 interface ViewContentProps {
   activeTab: string;
-  rules: any[];
-  displayHistory: any[];
-  showExecutionDetails: any;
-  setShowExecutionDetails: (value: any) => void;
+  rules: unknown[];
+  displayHistory: unknown[];
+  showExecutionDetails: unknown;
+  setShowExecutionDetails: (value: unknown) => void;
   handleCreateRule: () => void;
-  handleEditRule: (rule: any) => void;
+  handleEditRule: (rule: unknown) => void;
   handleDeleteRule: (ruleId: string) => void;
   handleToggleRule: (ruleId: string) => void;
   handleExecuteRules: () => void;
   isExecuting: boolean;
-  RulesTabComponent: React.ComponentType<any>;
-  HistoryTabComponent: React.ComponentType<any>;
+  RulesTabComponent: React.ComponentType<unknown>;
+  HistoryTabComponent: React.ComponentType<unknown>;
 }
 
 /**

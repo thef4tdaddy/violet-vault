@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 50 | +50 |
-| TypeScript Errors | 2 | +2 |
-| TypeScript Strict Mode Errors | 3099 | +3099 |
+| ESLint Issues | 2 | -48 |
+| TypeScript Errors | 34 | +32 |
+| TypeScript Strict Mode Errors | 3135 | +36 |
 
-*Last updated: 2025-11-13 23:58:32 UTC*
+*Last updated: 2025-11-14 00:05:32 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,92 +27,99 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 19 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts`
-- 11 issues in `/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx`
-- 8 issues in `/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts`
-- 8 issues in `/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx`
-- 3 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/receipts/receiptHelpers.tsx`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/pwa/PatchNotesModal.tsx`
+- 3 issues in `/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 46 | `@typescript-eslint/no-explicit-any` |
-| 2 | `no-undef` |
+| 2 | `react-hooks/exhaustive-deps` |
 | 1 | `max-lines-per-function` |
 | 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:36:10 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:37:19 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:72:10 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:73:19 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:74:25 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:75:36 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:77:26 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:82:22 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:82:42 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:83:24 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/components/automation/AutoFundingViewComponents.tsx:83:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:21:27 - 1 - Arrow function has too many lines (156). Maximum allowed is 150. (max-lines-per-function)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:34:71 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:35:69 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:37:35 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:39:74 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:76:37 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:148:26 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:164:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/components/pwa/PatchNotesModal.tsx:94:72 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:30:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:34:30 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:36:30 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:36:54 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:39:43 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:41:34 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:49:39 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:57:40 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:57:60 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:57:84 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:65:34 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:65:54 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:65:78 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:102:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:102:68 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:128:41 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:159:36 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:162:55 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtForm.ts:166:32 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:13:12 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:18:18 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:21:27 - 1 - Arrow function has too many lines (165). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:45:9 - 1 - The 'setEnvelopes' logical expression could make the dependencies of useCallback Hook (at line 139) change on every render. Move it inside the useCallback callback. Alternatively, wrap the initialization of 'setEnvelopes' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
+/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EnvelopeSystem.tsx:47:9 - 1 - The 'setBiweeklyAllocation' logical expression could make the dependencies of useCallback Hook (at line 139) change on every render. Move it inside the useCallback callback. Alternatively, wrap the initialization of 'setBiweeklyAllocation' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
 /home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:28:3 - 1 - Static async method 'submitWithFallbacks' has a complexity of 17. Maximum allowed is 15. (complexity)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:37:20 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:38:31 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:57:74 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:194:68 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/services/bugReport/reportSubmissionService.ts:277:49 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/utils/receipts/receiptHelpers.tsx:12:18 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/utils/receipts/receiptHelpers.tsx:20:18 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-/home/runner/work/violet-vault/violet-vault/src/utils/receipts/receiptHelpers.tsx:248:56 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 14 errors in `src/hooks/debts/useDebtForm.ts`
+- 6 errors in `src/services/bugReport/reportSubmissionService.ts`
+- 6 errors in `src/components/budgeting/EnvelopeSystem.tsx`
+- 3 errors in `src/utils/receipts/receiptHelpers.tsx`
+- 2 errors in `src/components/automation/AutoFundingViewComponents.tsx`
+- 2 errors in `src/components/automation/AutoFundingView.tsx`
 - 1 errors in `src/services/bugReport/apiService.ts`
-- 1 errors in `src/components/automation/AutoFundingView.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 1 | `TS2345` |
-| 1 | `TS2322` |
+| 24 | `TS2339` |
+| 3 | `TS2345` |
+| 2 | `TS2769` |
+| 2 | `TS2698` |
+| 2 | `TS2322` |
+| 1 | `TS2352` |
 
 ### Detailed Type Error Report
 ```
+src/components/automation/AutoFundingView.tsx(89,21): error TS2322: Type 'AutoFundingRule[]' is not assignable to type 'Rule[]'.
+  Type 'AutoFundingRule' is not assignable to type 'Rule'.
+    Index signature for type 'string' is missing in type 'AutoFundingRule'.
 src/components/automation/AutoFundingView.tsx(111,11): error TS2322: Type 'string' is not assignable to type 'boolean'.
+src/components/automation/AutoFundingViewComponents.tsx(115,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: unknown, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...>', gave the following error.
+    Type '{ rules: unknown[]; onCreateRule: () => void; onEditRule: (rule: unknown) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'rules' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: unknown): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...>', gave the following error.
+    Type '{ rules: unknown[]; onCreateRule: () => void; onEditRule: (rule: unknown) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'rules' does not exist on type 'IntrinsicAttributes'.
+src/components/automation/AutoFundingViewComponents.tsx(127,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: unknown, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...>', gave the following error.
+    Type '{ executionHistory: unknown[]; showExecutionDetails: unknown; onToggleDetails: (value: unknown) => void; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'executionHistory' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: unknown): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...>', gave the following error.
+    Type '{ executionHistory: unknown[]; showExecutionDetails: unknown; onToggleDetails: (value: unknown) => void; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'executionHistory' does not exist on type 'IntrinsicAttributes'.
+src/components/budgeting/EnvelopeSystem.tsx(94,73): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(97,27): error TS2339: Property 'biweeklyAllocation' does not exist on type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(97,58): error TS2339: Property 'biweeklyAllocation' does not exist on type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(108,40): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(115,17): error TS2698: Spread types may only be created from object types.
+src/components/budgeting/EnvelopeSystem.tsx(161,27): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AddEnvelopeData'.
+  Property 'name' is missing in type '{}' but required in type 'AddEnvelopeData'.
+src/hooks/debts/useDebtForm.ts(37,8): error TS2339: Property 'envelopeId' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(37,41): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(39,70): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(42,14): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(43,18): error TS2339: Property 'creditor' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(44,14): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(45,24): error TS2339: Property 'paymentDueDate' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(46,15): error TS2339: Property 'notes' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(50,37): error TS2339: Property 'currentBalance' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(51,38): error TS2339: Property 'originalBalance' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(52,35): error TS2339: Property 'interestRate' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(53,37): error TS2339: Property 'minimumPayment' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(54,26): error TS2339: Property 'paymentFrequency' does not exist on type 'unknown'.
+src/hooks/debts/useDebtForm.ts(170,39): error TS2698: Spread types may only be created from object types.
 src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'ProviderConfig[]' is not assignable to parameter of type 'Provider[]'.
   Property 'priority' is missing in type 'ProviderConfig' but required in type 'Provider'.
+src/services/bugReport/reportSubmissionService.ts(59,15): error TS2352: Conversion of type 'ReportData' to type 'BugReportData' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'title' is missing in type 'ReportData' but required in type 'BugReportData'.
+src/services/bugReport/reportSubmissionService.ts(111,49): error TS2339: Property 'provider' does not exist on type 'unknown'.
+src/services/bugReport/reportSubmissionService.ts(115,45): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/services/bugReport/reportSubmissionService.ts(116,42): error TS2339: Property 'success' does not exist on type 'unknown'.
+src/services/bugReport/reportSubmissionService.ts(199,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type '{}'.
+src/services/bugReport/reportSubmissionService.ts(281,41): error TS2339: Property 'submittedAt' does not exist on type 'unknown'.
+src/utils/receipts/receiptHelpers.tsx(141,35): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/utils/receipts/receiptHelpers.tsx(249,42): error TS2339: Property 'total' does not exist on type 'unknown'.
+src/utils/receipts/receiptHelpers.tsx(249,65): error TS2339: Property 'merchant' does not exist on type 'unknown'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -168,6 +175,7 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 14 errors in `src/utils/layout/paycheckDeletionUtils.ts`
 - 14 errors in `src/stores/ui/uiStore.ts`
 - 14 errors in `src/hooks/receipts/useReceiptScanner.ts`
+- 14 errors in `src/hooks/debts/useDebtForm.ts`
 - 14 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 14 errors in `src/components/sharing/steps/UserSetupStep.tsx`
 - 14 errors in `src/components/dashboard/RecentTransactionsWidget.tsx`
@@ -192,8 +200,10 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 12 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
 - 12 errors in `src/components/settings/SettingsDashboard.tsx`
 - 12 errors in `src/components/debt/modals/DebtFormSections.tsx`
+- 12 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 12 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
+- 12 errors in `src/components/automation/AutoFundingView.tsx`
 - 11 errors in `src/utils/security/shareCodeUtils.ts`
 - 11 errors in `src/utils/savings/savingsFormUtils.ts`
 - 11 errors in `src/utils/bills/billDetailUtils.ts`
@@ -261,7 +271,6 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 8 errors in `src/components/budgeting/suggestions/SuggestionCard.tsx`
 - 8 errors in `src/components/budgeting/DeleteEnvelopeModal.tsx`
 - 8 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
-- 8 errors in `src/components/automation/AutoFundingView.tsx`
 - 8 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 7 errors in `src/utils/security/errorViewer.ts`
 - 7 errors in `src/utils/security/cryptoCompat.ts`
@@ -304,6 +313,7 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 6 errors in `src/utils/common/BaseMutex.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
 - 6 errors in `src/services/firebaseSyncService.ts`
+- 6 errors in `src/services/bugReport/reportSubmissionService.ts`
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 6 errors in `src/hooks/common/useExportData.ts`
 - 6 errors in `src/hooks/bills/useBillManagerUI.ts`
@@ -352,7 +362,6 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 5 errors in `src/components/layout/SummaryCards.tsx`
 - 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
 - 5 errors in `src/components/budgeting/PaycheckProcessor.tsx`
-- 5 errors in `src/components/budgeting/EnvelopeSystem.tsx`
 - 5 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 5 errors in `src/components/bills/modals/BillDetailActions.tsx`
 - 5 errors in `src/components/bills/BulkBillUpdateModal.tsx`
@@ -409,6 +418,7 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 4 errors in `src/components/analytics/performance/MetricCard.tsx`
 - 4 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
+- 3 errors in `src/utils/receipts/receiptHelpers.tsx`
 - 3 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
 - 3 errors in `src/utils/analytics/transactionAnalyzer.ts`
@@ -518,6 +528,7 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 - 2 errors in `src/components/bills/BillFormFields.tsx`
 - 2 errors in `src/components/automation/steps/TriggerScheduleStep.tsx`
 - 2 errors in `src/components/automation/components/StepNavigation.tsx`
+- 2 errors in `src/components/automation/AutoFundingViewComponents.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
 - 2 errors in `src/components/auth/components/ColorPicker.tsx`
 - 2 errors in `src/components/auth/UserIndicator.tsx`
@@ -610,24 +621,24 @@ src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'Pr
 |---|---|
 | 1086 | `TS7006` |
 | 842 | `TS7031` |
-| 230 | `TS2345` |
-| 208 | `TS2339` |
-| 183 | `TS18046` |
-| 133 | `TS2322` |
+| 232 | `TS2345` |
+| 214 | `TS2339` |
+| 201 | `TS18046` |
+| 138 | `TS2322` |
 | 110 | `TS7053` |
 | 80 | `TS18048` |
 | 77 | `TS7005` |
 | 44 | `TS7034` |
 | 32 | `TS18047` |
-| 24 | `TS2769` |
+| 26 | `TS2769` |
 | 9 | `TS2353` |
 | 6 | `TS2531` |
 | 6 | `TS2411` |
+| 5 | `TS2698` |
+| 5 | `TS2352` |
 | 4 | `TS2722` |
-| 4 | `TS2352` |
 | 3 | `TS7019` |
 | 3 | `TS2783` |
-| 3 | `TS2698` |
 | 2 | `TS7022` |
 | 2 | `TS2538` |
 | 1 | `TS7023` |
@@ -851,7 +862,35 @@ src/components/automation/AutoFundingView.tsx(35,34): error TS2322: Type '(rule:
   Types of parameters 'rule' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'Partial<AutoFundingRule>'.
 src/components/automation/AutoFundingView.tsx(70,59): error TS18046: 'error' is of type 'unknown'.
+src/components/automation/AutoFundingView.tsx(89,21): error TS2322: Type 'AutoFundingRule[]' is not assignable to type 'Rule[]'.
+  Type 'AutoFundingRule' is not assignable to type 'Rule'.
+    Index signature for type 'string' is missing in type 'AutoFundingRule'.
+src/components/automation/AutoFundingView.tsx(105,11): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(value: unknown) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'unknown' is not assignable to type 'SetStateAction<null>'.
 src/components/automation/AutoFundingView.tsx(111,11): error TS2322: Type 'string' is not assignable to type 'boolean'.
+src/components/automation/AutoFundingView.tsx(112,11): error TS2322: Type '({ rules, onCreateRule, onEditRule, onDeleteRule, onToggleRule, onExecuteRules, isExecuting, }: { rules: any; onCreateRule: any; onEditRule: any; onDeleteRule: any; onToggleRule: any; onExecuteRules: any; isExecuting: any; }) => Element' is not assignable to type 'ComponentType<unknown>'.
+  Type '({ rules, onCreateRule, onEditRule, onDeleteRule, onToggleRule, onExecuteRules, isExecuting, }: { rules: any; onCreateRule: any; onEditRule: any; onDeleteRule: any; onToggleRule: any; onExecuteRules: any; isExecuting: any; }) => Element' is not assignable to type 'FunctionComponent<unknown>'.
+    Types of parameters '__0' and 'props' are incompatible.
+      Type 'unknown' is not assignable to type '{ rules: any; onCreateRule: any; onEditRule: any; onDeleteRule: any; onToggleRule: any; onExecuteRules: any; isExecuting: any; }'.
+src/components/automation/AutoFundingView.tsx(113,11): error TS2322: Type '({ executionHistory, showExecutionDetails, onToggleDetails }: { executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }) => Element' is not assignable to type 'ComponentType<unknown>'.
+  Type '({ executionHistory, showExecutionDetails, onToggleDetails }: { executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }) => Element' is not assignable to type 'FunctionComponent<unknown>'.
+    Types of parameters '__0' and 'props' are incompatible.
+      Type 'unknown' is not assignable to type '{ executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }'.
+src/components/automation/AutoFundingViewComponents.tsx(115,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: unknown, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ rules: unknown[]; onCreateRule: () => void; onEditRule: (rule: unknown) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'rules' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: unknown): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ rules: unknown[]; onCreateRule: () => void; onEditRule: (rule: unknown) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'rules' does not exist on type 'IntrinsicAttributes'.
+src/components/automation/AutoFundingViewComponents.tsx(127,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: unknown, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ executionHistory: unknown[]; showExecutionDetails: unknown; onToggleDetails: (value: unknown) => void; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'executionHistory' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: unknown): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ executionHistory: unknown[]; showExecutionDetails: unknown; onToggleDetails: (value: unknown) => void; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'executionHistory' does not exist on type 'IntrinsicAttributes'.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(6,27): error TS7006: Parameter 'type' implicitly has an 'any' type.
@@ -1141,10 +1180,17 @@ src/components/budgeting/EnvelopeGrid.tsx(427,9): error TS2322: Type '(envelopeD
   Types of parameters 'envelopeData' and 'data' are incompatible.
     Type 'unknown' is not assignable to type '{ [key: string]: unknown; id: string; }'.
 src/components/budgeting/EnvelopeSystem.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/budgeting/EnvelopeSystem.tsx(34,26): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeSystem.tsx(35,24): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeSystem.tsx(36,33): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeSystem.tsx(39,29): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeSystem.tsx(42,26): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeSystem.tsx(46,5): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeSystem.tsx(48,5): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeSystem.tsx(50,5): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeSystem.tsx(94,69): error TS18046: 'env' is of type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(97,18): error TS18046: 'envelope' is of type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(97,49): error TS18046: 'envelope' is of type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(108,31): error TS18046: 'envelope' is of type 'unknown'.
+src/components/budgeting/EnvelopeSystem.tsx(115,17): error TS2698: Spread types may only be created from object types.
+src/components/budgeting/EnvelopeSystem.tsx(161,27): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AddEnvelopeData'.
+src/components/budgeting/EnvelopeSystem.tsx(177,48): error TS2322: Type 'unknown' is not assignable to type 'Partial<Envelope>'.
 src/components/budgeting/PaycheckProcessor.tsx(20,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
 src/components/budgeting/PaycheckProcessor.tsx(21,3): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
 src/components/budgeting/PaycheckProcessor.tsx(22,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
@@ -1671,7 +1717,7 @@ src/components/pwa/PatchNotesModal.tsx(6,8): error TS7034: Variable 'useUiStore'
 src/components/pwa/PatchNotesModal.tsx(89,26): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/PatchNotesModal.tsx(90,26): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/PatchNotesModal.tsx(93,29): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/PatchNotesModal.tsx(94,31): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/components/pwa/PatchNotesModal.tsx(97,5): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/UpdateAvailableModal.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/pwa/UpdateAvailableModal.tsx(35,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/components/pwa/UpdateAvailableModal.tsx(53,27): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
@@ -2885,6 +2931,20 @@ src/hooks/debts/useDebtDetailModal.ts(15,3): error TS7031: Binding element 'onEd
 src/hooks/debts/useDebtDetailModal.ts(69,13): error TS7006: Parameter 'payment' implicitly has an 'any' type.
 src/hooks/debts/useDebtDetailModal.ts(69,22): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/hooks/debts/useDebtDetailModal.ts(80,32): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/hooks/debts/useDebtForm.ts(37,3): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(37,41): error TS2339: Property 'id' does not exist on type '{}'.
+src/hooks/debts/useDebtForm.ts(39,70): error TS2339: Property 'id' does not exist on type '{}'.
+src/hooks/debts/useDebtForm.ts(42,9): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(43,13): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(44,9): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(45,19): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(46,10): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(50,32): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(51,33): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(52,30): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(53,32): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(54,21): error TS18046: 'debt' is of type 'unknown'.
+src/hooks/debts/useDebtForm.ts(170,39): error TS2698: Spread types may only be created from object types.
 src/hooks/debts/useDebtManagement.ts(78,7): error TS2345: Argument of type 'UseMutateAsyncFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string | undefined; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type '(data: unknown) => unknown'.
   Types of parameters 'variables' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'AddEnvelopeData'.
@@ -3417,6 +3477,13 @@ src/services/bugReport/performanceInfoService.ts(355,9): error TS2322: Type 'num
   Type 'undefined' is not assignable to type 'number | null'.
 src/services/bugReport/performanceInfoService.ts(361,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/performanceInfoService.ts(390,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/services/bugReport/reportSubmissionService.ts(59,15): error TS2352: Conversion of type 'ReportData' to type 'BugReportData' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'title' is missing in type 'ReportData' but required in type 'BugReportData'.
+src/services/bugReport/reportSubmissionService.ts(111,49): error TS2339: Property 'provider' does not exist on type '{}'.
+src/services/bugReport/reportSubmissionService.ts(115,43): error TS18046: 'r' is of type 'unknown'.
+src/services/bugReport/reportSubmissionService.ts(116,40): error TS18046: 'r' is of type 'unknown'.
+src/services/bugReport/reportSubmissionService.ts(199,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/services/bugReport/reportSubmissionService.ts(281,39): error TS18046: 'r' is of type 'unknown'.
 src/services/bugReport/screenshotService.ts(39,37): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
 src/services/bugReport/screenshotService.ts(43,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/screenshotService.ts(52,75): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -4106,6 +4173,9 @@ src/utils/query/queryClientConfig.ts(180,18): error TS7006: Parameter 'queryKey'
 src/utils/query/queryClientConfig.ts(187,22): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(187,32): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(194,16): error TS18046: 'error' is of type 'unknown'.
+src/utils/receipts/receiptHelpers.tsx(141,35): error TS2339: Property 'length' does not exist on type '{}'.
+src/utils/receipts/receiptHelpers.tsx(249,42): error TS2339: Property 'total' does not exist on type '{}'.
+src/utils/receipts/receiptHelpers.tsx(249,65): error TS2339: Property 'merchant' does not exist on type '{}'.
 src/utils/savings/savingsCalculations.ts(240,12): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,19): error TS18046: 'aVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,30): error TS18046: 'bVal' is of type 'unknown'.

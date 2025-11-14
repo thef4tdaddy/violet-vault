@@ -27,18 +27,18 @@ const initialFormState = {
   newEnvelopeName: "",
 };
 
-const determinePaymentMethod = (connectedBill: any) => {
+const determinePaymentMethod = (connectedBill: unknown) => {
   return connectedBill ? "connect_existing_bill" : "create_new";
 };
 
-const safeToString = (value: any) => value?.toString() || "";
+const safeToString = (value: unknown) => value?.toString() || "";
 
-const getEnvelopeId = (debt: any, connectedEnvelope: any) =>
+const getEnvelopeId = (debt: unknown, connectedEnvelope: unknown) =>
   debt.envelopeId || connectedEnvelope?.id || "";
 
-const getExistingBillId = (connectedBill: any) => connectedBill?.id || "";
+const getExistingBillId = (connectedBill: unknown) => connectedBill?.id || "";
 
-const buildBaseFormData = (debt: any) => ({
+const buildBaseFormData = (debt: unknown) => ({
   name: debt.name || "",
   creditor: debt.creditor || "",
   type: debt.type || DEBT_TYPES.PERSONAL,
@@ -46,7 +46,7 @@ const buildBaseFormData = (debt: any) => ({
   notes: debt.notes || "",
 });
 
-const buildFinancialFormData = (debt: any) => ({
+const buildFinancialFormData = (debt: unknown) => ({
   currentBalance: safeToString(debt.currentBalance),
   originalBalance: safeToString(debt.originalBalance),
   interestRate: safeToString(debt.interestRate),
@@ -54,7 +54,11 @@ const buildFinancialFormData = (debt: any) => ({
   paymentFrequency: debt.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
 });
 
-const buildConnectionFormData = (debt: any, connectedBill: any, connectedEnvelope: any) => ({
+const buildConnectionFormData = (
+  debt: unknown,
+  connectedBill: unknown,
+  connectedEnvelope: unknown
+) => ({
   paymentMethod: determinePaymentMethod(connectedBill),
   createBill: false,
   envelopeId: getEnvelopeId(debt, connectedEnvelope),
@@ -62,7 +66,7 @@ const buildConnectionFormData = (debt: any, connectedBill: any, connectedEnvelop
   newEnvelopeName: "",
 });
 
-const buildEditFormData = (debt: any, connectedBill: any, connectedEnvelope: any) => ({
+const buildEditFormData = (debt: unknown, connectedBill: unknown, connectedEnvelope: unknown) => ({
   ...buildBaseFormData(debt),
   ...buildFinancialFormData(debt),
   ...buildConnectionFormData(debt, connectedBill, connectedEnvelope),
@@ -99,7 +103,9 @@ export const useDebtForm = (
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (onSubmitCallback: (arg0: any, arg1?: any) => Promise<void>) => {
+  const handleSubmit = async (
+    onSubmitCallback: (arg0: unknown, arg1?: unknown) => Promise<void>
+  ) => {
     if (!checkFormValidity()) return false;
 
     setIsSubmitting(true);
@@ -125,7 +131,11 @@ export const useDebtForm = (
 
       if (isEditMode) {
         // For edit mode, pass debt ID and updates
-        await onSubmitCallback((debt as any).id, debtData);
+        const debtId =
+          debt && typeof debt === "object" && "id" in debt
+            ? (debt as { id: unknown }).id
+            : undefined;
+        await onSubmitCallback(debtId, debtData);
       } else {
         // For add mode, just pass the debt data
         await onSubmitCallback(debtData);
@@ -156,14 +166,15 @@ export const useDebtForm = (
     setIsSubmitting(false);
   };
 
-  const updateFormData = (updates: any) => {
+  const updateFormData = (updates: unknown) => {
     setFormData((prev) => ({ ...prev, ...updates }));
     // Clear related errors when updating
-    if (Object.keys(updates).some((key) => (errors as any)[key])) {
+    const updatesObj = updates as Record<string, unknown>;
+    if (Object.keys(updatesObj).some((key) => Object.prototype.hasOwnProperty.call(errors, key))) {
       setErrors((prev) => {
         const newErrors = { ...prev };
-        Object.keys(updates).forEach((key) => {
-          delete (newErrors as any)[key];
+        Object.keys(updatesObj).forEach((key) => {
+          delete (newErrors as Record<string, unknown>)[key];
         });
         return newErrors;
       });

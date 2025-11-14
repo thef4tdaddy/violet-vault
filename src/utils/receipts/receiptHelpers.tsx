@@ -9,7 +9,7 @@ interface ReceiptData {
   merchant?: string;
   total?: number;
   date?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface TransactionForm {
@@ -17,7 +17,7 @@ interface TransactionForm {
   amount?: number;
   date?: string;
   envelopeId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -245,6 +245,6 @@ export const formatFileSize = (bytes: number) => {
 /**
  * Validate if extracted data has minimum required fields for transaction creation
  */
-export const hasMinimumExtractedData = (extractedData: any) => {
+export const hasMinimumExtractedData = (extractedData: unknown) => {
   return extractedData && (extractedData.total || extractedData.merchant);
 };

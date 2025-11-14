@@ -10,12 +10,12 @@ interface Provider {
   type: string;
   priority: number;
   url?: string;
-  config?: any;
+  config?: unknown;
   redundant?: boolean;
 }
 
 interface ReportData {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class ReportSubmissionService {
@@ -34,8 +34,8 @@ export class ReportSubmissionService {
     ];
 
     const providersToTry = providers.length > 0 ? providers : defaultProviders;
-    const results: any[] = [];
-    let successfulSubmission: any = null;
+    const results: unknown[] = [];
+    let successfulSubmission: unknown = null;
 
     // Sort by priority
     const sortedProviders = [...providersToTry].sort((a, b) => a.priority - b.priority);
@@ -54,7 +54,10 @@ export class ReportSubmissionService {
         let result;
         switch (provider.type) {
           case "github":
-            result = await GitHubAPIService.submitToGitHub(reportData as any);
+            // GitHubAPIService expects specific structure - using type assertion
+            result = await GitHubAPIService.submitToGitHub(
+              reportData as Parameters<typeof GitHubAPIService.submitToGitHub>[0]
+            );
             break;
           case "webhook":
             result = await this.submitToWebhook(reportData, provider.url || "");
@@ -191,7 +194,7 @@ export class ReportSubmissionService {
    * @param {Object} emailConfig - Email configuration
    * @returns {Promise<Object>} Submission result
    */
-  static async submitToEmail(_reportData: ReportData, emailConfig: any) {
+  static async submitToEmail(_reportData: ReportData, emailConfig: unknown) {
     try {
       logger.debug("Email submission requested", emailConfig);
 
@@ -274,7 +277,7 @@ export class ReportSubmissionService {
 
       return {
         totalReports: storedReports.length,
-        recentReports: storedReports.filter((r: any) => {
+        recentReports: storedReports.filter((r: unknown) => {
           const reportTime = new Date(r.submittedAt).getTime();
           const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
           return reportTime > oneDayAgo;
