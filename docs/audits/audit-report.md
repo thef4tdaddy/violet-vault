@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2501 | 0 |
+| TypeScript Strict Mode Errors | 2481 | -20 |
 
-*Last updated: 2025-11-21 19:46:55 UTC*
+*Last updated: 2025-11-21 20:37:38 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,18 +28,17 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-21 19:46:40 UTC
+Last check: 2025-11-21 20:37:15 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-21 19:46:47 UTC
+Last check: 2025-11-21 20:37:27 UTC
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 20 errors in `src/services/bugReport/githubApiService.ts`
 - 20 errors in `src/hooks/debts/useDebtStrategies.ts`
 - 19 errors in `src/hooks/common/useToast.ts`
 - 19 errors in `src/hooks/common/useImportData.ts`
@@ -491,15 +490,15 @@ Last check: 2025-11-21 19:46:47 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 824 | `TS7006` |
+| 821 | `TS7006` |
 | 689 | `TS7031` |
 | 181 | `TS2345` |
-| 169 | `TS2339` |
-| 147 | `TS18046` |
+| 168 | `TS2339` |
+| 145 | `TS18046` |
 | 133 | `TS2322` |
-| 71 | `TS18048` |
 | 69 | `TS7053` |
 | 69 | `TS7005` |
+| 57 | `TS18048` |
 | 41 | `TS7034` |
 | 37 | `TS18047` |
 | 24 | `TS2769` |
@@ -2832,26 +2831,6 @@ src/services/bugReport/errorTrackingService.ts(106,26): error TS2322: Type '(eve
     Types of parameters 'event' and 'event' are incompatible.
       Type 'Event' is missing the following properties from type 'ErrorEvent': colno, error, filename, lineno, message
 src/services/bugReport/errorTrackingService.ts(217,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/githubApiService.ts(138,16): error TS18046: 'error' is of type 'unknown'.
-src/services/bugReport/githubApiService.ts(289,41): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(293,9): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(294,39): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(294,66): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(298,9): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(299,40): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(299,69): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(303,9): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(305,9): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(306,13): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(307,13): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(312,9): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(313,32): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(317,39): error TS18048: 'systemInfo' is possibly 'undefined'.
-src/services/bugReport/githubApiService.ts(343,73): error TS2339: Property 'errors' does not exist on type '{ appVersion?: string | undefined; browser?: { name: string; version: string; } | undefined; viewport?: { width: number; height: number; } | undefined; userAgent?: string | undefined; performance?: { ...; } | undefined; timestamp?: string | undefined; errors?: { ...; } | undefined; } | undefined'.
-src/services/bugReport/githubApiService.ts(353,29): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/services/bugReport/githubApiService.ts(353,36): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/services/bugReport/githubApiService.ts(380,15): error TS7006: Parameter 'log' implicitly has an 'any' type.
-src/services/bugReport/githubApiService.ts(439,16): error TS18046: 'error' is of type 'unknown'.
 src/services/bugReport/index.ts(107,9): error TS2783: 'success' is specified more than once, so this usage will be overwritten.
 src/services/bugReport/index.ts(120,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
 src/services/bugReport/index.ts(158,26): error TS18046: 'error' is of type 'unknown'.

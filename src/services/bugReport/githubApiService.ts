@@ -135,7 +135,7 @@ export class GitHubAPIService {
       logger.error("GitHub API submission error", error);
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         provider: "github",
       };
     }
@@ -286,21 +286,21 @@ export class GitHubAPIService {
     const sections = [];
 
     // App version and environment
-    sections.push(`- **App Version:** ${systemInfo.appVersion || "unknown"}`);
+    sections.push(`- **App Version:** ${systemInfo?.appVersion || "unknown"}`);
     sections.push(`- **Environment:** ${this.detectEnvironment()}`);
 
     // Browser info
-    if (systemInfo.browser) {
+    if (systemInfo?.browser) {
       sections.push(`- **Browser:** ${systemInfo.browser.name} ${systemInfo.browser.version}`);
     }
 
     // Viewport
-    if (systemInfo.viewport) {
+    if (systemInfo?.viewport) {
       sections.push(`- **Viewport:** ${systemInfo.viewport.width}x${systemInfo.viewport.height}`);
     }
 
     // User agent (truncated)
-    if (systemInfo.userAgent) {
+    if (systemInfo?.userAgent) {
       const shortUA =
         systemInfo.userAgent.length > 100
           ? systemInfo.userAgent.substring(0, 100) + "..."
@@ -309,12 +309,12 @@ export class GitHubAPIService {
     }
 
     // Memory usage if available
-    if (systemInfo.performance?.memory) {
+    if (systemInfo?.performance?.memory) {
       const memMB = Math.round(systemInfo.performance.memory.usedJSHeapSize / 1024 / 1024);
       sections.push(`- **Memory Usage:** ${memMB}MB used`);
     }
 
-    sections.push(`- **Timestamp:** ${systemInfo.timestamp || new Date().toISOString()}`);
+    sections.push(`- **Timestamp:** ${systemInfo?.timestamp || new Date().toISOString()}`);
 
     return sections.join("\n");
   }
@@ -340,28 +340,58 @@ export class GitHubAPIService {
    * @param {Object} errors - Error object from system info
    * @returns {string} Formatted error information
    */
-  static formatConsoleLogsForGitHub(errors: BugReportData["systemInfo"]["errors"]): string {
+  static formatConsoleLogsForGitHub(
+    errors:
+      | {
+          recentErrors?: Array<{
+            type?: string;
+            message?: string;
+            stack?: string;
+            filename?: string;
+            lineno?: number;
+            timestamp?: string;
+          }>;
+          consoleLogs?: Array<{
+            level: string;
+            message: string;
+            timestamp: number;
+          }>;
+        }
+      | undefined
+  ): string {
     const sections = [];
 
     // Handle errors
-    if (errors && errors.recentErrors && errors.recentErrors.length > 0) {
+    if (errors?.recentErrors && errors.recentErrors.length > 0) {
       sections.push("### Recent JavaScript Errors", "");
 
       // Show last 3 errors to avoid overwhelming the issue
       const recentErrors = errors.recentErrors.slice(-3);
 
-      recentErrors.forEach((error, index) => {
-        sections.push(
-          `**Error ${index + 1}:**`,
-          "```javascript",
-          `${error.type || "Error"}: ${error.message || "Unknown error"}`,
-          error.stack ? `Stack: ${error.stack}` : "",
-          error.filename ? `File: ${error.filename} (Line: ${error.lineno || "?"})` : "",
-          `Time: ${error.timestamp || "Unknown"}`,
-          "```",
-          ""
-        );
-      });
+      recentErrors.forEach(
+        (
+          error: {
+            type?: string;
+            message?: string;
+            stack?: string;
+            filename?: string;
+            lineno?: number;
+            timestamp?: string;
+          },
+          index: number
+        ) => {
+          sections.push(
+            `**Error ${index + 1}:**`,
+            "```javascript",
+            `${error.type || "Error"}: ${error.message || "Unknown error"}`,
+            error.stack ? `Stack: ${error.stack}` : "",
+            error.filename ? `File: ${error.filename} (Line: ${error.lineno || "?"})` : "",
+            `Time: ${error.timestamp || "Unknown"}`,
+            "```",
+            ""
+          );
+        }
+      );
 
       if (errors.recentErrors.length > 3) {
         sections.push(`_... and ${errors.recentErrors.length - 3} more errors_`, "");
@@ -369,7 +399,7 @@ export class GitHubAPIService {
     }
 
     // Handle console logs
-    if (errors && errors.consoleLogs && errors.consoleLogs.length > 0) {
+    if (errors?.consoleLogs && errors.consoleLogs.length > 0) {
       sections.push("### Recent Console Logs", "");
 
       // Show last 10 console logs
@@ -377,7 +407,7 @@ export class GitHubAPIService {
 
       // Detect code patterns for syntax highlighting
       const logText = recentLogs
-        .map((log) => {
+        .map((log: { level: string; message: string; timestamp: number }) => {
           const timeStr = new Date(log.timestamp).toLocaleTimeString();
           return `[${timeStr}] ${log.level.toUpperCase()}: ${log.message}`;
         })
@@ -436,7 +466,7 @@ export class GitHubAPIService {
       logger.error("GitHub API call failed", error);
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
