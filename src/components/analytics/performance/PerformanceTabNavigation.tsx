@@ -2,11 +2,18 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+interface PerformanceTabNavigationProps {
+  selectedMetric: string;
+  setSelectedMetric: (metric: string) => void;
+  alertsCount: number;
+  recommendationsCount: number;
+}
+
 /**
  * PerformanceTabNavigation component - tab navigation for performance monitor
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const PerformanceTabNavigation = ({
+const PerformanceTabNavigation: React.FC<PerformanceTabNavigationProps> = ({
   selectedMetric,
   setSelectedMetric,
   alertsCount,

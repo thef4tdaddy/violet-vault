@@ -1,11 +1,23 @@
+import React from "react";
 import { Button } from "@/components/ui";
+
+interface StepButtonsProps {
+  step: number;
+  onContinue?: (e: React.SyntheticEvent) => void;
+  onBack?: () => void;
+  onStartTracking?: (e: React.SyntheticEvent) => void;
+  isLoading: boolean;
+  canContinue?: boolean;
+  canStartTracking?: boolean;
+  showBackButton?: boolean;
+}
 
 /**
  * Step Navigation Buttons Component
  * Continue, back, and start tracking buttons for multi-step flow
  * Extracted from UserSetup with UI standards compliance
  */
-const StepButtons = ({
+const StepButtons: React.FC<StepButtonsProps> = ({
   step,
   onContinue,
   onBack,

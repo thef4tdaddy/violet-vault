@@ -1,10 +1,15 @@
+import React from "react";
 import { getPerformanceMessage } from "../../../utils/performanceUtils";
+
+interface OverallScoreProps {
+  score: number;
+}
 
 /**
  * OverallScore component - displays the main performance score
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const OverallScore = ({ score }) => {
+const OverallScore: React.FC<OverallScoreProps> = ({ score }) => {
   return (
     <div className="mb-8">
       <div className="text-center">

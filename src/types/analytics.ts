@@ -115,6 +115,111 @@ export interface AnalyticsData {
   envelopeHealth: EnvelopeHealth;
   budgetVsActual: BudgetVsActual[];
   metrics: AnalyticsMetrics;
+  // Optional properties for flexibility
+  totalIncome?: number;
+}
+
+export interface EnvelopeAnalysis {
+  monthlyBudget?: number;
+  spent?: number;
+  name: string;
+}
+
+export interface BalanceData {
+  envelopeAnalysis?: EnvelopeAnalysis[];
+  actualBalance?: number;
+  virtualBalance?: number;
+  savingsGoals?: Array<{ currentAmount?: number }>;
+}
+
+// Trend Analysis Types
+export interface SpendingTrend {
+  month: string;
+  income: number;
+  spending: number;
+  net: number;
+  forecast?: boolean;
+  [key: string]: unknown;
+}
+
+export interface CategoryTrend {
+  name: string;
+  trend: ChartDataPoint[];
+  current?: number;
+  previous?: number;
+  [key: string]: unknown;
+}
+
+export interface SeasonalPattern {
+  name: string;
+  color: string;
+  avgSpending: number;
+  avgIncome: number;
+  avgNet: number;
+  categories?: string[];
+  [key: string]: unknown;
+}
+
+export interface ForecastInsights {
+  trend: string;
+  confidence: number;
+  projectedSpending?: number;
+  growthRate?: number;
+  [key: string]: unknown;
+}
+
+export interface InsightDetail {
+  type: string;
+  title: string;
+  description: string;
+  action: string;
+}
+
+export interface Insights {
+  highestSpendingSeason: string;
+  avgVelocity: number;
+  hasHighGrowth: boolean;
+  details?: InsightDetail[];
+  [key: string]: unknown;
+}
+
+export interface SpendingVelocity {
+  month: string;
+  change: number;
+  percentChange: number;
+}
+
+// Performance Types
+// Performance Types
+export interface PerformanceEntry {
+  month: string;
+  score: number;
+  change: number;
+  timestamp: string | number | Date;
+  [key: string]: unknown;
+}
+
+export interface Alert {
+  id: string;
+  type: "warning" | "critical" | "success" | "info";
+  message: string;
+  date: string;
+  title: string;
+  severity: "warning" | "critical" | "success" | "info";
+  action?: string;
+  details?: string;
+  [key: string]: unknown;
+}
+
+export interface Recommendation {
+  id: string;
+  type: "saving" | "spending" | "investment";
+  title: string;
+  description: string;
+  impact: string;
+  message: string;
+  action?: string;
+  [key: string]: unknown;
 }
 
 // Component prop types

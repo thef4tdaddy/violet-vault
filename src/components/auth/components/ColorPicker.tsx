@@ -1,12 +1,23 @@
+import React from "react";
 import { Button } from "@/components/ui";
-import { USER_COLORS } from "../../../utils/auth/userSetupHelpers.tsx";
+import { USER_COLORS } from "../../../utils/auth/userSetupHelpers";
+
+interface ColorPickerProps {
+  selectedColor: string;
+  onColorChange: (color: string) => void;
+  disabled?: boolean;
+}
 
 /**
  * Color Picker Component
  * Grid of color options for user profile customization
  * Extracted from UserSetup with UI standards compliance
  */
-const ColorPicker = ({ selectedColor, onColorChange, disabled = false }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({
+  selectedColor,
+  onColorChange,
+  disabled = false,
+}) => {
   return (
     <div>
       <label className="block text-base font-black text-black mb-3 uppercase tracking-wider">

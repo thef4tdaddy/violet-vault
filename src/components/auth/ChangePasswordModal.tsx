@@ -1,9 +1,20 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { AuthResult } from "@/types/auth";
 
-const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
+interface ChangePasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onChangePassword: (current: string, newPass: string) => Promise<AuthResult>;
+}
+
+const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
+  isOpen,
+  onClose,
+  onChangePassword,
+}) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,7 +24,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       setError("New passwords do not match.");
@@ -29,8 +40,9 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
       } else {
         setError(result.error || "Failed to change password.");
       }
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

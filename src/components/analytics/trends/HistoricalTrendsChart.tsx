@@ -14,8 +14,14 @@ import {
 import { getIcon } from "../../../utils";
 import { formatCurrency, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
 
-const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
-  const tooltipFormatter = (value, name) => [formatCurrency(value), name];
+import { SpendingTrend } from "@/types/analytics";
+
+interface HistoricalTrendsChartProps {
+  spendingTrends: SpendingTrend[];
+}
+
+const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({ spendingTrends = [] }) => {
+  const tooltipFormatter = (value: number, name: string) => [formatCurrency(value), name];
 
   const hasData = spendingTrends && spendingTrends.length > 0;
 

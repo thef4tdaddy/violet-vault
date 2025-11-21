@@ -77,7 +77,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
       await copyKeyToClipboard(30);
       handleClipboardSuccess();
     } catch (err) {
-      handleOperationError("Clipboard copy", err);
+      handleOperationError("Clipboard copy", err as Error);
     }
   };
 
@@ -85,7 +85,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
     try {
       await downloadKeyFile();
     } catch (err) {
-      handleOperationError("Download", err);
+      handleOperationError("Download", err as Error);
     }
   };
 
@@ -98,7 +98,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
       await downloadProtectedKeyFile(exportPassword);
       updatePassword("export", "");
     } catch (err) {
-      handleOperationError("Protected download", err);
+      handleOperationError("Protected download", err as Error);
     }
   };
 
@@ -124,7 +124,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
       updatePassword("import", "");
       updatePassword("vault", "");
     } catch (err) {
-      handleImportError(err);
+      handleImportError(err as Error);
     }
   };
 
@@ -134,7 +134,7 @@ const KeyManagementSettings: React.FC<KeyManagementSettingsProps> = ({ isOpen, o
       await generateQRCode();
       // QR code display functionality can be added to the service
     } catch (err) {
-      handleOperationError("QR code generation", err);
+      handleOperationError("QR code generation", err as Error);
     } finally {
       setLoading(false);
     }

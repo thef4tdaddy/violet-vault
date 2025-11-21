@@ -2,14 +2,22 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { getRecommendationIconType } from "../../../utils/performanceUtils";
 
+import { Recommendation } from "@/types/analytics";
+
+interface PerformanceRecommendationsTabProps {
+  recommendations: Recommendation[];
+}
+
 /**
  * PerformanceRecommendationsTab component - recommendations tab content
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const PerformanceRecommendationsTab = ({ recommendations }) => {
+const PerformanceRecommendationsTab: React.FC<PerformanceRecommendationsTabProps> = ({
+  recommendations,
+}) => {
   const CheckCircle = getIcon("CheckCircle");
 
-  const renderRecommendationIcon = (type) => {
+  const renderRecommendationIcon = (type: string) => {
     const iconConfig = getRecommendationIconType(type);
     const Icon = getIcon(iconConfig.name);
     return React.createElement(Icon, {

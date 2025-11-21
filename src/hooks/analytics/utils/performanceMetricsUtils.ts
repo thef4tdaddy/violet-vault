@@ -3,23 +3,7 @@
  * Extracted from usePerformanceMonitor hook to reduce complexity
  */
 
-interface EnvelopeAnalysis {
-  monthlyBudget?: number;
-  spent?: number;
-  name: string;
-}
-
-interface BalanceData {
-  envelopeAnalysis?: EnvelopeAnalysis[];
-  actualBalance?: number;
-  virtualBalance?: number;
-  savingsGoals?: Array<{ currentAmount?: number }>;
-}
-
-interface AnalyticsData {
-  totalIncome?: number;
-  categoryBreakdown?: Array<{ amount: number }>;
-}
+import { AnalyticsData, BalanceData } from "@/types/analytics";
 
 /**
  * Calculate budget adherence score
@@ -70,10 +54,10 @@ export const calculateSavingsRate = (analytics: AnalyticsData, balance: BalanceD
  * Calculate spending efficiency score
  */
 export const calculateSpendingEfficiency = (analytics: AnalyticsData): number => {
-  if (!analytics.categoryBreakdown || analytics.categoryBreakdown.length === 0) return 0;
+  const breakdown = analytics.categoryBreakdown as Array<{ amount: number }>;
+  if (!breakdown || !Array.isArray(breakdown) || breakdown.length === 0) return 0;
 
-  // Calculate spending distribution (Gini coefficient-like measure)
-  const amounts = analytics.categoryBreakdown.map((cat) => Math.abs(cat.amount));
+  const amounts = breakdown.map((cat) => Math.abs(cat.amount));
   const totalSpending = amounts.reduce((sum, amount) => sum + amount, 0);
 
   if (totalSpending === 0) return 100;

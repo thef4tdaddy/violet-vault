@@ -2,7 +2,14 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { formatPercent } from "../../../utils/analytics/trendHelpers";
 
-const InsightsPanel = ({ forecastInsights, insights }) => {
+import { Insights, ForecastInsights } from "@/types/analytics";
+
+interface InsightsPanelProps {
+  forecastInsights: ForecastInsights;
+  insights: Insights;
+}
+
+const InsightsPanel: React.FC<InsightsPanelProps> = ({ forecastInsights, insights }) => {
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-blue-100/40 backdrop-blur-sm shadow-xl">
       <div className="flex items-start gap-3">

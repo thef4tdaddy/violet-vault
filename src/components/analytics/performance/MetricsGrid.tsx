@@ -1,10 +1,23 @@
+import React from "react";
 import MetricCard from "./MetricCard";
+
+interface PerformanceMetrics {
+  budgetAdherence: number;
+  savingsRate: number;
+  spendingEfficiency: number;
+  balanceStability: number;
+  [key: string]: unknown; // Allow other properties if needed
+}
+
+interface MetricsGridProps {
+  performanceMetrics: PerformanceMetrics;
+}
 
 /**
  * MetricsGrid component - displays performance metric cards
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const MetricsGrid = ({ performanceMetrics }) => {
+const MetricsGrid: React.FC<MetricsGridProps> = ({ performanceMetrics }) => {
   const metricsConfig = [
     {
       title: "Budget Adherence",

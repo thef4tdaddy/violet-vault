@@ -1,9 +1,19 @@
 import { useMemo } from "react";
+import { SEASON_COLORS } from "../../utils/analytics/trendHelpers";
+import {
+  AnalyticsData,
+  SpendingTrend,
+  SpendingVelocity,
+  CategoryTrend,
+  SeasonalPattern,
+  ForecastInsights,
+  Insights,
+} from "@/types/analytics";
 
 /**
  * Generate historical spending trends data
  */
-const generateSpendingTrends = (analyticsData) => {
+const generateSpendingTrends = (analyticsData: AnalyticsData): SpendingTrend[] => {
   if (!analyticsData) return [];
 
   // Mock historical data - in real implementation, this would come from analytics
@@ -23,7 +33,7 @@ const generateSpendingTrends = (analyticsData) => {
   ];
 
   const currentMonth = new Date().getMonth();
-  const trends = [];
+  const trends: SpendingTrend[] = [];
 
   for (let i = 0; i < 12; i++) {
     const monthIndex = (currentMonth - 11 + i + 12) % 12;
@@ -53,10 +63,10 @@ const generateSpendingTrends = (analyticsData) => {
 /**
  * Calculate spending velocity (rate of change)
  */
-const calculateSpendingVelocity = (spendingTrends) => {
+const calculateSpendingVelocity = (spendingTrends: SpendingTrend[]): SpendingVelocity[] => {
   if (!spendingTrends || spendingTrends.length < 2) return [];
 
-  const velocity = [];
+  const velocity: SpendingVelocity[] = [];
   for (let i = 1; i < spendingTrends.length; i++) {
     const current = spendingTrends[i];
     const previous = spendingTrends[i - 1];
@@ -76,48 +86,71 @@ const calculateSpendingVelocity = (spendingTrends) => {
 /**
  * Generate category trends data
  */
-const generateCategoryTrends = (analyticsData) => {
+const generateCategoryTrends = (analyticsData: AnalyticsData): CategoryTrend[] => {
   if (!analyticsData) return [];
 
-  return [
-    { name: "Groceries", current: 850, previous: 780, trend: "increasing" },
-    {
-      name: "Transportation",
-      current: 320,
-      previous: 380,
-      trend: "decreasing",
-    },
-    { name: "Utilities", current: 245, previous: 250, trend: "stable" },
-    { name: "Entertainment", current: 180, previous: 120, trend: "increasing" },
-    { name: "Healthcare", current: 95, previous: 110, trend: "decreasing" },
+  const categories = [
+    { name: "Groceries", base: 800 },
+    { name: "Transportation", base: 350 },
+    { name: "Utilities", base: 250 },
+    { name: "Entertainment", base: 200 },
+    { name: "Healthcare", base: 100 },
   ];
+
+  return categories.map((cat) => {
+    const trend = [];
+    for (let i = 0; i < 6; i++) {
+      trend.push({
+        month: `M${i + 1}`,
+        amount: Math.round(cat.base + (Math.random() - 0.5) * 100),
+      });
+    }
+    return {
+      name: cat.name,
+      trend,
+      current: trend[5].amount,
+      previous: trend[4].amount,
+    };
+  });
 };
 
 /**
  * Generate seasonal patterns data
  */
-const generateSeasonalPatterns = (analyticsData) => {
+const generateSeasonalPatterns = (analyticsData: AnalyticsData): SeasonalPattern[] => {
   if (!analyticsData) return [];
 
   return [
     {
-      season: "Winter",
+      name: "Winter",
+      color: SEASON_COLORS.Winter,
       avgSpending: 2850,
+      avgIncome: 3200,
+      avgNet: 350,
       categories: ["Utilities", "Healthcare"],
     },
     {
-      season: "Spring",
+      name: "Spring",
+      color: SEASON_COLORS.Spring,
       avgSpending: 2650,
+      avgIncome: 3100,
+      avgNet: 450,
       categories: ["Groceries", "Transportation"],
     },
     {
-      season: "Summer",
+      name: "Summer",
+      color: SEASON_COLORS.Summer,
       avgSpending: 2950,
+      avgIncome: 3100,
+      avgNet: 150,
       categories: ["Entertainment", "Transportation"],
     },
     {
-      season: "Fall",
+      name: "Fall",
+      color: SEASON_COLORS.Fall,
       avgSpending: 2750,
+      avgIncome: 3150,
+      avgNet: 400,
       categories: ["Groceries", "Utilities"],
     },
   ];
@@ -126,8 +159,14 @@ const generateSeasonalPatterns = (analyticsData) => {
 /**
  * Generate forecast insights
  */
-const generateForecastInsights = (spendingTrends) => {
-  if (!spendingTrends || spendingTrends.length < 4) return {};
+const generateForecastInsights = (spendingTrends: SpendingTrend[]): ForecastInsights => {
+  if (!spendingTrends || spendingTrends.length < 4)
+    return {
+      trend: "stable",
+      projectedSpending: 0,
+      growthRate: 0,
+      confidence: 0,
+    };
 
   const currentMonthData = spendingTrends[spendingTrends.length - 4];
   const forecastData = spendingTrends.slice(-3);
@@ -135,43 +174,50 @@ const generateForecastInsights = (spendingTrends) => {
   const avgForecastSpending =
     forecastData.reduce((sum, month) => sum + month.spending, 0) / forecastData.length;
 
+  const growthRate =
+    ((avgForecastSpending - currentMonthData.spending) / currentMonthData.spending) * 100;
+
   return {
-    projectedMonthlySpending: Math.round(avgForecastSpending),
-    projectedSavings: Math.round(forecastData[2].net),
-    confidenceLevel: 85,
-    trendDirection: avgForecastSpending > currentMonthData.spending ? "up" : "down",
+    trend: avgForecastSpending > currentMonthData.spending ? "increasing" : "decreasing",
+    projectedSpending: Math.round(avgForecastSpending),
+    growthRate: Math.round(growthRate * 10) / 10,
+    confidence: 85,
   };
 };
 
 /**
  * Generate actionable insights
  */
-const generateInsights = (_categoryTrends, _seasonalPatterns) => [
-  {
-    type: "warning",
-    title: "Increasing Entertainment Spending",
-    description: "Entertainment costs have increased by 50% compared to last month.",
-    action: "Consider setting a monthly entertainment budget limit.",
-  },
-  {
-    type: "success",
-    title: "Transportation Savings",
-    description: "You've saved $60 on transportation this month.",
-    action: "Great job! Consider investing these savings.",
-  },
-  {
-    type: "info",
-    title: "Seasonal Pattern Detected",
-    description: "Your spending typically increases by 15% during summer months.",
-    action: "Plan ahead for higher summer expenses in categories like entertainment.",
-  },
-];
+const generateInsights = (
+  _categoryTrends: CategoryTrend[],
+  _seasonalPatterns: SeasonalPattern[]
+): Insights => {
+  return {
+    highestSpendingSeason: "Summer",
+    avgVelocity: 5.2,
+    hasHighGrowth: true,
+    details: [
+      {
+        type: "warning",
+        title: "Increasing Entertainment Spending",
+        description: "Entertainment costs have increased by 50% compared to last month.",
+        action: "Consider setting a monthly entertainment budget limit.",
+      },
+      {
+        type: "success",
+        title: "Transportation Savings",
+        description: "You've saved $60 on transportation this month.",
+        action: "Great job! Consider investing these savings.",
+      },
+    ],
+  };
+};
 
 /**
  * Custom hook for trend analysis calculations and data processing
  * Extracts all computational logic from TrendAnalysisCharts component
  */
-export const useTrendAnalysis = (analyticsData, _timeFilter) => {
+export const useTrendAnalysis = (analyticsData: AnalyticsData, _timeFilter: string) => {
   const spendingTrends = useMemo(() => generateSpendingTrends(analyticsData), [analyticsData]);
 
   const spendingVelocity = useMemo(

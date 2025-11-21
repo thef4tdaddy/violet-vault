@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
-| TypeScript Errors | 0 | -3 |
-| TypeScript Strict Mode Errors | 2595 | -4 |
+| TypeScript Errors | 0 | 0 |
+| TypeScript Strict Mode Errors | 2501 | 0 |
 
-*Last updated: 2025-11-13 23:23:40 UTC*
+*Last updated: 2025-11-21 19:46:55 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-13 23:23:24 UTC
+Last check: 2025-11-21 19:46:40 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-13 23:23:32 UTC
+Last check: 2025-11-21 19:46:47 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -100,7 +100,6 @@ Last check: 2025-11-13 23:23:32 UTC
 - 11 errors in `src/utils/savings/savingsFormUtils.ts`
 - 11 errors in `src/utils/bills/billDetailUtils.ts`
 - 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
-- 11 errors in `src/hooks/analytics/useTrendAnalysis.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
 - 11 errors in `src/components/budgeting/suggestions/SuggestionSettings.tsx`
@@ -180,7 +179,6 @@ Last check: 2025-11-13 23:23:32 UTC
 - 7 errors in `src/components/pwa/InstallPromptModal.tsx`
 - 7 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 7 errors in `src/components/modals/QuickFundForm.tsx`
-- 7 errors in `src/components/modals/PasswordRotationModal.tsx`
 - 7 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/components/history/viewer/ChangeDetails.tsx`
 - 7 errors in `src/components/debt/ui/QuickPaymentForm.tsx`
@@ -191,11 +189,10 @@ Last check: 2025-11-13 23:23:32 UTC
 - 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 7 errors in `src/components/automation/AutoFundingView.tsx`
-- 7 errors in `src/components/auth/components/StepButtons.tsx`
-- 7 errors in `src/components/auth/PasswordRotationModal.tsx`
 - 7 errors in `src/App.tsx`
 - 6 errors in `src/utils/transactions/splitting.ts`
 - 6 errors in `src/utils/transactions/fileParser.ts`
+- 6 errors in `src/utils/debts/debtFormValidation.ts`
 - 6 errors in `src/utils/debts/debtDebugConfig.ts`
 - 6 errors in `src/utils/dataManagement/validationUtils.ts`
 - 6 errors in `src/utils/common/BaseMutex.ts`
@@ -214,12 +211,10 @@ Last check: 2025-11-13 23:23:32 UTC
 - 6 errors in `src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
 - 6 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
 - 6 errors in `src/components/automation/steps/config/PriorityFillConfig.tsx`
-- 6 errors in `src/components/auth/KeyManagementSettings.tsx`
 - 5 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 5 errors in `src/utils/sync/syncFlowValidator.ts`
 - 5 errors in `src/utils/sync/syncEdgeCaseTester.ts`
 - 5 errors in `src/utils/pwa/offlineDataValidator.ts`
-- 5 errors in `src/utils/debts/debtFormValidation.ts`
 - 5 errors in `src/utils/dataManagement/dexieUtils.ts`
 - 5 errors in `src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 5 errors in `src/utils/budgeting/autofunding/conditions.ts`
@@ -248,7 +243,6 @@ Last check: 2025-11-13 23:23:32 UTC
 - 5 errors in `src/components/receipts/ReceiptButton.tsx`
 - 5 errors in `src/components/layout/ViewRenderer.tsx`
 - 5 errors in `src/components/layout/SummaryCards.tsx`
-- 5 errors in `src/components/charts/CategoryBarChart.tsx`
 - 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
 - 5 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 5 errors in `src/components/bills/modals/BillDetailActions.tsx`
@@ -259,7 +253,6 @@ Last check: 2025-11-13 23:23:32 UTC
 - 5 errors in `src/components/automation/steps/config/FixedAmountConfig.tsx`
 - 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
 - 5 errors in `src/components/auth/components/ReturningUserActions.tsx`
-- 5 errors in `src/components/auth/ChangePasswordModal.tsx`
 - 4 errors in `src/utils/sync/retryUtils.ts`
 - 4 errors in `src/utils/sync/retryPolicies.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
@@ -297,14 +290,7 @@ Last check: 2025-11-13 23:23:32 UTC
 - 4 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
 - 4 errors in `src/components/auth/components/UserSetupHeader.tsx`
 - 4 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
-- 4 errors in `src/components/auth/LocalOnlySetup.tsx`
-- 4 errors in `src/components/analytics/trends/CategoryTrendsSection.tsx`
 - 4 errors in `src/components/analytics/tabs/TrendsTab.tsx`
-- 4 errors in `src/components/analytics/performance/PerformanceTabNavigation.tsx`
-- 4 errors in `src/components/analytics/performance/PerformanceRecommendationsTab.tsx`
-- 4 errors in `src/components/analytics/performance/PerformanceAlertsTab.tsx`
-- 4 errors in `src/components/analytics/performance/MetricCard.tsx`
-- 4 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
 - 3 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
@@ -325,7 +311,6 @@ Last check: 2025-11-13 23:23:32 UTC
 - 3 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 3 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
 - 3 errors in `src/hooks/analytics/useTransactionAnalysis.ts`
-- 3 errors in `src/hooks/analytics/usePerformanceMonitor.ts`
 - 3 errors in `src/hooks/analytics/useChartsAnalytics.ts`
 - 3 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 3 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
@@ -340,6 +325,7 @@ Last check: 2025-11-13 23:23:32 UTC
 - 3 errors in `src/components/receipts/components/ExtractedItemsList.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/history/viewer/IntegrityWarning.tsx`
+- 3 errors in `src/components/charts/CategoryBarChart.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHeader.tsx`
@@ -354,8 +340,6 @@ Last check: 2025-11-13 23:23:32 UTC
 - 3 errors in `src/components/bills/AddBillModal.tsx`
 - 3 errors in `src/components/automation/steps/RuleTypeStep.tsx`
 - 3 errors in `src/components/analytics/tabs/HealthTab.tsx`
-- 3 errors in `src/components/analytics/performance/PerformanceTabContent.tsx`
-- 3 errors in `src/components/analytics/performance/PerformanceOverviewTab.tsx`
 - 3 errors in `src/components/analytics/components/AnalyticsHeader.tsx`
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
@@ -425,14 +409,9 @@ Last check: 2025-11-13 23:23:32 UTC
 - 2 errors in `src/components/automation/steps/TriggerScheduleStep.tsx`
 - 2 errors in `src/components/automation/components/StepNavigation.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
-- 2 errors in `src/components/auth/components/ColorPicker.tsx`
 - 2 errors in `src/components/auth/UserIndicator.tsx`
-- 2 errors in `src/components/analytics/trends/SeasonalPatternsSection.tsx`
-- 2 errors in `src/components/analytics/trends/InsightsPanel.tsx`
-- 2 errors in `src/components/analytics/trends/HistoricalTrendsChart.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
-- 2 errors in `src/components/analytics/performance/PerformanceHeader.tsx`
-- 2 errors in `src/components/analytics/PerformanceMonitor.tsx`
+- 2 errors in `src/components/analytics/components/TabContent.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
 - 1 errors in `src/utils/sync/dataDetectionHelper.ts`
@@ -503,11 +482,8 @@ Last check: 2025-11-13 23:23:32 UTC
 - 1 errors in `src/components/bills/BillDiscoveryModal.tsx`
 - 1 errors in `src/components/auth/key-management/MainContent.tsx`
 - 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
-- 1 errors in `src/components/auth/UserSetup.tsx`
-- 1 errors in `src/components/auth/AuthGateway.tsx`
-- 1 errors in `src/components/analytics/trends/ForecastSummaryCard.tsx`
-- 1 errors in `src/components/analytics/performance/OverallScore.tsx`
-- 1 errors in `src/components/analytics/performance/MetricsGrid.tsx`
+- 1 errors in `src/components/auth/KeyManagementSettings.tsx`
+- 1 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
@@ -515,18 +491,18 @@ Last check: 2025-11-13 23:23:32 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 854 | `TS7006` |
-| 744 | `TS7031` |
-| 186 | `TS2345` |
+| 824 | `TS7006` |
+| 689 | `TS7031` |
+| 181 | `TS2345` |
 | 169 | `TS2339` |
-| 149 | `TS18046` |
-| 136 | `TS2322` |
+| 147 | `TS18046` |
+| 133 | `TS2322` |
 | 71 | `TS18048` |
 | 69 | `TS7053` |
 | 69 | `TS7005` |
 | 41 | `TS7034` |
 | 37 | `TS18047` |
-| 23 | `TS2769` |
+| 24 | `TS2769` |
 | 6 | `TS2411` |
 | 5 | `TS2722` |
 | 5 | `TS2531` |
@@ -560,12 +536,10 @@ src/App.tsx(63,25): error TS2322: Type 'CloudSyncService' is not assignable to t
     Type '(config: SyncConfig) => void' is not assignable to type '(config: unknown) => void'.
       Types of parameters 'config' and 'config' are incompatible.
         Type 'unknown' is not assignable to type 'SyncConfig'.
-src/components/analytics/AnalyticsDashboard.tsx(168,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/AnalyticsDashboard.tsx(459,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
+src/components/analytics/AnalyticsDashboard.tsx(170,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
+  Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/AnalyticsDashboard.tsx(460,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
   Type 'undefined' is not assignable to type 'Record<string, unknown>'.
 src/components/analytics/AnalyticsDashboard.tsx(461,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
@@ -574,41 +548,19 @@ src/components/analytics/AnalyticsDashboard.tsx(462,15): error TS2322: Type '{ p
   Type 'undefined' is not assignable to type 'Record<string, unknown>'.
 src/components/analytics/AnalyticsDashboard.tsx(463,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
   Type 'undefined' is not assignable to type 'Record<string, unknown>'.
-src/components/analytics/AnalyticsDashboard.tsx(465,13): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
+src/components/analytics/AnalyticsDashboard.tsx(464,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
+  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
+src/components/analytics/AnalyticsDashboard.tsx(466,13): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
   Type 'undefined' is not assignable to type 'Record<string, unknown>'.
 src/components/analytics/CategorySuggestionsTab.tsx(93,32): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/analytics/components/AnalyticsHeader.tsx(9,28): error TS7031: Binding element 'dateRange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,39): error TS7031: Binding element 'handleDateRangeChange' implicitly has an 'any' type.
 src/components/analytics/components/AnalyticsHeader.tsx(9,62): error TS7031: Binding element 'handleExport' implicitly has an 'any' type.
-src/components/analytics/performance/MetricCard.tsx(9,23): error TS7031: Binding element 'title' implicitly has an 'any' type.
-src/components/analytics/performance/MetricCard.tsx(9,30): error TS7031: Binding element 'score' implicitly has an 'any' type.
-src/components/analytics/performance/MetricCard.tsx(9,37): error TS7031: Binding element 'iconName' implicitly has an 'any' type.
-src/components/analytics/performance/MetricCard.tsx(9,47): error TS7031: Binding element 'description' implicitly has an 'any' type.
-src/components/analytics/performance/MetricsGrid.tsx(7,24): error TS7031: Binding element 'performanceMetrics' implicitly has an 'any' type.
-src/components/analytics/performance/OverallScore.tsx(7,25): error TS7031: Binding element 'score' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceAlertsTab.tsx(9,33): error TS7031: Binding element 'alerts' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceAlertsTab.tsx(12,28): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceAlertsTab.tsx(31,21): error TS7006: Parameter 'alert' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceAlertsTab.tsx(31,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceHeader.tsx(9,30): error TS7031: Binding element 'alertsEnabled' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceHeader.tsx(9,45): error TS7031: Binding element 'setAlertsEnabled' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceOverviewTab.tsx(8,35): error TS7031: Binding element 'performanceHistory' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceOverviewTab.tsx(17,49): error TS7006: Parameter 'entry' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceOverviewTab.tsx(17,56): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceRecommendationsTab.tsx(9,42): error TS7031: Binding element 'recommendations' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceRecommendationsTab.tsx(12,37): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceRecommendationsTab.tsx(31,30): error TS7006: Parameter 'rec' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceRecommendationsTab.tsx(31,35): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabContent.tsx(9,34): error TS7031: Binding element 'selectedMetric' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabContent.tsx(9,50): error TS7031: Binding element 'performanceHistory' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabContent.tsx(9,70): error TS7031: Binding element 'performanceMetrics' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabNavigation.tsx(10,3): error TS7031: Binding element 'selectedMetric' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabNavigation.tsx(11,3): error TS7031: Binding element 'setSelectedMetric' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabNavigation.tsx(12,3): error TS7031: Binding element 'alertsCount' implicitly has an 'any' type.
-src/components/analytics/performance/PerformanceTabNavigation.tsx(13,3): error TS7031: Binding element 'recommendationsCount' implicitly has an 'any' type.
-src/components/analytics/PerformanceMonitor.tsx(13,31): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
-src/components/analytics/PerformanceMonitor.tsx(13,46): error TS7031: Binding element 'balanceData' implicitly has an 'any' type.
+src/components/analytics/components/TabContent.tsx(86,32): error TS2322: Type 'AnalyticsData | null | undefined' is not assignable to type 'AnalyticsData'.
+  Type 'undefined' is not assignable to type 'AnalyticsData'.
+src/components/analytics/components/TabContent.tsx(86,62): error TS2322: Type 'Record<string, unknown> | null | undefined' is not assignable to type 'BalanceData'.
+  Type 'undefined' is not assignable to type 'BalanceData'.
 src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: null; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type 'null' is not assignable to type 'boolean'.
@@ -624,31 +576,8 @@ src/components/analytics/tabs/TrendsTab.tsx(8,22): error TS7031: Binding element
 src/components/analytics/tabs/TrendsTab.tsx(8,33): error TS7031: Binding element 'handleChartTypeChange' implicitly has an 'any' type.
 src/components/analytics/tabs/TrendsTab.tsx(8,56): error TS7031: Binding element 'monthlyTrends' implicitly has an 'any' type.
 src/components/analytics/tabs/TrendsTab.tsx(8,71): error TS7031: Binding element 'weeklyPatterns' implicitly has an 'any' type.
-src/components/analytics/TrendAnalysisCharts.tsx(20,32): error TS7031: Binding element 'analyticsData' implicitly has an 'any' type.
-src/components/analytics/TrendAnalysisCharts.tsx(20,47): error TS7031: Binding element 'timeFilter' implicitly has an 'any' type.
-src/components/analytics/TrendAnalysisCharts.tsx(36,30): error TS2322: Type '{ month: string; spending: number; income: number; net: number; forecast: boolean; }[]' is not assignable to type 'never[]'.
-  Type '{ month: string; spending: number; income: number; net: number; forecast: boolean; }' is not assignable to type 'never'.
-src/components/analytics/TrendAnalysisCharts.tsx(39,22): error TS2322: Type '{ month: any; change: number; percentChange: number; }[]' is not assignable to type 'never[]'.
-  Type '{ month: any; change: number; percentChange: number; }' is not assignable to type 'never'.
-src/components/analytics/trends/CategoryTrendsSection.tsx(4,34): error TS7031: Binding element 'categoryTrends' implicitly has an 'any' type.
-src/components/analytics/trends/CategoryTrendsSection.tsx(5,29): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/components/analytics/trends/CategoryTrendsSection.tsx(14,30): error TS7006: Parameter 'category' implicitly has an 'any' type.
-src/components/analytics/trends/CategoryTrendsSection.tsx(14,40): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/analytics/trends/ForecastSummaryCard.tsx(9,32): error TS7031: Binding element 'forecastInsights' implicitly has an 'any' type.
-src/components/analytics/trends/HistoricalTrendsChart.tsx(18,29): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/components/analytics/trends/HistoricalTrendsChart.tsx(18,36): error TS7006: Parameter 'name' implicitly has an 'any' type.
-src/components/analytics/trends/InsightsPanel.tsx(5,26): error TS7031: Binding element 'forecastInsights' implicitly has an 'any' type.
-src/components/analytics/trends/InsightsPanel.tsx(5,44): error TS7031: Binding element 'insights' implicitly has an 'any' type.
-src/components/analytics/trends/SeasonalPatternsSection.tsx(3,36): error TS7031: Binding element 'seasonalPatterns' implicitly has an 'any' type.
-src/components/analytics/trends/SeasonalPatternsSection.tsx(11,32): error TS7006: Parameter 'season' implicitly has an 'any' type.
-src/components/auth/AuthGateway.tsx(76,26): error TS7006: Parameter 'mode' implicitly has an 'any' type.
-src/components/auth/ChangePasswordModal.tsx(6,32): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/auth/ChangePasswordModal.tsx(6,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/auth/ChangePasswordModal.tsx(6,49): error TS7031: Binding element 'onChangePassword' implicitly has an 'any' type.
-src/components/auth/ChangePasswordModal.tsx(16,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/auth/ChangePasswordModal.tsx(33,16): error TS18046: 'err' is of type 'unknown'.
-src/components/auth/components/ColorPicker.tsx(9,24): error TS7031: Binding element 'selectedColor' implicitly has an 'any' type.
-src/components/auth/components/ColorPicker.tsx(9,39): error TS7031: Binding element 'onColorChange' implicitly has an 'any' type.
+src/components/analytics/TrendAnalysisCharts.tsx(47,22): error TS2322: Type 'SpendingVelocity[]' is not assignable to type 'never[]'.
+  Type 'SpendingVelocity' is not assignable to type 'never'.
 src/components/auth/components/ReturningUserActions.tsx(10,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
 src/components/auth/components/ReturningUserActions.tsx(11,3): error TS7031: Binding element 'onChangeProfile' implicitly has an 'any' type.
 src/components/auth/components/ReturningUserActions.tsx(12,3): error TS7031: Binding element 'onStartFresh' implicitly has an 'any' type.
@@ -658,13 +587,6 @@ src/components/auth/components/ShareCodeDisplay.tsx(10,29): error TS7031: Bindin
 src/components/auth/components/ShareCodeDisplay.tsx(10,40): error TS7031: Binding element 'onCreateBudget' implicitly has an 'any' type.
 src/components/auth/components/ShareCodeDisplay.tsx(10,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
 src/components/auth/components/ShareCodeDisplay.tsx(10,64): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(9,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(10,3): error TS7031: Binding element 'onContinue' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(11,3): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(12,3): error TS7031: Binding element 'onStartTracking' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(13,3): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(14,3): error TS7031: Binding element 'canContinue' implicitly has an 'any' type.
-src/components/auth/components/StepButtons.tsx(15,3): error TS7031: Binding element 'canStartTracking' implicitly has an 'any' type.
 src/components/auth/components/UserNameInput.tsx(7,3): error TS7031: Binding element 'value' implicitly has an 'any' type.
 src/components/auth/components/UserNameInput.tsx(8,3): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
 src/components/auth/components/UserSetupHeader.tsx(9,28): error TS7031: Binding element 'step' implicitly has an 'any' type.
@@ -674,34 +596,13 @@ src/components/auth/components/UserSetupHeader.tsx(9,61): error TS7031: Binding 
 src/components/auth/components/UserSetupLayout.tsx(6,28): error TS7031: Binding element 'children' implicitly has an 'any' type.
 src/components/auth/key-management/MainContent.tsx(116,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
   Type 'null' is not assignable to type 'string'.
-src/components/auth/KeyManagementSettings.tsx(80,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
-src/components/auth/KeyManagementSettings.tsx(88,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
-src/components/auth/KeyManagementSettings.tsx(101,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
-src/components/auth/KeyManagementSettings.tsx(127,25): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
-src/components/auth/KeyManagementSettings.tsx(137,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
 src/components/auth/KeyManagementSettings.tsx(166,11): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
-src/components/auth/LocalOnlySetup.tsx(58,47): error TS18046: 'err' is of type 'unknown'.
-src/components/auth/LocalOnlySetup.tsx(65,27): error TS7031: Binding element 'onModeSelected' implicitly has an 'any' type.
-src/components/auth/LocalOnlySetup.tsx(65,43): error TS7031: Binding element 'onSwitchToAuth' implicitly has an 'any' type.
-src/components/auth/LocalOnlySetup.tsx(128,15): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(file: File | null) => void'.
-  Types of parameters 'value' and 'file' are incompatible.
-    Type 'File | null' is not assignable to type 'SetStateAction<null>'.
-      Type 'File' is not assignable to type 'SetStateAction<null>'.
-        Type 'File' provides no match for the signature '(prevState: null): null'.
-src/components/auth/PasswordRotationModal.tsx(11,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/auth/PasswordRotationModal.tsx(12,3): error TS7031: Binding element 'newPassword' implicitly has an 'any' type.
-src/components/auth/PasswordRotationModal.tsx(13,3): error TS7031: Binding element 'confirmPassword' implicitly has an 'any' type.
-src/components/auth/PasswordRotationModal.tsx(14,3): error TS7031: Binding element 'setNewPassword' implicitly has an 'any' type.
-src/components/auth/PasswordRotationModal.tsx(15,3): error TS7031: Binding element 'setConfirmPassword' implicitly has an 'any' type.
-src/components/auth/PasswordRotationModal.tsx(16,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/auth/PasswordRotationModal.tsx(17,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/auth/UserIndicator.tsx(71,23): error TS2349: This expression is not callable.
   Type 'never' has no call signatures.
 src/components/auth/UserIndicator.tsx(116,11): error TS2322: Type '((updates: { [key: string]: unknown; userName: string; userColor: string; budgetId?: string | undefined; }) => Promise<void>) | undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
   Type 'undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
-src/components/auth/UserSetup.tsx(73,36): error TS7006: Parameter 'joinData' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboard.tsx(8,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/automation/AutoFundingDashboard.tsx(13,33): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboard.tsx(13,41): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
@@ -1208,11 +1109,15 @@ src/components/budgeting/suggestions/SuggestionsList.tsx(26,55): error TS7006: P
 src/components/budgeting/suggestions/SuggestionsList.tsx(64,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ high: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; medium: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; low: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; }'.
   No index signature with a parameter of type 'string' was found on type '{ high: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; medium: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; low: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; }'.
 src/components/budgeting/suggestions/SuggestionsList.tsx(84,41): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
-src/components/charts/CategoryBarChart.tsx(154,15): error TS2322: Type 'unknown' is not assignable to type 'Key | null | undefined'.
-src/components/charts/CategoryBarChart.tsx(155,15): error TS2322: Type 'number[]' is not assignable to type 'number | [number, number, number, number] | undefined'.
-  Type 'number[]' is not assignable to type '[number, number, number, number]'.
-    Target requires 4 element(s) but source may have fewer.
-src/components/charts/CategoryBarChart.tsx(157,15): error TS2322: Type '{}' is not assignable to type 'string'.
+src/components/charts/CategoryBarChart.tsx(153,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: Props): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type 'unknown' is not assignable to type 'Key | null | undefined'.
+  Overload 2 of 2, '(props: Props): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type 'number[]' is not assignable to type 'number | [number, number, number, number] | undefined'.
+      Type 'number[]' is not assignable to type '[number, number, number, number]'.
+        Target requires 4 element(s) but source may have fewer.
+  Overload 2 of 2, '(props: Props): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{}' is not assignable to type 'string'.
 src/components/charts/CategoryBarChart.tsx(157,15): error TS2783: 'fill' is specified more than once, so this usage will be overwritten.
 src/components/charts/CategoryBarChart.tsx(157,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
 src/components/charts/ComposedFinancialChart.tsx(230,33): error TS7031: Binding element 'data' implicitly has an 'any' type.
@@ -1418,13 +1323,6 @@ src/components/mobile/SlideUpModal.tsx(350,9): error TS2322: Type 'RefObject<HTM
 src/components/mobile/SlideUpModal.tsx(351,9): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
-src/components/modals/PasswordRotationModal.tsx(10,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/modals/PasswordRotationModal.tsx(11,3): error TS7031: Binding element 'newPassword' implicitly has an 'any' type.
-src/components/modals/PasswordRotationModal.tsx(12,3): error TS7031: Binding element 'confirmPassword' implicitly has an 'any' type.
-src/components/modals/PasswordRotationModal.tsx(13,3): error TS7031: Binding element 'onNewPasswordChange' implicitly has an 'any' type.
-src/components/modals/PasswordRotationModal.tsx(14,3): error TS7031: Binding element 'onConfirmPasswordChange' implicitly has an 'any' type.
-src/components/modals/PasswordRotationModal.tsx(15,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/modals/PasswordRotationModal.tsx(16,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/modals/QuickFundForm.tsx(4,26): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
 src/components/modals/QuickFundForm.tsx(4,36): error TS7031: Binding element 'amount' implicitly has an 'any' type.
 src/components/modals/QuickFundForm.tsx(4,44): error TS7031: Binding element 'setAmount' implicitly has an 'any' type.
@@ -1986,12 +1884,6 @@ src/hooks/analytics/useBillAnalysis.ts(11,40): error TS7006: Parameter 'settings
 src/hooks/analytics/useChartsAnalytics.ts(39,6): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/hooks/analytics/useChartsAnalytics.ts(47,46): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/hooks/analytics/useChartsAnalytics.ts(51,40): error TS7006: Parameter 'tabId' implicitly has an 'any' type.
-src/hooks/analytics/usePerformanceMonitor.ts(15,39): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.
-src/hooks/analytics/usePerformanceMonitor.ts(15,54): error TS7006: Parameter 'balanceData' implicitly has an 'any' type.
-src/hooks/analytics/usePerformanceMonitor.ts(75,29): error TS2345: Argument of type '(prev: never[]) => { timestamp: number; score: number; budgetAdherence: number; savingsRate: number; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type '(prev: never[]) => { timestamp: number; score: number; budgetAdherence: number; savingsRate: number; }[]' is not assignable to type '(prevState: never[]) => never[]'.
-    Type '{ timestamp: number; score: number; budgetAdherence: number; savingsRate: number; }[]' is not assignable to type 'never[]'.
-      Type '{ timestamp: number; score: number; budgetAdherence: number; savingsRate: number; }' is not assignable to type 'never'.
 src/hooks/analytics/useReportExporter.ts(36,12): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.
 src/hooks/analytics/useReportExporter.ts(36,27): error TS7006: Parameter 'balanceData' implicitly has an 'any' type.
 src/hooks/analytics/useReportExporter.ts(36,40): error TS7006: Parameter 'timeFilter' implicitly has an 'any' type.
@@ -2015,17 +1907,6 @@ src/hooks/analytics/useTransactionAnalysis.ts(11,62): error TS7006: Parameter 'a
 src/hooks/analytics/useTransactionAnalysis.ts(11,79): error TS7006: Parameter 'settings' implicitly has an 'any' type.
 src/hooks/analytics/useTransactionFiltering.ts(15,23): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 7: Date; 30: Date; 90: Date; "6months": Date; }'.
   No index signature with a parameter of type 'string' was found on type '{ 7: Date; 30: Date; 90: Date; "6months": Date; }'.
-src/hooks/analytics/useTrendAnalysis.ts(6,33): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(56,36): error TS7006: Parameter 'spendingTrends' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(79,33): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(99,35): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(129,35): error TS7006: Parameter 'spendingTrends' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(136,26): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(136,31): error TS7006: Parameter 'month' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(149,27): error TS7006: Parameter '_categoryTrends' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(149,44): error TS7006: Parameter '_seasonalPatterns' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(174,34): error TS7006: Parameter 'analyticsData' implicitly has an 'any' type.
-src/hooks/analytics/useTrendAnalysis.ts(174,49): error TS7006: Parameter '_timeFilter' implicitly has an 'any' type.
 src/hooks/analytics/utils/csvImageExportUtils.ts(97,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(85,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AnalyticsData'.
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(94,39): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'BalanceData'.
@@ -3394,13 +3275,15 @@ src/utils/debts/debtDebugConfig.ts(50,36): error TS7006: Parameter 'feature' imp
 src/utils/debts/debtDebugConfig.ts(51,3): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
 src/utils/debts/debtDebugConfig.ts(59,35): error TS7006: Parameter 'feature' implicitly has an 'any' type.
 src/utils/debts/debtDebugConfig.ts(60,3): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtFormValidation.ts(181,30): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
-src/utils/debts/debtFormValidation.ts(182,20): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
-src/utils/debts/debtFormValidation.ts(201,35): error TS2345: Argument of type 'number | null | undefined' is not assignable to parameter of type 'number | null'.
+src/utils/debts/debtFormValidation.ts(101,38): error TS2345: Argument of type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; } | undefined' is not assignable to parameter of type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; }'.
+  Type 'undefined' is not assignable to type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; }'.
+src/utils/debts/debtFormValidation.ts(239,30): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
+src/utils/debts/debtFormValidation.ts(240,20): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
+src/utils/debts/debtFormValidation.ts(259,35): error TS2345: Argument of type 'number | null | undefined' is not assignable to parameter of type 'number | null'.
   Type 'undefined' is not assignable to type 'number | null'.
-src/utils/debts/debtFormValidation.ts(202,37): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number | null'.
+src/utils/debts/debtFormValidation.ts(260,37): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number | null'.
   Type 'undefined' is not assignable to type 'number | null'.
-src/utils/debts/debtFormValidation.ts(203,5): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+src/utils/debts/debtFormValidation.ts(261,5): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
   Type 'undefined' is not assignable to type 'boolean'.
 src/utils/debug/dataDiagnostic.ts(113,59): error TS18046: 'error' is of type 'unknown'.
 src/utils/debug/dataDiagnostic.ts(123,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'VioletVaultDB'.

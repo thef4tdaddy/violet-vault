@@ -5,11 +5,24 @@
 
 import { validateDebtFormDataSafe, type DebtFormData } from "@/domain/schemas/debt";
 
+type NumericString = string | number | null | undefined;
+
+type DebtFormParsedData = Omit<
+  DebtFormData,
+  "currentBalance" | "balance" | "minimumPayment" | "interestRate" | "originalBalance"
+> & {
+  currentBalance: number;
+  balance: number;
+  minimumPayment: number;
+  interestRate: number;
+  originalBalance: number;
+};
+
 interface ValidationResult {
   isValid: boolean;
   errors: Record<string, string>;
   warnings: string[];
-  parsedData: DebtFormData;
+  parsedData: DebtFormParsedData;
 }
 
 export interface DebtMetrics {
@@ -26,6 +39,49 @@ export interface DebtMetrics {
   isPaymentSufficient: boolean;
 }
 
+const parseNumericInput = (value: NumericString, fallback = 0): number => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : fallback;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return fallback;
+    }
+
+    const numeric = Number.parseFloat(trimmed.replace(/,/g, ""));
+    return Number.isNaN(numeric) ? fallback : numeric;
+  }
+
+  return fallback;
+};
+
+const buildParsedData = (data: DebtFormData): DebtFormParsedData => {
+  const currentBalance = parseNumericInput(data.currentBalance ?? data.balance, 0);
+  const minimumPayment = parseNumericInput(data.minimumPayment, 0);
+  const interestRate = parseNumericInput(data.interestRate, 0);
+
+  const originalBalance =
+    data.originalBalance !== undefined &&
+    data.originalBalance !== null &&
+    data.originalBalance !== ""
+      ? parseNumericInput(data.originalBalance, currentBalance)
+      : currentBalance;
+
+  return {
+    ...(data as Omit<
+      DebtFormData,
+      "currentBalance" | "balance" | "minimumPayment" | "interestRate" | "originalBalance"
+    >),
+    currentBalance,
+    balance: currentBalance,
+    minimumPayment,
+    interestRate,
+    originalBalance,
+  };
+};
+
 /**
  * Validate debt form data with financial business rules
  * Now uses Zod schema for validation
@@ -38,15 +94,17 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
       isValid: false,
       errors: result.errors,
       warnings: [],
-      parsedData: {} as DebtFormData,
+      parsedData: {} as DebtFormParsedData,
     };
   }
+
+  const parsedData = buildParsedData(result.data);
 
   return {
     isValid: true,
     errors: {},
     warnings: result.warnings,
-    parsedData: result.data!,
+    parsedData,
   };
 }
 

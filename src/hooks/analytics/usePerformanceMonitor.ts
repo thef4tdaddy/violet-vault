@@ -8,14 +8,16 @@ import {
 } from "./utils/performanceMetricsUtils";
 import { generateAlerts, generateRecommendations } from "./utils/alertsUtils";
 
+import { AnalyticsData, BalanceData, PerformanceEntry } from "@/types/analytics";
+
 /**
  * Hook for calculating financial performance metrics and monitoring
  * Extracts complex performance logic from PerformanceMonitor component
  */
-export const usePerformanceMonitor = (analyticsData, balanceData) => {
+export const usePerformanceMonitor = (analyticsData: AnalyticsData, balanceData: BalanceData) => {
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState("overview");
-  const [performanceHistory, setPerformanceHistory] = useState([]);
+  const [performanceHistory, setPerformanceHistory] = useState<PerformanceEntry[]>([]);
 
   // Performance metrics calculation
   const performanceMetrics = useMemo(() => {
@@ -73,9 +75,14 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setPerformanceHistory((prev) => {
-        const newEntry = {
-          timestamp: Date.now(),
+        const now = new Date();
+        const previousScore = prev.length > 0 ? prev[prev.length - 1].score : 0;
+
+        const newEntry: PerformanceEntry = {
+          month: now.toLocaleString("default", { month: "short" }),
+          timestamp: now.toISOString(),
           score: performanceMetrics.overallScore,
+          change: performanceMetrics.overallScore - previousScore,
           budgetAdherence: performanceMetrics.budgetAdherence,
           savingsRate: performanceMetrics.savingsRate,
         };

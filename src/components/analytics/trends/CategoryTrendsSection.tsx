@@ -1,8 +1,15 @@
+import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { formatCurrency, getCategoryChartColor } from "../../../utils/analytics/trendHelpers";
 
-const CategoryTrendsSection = ({ categoryTrends }) => {
-  const tooltipFormatter = (value) => [formatCurrency(value), "Amount"];
+import { CategoryTrend } from "@/types/analytics";
+
+interface CategoryTrendsSectionProps {
+  categoryTrends: CategoryTrend[];
+}
+
+const CategoryTrendsSection: React.FC<CategoryTrendsSectionProps> = ({ categoryTrends }) => {
+  const tooltipFormatter = (value: number) => [formatCurrency(value), "Amount"];
 
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">

@@ -19,6 +19,7 @@ import logger from "@/utils/common/logger";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { useAnalyticsData } from "@/hooks/analytics/useAnalyticsData";
+import type { AnalyticsData } from "@/types/analytics";
 
 /**
  * Calculate summary metrics from analytics data
@@ -419,7 +420,7 @@ const AnalyticsDashboard = () => {
                   categoryTransactions={categoryTransactions}
                   analyticsData={
                     analyticsQuery.analytics && typeof analyticsQuery.analytics === "object"
-                      ? (analyticsQuery.analytics as Record<string, unknown>)
+                      ? (analyticsQuery.analytics as unknown as AnalyticsData)
                       : null
                   }
                   balanceData={

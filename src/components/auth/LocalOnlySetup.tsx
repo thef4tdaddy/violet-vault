@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
 import { useLocalOnlyMode } from "@/hooks/common/useLocalOnlyMode";
 import UnsupportedBrowserView from "./setup/UnsupportedBrowserView";
@@ -8,6 +8,11 @@ import CustomizeStep from "./setup/CustomizeStep";
 import ImportStep from "./setup/ImportStep";
 import ErrorDisplay from "./local-only/ErrorDisplay";
 import logger from "@/utils/common/logger";
+
+interface LocalOnlySetupProps {
+  onModeSelected: (mode: string) => void;
+  onSwitchToAuth: () => void;
+}
 
 // Custom hook for setup logic
 const useSetupLogic = (
@@ -53,16 +58,17 @@ const useSetupLogic = (
       await importData(fileData);
       await enterLocalOnlyMode(fileData.user);
       onModeSelected("local-only");
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error("Failed to import and start:", err);
-      globalToast.showError(`Import failed: ${err.message}`, "Import Failed", 8000);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      globalToast.showError(`Import failed: ${errorMessage}`, "Import Failed", 8000);
     }
   };
 
   return { handleStartLocalOnly, handleImportAndStart };
 };
 
-const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
+const LocalOnlySetup: React.FC<LocalOnlySetupProps> = ({ onModeSelected, onSwitchToAuth }) => {
   const {
     loading,
     error,
@@ -76,7 +82,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
   const [step, setStep] = useState("welcome");
   const [userName, setUserName] = useState("Local User");
   const [userColor, setUserColor] = useState("#a855f7");
-  const [importFile, setImportFile] = useState(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
 
   const { handleStartLocalOnly, handleImportAndStart } = useSetupLogic(
     onModeSelected,

@@ -1,13 +1,24 @@
+import React from "react";
 import { Button } from "@/components/ui";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+
+interface PasswordRotationModalProps {
+  isOpen: boolean;
+  newPassword: string;
+  confirmPassword: string;
+  setNewPassword: (password: string) => void;
+  setConfirmPassword: (password: string) => void;
+  onSubmit: () => void;
+  onClose: () => void;
+}
 
 /**
  * Password Rotation Modal Component
  * Extracted from MainLayout for better organization
  * Handles password expiration and rotation UI
  */
-const PasswordRotationModal = ({
+const PasswordRotationModal: React.FC<PasswordRotationModalProps> = ({
   isOpen,
   newPassword,
   confirmPassword,

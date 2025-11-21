@@ -1,3 +1,4 @@
+import React from "react";
 import ForecastSummaryCard from "./trends/ForecastSummaryCard";
 import HistoricalTrendsChart from "./trends/HistoricalTrendsChart";
 import VelocityChart from "./trends/VelocityChart";
@@ -6,6 +7,13 @@ import SeasonalPatternsSection from "./trends/SeasonalPatternsSection";
 import InsightsPanel from "./trends/InsightsPanel";
 
 import { useTrendAnalysis } from "../../hooks/analytics/useTrendAnalysis";
+
+import { AnalyticsData } from "@/types/analytics";
+
+interface TrendAnalysisChartsProps {
+  analyticsData: AnalyticsData;
+  timeFilter: string;
+}
 
 /**
  * Advanced Trend Analysis Charts for v1.10.0
@@ -17,7 +25,7 @@ import { useTrendAnalysis } from "../../hooks/analytics/useTrendAnalysis";
  * - Predictive forecasting
  * - Comparative analysis
  */
-const TrendAnalysisCharts = ({ analyticsData, timeFilter }) => {
+const TrendAnalysisCharts: React.FC<TrendAnalysisChartsProps> = ({ analyticsData, timeFilter }) => {
   const {
     spendingTrends,
     spendingVelocity,

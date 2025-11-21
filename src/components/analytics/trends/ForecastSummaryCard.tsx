@@ -6,7 +6,13 @@ import {
   getTrendIconConfig,
 } from "../../../utils/analytics/trendHelpers";
 
-const ForecastSummaryCard = ({ forecastInsights }) => {
+import { ForecastInsights } from "@/types/analytics";
+
+interface ForecastSummaryCardProps {
+  forecastInsights: ForecastInsights;
+}
+
+const ForecastSummaryCard: React.FC<ForecastSummaryCardProps> = ({ forecastInsights }) => {
   const iconConfig = getTrendIconConfig(forecastInsights.trend);
 
   const renderTrendIcon = () => {
@@ -37,17 +43,17 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
             <div>
               <p className="text-sm text-purple-900">Next Month Projection</p>
               <p className="text-2xl font-bold text-purple-600">
-                {formatCurrency(forecastInsights.projectedSpending)}
+                {formatCurrency(forecastInsights.projectedSpending || 0)}
               </p>
             </div>
             <div>
               <p className="text-sm text-purple-900">Growth Rate</p>
               <p
                 className={`text-2xl font-bold ${
-                  forecastInsights.growthRate > 0 ? "text-red-600" : "text-green-600"
+                  (forecastInsights.growthRate || 0) > 0 ? "text-red-600" : "text-green-600"
                 }`}
               >
-                {formatPercent(forecastInsights.growthRate)}
+                {formatPercent(forecastInsights.growthRate || 0)}
               </p>
             </div>
             <div>

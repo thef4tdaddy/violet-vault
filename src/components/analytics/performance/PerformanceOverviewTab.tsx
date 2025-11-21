@@ -1,11 +1,17 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+import { PerformanceEntry } from "@/types/analytics";
+
+interface PerformanceOverviewTabProps {
+  performanceHistory: PerformanceEntry[];
+}
+
 /**
  * PerformanceOverviewTab component - overview tab content
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const PerformanceOverviewTab = ({ performanceHistory }) => {
+const PerformanceOverviewTab: React.FC<PerformanceOverviewTabProps> = ({ performanceHistory }) => {
   const Clock = getIcon("Clock");
 
   return (

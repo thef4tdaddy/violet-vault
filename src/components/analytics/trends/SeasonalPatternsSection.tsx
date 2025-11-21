@@ -1,6 +1,13 @@
+import React from "react";
 import { formatCurrency } from "../../../utils/analytics/trendHelpers";
 
-const SeasonalPatternsSection = ({ seasonalPatterns }) => {
+import { SeasonalPattern } from "@/types/analytics";
+
+interface SeasonalPatternsSectionProps {
+  seasonalPatterns: SeasonalPattern[];
+}
+
+const SeasonalPatternsSection: React.FC<SeasonalPatternsSectionProps> = ({ seasonalPatterns }) => {
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
       <h3 className="font-black text-black text-base mb-4">

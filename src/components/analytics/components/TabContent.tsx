@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnalyticsData } from "@/types/analytics";
 import OverviewTab from "../tabs/OverviewTab";
 import TrendsTab from "../tabs/TrendsTab";
 import HealthTab from "../tabs/HealthTab";
@@ -28,7 +29,7 @@ interface TabContentProps {
   selectedCategory?: string | null;
   onCategorySelect?: (name: string | null) => void;
   categoryTransactions?: CategoriesTabProps["categoryTransactions"];
-  analyticsData?: Record<string, unknown> | null;
+  analyticsData?: AnalyticsData | null;
   balanceData?: Record<string, unknown> | null;
   envelopes?: EnvelopeBalanceEntry[];
   emptyState?: ReactNode;

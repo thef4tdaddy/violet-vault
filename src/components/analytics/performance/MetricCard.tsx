@@ -2,11 +2,18 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { getScoreColor, getScoreBgColor } from "../../../utils/performanceUtils";
 
+interface MetricCardProps {
+  title: string;
+  score: number;
+  iconName: string;
+  description?: string;
+}
+
 /**
  * MetricCard component for displaying performance metrics
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const MetricCard = ({ title, score, iconName, description }) => {
+const MetricCard: React.FC<MetricCardProps> = ({ title, score, iconName, description }) => {
   const Icon = getIcon(iconName);
 
   return (

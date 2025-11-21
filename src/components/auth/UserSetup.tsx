@@ -70,8 +70,8 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     setUserColor,
   } = useUserSetup(handleSetupComplete);
 
-  const handleJoinSuccess = async (joinData) => {
-    logger.info("Join budget successful, setting up auth", joinData);
+  const handleJoinSuccess = async (joinData: unknown) => {
+    logger.info("Join budget successful, setting up auth", joinData as Record<string, unknown>);
 
     try {
       const result = await joinBudget(joinData);

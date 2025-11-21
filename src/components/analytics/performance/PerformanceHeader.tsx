@@ -2,11 +2,19 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+interface PerformanceHeaderProps {
+  alertsEnabled: boolean;
+  setAlertsEnabled: (enabled: boolean) => void;
+}
+
 /**
  * PerformanceHeader component - header section with controls
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const PerformanceHeader = ({ alertsEnabled, setAlertsEnabled }) => {
+const PerformanceHeader: React.FC<PerformanceHeaderProps> = ({
+  alertsEnabled,
+  setAlertsEnabled,
+}) => {
   const Zap = getIcon("Zap");
   const Bell = getIcon("Bell");
   const BellOff = getIcon("BellOff");
