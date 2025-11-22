@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   DEFAULT_ANALYSIS_SETTINGS,
   generateAllSuggestions,
-} from "../../utils/budgeting/suggestionUtils";
-import { globalToast } from "../../stores/ui/toastStore";
-import logger from "../../utils/common/logger";
-import localStorageService from "../../services/storage/localStorageService";
+} from "@/utils/budgeting/suggestionUtils";
+import { globalToast } from "@/stores/ui/toastStore";
+import logger from "@/utils/common/logger";
+import localStorageService from "@/services/storage/localStorageService";
 
 // Helper to apply create envelope suggestion
-const applyCreateEnvelope = async (suggestion, onCreateEnvelope) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const applyCreateEnvelope = async (suggestion: any, onCreateEnvelope: any) => {
   if (onCreateEnvelope) {
     await onCreateEnvelope(suggestion.data);
     globalToast.showSuccess(`Created "${suggestion.data.name}" envelope`, "Suggestion Applied");
@@ -16,7 +17,8 @@ const applyCreateEnvelope = async (suggestion, onCreateEnvelope) => {
 };
 
 // Helper to apply budget change suggestion
-const applyBudgetChange = async (suggestion, onUpdateEnvelope, actionType) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const applyBudgetChange = async (suggestion: any, onUpdateEnvelope: any, actionType: string) => {
   if (onUpdateEnvelope) {
     await onUpdateEnvelope(suggestion.data.envelopeId, {
       monthlyAmount: suggestion.data.suggestedAmount,
@@ -41,6 +43,18 @@ const useSmartSuggestions = ({
   onDismissSuggestion,
   dateRange = "6months",
   showDismissed = false,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transactions?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  envelopes?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onCreateEnvelope?: (data: any) => Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onUpdateEnvelope?: (id: string, data: any) => Promise<void>;
+  onDismissSuggestion?: (id: string) => void;
+  dateRange?: string;
+  showDismissed?: boolean;
 }) => {
   // Settings and state
   const [analysisSettings, setAnalysisSettings] = useState(DEFAULT_ANALYSIS_SETTINGS);
@@ -71,12 +85,14 @@ const useSmartSuggestions = ({
 
   // Toggle collapse state
   const toggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
+    setIsCollapsed((prev: boolean) => !prev);
   }, []);
 
   // Update analysis settings
-  const updateAnalysisSettings = useCallback((newSettings) => {
-    setAnalysisSettings((prev) => ({ ...prev, ...newSettings }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateAnalysisSettings = useCallback((newSettings: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setAnalysisSettings((prev: any) => ({ ...prev, ...newSettings }));
   }, []);
 
   // Reset analysis settings to defaults
@@ -86,8 +102,8 @@ const useSmartSuggestions = ({
 
   // Dismiss suggestion
   const handleDismissSuggestion = useCallback(
-    (suggestionId) => {
-      setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
+    (suggestionId: string) => {
+      setDismissedSuggestions((prev: Set<string>) => new Set([...prev, suggestionId]));
       onDismissSuggestion?.(suggestionId);
 
       globalToast.showInfo("Suggestion dismissed", "Dismissed", 5000);
@@ -97,7 +113,8 @@ const useSmartSuggestions = ({
 
   // Apply suggestion action
   const handleApplySuggestion = useCallback(
-    async (suggestion) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (suggestion: any) => {
       try {
         switch (suggestion.action) {
           case "create_envelope":
@@ -121,8 +138,9 @@ const useSmartSuggestions = ({
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to apply suggestion";
         globalToast.showError(
-          error.message || "Failed to apply suggestion",
+          errorMessage,
           "Application Error",
           8000
         );
@@ -146,7 +164,7 @@ const useSmartSuggestions = ({
 
   // Toggle settings panel
   const toggleSettings = useCallback(() => {
-    setShowSettings((prev) => !prev);
+    setShowSettings((prev: boolean) => !prev);
   }, []);
 
   // Get suggestion statistics
