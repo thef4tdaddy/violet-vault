@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | +2 |
+| ESLint Issues | 3 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2215 | -17 |
+| TypeScript Strict Mode Errors | 2199 | -16 |
 
-*Last updated: 2025-11-22 18:22:06 UTC*
+*Last updated: 2025-11-22 18:28:04 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -47,13 +47,12 @@
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 18:21:50 UTC
+Last check: 2025-11-22 18:27:47 UTC
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
 - 17 errors in `src/hooks/auth/authOperations.ts`
-- 16 errors in `src/utils/sync/autoBackupService.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
 - 15 errors in `src/hooks/transactions/useTransactionBalanceUpdater.ts`
@@ -498,7 +497,7 @@ Last check: 2025-11-22 18:21:50 UTC
 | 132 | `TS18046` |
 | 65 | `TS7005` |
 | 63 | `TS7053` |
-| 57 | `TS18048` |
+| 41 | `TS18048` |
 | 40 | `TS7034` |
 | 28 | `TS18047` |
 | 24 | `TS2769` |
@@ -3259,22 +3258,6 @@ src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>
       Types of parameters 'data' and 'data' are incompatible.
         Type 'unknown' is not assignable to type 'T'.
           'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
-src/utils/sync/autoBackupService.ts(93,18): error TS18048: 'backup.metadata' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(94,31): error TS18048: 'backup.metadata' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(197,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(197,72): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(198,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(198,78): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(199,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(199,64): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(200,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(200,64): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(201,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(201,78): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(202,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(203,52): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(206,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(209,19): error TS18048: 'data' is possibly 'undefined'.
 src/utils/sync/dataDetectionHelper.ts(104,48): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(517,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(536,16): error TS18046: 'error' is of type 'unknown'.
