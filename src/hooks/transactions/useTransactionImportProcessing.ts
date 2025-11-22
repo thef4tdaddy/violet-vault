@@ -60,9 +60,7 @@ export const useTransactionImportProcessing = (currentUser: { userName?: string 
       try {
         const rawAmount = row[fieldMapping.amount];
         const amountStr =
-          typeof rawAmount === "string"
-            ? rawAmount.replace(/[$,]/g, "")
-            : String(rawAmount || "0");
+          typeof rawAmount === "string" ? rawAmount.replace(/[$,]/g, "") : String(rawAmount || "0");
         const amount = parseFloat(amountStr);
 
         const transaction = {

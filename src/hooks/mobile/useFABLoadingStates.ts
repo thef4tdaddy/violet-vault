@@ -7,12 +7,12 @@ import logger from "../../utils/common/logger";
  * Provides loading indicators and error handling for FAB actions
  */
 export const useFABLoadingStates = () => {
-  const [loadingActions, setLoadingActions] = useState(new Set());
+  const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
   const { showError } = useToast();
 
   // Check if a specific action is loading
   const isActionLoading = useCallback(
-    (actionId) => {
+    (actionId: string) => {
       return loadingActions.has(actionId);
     },
     [loadingActions]
@@ -24,12 +24,12 @@ export const useFABLoadingStates = () => {
   }, [loadingActions]);
 
   // Start loading for an action
-  const startLoading = useCallback((actionId) => {
+  const startLoading = useCallback((actionId: string) => {
     setLoadingActions((prev) => new Set(prev).add(actionId));
   }, []);
 
   // Stop loading for an action
-  const stopLoading = useCallback((actionId) => {
+  const stopLoading = useCallback((actionId: string) => {
     setLoadingActions((prev) => {
       const newSet = new Set(prev);
       newSet.delete(actionId);
@@ -39,8 +39,12 @@ export const useFABLoadingStates = () => {
 
   // Wrap an action with loading state and error handling
   const wrapActionWithLoading = useCallback(
-    (actionId, actionFn, actionLabel = "Action") => {
-      return async (...args) => {
+    <T extends unknown[]>(
+      actionId: string,
+      actionFn: (...args: T) => Promise<unknown> | unknown,
+      actionLabel = "Action"
+    ) => {
+      return async (...args: T) => {
         if (isActionLoading(actionId)) {
           logger.debug(`FAB: Action ${actionId} already in progress, ignoring`);
           return;
@@ -58,14 +62,17 @@ export const useFABLoadingStates = () => {
           logger.debug(`FAB: Action ${actionId} completed successfully`);
           return result;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          const errorStack = error instanceof Error ? error.stack : undefined;
+
           logger.error(`FAB: Action ${actionId} failed`, {
-            error: error.message,
+            error: errorMessage,
             label: actionLabel,
-            stack: error.stack,
+            stack: errorStack,
           });
 
           // Show error toast
-          showError(`${actionLabel} Failed`, error.message || "An unexpected error occurred", 5000);
+          showError(`${actionLabel} Failed`, errorMessage || "An unexpected error occurred", 5000);
 
           // Re-throw for component error boundaries if needed
           throw error;
@@ -79,7 +86,11 @@ export const useFABLoadingStates = () => {
 
   // Create a loading wrapper for FAB actions
   const createLoadingAction = useCallback(
-    (actionId, actionFn, actionLabel) => {
+    <T extends unknown[]>(
+      actionId: string,
+      actionFn: (...args: T) => Promise<unknown> | unknown,
+      actionLabel: string
+    ) => {
       return wrapActionWithLoading(actionId, actionFn, actionLabel);
     },
     [wrapActionWithLoading]
