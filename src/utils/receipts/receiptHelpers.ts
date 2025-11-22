@@ -62,11 +62,11 @@ export const validateTransactionForm = (form: TransactionForm) => {
     errors.push("Valid amount is required");
   }
 
-  if (!form.date || !/^\d{4}-\d{2}-\d{2}$/.test(form.date)) {
+  if (!form.date || typeof form.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(form.date)) {
     errors.push("Valid date is required");
   }
 
-  if (!form.envelopeId || form.envelopeId.trim() === "") {
+  if (!form.envelopeId || typeof form.envelopeId !== "string" || form.envelopeId.trim() === "") {
     errors.push("Envelope selection is required");
   }
 
@@ -137,7 +137,7 @@ export const extractReceiptSummary = (receiptData: ReceiptData) => {
     merchant: receiptData.merchant || "Unknown Merchant",
     total: receiptData.total || 0,
     date: receiptData.date || new Date().toISOString().split("T")[0],
-    itemCount: receiptData.items?.length || 0,
+    itemCount: (Array.isArray(receiptData.items) ? receiptData.items.length : 0) || 0,
     hasSubtotal: Boolean(receiptData.subtotal),
     hasTax: Boolean(receiptData.tax),
     confidence: receiptData.confidence || 0,

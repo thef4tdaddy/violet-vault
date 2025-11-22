@@ -108,7 +108,7 @@ function AutoFundingView() {
           handleDeleteRule={handleDeleteRule}
           handleToggleRule={handleToggleRule}
           handleExecuteRules={handleExecuteRules}
-          isExecuting={isExecuting ? "true" : "false"}
+          isExecuting={isExecuting}
           RulesTabComponent={RulesTab}
           HistoryTabComponent={HistoryTab}
         />

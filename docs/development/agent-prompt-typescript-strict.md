@@ -14,7 +14,7 @@ Fix TypeScript strict mode errors **only**. Do NOT introduce normal TypeScript e
 
 1. ✅ `src/services/bugReport/githubApiService.ts` - 20 errors fixed
 2. ✅ `src/hooks/debts/useDebtStrategies.ts` - 20 errors fixed
-3. ✅ `src/hooks/common/useToast.ts` - 19 errors fixed
+3. ✅ `src/hooks/common/useImportData.ts` - 19 errors fixed
 4. ✅ `src/components/savings/AddEditGoalModal.tsx` - 19 errors fixed
 5. ✅ `src/components/budgeting/EnvelopeSystem.tsx` - 19 errors fixed
 6. ✅ `src/components/automation/AutoFundingViewComponents.tsx` - 19 errors fixed

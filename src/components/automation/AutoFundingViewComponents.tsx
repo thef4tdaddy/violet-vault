@@ -1,41 +1,34 @@
 import React from "react";
 import { Button } from "@/components/ui";
-
-// Define types
-interface Rule {
-  id: string;
-  name: string;
-  enabled: boolean;
-  [key: string]: unknown;
-}
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface ViewHeaderProps {
-  rules: Rule[];
+  rules: AutoFundingRule[];
 }
 
 interface ViewTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  rules: Rule[];
+  rules: AutoFundingRule[];
   displayHistory: unknown[];
 }
 
 interface ViewContentProps {
   activeTab: string;
-  rules: Rule[];
+  rules: AutoFundingRule[];
   displayHistory: unknown[];
   showExecutionDetails: boolean;
   setShowExecutionDetails: (show: boolean) => void;
   handleCreateRule: () => void;
-  handleEditRule: (rule: Rule) => void;
+  handleEditRule: (rule: AutoFundingRule) => void;
   handleDeleteRule: (ruleId: string) => void;
   handleToggleRule: (ruleId: string) => void;
   handleExecuteRules: () => void;
   isExecuting: boolean;
   RulesTabComponent: React.ComponentType<{
-    rules: Rule[];
+    rules: AutoFundingRule[];
     onCreateRule: () => void;
-    onEditRule: (rule: Rule) => void;
+    onEditRule: (rule: AutoFundingRule) => void;
     onDeleteRule: (ruleId: string) => void;
     onToggleRule: (ruleId: string) => void;
     onExecuteRules: () => void;
@@ -63,7 +56,7 @@ export const ViewHeader = ({ rules }: ViewHeaderProps) => {
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-            {rules.filter((r: Rule) => r.enabled).length} Active Rules
+            {rules.filter((r) => r.enabled).length} Active Rules
           </span>
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
             {rules.length} Total Rules
@@ -77,12 +70,7 @@ export const ViewHeader = ({ rules }: ViewHeaderProps) => {
 /**
  * View tabs component
  */
-export const ViewTabs = ({ 
-  activeTab, 
-  setActiveTab, 
-  rules, 
-  displayHistory 
-}: ViewTabsProps) => {
+export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }: ViewTabsProps) => {
   return (
     <div className="flex space-x-8 mt-6 border-b border-gray-200">
       <Button
