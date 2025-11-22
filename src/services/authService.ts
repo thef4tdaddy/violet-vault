@@ -64,7 +64,7 @@ export const validatePassword = async (password: string): Promise<boolean> => {
       parsedData = JSON.parse(savedData);
     } catch (parseError) {
       logger.auth("validatePassword: Failed to parse saved data", {
-        error: parseError.message,
+        error: (parseError as Error).message,
       });
       return false;
     }
@@ -103,12 +103,13 @@ export const validatePassword = async (password: string): Promise<boolean> => {
 
     return true;
   } catch (error) {
+    const err = error as Error;
     logger.auth("validatePassword: Validation failed", {
-      error: error.message,
-      errorType: error.constructor?.name,
+      error: err.message,
+      errorType: err.constructor?.name,
     });
     logger.production("Password validation failed", {
-      error: error.message,
+      error: err.message,
       method: "encrypted_data_validation",
     });
     return false;
@@ -298,9 +299,10 @@ export const login = async (password: string, userData: UserData | null = null) 
           decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
           logger.auth("Successfully decrypted local data.");
         } catch (decryptError) {
+          const err = decryptError as Error;
           logger.error("Unexpected decryption failure after password validation", {
-            error: decryptError.message,
-            errorType: decryptError.constructor?.name,
+            error: err.message,
+            errorType: err.constructor?.name,
           });
           return {
             success: false,
@@ -350,8 +352,9 @@ export const login = async (password: string, userData: UserData | null = null) 
         };
       }
     } catch (error) {
+      const err = error as Error;
       logger.error("Login failed.", error);
-      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+      if (err.name === "OperationError" || err.message.toLowerCase().includes("decrypt")) {
         return { success: false, error: "Invalid password." };
       }
       return { success: false, error: "Invalid password or corrupted data." };
@@ -499,7 +502,7 @@ export const updateProfile = async (updatedProfile: UserData, currentSession: Se
     return { success: true, user: updatedProfile };
   } catch (error) {
     logger.error("Failed to update profile:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: (error as Error).message };
   }
 };
 
@@ -543,8 +546,9 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
       },
     };
   } catch (error) {
+    const err = error as Error;
     logger.error("Password change failed:", error);
-    if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+    if (err.name === "OperationError" || err.message.toLowerCase().includes("decrypt")) {
       return { success: false, error: "Current password is incorrect." };
     }
     return {
@@ -570,7 +574,11 @@ export const startBackgroundSyncAfterLogin = async (isNewUser = false) => {
     await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
     // Import UI store to access startBackgroundSync
-    const { useBudgetStore } = await import("../stores/ui/uiStore");
+    const { useBudgetStore } = (await import("../stores/ui/uiStore")) as {
+      useBudgetStore: {
+        getState: () => { cloudSyncEnabled: boolean; startBackgroundSync: () => Promise<void> };
+      };
+    };
     const budgetState = useBudgetStore.getState();
 
     if (budgetState.cloudSyncEnabled) {

@@ -2,13 +2,13 @@
 
 ## Summary
 
-| Category                      | Current | Change |
-| ----------------------------- | ------- | ------ |
-| ESLint Issues                 | 3       | 0      |
-| TypeScript Errors             | 0       | 0      |
-| TypeScript Strict Mode Errors | 2199    | -16    |
+| Category | Current | Change |
+|----------|---------|--------|
+| ESLint Issues | 1 | +1 |
+| TypeScript Errors | 0 | 0 |
+| TypeScript Strict Mode Errors | 2213 | -13 |
 
-_Last updated: 2025-11-22 18:28:04 UTC_
+*Last updated: 2025-11-22 18:28:06 UTC*
 
 ## Table of Contents
 
@@ -28,30 +28,23 @@ _Last updated: 2025-11-22 18:28:04 UTC_
 ## Lint Audit
 
 ### Files with Most Issues
-
-- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 
 ### Issue Count by Category
-
-| Count | Rule ID      |
-| ----- | ------------ |
-| 2     | `no-undef`   |
-| 1     | `complexity` |
+| Count | Rule ID |
+|---|---|
+| 1 | `max-lines-per-function` |
 
 ### Detailed Lint Report
-
 ```
-/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:31:24 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:31:39 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts:13:79 - 1 - Arrow function has a complexity of 23. Maximum allowed is 15. (complexity)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
 ```
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 18:27:47 UTC
+Last check: 2025-11-22 18:27:50 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -76,10 +69,6 @@ Last check: 2025-11-22 18:27:47 UTC
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
-- 13 errors in `src/services/bugReport/performanceInfoService.ts`
-- 13 errors in `src/services/authService.ts`
-- 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
-- 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 13 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
@@ -494,37 +483,37 @@ Last check: 2025-11-22 18:27:47 UTC
 ### Strict Mode Error Breakdown
 
 | Count | Error Code |
-| ----- | ---------- |
-| 682   | `TS7006`   |
-| 626   | `TS7031`   |
-| 180   | `TS2345`   |
-| 142   | `TS2339`   |
-| 134   | `TS2322`   |
-| 132   | `TS18046`  |
-| 65    | `TS7005`   |
-| 63    | `TS7053`   |
-| 41    | `TS18048`  |
-| 40    | `TS7034`   |
-| 28    | `TS18047`  |
-| 24    | `TS2769`   |
-| 6     | `TS2411`   |
-| 5     | `TS2722`   |
-| 5     | `TS2531`   |
-| 5     | `TS2353`   |
-| 3     | `TS7019`   |
-| 3     | `TS2783`   |
-| 3     | `TS2352`   |
-| 2     | `TS7022`   |
-| 1     | `TS7023`   |
-| 1     | `TS7016`   |
-| 1     | `TS2774`   |
-| 1     | `TS2740`   |
-| 1     | `TS2698`   |
-| 1     | `TS2683`   |
-| 1     | `TS2538`   |
-| 1     | `TS2532`   |
-| 1     | `TS2365`   |
-| 1     | `TS2349`   |
+|---|---|
+| 687 | `TS7006` |
+| 643 | `TS7031` |
+| 174 | `TS2345` |
+| 142 | `TS2339` |
+| 131 | `TS2322` |
+| 116 | `TS18046` |
+| 64 | `TS7005` |
+| 63 | `TS7053` |
+| 51 | `TS18048` |
+| 39 | `TS7034` |
+| 37 | `TS18047` |
+| 24 | `TS2769` |
+| 6 | `TS2411` |
+| 5 | `TS2722` |
+| 5 | `TS2531` |
+| 5 | `TS2353` |
+| 3 | `TS7019` |
+| 3 | `TS2783` |
+| 3 | `TS2352` |
+| 2 | `TS7022` |
+| 1 | `TS7023` |
+| 1 | `TS7016` |
+| 1 | `TS2774` |
+| 1 | `TS2740` |
+| 1 | `TS2698` |
+| 1 | `TS2683` |
+| 1 | `TS2538` |
+| 1 | `TS2532` |
+| 1 | `TS2365` |
+| 1 | `TS2349` |
 
 ### Detailed Strict Mode Report
 
@@ -1015,6 +1004,24 @@ src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(140,74): error T
   Type 'undefined' is not assignable to type 'number'.
 src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(153,35): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
   Type 'undefined' is not assignable to type 'number'.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(12,3): error TS7031: Binding element 'payerName' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(13,3): error TS7031: Binding element 'uniquePayers' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(14,3): error TS7031: Binding element 'showAddNewPayer' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(15,3): error TS7031: Binding element 'newPayerName' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(16,3): error TS7031: Binding element 'isProcessing' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(17,3): error TS7031: Binding element 'onPayerChange' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(18,3): error TS7031: Binding element 'onNewPayerNameChange' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(19,3): error TS7031: Binding element 'onAddNewPayer' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(20,3): error TS7031: Binding element 'onToggleAddNewPayer' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(21,3): error TS7031: Binding element 'getPayerPrediction' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(48,32): error TS7006: Parameter 'payer' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(80,32): error TS7031: Binding element 'payerName' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(80,43): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(96,3): error TS7031: Binding element 'uniquePayers' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(97,3): error TS7031: Binding element 'newPayerName' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(98,3): error TS7031: Binding element 'onNewPayerNameChange' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(99,3): error TS7031: Binding element 'onAddNewPayer' implicitly has an 'any' type.
+src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(100,3): error TS7031: Binding element 'onToggleAddNewPayer' implicitly has an 'any' type.
 src/components/budgeting/shared/AllocationModeSelector.tsx(9,35): error TS7031: Binding element 'autoAllocate' implicitly has an 'any' type.
 src/components/budgeting/shared/AllocationModeSelector.tsx(9,49): error TS7031: Binding element 'onAutoAllocateChange' implicitly has an 'any' type.
 src/components/budgeting/shared/BillConnectionSelector.tsx(6,28): error TS7006: Parameter 'allBills' implicitly has an 'any' type.
@@ -1992,39 +1999,13 @@ src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(3,8): error TS7034: V
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(14,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(14,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(32,12): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(61,28): error TS2345: Argument of type '{ id: string; trigger: any; executedAt: string; rulesExecuted: number; totalFunded: number; results: ({ ruleId: any; ruleName: any; success: boolean; error: string; amount: number; executedAt: string; transfers?: undefined; targetEnvelopes?: undefined; } | { ...; } | { ...; })[]; remainingCash: any; initialCash: any...' is not assignable to parameter of type 'SetStateAction<null>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(61,28): error TS2345: Argument of type '{ id: string; trigger: string; executedAt: string; rulesExecuted: number; totalFunded: number; results: ({ ruleId: string; ruleName: string; success: boolean; error: string; amount: number; executedAt: string; transfers?: undefined; targetEnvelopes?: undefined; } | { ...; })[]; remainingCash: number; initialCash: nu...' is not assignable to parameter of type 'SetStateAction<null>'.
   Type 'undefined' is not assignable to type 'SetStateAction<null>'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(63,28): error TS18048: 'result.execution' is possibly 'undefined'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(64,26): error TS18048: 'result.execution' is possibly 'undefined'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(75,41): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts(7,37): error TS7006: Parameter 'lastExecution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts(23,47): error TS7006: Parameter 'r' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(16,35): error TS7006: Parameter 'budget' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(19,12): error TS7006: Parameter 'transfer' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(30,60): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(39,6): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(55,41): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(63,6): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(79,41): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(87,6): error TS7006: Parameter 'transfers' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(100,52): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(108,6): error TS7006: Parameter 'transfers' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(133,6): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(145,47): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(151,49): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(14,34): error TS7006: Parameter '_budget' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(16,48): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(16,54): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(16,63): error TS7006: Parameter 'availableCash' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(16,78): error TS7006: Parameter 'executeTransfer' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(61,12): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(61,19): error TS7006: Parameter 'context' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(61,28): error TS7006: Parameter 'executeTransfer' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(67,47): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(97,22): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(104,22): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(135,18): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts(139,18): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(77,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(68,37): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
@@ -2562,6 +2543,23 @@ src/hooks/transactions/useTransactionSplitter.ts(167,49): error TS2345: Argument
   Type 'undefined' is not assignable to type 'Transaction'.
 src/hooks/transactions/useTransactionSplitter.ts(178,9): error TS2322: Type 'Transaction | undefined' is not assignable to type 'Transaction'.
   Type 'undefined' is not assignable to type 'Transaction'.
+src/hooks/transactions/useTransactionSplitterUI.ts(29,3): error TS7006: Parameter 'splitAllocations' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(30,3): error TS7006: Parameter 'setSplitAllocations' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(31,3): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(32,3): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(51,26): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(56,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(56,10): error TS7006: Parameter 'field' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(56,17): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(71,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(72,28): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(72,50): error TS7006: Parameter 'split' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(131,3): error TS7006: Parameter 'splitAllocations' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(132,3): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(133,3): error TS7006: Parameter 'setIsProcessing' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(134,3): error TS7006: Parameter 'onSplitTransaction' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(135,3): error TS7006: Parameter 'onClose' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionSplitterUI.ts(166,39): error TS18046: 'error' is of type 'unknown'.
 src/hooks/transactions/useTransactionTable.ts(24,30): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionTable.ts(32,31): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionUtils.ts(6,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
@@ -2584,19 +2582,6 @@ src/main.tsx(271,20): error TS18046: 'error' is of type 'unknown'.
 src/main.tsx(280,23): error TS2345: Argument of type 'HTMLElement | null' is not assignable to parameter of type 'Container'.
   Type 'null' is not assignable to type 'Container'.
 src/services/activityLogger.ts(126,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/authService.ts(67,16): error TS18046: 'parseError' is of type 'unknown'.
-src/services/authService.ts(107,14): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(108,18): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(111,14): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(302,20): error TS18046: 'decryptError' is of type 'unknown'.
-src/services/authService.ts(303,24): error TS18046: 'decryptError' is of type 'unknown'.
-src/services/authService.ts(354,11): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(354,46): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(502,37): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(547,9): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(547,44): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(573,13): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/services/authService.ts(574,25): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(184,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -2629,22 +2614,6 @@ src/services/bugReport/pageDetectionService.ts(73,50): error TS2345: Argument of
 src/services/bugReport/pageDetectionService.ts(104,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/pageDetectionService.ts(147,13): error TS7034: Variable 'breadcrumbs' implicitly has type 'any[]' in some locations where its type cannot be determined.
 src/services/bugReport/pageDetectionService.ts(168,14): error TS7005: Variable 'breadcrumbs' implicitly has an 'any[]' type.
-src/services/bugReport/performanceInfoService.ts(175,29): error TS18048: 'navigation.domContentLoadedEventEnd' is possibly 'undefined'.
-src/services/bugReport/performanceInfoService.ts(175,68): error TS18048: 'navigation.fetchStart' is possibly 'undefined'.
-src/services/bugReport/performanceInfoService.ts(176,25): error TS18048: 'navigation.loadEventEnd' is possibly 'undefined'.
-src/services/bugReport/performanceInfoService.ts(176,52): error TS18048: 'navigation.fetchStart' is possibly 'undefined'.
-src/services/bugReport/performanceInfoService.ts(177,27): error TS18048: 'navigation.domInteractive' is possibly 'undefined'.
-src/services/bugReport/performanceInfoService.ts(177,56): error TS18048: 'navigation.fetchStart' is possibly 'undefined'.
-src/services/bugReport/performanceInfoService.ts(193,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/performanceInfoService.ts(215,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/performanceInfoService.ts(353,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
-  Type 'undefined' is not assignable to type 'string | null'.
-src/services/bugReport/performanceInfoService.ts(354,9): error TS2322: Type 'number | undefined' is not assignable to type 'number | null'.
-  Type 'undefined' is not assignable to type 'number | null'.
-src/services/bugReport/performanceInfoService.ts(355,9): error TS2322: Type 'number | undefined' is not assignable to type 'number | null'.
-  Type 'undefined' is not assignable to type 'number | null'.
-src/services/bugReport/performanceInfoService.ts(361,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/performanceInfoService.ts(390,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/screenshotService.ts(39,37): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
 src/services/bugReport/screenshotService.ts(43,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/screenshotService.ts(52,75): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -3265,6 +3234,22 @@ src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>
       Types of parameters 'data' and 'data' are incompatible.
         Type 'unknown' is not assignable to type 'T'.
           'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
+src/utils/sync/autoBackupService.ts(93,18): error TS18048: 'backup.metadata' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(94,31): error TS18048: 'backup.metadata' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(197,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(197,72): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(198,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(198,78): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(199,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(199,64): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(200,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(200,64): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(201,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(201,78): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(202,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(203,52): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(206,15): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/autoBackupService.ts(209,19): error TS18048: 'data' is possibly 'undefined'.
 src/utils/sync/dataDetectionHelper.ts(104,48): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(517,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(536,16): error TS18046: 'error' is of type 'unknown'.
