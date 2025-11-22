@@ -55,7 +55,7 @@ const useEnvelopeSystem = () => {
   } = useEnvelopes();
 
   const { bills = [], isLoading: billsLoading } = useBills();
-  
+
   // Use proper hook for unassigned cash
   const { unassignedCash = 0, setUnassignedCash: setUnassignedCashDb } = useUnassignedCash();
 
@@ -82,9 +82,7 @@ const useEnvelopeSystem = () => {
     isCalculatingRef.current = true;
 
     // Use the utility function for calculation
-    const totalBiweeklyNeed = calculateBiweeklyNeeds(
-      bills as Bill[]
-    );
+    const totalBiweeklyNeed = calculateBiweeklyNeeds(bills as Bill[]);
 
     logger.info("Calculated total biweekly need", {
       totalBiweeklyNeed,
