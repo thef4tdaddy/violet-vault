@@ -26,7 +26,7 @@
     "noUncheckedIndexedAccess": false,
 
     /* Test types - globals loaded via vitest config */
-    "types": [],
+    "types": ["@testing-library/jest-dom"],
 
     /* Path mapping for imports */
     "baseUrl": ".",
@@ -40,14 +40,6 @@
     }
   },
   "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "original-app",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/test/**"
-  ],
+  "exclude": ["node_modules", "dist", "build", "original-app", "**/*.test.ts", "**/*.test.tsx", "**/test/**"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
