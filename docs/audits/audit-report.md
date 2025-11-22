@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
+| ESLint Issues | 1 | +1 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2226 | -13 |
+| TypeScript Strict Mode Errors | 2213 | -13 |
 
-*Last updated: 2025-11-22 18:18:14 UTC*
+*Last updated: 2025-11-22 18:28:06 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,15 +26,24 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 
-Last check: 2025-11-22 18:17:44 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 1 | `max-lines-per-function` |
+
+### Detailed Lint Report
+```
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
+```
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 18:17:59 UTC
+Last check: 2025-11-22 18:27:50 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -63,7 +72,6 @@ Last check: 2025-11-22 18:17:59 UTC
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
-- 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 13 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
@@ -476,12 +484,12 @@ Last check: 2025-11-22 18:17:59 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 696 | `TS7006` |
+| 687 | `TS7006` |
 | 643 | `TS7031` |
 | 174 | `TS2345` |
 | 142 | `TS2339` |
 | 131 | `TS2322` |
-| 120 | `TS18046` |
+| 116 | `TS18046` |
 | 64 | `TS7005` |
 | 63 | `TS7053` |
 | 51 | `TS18048` |
@@ -2010,19 +2018,6 @@ src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(64,26): error TS18048
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(75,41): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts(7,37): error TS7006: Parameter 'lastExecution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts(23,47): error TS7006: Parameter 'r' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(16,35): error TS7006: Parameter 'budget' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(19,12): error TS7006: Parameter 'transfer' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(30,60): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(39,6): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(55,41): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(63,6): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(79,41): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(87,6): error TS7006: Parameter 'transfers' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(100,52): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(108,6): error TS7006: Parameter 'transfers' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(133,6): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(145,47): error TS7006: Parameter 'rule' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts(151,49): error TS7006: Parameter 'rule' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(77,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(68,37): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
