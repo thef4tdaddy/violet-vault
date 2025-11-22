@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | 0 |
+| ESLint Issues | 3 | +2 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2232 | -18 |
+| TypeScript Strict Mode Errors | 2215 | -17 |
 
-*Last updated: 2025-11-22 18:13:15 UTC*
+*Last updated: 2025-11-22 18:22:06 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,15 +27,19 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 2 | `no-undef` |
 | 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
+/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:31:24 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:31:39 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts:13:79 - 1 - Arrow function has a complexity of 23. Maximum allowed is 15. (complexity)
 ```
 
@@ -43,12 +47,11 @@
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 18:12:59 UTC
+Last check: 2025-11-22 18:21:50 UTC
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 17 errors in `src/hooks/transactions/useTransactionSplitterUI.ts`
 - 17 errors in `src/hooks/auth/authOperations.ts`
 - 16 errors in `src/utils/sync/autoBackupService.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
@@ -487,12 +490,12 @@ Last check: 2025-11-22 18:12:59 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 698 | `TS7006` |
+| 682 | `TS7006` |
 | 626 | `TS7031` |
 | 180 | `TS2345` |
 | 142 | `TS2339` |
 | 134 | `TS2322` |
-| 133 | `TS18046` |
+| 132 | `TS18046` |
 | 65 | `TS7005` |
 | 63 | `TS7053` |
 | 57 | `TS18048` |
@@ -2553,23 +2556,6 @@ src/hooks/transactions/useTransactionSplitter.ts(167,49): error TS2345: Argument
   Type 'undefined' is not assignable to type 'Transaction'.
 src/hooks/transactions/useTransactionSplitter.ts(178,9): error TS2322: Type 'Transaction | undefined' is not assignable to type 'Transaction'.
   Type 'undefined' is not assignable to type 'Transaction'.
-src/hooks/transactions/useTransactionSplitterUI.ts(29,3): error TS7006: Parameter 'splitAllocations' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(30,3): error TS7006: Parameter 'setSplitAllocations' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(31,3): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(32,3): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(51,26): error TS7006: Parameter 'prev' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(56,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(56,10): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(56,17): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(71,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(72,28): error TS7006: Parameter 'prev' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(72,50): error TS7006: Parameter 'split' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(131,3): error TS7006: Parameter 'splitAllocations' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(132,3): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(133,3): error TS7006: Parameter 'setIsProcessing' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(134,3): error TS7006: Parameter 'onSplitTransaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(135,3): error TS7006: Parameter 'onClose' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(166,39): error TS18046: 'error' is of type 'unknown'.
 src/hooks/transactions/useTransactionTable.ts(24,30): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionTable.ts(32,31): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionUtils.ts(6,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
