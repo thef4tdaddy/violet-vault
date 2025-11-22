@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2342 | 0 |
+| ESLint Issues | 1 | +1 |
+| TypeScript Errors | 7 | +7 |
+| TypeScript Strict Mode Errors | 2312 | -30 |
 
-*Last updated: 2025-11-22 16:07:31 UTC*
+*Last updated: 2025-11-22 16:24:55 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,21 +26,52 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 1 issues in `violet-vault/src/services/bugReport/reportSubmissionService.ts`
 
-Last check: 2025-11-22 16:07:14 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 1 | `complexity` |
+
+### Detailed Lint Report
+```
+violet-vault/src/services/bugReport/reportSubmissionService.ts:67:3 - 1 - Static async method 'submitWithFallbacks' has a complexity of 17. Maximum allowed is 15. (complexity)
+```
 
 ## Typecheck Audit
 
-✅ **All files passed TypeScript type checking!**
+### Files with Most Type Errors
+- 6 errors in `src/services/bugReport/apiService.ts`
+- 1 errors in `src/services/bugReport/reportSubmissionService.ts`
 
-Last check: 2025-11-22 16:07:22 UTC
+### Type Error Breakdown by Category
+| Count | Error Code |
+|---|---|
+| 4 | `TS2345` |
+| 3 | `TS2322` |
+
+### Detailed Type Error Report
+```
+src/services/bugReport/apiService.ts(128,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
+  Index signature for type 'string' is missing in type 'SubmissionResult'.
+src/services/bugReport/apiService.ts(128,52): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
+  Property 'description' is optional in type 'BugReportData' but required in type 'ReportData'.
+src/services/bugReport/apiService.ts(138,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
+  Index signature for type 'string' is missing in type 'SubmissionResult'.
+src/services/bugReport/apiService.ts(138,50): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
+  Property 'description' is optional in type 'BugReportData' but required in type 'ReportData'.
+src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'ProviderConfig[]' is not assignable to parameter of type 'Provider[]'.
+  Property 'priority' is missing in type 'ProviderConfig' but required in type 'Provider'.
+src/services/bugReport/apiService.ts(245,5): error TS2322: Type 'SubmissionStats' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SubmissionStats'.
+src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argument of type 'FinalResult' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'FinalResult'.
+```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 18 errors in `src/utils/common/frequencyCalculations.ts`
-- 18 errors in `src/services/bugReport/reportSubmissionService.ts`
 - 18 errors in `src/hooks/debts/useDebtForm.ts`
 - 18 errors in `src/components/pwa/PatchNotesModal.tsx`
 - 18 errors in `src/components/budgeting/paycheck/PaycheckPayerSelector.tsx`
@@ -190,6 +221,7 @@ Last check: 2025-11-22 16:07:22 UTC
 - 6 errors in `src/utils/common/BaseMutex.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
 - 6 errors in `src/services/firebaseSyncService.ts`
+- 6 errors in `src/services/bugReport/apiService.ts`
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 6 errors in `src/hooks/common/useExportData.ts`
 - 6 errors in `src/hooks/bills/useBillManagerUI.ts`
@@ -426,7 +458,7 @@ Last check: 2025-11-22 16:07:22 UTC
 - 1 errors in `src/stores/ui/toastStore.ts`
 - 1 errors in `src/services/typedChunkedSyncService.ts`
 - 1 errors in `src/services/editLockService.ts`
-- 1 errors in `src/services/bugReport/apiService.ts`
+- 1 errors in `src/services/bugReport/reportSubmissionService.ts`
 - 1 errors in `src/services/activityLogger.ts`
 - 1 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
@@ -484,13 +516,13 @@ Last check: 2025-11-22 16:07:22 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 746 | `TS7006` |
+| 725 | `TS7006` |
 | 658 | `TS7031` |
-| 181 | `TS2345` |
-| 145 | `TS2339` |
-| 141 | `TS18046` |
-| 135 | `TS2322` |
-| 69 | `TS7053` |
+| 182 | `TS2345` |
+| 143 | `TS2339` |
+| 138 | `TS2322` |
+| 135 | `TS18046` |
+| 65 | `TS7053` |
 | 65 | `TS7005` |
 | 57 | `TS18048` |
 | 40 | `TS7034` |
@@ -500,8 +532,8 @@ Last check: 2025-11-22 16:07:22 UTC
 | 5 | `TS2722` |
 | 5 | `TS2531` |
 | 5 | `TS2353` |
-| 4 | `TS2783` |
 | 3 | `TS7019` |
+| 3 | `TS2783` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
 | 1 | `TS7023` |
@@ -2676,8 +2708,22 @@ src/services/authService.ts(547,9): error TS18046: 'error' is of type 'unknown'.
 src/services/authService.ts(547,44): error TS18046: 'error' is of type 'unknown'.
 src/services/authService.ts(573,13): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/services/authService.ts(574,25): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'ProviderConfig[]' is not assignable to parameter of type 'never[]'.
-  Type 'ProviderConfig' is not assignable to type 'never'.
+src/services/bugReport/apiService.ts(128,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
+  Index signature for type 'string' is missing in type 'SubmissionResult'.
+src/services/bugReport/apiService.ts(128,52): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
+  Types of property 'description' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/bugReport/apiService.ts(138,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
+  Index signature for type 'string' is missing in type 'SubmissionResult'.
+src/services/bugReport/apiService.ts(138,50): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
+  Types of property 'description' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'ProviderConfig[]' is not assignable to parameter of type 'Provider[]'.
+  Property 'priority' is missing in type 'ProviderConfig' but required in type 'Provider'.
+src/services/bugReport/apiService.ts(245,5): error TS2322: Type 'SubmissionStats' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SubmissionStats'.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(184,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -2726,26 +2772,8 @@ src/services/bugReport/performanceInfoService.ts(355,9): error TS2322: Type 'num
   Type 'undefined' is not assignable to type 'number | null'.
 src/services/bugReport/performanceInfoService.ts(361,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/performanceInfoService.ts(390,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/reportSubmissionService.ts(16,36): error TS7006: Parameter 'reportData' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(49,68): error TS2339: Property 'config' does not exist on type '{ type: string; priority: number; url?: undefined; } | { type: string; priority: number; url: string | undefined; }'.
-  Property 'config' does not exist on type '{ type: string; priority: number; url?: undefined; }'.
-src/services/bugReport/reportSubmissionService.ts(63,11): error TS2783: 'provider' is specified more than once, so this usage will be overwritten.
-src/services/bugReport/reportSubmissionService.ts(73,25): error TS2339: Property 'redundant' does not exist on type '{ type: string; priority: number; url?: undefined; } | { type: string; priority: number; url: string | undefined; }'.
-  Property 'redundant' does not exist on type '{ type: string; priority: number; url?: undefined; }'.
-src/services/bugReport/reportSubmissionService.ts(81,18): error TS18046: 'error' is of type 'unknown'.
-src/services/bugReport/reportSubmissionService.ts(117,32): error TS7006: Parameter 'reportData' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(117,44): error TS7006: Parameter 'webhookUrl' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(164,16): error TS18046: 'error' is of type 'unknown'.
-src/services/bugReport/reportSubmissionService.ts(176,30): error TS7006: Parameter '_reportData' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(176,43): error TS7006: Parameter 'emailConfig' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(192,16): error TS18046: 'error' is of type 'unknown'.
-src/services/bugReport/reportSubmissionService.ts(203,32): error TS7006: Parameter 'reportData' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(229,67): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/reportSubmissionService.ts(240,16): error TS18046: 'error' is of type 'unknown'.
-src/services/bugReport/reportSubmissionService.ts(256,46): error TS7006: Parameter 'r' implicitly has an 'any' type.
-src/services/bugReport/reportSubmissionService.ts(265,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/reportSubmissionService.ts(271,16): error TS18046: 'error' is of type 'unknown'.
-src/services/bugReport/reportSubmissionService.ts(286,39): error TS18046: 'error' is of type 'unknown'.
+src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argument of type 'FinalResult' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'FinalResult'.
 src/services/bugReport/screenshotService.ts(39,37): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
 src/services/bugReport/screenshotService.ts(43,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/screenshotService.ts(52,75): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -3066,24 +3094,6 @@ src/utils/common/budgetHistoryTracker.ts(109,41): error TS2345: Argument of type
     Type 'string | null' is not assignable to type 'string | undefined'.
       Type 'null' is not assignable to type 'string | undefined'.
 src/utils/common/fixAutoAllocateUndefined.ts(66,37): error TS18046: 'error' is of type 'unknown'.
-src/utils/common/frequencyCalculations.ts(43,34): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(43,42): error TS7006: Parameter 'fromFrequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(43,57): error TS7006: Parameter 'toFrequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(48,26): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ weekly: number; biweekly: number; monthly: number; quarterly: number; yearly: number; }'.
-src/utils/common/frequencyCalculations.ts(49,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ weekly: number; biweekly: number; monthly: number; quarterly: number; yearly: number; }'.
-src/utils/common/frequencyCalculations.ts(68,28): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(68,36): error TS7006: Parameter 'fromFrequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(79,27): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(79,35): error TS7006: Parameter 'fromFrequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(90,26): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(90,34): error TS7006: Parameter 'fromFrequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(100,31): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(102,10): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ weekly: number; biweekly: number; monthly: number; quarterly: number; yearly: number; }'.
-src/utils/common/frequencyCalculations.ts(114,3): error TS7006: Parameter 'targetAmount' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(115,3): error TS7006: Parameter 'targetFrequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(127,34): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(157,41): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/utils/common/frequencyCalculations.ts(171,21): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ once: string; weekly: string; biweekly: string; monthly: string; quarterly: string; biannual: string; annual: string; yearly: string; }'.
 src/utils/common/highlight.ts(285,73): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/lazyImport.ts(4,21): error TS7006: Parameter 'factory' implicitly has an 'any' type.
 src/utils/common/lazyImport.ts(6,21): error TS7006: Parameter 'module' implicitly has an 'any' type.
