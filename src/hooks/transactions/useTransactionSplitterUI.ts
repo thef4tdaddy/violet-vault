@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { transactionSplitterService } from "../../services/transactions/transactionSplitterService";
 import type { Transaction, SplitAllocation, Envelope } from "@/types/finance";
 
@@ -28,7 +29,7 @@ export const useTransactionSplitterUI = () => {
  */
 export const useTransactionSplitterLogic = (
   splitAllocations: SplitAllocation[],
-  setSplitAllocations: React.Dispatch<React.SetStateAction<SplitAllocation[]>>,
+  setSplitAllocations: Dispatch<SetStateAction<SplitAllocation[]>>,
   transaction: Transaction | null | undefined,
   envelopes: Envelope[]
 ) => {
@@ -59,7 +60,7 @@ export const useTransactionSplitterLogic = (
         splitAllocations,
         id,
         field as keyof SplitAllocation,
-        value as never,
+        value as SplitAllocation[keyof SplitAllocation],
         envelopes
       );
       setSplitAllocations(updatedSplits);

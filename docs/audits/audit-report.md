@@ -2,15 +2,16 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 3 | 0 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2199 | -16 |
+| Category                      | Current | Change |
+| ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 3       | 0      |
+| TypeScript Errors             | 0       | 0      |
+| TypeScript Strict Mode Errors | 2199    | -16    |
 
-*Last updated: 2025-11-22 18:28:04 UTC*
+_Last updated: 2025-11-22 18:28:04 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -27,16 +28,19 @@
 ## Lint Audit
 
 ### Files with Most Issues
+
 - 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts`
 
 ### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 2 | `no-undef` |
-| 1 | `complexity` |
+
+| Count | Rule ID      |
+| ----- | ------------ |
+| 2     | `no-undef`   |
+| 1     | `complexity` |
 
 ### Detailed Lint Report
+
 ```
 /home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:31:24 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/transactions/useTransactionSplitterUI.ts:31:39 - 1 - 'React' is not defined. (no-undef)
@@ -52,6 +56,7 @@ Last check: 2025-11-22 18:27:47 UTC
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
+
 - 17 errors in `src/hooks/auth/authOperations.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
@@ -487,40 +492,42 @@ Last check: 2025-11-22 18:27:47 UTC
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 
 ### Strict Mode Error Breakdown
+
 | Count | Error Code |
-|---|---|
-| 682 | `TS7006` |
-| 626 | `TS7031` |
-| 180 | `TS2345` |
-| 142 | `TS2339` |
-| 134 | `TS2322` |
-| 132 | `TS18046` |
-| 65 | `TS7005` |
-| 63 | `TS7053` |
-| 41 | `TS18048` |
-| 40 | `TS7034` |
-| 28 | `TS18047` |
-| 24 | `TS2769` |
-| 6 | `TS2411` |
-| 5 | `TS2722` |
-| 5 | `TS2531` |
-| 5 | `TS2353` |
-| 3 | `TS7019` |
-| 3 | `TS2783` |
-| 3 | `TS2352` |
-| 2 | `TS7022` |
-| 1 | `TS7023` |
-| 1 | `TS7016` |
-| 1 | `TS2774` |
-| 1 | `TS2740` |
-| 1 | `TS2698` |
-| 1 | `TS2683` |
-| 1 | `TS2538` |
-| 1 | `TS2532` |
-| 1 | `TS2365` |
-| 1 | `TS2349` |
+| ----- | ---------- |
+| 682   | `TS7006`   |
+| 626   | `TS7031`   |
+| 180   | `TS2345`   |
+| 142   | `TS2339`   |
+| 134   | `TS2322`   |
+| 132   | `TS18046`  |
+| 65    | `TS7005`   |
+| 63    | `TS7053`   |
+| 41    | `TS18048`  |
+| 40    | `TS7034`   |
+| 28    | `TS18047`  |
+| 24    | `TS2769`   |
+| 6     | `TS2411`   |
+| 5     | `TS2722`   |
+| 5     | `TS2531`   |
+| 5     | `TS2353`   |
+| 3     | `TS7019`   |
+| 3     | `TS2783`   |
+| 3     | `TS2352`   |
+| 2     | `TS7022`   |
+| 1     | `TS7023`   |
+| 1     | `TS7016`   |
+| 1     | `TS2774`   |
+| 1     | `TS2740`   |
+| 1     | `TS2698`   |
+| 1     | `TS2683`   |
+| 1     | `TS2538`   |
+| 1     | `TS2532`   |
+| 1     | `TS2365`   |
+| 1     | `TS2349`   |
 
 ### Detailed Strict Mode Report
+
 ```
 src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/App.tsx(29,9): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
@@ -3362,4 +3369,3 @@ src/utils/ui/touchFeedback.ts(141,13): error TS7006: Parameter 'event' implicitl
 src/utils/ui/touchFeedback.ts(157,16): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ primary: string; secondary: string; card: string; small: string; tab: string; destructive: string; success: string; fab: string; envelope: string; navigation: string; comprehensive: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ primary: string; secondary: string; card: string; small: string; tab: string; destructive: string; success: string; fab: string; envelope: string; navigation: string; comprehensive: string; }'.
 ```
-
