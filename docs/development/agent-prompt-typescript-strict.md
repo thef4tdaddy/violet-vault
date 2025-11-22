@@ -8,7 +8,7 @@ Fix TypeScript strict mode errors **only**. Do NOT introduce normal TypeScript e
 
 - **ESLint Issues**: 0 ✅
 - **TypeScript Errors**: 0 ✅
-- **TypeScript Strict Mode Errors**: 2336 ⚠️ (reduced from 2501)
+- **TypeScript Strict Mode Errors**: 2342 ⚠️ (reduced from 2501)
 
 ## Completed Files
 
@@ -16,8 +16,11 @@ Fix TypeScript strict mode errors **only**. Do NOT introduce normal TypeScript e
 2. ✅ `src/hooks/debts/useDebtStrategies.ts` - 20 errors fixed
 3. ✅ `src/hooks/common/useImportData.ts` - 19 errors fixed
 4. ✅ `src/components/savings/AddEditGoalModal.tsx` - 19 errors fixed
-5. ✅ `src/components/budgeting/EnvelopeSystem.tsx` - 19 errors fixed
+5. ✅ `src/components/budgeting/EnvelopeSystem.tsx` - 19 errors fixed (exclusion added for useCallback)
 6. ✅ `src/components/automation/AutoFundingViewComponents.tsx` - 19 errors fixed
+7. ✅ `src/stores/ui/uiStore.ts` - Removed incorrect type annotation (fixed 105+ cascading errors)
+8. ✅ `src/utils/receipts/receiptHelpers.ts` - Fixed type guards for unknown types
+9. ✅ `src/components/automation/AutoFundingView.tsx` - Fixed boolean prop type
 
 ## ⚠️ CRITICAL: Zero Tolerance for New Errors
 
@@ -29,7 +32,7 @@ The goal is:
 
 - ✅ **ESLint Issues**: Keep at **0** (never allow new errors)
 - ✅ **Normal TypeScript Errors**: Keep at **0** (never allow new errors)
-- ⚠️ **Strict Mode Errors**: Reduce from 2501 toward 0
+- ⚠️ **Strict Mode Errors**: Reduce from 2342 toward 0
 
 ### If You Introduce Normal TS or Lint Errors
 
@@ -94,18 +97,19 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
 
 Begin with the file that has the **most** strict mode errors. Refer to `docs/audits/sorted-typecheck-strict-report.txt` for the ordered list.
 
-**Top 10 files to fix:**
+**Next 4 files to fix (in order):**
 
-1. ✅ `src/services/bugReport/githubApiService.ts` - 20 errors (COMPLETED)
-2. ✅ `src/hooks/debts/useDebtStrategies.ts` - 20 errors (COMPLETED)
-3. ✅ `src/hooks/common/useToast.ts` - 19 errors (COMPLETED)
-4. ✅ `src/components/savings/AddEditGoalModal.tsx` - 19 errors (COMPLETED)
-5. ✅ `src/components/budgeting/EnvelopeSystem.tsx` - 19 errors (COMPLETED)
-6. ✅ `src/components/automation/AutoFundingViewComponents.tsx` - 19 errors (COMPLETED)
-7. `src/utils/receipts/receiptHelpers.tsx` - 18 errors
-8. `src/utils/common/frequencyCalculations.ts` - 18 errors
-9. `src/hooks/common/useImportData.ts` - 19 errors
-10. `src/components/sync/ActivityBanner.tsx` - 19 errors
+1. 🔄 `src/utils/common/frequencyCalculations.ts` - 18 errors
+2. 🔄 `src/services/bugReport/reportSubmissionService.ts` - 18 errors
+3. 🔄 `src/hooks/debts/useDebtForm.ts` - 18 errors
+4. 🔄 `src/components/pwa/PatchNotesModal.tsx` - 18 errors
+
+**Additional high-priority files:**
+
+- `src/components/budgeting/paycheck/PaycheckPayerSelector.tsx` - 18 errors
+- `src/hooks/transactions/useTransactionSplitterUI.ts` - 17 errors
+- `src/hooks/auth/authOperations.ts` - 17 errors
+- `src/utils/sync/autoBackupService.ts` - 16 errors
 
 ### 2. How to Fix Errors
 
@@ -297,10 +301,16 @@ if (value !== undefined) {
    - Strict errors decreased ✅
 9. **Format**: `npm run format`
 10. **Final verification** (run all checks again after formatting)
-11. **Commit only if still passing**:
+11. **Commit only the files you edited** (CRITICAL):
 
     ```bash
-    git add .
+    # Stage ONLY the file(s) you edited
+    git add path/to/file/you/edited.ts
+
+    # Verify only your files are staged
+    git status
+
+    # Commit with descriptive message
     git commit -m "fix: resolve TypeScript strict mode errors in FILENAME
 
     - Fix X strict mode type errors
@@ -308,6 +318,8 @@ if (value !== undefined) {
     - Ensure type safety without breaking functionality
     - Verified: 0/0 normal TS/lint errors maintained"
     ```
+
+    **⚠️ NEVER use `git add .` - Always stage specific files you edited**
 
 ### 6. Progress Tracking
 
@@ -353,7 +365,7 @@ npm run format
 
 - ✅ **Normal TypeScript errors = 0** (MANDATORY - never allow new errors)
 - ✅ **ESLint errors = 0** (MANDATORY - never allow new errors)
-- ⚠️ **Strict mode errors decreased** (target: reduce from 2501 toward 0)
+- ⚠️ **Strict mode errors decreased** (target: reduce from 2342 toward 0)
 
 **Additional Requirements:**
 
@@ -365,6 +377,42 @@ npm run format
 **If any of the mandatory criteria fail, the fix is NOT successful.**
 **Do not commit until ALL mandatory criteria pass.**
 
+## Lessons Learned from Recent Fixes
+
+### Critical Mistakes to Avoid
+
+1. **❌ Incorrect Type Annotations Can Cascade**
+   - **Problem**: Adding `typeof create<typeof base>` to `useUiStore` caused 105+ cascading errors
+   - **Solution**: Let TypeScript infer types when possible. If annotation is needed, use proper types, not `typeof` of function calls
+   - **Lesson**: Removing incorrect annotations can fix many errors at once
+
+2. **❌ Missing Type Guards for Unknown Types**
+   - **Problem**: Accessing properties on `unknown` types without guards
+   - **Solution**: Always use type guards: `typeof value === "string"` before using string methods
+   - **Example**: `if (typeof form.date !== "string") return;` before `form.date.test(...)`
+
+3. **❌ Using Generic Types Instead of Specific Types**
+   - **Problem**: Using generic `Rule` interface when `AutoFundingRule` is available
+   - **Solution**: Import and use the specific type from the domain
+   - **Lesson**: Check for existing domain types before creating generic ones
+
+4. **❌ Incorrect Prop Types**
+   - **Problem**: Passing string `"true"` instead of boolean `true` to boolean props
+   - **Solution**: Always use correct types for props
+   - **Lesson**: TypeScript will catch these, but verify prop types match interfaces
+
+5. **❌ Inline ESLint Disables Instead of Config Exclusions**
+   - **Problem**: Using `// eslint-disable` comments for legitimate cases
+   - **Solution**: Add proper exclusions in `configs/linting/config-modules/exclusions-config.js` with justification
+   - **Lesson**: Config-based exclusions are better for maintainability
+
+### Best Practices
+
+- **When removing type annotations**: Verify it doesn't break inference elsewhere
+- **When adding type guards**: Ensure they're comprehensive and handle all cases
+- **When fixing store types**: Be very careful - store type errors cascade widely
+- **Always verify 0/0**: After every single change, not just at the end
+
 ## Questions?
 
 If you encounter:
@@ -373,7 +421,8 @@ If you encounter:
 - **Complex type issues**: Check existing patterns in the codebase
 - **Third-party type issues**: Check if types need to be imported or defined locally
 - **Breaking changes required**: Document in commit message and proceed carefully
+- **Store type errors**: Be extra careful - these cascade. Consider removing annotations before adding new ones
 
 ---
 
-**Remember**: Work systematically from the top of the audit. Fix one file completely before moving to the next. Verify after each fix. Commit frequently.
+**Remember**: Work systematically from the top of the audit. Fix one file completely before moving to the next. Verify after each fix. Commit frequently. **Only commit the files you edited.**
