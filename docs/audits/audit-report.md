@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | +5 |
+| ESLint Issues | 5 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2235 | -15 |
+| TypeScript Strict Mode Errors | 2212 | -23 |
 
-*Last updated: 2025-11-22 18:13:27 UTC*
+*Last updated: 2025-11-22 18:19:16 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -48,7 +48,7 @@
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 18:13:11 UTC
+Last check: 2025-11-22 18:19:00 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -60,7 +60,6 @@ Last check: 2025-11-22 18:13:11 UTC
 - 16 errors in `src/utils/sync/autoBackupService.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
-- 15 errors in `src/hooks/bills/useSmartBillSuggestions.ts`
 - 15 errors in `src/components/transactions/TransactionFilters.tsx`
 - 15 errors in `src/components/sharing/ShareCodeModal.tsx`
 - 14 errors in `src/utils/sync/validation/encryptedDataValidator.ts`
@@ -93,7 +92,6 @@ Last check: 2025-11-22 18:13:11 UTC
 - 12 errors in `src/hooks/analytics/useReportExporter.ts`
 - 12 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
 - 12 errors in `src/components/settings/SettingsDashboard.tsx`
-- 12 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
 - 11 errors in `src/utils/security/shareCodeUtils.ts`
 - 11 errors in `src/utils/savings/savingsFormUtils.ts`
@@ -286,6 +284,7 @@ Last check: 2025-11-22 18:13:11 UTC
 - 4 errors in `src/components/budgeting/shared/EnvelopeTypeSelector.tsx`
 - 4 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 4 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
+- 4 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 4 errors in `src/components/auth/components/UserSetupHeader.tsx`
 - 4 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
 - 4 errors in `src/components/analytics/tabs/TrendsTab.tsx`
@@ -491,16 +490,16 @@ Last check: 2025-11-22 18:13:11 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 679 | `TS7006` |
+| 669 | `TS7006` |
 | 642 | `TS7031` |
-| 176 | `TS2345` |
-| 142 | `TS2339` |
+| 175 | `TS2345` |
+| 134 | `TS2339` |
 | 134 | `TS2322` |
 | 134 | `TS18046` |
-| 65 | `TS7005` |
 | 63 | `TS7053` |
+| 62 | `TS7005` |
 | 57 | `TS18048` |
-| 40 | `TS7034` |
+| 39 | `TS7034` |
 | 37 | `TS18047` |
 | 24 | `TS2769` |
 | 6 | `TS2411` |
@@ -805,14 +804,6 @@ src/components/bills/SmartBillMatcher.tsx(8,29): error TS7031: Binding element '
 src/components/bills/SmartBillMatcher.tsx(8,36): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
 src/components/bills/SmartBillMatcher.tsx(8,47): error TS7031: Binding element 'onSuggestEnvelope' implicitly has an 'any' type.
 src/components/bills/SmartBillMatcher.tsx(8,66): error TS7031: Binding element 'searchQuery' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(28,67): error TS2339: Property 'confidence' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(32,34): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(33,59): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(39,56): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(42,74): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(43,70): error TS2339: Property 'reason' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(50,32): error TS2339: Property 'confidence' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(53,31): error TS2339: Property 'confidence' does not exist on type 'never'.
 src/components/bills/modals/BillDetailActions.tsx(10,3): error TS7031: Binding element 'bill' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailActions.tsx(11,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailActions.tsx(12,3): error TS7031: Binding element 'handleEdit' implicitly has an 'any' type.
@@ -1979,23 +1970,6 @@ src/hooks/bills/useBillValidation.ts(48,6): error TS7006: Parameter 'type' impli
 src/hooks/bills/useBillValidation.ts(48,12): error TS7006: Parameter 'changes' implicitly has an 'any' type.
 src/hooks/bills/useBills/index.ts(43,5): error TS2783: 'upcomingBills' is specified more than once, so this usage will be overwritten.
 src/hooks/bills/useBulkBillOperations.ts(31,39): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(8,41): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(8,48): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(8,59): error TS7006: Parameter 'searchQuery' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(20,32): error TS7006: Parameter 'query' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(22,11): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/hooks/bills/useSmartBillSuggestions.ts(25,24): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(37,20): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(39,50): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(59,28): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(67,18): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/hooks/bills/useSmartBillSuggestions.ts(81,24): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(86,10): error TS7006: Parameter 'word' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(89,40): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/hooks/bills/useSmartBillSuggestions.ts(101,31): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/hooks/bills/useSmartBillSuggestions.ts(109,20): error TS2345: Argument of type 'any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type 'any[]' is not assignable to type 'never[]'.
-    Type 'any' is not assignable to type 'never'.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(6,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(121,12): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
