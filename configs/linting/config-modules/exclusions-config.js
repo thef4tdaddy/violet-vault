@@ -382,4 +382,14 @@ export default [
       "max-lines": "off",
     },
   },
+  {
+    // EnvelopeSystem.tsx - updateBiweeklyAllocations is a useCallback hook, not a Zustand action
+    // The zustand-safe-patterns rule incorrectly flags it because it's used in a useEffect dependency array
+    // This is a legitimate React hook pattern where a useCallback depends on bills and envelopes,
+    // and the useEffect correctly includes it in dependencies to re-run when the callback changes
+    files: ["src/components/budgeting/EnvelopeSystem.tsx"],
+    rules: {
+      "zustand-safe-patterns/zustand-no-store-actions-in-deps": "off", // updateBiweeklyAllocations is a useCallback, not a Zustand action
+    },
+  },
 ];
