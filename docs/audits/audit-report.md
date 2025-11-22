@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2252 | +2252 |
+| TypeScript Strict Mode Errors | 2239 | -13 |
 
-*Last updated: 2025-11-22 18:04:30 UTC*
+*Last updated: 2025-11-22 18:10:56 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,13 +28,13 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-22 18:04:00 UTC
+Last check: 2025-11-22 18:10:26 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 18:04:14 UTC
+Last check: 2025-11-22 18:10:41 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -63,7 +63,6 @@ Last check: 2025-11-22 18:04:14 UTC
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
-- 13 errors in `src/services/authService.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
@@ -482,12 +481,12 @@ Last check: 2025-11-22 18:04:14 UTC
 | 643 | `TS7031` |
 | 174 | `TS2345` |
 | 142 | `TS2339` |
-| 135 | `TS18046` |
 | 131 | `TS2322` |
-| 65 | `TS7005` |
+| 124 | `TS18046` |
+| 64 | `TS7005` |
 | 63 | `TS7053` |
 | 51 | `TS18048` |
-| 40 | `TS7034` |
+| 39 | `TS7034` |
 | 37 | `TS18047` |
 | 24 | `TS2769` |
 | 6 | `TS2411` |
@@ -2614,19 +2613,6 @@ src/main.tsx(271,20): error TS18046: 'error' is of type 'unknown'.
 src/main.tsx(280,23): error TS2345: Argument of type 'HTMLElement | null' is not assignable to parameter of type 'Container'.
   Type 'null' is not assignable to type 'Container'.
 src/services/activityLogger.ts(126,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/authService.ts(67,16): error TS18046: 'parseError' is of type 'unknown'.
-src/services/authService.ts(107,14): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(108,18): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(111,14): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(302,20): error TS18046: 'decryptError' is of type 'unknown'.
-src/services/authService.ts(303,24): error TS18046: 'decryptError' is of type 'unknown'.
-src/services/authService.ts(354,11): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(354,46): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(502,37): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(547,9): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(547,44): error TS18046: 'error' is of type 'unknown'.
-src/services/authService.ts(573,13): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/services/authService.ts(574,25): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(184,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
