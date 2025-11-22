@@ -6,6 +6,7 @@
 import { useState, useMemo } from "react";
 import { useDebtManagement } from "@/hooks/debts/useDebtManagement";
 import logger from "@/utils/common/logger";
+import type { DebtSubmissionData } from "./useDebtForm";
 
 export const useDebtDashboard = () => {
   const {
@@ -95,8 +96,8 @@ export const useDebtDashboard = () => {
   };
 
   const handleModalSubmit = async (
-    debtIdOrData: unknown,
-    maybeUpdates?: Record<string, unknown>
+    debtIdOrData: DebtSubmissionData | string,
+    maybeUpdates?: DebtSubmissionData
   ) => {
     try {
       const isUpdatePayload = typeof debtIdOrData === "string" || typeof debtIdOrData === "number";

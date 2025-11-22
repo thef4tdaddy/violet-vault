@@ -3,16 +3,27 @@
  * Handles all business logic for debt modal including edit locks, connections, etc.
  */
 
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useAuthManager } from "../auth/useAuthManager";
 import { initializeEditLocks } from "../../services/editLockService";
 import useEditLock from "../common/useEditLock";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
 import useBills from "../bills/useBills";
-import { useDebtForm } from "./useDebtForm";
+import {
+  useDebtForm,
+  type ConnectedBill,
+  type ConnectedEnvelope,
+  type DebtSubmissionData,
+} from "./useDebtForm";
 import { calculateDebtMetrics } from "../../utils/debts/debtFormValidation";
+import type { DebtAccount } from "../../types/debt";
 
-export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
+export const useDebtModalLogic = (
+  debt: DebtAccount | null,
+  isOpen: boolean,
+  onSubmit: (data: DebtSubmissionData | string, updateData?: DebtSubmissionData) => Promise<void>,
+  onClose: () => void
+) => {
   // Get auth context for edit locking
   const {
     securityContext: { budgetId },
@@ -31,40 +42,48 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Find connected bill and envelope for this debt
-  const connectedBill = useMemo(
-    () =>
-      debt?.id
-        ? bills.find(
-            (bill) =>
-              bill && typeof bill === "object" && "debtId" in bill && bill.debtId === debt.id
-          )
-        : null,
-    [debt?.id, bills]
-  );
+  const connectedBill = useMemo<ConnectedBill | null>(() => {
+    if (!debt?.id) return null;
+    const bill = bills.find(
+      (b) =>
+        b &&
+        typeof b === "object" &&
+        "debtId" in b &&
+        (b as Record<string, unknown>).debtId === debt.id
+    );
+    return (bill as unknown as ConnectedBill) || null;
+  }, [debt?.id, bills]);
 
-  const connectedEnvelope = useMemo(() => {
+  const connectedEnvelope = useMemo<ConnectedEnvelope | null>(() => {
     if (connectedBill) {
-      return envelopes.find((env) => env.id === connectedBill.envelopeId);
+      const env = envelopes.find(
+        (env) => env.id === (connectedBill as Record<string, unknown>).envelopeId
+      );
+      return (env as unknown as ConnectedEnvelope) || null;
     }
-    if (debt?.envelopeId) {
-      return envelopes.find((env) => env.id === debt.envelopeId);
+    if (debt) {
+      const debtWithEnvelope = debt as { envelopeId?: string };
+      if (debtWithEnvelope.envelopeId) {
+        const env = envelopes.find((env) => env.id === debtWithEnvelope.envelopeId);
+        return (env as unknown as ConnectedEnvelope) || null;
+      }
     }
     return null;
-  }, [connectedBill, debt?.envelopeId, envelopes]);
+  }, [connectedBill, debt, envelopes]);
 
   // Use the debt form hook
   const debtFormHook = useDebtForm(debt, isOpen, connectedBill, connectedEnvelope);
 
   // Edit locking for the debt (only when editing existing debt)
   const editLockHook = useEditLock("debt", debt?.id, {
-    autoAcquire: isOpen && debt?.id,
+    autoAcquire: !!(isOpen && debt?.id),
     autoRelease: true,
     showToasts: true,
   });
 
   // Calculate debt metrics for display
+  const { formData } = debtFormHook;
   const debtMetrics = useMemo(() => {
-    const { formData } = debtFormHook;
     if (formData.currentBalance && formData.minimumPayment) {
       const metrics = calculateDebtMetrics({
         currentBalance: parseFloat(formData.currentBalance) || 0,
@@ -77,10 +96,10 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
       return metrics;
     }
     return null;
-  }, [debtFormHook]);
+  }, [formData]);
 
   // Handle form submission
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const success = await debtFormHook.handleSubmit(onSubmit);
     if (success && !debtFormHook.isEditMode) {
@@ -120,24 +139,24 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
     if (connectedBill) {
       connections.push({
         label: "Bill",
-        value: connectedBill.name,
-        badge: `$${connectedBill.amount?.toFixed(2)}`,
+        value: (connectedBill as Record<string, unknown>).name,
+        badge: `$${(((connectedBill as Record<string, unknown>).amount as number) || 0).toFixed(2)}`,
       });
     }
     if (connectedEnvelope) {
       connections.push({
         label: "Envelope",
-        value: connectedEnvelope.name,
-        badge: `$${connectedEnvelope.currentBalance?.toFixed(2)}`,
+        value: (connectedEnvelope as Record<string, unknown>).name,
+        badge: `$${(((connectedEnvelope as Record<string, unknown>).currentBalance as number) || 0).toFixed(2)}`,
       });
     }
 
     const description =
       connectedBill && connectedEnvelope
-        ? `This debt is connected to the "${connectedBill.name}" bill and funded from the "${connectedEnvelope.name}" envelope.`
+        ? `This debt is connected to the "${(connectedBill as Record<string, unknown>).name}" bill and funded from the "${(connectedEnvelope as Record<string, unknown>).name}" envelope.`
         : connectedBill
-          ? `This debt is connected to the "${connectedBill.name}" bill.`
-          : `This debt is connected to the "${connectedEnvelope.name}" envelope.`;
+          ? `This debt is connected to the "${(connectedBill as Record<string, unknown>).name}" bill.`
+          : `This debt is connected to the "${(connectedEnvelope as Record<string, unknown>).name}" envelope.`;
 
     return { connections, description };
   }, [connectedBill, connectedEnvelope, shouldShowExistingConnections]);

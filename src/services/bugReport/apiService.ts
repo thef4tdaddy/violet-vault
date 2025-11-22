@@ -88,6 +88,7 @@ export interface ProviderConfig {
   config?: Record<string, unknown>;
   url?: string;
   primary?: boolean;
+  priority?: number;
 }
 
 /**
@@ -158,7 +159,12 @@ export class BugReportAPIService {
       };
     }
 
-    return ReportSubmissionService.submitWithFallbacks(reportData as never, providers);
+    const mappedProviders = providers.map((p) => ({
+      ...p,
+      priority: p.priority ?? 99, // Default priority if missing
+    }));
+
+    return ReportSubmissionService.submitWithFallbacks(reportData as never, mappedProviders);
   }
 
   /**

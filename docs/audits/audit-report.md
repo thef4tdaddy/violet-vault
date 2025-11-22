@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | +1 |
-| TypeScript Errors | 7 | +7 |
-| TypeScript Strict Mode Errors | 2312 | -30 |
+| ESLint Issues | 3 | -12 |
+| TypeScript Errors | 0 | -7 |
+| TypeScript Strict Mode Errors | 2265 | -7 |
 
-*Last updated: 2025-11-22 16:24:55 UTC*
+*Last updated: 2025-11-22 17:02:05 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,52 +27,31 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 2 issues in `violet-vault/src/components/debt/modals/DebtFormSections.tsx`
 - 1 issues in `violet-vault/src/services/bugReport/reportSubmissionService.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 2 | `enforce-ui-library/enforce-ui-library` |
 | 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
-violet-vault/src/services/bugReport/reportSubmissionService.ts:67:3 - 1 - Static async method 'submitWithFallbacks' has a complexity of 17. Maximum allowed is 15. (complexity)
+violet-vault/src/components/debt/modals/DebtFormSections.tsx:55:11 - 1 - Use <Select> from @/components/ui instead of <select> element. Import: import { Select } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+violet-vault/src/components/debt/modals/DebtFormSections.tsx:213:9 - 1 - Use <Select> from @/components/ui instead of <select> element. Import: import { Select } from "@/components/ui" (enforce-ui-library/enforce-ui-library)
+violet-vault/src/services/bugReport/reportSubmissionService.ts:70:3 - 1 - Static async method 'submitWithFallbacks' has a complexity of 17. Maximum allowed is 15. (complexity)
 ```
 
 ## Typecheck Audit
 
-### Files with Most Type Errors
-- 6 errors in `src/services/bugReport/apiService.ts`
-- 1 errors in `src/services/bugReport/reportSubmissionService.ts`
+✅ **All files passed TypeScript type checking!**
 
-### Type Error Breakdown by Category
-| Count | Error Code |
-|---|---|
-| 4 | `TS2345` |
-| 3 | `TS2322` |
-
-### Detailed Type Error Report
-```
-src/services/bugReport/apiService.ts(128,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
-  Index signature for type 'string' is missing in type 'SubmissionResult'.
-src/services/bugReport/apiService.ts(128,52): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
-  Property 'description' is optional in type 'BugReportData' but required in type 'ReportData'.
-src/services/bugReport/apiService.ts(138,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
-  Index signature for type 'string' is missing in type 'SubmissionResult'.
-src/services/bugReport/apiService.ts(138,50): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
-  Property 'description' is optional in type 'BugReportData' but required in type 'ReportData'.
-src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'ProviderConfig[]' is not assignable to parameter of type 'Provider[]'.
-  Property 'priority' is missing in type 'ProviderConfig' but required in type 'Provider'.
-src/services/bugReport/apiService.ts(245,5): error TS2322: Type 'SubmissionStats' is not assignable to type 'Record<string, unknown>'.
-  Index signature for type 'string' is missing in type 'SubmissionStats'.
-src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argument of type 'FinalResult' is not assignable to parameter of type 'Record<string, unknown>'.
-  Index signature for type 'string' is missing in type 'FinalResult'.
-```
+Last check: 2025-11-22 17:01:55 UTC
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 18 errors in `src/hooks/debts/useDebtForm.ts`
 - 18 errors in `src/components/pwa/PatchNotesModal.tsx`
 - 18 errors in `src/components/budgeting/paycheck/PaycheckPayerSelector.tsx`
 - 17 errors in `src/hooks/transactions/useTransactionSplitterUI.ts`
@@ -115,7 +94,6 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 12 errors in `src/hooks/analytics/useReportExporter.ts`
 - 12 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
 - 12 errors in `src/components/settings/SettingsDashboard.tsx`
-- 12 errors in `src/components/debt/modals/DebtFormSections.tsx`
 - 12 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
 - 11 errors in `src/utils/security/shareCodeUtils.ts`
@@ -192,7 +170,6 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 7 errors in `src/hooks/sharing/useBudgetJoining.ts`
 - 7 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 7 errors in `src/hooks/mobile/useFABBehavior.ts`
-- 7 errors in `src/hooks/debts/useDebtModalLogic.ts`
 - 7 errors in `src/hooks/common/useModalManager.ts`
 - 7 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 7 errors in `src/components/transactions/import/FieldMapper.tsx`
@@ -221,7 +198,6 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 6 errors in `src/utils/common/BaseMutex.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
 - 6 errors in `src/services/firebaseSyncService.ts`
-- 6 errors in `src/services/bugReport/apiService.ts`
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 6 errors in `src/hooks/common/useExportData.ts`
 - 6 errors in `src/hooks/bills/useBillManagerUI.ts`
@@ -308,7 +284,6 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 4 errors in `src/components/layout/AppRoutes.tsx`
 - 4 errors in `src/components/history/viewer/HistoryControls.tsx`
 - 4 errors in `src/components/debt/ui/DebtList.tsx`
-- 4 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 4 errors in `src/components/budgeting/shared/EnvelopeTypeSelector.tsx`
 - 4 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 4 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
@@ -415,7 +390,6 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 2 errors in `src/components/debt/ui/StrategyCard.tsx`
 - 2 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
 - 2 errors in `src/components/debt/modals/DebtModalHeader.tsx`
-- 2 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 2 errors in `src/components/debt/DebtStrategies.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
 - 2 errors in `src/components/debt/DebtDashboard.tsx`
@@ -458,11 +432,11 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 1 errors in `src/stores/ui/toastStore.ts`
 - 1 errors in `src/services/typedChunkedSyncService.ts`
 - 1 errors in `src/services/editLockService.ts`
-- 1 errors in `src/services/bugReport/reportSubmissionService.ts`
 - 1 errors in `src/services/activityLogger.ts`
 - 1 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/mobile/useSlideUpModal.ts`
+- 1 errors in `src/hooks/debts/useDebtModalLogic.ts`
 - 1 errors in `src/hooks/debts/useDebtManagement.ts`
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
@@ -496,7 +470,9 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 - 1 errors in `src/components/history/IntegrityStatusIndicator.tsx`
 - 1 errors in `src/components/debt/ui/DebtProgressBar.tsx`
 - 1 errors in `src/components/debt/ui/DebtCardProgressBar.tsx`
+- 1 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 1 errors in `src/components/debt/modals/DebtDetailModal.tsx`
+- 1 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 1 errors in `src/components/charts/TrendLineChart.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
@@ -516,14 +492,14 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 725 | `TS7006` |
-| 658 | `TS7031` |
-| 182 | `TS2345` |
-| 143 | `TS2339` |
-| 138 | `TS2322` |
+| 705 | `TS7006` |
+| 643 | `TS7031` |
+| 178 | `TS2345` |
+| 142 | `TS2339` |
 | 135 | `TS18046` |
-| 65 | `TS7053` |
+| 134 | `TS2322` |
 | 65 | `TS7005` |
+| 63 | `TS7053` |
 | 57 | `TS18048` |
 | 40 | `TS7034` |
 | 37 | `TS18047` |
@@ -546,7 +522,6 @@ src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argumen
 | 1 | `TS2532` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
-| 1 | `TS18049` |
 
 ### Detailed Strict Mode Report
 ```
@@ -1168,28 +1143,12 @@ src/components/debt/DebtDashboardComponents.tsx(63,15): error TS2322: Type '(deb
 src/components/debt/DebtStrategies.tsx(11,27): error TS7031: Binding element 'debts' implicitly has an 'any' type.
 src/components/debt/DebtStrategies.tsx(108,27): error TS2322: Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { ...; } | { ...; }; }[]' is not assignable to type 'never[]'.
   Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { monthsToPayoff: number; tot...' is not assignable to type 'never'.
-src/components/debt/modals/AddDebtModal.tsx(12,25): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/debt/modals/AddDebtModal.tsx(12,33): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/debt/modals/AddDebtModal.tsx(12,42): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/debt/modals/AddDebtModal.tsx(38,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/components/debt/modals/AddDebtModal.tsx(47,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/debt/modals/DebtDetailModal.tsx(71,27): error TS2322: Type '{ expectedPayoff: string; totalInterest: any; payoffDate: string; } | null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
   Type 'null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
-src/components/debt/modals/DebtFormFields.tsx(94,9): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/debt/modals/DebtFormFields.tsx(97,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+src/components/debt/modals/DebtFormFields.tsx(96,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/debt/modals/DebtFormSections.tsx(8,33): error TS7031: Binding element 'formData' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(8,43): error TS7031: Binding element 'setFormData' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(8,56): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(8,64): error TS7031: Binding element 'canEdit' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(66,40): error TS7031: Binding element 'formData' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(66,50): error TS7031: Binding element 'setFormData' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(66,63): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(66,71): error TS7031: Binding element 'canEdit' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(158,38): error TS7031: Binding element 'formData' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(158,48): error TS7031: Binding element 'setFormData' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(158,61): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/debt/modals/DebtFormSections.tsx(158,69): error TS7031: Binding element 'canEdit' implicitly has an 'any' type.
 src/components/debt/modals/DebtModalHeader.tsx(9,28): error TS7031: Binding element 'isEditMode' implicitly has an 'any' type.
 src/components/debt/modals/DebtModalHeader.tsx(9,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/debt/modals/UpcomingPaymentsModal.tsx(11,34): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
@@ -2309,17 +2268,17 @@ src/hooks/common/useTransactionArchiving.ts(126,41): error TS7006: Parameter 'tr
 src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
 src/hooks/dashboard/useMainDashboard.ts(173,6): error TS7006: Parameter 'difference' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(60,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
-  No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
 src/hooks/debts/useDebtDashboard.ts(61,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
   No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
-src/hooks/debts/useDebtDashboard.ts(83,27): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(88,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(144,35): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(154,38): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(154,46): error TS7006: Parameter 'paymentData' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(158,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/debts/useDebtDashboard.ts(160,25): error TS2345: Argument of type 'DebtAccount | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
+src/hooks/debts/useDebtDashboard.ts(62,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
+  No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
+src/hooks/debts/useDebtDashboard.ts(84,27): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(89,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(145,35): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(155,38): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(155,46): error TS7006: Parameter 'paymentData' implicitly has an 'any' type.
+src/hooks/debts/useDebtDashboard.ts(159,40): error TS2339: Property 'id' does not exist on type 'never'.
+src/hooks/debts/useDebtDashboard.ts(161,25): error TS2345: Argument of type 'DebtAccount | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
   Type 'undefined' is not assignable to type 'SetStateAction<null>'.
 src/hooks/debts/useDebtDetailModal.ts(10,3): error TS7031: Binding element 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtDetailModal.ts(11,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
@@ -2330,37 +2289,11 @@ src/hooks/debts/useDebtDetailModal.ts(15,3): error TS7031: Binding element 'onEd
 src/hooks/debts/useDebtDetailModal.ts(69,13): error TS7006: Parameter 'payment' implicitly has an 'any' type.
 src/hooks/debts/useDebtDetailModal.ts(69,22): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/hooks/debts/useDebtDetailModal.ts(80,32): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(30,33): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(34,23): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(36,24): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(36,30): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(38,28): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(55,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(63,33): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(71,34): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(71,40): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(71,55): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(79,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(79,34): error TS7006: Parameter 'connectedBill' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(79,49): error TS7006: Parameter 'connectedEnvelope' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(116,31): error TS7006: Parameter 'onSubmitCallback' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(148,37): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/debts/useDebtForm.ts(179,27): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/hooks/debts/useDebtForm.ts(182,44): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/hooks/debts/useDebtForm.ts(186,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
 src/hooks/debts/useDebtManagement.ts(78,7): error TS2345: Argument of type 'UseMutateAsyncFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string | undefined; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type '(data: unknown) => unknown'.
   Types of parameters 'variables' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'AddEnvelopeData'.
-src/hooks/debts/useDebtModalLogic.ts(15,35): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtModalLogic.ts(15,41): error TS7006: Parameter 'isOpen' implicitly has an 'any' type.
-src/hooks/debts/useDebtModalLogic.ts(15,49): error TS7006: Parameter 'onSubmit' implicitly has an 'any' type.
-src/hooks/debts/useDebtModalLogic.ts(15,59): error TS7006: Parameter 'onClose' implicitly has an 'any' type.
-src/hooks/debts/useDebtModalLogic.ts(56,50): error TS2345: Argument of type 'Bill | null | undefined' is not assignable to parameter of type 'null | undefined'.
-  Type 'Bill' is not assignable to type 'null | undefined'.
-src/hooks/debts/useDebtModalLogic.ts(83,35): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/hooks/debts/useDebtModalLogic.ts(140,47): error TS18049: 'connectedEnvelope' is possibly 'null' or 'undefined'.
+src/hooks/debts/useDebtModalLogic.ts(78,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
 src/hooks/debts/useDebts.ts(27,14): error TS18046: 'error' is of type 'unknown'.
 src/hooks/debts/useDebts.ts(35,28): error TS7006: Parameter 'debtData' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(45,5): error TS2322: Type 'null' is not assignable to type 'Debt'.
@@ -2708,22 +2641,6 @@ src/services/authService.ts(547,9): error TS18046: 'error' is of type 'unknown'.
 src/services/authService.ts(547,44): error TS18046: 'error' is of type 'unknown'.
 src/services/authService.ts(573,13): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/services/authService.ts(574,25): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/services/bugReport/apiService.ts(128,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
-  Index signature for type 'string' is missing in type 'SubmissionResult'.
-src/services/bugReport/apiService.ts(128,52): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
-  Types of property 'description' are incompatible.
-    Type 'string | undefined' is not assignable to type 'string'.
-      Type 'undefined' is not assignable to type 'string'.
-src/services/bugReport/apiService.ts(138,5): error TS2322: Type 'SubmissionResult' is not assignable to type 'import("violet-vault/src/services/bugReport/apiService").SubmissionResult'.
-  Index signature for type 'string' is missing in type 'SubmissionResult'.
-src/services/bugReport/apiService.ts(138,50): error TS2345: Argument of type 'BugReportData' is not assignable to parameter of type 'ReportData'.
-  Types of property 'description' are incompatible.
-    Type 'string | undefined' is not assignable to type 'string'.
-      Type 'undefined' is not assignable to type 'string'.
-src/services/bugReport/apiService.ts(161,77): error TS2345: Argument of type 'ProviderConfig[]' is not assignable to parameter of type 'Provider[]'.
-  Property 'priority' is missing in type 'ProviderConfig' but required in type 'Provider'.
-src/services/bugReport/apiService.ts(245,5): error TS2322: Type 'SubmissionStats' is not assignable to type 'Record<string, unknown>'.
-  Index signature for type 'string' is missing in type 'SubmissionStats'.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(184,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -2772,8 +2689,6 @@ src/services/bugReport/performanceInfoService.ts(355,9): error TS2322: Type 'num
   Type 'undefined' is not assignable to type 'number | null'.
 src/services/bugReport/performanceInfoService.ts(361,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/performanceInfoService.ts(390,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/reportSubmissionService.ts(169,67): error TS2345: Argument of type 'FinalResult' is not assignable to parameter of type 'Record<string, unknown>'.
-  Index signature for type 'string' is missing in type 'FinalResult'.
 src/services/bugReport/screenshotService.ts(39,37): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
 src/services/bugReport/screenshotService.ts(43,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/screenshotService.ts(52,75): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.

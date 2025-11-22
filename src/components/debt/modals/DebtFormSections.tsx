@@ -1,11 +1,20 @@
-import { Select, TextInput } from "@/components/ui";
+import { TextInput } from "@/components/ui";
 import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
+import type { DebtFormState } from "@/hooks/debts/useDebtForm";
+import type { DebtType, PaymentFrequency } from "@/types/debt";
+
+interface SectionProps {
+  formData: DebtFormState;
+  setFormData: (patch: Partial<DebtFormState>) => void;
+  errors: Partial<Record<string, string | undefined>>;
+  canEdit: boolean;
+}
 
 /**
  * Basic information section for DebtFormFields
  * Extracted to reduce complexity
  */
-export const DebtBasicInfo = ({ formData, setFormData, errors, canEdit }) => {
+export const DebtBasicInfo = ({ formData, setFormData, errors, canEdit }: SectionProps) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Basic Information</h3>
@@ -41,19 +50,21 @@ export const DebtBasicInfo = ({ formData, setFormData, errors, canEdit }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
-        <Select
-          value={formData.type}
-          onChange={(e) => setFormData({ type: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          disabled={!canEdit}
-        >
-          {Object.entries(DEBT_TYPE_CONFIG).map(([key, config]) => (
-            <option key={key} value={key}>
-              {config.name}
-            </option>
-          ))}
-        </Select>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
+          <select
+            value={formData.type}
+            onChange={(e) => setFormData({ type: e.target.value as DebtType })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            disabled={!canEdit}
+          >
+            {Object.entries(DEBT_TYPE_CONFIG).map(([key, config]) => (
+              <option key={key} value={key}>
+                {config.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );
@@ -63,7 +74,7 @@ export const DebtBasicInfo = ({ formData, setFormData, errors, canEdit }) => {
  * Financial details section for DebtFormFields
  * Extracted to reduce complexity
  */
-export const DebtFinancialDetails = ({ formData, setFormData, errors, canEdit }) => {
+export const DebtFinancialDetails = ({ formData, setFormData, errors, canEdit }: SectionProps) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Financial Details</h3>
@@ -155,7 +166,7 @@ export const DebtFinancialDetails = ({ formData, setFormData, errors, canEdit })
  * Payment details section for DebtFormFields
  * Extracted to reduce complexity
  */
-export const DebtPaymentDetails = ({ formData, setFormData, errors, canEdit }) => {
+export const DebtPaymentDetails = ({ formData, setFormData, errors, canEdit }: SectionProps) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Payment Information</h3>
@@ -195,11 +206,14 @@ export const DebtPaymentDetails = ({ formData, setFormData, errors, canEdit }) =
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Payment Frequency</label>
-        <Select
+      <div className="space-y-2">
+        <label htmlFor="paymentFrequency" className="block text-sm font-medium text-gray-700 mb-2">
+          Payment Frequency
+        </label>
+        <select
+          id="paymentFrequency"
           value={formData.paymentFrequency}
-          onChange={(e) => setFormData({ paymentFrequency: e.target.value })}
+          onChange={(e) => setFormData({ paymentFrequency: e.target.value as PaymentFrequency })}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
           disabled={!canEdit}
         >
@@ -208,7 +222,7 @@ export const DebtPaymentDetails = ({ formData, setFormData, errors, canEdit }) =
               {key.charAt(0) + key.slice(1).toLowerCase()}
             </option>
           ))}
-        </Select>
+        </select>
       </div>
     </div>
   );

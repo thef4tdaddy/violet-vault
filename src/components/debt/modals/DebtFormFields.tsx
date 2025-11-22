@@ -2,13 +2,12 @@ import React from "react";
 import { Select, Checkbox, Button } from "@/components/ui";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import { DebtBasicInfo, DebtFinancialDetails, DebtPaymentDetails } from "./DebtFormSections";
+import type { DebtFormState } from "@/hooks/debts/useDebtForm";
 
 // Minimal strongly-typed shapes used by this form
-type DebtFormData = Record<string, unknown> & {
+type DebtFormData = DebtFormState & {
   id?: string;
   shouldCreateBill?: boolean;
-  existingBillId?: string | null;
-  notes?: string;
 };
 
 type Bill = {
