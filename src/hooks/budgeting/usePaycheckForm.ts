@@ -10,7 +10,11 @@ import logger from "../../utils/common/logger";
 /**
  * Hook to initialize new payer state for first-time users
  */
-const useInitializeNewPayerState = (uniquePayersLength, setShowAddNewPayer, initialRender) => {
+const useInitializeNewPayerState = (
+  uniquePayersLength: number,
+  setShowAddNewPayer: (value: boolean) => void,
+  initialRender: React.MutableRefObject<boolean>
+) => {
   useEffect(() => {
     if (initialRender.current) {
       const hasNoPaychecks = uniquePayersLength === 0;
@@ -30,6 +34,20 @@ export const usePaycheckForm = ({
   currentUser,
   onProcessPaycheck,
   envelopes = [],
+}: {
+  paycheckHistory: unknown[];
+  currentUser: { userName?: string };
+  onProcessPaycheck: (data: {
+    amount: number;
+    payerName: string;
+    mode: string;
+    date: string;
+    envelopeAllocations: Array<{ envelopeId: string; amount: number }>;
+    allocationSummary?: unknown;
+    allocationDebug?: unknown;
+    leftoverAmount: number;
+  }) => Promise<unknown>;
+  envelopes?: unknown[];
 }) => {
   // Form state
   const [paycheckAmount, setPaycheckAmount] = useState("");
@@ -40,7 +58,7 @@ export const usePaycheckForm = ({
 
   // Payer management state
   const [newPayerName, setNewPayerName] = useState("");
-  const [tempPayers, setTempPayers] = useState([]);
+  const [tempPayers, setTempPayers] = useState<string[]>([]);
   const [showAddNewPayer, setShowAddNewPayer] = useState(false);
 
   const initialRender = useRef(true);
@@ -52,7 +70,7 @@ export const usePaycheckForm = ({
   useInitializeNewPayerState(uniquePayers.length, setShowAddNewPayer, initialRender);
 
   // Form handlers
-  const handlePayerChange = (selectedPayer) => {
+  const handlePayerChange = (selectedPayer: string) => {
     setPayerName(selectedPayer);
 
     // Smart prediction: suggest the most recent paycheck amount for this payer
@@ -68,7 +86,7 @@ export const usePaycheckForm = ({
     }
   };
 
-  const addNewPayerToList = (trimmedName) => {
+  const addNewPayerToList = (trimmedName: string) => {
     // Add to temp payers list so it shows in dropdown (session-only, not persisted)
     setTempPayers((prev) => [...prev, trimmedName]);
     // Set as current selection
@@ -78,7 +96,7 @@ export const usePaycheckForm = ({
     setShowAddNewPayer(false);
   };
 
-  const handleAmountChange = (value) => {
+  const handleAmountChange = (value: string) => {
     setPaycheckAmount(value);
     setShowPreview(false);
   };
@@ -133,7 +151,7 @@ export const usePaycheckForm = ({
     }
   };
 
-  const handlePostProcessCleanup = (processedPayerName) => {
+  const handlePostProcessCleanup = (processedPayerName: string) => {
     // Clean up temp payers - once a paycheck is processed, the payer is now in history
     setTempPayers((prev) => prev.filter((name) => name !== processedPayerName));
     setPaycheckAmount("");
@@ -187,7 +205,7 @@ export const usePaycheckForm = ({
     resetForm,
 
     // Utilities
-    getPayerPrediction: (payer) => getPayerPrediction(payer, paycheckHistory),
+    getPayerPrediction: (payer: string) => getPayerPrediction(payer, paycheckHistory),
 
     // Preview data
     allocationPreview,
