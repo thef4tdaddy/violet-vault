@@ -1,26 +1,50 @@
 import { useState, useCallback, useRef } from "react";
-import { processReceiptImage } from "../../utils/common/ocrProcessor";
-import logger from "../../utils/common/logger";
+import { processReceiptImage } from "@/utils/common/ocrProcessor";
+import logger from "@/utils/common/logger";
+
+// Local type definition for receipt data with image
+interface ExtendedReceiptData {
+  merchant?: string;
+  total?: string | number;
+  date?: string;
+  items?: Array<{ name: string; price?: number; quantity?: number }>;
+  confidence?: string;
+  rawText?: string;
+  processingTime?: number;
+  imageData?: {
+    file: File;
+    url: string;
+    name: string;
+    size: number;
+  };
+}
 
 /**
  * Receipt Scanner Hook
  * Manages all receipt scanning state and business logic
  * Extracted from ReceiptScanner component for better organization
  */
-export const useReceiptScanner = (onReceiptProcessed) => {
+export const useReceiptScanner = (
+  onReceiptProcessed: (data: ExtendedReceiptData) => void
+) => {
   // State management
   const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [extractedData, setExtractedData] = useState(null);
-  const [error, setError] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState<{
+    file: File;
+    url: string;
+    name: string;
+    size: number;
+  } | null>(null);
+  const [extractedData, setExtractedData] = useState<ExtendedReceiptData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [showImagePreview, setShowImagePreview] = useState(false);
 
   // Refs for file inputs
-  const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // File validation utility
-  const validateFile = useCallback((file) => {
+  const validateFile = useCallback((file: File) => {
     if (!file) return { valid: false, error: null };
 
     if (!file.type.startsWith("image/")) {
@@ -42,7 +66,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
 
   // Handle file upload with OCR processing
   const handleFileUpload = useCallback(
-    async (file) => {
+    async (file: File) => {
       const validation = validateFile(file);
       if (!validation.valid) {
         setError(validation.error);
@@ -90,9 +114,10 @@ export const useReceiptScanner = (onReceiptProcessed) => {
 
   // Handle drag and drop
   const handleDrop = useCallback(
-    (e) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       e.preventDefault();
-      const files = Array.from(e.dataTransfer.files);
+      const files = Array.from(e.dataTransfer?.files || []) as File[];
       if (files.length > 0) {
         handleFileUpload(files[0]);
       }
@@ -100,13 +125,15 @@ export const useReceiptScanner = (onReceiptProcessed) => {
     [handleFileUpload]
   );
 
-  const handleDragOver = useCallback((e) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDragOver = useCallback((e: any) => {
     e.preventDefault();
   }, []);
 
   // Handle file input change
   const handleFileInputChange = useCallback(
-    (e) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       if (e.target.files && e.target.files[0]) {
         handleFileUpload(e.target.files[0]);
       }
@@ -140,7 +167,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
 
   // Toggle image preview
   const toggleImagePreview = useCallback(() => {
-    setShowImagePreview((prev) => !prev);
+    setShowImagePreview((prev: boolean) => !prev);
   }, []);
 
   return {
