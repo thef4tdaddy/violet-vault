@@ -5,6 +5,27 @@ import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent, DesktopModalHeader } from "./CreateEnvelopeModalComponents";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+interface Bill {
+  id: string;
+  name?: string;
+  provider?: string;
+  category?: string;
+  color?: string;
+  frequency?: string;
+  amount?: number;
+}
+
+interface CreateEnvelopeModalProps {
+  isOpen?: boolean;
+  onClose: () => void;
+  onCreateEnvelope: (envelope: unknown) => void;
+  onCreateBill: () => void;
+  existingEnvelopes?: unknown[];
+  allBills?: Bill[];
+  currentUser?: { userName: string; userColor: string };
+  _forceMobileMode?: boolean;
+}
+
 const CreateEnvelopeModal = ({
   isOpen = false,
   onClose,
@@ -14,7 +35,7 @@ const CreateEnvelopeModal = ({
   allBills = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
   _forceMobileMode = false, // Internal prop for testing
-}) => {
+}: CreateEnvelopeModalProps) => {
   const isMobile = useMobileDetection();
   const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
 
@@ -40,20 +61,20 @@ const CreateEnvelopeModal = ({
   });
 
   // Handle bill selection and auto-populate envelope data
-  const handleBillSelection = (billId) => {
+  const handleBillSelection = (billId: string) => {
     if (!billId) return;
 
-    const selectedBill = allBills.find((bill) => bill.id === billId);
+    const selectedBill = allBills.find((bill: Bill) => bill.id === billId);
     if (!selectedBill) return;
 
     // Auto-populate envelope fields from the selected bill
     const billData = {
-      name: selectedBill.name || selectedBill.provider || "",
-      category: selectedBill.category || "",
-      color: selectedBill.color || formData.color,
-      frequency: selectedBill.frequency || formData.frequency,
-      monthlyAmount: selectedBill.amount?.toString() || "",
-      description: `Bill envelope for ${selectedBill.name || selectedBill.provider}`,
+      name: selectedBill.name ?? selectedBill.provider ?? "",
+      category: selectedBill.category ?? "",
+      color: selectedBill.color ?? formData.color,
+      frequency: selectedBill.frequency ?? formData.frequency,
+      monthlyAmount: selectedBill.amount?.toString() ?? "",
+      description: `Bill envelope for ${selectedBill.name ?? selectedBill.provider}`,
       envelopeType: "BILL", // Set to bill type when bill is selected
     };
 
