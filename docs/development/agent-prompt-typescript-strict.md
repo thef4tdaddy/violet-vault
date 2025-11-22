@@ -125,11 +125,15 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
    # Create branch name
    BRANCH_NAME="fix-ts-strict-errors-${WORKTREE_ID}"
 
-   # Create worktree (will be in ~/.cursor/worktrees/violet-vault/${WORKTREE_ID})
-   git worktree add -b "${BRANCH_NAME}" ~/.cursor/worktrees/violet-vault/${WORKTREE_ID} develop
+   # Create worktree directory (using /tmp for accessibility)
+   WORKTREE_DIR="/tmp/violet-vault-worktrees/${WORKTREE_ID}"
+   mkdir -p "/tmp/violet-vault-worktrees"
+
+   # Create worktree (will be in /tmp/violet-vault-worktrees/${WORKTREE_ID})
+   git worktree add -b "${BRANCH_NAME}" "${WORKTREE_DIR}" develop
 
    # Change to your worktree directory
-   cd ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+   cd "${WORKTREE_DIR}"
    ```
 
 3. **Work in your worktree**:
@@ -144,7 +148,8 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
    cd /Users/thef4tdaddy/Git/violet-vault
 
    # Remove the worktree and branch
-   git worktree remove ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+   WORKTREE_DIR="/tmp/violet-vault-worktrees/${WORKTREE_ID}"
+   git worktree remove "${WORKTREE_DIR}"
    git branch -D "${BRANCH_NAME}"
    ```
 
@@ -153,7 +158,8 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
 - **Always create a new branch** with your worktree (use `-b` flag)
 - **Clean up when done**: Remove worktrees and delete branches after merging/abandoning work
 - **Check existing worktrees**: `git worktree list` shows all active worktrees
-- **If a worktree is stuck**: You can force remove with `rm -rf ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}` then `git worktree prune`
+- **If a worktree is stuck**: You can force remove with `rm -rf /tmp/violet-vault-worktrees/${WORKTREE_ID}` then `git worktree prune`
+- **Worktree location**: Uses `/tmp/violet-vault-worktrees/` for better accessibility (some agents cannot access `~/.cursor/` directory)
 
 #### Example Full Workflow
 
@@ -162,8 +168,10 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
 cd /Users/thef4tdaddy/Git/violet-vault
 WORKTREE_ID="$(openssl rand -hex 3 | head -c 5)"
 BRANCH_NAME="fix-ts-strict-errors-${WORKTREE_ID}"
-git worktree add -b "${BRANCH_NAME}" ~/.cursor/worktrees/violet-vault/${WORKTREE_ID} develop
-cd ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+WORKTREE_DIR="/tmp/violet-vault-worktrees/${WORKTREE_ID}"
+mkdir -p "/tmp/violet-vault-worktrees"
+git worktree add -b "${BRANCH_NAME}" "${WORKTREE_DIR}" develop
+cd "${WORKTREE_DIR}"
 
 # 2. Work (all your edits, commits, etc. happen here)
 # ... fix TypeScript strict errors ...
@@ -173,7 +181,7 @@ git commit -m "fix: resolve TypeScript strict mode errors in FILENAME"
 
 # 3. Cleanup (when done)
 cd /Users/thef4tdaddy/Git/violet-vault
-git worktree remove ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+git worktree remove "${WORKTREE_DIR}"
 git branch -D "${BRANCH_NAME}"
 ```
 

@@ -4,12 +4,21 @@ import EditLockIndicator from "../../ui/EditLockIndicator";
 import DebtModalHeader from "./DebtModalHeader";
 import DebtFormFields from "./DebtFormFields";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { DebtAccount } from "@/types/debt";
+import type { DebtSubmissionData } from "@/hooks/debts/useDebtForm";
+
+interface AddDebtModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: DebtSubmissionData | string, updateData?: DebtSubmissionData) => Promise<void>;
+  debt?: DebtAccount | null;
+}
 
 /**
  * Pure UI component for debt modal - ALL logic extracted to useDebtModalLogic hook
  * Refactored to use standardized shared components and extracted UI sections
  */
-const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
+const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }: AddDebtModalProps) => {
   const modalRef = useModalAutoScroll(isOpen);
 
   const {
