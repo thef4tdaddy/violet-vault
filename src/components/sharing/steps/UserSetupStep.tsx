@@ -1,5 +1,26 @@
 import { Button } from "@/components/ui";
-import { renderIcon } from "../../../utils";
+import { renderIcon } from "@/utils";
+
+interface UserSetupStepProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  shareInfo: any;
+  creatorInfo?: {
+    userName: string;
+    userColor: string;
+    createdAt?: string;
+  };
+  password: string;
+  setPassword: (password: string) => void;
+  showPassword: boolean;
+  setShowPassword: (show: boolean) => void;
+  userName: string;
+  setUserName: (name: string) => void;
+  userColor: string;
+  onGenerateRandomColor: () => void;
+  onJoin: () => void;
+  onBack: () => void;
+  isJoining: boolean;
+}
 
 /**
  * User Setup Step - Step 2 of join budget flow
@@ -19,8 +40,9 @@ const UserSetupStep = ({
   onJoin,
   onBack,
   isJoining,
-}) => {
-  const handleSubmit = (e) => {
+}: UserSetupStepProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     onJoin();
   };
