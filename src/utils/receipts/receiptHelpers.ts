@@ -5,10 +5,31 @@
 import React from "react";
 import { getIcon } from "../index";
 
+// Define types
+interface ReceiptData {
+  merchant?: string;
+  total?: number;
+  date?: string;
+  [key: string]: unknown;
+}
+
+interface TransactionForm {
+  description?: string;
+  amount?: number;
+  [key: string]: unknown;
+}
+
+interface ConfidenceLevel {
+  high: { color: string; iconName: string };
+  medium: { color: string; iconName: string };
+  low: { color: string; iconName: string };
+  none: { color: string; iconName: string };
+}
+
 /**
  * Validate receipt data structure
  */
-export const validateReceiptData = (receiptData) => {
+export const validateReceiptData = (receiptData: ReceiptData) => {
   const errors = [];
 
   if (!receiptData) {
@@ -37,7 +58,7 @@ export const validateReceiptData = (receiptData) => {
 /**
  * Validate transaction form data
  */
-export const validateTransactionForm = (form) => {
+export const validateTransactionForm = (form: TransactionForm) => {
   const errors = [];
 
   if (!form.description || form.description.trim() === "") {
@@ -65,7 +86,7 @@ export const validateTransactionForm = (form) => {
 /**
  * Format currency for display
  */
-export const formatCurrency = (amount) => {
+export const formatCurrency = (amount: number) => {
   if (!amount || isNaN(amount)) return "$0.00";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -76,7 +97,7 @@ export const formatCurrency = (amount) => {
 /**
  * Format date for display
  */
-export const formatDisplayDate = (dateString) => {
+export const formatDisplayDate = (dateString: string) => {
   if (!dateString) return "No date";
 
   try {
@@ -94,7 +115,7 @@ export const formatDisplayDate = (dateString) => {
 /**
  * Calculate confidence level description
  */
-export const getConfidenceDescription = (confidence) => {
+export const getConfidenceDescription = (confidence: number) => {
   if (!confidence || isNaN(confidence)) return "Unknown";
 
   if (confidence >= 0.9) return "Very High";
@@ -107,7 +128,7 @@ export const getConfidenceDescription = (confidence) => {
 /**
  * Get confidence level color for UI
  */
-export const getConfidenceColor = (confidence) => {
+export const getConfidenceColor = (confidence: number) => {
   if (!confidence || isNaN(confidence)) return "gray";
 
   if (confidence >= 0.8) return "green";
@@ -118,7 +139,7 @@ export const getConfidenceColor = (confidence) => {
 /**
  * Extract key information from OCR text
  */
-export const extractReceiptSummary = (receiptData) => {
+export const extractReceiptSummary = (receiptData: ReceiptData) => {
   const summary = {
     merchant: receiptData.merchant || "Unknown Merchant",
     total: receiptData.total || 0,
@@ -209,20 +230,21 @@ export const renderConfidenceIndicator = (_field, confidence) => {
   const conf = confidenceMap[confidence] || confidenceMap.none;
 
   return React.createElement(getIcon(conf.iconName), {
-    className: `h-4 w-4 ${conf.color}`,
+    className: conf.color,
   });
 };
 
 /**
- * Format file size for display
+ * Format file size in bytes to human-readable format
+ * @param bytes - File size in bytes
+ * @returns Formatted file size string
  */
-export const formatFileSize = (bytes) => {
-  return `${Math.round(bytes / 1024)} KB`;
-};
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return "0 Bytes";
 
-/**
- * Validate if extracted data has minimum required fields for transaction creation
- */
-export const hasMinimumExtractedData = (extractedData) => {
-  return extractedData && (extractedData.total || extractedData.merchant);
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(0)) + " " + sizes[i];
 };
