@@ -11,11 +11,11 @@ export const getLocalOnlyMode = () => {
 };
 
 export const isDevelopmentMode = () => {
-  return (import.meta.env.MODE || import.meta.env.DEV) === "development";
+  return import.meta.env.MODE === "development" || import.meta.env.DEV === true;
 };
 
 export const isProductionMode = () => {
-  return (import.meta.env.MODE || import.meta.env.PROD) === "production";
+  return import.meta.env.MODE === "production" || import.meta.env.PROD === true;
 };
 
 /**
@@ -89,7 +89,7 @@ export const calculateStorageUsage = (data: any) => {
   };
 };
 
-export const formatBytes = (bytes: number, decimals = 2) => {
+export const formatBytes = (bytes: number, decimals: number = 2) => {
   if (bytes === 0) return "0 B";
 
   const k = 1024;
