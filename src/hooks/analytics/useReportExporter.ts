@@ -20,7 +20,15 @@ import { generatePDFReport } from "./utils/pdfGeneratorUtils";
  */
 export const useReportExporter = () => {
   const [exportFormat, setExportFormat] = useState("pdf");
-  const [exportOptions, setExportOptions] = useState({
+  const [exportOptions, setExportOptions] = useState<{
+    includeSummary: boolean;
+    includeCharts: boolean;
+    includeTransactions: boolean;
+    includeEnvelopes: boolean;
+    includeSavings: boolean;
+    includeInsights: boolean;
+    customDateRange: null | { start: string; end: string };
+  }>({
     includeSummary: true,
     includeCharts: true,
     includeTransactions: false,
@@ -33,7 +41,7 @@ export const useReportExporter = () => {
   const [exportProgress, setExportProgress] = useState(0);
 
   const exportToPDF = useCallback(
-    async (analyticsData, balanceData, timeFilter) => {
+    async (analyticsData: unknown, balanceData: unknown, timeFilter: unknown) => {
       await generatePDFReport(
         analyticsData,
         balanceData,
@@ -45,7 +53,7 @@ export const useReportExporter = () => {
     [exportOptions]
   );
 
-  const exportToCSV = useCallback(async (analyticsData) => {
+  const exportToCSV = useCallback(async (analyticsData: unknown) => {
     setExportProgress(10);
     const csvContent = convertToCSV(analyticsData);
     setExportProgress(80);
@@ -68,7 +76,14 @@ export const useReportExporter = () => {
 
       // Dynamic import to avoid adding html2canvas to main bundle
       const html2canvas = (await import("html2canvas")).default;
-      await exportChartAsImage(element, chartName, html2canvas);
+      await exportChartAsImage(
+        element,
+        chartName,
+        html2canvas as (
+          element: Element,
+          options: Record<string, unknown>
+        ) => Promise<HTMLCanvasElement>
+      );
 
       // Small delay between downloads
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -78,7 +93,13 @@ export const useReportExporter = () => {
   }, []);
 
   const handleExport = useCallback(
-    async (analyticsData, balanceData, timeFilter, onExport, onClose) => {
+    async (
+      analyticsData: unknown,
+      balanceData: unknown,
+      timeFilter: unknown,
+      onExport: () => void,
+      onClose: () => void
+    ) => {
       setIsExporting(true);
       setExportProgress(0);
 
@@ -102,7 +123,7 @@ export const useReportExporter = () => {
     [exportFormat, exportOptions, exportToPDF, exportToCSV, exportChartImages]
   );
 
-  const applyTemplate = useCallback((template) => {
+  const applyTemplate = useCallback((template: string) => {
     const templateOptions = getTemplateOptions(template);
     if (templateOptions) {
       setExportOptions((prev) => ({ ...prev, ...templateOptions }));

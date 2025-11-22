@@ -23,8 +23,9 @@ const fetchDebtsWithMigration = async () => {
 
     return debts || [];
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     logger.warn("Dexie query failed", {
-      error: error.message,
+      error: errorMessage,
       source: "useDebts",
     });
     return [];
@@ -32,7 +33,12 @@ const fetchDebtsWithMigration = async () => {
 };
 
 // Mutation function for adding a debt
-const addDebtToDb = async (debtData) => {
+const addDebtToDb = async (debtData: {
+  id?: string;
+  status?: string;
+  author?: string;
+  [key: string]: unknown;
+}) => {
   const debt = debtData.id
     ? { status: "active", ...debtData }
     : { id: crypto.randomUUID(), status: "active", ...debtData };
@@ -40,10 +46,10 @@ const addDebtToDb = async (debtData) => {
   await budgetDb.debts.put(debt);
 
   await BudgetHistoryTracker.trackDebtChange({
-    debtId: debt.id,
+    debtId: debt.id as string,
     changeType: "add",
     previousData: null,
-    newData: debt,
+    newData: debt as never,
     author: debtData.author || "Unknown User",
   });
 
@@ -51,7 +57,15 @@ const addDebtToDb = async (debtData) => {
 };
 
 // Mutation function for updating a debt
-const updateDebtInDb = async ({ id, updates, author = "Unknown User" }) => {
+const updateDebtInDb = async ({
+  id,
+  updates,
+  author = "Unknown User",
+}: {
+  id: string;
+  updates: Record<string, unknown>;
+  author?: string;
+}) => {
   const previousData = await budgetDb.debts.get(id);
 
   await budgetDb.debts.update(id, {
@@ -64,8 +78,8 @@ const updateDebtInDb = async ({ id, updates, author = "Unknown User" }) => {
   await BudgetHistoryTracker.trackDebtChange({
     debtId: id,
     changeType: "modify",
-    previousData,
-    newData,
+    previousData: previousData || null,
+    newData: newData || null,
     author,
   });
 
@@ -73,7 +87,13 @@ const updateDebtInDb = async ({ id, updates, author = "Unknown User" }) => {
 };
 
 // Mutation function for deleting a debt
-const deleteDebtFromDb = async ({ id, author = "Unknown User" }) => {
+const deleteDebtFromDb = async ({
+  id,
+  author = "Unknown User",
+}: {
+  id: string;
+  author?: string;
+}) => {
   const previousData = await budgetDb.debts.get(id);
 
   await budgetDb.debts.delete(id);
@@ -82,7 +102,7 @@ const deleteDebtFromDb = async ({ id, author = "Unknown User" }) => {
     await BudgetHistoryTracker.trackDebtChange({
       debtId: id,
       changeType: "delete",
-      previousData,
+      previousData: previousData,
       newData: null,
       author,
     });
@@ -92,7 +112,15 @@ const deleteDebtFromDb = async ({ id, author = "Unknown User" }) => {
 };
 
 // Mutation function for recording a payment
-const recordPaymentInDb = async ({ id, payment, author = "Unknown User" }) => {
+const recordPaymentInDb = async ({
+  id,
+  payment,
+  author = "Unknown User",
+}: {
+  id: string;
+  payment: { amount: number; [key: string]: unknown };
+  author?: string;
+}) => {
   const debt = await budgetDb.debts.get(id);
   if (debt) {
     // Note: paymentHistory is not in the Debt type but may exist in data
@@ -210,7 +238,7 @@ const useDebts = () => {
     },
   });
 
-  const getDebtById = (id) => (debtsQuery.data || []).find((d) => d.id === id);
+  const getDebtById = (id: string) => (debtsQuery.data || []).find((d) => d.id === id);
 
   return {
     debts: debtsQuery.data || [],
