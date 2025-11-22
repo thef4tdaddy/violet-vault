@@ -5,8 +5,31 @@ import { getIcon } from "../../utils";
 import { useSmartBillSuggestions } from "../../hooks/bills/useSmartBillSuggestions";
 import { getConfidenceColor, getConfidenceIcon } from "./smartBillMatcherHelpers";
 
-const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) => {
-  const suggestions = useSmartBillSuggestions(bills, envelopes, searchQuery);
+interface Envelope {
+  id: string;
+  name: string;
+  color: string;
+  [key: string]: unknown;
+}
+
+interface Suggestion {
+  envelope: Envelope;
+  confidence: number;
+  reason: string;
+}
+
+const SmartBillMatcher = ({
+  bills,
+  envelopes,
+  onSuggestEnvelope,
+  searchQuery,
+}: {
+  bills: unknown[];
+  envelopes: unknown[];
+  onSuggestEnvelope: (envelope: Envelope) => void;
+  searchQuery: string;
+}) => {
+  const suggestions = useSmartBillSuggestions(bills, envelopes, searchQuery) as Suggestion[];
 
   if (!searchQuery || suggestions.length === 0) {
     return null;

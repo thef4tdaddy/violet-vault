@@ -51,7 +51,12 @@ const useSupplementalAccounts = ({
   onAddAccount: (account: Account) => void;
   onUpdateAccount: (account: Account) => void;
   onDeleteAccount: (accountId: string) => void;
-  onTransferToEnvelope: (transfer: { accountId: string; envelopeId: string; amount: number; description: string }) => void;
+  onTransferToEnvelope: (transfer: {
+    accountId: string;
+    envelopeId: string;
+    amount: number;
+    description: string;
+  }) => void;
   envelopes?: unknown[];
   currentUser?: { userName: string; userColor: string };
 }) => {
