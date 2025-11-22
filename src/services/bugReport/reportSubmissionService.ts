@@ -65,6 +65,32 @@ interface SubmissionStats {
 
 export class ReportSubmissionService {
   /**
+   * Submit to a specific provider type
+   * Extracted to reduce complexity of submitWithFallbacks
+   */
+  private static async submitToProvider(
+    provider: Provider,
+    reportData: ReportData
+  ): Promise<SubmissionResult> {
+    switch (provider.type) {
+      case "github":
+        return await GitHubAPIService.submitToGitHub(reportData);
+      case "webhook":
+        return await this.submitToWebhook(reportData, provider.url);
+      case "email":
+        return await this.submitToEmail(reportData, provider.config || {});
+      case "console":
+        return await this.submitToConsole(reportData);
+      default:
+        return {
+          success: false,
+          error: `Unknown provider type: ${provider.type}`,
+          provider: provider.type,
+        };
+    }
+  }
+
+  /**
    * Submit bug report with fallback providers
    */
   static async submitWithFallbacks(
@@ -98,27 +124,7 @@ export class ReportSubmissionService {
           url: provider.url,
         });
 
-        let result: SubmissionResult;
-        switch (provider.type) {
-          case "github":
-            result = await GitHubAPIService.submitToGitHub(reportData);
-            break;
-          case "webhook":
-            result = await this.submitToWebhook(reportData, provider.url);
-            break;
-          case "email":
-            result = await this.submitToEmail(reportData, provider.config || {});
-            break;
-          case "console":
-            result = await this.submitToConsole(reportData);
-            break;
-          default:
-            result = {
-              success: false,
-              error: `Unknown provider type: ${provider.type}`,
-              provider: provider.type,
-            };
-        }
+        const result = await this.submitToProvider(provider, reportData);
 
         results.push({
           provider: provider.type,

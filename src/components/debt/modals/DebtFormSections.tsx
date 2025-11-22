@@ -1,4 +1,4 @@
-import { TextInput } from "@/components/ui";
+import { TextInput, Select } from "@/components/ui";
 import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import type { DebtFormState } from "@/hooks/debts/useDebtForm";
 import type { DebtType, PaymentFrequency } from "@/types/debt";
@@ -50,21 +50,17 @@ export const DebtBasicInfo = ({ formData, setFormData, errors, canEdit }: Sectio
       </div>
 
       <div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
-          <select
-            value={formData.type}
-            onChange={(e) => setFormData({ type: e.target.value as DebtType })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            disabled={!canEdit}
-          >
-            {Object.entries(DEBT_TYPE_CONFIG).map(([key, config]) => (
-              <option key={key} value={key}>
-                {config.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label="Debt Type"
+          value={formData.type}
+          onChange={(e) => setFormData({ type: e.target.value as DebtType })}
+          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          disabled={!canEdit}
+          options={Object.entries(DEBT_TYPE_CONFIG).map(([key, config]) => ({
+            value: key,
+            label: config.name,
+          }))}
+        />
       </div>
     </div>
   );
@@ -207,22 +203,18 @@ export const DebtPaymentDetails = ({ formData, setFormData, errors, canEdit }: S
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="paymentFrequency" className="block text-sm font-medium text-gray-700 mb-2">
-          Payment Frequency
-        </label>
-        <select
+        <Select
           id="paymentFrequency"
+          label="Payment Frequency"
           value={formData.paymentFrequency}
           onChange={(e) => setFormData({ paymentFrequency: e.target.value as PaymentFrequency })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
           disabled={!canEdit}
-        >
-          {Object.entries(PAYMENT_FREQUENCIES).map(([key, value]) => (
-            <option key={value} value={value}>
-              {key.charAt(0) + key.slice(1).toLowerCase()}
-            </option>
-          ))}
-        </select>
+          options={Object.entries(PAYMENT_FREQUENCIES).map(([key, value]) => ({
+            value,
+            label: key.charAt(0) + key.slice(1).toLowerCase(),
+          }))}
+        />
       </div>
     </div>
   );
