@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | 0 |
-| TypeScript Errors | 113 | +1 |
-| TypeScript Strict Mode Errors | 2355 | -8 |
+| ESLint Issues |  | -1 |
+| TypeScript Errors | 112 | -1 |
+| TypeScript Strict Mode Errors | 2354 | -1 |
 
-*Last updated: 2025-11-22 15:50:15 UTC*
+*Last updated: 2025-11-22 15:52:27 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,19 +27,16 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 1 issues in `violet-vault/src/utils/receipts/receiptHelpers.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EnvelopeSystem.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
 | 1 | `react-hooks/exhaustive-deps` |
-| 1 | `@typescript-eslint/no-unused-vars` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/budgeting/EnvelopeSystem.tsx:157:6 - 1 - React Hook useEffect has a missing dependency: 'updateBiweeklyAllocations'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/utils/receipts/receiptHelpers.ts:22:11 - 1 - 'ConfidenceLevel' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 ```
 
 ## Typecheck Audit
@@ -54,11 +51,11 @@ violet-vault/src/utils/receipts/receiptHelpers.ts:22:11 - 1 - 'ConfidenceLevel' 
 - 5 errors in `src/components/pwa/PatchNotesModal.tsx`
 - 5 errors in `src/components/layout/MainLayout.tsx`
 - 5 errors in `src/App.tsx`
-- 4 errors in `src/utils/receipts/receiptHelpers.ts`
 - 4 errors in `src/hooks/common/useNetworkStatus.ts`
 - 4 errors in `src/hooks/common/useActualBalance.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 4 errors in `src/components/pwa/InstallPromptModal.tsx`
+- 3 errors in `src/utils/receipts/receiptHelpers.ts`
 - 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
 - 3 errors in `src/hooks/transactions/useTransactionQuery.ts`
 - 3 errors in `src/hooks/transactions/useTransactionLedger.ts`
@@ -85,7 +82,6 @@ violet-vault/src/utils/receipts/receiptHelpers.ts:22:11 - 1 - 'ConfidenceLevel' 
 | 27 | `TS2345` |
 | 15 | `TS2322` |
 | 4 | `TS2352` |
-| 1 | `TS6196` |
 
 ### Detailed Type Error Report
 ```
@@ -269,10 +265,9 @@ src/stores/ui/uiStore.ts(289,71): error TS2339: Property 'setState' does not exi
 src/stores/ui/uiStore.ts(290,26): error TS2339: Property 'getState' does not exist on type 'typeof create<typeof base>'.
 src/stores/ui/uiStore.ts(290,72): error TS2339: Property 'setState' does not exist on type 'typeof create<typeof base>'.
 src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<typeof base>' is not assignable to parameter of type '{ getState: () => UiStore; }'.
-src/utils/receipts/receiptHelpers.ts(22,11): error TS6196: 'ConfidenceLevel' is declared but never used.
-src/utils/receipts/receiptHelpers.ts(72,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/utils/receipts/receiptHelpers.ts(76,43): error TS2339: Property 'trim' does not exist on type 'unknown'.
-src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/utils/receipts/receiptHelpers.ts(65,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/utils/receipts/receiptHelpers.ts(69,43): error TS2339: Property 'trim' does not exist on type 'unknown'.
+src/utils/receipts/receiptHelpers.ts(140,35): error TS2339: Property 'length' does not exist on type 'unknown'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -306,7 +301,6 @@ src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' do
 - 14 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
-- 13 errors in `src/utils/receipts/receiptHelpers.ts`
 - 13 errors in `src/services/bugReport/performanceInfoService.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
@@ -314,6 +308,7 @@ src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' do
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 13 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 13 errors in `src/components/automation/AutoFundingDashboard.tsx`
+- 12 errors in `src/utils/receipts/receiptHelpers.ts`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
@@ -746,7 +741,6 @@ src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' do
 | 2 | `TS7022` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
-| 1 | `TS6196` |
 | 1 | `TS2740` |
 | 1 | `TS2698` |
 | 1 | `TS2683` |
@@ -3574,19 +3568,18 @@ src/utils/query/queryClientConfig.ts(180,18): error TS7006: Parameter 'queryKey'
 src/utils/query/queryClientConfig.ts(187,22): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(187,32): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(194,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/receipts/receiptHelpers.ts(22,11): error TS6196: 'ConfidenceLevel' is declared but never used.
-src/utils/receipts/receiptHelpers.ts(72,49): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
-src/utils/receipts/receiptHelpers.ts(76,43): error TS2339: Property 'trim' does not exist on type '{}'.
-src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' does not exist on type '{}'.
-src/utils/receipts/receiptHelpers.ts(168,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(181,42): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(181,52): error TS7006: Parameter 'date' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(181,58): error TS7006: Parameter 'total' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(196,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(196,52): error TS7006: Parameter 'transactionForm' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(230,43): error TS7006: Parameter '_field' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(230,51): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.ts(238,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
+src/utils/receipts/receiptHelpers.ts(65,49): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/utils/receipts/receiptHelpers.ts(69,43): error TS2339: Property 'trim' does not exist on type '{}'.
+src/utils/receipts/receiptHelpers.ts(140,35): error TS2339: Property 'length' does not exist on type '{}'.
+src/utils/receipts/receiptHelpers.ts(161,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(174,42): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(174,52): error TS7006: Parameter 'date' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(174,58): error TS7006: Parameter 'total' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(189,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(189,52): error TS7006: Parameter 'transactionForm' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(223,43): error TS7006: Parameter '_field' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(223,51): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(231,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
 src/utils/savings/savingsCalculations.ts(240,12): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,19): error TS18046: 'aVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,30): error TS18046: 'bVal' is of type 'unknown'.

@@ -19,13 +19,6 @@ interface TransactionForm {
   [key: string]: unknown;
 }
 
-interface ConfidenceLevel {
-  high: { color: string; iconName: string };
-  medium: { color: string; iconName: string };
-  low: { color: string; iconName: string };
-  none: { color: string; iconName: string };
-}
-
 /**
  * Validate receipt data structure
  */
