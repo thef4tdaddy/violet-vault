@@ -1,9 +1,57 @@
+import React from "react";
 import { Button } from "@/components/ui";
+
+// Define types
+interface Rule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  [key: string]: unknown;
+}
+
+interface ViewHeaderProps {
+  rules: Rule[];
+}
+
+interface ViewTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  rules: Rule[];
+  displayHistory: unknown[];
+}
+
+interface ViewContentProps {
+  activeTab: string;
+  rules: Rule[];
+  displayHistory: unknown[];
+  showExecutionDetails: boolean;
+  setShowExecutionDetails: (show: boolean) => void;
+  handleCreateRule: () => void;
+  handleEditRule: (rule: Rule) => void;
+  handleDeleteRule: (ruleId: string) => void;
+  handleToggleRule: (ruleId: string) => void;
+  handleExecuteRules: () => void;
+  isExecuting: boolean;
+  RulesTabComponent: React.ComponentType<{
+    rules: Rule[];
+    onCreateRule: () => void;
+    onEditRule: (rule: Rule) => void;
+    onDeleteRule: (ruleId: string) => void;
+    onToggleRule: (ruleId: string) => void;
+    onExecuteRules: () => void;
+    isExecuting: boolean;
+  }>;
+  HistoryTabComponent: React.ComponentType<{
+    executionHistory: unknown[];
+    showExecutionDetails: boolean;
+    onToggleDetails: (show: boolean) => void;
+  }>;
+}
 
 /**
  * View header component
  */
-export const ViewHeader = ({ rules }) => {
+export const ViewHeader = ({ rules }: ViewHeaderProps) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between">
@@ -15,7 +63,7 @@ export const ViewHeader = ({ rules }) => {
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-            {rules.filter((r) => r.enabled).length} Active Rules
+            {rules.filter((r: Rule) => r.enabled).length} Active Rules
           </span>
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
             {rules.length} Total Rules
@@ -29,7 +77,12 @@ export const ViewHeader = ({ rules }) => {
 /**
  * View tabs component
  */
-export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }) => {
+export const ViewTabs = ({ 
+  activeTab, 
+  setActiveTab, 
+  rules, 
+  displayHistory 
+}: ViewTabsProps) => {
   return (
     <div className="flex space-x-8 mt-6 border-b border-gray-200">
       <Button
@@ -73,7 +126,7 @@ export const ViewContent = ({
   isExecuting,
   RulesTabComponent,
   HistoryTabComponent,
-}) => {
+}: ViewContentProps) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200">
       <div className="p-6">
