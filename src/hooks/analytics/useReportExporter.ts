@@ -79,7 +79,10 @@ export const useReportExporter = () => {
       await exportChartAsImage(
         element,
         chartName,
-        html2canvas as (element: Element, options: Record<string, unknown>) => Promise<HTMLCanvasElement>
+        html2canvas as (
+          element: Element,
+          options: Record<string, unknown>
+        ) => Promise<HTMLCanvasElement>
       );
 
       // Small delay between downloads

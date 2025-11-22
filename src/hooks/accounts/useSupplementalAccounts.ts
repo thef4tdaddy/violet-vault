@@ -26,6 +26,18 @@ import {
   startAccountTransfer,
 } from "./utils/accountHandlersUtils";
 
+interface Account {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+interface TransferringAccount {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
 const useSupplementalAccounts = ({
   supplementalAccounts = [],
   onAddAccount,
@@ -34,13 +46,21 @@ const useSupplementalAccounts = ({
   onTransferToEnvelope,
   envelopes: _envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
+}: {
+  supplementalAccounts?: unknown[];
+  onAddAccount: (account: Account) => void;
+  onUpdateAccount: (account: Account) => void;
+  onDeleteAccount: (accountId: string) => void;
+  onTransferToEnvelope: (transfer: { accountId: string; envelopeId: string; amount: number; description: string }) => void;
+  envelopes?: unknown[];
+  currentUser?: { userName: string; userColor: string };
 }) => {
   // UI State
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingAccount, setEditingAccount] = useState(null);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [showBalances, setShowBalances] = useState(true);
   const [showTransferModal, setShowTransferModal] = useState(false);
-  const [transferringAccount, setTransferringAccount] = useState(null);
+  const [transferringAccount, setTransferringAccount] = useState<TransferringAccount | null>(null);
 
   // Form State
   const [accountForm, setAccountForm] = useState(getEmptyAccountForm());
@@ -80,7 +100,7 @@ const useSupplementalAccounts = ({
     setAccountForm(getEmptyAccountForm());
   };
 
-  const populateFormForEdit = (account) => {
+  const populateFormForEdit = (account: Account) => {
     setAccountForm(populateFormFromAccount(account));
   };
 
@@ -114,7 +134,7 @@ const useSupplementalAccounts = ({
     handleAccountSaveSuccess(setShowAddModal, setEditingAccount, resetForm);
   };
 
-  const startEdit = (account) => {
+  const startEdit = (account: Account) => {
     startAccountEdit(account, populateFormForEdit, setEditingAccount, setShowAddModal);
   };
 
@@ -122,12 +142,12 @@ const useSupplementalAccounts = ({
     handleModalCloseWithLock(isOwnLock, releaseLock, setEditingAccount, setShowAddModal, resetForm);
   };
 
-  const handleDelete = async (accountId) => {
+  const handleDelete = async (accountId: string) => {
     await handleAccountDelete(accountId, confirm, onDeleteAccount);
   };
 
   // Transfer Operations
-  const startTransfer = (account) => {
+  const startTransfer = (account: TransferringAccount) => {
     startAccountTransfer(
       account,
       setTransferringAccount,
