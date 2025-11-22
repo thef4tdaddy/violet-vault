@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 0 | 0 |
+| ESLint Issues | 5 | +5 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2250 | +2250 |
+| TypeScript Strict Mode Errors | 2235 | -15 |
 
-*Last updated: 2025-11-22 17:57:28 UTC*
+*Last updated: 2025-11-22 18:13:27 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -26,15 +26,29 @@
 
 ## Lint Audit
 
-✅ **All files passed ESLint validation!**
+### Files with Most Issues
+- 5 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts`
 
-Last check: 2025-11-22 17:56:57 UTC
+### Issue Count by Category
+| Count | Rule ID |
+|---|---|
+| 4 | `no-undef` |
+| 1 | `max-lines-per-function` |
+
+### Detailed Lint Report
+```
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:47:14 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:47:29 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:70:14 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:70:29 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:86:30 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
+```
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-22 17:57:12 UTC
+Last check: 2025-11-22 18:13:11 UTC
 
 ## Typecheck Strict Mode Audit
 
@@ -46,7 +60,6 @@ Last check: 2025-11-22 17:57:12 UTC
 - 16 errors in `src/utils/sync/autoBackupService.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
-- 15 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
 - 15 errors in `src/hooks/bills/useSmartBillSuggestions.ts`
 - 15 errors in `src/components/transactions/TransactionFilters.tsx`
 - 15 errors in `src/components/sharing/ShareCodeModal.tsx`
@@ -478,12 +491,12 @@ Last check: 2025-11-22 17:57:12 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 690 | `TS7006` |
-| 643 | `TS7031` |
-| 178 | `TS2345` |
+| 679 | `TS7006` |
+| 642 | `TS7031` |
+| 176 | `TS2345` |
 | 142 | `TS2339` |
-| 135 | `TS18046` |
 | 134 | `TS2322` |
+| 134 | `TS18046` |
 | 65 | `TS7005` |
 | 63 | `TS7053` |
 | 57 | `TS18048` |
@@ -2150,28 +2163,6 @@ src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overloa
       Type 'undefined' is not assignable to type 'string | number'.
 src/hooks/budgeting/usePaycheckHistory.ts(10,38): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
 src/hooks/budgeting/usePaycheckHistory.ts(14,39): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(16,26): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(16,33): error TS7006: Parameter 'errors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(16,41): error TS7006: Parameter 'setErrors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(18,16): error TS7006: Parameter 'prevErrors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(35,37): error TS7006: Parameter 'formData' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(35,47): error TS7006: Parameter 'currentAllocations' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(35,67): error TS7006: Parameter 'setErrors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(56,3): error TS7031: Binding element 'onAddPaycheck' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(86,29): error TS2345: Argument of type 'AllocationResult' is not assignable to parameter of type 'SetStateAction<{ allocations: never[]; totalAllocated: number; remainingAmount: number; allocationRate: number; }>'.
-  Type 'AllocationResult' is not assignable to type '{ allocations: never[]; totalAllocated: number; remainingAmount: number; allocationRate: number; }'.
-    Types of property 'allocations' are incompatible.
-      Type 'AllocationItem[]' is not assignable to type 'never[]'.
-        Type 'AllocationItem' is not assignable to type 'never'.
-src/hooks/budgeting/usePaycheckProcessor.ts(94,6): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(94,13): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(106,6): error TS7006: Parameter 'payerName' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(115,6): error TS7006: Parameter 'payerName' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(171,23): error TS2345: Argument of type '(prev: never[]) => string[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type '(prev: never[]) => string[]' is not assignable to type '(prevState: never[]) => never[]'.
-    Type 'string[]' is not assignable to type 'never[]'.
-      Type 'string' is not assignable to type 'never'.
-src/hooks/budgeting/usePaycheckProcessor.ts(186,9): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/usePaydayPrediction.ts(11,30): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,47): error TS7006: Parameter 'isUnlocked' implicitly has an 'any' type.
 src/hooks/budgeting/useSmartSuggestions.ts(11,36): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
