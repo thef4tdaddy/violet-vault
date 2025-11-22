@@ -1,26 +1,50 @@
 import { useState, useCallback } from "react";
 
+// Define types for the toast system
+export type ToastType = "info" | "success" | "error" | "warning" | "payday";
+
+export interface Toast {
+  id: number;
+  type: ToastType;
+  title: string;
+  message: string;
+  duration: number;
+}
+
 let toastId = 0;
 
 const useToast = () => {
-  const [toasts, setToasts] = useState([]);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = useCallback(({ type = "info", title, message, duration = 5000 }) => {
-    const id = ++toastId;
-    const toast = {
-      id,
-      type,
+  const addToast = useCallback(
+    ({
+      type = "info" as ToastType,
       title,
       message,
-      duration,
-    };
+      duration = 5000,
+    }: {
+      type?: ToastType;
+      title: string;
+      message: string;
+      duration?: number;
+    }) => {
+      const id = ++toastId;
+      const toast: Toast = {
+        id,
+        type,
+        title,
+        message,
+        duration,
+      };
 
-    setToasts((prev) => [...prev, toast]);
+      setToasts((prev) => [...prev, toast]);
 
-    return id;
-  }, []);
+      return id;
+    },
+    []
+  );
 
-  const removeToast = useCallback((id) => {
+  const removeToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
@@ -30,35 +54,35 @@ const useToast = () => {
 
   // Convenience methods for different toast types
   const showSuccess = useCallback(
-    (title, message, duration) => {
+    (title: string, message: string, duration?: number) => {
       return addToast({ type: "success", title, message, duration });
     },
     [addToast]
   );
 
   const showError = useCallback(
-    (title, message, duration) => {
+    (title: string, message: string, duration?: number) => {
       return addToast({ type: "error", title, message, duration });
     },
     [addToast]
   );
 
   const showWarning = useCallback(
-    (title, message, duration) => {
+    (title: string, message: string, duration?: number) => {
       return addToast({ type: "warning", title, message, duration });
     },
     [addToast]
   );
 
   const showInfo = useCallback(
-    (title, message, duration) => {
+    (title: string, message: string, duration?: number) => {
       return addToast({ type: "info", title, message, duration });
     },
     [addToast]
   );
 
   const showPayday = useCallback(
-    (title, message, duration = 8000) => {
+    (title: string, message: string, duration = 8000) => {
       return addToast({ type: "payday", title, message, duration });
     },
     [addToast]

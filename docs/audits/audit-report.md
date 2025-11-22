@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 0 | 0 |
 | TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2481 | -20 |
+| TypeScript Strict Mode Errors | 2424 | -57 |
 
-*Last updated: 2025-11-21 20:37:38 UTC*
+*Last updated: 2025-11-22 13:48:39 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -28,20 +28,17 @@
 
 ✅ **All files passed ESLint validation!**
 
-Last check: 2025-11-21 20:37:15 UTC
+Last check: 2025-11-22 13:47:56 UTC
 
 ## Typecheck Audit
 
 ✅ **All files passed TypeScript type checking!**
 
-Last check: 2025-11-21 20:37:27 UTC
+Last check: 2025-11-22 13:48:11 UTC
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 20 errors in `src/hooks/debts/useDebtStrategies.ts`
-- 19 errors in `src/hooks/common/useToast.ts`
-- 19 errors in `src/hooks/common/useImportData.ts`
 - 19 errors in `src/components/sync/ActivityBanner.tsx`
 - 19 errors in `src/components/savings/AddEditGoalModal.tsx`
 - 19 errors in `src/components/budgeting/EnvelopeSystem.tsx`
@@ -442,6 +439,7 @@ Last check: 2025-11-21 20:37:27 UTC
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
 - 1 errors in `src/hooks/common/usePrompt.ts`
+- 1 errors in `src/hooks/common/useImportData.ts`
 - 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
 - 1 errors in `src/hooks/common/useBugReport.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
@@ -490,11 +488,11 @@ Last check: 2025-11-21 20:37:27 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 821 | `TS7006` |
-| 689 | `TS7031` |
+| 776 | `TS7006` |
+| 687 | `TS7031` |
 | 181 | `TS2345` |
-| 168 | `TS2339` |
-| 145 | `TS18046` |
+| 161 | `TS2339` |
+| 144 | `TS18046` |
 | 133 | `TS2322` |
 | 69 | `TS7053` |
 | 69 | `TS7005` |
@@ -508,7 +506,6 @@ Last check: 2025-11-21 20:37:27 UTC
 | 5 | `TS2353` |
 | 4 | `TS2783` |
 | 3 | `TS7019` |
-| 3 | `TS2698` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
 | 2 | `TS2538` |
@@ -516,6 +513,7 @@ Last check: 2025-11-21 20:37:27 UTC
 | 1 | `TS7016` |
 | 1 | `TS2774` |
 | 1 | `TS2740` |
+| 1 | `TS2698` |
 | 1 | `TS2683` |
 | 1 | `TS2532` |
 | 1 | `TS2365` |
@@ -2330,25 +2328,7 @@ src/hooks/common/useFABActions.ts(47,18): error TS2339: Property 'id' does not e
 src/hooks/common/useFABActions.ts(49,31): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/common/useFABActions.ts(54,7): error TS7005: Variable 'actionIds' implicitly has an 'any[]' type.
 src/hooks/common/useFABActions.ts(90,34): error TS7006: Parameter 'screenId' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(13,26): error TS7006: Parameter 'validatedData' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(21,27): error TS7006: Parameter 'counts' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(24,31): error TS7006: Parameter 'importBudgetId' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(24,47): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(30,30): error TS7006: Parameter 'validatedData' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(30,45): error TS7006: Parameter 'hasBudgetIdMismatch' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(30,66): error TS7006: Parameter 'importBudgetId' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(30,82): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(42,3): error TS7006: Parameter 'confirm' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(43,3): error TS7006: Parameter 'validatedData' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(44,3): error TS7006: Parameter 'hasBudgetIdMismatch' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(45,3): error TS7006: Parameter 'importBudgetId' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(46,3): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(65,28): error TS7006: Parameter 'validatedData' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(78,30): error TS7006: Parameter 'validatedData' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(78,45): error TS7006: Parameter 'showSuccessToast' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(78,63): error TS7006: Parameter 'authConfig' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(110,12): error TS7006: Parameter 'event' implicitly has an 'any' type.
-src/hooks/common/useImportData.ts(157,42): error TS18046: 'error' is of type 'unknown'.
+src/hooks/common/useImportData.ts(145,26): error TS2345: Argument of type 'AuthConfig' is not assignable to parameter of type 'null | undefined'.
 src/hooks/common/useModalManager.ts(11,34): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
 src/hooks/common/useModalManager.ts(15,35): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
 src/hooks/common/useModalManager.ts(19,36): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
@@ -2364,28 +2344,6 @@ src/hooks/common/usePrompt.ts(109,12): error TS7006: Parameter 'value' implicitl
 src/hooks/common/useRouterPageDetection.ts(22,25): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
   No index signature with a parameter of type 'string' was found on type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
 src/hooks/common/useRouterPageDetection.ts(66,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
-src/hooks/common/useToast.ts(8,50): error TS7031: Binding element 'title' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(8,57): error TS7031: Binding element 'message' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(18,15): error TS2345: Argument of type '(prev: never[]) => { id: number; type: string; title: any; message: any; duration: number; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type '(prev: never[]) => { id: number; type: string; title: any; message: any; duration: number; }[]' is not assignable to type '(prevState: never[]) => never[]'.
-    Type '{ id: number; type: string; title: any; message: any; duration: number; }[]' is not assignable to type 'never[]'.
-      Type '{ id: number; type: string; title: any; message: any; duration: number; }' is not assignable to type 'never'.
-src/hooks/common/useToast.ts(23,36): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(24,54): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/common/useToast.ts(33,6): error TS7006: Parameter 'title' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(33,13): error TS7006: Parameter 'message' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(33,22): error TS7006: Parameter 'duration' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(40,6): error TS7006: Parameter 'title' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(40,13): error TS7006: Parameter 'message' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(40,22): error TS7006: Parameter 'duration' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(47,6): error TS7006: Parameter 'title' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(47,13): error TS7006: Parameter 'message' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(47,22): error TS7006: Parameter 'duration' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(54,6): error TS7006: Parameter 'title' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(54,13): error TS7006: Parameter 'message' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(54,22): error TS7006: Parameter 'duration' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(61,6): error TS7006: Parameter 'title' implicitly has an 'any' type.
-src/hooks/common/useToast.ts(61,13): error TS7006: Parameter 'message' implicitly has an 'any' type.
 src/hooks/common/useTransactionArchiving.ts(105,12): error TS7006: Parameter 'archiveId' implicitly has an 'any' type.
 src/hooks/common/useTransactionArchiving.ts(126,41): error TS7006: Parameter 'transactionCount' implicitly has an 'any' type.
 src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
@@ -2457,26 +2415,6 @@ src/hooks/debts/useDebts.ts(86,7): error TS2322: Type 'null' is not assignable t
 src/hooks/debts/useDebts.ts(95,36): error TS7031: Binding element 'id' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(95,40): error TS7031: Binding element 'payment' implicitly has an 'any' type.
 src/hooks/debts/useDebts.ts(213,24): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(11,40): error TS2339: Property 'status' does not exist on type 'never'.
-src/hooks/debts/useDebtStrategies.ts(11,68): error TS2339: Property 'currentBalance' does not exist on type 'never'.
-src/hooks/debts/useDebtStrategies.ts(19,20): error TS2339: Property 'interestRate' does not exist on type 'never'.
-src/hooks/debts/useDebtStrategies.ts(19,44): error TS2339: Property 'interestRate' does not exist on type 'never'.
-src/hooks/debts/useDebtStrategies.ts(32,9): error TS2698: Spread types may only be created from object types.
-src/hooks/debts/useDebtStrategies.ts(54,20): error TS2339: Property 'currentBalance' does not exist on type 'never'.
-src/hooks/debts/useDebtStrategies.ts(54,46): error TS2339: Property 'currentBalance' does not exist on type 'never'.
-src/hooks/debts/useDebtStrategies.ts(67,9): error TS2698: Spread types may only be created from object types.
-src/hooks/debts/useDebtStrategies.ts(163,30): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(181,33): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(190,44): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(190,50): error TS7006: Parameter 'extraPayment' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(214,31): error TS7006: Parameter 'activeDebts' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(218,49): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(219,44): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(219,49): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(221,6): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(221,11): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(242,47): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtStrategies.ts(255,35): error TS7006: Parameter 'recommendation' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(17,46): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(21,45): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
 src/hooks/history/useBudgetHistoryViewer.ts(33,37): error TS7006: Parameter 'updates' implicitly has an 'any' type.

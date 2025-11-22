@@ -5,7 +5,19 @@
 
 import { useMemo } from "react";
 
-export const useDebtStrategies = (debts = []) => {
+// Define the debt interface
+interface Debt {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  currentBalance: number;
+  minimumPayment: number;
+  interestRate?: number;
+  [key: string]: unknown;
+}
+
+export const useDebtStrategies = (debts: Debt[] = []) => {
   // Filter to active debts only
   const activeDebts = useMemo(() => {
     return debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
@@ -160,7 +172,7 @@ export const useDebtStrategies = (debts = []) => {
 };
 
 // Helper function to calculate payoff time in months
-function calculatePayoffTime(debt) {
+function calculatePayoffTime(debt: Debt) {
   const { currentBalance, minimumPayment, interestRate } = debt;
 
   if (!currentBalance || !minimumPayment || minimumPayment <= 0) return 0;
@@ -178,7 +190,7 @@ function calculatePayoffTime(debt) {
 }
 
 // Helper function to calculate total interest cost
-function calculateTotalInterest(debt) {
+function calculateTotalInterest(debt: Debt) {
   const months = calculatePayoffTime(debt);
   if (months >= 999) return debt.currentBalance * 2; // Estimate for impossible payoffs
 
@@ -187,14 +199,14 @@ function calculateTotalInterest(debt) {
 }
 
 // Helper function to calculate strategy with extra payment
-function calculateStrategyWithExtraPayment(debt, extraPayment) {
+function calculateStrategyWithExtraPayment(debt: Debt, extraPayment: number) {
   if (!debt) return { monthsToPayoff: 0, totalInterest: 0, savings: 0 };
 
   const originalMonths = calculatePayoffTime(debt);
   const originalInterest = calculateTotalInterest(debt);
 
   // Create modified debt with extra payment
-  const modifiedDebt = {
+  const modifiedDebt: Debt = {
     ...debt,
     minimumPayment: (debt.minimumPayment || 0) + extraPayment,
   };
@@ -211,14 +223,17 @@ function calculateStrategyWithExtraPayment(debt, extraPayment) {
 }
 
 // Helper function to generate insights from active debts
-function generateDebtInsights(activeDebts) {
+function generateDebtInsights(activeDebts: Debt[]) {
   if (!activeDebts.length) return [];
 
   const insights = [];
   const highInterestDebts = activeDebts.filter((debt) => (debt.interestRate || 0) > 15);
-  const totalBalance = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
+  const totalBalance = activeDebts.reduce(
+    (sum: number, debt) => sum + (debt.currentBalance || 0),
+    0
+  );
   const totalMinimumPayments = activeDebts.reduce(
-    (sum, debt) => sum + (debt.minimumPayment || 0),
+    (sum: number, debt) => sum + (debt.minimumPayment || 0),
     0
   );
 
@@ -252,14 +267,20 @@ function generateDebtInsights(activeDebts) {
 }
 
 // Helper function to format recommendation text
-function formatRecommendationText(recommendation) {
+function formatRecommendationText(
+  recommendation: {
+    strategy: string;
+    reason: string;
+    savings: number;
+  } | null
+) {
   if (!recommendation) return "";
 
   switch (recommendation.strategy) {
     case "avalanche":
-      return `We recommend the Debt Avalanche strategy. ${recommendation.reason}. You could save $${recommendation.savings.toFixed(2)} in interest.`;
+      return `We recommend to Debt Avalanche strategy. ${recommendation.reason}. You could save $${recommendation.savings.toFixed(2)} in interest.`;
     case "snowball":
-      return `We recommend the Debt Snowball strategy. ${recommendation.reason}. The interest cost difference is only $${recommendation.savings.toFixed(2)}.`;
+      return `We recommend to Debt Snowball strategy. ${recommendation.reason}. The interest cost difference is only $${recommendation.savings.toFixed(2)}.`;
     case "either":
       return `Both strategies work well for your situation. ${recommendation.reason}. Choose based on your preference for motivation vs. optimization.`;
     default:
