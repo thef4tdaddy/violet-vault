@@ -97,6 +97,88 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
 
 ## Instructions
 
+### 0. Setup: Use Git Worktrees
+
+**⚠️ CRITICAL: Always use git worktrees to avoid conflicts with other agents and to isolate your work.**
+
+#### Why Use Worktrees?
+
+- Prevents conflicts when multiple agents work simultaneously
+- Isolates your changes from the main workspace
+- Makes cleanup easier if something goes wrong
+- Allows safe experimentation without affecting the main workspace
+
+#### How to Create and Use a Worktree
+
+1. **Generate a unique identifier** for your worktree (you'll use this for the branch name too):
+
+   ```bash
+   # Use a short random identifier (e.g., Z1Rtt, 8fOBu, etc.)
+   WORKTREE_ID="$(openssl rand -hex 3 | head -c 5)"
+   ```
+
+2. **Create a worktree with a new branch**:
+
+   ```bash
+   cd /Users/thef4tdaddy/Git/violet-vault
+
+   # Create branch name
+   BRANCH_NAME="fix-ts-strict-errors-${WORKTREE_ID}"
+
+   # Create worktree (will be in ~/.cursor/worktrees/violet-vault/${WORKTREE_ID})
+   git worktree add -b "${BRANCH_NAME}" ~/.cursor/worktrees/violet-vault/${WORKTREE_ID} develop
+
+   # Change to your worktree directory
+   cd ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+   ```
+
+3. **Work in your worktree**:
+   - All your changes, commits, and work happen in this isolated directory
+   - You can still push to remote if needed
+   - Other agents won't interfere with your work
+
+4. **After completing your work**:
+
+   ```bash
+   # From the main workspace (or any other location)
+   cd /Users/thef4tdaddy/Git/violet-vault
+
+   # Remove the worktree and branch
+   git worktree remove ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+   git branch -D "${BRANCH_NAME}"
+   ```
+
+#### Important Notes
+
+- **Always create a new branch** with your worktree (use `-b` flag)
+- **Clean up when done**: Remove worktrees and delete branches after merging/abandoning work
+- **Check existing worktrees**: `git worktree list` shows all active worktrees
+- **If a worktree is stuck**: You can force remove with `rm -rf ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}` then `git worktree prune`
+
+#### Example Full Workflow
+
+```bash
+# 1. Setup
+cd /Users/thef4tdaddy/Git/violet-vault
+WORKTREE_ID="$(openssl rand -hex 3 | head -c 5)"
+BRANCH_NAME="fix-ts-strict-errors-${WORKTREE_ID}"
+git worktree add -b "${BRANCH_NAME}" ~/.cursor/worktrees/violet-vault/${WORKTREE_ID} develop
+cd ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+
+# 2. Work (all your edits, commits, etc. happen here)
+# ... fix TypeScript strict errors ...
+npm run format
+git add src/path/to/file.ts
+git commit -m "fix: resolve TypeScript strict mode errors in FILENAME"
+
+# 3. Cleanup (when done)
+cd /Users/thef4tdaddy/Git/violet-vault
+git worktree remove ~/.cursor/worktrees/violet-vault/${WORKTREE_ID}
+git branch -D "${BRANCH_NAME}"
+```
+
+**⚠️ If you forget to use a worktree and work directly in the main workspace, you risk conflicts with other agents. Always use worktrees.**
+
 ### 1. Start at the Top
 
 **⚠️ ALWAYS check `docs/audits/audit-report.md` for the current list of files with most errors.**
