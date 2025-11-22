@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { hasMinimumExtractedData } from "../../../utils/receipts/receiptHelpers.tsx";
+import { hasMinimumExtractedData } from "@/utils/receipts/receiptHelpers";
 
 /**
  * Receipt Action Buttons Component

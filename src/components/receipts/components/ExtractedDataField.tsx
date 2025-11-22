@@ -1,4 +1,4 @@
-import { renderConfidenceIndicator } from "../../../utils/receipts/receiptHelpers.tsx";
+import { renderConfidenceIndicator } from "@/utils/receipts/receiptHelpers";
 
 /**
  * Individual Extracted Data Field Component

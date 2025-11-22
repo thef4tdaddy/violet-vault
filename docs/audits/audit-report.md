@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | -4 |
-| TypeScript Errors | 112 | +108 |
-| TypeScript Strict Mode Errors | 2363 | -2385 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 113 | +1 |
+| TypeScript Strict Mode Errors | 2355 | -8 |
 
-*Last updated: 2025-11-22 14:16:04 UTC*
+*Last updated: 2025-11-22 15:50:15 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,20 +27,19 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 2 issues in `violet-vault/src/hooks/common/useImportData.ts`
+- 1 issues in `violet-vault/src/utils/receipts/receiptHelpers.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EnvelopeSystem.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 2 | `react-hooks/exhaustive-deps` |
-| 1 | `@typescript-eslint/no-explicit-any` |
+| 1 | `react-hooks/exhaustive-deps` |
+| 1 | `@typescript-eslint/no-unused-vars` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/budgeting/EnvelopeSystem.tsx:157:6 - 1 - React Hook useEffect has a missing dependency: 'updateBiweeklyAllocations'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
-violet-vault/src/hooks/common/useImportData.ts:160:40 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/common/useImportData.ts:245:5 - 1 - React Hook useCallback has missing dependencies: 'showErrorToast' and 'showSuccessToast'. Either include them or remove the dependency array. (react-hooks/exhaustive-deps)
+violet-vault/src/utils/receipts/receiptHelpers.ts:22:11 - 1 - 'ConfidenceLevel' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 ```
 
 ## Typecheck Audit
@@ -50,11 +49,12 @@ violet-vault/src/hooks/common/useImportData.ts:245:5 - 1 - React Hook useCallbac
 - 9 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 8 errors in `src/stores/ui/uiStore.ts`
 - 7 errors in `src/hooks/bills/useBillManager.ts`
-- 7 errors in `src/components/automation/AutoFundingView.tsx`
+- 6 errors in `src/components/automation/AutoFundingView.tsx`
 - 5 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 5 errors in `src/components/pwa/PatchNotesModal.tsx`
 - 5 errors in `src/components/layout/MainLayout.tsx`
 - 5 errors in `src/App.tsx`
+- 4 errors in `src/utils/receipts/receiptHelpers.ts`
 - 4 errors in `src/hooks/common/useNetworkStatus.ts`
 - 4 errors in `src/hooks/common/useActualBalance.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
@@ -68,7 +68,6 @@ violet-vault/src/hooks/common/useImportData.ts:245:5 - 1 - React Hook useCallbac
 - 2 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 2 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
-- 2 errors in `src/components/automation/AutoFundingViewComponents.tsx`
 - 2 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 1 errors in `src/services/authService.ts`
 - 1 errors in `src/hooks/common/useDataInitialization.ts`
@@ -82,11 +81,11 @@ violet-vault/src/hooks/common/useImportData.ts:245:5 - 1 - React Hook useCallbac
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 64 | `TS2339` |
-| 26 | `TS2345` |
-| 16 | `TS2322` |
+| 66 | `TS2339` |
+| 27 | `TS2345` |
+| 15 | `TS2322` |
 | 4 | `TS2352` |
-| 2 | `TS2769` |
+| 1 | `TS6196` |
 
 ### Detailed Type Error Report
 ```
@@ -110,24 +109,6 @@ src/components/automation/AutoFundingView.tsx(102,11): error TS2322: Type 'AutoF
   Type 'AutoFundingRule' is not assignable to type 'Rule'.
     Index signature for type 'string' is missing in type 'AutoFundingRule'.
 src/components/automation/AutoFundingView.tsx(111,11): error TS2322: Type 'string' is not assignable to type 'boolean'.
-src/components/automation/AutoFundingView.tsx(113,11): error TS2322: Type '({ executionHistory, showExecutionDetails, onToggleDetails }: { executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }) => Element' is not assignable to type 'ComponentType<{ displayHistory: unknown[]; }>'.
-  Type '({ executionHistory, showExecutionDetails, onToggleDetails }: { executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }) => Element' is not assignable to type 'FunctionComponent<{ displayHistory: unknown[]; }>'.
-    Types of parameters '__0' and 'props' are incompatible.
-      Type '{ displayHistory: unknown[]; }' is missing the following properties from type '{ executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }': executionHistory, showExecutionDetails, onToggleDetails
-src/components/automation/AutoFundingViewComponents.tsx(123,13): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(props: { rules: Rule[]; }, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<...> | Promise<...> | Component<...>', gave the following error.
-    Type '{ rules: Rule[]; onCreateRule: () => void; onEditRule: (rule: Rule) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes & { rules: Rule[]; }'.
-      Property 'onCreateRule' does not exist on type 'IntrinsicAttributes & { rules: Rule[]; }'.
-  Overload 2 of 2, '(props: { rules: Rule[]; }): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...>', gave the following error.
-    Type '{ rules: Rule[]; onCreateRule: () => void; onEditRule: (rule: Rule) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes & { rules: Rule[]; }'.
-      Property 'onCreateRule' does not exist on type 'IntrinsicAttributes & { rules: Rule[]; }'.
-src/components/automation/AutoFundingViewComponents.tsx(134,13): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(props: { displayHistory: unknown[]; }, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<...> | Promise<...> | Component<...>', gave the following error.
-    Type '{ executionHistory: unknown[]; showExecutionDetails: boolean; onToggleDetails: (show: boolean) => void; }' is not assignable to type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
-      Property 'executionHistory' does not exist on type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
-  Overload 2 of 2, '(props: { displayHistory: unknown[]; }): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...>', gave the following error.
-    Type '{ executionHistory: unknown[]; showExecutionDetails: boolean; onToggleDetails: (show: boolean) => void; }' is not assignable to type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
-      Property 'executionHistory' does not exist on type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
 src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,67): error TS2339: Property 'openUnassignedCashModal' does not exist on type '{ (partial: StateCreator<{ loadPatchNotesForUpdate(fromVersion: any, toVersion: any): Promise<{ version: any; summary: string; features: any[]; fixes: any[]; breaking: any[]; other: any[]; hasContent: boolean; }>; ... 31 more ...; loadingPatchNotes: boolean; }, [], [...]> | Partial<...> | ((state: StateCreator<...>)...'.
 src/components/budgeting/EnvelopeGrid.tsx(272,42): error TS2345: Argument of type '(state: BudgetState) => BudgetEnvelope[]' is not assignable to parameter of type 'StateCreator<StateCreator<{ loadPatchNotesForUpdate(fromVersion: any, toVersion: any): Promise<{ version: any; summary: string; features: any[]; fixes: any[]; breaking: any[]; other: any[]; hasContent: boolean; }>; ... 31 more ...; loadingPatchNotes: boolean; }, [], [...]>, [], []>'.
   Type '(state: BudgetState) => BudgetEnvelope[]' is not assignable to type '(setState: { (partial: StateCreator<{ loadPatchNotesForUpdate(fromVersion: any, toVersion: any): Promise<{ version: any; summary: string; features: any[]; fixes: any[]; breaking: any[]; other: any[]; hasContent: boolean; }>; ... 31 more ...; loadingPatchNotes: boolean; }, [], [...]> | Partial<...> | ((state: StateCr...'.
@@ -288,13 +269,16 @@ src/stores/ui/uiStore.ts(289,71): error TS2339: Property 'setState' does not exi
 src/stores/ui/uiStore.ts(290,26): error TS2339: Property 'getState' does not exist on type 'typeof create<typeof base>'.
 src/stores/ui/uiStore.ts(290,72): error TS2339: Property 'setState' does not exist on type 'typeof create<typeof base>'.
 src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<typeof base>' is not assignable to parameter of type '{ getState: () => UiStore; }'.
+src/utils/receipts/receiptHelpers.ts(22,11): error TS6196: 'ConfidenceLevel' is declared but never used.
+src/utils/receipts/receiptHelpers.ts(72,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/utils/receipts/receiptHelpers.ts(76,43): error TS2339: Property 'trim' does not exist on type 'unknown'.
+src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' does not exist on type 'unknown'.
 ```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
 - 20 errors in `src/stores/ui/uiStore.ts`
-- 18 errors in `src/utils/receipts/receiptHelpers.tsx`
 - 18 errors in `src/utils/common/frequencyCalculations.ts`
 - 18 errors in `src/services/bugReport/reportSubmissionService.ts`
 - 18 errors in `src/hooks/debts/useDebtForm.ts`
@@ -320,9 +304,9 @@ src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<
 - 14 errors in `src/components/dashboard/RecentTransactionsWidget.tsx`
 - 14 errors in `src/components/dashboard/AccountBalanceOverview.tsx`
 - 14 errors in `src/components/budgeting/EnvelopeGrid.tsx`
-- 14 errors in `src/components/automation/AutoFundingView.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
+- 13 errors in `src/utils/receipts/receiptHelpers.ts`
 - 13 errors in `src/services/bugReport/performanceInfoService.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useRuleExecution.ts`
 - 13 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
@@ -344,6 +328,7 @@ src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<
 - 12 errors in `src/components/debt/modals/DebtFormSections.tsx`
 - 12 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
+- 12 errors in `src/components/automation/AutoFundingView.tsx`
 - 11 errors in `src/utils/security/shareCodeUtils.ts`
 - 11 errors in `src/utils/savings/savingsFormUtils.ts`
 - 11 errors in `src/utils/bills/billDetailUtils.ts`
@@ -654,7 +639,6 @@ src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<
 - 2 errors in `src/components/bills/BillFormFields.tsx`
 - 2 errors in `src/components/automation/steps/TriggerScheduleStep.tsx`
 - 2 errors in `src/components/automation/components/StepNavigation.tsx`
-- 2 errors in `src/components/automation/AutoFundingViewComponents.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
 - 2 errors in `src/components/auth/UserIndicator.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
@@ -690,6 +674,7 @@ src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
 - 1 errors in `src/hooks/common/usePrompt.ts`
+- 1 errors in `src/hooks/common/useImportData.ts`
 - 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
 - 1 errors in `src/hooks/common/useBugReport.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
@@ -738,16 +723,16 @@ src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 729 | `TS7006` |
+| 720 | `TS7006` |
 | 658 | `TS7031` |
-| 209 | `TS2339` |
-| 206 | `TS2345` |
-| 152 | `TS2322` |
+| 211 | `TS2339` |
+| 208 | `TS2345` |
+| 150 | `TS2322` |
 | 141 | `TS18046` |
 | 69 | `TS7053` |
 | 57 | `TS18048` |
 | 37 | `TS18047` |
-| 26 | `TS2769` |
+| 24 | `TS2769` |
 | 15 | `TS7005` |
 | 10 | `TS7034` |
 | 7 | `TS2774` |
@@ -761,6 +746,7 @@ src/stores/ui/uiStore.ts(290,82): error TS2345: Argument of type 'typeof create<
 | 2 | `TS7022` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
+| 1 | `TS6196` |
 | 1 | `TS2740` |
 | 1 | `TS2698` |
 | 1 | `TS2683` |
@@ -891,28 +877,6 @@ src/components/automation/AutoFundingView.tsx(105,11): error TS2322: Type 'Dispa
   Types of parameters 'value' and 'show' are incompatible.
     Type 'boolean' is not assignable to type 'SetStateAction<null>'.
 src/components/automation/AutoFundingView.tsx(111,11): error TS2322: Type 'string' is not assignable to type 'boolean'.
-src/components/automation/AutoFundingView.tsx(112,11): error TS2322: Type '({ rules, onCreateRule, onEditRule, onDeleteRule, onToggleRule, onExecuteRules, isExecuting, }: { rules: any; onCreateRule: any; onEditRule: any; onDeleteRule: any; onToggleRule: any; onExecuteRules: any; isExecuting: any; }) => Element' is not assignable to type 'ComponentType<{ rules: Rule[]; }>'.
-  Type '({ rules, onCreateRule, onEditRule, onDeleteRule, onToggleRule, onExecuteRules, isExecuting, }: { rules: any; onCreateRule: any; onEditRule: any; onDeleteRule: any; onToggleRule: any; onExecuteRules: any; isExecuting: any; }) => Element' is not assignable to type 'FunctionComponent<{ rules: Rule[]; }>'.
-    Types of parameters '__0' and 'props' are incompatible.
-      Type '{ rules: Rule[]; }' is missing the following properties from type '{ rules: any; onCreateRule: any; onEditRule: any; onDeleteRule: any; onToggleRule: any; onExecuteRules: any; isExecuting: any; }': onCreateRule, onEditRule, onDeleteRule, onToggleRule, and 2 more.
-src/components/automation/AutoFundingView.tsx(113,11): error TS2322: Type '({ executionHistory, showExecutionDetails, onToggleDetails }: { executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }) => Element' is not assignable to type 'ComponentType<{ displayHistory: unknown[]; }>'.
-  Type '({ executionHistory, showExecutionDetails, onToggleDetails }: { executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }) => Element' is not assignable to type 'FunctionComponent<{ displayHistory: unknown[]; }>'.
-    Types of parameters '__0' and 'props' are incompatible.
-      Type '{ displayHistory: unknown[]; }' is missing the following properties from type '{ executionHistory: any; showExecutionDetails: any; onToggleDetails: any; }': executionHistory, showExecutionDetails, onToggleDetails
-src/components/automation/AutoFundingViewComponents.tsx(123,13): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(props: { rules: Rule[]; }, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | ... 4 more ... | undefined', gave the following error.
-    Type '{ rules: Rule[]; onCreateRule: () => void; onEditRule: (rule: Rule) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes & { rules: Rule[]; }'.
-      Property 'onCreateRule' does not exist on type 'IntrinsicAttributes & { rules: Rule[]; }'.
-  Overload 2 of 2, '(props: { rules: Rule[]; }): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
-    Type '{ rules: Rule[]; onCreateRule: () => void; onEditRule: (rule: Rule) => void; onDeleteRule: (ruleId: string) => void; onToggleRule: (ruleId: string) => void; onExecuteRules: () => void; isExecuting: boolean; }' is not assignable to type 'IntrinsicAttributes & { rules: Rule[]; }'.
-      Property 'onCreateRule' does not exist on type 'IntrinsicAttributes & { rules: Rule[]; }'.
-src/components/automation/AutoFundingViewComponents.tsx(134,13): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(props: { displayHistory: unknown[]; }, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | ... 4 more ... | undefined', gave the following error.
-    Type '{ executionHistory: unknown[]; showExecutionDetails: boolean; onToggleDetails: (show: boolean) => void; }' is not assignable to type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
-      Property 'executionHistory' does not exist on type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
-  Overload 2 of 2, '(props: { displayHistory: unknown[]; }): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
-    Type '{ executionHistory: unknown[]; showExecutionDetails: boolean; onToggleDetails: (show: boolean) => void; }' is not assignable to type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
-      Property 'executionHistory' does not exist on type 'IntrinsicAttributes & { displayHistory: unknown[]; }'.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
 src/components/automation/steps/config/FixedAmountConfig.tsx(5,30): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
@@ -2584,6 +2548,7 @@ src/hooks/common/useFABActions.ts(47,18): error TS2339: Property 'id' does not e
 src/hooks/common/useFABActions.ts(49,31): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/common/useFABActions.ts(54,7): error TS7005: Variable 'actionIds' implicitly has an 'any[]' type.
 src/hooks/common/useFABActions.ts(90,34): error TS7006: Parameter 'screenId' implicitly has an 'any' type.
+src/hooks/common/useImportData.ts(166,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
 src/hooks/common/useModalManager.ts(11,34): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
 src/hooks/common/useModalManager.ts(15,35): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
 src/hooks/common/useModalManager.ts(19,36): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
@@ -3609,24 +3574,19 @@ src/utils/query/queryClientConfig.ts(180,18): error TS7006: Parameter 'queryKey'
 src/utils/query/queryClientConfig.ts(187,22): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(187,32): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(194,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/receipts/receiptHelpers.tsx(11,37): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(40,41): error TS7006: Parameter 'form' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(68,32): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(79,35): error TS7006: Parameter 'dateString' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(97,42): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(110,36): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(121,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(139,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(152,42): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(152,52): error TS7006: Parameter 'date' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(152,58): error TS7006: Parameter 'total' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(167,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(167,52): error TS7006: Parameter 'transactionForm' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(201,43): error TS7006: Parameter '_field' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(201,51): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(209,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
-src/utils/receipts/receiptHelpers.tsx(219,32): error TS7006: Parameter 'bytes' implicitly has an 'any' type.
-src/utils/receipts/receiptHelpers.tsx(226,41): error TS7006: Parameter 'extractedData' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(22,11): error TS6196: 'ConfidenceLevel' is declared but never used.
+src/utils/receipts/receiptHelpers.ts(72,49): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/utils/receipts/receiptHelpers.ts(76,43): error TS2339: Property 'trim' does not exist on type '{}'.
+src/utils/receipts/receiptHelpers.ts(147,35): error TS2339: Property 'length' does not exist on type '{}'.
+src/utils/receipts/receiptHelpers.ts(168,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(181,42): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(181,52): error TS7006: Parameter 'date' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(181,58): error TS7006: Parameter 'total' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(196,39): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(196,52): error TS7006: Parameter 'transactionForm' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(230,43): error TS7006: Parameter '_field' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(230,51): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
+src/utils/receipts/receiptHelpers.ts(238,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
 src/utils/savings/savingsCalculations.ts(240,12): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,19): error TS18046: 'aVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,30): error TS18046: 'bVal' is of type 'unknown'.

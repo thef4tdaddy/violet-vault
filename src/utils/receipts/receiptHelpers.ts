@@ -155,6 +155,14 @@ export const extractReceiptSummary = (receiptData: ReceiptData) => {
 };
 
 /**
+ * Check if receipt data has minimum extracted data (merchant or total)
+ */
+export const hasMinimumExtractedData = (receiptData: ReceiptData | null | undefined): boolean => {
+  if (!receiptData) return false;
+  return Boolean(receiptData.merchant || receiptData.total);
+};
+
+/**
  * Check if receipt data is complete enough for transaction creation
  */
 export const isReceiptDataComplete = (receiptData) => {
