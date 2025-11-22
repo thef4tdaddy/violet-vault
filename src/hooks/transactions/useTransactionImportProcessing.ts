@@ -6,9 +6,9 @@ import logger from "../../utils/common/logger";
  * Hook for processing and importing transactions
  * Extracted from useTransactionImport.js for better maintainability
  */
-export const useTransactionImportProcessing = (currentUser) => {
+export const useTransactionImportProcessing = (currentUser: { userName?: string }) => {
   const [importProgress, setImportProgress] = useState(0);
-  const [autoFundingResults, setAutoFundingResults] = useState([]);
+  const [autoFundingResults, setAutoFundingResults] = useState<unknown[]>([]);
 
   const clearExistingData = async () => {
     try {
@@ -40,24 +40,38 @@ export const useTransactionImportProcessing = (currentUser) => {
     }
   };
 
-  const processTransactions = async (importData, fieldMapping) => {
-    const processedTransactions = [];
-    const dataArray = importData.data || importData;
+  const processTransactions = async (
+    importData: { data?: unknown[] } | unknown[],
+    fieldMapping: {
+      amount: string;
+      date: string;
+      description: string;
+      category: string;
+      notes: string;
+    }
+  ) => {
+    const processedTransactions: unknown[] = [];
+    const dataArray = Array.isArray(importData) ? importData : (importData.data as unknown[]) || [];
 
     for (let i = 0; i < dataArray.length; i++) {
-      const row = dataArray[i];
+      const row = dataArray[i] as Record<string, unknown>;
       setImportProgress((i / dataArray.length) * 100);
 
       try {
-        const amount = parseFloat(row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0");
+        const rawAmount = row[fieldMapping.amount];
+        const amountStr =
+          typeof rawAmount === "string"
+            ? rawAmount.replace(/[$,]/g, "")
+            : String(rawAmount || "0");
+        const amount = parseFloat(amountStr);
 
         const transaction = {
           id: `import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`,
-          date: row[fieldMapping.date] || new Date().toISOString().split("T")[0],
-          description: row[fieldMapping.description] || "Imported Transaction",
+          date: String(row[fieldMapping.date] || new Date().toISOString().split("T")[0]),
+          description: String(row[fieldMapping.description] || "Imported Transaction"),
           amount,
-          category: row[fieldMapping.category] || "Imported",
-          notes: row[fieldMapping.notes] || "",
+          category: String(row[fieldMapping.category] || "Imported"),
+          notes: String(row[fieldMapping.notes] || ""),
           envelopeId: "", // Empty means unassigned
 
           // Add type based on amount
@@ -83,7 +97,13 @@ export const useTransactionImportProcessing = (currentUser) => {
     return processedTransactions;
   };
 
-  const generateSuccessMessage = (processedTransactions, importData, autoFundingPromises) => {
+  const generateSuccessMessage = (
+    processedTransactions: Array<{ amount: number }>,
+    importData: { clearExisting?: boolean },
+    autoFundingPromises: Array<{
+      result: { execution: { totalFunded: number; rulesExecuted: number } };
+    }>
+  ) => {
     const incomeCount = processedTransactions.filter((t) => t.amount >= 0).length;
     const expenseCount = processedTransactions.filter((t) => t.amount < 0).length;
 
@@ -96,13 +116,13 @@ export const useTransactionImportProcessing = (currentUser) => {
 
     if (autoFundingPromises.length > 0) {
       const totalAutoFunded = autoFundingPromises.reduce(
-        (sum, result) => sum + result.result.execution.totalFunded,
+        (sum: number, result) => sum + result.result.execution.totalFunded,
         0
       );
       message +=
         `🤖 Auto-funding executed for ${autoFundingPromises.length} income transactions:\n` +
         `• Total auto-funded: $${totalAutoFunded.toFixed(2)}\n` +
-        `• Rules executed: ${autoFundingPromises.reduce((sum, result) => sum + result.result.execution.rulesExecuted, 0)}\n\n`;
+        `• Rules executed: ${autoFundingPromises.reduce((sum: number, result) => sum + result.result.execution.rulesExecuted, 0)}\n\n`;
     }
 
     message += `All transactions have been added to your ledger with "Imported" category.`;
