@@ -11,17 +11,18 @@ export const getLocalOnlyMode = () => {
 };
 
 export const isDevelopmentMode = () => {
-  return import.meta.env.NODE_ENV === "development";
+  return (import.meta.env.MODE || import.meta.env.DEV) === "development";
 };
 
 export const isProductionMode = () => {
-  return import.meta.env.NODE_ENV === "production";
+  return (import.meta.env.MODE || import.meta.env.PROD) === "production";
 };
 
 /**
  * Settings Validation Utilities
  */
-export const validateCloudSyncSettings = (settings) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const validateCloudSyncSettings = (settings: any) => {
   const errors = [];
 
   if (!settings) {
@@ -43,7 +44,8 @@ export const validateCloudSyncSettings = (settings) => {
   };
 };
 
-export const validateSecuritySettings = (settings) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const validateSecuritySettings = (settings: any) => {
   const errors = [];
 
   if (!settings) {
@@ -74,7 +76,8 @@ export const validateSecuritySettings = (settings) => {
 /**
  * Settings Calculations
  */
-export const calculateStorageUsage = (data) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const calculateStorageUsage = (data: any) => {
   if (!data) return { bytes: 0, readable: "0 B" };
 
   const jsonString = JSON.stringify(data);
@@ -86,7 +89,7 @@ export const calculateStorageUsage = (data) => {
   };
 };
 
-export const formatBytes = (bytes, decimals = 2) => {
+export const formatBytes = (bytes: number, decimals = 2) => {
   if (bytes === 0) return "0 B";
 
   const k = 1024;
@@ -129,10 +132,13 @@ export const getDefaultSettingsState = () => ({
 /**
  * Settings Comparison Utilities
  */
-export const compareSettings = (settings1, settings2) => {
-  const changes = [];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const compareSettings = (settings1: any, settings2: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const changes: any[] = [];
 
-  const compare = (obj1, obj2, path = "") => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const compare = (obj1: any, obj2: any, path = "") => {
     for (const key in obj1) {
       const currentPath = path ? `${path}.${key}` : key;
 
@@ -165,14 +171,16 @@ export const compareSettings = (settings1, settings2) => {
 /**
  * Settings Export/Import Helpers
  */
-export const sanitizeSettingsForExport = (settings) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const sanitizeSettingsForExport = (settings: any) => {
   // Remove sensitive data before export
   const sanitized = { ...settings };
 
   // Remove any keys that might contain sensitive data
   const sensitiveKeys = ["encryptionKey", "password", "apiKey", "token"];
 
-  const removeSensitiveData = (obj) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const removeSensitiveData = (obj: any) => {
     for (const key in obj) {
       if (sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive.toLowerCase()))) {
         delete obj[key];
@@ -186,7 +194,8 @@ export const sanitizeSettingsForExport = (settings) => {
   return sanitized;
 };
 
-export const validateImportedSettings = (importedData) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const validateImportedSettings = (importedData: any) => {
   const errors = [];
 
   if (!importedData || typeof importedData !== "object") {
