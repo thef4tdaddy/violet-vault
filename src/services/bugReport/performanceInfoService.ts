@@ -172,9 +172,10 @@ export class PerformanceInfoService {
         available: true,
         timing: {
           navigationStart: navigation?.fetchStart || 0,
-          domContentLoaded: navigation?.domContentLoadedEventEnd - navigation?.fetchStart || 0,
-          loadComplete: navigation?.loadEventEnd - navigation?.fetchStart || 0,
-          domInteractive: navigation?.domInteractive - navigation?.fetchStart || 0,
+          domContentLoaded:
+            (navigation?.domContentLoadedEventEnd ?? 0) - (navigation?.fetchStart ?? 0),
+          loadComplete: (navigation?.loadEventEnd ?? 0) - (navigation?.fetchStart ?? 0),
+          domInteractive: (navigation?.domInteractive ?? 0) - (navigation?.fetchStart ?? 0),
         },
         memory: memory
           ? {
@@ -190,7 +191,7 @@ export class PerformanceInfoService {
         resourceCount: perf.getEntries?.()?.length || 0,
       };
     } catch (error) {
-      logger.warn("Error collecting performance info", error);
+      logger.warn("Error collecting performance info", error as Record<string, unknown>);
       return {
         available: false,
         error: (error as Error).message,
@@ -212,7 +213,7 @@ export class PerformanceInfoService {
 
       return storageInfo;
     } catch (error) {
-      logger.warn("Error collecting storage info", error);
+      logger.warn("Error collecting storage info", error as Record<string, unknown>);
       return {
         localStorage: { available: false },
         sessionStorage: { available: false },
@@ -350,15 +351,15 @@ export class PerformanceInfoService {
       const nav = navigator as NavigatorWithConnection;
       const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
       if (connection) {
-        networkInfo.effectiveType = connection.effectiveType;
-        networkInfo.downlink = connection.downlink;
-        networkInfo.rtt = connection.rtt;
+        networkInfo.effectiveType = connection.effectiveType ?? null;
+        networkInfo.downlink = connection.downlink ?? null;
+        networkInfo.rtt = connection.rtt ?? null;
         networkInfo.saveData = connection.saveData;
       }
 
       return networkInfo;
     } catch (error) {
-      logger.warn("Error collecting network info", error);
+      logger.warn("Error collecting network info", error as Record<string, unknown>);
       return {
         onLine: navigator.onLine || true,
         connection: null,
@@ -387,7 +388,7 @@ export class PerformanceInfoService {
         saveData: connection.saveData,
       };
     } catch (error) {
-      logger.debug("Error getting connection info", error);
+      logger.debug("Error getting connection info", error as Record<string, unknown>);
       return null;
     }
   }
