@@ -6,17 +6,31 @@ import {
   calculateTransferImpact,
 } from "../../../../utils/budgeting/autofunding/simulation.ts";
 import { shouldRuleExecute } from "../../../../utils/budgeting/autofunding/conditions.ts";
-import { TRIGGER_TYPES } from "../../../../utils/budgeting/autofunding/rules.ts";
+import { TRIGGER_TYPES, AutoFundingRule } from "../../../../utils/budgeting/autofunding/rules.ts";
 import logger from "../../../../utils/common/logger";
+
+interface Transfer {
+  fromEnvelopeId: string;
+  toEnvelopeId: string;
+  amount: number;
+  description?: string;
+}
+
+interface Budget {
+  transferFunds: (from: string, to: string, amount: number, description?: string) => Promise<void>;
+  envelopes?: unknown[];
+  unassignedCash?: number;
+  allTransactions?: unknown[];
+}
 
 /**
  * Hook for utility functions like simulation and planning
  * Extracted from useAutoFundingExecution.js for better maintainability
  */
-export const useExecutionUtils = (budget) => {
+export const useExecutionUtils = (budget: Budget) => {
   // Execute a single transfer using the budget store
   const executeTransfer = useCallback(
-    async (transfer) => {
+    async (transfer: Transfer) => {
       try {
         await budget.transferFunds(
           transfer.fromEnvelopeId,
@@ -25,9 +39,9 @@ export const useExecutionUtils = (budget) => {
           transfer.description
         );
 
-        logger.debug("Transfer executed", transfer);
+        logger.debug("Transfer executed", transfer as unknown as Record<string, unknown>);
       } catch (error) {
-        logger.error("Transfer failed", { transfer, error: error.message });
+        logger.error("Transfer failed", { transfer, error: (error as Error).message });
         throw error;
       }
     },
@@ -36,7 +50,11 @@ export const useExecutionUtils = (budget) => {
 
   // Simulate rule execution without making actual transfers
   const simulateExecution = useCallback(
-    (rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
+    (
+      rules: AutoFundingRule[],
+      trigger = TRIGGER_TYPES.MANUAL,
+      triggerData: Record<string, unknown> = {}
+    ) => {
       try {
         const context = {
           trigger,
@@ -47,12 +65,12 @@ export const useExecutionUtils = (budget) => {
             transactions: budget.allTransactions || [],
             ...triggerData,
           },
-        };
+        } as unknown as Parameters<typeof simulateRuleExecution>[1];
 
         return simulateRuleExecution(rules, context);
       } catch (error) {
         logger.error("Simulation failed", error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
       }
     },
     [budget]
@@ -60,7 +78,11 @@ export const useExecutionUtils = (budget) => {
 
   // Create detailed execution plan
   const createPlan = useCallback(
-    (rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
+    (
+      rules: AutoFundingRule[],
+      trigger = TRIGGER_TYPES.MANUAL,
+      triggerData: Record<string, unknown> = {}
+    ) => {
       try {
         const context = {
           trigger,
@@ -71,12 +93,12 @@ export const useExecutionUtils = (budget) => {
             transactions: budget.allTransactions || [],
             ...triggerData,
           },
-        };
+        } as unknown as Parameters<typeof createExecutionPlan>[1];
 
         return createExecutionPlan(rules, context);
       } catch (error) {
         logger.error("Plan creation failed", error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
       }
     },
     [budget]
@@ -84,7 +106,7 @@ export const useExecutionUtils = (budget) => {
 
   // Validate planned transfers
   const validatePlannedTransfers = useCallback(
-    (transfers, triggerData = {}) => {
+    (transfers: Transfer[], triggerData: Record<string, unknown> = {}) => {
       try {
         const context = {
           data: {
@@ -92,12 +114,12 @@ export const useExecutionUtils = (budget) => {
             unassignedCash: budget.unassignedCash || 0,
             ...triggerData,
           },
-        };
+        } as unknown as Parameters<typeof validateTransfers>[1];
 
         return validateTransfers(transfers, context);
       } catch (error) {
         logger.error("Transfer validation failed", error);
-        return { isValid: false, errors: [{ error: error.message }] };
+        return { isValid: false, errors: [{ error: (error as Error).message }] };
       }
     },
     [budget]
@@ -105,7 +127,7 @@ export const useExecutionUtils = (budget) => {
 
   // Calculate impact of transfers on envelope balances
   const calculateImpact = useCallback(
-    (transfers, triggerData = {}) => {
+    (transfers: Transfer[], triggerData: Record<string, unknown> = {}) => {
       try {
         const context = {
           data: {
@@ -113,7 +135,7 @@ export const useExecutionUtils = (budget) => {
             unassignedCash: budget.unassignedCash || 0,
             ...triggerData,
           },
-        };
+        } as unknown as Parameters<typeof calculateTransferImpact>[1];
 
         return calculateTransferImpact(transfers, context);
       } catch (error) {
@@ -130,7 +152,7 @@ export const useExecutionUtils = (budget) => {
 
   // Check if rules can execute with current budget state
   const canExecuteRules = useCallback(
-    (rules, trigger = TRIGGER_TYPES.MANUAL) => {
+    (rules: AutoFundingRule[], trigger = TRIGGER_TYPES.MANUAL) => {
       try {
         const context = {
           trigger,
@@ -140,15 +162,20 @@ export const useExecutionUtils = (budget) => {
             unassignedCash: budget.unassignedCash || 0,
             transactions: budget.allTransactions || [],
           },
-        };
+        } as unknown as import("../../../../utils/budgeting/autofunding/conditions.ts").ExecutionContext;
 
-        const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
+        const executableRules = rules.filter((rule: AutoFundingRule) =>
+          shouldRuleExecute(
+            rule as unknown as import("../../../../utils/budgeting/autofunding/conditions.ts").Rule,
+            context
+          )
+        );
         return {
           canExecute: executableRules.length > 0 && context.data.unassignedCash > 0,
           executableCount: executableRules.length,
           totalRules: rules.length,
           availableCash: context.data.unassignedCash,
-          executableRules: executableRules.map((rule) => ({
+          executableRules: executableRules.map((rule: AutoFundingRule) => ({
             id: rule.id,
             name: rule.name,
             priority: rule.priority,
