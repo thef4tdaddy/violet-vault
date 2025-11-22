@@ -10,41 +10,75 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 /**
  * Transform old data format to new format
  */
-const transformOldData = (parsedOldData) => ({
-  state: {
-    envelopes: parsedOldData.state.envelopes || [],
-    bills: parsedOldData.state.bills || [],
-    transactions: parsedOldData.state.transactions || [],
-    allTransactions: parsedOldData.state.allTransactions || [],
-    savingsGoals: parsedOldData.state.savingsGoals || [],
-    supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
-    debts: parsedOldData.state.debts || [],
-    unassignedCash: parsedOldData.state.unassignedCash || 0,
-    biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
-    paycheckHistory: parsedOldData.state.paycheckHistory || [],
-    actualBalance: parsedOldData.state.actualBalance || 0,
-  },
-  version: 0,
-});
+const transformOldData = (parsedOldData: unknown) => {
+  // Type guard to check if parsedOldData has expected structure
+  const data = parsedOldData as {
+    state?: {
+      envelopes?: unknown[];
+      bills?: unknown[];
+      transactions?: unknown[];
+      allTransactions?: unknown[];
+      savingsGoals?: unknown[];
+      supplementalAccounts?: unknown[];
+      debts?: unknown[];
+      unassignedCash?: number;
+      biweeklyAllocation?: number;
+      paycheckHistory?: unknown[];
+      actualBalance?: number;
+    };
+  };
+
+  return {
+    state: {
+      envelopes: data.state?.envelopes || [],
+      bills: data.state?.bills || [],
+      transactions: data.state?.transactions || [],
+      allTransactions: data.state?.allTransactions || [],
+      savingsGoals: data.state?.savingsGoals || [],
+      supplementalAccounts: data.state?.supplementalAccounts || [],
+      debts: data.state?.debts || [],
+      unassignedCash: data.state?.unassignedCash || 0,
+      biweeklyAllocation: data.state?.biweeklyAllocation || 0,
+      paycheckHistory: data.state?.paycheckHistory || [],
+      actualBalance: data.state?.actualBalance || 0,
+    },
+    version: 0,
+  };
+};
 
 /**
  * Seed Dexie database with migrated data
  */
-const seedDexieWithMigratedData = async (transformedData) => {
-  await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
-  await budgetDb.bulkUpsertBills(transformedData.state.bills);
+const seedDexieWithMigratedData = async (transformedData: unknown) => {
+  // Type guard
+  const data = transformedData as {
+    state: {
+      envelopes: unknown[];
+      bills: unknown[];
+      allTransactions: unknown[];
+      transactions: unknown[];
+      savingsGoals: unknown[];
+      debts: unknown[];
+      paycheckHistory: unknown[];
+      unassignedCash: number;
+      actualBalance: number;
+    };
+  };
+
+  await budgetDb.bulkUpsertEnvelopes(data.state.envelopes as never[]);
+  await budgetDb.bulkUpsertBills(data.state.bills as never[]);
   await budgetDb.bulkUpsertTransactions(
-    transformedData.state.allTransactions.length > 0
-      ? transformedData.state.allTransactions
-      : transformedData.state.transactions
+    data.state.allTransactions.length > 0
+      ? (data.state.allTransactions as never[])
+      : (data.state.transactions as never[])
   );
-  await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
-  await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-  await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+  await budgetDb.bulkUpsertSavingsGoals(data.state.savingsGoals as never[]);
+  await budgetDb.bulkUpsertDebts(data.state.debts as never[]);
+  await budgetDb.bulkUpsertPaychecks(data.state.paycheckHistory as never[]);
 
   await setBudgetMetadata({
-    unassignedCash: transformedData.state.unassignedCash || 0,
-    actualBalance: transformedData.state.actualBalance || 0,
+    unassignedCash: data.state.unassignedCash || 0,
+    actualBalance: data.state.actualBalance || 0,
   });
 };
 
@@ -77,8 +111,9 @@ const migrateOldData = async () => {
       source: "migrateOldData",
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     logger.warn("Failed to migrate old data", {
-      error: error.message,
+      error: errorMessage,
       source: "migrateOldData",
     });
   }
@@ -93,7 +128,8 @@ import {
 
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (set, _get) => ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const storeInitializer = (set: any, _get: any) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -128,8 +164,9 @@ const storeInitializer = (set, _get) => ({
   ...createPatchNotesActions(set),
 
   // Load and show patch notes for version update
-  async loadPatchNotesForUpdate(fromVersion, toVersion) {
-    set((state) => {
+  async loadPatchNotesForUpdate(fromVersion: string, toVersion: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    set((state: any) => {
       state.loadingPatchNotes = true;
     });
 
@@ -137,7 +174,8 @@ const storeInitializer = (set, _get) => ({
       const { default: patchNotesManager } = await import("../../utils/pwa/patchNotesManager");
       const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
 
-      set((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      set((state: any) => {
         state.loadingPatchNotes = false;
         state.showPatchNotes = true;
         state.patchNotesData = {
@@ -152,7 +190,8 @@ const storeInitializer = (set, _get) => ({
       return patchNotes;
     } catch (error) {
       logger.error("Failed to load patch notes", error);
-      set((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      set((state: any) => {
         state.loadingPatchNotes = false;
       });
       return null;
@@ -164,7 +203,8 @@ const storeInitializer = (set, _get) => ({
     try {
       await migrateOldData();
     } catch (error) {
-      logger.warn("Migration failed in store", { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.warn("Migration failed in store", { error: errorMessage });
     }
   },
 
@@ -224,7 +264,8 @@ const storeInitializer = (set, _get) => ({
   // Reset UI state only - data arrays handled by TanStack Query/Dexie
   resetAllData() {
     logger.info("Resetting UI state");
-    set((state) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    set((state: any) => {
       // Reset UI state
       state.biweeklyAllocation = 0;
       state.isActualBalanceManual = false;
@@ -253,7 +294,8 @@ const storeInitializer = (set, _get) => ({
 
 const base = subscribeWithSelector(immer(storeInitializer));
 
-let useUiStore;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let useUiStore: any;
 
 if (LOCAL_ONLY_MODE) {
   // No persistence when running in local-only mode
