@@ -87,7 +87,13 @@ const updateDebtInDb = async ({
 };
 
 // Mutation function for deleting a debt
-const deleteDebtFromDb = async ({ id, author = "Unknown User" }: { id: string; author?: string }) => {
+const deleteDebtFromDb = async ({
+  id,
+  author = "Unknown User",
+}: {
+  id: string;
+  author?: string;
+}) => {
   const previousData = await budgetDb.debts.get(id);
 
   await budgetDb.debts.delete(id);
