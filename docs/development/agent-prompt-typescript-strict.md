@@ -99,21 +99,20 @@ npx tsc --noEmit --strict --allowJs false 2>&1 | grep -c "error TS"
 
 ### 1. Start at the Top
 
-Begin with the file that has the **most** strict mode errors. Refer to `docs/audits/sorted-typecheck-strict-report.txt` for the ordered list.
+**⚠️ ALWAYS check `docs/audits/audit-report.md` for the current list of files with most errors.**
 
-**Next 4 files to fix (in order):**
+The audit report is updated after every commit and shows:
 
-1. 🔄 `src/utils/common/frequencyCalculations.ts` - 18 errors
-2. 🔄 `src/services/bugReport/reportSubmissionService.ts` - 18 errors
-3. 🔄 `src/hooks/debts/useDebtForm.ts` - 18 errors
-4. 🔄 `src/components/pwa/PatchNotesModal.tsx` - 18 errors
+- Files sorted by error count (highest first)
+- Current error counts per file
+- Which files have been completed
 
-**Additional high-priority files:**
+**Reference files:**
 
-- `src/components/budgeting/paycheck/PaycheckPayerSelector.tsx` - 18 errors
-- `src/hooks/transactions/useTransactionSplitterUI.ts` - 17 errors
-- `src/hooks/auth/authOperations.ts` - 17 errors
-- `src/utils/sync/autoBackupService.ts` - 16 errors
+- `docs/audits/audit-report.md` - Latest status and file list (updated after each commit)
+- `docs/audits/sorted-typecheck-strict-report.txt` - Detailed error list per file
+
+**Work on the top file from the audit report that hasn't been completed yet.**
 
 ### 2. How to Fix Errors
 
