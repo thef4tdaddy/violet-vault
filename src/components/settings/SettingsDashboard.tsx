@@ -38,6 +38,20 @@ const SettingsDashboard = ({
   securityManager,
   initialSection = "general",
   onUpdateProfile,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onExport: () => void;
+  onImport: () => void;
+  onLogout: () => void;
+  onResetEncryption: () => void;
+  onSync: () => void;
+  onChangePassword: (password: string) => void;
+  currentUser: { userName?: string; userColor?: string };
+  isLocalOnlyMode?: boolean;
+  securityManager: unknown;
+  initialSection?: string;
+  onUpdateProfile: (profile: { userName: string; userColor: string }) => void;
 }) => {
   // Use the reusable modal manager instead of the old hook
   const {
@@ -75,7 +89,7 @@ const SettingsDashboard = ({
     }
   }, [isOpen, initialSection]);
 
-  const handleSectionChange = React.useCallback((sectionId) => {
+  const handleSectionChange = React.useCallback((sectionId: string) => {
     setActiveSection(sectionId);
   }, []);
 
