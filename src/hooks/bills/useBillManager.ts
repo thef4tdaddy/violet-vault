@@ -36,6 +36,12 @@ interface Transaction {
   [key: string]: unknown;
 }
 
+interface BudgetState {
+  allTransactions: Transaction[];
+  envelopes: Envelope[];
+  bills: Bill[];
+}
+
 interface UseBillManagerOptions {
   propTransactions?: Transaction[];
   propEnvelopes?: Envelope[];
@@ -84,19 +90,13 @@ export const useBillManager = ({
     [updateBillAsync]
   );
 
-  interface BudgetState {
-    allTransactions: Transaction[];
-    envelopes: Envelope[];
-    bills: Bill[];
-  }
-
   const budget = useBudgetStore(
     useShallow((state: BudgetState) => ({
       allTransactions: state.allTransactions,
       envelopes: state.envelopes,
       bills: state.bills,
     }))
-  );
+  ) as BudgetState;
 
   // Note: useBillManagerUIState is NOT a Zustand store - it's a custom hook with useState
   // eslint-disable-next-line zustand-safe-patterns/zustand-selective-subscriptions
@@ -186,7 +186,7 @@ export const useBillManager = ({
   );
 
   const handleBulkUpdate = useCallback(
-    async (updatedBills) => {
+    async (updatedBills: Bill[]) => {
       const result = await billOperations.handleBulkUpdate(updatedBills);
       if (result.success) uiState.setSelectedBills(new Set());
     },
@@ -194,14 +194,14 @@ export const useBillManager = ({
   );
 
   const uiActions = createUIActions({
-    setSelectedBills: uiState.setSelectedBills,
+    setSelectedBills: uiState.setSelectedBills as (bills: Bill[]) => void,
     setViewMode: uiState.setViewMode,
-    setShowBillDetail: uiState.setShowBillDetail,
+    setShowBillDetail: uiState.setShowBillDetail as (bill: Bill | null) => void,
     setShowAddBillModal: uiState.setShowAddBillModal,
-    setEditingBill: uiState.setEditingBill,
+    setEditingBill: uiState.setEditingBill as (bill: Bill | null) => void,
     setShowBulkUpdateModal: uiState.setShowBulkUpdateModal,
     setShowDiscoveryModal: uiState.setShowDiscoveryModal,
-    setHistoryBill: uiState.setHistoryBill,
+    setHistoryBill: uiState.setHistoryBill as (bill: Bill | null) => void,
     setFilterOptions: uiState.setFilterOptions as (options: FilterOptions) => void,
   });
   const isLoading = transactionsLoading || envelopesLoading || billsLoading;

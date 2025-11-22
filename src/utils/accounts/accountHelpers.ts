@@ -38,7 +38,7 @@ export const ACCOUNT_COLORS = [
  * @param {string} type - Account type value
  * @returns {Object} Account type info with icon and label
  */
-export const getAccountTypeInfo = (type) => {
+export const getAccountTypeInfo = (type: string) => {
   return (
     ACCOUNT_TYPES.find((t) => t.value === type) || ACCOUNT_TYPES.find((t) => t.value === "Other")
   );
@@ -50,7 +50,19 @@ export const getAccountTypeInfo = (type) => {
  * @param {Object} currentUser - Current user info
  * @returns {Object} Formatted account data
  */
-export const formatAccountData = (accountForm, currentUser) => {
+export const formatAccountData = (
+  accountForm: {
+    name: string;
+    type: string;
+    currentBalance: string;
+    annualContribution: string;
+    expirationDate: string;
+    description?: string;
+    color: string;
+    isActive: boolean;
+  },
+  currentUser: { userName: string }
+) => {
   return {
     name: accountForm.name.trim(),
     type: accountForm.type,
@@ -113,7 +125,7 @@ export const createDefaultTransferForm = (fromAccountName = "") => {
  * @param {boolean} showDecimals - Whether to show decimal places
  * @returns {string} Formatted currency string
  */
-export const formatCurrency = (amount, showDecimals = true) => {
+export const formatCurrency = (amount: number, showDecimals = true) => {
   if (typeof amount !== "number" || isNaN(amount)) {
     return "$0.00";
   }
@@ -154,6 +166,13 @@ export const createAccountTransaction = ({
   description,
   relatedEntityId = null, // envelope ID for transfers
   metadata = {},
+}: {
+  accountId: number | string;
+  type: string;
+  amount: number;
+  description: string;
+  relatedEntityId?: string | number | null;
+  metadata?: Record<string, unknown>;
 }) => {
   return {
     id: generateAccountId(),
@@ -172,7 +191,7 @@ export const createAccountTransaction = ({
  * @param {string} color - Hex color string
  * @returns {boolean} Whether color is valid
  */
-export const isValidAccountColor = (color) => {
+export const isValidAccountColor = (color: unknown): boolean => {
   if (!color || typeof color !== "string") return false;
 
   // Check if it's a valid hex color
@@ -207,7 +226,10 @@ export const getAccountIconName = (type: string) => {
  * @param {number} annualContribution - Annual contribution limit
  * @returns {number} Utilization percentage (0-100)
  */
-export const calculateAccountUtilization = (currentBalance, annualContribution) => {
+export const calculateAccountUtilization = (
+  currentBalance: number,
+  annualContribution: number
+): number => {
   if (!annualContribution || annualContribution <= 0) return 0;
   if (!currentBalance || currentBalance <= 0) return 0;
 
@@ -291,9 +313,8 @@ export const filterAccounts = (
 
   // Filter by minimum balance
   if (filters.minBalance !== undefined) {
-    filteredAccounts = filteredAccounts.filter(
-      (account) => account.currentBalance >= filters.minBalance
-    );
+    const minBalance = filters.minBalance;
+    filteredAccounts = filteredAccounts.filter((account) => account.currentBalance >= minBalance);
   }
 
   // Filter by expiring soon
