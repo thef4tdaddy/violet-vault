@@ -157,7 +157,11 @@ class FirebaseSyncService {
    * Ensure user is authenticated with Firebase
    */
   async ensureAuthenticated(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
+    if (!this.auth) {
+      throw new Error("Firebase auth not initialized");
+    }
+
+    return new Promise<boolean>((resolve, reject) => {
       const timeout = setTimeout(() => {
         unsubscribe();
         resolve(false);
@@ -175,6 +179,9 @@ class FirebaseSyncService {
           }
 
           logger.debug("No user found, signing in anonymously...");
+          if (!this.auth) {
+            throw new Error("Firebase auth not initialized");
+          }
           const userCredential = await signInAnonymously(this.auth);
           logger.info("✅ Anonymous authentication successful", {
             uid: userCredential.user.uid,
@@ -234,6 +241,9 @@ class FirebaseSyncService {
       };
 
       // Save to Firebase
+      if (!this.db) {
+        throw new Error("Firebase database not initialized");
+      }
       const docRef = doc(this.db, "budgets", this.budgetId);
       await setDoc(docRef, syncData);
 
@@ -265,6 +275,9 @@ class FirebaseSyncService {
       }
 
       // Load from Firebase
+      if (!this.db) {
+        throw new Error("Firebase database not initialized");
+      }
       const docRef = doc(this.db, "budgets", this.budgetId);
       const docSnap = await getDoc(docRef);
 
@@ -300,6 +313,10 @@ class FirebaseSyncService {
   setupRealTimeSync(callback: (data: unknown) => void): void {
     if (!this.budgetId) {
       throw new Error("Sync not initialized");
+    }
+
+    if (!this.db) {
+      throw new Error("Firebase database not initialized");
     }
 
     const docRef = doc(this.db, "budgets", this.budgetId);
@@ -363,10 +380,12 @@ class FirebaseSyncService {
 
     while (this.syncQueue.length > 0) {
       const operation = this.syncQueue.shift();
-      try {
-        await operation();
-      } catch (error) {
-        logger.error("Failed to process queued operation", error);
+      if (operation) {
+        try {
+          await operation();
+        } catch (error) {
+          logger.error("Failed to process queued operation", error);
+        }
       }
     }
   }
