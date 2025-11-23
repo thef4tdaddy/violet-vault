@@ -131,8 +131,8 @@ const DebtDisabledView = () => (
 // Extract budget operations to reduce complexity
 function extractBudgetOperations(budget: Record<string, unknown> | undefined) {
   const {
-    savingsGoals = [],
-    supplementalAccounts = [],
+    savingsGoals = [] as unknown[],
+    supplementalAccounts = [] as unknown[],
     addSavingsGoal = () => {},
     updateSavingsGoal = () => {},
     deleteSavingsGoal = () => {},
@@ -145,8 +145,8 @@ function extractBudgetOperations(budget: Record<string, unknown> | undefined) {
   } = budget || {};
 
   return {
-    savingsGoals,
-    supplementalAccounts,
+    savingsGoals: savingsGoals as unknown[],
+    supplementalAccounts: supplementalAccounts as unknown[],
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
@@ -231,7 +231,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     logger.error("Bill manager error", { message });
   }, []);
 
-  const views: Record<string, ReactNode> = {
+  const views: Record<string, React.ReactElement | ReactNode> = {
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
       <EnvelopeView
@@ -245,7 +245,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     savings: (
       <SavingsGoals
-        savingsGoals={savingsGoalsHook.savingsGoals as unknown as Array<Record<string, unknown>>}
+        savingsGoals={
+          (savingsGoalsHook.savingsGoals as unknown as Array<Record<string, unknown>>) || []
+        }
         unassignedCash={unassignedCash}
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
@@ -255,19 +257,19 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     supplemental: (
       <SupplementalAccounts
-        supplementalAccounts={budgetOps.supplementalAccounts as Array<Record<string, unknown>>}
+        supplementalAccounts={(budgetOps.supplementalAccounts as unknown[]) || []}
         onAddAccount={budgetOps.addSupplementalAccount}
         onUpdateAccount={budgetOps.updateSupplementalAccount}
         onDeleteAccount={budgetOps.deleteSupplementalAccount}
         onTransferToEnvelope={budgetOps.transferFromSupplementalAccount}
-        envelopes={envelopes}
+        envelopes={(envelopes as unknown[]) || []}
         currentUser={user}
       />
     ),
     paycheck: (
       <PaycheckProcessor
-        envelopes={envelopes}
-        paycheckHistory={tanStackPaycheckHistory}
+        envelopes={(envelopes as unknown[]) || []}
+        paycheckHistory={(tanStackPaycheckHistory as unknown[]) || []}
         onProcessPaycheck={tanStackProcessPaycheck}
         onDeletePaycheck={(paycheckId: string) =>
           handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)
@@ -277,8 +279,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     bills: (
       <BillManager
-        transactions={safeTransactions}
-        envelopes={envelopes}
+        transactions={(safeTransactions as unknown[]) || []}
+        envelopes={(envelopes as unknown[]) || []}
         onUpdateBill={handleUpdateBill}
         onCreateRecurringBill={() => {}}
         onSearchNewBills={async () => {}}
