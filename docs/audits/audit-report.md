@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +4 |
-| TypeScript Errors | 40 | +40 |
-| TypeScript Strict Mode Errors | 2135 | +2135 |
+| ESLint Issues | 4 | 0 |
+| TypeScript Errors | 40 | 0 |
+| TypeScript Strict Mode Errors | 2126 | -9 |
 
-*Last updated: 2025-11-23 13:11:56 UTC*
+*Last updated: 2025-11-23 13:17:58 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -243,7 +243,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/utils/budgeting/envelopeMatching.ts`
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
-- 9 errors in `src/services/bugReport/uiStateService.ts`
 - 9 errors in `src/hooks/debts/useDebts.ts`
 - 9 errors in `src/hooks/debts/useDebtDetailModal.ts`
 - 9 errors in `src/hooks/debts/useDebtDashboard.ts`
@@ -611,7 +610,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 |---|---|
 | 624 | `TS7006` |
 | 609 | `TS7031` |
-| 186 | `TS2345` |
+| 177 | `TS2345` |
 | 154 | `TS2322` |
 | 128 | `TS2339` |
 | 112 | `TS18046` |
@@ -2765,15 +2764,6 @@ src/services/bugReport/screenshotService.ts(219,9): error TS18047: 'ctx' is poss
 src/services/bugReport/screenshotService.ts(283,7): error TS18047: 'ctx' is possibly 'null'.
 src/services/bugReport/screenshotService.ts(284,7): error TS18047: 'ctx' is possibly 'null'.
 src/services/bugReport/screenshotService.ts(287,7): error TS18047: 'ctx' is possibly 'null'.
-src/services/bugReport/uiStateService.ts(96,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(146,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(178,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(210,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(241,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(271,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(305,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(338,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/uiStateService.ts(379,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/chunkedSyncService.ts(195,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/chunkedSyncService.ts(275,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
