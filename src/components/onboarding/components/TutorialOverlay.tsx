@@ -2,11 +2,38 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
 
+// Type definitions
+interface TutorialStep {
+  title: string;
+  description: string;
+  selector?: string;
+}
+
+interface TooltipPosition {
+  top?: string | number;
+  left?: string | number;
+  bottom?: string | number;
+  right?: string | number;
+  [key: string]: string | number | undefined;
+}
+
+interface TutorialOverlayProps {
+  currentStepElement: Element | null;
+  step: TutorialStep;
+  currentStep: number;
+  tutorialStepsLength: number;
+  tooltipPosition: TooltipPosition;
+  onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+  onSkip: () => void;
+}
+
 /**
  * Tutorial overlay component with spotlight effect
  * Extracted from OnboardingTutorial.jsx to reduce complexity
  */
-const TutorialOverlay = ({
+const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
   currentStepElement,
   step,
   currentStep,
@@ -17,7 +44,7 @@ const TutorialOverlay = ({
   onPrev,
   onSkip,
 }) => {
-  const getSpotlightStyle = () => {
+  const getSpotlightStyle = (): string => {
     if (!currentStepElement) return "rgba(0,0,0,0.5)";
 
     const rect = currentStepElement.getBoundingClientRect();

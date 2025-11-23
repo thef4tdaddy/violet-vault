@@ -8,7 +8,7 @@
 import logger from "../common/logger";
 
 // Track store action calls to detect patterns
-let storeActionCallCount = new Map();
+const storeActionCallCount = new Map<string, number>();
 let lastResetTime = Date.now();
 
 /**
@@ -26,7 +26,7 @@ const monitorStoreActions = () => {
 /**
  * Track a store action call and warn if excessive
  */
-export const trackStoreAction = (actionName, storeName = "unknown") => {
+export const trackStoreAction = (actionName: string, storeName: string = "unknown"): void => {
   if (import.meta?.env?.MODE !== "development") return;
 
   const key = `${storeName}.${actionName}`;
@@ -53,14 +53,19 @@ export const trackStoreAction = (actionName, storeName = "unknown") => {
 /**
  * Warn about dangerous useEffect patterns
  */
-export const warnDangerousUseEffect = (hookName, dependencies) => {
+export const warnDangerousUseEffect = (
+  hookName: string,
+  dependencies: unknown[]
+): void => {
   if (import.meta?.env?.MODE !== "development") return;
 
   const storeActionDeps = dependencies.filter(
-    (dep) =>
+    (dep): dep is { name: string } =>
       typeof dep === "function" &&
-      dep.name &&
-      /^(set|get|add|remove|update|delete|create|save|load|sync|login|logout|reset)/.test(dep.name)
+      typeof (dep as { name?: string }).name === "string" &&
+      /^(set|get|add|remove|update|delete|create|save|load|sync|login|logout|reset)/.test(
+        (dep as { name: string }).name
+      )
   );
 
   if (storeActionDeps.length > 0) {
@@ -76,7 +81,7 @@ export const warnDangerousUseEffect = (hookName, dependencies) => {
 /**
  * Initialize runtime monitoring
  */
-export const initializeReactErrorDetector = () => {
+export const initializeReactErrorDetector = (): void => {
   if (import.meta?.env?.MODE !== "development") return;
 
   logger.info("🛡️ React Error #185 detector initialized - monitoring for dangerous patterns");
@@ -86,7 +91,7 @@ export const initializeReactErrorDetector = () => {
   let lastRenderTime = Date.now();
 
   const originalError = console.error;
-  console.error = (...args) => {
+  console.error = (...args: unknown[]) => {
     const errorMessage = args[0];
 
     if (typeof errorMessage === "string" && errorMessage.includes("error #185")) {

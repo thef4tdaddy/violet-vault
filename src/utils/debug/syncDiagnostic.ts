@@ -99,12 +99,13 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       };
       logger.info("✅ IndexedDB stores:", { stores: storeNames });
     };
-    dbRequest.onerror = (error) => {
-      results.errors.push("IndexedDB connection failed: " + error);
+    dbRequest.onerror = (error: Event) => {
+      results.errors.push("IndexedDB connection failed: " + String(error));
       logger.error("❌ IndexedDB failed:", error);
     };
   } catch (error) {
-    results.errors.push("IndexedDB error: " + error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    results.errors.push("IndexedDB error: " + errorMessage);
     logger.error("❌ IndexedDB error:", error);
   }
 
@@ -132,7 +133,8 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       logger.error("❌ budgetDb not available");
     }
   } catch (error) {
-    results.errors.push("Budget metadata check failed: " + error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    results.errors.push("Budget metadata check failed: " + errorMessage);
     logger.error("❌ Budget metadata error:", error);
   }
 
@@ -141,7 +143,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
   try {
     const windowObj = window as unknown as WindowWithDiagnostics;
     if (windowObj.budgetDb) {
-      const counts = {};
+      const counts: Record<string, number | string> = {};
       const tables = [
         "envelopes",
         "transactions",
@@ -153,9 +155,10 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
 
       for (const table of tables) {
         try {
-          counts[table] = await windowObj.budgetDb[table].count();
+          counts[table] = await windowObj.budgetDb[table as keyof VioletVaultDB].count();
         } catch (err) {
-          counts[table] = "error: " + err.message;
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          counts[table] = "error: " + errorMessage;
         }
       }
 
@@ -174,7 +177,8 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       }
     }
   } catch (error) {
-    results.errors.push("Data count check failed: " + error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    results.errors.push("Data count check failed: " + errorMessage);
     logger.error("❌ Data count error:", error);
   }
 
@@ -201,7 +205,8 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       logger.error("❌ cloudSyncService not available on window");
     }
   } catch (error) {
-    results.errors.push("Cloud sync check failed: " + error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    results.errors.push("Cloud sync check failed: " + errorMessage);
     logger.error("❌ Cloud sync error:", error);
   }
 
@@ -233,7 +238,8 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       logger.error("❌ Firebase not available on window");
     }
   } catch (error) {
-    results.errors.push("Firebase auth check failed: " + error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    results.errors.push("Firebase auth check failed: " + errorMessage);
     logger.error("❌ Firebase auth error:", error);
   }
 

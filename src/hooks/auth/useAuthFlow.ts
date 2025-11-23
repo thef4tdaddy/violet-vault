@@ -8,6 +8,27 @@ import {
   handleNewUserSetup,
 } from "../../utils/auth/authFlowHelpers";
 
+// Type definitions
+interface UserData {
+  budgetId?: string;
+  password: string;
+  userName?: string;
+  userColor?: string;
+  [key: string]: unknown;
+}
+
+interface UserProfile {
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+  [key: string]: unknown;
+}
+
+interface AuthError extends Error {
+  code?: string;
+}
+
 /**
  * Custom hook for authentication flow management
  * Extracts authentication logic from Layout component
@@ -26,7 +47,7 @@ const useAuthFlow = () => {
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   const handleSetup = useCallback(
-    async (userDataOrPassword) => {
+    async (userDataOrPassword: string | UserData) => {
       // Handle three scenarios:
       // 1. Existing user login (string password)
       // 2. Shared budget join (object with budgetId)
@@ -60,11 +81,13 @@ const useAuthFlow = () => {
         logger.error("❌ Setup error:", error);
 
         // If this is our enhanced password validation error, re-throw it
-        if (error.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET") {
+        const authError = error as AuthError;
+        if (authError.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET") {
           throw error;
         }
 
-        showErrorToast(`Setup error: ${error.message}`, "Setup Error");
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        showErrorToast(`Setup error: ${errorMessage}`, "Setup Error");
       }
     },
     [login, showErrorToast]
@@ -75,7 +98,7 @@ const useAuthFlow = () => {
   }, [logout]);
 
   const handleChangePassword = useCallback(
-    async (oldPass, newPass) => {
+    async (oldPass: string, newPass: string) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
         showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
@@ -87,7 +110,7 @@ const useAuthFlow = () => {
   );
 
   const handleUpdateProfile = useCallback(
-    async (updatedProfile) => {
+    async (updatedProfile: UserProfile) => {
       const result = await updateProfile(updatedProfile);
       if (!result.success) {
         throw new Error(result.error);

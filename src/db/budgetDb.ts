@@ -90,96 +90,114 @@ export class VioletVaultDB extends Dexie {
 
     // Enhanced hooks for automatic timestamping across all tables
     const addTimestampHooks = (table: Table<unknown, unknown>) => {
-      table.hook("creating", (_primKey, obj, trans) => {
-        // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
-        try {
-          (obj as { lastModified: number; createdAt?: number }).lastModified = Date.now();
-          if (!(obj as { createdAt: number }).createdAt)
-            (obj as { createdAt: number }).createdAt = Date.now();
-        } catch (error: unknown) {
-          if (
-            error instanceof Error &&
-            (error.message.includes("not extensible") ||
-              error.message.includes("Cannot add property") ||
-              error.message.includes("read only property") ||
-              error.message.includes("Cannot assign to read only"))
-          ) {
-            logger.debug("🔧 Handling readonly/frozen object from Firebase", {
-              errorType: error.message,
-              objectId: (obj as { id: string }).id,
-              objectKeys: Object.keys(obj as object),
-            });
+      table.hook(
+        "creating",
+        (
+          _primKey: string | number,
+          obj: unknown,
+          trans: {
+            source?: unknown;
+            [key: string]: unknown;
+          }
+        ) => {
+          // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
+          try {
+            (obj as { lastModified: number; createdAt?: number }).lastModified = Date.now();
+            if (!(obj as { createdAt: number }).createdAt)
+              (obj as { createdAt: number }).createdAt = Date.now();
+          } catch (error: unknown) {
+            if (
+              error instanceof Error &&
+              (error.message.includes("not extensible") ||
+                error.message.includes("Cannot add property") ||
+                error.message.includes("read only property") ||
+                error.message.includes("Cannot assign to read only"))
+            ) {
+              logger.debug("🔧 Handling readonly/frozen object from Firebase", {
+                errorType: error.message,
+                objectId: (obj as { id: string }).id,
+                objectKeys: Object.keys(obj as object),
+              });
 
-            // Create a completely new extensible object
-            const extensibleObj: Record<string, unknown> = {};
+              // Create a completely new extensible object
+              const extensibleObj: Record<string, unknown> = {};
 
-            // Copy all properties from the readonly object
-            Object.keys(obj as object).forEach((key) => {
+              // Copy all properties from the readonly object
+              Object.keys(obj as object).forEach((key) => {
+                try {
+                  extensibleObj[key] = (obj as Record<string, unknown>)[key];
+                } catch (copyError: unknown) {
+                  logger.warn(`Failed to copy property ${key}:`, {
+                    error: (copyError as Error).message,
+                  });
+                }
+              });
+
+              // Add timestamp properties
+              extensibleObj.lastModified = Date.now();
+              extensibleObj.createdAt = extensibleObj.createdAt || Date.now();
+
+              // Try to replace the object properties
               try {
-                extensibleObj[key] = (obj as Record<string, unknown>)[key];
-              } catch (copyError: unknown) {
-                logger.warn(`Failed to copy property ${key}:`, {
-                  error: (copyError as Error).message,
-                });
-              }
-            });
+                Object.assign(obj, extensibleObj);
+              } catch {
+                // If Object.assign fails, clear the object and reassign
+                try {
+                  // Clear existing properties (if possible)
+                  Object.keys(obj as object).forEach((key) => {
+                    try {
+                      delete (obj as Record<string, unknown>)[key];
+                    } catch {
+                      // Property can't be deleted, skip it
+                    }
+                  });
 
-            // Add timestamp properties
-            extensibleObj.lastModified = Date.now();
-            extensibleObj.createdAt = extensibleObj.createdAt || Date.now();
-
-            // Try to replace the object properties
-            try {
-              Object.assign(obj, extensibleObj);
-            } catch {
-              // If Object.assign fails, clear the object and reassign
-              try {
-                // Clear existing properties (if possible)
-                Object.keys(obj as object).forEach((key) => {
-                  try {
-                    delete (obj as Record<string, unknown>)[key];
-                  } catch {
-                    // Property can't be deleted, skip it
+                  // Add all properties from extensible object
+                  Object.keys(extensibleObj).forEach((key) => {
+                    try {
+                      (obj as Record<string, unknown>)[key] = extensibleObj[key];
+                    } catch (setError: unknown) {
+                      logger.warn(`Failed to set property ${key}:`, {
+                        error: (setError as Error).message,
+                      });
+                    }
+                  });
+                } catch (finalError: unknown) {
+                  logger.warn("Complete object replacement failed:", {
+                    error: (finalError as Error).message,
+                  });
+                  // As a last resort, try to modify the transaction
+                  // Note: trans.source is a Dexie internal property
+                  if (
+                    typeof (trans as { source: unknown }).source === "object" &&
+                    (trans as { source: unknown }).source !== null
+                  ) {
+                    (trans as { source: unknown }).source = extensibleObj;
                   }
-                });
-
-                // Add all properties from extensible object
-                Object.keys(extensibleObj).forEach((key) => {
-                  try {
-                    (obj as Record<string, unknown>)[key] = extensibleObj[key];
-                  } catch (setError: unknown) {
-                    logger.warn(`Failed to set property ${key}:`, {
-                      error: (setError as Error).message,
-                    });
-                  }
-                });
-              } catch (finalError: unknown) {
-                logger.warn("Complete object replacement failed:", {
-                  error: (finalError as Error).message,
-                });
-                // As a last resort, try to modify the transaction
-                // Note: trans.source is a Dexie internal property
-                if (
-                  typeof (trans as unknown as { source: unknown }).source === "object" &&
-                  (trans as unknown as { source: unknown }).source !== null
-                ) {
-                  (trans as unknown as { source: unknown }).source = extensibleObj;
                 }
               }
+            } else {
+              throw error; // Re-throw unexpected errors
             }
-          } else {
-            throw error; // Re-throw unexpected errors
           }
         }
-      });
+      );
 
-      table.hook("updating", (modifications, _primKey, _obj, _trans) => {
+      table.hook(
+        "updating",
         (
-          modifications as Partial<
-            Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
-          >
-        ).lastModified = Date.now();
-      });
+          modifications: unknown,
+          _primKey: string | number,
+          _obj: unknown,
+          _trans: unknown
+        ) => {
+          (
+            modifications as Partial<
+              Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
+            >
+          ).lastModified = Date.now();
+        }
+      );
     };
 
     // Apply hooks to all data tables
@@ -191,7 +209,7 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.debts);
 
     // Audit log hook
-    this.auditLog.hook("creating", (_primKey, obj, _trans) => {
+    this.auditLog.hook("creating", (_primKey: number, obj: AuditLogEntry, _trans: unknown) => {
       if (!obj.timestamp) obj.timestamp = Date.now();
     });
   }

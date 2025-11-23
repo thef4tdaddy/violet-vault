@@ -7,6 +7,30 @@ import NotificationSettingsSection from "@/components/settings/sections/Notifica
 import DevToolsSection from "@/components/settings/sections/DevToolsSection";
 import SyncHealthDashboard from "@/components/sync/SyncHealthDashboard";
 
+// Type definitions for user and security manager
+interface User {
+  uid?: string;
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+  [key: string]: unknown;
+}
+
+interface UserProfile {
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+  [key: string]: unknown;
+}
+
+interface SecurityManager {
+  isLocked?: boolean;
+  hasEncryptionKey?: boolean;
+  [key: string]: unknown;
+}
+
 interface SettingsSectionRendererProps {
   // General Settings Props
   isLocalOnlyMode?: boolean;
@@ -17,14 +41,14 @@ interface SettingsSectionRendererProps {
   onManualSync?: () => void;
 
   // Account Settings Props
-  currentUser?: unknown;
+  currentUser?: User;
   onOpenPasswordModal?: () => void;
   onLogout?: () => void;
   onOpenResetConfirm?: () => void;
-  onUpdateProfile?: (profile: unknown) => void;
+  onUpdateProfile?: (profile: UserProfile) => void;
 
   // Security Settings Props
-  securityManager?: unknown;
+  securityManager?: SecurityManager;
   onOpenSecuritySettings?: () => void;
   onShowLocalDataSecurity?: () => void;
 
