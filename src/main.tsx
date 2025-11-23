@@ -33,7 +33,7 @@ if (typeof window !== "undefined") {
     });
   };
 
-  const setupEventListeners = (loadOnce) => {
+  const setupEventListeners = (loadOnce: () => void) => {
     const events = ["click", "keydown", "touchstart", "mousemove"];
     const cleanup = () => {
       events.forEach((event) => document.removeEventListener(event, loadOnce));
@@ -144,7 +144,7 @@ const initializeApp = () => {
       };
 
       // Helper functions for cloud data reset
-      const validateLocalDataExists = (localData) => {
+      const validateLocalDataExists = (localData: Record<string, unknown>) => {
         if (!localData) return false;
 
         return (
@@ -155,13 +155,17 @@ const initializeApp = () => {
         );
       };
 
-      const logLocalDataStats = (localData) => {
+      const logLocalDataStats = (localData: Record<string, unknown>) => {
         logger.info(
           `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`
         );
       };
 
-      const performCloudReset = async (cloudSyncService) => {
+      const performCloudReset = async (cloudSyncService: {
+        stop: () => void;
+        clearAllData: () => Promise<void>;
+        forcePushData: () => Promise<{ success: boolean; error?: string }>;
+      }) => {
         // Stop sync, clear cloud data, and force push local data
         cloudSyncService.stop();
         logger.info("⏸️ Stopped background sync");
@@ -215,7 +219,7 @@ const initializeApp = () => {
           }
         } catch (error) {
           logger.error("❌ Force reset failed:", error);
-          return { success: false, error: error.message };
+          return { success: false, error: error instanceof Error ? error.message : String(error) };
         }
       };
 
@@ -233,7 +237,7 @@ const initializeApp = () => {
           return { success: true, message: "Cloud data cleared, sync stopped" };
         } catch (error) {
           logger.error("❌ Clear failed:", error);
-          return { success: false, error: error.message };
+          return { success: false, error: error instanceof Error ? error.message : String(error) };
         }
       };
 
@@ -268,7 +272,7 @@ const initializeApp = () => {
             success: false,
             errors,
             screenshot: false,
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
           };
         }
       };
@@ -277,7 +281,9 @@ const initializeApp = () => {
     initDebugTools();
   }
 
-  ReactDOM.createRoot(document.getElementById("root")).render(
+  const rootElement = document.getElementById("root");
+  if (!rootElement) throw new Error("Root element not found");
+  ReactDOM.createRoot(rootElement).render(
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>

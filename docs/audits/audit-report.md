@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | +1 |
-| TypeScript Errors | 43 | +3 |
-| TypeScript Strict Mode Errors | 2112 | -14 |
+| ESLint Issues | 5 | 0 |
+| TypeScript Errors | 58 | +15 |
+| TypeScript Strict Mode Errors | 2103 | -9 |
 
-*Last updated: 2025-11-23 13:50:18 UTC*
+*Last updated: 2025-11-23 13:56:24 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -52,6 +52,7 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 12 errors in `src/main.tsx`
 - 7 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 6 errors in `src/hooks/debts/useDebtManagement.ts`
 - 6 errors in `src/hooks/budgeting/usePaycheckForm.ts`
@@ -61,16 +62,18 @@
 - 3 errors in `src/hooks/analytics/useReportExporter.ts`
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/bills/useBillManager.ts`
+- 2 errors in `src/components/transactions/components/TransactionRow.tsx`
 - 2 errors in `src/components/layout/MainLayout.tsx`
+- 1 errors in `src/components/transactions/TransactionTable.tsx`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 18 | `TS2345` |
-| 18 | `TS2322` |
-| 4 | `TS2339` |
+| 23 | `TS2345` |
+| 19 | `TS2322` |
+| 13 | `TS2339` |
 | 1 | `TS2741` |
 | 1 | `TS2719` |
 | 1 | `TS2352` |
@@ -107,6 +110,12 @@ src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: 
   Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/components/settings/SettingsDashboard.tsx(162,13): error TS2322: Type '(password: string) => void' is not assignable to type '(current: string, newPass: string) => Promise<AuthResult>'.
   Type 'void' is not assignable to type 'Promise<AuthResult>'.
+src/components/transactions/TransactionTable.tsx(139,21): error TS2322: Type '(transaction: Transaction) => void' is not assignable to type '(transactionId: string) => void'.
+  Types of parameters 'transaction' and 'transactionId' are incompatible.
+    Type 'string' is not assignable to type 'Transaction'.
+src/components/transactions/components/TransactionRow.tsx(39,60): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
+  Type '{}' is missing the following properties from type 'Envelope': id, name, currentBalance, targetAmount
+src/components/transactions/components/TransactionRow.tsx(134,42): error TS2345: Argument of type 'Transaction' is not assignable to parameter of type 'string'.
 src/hooks/accounts/useSupplementalAccounts.ts(109,44): error TS2345: Argument of type 'Account' is not assignable to parameter of type 'Account'.
   Type 'Account' is missing the following properties from type 'Account': type, currentBalance, color, isActive
 src/hooks/accounts/useSupplementalAccounts.ts(134,7): error TS2322: Type '(account: Account) => void' is not assignable to type '(id: string, data: unknown) => void'.
@@ -182,6 +191,21 @@ src/hooks/transactions/useTransactionImport.ts(78,61): error TS2345: Argument of
   Type 'ImportData' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
 src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type '{ amount: number; }[]'.
   Property 'amount' is missing in type '{}' but required in type '{ amount: number; }'.
+src/main.tsx(151,55): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(152,61): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(153,47): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(154,47): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,45): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,95): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,141): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,180): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(178,47): error TS2339: Property 'forcePushToCloud' does not exist on type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string; }>; }'.
+src/main.tsx(197,40): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(205,29): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(207,50): error TS2345: Argument of type 'CloudSyncService' is not assignable to parameter of type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string; }>; }'.
+  Property 'forcePushData' is missing in type 'CloudSyncService' but required in type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string; }>; }'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -216,6 +240,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
+- 12 errors in `src/main.tsx`
 - 12 errors in `src/components/bills/BillManager.tsx`
 - 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
 - 11 errors in `src/utils/security/shareCodeUtils.ts`
@@ -267,13 +292,10 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/components/onboarding/components/TutorialOverlay.tsx`
 - 9 errors in `src/components/history/viewer/HistoryList.tsx`
 - 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
-- 8 errors in `src/utils/auth/userSetupHelpers.tsx`
-- 8 errors in `src/main.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
 - 8 errors in `src/hooks/savings/useSavingsGoalsActions.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 8 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
-- 8 errors in `src/components/transactions/components/TransactionRow.tsx`
 - 8 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 8 errors in `src/components/dashboard/ReconcileTransactionModal.tsx`
 - 8 errors in `src/components/budgeting/suggestions/SuggestionCard.tsx`
@@ -357,6 +379,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 5 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
+- 5 errors in `src/components/transactions/TransactionTable.tsx`
 - 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 5 errors in `src/components/settings/archiving/ArchivingConfiguration.tsx`
 - 5 errors in `src/components/receipts/steps/ReceiptDataStep.tsx`
@@ -397,7 +420,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 4 errors in `src/hooks/analytics/useReportExporter.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
-- 4 errors in `src/components/transactions/TransactionTable.tsx`
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
@@ -500,6 +522,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/hooks/analytics/useAnalyticsExport.ts`
 - 2 errors in `src/contexts/authUtils.ts`
 - 2 errors in `src/components/transactions/import/ImportProgress.tsx`
+- 2 errors in `src/components/transactions/components/TransactionRow.tsx`
 - 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
 - 2 errors in `src/components/settings/sections/ClipboardSecuritySection.tsx`
 - 2 errors in `src/components/settings/archiving/ArchivingProgress.tsx`
@@ -616,12 +639,12 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 622 | `TS7006` |
-| 602 | `TS7031` |
-| 188 | `TS2345` |
-| 149 | `TS2322` |
-| 128 | `TS2339` |
-| 103 | `TS18046` |
+| 613 | `TS7006` |
+| 591 | `TS7031` |
+| 192 | `TS2345` |
+| 150 | `TS2322` |
+| 137 | `TS2339` |
+| 100 | `TS18046` |
 | 63 | `TS7053` |
 | 63 | `TS7005` |
 | 50 | `TS18048` |
@@ -1745,6 +1768,9 @@ src/components/transactions/TransactionSplitter.tsx(105,19): error TS2322: Type 
   Type 'string' is not assignable to type 'never'.
 src/components/transactions/TransactionSplitter.tsx(126,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
   Type 'string' is not assignable to type 'never'.
+src/components/transactions/TransactionTable.tsx(139,21): error TS2322: Type '(transaction: Transaction) => void' is not assignable to type '(transactionId: string) => void'.
+  Types of parameters 'transaction' and 'transactionId' are incompatible.
+    Type 'string' is not assignable to type 'Transaction'.
 src/components/transactions/TransactionTable.tsx(322,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
 src/components/transactions/TransactionTable.tsx(326,36): error TS2339: Property 'id' does not exist on type 'never'.
@@ -1755,14 +1781,9 @@ src/components/transactions/components/DeleteConfirmation.tsx(8,44): error TS703
 src/components/transactions/components/DeleteConfirmation.tsx(8,55): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,65): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,77): error TS7031: Binding element 'gridTemplate' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(16,3): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(18,3): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(20,3): error TS7031: Binding element 'gridTemplate' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(21,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(22,3): error TS7031: Binding element 'onSplit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(23,3): error TS7031: Binding element 'onDeleteClick' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(24,3): error TS7031: Binding element 'onHistoryClick' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(39,60): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
+  Type 'unknown' is not assignable to type 'Envelope'.
+src/components/transactions/components/TransactionRow.tsx(134,42): error TS2345: Argument of type 'Transaction' is not assignable to parameter of type 'string'.
 src/components/transactions/import/FieldMapper.tsx(4,24): error TS7031: Binding element 'importData' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,36): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,50): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
@@ -2693,15 +2714,21 @@ src/hooks/transactions/useTransactionUtils.ts(21,58): error TS2339: Property 'ca
 src/hooks/transactions/useTransactionsV2.ts(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/transactions/useTransactionsV2.ts(56,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionsV2.ts(89,41): error TS2339: Property 'length' does not exist on type '{}'.
-src/main.tsx(36,32): error TS7006: Parameter 'loadOnce' implicitly has an 'any' type.
-src/main.tsx(147,40): error TS7006: Parameter 'localData' implicitly has an 'any' type.
-src/main.tsx(158,34): error TS7006: Parameter 'localData' implicitly has an 'any' type.
-src/main.tsx(164,40): error TS7006: Parameter 'cloudSyncService' implicitly has an 'any' type.
-src/main.tsx(218,43): error TS18046: 'error' is of type 'unknown'.
-src/main.tsx(236,43): error TS18046: 'error' is of type 'unknown'.
-src/main.tsx(271,20): error TS18046: 'error' is of type 'unknown'.
-src/main.tsx(280,23): error TS2345: Argument of type 'HTMLElement | null' is not assignable to parameter of type 'Container'.
-  Type 'null' is not assignable to type 'Container'.
+src/main.tsx(151,55): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(152,61): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(153,47): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(154,47): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,45): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,95): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,141): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,180): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(178,47): error TS2339: Property 'forcePushToCloud' does not exist on type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
+src/main.tsx(197,40): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(205,29): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(207,50): error TS2345: Argument of type 'CloudSyncService' is not assignable to parameter of type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
+  Property 'forcePushData' is missing in type 'CloudSyncService' but required in type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
 src/services/activityLogger.ts(126,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -2892,14 +2919,6 @@ src/utils/analytics/trendHelpers.ts(71,49): error TS7006: Parameter 'name' impli
 src/utils/auth/shareCodeManager.ts(30,20): error TS7006: Parameter 'shareCode' implicitly has an 'any' type.
 src/utils/auth/shareCodeManager.ts(44,20): error TS7006: Parameter 'shareCode' implicitly has an 'any' type.
 src/utils/auth/shareCodeManager.ts(54,18): error TS7006: Parameter 'shareCode' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(23,37): error TS7031: Binding element 'masterPassword' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(23,53): error TS7031: Binding element 'userName' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(23,63): error TS7031: Binding element 'userColor' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(47,30): error TS7006: Parameter 'step' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(47,36): error TS7006: Parameter 'isReturningUser' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(47,53): error TS7006: Parameter 'userName' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(86,33): error TS7006: Parameter 'step' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(86,39): error TS7006: Parameter 'isReturningUser' implicitly has an 'any' type.
 src/utils/billIcons/iconOptions.ts(179,10): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
 src/utils/billIcons/iconUtils.ts(22,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
