@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +4 |
-| TypeScript Errors | 40 | +40 |
-| TypeScript Strict Mode Errors | 2138 | +2138 |
+| ESLint Issues | 4 | 0 |
+| TypeScript Errors | 40 | 0 |
+| TypeScript Strict Mode Errors | 2131 | -7 |
 
-*Last updated: 2025-11-23 13:19:16 UTC*
+*Last updated: 2025-11-23 13:26:13 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -274,7 +274,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 8 errors in `src/components/budgeting/DeleteEnvelopeModal.tsx`
 - 8 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
 - 8 errors in `src/components/accounts/SupplementalAccounts.tsx`
-- 7 errors in `src/utils/security/errorViewer.ts`
 - 7 errors in `src/utils/security/cryptoCompat.ts`
 - 7 errors in `src/utils/billIcons/iconUtils.ts`
 - 7 errors in `src/services/bugReport/index.ts`
@@ -610,7 +609,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 633 | `TS7006` |
+| 626 | `TS7006` |
 | 609 | `TS7031` |
 | 186 | `TS2345` |
 | 148 | `TS2322` |
@@ -3254,13 +3253,6 @@ src/utils/security/cryptoCompat.ts(69,16): error TS7053: Element implicitly has 
 src/utils/security/cryptoCompat.ts(73,18): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'SubtleCrypto'.
 src/utils/security/cryptoCompat.ts(85,32): error TS7006: Parameter 'length' implicitly has an 'any' type.
 src/utils/security/cryptoCompat.ts(129,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/security/errorViewer.ts(52,21): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(52,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(96,21): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(96,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(103,14): error TS7006: Parameter 'timestamp' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(129,21): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(129,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/utils/security/keyExport.ts(268,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/security/keyExport.ts(319,35): error TS7016: Could not find a declaration file for module 'qrcode'. '/home/runner/work/violet-vault/violet-vault/node_modules/qrcode/lib/index.js' implicitly has an 'any' type.
   Try `npm i --save-dev @types/qrcode` if it exists or add a new declaration (.d.ts) file containing `declare module 'qrcode';`
