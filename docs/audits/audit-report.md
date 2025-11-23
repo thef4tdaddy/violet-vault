@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +4 |
-| TypeScript Errors | 40 | +40 |
-| TypeScript Strict Mode Errors | 2135 | +2135 |
+| ESLint Issues | 4 | 0 |
+| TypeScript Errors | 40 | 0 |
+| TypeScript Strict Mode Errors | 2126 | -9 |
 
-*Last updated: 2025-11-23 13:16:50 UTC*
+*Last updated: 2025-11-23 13:36:49 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -257,7 +257,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/components/onboarding/components/TutorialOverlay.tsx`
 - 9 errors in `src/components/history/viewer/HistoryList.tsx`
 - 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
-- 9 errors in `src/components/automation/AutoFundingView.tsx`
 - 8 errors in `src/utils/savings/savingsCalculations.ts`
 - 8 errors in `src/utils/bills/recurringBillUtils.ts`
 - 8 errors in `src/utils/auth/userSetupHelpers.tsx`
@@ -609,16 +608,16 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 631 | `TS7006` |
+| 630 | `TS7006` |
 | 602 | `TS7031` |
 | 186 | `TS2345` |
-| 154 | `TS2322` |
+| 149 | `TS2322` |
 | 128 | `TS2339` |
-| 112 | `TS18046` |
-| 64 | `TS7005` |
+| 111 | `TS18046` |
 | 63 | `TS7053` |
+| 63 | `TS7005` |
 | 50 | `TS18048` |
-| 39 | `TS7034` |
+| 38 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
 | 6 | `TS2411` |
@@ -761,23 +760,6 @@ src/components/automation/AutoFundingDashboard.tsx(141,15): error TS2322: Type '
   Types of parameters 'value' and 'show' are incompatible.
     Type 'string | null' is not assignable to type 'SetStateAction<null>'.
       Type 'string' is not assignable to type 'SetStateAction<null>'.
-src/components/automation/AutoFundingView.tsx(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/automation/AutoFundingView.tsx(17,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/automation/AutoFundingView.tsx(17,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/automation/AutoFundingView.tsx(33,7): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(rule: unknown) => void'.
-  Types of parameters 'value' and 'rule' are incompatible.
-    Type 'unknown' is not assignable to type 'SetStateAction<null>'.
-src/components/automation/AutoFundingView.tsx(35,22): error TS2322: Type '(ruleId: string, updates: Partial<AutoFundingRule>) => void' is not assignable to type '(id: unknown, data: unknown) => void'.
-  Types of parameters 'ruleId' and 'id' are incompatible.
-    Type 'unknown' is not assignable to type 'string'.
-src/components/automation/AutoFundingView.tsx(35,34): error TS2322: Type '(rule: Partial<AutoFundingRule>) => void' is not assignable to type '(data: unknown) => void'.
-  Types of parameters 'rule' and 'data' are incompatible.
-    Type 'unknown' is not assignable to type 'Partial<AutoFundingRule>'.
-src/components/automation/AutoFundingView.tsx(70,59): error TS18046: 'error' is of type 'unknown'.
-src/components/automation/AutoFundingView.tsx(104,11): error TS2322: Type 'null' is not assignable to type 'boolean'.
-src/components/automation/AutoFundingView.tsx(105,11): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(show: boolean) => void'.
-  Types of parameters 'value' and 'show' are incompatible.
-    Type 'boolean' is not assignable to type 'SetStateAction<null>'.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(6,27): error TS7006: Parameter 'type' implicitly has an 'any' type.
