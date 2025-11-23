@@ -58,8 +58,8 @@ export const useDebtDashboard = () => {
     // Sort debts
     filtered.sort((a, b) => {
       const { sortBy, sortOrder } = filterOptions;
-      let aValue = a[sortBy];
-      let bValue = b[sortBy];
+      let aValue = a[sortBy as keyof typeof a] as number | undefined;
+      let bValue = b[sortBy as keyof typeof b] as number | undefined;
 
       // Handle null/undefined values
       if (aValue == null) aValue = 0;

@@ -5,17 +5,17 @@
 /**
  * Format currency values for display
  */
-export const formatCurrency = (value) => `$${value.toLocaleString()}`;
+export const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
 
 /**
  * Format percentage values for display
  */
-export const formatPercent = (value) => `${value > 0 ? "+" : ""}${value}%`;
+export const formatPercent = (value: number) => `${value > 0 ? "+" : ""}${value}%`;
 
 /**
  * Get trend icon and styling based on trend direction
  */
-export const getTrendIconConfig = (trend) => {
+export const getTrendIconConfig = (trend: string) => {
   switch (trend) {
     case "increasing":
       return {
@@ -41,14 +41,14 @@ export const getTrendIconConfig = (trend) => {
 /**
  * Get color configuration for growth rate display
  */
-export const getGrowthRateColor = (growthRate) => {
+export const getGrowthRateColor = (growthRate: number) => {
   return growthRate > 0 ? "text-red-600" : "text-green-600";
 };
 
 /**
  * Generate dynamic category chart colors
  */
-export const getCategoryChartColor = (index) => {
+export const getCategoryChartColor = (index: number) => {
   return `hsl(${index * 60}, 70%, 50%)`;
 };
 
@@ -63,12 +63,15 @@ export const getChartConfig = (height = "100%") => ({
 /**
  * Common tooltip formatter for currency values
  */
-export const currencyTooltipFormatter = (value, name) => [formatCurrency(value), name];
+export const currencyTooltipFormatter = (value: number, name: string): [string, string] => [
+  formatCurrency(value),
+  name,
+];
 
 /**
  * Tooltip formatter for percentage change
  */
-export const velocityTooltipFormatter = (value, name) => [
+export const velocityTooltipFormatter = (value: number, name: string): [string, string] => [
   name === "percentChange" ? formatPercent(value) : formatCurrency(value),
   name === "percentChange" ? "Rate of Change" : "Amount Change",
 ];

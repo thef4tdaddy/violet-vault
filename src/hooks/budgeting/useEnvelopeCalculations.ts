@@ -1,11 +1,19 @@
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import logger from "../../utils/common/logger";
 
+interface Envelope {
+  id?: string;
+  currentBalance?: number;
+  targetAmount?: number;
+  category?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Hook for envelope calculations and utility functions
  * Handles computed values and helper functions for envelopes
  */
-export const useEnvelopeCalculations = (envelopes = []) => {
+export const useEnvelopeCalculations = (envelopes: Envelope[] = []) => {
   // Computed values
   const totalBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
   const totalTargetAmount = envelopes.reduce((sum, env) => sum + (env.targetAmount || 0), 0);
@@ -22,7 +30,7 @@ export const useEnvelopeCalculations = (envelopes = []) => {
   const getEnvelopesByCategory = (cat: string) => envelopes.filter((env) => env.category === cat);
 
   const getAvailableCategories = () => {
-    const categories = new Set(envelopes.map((env) => env.category));
+    const categories = new Set(envelopes.map((env) => env.category).filter(Boolean));
     return Array.from(categories).sort();
   };
 
