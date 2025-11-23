@@ -6,6 +6,15 @@ import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
 import logger from "../../../utils/common/logger";
 
+interface ExecutionResult {
+  success: boolean;
+  error?: string;
+  execution?: {
+    rulesExecuted: number;
+    totalFunded: number;
+  };
+}
+
 /**
  * Hook for executing auto-funding rules and managing execution state
  * Extracted from useAutoFunding.js for Issue #506
@@ -13,7 +22,7 @@ import logger from "../../../utils/common/logger";
 export const useAutoFundingExecution = () => {
   const budget = useUiStore((state) => state.budget);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [lastExecution, setLastExecution] = useState(null);
+  const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 
   // Use focused sub-hooks
   const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budget);
@@ -29,7 +38,11 @@ export const useAutoFundingExecution = () => {
 
   // Execute rules with given trigger
   const executeRules = useCallback(
-    async (rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
+    async (
+      rules: unknown[],
+      trigger: string = TRIGGER_TYPES.MANUAL,
+      triggerData: Record<string, unknown> = {}
+    ): Promise<ExecutionResult> => {
       if (isExecuting) {
         logger.warn("Auto-funding execution already in progress");
         return { success: false, error: "Execution already in progress" };
@@ -72,7 +85,7 @@ export const useAutoFundingExecution = () => {
         return result;
       } catch (error) {
         logger.error("Error during auto-funding execution", error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
       } finally {
         setIsExecuting(false);
       }

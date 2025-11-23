@@ -67,7 +67,7 @@ interface BillDetailQuickPaymentProps {
   paymentAmount: string;
   handleShowPaymentForm: () => void;
   handleHidePaymentForm: () => void;
-  handleMarkPaid: (e: React.FormEvent) => void;
+  handleMarkPaid: (e: React.FormEvent) => Promise<void> | void;
   handlePaymentAmountChange: (value: string) => void;
 }
 
