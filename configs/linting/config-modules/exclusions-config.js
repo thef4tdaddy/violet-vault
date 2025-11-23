@@ -23,6 +23,7 @@ export default [
       "src/utils/**/calculations/**/*.{js,jsx,ts,tsx}",
       "src/utils/**/validation/**/*.{js,jsx,ts,tsx}",
       "src/utils/**/formatting/**/*.{js,jsx,ts,tsx}",
+      "src/utils/accounts/accountValidation.ts", // Account validation - complex form validation logic
       "src/utils/sync/**/*.{js,jsx,ts,tsx}", // Sync utilities - complex data coordination
       "src/services/sync/**/*.{js,jsx,ts,tsx}",
       "src/services/auth/**/*.{js,jsx,ts,tsx}",
