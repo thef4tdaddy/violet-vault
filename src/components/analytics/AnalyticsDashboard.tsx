@@ -166,8 +166,8 @@ const AnalyticsDashboard = () => {
   }, [analyticsQuery.analytics, envelopes]);
 
   const analyticsData = useAnalyticsData({
-    transactions: (normalizedTransactions as unknown[]) || [],
-    envelopes: (normalizedEnvelopes as unknown[]) || [],
+    transactions: normalizedTransactions,
+    envelopes: normalizedEnvelopes,
     timeFilter,
   });
 
@@ -457,13 +457,13 @@ const AnalyticsDashboard = () => {
         {showExportModal && (
           <ReportExporter
             analyticsData={{
-              balanceData: balanceQuery.analytics,
-              categoryData: analyticsQuery.analytics,
-              transactionData: analyticsQuery.analytics,
-              envelopeData: analyticsQuery.analytics,
-              savingsData: analyticsQuery.analytics,
+              balanceData: (balanceQuery.analytics as Record<string, unknown>) ?? {},
+              categoryData: (analyticsQuery.analytics as Record<string, unknown>) ?? {},
+              transactionData: (analyticsQuery.analytics as Record<string, unknown>) ?? {},
+              envelopeData: (analyticsQuery.analytics as Record<string, unknown>) ?? {},
+              savingsData: (analyticsQuery.analytics as Record<string, unknown>) ?? {},
             }}
-            balanceData={balanceQuery.analytics}
+            balanceData={(balanceQuery.analytics as Record<string, unknown>) ?? {}}
             timeFilter={timeFilter}
             onExport={handleExport}
             onClose={() => setShowExportModal(false)}

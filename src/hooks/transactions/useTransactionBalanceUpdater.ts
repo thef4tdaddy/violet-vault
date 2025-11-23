@@ -1,8 +1,15 @@
 import { getBudgetMetadata, setBudgetMetadata, budgetDb } from "../../db/budgetDb.ts";
 import logger from "../../utils/common/logger.ts";
+import type { Transaction } from "../../db/types.ts";
+
+type TransactionType = "income" | "expense" | "transfer";
 
 // Calculate the actual balance change
-const calculateActualBalanceChange = (type, amount, multiplier) => {
+const calculateActualBalanceChange = (
+  type: TransactionType | undefined,
+  amount: number,
+  multiplier: number
+): number => {
   if (type === "income") {
     return amount * multiplier;
   }
@@ -13,17 +20,21 @@ const calculateActualBalanceChange = (type, amount, multiplier) => {
 };
 
 // Calculate the change for envelope or unassigned
-const calculateBalanceChange = (type, amount, multiplier) => {
+const calculateBalanceChange = (
+  type: TransactionType | undefined,
+  amount: number,
+  multiplier: number
+): number => {
   return type === "income" ? amount * multiplier : -Math.abs(amount) * multiplier;
 };
 
 // Update unassigned cash balance
 const updateUnassignedBalance = async (
-  currentActualBalance,
-  currentUnassignedCash,
-  actualBalanceChange,
-  unassignedChange
-) => {
+  currentActualBalance: number,
+  currentUnassignedCash: number,
+  actualBalanceChange: number,
+  unassignedChange: number
+): Promise<void> => {
   await setBudgetMetadata({
     actualBalance: currentActualBalance + actualBalanceChange,
     unassignedCash: currentUnassignedCash + unassignedChange,
@@ -32,15 +43,16 @@ const updateUnassignedBalance = async (
 
 // Update specific envelope balance
 const updateEnvelopeBalance = async (
-  envelopeId,
-  balanceChange,
-  currentActualBalance,
-  actualBalanceChange
-) => {
-  const envelope = await budgetDb.envelopes.get(envelopeId);
+  envelopeId: string | number,
+  balanceChange: number,
+  currentActualBalance: number,
+  actualBalanceChange: number
+): Promise<void> => {
+  const envelopeIdStr = String(envelopeId);
+  const envelope = await budgetDb.envelopes.get(envelopeIdStr);
   if (envelope) {
     const newBalance = (envelope.currentBalance || 0) + balanceChange;
-    await budgetDb.envelopes.update(envelopeId, {
+    await budgetDb.envelopes.update(envelopeIdStr, {
       currentBalance: newBalance,
       lastModified: Date.now(),
     });
@@ -53,14 +65,19 @@ const updateEnvelopeBalance = async (
 
 export const useTransactionBalanceUpdater = () => {
   // Helper function to update balances when transactions are added/removed
-  const updateBalancesForTransaction = async (transaction, isRemoving = false) => {
+  const updateBalancesForTransaction = async (
+    transaction: Transaction,
+    isRemoving = false
+  ): Promise<void> => {
     const { envelopeId, amount, type } = transaction;
     const multiplier = isRemoving ? -1 : 1;
 
     try {
       const metadata = await getBudgetMetadata();
-      const currentActualBalance = metadata?.actualBalance || 0;
-      const currentUnassignedCash = metadata?.unassignedCash || 0;
+      const currentActualBalance =
+        typeof metadata?.actualBalance === "number" ? metadata.actualBalance : 0;
+      const currentUnassignedCash =
+        typeof metadata?.unassignedCash === "number" ? metadata.unassignedCash : 0;
 
       const actualBalanceChange = calculateActualBalanceChange(type, amount, multiplier);
 

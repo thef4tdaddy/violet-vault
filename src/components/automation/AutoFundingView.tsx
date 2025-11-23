@@ -4,23 +4,24 @@ import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
 import { globalToast } from "@/stores/ui/toastStore";
 import logger from "@/utils/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useAutoFundingHandlers } from "./useAutoFundingHandlers";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 function AutoFundingView() {
   const navigate = useNavigate();
-  const envelopes = useBudgetStore((state) => state.envelopes) as unknown[];
+  const { envelopes } = useEnvelopesQuery();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
-  const [editingRule, setEditingRule] = useState(null);
+  const [editingRule, setEditingRule] = useState<AutoFundingRule | null>(null);
   const [activeTab, setActiveTab] = useState("rules");
-  const [showExecutionDetails, setShowExecutionDetails] = useState(null);
+  const [showExecutionDetails, setShowExecutionDetails] = useState<string | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
   // Get execution history
@@ -30,9 +31,14 @@ function AutoFundingView() {
   const { handleCreateRule, handleEditRule, handleSaveRule, handleDeleteRule, handleToggleRule } =
     useAutoFundingHandlers({
       editingRule,
-      setEditingRule,
+      setEditingRule: setEditingRule as (rule: unknown) => void,
       setShowRuleBuilder,
-      ruleActions: { updateRule, addRule, deleteRule, toggleRule },
+      ruleActions: {
+        updateRule: updateRule as (id: unknown, data: unknown) => void,
+        addRule: addRule as (data: unknown) => void,
+        deleteRule,
+        toggleRule,
+      },
     });
 
   const handleExecuteRules = async () => {
@@ -67,7 +73,8 @@ function AutoFundingView() {
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed", 8000);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      globalToast.showError("Failed to execute rules: " + errorMessage, "Execution Failed", 8000);
     } finally {
       setIsExecuting(false);
     }

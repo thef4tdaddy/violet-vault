@@ -1,7 +1,11 @@
 // Query Client Configuration - TanStack Query setup with Dexie integration
-import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
+import { QueryClient, MutationCache, QueryCache, type Query } from "@tanstack/react-query";
 // Import H safely to avoid circular dependency issues
 import logger from "../common/logger";
+
+interface ErrorWithStatus {
+  status?: number;
+}
 
 /**
  * Enhanced TanStack Query configuration with optimized caching,
@@ -14,15 +18,15 @@ export const createQueryClient = () => {
         // Performance optimizations
         staleTime: 5 * 60 * 1000, // 5 minutes
         gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime)
-        retry: (failureCount, error) => {
+        retry: (failureCount: number, error: unknown) => {
           // Don't retry auth errors
-          const errorWithStatus = error as { status?: number };
+          const errorWithStatus = error as ErrorWithStatus;
           if (errorWithStatus?.status === 401 || errorWithStatus?.status === 403) {
             return false;
           }
           return failureCount < 3;
         },
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
 
         // Background refetching
         refetchOnWindowFocus: true,
@@ -38,7 +42,7 @@ export const createQueryClient = () => {
         networkMode: "offlineFirst",
 
         // Global error handling
-        onError: (error, variables, context) => {
+        onError: (error: unknown, variables: unknown, context: unknown) => {
           logger.error("Mutation error", error, {
             variables,
             context,
@@ -51,14 +55,14 @@ export const createQueryClient = () => {
 
     // Query cache with global error handling
     queryCache: new QueryCache({
-      onError: (error, query) => {
+      onError: (error: unknown, query: Query) => {
         logger.error("Query error", error, {
           queryKey: query.queryKey,
           source: "queryClient",
         });
         // Error logging is handled by logger, no need for direct H usage
       },
-      onSuccess: (_data, query) => {
+      onSuccess: (_data: unknown, query: Query) => {
         // Optional: Track successful queries in development
         if (import.meta.env.DEV) {
           logger.debug("Query success", {
@@ -71,7 +75,7 @@ export const createQueryClient = () => {
 
     // Mutation cache with global handling and automatic invalidations
     mutationCache: new MutationCache({
-      onSuccess: (_data, _variables, _context, mutation) => {
+      onSuccess: (_data: unknown, _variables: unknown, _context: unknown, mutation) => {
         // Get the query client instance
         const mutationQueryClient = queryClient;
 
@@ -94,7 +98,7 @@ export const createQueryClient = () => {
           }
         }
       },
-      onError: (error, variables, context, mutation) => {
+      onError: (error: unknown, variables: unknown, context: unknown, mutation) => {
         logger.error("Mutation cache error", error, {
           mutationKey: mutation.options.mutationKey,
           variables,
@@ -122,7 +126,7 @@ export const queryClientUtils = {
   /**
    * Clear cache for specific entity type
    */
-  clearEntityCache: (entityType) => {
+  clearEntityCache: (entityType: string) => {
     queryClient.invalidateQueries({ queryKey: [entityType] });
     logger.info(`Cache cleared for entity: ${entityType}`);
   },
@@ -146,7 +150,11 @@ export const queryClientUtils = {
   /**
    * Prefetch with automatic error handling
    */
-  safePrefetch: async (queryKey, queryFn, options = {}) => {
+  safePrefetch: async <T>(
+    queryKey: unknown[],
+    queryFn: () => Promise<T>,
+    options: Record<string, unknown> = {}
+  ): Promise<void | null> => {
     try {
       return await queryClient.prefetchQuery({
         queryKey,
@@ -155,9 +163,10 @@ export const queryClientUtils = {
         ...options,
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.warn("Safe prefetch failed", {
         queryKey,
-        error: error.message,
+        error: errorMessage,
         source: "queryClientUtils",
       });
       return null;
@@ -167,7 +176,7 @@ export const queryClientUtils = {
   /**
    * Batch invalidate multiple query keys
    */
-  batchInvalidate: (queryKeys) => {
+  batchInvalidate: (queryKeys: unknown[][]) => {
     queryKeys.forEach((queryKey) => {
       queryClient.invalidateQueries({ queryKey });
     });
@@ -177,21 +186,26 @@ export const queryClientUtils = {
   /**
    * Check if query data exists in cache
    */
-  hasQueryData: (queryKey) => {
+  hasQueryData: (queryKey: unknown[]) => {
     return queryClient.getQueryData(queryKey) !== undefined;
   },
 
   /**
    * Set query data with automatic error handling
    */
-  safeSetQueryData: (queryKey, data, options = {}) => {
+  safeSetQueryData: (
+    queryKey: unknown[],
+    data: unknown,
+    options: Record<string, unknown> = {}
+  ): boolean => {
     try {
       queryClient.setQueryData(queryKey, data, options);
       return true;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.warn("Safe set query data failed", {
         queryKey,
-        error: error.message,
+        error: errorMessage,
         source: "queryClientUtils",
       });
       return false;

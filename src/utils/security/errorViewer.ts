@@ -49,14 +49,16 @@ class ErrorViewer {
 
     logger.info(`🚨 VioletVault Stored Errors (${errors.length})`);
 
-    errors.forEach((error, index) => {
+    errors.forEach((error: Record<string, unknown>, index: number) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
       logger.info(`${index + 1}. ${error.name}: ${error.message} (${timeAgo})`);
-      logger.debug("Component:", error.failingComponent);
-      logger.debug("Timestamp:", error.timestamp);
-      logger.debug("URL:", error.url);
-      logger.debug("Stack:", error.stack);
-      logger.debug("Component Stack:", error.componentStack);
+      logger.debug("Error details:", {
+        component: error.failingComponent,
+        timestamp: error.timestamp,
+        url: error.url,
+        stack: error.stack,
+        componentStack: error.componentStack,
+      });
     });
 
     return errors;
@@ -93,15 +95,15 @@ class ErrorViewer {
   getLatestErrors(n = 5) {
     const errors = this.getStoredErrors().slice(0, n);
     logger.info(`📋 Latest ${n} errors:`);
-    errors.forEach((error, index) => {
+    errors.forEach((error: Record<string, unknown>, index: number) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
       logger.info(`${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`);
     });
     return errors;
   }
 
-  getTimeAgo(timestamp) {
-    const diff = Date.now() - new Date(timestamp).getTime();
+  getTimeAgo(timestamp: unknown) {
+    const diff = Date.now() - new Date(timestamp as string | number | Date).getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
@@ -126,7 +128,7 @@ class ErrorViewer {
     // This would integrate with whatever error service you want to use
     // For now, just log them with instructions for manual sending
     logger.info("📤 Errors ready to send to external service:");
-    errors.forEach((error, index) => {
+    errors.forEach((error: Record<string, unknown>, index: number) => {
       logger.debug(`${index + 1}.`, {
         timestamp: error.timestamp,
         error: error.name,

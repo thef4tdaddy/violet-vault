@@ -1,4 +1,15 @@
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 import { EmptyRulesList, RuleCard, CreateRuleButton, ExecuteAllButton } from "./RulesTabComponents";
+
+interface RulesTabProps {
+  rules: AutoFundingRule[];
+  onCreateRule: () => void;
+  onEditRule: (rule: AutoFundingRule) => void;
+  onDeleteRule: (ruleId: string) => void;
+  onToggleRule: (ruleId: string) => void;
+  onExecuteRules: () => void;
+  isExecuting: boolean;
+}
 
 const RulesTab = ({
   rules,
@@ -8,8 +19,8 @@ const RulesTab = ({
   onToggleRule,
   onExecuteRules,
   isExecuting,
-}) => {
-  const hasActiveRules = rules.filter((r) => r.enabled).length > 0;
+}: RulesTabProps) => {
+  const hasActiveRules = rules.filter((r: AutoFundingRule) => r.enabled).length > 0;
 
   return (
     <div className="space-y-4">
@@ -25,7 +36,7 @@ const RulesTab = ({
         <EmptyRulesList />
       ) : (
         <div className="space-y-3">
-          {rules.map((rule) => (
+          {rules.map((rule: AutoFundingRule) => (
             <RuleCard
               key={rule.id}
               rule={rule}
