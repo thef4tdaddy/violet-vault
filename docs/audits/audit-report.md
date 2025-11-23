@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 4 | 0 |
 | TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2125 | -5 |
+| TypeScript Strict Mode Errors | 2119 | -6 |
 
-*Last updated: 2025-11-23 13:42:06 UTC*
+*Last updated: 2025-11-23 13:49:29 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -302,7 +302,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 7 errors in `src/App.tsx`
-- 6 errors in `src/utils/transactions/splitting.ts`
 - 6 errors in `src/utils/transactions/fileParser.ts`
 - 6 errors in `src/utils/debts/debtFormValidation.ts`
 - 6 errors in `src/utils/debts/debtDebugConfig.ts`
@@ -611,12 +610,12 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | 630 | `TS7006` |
 | 608 | `TS7031` |
 | 186 | `TS2345` |
-| 153 | `TS2322` |
+| 152 | `TS2322` |
 | 122 | `TS2339` |
-| 112 | `TS18046` |
+| 109 | `TS18046` |
 | 63 | `TS7053` |
 | 59 | `TS7005` |
-| 50 | `TS18048` |
+| 48 | `TS18048` |
 | 37 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
@@ -3420,17 +3419,6 @@ src/utils/transactions/fileParser.ts(26,3): error TS2411: Property 'id' of type 
 src/utils/transactions/fileParser.ts(27,3): error TS2411: Property 'description' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
 src/utils/transactions/fileParser.ts(28,3): error TS2411: Property 'notes' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
-src/utils/transactions/splitting.ts(59,11): error TS18048: 'transaction.metadata.shipping' is possibly 'undefined'.
-src/utils/transactions/splitting.ts(70,11): error TS18048: 'transaction.metadata.tax' is possibly 'undefined'.
-src/utils/transactions/splitting.ts(81,7): error TS2322: Type '({ id: number; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem: boolean; originalItem: { name: string; price?: number | undefined; totalPrice?: number | undefined; category?: { ...; } | undefined; }; } | { ...; })[]' is not assignable to type 'SplitAllocation[]'.
-  Type '{ id: number; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem: boolean; originalItem: { name: string; price?: number | undefined; totalPrice?: number | undefined; category?: { ...; } | undefined; }; } | { ...; }' is not assignable to type 'SplitAllocation'.
-    Type '{ id: number; description: string; amount: number | undefined; category: string; envelopeId: string; isOriginalItem: boolean; }' is not assignable to type 'SplitAllocation'.
-      Types of property 'amount' are incompatible.
-        Type 'number | undefined' is not assignable to type 'number'.
-          Type 'undefined' is not assignable to type 'number'.
-src/utils/transactions/splitting.ts(141,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/transactions/splitting.ts(182,40): error TS18046: 'error' is of type 'unknown'.
-src/utils/transactions/splitting.ts(432,58): error TS18046: 'error' is of type 'unknown'.
 src/utils/ui/touchFeedback.ts(41,19): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ light: number[]; medium: number[]; heavy: number[]; tap: number[]; confirm: number[]; error: number[]; success: number[]; warning: number[]; navigation: number[]; select: number[]; longPress: number[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ light: number[]; medium: number[]; heavy: number[]; tap: number[]; confirm: number[]; error: number[]; success: number[]; warning: number[]; navigation: number[]; select: number[]; longPress: number[]; }'.
 src/utils/ui/touchFeedback.ts(100,36): error TS7006: Parameter 'originalHandler' implicitly has an 'any' type.
