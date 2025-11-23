@@ -5,12 +5,12 @@ import { hapticFeedback } from "../../utils/ui/touchFeedback";
 /**
  * Custom hook for long-press detection
  */
-const useLongPress = (callback, threshold = 500) => {
+const useLongPress = (callback: (event: unknown) => void, threshold = 500) => {
   const isLongPress = useRef(false);
-  const timeout = useRef(null);
+  const timeout = useRef<NodeJS.Timeout | null>(null);
 
   const start = useCallback(
-    (event) => {
+    (event: unknown) => {
       isLongPress.current = false;
       timeout.current = setTimeout(() => {
         isLongPress.current = true;
@@ -40,9 +40,13 @@ const useLongPress = (callback, threshold = 500) => {
 /**
  * Hook for keyboard navigation
  */
-const useKeyboardNavigation = (isExpanded, setExpanded, containerRef) => {
+const useKeyboardNavigation = (
+  isExpanded: boolean,
+  setExpanded: (expanded: boolean) => void,
+  containerRef: React.RefObject<HTMLElement>
+) => {
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (!isExpanded) return;
 
       switch (e.key) {

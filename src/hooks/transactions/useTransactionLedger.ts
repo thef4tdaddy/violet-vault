@@ -51,7 +51,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   const pageSize = 10;
 
   // Handle bulk import by updating both store arrays
-  const handleBulkImport = (newTransactions: unknown[]) => {
+  const handleBulkImport = (newTransactions: unknown[]): void => {
     logger.debug("🔄 Bulk import called with transactions:", { count: newTransactions.length });
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions?.(updatedAllTransactions);
@@ -149,7 +149,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   });
 
   // Event handlers
-  const handleSubmitTransaction = async () => {
+  const handleSubmitTransaction = async (): Promise<void> => {
     const newTransaction = createTransaction(currentUser);
 
     if (ledgerState.editingTransaction) {
@@ -199,19 +199,19 @@ export const useTransactionLedger = (currentUser: unknown) => {
     resetForm();
   };
 
-  const startEdit = (transaction) => {
+  const startEdit = (transaction: FinanceTransaction): void => {
     populateForm(transaction);
     ledgerState.setEditingTransaction(transaction);
     ledgerState.setShowAddModal(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (): void => {
     ledgerState.setShowAddModal(false);
     ledgerState.setEditingTransaction(null);
     resetForm();
   };
 
-  const handleCloseImportModal = () => {
+  const handleCloseImportModal = (): void => {
     ledgerState.setShowImportModal(false);
     resetImport();
   };
@@ -223,7 +223,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
     );
   };
 
-  const handlePagination = (direction) => {
+  const handlePagination = (direction: "prev" | "next"): void => {
     if (direction === "prev") {
       setCurrentPage((p) => Math.max(1, p - 1));
     } else if (direction === "next") {

@@ -90,8 +90,8 @@ class AutoBackupService {
 
       logger.production("📦 Auto backup created successfully", {
         backupId,
-        records: backup.metadata.totalRecords,
-        size: this.formatSize(backup.metadata.sizeEstimate),
+        records: backup.metadata?.totalRecords ?? 0,
+        size: this.formatSize(backup.metadata?.sizeEstimate ?? 0),
         duration,
       });
 
@@ -194,16 +194,16 @@ class AutoBackupService {
           await budgetDb.paycheckHistory.clear();
 
           // Restore data
-          if (data.envelopes?.length) await budgetDb.envelopes.bulkAdd(data.envelopes);
-          if (data.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
-          if (data.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
-          if (data.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
-          if (data.savingsGoals?.length) await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
-          if (data.paycheckHistory?.length)
+          if (data?.envelopes?.length) await budgetDb.envelopes.bulkAdd(data.envelopes);
+          if (data?.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
+          if (data?.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
+          if (data?.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
+          if (data?.savingsGoals?.length) await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
+          if (data?.paycheckHistory?.length)
             await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
 
           // Restore metadata
-          if (data.metadata) {
+          if (data?.metadata) {
             await budgetDb.budget.put({
               id: "metadata",
               ...(data.metadata as Record<string, unknown>),
