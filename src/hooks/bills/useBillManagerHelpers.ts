@@ -282,7 +282,8 @@ export const processBills = (
  * Categorize and calculate totals for bills
  */
 export const categorizeBillsWithTotals = (bills: BillRecord[]) => {
-  const categorizedBills = categorizeBills(bills) as unknown as ReturnType<typeof categorizeBills>;
+  // Type assertion needed because BillRecord and Bill are compatible but different types
+  const categorizedBills = categorizeBills(bills as never[]);
   const totals = calculateBillTotals(categorizedBills);
   return { categorizedBills, totals };
 };
@@ -313,7 +314,7 @@ export const getFilteredBills = (
   filterOptions: FilterOptions
 ): BillRecord[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
-  return filterBills(billsToFilter, filterOptions) as unknown as BillRecord[];
+  return filterBills(billsToFilter, filterOptions) as BillRecord[];
 };
 
 /**

@@ -212,7 +212,7 @@ export const saveToStorage = (
     };
 
     localStorageService.setJSON(STORAGE_KEY, dataToSave);
-    setLastSaved(dataToSave.lastSaved);
+    setLastSaved(dataToSave.lastSaved ?? null);
     setHasUnsavedChanges(false);
 
     logger.debug("Auto-funding data saved to localStorage", {

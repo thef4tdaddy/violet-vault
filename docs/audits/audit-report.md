@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 4 | 0 |
 | TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2134 | -9 |
+| TypeScript Strict Mode Errors | 2125 | -9 |
 
-*Last updated: 2025-11-23 15:40:22 UTC*
+*Last updated: 2025-11-23 15:54:45 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -416,10 +416,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
 - 3 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 3 errors in `src/hooks/mobile/useFABSmartPositioning.ts`
-- 3 errors in `src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
-- 3 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
-- 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
-- 3 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 3 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 3 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 3 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
@@ -481,9 +477,11 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
 - 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
+- 2 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts`
 - 2 errors in `src/hooks/bills/useBillOperations.ts`
+- 2 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
 - 2 errors in `src/hooks/auth/mutations/useProfileMutations.ts`
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
@@ -562,7 +560,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
-- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
 - 1 errors in `src/hooks/bills/useBulkBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
@@ -607,15 +604,15 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 632 | `TS7006` |
+| 631 | `TS7006` |
 | 609 | `TS7031` |
-| 184 | `TS2345` |
+| 177 | `TS2345` |
 | 149 | `TS2322` |
 | 128 | `TS2339` |
 | 110 | `TS18046` |
 | 64 | `TS7005` |
 | 63 | `TS7053` |
-| 50 | `TS18048` |
+| 49 | `TS18048` |
 | 39 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
@@ -2056,12 +2053,7 @@ src/hooks/bills/useBillManager.ts(204,5): error TS2322: Type '(bill: Bill | null
     Type 'BillRecord | null' is not assignable to type 'Bill | null'.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
 src/hooks/bills/useBillManagerHelpers.ts(260,55): error TS7006: Parameter 'updatedBill' implicitly has an 'any' type.
-src/hooks/bills/useBillManagerHelpers.ts(285,44): error TS2345: Argument of type 'BillRecord[]' is not assignable to parameter of type 'Bill[]'.
-  Type 'BillRecord' is not assignable to type 'Bill'.
-    Types of property 'dueDate' are incompatible.
-      Type 'string | Date | null' is not assignable to type 'string | Date | undefined'.
-        Type 'null' is not assignable to type 'string | Date | undefined'.
-src/hooks/bills/useBillManagerHelpers.ts(316,22): error TS2345: Argument of type 'BillRecord[]' is not assignable to parameter of type 'Bill[]'.
+src/hooks/bills/useBillManagerHelpers.ts(317,22): error TS2345: Argument of type 'BillRecord[]' is not assignable to parameter of type 'Bill[]'.
   Type 'BillRecord' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
       Type 'string | Date | null' is not assignable to type 'string | Date | undefined'.
@@ -2111,20 +2103,6 @@ src/hooks/budgeting/autofunding/useAutoFunding.ts(6,10): error TS7034: Variable 
 src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(121,12): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(141,6): error TS7006: Parameter 'importData' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingData.ts(31,65): error TS2345: Argument of type 'Dispatch<SetStateAction<null>>' is not assignable to parameter of type '(val: string | null) => void'.
-  Types of parameters 'value' and 'val' are incompatible.
-    Type 'string | null' is not assignable to type 'SetStateAction<null>'.
-      Type 'string' is not assignable to type 'SetStateAction<null>'.
-src/hooks/budgeting/autofunding/useAutoFundingData.ts(37,52): error TS2345: Argument of type 'Dispatch<SetStateAction<null>>' is not assignable to parameter of type '(val: string | null) => void'.
-  Types of parameters 'value' and 'val' are incompatible.
-    Type 'string | null' is not assignable to type 'SetStateAction<null>'.
-      Type 'string' is not assignable to type 'SetStateAction<null>'.
-src/hooks/budgeting/autofunding/useAutoFundingData.ts(42,54): error TS2345: Argument of type 'Dispatch<SetStateAction<null>>' is not assignable to parameter of type '(val: string | null) => void'.
-  Types of parameters 'value' and 'val' are incompatible.
-    Type 'string | null' is not assignable to type 'SetStateAction<null>'.
-      Type 'string' is not assignable to type 'SetStateAction<null>'.
-src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts(215,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
-  Type 'undefined' is not assignable to type 'string | null'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(3,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(14,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(14,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
@@ -2162,8 +2140,7 @@ src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,50): error TS7006: 
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,55): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionStatistics.ts(35,10): error TS7006: Parameter 'execution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useUndoOperations.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(190,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(190,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(195,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(27,23): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(31,59): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(36,27): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
@@ -2174,11 +2151,6 @@ src/hooks/budgeting/mutations/useTransferFunds.ts(45,25): error TS18048: 'fromEn
 src/hooks/budgeting/mutations/useTransferFunds.ts(50,25): error TS18048: 'toEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(70,25): error TS18048: 'fromEnvelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useTransferFunds.ts(74,25): error TS18048: 'toEnvelope.currentBalance' is possibly 'undefined'.
-src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(81,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
-src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(105,49): error TS2345: Argument of type 'BudgetRecord | null' is not assignable to parameter of type 'BudgetMetadata'.
-  Type 'null' is not assignable to type 'BudgetMetadata'.
-src/hooks/budgeting/useBudgetData/mutationsHelpers.ts(106,36): error TS2345: Argument of type 'EnvelopeAllocation[] | undefined' is not assignable to parameter of type 'EnvelopeAllocation[]'.
-  Type 'undefined' is not assignable to type 'EnvelopeAllocation[]'.
 src/hooks/budgeting/useBudgetData/queries.ts(9,30): error TS7006: Parameter 'queries' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/queries.ts(10,24): error TS7006: Parameter 'query' implicitly has an 'any' type.
 src/hooks/budgeting/useBudgetData/queries.ts(13,28): error TS7006: Parameter 'queries' implicitly has an 'any' type.

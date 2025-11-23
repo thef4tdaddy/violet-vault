@@ -4,6 +4,11 @@ import logger from "../../../utils/common/logger";
 import type { ExecutionRecord } from "./useExecutionHistory";
 import type { RuleExecutionResult, UndoStackEntry as AutofundingUndoStackEntry } from "./types";
 
+// Type for the store state
+type UiStoreState = {
+  budget: unknown;
+};
+
 type UndoTransfer = {
   fromEnvelopeId: string;
   toEnvelopeId: string;
@@ -187,7 +192,7 @@ export const useUndoOperations = (
   initialUndoStack: UndoStackItem[] = [],
   addToHistory: (record: ExecutionRecord) => void
 ) => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUiStore((state: UiStoreState) => state.budget);
   const [undoStack, setUndoStack] = useState<UndoStackItem[]>(initialUndoStack);
 
   // Add execution to undo stack if it has successful transfers
