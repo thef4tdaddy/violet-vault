@@ -58,7 +58,7 @@ const useEnvelopeEdit = ({
   };
 
   // Enhanced save handler that manages locks
-  const handleSave = async (envelopeData) => {
+  const handleSave = async (envelopeData: unknown) => {
     // Check if we can edit before saving
     if (envelope && !canEdit) {
       throw new Error("Cannot save changes - envelope is locked by another user");
@@ -70,8 +70,6 @@ const useEnvelopeEdit = ({
     if (isOwnLock && envelope) {
       releaseLock();
     }
-
-    return true;
   };
 
   // Enhanced delete handler with lock management

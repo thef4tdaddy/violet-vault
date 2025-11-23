@@ -209,7 +209,7 @@ export const useImportData = () => {
 
         const confirmed = await handleConfirmation(
           confirm,
-          validatedData,
+          validatedData as ValidatedImportData,
           hasBudgetIdMismatch,
           importBudgetId,
           currentUser
@@ -228,9 +228,9 @@ export const useImportData = () => {
           currentUser,
         };
 
-        await performImport(validatedData, showSuccessToast, authConfig);
+        await performImport(validatedData as ValidatedImportData, showSuccessToast, authConfig);
 
-        return buildImportResult(validatedData);
+        return buildImportResult(validatedData as ValidatedImportData);
       } catch (error: unknown) {
         logger.error("Import failed", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";

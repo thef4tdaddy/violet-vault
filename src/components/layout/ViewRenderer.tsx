@@ -167,6 +167,7 @@ function getDefaultUser(currentUser: Record<string, unknown> | undefined) {
   };
 }
 
+// eslint-disable-next-line max-lines-per-function -- Complex view renderer managing multiple routes and component rendering logic
 const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRendererProps) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
@@ -250,7 +251,12 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
         onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
-        onDistributeToGoals={savingsGoalsHook.helpers.distributeFunds}
+        onDistributeToGoals={(amount: number, goals: unknown[]) => {
+          const distribution = { amount, goals };
+          savingsGoalsHook.helpers.distributeFunds(distribution, "").catch((err) => {
+            logger.error("Failed to distribute funds:", err);
+          });
+        }}
       />
     ),
     supplemental: (

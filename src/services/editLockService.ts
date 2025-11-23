@@ -126,8 +126,12 @@ class EditLockService {
     try {
       // Check for existing lock and determine action
       const existingLock = await this.getLock(recordType, recordId);
-      const lockAction = await handleExistingLock(existingLock, this.currentUser, () =>
-        this.releaseLock(recordType, recordId)
+      const lockAction = await handleExistingLock(
+        existingLock as { userId: string; userName: string; expiresAt: { toDate(): Date } } | null,
+        this.currentUser,
+        async () => {
+          await this.releaseLock(recordType, recordId);
+        }
       );
 
       if (lockAction.action === "blocked") {

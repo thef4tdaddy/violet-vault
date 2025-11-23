@@ -14,7 +14,15 @@ const useEnvelopes = (options = {}) => {
   const operationsResult = useEnvelopeOperations();
 
   // Extract calculations and utilities
-  const calculationsResult = useEnvelopeCalculations(queryResult.envelopes);
+  const calculationsResult = useEnvelopeCalculations(
+    queryResult.envelopes as unknown as Array<{
+      id?: string;
+      currentBalance?: number;
+      targetAmount?: number;
+      category?: string;
+      [key: string]: unknown;
+    }>
+  );
 
   // Wrapper functions for envelope deletion with bill handling
   const deleteEnvelopeWrapper = (envelopeId: string, deleteBillsToo: boolean = false) => {

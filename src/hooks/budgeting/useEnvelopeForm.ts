@@ -64,10 +64,7 @@ const useEnvelopeForm = ({
           });
         }
         if (field === "envelopeType") {
-          const compatibility = validateEnvelopeTypeChange(
-            String(value),
-            envelope as Record<string, unknown>
-          );
+          const compatibility = validateEnvelopeTypeChange(String(value), envelope as never);
           if (!compatibility.isValid) {
             setErrors((prevErrors) => ({
               ...prevErrors,
@@ -95,7 +92,7 @@ const useEnvelopeForm = ({
   const validateForm = useCallback(() => {
     const validation = validateEnvelopeForm(
       formData,
-      existingEnvelopes as Record<string, unknown>[],
+      existingEnvelopes as never,
       envelope?.id as string | undefined
     );
     setErrors(validation.errors);

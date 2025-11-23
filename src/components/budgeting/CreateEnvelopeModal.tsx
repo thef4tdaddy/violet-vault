@@ -54,8 +54,10 @@ const CreateEnvelopeModal = ({
     handleClose,
   } = useEnvelopeForm({
     envelope: null, // New envelope
-    existingEnvelopes,
-    onSave: onCreateEnvelope,
+    existingEnvelopes: existingEnvelopes as Record<string, unknown>[],
+    onSave: async (data: unknown) => {
+      onCreateEnvelope(data);
+    },
     onClose,
     currentUser,
   });

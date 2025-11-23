@@ -31,8 +31,16 @@ export const usePaycheckOperations = () => {
       // Calculate new balances and handle envelope reversals
       const balances = await calculateReversedBalances(
         paycheckToDelete,
-        budgetDb,
-        getBudgetMetadata
+        budgetDb as unknown as {
+          envelopes: {
+            get: (id: string | number) => Promise<unknown>;
+            update: (id: string | number, data: unknown) => Promise<void>;
+          };
+        },
+        getBudgetMetadata as unknown as () => Promise<{
+          actualBalance?: number;
+          unassignedCash?: number;
+        }>
       );
 
       // Update budget metadata

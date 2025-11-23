@@ -141,7 +141,15 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <EnvelopeSelectionStep
             transactionForm={transactionForm}
-            envelopes={envelopes}
+            envelopes={
+              envelopes as unknown as Array<{
+                id: string;
+                name: string;
+                category: string;
+                allocated: number;
+                spent: number;
+              }>
+            }
             handleFormChange={handleFormChange}
           />
         );
@@ -150,7 +158,15 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           <ConfirmationStep
             receiptData={receiptData}
             transactionForm={transactionForm}
-            envelopes={envelopes}
+            envelopes={
+              envelopes as unknown as Array<{
+                id: string;
+                name: string;
+                category: string;
+                allocated: number;
+                spent: number;
+              }>
+            }
           />
         );
       default:

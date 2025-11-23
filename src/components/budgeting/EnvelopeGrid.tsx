@@ -59,6 +59,7 @@ const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 // Modals container component
 interface EnvelopeRef {
   id: string;
+  name: string;
 }
 
 const EnvelopeModals = ({
@@ -144,8 +145,14 @@ const EnvelopeModals = ({
       <QuickFundModal
         isOpen={quickFundModal.isOpen}
         onClose={closeQuickFundModal}
-        onConfirm={handleQuickFundConfirm}
-        envelope={quickFundModal.envelope as EnvelopeRef}
+        onConfirm={(amount: number) => {
+          if (quickFundModal.envelope?.id) {
+            handleQuickFundConfirm(quickFundModal.envelope.id, amount).catch((err) => {
+              logger.error("Failed to quick fund envelope:", err);
+            });
+          }
+        }}
+        envelope={quickFundModal.envelope as { id: string; name: string; [key: string]: unknown }}
         suggestedAmount={quickFundModal.suggestedAmount}
         unassignedCash={unassignedCash}
       />

@@ -25,10 +25,10 @@ const usePatchNotes = (shouldFetch: boolean) => {
 
     const fetchNotes = async () => {
       try {
-        const notes = await patchNotesManager.getPatchNotesForVersion(APP_VERSION);
-        if (notes && notes.hasContent) {
-          const highlights = patchNotesManager.getTopHighlights(notes);
-          setPatchNotes(highlights);
+        const parsedNotes = await patchNotesManager.getPatchNotesForVersion(APP_VERSION);
+        if (parsedNotes && typeof parsedNotes === "object" && Object.keys(parsedNotes).length > 0) {
+          const highlights = patchNotesManager.getTopHighlights(parsedNotes);
+          setPatchNotes(highlights as PatchNote[]);
           logger.info("Loaded patch notes for version popup", { version: APP_VERSION });
         }
       } catch (error) {

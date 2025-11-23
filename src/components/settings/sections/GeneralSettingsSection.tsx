@@ -300,7 +300,9 @@ const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
           not_available: "Installation not available on this browser",
           declined: "Installation cancelled",
         };
-        logger.info("Manual PWA install:", messages[result.reason] || "Installation failed");
+        logger.info("Manual PWA install:", {
+          message: messages[result.reason] || "Installation failed",
+        });
       }
     } catch (error) {
       logger.error("Manual PWA install failed:", error);

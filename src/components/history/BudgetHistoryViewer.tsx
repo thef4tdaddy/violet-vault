@@ -42,7 +42,13 @@ const BudgetHistoryViewer = ({ onClose }) => {
     toggleIntegrityDetails,
   } = useBudgetHistoryViewerUI();
 
-  const { handleRestoreFromHistory } = useBudgetHistoryRestore(restore);
+  const { handleRestoreFromHistory } = useBudgetHistoryRestore(
+    async (params: { commitHash: string; password: string }) => {
+      await (
+        restore as unknown as (params: { commitHash: string; password: string }) => Promise<void>
+      )(params);
+    }
+  );
   const { getChangeIcon, getAuthorColor } = useBudgetHistoryUIHelpers();
 
   const [integrityCheck] = useState(null);

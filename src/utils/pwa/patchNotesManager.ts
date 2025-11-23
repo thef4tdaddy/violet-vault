@@ -59,7 +59,7 @@ class PatchNotesManager {
   /**
    * Extract patch notes for a specific version
    */
-  async getPatchNotesForVersion(version: string): Promise<string> {
+  async getPatchNotesForVersion(version: string): Promise<Record<string, unknown>> {
     try {
       const changelog = await this.fetchChangelog();
       return this.extractVersionNotes(changelog, version);
@@ -72,7 +72,7 @@ class PatchNotesManager {
   /**
    * Extract notes for a version from changelog content
    */
-  extractVersionNotes(changelog: string, version: string): string {
+  extractVersionNotes(changelog: string, version: string): Record<string, unknown> {
     // Look for version header (e.g., "## [1.9.0]" or "# v1.9.0")
     const versionRegex = new RegExp(
       `(?:^|\\n)(?:##?\\s*(?:\\[?v?${version.replace(/\./g, "\\.")}\\]?|${version.replace(/\./g, "\\.")}))(?:\\s*-[^\\n]*)?(?:\\n|$)`,

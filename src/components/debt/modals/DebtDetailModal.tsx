@@ -59,7 +59,7 @@ const DebtDetailModal = ({
     handleShowPaymentForm,
     handleCancelPayment,
   } = useDebtDetailModal({
-    debt: debt as Parameters<typeof useDebtDetailModal>[0]["debt"],
+    debt: debt as unknown as Parameters<typeof useDebtDetailModal>[0]["debt"],
     isOpen,
     onClose,
     onDelete: async (debtId: string) => {
@@ -70,12 +70,8 @@ const DebtDetailModal = ({
         logger.error("Failed to record payment:", err);
       });
     },
-    onEdit: (
-      debt: Parameters<typeof useDebtDetailModal>[0]["debt"] extends null
-        ? never
-        : NonNullable<Parameters<typeof useDebtDetailModal>[0]["debt"]>
-    ) => {
-      onEdit(debt as Record<string, unknown>);
+    onEdit: (debt: NonNullable<Parameters<typeof useDebtDetailModal>[0]["debt"]>) => {
+      onEdit(debt as unknown as Record<string, unknown>);
     },
   });
 

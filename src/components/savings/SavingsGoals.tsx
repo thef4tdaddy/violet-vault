@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui";
 import React from "react";
 import { getIcon } from "../../utils";
+import type { SavingsGoal } from "@/db/types";
 
 // Import the new modular components
 import SavingsSummaryCard from "./SavingsSummaryCard";
@@ -90,7 +91,7 @@ const SavingsGoals = ({
       </div>
 
       {/* Summary Cards - Page-specific cards like Debt page */}
-      <SavingsSummaryCard savingsGoals={savingsGoals} onAddGoal={openAddForm} />
+      <SavingsSummaryCard savingsGoals={savingsGoals as SavingsGoal[]} onAddGoal={openAddForm} />
 
       {/* White block for goals list */}
       <div className="bg-white rounded-xl p-6 border-2 border-black shadow-sm">
@@ -127,7 +128,7 @@ const SavingsGoals = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {savingsGoals.map((goal) => (
+            {(savingsGoals as SavingsGoal[]).map((goal: SavingsGoal) => (
               <SavingsGoalCard
                 key={goal.id}
                 goal={goal}
@@ -153,7 +154,7 @@ const SavingsGoals = ({
         isOpen={showDistributeModal}
         onClose={handleCloseModals}
         onDistribute={handleDistribute}
-        savingsGoals={savingsGoals}
+        savingsGoals={savingsGoals as SavingsGoal[]}
         unassignedCash={unassignedCash}
       />
     </div>

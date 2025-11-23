@@ -73,7 +73,7 @@ const useKeyboardNavigation = (
                 : currentIndex >= actionButtons.length - 1
                   ? 0
                   : currentIndex + 1;
-            actionButtons[nextIndex]?.focus();
+            (actionButtons[nextIndex] as HTMLElement)?.focus();
           }
           break;
         }

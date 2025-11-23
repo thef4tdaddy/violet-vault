@@ -59,8 +59,9 @@ export const reverseEnvelopeAllocations = async (
   for (const allocation of paycheckToDelete.envelopeAllocations) {
     const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
     if (envelope) {
+      const envelopeData = envelope as { currentBalance?: number; [key: string]: unknown };
       await budgetDb.envelopes.update(allocation.envelopeId, {
-        currentBalance: Math.max(0, (envelope.currentBalance || 0) - allocation.amount),
+        currentBalance: Math.max(0, (envelopeData.currentBalance || 0) - allocation.amount),
       });
       logger.debug("Reversed envelope allocation", {
         envelopeId: allocation.envelopeId,
@@ -135,7 +136,12 @@ export const deletePaycheckRecord = async (
   });
 
   // Verify the paycheck exists in Dexie before attempting to delete
-  const existsInDexie = await budgetDb.paycheckHistory.get(paycheckId);
+  const existsInDexie = await (
+    budgetDb.paycheckHistory as {
+      get: (id: string | number) => Promise<unknown>;
+      delete: (id: string | number) => Promise<void>;
+    }
+  ).get(paycheckId);
   if (!existsInDexie) {
     logger.warn("Paycheck not found in Dexie database", {
       paycheckId,
@@ -151,7 +157,12 @@ export const deletePaycheckRecord = async (
  */
 export const invalidatePaycheckCaches = async (
   queryClient: { invalidateQueries: (opts: unknown) => Promise<void> },
-  queryKeys: { paycheckHistory: unknown[]; budgetMetadata: unknown[] }
+  queryKeys: {
+    paycheckHistory: () => unknown[];
+    envelopes: unknown[];
+    budgetMetadata: unknown[];
+    dashboard: unknown[];
+  }
 ): Promise<void> => {
   queryClient.invalidateQueries({
     queryKey: queryKeys.paycheckHistory(),

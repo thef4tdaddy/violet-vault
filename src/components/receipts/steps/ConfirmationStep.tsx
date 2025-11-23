@@ -61,7 +61,15 @@ const TransactionDetailsCard: React.FC<{ transactionForm: TransactionForm }> = (
           {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 mr-1" })}
           Date:
         </span>
-        <span className="font-bold text-gray-900">{formatDisplayDate(transactionForm.date)}</span>
+        <span className="font-bold text-gray-900">
+          {formatDisplayDate(
+            transactionForm.date instanceof Date
+              ? transactionForm.date.toISOString()
+              : typeof transactionForm.date === "number"
+                ? new Date(transactionForm.date).toISOString()
+                : String(transactionForm.date)
+          )}
+        </span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium text-gray-700">Category:</span>
@@ -136,7 +144,15 @@ const ReceiptInformationCard: React.FC<{ receiptData: ReceiptData }> = ({ receip
       </div>
       <div className="flex justify-between">
         <span className="text-gray-700 font-medium">Original Date:</span>
-        <span className="font-bold text-gray-900">{formatDisplayDate(receiptData.date)}</span>
+        <span className="font-bold text-gray-900">
+          {formatDisplayDate(
+            receiptData.date instanceof Date
+              ? receiptData.date.toISOString()
+              : typeof receiptData.date === "number"
+                ? new Date(receiptData.date).toISOString()
+                : String(receiptData.date)
+          )}
+        </span>
       </div>
       {receiptData.confidence && (
         <div className="flex justify-between">

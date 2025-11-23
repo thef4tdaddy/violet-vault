@@ -127,7 +127,7 @@ export const useFirebaseMessaging = () => {
       const customEvent = event as CustomEvent<{ payload: unknown; timestamp: number }>;
       const { payload, timestamp } = customEvent.detail;
       setLastMessage({ payload, timestamp });
-      logger.info("📨 Received FCM message in hook", payload);
+      logger.info("📨 Received FCM message in hook", payload as Record<string, unknown>);
     };
 
     window.addEventListener("fcm-message", handleFCMMessage);

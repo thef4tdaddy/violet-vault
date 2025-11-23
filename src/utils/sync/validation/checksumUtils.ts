@@ -20,7 +20,7 @@ export const generateChecksum = async (data: unknown): Promise<string> => {
     if (data instanceof ArrayBuffer) {
       dataBuffer = data;
     } else if (typeof data === "string") {
-      dataBuffer = encoder.encode(data);
+      dataBuffer = encoder.encode(data).buffer;
     } else {
       // Handle objects, arrays, null, undefined, etc.
       const jsonString = JSON.stringify(data, (_key, value: unknown) => {
@@ -29,7 +29,7 @@ export const generateChecksum = async (data: unknown): Promise<string> => {
         if (value instanceof Date) return value.toISOString();
         return value;
       });
-      dataBuffer = encoder.encode(jsonString);
+      dataBuffer = encoder.encode(jsonString).buffer;
     }
 
     const hashBuffer = await crypto.subtle.digest(
