@@ -116,10 +116,11 @@ class OfflineDataValidator {
   /**
    * Get count of records in a table
    */
-  async getTableCount(tableName) {
+  async getTableCount(tableName: string): Promise<number> {
     try {
-      const table = budgetDb[tableName];
-      if (!table) {
+      const dbAny = budgetDb as unknown as Record<string, { count?: () => Promise<number> }>;
+      const table = dbAny[tableName];
+      if (!table || typeof table.count !== "function") {
         logger.warn(`Table ${tableName} not found in Dexie schema`);
         return 0;
       }
@@ -128,7 +129,7 @@ class OfflineDataValidator {
       logger.debug(`📋 Table ${tableName}: ${count} records`);
       return count;
     } catch (error) {
-      logger.warn(`Failed to count records in ${tableName}:`, error);
+      logger.warn(`Failed to count records in ${tableName}:`, error as Record<string, unknown>);
       return 0;
     }
   }
@@ -149,10 +150,10 @@ class OfflineDataValidator {
         description: tx.description,
         amount: tx.amount,
         date: tx.date,
-        envelope: (tx as unknown as Record<string, unknown>).envelope,
+        envelope: tx.envelopeId,
       }));
     } catch (error) {
-      logger.warn("Failed to get recent transactions preview:", error);
+      logger.warn("Failed to get recent transactions preview:", error as Record<string, unknown>);
       return [];
     }
   }
@@ -167,18 +168,17 @@ class OfflineDataValidator {
       return {
         totalEnvelopes: envelopes.length,
         totalAllocated: envelopes.reduce(
-          (sum, env) =>
-            sum + (((env as unknown as Record<string, unknown>).allocated as number) || 0),
+          (sum, env) => sum + ((env as { allocated?: number }).allocated || 0),
           0
         ),
         totalSpent: envelopes.reduce(
-          (sum, env) => sum + (((env as unknown as Record<string, unknown>).spent as number) || 0),
+          (sum, env) => sum + ((env as { spent?: number }).spent || 0),
           0
         ),
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
     } catch (error) {
-      logger.warn("Failed to get envelope summary:", error);
+      logger.warn("Failed to get envelope summary:", error as Record<string, unknown>);
       return {
         totalEnvelopes: 0,
         totalAllocated: 0,
