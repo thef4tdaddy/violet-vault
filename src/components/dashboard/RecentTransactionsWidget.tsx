@@ -1,7 +1,22 @@
 import React from "react";
 import { getIcon } from "../../utils";
+import type { Transaction } from "../../types/finance";
 
-const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () => [] }) => {
+// Define interfaces for component props
+interface EnvelopeOption {
+  id: string;
+  name: string;
+}
+
+interface RecentTransactionsWidgetProps {
+  transactions: Transaction[];
+  getEnvelopeOptions: () => EnvelopeOption[];
+}
+
+const RecentTransactionsWidget = ({
+  transactions = [],
+  getEnvelopeOptions = () => [],
+}: RecentTransactionsWidgetProps) => {
   if (transactions.length === 0) {
     return null;
   }
@@ -12,7 +27,7 @@ const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () =
         <span className="text-lg">R</span>ECENT <span className="text-lg">T</span>RANSACTIONS
       </h3>
       <div className="space-y-3">
-        {transactions.map((transaction) => (
+        {transactions.map((transaction: Transaction) => (
           <div
             key={transaction.id}
             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
@@ -37,8 +52,9 @@ const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () =
                   {transaction.envelopeId && transaction.envelopeId !== "unassigned" && (
                     <span className="ml-2">
                       →{" "}
-                      {getEnvelopeOptions().find((opt) => opt.id === transaction.envelopeId)
-                        ?.name || "Unknown"}
+                      {getEnvelopeOptions().find(
+                        (opt: EnvelopeOption) => opt.id === transaction.envelopeId
+                      )?.name || "Unknown"}
                     </span>
                   )}
                 </div>
