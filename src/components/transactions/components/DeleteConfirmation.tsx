@@ -2,10 +2,28 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 
+interface Transaction {
+  description: string;
+  [key: string]: unknown;
+}
+
+interface VirtualRow {
+  start: number;
+  [key: string]: unknown;
+}
+
+interface DeleteConfirmationProps {
+  transaction: Transaction;
+  onConfirm: () => void;
+  onCancel: () => void;
+  virtualRow: VirtualRow;
+  gridTemplate: string;
+}
+
 /**
  * Inline delete confirmation component
  */
-const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow, gridTemplate }) => {
+const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow, gridTemplate }: DeleteConfirmationProps) => {
   return (
     <div
       className="grid bg-red-50 border border-red-200"

@@ -2,7 +2,22 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const SplitActions = ({ totals, hasUnsavedChanges, isSaving, errors = [], onSave, onCancel }) => {
+interface Totals {
+  isValid: boolean;
+  isOverAllocated: boolean;
+  remaining: number;
+}
+
+interface SplitActionsProps {
+  totals: Totals;
+  hasUnsavedChanges: boolean;
+  isSaving: boolean;
+  errors?: string[];
+  onSave: () => void;
+  onCancel: () => void;
+}
+
+const SplitActions = ({ totals, hasUnsavedChanges, isSaving, errors = [], onSave, onCancel }: SplitActionsProps) => {
   const { isValid, isOverAllocated, remaining } = totals;
 
   const getValidationMessage = () => {
