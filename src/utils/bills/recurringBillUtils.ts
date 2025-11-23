@@ -1,4 +1,5 @@
 import logger from "../common/logger";
+import type { Bill } from "@/types/bills";
 
 /**
  * Calculate the next due date based on payment date and frequency
@@ -6,12 +7,12 @@ import logger from "../common/logger";
  * @param {string} frequency - The billing frequency (monthly, biweekly, weekly, quarterly, yearly)
  * @returns {Date|null} The next due date
  */
-export const calculateNextDueDate = (paidDate, frequency) => {
+export const calculateNextDueDate = (paidDate: string | Date, frequency: string): Date | null => {
   try {
     const paid = new Date(paidDate);
 
     if (isNaN(paid.getTime())) {
-      logger.warn("Invalid paid date:", paidDate);
+      logger.warn("Invalid paid date:", { paidDate: String(paidDate) });
       return null;
     }
 
@@ -33,7 +34,7 @@ export const calculateNextDueDate = (paidDate, frequency) => {
         paid.setFullYear(paid.getFullYear() + 1);
         break;
       default:
-        logger.warn("Unknown frequency:", frequency);
+        logger.warn("Unknown frequency:", { frequency });
         return null;
     }
 
@@ -50,7 +51,7 @@ export const calculateNextDueDate = (paidDate, frequency) => {
  * @param {Function} updateBillFn - Function to update the bill in database
  * @returns {Object} The processed bill
  */
-export const processRecurringBill = (bill, updateBillFn) => {
+export const processRecurringBill = (bill: Bill, updateBillFn: (bill: Bill) => void): Bill => {
   const processedBill = { ...bill };
 
   // Handle recurring bill logic - reset paid bills when their next cycle arrives
@@ -62,7 +63,7 @@ export const processRecurringBill = (bill, updateBillFn) => {
     if (nextDueDate && today >= nextDueDate) {
       processedBill.isPaid = false;
       processedBill.dueDate = nextDueDate.toISOString().split("T")[0];
-      processedBill.paidDate = null;
+      processedBill.paidDate = undefined;
 
       // Update the bill in the database
       if (updateBillFn) {
@@ -72,7 +73,9 @@ export const processRecurringBill = (bill, updateBillFn) => {
             `Reset recurring bill ${processedBill.id} - next due: ${processedBill.dueDate}`
           );
         } catch (error) {
-          logger.warn("Failed to reset recurring bill", error);
+          logger.warn("Failed to reset recurring bill", {
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
     }
@@ -87,6 +90,9 @@ export const processRecurringBill = (bill, updateBillFn) => {
  * @param {Function} updateBillFn - Function to update bills in database
  * @returns {Array} Array of processed bills
  */
-export const processRecurringBills = (bills, updateBillFn) => {
-  return bills.map((bill) => processRecurringBill(bill, updateBillFn));
+export const processRecurringBills = (
+  bills: Bill[],
+  updateBillFn: (bill: Bill) => void
+): Bill[] => {
+  return bills.map((bill: Bill) => processRecurringBill(bill, updateBillFn));
 };

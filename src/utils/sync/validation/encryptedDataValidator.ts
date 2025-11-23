@@ -8,12 +8,23 @@ import { VALIDATION_CONSTANTS } from "./constants";
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements
  */
 
+interface EncryptedData {
+  data: string;
+  iv: string;
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
 /**
  * Validate encrypted data structure before decryption
  */
-export const validateEncryptedData = (encryptedData, operation = "unknown") => {
-  const errors = [];
-  const warnings = [];
+export const validateEncryptedData = (encryptedData: EncryptedData | null | undefined, operation = "unknown"): ValidationResult => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
 
   // Check if encrypted data exists
   if (!encryptedData) {
@@ -41,7 +52,7 @@ export const validateEncryptedData = (encryptedData, operation = "unknown") => {
  * Validate data sizes to prevent corruption errors
  * @private
  */
-const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
+const _validateDataSizes = (encryptedData: EncryptedData, operation: string, errors: string[], warnings: string[]): ValidationResult => {
   try {
     const dataLength = encryptedData.data.length;
     const ivLength = encryptedData.iv.length;
@@ -73,7 +84,8 @@ const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
 
     return _buildValidationResult(encryptedData, errors, warnings, operation);
   } catch (validationError) {
-    errors.push(`Data validation error: ${validationError.message}`);
+    const errorMsg = validationError instanceof Error ? validationError.message : String(validationError);
+    errors.push(`Data validation error: ${errorMsg}`);
     return { isValid: false, errors, warnings };
   }
 };
@@ -82,7 +94,7 @@ const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
  * Build validation result object
  * @private
  */
-const _buildValidationResult = (encryptedData, errors, warnings, operation) => {
+const _buildValidationResult = (encryptedData: EncryptedData, errors: string[], warnings: string[], operation: string): ValidationResult & { dataLength: number; ivLength: number } => {
   const result = {
     isValid: errors.length === 0,
     errors,

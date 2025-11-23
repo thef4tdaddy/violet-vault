@@ -384,7 +384,7 @@ class SyncEdgeCaseTester {
       await budgetDb.transactions.add(testData as Partial<Transaction> as Transaction);
 
       const syncData = await cloudSyncService.fetchDexieData();
-      const foundItem = syncData.transactions.find((t) => t.id === "unicode-test");
+      const foundItem = syncData.transactions.find((t: Transaction) => t.id === "unicode-test");
       // Check if name property exists (it's not in Transaction type but test data has it)
       const passed =
         foundItem && (foundItem as Transaction & { name?: string }).name === testData.name;

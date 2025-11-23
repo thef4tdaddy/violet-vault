@@ -2,11 +2,32 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
 
+interface SecuritySettings {
+  securityLoggingEnabled: boolean;
+}
+
+interface SecurityEvent {
+  id: string;
+  type: string;
+  description: string;
+  timestamp: string | number | Date;
+}
+
+interface SecurityLoggingSectionProps {
+  securitySettings: SecuritySettings;
+  securityEvents: SecurityEvent[];
+  showEvents: boolean;
+  handleSettingChange: (key: string, value: boolean) => void;
+  toggleEventsDisplay: () => void;
+  exportSecurityEvents: () => void;
+  showClearConfirmDialog: () => void;
+}
+
 /**
  * Security logging section with events display and management
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const SecurityLoggingSection = ({
+const SecurityLoggingSection: React.FC<SecurityLoggingSectionProps> = ({
   securitySettings,
   securityEvents,
   showEvents,
@@ -16,8 +37,8 @@ const SecurityLoggingSection = ({
   showClearConfirmDialog,
 }) => {
   // Security event item component
-  const SecurityEventItem = ({ event }) => {
-    const getEventTypeColor = (type) => {
+  const SecurityEventItem: React.FC<{ event: SecurityEvent }> = ({ event }) => {
+    const getEventTypeColor = (type: string) => {
       if (type.includes("FAILED") || type.includes("ERROR")) {
         return "text-red-600 bg-red-100 border-red-300";
       } else if (type.includes("LOCK")) {

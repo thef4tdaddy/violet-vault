@@ -3,7 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import useUiStore from "@/stores/ui/uiStore";
+import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import { markVersionAsSeen } from "@/utils/common/version";
 
 type ChangeType = "feature" | "fix" | "breaking" | "other";
@@ -86,10 +86,12 @@ const getChangeColor = (type: ChangeType): string => {
  * Shows what's new after app updates
  */
 const PatchNotesModal: React.FC = () => {
-  const showPatchNotes = useUiStore((state) => state.showPatchNotes);
-  const patchNotesData = useUiStore((state) => state.patchNotesData) as PatchNotesData | null;
-  const loadingPatchNotes = useUiStore((state) => state.loadingPatchNotes);
-  const hidePatchNotesModal = useUiStore((state) => state.hidePatchNotesModal);
+  const showPatchNotes = useUiStore((state: UiStore) => state.showPatchNotes);
+  const patchNotesData = useUiStore(
+    (state: UiStore) => state.patchNotesData
+  ) as PatchNotesData | null;
+  const loadingPatchNotes = useUiStore((state: UiStore) => state.loadingPatchNotes);
+  const hidePatchNotesModal = useUiStore((state: UiStore) => state.hidePatchNotesModal);
   const shouldRender = showPatchNotes && Boolean(patchNotesData);
   const modalRef = useModalAutoScroll(shouldRender);
 
@@ -118,6 +120,7 @@ const PatchNotesModal: React.FC = () => {
   };
 
   const handleViewFullNotes = (): void => {
+    if (!patchNotesData) return;
     // Open GitHub releases page in new tab
     const repoUrl = "https://github.com/thef4tdaddy/violet-vault";
     const releaseUrl = `${repoUrl}/releases/tag/v${patchNotesData.version}`;
@@ -143,6 +146,9 @@ const PatchNotesModal: React.FC = () => {
       </div>
     );
   }
+
+  // Guard against null patchNotesData
+  if (!patchNotesData) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -208,7 +214,7 @@ const PatchNotesModal: React.FC = () => {
         )}
 
         {/* Update Info */}
-        {patchNotesData.isUpdate && patchNotesData.fromVersion && (
+        {patchNotesData.isUpdate && patchNotesData.fromVersion && patchNotesData.toVersion && (
           <div className="bg-blue-50/60 rounded-lg p-4 mb-6 border border-blue-200">
             <div className="flex items-center space-x-2 text-sm">
               {React.createElement(getIcon("ArrowUp"), {

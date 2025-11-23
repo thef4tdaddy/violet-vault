@@ -98,7 +98,7 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
     };
   }
 
-  const parsedData = buildParsedData(result.data);
+  const parsedData = result.data ? buildParsedData(result.data) : ({} as DebtFormParsedData);
 
   return {
     isValid: true,
@@ -236,8 +236,8 @@ export function formatDebtMetrics(
   if (!isPaymentSufficient || monthsToPayoff === null) {
     payoffTime = "Payment insufficient (covers interest only)";
   } else {
-    const years = Math.floor(monthsToPayoff / 12);
-    const months = monthsToPayoff % 12;
+    const years = Math.floor((monthsToPayoff ?? 0) / 12);
+    const months = (monthsToPayoff ?? 0) % 12;
 
     if (years === 0) {
       payoffTime = `${months} month${months !== 1 ? "s" : ""}`;
@@ -249,15 +249,15 @@ export function formatDebtMetrics(
   }
 
   // Format currency values
-  const formatCurrency = (value: number | null): string => {
-    if (value === null) return "N/A";
+  const formatCurrency = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return "N/A";
     return `$${value.toFixed(2)}`;
   };
 
   return {
     payoffTime,
-    totalInterest: formatCurrency(totalInterest),
-    monthlyInterest: formatCurrency(monthlyInterestCost),
-    isPaymentSufficient,
+    totalInterest: formatCurrency(totalInterest ?? null),
+    monthlyInterest: formatCurrency(monthlyInterestCost ?? null),
+    isPaymentSufficient: isPaymentSufficient ?? false,
   };
 }

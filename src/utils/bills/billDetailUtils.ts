@@ -3,6 +3,12 @@
  * Extracted from components following Issue #152 pattern
  */
 
+interface Bill {
+  status?: string;
+  dueDate?: string;
+  paymentHistory?: Array<{ amount?: number }>;
+}
+
 /**
  * Calculate the next due date for a recurring bill
  * @param {Date} currentDueDate - Current due date
@@ -10,7 +16,11 @@
  * @param {number} customFrequency - Custom frequency multiplier
  * @returns {Date|null} Next due date or null if not applicable
  */
-export const calculateNextDueDate = (currentDueDate, frequency, customFrequency = 1) => {
+export const calculateNextDueDate = (
+  currentDueDate: Date | string,
+  frequency: string,
+  customFrequency = 1
+): Date | null => {
   if (!currentDueDate || frequency === "once") return null;
 
   const current = new Date(currentDueDate);
@@ -49,7 +59,11 @@ export const calculateNextDueDate = (currentDueDate, frequency, customFrequency 
  * @param {boolean} isDueSoon - Whether bill is due soon
  * @returns {string} Icon component name
  */
-export const getBillStatusIcon = (status, isOverdue, isDueSoon) => {
+export const getBillStatusIcon = (
+  status: string,
+  isOverdue: boolean,
+  isDueSoon: boolean
+): string => {
   if (status === "paid") return "CheckCircle";
   if (isOverdue) return "AlertTriangle";
   if (isDueSoon) return "Clock";
@@ -61,8 +75,8 @@ export const getBillStatusIcon = (status, isOverdue, isDueSoon) => {
  * @param {number|string} amount - Bill amount
  * @returns {string} Formatted amount string
  */
-export const formatBillAmount = (amount) => {
-  const numAmount = parseFloat(amount || 0);
+export const formatBillAmount = (amount: number | string): string => {
+  const numAmount = parseFloat(String(amount) || "0");
   return numAmount.toFixed(2);
 };
 
@@ -71,7 +85,7 @@ export const formatBillAmount = (amount) => {
  * @param {Object} bill - Bill object
  * @returns {Object} Payment statistics
  */
-export const getBillPaymentStats = (bill) => {
+export const getBillPaymentStats = (bill: Bill) => {
   if (!bill.paymentHistory || !Array.isArray(bill.paymentHistory)) {
     return {
       totalPaid: 0,
@@ -82,7 +96,7 @@ export const getBillPaymentStats = (bill) => {
   }
 
   const payments = bill.paymentHistory;
-  const totalPaid = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+  const totalPaid = payments.reduce((sum: number, payment) => sum + (payment.amount || 0), 0);
   const paymentCount = payments.length;
   const lastPayment = payments.length > 0 ? payments[payments.length - 1] : null;
   const averagePayment = paymentCount > 0 ? totalPaid / paymentCount : 0;
@@ -100,7 +114,7 @@ export const getBillPaymentStats = (bill) => {
  * @param {Object} bill - Bill object
  * @returns {boolean} Whether bill needs attention
  */
-export const billNeedsAttention = (bill) => {
+export const billNeedsAttention = (bill: Bill): boolean => {
   if (bill.status === "paid") return false;
   if (!bill.dueDate) return false;
 
@@ -115,7 +129,7 @@ export const billNeedsAttention = (bill) => {
  * @param {Object} bill - Bill object
  * @returns {number} Urgency score (higher = more urgent)
  */
-export const getBillUrgencyScore = (bill) => {
+export const getBillUrgencyScore = (bill: Bill): number => {
   if (bill.status === "paid") return 0;
   if (!bill.dueDate) return 1;
 

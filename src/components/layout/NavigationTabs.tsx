@@ -11,15 +11,22 @@ interface NavButtonProps {
   viewKey: string;
 }
 
+interface TabItem {
+  key: string;
+  path: string;
+  icon: React.ElementType;
+  label: string;
+}
+
 /**
  * Navigation tabs component for the main layout
  * Now using React Router for proper URL-based navigation
  */
 const NavigationTabs = memo(() => {
   const location = useLocation();
-  const navRef = useRef(null);
-  const leftFadeRef = useRef(null);
-  const rightFadeRef = useRef(null);
+  const navRef = useRef<HTMLElement | null>(null);
+  const leftFadeRef = useRef<HTMLDivElement | null>(null);
+  const rightFadeRef = useRef<HTMLDivElement | null>(null);
 
   // Handle scroll indicators for mobile
   useEffect(() => {
@@ -63,7 +70,7 @@ const NavigationTabs = memo(() => {
     };
   }, []);
 
-  const tabs = [
+  const tabs: TabItem[] = [
     {
       key: "dashboard",
       path: "/app/dashboard",
@@ -121,7 +128,7 @@ const NavigationTabs = memo(() => {
   ];
 
   // Get current active view from URL
-  const getCurrentView = () => {
+  const getCurrentView = (): string => {
     const currentTab = tabs.find((tab) => tab.path === location.pathname);
     return currentTab?.key || "dashboard";
   };

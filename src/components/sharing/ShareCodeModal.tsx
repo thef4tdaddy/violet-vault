@@ -10,12 +10,24 @@ import logger from "@/utils/common/logger";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+interface ShareData {
+  shareCode: string;
+  qrData: string;
+  shareUrl: string;
+  expiresAt: number;
+}
+
+interface ShareCodeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 /**
  * Share Code Modal - Generate and display share codes with QR codes
  * Addresses GitHub Issue #580 - Secure budget sharing system
  */
-const ShareCodeModal = ({ isOpen, onClose }) => {
-  const [shareData, setShareData] = useState(null);
+const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
+  const [shareData, setShareData] = useState<ShareData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -42,7 +54,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       try {
         const shareCode = currentUser.shareCode;
         const displayCode = shareCodeManager.formatForDisplay(shareCode);
-        const qrData = shareCodeManager.generateQRData(shareCode, currentUser);
+        const qrData = shareCodeManager.generateQRData(shareCode, currentUser as never);
 
         const result = {
           shareCode: displayCode,
@@ -81,7 +93,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       // Generate a new 4-word BIP39 share code
       const shareCode = shareCodeManager.generateShareCode();
       const displayCode = shareCodeManager.formatForDisplay(shareCode);
-      const qrData = shareCodeManager.generateQRData(shareCode, currentUser);
+      const qrData = shareCodeManager.generateQRData(shareCode, currentUser as never);
 
       const result = {
         shareCode: displayCode,
@@ -97,7 +109,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
         await updateProfile({
           ...currentUser,
           shareCode: shareCode,
-        });
+        } as never);
         logger.info("Share code saved to user profile for persistence");
       } catch (error) {
         logger.error("Failed to save share code to user profile", error);
@@ -129,7 +141,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       showSuccessToast("Share code copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      logger.warn("Failed to copy to clipboard", error);
+      logger.warn("Failed to copy to clipboard", error as Record<string, unknown>);
       showErrorToast("Failed to copy share code");
     }
   };
@@ -141,7 +153,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       await navigator.clipboard.writeText(shareData.shareUrl);
       showSuccessToast("Share URL copied to clipboard!");
     } catch (error) {
-      logger.warn("Failed to copy URL to clipboard", error);
+      logger.warn("Failed to copy URL to clipboard", error as Record<string, unknown>);
       showErrorToast("Failed to copy share URL");
     }
   };

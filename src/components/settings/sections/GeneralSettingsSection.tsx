@@ -266,7 +266,16 @@ const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
   </div>
 );
 
-const GeneralSettingsSection = ({
+interface GeneralSettingsSectionProps {
+  isLocalOnlyMode: boolean;
+  cloudSyncEnabled: boolean;
+  isSyncing: boolean;
+  onOpenLocalOnlySettings: () => void;
+  onToggleCloudSync: () => void;
+  onManualSync: () => void;
+}
+
+const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
   isLocalOnlyMode,
   cloudSyncEnabled,
   isSyncing,
@@ -286,7 +295,7 @@ const GeneralSettingsSection = ({
       if (result.success) {
         logger.info("Manual PWA install successful");
       } else {
-        const messages = {
+        const messages: Record<string, string> = {
           already_installed: "App is already installed",
           not_available: "Installation not available on this browser",
           declined: "Installation cancelled",

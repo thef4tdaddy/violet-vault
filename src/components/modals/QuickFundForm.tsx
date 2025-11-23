@@ -1,8 +1,30 @@
 import { Button } from "@/components/ui";
-import { getButtonClasses, withHapticFeedback } from "../../utils/ui/touchFeedback";
+import { getButtonClasses, withHapticFeedback } from "@/utils/ui/touchFeedback";
 
-const QuickFundForm = ({ envelope, amount, setAmount, unassignedCash, onConfirm, onClose }) => {
-  const handleQuickAmounts = (quickAmount) => {
+interface Envelope {
+  name: string;
+  color?: string;
+  currentBalance?: number;
+}
+
+interface QuickFundFormProps {
+  envelope: Envelope;
+  amount: number;
+  setAmount: (amount: number) => void;
+  unassignedCash: number;
+  onConfirm: () => void;
+  onClose: () => void;
+}
+
+const QuickFundForm = ({
+  envelope,
+  amount,
+  setAmount,
+  unassignedCash,
+  onConfirm,
+  onClose,
+}: QuickFundFormProps) => {
+  const handleQuickAmounts = (quickAmount: number) => {
     setAmount(Math.min(quickAmount, unassignedCash));
   };
 
