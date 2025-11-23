@@ -4,16 +4,35 @@ import { getIcon } from "../../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+// Type definitions
+interface UpcomingPayment {
+  debtId: string;
+  debtName: string;
+  dueDate: string;
+  amount: number;
+  type?: string;
+}
+
+interface UpcomingPaymentsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  upcomingPayments?: UpcomingPayment[];
+}
+
 /**
  * Modal for displaying upcoming debt payments
  * Pure UI component - receives data as props
  */
-const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
+const UpcomingPaymentsModal: React.FC<UpcomingPaymentsModalProps> = ({
+  isOpen,
+  onClose,
+  upcomingPayments = [],
+}) => {
   const modalRef = useModalAutoScroll(isOpen);
 
   if (!isOpen) return null;
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -21,7 +40,10 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
     });
   };
 
-  const totalUpcoming = upcomingPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+  const totalUpcoming = upcomingPayments.reduce(
+    (sum: number, payment: UpcomingPayment) => sum + (payment.amount || 0),
+    0
+  );
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
