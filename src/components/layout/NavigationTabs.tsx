@@ -129,7 +129,7 @@ const NavigationTabs = memo(() => {
 
   // Get current active view from URL
   const getCurrentView = (): string => {
-    const currentTab = tabs.find((tab: TabItem) => tab.path === location.pathname);
+    const currentTab = tabs.find((tab) => tab.path === location.pathname);
     return currentTab?.key || "dashboard";
   };
 

@@ -32,7 +32,7 @@ const checkBudgetIdMismatch = (
 ): boolean => {
   const importBudgetId = importedData.exportMetadata?.budgetId;
   const currentBudgetId = currentUser?.budgetId;
-  return !!(importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId);
+  return Boolean(importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId);
 };
 
 const unifyTransactions = (importedData: ImportedData): unknown[] => {
