@@ -158,7 +158,7 @@ export const hasMinimumExtractedData = (receiptData: ReceiptData | null | undefi
 /**
  * Check if receipt data is complete enough for transaction creation
  */
-export const isReceiptDataComplete = (receiptData) => {
+export const isReceiptDataComplete = (receiptData: ReceiptData): boolean => {
   return Boolean(
     receiptData &&
       receiptData.merchant &&
@@ -171,7 +171,7 @@ export const isReceiptDataComplete = (receiptData) => {
 /**
  * Generate receipt reference ID
  */
-export const generateReceiptReference = (merchant, date, total) => {
+export const generateReceiptReference = (merchant: string, date: string, total: number): string => {
   const merchantCode = merchant?.substring(0, 3).toUpperCase() || "RCP";
   const dateCode =
     date?.replace(/-/g, "").substring(2) ||
@@ -186,7 +186,10 @@ export const generateReceiptReference = (merchant, date, total) => {
 /**
  * Compare receipt data with transaction form for changes
  */
-export const getReceiptFormChanges = (receiptData, transactionForm) => {
+export const getReceiptFormChanges = (
+  receiptData: ReceiptData,
+  transactionForm: TransactionForm
+) => {
   const changes = [];
 
   if (receiptData.merchant !== transactionForm.description) {
@@ -216,12 +219,14 @@ export const getReceiptFormChanges = (receiptData, transactionForm) => {
   return changes;
 };
 
+type ConfidenceLevel = "high" | "medium" | "low" | "none";
+
 /**
  * Render confidence indicator for receipt data fields
  * UI utility function extracted from ReceiptScanner
  */
-export const renderConfidenceIndicator = (_field, confidence) => {
-  const confidenceMap = {
+export const renderConfidenceIndicator = (_field: string, confidence: ConfidenceLevel) => {
+  const confidenceMap: Record<ConfidenceLevel, { color: string; iconName: string }> = {
     high: { color: "text-green-600", iconName: "CheckCircle" },
     medium: { color: "text-yellow-600", iconName: "CheckCircle" },
     low: { color: "text-red-600", iconName: "XCircle" },
