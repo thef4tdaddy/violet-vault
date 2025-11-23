@@ -287,10 +287,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 7 errors in `src/App.tsx`
-- 6 errors in `src/utils/transactions/splitting.ts`
-- 6 errors in `src/utils/transactions/fileParser.ts`
-- 6 errors in `src/utils/debts/debtFormValidation.ts`
-- 6 errors in `src/utils/debts/debtDebugConfig.ts`
 - 6 errors in `src/utils/dataManagement/validationUtils.ts`
 - 6 errors in `src/utils/common/BaseMutex.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
@@ -491,6 +487,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/onboarding/hooks/useTutorialPositioning.ts`
 - 2 errors in `src/components/onboarding/EmptyStateHints.tsx`
+- 2 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 2 errors in `src/components/mobile/FABActionMenu.tsx`
 - 2 errors in `src/components/debt/ui/StrategyCard.tsx`
 - 2 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
@@ -631,7 +628,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | 1 | `TS2698` |
 | 1 | `TS2683` |
 | 1 | `TS2538` |
-| 1 | `TS2532` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
 
@@ -1357,28 +1353,14 @@ src/components/mobile/SlideUpModal.tsx(350,9): error TS2322: Type 'RefObject<HTM
 src/components/mobile/SlideUpModal.tsx(351,9): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
-src/components/modals/QuickFundForm.tsx(4,26): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,36): error TS7031: Binding element 'amount' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,44): error TS7031: Binding element 'setAmount' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,55): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,71): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,82): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(5,31): error TS7006: Parameter 'quickAmount' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(13,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(14,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(15,3): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(16,3): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(17,3): error TS7031: Binding element 'suggestedAmount' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(18,3): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/modals/UnassignedCashModal.tsx(264,35): error TS2532: Object is possibly 'undefined'.
-src/components/modals/UnassignedCashModal.tsx(304,37): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(304,53): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(305,36): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(305,52): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(337,7): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
-  Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
-    Type 'null' is not assignable to type 'HTMLDivElement'.
+src/components/modals/UnassignedCashModal.tsx(311,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/modals/UnassignedCashModal.tsx(315,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/monitoring/HighlightLoader.tsx(22,63): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/components/onboarding/EmptyStateHints.tsx(228,46): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
@@ -1413,13 +1395,6 @@ src/components/pages/MainDashboard.tsx(159,9): error TS2322: Type '() => Envelop
 src/components/pages/MainDashboard.tsx(169,9): error TS2322: Type '() => EnvelopeOption[]' is not assignable to type '() => never[]'.
   Type 'EnvelopeOption[]' is not assignable to type 'never[]'.
     Type 'EnvelopeOption' is not assignable to type 'never'.
-src/components/pwa/InstallPromptModal.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/pwa/InstallPromptModal.tsx(13,29): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(13,41): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(14,32): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(14,44): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(15,22): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(15,34): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/pwa/OfflineStatusIndicator.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/pwa/OfflineStatusIndicator.tsx(34,20): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/OfflineStatusIndicator.tsx(34,32): error TS7006: Parameter 'state' implicitly has an 'any' type.
@@ -1521,13 +1496,6 @@ src/components/savings/SavingsGoals.tsx(140,9): error TS2322: Type '(goalData: a
   Types of parameters 'goalId' and 'goalId' are incompatible.
     Type 'string | undefined' is not assignable to type 'null | undefined'.
       Type 'string' is not assignable to type 'null | undefined'.
-src/components/savings/SavingsSummaryCard.tsx(5,61): error TS7031: Binding element '_onAddGoal' implicitly has an 'any' type.
-src/components/savings/SavingsSummaryCard.tsx(7,69): error TS2339: Property 'currentAmount' does not exist on type 'never'.
-src/components/savings/SavingsSummaryCard.tsx(8,71): error TS2339: Property 'targetAmount' does not exist on type 'never'.
-src/components/savings/SavingsSummaryCard.tsx(12,26): error TS2339: Property 'currentAmount' does not exist on type 'never'.
-src/components/savings/SavingsSummaryCard.tsx(13,25): error TS2339: Property 'targetAmount' does not exist on type 'never'.
-src/components/savings/SavingsSummaryCard.tsx(18,26): error TS2339: Property 'currentAmount' does not exist on type 'never'.
-src/components/savings/SavingsSummaryCard.tsx(19,25): error TS2339: Property 'targetAmount' does not exist on type 'never'.
 src/components/security/LocalDataSecurityWarning.tsx(12,37): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/security/LocalDataSecurityWarning.tsx(12,46): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
 src/components/security/LocalDataSecurityWarning.tsx(133,26): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
@@ -2888,22 +2856,6 @@ src/utils/debts/calculations/interestCalculation.ts(12,48): error TS7006: Parame
 src/utils/debts/calculations/nextPaymentDate.ts(13,42): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/utils/debts/calculations/nextPaymentDate.ts(13,48): error TS7006: Parameter 'relatedBill' implicitly has an 'any' type.
 src/utils/debts/calculations/payoffProjection.ts(11,43): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(42,38): error TS7006: Parameter 'feature' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(43,10): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtDebugConfig.ts(50,36): error TS7006: Parameter 'feature' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(51,3): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtDebugConfig.ts(59,35): error TS7006: Parameter 'feature' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(60,3): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtFormValidation.ts(101,38): error TS2345: Argument of type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; } | undefined' is not assignable to parameter of type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; }'.
-  Type 'undefined' is not assignable to type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; }'.
-src/utils/debts/debtFormValidation.ts(239,30): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
-src/utils/debts/debtFormValidation.ts(240,20): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
-src/utils/debts/debtFormValidation.ts(259,35): error TS2345: Argument of type 'number | null | undefined' is not assignable to parameter of type 'number | null'.
-  Type 'undefined' is not assignable to type 'number | null'.
-src/utils/debts/debtFormValidation.ts(260,37): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number | null'.
-  Type 'undefined' is not assignable to type 'number | null'.
-src/utils/debts/debtFormValidation.ts(261,5): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
-  Type 'undefined' is not assignable to type 'boolean'.
 src/utils/debug/dataDiagnostic.ts(113,59): error TS18046: 'error' is of type 'unknown'.
 src/utils/debug/dataDiagnostic.ts(123,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'VioletVaultDB'.
   No index signature with a parameter of type 'string' was found on type 'VioletVaultDB'.
@@ -3196,12 +3148,6 @@ src/utils/testing/storeTestUtils.ts(58,13): error TS7053: Element implicitly has
   No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/testing/storeTestUtils.ts(72,16): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'unknown'.
   No index signature with a parameter of type 'string' was found on type 'unknown'.
-src/utils/transactions/fileParser.ts(23,3): error TS2411: Property 'date' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(24,3): error TS2411: Property 'type' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(25,3): error TS2411: Property 'amount' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(26,3): error TS2411: Property 'id' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(27,3): error TS2411: Property 'description' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(28,3): error TS2411: Property 'notes' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
 src/utils/transactions/splitting.ts(59,11): error TS18048: 'transaction.metadata.shipping' is possibly 'undefined'.
 src/utils/transactions/splitting.ts(70,11): error TS18048: 'transaction.metadata.tax' is possibly 'undefined'.

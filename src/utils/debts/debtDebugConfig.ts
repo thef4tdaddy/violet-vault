@@ -39,7 +39,7 @@ export const DEBT_DEBUG_CONFIG = {
  * @param {string} feature - Feature key from DEBT_DEBUG_CONFIG
  * @returns {boolean} Whether feature is enabled
  */
-export function isDebtFeatureEnabled(feature) {
+export function isDebtFeatureEnabled(feature: keyof typeof DEBT_DEBUG_CONFIG): boolean {
   return DEBT_DEBUG_CONFIG[feature] === true;
 }
 
@@ -47,7 +47,7 @@ export function isDebtFeatureEnabled(feature) {
  * Disable a debt feature for testing
  * @param {string} feature - Feature key to disable
  */
-export function disableDebtFeature(feature) {
+export function disableDebtFeature(feature: keyof typeof DEBT_DEBUG_CONFIG): void {
   DEBT_DEBUG_CONFIG[feature] = false;
   logger.debug(`[DEBT DEBUG] Disabled feature: ${feature}`, { feature });
 }
@@ -56,7 +56,7 @@ export function disableDebtFeature(feature) {
  * Enable a debt feature for testing
  * @param {string} feature - Feature key to enable
  */
-export function enableDebtFeature(feature) {
+export function enableDebtFeature(feature: keyof typeof DEBT_DEBUG_CONFIG): void {
   DEBT_DEBUG_CONFIG[feature] = true;
   logger.debug(`[DEBT DEBUG] Enabled feature: ${feature}`, { feature });
 }

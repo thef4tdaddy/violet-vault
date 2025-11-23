@@ -55,8 +55,8 @@ export const initializeSplitsFromTransaction = (
       }));
 
       // Add shipping/tax if present
-      const extraItems = [];
-      if (transaction.metadata.shipping > 0) {
+      const extraItems: SplitAllocation[] = [];
+      if (transaction.metadata.shipping !== undefined && transaction.metadata.shipping > 0) {
         extraItems.push({
           id: Date.now() + 1000,
           description: "Shipping & Handling",
@@ -67,7 +67,7 @@ export const initializeSplitsFromTransaction = (
         });
       }
 
-      if (transaction.metadata.tax > 0) {
+      if (transaction.metadata.tax !== undefined && transaction.metadata.tax > 0) {
         extraItems.push({
           id: Date.now() + 2000,
           description: "Sales Tax",
@@ -138,7 +138,7 @@ export const calculateSplitTotals = (
       isValid: false,
       isOverAllocated: false,
       isUnderAllocated: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 };
@@ -179,7 +179,7 @@ export const validateSplitAllocations = (
     }
   } catch (error) {
     logger.error("Error validating split allocations", error);
-    errors.push("Validation error: " + error.message);
+    errors.push("Validation error: " + (error instanceof Error ? error.message : String(error)));
   }
 
   return errors;
@@ -429,7 +429,9 @@ export const getSplitSummary = (
       remainingAmount: 0,
       isValid: false,
       isBalanced: false,
-      validationErrors: ["Error calculating summary: " + error.message],
+      validationErrors: [
+        "Error calculating summary: " + (error instanceof Error ? error.message : String(error)),
+      ],
       canSubmit: false,
     };
   }

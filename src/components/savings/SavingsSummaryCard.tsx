@@ -1,8 +1,17 @@
-// components/savings/SavingsSummaryCard.jsx
-import { getIcon } from "../../utils";
-import PageSummaryCard from "../ui/PageSummaryCard";
+// components/savings/SavingsSummaryCard.tsx
+import { getIcon } from "@/utils";
+import PageSummaryCard from "@/components/ui/PageSummaryCard";
+import type { SavingsGoal } from "@/db/types";
 
-const SavingsSummaryCard = ({ savingsGoals = [], onAddGoal: _onAddGoal }) => {
+interface SavingsSummaryCardProps {
+  savingsGoals?: SavingsGoal[];
+  onAddGoal?: () => void;
+}
+
+const SavingsSummaryCard = ({
+  savingsGoals = [],
+  onAddGoal: _onAddGoal,
+}: SavingsSummaryCardProps) => {
   // Calculate summary statistics
   const totalSaved = savingsGoals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0);
   const totalTargets = savingsGoals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0);

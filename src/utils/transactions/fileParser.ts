@@ -19,7 +19,7 @@ export const parseCSV = (csvText: string): ParsedRow[] => {
 
 interface OFXTransaction {
   _index: number;
-  [key: string]: string | number;
+  [key: string]: string | number | undefined;
   date?: string;
   type?: string;
   amount?: string;
