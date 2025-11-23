@@ -10,6 +10,7 @@ import {
   ModalActions,
 } from "./DebtDetailModalComponents";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import logger from "@/utils/common/logger";
 
 interface DebtDetailModalProps {
   debt?: Record<string, unknown> & { id: string };
@@ -18,6 +19,15 @@ interface DebtDetailModalProps {
   onDelete: (debtId: string) => Promise<void>;
   onRecordPayment: (debtId: string, amount: number) => Promise<void>;
   onEdit: (debt: Record<string, unknown>) => void;
+}
+
+// DebtWithHistory is imported from useDebtDetailModal hook
+
+interface PaymentData {
+  amount: number;
+  date: string;
+  paymentMethod: string;
+  notes: string;
 }
 
 /**
@@ -49,12 +59,24 @@ const DebtDetailModal = ({
     handleShowPaymentForm,
     handleCancelPayment,
   } = useDebtDetailModal({
-    debt,
+    debt: debt as Parameters<typeof useDebtDetailModal>[0]["debt"],
     isOpen,
     onClose,
-    onDelete,
-    onRecordPayment,
-    onEdit,
+    onDelete: async (debtId: string) => {
+      await onDelete(debtId);
+    },
+    onRecordPayment: (debtId: string, paymentData: PaymentData) => {
+      onRecordPayment(debtId, paymentData.amount).catch((err) => {
+        logger.error("Failed to record payment:", err);
+      });
+    },
+    onEdit: (
+      debt: Parameters<typeof useDebtDetailModal>[0]["debt"] extends null
+        ? never
+        : NonNullable<Parameters<typeof useDebtDetailModal>[0]["debt"]>
+    ) => {
+      onEdit(debt as Record<string, unknown>);
+    },
   });
 
   if (!isOpen || !debt) return null;
@@ -78,7 +100,17 @@ const DebtDetailModal = ({
           theme="purple"
         />
 
-        {hasRecentPayments && <RecentPayments recentPayments={recentPayments} />}
+        {hasRecentPayments && (
+          <RecentPayments
+            recentPayments={recentPayments.map((p) => ({
+              id: String(p.id ?? ""),
+              formattedAmount: p.formattedAmount ?? "",
+              displayDate: p.displayDate ?? "",
+              principalDisplay: p.principalDisplay,
+              interestDisplay: p.interestDisplay,
+            }))}
+          />
+        )}
 
         {/* Quick Payment */}
         <QuickPaymentForm
