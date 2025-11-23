@@ -16,7 +16,12 @@ interface PercentageConfigProps {
   errors: Record<string, string>;
 }
 
-const PercentageConfig: React.FC<PercentageConfigProps> = ({ ruleData, updateConfig, envelopes, errors }) => {
+const PercentageConfig: React.FC<PercentageConfigProps> = ({
+  ruleData,
+  updateConfig,
+  envelopes,
+  errors,
+}) => {
   return (
     <>
       <div>

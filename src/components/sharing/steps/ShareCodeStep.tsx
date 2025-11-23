@@ -14,7 +14,13 @@ interface ShareCodeStepProps {
  * Share Code Step - Step 1 of join budget flow
  * Extracted from JoinBudgetModal to reduce complexity
  */
-const ShareCodeStep: React.FC<ShareCodeStepProps> = ({ shareCode, setShareCode, onValidate, onQRScan, isValidating }) => {
+const ShareCodeStep: React.FC<ShareCodeStepProps> = ({
+  shareCode,
+  setShareCode,
+  onValidate,
+  onQRScan,
+  isValidating,
+}) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onValidate();

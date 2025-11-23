@@ -17,7 +17,12 @@ interface PriorityFillConfigProps {
   errors: Record<string, string>;
 }
 
-const PriorityFillConfig: React.FC<PriorityFillConfigProps> = ({ ruleData, updateConfig, envelopes, errors }) => {
+const PriorityFillConfig: React.FC<PriorityFillConfigProps> = ({
+  ruleData,
+  updateConfig,
+  envelopes,
+  errors,
+}) => {
   return (
     <>
       <div>

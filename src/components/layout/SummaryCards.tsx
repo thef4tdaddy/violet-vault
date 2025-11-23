@@ -42,9 +42,13 @@ const SummaryCards = () => {
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce((sum: number, env: { currentBalance?: number }) => sum + (env.currentBalance || 0), 0);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum: number, env: { currentBalance?: number }) => sum + (env.currentBalance || 0),
+    0
+  );
   const totalSavingsBalance = savingsGoals.reduce(
-    (sum: number, goal: { currentAmount?: number | string }) => sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
+    (sum: number, goal: { currentAmount?: number | string }) =>
+      sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
     0
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;

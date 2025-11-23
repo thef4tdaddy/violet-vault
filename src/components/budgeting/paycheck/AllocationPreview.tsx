@@ -23,7 +23,11 @@ interface AllocationPreviewProps {
   allocationMode: string;
 }
 
-const AllocationPreview: React.FC<AllocationPreviewProps> = ({ allocationPreview, hasAmount, allocationMode }) => {
+const AllocationPreview: React.FC<AllocationPreviewProps> = ({
+  allocationPreview,
+  hasAmount,
+  allocationMode,
+}) => {
   const { allocations, totalAllocated, remainingAmount, allocationRate } = allocationPreview;
 
   if (!hasAmount) {

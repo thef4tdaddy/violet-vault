@@ -20,7 +20,13 @@ interface BulkBillUpdateModalProps {
   onError?: (error: string) => void;
 }
 
-const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({ isOpen, onClose, selectedBills = [], onUpdateBills, onError }) => {
+const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
+  isOpen,
+  onClose,
+  selectedBills = [],
+  onUpdateBills,
+  onError,
+}) => {
   const [updateMode, setUpdateMode] = useState("amounts");
 
   const {

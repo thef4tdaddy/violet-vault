@@ -48,7 +48,10 @@ interface AutoLockSettingsSectionProps {
  * Auto-lock settings section with toggle switches and timeout slider
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const AutoLockSettingsSection: React.FC<AutoLockSettingsSectionProps> = ({ securitySettings, handleSettingChange }) => {
+const AutoLockSettingsSection: React.FC<AutoLockSettingsSectionProps> = ({
+  securitySettings,
+  handleSettingChange,
+}) => {
   return (
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">

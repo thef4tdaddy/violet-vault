@@ -137,7 +137,9 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
             {getModeLabel(paycheck.allocationMode)}
           </span>
         </div>
-        <span className="font-bold text-green-600">{formatPaycheckAmount(paycheck.amount ?? 0)}</span>
+        <span className="font-bold text-green-600">
+          {formatPaycheckAmount(paycheck.amount ?? 0)}
+        </span>
       </div>
 
       <div className="flex items-center justify-between text-sm text-gray-600">

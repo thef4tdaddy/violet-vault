@@ -148,7 +148,9 @@ const PaycheckForm: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> =
 /**
  * Form action buttons component
  */
-const PaycheckFormButtons: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> = ({ formHook }) => (
+const PaycheckFormButtons: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> = ({
+  formHook,
+}) => (
   <div className="flex gap-4">
     <Button
       onClick={() => formHook.setShowPreview(true)}

@@ -137,7 +137,10 @@ export const ModalContent = ({
       <EnvelopeTypeSelector
         selectedType={formData.envelopeType}
         onTypeChange={(type: string) => onUpdateField("envelopeType", type)}
-        excludeTypes={[ENVELOPE_TYPES.SAVINGS as EnvelopeType, ENVELOPE_TYPES.SINKING_FUND as EnvelopeType]}
+        excludeTypes={[
+          ENVELOPE_TYPES.SAVINGS as EnvelopeType,
+          ENVELOPE_TYPES.SINKING_FUND as EnvelopeType,
+        ]}
         disabled={isLoading}
       />
 

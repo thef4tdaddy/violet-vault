@@ -192,7 +192,10 @@ class ChunkedSyncService implements IChunkedSyncService {
       }
     } catch (error) {
       // Fallback to original method if compression analysis fails
-      logger.debug("Compression analysis failed, using JSON size", error as Record<string, unknown>);
+      logger.debug(
+        "Compression analysis failed, using JSON size",
+        error as Record<string, unknown>
+      );
     }
 
     // Fallback: original JSON size calculation
@@ -559,7 +562,11 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Check if we have chunks to reassemble
         if (mainData._manifest) {
-          let manifest: { version?: string; metadata?: { totalChunks?: number }; chunks?: unknown[] } = {};
+          let manifest: {
+            version?: string;
+            metadata?: { totalChunks?: number };
+            chunks?: unknown[];
+          } = {};
           try {
             // Validate manifest data before decryption
             const manifestData = mainData._manifest as Record<string, unknown>;
@@ -638,8 +645,10 @@ class ChunkedSyncService implements IChunkedSyncService {
             return null; // Return null to trigger fresh upload from local data without clearing cloud
           }
           logger.debug("Loaded manifest", {
-            version: (manifest as { version?: string; metadata?: { totalChunks?: number } }).version,
-            totalChunks: (manifest as { version?: string; metadata?: { totalChunks?: number } }).metadata?.totalChunks,
+            version: (manifest as { version?: string; metadata?: { totalChunks?: number } })
+              .version,
+            totalChunks: (manifest as { version?: string; metadata?: { totalChunks?: number } })
+              .metadata?.totalChunks,
           });
 
           // Load all chunks

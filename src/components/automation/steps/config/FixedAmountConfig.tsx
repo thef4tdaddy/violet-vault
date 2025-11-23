@@ -16,7 +16,12 @@ interface FixedAmountConfigProps {
   errors: Record<string, string>;
 }
 
-const FixedAmountConfig: React.FC<FixedAmountConfigProps> = ({ ruleData, updateConfig, envelopes, errors }) => {
+const FixedAmountConfig: React.FC<FixedAmountConfigProps> = ({
+  ruleData,
+  updateConfig,
+  envelopes,
+  errors,
+}) => {
   return (
     <>
       <div>

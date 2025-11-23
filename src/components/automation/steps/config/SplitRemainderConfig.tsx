@@ -17,7 +17,12 @@ interface SplitRemainderConfigProps {
   errors: Record<string, string>;
 }
 
-const SplitRemainderConfig: React.FC<SplitRemainderConfigProps> = ({ ruleData, envelopes, toggleTargetEnvelope, errors }) => {
+const SplitRemainderConfig: React.FC<SplitRemainderConfigProps> = ({
+  ruleData,
+  envelopes,
+  toggleTargetEnvelope,
+  errors,
+}) => {
   return (
     <>
       <div>
