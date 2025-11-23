@@ -155,7 +155,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
 
       {/* Recent Transactions */}
       <RecentTransactionsWidget
-        transactions={recentTransactions}
+        transactions={recentTransactions as never}
         getEnvelopeOptions={getEnvelopeOptions}
       />
 

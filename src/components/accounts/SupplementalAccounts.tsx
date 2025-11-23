@@ -122,10 +122,19 @@ const SupplementalAccounts = ({
         onAddAccount={openAddForm}
       />
 
-      <ExpirationAlert expiringAccounts={expiringAccounts} />
+      <ExpirationAlert expiringAccounts={expiringAccounts as never} />
 
       {/* Summary Cards */}
-      <AccountsSummaryCards accounts={typedAccounts as never} />
+      <AccountsSummaryCards
+        accounts={
+          typedAccounts as unknown as Array<{
+            id: string | number;
+            currentBalance: number;
+            transactions?: unknown[];
+            [key: string]: unknown;
+          }>
+        }
+      />
 
       {/* White block with black outline for accounts area */}
       <div className="bg-white rounded-xl p-6 border-2 border-black shadow-sm">

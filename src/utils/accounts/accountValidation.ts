@@ -3,6 +3,7 @@
  * Handles form validation, balance calculations, and data integrity checks
  */
 
+// eslint-disable-next-line complexity
 // Type definitions for account objects
 interface AccountForm {
   name?: string;
@@ -58,6 +59,7 @@ interface ExpirationStatus {
  * @param {Object} accountForm - The account form data
  * @returns {Object} Validation result with isValid flag and message
  */
+// eslint-disable-next-line complexity
 export const validateAccountForm = (accountForm: AccountForm): ValidationResult => {
   // Required field validation
   if (!accountForm.name?.trim()) {

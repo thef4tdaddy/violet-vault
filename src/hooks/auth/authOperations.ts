@@ -7,9 +7,9 @@ import type { UseMutationResult } from "@tanstack/react-query";
  */
 
 // Type definitions for auth operations
-interface LoginResult {
+export interface LoginResult {
   success: boolean;
-  user?: any;
+  user?: { userName?: string; [key: string]: unknown };
   error?: string;
   newKey?: string;
   newSalt?: string;
@@ -20,9 +20,12 @@ interface JoinBudgetResult {
   error?: string;
 }
 
-interface AuthContext {
-  user: any;
-  setAuthenticated: (user: any, authData: { encryptionKey?: string; salt?: string }) => void;
+export interface AuthContext {
+  user: { userName?: string; [key: string]: unknown } | null;
+  setAuthenticated: (
+    user: { userName?: string; [key: string]: unknown },
+    authData: { encryptionKey?: string; salt?: string }
+  ) => void;
   lockSession: () => void;
   updateActivity: () => void;
 }
@@ -39,9 +42,16 @@ interface UpdatedProfile {
 /**
  * Login with password and optional user data (for new users)
  */
+
 export const createLoginOperation =
-  (loginMutation: UseMutationResult<LoginResult, Error, { password: string; userData?: any }>) =>
-  async (password: string, userData: any = null) => {
+  (
+    loginMutation: UseMutationResult<
+      LoginResult,
+      Error,
+      { password: string; userData?: Record<string, unknown> }
+    >
+  ) =>
+  async (password: string, userData: Record<string, unknown> | null = null) => {
     try {
       logger.auth("AuthManager: Starting login", {
         hasPassword: !!password,
@@ -61,9 +71,9 @@ export const createLoginOperation =
         logger.auth("AuthManager: Login failed", { error: result.error });
         return { success: false, error: result.error };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("AuthManager: Login error", error);
-      return { success: false, error: error.message || "Login failed" };
+      return { success: false, error: error instanceof Error ? error.message : "Login failed" };
     }
   };
 
@@ -87,11 +97,11 @@ export const createJoinBudgetOperation =
       } else {
         return { success: false, error: result.error };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("AuthManager: Budget join error", error);
       return {
         success: false,
-        error: error.message || "Failed to join budget",
+        error: error instanceof Error ? error.message : "Failed to join budget",
       };
     }
   };
@@ -100,13 +110,13 @@ export const createJoinBudgetOperation =
  * Logout user and clear session
  */
 export const createLogoutOperation =
-  (logoutMutation: UseMutationResult<void, Error, void>) => async () => {
+  (logoutMutation: UseMutationResult<{ success: boolean }, Error, void, unknown>) => async () => {
     try {
       logger.auth("AuthManager: Starting logout");
       await logoutMutation.mutateAsync();
       logger.auth("AuthManager: Logout successful");
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("AuthManager: Logout error", error);
       // Still return success since auth state is cleared
       return { success: true };
@@ -144,11 +154,11 @@ export const createChangePasswordOperation =
       } else {
         return { success: false, error: result.error };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("AuthManager: Password change error", error);
       return {
         success: false,
-        error: error.message || "Failed to change password",
+        error: error instanceof Error ? error.message : "Failed to change password",
       };
     }
   };
@@ -172,11 +182,11 @@ export const createUpdateProfileOperation =
       } else {
         return { success: false, error: result.error };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("AuthManager: Profile update error", error);
       return {
         success: false,
-        error: error.message || "Failed to update profile",
+        error: error instanceof Error ? error.message : "Failed to update profile",
       };
     }
   };

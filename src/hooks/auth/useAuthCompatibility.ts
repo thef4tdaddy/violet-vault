@@ -27,7 +27,7 @@ export const useAuthCompatibility = () => {
 
     // Action methods (matching old authStore)
     login: async (password: string, userData: unknown = null) => {
-      const result = await authManager.login(password, userData);
+      const result = await authManager.login(password, userData as Record<string, unknown> | null);
       return result;
     },
 
