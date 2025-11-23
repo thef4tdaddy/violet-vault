@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +4 |
-| TypeScript Errors | 40 | +40 |
-| TypeScript Strict Mode Errors | 2139 | +2139 |
+| ESLint Issues | 4 | 0 |
+| TypeScript Errors | 40 | 0 |
+| TypeScript Strict Mode Errors | 2135 | -4 |
 
-*Last updated: 2025-11-23 15:31:14 UTC*
+*Last updated: 2025-11-23 15:36:23 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -385,7 +385,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 4 errors in `src/hooks/budgeting/useBudgetHistoryQuery.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetData/queries.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
-- 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 4 errors in `src/hooks/analytics/useReportExporter.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
@@ -609,12 +608,12 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 630 | `TS7006` |
+| 628 | `TS7006` |
 | 609 | `TS7031` |
 | 185 | `TS2345` |
 | 154 | `TS2322` |
 | 127 | `TS2339` |
-| 112 | `TS18046` |
+| 110 | `TS18046` |
 | 64 | `TS7005` |
 | 63 | `TS7053` |
 | 50 | `TS18048` |
@@ -2076,10 +2075,6 @@ src/hooks/bills/useBillManagerUI.ts(19,49): error TS7006: Parameter 'color' impl
 src/hooks/bills/useBillManagerUI.ts(95,50): error TS2345: Argument of type '(bill: { id: string; }) => string' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => string'.
   Types of parameters 'bill' and 'value' are incompatible.
     Type 'unknown' is not assignable to type '{ id: string; }'.
-src/hooks/bills/useBillOperationWrappers.ts(38,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(47,30): error TS18046: 'error' is of type 'unknown'.
-src/hooks/bills/useBillOperationWrappers.ts(83,12): error TS7006: Parameter 'billIds' implicitly has an 'any' type.
-src/hooks/bills/useBillOperationWrappers.ts(92,30): error TS18046: 'error' is of type 'unknown'.
 src/hooks/bills/useBillOperations.ts(68,7): error TS2322: Type '(updatedBills: Bill[]) => Promise<BulkOperationResult>' is not assignable to type '(updatedBills: unknown[]) => Promise<{ success: boolean; successCount: number; errorCount: number; errors: string[]; message: string; }>'.
   Types of parameters 'updatedBills' and 'updatedBills' are incompatible.
     Type 'unknown[]' is not assignable to type 'Bill[]'.

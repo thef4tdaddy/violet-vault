@@ -35,7 +35,7 @@ export const useBillOperationWrappers = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const wrappedHandleBulkUpdate = useCallback(
-    async (updatedBills) => {
+    async (updatedBills: unknown[]) => {
       setIsProcessing(true);
       try {
         const result = await handleBulkUpdate(updatedBills);
@@ -44,7 +44,7 @@ export const useBillOperationWrappers = ({
         }
         return result;
       } catch (error) {
-        const errorMessage = error.message || "Failed to update bills";
+        const errorMessage = error instanceof Error ? error.message : "Failed to update bills";
         onError?.(errorMessage);
         return {
           success: false,
@@ -80,7 +80,7 @@ export const useBillOperationWrappers = ({
   );
 
   const wrappedHandleBulkPayment = useCallback(
-    async (billIds) => {
+    async (billIds: string[]) => {
       setIsProcessing(true);
       try {
         const result = await handleBulkPayment(billIds);
@@ -89,7 +89,8 @@ export const useBillOperationWrappers = ({
         }
         return result;
       } catch (error) {
-        const errorMessage = error.message || "Failed to pay selected bills";
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to pay selected bills";
         onError?.(errorMessage);
         return {
           success: false,
