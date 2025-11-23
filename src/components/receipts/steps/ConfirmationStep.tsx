@@ -6,8 +6,35 @@ import {
   getConfidenceDescription,
 } from "../../../utils/receipts/receiptHelpers";
 
+interface TransactionForm {
+  description: string;
+  amount: number;
+  date: string | number | Date;
+  category: string;
+  notes?: string;
+  envelopeId: string;
+}
+
+interface Envelope {
+  id: string;
+  name: string;
+  category: string;
+  allocated: number;
+  spent: number;
+}
+
+interface ReceiptData {
+  merchant: string;
+  total: number;
+  date: string | number | Date;
+  confidence?: number;
+  items?: unknown[];
+}
+
 // TransactionDetailsCard - displays transaction information
-const TransactionDetailsCard = ({ transactionForm }) => (
+const TransactionDetailsCard: React.FC<{ transactionForm: TransactionForm }> = ({
+  transactionForm,
+}) => (
   <div className="bg-gradient-to-r from-green-50/80 to-blue-50/80 backdrop-blur-sm rounded-xl p-6 border-2 border-black shadow-lg">
     <h4 className="font-black text-gray-900 mb-4 flex items-center">
       {React.createElement(getIcon("Receipt"), {
@@ -53,7 +80,10 @@ const TransactionDetailsCard = ({ transactionForm }) => (
 );
 
 // EnvelopeAssignmentCard - displays envelope assignment info
-const EnvelopeAssignmentCard = ({ selectedEnvelope, transactionForm }) => {
+const EnvelopeAssignmentCard: React.FC<{
+  selectedEnvelope: Envelope | null | undefined;
+  transactionForm: TransactionForm;
+}> = ({ selectedEnvelope, transactionForm }) => {
   if (!selectedEnvelope) return null;
 
   const availableAfter =
@@ -92,7 +122,7 @@ const EnvelopeAssignmentCard = ({ selectedEnvelope, transactionForm }) => {
 };
 
 // ReceiptInformationCard - displays original receipt data
-const ReceiptInformationCard = ({ receiptData }) => (
+const ReceiptInformationCard: React.FC<{ receiptData: ReceiptData }> = ({ receiptData }) => (
   <div className="bg-gradient-to-r from-gray-50/80 to-blue-50/80 backdrop-blur-sm rounded-xl p-6 border-2 border-black shadow-lg">
     <h4 className="font-black text-gray-900 mb-4">RECEIPT INFORMATION</h4>
     <div className="space-y-2 text-sm">
@@ -128,7 +158,10 @@ const ReceiptInformationCard = ({ receiptData }) => (
 );
 
 // ChangesWarningBanner - shows warning when data was modified
-const ChangesWarningBanner = ({ receiptData, transactionForm }) => {
+const ChangesWarningBanner: React.FC<{
+  receiptData: ReceiptData;
+  transactionForm: TransactionForm;
+}> = ({ receiptData, transactionForm }) => {
   const hasChanges =
     Math.abs(receiptData.total - transactionForm.amount) > 0.01 ||
     receiptData.merchant !== transactionForm.description ||
@@ -147,7 +180,11 @@ const ChangesWarningBanner = ({ receiptData, transactionForm }) => {
   );
 };
 
-const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
+const ConfirmationStep: React.FC<{
+  receiptData: ReceiptData;
+  transactionForm: TransactionForm;
+  envelopes: Envelope[];
+}> = ({ receiptData, transactionForm, envelopes }) => {
   const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
 
   return (

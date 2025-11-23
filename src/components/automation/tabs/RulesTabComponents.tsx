@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import { RULE_TYPES, TRIGGER_TYPES } from "@/utils/budgeting/autofunding";
+import { RULE_TYPES, TRIGGER_TYPES, type AutoFundingRule } from "@/utils/budgeting/autofunding";
 
 /**
  * Helper functions for rule types and triggers
  */
-export const getRuleTypeIcon = (type) => {
+export const getRuleTypeIcon = (type: string) => {
   switch (type) {
     case RULE_TYPES.FIXED_AMOUNT:
       return "DollarSign";
@@ -21,7 +21,7 @@ export const getRuleTypeIcon = (type) => {
   }
 };
 
-export const getRuleTypeColor = (type) => {
+export const getRuleTypeColor = (type: string) => {
   switch (type) {
     case RULE_TYPES.FIXED_AMOUNT:
       return "text-green-600 bg-green-100";
@@ -36,7 +36,7 @@ export const getRuleTypeColor = (type) => {
   }
 };
 
-export const formatTriggerType = (trigger) => {
+export const formatTriggerType = (trigger: string) => {
   switch (trigger) {
     case TRIGGER_TYPES.MANUAL:
       return "Manual";
@@ -55,7 +55,7 @@ export const formatTriggerType = (trigger) => {
   }
 };
 
-export const formatRuleType = (type) => {
+export const formatRuleType = (type: string) => {
   switch (type) {
     case RULE_TYPES.FIXED_AMOUNT:
       return "Fixed Amount";
@@ -90,7 +90,19 @@ export const EmptyRulesList = () => {
 /**
  * Rule card component
  */
-export const RuleCard = ({ rule, onToggleRule, onEditRule, onDeleteRule }) => {
+interface RuleCardProps {
+  rule: AutoFundingRule;
+  onToggleRule: (ruleId: string) => void;
+  onEditRule: (rule: AutoFundingRule) => void;
+  onDeleteRule: (ruleId: string) => void;
+}
+
+export const RuleCard: React.FC<RuleCardProps> = ({
+  rule,
+  onToggleRule,
+  onEditRule,
+  onDeleteRule,
+}) => {
   const iconName = getRuleTypeIcon(rule.type);
   const colorClasses = getRuleTypeColor(rule.type);
 
@@ -180,7 +192,11 @@ export const RuleCard = ({ rule, onToggleRule, onEditRule, onDeleteRule }) => {
 /**
  * Create rule button component
  */
-export const CreateRuleButton = ({ onCreateRule }) => {
+interface CreateRuleButtonProps {
+  onCreateRule: () => void;
+}
+
+export const CreateRuleButton: React.FC<CreateRuleButtonProps> = ({ onCreateRule }) => {
   return (
     <div className="text-center py-4">
       <Button
@@ -197,7 +213,17 @@ export const CreateRuleButton = ({ onCreateRule }) => {
 /**
  * Execute all rules button component
  */
-export const ExecuteAllButton = ({ onExecuteRules, isExecuting, hasActiveRules }) => {
+interface ExecuteAllButtonProps {
+  onExecuteRules: () => void;
+  isExecuting: boolean;
+  hasActiveRules: boolean;
+}
+
+export const ExecuteAllButton: React.FC<ExecuteAllButtonProps> = ({
+  onExecuteRules,
+  isExecuting,
+  hasActiveRules,
+}) => {
   if (!hasActiveRules) return null;
 
   return (

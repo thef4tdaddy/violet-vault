@@ -1,13 +1,31 @@
+import React from "react";
 import { Button } from "@/components/ui";
 import {
   formatAmountChange,
   formatDateChange,
   hasChanges,
+  type BillChange,
 } from "../../../utils/bills/billUpdateHelpers";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { Bill } from "@/types/bills";
 
-const BulkUpdateConfirmModal = ({
+interface BulkUpdateSummary {
+  changedBills: number;
+  totalBills: number;
+  totalAmountChange: number;
+}
+
+interface BulkUpdateConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  selectedBills: Bill[];
+  changes: Record<string, BillChange>;
+  summary: BulkUpdateSummary;
+}
+
+const BulkUpdateConfirmModal: React.FC<BulkUpdateConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
@@ -60,7 +78,7 @@ const BulkUpdateConfirmModal = ({
                     key={bill.id}
                     className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-gray-200 shadow-sm"
                   >
-                    <h5 className="font-bold text-gray-900">{bill.provider || bill.description}</h5>
+                    <h5 className="font-bold text-gray-900">{bill.provider || bill.name}</h5>
                     <div className="text-sm text-purple-800 space-y-1 mt-1">
                       {amountChange.hasChange && (
                         <p className="font-medium">
@@ -68,7 +86,7 @@ const BulkUpdateConfirmModal = ({
                           <span className="text-purple-900 font-bold">${amountChange.updated}</span>
                         </p>
                       )}
-                      {dateChange.hasChange && (
+                      {dateChange && dateChange.hasChange && (
                         <p className="font-medium">
                           Due Date: <span className="text-gray-600">{dateChange.original}</span> →{" "}
                           <span className="text-purple-900 font-bold">{dateChange.updated}</span>

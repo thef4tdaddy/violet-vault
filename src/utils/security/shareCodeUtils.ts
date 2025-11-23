@@ -12,6 +12,19 @@ import logger from "../common/logger";
 // Make Buffer available globally for BIP39
 globalThis.Buffer = Buffer;
 
+interface CreatorInfo {
+  userName?: string;
+  userColor?: string;
+}
+
+interface ShareCodeData {
+  shareCode: string;
+  createdBy: string | null;
+  creatorColor: string | null;
+  createdAt: number | null;
+  version: string;
+}
+
 export const shareCodeUtils = {
   /**
    * Generate a 4-word share code from random entropy
@@ -50,7 +63,7 @@ export const shareCodeUtils = {
    * @param {string} shareCode - The share code to validate
    * @returns {boolean} True if valid 4-word format
    */
-  validateShareCode(shareCode) {
+  validateShareCode(shareCode: string): boolean {
     if (!shareCode || typeof shareCode !== "string") {
       logger.debug("Share code validation failed - invalid input", {
         shareCode,
@@ -107,7 +120,7 @@ export const shareCodeUtils = {
    * @param {string} shareCode - The share code to normalize
    * @returns {string} Normalized share code
    */
-  normalizeShareCode(shareCode) {
+  normalizeShareCode(shareCode: string): string {
     if (!shareCode) return "";
 
     return shareCode.toLowerCase().trim().replace(/\s+/g, " "); // Replace multiple spaces with single space
@@ -119,7 +132,7 @@ export const shareCodeUtils = {
    * @param {string} shareCode - 4-word share code
    * @returns {Promise<string>} Budget ID in format "budget_xxxxxxxxxxxxxxxx"
    */
-  async generateBudgetId(password, shareCode) {
+  async generateBudgetId(password: string, shareCode: string): Promise<string> {
     if (!password || !shareCode) {
       throw new Error("Both password and share code are required for budget ID generation");
     }
@@ -162,7 +175,7 @@ export const shareCodeUtils = {
    * @param {Object} creatorInfo - Optional creator profile info
    * @returns {string} QR code data string
    */
-  generateQRData(shareCode, creatorInfo = null) {
+  generateQRData(shareCode: string, creatorInfo: CreatorInfo | null = null): string {
     const normalizedShareCode = this.normalizeShareCode(shareCode);
 
     if (!this.validateShareCode(normalizedShareCode)) {
@@ -198,7 +211,7 @@ export const shareCodeUtils = {
    * @param {string} qrData - QR code data string
    * @returns {Object|null} Share code data or null if invalid
    */
-  parseQRData(qrData) {
+  parseQRData(qrData: string): ShareCodeData | null {
     if (!qrData || typeof qrData !== "string") {
       return null;
     }
@@ -245,7 +258,7 @@ export const shareCodeUtils = {
    * @param {string} shareCode - The share code to format
    * @returns {string} Formatted share code for display
    */
-  formatForDisplay(shareCode) {
+  formatForDisplay(shareCode: string): string {
     const normalized = this.normalizeShareCode(shareCode);
 
     if (!this.validateShareCode(normalized)) {
@@ -255,7 +268,7 @@ export const shareCodeUtils = {
     // Capitalize first letter of each word for display
     return normalized
       .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   },
 };
