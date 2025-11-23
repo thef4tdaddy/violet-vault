@@ -171,11 +171,12 @@ export class VioletVaultDB extends Dexie {
                   // to handle frozen objects from Firebase. This is needed because
                   // Firebase returns frozen objects that cannot be modified normally.
                   // If Dexie API changes, this fallback may need to be updated.
+                  const transWithSource = trans as { source: unknown };
                   if (
-                    typeof (trans as { source: unknown }).source === "object" &&
-                    (trans as { source: unknown }).source !== null
+                    typeof transWithSource.source === "object" &&
+                    transWithSource.source !== null
                   ) {
-                    (trans as { source: unknown }).source = extensibleObj;
+                    transWithSource.source = extensibleObj;
                   }
                 }
               }

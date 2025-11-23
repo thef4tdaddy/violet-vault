@@ -14,7 +14,9 @@ interface TooltipPosition {
   left?: string | number;
   bottom?: string | number;
   right?: string | number;
-  [key: string]: string | number | undefined;
+  transform?: string;
+  maxWidth?: string;
+  width?: string;
 }
 
 interface TutorialOverlayProps {

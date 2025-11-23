@@ -153,11 +153,16 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
         "debts",
         "budgetCommits",
         "budgetChanges",
-      ];
+      ] as const;
 
       for (const table of tables) {
         try {
-          counts[table] = await windowObj.budgetDb[table as keyof VioletVaultDB].count();
+          const dbTable = windowObj.budgetDb[table];
+          if (dbTable && typeof dbTable.count === "function") {
+            counts[table] = await dbTable.count();
+          } else {
+            counts[table] = "error: table not found";
+          }
         } catch (err) {
           const errorMessage = err instanceof Error ? err.message : String(err);
           counts[table] = "error: " + errorMessage;

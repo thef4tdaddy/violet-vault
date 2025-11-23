@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
+import useUiStore from "@/stores/ui/uiStore";
 import patchNotesManager from "@/utils/pwa/patchNotesManager";
 import { APP_VERSION } from "@/utils/common/version";
 import logger from "@/utils/common/logger";
@@ -50,10 +50,10 @@ const usePatchNotes = (shouldFetch: boolean) => {
  * Displays actual patch notes when available (for release builds)
  */
 const UpdateAvailableModal: React.FC = () => {
-  const updateAvailable = useUiStore((state: UiStore) => state.updateAvailable);
-  const isUpdating = useUiStore((state: UiStore) => state.isUpdating);
-  const setUpdateAvailable = useUiStore((state: UiStore) => state.setUpdateAvailable);
-  const updateApp = useUiStore((state: UiStore) => state.updateApp);
+  const updateAvailable = useUiStore((state) => state.updateAvailable);
+  const isUpdating = useUiStore((state) => state.isUpdating);
+  const setUpdateAvailable = useUiStore((state) => state.setUpdateAvailable);
+  const updateApp = useUiStore((state) => state.updateApp);
 
   const { patchNotes, loadingNotes } = usePatchNotes(updateAvailable);
   const modalRef = useModalAutoScroll(updateAvailable);
