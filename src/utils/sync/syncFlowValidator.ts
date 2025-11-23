@@ -133,19 +133,19 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     const validations = [
       {
         name: "Envelope in sync",
-        test: syncData.envelopes.some((e) => e.id === testData.envelope.id),
+        test: syncData.envelopes.some((e: Envelope) => e.id === testData.envelope.id),
       },
       {
         name: "Transaction in sync",
-        test: syncData.transactions.some((t) => t.id === testData.transaction.id),
+        test: syncData.transactions.some((t: Transaction) => t.id === testData.transaction.id),
       },
       {
         name: "Bill in sync",
-        test: syncData.bills.some((b) => b.id === testData.bill.id),
+        test: syncData.bills.some((b: Bill) => b.id === testData.bill.id),
       },
       {
         name: "Debt in sync",
-        test: syncData.debts.some((d) => d.id === testData.debt.id),
+        test: syncData.debts.some((d: Debt) => d.id === testData.debt.id),
       },
       {
         name: "Metadata synced",
@@ -182,7 +182,7 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
   try {
     logger.info("🧪 Testing bulk operations flow");
 
-    const bulkEnvelopes = Array.from({ length: 10 }, (_, i) => ({
+    const bulkEnvelopes = Array.from({ length: 10 }, (_: unknown, i: number) => ({
       id: `bulk-env-${i}-${Date.now()}`,
       name: `Bulk Envelope ${i}`,
       lastModified: Date.now() + i,
@@ -190,7 +190,7 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
       archived: false,
     }));
 
-    const bulkTransactions = Array.from({ length: 20 }, (_, i) => ({
+    const bulkTransactions = Array.from({ length: 20 }, (_: unknown, i: number) => ({
       id: `bulk-txn-${i}-${Date.now()}`,
       description: `Bulk Transaction ${i}`,
       amount: Math.random() * 100,
@@ -211,11 +211,15 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     const bulkValidations = [
       {
         name: "All envelopes synced",
-        test: bulkEnvelopes.every((e) => syncData.envelopes.some((se) => se.id === e.id)),
+        test: bulkEnvelopes.every((e: { id: string }) =>
+          syncData.envelopes.some((se: Envelope) => se.id === e.id)
+        ),
       },
       {
         name: "All transactions synced",
-        test: bulkTransactions.every((t) => syncData.transactions.some((st) => st.id === t.id)),
+        test: bulkTransactions.every((t: { id: string }) =>
+          syncData.transactions.some((st: Transaction) => st.id === t.id)
+        ),
       },
       {
         name: "Counts correct",
