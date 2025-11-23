@@ -6,14 +6,22 @@ import ReceiptToTransactionModal from "./ReceiptToTransactionModal";
 import { preloadOCR } from "../../utils/common/ocrProcessor";
 import logger from "../../utils/common/logger";
 
+interface ReceiptButtonProps {
+  onTransactionCreated?: (transaction: unknown, receipt: unknown) => void;
+  variant?: "primary" | "secondary" | "icon" | "fab";
+}
+
 /**
  * Button to trigger receipt scanning
  * Can be integrated into transaction forms or used as standalone
  */
-const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
+const ReceiptButton: React.FC<ReceiptButtonProps> = ({
+  onTransactionCreated,
+  variant = "primary",
+}) => {
   const [showScanner, setShowScanner] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [receiptData, setReceiptData] = useState(null);
+  const [receiptData, setReceiptData] = useState<unknown>(null);
   const [isPreloading, setIsPreloading] = useState(false);
 
   const handleScanReceipt = async () => {
@@ -23,7 +31,9 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
       try {
         await preloadOCR();
       } catch (error) {
-        logger.warn("Failed to preload OCR:", error);
+        logger.warn("Failed to preload OCR", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       } finally {
         setIsPreloading(false);
       }
@@ -32,13 +42,13 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
     setShowScanner(true);
   };
 
-  const handleReceiptProcessed = (processedReceipt) => {
+  const handleReceiptProcessed = (processedReceipt: unknown) => {
     setReceiptData(processedReceipt);
     setShowScanner(false);
     setShowTransactionModal(true);
   };
 
-  const handleTransactionComplete = (transaction, receipt) => {
+  const handleTransactionComplete = (transaction: unknown, receipt: unknown) => {
     setShowTransactionModal(false);
     setReceiptData(null);
 
@@ -46,8 +56,12 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
     onTransactionCreated?.(transaction, receipt);
 
     logger.info("✅ Transaction created from receipt", {
-      transactionId: transaction.id,
-      receiptId: receipt.id,
+      transactionId:
+        transaction && typeof transaction === "object" && "id" in transaction
+          ? String(transaction.id)
+          : "unknown",
+      receiptId:
+        receipt && typeof receipt === "object" && "id" in receipt ? String(receipt.id) : "unknown",
     });
   };
 
