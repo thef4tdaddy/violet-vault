@@ -191,7 +191,11 @@ export const useJoinBudgetMutation = () => {
           await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
           const { useBudgetStore } = await import("../../../stores/ui/uiStore");
-          const budgetState = useBudgetStore.getState();
+          // Type assertion for dynamically imported store
+          const budgetState = (useBudgetStore as { getState: () => unknown }).getState() as {
+            cloudSyncEnabled: boolean;
+            startBackgroundSync: () => Promise<void>;
+          };
 
           if (budgetState.cloudSyncEnabled) {
             await budgetState.startBackgroundSync();
@@ -200,7 +204,7 @@ export const useJoinBudgetMutation = () => {
           logger.error("Failed to start background sync after join", error);
         }
       } else {
-        setError(result.error);
+        setError(result.error ?? "Unknown error");
       }
       setLoading(false);
     },

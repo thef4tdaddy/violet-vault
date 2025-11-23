@@ -57,11 +57,13 @@ export const useChangePasswordMutation = () => {
 
         return { success: true, newKey, newSalt };
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        const errorName = error instanceof Error ? error.name : "";
         logger.error("Password change failed.", error);
-        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+        if (errorName === "OperationError" || errorMessage.toLowerCase().includes("decrypt")) {
           return { success: false, error: "Invalid current password." };
         }
-        return { success: false, error: error.message };
+        return { success: false, error: errorMessage };
       }
     },
     onSuccess: (result) => {
