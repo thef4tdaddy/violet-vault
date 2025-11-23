@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | +1 |
-| TypeScript Errors | 44 | +4 |
-| TypeScript Strict Mode Errors | 2128 | +2 |
+| ESLint Issues | 7 | +2 |
+| TypeScript Errors | 48 | +4 |
+| TypeScript Strict Mode Errors | 2110 | -18 |
 
-*Last updated: 2025-11-23 13:29:03 UTC*
+*Last updated: 2025-11-23 13:38:19 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useEnvelopeForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDetailModal.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
@@ -38,12 +39,16 @@
 |---|---|
 | 3 | `max-lines-per-function` |
 | 2 | `no-undef` |
+| 1 | `null` |
+| 1 | `@typescript-eslint/no-explicit-any` |
 
 ### Detailed Lint Report
 ```
 /home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx:27:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useEnvelopeForm.ts:102:5 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useEnvelopeForm.ts:105:28 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:18 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDetailModal.ts:117:35 - 1 - 'React' is not defined. (no-undef)
 ```
@@ -61,14 +66,17 @@
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/bills/useBillManager.ts`
 - 2 errors in `src/components/layout/MainLayout.tsx`
+- 2 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
+- 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
+- 1 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 21 | `TS2322` |
-| 15 | `TS2345` |
+| 24 | `TS2322` |
+| 16 | `TS2345` |
 | 4 | `TS2339` |
 | 1 | `TS2741` |
 | 1 | `TS2740` |
@@ -101,6 +109,11 @@ src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2741: Property 
 src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type '{ start: string; end: string; }' is not assignable to type 'boolean'.
+src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type '{}'.
+src/components/budgeting/CreateEnvelopeModal.tsx(58,5): error TS2322: Type '(envelope: unknown) => void' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
 src/components/debt/modals/DebtDetailModal.tsx(52,5): error TS2740: Type 'Record<string, unknown> & { id: string; }' is missing the following properties from type 'DebtWithHistory': name, balance, status, type, and 5 more.
 src/components/debt/modals/DebtDetailModal.tsx(56,5): error TS2322: Type '(debtId: string, amount: number) => Promise<void>' is not assignable to type '(debtId: string, paymentData: PaymentData) => void'.
   Types of parameters 'amount' and 'paymentData' are incompatible.
@@ -145,6 +158,12 @@ src/hooks/bills/useBillManager.ts(197,23): error TS2352: Conversion of type 'Dis
   Types of parameters 'value' and 'bills' are incompatible.
     Type 'Bill[]' is not comparable to type 'SetStateAction<Set<unknown>>'.
       Type 'Bill[]' is missing the following properties from type 'Set<unknown>': add, clear, delete, has, and 2 more.
+src/hooks/budgeting/useEnvelopeEdit.ts(93,5): error TS2322: Type '(envelopeData: any) => Promise<boolean>' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'Promise<boolean>' is not assignable to type 'Promise<void>'.
+    Type 'boolean' is not assignable to type 'void'.
+src/hooks/budgeting/useEnvelopes.ts(17,54): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'Envelope[]'.
+  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
+    Index signature for type 'string' is missing in type 'Envelope'.
 src/hooks/budgeting/usePaycheckForm.ts(67,40): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
   Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
 src/hooks/budgeting/usePaycheckForm.ts(77,58): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
@@ -261,9 +280,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/hooks/debts/useDebts.ts`
-- 9 errors in `src/hooks/debts/useDebtDashboard.ts`
-- 9 errors in `src/hooks/budgeting/useEnvelopeForm.ts`
-- 9 errors in `src/hooks/budgeting/useEnvelopeCalculations.ts`
 - 9 errors in `src/hooks/auth/useAuthFlow.ts`
 - 9 errors in `src/db/budgetDb.ts`
 - 9 errors in `src/components/transactions/splitter/SplitAllocationRow.tsx`
@@ -279,6 +295,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 8 errors in `src/main.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
 - 8 errors in `src/hooks/savings/useSavingsGoalsActions.ts`
+- 8 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 8 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
 - 8 errors in `src/components/transactions/components/TransactionRow.tsx`
@@ -301,8 +318,8 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 7 errors in `src/hooks/debts/useDebtManagement.ts`
 - 7 errors in `src/hooks/debts/useDebtDetailModal.ts`
+- 7 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 7 errors in `src/hooks/common/useModalManager.ts`
-- 7 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 7 errors in `src/components/transactions/import/FieldMapper.tsx`
 - 7 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 7 errors in `src/components/settings/archiving/ArchivingActionButtons.tsx`
@@ -536,6 +553,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/components/budgeting/envelope/EnvelopeModalHeader.tsx`
 - 2 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 2 errors in `src/components/budgeting/EditEnvelopeModalComponents.tsx`
+- 2 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 2 errors in `src/components/bills/smartBillMatcherHelpers.ts`
 - 2 errors in `src/components/bills/BulkUpdateModeSelector.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
@@ -609,7 +627,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
-- 1 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 1 errors in `src/components/budgeting/CashFlowSummary.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 1 errors in `src/components/bills/BillFormSections.tsx`
@@ -625,14 +642,14 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 621 | `TS7006` |
-| 603 | `TS7031` |
+| 620 | `TS7006` |
+| 601 | `TS7031` |
 | 178 | `TS2345` |
-| 158 | `TS2322` |
-| 128 | `TS2339` |
-| 112 | `TS18046` |
+| 160 | `TS2322` |
+| 114 | `TS2339` |
+| 111 | `TS18046` |
 | 64 | `TS7005` |
-| 63 | `TS7053` |
+| 61 | `TS7053` |
 | 51 | `TS18048` |
 | 42 | `TS18047` |
 | 39 | `TS7034` |
@@ -1007,8 +1024,10 @@ src/components/budgeting/BillEnvelopeFundingInfo.tsx(103,47): error TS18048: 'ne
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(301,11): error TS2322: Type '{ id: string; name: string; amount: number; dueDate: string; category?: string | undefined; frequency: string; } | null | undefined' is not assignable to type '{ amount: number; frequency?: string | undefined; } | undefined'.
   Type 'null' is not assignable to type '{ amount: number; frequency?: string | undefined; } | undefined'.
 src/components/budgeting/CashFlowSummary.tsx(4,28): error TS7031: Binding element 'cashFlow' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
+src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+src/components/budgeting/CreateEnvelopeModal.tsx(58,5): error TS2322: Type '(envelope: unknown) => void' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(133,24): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,24): error TS2322: Type '"savings"' is not assignable to type 'never'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,48): error TS2322: Type '"sinking_fund"' is not assignable to type 'never'.
@@ -2225,15 +2244,6 @@ src/hooks/budgeting/useBudgetHistoryQuery.ts(63,40): error TS2345: Argument of t
       Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(107,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(136,62): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(10,66): error TS2339: Property 'currentBalance' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(11,71): error TS2339: Property 'targetAmount' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(13,19): error TS2339: Property 'currentBalance' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(13,47): error TS2339: Property 'targetAmount' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(16,19): error TS2339: Property 'currentBalance' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(16,47): error TS2339: Property 'targetAmount' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(20,71): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(22,81): error TS2339: Property 'category' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeCalculations.ts(25,59): error TS2339: Property 'category' does not exist on type 'never'.
 src/hooks/budgeting/useEnvelopeEdit.ts(15,3): error TS7031: Binding element 'onSave' implicitly has an 'any' type.
 src/hooks/budgeting/useEnvelopeEdit.ts(16,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/hooks/budgeting/useEnvelopeEdit.ts(17,3): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
@@ -2241,17 +2251,12 @@ src/hooks/budgeting/useEnvelopeEdit.ts(46,41): error TS2339: Property 'id' does 
 src/hooks/budgeting/useEnvelopeEdit.ts(47,38): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/budgeting/useEnvelopeEdit.ts(61,29): error TS7006: Parameter 'envelopeData' implicitly has an 'any' type.
 src/hooks/budgeting/useEnvelopeEdit.ts(83,20): error TS18047: 'envelope' is possibly 'null'.
-src/hooks/budgeting/useEnvelopeForm.ts(20,3): error TS7031: Binding element 'onSave' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeForm.ts(21,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeForm.ts(85,39): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeForm.ts(92,84): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeForm.ts(95,46): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeForm.ts(124,30): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeForm.ts(136,29): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/useEnvelopeForm.ts(141,27): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeForm.ts(188,27): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopes.ts(17,54): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'never[]'.
-  Type 'Envelope' is not assignable to type 'never'.
+src/hooks/budgeting/useEnvelopeEdit.ts(93,5): error TS2322: Type '(envelopeData: any) => Promise<boolean>' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'Promise<boolean>' is not assignable to type 'Promise<void>'.
+    Type 'boolean' is not assignable to type 'void'.
+src/hooks/budgeting/useEnvelopes.ts(17,54): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'Envelope[]'.
+  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
+    Index signature for type 'string' is missing in type 'Envelope'.
 src/hooks/budgeting/useEnvelopesQuery.ts(117,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
   No index signature with a parameter of type 'string' was found on type 'Envelope'.
 src/hooks/budgeting/useEnvelopesQuery.ts(118,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Envelope'.
@@ -2380,10 +2385,6 @@ src/hooks/common/useTransactionArchiving.ts(126,41): error TS7006: Parameter 'tr
 src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
 src/hooks/dashboard/useMainDashboard.ts(173,6): error TS7006: Parameter 'difference' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(61,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
-  No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
-src/hooks/debts/useDebtDashboard.ts(62,20): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'DebtAccount'.
-  No index signature with a parameter of type 'string' was found on type 'DebtAccount'.
 src/hooks/debts/useDebtDashboard.ts(84,27): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtDashboard.ts(89,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/hooks/debts/useDebtDashboard.ts(145,35): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
