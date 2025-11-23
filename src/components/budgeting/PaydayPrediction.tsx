@@ -275,8 +275,8 @@ const PaydayPrediction = ({
       {showProactiveSuggestions && daysUntil !== null && (
         <ProactiveSuggestions
           daysUntil={daysUntil}
-          onProcessPaycheck={onProcessPaycheck ?? undefined}
-          onPrepareEnvelopes={onPrepareEnvelopes ?? undefined}
+          onProcessPaycheck={onProcessPaycheck}
+          onPrepareEnvelopes={onPrepareEnvelopes}
         />
       )}
     </div>

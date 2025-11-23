@@ -157,9 +157,7 @@ const LockScreen = () => {
       if (processedValidationRef.current === validationResult) {
         return;
       }
-      processedValidationRef.current = validationResult as
-        | { isValid: boolean; reason?: string; isCorrupted?: boolean }
-        | { isValid: boolean; reason: string; error: unknown };
+      processedValidationRef.current = validationResult;
 
       if ((validationResult as { isValid?: boolean })?.isValid) {
         // Password is correct, unlock the session
