@@ -1,7 +1,7 @@
 import { useState, useMemo, FormEvent } from "react";
 import { useConfirm } from "../common/useConfirm";
 import logger from "../../utils/common/logger";
-import { Bill } from "../../db/types";
+import type { Bill as BillFromTypes } from "../../types/bills";
 
 const STATUS_COLOR_CLASSES = {
   green: {
@@ -38,12 +38,12 @@ interface PaymentData {
 }
 
 interface BillDetailParams {
-  bill: Bill;
+  bill: BillFromTypes;
   onDelete: (billId: string) => void;
   onMarkPaid: (billId: string, paymentData: PaymentData) => void;
   onClose: () => void;
-  onEdit: (bill: Bill) => void;
-  onCreateRecurring: (bill: Bill) => void;
+  onEdit: (bill: BillFromTypes) => void;
+  onCreateRecurring: (bill: BillFromTypes) => void;
 }
 
 /**
@@ -71,9 +71,11 @@ export const useBillDetail = ({
     }
 
     const parsed =
-      bill.dueDate instanceof Date
-        ? bill.dueDate
-        : new Date(typeof bill.dueDate === "number" ? bill.dueDate : `${bill.dueDate}`);
+      bill.dueDate && typeof bill.dueDate === "object" && "getTime" in bill.dueDate
+        ? (bill.dueDate as Date)
+        : new Date(
+            typeof bill.dueDate === "number" ? bill.dueDate : bill.dueDate ? `${bill.dueDate}` : ""
+          );
 
     if (isNaN(parsed.getTime())) {
       logger.warn("Invalid bill due date received", { billId: bill.id, dueDate: bill.dueDate });

@@ -21,7 +21,7 @@ type BillEntity = Record<string, unknown> & {
 /**
  * Update mode type
  */
-type UpdateMode = "amount" | "date" | "both";
+type UpdateMode = "amounts" | "dates" | "both";
 
 /**
  * Props for BulkUpdateBillRow component

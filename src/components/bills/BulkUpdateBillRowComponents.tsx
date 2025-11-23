@@ -91,7 +91,9 @@ export const DateUpdateField: React.FC<DateUpdateFieldProps> = ({
 export const BillInfo: React.FC<BillInfoProps> = ({ bill }) => {
   return (
     <div className="flex-1">
-      <h5 className="font-bold text-gray-900">{bill.provider || bill.description}</h5>
+      <h5 className="font-bold text-gray-900">
+        {bill.provider || (bill as { description?: string }).description || bill.name}
+      </h5>
       <p className="text-sm text-purple-800 font-medium">{bill.category}</p>
     </div>
   );

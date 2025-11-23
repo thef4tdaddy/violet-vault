@@ -27,7 +27,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
   onUpdateBills,
   onError,
 }) => {
-  const [updateMode, setUpdateMode] = useState("amounts");
+  const [updateMode, setUpdateMode] = useState<"amounts" | "dates" | "both">("amounts");
 
   const {
     changes,
@@ -64,7 +64,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
   const confirmChanges = async () => {
     try {
       const updatedBills = transformBillsForUpdate(selectedBills, changes);
-      await onUpdateBills(updatedBills);
+      await onUpdateBills(updatedBills as Bill[]);
       onClose();
     } catch (error) {
       onError?.(error.message || "Failed to update bills");

@@ -149,20 +149,20 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
           bill={showBillDetail}
           isOpen={!!showBillDetail}
           onClose={() => setShowBillDetail(null)}
-          onDelete={deleteBill}
-          onMarkPaid={(billId, paymentData) =>
-            billOperations.handlePayBill(billId, {
+          onDelete={(billId: string) => deleteBill(billId)}
+          onMarkPaid={async (billId: string, paymentData: { amount: number; paidDate: string }) => {
+            await billOperations.handlePayBill(billId, {
               amount: paymentData.amount,
               paidDate: paymentData.paidDate,
-            })
-          }
-          onEdit={(bill: BillEntity) => {
-            setShowBillDetail(null);
-            handleEditBill(bill);
+            });
           }}
-          onCreateRecurring={(bill: BillEntity) => {
+          onEdit={(bill) => {
+            setShowBillDetail(null);
+            handleEditBill(bill as unknown as BillEntity);
+          }}
+          onCreateRecurring={(bill) => {
             logger.warn("Recurring bill creation not yet implemented", {
-              billName: bill.name as string,
+              billName: (bill as unknown as BillEntity).name as string,
             });
           }}
         />

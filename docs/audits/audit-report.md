@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | -1 |
-| TypeScript Errors | 128 | -1 |
-| TypeScript Strict Mode Errors | 965 | -1 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 108 | -2 |
+| TypeScript Strict Mode Errors | 945 | -3 |
 
-*Last updated: 2025-11-23 23:14:17 UTC*
+*Last updated: 2025-11-23 23:44:22 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -42,9 +42,7 @@ violet-vault/src/hooks/debts/useDebtDashboard.ts:7:33 - 1 - Arrow function has t
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 8 errors in `src/components/bills/BillManagerModals.tsx`
 - 7 errors in `src/components/layout/ViewRenderer.tsx`
-- 7 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 5 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 5 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 5 errors in `src/components/transactions/TransactionLedger.tsx`
@@ -71,13 +69,12 @@ violet-vault/src/hooks/debts/useDebtDashboard.ts:7:33 - 1 - Arrow function has t
 - 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 2 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 2 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
-- 2 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 2 errors in `src/components/bills/BulkUpdateBillRow.tsx`
-- 2 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 1 errors in `src/utils/security/encryption.ts`
 - 1 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
+- 1 errors in `src/hooks/bills/useBillDetail.ts`
 - 1 errors in `src/hooks/auth/useAuthenticationManager.ts`
 - 1 errors in `src/db/budgetDb.ts`
 - 1 errors in `src/components/settings/sections/NotificationSettingsSection.tsx`
@@ -85,20 +82,18 @@ violet-vault/src/hooks/debts/useDebtDashboard.ts:7:33 - 1 - Arrow function has t
 - 1 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 1 errors in `src/components/debt/DebtStrategies.tsx`
 - 1 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
-- 1 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
 - 1 errors in `src/components/bills/BulkBillUpdateModal.tsx`
+- 1 errors in `src/components/bills/BillManagerModals.tsx`
 - 1 errors in `src/components/bills/BillManager.tsx`
-- 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
-- 1 errors in `src/components/automation/AutoFundingDashboard.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 50 | `TS2322` |
-| 33 | `TS2345` |
-| 12 | `TS2339` |
-| 10 | `TS2739` |
+| 39 | `TS2322` |
+| 31 | `TS2345` |
+| 9 | `TS2739` |
 | 7 | `TS2719` |
+| 5 | `TS2339` |
 | 4 | `TS2717` |
 | 4 | `TS2687` |
 | 2 | `TS2741` |
@@ -106,70 +101,22 @@ violet-vault/src/hooks/debts/useDebtDashboard.ts:7:33 - 1 - Arrow function has t
 | 2 | `TS2578` |
 | 1 | `TS2769` |
 | 1 | `TS2559` |
+| 1 | `TS18047` |
 
 ### Detailed Type Error Report
 ```
-src/components/automation/AutoFundingDashboard.tsx(160,15): error TS2322: Type 'FC<HistoryTabProps>' is not assignable to type 'ComponentType<HistoryTabProps>'.
-  Type 'React.FunctionComponent<HistoryTabProps>' is not assignable to type 'React.FunctionComponent<HistoryTabProps>'. Two different types with this name exist, but they are unrelated.
-    Type 'HistoryTabProps' is not assignable to type 'HistoryTabProps'. Two different types with this name exist, but they are unrelated.
-      Types of property 'executionHistory' are incompatible.
-        Type 'Execution[]' is not assignable to type 'ExecutionHistoryEntry[]'.
-          Type 'Execution' is missing the following properties from type 'ExecutionHistoryEntry': timestamp, trigger
-src/components/automation/steps/config/SplitRemainderConfig.tsx(35,68): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/components/automation/tabs/HistoryTab.tsx(134,30): error TS2339: Property 'error' does not exist on type 'Execution'.
-src/components/automation/tabs/HistoryTab.tsx(136,58): error TS2339: Property 'error' does not exist on type 'Execution'.
 src/components/bills/BillManager.tsx(105,5): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
   Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
     Types of property 'id' are incompatible.
       Type 'string | number' is not assignable to type 'string'.
         Type 'number' is not assignable to type 'string'.
 src/components/bills/BillManagerModals.tsx(149,11): error TS2739: Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
-src/components/bills/BillManagerModals.tsx(152,11): error TS2322: Type '(billId: string, deleteEnvelope?: boolean) => Promise<void>' is not assignable to type '(bill: Bill) => void | Promise<void>'.
-  Types of parameters 'billId' and 'bill' are incompatible.
-    Type 'Bill' is not assignable to type 'string'.
-src/components/bills/BillManagerModals.tsx(154,13): error TS2322: Type 'Promise<unknown>' is not assignable to type 'void | Promise<void>'.
-  Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
-    Type 'unknown' is not assignable to type 'void'.
-src/components/bills/BillManagerModals.tsx(154,42): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'string'.
-src/components/bills/BillManagerModals.tsx(155,35): error TS2339: Property 'amount' does not exist on type 'number'.
-src/components/bills/BillManagerModals.tsx(156,37): error TS2339: Property 'paidDate' does not exist on type 'number'.
-src/components/bills/BillManagerModals.tsx(159,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Type 'Bill' is not assignable to type 'BillEntity'.
-      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
-        Index signature for type 'string' is missing in type 'Bill'.
-src/components/bills/BillManagerModals.tsx(163,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Type 'Bill' is not assignable to type 'BillEntity'.
-      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
-        Index signature for type 'string' is missing in type 'Bill'.
 src/components/bills/BulkBillUpdateModal.tsx(40,25): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type '{ id: string; name: string; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; dueDate?: string | Date; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }[]'.
   Type 'Bill' is missing the following properties from type '{ id: string; name: string; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; dueDate?: string | Date; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }': isRecurring, lastModified
 src/components/bills/BulkUpdateBillRow.tsx(59,19): error TS2739: Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
 src/components/bills/BulkUpdateBillRow.tsx(65,15): error TS2719: Type 'AmountChange' is not assignable to type 'AmountChange'. Two different types with this name exist, but they are unrelated.
   Types of property 'original' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/bills/BulkUpdateBillRowComponents.tsx(94,70): error TS2339: Property 'description' does not exist on type 'Bill'.
-src/components/bills/BulkUpdateEditor.tsx(94,15): error TS2322: Type 'Bill' is not assignable to type 'BillEntity'.
-  Type 'Bill' is not assignable to type 'Record<string, unknown>'.
-    Index signature for type 'string' is missing in type 'Bill'.
-src/components/bills/BulkUpdateEditor.tsx(96,15): error TS2322: Type 'string' is not assignable to type 'UpdateMode'.
-src/components/bills/modals/BillDetailModal.tsx(48,23): error TS2739: Type 'Bill' is missing the following properties from type 'Bill': isRecurring, lastModified
-src/components/bills/modals/BillDetailModal.tsx(48,29): error TS2322: Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(billId: string) => void'.
-  Types of parameters 'bill' and 'billId' are incompatible.
-    Type 'string' is not assignable to type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,39): error TS2322: Type '(bill: Bill, amount: number) => void | Promise<void>' is not assignable to type '(billId: string, paymentData: PaymentData) => void'.
-  Types of parameters 'bill' and 'billId' are incompatible.
-    Type 'string' is not assignable to type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,60): error TS2322: Type '(bill: import("violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/Users/thef4tdaddy/Git/violet-vault/src/db/types").Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Property 'color' is missing in type 'import("violet-vault/src/db/types").Bill' but required in type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/bills").Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,68): error TS2322: Type '(bill: import("violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/Users/thef4tdaddy/Git/violet-vault/src/db/types").Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Property 'color' is missing in type 'import("violet-vault/src/db/types").Bill' but required in type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/bills").Bill'.
-src/components/bills/modals/BillDetailModal.tsx(83,44): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(90,34): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
 src/components/budgeting/CreateEnvelopeModal.tsx(106,13): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
   Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
     Property 'name' is optional in type 'Bill' but required in type 'Bill'.
@@ -320,6 +267,7 @@ src/db/budgetDb.ts(94,9): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Argument of type '"creating"' is not assignable to parameter of type '"deleting"'.
 src/hooks/auth/useAuthenticationManager.ts(132,34): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | UserData'.
+src/hooks/bills/useBillDetail.ts(74,72): error TS18047: 'bill.dueDate' is possibly 'null'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(71,54): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'AutoFundingRule[]'.
   Type '{}' is missing the following properties from type 'AutoFundingRule': id, name, description, type, and 7 more.
 src/hooks/budgeting/useEnvelopeEdit.ts(66,31): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
@@ -454,8 +402,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/components/transactions/TransactionLedger.tsx`
 - 9 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
-- 9 errors in `src/components/bills/modals/BillDetailModal.tsx`
-- 9 errors in `src/components/bills/BillManagerModals.tsx`
 - 8 errors in `src/stores/ui/uiStore.ts`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
 - 8 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
@@ -592,6 +538,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
 - 3 errors in `src/components/budgeting/PaycheckProcessor.tsx`
+- 3 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailHeader.tsx`
 - 3 errors in `src/components/bills/BulkUpdateSummary.tsx`
 - 3 errors in `src/components/bills/BillTabs.tsx`
@@ -675,10 +622,9 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 2 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 2 errors in `src/components/bills/smartBillMatcherHelpers.ts`
 - 2 errors in `src/components/bills/BulkUpdateModeSelector.tsx`
-- 2 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 2 errors in `src/components/bills/BulkUpdateBillRow.tsx`
+- 2 errors in `src/components/bills/BillManagerModals.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
-- 2 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 2 errors in `src/components/automation/steps/TriggerScheduleStep.tsx`
 - 2 errors in `src/components/automation/components/StepNavigation.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
@@ -761,13 +707,10 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 1 errors in `src/components/bills/modals/BulkUpdateConfirmModal.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailSections.tsx`
-- 1 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
 - 1 errors in `src/components/bills/BillFormSections.tsx`
 - 1 errors in `src/components/bills/BillDiscoveryModal.tsx`
-- 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
 - 1 errors in `src/components/automation/AutoFundingView.tsx`
 - 1 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
-- 1 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 1 errors in `src/components/auth/key-management/MainContent.tsx`
 - 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
 - 1 errors in `src/components/auth/KeyManagementSettings.tsx`
@@ -782,15 +725,15 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 | Count | Error Code |
 |---|---|
 | 199 | `TS7031` |
-| 171 | `TS2322` |
-| 168 | `TS2345` |
+| 166 | `TS2345` |
+| 160 | `TS2322` |
 | 145 | `TS7006` |
 | 43 | `TS7005` |
 | 37 | `TS18046` |
-| 34 | `TS2339` |
 | 31 | `TS2769` |
 | 30 | `TS18048` |
 | 29 | `TS7034` |
+| 27 | `TS2339` |
 | 24 | `TS7053` |
 | 9 | `TS18047` |
 | 7 | `TS2719` |
@@ -881,12 +824,6 @@ src/components/auth/UserIndicator.tsx(71,23): error TS2349: This expression is n
   Type 'never' has no call signatures.
 src/components/auth/UserIndicator.tsx(116,11): error TS2322: Type '((updates: { [key: string]: unknown; userName: string; userColor: string; budgetId?: string | undefined; }) => Promise<void>) | undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
   Type 'undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
-src/components/automation/AutoFundingDashboard.tsx(160,15): error TS2322: Type 'FC<HistoryTabProps>' is not assignable to type 'ComponentType<HistoryTabProps>'.
-  Type 'React.FunctionComponent<HistoryTabProps>' is not assignable to type 'React.FunctionComponent<HistoryTabProps>'. Two different types with this name exist, but they are unrelated.
-    Type 'HistoryTabProps' is not assignable to type 'HistoryTabProps'. Two different types with this name exist, but they are unrelated.
-      Types of property 'executionHistory' are incompatible.
-        Type 'ExecutionHistoryEntry[]' is not assignable to type 'Execution[]'.
-          Property 'success' is missing in type 'ExecutionHistoryEntry' but required in type 'Execution'.
 src/components/automation/AutoFundingRuleBuilder.tsx(158,9): error TS2322: Type '(envelopeId: string) => void' is not assignable to type '(envelopeId: string | number) => void'.
   Types of parameters 'envelopeId' and 'envelopeId' are incompatible.
     Type 'string | number' is not assignable to type 'string'.
@@ -895,19 +832,15 @@ src/components/automation/AutoFundingView.tsx(120,11): error TS2322: Type 'FC<Hi
   Type 'FunctionComponent<HistoryTabProps>' is not assignable to type 'FunctionComponent<{ executionHistory: unknown[]; showExecutionDetails: string | null; onToggleDetails: (show: string | null) => void; }>'.
     Type '{ executionHistory: unknown[]; showExecutionDetails: string | null; onToggleDetails: (show: string | null) => void; }' is not assignable to type 'HistoryTabProps'.
       Types of property 'executionHistory' are incompatible.
-        Type 'unknown[]' is not assignable to type 'Execution[]'.
-          Type 'unknown' is not assignable to type 'Execution'.
+        Type 'unknown[]' is not assignable to type 'ExecutionHistoryEntry[]'.
+          Type 'unknown' is not assignable to type 'ExecutionHistoryEntry'.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(35,68): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
 src/components/automation/steps/RuleTypeStep.tsx(5,25): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
 src/components/automation/steps/RuleTypeStep.tsx(5,35): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
 src/components/automation/steps/RuleTypeStep.tsx(5,51): error TS7031: Binding element 'errors' implicitly has an 'any' type.
 src/components/automation/steps/TriggerScheduleStep.tsx(5,32): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
 src/components/automation/steps/TriggerScheduleStep.tsx(5,42): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(134,30): error TS2339: Property 'error' does not exist on type 'Execution'.
-src/components/automation/tabs/HistoryTab.tsx(136,58): error TS2339: Property 'error' does not exist on type 'Execution'.
 src/components/bills/AddBillModal.tsx(211,5): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
   Type 'null' is not assignable to type 'string'.
 src/components/bills/AddBillModal.tsx(257,5): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
@@ -962,25 +895,6 @@ src/components/bills/BillManagerModals.tsx(115,11): error TS2322: Type '(billId:
     Type 'unknown' is not assignable to type 'string'.
 src/components/bills/BillManagerModals.tsx(149,11): error TS2322: Type 'BillEntity' is not assignable to type 'Bill | null'.
   Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
-src/components/bills/BillManagerModals.tsx(152,11): error TS2322: Type '(billId: string, deleteEnvelope?: boolean | undefined) => Promise<void>' is not assignable to type '(bill: Bill) => void | Promise<void>'.
-  Types of parameters 'billId' and 'bill' are incompatible.
-    Type 'Bill' is not assignable to type 'string'.
-src/components/bills/BillManagerModals.tsx(154,13): error TS2322: Type 'Promise<unknown>' is not assignable to type 'void | Promise<void>'.
-  Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
-    Type 'unknown' is not assignable to type 'void'.
-src/components/bills/BillManagerModals.tsx(154,42): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'string'.
-src/components/bills/BillManagerModals.tsx(155,35): error TS2339: Property 'amount' does not exist on type 'number'.
-src/components/bills/BillManagerModals.tsx(156,37): error TS2339: Property 'paidDate' does not exist on type 'number'.
-src/components/bills/BillManagerModals.tsx(159,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Type 'Bill' is not assignable to type 'BillEntity'.
-      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
-        Index signature for type 'string' is missing in type 'Bill'.
-src/components/bills/BillManagerModals.tsx(163,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Type 'Bill' is not assignable to type 'BillEntity'.
-      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
-        Index signature for type 'string' is missing in type 'Bill'.
 src/components/bills/BillModalHeader.tsx(10,28): error TS7031: Binding element 'editingBill' implicitly has an 'any' type.
 src/components/bills/BillModalHeader.tsx(10,41): error TS7031: Binding element 'formData' implicitly has an 'any' type.
 src/components/bills/BillModalHeader.tsx(10,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
@@ -1006,11 +920,6 @@ src/components/bills/BulkUpdateBillRow.tsx(59,19): error TS2739: Type 'BillEntit
 src/components/bills/BulkUpdateBillRow.tsx(65,15): error TS2719: Type 'AmountChange' is not assignable to type 'AmountChange'. Two different types with this name exist, but they are unrelated.
   Types of property 'original' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/bills/BulkUpdateBillRowComponents.tsx(94,70): error TS2339: Property 'description' does not exist on type 'Bill'.
-src/components/bills/BulkUpdateEditor.tsx(94,15): error TS2322: Type 'Bill' is not assignable to type 'BillEntity'.
-  Type 'Bill' is not assignable to type 'Record<string, unknown>'.
-    Index signature for type 'string' is missing in type 'Bill'.
-src/components/bills/BulkUpdateEditor.tsx(96,15): error TS2322: Type 'string' is not assignable to type 'UpdateMode'.
 src/components/bills/BulkUpdateModeSelector.tsx(9,35): error TS7031: Binding element 'updateMode' implicitly has an 'any' type.
 src/components/bills/BulkUpdateModeSelector.tsx(9,47): error TS7031: Binding element 'setUpdateMode' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,30): error TS7031: Binding element 'summary' implicitly has an 'any' type.
@@ -1019,25 +928,11 @@ src/components/bills/BulkUpdateSummary.tsx(9,48): error TS7031: Binding element 
 src/components/bills/modals/BillDetailHeader.tsx(10,36): error TS7031: Binding element 'bill' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailHeader.tsx(10,42): error TS7031: Binding element 'statusInfo' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailHeader.tsx(10,54): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(48,23): error TS2322: Type 'Bill | null' is not assignable to type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(53,23): error TS2322: Type 'Bill | null' is not assignable to type 'Bill'.
   Type 'null' is not assignable to type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,29): error TS2322: Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(billId: string) => void'.
-  Types of parameters 'bill' and 'billId' are incompatible.
-    Type 'string' is not assignable to type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,39): error TS2322: Type '(bill: Bill, amount: number) => void | Promise<void>' is not assignable to type '(billId: string, paymentData: PaymentData) => void'.
-  Types of parameters 'bill' and 'billId' are incompatible.
-    Type 'string' is not assignable to type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,60): error TS2322: Type '(bill: import("violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/Users/thef4tdaddy/Git/violet-vault/src/db/types").Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Property 'color' is missing in type 'import("violet-vault/src/db/types").Bill' but required in type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/bills").Bill'.
-src/components/bills/modals/BillDetailModal.tsx(48,68): error TS2322: Type '(bill: import("violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/Users/thef4tdaddy/Git/violet-vault/src/db/types").Bill) => void'.
-  Types of parameters 'bill' and 'bill' are incompatible.
-    Property 'color' is missing in type 'import("violet-vault/src/db/types").Bill' but required in type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/bills").Bill'.
-src/components/bills/modals/BillDetailModal.tsx(54,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/components/bills/modals/BillDetailModal.tsx(59,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/bills/modals/BillDetailModal.tsx(83,44): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(90,34): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
-src/components/bills/modals/BillDetailModal.tsx(131,11): error TS2322: Type '(e: FormEvent<HTMLFormElement>) => Promise<void>' is not assignable to type '(e: FormEvent<Element>) => void | Promise<void>'.
+src/components/bills/modals/BillDetailModal.tsx(136,11): error TS2322: Type '(e: FormEvent<HTMLFormElement>) => Promise<void>' is not assignable to type '(e: FormEvent<Element>) => void | Promise<void>'.
   Types of parameters 'e' and 'e' are incompatible.
     Type 'FormEvent<Element>' is not assignable to type 'FormEvent<HTMLFormElement>'.
       Type 'Element' is missing the following properties from type 'HTMLFormElement': acceptCharset, action, autocomplete, elements, and 148 more.

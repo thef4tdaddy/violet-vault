@@ -1,23 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
-
-interface Execution {
-  id: string;
-  executedAt: string;
-  success: boolean;
-  totalFunded?: number;
-  rulesExecuted?: number;
-  results?: Array<{
-    success: boolean;
-    ruleName?: string;
-    amount?: number;
-    error?: string;
-  }>;
-}
+import type { ExecutionHistoryEntry } from "@/hooks/budgeting/autofunding/types";
 
 interface HistoryTabProps {
-  executionHistory: Execution[];
+  executionHistory: ExecutionHistoryEntry[];
   showExecutionDetails: string | null;
   onToggleDetails: (id: string | null) => void;
 }
@@ -65,12 +52,14 @@ const HistoryTab: React.FC<HistoryTabProps> = ({
                       </h4>
                       <span
                         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          execution.success
+                          (execution.success as boolean | undefined) !== false
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {execution.success ? "Success" : "Failed"}
+                        {(execution.success as boolean | undefined) !== false
+                          ? "Success"
+                          : "Failed"}
                       </span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -78,9 +67,9 @@ const HistoryTab: React.FC<HistoryTabProps> = ({
                         {React.createElement(getIcon("Calendar"), {
                           className: "h-3 w-3",
                         })}
-                        {new Date(execution.executedAt).toLocaleString()}
+                        {new Date(execution.executedAt || execution.timestamp).toLocaleString()}
                       </span>
-                      {execution.success && (
+                      {(execution.success as boolean | undefined) !== false && (
                         <>
                           <span className="flex items-center gap-1">
                             {React.createElement(getIcon("TrendingUp"), {
@@ -113,7 +102,16 @@ const HistoryTab: React.FC<HistoryTabProps> = ({
               {showExecutionDetails === execution.id && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="space-y-2">
-                    {execution.results?.map((result, resultIndex) => (
+                    {(
+                      (execution.results as
+                        | Array<{
+                            success: boolean;
+                            ruleName?: string;
+                            amount?: number;
+                            error?: string;
+                          }>
+                        | undefined) || []
+                    ).map((result, resultIndex) => (
                       <div key={resultIndex} className="text-sm">
                         <div
                           className={`flex items-center justify-between p-2 rounded ${
@@ -131,9 +129,9 @@ const HistoryTab: React.FC<HistoryTabProps> = ({
                     ))}
                   </div>
 
-                  {execution.error && (
+                  {(execution.error as string | undefined) && (
                     <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
-                      <strong>Error:</strong> {execution.error}
+                      <strong>Error:</strong> {execution.error as string}
                     </div>
                   )}
 

@@ -8,16 +8,21 @@ import { BillDetailStats } from "./BillDetailStats";
 import { BillDetailPaymentHistory, BillDetailQuickPayment } from "./BillDetailSections";
 import { BillDetailActions } from "./BillDetailActions";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { Bill } from "@/types/bills";
+import type { Bill as BillFromTypes } from "@/types/bills";
+
+interface PaymentData {
+  amount: number;
+  paidDate: string;
+}
 
 interface BillDetailModalProps {
-  bill: Bill | null;
+  bill: BillFromTypes | null;
   isOpen: boolean;
   onClose: () => void;
-  onDelete: (bill: Bill) => void | Promise<void>;
-  onMarkPaid: (bill: Bill, amount: number) => void | Promise<void>;
-  onEdit: (bill: Bill) => void;
-  onCreateRecurring: (bill: Bill) => void;
+  onDelete: (billId: string) => void | Promise<void>;
+  onMarkPaid: (billId: string, paymentData: PaymentData) => void | Promise<void>;
+  onEdit: (bill: BillFromTypes) => void;
+  onCreateRecurring: (bill: BillFromTypes) => void;
 }
 
 /**
@@ -80,14 +85,14 @@ const BillDetailModal: React.FC<BillDetailModalProps> = ({
         <BillDetailStats bill={bill} />
 
         {/* Next Due Date (for recurring bills) */}
-        {bill.frequency !== "once" && bill.nextDueDate && (
+        {bill.frequency !== "once" && bill.nextDue && (
           <div className="bg-amber-50 rounded-xl p-4 mb-6">
             <h4 className="font-medium text-amber-900 mb-3">Next Payment</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-amber-600">Next Due Date</p>
                 <p className="font-semibold text-amber-900">
-                  {new Date(bill.nextDueDate).toLocaleDateString()}
+                  {new Date(bill.nextDue || "").toLocaleDateString()}
                 </p>
               </div>
               <div>
