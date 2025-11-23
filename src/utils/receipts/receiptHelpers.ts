@@ -200,7 +200,11 @@ export const getReceiptFormChanges = (
     });
   }
 
-  if (Math.abs(receiptData.total - transactionForm.amount) > 0.01) {
+  if (
+    receiptData.total !== undefined &&
+    transactionForm.amount !== undefined &&
+    Math.abs(receiptData.total - transactionForm.amount) > 0.01
+  ) {
     changes.push({
       field: "amount",
       original: receiptData.total,

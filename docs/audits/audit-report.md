@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 3 | 0 |
 | TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2154 | -7 |
+| TypeScript Strict Mode Errors | 2152 | -2 |
 
-*Last updated: 2025-11-23 00:27:30 UTC*
+*Last updated: 2025-11-23 00:32:10 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -458,7 +458,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
 - 2 errors in `src/utils/security/keyExport.ts`
-- 2 errors in `src/utils/receipts/receiptHelpers.ts`
 - 2 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
@@ -616,7 +615,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | 131 | `TS18046` |
 | 65 | `TS7005` |
 | 59 | `TS7053` |
-| 58 | `TS18048` |
+| 56 | `TS18048` |
 | 40 | `TS7034` |
 | 34 | `TS18047` |
 | 26 | `TS2769` |
@@ -3275,8 +3274,6 @@ src/utils/query/queryClientConfig.ts(180,18): error TS7006: Parameter 'queryKey'
 src/utils/query/queryClientConfig.ts(187,22): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(187,32): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(194,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/receipts/receiptHelpers.ts(203,16): error TS18048: 'receiptData.total' is possibly 'undefined'.
-src/utils/receipts/receiptHelpers.ts(203,36): error TS18048: 'transactionForm.amount' is possibly 'undefined'.
 src/utils/savings/savingsCalculations.ts(240,12): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,19): error TS18046: 'aVal' is of type 'unknown'.
 src/utils/savings/savingsCalculations.ts(240,30): error TS18046: 'bVal' is of type 'unknown'.
