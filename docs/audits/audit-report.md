@@ -2,15 +2,16 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 0 | -1 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 1358 | 0 |
+| Category                      | Current | Change |
+| ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 0       | -1     |
+| TypeScript Errors             | 0       | 0      |
+| TypeScript Strict Mode Errors | 1358    | 0      |
 
-*Last updated: 2025-11-23 21:41:30 UTC*
+_Last updated: 2025-11-23 21:41:30 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -39,6 +40,7 @@ Last check: 2025-11-23 21:41:09 UTC
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
+
 - 14 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 14 errors in `src/components/dashboard/AccountBalanceOverview.tsx`
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
@@ -404,36 +406,38 @@ Last check: 2025-11-23 21:41:09 UTC
 - 1 errors in `src/components/accounts/AccountsGrid.tsx`
 
 ### Strict Mode Error Breakdown
+
 | Count | Error Code |
-|---|---|
-| 451 | `TS7031` |
-| 276 | `TS7006` |
-| 158 | `TS2345` |
-| 121 | `TS2322` |
-| 71 | `TS18046` |
-| 53 | `TS2339` |
-| 52 | `TS7005` |
-| 38 | `TS7053` |
-| 34 | `TS7034` |
-| 32 | `TS18048` |
-| 29 | `TS2769` |
-| 17 | `TS18047` |
-| 4 | `TS2722` |
-| 4 | `TS2353` |
-| 3 | `TS2783` |
-| 3 | `TS2352` |
-| 2 | `TS7022` |
-| 2 | `TS2531` |
-| 1 | `TS7023` |
-| 1 | `TS7019` |
-| 1 | `TS7016` |
-| 1 | `TS2740` |
-| 1 | `TS2683` |
-| 1 | `TS2538` |
-| 1 | `TS2365` |
-| 1 | `TS2349` |
+| ----- | ---------- |
+| 451   | `TS7031`   |
+| 276   | `TS7006`   |
+| 158   | `TS2345`   |
+| 121   | `TS2322`   |
+| 71    | `TS18046`  |
+| 53    | `TS2339`   |
+| 52    | `TS7005`   |
+| 38    | `TS7053`   |
+| 34    | `TS7034`   |
+| 32    | `TS18048`  |
+| 29    | `TS2769`   |
+| 17    | `TS18047`  |
+| 4     | `TS2722`   |
+| 4     | `TS2353`   |
+| 3     | `TS2783`   |
+| 3     | `TS2352`   |
+| 2     | `TS7022`   |
+| 2     | `TS2531`   |
+| 1     | `TS7023`   |
+| 1     | `TS7019`   |
+| 1     | `TS7016`   |
+| 1     | `TS2740`   |
+| 1     | `TS2683`   |
+| 1     | `TS2538`   |
+| 1     | `TS2365`   |
+| 1     | `TS2349`   |
 
 ### Detailed Strict Mode Report
+
 ```
 src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/App.tsx(29,9): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
@@ -2506,4 +2510,3 @@ src/utils/testing/storeTestUtils.ts(72,16): error TS7053: Element implicitly has
   No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
 ```
-
