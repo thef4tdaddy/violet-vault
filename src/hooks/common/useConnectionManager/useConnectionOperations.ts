@@ -180,7 +180,7 @@ export const useConnectionOperations = () => {
     try {
       switch (entityType) {
         case "bill":
-          await updateBill(entityId, { envelopeId: null });
+          await updateBill(entityId, { envelopeId: undefined });
 
           addToast({
             type: "info",
@@ -193,7 +193,7 @@ export const useConnectionOperations = () => {
         case "envelope": {
           const connectedBillIds = currentConnections.map((c) => c.id);
           await Promise.all(
-            connectedBillIds.map((billId) => updateBill(billId, { envelopeId: null }))
+            connectedBillIds.map((billId) => updateBill(billId, { envelopeId: undefined }))
           );
 
           addToast({
@@ -206,7 +206,7 @@ export const useConnectionOperations = () => {
         }
 
         case "debt":
-          await updateDebt({ id: entityId, updates: { envelopeId: null } });
+          await updateDebt({ id: entityId, updates: { envelopeId: undefined } });
 
           addToast({
             type: "info",
