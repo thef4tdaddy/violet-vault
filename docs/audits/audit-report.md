@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 4 | 0 |
 | TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2130 | -7 |
+| TypeScript Strict Mode Errors | 2125 | -5 |
 
-*Last updated: 2025-11-23 13:34:58 UTC*
+*Last updated: 2025-11-23 13:42:06 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -292,7 +292,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 7 errors in `src/components/settings/archiving/ArchivingActionButtons.tsx`
 - 7 errors in `src/components/security/LockScreen.tsx`
-- 7 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 7 errors in `src/components/modals/QuickFundForm.tsx`
 - 7 errors in `src/components/history/viewer/ChangeDetails.tsx`
 - 7 errors in `src/components/debt/ui/QuickPaymentForm.tsx`
@@ -502,6 +501,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/onboarding/hooks/useTutorialPositioning.ts`
 - 2 errors in `src/components/onboarding/EmptyStateHints.tsx`
+- 2 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 2 errors in `src/components/mobile/FABActionMenu.tsx`
 - 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 2 errors in `src/components/debt/ui/StrategyCard.tsx`
@@ -611,13 +611,13 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | 630 | `TS7006` |
 | 608 | `TS7031` |
 | 186 | `TS2345` |
-| 154 | `TS2322` |
+| 153 | `TS2322` |
 | 122 | `TS2339` |
 | 112 | `TS18046` |
 | 63 | `TS7053` |
-| 61 | `TS7005` |
+| 59 | `TS7005` |
 | 50 | `TS18048` |
-| 38 | `TS7034` |
+| 37 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
 | 6 | `TS2411` |
@@ -636,7 +636,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | 1 | `TS2698` |
 | 1 | `TS2683` |
 | 1 | `TS2538` |
-| 1 | `TS2532` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
 
@@ -1410,15 +1409,8 @@ src/components/modals/QuickFundModal.tsx(15,3): error TS7031: Binding element 'o
 src/components/modals/QuickFundModal.tsx(16,3): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(17,3): error TS7031: Binding element 'suggestedAmount' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(18,3): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/modals/UnassignedCashModal.tsx(264,35): error TS2532: Object is possibly 'undefined'.
-src/components/modals/UnassignedCashModal.tsx(304,37): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(304,53): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(305,36): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(305,52): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(337,7): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
-  Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
-    Type 'null' is not assignable to type 'HTMLDivElement'.
+src/components/modals/UnassignedCashModal.tsx(311,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/modals/UnassignedCashModal.tsx(315,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/monitoring/HighlightLoader.tsx(22,63): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/components/onboarding/EmptyStateHints.tsx(228,46): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
