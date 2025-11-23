@@ -2,12 +2,32 @@ import React from "react";
 import { getIconByName } from "../../../utils/common/billIcons";
 import { getFrequencyDisplayText } from "../../../utils/common/frequencyCalculations";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import type { Bill } from "@/types/bills";
+
+interface StatusInfo {
+  color: string;
+  classes: {
+    bg: string;
+    border?: string;
+    text: string;
+    icon: string;
+  };
+  text: string;
+  isOverdue: boolean;
+  isDueSoon: boolean;
+}
+
+interface BillDetailHeaderProps {
+  bill: Bill;
+  statusInfo: StatusInfo;
+  onClose: () => void;
+}
 
 /**
  * Header section for BillDetailModal
  * Extracted to reduce modal complexity
  */
-export const BillDetailHeader = ({ bill, statusInfo, onClose }) => {
+export const BillDetailHeader = ({ bill, statusInfo, onClose }: BillDetailHeaderProps) => {
   const BillIcon = getIconByName(bill.iconName || "Receipt");
 
   return (
