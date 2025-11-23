@@ -1,12 +1,28 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import type { Bill } from "@/types/bills";
+
+interface PaymentHistoryEntry {
+  id?: string;
+  amount?: number;
+  paidDate?: string;
+  date?: string;
+}
+
+interface BillWithPaymentHistory extends Bill {
+  paymentHistory?: PaymentHistoryEntry[];
+}
 
 /**
  * Payment history section for BillDetailModal
  * Extracted to reduce modal complexity
  */
-export const BillDetailPaymentHistory = ({ bill }) => {
+interface BillDetailPaymentHistoryProps {
+  bill: BillWithPaymentHistory;
+}
+
+export const BillDetailPaymentHistory: React.FC<BillDetailPaymentHistoryProps> = ({ bill }) => {
   if (!bill.paymentHistory || bill.paymentHistory.length === 0) {
     return null;
   }
@@ -18,7 +34,7 @@ export const BillDetailPaymentHistory = ({ bill }) => {
         {bill.paymentHistory
           .slice(-5)
           .reverse()
-          .map((payment, index) => (
+          .map((payment: PaymentHistoryEntry, index: number) => (
             <div
               key={payment.id || index}
               className="flex justify-between items-center bg-gray-50 rounded-lg p-3"
@@ -45,7 +61,17 @@ export const BillDetailPaymentHistory = ({ bill }) => {
  * Quick payment form section for BillDetailModal
  * Extracted to reduce modal complexity
  */
-export const BillDetailQuickPayment = ({
+interface BillDetailQuickPaymentProps {
+  bill: Bill;
+  showPaymentForm: boolean;
+  paymentAmount: string;
+  handleShowPaymentForm: () => void;
+  handleHidePaymentForm: () => void;
+  handleMarkPaid: (e: React.FormEvent) => void;
+  handlePaymentAmountChange: (value: string) => void;
+}
+
+export const BillDetailQuickPayment: React.FC<BillDetailQuickPaymentProps> = ({
   bill,
   showPaymentForm,
   paymentAmount,

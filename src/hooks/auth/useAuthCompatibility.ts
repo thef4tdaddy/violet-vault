@@ -26,12 +26,12 @@ export const useAuthCompatibility = () => {
     lastActivity: authManager.lastActivity,
 
     // Action methods (matching old authStore)
-    login: async (password, userData = null) => {
+    login: async (password: string, userData: unknown = null) => {
       const result = await authManager.login(password, userData);
       return result;
     },
 
-    joinBudgetWithShareCode: async (joinData) => {
+    joinBudgetWithShareCode: async (joinData: unknown) => {
       const result = await authManager.joinBudget(joinData);
       return result;
     },
@@ -40,25 +40,25 @@ export const useAuthCompatibility = () => {
       authManager.logout();
     },
 
-    updateUser: (updatedUser) => {
+    updateUser: (updatedUser: unknown) => {
       authManager.updateUser(updatedUser);
     },
 
-    changePassword: async (oldPassword, newPassword) => {
+    changePassword: async (oldPassword: string, newPassword: string) => {
       const result = await authManager.changePassword(oldPassword, newPassword);
       return result;
     },
 
-    updateProfile: async (updatedProfile) => {
+    updateProfile: async (updatedProfile: unknown) => {
       const result = await authManager.updateProfile(updatedProfile);
       return result;
     },
 
-    setLastActivity: (_timestamp) => {
+    setLastActivity: (_timestamp: number) => {
       authManager.updateActivity();
     },
 
-    validatePassword: async (password) => {
+    validatePassword: async (password: string) => {
       // Compatibility method - validates password
       try {
         // Simple validation - attempt to derive key
@@ -70,7 +70,7 @@ export const useAuthCompatibility = () => {
     },
 
     // Additional methods that some components might use
-    setEncryption: ({ key: _key, salt: _salt }) => {
+    setEncryption: ({ key: _key, salt: _salt }: { key: unknown; salt: unknown }) => {
       logger.warn("setEncryption called via compatibility layer - this should be migrated");
       // This would need to be handled through the new auth context
       // For now, log a warning since this should be rare
