@@ -63,8 +63,8 @@ const EditEnvelopeModal = ({
     isExpired,
   } = useEnvelopeEdit({
     isOpen,
-    envelope,
-    existingEnvelopes,
+    envelope: (envelope ?? null) as never,
+    existingEnvelopes: existingEnvelopes as never[],
     onSave: onUpdateEnvelope,
     onClose,
     onDelete: onDeleteEnvelope,
@@ -147,7 +147,7 @@ const EditEnvelopeModal = ({
             isLocked={isLocked}
             isOwnLock={isOwnLock}
             isExpired={isExpired}
-            lock={lock}
+            lock={lock as null | undefined}
             onBreakLock={breakLock}
             onClose={handleClose}
           />
