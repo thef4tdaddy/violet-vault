@@ -3,6 +3,34 @@ import { shouldRetryError } from "./retryPolicies";
 import { calculateRetryDelay } from "./retryUtils";
 import { createRetryMetrics, updateRetryMetrics, formatMetrics } from "./retryMetrics";
 
+interface RetryOptions {
+  maxRetries?: number;
+  baseDelay?: number;
+  maxDelay?: number;
+  operationName?: string;
+  jitter?: boolean;
+}
+
+interface RetryConfig {
+  maxRetries: number;
+  baseDelay: number;
+  maxDelay: number;
+  operationName: string;
+  jitter: boolean;
+}
+
+interface BatchOperation {
+  operation: () => Promise<unknown>;
+  name: string;
+}
+
+interface BatchResult {
+  success: boolean;
+  result?: unknown;
+  error?: unknown;
+  operation: string;
+}
+
 /**
  * RetryManager - Smart retry logic with exponential backoff
  * Handles transient failures in cloud sync operations
@@ -21,7 +49,7 @@ export class RetryManager {
   /**
    * Execute operation with retry logic
    */
-  async execute(operation, options = {}) {
+  async execute<T>(operation: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
     const config = this._buildRetryConfig(options);
     this.retryMetrics.totalOperations++;
 
@@ -37,14 +65,24 @@ export class RetryManager {
         }
       }
     }
+
+    // This should never be reached due to the throw in the loop, but TypeScript needs it
+    throw new Error(`Operation failed after ${config.maxRetries} attempts`);
   }
 
   /**
    * Execute multiple operations with coordinated retry
    */
-  async executeBatch(operations, options = {}) {
-    const results = [];
-    const errors = [];
+  async executeBatch(
+    operations: BatchOperation[],
+    options: RetryOptions = {}
+  ): Promise<{
+    results: BatchResult[];
+    errors: BatchResult[];
+    hasErrors: boolean;
+  }> {
+    const results: BatchResult[] = [];
+    const errors: BatchResult[] = [];
 
     for (const { operation, name } of operations) {
       try {
@@ -80,7 +118,7 @@ export class RetryManager {
    * Build retry configuration with defaults
    * @private
    */
-  _buildRetryConfig(options) {
+  _buildRetryConfig(options: RetryOptions): RetryConfig {
     return {
       maxRetries: 4,
       baseDelay: 1000,
@@ -95,7 +133,11 @@ export class RetryManager {
    * Attempt single operation with logging
    * @private
    */
-  async _attemptOperation(operation, config, attempt) {
+  async _attemptOperation<T>(
+    operation: () => Promise<T>,
+    config: RetryConfig,
+    attempt: number
+  ): Promise<T> {
     logger.debug(
       `🔄 ${this.name}: ${config.operationName} attempt ${attempt}/${config.maxRetries}`
     );
@@ -106,7 +148,7 @@ export class RetryManager {
    * Track successful operation metrics
    * @private
    */
-  _trackSuccess(attempt) {
+  _trackSuccess(attempt: number): void {
     updateRetryMetrics(this.retryMetrics, attempt);
     logger.debug(`✅ ${this.name}: Operation succeeded on attempt ${attempt}`);
   }
@@ -115,10 +157,13 @@ export class RetryManager {
    * Handle operation failure and determine retry
    * @private
    */
-  async _handleFailure(error, config, attempt) {
+  async _handleFailure(error: unknown, config: RetryConfig, attempt: number): Promise<boolean> {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorType = error instanceof Error ? error.constructor.name : typeof error;
+
     logger.warn(`⚠️ ${this.name}: ${config.operationName} failed on attempt ${attempt}`, {
-      error: error.message,
-      errorType: error.constructor.name,
+      error: errorMessage,
+      errorType,
       attempt,
       maxRetries: config.maxRetries,
     });
@@ -133,7 +178,7 @@ export class RetryManager {
     const delay = calculateRetryDelay(attempt, config);
     logger.debug(`⏳ ${this.name}: Waiting ${delay}ms before retry ${attempt + 1}`);
 
-    await new Promise((resolve) => setTimeout(resolve, delay));
+    await new Promise<void>((resolve) => setTimeout(resolve, delay));
     return true;
   }
 }

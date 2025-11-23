@@ -10,20 +10,31 @@ import { detectLocalData } from "@/utils/sync/dataDetectionHelper";
 import logger from "@/utils/common/logger";
 import type { Envelope } from "@/db/types";
 
-export const runImmediateSyncHealthCheck = async () => {
+export const runImmediateSyncHealthCheck = async (): Promise<HealthCheckResults> => {
   logger.info("🔧 RUNNING IMMEDIATE SYNC HEALTH CHECK (WITH TIMEOUT)...");
-  const results = { passed: 0, failed: 0, tests: [] };
+  const results: HealthCheckResults = { passed: 0, failed: 0, tests: [] };
 
   // Overall timeout for all health checks
   return Promise.race([
     runHealthChecksInternal(results),
-    new Promise((_, reject) =>
+    new Promise<HealthCheckResults>((_resolve, reject) =>
       setTimeout(() => reject(new Error("Health check timed out after 60 seconds")), 60000)
     ),
   ]);
 };
 
-async function runHealthChecksInternal(results) {
+interface HealthCheckResults {
+  passed: number;
+  failed: number;
+  tests: Array<{
+    name: string;
+    status: string;
+    details?: string;
+    error?: string;
+  }>;
+}
+
+async function runHealthChecksInternal(results: HealthCheckResults) {
   const createDexieSnapshot = (overrides: Partial<DexieData> = {}): DexieData => ({
     envelopes: [],
     transactions: [],
@@ -74,10 +85,11 @@ async function runHealthChecksInternal(results) {
     });
     results.passed++;
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Database Connection",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -114,10 +126,11 @@ async function runHealthChecksInternal(results) {
       throw new Error(`Invalid lastModified: ${syncData.lastModified}`);
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Timestamp Handling",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -138,7 +151,7 @@ async function runHealthChecksInternal(results) {
 
     const syncResult = (await Promise.race([
       cloudSyncService.determineSyncDirection(mockDexieData, mockFirestoreData),
-      new Promise((_, reject) =>
+      new Promise<{ direction: string }>((_resolve, reject) =>
         setTimeout(() => reject(new Error("Sync direction determination timed out")), 10000)
       ),
     ])) as { direction: string };
@@ -154,10 +167,11 @@ async function runHealthChecksInternal(results) {
       throw new Error(`Wrong direction: ${syncResult.direction}, expected: toFirestore`);
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Sync Direction Logic",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -189,10 +203,11 @@ async function runHealthChecksInternal(results) {
       throw new Error("Invalid data structure returned");
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Data Validation",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -219,10 +234,11 @@ async function runHealthChecksInternal(results) {
       throw new Error("Invalid service status structure");
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Service State Management",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -255,10 +271,11 @@ async function runHealthChecksInternal(results) {
       throw new Error("Metadata not properly loaded");
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Metadata Handling",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -284,10 +301,11 @@ async function runHealthChecksInternal(results) {
       throw new Error("ChunkedFirebaseSync missing required methods");
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Chunked Firebase Init",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
@@ -311,10 +329,11 @@ async function runHealthChecksInternal(results) {
     });
     results.passed++;
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     results.tests.push({
       name: "Comprehensive Data Detection",
       status: "❌ FAILED",
-      error: error.message,
+      error: errorMessage,
     });
     results.failed++;
   }
