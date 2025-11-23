@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | 0 |
-| TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2126 | -9 |
+| ESLint Issues | 5 | +1 |
+| TypeScript Errors | 44 | +4 |
+| TypeScript Strict Mode Errors | 2128 | +2 |
 
-*Last updated: 2025-11-23 13:17:58 UTC*
+*Last updated: 2025-11-23 13:29:03 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDetailModal.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
@@ -36,7 +37,7 @@
 | Count | Rule ID |
 |---|---|
 | 3 | `max-lines-per-function` |
-| 1 | `no-undef` |
+| 2 | `no-undef` |
 
 ### Detailed Lint Report
 ```
@@ -44,6 +45,7 @@
 /home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:18 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDetailModal.ts:117:35 - 1 - 'React' is not defined. (no-undef)
 ```
 
 ## Typecheck Audit
@@ -54,6 +56,7 @@
 - 6 errors in `src/hooks/budgeting/usePaycheckForm.ts`
 - 5 errors in `src/hooks/debts/useDebts.ts`
 - 5 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
+- 4 errors in `src/components/debt/modals/DebtDetailModal.tsx`
 - 3 errors in `src/hooks/analytics/useReportExporter.ts`
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/bills/useBillManager.ts`
@@ -64,10 +67,11 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 18 | `TS2322` |
+| 21 | `TS2322` |
 | 15 | `TS2345` |
 | 4 | `TS2339` |
 | 1 | `TS2741` |
+| 1 | `TS2740` |
 | 1 | `TS2719` |
 | 1 | `TS2352` |
 
@@ -97,6 +101,19 @@ src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2741: Property 
 src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type '{ start: string; end: string; }' is not assignable to type 'boolean'.
+src/components/debt/modals/DebtDetailModal.tsx(52,5): error TS2740: Type 'Record<string, unknown> & { id: string; }' is missing the following properties from type 'DebtWithHistory': name, balance, status, type, and 5 more.
+src/components/debt/modals/DebtDetailModal.tsx(56,5): error TS2322: Type '(debtId: string, amount: number) => Promise<void>' is not assignable to type '(debtId: string, paymentData: PaymentData) => void'.
+  Types of parameters 'amount' and 'paymentData' are incompatible.
+    Type 'PaymentData' is not assignable to type 'number'.
+src/components/debt/modals/DebtDetailModal.tsx(57,5): error TS2322: Type '(debt: Record<string, unknown>) => void' is not assignable to type '(debt: DebtWithHistory) => void'.
+  Types of parameters 'debt' and 'debt' are incompatible.
+    Type 'DebtWithHistory' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'DebtWithHistory'.
+src/components/debt/modals/DebtDetailModal.tsx(81,47): error TS2322: Type '{ id: string | number; displayDate: string; formattedAmount: string; principalDisplay: string; interestDisplay: string; date: string; amount: number; principalAmount?: number; interestAmount?: number; }[]' is not assignable to type '{ id: string; formattedAmount: string; displayDate: string; principalDisplay?: string; interestDisplay?: string; }[]'.
+  Type '{ id: string | number; displayDate: string; formattedAmount: string; principalDisplay: string; interestDisplay: string; date: string; amount: number; principalAmount?: number; interestAmount?: number; }' is not assignable to type '{ id: string; formattedAmount: string; displayDate: string; principalDisplay?: string; interestDisplay?: string; }'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
 src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; }>' is not assignable to type '() => void'.
   Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
@@ -244,7 +261,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/hooks/debts/useDebts.ts`
-- 9 errors in `src/hooks/debts/useDebtDetailModal.ts`
 - 9 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 9 errors in `src/hooks/budgeting/useEnvelopeForm.ts`
 - 9 errors in `src/hooks/budgeting/useEnvelopeCalculations.ts`
@@ -284,6 +300,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 7 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 7 errors in `src/hooks/debts/useDebtManagement.ts`
+- 7 errors in `src/hooks/debts/useDebtDetailModal.ts`
 - 7 errors in `src/hooks/common/useModalManager.ts`
 - 7 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 7 errors in `src/components/transactions/import/FieldMapper.tsx`
@@ -357,6 +374,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 5 errors in `src/components/receipts/ReceiptButton.tsx`
 - 5 errors in `src/components/layout/ViewRenderer.tsx`
 - 5 errors in `src/components/layout/SummaryCards.tsx`
+- 5 errors in `src/components/debt/modals/DebtDetailModal.tsx`
 - 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
 - 5 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 5 errors in `src/components/bills/modals/BillDetailActions.tsx`
@@ -586,7 +604,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/components/debt/ui/DebtProgressBar.tsx`
 - 1 errors in `src/components/debt/ui/DebtCardProgressBar.tsx`
 - 1 errors in `src/components/debt/modals/DebtFormFields.tsx`
-- 1 errors in `src/components/debt/modals/DebtDetailModal.tsx`
 - 1 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 1 errors in `src/components/charts/TrendLineChart.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
@@ -608,17 +625,17 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 624 | `TS7006` |
-| 609 | `TS7031` |
-| 177 | `TS2345` |
-| 154 | `TS2322` |
+| 621 | `TS7006` |
+| 603 | `TS7031` |
+| 178 | `TS2345` |
+| 158 | `TS2322` |
 | 128 | `TS2339` |
 | 112 | `TS18046` |
 | 64 | `TS7005` |
 | 63 | `TS7053` |
-| 50 | `TS18048` |
+| 51 | `TS18048` |
+| 42 | `TS18047` |
 | 39 | `TS7034` |
-| 37 | `TS18047` |
 | 25 | `TS2769` |
 | 6 | `TS2411` |
 | 5 | `TS2722` |
@@ -1264,8 +1281,22 @@ src/components/debt/DebtStrategies.tsx(108,27): error TS2322: Type '{ extraPayme
   Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { monthsToPayoff: number; tot...' is not assignable to type 'never'.
 src/components/debt/modals/AddDebtModal.tsx(47,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/debt/modals/DebtDetailModal.tsx(71,27): error TS2322: Type '{ expectedPayoff: string; totalInterest: any; payoffDate: string; } | null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
+src/components/debt/modals/DebtDetailModal.tsx(52,5): error TS2322: Type '(Record<string, unknown> & { id: string; }) | undefined' is not assignable to type 'DebtWithHistory | null'.
+  Type 'undefined' is not assignable to type 'DebtWithHistory | null'.
+src/components/debt/modals/DebtDetailModal.tsx(56,5): error TS2322: Type '(debtId: string, amount: number) => Promise<void>' is not assignable to type '(debtId: string, paymentData: PaymentData) => void'.
+  Types of parameters 'amount' and 'paymentData' are incompatible.
+    Type 'PaymentData' is not assignable to type 'number'.
+src/components/debt/modals/DebtDetailModal.tsx(57,5): error TS2322: Type '(debt: Record<string, unknown>) => void' is not assignable to type '(debt: DebtWithHistory) => void'.
+  Types of parameters 'debt' and 'debt' are incompatible.
+    Type 'DebtWithHistory' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'DebtWithHistory'.
+src/components/debt/modals/DebtDetailModal.tsx(71,27): error TS2322: Type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; } | null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
   Type 'null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
+src/components/debt/modals/DebtDetailModal.tsx(81,47): error TS2322: Type '{ id: string | number; displayDate: string; formattedAmount: string; principalDisplay: string | undefined; interestDisplay: string | undefined; date: string; amount: number; principalAmount?: number | undefined; interestAmount?: number | undefined; }[]' is not assignable to type '{ id: string; formattedAmount: string; displayDate: string; principalDisplay?: string | undefined; interestDisplay?: string | undefined; }[]'.
+  Type '{ id: string | number; displayDate: string; formattedAmount: string; principalDisplay: string | undefined; interestDisplay: string | undefined; date: string; amount: number; principalAmount?: number; interestAmount?: number; }' is not assignable to type '{ id: string; formattedAmount: string; displayDate: string; principalDisplay?: string | undefined; interestDisplay?: string | undefined; }'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
 src/components/debt/modals/DebtFormFields.tsx(96,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/debt/modals/DebtModalHeader.tsx(9,28): error TS7031: Binding element 'isEditMode' implicitly has an 'any' type.
@@ -2361,15 +2392,14 @@ src/hooks/debts/useDebtDashboard.ts(155,46): error TS7006: Parameter 'paymentDat
 src/hooks/debts/useDebtDashboard.ts(159,40): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/debts/useDebtDashboard.ts(161,25): error TS2345: Argument of type 'DebtAccount | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
   Type 'undefined' is not assignable to type 'SetStateAction<null>'.
-src/hooks/debts/useDebtDetailModal.ts(10,3): error TS7031: Binding element 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(11,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(12,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(13,3): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(14,3): error TS7031: Binding element 'onRecordPayment' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(15,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(69,13): error TS7006: Parameter 'payment' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(69,22): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/hooks/debts/useDebtDetailModal.ts(80,32): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/hooks/debts/useDebtDetailModal.ts(71,49): error TS18048: 'debt.currentBalance' is possibly 'undefined'.
+src/hooks/debts/useDebtDetailModal.ts(129,21): error TS18047: 'debt' is possibly 'null'.
+src/hooks/debts/useDebtDetailModal.ts(131,22): error TS18047: 'debt' is possibly 'null'.
+src/hooks/debts/useDebtDetailModal.ts(137,52): error TS18047: 'debt' is possibly 'null'.
+src/hooks/debts/useDebtDetailModal.ts(144,16): error TS18047: 'debt' is possibly 'null'.
+src/hooks/debts/useDebtDetailModal.ts(151,12): error TS2345: Argument of type 'DebtWithHistory | null' is not assignable to parameter of type 'DebtWithHistory'.
+  Type 'null' is not assignable to type 'DebtWithHistory'.
+src/hooks/debts/useDebtDetailModal.ts(160,22): error TS18047: 'debt' is possibly 'null'.
 src/hooks/debts/useDebtManagement.ts(78,7): error TS2345: Argument of type 'UseMutateAsyncFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string | undefined; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type '(data: unknown) => unknown'.
   Types of parameters 'variables' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'AddEnvelopeData'.
