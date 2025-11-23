@@ -14,7 +14,6 @@ interface User {
   userColor?: string;
   email?: string;
   displayName?: string;
-  [key: string]: unknown;
 }
 
 interface UserProfile {
@@ -22,13 +21,11 @@ interface UserProfile {
   userColor?: string;
   email?: string;
   displayName?: string;
-  [key: string]: unknown;
 }
 
 interface SecurityManager {
   isLocked?: boolean;
   hasEncryptionKey?: boolean;
-  [key: string]: unknown;
 }
 
 interface SettingsSectionRendererProps {

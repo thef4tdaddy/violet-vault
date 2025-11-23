@@ -14,7 +14,6 @@ interface UserData {
   password: string;
   userName?: string;
   userColor?: string;
-  [key: string]: unknown;
 }
 
 interface UserProfile {
@@ -22,7 +21,6 @@ interface UserProfile {
   userColor?: string;
   email?: string;
   displayName?: string;
-  [key: string]: unknown;
 }
 
 interface AuthError extends Error {

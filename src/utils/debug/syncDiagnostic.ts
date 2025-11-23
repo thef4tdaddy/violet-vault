@@ -100,7 +100,9 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       logger.info("✅ IndexedDB stores:", { stores: storeNames });
     };
     dbRequest.onerror = (error: Event) => {
-      results.errors.push("IndexedDB connection failed: " + String(error));
+      const errorTarget = error.target as IDBRequest | null;
+      const errorMessage = errorTarget?.error?.message || String(error);
+      results.errors.push("IndexedDB connection failed: " + errorMessage);
       logger.error("❌ IndexedDB failed:", error);
     };
   } catch (error) {

@@ -166,8 +166,11 @@ export class VioletVaultDB extends Dexie {
                   logger.warn("Complete object replacement failed:", {
                     error: (finalError as Error).message,
                   });
-                  // As a last resort, try to modify the transaction
-                  // Note: trans.source is a Dexie internal property
+                  // IMPORTANT: Last resort fallback for frozen Firebase objects
+                  // This modifies Dexie's internal transaction.source as a final attempt
+                  // to handle frozen objects from Firebase. This is needed because
+                  // Firebase returns frozen objects that cannot be modified normally.
+                  // If Dexie API changes, this fallback may need to be updated.
                   if (
                     typeof (trans as { source: unknown }).source === "object" &&
                     (trans as { source: unknown }).source !== null
