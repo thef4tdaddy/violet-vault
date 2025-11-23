@@ -235,11 +235,20 @@ const getSavingsGoalSortValue = (goal: ProcessedSavingsGoal, sortBy: string) => 
 /**
  * Compare two values for sorting
  */
-const compareSortValues = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc") => {
+const compareSortValues = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc"): number => {
+  // Handle null/undefined values
+  if (aVal == null && bVal == null) return 0;
+  if (aVal == null) return sortOrder === "desc" ? 1 : -1;
+  if (bVal == null) return sortOrder === "desc" ? -1 : 1;
+
+  // Convert to comparable types
+  const aComp = typeof aVal === "number" || typeof aVal === "string" ? aVal : String(aVal);
+  const bComp = typeof bVal === "number" || typeof bVal === "string" ? bVal : String(bVal);
+
   if (sortOrder === "desc") {
-    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+    return bComp > aComp ? 1 : bComp < aComp ? -1 : 0;
   }
-  return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+  return aComp > bComp ? 1 : aComp < bComp ? -1 : 0;
 };
 
 /**

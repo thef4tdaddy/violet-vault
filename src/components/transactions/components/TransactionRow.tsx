@@ -8,6 +8,19 @@ import {
   formatTransactionDate,
   getEnvelopeDisplay,
 } from "../../../utils/transactions/tableHelpers";
+import type { Transaction } from "@/types/finance";
+
+interface TransactionRowProps {
+  transaction: Transaction;
+  envelopes: unknown[];
+  virtualRow: { index: number; start: number };
+  columnStyles?: typeof COLUMN_STYLES;
+  gridTemplate: string;
+  onEdit: (transaction: Transaction) => void;
+  onSplit: (transaction: Transaction) => void;
+  onDeleteClick: (transactionId: string) => void;
+  onHistoryClick: (transaction: Transaction) => void;
+}
 
 /**
  * Individual transaction row component - pure UI component
@@ -22,7 +35,7 @@ const TransactionRow = ({
   onSplit,
   onDeleteClick,
   onHistoryClick,
-}) => {
+}: TransactionRowProps) => {
   const envelope = findEnvelopeForTransaction(transaction, envelopes);
   const { formatted: formattedAmount, className: amountClassName } = formatTransactionAmount(
     transaction.amount

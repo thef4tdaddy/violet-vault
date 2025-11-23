@@ -17,8 +17,8 @@ interface ViewContentProps {
   activeTab: string;
   rules: AutoFundingRule[];
   displayHistory: unknown[];
-  showExecutionDetails: boolean;
-  setShowExecutionDetails: (show: boolean) => void;
+  showExecutionDetails: string | null;
+  setShowExecutionDetails: (show: string | null) => void;
   handleCreateRule: () => void;
   handleEditRule: (rule: AutoFundingRule) => void;
   handleDeleteRule: (ruleId: string) => void;
@@ -36,8 +36,8 @@ interface ViewContentProps {
   }>;
   HistoryTabComponent: React.ComponentType<{
     executionHistory: unknown[];
-    showExecutionDetails: boolean;
-    onToggleDetails: (show: boolean) => void;
+    showExecutionDetails: string | null;
+    onToggleDetails: (show: string | null) => void;
   }>;
 }
 

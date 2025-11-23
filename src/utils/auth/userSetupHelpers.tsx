@@ -20,7 +20,15 @@ export const USER_COLORS = [
 /**
  * Validate setup form data
  */
-export const validateSetupData = ({ masterPassword, userName, userColor }) => {
+export const validateSetupData = ({
+  masterPassword,
+  userName,
+  userColor,
+}: {
+  masterPassword: string;
+  userName: string;
+  userColor: string;
+}) => {
   const errors = [];
 
   if (!masterPassword || masterPassword.trim().length === 0) {
@@ -44,7 +52,7 @@ export const validateSetupData = ({ masterPassword, userName, userColor }) => {
 /**
  * Get step title based on current state
  */
-export const getStepTitle = (step, isReturningUser, userName) => {
+export const getStepTitle = (step: number, isReturningUser: boolean, userName: string) => {
   if (isReturningUser) {
     return (
       <span className="uppercase tracking-wider text-black">
@@ -83,7 +91,7 @@ export const getStepTitle = (step, isReturningUser, userName) => {
 /**
  * Get step subtitle based on current state
  */
-export const getStepSubtitle = (step, isReturningUser) => {
+export const getStepSubtitle = (step: number, isReturningUser: boolean) => {
   if (isReturningUser) {
     return (
       <span>

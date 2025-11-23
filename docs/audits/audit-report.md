@@ -245,12 +245,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/components/onboarding/components/TutorialOverlay.tsx`
 - 9 errors in `src/components/history/viewer/HistoryList.tsx`
 - 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
-- 9 errors in `src/components/automation/tabs/RulesTab.tsx`
-- 9 errors in `src/components/automation/AutoFundingView.tsx`
-- 8 errors in `src/utils/savings/savingsCalculations.ts`
-- 8 errors in `src/utils/bills/recurringBillUtils.ts`
-- 8 errors in `src/utils/auth/userSetupHelpers.tsx`
-- 8 errors in `src/main.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
 - 8 errors in `src/hooks/savings/useSavingsGoalsActions.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
@@ -336,8 +330,10 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 5 errors in `src/hooks/common/bug-report/useBugReportHighlight.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useTransferFunds.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useDeleteEnvelope.ts`
+- 5 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
+- 5 errors in `src/components/transactions/TransactionTable.tsx`
 - 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 5 errors in `src/components/settings/archiving/ArchivingConfiguration.tsx`
 - 5 errors in `src/components/receipts/steps/ReceiptDataStep.tsx`
@@ -379,7 +375,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 4 errors in `src/hooks/analytics/useReportExporter.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
-- 4 errors in `src/components/transactions/TransactionTable.tsx`
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
@@ -413,7 +408,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 3 errors in `src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
-- 3 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 3 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 3 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 3 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
@@ -485,6 +479,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/hooks/analytics/useAnalyticsExport.ts`
 - 2 errors in `src/contexts/authUtils.ts`
 - 2 errors in `src/components/transactions/import/ImportProgress.tsx`
+- 2 errors in `src/components/transactions/components/TransactionRow.tsx`
 - 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
 - 2 errors in `src/components/settings/sections/ClipboardSecuritySection.tsx`
 - 2 errors in `src/components/settings/archiving/ArchivingProgress.tsx`
@@ -748,23 +743,6 @@ src/components/automation/AutoFundingDashboard.tsx(141,15): error TS2322: Type '
   Types of parameters 'value' and 'show' are incompatible.
     Type 'string | null' is not assignable to type 'SetStateAction<null>'.
       Type 'string' is not assignable to type 'SetStateAction<null>'.
-src/components/automation/AutoFundingView.tsx(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/automation/AutoFundingView.tsx(17,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/automation/AutoFundingView.tsx(17,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/automation/AutoFundingView.tsx(33,7): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(rule: unknown) => void'.
-  Types of parameters 'value' and 'rule' are incompatible.
-    Type 'unknown' is not assignable to type 'SetStateAction<null>'.
-src/components/automation/AutoFundingView.tsx(35,22): error TS2322: Type '(ruleId: string, updates: Partial<AutoFundingRule>) => void' is not assignable to type '(id: unknown, data: unknown) => void'.
-  Types of parameters 'ruleId' and 'id' are incompatible.
-    Type 'unknown' is not assignable to type 'string'.
-src/components/automation/AutoFundingView.tsx(35,34): error TS2322: Type '(rule: Partial<AutoFundingRule>) => void' is not assignable to type '(data: unknown) => void'.
-  Types of parameters 'rule' and 'data' are incompatible.
-    Type 'unknown' is not assignable to type 'Partial<AutoFundingRule>'.
-src/components/automation/AutoFundingView.tsx(70,59): error TS18046: 'error' is of type 'unknown'.
-src/components/automation/AutoFundingView.tsx(104,11): error TS2322: Type 'null' is not assignable to type 'boolean'.
-src/components/automation/AutoFundingView.tsx(105,11): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(show: boolean) => void'.
-  Types of parameters 'value' and 'show' are incompatible.
-    Type 'boolean' is not assignable to type 'SetStateAction<null>'.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(6,27): error TS7006: Parameter 'type' implicitly has an 'any' type.
@@ -1717,6 +1695,9 @@ src/components/transactions/TransactionSplitter.tsx(105,19): error TS2322: Type 
   Type 'string' is not assignable to type 'never'.
 src/components/transactions/TransactionSplitter.tsx(126,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
   Type 'string' is not assignable to type 'never'.
+src/components/transactions/TransactionTable.tsx(139,21): error TS2322: Type '(transaction: Transaction) => void' is not assignable to type '(transactionId: string) => void'.
+  Types of parameters 'transaction' and 'transactionId' are incompatible.
+    Type 'string' is not assignable to type 'Transaction'.
 src/components/transactions/TransactionTable.tsx(322,27): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
   Type 'Transaction' is not assignable to type 'never'.
 src/components/transactions/TransactionTable.tsx(326,36): error TS2339: Property 'id' does not exist on type 'never'.
@@ -1727,14 +1708,9 @@ src/components/transactions/components/DeleteConfirmation.tsx(8,44): error TS703
 src/components/transactions/components/DeleteConfirmation.tsx(8,55): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,65): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
 src/components/transactions/components/DeleteConfirmation.tsx(8,77): error TS7031: Binding element 'gridTemplate' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(16,3): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(17,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(18,3): error TS7031: Binding element 'virtualRow' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(20,3): error TS7031: Binding element 'gridTemplate' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(21,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(22,3): error TS7031: Binding element 'onSplit' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(23,3): error TS7031: Binding element 'onDeleteClick' implicitly has an 'any' type.
-src/components/transactions/components/TransactionRow.tsx(24,3): error TS7031: Binding element 'onHistoryClick' implicitly has an 'any' type.
+src/components/transactions/components/TransactionRow.tsx(39,60): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
+  Type 'unknown' is not assignable to type 'Envelope'.
+src/components/transactions/components/TransactionRow.tsx(134,42): error TS2345: Argument of type 'Transaction' is not assignable to parameter of type 'string'.
 src/components/transactions/import/FieldMapper.tsx(4,24): error TS7031: Binding element 'importData' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,36): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
 src/components/transactions/import/FieldMapper.tsx(4,50): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
@@ -2598,15 +2574,21 @@ src/hooks/transactions/useTransactionUtils.ts(21,58): error TS2339: Property 'ca
 src/hooks/transactions/useTransactionsV2.ts(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/transactions/useTransactionsV2.ts(56,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionsV2.ts(89,41): error TS2339: Property 'length' does not exist on type '{}'.
-src/main.tsx(36,32): error TS7006: Parameter 'loadOnce' implicitly has an 'any' type.
-src/main.tsx(147,40): error TS7006: Parameter 'localData' implicitly has an 'any' type.
-src/main.tsx(158,34): error TS7006: Parameter 'localData' implicitly has an 'any' type.
-src/main.tsx(164,40): error TS7006: Parameter 'cloudSyncService' implicitly has an 'any' type.
-src/main.tsx(218,43): error TS18046: 'error' is of type 'unknown'.
-src/main.tsx(236,43): error TS18046: 'error' is of type 'unknown'.
-src/main.tsx(271,20): error TS18046: 'error' is of type 'unknown'.
-src/main.tsx(280,23): error TS2345: Argument of type 'HTMLElement | null' is not assignable to parameter of type 'Container'.
-  Type 'null' is not assignable to type 'Container'.
+src/main.tsx(151,55): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(152,61): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(153,47): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(154,47): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,45): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,95): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,141): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(160,180): error TS2339: Property 'length' does not exist on type '{}'.
+src/main.tsx(178,47): error TS2339: Property 'forcePushToCloud' does not exist on type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
+src/main.tsx(197,40): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(205,29): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(207,50): error TS2345: Argument of type 'CloudSyncService' is not assignable to parameter of type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
+  Property 'forcePushData' is missing in type 'CloudSyncService' but required in type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
 src/services/activityLogger.ts(126,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -2794,14 +2776,6 @@ src/utils/analytics/trendHelpers.ts(71,49): error TS7006: Parameter 'name' impli
 src/utils/auth/shareCodeManager.ts(30,20): error TS7006: Parameter 'shareCode' implicitly has an 'any' type.
 src/utils/auth/shareCodeManager.ts(44,20): error TS7006: Parameter 'shareCode' implicitly has an 'any' type.
 src/utils/auth/shareCodeManager.ts(54,18): error TS7006: Parameter 'shareCode' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(23,37): error TS7031: Binding element 'masterPassword' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(23,53): error TS7031: Binding element 'userName' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(23,63): error TS7031: Binding element 'userColor' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(47,30): error TS7006: Parameter 'step' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(47,36): error TS7006: Parameter 'isReturningUser' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(47,53): error TS7006: Parameter 'userName' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(86,33): error TS7006: Parameter 'step' implicitly has an 'any' type.
-src/utils/auth/userSetupHelpers.tsx(86,39): error TS7006: Parameter 'isReturningUser' implicitly has an 'any' type.
 src/utils/billIcons/iconOptions.ts(179,10): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
 src/utils/bills/billCalculations.ts(131,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
@@ -2812,14 +2786,6 @@ src/utils/bills/billCalculations.ts(201,5): error TS2322: Type 'number | null' i
   Type 'null' is not assignable to type 'number | undefined'.
 src/utils/bills/billUpdateHelpers.ts(106,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billUpdateHelpers.ts(107,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/utils/bills/recurringBillUtils.ts(9,38): error TS7006: Parameter 'paidDate' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(9,48): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(53,38): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(53,44): error TS7006: Parameter 'updateBillFn' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(75,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/bills/recurringBillUtils.ts(90,39): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(90,46): error TS7006: Parameter 'updateBillFn' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(91,21): error TS7006: Parameter 'bill' implicitly has an 'any' type.
 src/utils/budgeting/autofunding/conditions.ts(237,31): error TS18048: 'rule.config' is possibly 'undefined'.
 src/utils/budgeting/autofunding/conditions.ts(237,31): error TS2345: Argument of type 'Condition[] | undefined' is not assignable to parameter of type 'Condition[]'.
   Type 'undefined' is not assignable to type 'Condition[]'.
