@@ -2,7 +2,34 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const ChangeDetails = ({
+interface Change {
+  type: string;
+  changeType: string;
+  entityType: string;
+  description?: string;
+  diff?: Record<string, { from: unknown; to: unknown }>;
+}
+
+interface CommitDetails {
+  commit: {
+    hash?: string;
+    message: string;
+    author: string;
+    timestamp: string | number;
+    parentHash?: string;
+  };
+  changes: Change[];
+}
+
+interface ChangeDetailsProps {
+  selectedCommit: string | null;
+  commitDetailsLoading: boolean;
+  commitDetails: CommitDetails | null;
+  handleRestoreFromHistory: (commit: string) => void;
+  getChangeIcon: (changeType: string) => React.ReactElement;
+}
+
+const ChangeDetails: React.FC<ChangeDetailsProps> = ({
   selectedCommit,
   commitDetailsLoading,
   commitDetails,
@@ -72,7 +99,7 @@ const ChangeDetails = ({
 
             {commitDetails.changes.length > 0 && (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {commitDetails.changes.map((change, index) => (
+                {commitDetails.changes.map((change: Change, index: number) => (
                   <div
                     key={index}
                     className="flex items-start gap-2 p-2 bg-gray-50 rounded text-sm"

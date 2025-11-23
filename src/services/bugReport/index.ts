@@ -155,7 +155,7 @@ export class BugReportService {
         systemInfo: SystemInfoService.getFallbackSystemInfo(),
         contextInfo: ContextAnalysisService.getFallbackContext(),
         timestamp: new Date().toISOString(),
-        collectionError: error.message,
+        collectionError: error instanceof Error ? error.message : String(error),
       };
     }
   }

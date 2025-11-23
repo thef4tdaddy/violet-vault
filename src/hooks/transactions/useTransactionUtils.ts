@@ -1,19 +1,20 @@
 import { useCallback } from "react";
+import type { Transaction } from "@/types/finance";
 
-export const useTransactionUtils = (transactions = []) => {
+export const useTransactionUtils = (transactions: Transaction[] = []) => {
   // Utility functions
   const getTransactionById = useCallback(
-    (id) => transactions.find((t) => t.id === id),
+    (id: string | number) => transactions.find((t) => t.id === id),
     [transactions]
   );
 
   const getTransactionsByEnvelope = useCallback(
-    (envId) => transactions.filter((t) => t.envelopeId === envId),
+    (envId: string | number) => transactions.filter((t) => t.envelopeId === envId),
     [transactions]
   );
 
   const getTransactionsByCategory = useCallback(
-    (cat) => transactions.filter((t) => t.category === cat),
+    (cat: string) => transactions.filter((t) => t.category === cat),
     [transactions]
   );
 

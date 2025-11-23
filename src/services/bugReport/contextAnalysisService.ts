@@ -154,8 +154,13 @@ export class ContextAnalysisService {
         resourceCount: perf.getEntries?.()?.length || 0,
       };
     } catch (error) {
-      logger.debug("Error getting page performance", error);
-      return { available: false, error: (error as Error).message };
+      logger.debug("Error getting page performance", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return {
+        available: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 
@@ -183,8 +188,13 @@ export class ContextAnalysisService {
 
       return a11yInfo;
     } catch (error) {
-      logger.debug("Error getting accessibility info", error);
-      return { available: false, error: (error as Error).message };
+      logger.debug("Error getting accessibility info", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return {
+        available: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 
@@ -203,8 +213,13 @@ export class ContextAnalysisService {
         loadingStates: document.querySelectorAll('[aria-busy="true"], [class*="loading"]').length,
       };
     } catch (error) {
-      logger.debug("Error getting data state", error);
-      return { available: false, error: (error as Error).message };
+      logger.debug("Error getting data state", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return {
+        available: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 
@@ -223,7 +238,9 @@ export class ContextAnalysisService {
         ).length,
       };
     } catch (error) {
-      logger.debug("Error getting recent interactions", error);
+      logger.debug("Error getting recent interactions", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }

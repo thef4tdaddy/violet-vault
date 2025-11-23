@@ -2,7 +2,20 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import SuggestionCard from "./SuggestionCard";
 
-const SuggestionsList = ({
+interface Suggestion {
+  id: string;
+  priority: "high" | "medium" | "low";
+  [key: string]: unknown;
+}
+
+interface SuggestionsListProps {
+  suggestions: Suggestion[];
+  onApplySuggestion: (suggestion: Suggestion) => void;
+  onDismissSuggestion: (suggestion: Suggestion) => void;
+  isCompact?: boolean;
+}
+
+const SuggestionsList: React.FC<SuggestionsListProps> = ({
   suggestions,
   onApplySuggestion,
   onDismissSuggestion,
@@ -23,15 +36,27 @@ const SuggestionsList = ({
   }
 
   // Group suggestions by priority for better organization
-  const groupedSuggestions = suggestions.reduce((acc, suggestion) => {
-    if (!acc[suggestion.priority]) {
-      acc[suggestion.priority] = [];
-    }
-    acc[suggestion.priority].push(suggestion);
-    return acc;
-  }, {});
+  const groupedSuggestions = suggestions.reduce(
+    (acc: Record<"high" | "medium" | "low", Suggestion[]>, suggestion: Suggestion) => {
+      if (!acc[suggestion.priority]) {
+        acc[suggestion.priority] = [];
+      }
+      acc[suggestion.priority].push(suggestion);
+      return acc;
+    },
+    { high: [], medium: [], low: [] }
+  );
 
-  const priorityConfig = {
+  const priorityConfig: Record<
+    "high" | "medium" | "low",
+    {
+      label: string;
+      icon: string;
+      color: string;
+      bgColor: string;
+      borderColor: string;
+    }
+  > = {
     high: {
       label: "High Priority",
       icon: "AlertTriangle",
@@ -57,7 +82,7 @@ const SuggestionsList = ({
 
   return (
     <div className="space-y-4">
-      {["high", "medium", "low"].map((priority) => {
+      {(["high", "medium", "low"] as const).map((priority) => {
         const prioritySuggestions = groupedSuggestions[priority];
         if (!prioritySuggestions || prioritySuggestions.length === 0) return null;
 
