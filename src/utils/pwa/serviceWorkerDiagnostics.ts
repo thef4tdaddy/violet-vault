@@ -5,6 +5,33 @@ import logger from "../common/logger";
  * Monitor cache health, sync status, and PWA performance
  */
 
+interface CacheEntry {
+  url: string;
+  size: number;
+  type: string;
+}
+
+interface CacheDetail {
+  entries: number;
+  estimatedSize: number;
+  sampleEntries: CacheEntry[];
+  isKnownCache: boolean;
+}
+
+interface CacheHealthReport {
+  totalCaches: number;
+  totalEntries: number;
+  totalSize: number;
+  cacheDetails: Record<string, CacheDetail>;
+  recommendations: Array<{
+    type: string;
+    message: string;
+    action: string;
+  }>;
+  lastUpdated: string;
+  error?: string;
+}
+
 class ServiceWorkerDiagnostics {
   isInitialized: boolean;
   cacheNames: string[];
@@ -26,8 +53,8 @@ class ServiceWorkerDiagnostics {
   /**
    * Initialize diagnostics system
    */
-  async initialize() {
-    if (this.isInitialized) return;
+  async initialize(): Promise<boolean> {
+    if (this.isInitialized) return true;
 
     // Check if service worker and cache APIs are available
     if ("serviceWorker" in navigator && "caches" in window) {
@@ -44,12 +71,12 @@ class ServiceWorkerDiagnostics {
   /**
    * Get comprehensive cache health report
    */
-  async getCacheHealth() {
+  async getCacheHealth(): Promise<CacheHealthReport> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
-    const report = {
+    const report: CacheHealthReport = {
       totalCaches: 0,
       totalEntries: 0,
       totalSize: 0,
@@ -67,7 +94,7 @@ class ServiceWorkerDiagnostics {
         const keys = await cache.keys();
 
         let cacheSize = 0;
-        const entries = [];
+        const entries: CacheEntry[] = [];
 
         // Sample a few entries to estimate size
         const sampleKeys = keys.slice(0, Math.min(5, keys.length));
@@ -84,7 +111,9 @@ class ServiceWorkerDiagnostics {
               });
             }
           } catch (error) {
-            logger.warn(`Failed to analyze cache entry: ${request.url}`, error);
+            logger.warn(`Failed to analyze cache entry: ${request.url}`, {
+              error: error instanceof Error ? error.message : String(error),
+            });
           }
         }
 
@@ -114,14 +143,15 @@ class ServiceWorkerDiagnostics {
       return report;
     } catch (error) {
       logger.error("❌ Failed to generate cache health report", error);
-      return { ...report, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return { ...report, error: errorMessage };
     }
   }
 
   /**
    * Generate performance recommendations
    */
-  generateRecommendations(report) {
+  generateRecommendations(report: CacheHealthReport): void {
     const sizeLimitMB = 50; // Conservative limit for mobile devices
     const entryLimit = 500;
 
@@ -167,7 +197,7 @@ class ServiceWorkerDiagnostics {
   /**
    * Clear specific cache by name
    */
-  async clearCache(cacheName) {
+  async clearCache(cacheName: string): Promise<boolean> {
     try {
       const success = await caches.delete(cacheName);
       if (success) {
@@ -257,9 +287,10 @@ class ServiceWorkerDiagnostics {
       return status;
     } catch (error) {
       logger.error("❌ Failed to get service worker status", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         supported: true,
-        error: error.message,
+        error: errorMessage,
       };
     }
   }
@@ -297,8 +328,12 @@ class ServiceWorkerDiagnostics {
       // Test cache read
       const readStart = performance.now();
       const cachedResponse = await cache.match(testUrl);
-      await cachedResponse.text(); // Read the response
-      results.readTime = performance.now() - readStart;
+      if (cachedResponse) {
+        await cachedResponse.text(); // Read the response
+        results.readTime = performance.now() - readStart;
+      } else {
+        throw new Error("Cache read failed: response not found");
+      }
 
       // Test cache delete
       const deleteStart = performance.now();
@@ -358,14 +393,18 @@ class ServiceWorkerDiagnostics {
     if ("storage" in navigator && "estimate" in navigator.storage) {
       try {
         const estimate = await navigator.storage.estimate();
-        return {
-          quota: estimate.quota,
-          usage: estimate.usage,
-          available: estimate.quota - estimate.usage,
-          usagePercent: Math.round((estimate.usage / estimate.quota) * 100),
-        };
+        if (estimate.quota !== undefined && estimate.usage !== undefined) {
+          return {
+            quota: estimate.quota,
+            usage: estimate.usage,
+            available: estimate.quota - estimate.usage,
+            usagePercent: Math.round((estimate.usage / estimate.quota) * 100),
+          };
+        }
+        return { error: "Storage quota information unavailable" };
       } catch (error) {
-        return { error: error.message };
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return { error: errorMessage };
       }
     }
     return { supported: false };
