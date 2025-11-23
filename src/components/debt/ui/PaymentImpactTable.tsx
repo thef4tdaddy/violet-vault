@@ -1,11 +1,27 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+interface PaymentImpactScenario {
+  extraPayment: number;
+  avalanche: {
+    timeSavings: number;
+    interestSavings: number;
+  };
+  snowball: {
+    timeSavings: number;
+    interestSavings: number;
+  };
+}
+
+interface PaymentImpactTableProps {
+  paymentImpact?: PaymentImpactScenario[];
+}
+
 /**
  * Table component for showing payment impact analysis
  * Pure UI component - receives impact data as props
  */
-const PaymentImpactTable = ({ paymentImpact = [] }) => {
+const PaymentImpactTable: React.FC<PaymentImpactTableProps> = ({ paymentImpact = [] }) => {
   if (!paymentImpact.length) {
     return (
       <div className="bg-white rounded-xl p-6 border border-gray-200">
@@ -49,7 +65,7 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {paymentImpact.map((scenario, index) => (
+            {paymentImpact.map((scenario: PaymentImpactScenario, index: number) => (
               <React.Fragment key={scenario.extraPayment}>
                 {/* Avalanche row */}
                 <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>

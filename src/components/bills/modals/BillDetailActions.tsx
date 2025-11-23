@@ -1,12 +1,21 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
+import type { Bill } from "@/types/bills";
+
+interface BillDetailActionsProps {
+  bill: Bill;
+  onClose: () => void;
+  handleEdit: () => void;
+  handleDelete: () => void;
+  handleCreateRecurring: () => void;
+}
 
 /**
  * Action buttons section for BillDetailModal
  * Extracted to reduce modal complexity
  */
-export const BillDetailActions = ({
+export const BillDetailActions: React.FC<BillDetailActionsProps> = ({
   bill,
   onClose,
   handleEdit,

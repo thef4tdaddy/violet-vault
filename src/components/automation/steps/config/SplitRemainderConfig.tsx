@@ -1,8 +1,23 @@
 import React from "react";
 import { getIcon } from "../../../../utils";
 import { Checkbox } from "@/components/ui";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
 
-const SplitRemainderConfig = ({ ruleData, envelopes, toggleTargetEnvelope, errors }) => {
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+}
+
+interface SplitRemainderConfigProps {
+  ruleData: AutoFundingRule;
+  envelopes: Envelope[];
+  toggleTargetEnvelope: (envelopeId: string | number) => void;
+  errors: Record<string, string>;
+}
+
+const SplitRemainderConfig: React.FC<SplitRemainderConfigProps> = ({ ruleData, envelopes, toggleTargetEnvelope, errors }) => {
   return (
     <>
       <div>
@@ -11,7 +26,7 @@ const SplitRemainderConfig = ({ ruleData, envelopes, toggleTargetEnvelope, error
           Select multiple envelopes to split the remaining funds between:
         </p>
         <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
-          {envelopes.map((envelope) => {
+          {envelopes.map((envelope: Envelope) => {
             const isSelected = ruleData.config.targetIds?.includes(envelope.id) || false;
             return (
               <div

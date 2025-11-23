@@ -7,7 +7,7 @@ import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
 import AllocationModeSelector from "./shared/AllocationModeSelector";
 import BillConnectionSelector from "./shared/BillConnectionSelector";
-import { ENVELOPE_TYPES } from "@/constants/categories";
+import { ENVELOPE_TYPES, type EnvelopeType } from "@/constants/categories";
 
 interface ColorSelectorProps {
   selectedColor: string;
@@ -90,6 +90,12 @@ export const ActionButtons = ({ onCancel, onSubmit, canSubmit, isLoading }: Acti
   );
 };
 
+interface Bill {
+  id: string;
+  name: string;
+  amount: number;
+}
+
 interface ModalContentProps {
   formData: {
     envelopeType: string;
@@ -101,10 +107,10 @@ interface ModalContentProps {
   calculatedAmounts: Record<string, number>;
   isLoading: boolean;
   canSubmit: boolean;
-  allBills: unknown[];
+  allBills: Bill[];
   onUpdateField: (field: string, value: unknown) => void;
   onBillSelection: (billId: string) => void;
-  onCreateBill?: () => void;
+  onCreateBill?: (() => void) | null;
   onCancel: () => void;
   onSubmit: () => void;
 }
@@ -130,8 +136,8 @@ export const ModalContent = ({
       {/* Envelope Type Selection */}
       <EnvelopeTypeSelector
         selectedType={formData.envelopeType}
-        onTypeChange={(type) => onUpdateField("envelopeType", type)}
-        excludeTypes={[ENVELOPE_TYPES.SAVINGS, ENVELOPE_TYPES.SINKING_FUND]}
+        onTypeChange={(type: string) => onUpdateField("envelopeType", type)}
+        excludeTypes={[ENVELOPE_TYPES.SAVINGS as EnvelopeType, ENVELOPE_TYPES.SINKING_FUND as EnvelopeType]}
         disabled={isLoading}
       />
 
@@ -155,7 +161,7 @@ export const ModalContent = ({
       {/* Allocation Mode */}
       <AllocationModeSelector
         autoAllocate={formData.autoAllocate}
-        onAutoAllocateChange={(value) => onUpdateField("autoAllocate", value)}
+        onAutoAllocateChange={(value: boolean) => onUpdateField("autoAllocate", value)}
         disabled={isLoading}
       />
 
@@ -165,7 +171,7 @@ export const ModalContent = ({
           allBills={allBills}
           selectedBillId={formData.billId}
           onBillSelection={onBillSelection}
-          onCreateBill={onCreateBill}
+          onCreateBill={onCreateBill || undefined}
           disabled={isLoading}
         />
       )}

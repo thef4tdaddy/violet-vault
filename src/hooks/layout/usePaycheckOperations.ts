@@ -7,6 +7,22 @@ import {
   invalidatePaycheckCaches,
 } from "../../utils/layout/paycheckDeletionUtils";
 
+interface PaycheckHistory {
+  id: string | number;
+  amount?: number;
+  allocations?: unknown[];
+}
+
+interface BudgetDb {
+  paycheckHistory: {
+    delete: (id: string | number) => Promise<void>;
+  };
+}
+
+interface QueryClient {
+  invalidateQueries: (opts: unknown) => Promise<void>;
+}
+
 /**
  * Paycheck operations hook
  * Extracts complex paycheck deletion logic from ViewRenderer
@@ -15,7 +31,7 @@ import {
  * @returns {Object} Paycheck operation handlers
  */
 export const usePaycheckOperations = () => {
-  const handleDeletePaycheck = useCallback(async (paycheckId, paycheckHistory) => {
+  const handleDeletePaycheck = useCallback(async (paycheckId: string | number, paycheckHistory: PaycheckHistory[]) => {
     try {
       logger.info("Starting paycheck deletion process", {
         paycheckId,
@@ -49,22 +65,24 @@ export const usePaycheckOperations = () => {
       });
 
       // Delete paycheck record
-      await deletePaycheckRecord(paycheckId, budgetDb);
+      await deletePaycheckRecord(paycheckId, budgetDb as BudgetDb);
 
       // Invalidate caches
       const { queryClient, queryKeys } = await import("../../utils/common/queryClient");
-      await invalidatePaycheckCaches(queryClient, queryKeys);
+      await invalidatePaycheckCaches(queryClient as QueryClient, queryKeys);
 
       logger.info("Paycheck deleted successfully with proper balance reversal", {
         paycheckId,
         actualBalanceChange: balances.newActualBalance - balances.currentActualBalance,
         unassignedCashChange: balances.newUnassignedCash - balances.currentUnassignedCash,
       });
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorStack = error instanceof Error ? error.stack : undefined;
       logger.error("Failed to delete paycheck with proper balance reversal", error, {
         paycheckId,
-        errorMessage: error.message,
-        errorStack: error.stack,
+        errorMessage,
+        errorStack,
       });
       throw error;
     }

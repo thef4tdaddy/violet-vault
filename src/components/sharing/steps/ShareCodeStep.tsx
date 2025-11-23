@@ -1,12 +1,21 @@
 import { Button } from "@/components/ui";
 import { renderIcon } from "../../../utils";
+import React from "react";
+
+interface ShareCodeStepProps {
+  shareCode: string;
+  setShareCode: (code: string) => void;
+  onValidate: () => void;
+  onQRScan: () => void;
+  isValidating: boolean;
+}
 
 /**
  * Share Code Step - Step 1 of join budget flow
  * Extracted from JoinBudgetModal to reduce complexity
  */
-const ShareCodeStep = ({ shareCode, setShareCode, onValidate, onQRScan, isValidating }) => {
-  const handleSubmit = (e) => {
+const ShareCodeStep: React.FC<ShareCodeStepProps> = ({ shareCode, setShareCode, onValidate, onQRScan, isValidating }) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onValidate();
   };

@@ -2,10 +2,17 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
 
+interface ToggleSwitchProps {
+  enabled: boolean;
+  onChange: () => void;
+  label: string;
+  description: string;
+}
+
 /**
  * Toggle switch component for consistency
  */
-const ToggleSwitch = ({ enabled, onChange, label, description }) => (
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ enabled, onChange, label, description }) => (
   <div className="flex items-center justify-between py-3">
     <div className="flex-1 mr-4">
       <label className="text-sm font-black text-purple-800 uppercase tracking-wide">{label}</label>
@@ -26,11 +33,22 @@ const ToggleSwitch = ({ enabled, onChange, label, description }) => (
   </div>
 );
 
+interface SecuritySettings {
+  autoLockEnabled: boolean;
+  autoLockTimeout: number;
+  lockOnPageHide: boolean;
+}
+
+interface AutoLockSettingsSectionProps {
+  securitySettings: SecuritySettings;
+  handleSettingChange: (setting: string, value: boolean | number) => void;
+}
+
 /**
  * Auto-lock settings section with toggle switches and timeout slider
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
+const AutoLockSettingsSection: React.FC<AutoLockSettingsSectionProps> = ({ securitySettings, handleSettingChange }) => {
   return (
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">

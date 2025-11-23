@@ -2,11 +2,19 @@ import React from "react";
 import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../utils";
 
+interface BillManagerHeaderProps {
+  isEditLocked: boolean;
+  currentEditor: string;
+  isSearching: boolean;
+  searchNewBills: () => void;
+  handleAddNewBill: () => void;
+}
+
 /**
  * Header section for BillManager
  * Pure UI component that preserves exact visual appearance
  */
-const BillManagerHeader = ({
+const BillManagerHeader: React.FC<BillManagerHeaderProps> = ({
   isEditLocked,
   currentEditor,
   isSearching,

@@ -1,8 +1,22 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../../utils";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
 
-const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentBalance?: number;
+}
+
+interface PercentageConfigProps {
+  ruleData: AutoFundingRule;
+  updateConfig: (updates: Partial<AutoFundingRule["config"]>) => void;
+  envelopes: Envelope[];
+  errors: Record<string, string>;
+}
+
+const PercentageConfig: React.FC<PercentageConfigProps> = ({ ruleData, updateConfig, envelopes, errors }) => {
   return (
     <>
       <div>
@@ -47,7 +61,7 @@ const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
           }`}
         >
           <option value="">Select envelope...</option>
-          {envelopes.map((envelope) => (
+          {envelopes.map((envelope: Envelope) => (
             <option key={envelope.id} value={envelope.id}>
               {envelope.name} ($
               {envelope.currentBalance?.toFixed(2) || "0.00"})
