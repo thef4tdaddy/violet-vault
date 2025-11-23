@@ -49,7 +49,13 @@ const startBackgroundSyncAfterLogin = async (isNewUser: boolean) => {
 
     await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
-    const { useBudgetStore } = await import("../../../stores/ui/uiStore");
+    const uiStoreModule = await import("../../../stores/ui/uiStore");
+    const useBudgetStore = uiStoreModule.useBudgetStore as {
+      getState: () => {
+        cloudSyncEnabled: boolean;
+        startBackgroundSync: () => Promise<void>;
+      };
+    };
     const budgetState = useBudgetStore.getState();
 
     if (budgetState.cloudSyncEnabled) {
@@ -310,7 +316,7 @@ export const useLoginMutation = () => {
   return useMutation<LoginResult, Error, LoginMutationVariables>({
     mutationFn: async ({
       password,
-      userData = null,
+      userData = undefined,
     }: LoginMutationVariables): Promise<LoginResult> => {
       logger.auth("TanStack Login attempt started.", {
         hasPassword: !!password,
@@ -353,7 +359,7 @@ export const useLoginMutation = () => {
         handleSuccessfulAuthentication(result, setAuthenticated);
         await startBackgroundSyncAfterLogin(result.isNewUser || false);
       } else {
-        setError(result.error);
+        setError(result.error || null);
       }
       setLoading(false);
     },
