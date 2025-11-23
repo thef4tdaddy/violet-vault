@@ -562,11 +562,12 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Check if we have chunks to reassemble
         if (mainData._manifest) {
-          let manifest: {
+          type ManifestType = {
             version?: string;
             metadata?: { totalChunks?: number };
             chunks?: unknown[];
-          } = {};
+          };
+          let manifest: ManifestType = {};
           try {
             // Validate manifest data before decryption
             const manifestData = mainData._manifest as Record<string, unknown>;
@@ -645,10 +646,8 @@ class ChunkedSyncService implements IChunkedSyncService {
             return null; // Return null to trigger fresh upload from local data without clearing cloud
           }
           logger.debug("Loaded manifest", {
-            version: (manifest as { version?: string; metadata?: { totalChunks?: number } })
-              .version,
-            totalChunks: (manifest as { version?: string; metadata?: { totalChunks?: number } })
-              .metadata?.totalChunks,
+            version: manifest.version,
+            totalChunks: manifest.metadata?.totalChunks,
           });
 
           // Load all chunks
