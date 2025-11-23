@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | +1 |
-| TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2113 | -12 |
+| ESLint Issues | 6 | +1 |
+| TypeScript Errors | 61 | +21 |
+| TypeScript Strict Mode Errors | 2116 | +3 |
 
-*Last updated: 2025-11-23 16:04:04 UTC*
+*Last updated: 2025-11-23 16:11:55 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -31,6 +31,7 @@
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/analytics/useChartsAnalytics.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/settings/sections/SecuritySettingsSection.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx`
 
 ### Issue Count by Category
@@ -38,10 +39,12 @@
 |---|---|
 | 3 | `max-lines-per-function` |
 | 2 | `no-undef` |
+| 1 | `@typescript-eslint/no-unused-vars` |
 
 ### Detailed Lint Report
 ```
 /home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx:27:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/components/settings/sections/SecuritySettingsSection.tsx:5:11 - 1 - 'SecuritySettingsSectionProps' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 /home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/analytics/useChartsAnalytics.ts:39:9 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
@@ -51,25 +54,32 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 14 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
 - 7 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 6 errors in `src/hooks/debts/useDebtManagement.ts`
 - 6 errors in `src/hooks/budgeting/usePaycheckForm.ts`
 - 5 errors in `src/hooks/debts/useDebts.ts`
 - 5 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
 - 3 errors in `src/hooks/analytics/useReportExporter.ts`
+- 3 errors in `src/components/sync/ConflictResolutionModal.tsx`
+- 3 errors in `src/components/layout/MainLayout.tsx`
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/bills/useBillManager.ts`
-- 2 errors in `src/components/layout/MainLayout.tsx`
+- 1 errors in `src/components/settings/sections/SecuritySettingsSection.tsx`
+- 1 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
+- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 18 | `TS2322` |
+| 21 | `TS2322` |
+| 20 | `TS2339` |
 | 15 | `TS2345` |
-| 4 | `TS2339` |
+| 1 | `TS6196` |
 | 1 | `TS2741` |
+| 1 | `TS2740` |
 | 1 | `TS2719` |
 | 1 | `TS2352` |
 
@@ -99,12 +109,36 @@ src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2741: Property 
 src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type '{ start: string; end: string; }' is not assignable to type 'boolean'.
+src/components/auth/UserSetup.tsx(190,9): error TS2322: Type '(joinData: unknown) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/components/layout/MainLayout.tsx(448,11): error TS2740: Type '{}' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
 src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; }>' is not assignable to type '() => void'.
   Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
   Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/components/settings/SettingsDashboard.tsx(162,13): error TS2322: Type '(password: string) => void' is not assignable to type '(current: string, newPass: string) => Promise<AuthResult>'.
   Type 'void' is not assignable to type 'Promise<AuthResult>'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(26,20): error TS2339: Property 'totalCount' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(41,30): error TS2339: Property 'totalCount' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(47,40): error TS2339: Property 'totalAmount' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(53,42): error TS2339: Property 'categories' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(59,30): error TS2339: Property 'dateRange' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(60,42): error TS2339: Property 'dateRange' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(63,30): error TS2339: Property 'dateRange' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(64,42): error TS2339: Property 'dateRange' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(76,45): error TS2339: Property 'categories' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(106,40): error TS2339: Property 'categories' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(108,45): error TS2339: Property 'categories' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(123,48): error TS2339: Property 'totalCount' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(125,45): error TS2339: Property 'totalCount' does not exist on type 'unknown'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(141,61): error TS2339: Property 'cutoffDate' does not exist on type 'unknown'.
+src/components/settings/sections/AccountSettingsSection.tsx(132,9): error TS2322: Type '(joinData: unknown) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/components/settings/sections/SecuritySettingsSection.tsx(5,11): error TS6196: 'SecuritySettingsSectionProps' is declared but never used.
+src/components/sync/ConflictResolutionModal.tsx(36,47): error TS2339: Property 'hasConflict' does not exist on type 'unknown[]'.
+src/components/sync/ConflictResolutionModal.tsx(65,36): error TS2339: Property 'cloudUser' does not exist on type 'unknown[]'.
+src/components/sync/ConflictResolutionModal.tsx(77,15): error TS2322: Type '(conflictId: string, resolution: string) => void' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/hooks/accounts/useSupplementalAccounts.ts(109,44): error TS2345: Argument of type 'Account' is not assignable to parameter of type 'Account'.
   Type 'Account' is missing the following properties from type 'Account': type, currentBalance, color, isActive
 src/hooks/accounts/useSupplementalAccounts.ts(134,7): error TS2322: Type '(account: Account) => void' is not assignable to type '(id: string, data: unknown) => void'.
@@ -198,6 +232,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 14 errors in `src/hooks/receipts/useReceiptScanner.ts`
 - 14 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 14 errors in `src/components/sharing/steps/UserSetupStep.tsx`
+- 14 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
 - 14 errors in `src/components/dashboard/RecentTransactionsWidget.tsx`
 - 14 errors in `src/components/dashboard/AccountBalanceOverview.tsx`
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
@@ -216,6 +251,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
+- 11 errors in `src/components/layout/MainLayout.tsx`
 - 11 errors in `src/components/budgeting/suggestions/SuggestionSettings.tsx`
 - 11 errors in `src/components/budgeting/shared/BillConnectionSelector.tsx`
 - 10 errors in `src/utils/sync/syncHealthChecker.ts`
@@ -230,7 +266,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 10 errors in `src/components/settings/sections/GeneralSettingsSection.tsx`
 - 10 errors in `src/components/receipts/steps/ConfirmationStep.tsx`
 - 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
-- 10 errors in `src/components/layout/MainLayout.tsx`
 - 10 errors in `src/components/budgeting/paycheck/PaycheckAllocationModes.tsx`
 - 10 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 10 errors in `src/components/bills/modals/BulkUpdateConfirmModal.tsx`
@@ -321,6 +356,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 6 errors in `src/hooks/bills/useBillManagerUI.ts`
 - 6 errors in `src/components/sharing/steps/ShareCodeStep.tsx`
 - 6 errors in `src/components/settings/sections/AutoLockSettingsSection.tsx`
+- 6 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 6 errors in `src/components/savings/SavingsGoals.tsx`
 - 6 errors in `src/components/modals/QuickFundModal.tsx`
 - 6 errors in `src/components/layout/NavigationTabs.tsx`
@@ -352,7 +388,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 5 errors in `src/hooks/budgeting/mutations/useDeleteEnvelope.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
-- 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
+- 5 errors in `src/components/transactions/TransactionLedger.tsx`
 - 5 errors in `src/components/settings/archiving/ArchivingConfiguration.tsx`
 - 5 errors in `src/components/receipts/steps/ReceiptDataStep.tsx`
 - 5 errors in `src/components/receipts/steps/EnvelopeSelectionStep.tsx`
@@ -393,9 +429,9 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 4 errors in `src/hooks/analytics/useReportExporter.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
 - 4 errors in `src/components/transactions/TransactionTable.tsx`
-- 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
+- 4 errors in `src/components/settings/sections/SecuritySettingsSection.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingStatusOverview.tsx`
 - 4 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
 - 4 errors in `src/components/pages/MainDashboard.tsx`
@@ -418,15 +454,8 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
 - 3 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 3 errors in `src/hooks/mobile/useFABSmartPositioning.ts`
-- 3 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
-- 3 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
-- 3 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/components/sync/ConflictResolutionModal.tsx`
-- 3 errors in `src/components/sharing/JoinBudgetModal.tsx`
-- 3 errors in `src/components/settings/sections/SecuritySettingsSection.tsx`
-- 3 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
 - 3 errors in `src/components/settings/SettingsDashboard.tsx`
-- 3 errors in `src/components/security/LocalDataSecurityWarning.tsx`
 - 3 errors in `src/components/receipts/components/ReceiptImagePreview.tsx`
 - 3 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
 - 3 errors in `src/components/receipts/components/ExtractedItemsList.tsx`
@@ -487,6 +516,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/hooks/analytics/useAnalyticsExport.ts`
 - 2 errors in `src/contexts/authUtils.ts`
 - 2 errors in `src/components/transactions/import/ImportProgress.tsx`
+- 2 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
 - 2 errors in `src/components/settings/sections/ClipboardSecuritySection.tsx`
 - 2 errors in `src/components/settings/archiving/ArchivingProgress.tsx`
@@ -594,6 +624,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/components/bills/BillDiscoveryModal.tsx`
 - 1 errors in `src/components/auth/key-management/MainContent.tsx`
 - 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
+- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/auth/KeyManagementSettings.tsx`
 - 1 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
@@ -604,10 +635,10 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | Count | Error Code |
 |---|---|
 | 623 | `TS7006` |
-| 609 | `TS7031` |
+| 591 | `TS7031` |
 | 177 | `TS2345` |
-| 149 | `TS2322` |
-| 128 | `TS2339` |
+| 153 | `TS2322` |
+| 144 | `TS2339` |
 | 106 | `TS18046` |
 | 64 | `TS7005` |
 | 63 | `TS7053` |
@@ -626,6 +657,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 | 2 | `TS2719` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
+| 1 | `TS6196` |
 | 1 | `TS2774` |
 | 1 | `TS2740` |
 | 1 | `TS2698` |
@@ -720,6 +752,8 @@ src/components/auth/UserIndicator.tsx(71,23): error TS2349: This expression is n
   Type 'never' has no call signatures.
 src/components/auth/UserIndicator.tsx(116,11): error TS2322: Type '((updates: { [key: string]: unknown; userName: string; userColor: string; budgetId?: string | undefined; }) => Promise<void>) | undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
   Type 'undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
+src/components/auth/UserSetup.tsx(190,9): error TS2322: Type '(joinData: unknown) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/auth/components/ReturningUserActions.tsx(10,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
 src/components/auth/components/ReturningUserActions.tsx(11,3): error TS7031: Binding element 'onChangeProfile' implicitly has an 'any' type.
 src/components/auth/components/ReturningUserActions.tsx(12,3): error TS7031: Binding element 'onStartFresh' implicitly has an 'any' type.
@@ -1353,6 +1387,7 @@ src/components/layout/MainLayout.tsx(256,18): error TS7053: Element implicitly h
   No index signature with a parameter of type 'string' was found on type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
 src/components/layout/MainLayout.tsx(287,20): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/layout/MainLayout.tsx(290,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/layout/MainLayout.tsx(448,11): error TS2322: Type 'unknown' is not assignable to type 'unknown[]'.
 src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; } | undefined>' is not assignable to type '() => void'.
   Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
@@ -1576,9 +1611,6 @@ src/components/savings/SavingsSummaryCard.tsx(12,26): error TS2339: Property 'cu
 src/components/savings/SavingsSummaryCard.tsx(13,25): error TS2339: Property 'targetAmount' does not exist on type 'never'.
 src/components/savings/SavingsSummaryCard.tsx(18,26): error TS2339: Property 'currentAmount' does not exist on type 'never'.
 src/components/savings/SavingsSummaryCard.tsx(19,25): error TS2339: Property 'targetAmount' does not exist on type 'never'.
-src/components/security/LocalDataSecurityWarning.tsx(12,37): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/security/LocalDataSecurityWarning.tsx(12,46): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
-src/components/security/LocalDataSecurityWarning.tsx(133,26): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
 src/components/security/LockScreen.tsx(58,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
 src/components/security/LockScreen.tsx(126,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
 src/components/security/LockScreen.tsx(156,7): error TS2322: Type '{ isValid: boolean; reason?: string | undefined; isCorrupted?: boolean | undefined; } | { isValid: boolean; reason: string; error: string; }' is not assignable to type 'null'.
@@ -1609,9 +1641,20 @@ src/components/settings/archiving/ArchivingConfiguration.tsx(10,3): error TS7031
 src/components/settings/archiving/ArchivingConfiguration.tsx(11,3): error TS7031: Binding element 'toggleAdvancedOptions' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingHeader.tsx(5,28): error TS7031: Binding element 'onRefresh' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingHeader.tsx(5,39): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingPreviewResults.tsx(5,36): error TS7031: Binding element 'showPreview' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingPreviewResults.tsx(5,49): error TS7031: Binding element 'previewData' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingPreviewResults.tsx(5,62): error TS7031: Binding element 'onClosePreview' implicitly has an 'any' type.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(26,20): error TS2339: Property 'totalCount' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(41,30): error TS2339: Property 'totalCount' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(47,40): error TS2339: Property 'totalAmount' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(53,42): error TS2339: Property 'categories' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(59,30): error TS2339: Property 'dateRange' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(60,42): error TS2339: Property 'dateRange' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(63,30): error TS2339: Property 'dateRange' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(64,42): error TS2339: Property 'dateRange' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(76,45): error TS2339: Property 'categories' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(106,40): error TS2339: Property 'categories' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(108,45): error TS2339: Property 'categories' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(123,48): error TS2339: Property 'totalCount' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(125,45): error TS2339: Property 'totalCount' does not exist on type '{}'.
+src/components/settings/archiving/ArchivingPreviewResults.tsx(141,61): error TS2339: Property 'cutoffDate' does not exist on type '{}'.
 src/components/settings/archiving/ArchivingProgress.tsx(4,30): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingProgress.tsx(4,43): error TS7031: Binding element 'archivingProgress' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingResult.tsx(4,28): error TS7031: Binding element 'lastResult' implicitly has an 'any' type.
@@ -1624,6 +1667,8 @@ src/components/settings/sections/AccountSettingsSection.tsx(12,3): error TS7031:
 src/components/settings/sections/AccountSettingsSection.tsx(13,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(14,3): error TS7031: Binding element 'onOpenResetConfirm' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(15,3): error TS7031: Binding element 'onUpdateProfile' implicitly has an 'any' type.
+src/components/settings/sections/AccountSettingsSection.tsx(132,9): error TS2322: Type '(joinData: unknown) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/settings/sections/AutoLockSettingsSection.tsx(8,25): error TS7031: Binding element 'enabled' implicitly has an 'any' type.
 src/components/settings/sections/AutoLockSettingsSection.tsx(8,34): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
 src/components/settings/sections/AutoLockSettingsSection.tsx(8,44): error TS7031: Binding element 'label' implicitly has an 'any' type.
@@ -1654,9 +1699,10 @@ src/components/settings/sections/SecurityLoggingSection.tsx(16,3): error TS7031:
 src/components/settings/sections/SecurityLoggingSection.tsx(19,32): error TS7031: Binding element 'event' implicitly has an 'any' type.
 src/components/settings/sections/SecurityLoggingSection.tsx(20,32): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/settings/sections/SecurityLoggingSection.tsx(148,41): error TS7006: Parameter 'event' implicitly has an 'any' type.
-src/components/settings/sections/SecuritySettingsSection.tsx(6,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
-src/components/settings/sections/SecuritySettingsSection.tsx(7,3): error TS7031: Binding element 'onOpenSecuritySettings' implicitly has an 'any' type.
-src/components/settings/sections/SecuritySettingsSection.tsx(8,3): error TS7031: Binding element 'onShowLocalDataSecurity' implicitly has an 'any' type.
+src/components/settings/sections/SecuritySettingsSection.tsx(5,11): error TS6196: 'SecuritySettingsSectionProps' is declared but never used.
+src/components/settings/sections/SecuritySettingsSection.tsx(11,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
+src/components/settings/sections/SecuritySettingsSection.tsx(12,3): error TS7031: Binding element 'onOpenSecuritySettings' implicitly has an 'any' type.
+src/components/settings/sections/SecuritySettingsSection.tsx(13,3): error TS7031: Binding element 'onShowLocalDataSecurity' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(9,3): error TS7031: Binding element 'isLocked' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(10,3): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(11,3): error TS7031: Binding element 'securityEvents' implicitly has an 'any' type.
@@ -1668,9 +1714,6 @@ src/components/settings/sections/SyncDebugToolsSection.tsx(65,40): error TS2722:
 src/components/settings/sections/SyncDebugToolsSection.tsx(65,40): error TS18048: 'window.runMasterSyncValidation' is possibly 'undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(171,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(171,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
-src/components/sharing/JoinBudgetModal.tsx(17,28): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/sharing/JoinBudgetModal.tsx(17,36): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/sharing/JoinBudgetModal.tsx(17,45): error TS7031: Binding element 'onJoinSuccess' implicitly has an 'any' type.
 src/components/sharing/ShareCodeModal.tsx(17,27): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/sharing/ShareCodeModal.tsx(17,35): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/sharing/ShareCodeModal.tsx(45,67): error TS2345: Argument of type 'UserData' is not assignable to parameter of type 'null | undefined'.
@@ -1708,9 +1751,10 @@ src/components/sharing/steps/UserSetupStep.tsx(19,3): error TS7031: Binding elem
 src/components/sharing/steps/UserSetupStep.tsx(20,3): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
 src/components/sharing/steps/UserSetupStep.tsx(21,3): error TS7031: Binding element 'isJoining' implicitly has an 'any' type.
 src/components/sharing/steps/UserSetupStep.tsx(23,25): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/sync/ConflictResolutionModal.tsx(26,36): error TS7031: Binding element 'syncConflicts' implicitly has an 'any' type.
-src/components/sync/ConflictResolutionModal.tsx(26,51): error TS7031: Binding element 'onResolveConflict' implicitly has an 'any' type.
-src/components/sync/ConflictResolutionModal.tsx(26,70): error TS7031: Binding element 'onDismiss' implicitly has an 'any' type.
+src/components/sync/ConflictResolutionModal.tsx(36,47): error TS2339: Property 'hasConflict' does not exist on type 'unknown[]'.
+src/components/sync/ConflictResolutionModal.tsx(65,36): error TS2339: Property 'cloudUser' does not exist on type 'unknown[]'.
+src/components/sync/ConflictResolutionModal.tsx(77,15): error TS2322: Type '(conflictId: string, resolution: string) => void' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/components/sync/health/SyncHealthDetails.tsx(43,3): error TS7031: Binding element 'syncStatus' implicitly has an 'any' type.
 src/components/sync/health/SyncHealthDetails.tsx(44,3): error TS7031: Binding element 'isBackgroundSyncing' implicitly has an 'any' type.
 src/components/sync/health/SyncHealthDetails.tsx(45,3): error TS7031: Binding element 'isRecovering' implicitly has an 'any' type.
@@ -1738,6 +1782,9 @@ src/components/transactions/TransactionFilters.tsx(18,3): error TS7031: Binding 
 src/components/transactions/TransactionFilters.tsx(115,39): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionFilters.tsx(115,59): error TS2339: Property 'id' does not exist on type 'never'.
 src/components/transactions/TransactionFilters.tsx(116,29): error TS2339: Property 'name' does not exist on type 'never'.
+src/components/transactions/TransactionLedger.tsx(155,7): error TS2322: Type '(direction: "next" | "prev") => void' is not assignable to type '(direction: string) => void'.
+  Types of parameters 'direction' and 'direction' are incompatible.
+    Type 'string' is not assignable to type '"next" | "prev"'.
 src/components/transactions/TransactionLedger.tsx(476,7): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(transaction: Transaction | null) => void'.
   Types of parameters 'value' and 'transaction' are incompatible.
     Type 'Transaction | null' is not assignable to type 'SetStateAction<null>'.
@@ -1752,8 +1799,6 @@ src/components/transactions/TransactionLedger.tsx(495,7): error TS2322: Type '(s
 src/components/transactions/TransactionLedger.tsx(498,7): error TS2322: Type '(mapping: FieldMapping) => void' is not assignable to type '(mapping: unknown) => void'.
   Types of parameters 'mapping' and 'mapping' are incompatible.
     Type 'unknown' is not assignable to type 'FieldMapping'.
-src/components/transactions/TransactionSplitter.tsx(34,5): error TS2322: Type 'Transaction | null' is not assignable to type 'Transaction | undefined'.
-  Type 'null' is not assignable to type 'Transaction | undefined'.
 src/components/transactions/TransactionSplitter.tsx(105,19): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
   Type 'string' is not assignable to type 'never'.
 src/components/transactions/TransactionSplitter.tsx(126,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
@@ -1800,9 +1845,6 @@ src/components/transactions/ledger/TransactionLedgerHeader.tsx(7,3): error TS703
 src/components/transactions/ledger/TransactionLedgerHeader.tsx(8,3): error TS7031: Binding element 'netCashFlow' implicitly has an 'any' type.
 src/components/transactions/ledger/TransactionLedgerHeader.tsx(9,3): error TS7031: Binding element 'onAddTransaction' implicitly has an 'any' type.
 src/components/transactions/ledger/TransactionLedgerHeader.tsx(10,3): error TS7031: Binding element 'onImportTransactions' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionPagination.tsx(3,34): error TS7031: Binding element 'currentPage' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionPagination.tsx(3,47): error TS7031: Binding element 'totalPages' implicitly has an 'any' type.
-src/components/transactions/ledger/TransactionPagination.tsx(3,59): error TS7031: Binding element 'onPageChange' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitActions.tsx(5,25): error TS7031: Binding element 'totals' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitActions.tsx(5,33): error TS7031: Binding element 'hasUnsavedChanges' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitActions.tsx(5,52): error TS7031: Binding element 'isSaving' implicitly has an 'any' type.
@@ -1829,9 +1871,6 @@ src/components/transactions/splitter/SplitAllocationsSection.tsx(15,3): error TS
 src/components/transactions/splitter/SplitAllocationsSection.tsx(84,32): error TS7006: Parameter 'split' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitAllocationsSection.tsx(84,39): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitTotals.tsx(5,24): error TS7031: Binding element 'totals' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(5,27): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(5,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(5,49): error TS7031: Binding element 'hasUnsavedChanges' implicitly has an 'any' type.
 src/contexts/authUtils.ts(81,18): error TS2345: Argument of type '(prev: AuthContextState) => { user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<...> | null; lastActivity: number; error: null; isLoading: boolean; }' is not assignable to parameter of type 'SetStateAction<AuthContextState>'.
   Type '(prev: AuthContextState) => { user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<...> | null; lastActivity: number; error: null; isLoading: boolean; }' is not assignable to type '(prevState: AuthContextState) => AuthContextState'.
     Call signature return types '{ user: UserData; isAuthenticated: true; isUnlocked: true; budgetId: string | undefined; encryptionKey: CryptoKey | null; salt: Uint8Array<ArrayBufferLike> | null; lastActivity: number; error: null; isLoading: boolean; }' and 'AuthContextState' are incompatible.

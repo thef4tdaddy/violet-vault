@@ -1,6 +1,16 @@
 import { Button } from "@/components/ui";
 
-const TransactionPagination = ({ currentPage, totalPages, onPageChange }) => {
+interface TransactionPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (direction: string) => void;
+}
+
+const TransactionPagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: TransactionPaginationProps) => {
   return (
     <div className="flex items-center justify-between mt-4">
       <Button

@@ -2,6 +2,11 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+interface SecuritySettingsSectionProps {
+  securityManager: unknown;
+  onOpenSecuritySettings: () => void;
+  onShowLocalDataSecurity: () => void;
+}
 const SecuritySettingsSection = ({
   securityManager,
   onOpenSecuritySettings,

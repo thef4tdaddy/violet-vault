@@ -31,7 +31,7 @@ const TransactionSplitter = ({
   className = "",
 }: TransactionSplitterProps) => {
   const splitter = useTransactionSplitter({
-    transaction,
+    transaction: transaction ?? undefined,
     envelopes,
     onSplit: onSave,
   });
@@ -77,8 +77,8 @@ const TransactionSplitter = ({
   const categoryOptions = React.useMemo(() => {
     return availableCategories.length > 0
       ? availableCategories
-      : Object.values(TRANSACTION_CATEGORIES).flat();
-  }, [availableCategories]);
+      : (Object.values(TRANSACTION_CATEGORIES).flat() as string[]);
+  }, [availableCategories]) as string[];
 
   if (!isOpen || !transaction || !totals) return null;
 

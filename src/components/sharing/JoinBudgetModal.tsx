@@ -14,7 +14,12 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
  * Refactored to use custom hooks and step components for better maintainability
  * Addresses GitHub Issue #580 - Two-factor authentication for joining
  */
-const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
+interface JoinBudgetModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onJoinSuccess?: () => void;
+}
+const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }: JoinBudgetModalProps) => {
   const [shareCode, setShareCode] = useState("");
   const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");

@@ -23,7 +23,16 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
  * @param {Function} props.onDismiss - Callback to dismiss conflict and keep local data
  * @returns {React.ReactElement|null} Modal element or null if no conflict
  */
-const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }) => {
+interface ConflictResolutionModalProps {
+  syncConflicts: unknown[];
+  onResolveConflict: (conflictId: string, resolution: string) => void;
+  onDismiss: () => void;
+}
+const ConflictResolutionModal = ({
+  syncConflicts,
+  onResolveConflict,
+  onDismiss,
+}: ConflictResolutionModalProps) => {
   const shouldRender = Boolean(syncConflicts?.hasConflict);
   const modalRef = useModalAutoScroll(shouldRender);
 

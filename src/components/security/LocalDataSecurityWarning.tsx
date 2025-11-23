@@ -9,7 +9,16 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
  * Security warning component that informs users about local data storage
  * Addresses GitHub Issue #589 - Warning about unencrypted local data
  */
-const LocalDataSecurityWarning = ({ onClose, onAcknowledge, forceShow = false }) => {
+interface LocalDataSecurityWarningProps {
+  onClose?: () => void;
+  onAcknowledge?: () => void;
+  forceShow?: boolean;
+}
+const LocalDataSecurityWarning = ({
+  onClose,
+  onAcknowledge,
+  forceShow = false,
+}: LocalDataSecurityWarningProps) => {
   const { hasBeenAcknowledged, acknowledge } = useSecurityAcknowledgment();
   const modalRef = useModalAutoScroll(true);
 
@@ -130,7 +139,7 @@ const ImplicationsSection = () => (
   </div>
 );
 
-const WarningFooter = ({ onAcknowledge }) => (
+const WarningFooter = ({ onAcknowledge }: { onAcknowledge?: () => void }) => (
   <div className="flex flex-col items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
     <div className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center">
       This notice will not be shown again after you acknowledge it.
