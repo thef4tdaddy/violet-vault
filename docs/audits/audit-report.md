@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 3 | 0 |
-| TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2164 | -11 |
+| TypeScript Errors | 41 | +1 |
+| TypeScript Strict Mode Errors | 2154 | -10 |
 
-*Last updated: 2025-11-23 00:18:23 UTC*
+*Last updated: 2025-11-23 00:24:39 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -57,13 +57,14 @@
 - 2 errors in `src/hooks/bills/useBillManager.ts`
 - 2 errors in `src/components/layout/MainLayout.tsx`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
+- 1 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
 | 18 | `TS2322` |
-| 15 | `TS2345` |
+| 16 | `TS2345` |
 | 4 | `TS2339` |
 | 1 | `TS2741` |
 | 1 | `TS2719` |
@@ -95,6 +96,8 @@ src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2741: Property 
 src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type '{ start: string; end: string; }' is not assignable to type 'boolean'.
+src/components/history/BudgetHistoryViewer.tsx(45,64): error TS2345: Argument of type 'UseMutateFunction<{ commitHash: string; snapshot: any; }, Error, { commitHash: string; password: string; }, unknown>' is not assignable to parameter of type '(params: { commitHash: string; password: string; }) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
 src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; }>' is not assignable to type '() => void'.
   Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
@@ -210,7 +213,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
 - 12 errors in `src/components/bills/BillManager.tsx`
-- 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
 - 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 11 errors in `src/components/transactions/import/ImportModal.tsx`
 - 11 errors in `src/components/budgeting/suggestions/SuggestionSettings.tsx`
@@ -442,6 +444,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 3 errors in `src/components/receipts/components/ExtractedItemsList.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/history/viewer/IntegrityWarning.tsx`
+- 3 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
@@ -504,7 +507,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/components/onboarding/hooks/useTutorialPositioning.ts`
 - 2 errors in `src/components/onboarding/EmptyStateHints.tsx`
 - 2 errors in `src/components/mobile/FABActionMenu.tsx`
-- 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 2 errors in `src/components/debt/ui/StrategyCard.tsx`
 - 2 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
 - 2 errors in `src/components/debt/modals/DebtModalHeader.tsx`
@@ -608,14 +610,14 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 629 | `TS7006` |
+| 619 | `TS7006` |
 | 604 | `TS7031` |
-| 189 | `TS2345` |
+| 190 | `TS2345` |
 | 157 | `TS2322` |
 | 131 | `TS18046` |
 | 126 | `TS2339` |
 | 65 | `TS7005` |
-| 61 | `TS7053` |
+| 60 | `TS7053` |
 | 56 | `TS18048` |
 | 40 | `TS7034` |
 | 37 | `TS18047` |
@@ -1304,7 +1306,10 @@ src/components/debt/ui/QuickPaymentForm.tsx(14,3): error TS7031: Binding element
 src/components/debt/ui/StrategyCard.tsx(8,25): error TS7031: Binding element 'strategy' implicitly has an 'any' type.
 src/components/debt/ui/StrategyCard.tsx(78,35): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/components/history/BudgetHistoryViewer.tsx(23,32): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/history/BudgetHistoryViewer.tsx(52,28): error TS2345: Argument of type 'null' is not assignable to parameter of type 'string'.
+src/components/history/BudgetHistoryViewer.tsx(45,64): error TS2345: Argument of type 'UseMutateFunction<{ commitHash: string; snapshot: any; }, Error, { commitHash: string; password: string; }, unknown>' is not assignable to parameter of type '(params: { commitHash: string; password: string; }) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/history/BudgetHistoryViewer.tsx(52,28): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
 src/components/history/IntegrityStatusIndicator.tsx(148,40): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number | Date'.
@@ -2436,17 +2441,6 @@ src/hooks/debts/useDebts.ts(195,20): error TS2339: Property 'name' does not exis
 src/hooks/debts/useDebts.ts(196,20): error TS2339: Property 'type' does not exist on type '{ id?: string | undefined; status: string; author?: string | undefined; }'.
 src/hooks/debts/useDebts.ts(197,30): error TS2339: Property 'currentBalance' does not exist on type '{ id?: string | undefined; status: string; author?: string | undefined; }'.
 src/hooks/debts/useDebts.ts(198,28): error TS2339: Property 'interestRate' does not exist on type '{ id?: string | undefined; status: string; author?: string | undefined; }'.
-src/hooks/history/useBudgetHistoryViewer.ts(17,46): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(21,45): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(33,37): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(60,41): error TS7006: Parameter 'restore' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(65,12): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(122,38): error TS7006: Parameter 'changeType' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(143,39): error TS7006: Parameter 'author' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(149,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ system: string; user: string; default: string; }'.
-src/hooks/history/useBudgetHistoryViewer.ts(152,41): error TS7006: Parameter 'hash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(156,40): error TS7006: Parameter 'timestamp' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(160,35): error TS7006: Parameter 'date' implicitly has an 'any' type.
 src/hooks/layout/usePaycheckOperations.ts(18,51): error TS7006: Parameter 'paycheckId' implicitly has an 'any' type.
 src/hooks/layout/usePaycheckOperations.ts(18,63): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/layout/usePaycheckOperations.ts(66,23): error TS18046: 'error' is of type 'unknown'.
