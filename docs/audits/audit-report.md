@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 4 | 0 |
 | TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2119 | -6 |
+| TypeScript Strict Mode Errors | 2094 | -25 |
 
-*Last updated: 2025-11-23 13:49:29 UTC*
+*Last updated: 2025-11-23 13:55:28 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -292,7 +292,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 7 errors in `src/components/settings/archiving/ArchivingActionButtons.tsx`
 - 7 errors in `src/components/security/LockScreen.tsx`
-- 7 errors in `src/components/modals/QuickFundForm.tsx`
 - 7 errors in `src/components/history/viewer/ChangeDetails.tsx`
 - 7 errors in `src/components/debt/ui/QuickPaymentForm.tsx`
 - 7 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
@@ -302,9 +301,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
 - 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 7 errors in `src/App.tsx`
-- 6 errors in `src/utils/transactions/fileParser.ts`
-- 6 errors in `src/utils/debts/debtFormValidation.ts`
-- 6 errors in `src/utils/debts/debtDebugConfig.ts`
 - 6 errors in `src/utils/dataManagement/validationUtils.ts`
 - 6 errors in `src/utils/common/BaseMutex.ts`
 - 6 errors in `src/utils/budgeting/envelopeStyles.ts`
@@ -607,19 +603,18 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 630 | `TS7006` |
-| 608 | `TS7031` |
-| 186 | `TS2345` |
-| 152 | `TS2322` |
+| 626 | `TS7006` |
+| 602 | `TS7031` |
+| 183 | `TS2345` |
+| 151 | `TS2322` |
 | 122 | `TS2339` |
 | 109 | `TS18046` |
-| 63 | `TS7053` |
+| 60 | `TS7053` |
 | 59 | `TS7005` |
-| 48 | `TS18048` |
+| 46 | `TS18048` |
 | 37 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
-| 6 | `TS2411` |
 | 5 | `TS2722` |
 | 5 | `TS2531` |
 | 5 | `TS2353` |
@@ -1395,13 +1390,6 @@ src/components/mobile/SlideUpModal.tsx(350,9): error TS2322: Type 'RefObject<HTM
 src/components/mobile/SlideUpModal.tsx(351,9): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
-src/components/modals/QuickFundForm.tsx(4,26): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,36): error TS7031: Binding element 'amount' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,44): error TS7031: Binding element 'setAmount' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,55): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,71): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(4,82): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/modals/QuickFundForm.tsx(5,31): error TS7006: Parameter 'quickAmount' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(13,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(14,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/modals/QuickFundModal.tsx(15,3): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
@@ -3063,22 +3051,6 @@ src/utils/debts/calculations/interestCalculation.ts(12,48): error TS7006: Parame
 src/utils/debts/calculations/nextPaymentDate.ts(13,42): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/utils/debts/calculations/nextPaymentDate.ts(13,48): error TS7006: Parameter 'relatedBill' implicitly has an 'any' type.
 src/utils/debts/calculations/payoffProjection.ts(11,43): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(42,38): error TS7006: Parameter 'feature' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(43,10): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtDebugConfig.ts(50,36): error TS7006: Parameter 'feature' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(51,3): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtDebugConfig.ts(59,35): error TS7006: Parameter 'feature' implicitly has an 'any' type.
-src/utils/debts/debtDebugConfig.ts(60,3): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ENABLE_DEBT_MANAGEMENT_HOOK: boolean; ENABLE_DEBT_DASHBOARD: boolean; ENABLE_DEBT_SUMMARY_CARDS: boolean; ENABLE_DEBT_LIST: boolean; ENABLE_DEBT_FILTERS: boolean; ENABLE_DEBT_MODALS: boolean; ... 9 more ...; ENABLE_DEBT_STRATEGIES: boolean; }'.
-src/utils/debts/debtFormValidation.ts(101,38): error TS2345: Argument of type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; } | undefined' is not assignable to parameter of type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; }'.
-  Type 'undefined' is not assignable to type '{ name: string; creditor: string; notes: string; balance: string; currentBalance: string; type: "credit_card" | "mortgage" | "other" | "auto" | "chapter13" | "student" | "personal" | "business"; ... 12 more ...; paymentDueDate?: string | undefined; }'.
-src/utils/debts/debtFormValidation.ts(239,30): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
-src/utils/debts/debtFormValidation.ts(240,20): error TS18048: 'monthsToPayoff' is possibly 'undefined'.
-src/utils/debts/debtFormValidation.ts(259,35): error TS2345: Argument of type 'number | null | undefined' is not assignable to parameter of type 'number | null'.
-  Type 'undefined' is not assignable to type 'number | null'.
-src/utils/debts/debtFormValidation.ts(260,37): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number | null'.
-  Type 'undefined' is not assignable to type 'number | null'.
-src/utils/debts/debtFormValidation.ts(261,5): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
-  Type 'undefined' is not assignable to type 'boolean'.
 src/utils/debug/dataDiagnostic.ts(113,59): error TS18046: 'error' is of type 'unknown'.
 src/utils/debug/dataDiagnostic.ts(123,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'VioletVaultDB'.
   No index signature with a parameter of type 'string' was found on type 'VioletVaultDB'.
@@ -3412,12 +3384,6 @@ src/utils/testing/storeTestUtils.ts(58,13): error TS7053: Element implicitly has
   No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/testing/storeTestUtils.ts(72,16): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'unknown'.
   No index signature with a parameter of type 'string' was found on type 'unknown'.
-src/utils/transactions/fileParser.ts(23,3): error TS2411: Property 'date' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(24,3): error TS2411: Property 'type' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(25,3): error TS2411: Property 'amount' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(26,3): error TS2411: Property 'id' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(27,3): error TS2411: Property 'description' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
-src/utils/transactions/fileParser.ts(28,3): error TS2411: Property 'notes' of type 'string | undefined' is not assignable to 'string' index type 'string | number'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
 src/utils/ui/touchFeedback.ts(41,19): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ light: number[]; medium: number[]; heavy: number[]; tap: number[]; confirm: number[]; error: number[]; success: number[]; warning: number[]; navigation: number[]; select: number[]; longPress: number[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ light: number[]; medium: number[]; heavy: number[]; tap: number[]; confirm: number[]; error: number[]; success: number[]; warning: number[]; navigation: number[]; select: number[]; longPress: number[]; }'.
