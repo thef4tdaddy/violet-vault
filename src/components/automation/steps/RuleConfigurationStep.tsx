@@ -1,5 +1,4 @@
-import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
+import { RULE_TYPES, type AutoFundingRule } from "@/utils/budgeting/autofunding";
 import FixedAmountConfig from "./config/FixedAmountConfig";
 import PercentageConfig from "./config/PercentageConfig";
 import SplitRemainderConfig from "./config/SplitRemainderConfig";

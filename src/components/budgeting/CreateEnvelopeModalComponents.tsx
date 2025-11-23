@@ -7,7 +7,7 @@ import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
 import AllocationModeSelector from "./shared/AllocationModeSelector";
 import BillConnectionSelector from "./shared/BillConnectionSelector";
-import { ENVELOPE_TYPES, type EnvelopeType } from "@/constants/categories";
+import { ENVELOPE_TYPES } from "@/constants/categories";
 
 interface ColorSelectorProps {
   selectedColor: string;
@@ -110,7 +110,7 @@ interface ModalContentProps {
   allBills: Bill[];
   onUpdateField: (field: string, value: unknown) => void;
   onBillSelection: (billId: string) => void;
-  onCreateBill?: (() => void) | null;
+  onCreateBill?: () => void;
   onCancel: () => void;
   onSubmit: () => void;
 }
