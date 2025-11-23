@@ -1,8 +1,18 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
+import type { Bill } from "@/types/bills";
 
-const BillTabs = ({ activeTab, onTabChange, bills }) => {
+interface BillTabsProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  bills: {
+    monthly?: Bill[];
+    longerTerm?: Bill[];
+  };
+}
+
+const BillTabs = ({ activeTab, onTabChange, bills }: BillTabsProps) => {
   return (
     <div className="border-b border-gray-200">
       <nav className="flex">

@@ -2,11 +2,19 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 
+interface BillTableHeaderProps {
+  selectionState: {
+    isAllSelected: boolean;
+  };
+  clearSelection: () => void;
+  selectAllBills: () => void;
+}
+
 /**
  * Table header component for BillTable
  * Extracted to reduce BillTable complexity
  */
-const BillTableHeader = ({ selectionState, clearSelection, selectAllBills }) => {
+const BillTableHeader = ({ selectionState, clearSelection, selectAllBills }: BillTableHeaderProps) => {
   return (
     <thead className="bg-gray-50 border-b-2 border-black">
       <tr>
