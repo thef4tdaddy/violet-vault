@@ -3,13 +3,18 @@ import { queryKeys } from "@/utils/common/queryClient";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 
+interface PaycheckItem {
+  date: string | number | Date;
+  amount: number;
+}
+
 /**
  * Hook for paycheck trends analytics data fetching and calculations
  */
 export const usePaycheckTrendsQuery = () => {
   // Get data from Zustand store
   const { paycheckHistory } = useBudgetStore(
-    useShallow((state: { paycheckHistory?: unknown[] }) => ({
+    useShallow((state: { paycheckHistory?: PaycheckItem[] }) => ({
       paycheckHistory: state.paycheckHistory || [],
     }))
   );
@@ -29,10 +34,10 @@ export const usePaycheckTrendsQuery = () => {
       // Sort paychecks by date
       const sortedPaychecks = [...paycheckHistory].sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      ) as typeof paycheckHistory;
+      );
 
       const averageAmount =
-        sortedPaychecks.reduce((sum, pc) => sum + pc.amount, 0) / sortedPaychecks.length;
+        sortedPaychecks.reduce((sum: number, pc) => sum + pc.amount, 0) / sortedPaychecks.length;
 
       // Calculate frequency (days between paychecks)
       const intervals: number[] = [];
@@ -57,8 +62,10 @@ export const usePaycheckTrendsQuery = () => {
       // Calculate growth rate (compare recent vs older paychecks)
       let growth = 0;
       if (sortedPaychecks.length >= 4) {
-        const recentAvg = sortedPaychecks.slice(-2).reduce((sum, pc) => sum + pc.amount, 0) / 2;
-        const olderAvg = sortedPaychecks.slice(0, 2).reduce((sum, pc) => sum + pc.amount, 0) / 2;
+        const recentAvg =
+          sortedPaychecks.slice(-2).reduce((sum: number, pc) => sum + pc.amount, 0) / 2;
+        const olderAvg =
+          sortedPaychecks.slice(0, 2).reduce((sum: number, pc) => sum + pc.amount, 0) / 2;
         growth = ((recentAvg - olderAvg) / olderAvg) * 100;
       }
 
@@ -68,7 +75,7 @@ export const usePaycheckTrendsQuery = () => {
         frequency,
         averageInterval,
         growth,
-        totalEarned: sortedPaychecks.reduce((sum, pc) => sum + pc.amount, 0),
+        totalEarned: sortedPaychecks.reduce((sum: number, pc) => sum + pc.amount, 0),
       };
     },
     staleTime: 10 * 60 * 1000, // 10 minutes

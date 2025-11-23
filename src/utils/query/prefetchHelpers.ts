@@ -52,7 +52,7 @@ export const prefetchHelpers = {
 
           // Fallback to direct database query
           const cached = await budgetDb.getEnvelopesByCategory(
-            filters.category,
+            filters.category ?? undefined,
             filters.includeArchived
           );
 
@@ -247,7 +247,7 @@ export const prefetchHelpers = {
   /**
    * Prefetch analytics data for a period
    */
-  prefetchAnalytics: async (queryClient, period = "month") => {
+  prefetchAnalytics: async (queryClient: QueryClient, period = "month") => {
     try {
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.analyticsReport("spending", { period }),
@@ -296,7 +296,7 @@ export const prefetchHelpers = {
   /**
    * Batch prefetch common dashboard queries
    */
-  prefetchDashboardBundle: async (queryClient) => {
+  prefetchDashboardBundle: async (queryClient: QueryClient) => {
     try {
       const prefetchPromises = [
         prefetchHelpers.prefetchDashboard(queryClient),
@@ -329,50 +329,63 @@ export const prefetchHelpers = {
       return null;
     }
   },
+};
 
-  /**
-   * Smart prefetch based on user navigation patterns
-   */
-  smartPrefetch: async (queryClient, currentRoute, _userHistory = []) => {
-    const prefetchMap = {
-      "/": ["dashboard", "envelopes", "bills"],
-      "/envelopes": ["envelopes", "transactions"],
-      "/transactions": ["transactions", "analytics"],
-      "/bills": ["bills", "dashboard"],
-      "/analytics": ["analytics", "transactions"],
-      "/goals": ["savingsGoals", "dashboard"],
-    };
+type RouteKey = "/" | "/envelopes" | "/transactions" | "/bills" | "/analytics" | "/goals";
+type EntityKey =
+  | "dashboard"
+  | "envelopes"
+  | "transactions"
+  | "bills"
+  | "analytics"
+  | "savingsGoals";
 
-    const entityPrefetchMap = {
-      dashboard: () => prefetchHelpers.prefetchDashboard(queryClient),
-      envelopes: () => prefetchHelpers.prefetchEnvelopes(queryClient),
-      transactions: () =>
-        prefetchHelpers.prefetchTransactions(queryClient, {
-          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-          end: new Date(),
-        }),
-      bills: () => prefetchHelpers.prefetchBills(queryClient),
-      analytics: () => prefetchHelpers.prefetchAnalytics(queryClient),
-      savingsGoals: () => prefetchHelpers.prefetchSavingsGoals(queryClient),
-    };
+/**
+ * Smart prefetch based on user navigation patterns
+ */
+export const smartPrefetch = async (
+  queryClient: QueryClient,
+  currentRoute: string,
+  _userHistory: string[] = []
+) => {
+  const prefetchMap: Record<RouteKey, EntityKey[]> = {
+    "/": ["dashboard", "envelopes", "bills"],
+    "/envelopes": ["envelopes", "transactions"],
+    "/transactions": ["transactions", "analytics"],
+    "/bills": ["bills", "dashboard"],
+    "/analytics": ["analytics", "transactions"],
+    "/goals": ["savingsGoals", "dashboard"],
+  };
 
-    const toPrefetch = prefetchMap[currentRoute] || [];
+  const entityPrefetchMap: Record<EntityKey, () => Promise<void | null>> = {
+    dashboard: () => prefetchHelpers.prefetchDashboard(queryClient),
+    envelopes: () => prefetchHelpers.prefetchEnvelopes(queryClient),
+    transactions: () =>
+      prefetchHelpers.prefetchTransactions(queryClient, {
+        start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        end: new Date(),
+      }),
+    bills: () => prefetchHelpers.prefetchBills(queryClient),
+    analytics: () => prefetchHelpers.prefetchAnalytics(queryClient),
+    savingsGoals: () => prefetchHelpers.prefetchSavingsGoals(queryClient),
+  };
 
-    try {
-      const prefetchPromises = toPrefetch
-        .map((entity) => entityPrefetchMap[entity])
-        .filter(Boolean)
-        .map((fn) => fn());
+  const toPrefetch = prefetchMap[currentRoute as RouteKey] || [];
 
-      await Promise.allSettled(prefetchPromises);
-      logger.debug(`Smart prefetch completed for route: ${currentRoute}`, {
-        entities: toPrefetch,
-      });
-    } catch (error) {
-      logger.warn("Smart prefetch failed", {
-        currentRoute,
-        error: (error as Error).message,
-      });
-    }
-  },
+  try {
+    const prefetchPromises = toPrefetch
+      .map((entity) => entityPrefetchMap[entity])
+      .filter(Boolean)
+      .map((fn) => fn());
+
+    await Promise.allSettled(prefetchPromises);
+    logger.debug(`Smart prefetch completed for route: ${currentRoute}`, {
+      entities: toPrefetch,
+    });
+  } catch (error) {
+    logger.warn("Smart prefetch failed", {
+      currentRoute,
+      error: (error as Error).message,
+    });
+  }
 };

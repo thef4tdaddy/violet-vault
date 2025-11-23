@@ -1,31 +1,42 @@
 import { useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
+interface ExecutionHistoryItem {
+  success?: boolean;
+  totalFunded?: number;
+  isUndo?: boolean;
+  trigger: string;
+  executedAt: string | number | Date;
+}
+
 /**
  * Hook for managing auto-funding execution statistics
  * Extracted from useAutoFundingHistory.js to reduce complexity
  */
 export const useExecutionStatistics = () => {
   // Get execution statistics
-  const getExecutionStatistics = useCallback((executionHistory) => {
+  const getExecutionStatistics = useCallback((executionHistory: ExecutionHistoryItem[]) => {
     try {
       const totalExecutions = executionHistory.length;
       const successfulExecutions = executionHistory.filter(
         (execution) => execution.success !== false
       );
       const totalFunded = executionHistory.reduce(
-        (sum, execution) => sum + Math.max(0, execution.totalFunded || 0),
+        (sum: number, execution) => sum + Math.max(0, execution.totalFunded || 0),
         0
       );
       const totalReversed = executionHistory
         .filter((execution) => execution.isUndo)
-        .reduce((sum, execution) => sum + Math.abs(execution.totalFunded || 0), 0);
+        .reduce((sum: number, execution) => sum + Math.abs(execution.totalFunded || 0), 0);
 
       // Group by trigger
-      const byTrigger = executionHistory.reduce((acc, execution) => {
-        acc[execution.trigger] = (acc[execution.trigger] || 0) + 1;
-        return acc;
-      }, {});
+      const byTrigger = executionHistory.reduce(
+        (acc: Record<string, number>, execution) => {
+          acc[execution.trigger] = (acc[execution.trigger] || 0) + 1;
+          return acc;
+        },
+        {}
+      );
 
       // Group by date (last 30 days)
       const last30Days = new Date();

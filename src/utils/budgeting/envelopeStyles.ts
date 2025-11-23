@@ -1,10 +1,24 @@
-import { ENVELOPE_TYPE_CONFIG, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import {
+  ENVELOPE_TYPE_CONFIG,
+  AUTO_CLASSIFY_ENVELOPE_TYPE,
+  EnvelopeType,
+} from "../../constants/categories";
+
+interface EnvelopeWithType {
+  envelopeType?: EnvelopeType;
+  category?: string;
+}
+
+interface EnvelopeWithStatus extends EnvelopeWithType {
+  status?: "overdue" | "overspent" | "underfunded" | "healthy";
+}
 
 /**
  * Get styling based on envelope type
  */
-export const getEnvelopeTypeStyle = (envelope) => {
-  const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+export const getEnvelopeTypeStyle = (envelope: EnvelopeWithType): string => {
+  const envelopeType =
+    envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "");
   const config = ENVELOPE_TYPE_CONFIG[envelopeType];
 
   if (!config) {
@@ -17,7 +31,7 @@ export const getEnvelopeTypeStyle = (envelope) => {
 /**
  * Get styling based on envelope status
  */
-export const getStatusStyle = (envelope) => {
+export const getStatusStyle = (envelope: EnvelopeWithStatus): string => {
   const { status } = envelope;
   // Status overrides envelope type styling for critical states
   switch (status) {
@@ -36,7 +50,7 @@ export const getStatusStyle = (envelope) => {
 /**
  * Get icon for envelope status
  */
-export const getStatusIcon = (status) => {
+export const getStatusIcon = (status: string | undefined): string => {
   switch (status) {
     case "overdue":
     case "overspent":
@@ -52,7 +66,10 @@ export const getStatusIcon = (status) => {
 /**
  * Get color classes for utilization rate display
  */
-export const getUtilizationColor = (utilizationRate, status) => {
+export const getUtilizationColor = (
+  utilizationRate: number,
+  status: string | undefined
+): string => {
   if (status === "overdue" || status === "overspent") {
     return "text-red-600 bg-red-100";
   }

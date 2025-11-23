@@ -3,15 +3,25 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
 
-const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory, viewMode = "overview" }) => {
-  const openUnassignedCashModal = useBudgetStore((state) => state.openUnassignedCashModal);
+const UnassignedCashEnvelope = ({
+  unassignedCash,
+  onViewHistory,
+  viewMode = "overview",
+}: {
+  unassignedCash: number;
+  onViewHistory?: (envelope: unknown) => void;
+  viewMode?: string;
+}) => {
+  const openUnassignedCashModal = useBudgetStore(
+    (state: { openUnassignedCashModal?: () => void }) => state.openUnassignedCashModal
+  );
   const isCollapsed = viewMode === "overview";
 
-  const handleClick = () => {
-    openUnassignedCashModal();
+  const handleClick = (): void => {
+    openUnassignedCashModal?.();
   };
 
-  const handleHistoryClick = (e) => {
+  const handleHistoryClick = (e: React.MouseEvent): void => {
     e.stopPropagation();
     // Create a virtual unassigned envelope for history viewing
     const unassignedEnvelope = {

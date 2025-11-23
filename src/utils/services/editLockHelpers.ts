@@ -5,10 +5,49 @@
 import { serverTimestamp } from "firebase/firestore";
 import logger from "../common/logger";
 
+interface User {
+  id?: string;
+  budgetId?: string;
+  userName?: string;
+}
+
+interface Auth {
+  currentUser: unknown;
+}
+
+interface LockResult {
+  valid: boolean;
+  reason?: string;
+  degraded?: boolean;
+}
+
+interface ExistingLock {
+  userId: string;
+  userName: string;
+  expiresAt: {
+    toDate(): Date;
+  };
+}
+
+interface HandleLockResult {
+  action: string;
+  existingLock?: ExistingLock;
+  result?: {
+    success: boolean;
+    reason: string;
+    lockedBy: string;
+    expiresAt: Date;
+  };
+}
+
 /**
  * Validate edit lock service prerequisites
  */
-export const validateLockPrerequisites = (budgetId, currentUser, auth) => {
+export const validateLockPrerequisites = (
+  budgetId: string | null | undefined,
+  currentUser: User | null | undefined,
+  auth: Auth
+): LockResult => {
   if (!budgetId || !currentUser) {
     logger.warn("EditLockService not initialized");
     return { valid: false, reason: "not_initialized" };
@@ -26,7 +65,7 @@ export const validateLockPrerequisites = (budgetId, currentUser, auth) => {
 /**
  * Generate consistent user ID for lock documents
  */
-export const generateUserId = (currentUser) => {
+export const generateUserId = (currentUser: User): string => {
   return (
     currentUser.id ||
     currentUser.budgetId ||
@@ -64,7 +103,11 @@ export const createLockDocument = (
 /**
  * Handle existing lock scenarios
  */
-export const handleExistingLock = async (existingLock, currentUser, releaseLockFn) => {
+export const handleExistingLock = async (
+  existingLock: ExistingLock | null | undefined,
+  currentUser: User,
+  releaseLockFn: () => Promise<void>
+): Promise<HandleLockResult> => {
   if (!existingLock) {
     return { action: "acquire_new" };
   }
@@ -112,11 +155,21 @@ export const createExtendedLock = (
 /**
  * Handle Firebase permission errors
  */
-export const handleLockError = (error, currentUser, budgetId) => {
+export const handleLockError = (
+  error: unknown,
+  currentUser: User | null | undefined,
+  budgetId: string | null | undefined
+): { success: boolean; reason: string; lockDoc?: null; error?: string } => {
+  const errorCode = error && typeof error === "object" && "code" in error ? error.code : null;
+  const errorMessage =
+    error && typeof error === "object" && "message" in error
+      ? String(error.message)
+      : String(error);
+
   // Handle Firebase permission errors gracefully
   if (
-    error.code === "permission-denied" ||
-    error.message?.includes("Missing or insufficient permissions")
+    errorCode === "permission-denied" ||
+    errorMessage?.includes("Missing or insufficient permissions")
   ) {
     logger.warn("❌ Edit locks unavailable - insufficient Firebase permissions", {
       userId: currentUser?.id,
@@ -126,5 +179,5 @@ export const handleLockError = (error, currentUser, budgetId) => {
   }
 
   logger.error("❌ Failed to acquire lock", error);
-  return { success: true, reason: "locks_disabled", error: error.message };
+  return { success: true, reason: "locks_disabled", error: errorMessage };
 };

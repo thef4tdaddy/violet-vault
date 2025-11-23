@@ -1,28 +1,54 @@
 import logger from "../common/logger";
 
-const validateDataStructure = (data) => {
+interface ImportedData {
+  envelopes?: unknown[];
+  exportMetadata?: { budgetId?: string };
+  allTransactions?: unknown[];
+  transactions?: unknown[];
+  bills?: unknown[];
+  savingsGoals?: unknown[];
+  debts?: unknown[];
+  auditLog?: unknown[];
+}
+
+interface CurrentUser {
+  budgetId?: string;
+}
+
+const validateDataStructure = (data: unknown): void => {
   if (!data || typeof data !== "object") {
     throw new Error("Invalid backup file: not a valid JSON object.");
   }
 
-  if (!data.envelopes || !Array.isArray(data.envelopes)) {
+  const typedData = data as ImportedData;
+  if (!typedData.envelopes || !Array.isArray(typedData.envelopes)) {
     throw new Error("Invalid backup file: missing or invalid envelopes data.");
   }
 };
 
-const checkBudgetIdMismatch = (importedData, currentUser) => {
+const checkBudgetIdMismatch = (
+  importedData: ImportedData,
+  currentUser: CurrentUser | null | undefined
+): boolean => {
   const importBudgetId = importedData.exportMetadata?.budgetId;
   const currentBudgetId = currentUser?.budgetId;
-  return importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId;
+  return Boolean(importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId);
 };
 
-const unifyTransactions = (importedData) => {
+const unifyTransactions = (importedData: ImportedData): unknown[] => {
   return Array.isArray(importedData.allTransactions)
     ? importedData.allTransactions
     : [...(importedData.transactions || []), ...(importedData.bills || [])];
 };
 
-export const validateImportedData = (importedData, currentUser) => {
+export const validateImportedData = (
+  importedData: ImportedData,
+  currentUser: CurrentUser | null | undefined
+): {
+  validatedData: ImportedData & { allTransactions: unknown[] };
+  hasBudgetIdMismatch: boolean;
+  importBudgetId: string | undefined;
+} => {
   logger.info("Validating imported data");
   validateDataStructure(importedData);
 

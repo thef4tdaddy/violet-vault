@@ -18,6 +18,13 @@ const SavingsGoals = ({
   onUpdateGoal,
   onDeleteGoal,
   onDistributeToGoals,
+}: {
+  savingsGoals?: unknown[];
+  unassignedCash?: number;
+  onAddGoal: (goal: unknown) => void;
+  onUpdateGoal: (id: string, updates: unknown) => void;
+  onDeleteGoal: (id: string) => void;
+  onDistributeToGoals: (amount: number, goals: unknown[]) => void;
 }) => {
   const {
     showDistributeModal,
