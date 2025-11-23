@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +4 |
-| TypeScript Errors | 40 | +40 |
-| TypeScript Strict Mode Errors | 2139 | +2139 |
+| ESLint Issues | 4 | 0 |
+| TypeScript Errors | 40 | 0 |
+| TypeScript Strict Mode Errors | 2134 | -5 |
 
-*Last updated: 2025-11-23 15:30:03 UTC*
+*Last updated: 2025-11-23 15:36:35 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -331,7 +331,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 5 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 5 errors in `src/utils/sync/syncFlowValidator.ts`
 - 5 errors in `src/utils/sync/syncEdgeCaseTester.ts`
-- 5 errors in `src/utils/dataManagement/dexieUtils.ts`
 - 5 errors in `src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 5 errors in `src/utils/budgeting/autofunding/conditions.ts`
 - 5 errors in `src/services/security/securityService.ts`
@@ -609,9 +608,9 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 632 | `TS7006` |
+| 628 | `TS7006` |
 | 609 | `TS7031` |
-| 183 | `TS2345` |
+| 182 | `TS2345` |
 | 154 | `TS2322` |
 | 128 | `TS2339` |
 | 112 | `TS18046` |
@@ -3068,11 +3067,6 @@ src/utils/common/toastHelpers.ts(117,16): error TS7006: Parameter 'error' implic
 src/utils/common/transactionArchiving.ts(255,11): error TS2322: Type 'null' is not assignable to type 'number'.
 src/utils/common/transactionArchiving.ts(423,9): error TS2322: Type 'null' is not assignable to type 'number'.
 src/utils/dataManagement/backupUtils.ts(45,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/dataManagement/dexieUtils.ts(4,27): error TS7006: Parameter 'table' implicitly has an 'any' type.
-src/utils/dataManagement/dexieUtils.ts(8,87): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/dataManagement/dexieUtils.ts(41,33): error TS7006: Parameter 'table' implicitly has an 'any' type.
-src/utils/dataManagement/dexieUtils.ts(41,40): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/utils/dataManagement/dexieUtils.ts(47,41): error TS7006: Parameter 'data' implicitly has an 'any' type.
 src/utils/dataManagement/fileUtils.ts(3,33): error TS7006: Parameter 'file' implicitly has an 'any' type.
 src/utils/dataManagement/fileUtils.ts(11,36): error TS18047: 'e.target' is possibly 'null'.
 src/utils/dataManagement/firebaseUtils.ts(15,74): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
