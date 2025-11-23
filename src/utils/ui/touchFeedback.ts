@@ -6,12 +6,40 @@
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
 
+import React from "react";
+
+export type HapticFeedbackType =
+  | "light"
+  | "medium"
+  | "heavy"
+  | "tap"
+  | "confirm"
+  | "error"
+  | "success"
+  | "warning"
+  | "navigation"
+  | "select"
+  | "longPress";
+
+export type TouchFeedbackType =
+  | "primary"
+  | "secondary"
+  | "card"
+  | "small"
+  | "tab"
+  | "destructive"
+  | "success"
+  | "fab"
+  | "envelope"
+  | "navigation"
+  | "comprehensive";
+
 /**
  * Provide haptic feedback on mobile devices
  * @param {number} duration - Vibration duration in milliseconds (default: 10)
  * @param {string} type - Type of feedback: 'light', 'medium', 'heavy', 'confirm' (default: 'light')
  */
-export const hapticFeedback = (duration = 10, type = "light") => {
+export const hapticFeedback = (duration = 10, type: HapticFeedbackType = "light"): boolean => {
   // Check if vibration is supported
   if (!("vibrate" in navigator) || typeof navigator.vibrate !== "function") {
     return false;
@@ -24,7 +52,7 @@ export const hapticFeedback = (duration = 10, type = "light") => {
   }
 
   // Enhanced patterns for different types of feedback
-  const patterns = {
+  const patterns: Record<HapticFeedbackType, number[]> = {
     light: [10],
     medium: [15],
     heavy: [25],
@@ -52,7 +80,7 @@ export const hapticFeedback = (duration = 10, type = "light") => {
 /**
  * Enhanced touch feedback classes for buttons and interactive elements
  */
-export const touchFeedbackClasses = {
+export const touchFeedbackClasses: Record<TouchFeedbackType, string> = {
   // Primary action buttons
   primary:
     "active:scale-95 active:brightness-95 transition-all duration-150 ease-out hover:scale-[1.02] hover:shadow-lg transform",
@@ -97,11 +125,14 @@ export const touchFeedbackClasses = {
 /**
  * Enhanced button event handlers with haptic feedback
  */
-export const withHapticFeedback = (originalHandler, feedbackType = "light") => {
-  return (event) => {
+export const withHapticFeedback = <T extends unknown[]>(
+  originalHandler: ((...args: T) => void) | undefined,
+  feedbackType: HapticFeedbackType = "light"
+) => {
+  return (...args: T) => {
     hapticFeedback(10, feedbackType);
     if (originalHandler) {
-      originalHandler(event);
+      originalHandler(...args);
     }
   };
 };
@@ -112,7 +143,10 @@ export const withHapticFeedback = (originalHandler, feedbackType = "light") => {
  * @param {string} touchType - Type of touch feedback (primary, secondary, card, small, tab)
  * @returns {string} Complete class string with touch feedback
  */
-export const getButtonClasses = (baseClasses, touchType = "primary") => {
+export const getButtonClasses = (
+  baseClasses: string,
+  touchType: TouchFeedbackType = "primary"
+): string => {
   const touchClasses = touchFeedbackClasses[touchType] || touchFeedbackClasses.primary;
 
   // Ensure transition classes are not duplicated
@@ -132,13 +166,16 @@ export const getButtonClasses = (baseClasses, touchType = "primary") => {
  * @param {string} touchType - Type of visual touch feedback
  * @returns {Object} Object with touch handlers and classes
  */
-export const useTouchFeedback = (hapticType = "tap", touchType = "primary") => {
-  const handleTouchStart = (_event) => {
+export const useTouchFeedback = (
+  hapticType: HapticFeedbackType = "tap",
+  touchType: TouchFeedbackType = "primary"
+) => {
+  const handleTouchStart = (_event: React.TouchEvent) => {
     hapticFeedback(10, hapticType);
   };
 
-  const handleClick = (originalHandler) => {
-    return (event) => {
+  const handleClick = <T extends unknown[]>(originalHandler?: (...args: T) => void) => {
+    return (...args: T) => {
       // Provide feedback on click for non-touch devices
       if (!("ontouchstart" in window)) {
         hapticFeedback(10, hapticType);
@@ -146,7 +183,7 @@ export const useTouchFeedback = (hapticType = "tap", touchType = "primary") => {
 
       // Call original handler
       if (originalHandler) {
-        originalHandler(event);
+        originalHandler(...args);
       }
     };
   };
