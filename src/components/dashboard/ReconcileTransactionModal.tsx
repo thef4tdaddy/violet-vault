@@ -5,7 +5,29 @@ import { getIcon } from "../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
-const ReconcileTransactionModal = ({
+interface EnvelopeOption {
+  id: string | number;
+  name: string;
+}
+
+interface NewTransaction {
+  type?: string;
+  amount?: string | number;
+  description?: string;
+  envelopeId?: string | number;
+  date?: string;
+}
+
+interface ReconcileTransactionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  newTransaction: NewTransaction;
+  onUpdateTransaction: (updates: Partial<NewTransaction>) => void;
+  onReconcile: () => void;
+  getEnvelopeOptions?: () => EnvelopeOption[];
+}
+
+const ReconcileTransactionModal: React.FC<ReconcileTransactionModalProps> = ({
   isOpen,
   onClose,
   newTransaction,

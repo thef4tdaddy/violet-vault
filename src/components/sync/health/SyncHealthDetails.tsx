@@ -9,37 +9,42 @@ import {
 } from "@/utils/common/syncHelpers";
 
 /**
- * @typedef {Object} RecoveryResult
- * @property {boolean} success - Whether recovery succeeded
- * @property {string} [message] - Recovery message
- * @property {string} [error] - Error message if failed
+ * Recovery result from sync health operations
  */
+interface RecoveryResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
 
 /**
- * @typedef {Object} SyncStatus
- * @property {'CHECKING'|'HEALTHY'|'ISSUES_DETECTED'|'ERROR'|'CRITICAL_FAILURE'} status - Current sync health status
- * @property {boolean|null} isHealthy - Whether sync is healthy
- * @property {string|null} lastChecked - ISO timestamp of last health check
- * @property {boolean} isLoading - Whether health check is in progress
- * @property {number} [failedTests] - Number of failed tests
- * @property {string} [error] - Error message if check failed
+ * Current sync health status
  */
+interface SyncStatus {
+  status: "CHECKING" | "HEALTHY" | "ISSUES_DETECTED" | "ERROR" | "CRITICAL_FAILURE";
+  isHealthy: boolean | null;
+  lastChecked: string | null;
+  isLoading: boolean;
+  failedTests?: number;
+  error?: string;
+  fullResults?: unknown;
+}
 
 /**
  * SyncHealthDetails component displays detailed sync health information
  * Shows status, test results, and recovery actions in a dropdown panel
- *
- * @param {Object} props - Component props
- * @param {SyncStatus} props.syncStatus - Current sync health status
- * @param {boolean} props.isBackgroundSyncing - Whether sync is currently running
- * @param {boolean} props.isRecovering - Whether recovery is in progress
- * @param {RecoveryResult|null} props.recoveryResult - Result of last recovery attempt
- * @param {Function} props.onRefresh - Callback to refresh health status
- * @param {Function} props.onRunValidation - Callback to run sync validation
- * @param {Function} props.onResetData - Callback to reset sync data
- * @returns {React.ReactElement} Rendered health details panel
  */
-const SyncHealthDetails = ({
+interface SyncHealthDetailsProps {
+  syncStatus: SyncStatus;
+  isBackgroundSyncing: boolean;
+  isRecovering: boolean;
+  recoveryResult: RecoveryResult | null;
+  onRefresh: () => void;
+  onRunValidation: () => void;
+  onResetData: () => void;
+}
+
+const SyncHealthDetails: React.FC<SyncHealthDetailsProps> = ({
   syncStatus,
   isBackgroundSyncing,
   isRecovering,
@@ -97,7 +102,7 @@ const SyncHealthDetails = ({
         )}
 
         {/* Failed Tests */}
-        {syncStatus.failedTests > 0 && (
+        {(syncStatus.failedTests ?? 0) > 0 && (
           <div className="bg-gradient-to-r from-yellow-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-yellow-200 shadow-sm">
             <p className="text-xs font-bold text-orange-800">
               {syncStatus.failedTests} validation test
