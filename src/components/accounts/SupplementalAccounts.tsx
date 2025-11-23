@@ -33,12 +33,17 @@ interface Envelope {
 
 interface SupplementalAccountsProps {
   supplementalAccounts?: unknown[];
-  onAddAccount: unknown;
-  onUpdateAccount: unknown;
-  onDeleteAccount: unknown;
-  onTransferToEnvelope: unknown;
+  onAddAccount: (account: Account) => void;
+  onUpdateAccount: (account: Account) => void;
+  onDeleteAccount: (accountId: string) => void;
+  onTransferToEnvelope: (transfer: {
+    accountId: string;
+    envelopeId: string;
+    amount: number;
+    description: string;
+  }) => void;
   envelopes?: unknown[];
-  currentUser?: unknown;
+  currentUser?: { userName: string; userColor: string };
 }
 
 const SupplementalAccounts = ({
@@ -87,10 +92,23 @@ const SupplementalAccounts = ({
     expiringAccounts,
   } = useSupplementalAccounts({
     supplementalAccounts: supplementalAccounts as never[],
-    onAddAccount,
-    onUpdateAccount,
-    onDeleteAccount,
-    onTransferToEnvelope,
+    onAddAccount: onAddAccount as unknown as (account: {
+      id: string;
+      name: string;
+      [key: string]: unknown;
+    }) => void,
+    onUpdateAccount: onUpdateAccount as unknown as (account: {
+      id: string;
+      name: string;
+      [key: string]: unknown;
+    }) => void,
+    onDeleteAccount: onDeleteAccount as unknown as (accountId: string) => void,
+    onTransferToEnvelope: onTransferToEnvelope as unknown as (transfer: {
+      accountId: string;
+      envelopeId: string;
+      amount: number;
+      description: string;
+    }) => void,
     envelopes: envelopes as never[],
     currentUser: currentUser as { userName: string; userColor: string } | undefined,
   });
@@ -126,9 +144,9 @@ const SupplementalAccounts = ({
         <AccountsGrid
           accounts={typedAccounts}
           showBalances={showBalances}
-          onEdit={startEdit}
+          onEdit={startEdit as unknown as (account: Account) => void}
           onDelete={handleDelete}
-          onStartTransfer={startTransfer}
+          onStartTransfer={startTransfer as unknown as (account: Account) => void}
         />
       </div>
 
@@ -151,7 +169,13 @@ const SupplementalAccounts = ({
         isOpen={showTransferModal}
         onClose={handleCloseTransferModal}
         onTransfer={handleTransfer}
-        transferringAccount={transferringAccount}
+        transferringAccount={
+          transferringAccount as unknown as {
+            id: string | number;
+            name: string;
+            currentBalance: number;
+          }
+        }
         transferForm={transferForm}
         setTransferForm={setTransferForm}
         envelopes={typedEnvelopes}

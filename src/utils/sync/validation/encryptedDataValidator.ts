@@ -22,7 +22,10 @@ interface ValidationResult {
 /**
  * Validate encrypted data structure before decryption
  */
-export const validateEncryptedData = (encryptedData: EncryptedData | null | undefined, operation = "unknown"): ValidationResult => {
+export const validateEncryptedData = (
+  encryptedData: EncryptedData | null | undefined,
+  operation = "unknown"
+): ValidationResult => {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -52,7 +55,12 @@ export const validateEncryptedData = (encryptedData: EncryptedData | null | unde
  * Validate data sizes to prevent corruption errors
  * @private
  */
-const _validateDataSizes = (encryptedData: EncryptedData, operation: string, errors: string[], warnings: string[]): ValidationResult => {
+const _validateDataSizes = (
+  encryptedData: EncryptedData,
+  operation: string,
+  errors: string[],
+  warnings: string[]
+): ValidationResult => {
   try {
     const dataLength = encryptedData.data.length;
     const ivLength = encryptedData.iv.length;
@@ -84,7 +92,8 @@ const _validateDataSizes = (encryptedData: EncryptedData, operation: string, err
 
     return _buildValidationResult(encryptedData, errors, warnings, operation);
   } catch (validationError) {
-    const errorMsg = validationError instanceof Error ? validationError.message : String(validationError);
+    const errorMsg =
+      validationError instanceof Error ? validationError.message : String(validationError);
     errors.push(`Data validation error: ${errorMsg}`);
     return { isValid: false, errors, warnings };
   }
@@ -94,7 +103,12 @@ const _validateDataSizes = (encryptedData: EncryptedData, operation: string, err
  * Build validation result object
  * @private
  */
-const _buildValidationResult = (encryptedData: EncryptedData, errors: string[], warnings: string[], operation: string): ValidationResult & { dataLength: number; ivLength: number } => {
+const _buildValidationResult = (
+  encryptedData: EncryptedData,
+  errors: string[],
+  warnings: string[],
+  operation: string
+): ValidationResult & { dataLength: number; ivLength: number } => {
   const result = {
     isValid: errors.length === 0,
     errors,

@@ -288,7 +288,8 @@ class PatchNotesManager {
       hasCache: !!this.changelogCache,
       isValid,
       cacheAge: this.cacheTimestamp ? now - this.cacheTimestamp : 0,
-      timeUntilExpiry: isValid && this.cacheTimestamp !== null ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
+      timeUntilExpiry:
+        isValid && this.cacheTimestamp !== null ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
     };
   }
 }

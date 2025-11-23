@@ -29,7 +29,11 @@ const SmartBillMatcher = ({
   onSuggestEnvelope: (envelope: Envelope) => void;
   searchQuery: string;
 }) => {
-  const suggestions = useSmartBillSuggestions(bills, envelopes, searchQuery) as Suggestion[];
+  const suggestions = useSmartBillSuggestions(
+    bills as Array<{ id: string; name: string; [key: string]: unknown }>,
+    envelopes as Array<{ id: string; name: string; [key: string]: unknown }>,
+    searchQuery
+  ) as unknown as Suggestion[];
 
   if (!searchQuery || suggestions.length === 0) {
     return null;

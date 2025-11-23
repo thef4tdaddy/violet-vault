@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from "react";
+import React, { useRef, useCallback, useEffect } from "react";
 import { useFABSelectors, useFABActions } from "../../stores/ui/fabStore";
 import { hapticFeedback } from "../../utils/ui/touchFeedback";
 
@@ -7,7 +7,7 @@ import { hapticFeedback } from "../../utils/ui/touchFeedback";
  */
 const useLongPress = (callback: (event: unknown) => void, threshold = 500) => {
   const isLongPress = useRef(false);
-  const timeout = useRef<NodeJS.Timeout | null>(null);
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const start = useCallback(
     (event: unknown) => {

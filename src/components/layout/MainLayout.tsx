@@ -474,14 +474,14 @@ const MainContentLayoutView = ({
           onClose={() => settings.close()}
           initialSection={settings.initialSection}
           onExport={onExport}
-          onImport={onImport}
+          onImport={onImport as unknown as () => void}
           onLogout={onLogout}
           onResetEncryption={() => {
             resetAllData();
             onResetEncryption();
           }}
           onSync={onManualSync}
-          onChangePassword={onChangePassword}
+          onChangePassword={onChangePassword as unknown as (password: string) => void}
           currentUser={currentUser}
           isLocalOnlyMode={isLocalOnlyMode}
           securityManager={securityManager}

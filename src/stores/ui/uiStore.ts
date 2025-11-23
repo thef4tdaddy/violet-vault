@@ -10,6 +10,7 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 /**
  * Transform old data format to new format
  */
+// eslint-disable-next-line complexity -- Complex data transformation with multiple nested conditions
 const transformOldData = (parsedOldData: { state?: Record<string, unknown> }) => ({
   state: {
     envelopes: (parsedOldData.state?.envelopes as unknown[]) || [],

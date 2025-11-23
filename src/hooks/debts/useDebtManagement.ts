@@ -59,6 +59,7 @@ interface ConnectionData {
 
 type CreateDebtPayload = DebtFormData & { connectionData?: ConnectionData; paymentDueDate: string };
 
+// eslint-disable-next-line max-lines-per-function, max-statements -- Complex hook managing debt operations, bill/envelope connections, and data transformations
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
   const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
@@ -75,8 +76,8 @@ export const useDebtManagement = () => {
 
   const { createEnvelopeWrapper, createBillWrapper, updateBillWrapper, createTransactionWrapper } =
     createAPIWrappers(
-      addEnvelopeAsync,
-      createEnvelope,
+      addEnvelopeAsync as unknown as (data: unknown) => unknown,
+      createEnvelope as unknown as (data: unknown) => unknown,
       addBillAsync,
       (id: string, updates: unknown) =>
         updateBillAsync({ billId: id, updates: updates as Record<string, unknown> }),
@@ -84,9 +85,71 @@ export const useDebtManagement = () => {
     );
 
   const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
-  const createDebtData = debtsHook?.addDebtAsync;
-  const updateDebtData = debtsHook?.updateDebtAsync;
-  const deleteDebtData = debtsHook?.deleteDebtAsync;
+
+  // Wrap mutation functions to match expected types
+  const createDebtDataWrapper = () => {
+    if (!debtsHook?.addDebtAsync) return undefined;
+    return async (data: {
+      name: string;
+      minimumPayment: number;
+      paymentDueDate: string;
+      paymentFrequency: string;
+      currentBalance?: number;
+      interestRate?: number;
+    }) => {
+      const result = await debtsHook.addDebtAsync(data as { [key: string]: unknown });
+      return { id: result.id };
+    };
+  };
+
+  const updateDebtDataWrapper = () => {
+    if (!debtsHook?.updateDebtAsync) return undefined;
+    return (async (params: {
+      id: string;
+      updates:
+        | {
+            id: string;
+            name: string;
+            currentBalance: number;
+            minimumPayment: number;
+            [key: string]: unknown;
+          }
+        | Partial<{
+            id: string;
+            name: string;
+            currentBalance: number;
+            minimumPayment: number;
+            [key: string]: unknown;
+          }>;
+      author?: string;
+    }) => {
+      await debtsHook.updateDebtAsync({
+        id: params.id,
+        updates: params.updates as Record<string, unknown>,
+        author: params.author,
+      });
+    }) as unknown as (params: {
+      id: string;
+      updates: {
+        id: string;
+        name: string;
+        currentBalance: number;
+        minimumPayment: number;
+        [key: string]: unknown;
+      };
+    }) => Promise<void>;
+  };
+
+  const deleteDebtDataWrapper = () => {
+    if (!debtsHook?.deleteDebtAsync) return undefined;
+    return async (params: { id: string }) => {
+      await debtsHook.deleteDebtAsync(params);
+    };
+  };
+
+  const createDebtData = createDebtDataWrapper();
+  const updateDebtData = updateDebtDataWrapper();
+  const deleteDebtData = deleteDebtDataWrapper();
 
   const enrichedDebts = useMemo(
     () =>
@@ -180,9 +243,8 @@ export const useDebtManagement = () => {
     return updateDebtOperation({ debtId, updates, author, updateDebtData });
   };
 
-  const deleteDebt = async (debtId: string) => {
-    if (!deleteDebtData || !deleteBillAsync) throw new Error("Delete functions not available");
-    const transformedBills = (bills || []).map((bill) => {
+  const transformBillsForDelete = () => {
+    return (bills || []).map((bill) => {
       const tb = makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId);
       return {
         ...tb,
@@ -193,6 +255,11 @@ export const useDebtManagement = () => {
           : undefined,
       } as unknown as HelperBill & Record<string, unknown>;
     });
+  };
+
+  const deleteDebt = async (debtId: string) => {
+    if (!deleteDebtData || !deleteBillAsync) throw new Error("Delete functions not available");
+    const transformedBills = transformBillsForDelete();
     await deleteDebtOperation({
       debtId,
       bills: transformedBills as unknown as HelperBill[],

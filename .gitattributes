@@ -1,6 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Audit reports: Use 'ours' strategy to avoid merge conflicts
+# Audit reports: Always use develop branch version to avoid merge conflicts
 # audit-report.md is tracked (main report), other files are ignored
-docs/audits/audit-report.md merge=ours
+docs/audits/audit-report.md merge=develop-ours

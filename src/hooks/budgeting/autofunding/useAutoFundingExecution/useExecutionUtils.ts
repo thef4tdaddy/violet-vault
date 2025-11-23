@@ -27,6 +27,7 @@ interface Budget {
  * Hook for utility functions like simulation and planning
  * Extracted from useAutoFundingExecution.js for better maintainability
  */
+// eslint-disable-next-line max-lines-per-function -- Complex hook managing multiple execution utilities
 export const useExecutionUtils = (budget: Budget) => {
   // Execute a single transfer using the budget store
   const executeTransfer = useCallback(

@@ -45,7 +45,7 @@ export const useReportExporter = () => {
       await generatePDFReport(
         analyticsData,
         balanceData,
-        timeFilter,
+        timeFilter as string,
         exportOptions,
         setExportProgress
       );
@@ -55,7 +55,17 @@ export const useReportExporter = () => {
 
   const exportToCSV = useCallback(async (analyticsData: unknown) => {
     setExportProgress(10);
-    const csvContent = convertToCSV(analyticsData);
+    const csvContent = convertToCSV(
+      analyticsData as {
+        transactions?: Array<{
+          date?: string;
+          description?: string;
+          amount?: number;
+          category?: string;
+          envelopeName?: string;
+        }>;
+      }
+    );
     setExportProgress(80);
 
     const fileName = `VioletVault-Data-${new Date().toISOString().split("T")[0]}.csv`;
@@ -126,7 +136,18 @@ export const useReportExporter = () => {
   const applyTemplate = useCallback((template: string) => {
     const templateOptions = getTemplateOptions(template);
     if (templateOptions) {
-      setExportOptions((prev) => ({ ...prev, ...templateOptions }));
+      setExportOptions(
+        (prev) =>
+          ({ ...prev, ...templateOptions }) as {
+            includeSummary: boolean;
+            includeCharts: boolean;
+            includeTransactions: boolean;
+            includeEnvelopes: boolean;
+            includeSavings: boolean;
+            includeInsights: boolean;
+            customDateRange: null | { start: string; end: string };
+          }
+      );
     }
   }, []);
 

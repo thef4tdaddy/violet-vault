@@ -3,7 +3,7 @@
  * Handles payment recording, deletion, progress calculation, and modal actions
  */
 
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useConfirm } from "../common/useConfirm";
 import type { DebtAccount, PayoffProjection } from "@/types/debt";
 

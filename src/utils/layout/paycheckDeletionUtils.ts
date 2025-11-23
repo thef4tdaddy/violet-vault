@@ -14,7 +14,10 @@ interface Paycheck {
 /**
  * Validate paycheck deletion parameters
  */
-export const validatePaycheckDeletion = (paycheckId: string | number, paycheckHistory: Paycheck[]): Paycheck => {
+export const validatePaycheckDeletion = (
+  paycheckId: string | number,
+  paycheckHistory: Paycheck[]
+): Paycheck => {
   if (!paycheckId) {
     throw new Error("Paycheck ID is required for deletion");
   }
@@ -37,7 +40,15 @@ export const validatePaycheckDeletion = (paycheckId: string | number, paycheckHi
 /**
  * Reverse envelope allocations for deleted paycheck
  */
-export const reverseEnvelopeAllocations = async (paycheckToDelete: Paycheck, budgetDb: { envelopes: { get: (id: string | number) => Promise<unknown>; update: (id: string | number, data: unknown) => Promise<void> } }): Promise<number> => {
+export const reverseEnvelopeAllocations = async (
+  paycheckToDelete: Paycheck,
+  budgetDb: {
+    envelopes: {
+      get: (id: string | number) => Promise<unknown>;
+      update: (id: string | number, data: unknown) => Promise<void>;
+    };
+  }
+): Promise<number> => {
   if (paycheckToDelete.mode !== "allocate" || !paycheckToDelete.envelopeAllocations) {
     return 0;
   }
@@ -69,7 +80,21 @@ export const reverseEnvelopeAllocations = async (paycheckToDelete: Paycheck, bud
 /**
  * Calculate new balances after paycheck deletion
  */
-export const calculateReversedBalances = async (paycheckToDelete: Paycheck, budgetDb: { envelopes: { get: (id: string | number) => Promise<unknown>; update: (id: string | number, data: unknown) => Promise<void> } }, getBudgetMetadata: () => Promise<{ actualBalance?: number; unassignedCash?: number } | null>): Promise<{ currentActualBalance: number; currentUnassignedCash: number; newActualBalance: number; newUnassignedCash: number }> => {
+export const calculateReversedBalances = async (
+  paycheckToDelete: Paycheck,
+  budgetDb: {
+    envelopes: {
+      get: (id: string | number) => Promise<unknown>;
+      update: (id: string | number, data: unknown) => Promise<void>;
+    };
+  },
+  getBudgetMetadata: () => Promise<{ actualBalance?: number; unassignedCash?: number } | null>
+): Promise<{
+  currentActualBalance: number;
+  currentUnassignedCash: number;
+  newActualBalance: number;
+  newUnassignedCash: number;
+}> => {
   // Get current metadata
   const currentMetadata = await getBudgetMetadata();
   const currentActualBalance = currentMetadata?.actualBalance || 0;
@@ -100,7 +125,10 @@ export const calculateReversedBalances = async (paycheckToDelete: Paycheck, budg
 /**
  * Delete paycheck record from database
  */
-export const deletePaycheckRecord = async (paycheckId: string | number, budgetDb: { paycheckHistory: { delete: (id: string | number) => Promise<void> } }): Promise<void> => {
+export const deletePaycheckRecord = async (
+  paycheckId: string | number,
+  budgetDb: { paycheckHistory: { delete: (id: string | number) => Promise<void> } }
+): Promise<void> => {
   logger.info("Deleting paycheck from Dexie", {
     paycheckId,
     paycheckIdType: typeof paycheckId,
@@ -121,7 +149,10 @@ export const deletePaycheckRecord = async (paycheckId: string | number, budgetDb
 /**
  * Invalidate query caches after paycheck deletion
  */
-export const invalidatePaycheckCaches = async (queryClient: { invalidateQueries: (opts: unknown) => Promise<void> }, queryKeys: { paycheckHistory: unknown[]; budgetMetadata: unknown[] }): Promise<void> => {
+export const invalidatePaycheckCaches = async (
+  queryClient: { invalidateQueries: (opts: unknown) => Promise<void> },
+  queryKeys: { paycheckHistory: unknown[]; budgetMetadata: unknown[] }
+): Promise<void> => {
   queryClient.invalidateQueries({
     queryKey: queryKeys.paycheckHistory(),
   });

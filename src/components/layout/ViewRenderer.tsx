@@ -256,10 +256,51 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     supplemental: (
       <SupplementalAccounts
         supplementalAccounts={budgetOps.supplementalAccounts as Array<Record<string, unknown>>}
-        onAddAccount={budgetOps.addSupplementalAccount}
-        onUpdateAccount={budgetOps.updateSupplementalAccount}
-        onDeleteAccount={budgetOps.deleteSupplementalAccount}
-        onTransferToEnvelope={budgetOps.transferFromSupplementalAccount}
+        onAddAccount={
+          budgetOps.addSupplementalAccount as unknown as (account: {
+            id: string | number;
+            name: string;
+            type: string;
+            currentBalance: number;
+            annualContribution: number;
+            expirationDate: string | null;
+            description: string | null;
+            color: string;
+            isActive: boolean;
+            createdBy: string;
+            createdAt: string;
+            lastUpdated: string;
+            transactions: unknown[];
+          }) => void
+        }
+        onUpdateAccount={
+          budgetOps.updateSupplementalAccount as unknown as (account: {
+            id: string | number;
+            name: string;
+            type: string;
+            currentBalance: number;
+            annualContribution: number;
+            expirationDate: string | null;
+            description: string | null;
+            color: string;
+            isActive: boolean;
+            createdBy: string;
+            createdAt: string;
+            lastUpdated: string;
+            transactions: unknown[];
+          }) => void
+        }
+        onDeleteAccount={
+          budgetOps.deleteSupplementalAccount as unknown as (accountId: string) => void
+        }
+        onTransferToEnvelope={
+          budgetOps.transferFromSupplementalAccount as unknown as (transfer: {
+            accountId: string;
+            envelopeId: string;
+            amount: number;
+            description: string;
+          }) => void
+        }
         envelopes={envelopes}
         currentUser={user}
       />

@@ -194,7 +194,9 @@ export const useBillManager = ({
   );
 
   const uiActions = createUIActions({
-    setSelectedBills: uiState.setSelectedBills as (bills: Bill[]) => void,
+    setSelectedBills: ((bills: Set<string>) => {
+      uiState.setSelectedBills(bills);
+    }) as unknown as (bills: Set<string>) => void,
     setViewMode: uiState.setViewMode,
     setShowBillDetail: uiState.setShowBillDetail as (bill: Bill | null) => void,
     setShowAddBillModal: uiState.setShowAddBillModal,

@@ -104,7 +104,7 @@ const ReportExporter = ({
 
             {/* Export Options */}
             <ExportOptionsForm
-              exportOptions={exportOptions}
+              exportOptions={exportOptions as unknown as Record<string, boolean>}
               timeFilter={timeFilter}
               onOptionChange={handleOptionChange}
               disabled={isExporting}

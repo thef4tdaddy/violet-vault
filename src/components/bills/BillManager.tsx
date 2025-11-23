@@ -151,7 +151,15 @@ const BillManager = ({
 
       {/* View Tabs and Filters */}
       <BillViewTabs
-        viewModes={viewModes}
+        viewModes={
+          viewModes as Array<{
+            id: string;
+            label: string;
+            count?: number;
+            icon?: string;
+            color?: string;
+          }>
+        }
         viewMode={viewMode}
         setViewMode={setViewMode}
         filterOptions={filterOptions}
