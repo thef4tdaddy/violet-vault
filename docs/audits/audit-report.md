@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | +1 |
-| TypeScript Errors | 0 | 0 |
-| TypeScript Strict Mode Errors | 2213 | -13 |
+| ESLint Issues | 6 | +2 |
+| TypeScript Errors | 41 | +1 |
+| TypeScript Strict Mode Errors | 2106 | -12 |
 
-*Last updated: 2025-11-22 18:28:06 UTC*
+*Last updated: 2025-11-23 13:56:37 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,16 +27,26 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 1 | `max-lines-per-function` |
+| 3 | `no-undef` |
+| 3 | `max-lines-per-function` |
 
 ### Detailed Lint Report
 ```
+/home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx:27:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:18 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts:10:26 - 1 - 'NodeJS' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts:46:17 - 1 - 'React' is not defined. (no-undef)
 ```
 
 ## Typecheck Audit
@@ -64,7 +74,109 @@
 | 1 | `TS2719` |
 | 1 | `TS2352` |
 
-Last check: 2025-11-22 18:27:50 UTC
+### Detailed Type Error Report
+```
+src/components/accounts/SupplementalAccounts.tsx(90,5): error TS2322: Type 'unknown' is not assignable to type '(account: Account) => void'.
+  Type '{}' provides no match for the signature '(account: Account): void'.
+src/components/accounts/SupplementalAccounts.tsx(91,5): error TS2322: Type 'unknown' is not assignable to type '(account: Account) => void'.
+  Type '{}' provides no match for the signature '(account: Account): void'.
+src/components/accounts/SupplementalAccounts.tsx(92,5): error TS2322: Type 'unknown' is not assignable to type '(accountId: string) => void'.
+  Type '{}' provides no match for the signature '(accountId: string): void'.
+src/components/accounts/SupplementalAccounts.tsx(93,5): error TS2322: Type 'unknown' is not assignable to type '(transfer: { accountId: string; envelopeId: string; amount: number; description: string; }) => void'.
+  Type '{}' provides no match for the signature '(transfer: { accountId: string; envelopeId: string; amount: number; description: string; }): void'.
+src/components/accounts/SupplementalAccounts.tsx(129,11): error TS2719: Type '(account: Account) => void' is not assignable to type '(account: Account) => void'. Two different types with this name exist, but they are unrelated.
+  Types of parameters 'account' and 'account' are incompatible.
+    Type 'Account' is not assignable to type 'Account'. Two different types with this name exist, but they are unrelated.
+      Types of property 'id' are incompatible.
+        Type 'string | number' is not assignable to type 'string'.
+          Type 'number' is not assignable to type 'string'.
+src/components/accounts/SupplementalAccounts.tsx(131,11): error TS2322: Type '(account: TransferringAccount) => void' is not assignable to type '(account: Account) => void'.
+  Types of parameters 'account' and 'account' are incompatible.
+    Type 'Account' is not assignable to type 'TransferringAccount'.
+      Types of property 'id' are incompatible.
+        Type 'string | number' is not assignable to type 'string'.
+          Type 'number' is not assignable to type 'string'.
+src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2741: Property 'currentBalance' is missing in type 'TransferringAccount' but required in type 'TransferringAccount'.
+src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' is not assignable to type 'Record<string, boolean>'.
+  Property 'customDateRange' is incompatible with index signature.
+    Type '{ start: string; end: string; }' is not assignable to type 'boolean'.
+src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; }>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/components/settings/SettingsDashboard.tsx(162,13): error TS2322: Type '(password: string) => void' is not assignable to type '(current: string, newPass: string) => Promise<AuthResult>'.
+  Type 'void' is not assignable to type 'Promise<AuthResult>'.
+src/hooks/accounts/useSupplementalAccounts.ts(109,44): error TS2345: Argument of type 'Account' is not assignable to parameter of type 'Account'.
+  Type 'Account' is missing the following properties from type 'Account': type, currentBalance, color, isActive
+src/hooks/accounts/useSupplementalAccounts.ts(134,7): error TS2322: Type '(account: Account) => void' is not assignable to type '(id: string, data: unknown) => void'.
+  Types of parameters 'account' and 'id' are incompatible.
+    Type 'string' is not assignable to type 'Account'.
+src/hooks/accounts/useSupplementalAccounts.ts(143,22): error TS2345: Argument of type 'Account' is not assignable to parameter of type 'Account'.
+  Type 'Account' is missing the following properties from type 'Account': type, currentBalance, color, isActive
+src/hooks/accounts/useSupplementalAccounts.ts(157,7): error TS2345: Argument of type 'TransferringAccount' is not assignable to parameter of type 'Account'.
+  Type 'TransferringAccount' is missing the following properties from type 'Account': type, currentBalance, color, isActive
+src/hooks/accounts/useSupplementalAccounts.ts(172,35): error TS2345: Argument of type 'TransferringAccount' is not assignable to parameter of type 'TransferringAccount'.
+  Property 'currentBalance' is missing in type 'TransferringAccount' but required in type 'TransferringAccount'.
+src/hooks/analytics/useReportExporter.ts(48,9): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/hooks/analytics/useReportExporter.ts(112,41): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/hooks/analytics/useReportExporter.ts(129,24): error TS2345: Argument of type '(prev: { includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }) => { ...; }' is not assignable to parameter of type 'SetStateAction<{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }>'.
+  Type '(prev: { includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }) => { ...; }' is not assignable to type '(prevState: { includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }) => { ...; }'.
+    Call signature return types '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: unknown; }' and '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' are incompatible.
+      The types of 'customDateRange' are incompatible between these types.
+        Type '{}' is missing the following properties from type '{ start: string; end: string; }': start, end
+src/hooks/bills/useBillManager.ts(197,5): error TS2322: Type '(bills: Bill[]) => void' is not assignable to type '(bills: Set<string>) => void'.
+  Types of parameters 'bills' and 'bills' are incompatible.
+    Type 'Set<string>' is missing the following properties from type 'Bill[]': length, pop, push, concat, and 24 more.
+src/hooks/bills/useBillManager.ts(197,23): error TS2352: Conversion of type 'Dispatch<SetStateAction<Set<unknown>>>' to type '(bills: Bill[]) => void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of parameters 'value' and 'bills' are incompatible.
+    Type 'Bill[]' is not comparable to type 'SetStateAction<Set<unknown>>'.
+      Type 'Bill[]' is missing the following properties from type 'Set<unknown>': add, clear, delete, has, and 2 more.
+src/hooks/budgeting/usePaycheckForm.ts(67,40): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
+  Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
+src/hooks/budgeting/usePaycheckForm.ts(77,58): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
+  Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
+src/hooks/budgeting/usePaycheckForm.ts(111,85): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
+  Type '{}' is missing the following properties from type 'Envelope': id, name, category, archived, lastModified
+src/hooks/budgeting/usePaycheckForm.ts(143,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type '{}'.
+src/hooks/budgeting/usePaycheckForm.ts(174,64): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
+  Type '{}' is missing the following properties from type 'Envelope': id, name, category, archived, lastModified
+src/hooks/budgeting/usePaycheckForm.ts(208,70): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
+  Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
+src/hooks/debts/useDebtManagement.ts(134,7): error TS2322: Type 'UseMutateAsyncFunction<{ id?: string; status: string; author?: string; }, Error, { [key: string]: unknown; id?: string; status?: string; author?: string; }, unknown>' is not assignable to type '(data: DebtData) => Promise<CreatedDebt>'.
+  Types of parameters 'variables' and 'data' are incompatible.
+    Type 'DebtData' is not assignable to type '{ [key: string]: unknown; id?: string; status?: string; author?: string; }'.
+      Index signature for type 'string' is missing in type 'DebtData'.
+src/hooks/debts/useDebtManagement.ts(148,7): error TS2322: Type 'UseMutateAsyncFunction<{ id: string; }, Error, { id: string; updates: Record<string, unknown>; author?: string; }, unknown>' is not assignable to type '(params: { id: string; updates: Debt; }) => Promise<void>'.
+  Types of parameters 'variables' and 'params' are incompatible.
+    Type '{ id: string; updates: Debt; }' is not assignable to type '{ id: string; updates: Record<string, unknown>; author?: string; }'.
+      Types of property 'updates' are incompatible.
+        Type 'Debt' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'Debt'.
+src/hooks/debts/useDebtManagement.ts(161,7): error TS2322: Type 'UseMutateAsyncFunction<{ id: string; }, Error, { id: string; updates: Record<string, unknown>; author?: string; }, unknown>' is not assignable to type '(params: { id: string; updates: Partial<Debt>; }) => Promise<void>'.
+  Type 'Promise<{ id: string; }>' is not assignable to type 'Promise<void>'.
+    Type '{ id: string; }' is not assignable to type 'void'.
+src/hooks/debts/useDebtManagement.ts(170,7): error TS2322: Type 'UseMutateAsyncFunction<{ id: string; }, Error, { id: string; updates: Record<string, unknown>; author?: string; }, unknown>' is not assignable to type '(params: { id: string; updates: Partial<Debt>; }) => Promise<void>'.
+  Type 'Promise<{ id: string; }>' is not assignable to type 'Promise<void>'.
+    Type '{ id: string; }' is not assignable to type 'void'.
+src/hooks/debts/useDebtManagement.ts(180,59): error TS2322: Type 'UseMutateAsyncFunction<{ id: string; }, Error, { id: string; updates: Record<string, unknown>; author?: string; }, unknown>' is not assignable to type '(params: { id: string; updates: Partial<Debt>; author?: string; }) => Promise<void>'.
+  Type 'Promise<{ id: string; }>' is not assignable to type 'Promise<void>'.
+    Type '{ id: string; }' is not assignable to type 'void'.
+src/hooks/debts/useDebtManagement.ts(200,7): error TS2322: Type 'UseMutateAsyncFunction<string, Error, { id: string; author?: string; }, unknown>' is not assignable to type '(params: { id: string; }) => Promise<void>'.
+  Type 'Promise<string>' is not assignable to type 'Promise<void>'.
+    Type 'string' is not assignable to type 'void'.
+src/hooks/debts/useDebts.ts(46,28): error TS2345: Argument of type '{ id?: string; status: string; author?: string; }' is not assignable to parameter of type 'Debt'.
+  Type '{ id?: string; status: string; author?: string; }' is missing the following properties from type 'Debt': name, creditor, type, currentBalance, and 2 more.
+src/hooks/debts/useDebts.ts(195,20): error TS2339: Property 'name' does not exist on type '{ id?: string; status: string; author?: string; }'.
+src/hooks/debts/useDebts.ts(196,20): error TS2339: Property 'type' does not exist on type '{ id?: string; status: string; author?: string; }'.
+src/hooks/debts/useDebts.ts(197,30): error TS2339: Property 'currentBalance' does not exist on type '{ id?: string; status: string; author?: string; }'.
+src/hooks/debts/useDebts.ts(198,28): error TS2339: Property 'interestRate' does not exist on type '{ id?: string; status: string; author?: string; }'.
+src/hooks/mobile/useFABBehavior.ts(76,39): error TS2339: Property 'focus' does not exist on type 'Element'.
+src/hooks/transactions/useTransactionImport.ts(78,61): error TS2345: Argument of type 'ImportData' is not assignable to parameter of type 'unknown[] | { data?: unknown[]; }'.
+  Type 'ImportData' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type '{ amount: number; }[]'.
+  Property 'amount' is missing in type '{}' but required in type '{ amount: number; }'.
+```
 
 ## Typecheck Strict Mode Audit
 
@@ -93,8 +205,8 @@ Last check: 2025-11-22 18:27:50 UTC
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
+- 13 errors in `src/hooks/bills/useBillManager.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
-- 13 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
 - 12 errors in `src/utils/debug/dataDiagnostic.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
@@ -361,6 +473,7 @@ Last check: 2025-11-22 18:27:50 UTC
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
 - 2 errors in `src/hooks/security/useSecuritySettingsLogic.ts`
+- 2 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 2 errors in `src/hooks/mobile/useBottomNavigation.ts`
 - 2 errors in `src/hooks/common/useTransactionArchiving.ts`
 - 2 errors in `src/hooks/common/useRouterPageDetection.ts`
@@ -412,6 +525,7 @@ Last check: 2025-11-22 18:27:50 UTC
 - 2 errors in `src/components/auth/UserIndicator.tsx`
 - 2 errors in `src/components/analytics/tabs/OverviewTab.tsx`
 - 2 errors in `src/components/analytics/components/TabContent.tsx`
+- 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
 - 1 errors in `src/utils/sync/dataDetectionHelper.ts`
@@ -452,6 +566,7 @@ Last check: 2025-11-22 18:27:50 UTC
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
 - 1 errors in `src/hooks/bills/useBulkBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
+- 1 errors in `src/hooks/bills/useBillManagerDisplayLogic.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 1 errors in `src/hooks/auth/useKeyManagement.ts`
 - 1 errors in `src/hooks/auth/useAuthManager.ts`
@@ -478,6 +593,7 @@ Last check: 2025-11-22 18:27:50 UTC
 - 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
+- 1 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 1 errors in `src/components/budgeting/CashFlowSummary.tsx`
 - 1 errors in `src/components/bills/modals/BulkUpdateConfirmModal.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
@@ -495,15 +611,15 @@ Last check: 2025-11-22 18:27:50 UTC
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 687 | `TS7006` |
-| 643 | `TS7031` |
-| 174 | `TS2345` |
-| 142 | `TS2339` |
-| 131 | `TS2322` |
-| 116 | `TS18046` |
+| 611 | `TS7006` |
+| 609 | `TS7031` |
+| 186 | `TS2345` |
+| 147 | `TS2322` |
+| 129 | `TS2339` |
+| 112 | `TS18046` |
 | 64 | `TS7005` |
-| 63 | `TS7053` |
-| 51 | `TS18048` |
+| 54 | `TS7053` |
+| 50 | `TS18048` |
 | 39 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
@@ -517,6 +633,7 @@ Last check: 2025-11-22 18:27:50 UTC
 | 2 | `TS7019` |
 | 2 | `TS2719` |
 | 1 | `TS7023` |
+| 1 | `TS7019` |
 | 1 | `TS7016` |
 | 1 | `TS2774` |
 | 1 | `TS2740` |
@@ -564,25 +681,14 @@ src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2719: Type 'Tra
   Property 'currentBalance' is missing in type 'TransferringAccount' but required in type 'TransferringAccount'.
 src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/AnalyticsDashboard.tsx(170,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/analytics/AnalyticsDashboard.tsx(460,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
-src/components/analytics/AnalyticsDashboard.tsx(461,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
-src/components/analytics/AnalyticsDashboard.tsx(462,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
-src/components/analytics/AnalyticsDashboard.tsx(463,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
-src/components/analytics/AnalyticsDashboard.tsx(464,15): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
-src/components/analytics/AnalyticsDashboard.tsx(466,13): error TS2322: Type '{ period: string; dateRange: { startDate: Date; endDate: Date; }; summary: { totalIncome: number; totalExpenses: number; netAmount: number; transactionCount: number; incomeTransactionCount: number; ... 4 more ...; expenseRatio: number; }; ... 10 more ...; _meta: { ...; }; } | undefined' is not assignable to type 'Record<string, unknown>'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>'.
+src/components/analytics/AnalyticsDashboard.tsx(170,5): error TS2322: Type 'NormalizedEnvelope[]' is not assignable to type 'never[]'.
+  Type 'NormalizedEnvelope' is not assignable to type 'never'.
 src/components/analytics/CategorySuggestionsTab.tsx(93,32): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: null; }' is not assignable to type 'Record<string, boolean>'.
+src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; } | null; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
-    Type 'null' is not assignable to type 'boolean'.
+    Type '{ start: string; end: string; } | null' is not assignable to type 'boolean'.
+      Type 'null' is not assignable to type 'boolean'.
 src/components/analytics/SmartCategoryManager.tsx(120,9): error TS2322: Type '(tabId: CategoryTabId) => void' is not assignable to type '(tabId: string) => void'.
   Types of parameters 'tabId' and 'tabId' are incompatible.
     Type 'string' is not assignable to type 'CategoryTabId'.
@@ -820,18 +926,6 @@ src/components/bills/BulkUpdateModeSelector.tsx(9,47): error TS7031: Binding ele
 src/components/bills/BulkUpdateSummary.tsx(9,30): error TS7031: Binding element 'summary' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,39): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,48): error TS7031: Binding element 'handleSubmit' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,29): error TS7031: Binding element 'bills' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,36): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,47): error TS7031: Binding element 'onSuggestEnvelope' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(8,66): error TS7031: Binding element 'searchQuery' implicitly has an 'any' type.
-src/components/bills/SmartBillMatcher.tsx(28,67): error TS2339: Property 'confidence' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(32,34): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(33,59): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(39,56): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(42,74): error TS2339: Property 'envelope' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(43,70): error TS2339: Property 'reason' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(50,32): error TS2339: Property 'confidence' does not exist on type 'never'.
-src/components/bills/SmartBillMatcher.tsx(53,31): error TS2339: Property 'confidence' does not exist on type 'never'.
 src/components/bills/modals/BillDetailActions.tsx(10,3): error TS7031: Binding element 'bill' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailActions.tsx(11,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailActions.tsx(12,3): error TS7031: Binding element 'handleEdit' implicitly has an 'any' type.
@@ -877,19 +971,8 @@ src/components/budgeting/BillEnvelopeFundingInfo.tsx(103,47): error TS18048: 'ne
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(301,11): error TS2322: Type '{ id: string; name: string; amount: number; dueDate: string; category?: string | undefined; frequency: string; } | null | undefined' is not assignable to type '{ amount: number; frequency?: string | undefined; } | undefined'.
   Type 'null' is not assignable to type '{ amount: number; frequency?: string | undefined; } | undefined'.
 src/components/budgeting/CashFlowSummary.tsx(4,28): error TS7031: Binding element 'cashFlow' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(10,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(11,3): error TS7031: Binding element 'onCreateEnvelope' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(12,3): error TS7031: Binding element 'onCreateBill' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(43,32): error TS7006: Parameter 'billId' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(46,55): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(51,26): error TS2339: Property 'name' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(51,47): error TS2339: Property 'provider' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(52,30): error TS2339: Property 'category' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(53,27): error TS2339: Property 'color' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(54,31): error TS2339: Property 'frequency' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(55,35): error TS2339: Property 'amount' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(56,54): error TS2339: Property 'name' does not exist on type 'never'.
-src/components/budgeting/CreateEnvelopeModal.tsx(56,75): error TS2339: Property 'provider' does not exist on type 'never'.
+src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
+  Type 'unknown' is not assignable to type 'never'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(133,24): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,24): error TS2322: Type '"savings"' is not assignable to type 'never'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,48): error TS2322: Type '"sinking_fund"' is not assignable to type 'never'.
@@ -917,8 +1000,6 @@ src/components/budgeting/EditEnvelopeModalComponents.tsx(179,11): error TS2322: 
   Type '"savings" | "sinking_fund"' is not assignable to type 'never'.
     Type '"savings"' is not assignable to type 'never'.
 src/components/budgeting/EnvelopeGrid.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/budgeting/EnvelopeGrid.tsx(108,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
-  Type 'Envelope' is not assignable to type 'never'.
 src/components/budgeting/EnvelopeGrid.tsx(272,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeGrid.tsx(273,30): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/budgeting/EnvelopeGrid.tsx(274,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
@@ -1484,18 +1565,12 @@ src/components/security/LockScreen.tsx(217,31): error TS7006: Parameter 'e' impl
 src/components/security/LockScreen.tsx(232,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/settings/EnvelopeIntegrityChecker.tsx(17,37): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/settings/EnvelopeIntegrityChecker.tsx(17,45): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(28,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(29,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(30,3): error TS7031: Binding element 'onExport' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(31,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(32,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(33,3): error TS7031: Binding element 'onResetEncryption' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(34,3): error TS7031: Binding element 'onSync' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(35,3): error TS7031: Binding element 'onChangePassword' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(36,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(38,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(40,3): error TS7031: Binding element 'onUpdateProfile' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(78,50): error TS7006: Parameter 'sectionId' implicitly has an 'any' type.
+src/components/settings/SettingsDashboard.tsx(121,5): error TS2322: Type '(profile: { userName: string; userColor: string; }) => void' is not assignable to type '(profile: unknown) => void'.
+  Types of parameters 'profile' and 'profile' are incompatible.
+    Type 'unknown' is not assignable to type '{ userName: string; userColor: string; }'.
+src/components/settings/SettingsDashboard.tsx(162,13): error TS2322: Type '(password: string) => void' is not assignable to type '(current: string, newPass: string) => Promise<AuthResult>'.
+  Type 'void' is not assignable to type 'Promise<AuthResult>'.
+src/components/settings/SettingsDashboard.tsx(167,9): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
 src/components/settings/archiving/ArchivingActionButtons.tsx(6,3): error TS7031: Binding element 'needsArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(7,3): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingActionButtons.tsx(8,3): error TS7031: Binding element 'showPreview' implicitly has an 'any' type.
@@ -2225,14 +2300,6 @@ src/hooks/common/useFABActions.ts(49,31): error TS2339: Property 'id' does not e
 src/hooks/common/useFABActions.ts(54,7): error TS7005: Variable 'actionIds' implicitly has an 'any[]' type.
 src/hooks/common/useFABActions.ts(90,34): error TS7006: Parameter 'screenId' implicitly has an 'any' type.
 src/hooks/common/useImportData.ts(166,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
-src/hooks/common/useModalManager.ts(11,34): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(15,35): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(19,36): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(20,51): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/common/useModalManager.ts(27,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/hooks/common/useModalManager.ts(34,6): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(35,22): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
 src/hooks/common/useNetworkStatus.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/common/useNetworkStatus.ts(11,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/common/useNetworkStatus.ts(11,43): error TS7006: Parameter 'state' implicitly has an 'any' type.
@@ -2811,17 +2878,6 @@ src/utils/auth/userSetupHelpers.tsx(86,33): error TS7006: Parameter 'step' impli
 src/utils/auth/userSetupHelpers.tsx(86,39): error TS7006: Parameter 'isReturningUser' implicitly has an 'any' type.
 src/utils/billIcons/iconOptions.ts(179,10): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
-src/utils/billIcons/iconUtils.ts(22,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
-  No index signature with a parameter of type 'string' was found on type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
-src/utils/billIcons/iconUtils.ts(40,17): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
-  No index signature with a parameter of type 'string' was found on type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
-src/utils/billIcons/iconUtils.ts(41,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
-  No index signature with a parameter of type 'string' was found on type '{ utilities: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 60 more ...; other: ForwardRefExoticComponent<...>; }'.
-src/utils/billIcons/iconUtils.ts(60,31): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
-src/utils/billIcons/iconUtils.ts(64,10): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ Zap: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 42 more ...; Receipt: ForwardRefExoticComponent<...>; }'.
-  No index signature with a parameter of type 'string' was found on type '{ Zap: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 42 more ...; Receipt: ForwardRefExoticComponent<...>; }'.
-src/utils/billIcons/iconUtils.ts(70,29): error TS7006: Parameter 'IconComponent' implicitly has an 'any' type.
-src/utils/billIcons/iconUtils.ts(86,39): error TS7006: Parameter 'IconComponent' implicitly has an 'any' type.
 src/utils/bills/billCalculations.ts(131,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billCalculations.ts(166,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billCalculations.ts(192,46): error TS2345: Argument of type 'string | Date | undefined' is not assignable to parameter of type 'string | Date'.
