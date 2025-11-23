@@ -42,8 +42,25 @@ export const SAVINGS_COLORS = [
   "#6B7280", // Gray
 ];
 
+interface SavingsGoalData {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string | null;
+  category: string;
+  color: string;
+  description: string;
+  priority: string;
+  createdAt: string;
+  updatedAt: string;
+  isCompleted?: boolean;
+  monthlyNeeded?: number;
+  remainingAmount?: number;
+}
+
 // Default form data structure
-export const getDefaultSavingsGoalFormData = (editingGoal = null) => {
+export const getDefaultSavingsGoalFormData = (editingGoal: SavingsGoalData | null = null) => {
   if (editingGoal) {
     return {
       name: editingGoal.name || "",
@@ -83,23 +100,6 @@ export const validateSavingsGoalForm = (formData: unknown): string[] => {
   // Extract error messages from Zod validation errors
   return result.error?.issues.map((err) => err.message) || [];
 };
-
-interface SavingsGoalData {
-  id: string;
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-  targetDate: string | null;
-  category: string;
-  color: string;
-  description: string;
-  priority: string;
-  createdAt: string;
-  updatedAt: string;
-  isCompleted?: boolean;
-  monthlyNeeded?: number;
-  remainingAmount?: number;
-}
 
 /**
  * Process form data into savings goal object
@@ -181,7 +181,7 @@ export const calculateGoalDistribution = (
 
     case "priority": {
       // Distribute based on priority (high: 50%, medium: 30%, low: 20%)
-      const priorityWeights = { high: 0.5, medium: 0.3, low: 0.2 };
+      const priorityWeights: Record<string, number> = { high: 0.5, medium: 0.3, low: 0.2 };
       const totalWeight = activeGoals.reduce((sum, goal) => {
         return sum + (priorityWeights[goal.priority] || 0.3);
       }, 0);
@@ -280,8 +280,10 @@ export const formatCurrency = (amount: number | string, currency = "USD"): strin
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  } catch (error) {
-    logger.warn("Error formatting currency:", error);
+  } catch (error: unknown) {
+    logger.warn("Error formatting currency:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return `$${amount.toFixed(2)}`;
   }
 };

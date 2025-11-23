@@ -9,16 +9,16 @@ import logger from "../../utils/common/logger";
  * Extracts UI state management from BudgetHistoryViewer component
  */
 export const useBudgetHistoryViewerUI = () => {
-  const [selectedCommit, setSelectedCommit] = useState(null);
-  const [expandedCommits, setExpandedCommits] = useState(new Set());
+  const [selectedCommit, setSelectedCommit] = useState<string | null>(null);
+  const [expandedCommits, setExpandedCommits] = useState(new Set<string>());
   const [filter, setFilter] = useState({ author: "all", limit: 50 });
   const [showIntegrityDetails, setShowIntegrityDetails] = useState(false);
 
-  const handleCommitSelection = useCallback((commitHash) => {
+  const handleCommitSelection = useCallback((commitHash: string) => {
     setSelectedCommit(commitHash);
   }, []);
 
-  const toggleCommitExpanded = useCallback((commitHash) => {
+  const toggleCommitExpanded = useCallback((commitHash: string) => {
     setExpandedCommits((prev) => {
       const next = new Set(prev);
       if (next.has(commitHash)) {
@@ -30,7 +30,7 @@ export const useBudgetHistoryViewerUI = () => {
     });
   }, []);
 
-  const updateFilter = useCallback((updates) => {
+  const updateFilter = useCallback((updates: Partial<{ author: string; limit: number }>) => {
     setFilter((prev) => ({ ...prev, ...updates }));
   }, []);
 
@@ -57,12 +57,14 @@ export const useBudgetHistoryViewerUI = () => {
  * Hook for handling budget history restoration process
  * Extracts restoration logic with password validation
  */
-export const useBudgetHistoryRestore = (restore) => {
+export const useBudgetHistoryRestore = (
+  restore: (params: { commitHash: string; password: string }) => Promise<void>
+) => {
   const confirm = useConfirm();
   const prompt = usePrompt();
 
   const handleRestoreFromHistory = useCallback(
-    async (commitHash) => {
+    async (commitHash: string) => {
       const confirmed = await confirm({
         title: "Restore from History",
         message:
@@ -119,7 +121,7 @@ export const useBudgetHistoryRestore = (restore) => {
  * Provides utility functions for rendering history elements
  */
 export const useBudgetHistoryUIHelpers = () => {
-  const getChangeIcon = useCallback((changeType) => {
+  const getChangeIcon = useCallback((changeType: string) => {
     switch (changeType) {
       case "add":
         return React.createElement(getIcon("Plus"), {
@@ -140,8 +142,8 @@ export const useBudgetHistoryUIHelpers = () => {
     }
   }, []);
 
-  const getAuthorColor = useCallback((author) => {
-    const colorMap = {
+  const getAuthorColor = useCallback((author: string) => {
+    const colorMap: Record<string, string> = {
       system: "bg-gray-100 text-gray-700",
       user: "bg-blue-100 text-blue-700",
       default: "bg-purple-100 text-purple-700",
@@ -149,15 +151,15 @@ export const useBudgetHistoryUIHelpers = () => {
     return colorMap[author] || colorMap.default;
   }, []);
 
-  const formatCommitHash = useCallback((hash) => {
+  const formatCommitHash = useCallback((hash: string) => {
     return hash?.substring(0, 8) || "";
   }, []);
 
-  const formatTimestamp = useCallback((timestamp) => {
+  const formatTimestamp = useCallback((timestamp: string | number) => {
     return new Date(timestamp).toLocaleString();
   }, []);
 
-  const formatDate = useCallback((date) => {
+  const formatDate = useCallback((date: string | number) => {
     return new Date(date).toLocaleDateString();
   }, []);
 

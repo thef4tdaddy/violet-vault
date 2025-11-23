@@ -20,7 +20,7 @@ export const isCryptoSupported = () => {
       typeof crypto.subtle.encrypt === "function"
     );
   } catch (error) {
-    logger.warn("Crypto availability check failed:", error);
+    logger.warn("Crypto availability check failed:", { error });
     return false;
   }
 };
@@ -58,7 +58,8 @@ export const getCrypto = () => {
  * @param {...any} args - Arguments to pass to the operation
  * @returns {Promise<any>} Result of crypto operation or null if failed
  */
-export const safeCryptoOperation = async (operation, ...args) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const safeCryptoOperation = async (operation: string, ...args: any[]): Promise<any> => {
   try {
     const cryptoInstance = getCrypto();
     if (!cryptoInstance || !cryptoInstance.subtle) {
@@ -66,11 +67,13 @@ export const safeCryptoOperation = async (operation, ...args) => {
     }
 
     const subtleCrypto = cryptoInstance.subtle;
-    if (typeof subtleCrypto[operation] !== "function") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof (subtleCrypto as any)[operation] !== "function") {
       throw new Error(`Crypto operation '${operation}' not supported`);
     }
 
-    return await subtleCrypto[operation](...args);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (subtleCrypto as any)[operation](...args);
   } catch (error) {
     logger.error(`Crypto operation '${operation}' failed:`, error);
     throw error;
@@ -82,7 +85,7 @@ export const safeCryptoOperation = async (operation, ...args) => {
  * @param {number} length - Number of bytes to generate
  * @returns {Uint8Array} Random bytes or fallback values
  */
-export const getRandomBytes = (length) => {
+export const getRandomBytes = (length: number): Uint8Array => {
   try {
     const cryptoInstance = getCrypto();
     if (cryptoInstance && cryptoInstance.getRandomValues) {
@@ -126,7 +129,7 @@ export const isSecureContext = () => {
     }
     return true; // Assume secure in non-browser environments
   } catch (error) {
-    logger.warn("Secure context check failed:", error);
+    logger.warn("Secure context check failed:", { error });
     return false;
   }
 };

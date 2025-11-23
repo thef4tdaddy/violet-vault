@@ -2,7 +2,20 @@
  * Suggest envelope based on transaction description
  * Consolidated from components/transactions/utils/envelopeMatching.js
  */
-export const suggestEnvelope = (description, envelopes) => {
+
+interface Envelope {
+  id: string;
+  name: string;
+  category?: string;
+}
+
+interface Transaction {
+  envelopeId?: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
+export const suggestEnvelope = (description: string, envelopes: Envelope[]): Envelope | null => {
   const desc = description.toLowerCase();
 
   // First, try exact name matching
@@ -39,7 +52,7 @@ export const suggestEnvelope = (description, envelopes) => {
 /**
  * Auto-assign envelope to transactions based on patterns
  */
-export const autoAssignEnvelopes = (transactions, envelopes) => {
+export const autoAssignEnvelopes = (transactions: Transaction[], envelopes: Envelope[]) => {
   return transactions.map((transaction) => {
     if (!transaction.envelopeId && transaction.description) {
       const suggestedEnvelope = suggestEnvelope(transaction.description, envelopes);
@@ -58,7 +71,7 @@ export const autoAssignEnvelopes = (transactions, envelopes) => {
 /**
  * Get matching confidence score for envelope suggestion
  */
-export const getMatchingConfidence = (description, envelope) => {
+export const getMatchingConfidence = (description: string, envelope: Envelope): number => {
   const desc = description.toLowerCase();
   const envName = envelope.name.toLowerCase();
   const envCategory = envelope.category?.toLowerCase() || "";

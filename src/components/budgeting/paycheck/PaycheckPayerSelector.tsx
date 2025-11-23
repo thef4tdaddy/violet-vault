@@ -4,11 +4,30 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
+interface PayerPrediction {
+  average: number;
+  mostRecent: number;
+  count: number;
+}
+
+interface PaycheckPayerSelectorProps {
+  payerName: string;
+  uniquePayers: string[];
+  showAddNewPayer: boolean;
+  newPayerName: string;
+  isProcessing: boolean;
+  onPayerChange: (payer: string) => void;
+  onNewPayerNameChange: (name: string) => void;
+  onAddNewPayer: () => void;
+  onToggleAddNewPayer: (show: boolean) => void;
+  getPayerPrediction: (payer: string) => PayerPrediction | null;
+}
+
 /**
  * Paycheck payer selector component
  * Handles payer dropdown and add new payer functionality
  */
-const PaycheckPayerSelector = ({
+const PaycheckPayerSelector: React.FC<PaycheckPayerSelectorProps> = ({
   payerName,
   uniquePayers,
   showAddNewPayer,
@@ -57,9 +76,13 @@ const PaycheckPayerSelector = ({
           </Select>
 
           {/* Show prediction info for selected payer */}
-          {payerName && getPayerPrediction(payerName) && (
-            <PayerPredictionInfo payerName={payerName} prediction={getPayerPrediction(payerName)} />
-          )}
+          {payerName &&
+            (() => {
+              const prediction = getPayerPrediction(payerName);
+              return prediction ? (
+                <PayerPredictionInfo payerName={payerName} prediction={prediction} />
+              ) : null;
+            })()}
         </div>
       ) : (
         <AddNewPayerForm
@@ -77,7 +100,12 @@ const PaycheckPayerSelector = ({
 /**
  * Payer prediction information display
  */
-const PayerPredictionInfo = ({ payerName, prediction }) => (
+interface PayerPredictionInfoProps {
+  payerName: string;
+  prediction: PayerPrediction;
+}
+
+const PayerPredictionInfo: React.FC<PayerPredictionInfoProps> = ({ payerName, prediction }) => (
   <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20">
     <div className="text-sm text-gray-600">
       {React.createElement(getIcon("TrendingUp"), {
@@ -92,7 +120,15 @@ const PayerPredictionInfo = ({ payerName, prediction }) => (
 /**
  * Add new payer form component
  */
-const AddNewPayerForm = ({
+interface AddNewPayerFormProps {
+  uniquePayers: string[];
+  newPayerName: string;
+  onNewPayerNameChange: (name: string) => void;
+  onAddNewPayer: () => void;
+  onToggleAddNewPayer: (show: boolean) => void;
+}
+
+const AddNewPayerForm: React.FC<AddNewPayerFormProps> = ({
   uniquePayers,
   newPayerName,
   onNewPayerNameChange,

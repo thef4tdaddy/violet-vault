@@ -25,7 +25,7 @@ export class BaseMutex {
   /**
    * Acquire the mutex lock with timeout
    */
-  async acquire(operationName = "unknown", timeoutMs = 60000) {
+  async acquire(operationName = "unknown", timeoutMs = 60000): Promise<void> {
     return Promise.race([
       new Promise<void>((resolve) => {
         if (this.locked) {
@@ -40,7 +40,7 @@ export class BaseMutex {
         this._lock(operationName);
         resolve();
       }),
-      new Promise((_, reject) =>
+      new Promise<void>((_, reject) =>
         setTimeout(
           () =>
             reject(new Error(`Mutex acquire timed out for ${operationName} after ${timeoutMs}ms`)),
@@ -53,13 +53,13 @@ export class BaseMutex {
   /**
    * Release the mutex lock
    */
-  release() {
+  release(): void {
     if (!this.locked) {
       logger.warn(`🔓 ${this.name}: Attempted to release unlocked mutex`);
       return;
     }
 
-    const duration = Date.now() - this.lockStartTime;
+    const duration = this.lockStartTime !== null ? Date.now() - this.lockStartTime : 0;
     logger.debug(`🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`);
 
     this.locked = false;
@@ -68,16 +68,19 @@ export class BaseMutex {
 
     // Process next operation in queue
     if (this.queue.length > 0) {
-      const { resolve, operationName } = this.queue.shift();
-      this._lock(operationName);
-      resolve();
+      const next = this.queue.shift();
+      if (next) {
+        const { resolve, operationName } = next;
+        this._lock(operationName);
+        resolve();
+      }
     }
   }
 
   /**
    * Execute a function with mutex protection
    */
-  async execute(fn, operationName = "unknown") {
+  async execute<T>(fn: () => Promise<T>, operationName = "unknown"): Promise<T> {
     logger.debug(`🔧 ${this.name}: Starting execute for ${operationName}`);
 
     await this.acquire(operationName);
@@ -101,19 +104,25 @@ export class BaseMutex {
   /**
    * Check current lock status
    */
-  getStatus() {
+  getStatus(): {
+    locked: boolean;
+    currentOperation: string | null;
+    queueLength: number;
+    lockDuration: number | null;
+  } {
     return {
       locked: this.locked,
       currentOperation: this.currentOperation,
       queueLength: this.queue.length,
-      lockDuration: this.locked ? Date.now() - this.lockStartTime : null,
+      lockDuration:
+        this.locked && this.lockStartTime !== null ? Date.now() - this.lockStartTime : null,
     };
   }
 
   /**
    * Private method to acquire lock
    */
-  _lock(operationName) {
+  _lock(operationName: string): void {
     this.locked = true;
     this.currentOperation = operationName;
     this.lockStartTime = Date.now();

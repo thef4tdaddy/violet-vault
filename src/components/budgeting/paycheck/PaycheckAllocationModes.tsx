@@ -2,11 +2,23 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { Radio } from "@/components/ui";
 
+type AllocationMode = "allocate" | "leftover";
+
+interface PaycheckAllocationModesProps {
+  allocationMode: AllocationMode;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
 /**
  * Paycheck allocation mode selector component
  * Radio button selection for allocation strategy
  */
-const PaycheckAllocationModes = ({ allocationMode, onChange, disabled = false }) => {
+const PaycheckAllocationModes: React.FC<PaycheckAllocationModesProps> = ({
+  allocationMode,
+  onChange,
+  disabled = false,
+}) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-4">
@@ -42,10 +54,21 @@ const PaycheckAllocationModes = ({ allocationMode, onChange, disabled = false })
   );
 };
 
+interface AllocationModeOptionProps {
+  value: string;
+  checked: boolean;
+  onChange: (value: string) => void;
+  disabled: boolean;
+  icon: string;
+  iconColor: string;
+  title: string;
+  description: string;
+}
+
 /**
  * Individual allocation mode option component
  */
-const AllocationModeOption = ({
+const AllocationModeOption: React.FC<AllocationModeOptionProps> = ({
   value,
   checked,
   onChange,

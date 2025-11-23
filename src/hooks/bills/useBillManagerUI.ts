@@ -16,7 +16,13 @@ interface CategorizedBills {
 }
 
 // Helper to create view mode configuration
-const createViewMode = (id, label, count, icon, color) => ({
+const createViewMode = (
+  id: string,
+  label: string,
+  count: number,
+  icon: string,
+  color: string
+): { id: string; label: string; count: number; icon: string; color: string } => ({
   id,
   label,
   count,
