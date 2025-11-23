@@ -1,6 +1,11 @@
 import { useEffect } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
+import useUiStore from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
+
+// Type for the store selector
+type UiStoreState = {
+  setOnlineStatus: (status: boolean) => void;
+};
 
 /**
  * Custom hook for network status management
@@ -8,7 +13,7 @@ import logger from "../../utils/common/logger";
  */
 const useNetworkStatus = (): void => {
   // Get the store action using proper subscription (prevents React error #185)
-  const setOnlineStatus = useBudgetStore((state) => state.setOnlineStatus);
+  const setOnlineStatus = useUiStore((state: UiStoreState) => state.setOnlineStatus);
 
   // Set up online/offline status detection
   useEffect(() => {
