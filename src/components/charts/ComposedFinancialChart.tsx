@@ -227,7 +227,15 @@ const ComposedFinancialChart = ({
 };
 
 // Specialized cash flow chart
-export const CashFlowChart = ({ data, title = "Monthly Cash Flow", ...props }) => {
+export const CashFlowChart = ({ 
+  data, 
+  title = "Monthly Cash Flow", 
+  ...props 
+}: { 
+  data: ChartDatum[]; 
+  title?: string; 
+  [key: string]: unknown 
+}) => {
   const series = [
     {
       type: "bar",
@@ -259,6 +267,11 @@ export const BudgetVsActualChart = ({
   title = "Budget vs Actual Spending",
   _orientation = "horizontal",
   ...props
+}: {
+  data: ChartDatum[];
+  title?: string;
+  _orientation?: string;
+  [key: string]: unknown;
 }) => {
   const series = [
     {

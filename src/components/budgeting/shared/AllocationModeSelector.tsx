@@ -2,11 +2,21 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { Radio } from "@/components/ui";
 
+interface AllocationModeSelectorProps {
+  autoAllocate: boolean;
+  onAutoAllocateChange: (value: boolean) => void;
+  disabled?: boolean;
+}
+
 /**
  * Shared component for allocation mode selection using radio buttons
  * Follows the CSS Grid pattern from docs/UI-Component-Patterns.md
  */
-const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled = false }) => {
+const AllocationModeSelector: React.FC<AllocationModeSelectorProps> = ({ 
+  autoAllocate, 
+  onAutoAllocateChange, 
+  disabled = false 
+}) => {
   return (
     <div className="space-y-3">
       <label className="block text-sm font-medium text-gray-700">Paycheck Allocation</label>

@@ -206,8 +206,8 @@ const SmartEnvelopeSuggestions = ({
     toggleSettings,
     hasSuggestions,
   } = useSmartSuggestions({
-    transactions,
-    envelopes,
+    transactions: transactions || [],
+    envelopes: envelopes || [],
     onCreateEnvelope,
     onUpdateEnvelope,
     onDismissSuggestion,
