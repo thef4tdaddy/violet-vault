@@ -4,7 +4,22 @@ import { getIcon } from "../../../utils";
 import { useConfirm } from "../../../hooks/common/useConfirm";
 import logger from "../../../utils/common/logger";
 
-const SyncDebugToolsSection = ({ isDebugMode }) => {
+// Extend window interface for custom debug functions
+declare global {
+  interface Window {
+    getQuickSyncStatus?: () => Promise<unknown>;
+    runMasterSyncValidation?: () => Promise<unknown>;
+    detectLocalDataDebug?: () => Promise<unknown>;
+    hasLocalDataDebug?: () => Promise<boolean>;
+    forceCloudDataReset?: () => Promise<unknown>;
+  }
+}
+
+interface SyncDebugToolsSectionProps {
+  isDebugMode: boolean;
+}
+
+const SyncDebugToolsSection: React.FC<SyncDebugToolsSectionProps> = ({ isDebugMode }) => {
   const confirm = useConfirm();
 
   return (
@@ -38,7 +53,7 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
           onClick={async () => {
             logger.info("🔄 TESTING: window.getQuickSyncStatus");
             try {
-              const result = await window.getQuickSyncStatus();
+              const result = window.getQuickSyncStatus && (await window.getQuickSyncStatus());
               logger.info("🔄 SUCCESS:", result);
             } catch (error) {
               logger.error("🔄 ERROR:", error);
@@ -62,7 +77,9 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
               onClick={async () => {
                 logger.info("🚀 TESTING: window.runMasterSyncValidation");
                 try {
-                  const result = await window.runMasterSyncValidation();
+                  const result =
+                    window.runMasterSyncValidation &&
+                    (await window.runMasterSyncValidation());
                   logger.info("🚀 SUCCESS:", result as unknown as Record<string, unknown>);
                 } catch (error) {
                   logger.error("🚀 ERROR:", error as Record<string, unknown>);
@@ -168,7 +185,8 @@ const SyncDebugToolsSection = ({ isDebugMode }) => {
                 });
                 if (confirmed) {
                   try {
-                    const result = await window.forceCloudDataReset();
+                    const result =
+                      window.forceCloudDataReset && (await window.forceCloudDataReset());
                     logger.info("🧹 SUCCESS:", result);
                   } catch (error) {
                     logger.error("🧹 ERROR:", error);

@@ -1,7 +1,35 @@
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 
-const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImport }) => {
+interface ImportData {
+  data?: Record<string, unknown>[];
+  [key: number]: Record<string, unknown>;
+}
+
+interface FieldMapping {
+  date?: string;
+  description?: string;
+  amount?: string;
+  category?: string;
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
+interface FieldMapperProps {
+  importData: ImportData | Record<string, unknown>[];
+  fieldMapping: FieldMapping;
+  setFieldMapping: (mapping: FieldMapping) => void;
+  onBack: () => void;
+  onImport: () => void;
+}
+
+const FieldMapper: React.FC<FieldMapperProps> = ({
+  importData,
+  fieldMapping,
+  setFieldMapping,
+  onBack,
+  onImport,
+}) => {
   const isValid = fieldMapping.date && fieldMapping.description && fieldMapping.amount;
 
   return (
@@ -64,7 +92,9 @@ const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImpo
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {(importData.data || importData).slice(0, 5).map((row, index) => (
+                  {(importData.data || importData)
+                    .slice(0, 5)
+                    .map((row: Record<string, unknown>, index: number) => (
                     <tr key={index}>
                       {Object.values(row)
                         .slice(0, 4)

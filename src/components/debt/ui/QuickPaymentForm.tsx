@@ -1,10 +1,20 @@
 import { Button } from "@/components/ui";
 
+interface QuickPaymentFormProps {
+  showPaymentForm: boolean;
+  paymentAmount: string;
+  setPaymentAmount: (amount: string) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onShowForm: () => void;
+  onCancel: () => void;
+  isActiveDebt: boolean;
+}
+
 /**
  * Quick payment form component for recording debt payments
  * Pure UI component - receives state and handlers as props
  */
-const QuickPaymentForm = ({
+const QuickPaymentForm: React.FC<QuickPaymentFormProps> = ({
   showPaymentForm,
   paymentAmount,
   setPaymentAmount,

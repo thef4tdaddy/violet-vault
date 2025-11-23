@@ -3,12 +3,26 @@ import { useReceipts } from "../common/useReceipts";
 import { useTransactions } from "../common/useTransactions";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
 import logger from "../../utils/common/logger";
+import type { Envelope } from "@/types/finance";
+
+interface ReceiptData {
+  merchant?: string;
+  total?: number;
+  date?: string;
+  imageData?: string;
+  rawText?: string;
+  confidence?: number;
+  items?: unknown[];
+  tax?: number;
+  subtotal?: number;
+  processingTime?: number;
+}
 
 /**
  * Hook for managing receipt-to-transaction conversion process
  * Handles form state, envelope suggestions, and submission workflow
  */
-export const useReceiptToTransaction = (receiptData) => {
+export const useReceiptToTransaction = (receiptData: ReceiptData) => {
   const { addReceiptAsync } = useReceipts();
   const { addTransactionAsync } = useTransactions();
   const { envelopes } = useEnvelopes();
@@ -40,7 +54,7 @@ export const useReceiptToTransaction = (receiptData) => {
     }
   }, [receiptData?.merchant, envelopes]);
 
-  const handleFormChange = (field, value) => {
+  const handleFormChange = (field: string, value: string | number) => {
     setTransactionForm((prev) => ({
       ...prev,
       [field]: value,
@@ -105,7 +119,10 @@ export const useReceiptToTransaction = (receiptData) => {
       return { success: true, transaction, receipt };
     } catch (error) {
       logger.error("❌ Failed to create transaction from receipt:", error);
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     } finally {
       setIsSubmitting(false);
     }
@@ -127,7 +144,7 @@ export const useReceiptToTransaction = (receiptData) => {
 /**
  * Suggest envelope based on merchant name
  */
-const suggestEnvelopeForMerchant = (merchant, envelopes) => {
+const suggestEnvelopeForMerchant = (merchant: string, envelopes: Envelope[]) => {
   if (!merchant || !envelopes.length) return null;
 
   const merchantLower = merchant.toLowerCase();
@@ -155,7 +172,7 @@ const suggestEnvelopeForMerchant = (merchant, envelopes) => {
   for (const suggestion of suggestions) {
     if (suggestion.keywords.some((keyword) => merchantLower.includes(keyword))) {
       const matchingEnvelope = envelopes.find(
-        (env) =>
+        (env: Envelope) =>
           env.category?.toLowerCase().includes(suggestion.category) ||
           env.name?.toLowerCase().includes(suggestion.category)
       );

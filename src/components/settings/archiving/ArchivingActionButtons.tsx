@@ -2,7 +2,17 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const ArchivingActionButtons = ({
+interface ArchivingActionButtonsProps {
+  needsArchiving: boolean;
+  isArchiving: boolean;
+  showPreview: boolean;
+  confirmArchiving: boolean;
+  handlePreview: () => void;
+  toggleConfirmArchiving: () => void;
+  onArchiveClick: () => void;
+}
+
+const ArchivingActionButtons: React.FC<ArchivingActionButtonsProps> = ({
   needsArchiving,
   isArchiving,
   showPreview,

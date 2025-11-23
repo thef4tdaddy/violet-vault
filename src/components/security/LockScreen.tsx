@@ -18,10 +18,14 @@ const LockScreen = () => {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [error, setError] = useState("");
   const [failedAttempts, setFailedAttempts] = useState(0);
-  const [pendingConfirm, setPendingConfirm] = useState(null);
+  const [pendingConfirm, setPendingConfirm] = useState<{ cancel: () => void } | null>(null);
   const [passwordToValidate, setPasswordToValidate] = useState("");
-  const passwordInputRef = useRef(null);
-  const processedValidationRef = useRef(null);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  const processedValidationRef = useRef<
+    | { isValid: boolean; reason?: string; isCorrupted?: boolean }
+    | { isValid: boolean; reason: string; error: unknown }
+    | null
+  >(null);
 
   // Password validation query
   const { data: validationResult, isLoading: isValidating } = usePasswordValidation(
@@ -153,7 +157,9 @@ const LockScreen = () => {
       if (processedValidationRef.current === validationResult) {
         return;
       }
-      processedValidationRef.current = validationResult;
+      processedValidationRef.current = validationResult as
+        | { isValid: boolean; reason?: string; isCorrupted?: boolean }
+        | { isValid: boolean; reason: string; error: unknown };
 
       if ((validationResult as { isValid?: boolean })?.isValid) {
         // Password is correct, unlock the session
@@ -214,7 +220,7 @@ const LockScreen = () => {
     }
   }, [password, error]);
 
-  const handleUnlock = async (e) => {
+  const handleUnlock = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!password.trim()) {
@@ -229,7 +235,7 @@ const LockScreen = () => {
     setPasswordToValidate(password);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleUnlock(e);
     }

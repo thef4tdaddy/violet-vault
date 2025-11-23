@@ -1,12 +1,8 @@
-/**
- * useDebtDashboard hook - Business logic for DebtDashboard component
- * Handles filtering, sorting, stats calculation, and modal state management
- */
-
 import { useState, useMemo } from "react";
 import { useDebtManagement } from "@/hooks/debts/useDebtManagement";
 import logger from "@/utils/common/logger";
 import type { DebtSubmissionData } from "./useDebtForm";
+import type { DebtAccount } from "@/types/debt";
 
 export const useDebtDashboard = () => {
   const {
@@ -23,8 +19,8 @@ export const useDebtDashboard = () => {
   // UI state
   const [activeTab, setActiveTab] = useState("overview");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedDebt, setSelectedDebt] = useState(null);
-  const [editingDebt, setEditingDebt] = useState(null);
+  const [selectedDebt, setSelectedDebt] = useState<DebtAccount | null>(null);
+  const [editingDebt, setEditingDebt] = useState<DebtAccount | null>(null);
   const [showUpcomingPaymentsModal, setShowUpcomingPaymentsModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     type: "all",
@@ -81,12 +77,12 @@ export const useDebtDashboard = () => {
     setShowAddModal(true);
   };
 
-  const handleEditDebt = (debt) => {
+  const handleEditDebt = (debt: DebtAccount) => {
     setEditingDebt(debt);
     setShowAddModal(true);
   };
 
-  const handleDebtClick = (debt) => {
+  const handleDebtClick = (debt: DebtAccount) => {
     setSelectedDebt(debt);
   };
 
@@ -142,7 +138,7 @@ export const useDebtDashboard = () => {
     }
   };
 
-  const handleDeleteDebt = async (debtId) => {
+  const handleDeleteDebt = async (debtId: string) => {
     try {
       await deleteDebt(debtId);
       setSelectedDebt(null);
@@ -152,13 +148,16 @@ export const useDebtDashboard = () => {
     }
   };
 
-  const handleRecordPayment = async (debtId, paymentData) => {
+  const handleRecordPayment = async (
+    debtId: string,
+    paymentData: { amount: number; date?: string }
+  ) => {
     try {
       await recordPayment(debtId, paymentData);
       // Refresh selected debt if it's the one being paid
       if (selectedDebt && selectedDebt.id === debtId) {
         const updatedDebt = debts.find((d) => d.id === debtId);
-        setSelectedDebt(updatedDebt);
+        setSelectedDebt(updatedDebt ?? null);
       }
     } catch (error) {
       logger.error("Failed to record payment:", error);
