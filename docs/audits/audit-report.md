@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | 0 |
-| TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2126 | -9 |
+| ESLint Issues | 5 | +1 |
+| TypeScript Errors | 43 | +3 |
+| TypeScript Strict Mode Errors | 2112 | -14 |
 
-*Last updated: 2025-11-23 13:36:49 UTC*
+*Last updated: 2025-11-23 13:50:18 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/savings/savingsCalculations.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
@@ -37,6 +38,7 @@
 |---|---|
 | 3 | `max-lines-per-function` |
 | 1 | `no-undef` |
+| 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
@@ -44,6 +46,7 @@
 /home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:18 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/utils/savings/savingsCalculations.ts:238:93 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
 ```
 
 ## Typecheck Audit
@@ -54,6 +57,7 @@
 - 6 errors in `src/hooks/budgeting/usePaycheckForm.ts`
 - 5 errors in `src/hooks/debts/useDebts.ts`
 - 5 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
+- 3 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 3 errors in `src/hooks/analytics/useReportExporter.ts`
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/bills/useBillManager.ts`
@@ -64,8 +68,8 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
+| 18 | `TS2345` |
 | 18 | `TS2322` |
-| 15 | `TS2345` |
 | 4 | `TS2339` |
 | 1 | `TS2741` |
 | 1 | `TS2719` |
@@ -128,6 +132,12 @@ src/hooks/bills/useBillManager.ts(197,23): error TS2352: Conversion of type 'Dis
   Types of parameters 'value' and 'bills' are incompatible.
     Type 'Bill[]' is not comparable to type 'SetStateAction<Set<unknown>>'.
       Type 'Bill[]' is missing the following properties from type 'Set<unknown>': add, clear, delete, has, and 2 more.
+src/hooks/bills/useBillManagerHelpers.ts(260,48): error TS2345: Argument of type 'BillRecord' is not assignable to parameter of type 'Bill'.
+  Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
+src/hooks/bills/useBillManagerHelpers.ts(262,22): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'BillRecord'.
+  Index signature for type 'string' is missing in type 'Bill'.
+src/hooks/bills/useBillManagerHelpers.ts(276,52): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to parameter of type 'Bill'.
+  Index signature for type 'string' is missing in type 'Bill'.
 src/hooks/budgeting/usePaycheckForm.ts(67,40): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
   Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
 src/hooks/budgeting/usePaycheckForm.ts(77,58): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
@@ -257,8 +267,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 9 errors in `src/components/onboarding/components/TutorialOverlay.tsx`
 - 9 errors in `src/components/history/viewer/HistoryList.tsx`
 - 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
-- 8 errors in `src/utils/savings/savingsCalculations.ts`
-- 8 errors in `src/utils/bills/recurringBillUtils.ts`
 - 8 errors in `src/utils/auth/userSetupHelpers.tsx`
 - 8 errors in `src/main.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
@@ -346,6 +354,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 5 errors in `src/hooks/common/bug-report/useBugReportHighlight.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useTransferFunds.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useDeleteEnvelope.ts`
+- 5 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
 - 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
@@ -421,7 +430,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 3 errors in `src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
-- 3 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 3 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 3 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 3 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
@@ -608,12 +616,12 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 630 | `TS7006` |
+| 622 | `TS7006` |
 | 602 | `TS7031` |
-| 186 | `TS2345` |
+| 188 | `TS2345` |
 | 149 | `TS2322` |
 | 128 | `TS2339` |
-| 111 | `TS18046` |
+| 103 | `TS18046` |
 | 63 | `TS7053` |
 | 63 | `TS7005` |
 | 50 | `TS18048` |
@@ -2030,7 +2038,12 @@ src/hooks/bills/useBillManager.ts(204,5): error TS2322: Type '(bill: Bill | null
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillRecord | null' is not assignable to type 'Bill | null'.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManagerHelpers.ts(260,55): error TS7006: Parameter 'updatedBill' implicitly has an 'any' type.
+src/hooks/bills/useBillManagerHelpers.ts(260,48): error TS2345: Argument of type 'BillRecord' is not assignable to parameter of type 'Bill'.
+  Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
+src/hooks/bills/useBillManagerHelpers.ts(262,22): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'BillRecord'.
+  Index signature for type 'string' is missing in type 'Bill'.
+src/hooks/bills/useBillManagerHelpers.ts(276,52): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to parameter of type 'Bill'.
+  Index signature for type 'string' is missing in type 'Bill'.
 src/hooks/bills/useBillManagerHelpers.ts(285,44): error TS2345: Argument of type 'BillRecord[]' is not assignable to parameter of type 'Bill[]'.
   Type 'BillRecord' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
@@ -2919,14 +2932,6 @@ src/utils/bills/billDetailUtils.ts(103,36): error TS7006: Parameter 'bill' impli
 src/utils/bills/billDetailUtils.ts(118,37): error TS7006: Parameter 'bill' implicitly has an 'any' type.
 src/utils/bills/billUpdateHelpers.ts(106,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billUpdateHelpers.ts(107,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/utils/bills/recurringBillUtils.ts(9,38): error TS7006: Parameter 'paidDate' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(9,48): error TS7006: Parameter 'frequency' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(53,38): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(53,44): error TS7006: Parameter 'updateBillFn' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(75,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/bills/recurringBillUtils.ts(90,39): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(90,46): error TS7006: Parameter 'updateBillFn' implicitly has an 'any' type.
-src/utils/bills/recurringBillUtils.ts(91,21): error TS7006: Parameter 'bill' implicitly has an 'any' type.
 src/utils/budgeting/autofunding/conditions.ts(237,31): error TS18048: 'rule.config' is possibly 'undefined'.
 src/utils/budgeting/autofunding/conditions.ts(237,31): error TS2345: Argument of type 'Condition[] | undefined' is not assignable to parameter of type 'Condition[]'.
   Type 'undefined' is not assignable to type 'Condition[]'.
@@ -3210,14 +3215,6 @@ src/utils/receipts/receiptHelpers.ts(189,52): error TS7006: Parameter 'transacti
 src/utils/receipts/receiptHelpers.ts(223,43): error TS7006: Parameter '_field' implicitly has an 'any' type.
 src/utils/receipts/receiptHelpers.ts(223,51): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
 src/utils/receipts/receiptHelpers.ts(231,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: { color: string; iconName: string; }; medium: { color: string; iconName: string; }; low: { color: string; iconName: string; }; none: { color: string; iconName: string; }; }'.
-src/utils/savings/savingsCalculations.ts(240,12): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,19): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,30): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,37): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,10): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,17): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,28): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,35): error TS18046: 'bVal' is of type 'unknown'.
 src/utils/savings/savingsFormUtils.ts(49,25): error TS2339: Property 'name' does not exist on type 'never'.
 src/utils/savings/savingsFormUtils.ts(50,33): error TS2339: Property 'targetAmount' does not exist on type 'never'.
 src/utils/savings/savingsFormUtils.ts(51,34): error TS2339: Property 'currentAmount' does not exist on type 'never'.
