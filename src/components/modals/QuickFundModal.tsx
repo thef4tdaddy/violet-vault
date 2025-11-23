@@ -16,6 +16,13 @@ const QuickFundModal = ({
   envelope,
   suggestedAmount,
   unassignedCash,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (amount: number) => void;
+  envelope: unknown;
+  suggestedAmount: number;
+  unassignedCash: number;
 }) => {
   const [amount, setAmount] = useState(suggestedAmount || 0);
   const confirm = useConfirm();

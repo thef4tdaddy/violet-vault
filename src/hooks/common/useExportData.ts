@@ -5,7 +5,9 @@ import logger from "@/utils/common/logger";
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import { constructExportObject } from "./useExportDataHelpers";
 
-const gatherDataForExport = async () => {
+const gatherDataForExport = async (): Promise<
+  [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown]
+> => {
   logger.info("Gathering data for export");
   return Promise.all([
     budgetDb.envelopes.toArray(),
@@ -19,7 +21,7 @@ const gatherDataForExport = async () => {
   ]);
 };
 
-const triggerDownload = (exportableData) => {
+const triggerDownload = (exportableData: unknown): number => {
   const dataStr = JSON.stringify(exportableData, null, 2);
   const dataBlob = new Blob([dataStr], { type: "application/json" });
 
@@ -38,7 +40,17 @@ const triggerDownload = (exportableData) => {
   return dataStr.length;
 };
 
-const logExportSuccess = (data, pureTransactions, fileSize) => {
+const logExportSuccess = (
+  data: [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown],
+  pureTransactions: unknown[],
+  fileSize: number
+): {
+  envelopes: number;
+  bills: number;
+  debts: number;
+  transactions: number;
+  fileSizeKB: number;
+} => {
   const [envelopes, bills, , , debts, , ,] = data;
 
   logger.info("Export completed successfully", {
@@ -57,7 +69,12 @@ const logExportSuccess = (data, pureTransactions, fileSize) => {
   };
 };
 
-const buildExportSummary = (counts) => {
+const buildExportSummary = (counts: {
+  envelopes: number;
+  bills: number;
+  debts: number;
+  transactions: number;
+}): string => {
   return [
     `${counts.envelopes} envelopes`,
     `${counts.bills} bills`,
@@ -103,7 +120,8 @@ export const useExportData = () => {
       );
     } catch (error) {
       logger.error("Export failed", error);
-      showErrorToast(`Export failed: ${error.message}`, "Export Failed");
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      showErrorToast(`Export failed: ${errorMessage}`, "Export Failed");
     }
   }, [currentUser, showErrorToast, showSuccessToast, showWarningToast]);
 

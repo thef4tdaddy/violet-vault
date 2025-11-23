@@ -19,7 +19,8 @@ export const getBillIcon = (provider = "", description = "", category = "") => {
 
   // Fall back to category-based icon
   const normalizedCategory = category.toLowerCase().trim();
-  const categoryIcon = CATEGORY_FALLBACK_ICONS[normalizedCategory];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const categoryIcon = (CATEGORY_FALLBACK_ICONS as Record<string, any>)[normalizedCategory];
 
   return categoryIcon || FileText; // Default fallback
 };
@@ -37,8 +38,12 @@ export const suggestBillCategoryAndIcon = (provider = "", description = "") => {
       if (regex.test(searchText)) {
         return {
           category,
-          icon: CATEGORY_FALLBACK_ICONS[category] || FileText,
-          iconName: getIconName(CATEGORY_FALLBACK_ICONS[category] || FileText),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          icon: (CATEGORY_FALLBACK_ICONS as Record<string, any>)[category] || FileText,
+          iconName: getIconName(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (CATEGORY_FALLBACK_ICONS as Record<string, any>)[category] || FileText
+          ),
           confidence: 0.8, // High confidence for pattern match
         };
       }
@@ -57,17 +62,19 @@ export const suggestBillCategoryAndIcon = (provider = "", description = "") => {
 /**
  * Get icon component from icon name string
  */
-export const getIconByName = (iconName) => {
+export const getIconByName = (iconName: string) => {
   if (!iconName || typeof iconName !== "string") {
     return FileText; // Default fallback
   }
-  return ALL_ICONS[iconName] || FileText;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (ALL_ICONS as Record<string, any>)[iconName] || FileText;
 };
 
 /**
  * Get icon name from component (reverse lookup)
  */
-export const getIconName = (IconComponent) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getIconName = (IconComponent: any) => {
   if (!IconComponent) return "FileText";
 
   // Find the name by comparing the component
@@ -83,7 +90,8 @@ export const getIconName = (IconComponent) => {
 /**
  * Get icon name for storage (serialization)
  */
-export const getIconNameForStorage = (IconComponent) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getIconNameForStorage = (IconComponent: any) => {
   if (!IconComponent) return "FileText";
   return IconComponent.displayName || getIconName(IconComponent) || "FileText";
 };

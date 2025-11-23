@@ -49,8 +49,9 @@ export const useFirebaseMessaging = () => {
 
       return success;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
       logger.error("Failed to initialize Firebase Messaging", err);
-      setError(err.message);
+      setError(errorMessage);
       return false;
     } finally {
       setIsLoading(false);
@@ -88,9 +89,10 @@ export const useFirebaseMessaging = () => {
 
       return tokenResult;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
       logger.error("Failed to request permission and get token", err);
-      setError(err.message);
-      return { success: false, reason: "error", error: err.message };
+      setError(errorMessage);
+      return { success: false, reason: "error", error: errorMessage };
     } finally {
       setIsLoading(false);
     }
@@ -121,8 +123,9 @@ export const useFirebaseMessaging = () => {
 
   // Listen for foreground messages
   useEffect(() => {
-    const handleFCMMessage = (event) => {
-      const { payload, timestamp } = event.detail;
+    const handleFCMMessage = (event: Event) => {
+      const customEvent = event as CustomEvent<{ payload: unknown; timestamp: number }>;
+      const { payload, timestamp } = customEvent.detail;
       setLastMessage({ payload, timestamp });
       logger.info("📨 Received FCM message in hook", payload);
     };
