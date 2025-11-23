@@ -6,9 +6,9 @@
 |----------|---------|--------|
 | ESLint Issues | 3 | 0 |
 | TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2152 | -2 |
+| TypeScript Strict Mode Errors | 2135 | -17 |
 
-*Last updated: 2025-11-23 00:32:10 UTC*
+*Last updated: 2025-11-23 00:37:42 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -233,11 +233,9 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 10 errors in `src/components/receipts/steps/ConfirmationStep.tsx`
 - 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
 - 10 errors in `src/components/layout/MainLayout.tsx`
-- 9 errors in `src/utils/query/prefetchHelpers.ts`
 - 9 errors in `src/utils/pwa/backgroundSync.ts`
 - 9 errors in `src/utils/debug/syncDiagnostic.ts`
 - 9 errors in `src/utils/debug/reactErrorDetector.ts`
-- 9 errors in `src/utils/budgeting/envelopeMatching.ts`
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/utils/analytics/trendHelpers.ts`
@@ -530,6 +528,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/utils/sync/dataDetectionHelper.ts`
 - 1 errors in `src/utils/sync/SyncQueue.ts`
 - 1 errors in `src/utils/stores/createSafeStore.ts`
+- 1 errors in `src/utils/query/prefetchHelpers.ts`
 - 1 errors in `src/utils/query/backgroundSyncService.ts`
 - 1 errors in `src/utils/pageDetection/pageIdentifier.ts`
 - 1 errors in `src/utils/debts/calculations/payoffProjection.ts`
@@ -607,14 +606,14 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 623 | `TS7006` |
+| 608 | `TS7006` |
 | 588 | `TS7031` |
 | 191 | `TS2345` |
 | 158 | `TS2322` |
 | 137 | `TS2339` |
 | 131 | `TS18046` |
 | 65 | `TS7005` |
-| 59 | `TS7053` |
+| 57 | `TS7053` |
 | 56 | `TS18048` |
 | 40 | `TS7034` |
 | 34 | `TS18047` |
@@ -3051,15 +3050,6 @@ src/utils/budgeting/envelopeIntegrityChecker.ts(119,14): error TS18046: 'error' 
 src/utils/budgeting/envelopeIntegrityChecker.ts(130,48): error TS7006: Parameter 'corruptedEnvelopes' implicitly has an 'any' type.
 src/utils/budgeting/envelopeIntegrityChecker.ts(216,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(277,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/budgeting/envelopeMatching.ts(5,33): error TS7006: Parameter 'description' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(5,46): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(9,38): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(28,10): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(42,37): error TS7006: Parameter 'transactions' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(42,51): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(43,28): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(61,39): error TS7006: Parameter 'description' implicitly has an 'any' type.
-src/utils/budgeting/envelopeMatching.ts(61,52): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(6,38): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
 src/utils/budgeting/envelopeStyles.ts(8,18): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
 src/utils/budgeting/envelopeStyles.ts(20,32): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
@@ -3256,14 +3246,6 @@ src/utils/pwa/serviceWorkerDiagnostics.ts(368,25): error TS18046: 'error' is of 
 src/utils/query/backgroundSyncService.ts(92,20): error TS18046: 'restoreError' is of type 'unknown'.
 src/utils/query/prefetchHelpers.ts(55,13): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/utils/query/prefetchHelpers.ts(250,29): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/prefetchHelpers.ts(299,35): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/prefetchHelpers.ts(336,25): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/query/prefetchHelpers.ts(336,38): error TS7006: Parameter 'currentRoute' implicitly has an 'any' type.
-src/utils/query/prefetchHelpers.ts(359,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ "/": string[]; "/envelopes": string[]; "/transactions": string[]; "/bills": string[]; "/analytics": string[]; "/goals": string[]; }'.
-src/utils/query/prefetchHelpers.ts(363,15): error TS7006: Parameter 'entity' implicitly has an 'any' type.
-src/utils/query/prefetchHelpers.ts(363,26): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ dashboard: () => Promise<void | null>; envelopes: () => Promise<void | null>; transactions: () => Promise<void | null>; bills: () => Promise<void | null>; analytics: () => Promise<...>; savingsGoals: () => Promise<...>; }'.
-src/utils/query/prefetchHelpers.ts(365,15): error TS7006: Parameter 'fn' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(125,22): error TS7006: Parameter 'entityType' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(149,24): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
 src/utils/query/queryClientConfig.ts(149,34): error TS7006: Parameter 'queryFn' implicitly has an 'any' type.
